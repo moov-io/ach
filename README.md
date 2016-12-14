@@ -21,7 +21,7 @@ go get -u github.com/wadearnold/ach
 ```
 
 ## Example
-Let's start registering a couple of URL paths and handlers:
+Let's start parsing an ACH PPD file from the test data:
 
 ```go
 package main
