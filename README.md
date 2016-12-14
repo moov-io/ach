@@ -12,15 +12,6 @@ Package 'wadearnold/ach' implements a file decoder and encoder for parsing [ACH]
 
 Their are several kinds of ACH files PPD, PPD+, CCD, CCD+, and CTX; this package currently supports the (PPD) Prearranged Payment and Deposit Entry type transactions described by [NACHA](https://www.nacha.org//) Operating Rules
 
----
-* [Install](#Install)
-* [Example](#Example)
-* [Contributing](# Contributing)
-* [License](#License)
-* [Prior Art](#Prior Art)
-
----
-
 ## Install
 
 With a [correctly configured](https://golang.org/doc/install#testing) Go toolchain:
@@ -78,4 +69,5 @@ Apache License 2.0 See [LICENSE](LICENSE) for details.
 
 ## Prior Art
 [Gusto: How ACH Works: A developer perspective](http://engineering.gusto.com/how-ach-works-a-developer-perspective-part-4/)
+
 [mosscode / ach](https://github.com/mosscode/ach)
