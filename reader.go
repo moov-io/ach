@@ -139,7 +139,7 @@ func parseFileHeader(record string) (fileHeader FileHeaderRecord, err error) {
 	 * This field contains the Routing Number of the ACH Operator or receiving
 	 * point to which the file is being sent. The 10 character field begins with
 	 * a blank in the first position, followed by the four digit Federal Reserve
-	 * Routing Symbol, the four digit ABA Insitution Identifier, and the Check
+	 * Routing Symbol, the four digit ABA Institution Identifier, and the Check
 	 * Digit (bTTTTAAAAC).
 	 */
 	fileHeader.ImmediateDestination = record[3:13]
@@ -148,7 +148,7 @@ func parseFileHeader(record string) (fileHeader FileHeaderRecord, err error) {
 	 * This field contains the Routing Number of the ACH Operator or sending
 	 * point that is sending the file. The 10 character field begins with
 	 * a blank in the first position, followed by the four digit Federal Reserve
-	 * Routing Symbol, the four digit ABA Insitution Identifier, and the Check
+	 * Routing Symbol, the four digit ABA Institution Identifier, and the Check
 	 * Digit (bTTTTAAAAC).
 	 */
 	fileHeader.ImmediateOrigin = record[13:23]
