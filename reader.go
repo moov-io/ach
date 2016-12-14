@@ -73,10 +73,9 @@ func (d *decoder) error(err error) error {
 
 // Decode reads a ACH file from r and returns it as a ach.ACH
 // Thy type of ach returned depends on its contents.
-func Decode(r io.Reader) (ach ACH) {
+func Decode(r io.Reader) (ach ACH, err error) {
 	var d decoder
-	ach, _ = d.decode(r)
-	return ach
+	return d.decode(r)
 }
 
 // Decode reads one record (94 characters of a line) from r.

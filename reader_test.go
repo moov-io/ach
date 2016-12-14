@@ -15,7 +15,10 @@ func TestDecod(t *testing.T) {
 		t.Errorf("%s: ", err)
 	}
 	defer f.Close()
-	Decode(f)
+	_, err = Decode(f)
+	if err != nil {
+		t.Errorf("Can not ach.Decode ach file: %v", err)
+	}
 
 }
 
