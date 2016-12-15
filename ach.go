@@ -42,7 +42,7 @@ type ACH struct {
 // contained in the file. The file header also includes creation date and time
 // fields which can be used to uniquely identify a file.
 type FileHeaderRecord struct {
-	// RecordType defines the type of record in the block. FILE_HEADER
+	// RecordType defines the type of record in the block. headerPos
 	RecordType string
 
 	// PriorityCode conists of the numerals 01
@@ -111,25 +111,144 @@ type FileHeaderRecord struct {
 // settlement date, for all entries contained in this batch. The settlement date
 // field is not entered as it is determined by the ACH operator.
 type BatchHeaderRecord struct {
+	// RecordType defines the type of record in the block. 5
+	RecordType string
+	// ServiceClassCode ACH Mixed Debits and Credits ‘200’
+	// ACH Credits Only ‘220’
+	// ACH Debits Only ‘225'
+	ServiceClassCode string
+	// CompanyName the company originating the entries in the batch
+	CompanyName string
+
+	// CompanyDiscretionaryData allows Originators and/or ODFIs to include codes (one or more),
+	// of significance only to them, to enable specialized handling of all
+	// subsequent entries in that batch. There will be no standardized
+	// interpretation for the value of the field. This field must be returned
+	// intact on any return entry.
+	CompanyDiscretionaryData string
+	// CompanyIdentification The 9 digit FEIN number (proceeded by a predetermined
+	// alpha or numeric character) of the entity in the company name field
+	CompanyIdentification string
+
+	// StandardEntryClassCode PPD’ for consumer transactions, ‘CCD’ or ‘CTX’ for corporate
+	StandardEntryClassCode string
+
+	// CompanyEntryDescription A description of the entries contained in the batch
+	//
+	//The Originator establishes the value of this field to provide a
+	// description of the purpose of the entry to be displayed back to
+	// the receiver. For example, "GAS BILL," "REG. SALARY," "INS. PREM,"
+	// "SOC. SEC.," "DTC," "TRADE PAY," "PURCHASE," etc.
+	//
+	// This field must contain the word "REVERSAL" (left justified) when the
+	// batch contains reversing entries.
+	//
+	// This field must contain the word "RECLAIM" (left justified) when the
+	// batch contains reclamation entries.
+	//
+	// This field must contain the word "NONSETTLED" (left justified) when the
+	// batch contains entries which could not settle.
+	CompanyEntryDescription string
+
+	// CompanyDescriptiveDate except as otherwise noted below, the Originator establishes this field
+	// as the date it would like to see displayed to the receiver for
+	// descriptive purposes. This field is never used to control timing of any
+	// computer or manual operation. It is solely for descriptive purposes.
+	// The RDFI should not assume any specific format. Examples of possible
+	// entries in this field are "011392,", "01 92," "JAN 13," "JAN 92," etc.
+	CompanyDescriptiveDate string
+
+	// EffectiveEntryDate the date on which the entries are to settle
+	EffectiveEntryDate string
+
+	// SettlementDate Leave blank, this field is inserted by the ACH operator
+	SettlementDate string
+
+	// OriginatorStatusCode '1'
+	OriginatorStatusCode string
+
+	//OriginatingOdfiIdentification First 8 digits of the originating DFI transit routing number
+	OriginatingOdfiIdentification string
+
+	// BatchNumber Sequential batch number, zero fill
+	//
+	// This number is assigned in ascending sequence to each batch by the ODFI
+	// or its Sending Point in a given file of entries. Since the batch number
+	// in the Batch Header Record and the Batch Control Record is the same,
+	// the ascending sequence number should be assigned by batch and not by
+	// record.
+	BatchNumber string
 }
 
 // EntryDetailRecord contains the actual transaction data for an individual entry.
 // Fields include those designating the entry as a deposit (credit) or
 // withdrawal (debit), the transit routing number for the entry recipient’s financial
 // institution, the account number (left justify,no zero fill), name, and dollar amount.
-type EntryDetailRecord struct{}
+type EntryDetailRecord struct {
+	RecordType                     string
+	TransactionCode                string
+	RoutingNumber                  string
+	CheckDigit                     string
+	DfiAccountNumber               string
+	Amount                         string
+	IndividualIdentificationNumber string
+	IndividualName                 string
+	DiscretionaryData              string
+	AddendaRecordIndicator         string
+	TraceNumber                    string
+	Addenda                        string
+}
 
 // AddendaRecord provides business transaction information in a machine
 // readable format. It is usually formatted according to ANSI, ASC, X12 Standard
 type AddendaRecord struct {
+	// TODO implement structure
 }
 
 // BatchControlRecord contains entry counts, dollar total and has totals for all
 // entries contained in the preceding batch
 type BatchControlRecord struct {
+	RecordType                   string
+	ServiceClassCode             string
+	EntryAddendaCount            string
+	EntryHash                    string
+	TotalDebitEntryDollarAmount  string
+	TotalCreditEntryDollarAmount string
+	CompanyIdentification        string
+	MessageAuthenticationCode    string
+	Reserved                     string
+	// RoutingNumber
+	RoutingNumber string
+
+	// BatchNumber must match the same field from the batch header record
+	BatchNumber string
 }
 
-// FileControlRecord This record contains entry counts, dollar totals and hash
+// FileControlRecord record contains entry counts, dollar totals and hash
 // totals accumulated from each batch control record in the file.
 type FileControlRecord struct {
+	// RecordType defines the type of record in the block. fileControlPos
+	RecordType string
+
+	// BatchCount total number of batches (i.e., ‘5’ records) in the file
+	BatchCount string
+
+	// BlockCount total number of records in the file (include all headers and trailer) divided
+	// by 10 (This number must be evenly divisible by 10. If not, additional records consisting of all 9’s are added to the file after the initial ‘9’ record to fill out the block 10.)
+	BlockCount string
+
+	// EntryAddendaCount total detail and addenda records in the file
+	EntryAddendaCount string
+
+	// EntryHash calculated in the same manner as the batch has total but includes total from entire file
+	EntryHash string
+
+	// TotalDebitEntryDollarAmountInFile contains accumulated Batch debit totals within the file.
+	TotalDebitEntryDollarAmountInFile string
+
+	// TotalCreditEntryDollarAmountInFile contains accumulated Batch credit totals within the file.
+	TotalCreditEntryDollarAmountInFile string
+
+	// Reserved should be blank.
+	Reserved string
 }
