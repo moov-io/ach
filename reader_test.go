@@ -9,7 +9,8 @@ import (
 	"testing"
 )
 
-func TestDecod(t *testing.T) {
+// TestDecode is a complete file decoding test.
+func TestDecode(t *testing.T) {
 	f, err := os.Open("./testdata/ppd-debit.ach")
 	if err != nil {
 		t.Errorf("%s: ", err)
@@ -17,11 +18,11 @@ func TestDecod(t *testing.T) {
 	defer f.Close()
 	_, err = Decode(f)
 	if err != nil {
-		t.Errorf("Can not ach.Decode ach file: %v", err)
+		t.Errorf("Can not ach. ecode ach file: %v", err)
 	}
-
 }
 
+// TestParseFileHeader simply parses a known File Header Record string.
 func TestParseFileHeader(t *testing.T) {
 	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
 	record, err := parseFileHeader(line)
@@ -68,3 +69,26 @@ func TestParseFileHeader(t *testing.T) {
 		t.Errorf("ReferenceCode Expected '        ' got:'%v'", record.ReferenceCode)
 	}
 }
+
+// Ghetto test function for when I need to prove something to myself.
+/*
+func TestLines(t *testing.T) {
+	f, err := os.Open("./testdata/ppd-debit.ach")
+	if err != nil {
+		t.Errorf("%s: ", err)
+	}
+	r := bufio.NewReader(f)
+	i := 0
+	for {
+		line, _, err := r.ReadLine()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+		}
+		i++
+
+		fmt.Printf("%v = %v \n", i, string(line))
+	}
+}
+*/

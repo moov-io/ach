@@ -50,9 +50,9 @@ var (
 
 // A decoder reads records from a ACH-encoded file.
 type decoder struct {
-	line    int
-	charpos int
-	r       *bufio.Reader
+	line int
+	//charpos int
+	r *bufio.Reader
 	// lineBuffer holds the unescaped content read by readRecord
 	lineBuffer bytes.Buffer
 	//Indexes of the fields inside of lineBuffer
@@ -63,9 +63,9 @@ type decoder struct {
 // error creates a new ParseError based on err.
 func (d *decoder) error(err error) error {
 	return &ParseError{
-		Line:    d.line,
-		CharPos: d.charpos,
-		Err:     err,
+		Line: d.line,
+		//CharPos: d.charpos,
+		Err: err,
 	}
 }
 
@@ -96,9 +96,7 @@ func (d *decoder) decode(r io.Reader) (ach ACH, err error) {
 		// Only 94 ASCII characters to a line
 
 		if len(line) != RecordLength {
-			fmt.Println("character length is not 94: ")
-			break
-			// TODO: return nil, err
+			return ach, d.error(ErrFieldCount)
 		}
 		// TODO: Check that all characters are accepted.
 
@@ -106,17 +104,17 @@ func (d *decoder) decode(r io.Reader) (ach ACH, err error) {
 
 		record := string(line)
 		switch record[:1] {
-		case FILE_HEADER:
+		case headerPos:
 			ach.FileHeader, err = parseFileHeader(record)
-			return ach, err
-			//fmt.Println("FileHeader")
-		case BATCH_HEADER:
-			//fmt.Println("BatchHeader")
-		case ENTRY_DETAIL:
+		case batchPos:
+			ach.BatchHeader, err = parseBatchHeader(record)
+		case entryDetailPos:
 			//fmt.Println("EntryDetail")
-		case BATCH_CONTROL:
+		case entryAgendaPos:
 			//fmt.Println("BatchControl")
-		case FILE_CONTROL:
+		case batchControlPos:
+			//fmt.Println("FileControl")
+		case fileControlPos:
 			//fmt.Println("FileControl")
 		default:
 			//fmt.Println("Record type not detected")
@@ -159,4 +157,8 @@ func parseFileHeader(record string) (fileHeader FileHeaderRecord, err error) {
 	fileHeader.ReferenceCode = record[86:94]
 
 	return fileHeader, nil
+}
+
+func parseBatchHeader(record string) (batchHeader BatchHeaderRecord, err error) {
+	return batchHeader, nil
 }
