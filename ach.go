@@ -62,15 +62,48 @@ type ACH struct {
 //	within the file. In addition, this record includes date, time, and file
 //	identification fields used to identify the file uniquely.
 type FileHeaderRecord struct {
-	RecordType               string // (character position 1-1) Always "1"
-	PriorityCode             string // (2-3) Always "01"
-	ImmediateDestination     string // (4-13) A blank space followed by your ODFI's routing number. For example: " 121140399"
-	ImmediateOrigin          string // (14-23) A 10-digit number assigned to you by the ODFI once they approve you to originate ACH files through them
-	FileCreationDate         string // 24-29 Today's date in YYMMDD format
-	FileCreationTime         string // 30-33 The current time in HHMM format
-	FileIdModifier           string // 35-37 Always "A"
-	RecordSize               string // 35-37 always "094"
-	BlockingFactor           string //38-39 always "10"
+	// RecordType defines the type of record in the block. FILE_HEADER
+	RecordType string
+
+	// Priority Code the numerlas 01
+	PriorityCode string
+
+	// This field contains the Routing Number of the ACH Operator or receiving
+	// point to which the file is being sent. The 10 character field begins with
+	// a blank in the first position, followed by the four digit Federal Reserve
+	// Routing Symbol, the four digit ABA Institution Identifier, and the Check
+	// Digit (bTTTTAAAAC).
+	ImmediateDestination string
+
+	// The File Creation Date is expressed in a "YYMMDD" format. The File Creation
+	// Date is the date on which the file is prepared by an ODFI (ACH input files)
+	// or the date (exchange date) on which a file is transmitted from ACH Operator
+	// to ACH Operator, or from ACH Operator to RDFIs (ACH output files).
+	ImmediateOrigin string
+
+	// The File Creation Time is expressed ina n "HHMM" (24 hour clock) format.
+	FileCreationDate string
+
+	// The Record Size Field indicates the number of characters contained in each
+	// record. At this time, the value "094" must be used.
+	FileCreationTime string
+
+	// This field should start at zero and increment by 1 (up to 9) and then go to
+	// letters starting at A through Z for each subsequent file that is created for
+	// a single system date. (34-34) 1 numeric 0-9 or uppercase alpha A-Z.
+	// I have yet to see this ID not A
+	FileIdModifier string
+
+	//The Record Size Field indicates the number of characters contained in each
+	// record. At this time, the value "094" must be used.
+	RecordSize string
+
+	// The Blocking Factor defines the number of physical records within a block
+	// (a block is 940 characters). For all files moving between a DFI and an ACH
+	// Operator (either way), the value "10" must be used. If the number of records
+	// within the file is not a multiple of ten, the remainder of the block must
+	// be nine-filled.
+	BlockingFactor           string
 	FormatCode               string //40 always "1"
 	ImmediateDestinationName string //41-63 The name of the ODFI. example "SILICON VALLEY BANK    "
 	ImmidiateOriginName      string //64-86 ACH operator or sending point that is sending the file

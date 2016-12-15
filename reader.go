@@ -2,6 +2,18 @@
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 //
+package ach
+
+import (
+	"bufio"
+	"bytes"
+	"errors"
+	"fmt"
+	"io"
+)
+
+// A Reader decodes records from a NACHA ACH ecoded file
+//
 // Data Specifications Within the ACH File
 // • Each line is a Record and consists of 94 characters in
 // • Fields within each record type are alphabetic, numeric or alphameric.
@@ -15,16 +27,6 @@
 // must be nine filled. The total number of records in your file must be evenly
 // divisible by 10.
 
-package ach
-
-import (
-	"bufio"
-	"bytes"
-	"errors"
-	"fmt"
-	"io"
-)
-
 const (
 	RecordLength = 94
 )
@@ -34,7 +36,7 @@ const (
 type ParseError struct {
 	Line    int   // line where the error occurred
 	CharPos int   // The character position where the error was found
-	Err     error // The actual errror
+	Err     error // The actual error
 }
 
 func (e *ParseError) Error() string {
@@ -46,11 +48,7 @@ var (
 	ErrFieldCount = errors.New("wrong number of fields in record expect 94")
 )
 
-// A Reader reads records from a ACH-encoded file.
-//
-// As returned by NewReader, a Readers expects iunput conforming to NACHA ACH
-// file format specification.
-//
+// A decoder reads records from a ACH-encoded file.
 type decoder struct {
 	line    int
 	charpos int
@@ -72,15 +70,14 @@ func (d *decoder) error(err error) error {
 }
 
 // Decode reads a ACH file from r and returns it as a ach.ACH
-// Thy type of ach returned depends on its contents.
 func Decode(r io.Reader) (ach ACH, err error) {
 	var d decoder
 	return d.decode(r)
 }
 
-// Decode reads one record (94 characters of a line) from r.
-// If the record has an unexpected formatiing Read returns the record an error
-// If there is no data left to be read, Read returns nil, io.EOF.
+// Decode reads each line of the ACH file and defines which parser to use based
+// on the first byte of each line. It also enforces ACH formating rules and returns
+// the appropriate error if issues are found.
 func (d *decoder) decode(r io.Reader) (ach ACH, err error) {
 
 	d.r = bufio.NewReader(r)
@@ -127,82 +124,38 @@ func (d *decoder) decode(r io.Reader) (ach ACH, err error) {
 		}
 
 	}
-	// TODO: number of lines in file must be divisable by 5
+	// TODO: number of lines in file must be divisable by 10 the blocking factor
 	//fmt.Printf("Number of lines in file: %v \n", d.line)
 	return ach, nil
 }
 
+// parseFileHeader takes the input record string and parses the FileHeaderRecord values
 func parseFileHeader(record string) (fileHeader FileHeaderRecord, err error) {
+	// (character position 1-1) Always "1"
 	fileHeader.RecordType = record[:1]
+	// (2-3) Always "01"
 	fileHeader.PriorityCode = record[1:3]
-	/**
-	 * This field contains the Routing Number of the ACH Operator or receiving
-	 * point to which the file is being sent. The 10 character field begins with
-	 * a blank in the first position, followed by the four digit Federal Reserve
-	 * Routing Symbol, the four digit ABA Institution Identifier, and the Check
-	 * Digit (bTTTTAAAAC).
-	 */
+	// (4-13) A blank space followed by your ODFI's routing number. For example: " 121140399"
 	fileHeader.ImmediateDestination = record[3:13]
-
-	/**
-	 * This field contains the Routing Number of the ACH Operator or sending
-	 * point that is sending the file. The 10 character field begins with
-	 * a blank in the first position, followed by the four digit Federal Reserve
-	 * Routing Symbol, the four digit ABA Institution Identifier, and the Check
-	 * Digit (bTTTTAAAAC).
-	 */
+	// (14-23) A 10-digit number assigned to you by the ODFI once they approve you to originate ACH files through them
 	fileHeader.ImmediateOrigin = record[13:23]
-
-	/**
-	 * The File Creation Date is expressed in a "YYMMDD" format. The File Creation
-	 * Date is the date on which the file is prepared by an ODFI (ACH input files)
-	 * or the date (exchange date) on which a file is transmitted from ACH Operator
-	 * to ACH Operator, or from ACH Operator to RDFIs (ACH output files).
-	 */
+	// 24-29 Today's date in YYMMDD format
 	fileHeader.FileCreationDate = record[23:29]
-
-	/**
-	 * The File Creation Time is expressed ina n "HHMM" (24 hour clock) format.
-	 */
+	// 30-33 The current time in HHMM format
 	fileHeader.FileCreationTime = record[29:33]
-
+	// 35-37 Always "A"
 	fileHeader.FileIdModifier = record[33:34]
-
-	/**
-	 * The Record Size Field indicates the number of characters contained in each
-	 * record. At this time, the value "094" must be used.
-	 */
+	// 35-37 always "094"
 	fileHeader.RecordSize = record[34:37]
-
-	/**
-	 * The Blocking Factor defines the number of physical records within a block
-	 * (a block is 940 characters). For all files moving between a DFI and an ACH
-	 * Operator (either way), the value "10" must be used. If the number of records
-	 * within the file is not a multiple of ten, the remainder of the block must
-	 * be nine-filled.
-	 */
+	//38-39 always "10"
 	fileHeader.BlockingFactor = record[37:39]
-
-	/**
-	 * This field identifies a code to allow for future format variations. As
-	 * currently defined, this field will contain a value of "1".
-	 */
+	//40 always "1"
 	fileHeader.FormatCode = record[39:40]
-
-	/**
-	 * This field contains the name of the ACH or receiving point for which that
-	 * file is destined.
-	 */
+	//41-63 The name of the ODFI. example "SILICON VALLEY BANK    "
 	fileHeader.ImmediateDestinationName = record[40:63]
-
-	/**
-	 * This field contains the name of the ACH operator or sending point that is sending the file.
-	 */
+	//64-86 ACH operator or sending point that is sending the file
 	fileHeader.ImmidiateOriginName = record[63:86]
-
-	/**
-	 * This field is reserved for information pertinent to the Originator.
-	 */
+	//97-94 Optional field that may be used to describe the ACH file for internal accounting purposes
 	fileHeader.ReferenceCode = record[86:94]
 
 	return fileHeader, nil

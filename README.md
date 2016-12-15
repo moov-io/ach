@@ -64,10 +64,22 @@ We use GitHub to manage reviews of pull requests.
   Practices for Production
   Environments](http://peter.bourgon.org/go-in-production/#formatting-and-style).
 
-## License
-Apache License 2.0 See [LICENSE](LICENSE) for details.
+## References  
+* [Wikipeda: Automated Clearing House](http://en.wikipedia.org/wiki/Automated_Clearing_House)
+* [Nacha ACH Network: How it Works](https://www.nacha.org/ach-network)
+* [Federal ACH Directory](https://www.frbservices.org/EPaymentsDirectory/search.html)
+
+## Format Specification
+* [NACHA ACH File Formatting](https://www.nacha.org/system/files/resources/AAP201%20-%20ACH%20File%20Formatting.pdf)
+* [PNC ACH File Specification](http://content.pncmc.com/live/pnc/corporate/treasury-management/ach-conversion/ACH-File-Specifications.pdf)
+* [Thomson Reuters ACH FIle Structure](http://cs.thomsonreuters.com/ua/acct_pr/acs/cs_us_en/pr/dd/ach_file_structure_and_content.htm)
+* [Gusto: How ACH Works: A developer perspective](http://engineering.gusto.com/how-ach-works-a-developer-perspective-part-4/)
+
 
 ## Prior Art
-[Gusto: How ACH Works: A developer perspective](http://engineering.gusto.com/how-ach-works-a-developer-perspective-part-4/)
+* [ACH:Builder - Tools for Building ACH](http://search.cpan.org/~tkeefer/ACH-Builder-0.03/lib/ACH/Builder.pm)
+* [mosscode / ach](https://github.com/mosscode/ach)
+* [Helper for building ACH files in Ruby](https://github.com/jm81/ach)
 
-[mosscode / ach](https://github.com/mosscode/ach)
+## License
+Apache License 2.0 See [LICENSE](LICENSE) for details.
