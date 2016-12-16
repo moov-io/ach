@@ -109,7 +109,7 @@ func (d *decoder) decode(r io.Reader) (ach ACH, err error) {
 		case batchPos:
 			ach.BatchHeader = parseBatchHeader(record)
 		case entryDetailPos:
-			//fmt.Println("EntryDetail")
+			ach.EntryDetail = parseEntryDetail(record)
 		case entryAgendaPos:
 			//fmt.Println("BatchControl")
 		case batchControlPos:
@@ -182,7 +182,8 @@ func parseBatchHeader(record string) (batchHeader BatchHeaderRecord) {
 	// 64-69 The date you choose to identify the transactions in YYMMDD format.
 	// This date may be printed on the receivers’ bank statement by the RDFI
 	batchHeader.CompanyDescriptiveDate = record[63:69]
-	// 70-75 Date transactions are to be posted to the receivers’ account. You almost always want the transaction to post as soon as possible, so put tomorrow's date in YYMMDD format
+	// 70-75 Date transactions are to be posted to the receivers’ account.
+	// You almost always want the transaction to post as soon as possible, so put tomorrow's date in YYMMDD format
 	batchHeader.EffectiveEntryDate = record[69:75]
 	// 76-79 Always blank (just fill with spaces)
 	batchHeader.SettlementDate = record[75:78]
@@ -196,4 +197,34 @@ func parseBatchHeader(record string) (batchHeader BatchHeaderRecord) {
 	batchHeader.BatchNumber = record[87:94]
 
 	return batchHeader
+}
+
+// parseBatchHeader takes the input record string and parses the FileHeaderRecord values
+func parseEntryDetail(record string) (entryDetail EntryDetailRecord) {
+	// 1-1 Always "6"
+	entryDetail.RecordType = record[:1]
+	// 2-3 is checking credit 22 debit 27 savings credit 32 debit 37
+	entryDetail.TransactionCode = record[1:3]
+	// 4-11 the RDFI's routing number without the last digit.
+	entryDetail.RdfiIdentification = record[3:11]
+	// 12-12 The last digit of the RDFI's routing number
+	entryDetail.CheckDigit = record[11:12]
+	// 13-29 The receiver's bank account number you are crediting/debiting
+	entryDetail.DfiAccountNumber = record[12:29]
+	// 30-39 Number of cents you are debiting/crediting this account
+	entryDetail.Amount = record[29:39]
+	// 40-54 An internal identification (alphanumeric) that you use to uniquely identify this Entry Detail Record
+	entryDetail.IndividualIdentificationNumber = record[39:54]
+	// 55-76 The name of the receiver, usually the name on the bank account
+	entryDetail.IndividualName = record[54:76]
+	// 77-78 allows ODFIs to include codes of significance only to them
+	// normally blank
+	entryDetail.DiscretionaryData = record[76:78]
+	// 79-79 1 if addenda exists 0 if it does not
+	entryDetail.AddendaRecordIndicator = record[78:79]
+	// 80-84 An internal identification (alphanumeric) that you use to uniquely identify
+	// this Entry Detail Record. This number should be unique to the transaction and will help identify the transaction in case of an inquiry
+	entryDetail.TraceNumber = record[79:94]
+
+	return entryDetail
 }
