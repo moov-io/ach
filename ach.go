@@ -167,8 +167,8 @@ type BatchHeaderRecord struct {
 	// OriginatorStatusCode '1'
 	OriginatorStatusCode string
 
-	//OriginatingOdfiIdentification First 8 digits of the originating DFI transit routing number
-	OriginatingOdfiIdentification string
+	//OdfiIdentification First 8 digits of the originating DFI transit routing number
+	OdfiIdentification string
 
 	// BatchNumber Sequential batch number, zero fill
 	//
