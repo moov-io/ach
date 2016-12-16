@@ -9,7 +9,8 @@ import (
 	"testing"
 )
 
-func TestDecod(t *testing.T) {
+// TestDecode is a complete file decoding test.
+func TestDecode(t *testing.T) {
 	f, err := os.Open("./testdata/ppd-debit.ach")
 	if err != nil {
 		t.Errorf("%s: ", err)
@@ -17,17 +18,15 @@ func TestDecod(t *testing.T) {
 	defer f.Close()
 	_, err = Decode(f)
 	if err != nil {
-		t.Errorf("Can not ach.Decode ach file: %v", err)
+		t.Errorf("Can not ach. ecode ach file: %v", err)
 	}
-
 }
 
+// TestParseFileHeader simply parses a known File Header Record string.
 func TestParseFileHeader(t *testing.T) {
 	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
-	record, err := parseFileHeader(line)
-	if err != nil {
-		t.Errorf("ParseFileHeader decode error: %v", err)
-	}
+	record := parseFileHeader(line)
+
 	if record.RecordType != "1" {
 		t.Errorf("RecordType Expected 1 got: %v", record.RecordType)
 	}
@@ -68,3 +67,71 @@ func TestParseFileHeader(t *testing.T) {
 		t.Errorf("ReferenceCode Expected '        ' got:'%v'", record.ReferenceCode)
 	}
 }
+
+// TestParseFileHeader simply parses a known File Header Record string.
+func TestParseBatchHeader(t *testing.T) {
+	var line = "5225companyname                         origid    PPDCHECKPAYMT000002080730   1076401250000001"
+	record := parseBatchHeader(line)
+	if record.RecordType != "5" {
+		t.Errorf("RecordType Expected '5' got: %v", record.RecordType)
+	}
+	if record.ServiceClassCode != "225" {
+		t.Errorf("ServiceClassCode Expected '225' got: %v", record.ServiceClassCode)
+	}
+	if record.CompanyName != "companyname     " {
+		t.Errorf("CompanyName Expected 'companyname    ' got: '%v'", record.CompanyName)
+	}
+	if record.CompanyDiscretionaryData != "                    " {
+		t.Errorf("CompanyDiscretionaryData Expected '                    ' got: %v", record.CompanyDiscretionaryData)
+	}
+	if record.CompanyIdentification != "origid    " {
+		t.Errorf("CompanyIdentification Expected 'origid    ' got: %v", record.CompanyIdentification)
+	}
+	if record.StandardEntryClassCode != "PPD" {
+		t.Errorf("StandardEntryClassCode Expected 'PPD' got: %v", record.StandardEntryClassCode)
+	}
+	if record.CompanyEntryDescription != "CHECKPAYMT" {
+		t.Errorf("CompanyEntryDescription Expected 'CHECKPAYMT' got: %v", record.CompanyEntryDescription)
+	}
+	if record.CompanyDescriptiveDate != "000002" {
+		t.Errorf("CompanyDescriptiveDate Expected '000002' got: %v", record.CompanyDescriptiveDate)
+	}
+	if record.EffectiveEntryDate != "080730" {
+		t.Errorf("EffectiveEntryDate Expected '080730' got: %v", record.EffectiveEntryDate)
+	}
+	if record.SettlementDate != "   " {
+		t.Errorf("SettlementDate Expected '   ' got: %v", record.SettlementDate)
+	}
+	if record.OriginatorStatusCode != "1" {
+		t.Errorf("OriginatorStatusCode Expected 1 got: %v", record.OriginatorStatusCode)
+	}
+	if record.OdfiIdentification != "07640125" {
+		t.Errorf("OdfiIdentification Expected '07640125' got: %v", record.OdfiIdentification)
+	}
+	if record.BatchNumber != "0000001" {
+		t.Errorf("BatchNumber Expected '0000001' got: %v", record.BatchNumber)
+	}
+}
+
+// Ghetto test function for when I need to prove something to myself.
+/*
+func TestLines(t *testing.T) {
+	f, err := os.Open("./testdata/ppd-debit.ach")
+	if err != nil {
+		t.Errorf("%s: ", err)
+	}
+	r := bufio.NewReader(f)
+	i := 0
+	for {
+		line, _, err := r.ReadLine()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+		}
+		i++
+
+		fmt.Printf("%v = %v \n", i, string(line))
+	}
+}
+*/

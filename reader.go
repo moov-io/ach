@@ -50,9 +50,9 @@ var (
 
 // A decoder reads records from a ACH-encoded file.
 type decoder struct {
-	line    int
-	charpos int
-	r       *bufio.Reader
+	line int
+	//charpos int
+	r *bufio.Reader
 	// lineBuffer holds the unescaped content read by readRecord
 	lineBuffer bytes.Buffer
 	//Indexes of the fields inside of lineBuffer
@@ -63,9 +63,9 @@ type decoder struct {
 // error creates a new ParseError based on err.
 func (d *decoder) error(err error) error {
 	return &ParseError{
-		Line:    d.line,
-		CharPos: d.charpos,
-		Err:     err,
+		Line: d.line,
+		//CharPos: d.charpos,
+		Err: err,
 	}
 }
 
@@ -96,9 +96,7 @@ func (d *decoder) decode(r io.Reader) (ach ACH, err error) {
 		// Only 94 ASCII characters to a line
 
 		if len(line) != RecordLength {
-			fmt.Println("character length is not 94: ")
-			break
-			// TODO: return nil, err
+			return ach, d.error(ErrFieldCount)
 		}
 		// TODO: Check that all characters are accepted.
 
@@ -106,17 +104,17 @@ func (d *decoder) decode(r io.Reader) (ach ACH, err error) {
 
 		record := string(line)
 		switch record[:1] {
-		case FILE_HEADER:
-			ach.FileHeader, err = parseFileHeader(record)
-			return ach, err
-			//fmt.Println("FileHeader")
-		case BATCH_HEADER:
-			//fmt.Println("BatchHeader")
-		case ENTRY_DETAIL:
+		case headerPos:
+			ach.FileHeader = parseFileHeader(record)
+		case batchPos:
+			ach.BatchHeader = parseBatchHeader(record)
+		case entryDetailPos:
 			//fmt.Println("EntryDetail")
-		case BATCH_CONTROL:
+		case entryAgendaPos:
 			//fmt.Println("BatchControl")
-		case FILE_CONTROL:
+		case batchControlPos:
+			//fmt.Println("FileControl")
+		case fileControlPos:
 			//fmt.Println("FileControl")
 		default:
 			//fmt.Println("Record type not detected")
@@ -130,7 +128,7 @@ func (d *decoder) decode(r io.Reader) (ach ACH, err error) {
 }
 
 // parseFileHeader takes the input record string and parses the FileHeaderRecord values
-func parseFileHeader(record string) (fileHeader FileHeaderRecord, err error) {
+func parseFileHeader(record string) (fileHeader FileHeaderRecord) {
 	// (character position 1-1) Always "1"
 	fileHeader.RecordType = record[:1]
 	// (2-3) Always "01"
@@ -158,5 +156,44 @@ func parseFileHeader(record string) (fileHeader FileHeaderRecord, err error) {
 	//97-94 Optional field that may be used to describe the ACH file for internal accounting purposes
 	fileHeader.ReferenceCode = record[86:94]
 
-	return fileHeader, nil
+	return fileHeader
+}
+
+// parseBatchHeader takes the input record string and parses the FileHeaderRecord values
+func parseBatchHeader(record string) (batchHeader BatchHeaderRecord) {
+	// 1-1 Always "5"
+	batchHeader.RecordType = record[:1]
+	// 2-4 If the entries are credits, always "220". If the entries are debits, always "225"
+	batchHeader.ServiceClassCode = record[1:4]
+	// 5-20 Your company's name. This name may appear on the receivers’ statements prepared by the RDFI.
+	batchHeader.CompanyName = record[4:20]
+	// 21-40 Optional field you may use to describe the batch for internal accounting purposes
+	batchHeader.CompanyDiscretionaryData = record[20:40]
+	// 41-50 A 10-digit number assigned to you by the ODFI once they approve you to
+	// originate ACH files through them. This is the same as the "Immediate origin" field in File Header Record
+	batchHeader.CompanyIdentification = record[40:50]
+	// 51-53 If the entries are PPD (credits/debits towards consumer account), use "PPD".
+	// If the entries are CCD (credits/debits towards corporate account), use "CCD".
+	// The difference between the 2 class codes are outside of the scope of this post, but generally most ACH transfers to consumer bank accounts should use "PPD"
+	batchHeader.StandardEntryClassCode = record[50:53]
+	// 54-63 Your description of the transaction. This text will appear on the receivers’ bank statement.
+	// For example: "Payroll   "
+	batchHeader.CompanyEntryDescription = record[53:63]
+	// 64-69 The date you choose to identify the transactions in YYMMDD format.
+	// This date may be printed on the receivers’ bank statement by the RDFI
+	batchHeader.CompanyDescriptiveDate = record[63:69]
+	// 70-75 Date transactions are to be posted to the receivers’ account. You almost always want the transaction to post as soon as possible, so put tomorrow's date in YYMMDD format
+	batchHeader.EffectiveEntryDate = record[69:75]
+	// 76-79 Always blank (just fill with spaces)
+	batchHeader.SettlementDate = record[75:78]
+	// 79-79 Always 1
+	batchHeader.OriginatorStatusCode = record[78:79]
+	// 80-87 Your ODFI's routing number without the last digit. The last digit is simply a
+	// checksum digit, which is why it is not necessary
+	batchHeader.OdfiIdentification = record[79:87]
+	// 88-94 Sequential number of this Batch Header Record.
+	// For example, put "1" if this is the first Batch Header Record in the file
+	batchHeader.BatchNumber = record[87:94]
+
+	return batchHeader
 }
