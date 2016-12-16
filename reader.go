@@ -111,11 +111,13 @@ func (d *decoder) decode(r io.Reader) (ach ACH, err error) {
 		case entryDetailPos:
 			ach.EntryDetail = parseEntryDetail(record)
 		case entryAgendaPos:
-			//fmt.Println("BatchControl")
+			// TODO: implement parseEntryAgenda
+			//ach.EntryAgenda = parseEntryAgenda(record)
 		case batchControlPos:
-			//fmt.Println("FileControl")
+			ach.BatchControl = parseBatchControl(record)
 		case fileControlPos:
-			//fmt.Println("FileControl")
+			// TODO: implement parseFileContro
+			//ach.fileControl = parseFileContro(record)
 		default:
 			//fmt.Println("Record type not detected")
 			// TODO: return nil, error
@@ -199,7 +201,7 @@ func parseBatchHeader(record string) (batchHeader BatchHeaderRecord) {
 	return batchHeader
 }
 
-// parseBatchHeader takes the input record string and parses the FileHeaderRecord values
+// parseEntryDetail takes the input record string and parses the EntryDetailRecord values
 func parseEntryDetail(record string) (entryDetail EntryDetailRecord) {
 	// 1-1 Always "6"
 	entryDetail.RecordType = record[:1]
@@ -227,4 +229,33 @@ func parseEntryDetail(record string) (entryDetail EntryDetailRecord) {
 	entryDetail.TraceNumber = record[79:94]
 
 	return entryDetail
+}
+
+// parseBatchControl takes the input record string and parses the BatchControlRecord values
+func parseBatchControl(record string) (batchControl BatchControlRecord) {
+	// 1-1 Always "8"
+	batchControl.RecordType = record[:1]
+	// 2-4 This is the same as the "Service code" field in previous Batch Header Record
+	batchControl.ServiceClassCode = record[1:4]
+	// 5-10 Total number of Entry Detail Record in the batch
+	batchControl.EntryAddendaCount = record[4:10]
+	// 11-20 Total of all positions 4-11 on each Entry Detail Record in the batch. This is essentially the sum of all the RDFI routing numbers in the batch.
+	// If the sum exceeds 10 digits (because you have lots of Entry Detail Records), lop off the most significant digits of the sum until there are only 10
+	batchControl.EntryHash = record[10:20]
+	// 21-32 Number of cents of debit entries within the batch
+	batchControl.TotalDebitEntryDollarAmount = record[20:32]
+	// 33-44 Number of cents of credit entries within the batch
+	batchControl.TotalCreditEntryDollarAmount = record[32:44]
+	// 45-54 This is the same as the "Company identification" field in previous Batch Header Record
+	batchControl.CompanyIdentification = record[44:54]
+	// 55-73 Seems to always be blank
+	batchControl.MessageAuthenticationCode = record[54:73]
+	// 74-79 Always blank (just fill with spaces)
+	batchControl.Reserved = record[73:79]
+	// 80-87 This is the same as the "ODFI identification" field in previous Batch Header Record
+	batchControl.OdfiIdentification = record[79:87]
+	// 88-94 This is the same as the "Batch number" field in previous Batch Header Record
+	batchControl.BatchNumber = record[87:94]
+
+	return batchControl
 }
