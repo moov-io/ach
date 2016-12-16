@@ -75,6 +75,7 @@ We use GitHub to manage reviews of pull requests.
 * [Thomson Reuters ACH FIle Structure](http://cs.thomsonreuters.com/ua/acct_pr/acs/cs_us_en/pr/dd/ach_file_structure_and_content.htm)
 * [Gusto: How ACH Works: A developer perspective](http://engineering.gusto.com/how-ach-works-a-developer-perspective-part-4/)
 
+![ACH File Layout](https://github.com/wadearnold/ach/blob/master/documentation/ach_file_structure_shg.gif)
 
 ## Prior Art
 * [ACH:Builder - Tools for Building ACH](http://search.cpan.org/~tkeefer/ACH-Builder-0.03/lib/ACH/Builder.pm)
