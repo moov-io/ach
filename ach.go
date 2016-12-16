@@ -37,6 +37,7 @@ type ACH struct {
 	BatchHeader  BatchHeaderRecord
 	EntryDetail  EntryDetailRecord
 	BatchControl BatchControlRecord
+	FileControl  FileControlRecord
 }
 
 // FileHeaderRecord designate physical file characteristics and identify
@@ -314,7 +315,7 @@ type BatchControlRecord struct {
 // FileControlRecord record contains entry counts, dollar totals and hash
 // totals accumulated from each batch control record in the file.
 type FileControlRecord struct {
-	// RecordType defines the type of record in the block. fileControlPos
+	// RecordType defines the type of record in the block. fileControlPos 9
 	RecordType string
 
 	// BatchCount total number of batches (i.e., ‘5’ records) in the file

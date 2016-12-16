@@ -116,8 +116,7 @@ func (d *decoder) decode(r io.Reader) (ach ACH, err error) {
 		case batchControlPos:
 			ach.BatchControl = parseBatchControl(record)
 		case fileControlPos:
-			// TODO: implement parseFileContro
-			//ach.fileControl = parseFileContro(record)
+			ach.FileControl = parseFileControl(record)
 		default:
 			//fmt.Println("Record type not detected")
 			// TODO: return nil, error
@@ -258,4 +257,27 @@ func parseBatchControl(record string) (batchControl BatchControlRecord) {
 	batchControl.BatchNumber = record[87:94]
 
 	return batchControl
+}
+
+// parseFileControl takes the input record string and parses the FileControlRecord values
+func parseFileControl(record string) (fileControl FileControlRecord) {
+	// 1-1 Always "9"
+	fileControl.RecordType = record[:1]
+	// 2-7 The total number of Batch Header Record in the file. For example: "000003
+	fileControl.BatchCount = record[1:7]
+	// 8-13 e total number of blocks on the file, including the File Header and File Control records. One block is 10 lines, so it's effectively the number of lines in the file divided by 10.
+	fileControl.BlockCount = record[7:13]
+	// 14-21 Total number of Entry Detail Record in the file
+	fileControl.EntryAddendaCount = record[13:21]
+	// 22-31 Total of all positions 4-11 on each Entry Detail Record in the file. This is essentially the sum of all the RDFI routing numbers in the file.
+	// If the sum exceeds 10 digits (because you have lots of Entry Detail Records), lop off the most significant digits of the sum until there are only 10
+	fileControl.EntryHash = record[21:31]
+	// 32-43 Number of cents of debit entries within the file
+	fileControl.TotalDebitEntryDollarAmountInFile = record[31:43]
+	// 44-55 Number of cents of credit entries within the file
+	fileControl.TotalCreditEntryDollarAmountInFile = record[43:55]
+	// 56-94 Reserved Always blank (just fill with spaces)
+	fileControl.Reserved = record[55:94]
+
+	return fileControl
 }
