@@ -110,7 +110,7 @@ func (d *decoder) decode(r io.Reader) (ach ACH, err error) {
 			ach.BatchHeader = parseBatchHeader(record)
 		case entryDetailPos:
 			ach.EntryDetail = parseEntryDetail(record)
-		case entryAgendaPos:
+		case entryAddendaPos:
 			// TODO: implement parseEntryAgenda
 			//ach.EntryAgenda = parseEntryAgenda(record)
 		case batchControlPos:
@@ -228,6 +228,23 @@ func parseEntryDetail(record string) (entryDetail EntryDetailRecord) {
 	entryDetail.TraceNumber = record[79:94]
 
 	return entryDetail
+}
+
+// parseAddendaRecord takes the input record string and parses the AddendaRecord values
+func parseAddendaRecord(record string) (addenda AddendaRecord) {
+	// 1-1 Always "7"
+	addenda.RecordType = record[:1]
+	// 2-3 Defines the specific explanation and format for the addenda information contained in the same record
+	addenda.TypeCode = record[1:3]
+	// 4-83 Based on the information entered. (04-83) 80 alphanumeric
+	addenda.PaymentRelatedInformation = record[3:83]
+	// 84-87 SequenceNumber is consecutively assigned to each Addenda Record following
+	// an Entry Detail Record
+	addenda.SequenceNumber = record[83:87]
+	// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
+	addenda.EntryDetailSequenceNumber = record[87:94]
+
+	return addenda
 }
 
 // parseBatchControl takes the input record string and parses the BatchControlRecord values
