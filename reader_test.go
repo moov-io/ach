@@ -158,6 +158,28 @@ func TestParseEntryDetail(t *testing.T) {
 	*/
 }
 
+// TestParseAddendaRecord parses a known Addenda Record string.
+func TestParseAddendaRecord(t *testing.T) {
+	var line = "710WEB                                        DIEGO MAY                                0000001"
+
+	record := parseAddendaRecord(line)
+	if record.RecordType != "7" {
+		t.Errorf("RecordType Expected '7' got: %v", record.RecordType)
+	}
+	if record.TypeCode != "10" {
+		t.Errorf("TypeCode Expected 10 got: %v", record.TypeCode)
+	}
+	if record.PaymentRelatedInformation != "WEB                                        DIEGO MAY                            " {
+		t.Errorf("PaymentRelatedInformation Expected 'WEB                                        DIEGO MAY                            ' got: %v", record.PaymentRelatedInformation)
+	}
+	if record.SequenceNumber != "    " {
+		t.Errorf("SequenceNumber Expected '    ' got: %v", record.SequenceNumber)
+	}
+	if record.EntryDetailSequenceNumber != "0000001" {
+		t.Errorf("EntryDetailSequenceNumber Expected '0000001' got: %v", record.EntryDetailSequenceNumber)
+	}
+}
+
 // TestParseBatchControl parses a known Batch ControlRecord string.
 func TestParseBatchControl(t *testing.T) {
 	var line = "82250000010005320001000000010500000000000000origid                             076401250000001"

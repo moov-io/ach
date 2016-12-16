@@ -26,7 +26,7 @@ const (
 	headerPos       = "1"
 	batchPos        = "5"
 	entryDetailPos  = "6"
-	entryAgendaPos  = "7"
+	entryAddendaPos = "7"
 	batchControlPos = "8"
 	fileControlPos  = "9"
 )
@@ -36,6 +36,7 @@ type ACH struct {
 	FileHeader   FileHeaderRecord
 	BatchHeader  BatchHeaderRecord
 	EntryDetail  EntryDetailRecord
+	Addenda      AddendaRecord
 	BatchControl BatchControlRecord
 	FileControl  FileControlRecord
 }
@@ -173,9 +174,7 @@ type BatchHeaderRecord struct {
 	//OdfiIdentification First 8 digits of the originating DFI transit routing number
 	OdfiIdentification string
 
-	// BatchNumber Sequential batch number, zero fill
-	//
-	// This number is assigned in ascending sequence to each batch by the ODFI
+	// BatchNumber is assigned in ascending sequence to each batch by the ODFI
 	// or its Sending Point in a given file of entries. Since the batch number
 	// in the Batch Header Record and the Batch Control Record is the same,
 	// the ascending sequence number should be assigned by batch and not by
@@ -250,11 +249,20 @@ type EntryDetailRecord struct {
 // AddendaRecord provides business transaction information in a machine
 // readable format. It is usually formatted according to ANSI, ASC, X12 Standard
 type AddendaRecord struct {
-	// TODO implement structure
-	RecordType                string
-	TypeCode                  string
+	// RecordType defines the type of record in the block. entryAddendaPos 7
+	RecordType string
+	// TypeCode Addenda types code '05'
+	TypeCode string
+	// PaymentRelatedInformation
 	PaymentRelatedInformation string
-	SequenceNumber            string
+	// SequenceNumber is consecutively assigned to each Addenda Record following
+	// an Entry Detail Record. The first addenda sequence number must always
+	// be a "1".
+	SequenceNumber string
+	// EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
+	// Detail or Corporate Entry Detail Record's trace number. This number is
+	// the same as the last seven digits of the trace number of the related
+	// Entry Detail Record or Corporate Entry Detail Record.
 	EntryDetailSequenceNumber string
 }
 
