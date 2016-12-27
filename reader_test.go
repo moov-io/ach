@@ -6,6 +6,7 @@ package ach
 
 import (
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -16,7 +17,8 @@ func TestDecode(t *testing.T) {
 		t.Errorf("%s: ", err)
 	}
 	defer f.Close()
-	_, err = Decode(f)
+	r := NewReader(f)
+	_, err = r.Read()
 	if err != nil {
 		t.Errorf("Can not ach. ecode ach file: %v", err)
 	}
@@ -25,7 +27,9 @@ func TestDecode(t *testing.T) {
 // TestParseFileHeader parses a known File Header Record string.
 func TestParseFileHeader(t *testing.T) {
 	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
-	record := parseFileHeader(line)
+	r := NewReader(strings.NewReader(line))
+	r.record = line
+	record := r.parseFileHeader()
 
 	if record.RecordType != "1" {
 		t.Errorf("RecordType Expected 1 got: %v", record.RecordType)
@@ -71,7 +75,10 @@ func TestParseFileHeader(t *testing.T) {
 // TestParseBatch Header parses a known Batch Header Record string.
 func TestParseBatchHeader(t *testing.T) {
 	var line = "5225companyname                         origid    PPDCHECKPAYMT000002080730   1076401250000001"
-	record := parseBatchHeader(line)
+	r := NewReader(strings.NewReader(line))
+	r.record = line
+	record := r.parseBatchHeader()
+
 	if record.RecordType != "5" {
 		t.Errorf("RecordType Expected '5' got: %v", record.RecordType)
 	}
@@ -116,7 +123,10 @@ func TestParseBatchHeader(t *testing.T) {
 // TestParseEntryDetail Header parses a known Entry Detail Record string.
 func TestParseEntryDetail(t *testing.T) {
 	var line = "62705320001912345            0000010500c-1            Arnold Wade           DD0076401255655291"
-	record := parseEntryDetail(line)
+	r := NewReader(strings.NewReader(line))
+	r.record = line
+	record := r.parseEntryDetail()
+
 	if record.RecordType != "6" {
 		t.Errorf("RecordType Expected '6' got: %v", record.RecordType)
 	}
@@ -162,7 +172,10 @@ func TestParseEntryDetail(t *testing.T) {
 func TestParseAddendaRecord(t *testing.T) {
 	var line = "710WEB                                        DIEGO MAY                                0000001"
 
-	record := parseAddendaRecord(line)
+	r := NewReader(strings.NewReader(line))
+	r.record = line
+	record := r.parseAddendaRecord()
+
 	if record.RecordType != "7" {
 		t.Errorf("RecordType Expected '7' got: %v", record.RecordType)
 	}
@@ -183,7 +196,10 @@ func TestParseAddendaRecord(t *testing.T) {
 // TestParseBatchControl parses a known Batch ControlRecord string.
 func TestParseBatchControl(t *testing.T) {
 	var line = "82250000010005320001000000010500000000000000origid                             076401250000001"
-	record := parseBatchControl(line)
+	r := NewReader(strings.NewReader(line))
+	r.record = line
+	record := r.parseBatchControl()
+
 	if record.RecordType != "8" {
 		t.Errorf("RecordType Expected '8' got: %v", record.RecordType)
 	}
@@ -222,7 +238,10 @@ func TestParseBatchControl(t *testing.T) {
 // TestParseFileControl parses a known File Control Record string.
 func TestParseFileControl(t *testing.T) {
 	var line = "9000001000001000000010005320001000000010500000000000000                                       "
-	record := parseFileControl(line)
+	r := NewReader(strings.NewReader(line))
+	r.record = line
+	record := r.parseFileControl()
+
 	if record.RecordType != "9" {
 		t.Errorf("RecordType Expected '9' got: %v", record.RecordType)
 	}

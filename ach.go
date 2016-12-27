@@ -4,6 +4,7 @@
 
 // Package ach reads and writes (ACH) Automated Clearing House files. ACH is the
 // primary method of electronic money movemenet through the United States.
+//
 // https://en.wikipedia.org/wiki/Automated_Clearing_House
 // Their are several kinds of ACH files PPD, PPD+, CCD, CCD+, and CTX; this
 // package currently supports the (PPD) Prearranged Payment and Deposit Entry
