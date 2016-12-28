@@ -15,7 +15,7 @@ const (
 	RecordLength = 94
 )
 
-// A ParseError is returned for parsing errors.
+// ParseError is returned for parsing reader errors.
 // The first line is 1.
 type ParseError struct {
 	Line  int    // Line number where the error accurd
@@ -112,36 +112,9 @@ func (r *Reader) Read() (ach ACH, err error) {
 }
 
 // parseFileHeader takes the input record string and parses the FileHeaderRecord values
-func (r *Reader) parseFileHeader() (fileHeader FileHeaderRecord) {
-	// (character position 1-1) Always "1"
-	fileHeader.RecordType = r.record[:1]
-	// (2-3) Always "01"
-	fileHeader.PriorityCode = r.record[1:3]
-	// (4-13) A blank space followed by your ODFI's routing number. For example: " 121140399"
-	fileHeader.ImmediateDestination = r.record[3:13]
-	// (14-23) A 10-digit number assigned to you by the ODFI once they approve you to originate ACH files through them
-	fileHeader.ImmediateOrigin = r.record[13:23]
-	// 24-29 Today's date in YYMMDD format
-	// must be after todays date.
-	fileHeader.FileCreationDate = r.record[23:29]
-	// 30-33 The current time in HHMM format
-	fileHeader.FileCreationTime = r.record[29:33]
-	// 35-37 Always "A"
-	fileHeader.FileIdModifier = r.record[33:34]
-	// 35-37 always "094"
-	fileHeader.RecordSize = r.record[34:37]
-	//38-39 always "10"
-	fileHeader.BlockingFactor = r.record[37:39]
-	//40 always "1"
-	fileHeader.FormatCode = r.record[39:40]
-	//41-63 The name of the ODFI. example "SILICON VALLEY BANK    "
-	fileHeader.ImmediateDestinationName = r.record[40:63]
-	//64-86 ACH operator or sending point that is sending the file
-	fileHeader.ImmidiateOriginName = r.record[63:86]
-	//97-94 Optional field that may be used to describe the ACH file for internal accounting purposes
-	fileHeader.ReferenceCode = r.record[86:94]
-
-	return fileHeader
+func (r *Reader) parseFileHeader() (fh FileHeader) {
+	fh.parse(r.record)
+	return fh
 }
 
 // parseBatchHeader takes the input record string and parses the FileHeaderRecord values
