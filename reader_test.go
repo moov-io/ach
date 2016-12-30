@@ -20,7 +20,7 @@ func TestDecode(t *testing.T) {
 	r := NewReader(f)
 	_, err = r.Read()
 	if err != nil {
-		t.Errorf("Can not ach. ecode ach file: %v", err)
+		t.Errorf("Can not ach.read ach file: %v", err)
 	}
 }
 
@@ -280,6 +280,15 @@ func TestParseFileControl(t *testing.T) {
 		t.Errorf("Reserved Expected '                                       ' got: %v", record.Reserved)
 	}
 
+}
+
+func TestRecordTypeUnknown(t *testing.T) {
+	var line = "301 076401251 0764012510807291511A094101achdestname            companyname                    "
+	r := NewReader(strings.NewReader(line))
+	_, err := r.Read()
+	if !strings.Contains(err.Error(), "Unhandled Record Type") {
+		t.Errorf("Expected RecordType Error got: %v", err)
+	}
 }
 
 // Ghetto test function for when I need to prove something to myself.

@@ -29,8 +29,9 @@ func (e *ParseError) Error() string {
 
 // These are the errors that can be returned in Parse.Error
 var (
-	ErrRecordLen    = errors.New("wrong number of fields in record expect 94")
+	ErrRecordLen    = errors.New("Wrong number of fields in record expect 94")
 	ErrBatchControl = errors.New("No terminating batch control record found in file")
+	ErrRecordType   = errors.New("Unhandled Record Type")
 )
 
 // Reader reads records from a ACH-encoded file.
@@ -103,6 +104,7 @@ func (r *Reader) Read() (ach ACH, err error) {
 		default:
 			//fmt.Println("Record type not detected")
 			// TODO: return nil, error
+			return ach, r.error(ErrRecordType)
 		}
 
 	}
