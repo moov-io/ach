@@ -134,7 +134,7 @@ func (fh *FileHeader) Parse(record string) {
 	fh.ReferenceCode = record[86:94]
 }
 
-// String wriutes the FileHeader struct to a 94 character string.
+// String writes the FileHeader struct to a 94 character string.
 func (fh *FileHeader) String() string {
 
 	return fmt.Sprintf("%v%v%v%v%v%v%v%v%v%v%v%v%v",
@@ -174,6 +174,7 @@ func (fh *FileHeader) Validate() (bool, error) {
 	if fh.formatCode != "1" {
 		return false, ErrFormatCode
 	}
+	// todo: handle test cases for before date
 	/*
 		if fh.fileCreationDate.Before(time.Now()) {
 			return false, ErrFileCreationDate

@@ -22,9 +22,9 @@ const (
 // File contains the structures of a parsed ACH File.
 type File struct {
 	FileHeader
-	BatchHeader  BatchHeaderRecord
-	EntryDetail  EntryDetailRecord
-	Addenda      AddendaRecord
-	BatchControl BatchControlRecord
-	FileControl  FileControlRecord
+	BatchHeader
+	EntryDetail
+	Addenda
+	BatchControl
+	FileControl
 }
