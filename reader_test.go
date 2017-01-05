@@ -286,7 +286,7 @@ func TestRecordTypeUnknown(t *testing.T) {
 	var line = "301 076401251 0764012510807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), "Unhandled Record Type") {
+	if !strings.Contains(err.Error(), ErrRecordType.Error()) {
 		t.Errorf("Expected RecordType Error got: %v", err)
 	}
 }

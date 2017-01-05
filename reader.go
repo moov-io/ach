@@ -66,7 +66,7 @@ func NewReader(r io.Reader) *Reader {
 // Read reads each line of the ACH file and defines which parser to use based
 // on the first byte of each line. It also enforces ACH formating rules and returns
 // the appropriate error if issues are founr.
-func (r *Reader) Read() (ach ACH, err error) {
+func (r *Reader) Read() (file File, err error) {
 	// read through the entire file
 	for {
 		line, _, err := r.r.ReadLine()
@@ -81,7 +81,7 @@ func (r *Reader) Read() (ach ACH, err error) {
 		// Only 94 ASCII characters to a line
 
 		if len(line) != RecordLength {
-			return ach, r.error(ErrRecordLen)
+			return file, r.error(ErrRecordLen)
 		}
 		// TODO: Check that all characters are accepter.
 
@@ -90,28 +90,28 @@ func (r *Reader) Read() (ach ACH, err error) {
 		r.record = string(line)
 		switch r.record[:1] {
 		case headerPos:
-			ach.FileHeader = r.parseFileHeader()
+			file.FileHeader = r.parseFileHeader()
 		case batchPos:
-			ach.BatchHeader = r.parseBatchHeader()
+			file.BatchHeader = r.parseBatchHeader()
 		case entryDetailPos:
-			ach.EntryDetail = r.parseEntryDetail()
+			file.EntryDetail = r.parseEntryDetail()
 		case entryAddendaPos:
 			// TODO: implement parseEntryAgenda
 			//ach.EntryAgenda = parseEntryAgenda(record)
 		case batchControlPos:
-			ach.BatchControl = r.parseBatchControl()
+			file.BatchControl = r.parseBatchControl()
 		case fileControlPos:
-			ach.FileControl = r.parseFileControl()
+			file.FileControl = r.parseFileControl()
 		default:
 			//fmt.Println("Record type not detected")
 			// TODO: return nil, error
-			return ach, r.error(ErrRecordType)
+			return file, r.error(ErrRecordType)
 		}
 
 	}
 	// TODO: number of lines in file must be divisable by 10 the blocking factor
 	//fmt.Printf("Number of lines in file: %v \n", r.line)
-	return ach, nil
+	return file, nil
 }
 
 // parseFileHeader takes the input record string and parses the FileHeaderRecord values
