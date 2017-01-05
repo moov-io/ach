@@ -11,6 +11,49 @@ import (
 // Validator is common validation and formating of golang types to ach type strings
 type Validator struct{}
 
+// isValidServiceClass returns true if a valid service class code
+func (v *Validator) isValidServiceClass(code int) bool {
+	switch code {
+	case
+		// ACH Mixed Debits and Credits
+		200,
+		// ACH Credits Only
+		220,
+		// ACH Debits Only
+		225,
+		// ACH Automated Accounting Advices
+		280:
+		return true
+	}
+	return false
+}
+
+// isValidSECCode returns true if a SEC Code is found
+func (v *Validator) isValidSECCode(code string) bool {
+	switch code {
+	case
+		"ACK", "ADV", "ARC", "ATX", "BOC", "CCD", "CIE", "COR", "CTX", "DNE", "ENR",
+		"IAT", "MTE", "POS", "PPD", "POP", "RCK", "SHR", "TEL", "TRC", "TRX", "WEB", "XCK":
+		return true
+	}
+	return false
+}
+
+// isOriginatorStatusCode ensures status code is valid
+func (v *Validator) isOriginatorStatusCode(code int) bool {
+	switch code {
+	case
+		// ADV file - prepared by an ACH Operator
+		0,
+		//Originator is a financial institution
+		1,
+		// Originator is a Government Agency or other agency not subject to ACH Rules
+		2:
+		return true
+	}
+	return false
+}
+
 func (v *Validator) parseNumField(r string) (s int) {
 	s, err := strconv.Atoi(strings.TrimSpace(r))
 	if err != nil {
@@ -20,24 +63,24 @@ func (v *Validator) parseNumField(r string) (s int) {
 	return s
 }
 
-// formatFileCreationDate takes a time.Time and returns a string of YYMMDD
-func (v *Validator) formatFileCreationDate(t time.Time) string {
+// formatSimpleDate takes a time.Time and returns a string of YYMMDD
+func (v *Validator) formatSimpleDate(t time.Time) string {
 	return t.Format("060102")
 }
 
-// parseFileCreationDate returns a time.Time when passed time as YYMMDD
-func (v *Validator) parseFileCreationDate(s string) time.Time {
+// parseSimpleDate returns a time.Time when passed time as YYMMDD
+func (v *Validator) parseSimpleDate(s string) time.Time {
 	t, _ := time.Parse("060102", s)
 	return t
 }
 
-// formatFileCreationTime returns a string of HHMM when  passed a time.Time
-func (v *Validator) formatFileCreationTime(t time.Time) string {
+// formatSimpleTime returns a string of HHMM when  passed a time.Time
+func (v *Validator) formatSimpleTime(t time.Time) string {
 	return t.Format("1504")
 }
 
-// parseFileCreationTime returns a time.Time when passed a string of HHMM
-func (v *Validator) parseFileCreationTime(s string) time.Time {
+// parseSimpleTime returns a time.Time when passed a string of HHMM
+func (v *Validator) parseSimpleTime(s string) time.Time {
 	t, _ := time.Parse("1504", s)
 	return t
 }

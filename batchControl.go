@@ -1,8 +1,8 @@
 package ach
 
-// BatchControlRecord contains entry counts, dollar total and has totals for all
+// BatchControl contains entry counts, dollar total and has totals for all
 // entries contained in the preceding batch
-type BatchControlRecord struct {
+type BatchControl struct {
 	// RecordType defines the type of record in the block. batchControlPos 8
 	RecordType string
 	// ServiceClassCode ACH Mixed Debits and Credits ‘200’
@@ -15,7 +15,7 @@ type BatchControlRecord struct {
 	EntryAddendaCount string
 	// EntryHash the Receiving DFI Identification in each Entry Detail Record is hashed
 	// to provide a check against inadvertent alteration of data contents due
-	// to hardware failure or program error.
+	// to hardware failure or program erro
 	//
 	// In this context the Entry Hash is the sum of the corresponding fields in the
 	// Entry Detail Records on the file.
@@ -24,12 +24,12 @@ type BatchControlRecord struct {
 	TotalDebitEntryDollarAmount string
 	// TotalCreditEntryDollarAmount Contains accumulated Entry credit totals within the batch.
 	TotalCreditEntryDollarAmount string
-	// CompanyIdentification is an alphameric code used to identify an Originator.
+	// CompanyIdentification is an alphameric code used to identify an Originato
 	// The Company Identification Field must be included on all
 	// prenotification records and on each entry initiated puruant to such
 	// prenotification. The Company ID may begin with the ANSI one-digit
 	// Identification Code Designators (ICD), followed by the identification
-	// number. The ANSI Identification Numbers and related Identification Code
+	// numbe The ANSI Identification Numbers and related Identification Code
 	// Designators (ICD) are:
 	//
 	// IRS Employer Identification Number (EIN) "1"
@@ -52,4 +52,42 @@ type BatchControlRecord struct {
 	// in the Batch Header Record and the Batch Control Record is the same,
 	// the ascending sequence number should be assigned by batch and not by record.
 	BatchNumber string
+}
+
+// Parse takes the input record string and parses the EntryDetail values
+func (bc *BatchControl) Parse(record string) {
+	// 1-1 Always "8"
+	bc.RecordType = record[:1]
+	// 2-4 This is the same as the "Service code" field in previous Batch Header Record
+	bc.ServiceClassCode = record[1:4]
+	// 5-10 Total number of Entry Detail Record in the batch
+	bc.EntryAddendaCount = record[4:10]
+	// 11-20 Total of all positions 4-11 on each Entry Detail Record in the batch. This is essentially the sum of all the RDFI routing numbers in the batch.
+	// If the sum exceeds 10 digits (because you have lots of Entry Detail Records), lop off the most significant digits of the sum until there are only 10
+	bc.EntryHash = record[10:20]
+	// 21-32 Number of cents of debit entries within the batch
+	bc.TotalDebitEntryDollarAmount = record[20:32]
+	// 33-44 Number of cents of credit entries within the batch
+	bc.TotalCreditEntryDollarAmount = record[32:44]
+	// 45-54 This is the same as the "Company identification" field in previous Batch Header Record
+	bc.CompanyIdentification = record[44:54]
+	// 55-73 Seems to always be blank
+	bc.MessageAuthenticationCode = record[54:73]
+	// 74-79 Always blank (just fill with spaces)
+	bc.Reserved = record[73:79]
+	// 80-87 This is the same as the "ODFI identification" field in previous Batch Header Record
+	bc.OdfiIdentification = record[79:87]
+	// 88-94 This is the same as the "Batch number" field in previous Batch Header Record
+	bc.BatchNumber = record[87:94]
+}
+
+// NewBatchControl returns a new BatchControl with default values for none exported fields
+func NewBatchControl() *BatchControl {
+	return &BatchControl{}
+}
+
+// Validate performs NACHA format rule checks on the record and returns an error if not Validated
+// The first error encountered is returned and stops that parsing.
+func (bc *BatchControl) Validate() (bool, error) {
+	return true, nil
 }

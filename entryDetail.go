@@ -1,10 +1,10 @@
 package ach
 
-// EntryDetailRecord contains the actual transaction data for an individual entry.
+// EntryDetail contains the actual transaction data for an individual entry.
 // Fields include those designating the entry as a deposit (credit) or
 // withdrawal (debit), the transit routing number for the entry recipient’s financial
 // institution, the account number (left justify,no zero fill), name, and dollar amount.
-type EntryDetailRecord struct {
+type EntryDetail struct {
 	// RecordType defines the type of record in the block. 6
 	RecordType string
 	// TransactionCode if the recievers account is:
@@ -60,26 +60,43 @@ type EntryDetailRecord struct {
 	// in the associated Entry Detail Record, since the Trace Number is associated
 	// with an entry or item rather than a physical record.
 	TraceNumber string
-
-	Addenda AddendaRecord
 }
 
-// AddendaRecord provides business transaction information in a machine
-// readable format. It is usually formatted according to ANSI, ASC, X12 Standard
-type AddendaRecord struct {
-	// RecordType defines the type of record in the block. entryAddendaPos 7
-	RecordType string
-	// TypeCode Addenda types code '05'
-	TypeCode string
-	// PaymentRelatedInformation
-	PaymentRelatedInformation string
-	// SequenceNumber is consecutively assigned to each Addenda Record following
-	// an Entry Detail Record. The first addenda sequence number must always
-	// be a "1".
-	SequenceNumber string
-	// EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
-	// Detail or Corporate Entry Detail Record's trace number. This number is
-	// the same as the last seven digits of the trace number of the related
-	// Entry Detail Record or Corporate Entry Detail Record.
-	EntryDetailSequenceNumber string
+// Parse takes the input record string and parses the EntryDetail values
+func (ed *EntryDetail) Parse(record string) {
+	// 1-1 Always "6"
+	ed.RecordType = record[:1]
+	// 2-3 is checking credit 22 debit 27 savings credit 32 debit 37
+	ed.TransactionCode = record[1:3]
+	// 4-11 the RDFI's routing number without the last digit.
+	ed.RdfiIdentification = record[3:11]
+	// 12-12 The last digit of the RDFI's routing number
+	ed.CheckDigit = record[11:12]
+	// 13-29 The receiver's bank account number you are crediting/debiting
+	ed.DfiAccountNumber = record[12:29]
+	// 30-39 Number of cents you are debiting/crediting this account
+	ed.Amount = record[29:39]
+	// 40-54 An internal identification (alphanumeric) that you use to uniquely identify this Entry Detail Record
+	ed.IndividualIdentificationNumber = record[39:54]
+	// 55-76 The name of the receiver, usually the name on the bank account
+	ed.IndividualName = record[54:76]
+	// 77-78 allows ODFIs to include codes of significance only to them
+	// normally blank
+	ed.DiscretionaryData = record[76:78]
+	// 79-79 1 if addenda exists 0 if it does not
+	ed.AddendaRecordIndicator = record[78:79]
+	// 80-84 An internal identification (alphanumeric) that you use to uniquely identify
+	// this Entry Detail Recor This number should be unique to the transaction and will help identify the transaction in case of an inquiry
+	ed.TraceNumber = record[79:94]
+}
+
+// NewEntryDetail returns a new EntryDetail with default values for none exported fields
+func NewEntryDetail() *EntryDetail {
+	return &EntryDetail{}
+}
+
+// Validate performs NACHA format rule checks on the record and returns an error if not Validated
+// The first error encountered is returned and stops that parsing.
+func (ed *EntryDetail) Validate() (bool, error) {
+	return true, nil
 }

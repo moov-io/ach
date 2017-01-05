@@ -7,12 +7,12 @@ wadearnold/ach
 [![Apache 2 licensed](https://img.shields.io/badge/license-Apache2-blue.svg)](https://raw.githubusercontent.com/wadearnold/ach/master/LICENSE)
 
 
-Package 'wadearnold/ach' implements a file decoder and encoder for parsing [ACH](https://en.wikipedia.org/wiki/Automated_Clearing_House
+Package 'wadearnold/ach' implements a file reader and writer for parsing [ACH](https://en.wikipedia.org/wiki/Automated_Clearing_House
 ) Automated Clearing House files. ACH is the primary method of electronic money movement throughout the United States.
 
 ## Project Status
 
-ACH is at an early stage and under active development. Please star the project if you are interested in its development or join the development. 
+ACH is at an early stage and under active development. Please star the project if you are interested in its development or join the development.
 
 ## Install
 
@@ -22,31 +22,6 @@ With a [correctly configured](https://golang.org/doc/install#testing) Go toolcha
 go get -u github.com/wadearnold/ach
 ```
 
-## Example
-Let's start parsing an ACH PPD file from the test data:
-
-```go
-package main
-import (
-  "fmt"
-  "log"
-  "wadearnold/ach"
-
-)
-func main() {
-  f, err := os.Open("./testdata/ppd-debit.ach")
-	if err != nil {
-		log.Fatal("%s: ", err)
-	}
-	defer f.Close()
-
-  achfile, err := ach.Decode(f)
-  if err != nil {
-		fmt.PrintF("Cannot decode: %v", err)
-	}
-  fmt.PrintF("ACH Destination from: %v", achfile.FileHeaderRecord.ImmediateDestinationName)
-
-```
 
 # Contributing
 
