@@ -19,21 +19,22 @@ const (
 // ParseError is returned for parsing reader errors.
 // The first line is 1.
 type ParseError struct {
-	Line  int    // Line number where the error accurd
-	Field string // Name of the field being parsed
-	Err   error  // The actual error
+	Line   int    // Line number where the error accurd
+	Record string // Name of the record type being parsed
+	Err    error  // The actual error
 }
 
 func (e *ParseError) Error() string {
-	return fmt.Sprintf("line %d, field  %s: %s", e.Line, e.Field, e.Err)
+	return fmt.Sprintf("line %d, Record  %s: %s", e.Line, e.Record, e.Err)
 }
 
 // These are the errors that can be returned in Parse.Error
+// additional errors can occur in the Record
 var (
-	ErrRecordLen    = errors.New("Wrong number of fields in record expect 94")
-	ErrBatchControl = errors.New("No terminating batch control record found in file")
-	ErrRecordType   = errors.New("Unhandled Record Type")
-	ErrFileHeader   = errors.New("None or more than one File Headers exists")
+	ErrRecordLen         = errors.New("Wrong number of fields in record expect 94")
+	ErrBatchControl      = errors.New("No terminating batch control record found in file")
+	ErrUnknownRecordType = errors.New("Unhandled Record Type")
+	ErrFileHeader        = errors.New("None or more than one File Headers exists")
 )
 
 // Reader reads records from a ACH-encoded file.
@@ -42,18 +43,18 @@ type Reader struct {
 	r *bufio.Reader
 	// line number of the file being parsed
 	line int
-	// record holds the current line being parser.
+	// record holds the current record type being parser.
 	record string
 	// field number of the record currently being parsed
-	field string
+	//field string
 }
 
 // error creates a new ParseError based on err.
 func (r *Reader) error(err error) error {
 	return &ParseError{
-		Line:  r.line,
-		Field: r.field,
-		Err:   err,
+		Line:   r.line,
+		Record: r.record,
+		Err:    err,
 	}
 }
 
@@ -65,8 +66,8 @@ func NewReader(r io.Reader) *Reader {
 }
 
 // Read reads each line of the ACH file and defines which parser to use based
-// on the first byte of each line. It also enforces ACH formating rules and returns
-// the appropriate error if issues are founr.
+// on the first character of each line. It also enforces ACH formating rules and returns
+// the appropriate error if issues are found.
 func (r *Reader) Read() (file File, err error) {
 	// read through the entire file
 	for {
@@ -96,6 +97,11 @@ func (r *Reader) Read() (file File, err error) {
 				return file, r.error(ErrFileHeader)
 			}
 			file.FileHeader = r.parseFileHeader()
+			v, err := file.FileHeader.Validate()
+			if !v {
+				r.record = "FileHeader"
+				return file, r.error(err)
+			}
 		case batchPos:
 			file.BatchHeader = r.parseBatchHeader()
 		case entryDetailPos:
@@ -108,9 +114,7 @@ func (r *Reader) Read() (file File, err error) {
 		case fileControlPos:
 			file.FileControl = r.parseFileControl()
 		default:
-			//fmt.Println("Record type not detected")
-			// TODO: return nil, error
-			return file, r.error(ErrRecordType)
+			return file, r.error(ErrUnknownRecordType)
 		}
 
 	}
@@ -127,7 +131,7 @@ func (r *Reader) Read() (file File, err error) {
 
 // parseFileHeader takes the input record string and parses the FileHeaderRecord values
 func (r *Reader) parseFileHeader() (fh FileHeader) {
-	fh.parse(r.record)
+	fh.Parse(r.record)
 	return fh
 }
 

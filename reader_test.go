@@ -1,4 +1,4 @@
-// Copyright 2016 The ACH Authors
+// Copyright 2017 The ACH Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -20,68 +20,7 @@ func TestDecode(t *testing.T) {
 	r := NewReader(f)
 	_, err = r.Read()
 	if err != nil {
-		t.Errorf("Can not ach.read ach file: %v", err)
-	}
-}
-
-// TestParseFileHeader parses a known File Header Record string.
-func TestParseFileHeader(t *testing.T) {
-	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
-	r := NewReader(strings.NewReader(line))
-	r.record = line
-	record := r.parseFileHeader()
-
-	if record.recordType != "1" {
-		t.Errorf("RecordType Expected 1 got: %v", record.recordType)
-	}
-	if record.priorityCode != "01" {
-		t.Errorf("PriorityCode Expected 01 got: %v", record.priorityCode)
-	}
-	if record.ImmediateDestination() != " 076401251" {
-		t.Errorf("ImmediateDestination Expected ' 076401251' got: %v", record.ImmediateDestination())
-	}
-	if record.ImmediateOrigin() != " 076401251" {
-		t.Errorf("ImmediateOrigin Expected '   076401251' got: %v", record.ImmediateOrigin())
-	}
-
-	if record.FileCreationDate() != "080729" {
-		t.Errorf("FileCreationDate Expected '080729' got:'%v'", record.FileCreationDate())
-	}
-	if record.FileCreationTime() != "1511" {
-		t.Errorf("FileCreationTime Expected '1511' got:'%v'", record.FileCreationTime())
-	}
-
-	if record.FileIDModifier != "A" {
-		t.Errorf("FileIDModifier Expected 'A' got:'%v'", record.FileIDModifier)
-	}
-	if record.recordSize != "094" {
-		t.Errorf("RecordSize Expected '094' got:'%v'", record.recordSize)
-	}
-	if record.blockingFactor != "10" {
-		t.Errorf("BlockingFactor Expected '10' got:'%v'", record.blockingFactor)
-	}
-	if record.formatCode != "1" {
-		t.Errorf("FormatCode Expected '1' got:'%v'", record.formatCode)
-	}
-	if record.ImmediateDestinationName != "achdestname            " {
-		t.Errorf("ImmediateDestinationName Expected 'achdestname           ' got:'%v'", record.ImmediateDestinationName)
-	}
-	if record.ImmidiateOriginName != "companyname            " {
-		t.Errorf("ImmidiateOriginName Expected 'companyname          ' got: '%v'", record.ImmidiateOriginName)
-	}
-	if record.ReferenceCode != "        " {
-		t.Errorf("ReferenceCode Expected '        ' got:'%v'", record.ReferenceCode)
-	}
-}
-
-func TestFileHeaderString(t *testing.T) {
-	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
-	r := NewReader(strings.NewReader(line))
-	r.record = line
-	record := r.parseFileHeader()
-
-	if record.String() != line {
-		t.Errorf("Strings do not match")
+		t.Errorf("Can not ach.read file: %v", err)
 	}
 }
 
@@ -286,7 +225,7 @@ func TestRecordTypeUnknown(t *testing.T) {
 	var line = "301 076401251 0764012510807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), ErrRecordType.Error()) {
+	if !strings.Contains(err.Error(), ErrUnknownRecordType.Error()) {
 		t.Errorf("Expected RecordType Error got: %v", err)
 	}
 }

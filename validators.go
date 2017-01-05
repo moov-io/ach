@@ -20,24 +20,24 @@ func (v *Validator) parseNumField(r string) (s int) {
 	return s
 }
 
-// formatFileCreationDate takes a time.Time and returns a string of YYMMDD
-func (v *Validator) formatFileCreationDate(t time.Time) string {
+// formatSimpleDate takes a time.Time and returns a string of YYMMDD
+func (v *Validator) formatSimpleDate(t time.Time) string {
 	return t.Format("060102")
 }
 
-// parseFileCreationDate returns a time.Time when passed time as YYMMDD
-func (v *Validator) parseFileCreationDate(s string) time.Time {
+// parseSimpleDate returns a time.Time when passed time as YYMMDD
+func (v *Validator) parseSimpleDate(s string) time.Time {
 	t, _ := time.Parse("060102", s)
 	return t
 }
 
-// formatFileCreationTime returns a string of HHMM when  passed a time.Time
-func (v *Validator) formatFileCreationTime(t time.Time) string {
+// formatSimpleTime returns a string of HHMM when  passed a time.Time
+func (v *Validator) formatSimpleTime(t time.Time) string {
 	return t.Format("1504")
 }
 
-// parseFileCreationTime returns a time.Time when passed a string of HHMM
-func (v *Validator) parseFileCreationTime(s string) time.Time {
+// parseSimpleTime returns a time.Time when passed a string of HHMM
+func (v *Validator) parseSimpleTime(s string) time.Time {
 	t, _ := time.Parse("1504", s)
 	return t
 }

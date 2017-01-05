@@ -1,12 +1,27 @@
+// Copyright 2016 The ACH Authors
+// Use of this source code is governed by an Apache License
+// license that can be found in the LICENSE file.
+
 package ach
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"time"
 )
 
-// FileHeader designate physical file characteristics and identify
+// Errors specific to a File Header Record
+var (
+	ErrRecordType       = errors.New("Wrong Record type")
+	ErrIDModifier       = errors.New("File ID Modifier is not uppercase A-Z or 0-9")
+	ErrRecordSize       = errors.New("Record size is not 094")
+	ErrBlockingFactor   = errors.New("Blocking Factor is not 10")
+	ErrFormatCode       = errors.New("Format Code is not 1.")
+	ErrFileCreationDate = errors.New("File was created before today")
+)
+
+// FileHeader is a Record designating physical file characteristics and identify
 // the origin (sending point) and destination (receiving point) of the entries
 // contained in the file. The file header also includes creation date and time
 // fields which can be used to uniquely identify a file.
@@ -88,8 +103,8 @@ func NewFileHeader() *FileHeader {
 	}
 }
 
-// parse takes the input record string and parses the FileHeader values
-func (fh *FileHeader) parse(record string) {
+// Parse takes the input record string and parses the FileHeader values
+func (fh *FileHeader) Parse(record string) {
 	// (character position 1-1) Always "1"
 	fh.recordType = record[:1]
 	// (2-3) Always "01"
@@ -100,9 +115,9 @@ func (fh *FileHeader) parse(record string) {
 	fh.immediateOrigin = fh.parseNumField(record[13:23])
 	// 24-29 Today's date in YYMMDD format
 	// must be after todays date.
-	fh.fileCreationDate = fh.parseFileCreationDate(record[23:29])
+	fh.fileCreationDate = fh.parseSimpleDate(record[23:29])
 	// 30-33 The current time in HHMM format
-	fh.fileCreationTime = fh.parseFileCreationTime(record[29:33])
+	fh.fileCreationTime = fh.parseSimpleTime(record[29:33])
 	// 35-37 Always "A"
 	fh.FileIDModifier = record[33:34]
 	// 35-37 always "094"
@@ -140,14 +155,41 @@ func (fh *FileHeader) String() string {
 
 }
 
+// Validate performs NACHA format rule checks on the record and returns an error if not Validated
+// The first error encountered is returned and stops that parsing.
+func (fh *FileHeader) Validate() (bool, error) {
+
+	if fh.recordType != "1" {
+		return false, ErrRecordType
+	}
+	if !fh.isUpperAlphanumeric(fh.FileIDModifier) {
+		return false, ErrIDModifier
+	}
+	if fh.recordSize != "094" {
+		return false, ErrRecordSize
+	}
+	if fh.blockingFactor != "10" {
+		return false, ErrBlockingFactor
+	}
+	if fh.formatCode != "1" {
+		return false, ErrFormatCode
+	}
+	/*
+		if fh.fileCreationDate.Before(time.Now()) {
+			return false, ErrFileCreationDate
+		}
+	*/
+	return true, nil
+}
+
 // FileCreationDate gets the file cereation date in YYMMDD format
 func (fh *FileHeader) FileCreationDate() string {
-	return fh.formatFileCreationDate(fh.fileCreationDate)
+	return fh.formatSimpleDate(fh.fileCreationDate)
 }
 
 // FileCreationTime gets the file creation time in HHMM format
 func (fh *FileHeader) FileCreationTime() string {
-	return fh.formatFileCreationTime(fh.fileCreationTime)
+	return fh.formatSimpleTime(fh.fileCreationTime)
 }
 
 // ImmediateDestination gets the immidiate destination number with zero padding
