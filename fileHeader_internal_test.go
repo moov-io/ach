@@ -71,8 +71,8 @@ func TestString(t *testing.T) {
 	}
 }
 
-// TestValidateRecordType ensure error if recordType is not 1
-func TestValidateRecordType(t *testing.T) {
+// TestValidateFHRecordType ensure error if recordType is not 1
+func TestValidateFHRecordType(t *testing.T) {
 	fh := NewFileHeader()
 	fh.recordType = "2"
 	_, err := fh.Validate()

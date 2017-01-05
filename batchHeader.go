@@ -1,5 +1,21 @@
 package ach
 
+import (
+	"errors"
+	"fmt"
+	"strconv"
+	"time"
+)
+
+// Errors specific to a Batch Header Record
+var (
+	ErrServiceClass   = errors.New("Invalid Service Class Code")
+	ErrSECCode        = errors.New("Invalid Standard Entry Class Code")
+	ErrOrigStatusCode = errors.New("Invalid Originator Status Code")
+)
+
+// ErrServiceClass
+
 // BatchHeader identifies the originating entity and the type of transactions
 // contained in the batch (i.e., the standard entry class, PPD for consumer, CCD
 // or CTX for corporate). This record also contains the effective date, or desired
@@ -7,11 +23,11 @@ package ach
 // field is not entered as it is determined by the ACH operato
 type BatchHeader struct {
 	// RecordType defines the type of record in the block. 5
-	RecordType string
+	recordType string
 	// ServiceClassCode ACH Mixed Debits and Credits ‘200’
 	// ACH Credits Only ‘220’
 	// ACH Debits Only ‘225'
-	ServiceClassCode string
+	ServiceClassCode int
 	// CompanyName the company originating the entries in the batch
 	CompanyName string
 
@@ -54,36 +70,41 @@ type BatchHeader struct {
 	CompanyDescriptiveDate string
 
 	// EffectiveEntryDate the date on which the entries are to settle
-	EffectiveEntryDate string
+	effectiveEntryDate time.Time
 
 	// SettlementDate Leave blank, this field is inserted by the ACH operator
-	SettlementDate string
+	settlementDate string
 
 	// OriginatorStatusCode '1'
-	OriginatorStatusCode string
+	OriginatorStatusCode int
 
 	//OdfiIdentification First 8 digits of the originating DFI transit routing number
-	OdfiIdentification string
+	OdfiIdentification int
 
 	// BatchNumber is assigned in ascending sequence to each batch by the ODFI
 	// or its Sending Point in a given file of entries. Since the batch number
 	// in the Batch Header Record and the Batch Control Record is the same,
 	// the ascending sequence number should be assigned by batch and not by
 	// record.
-	BatchNumber string
+	BatchNumber int
+
+	// Validator is composed for data conversion and validation
+	Validator
 }
 
 // NewBatchHeader returns a new BatchHeader with default valus for none exported fields
 func NewBatchHeader() *BatchHeader {
-	return &BatchHeader{}
+	return &BatchHeader{
+		recordType: "5",
+	}
 }
 
 // Parse takes the input record string and parses the BatchHeader values
 func (bh *BatchHeader) Parse(record string) {
 	// 1-1 Always "5"
-	bh.RecordType = record[:1]
+	bh.recordType = record[:1]
 	// 2-4 If the entries are credits, always "220". If the entries are debits, always "225"
-	bh.ServiceClassCode = record[1:4]
+	bh.ServiceClassCode = bh.parseNumField(record[1:4])
 	// 5-20 Your company's name. This name may appear on the receivers’ statements prepared by the RDFI.
 	bh.CompanyName = record[4:20]
 	// 21-40 Optional field you may use to describe the batch for internal accounting purposes
@@ -103,21 +124,57 @@ func (bh *BatchHeader) Parse(record string) {
 	bh.CompanyDescriptiveDate = record[63:69]
 	// 70-75 Date transactions are to be posted to the receivers’ account.
 	// You almost always want the transaction to post as soon as possible, so put tomorrow's date in YYMMDD format
-	bh.EffectiveEntryDate = record[69:75]
+	bh.effectiveEntryDate = bh.parseSimpleDate(record[69:75])
 	// 76-79 Always blank (just fill with spaces)
-	bh.SettlementDate = record[75:78]
+	bh.settlementDate = record[75:78]
 	// 79-79 Always 1
-	bh.OriginatorStatusCode = record[78:79]
+	bh.OriginatorStatusCode = bh.parseNumField(record[78:79])
 	// 80-87 Your ODFI's routing number without the last digit. The last digit is simply a
 	// checksum digit, which is why it is not necessary
-	bh.OdfiIdentification = record[79:87]
+	bh.OdfiIdentification = bh.parseNumField(record[79:87])
 	// 88-94 Sequential number of this Batch Header Recor
 	// For example, put "1" if this is the first Batch Header Record in the file
-	bh.BatchNumber = record[87:94]
+	bh.BatchNumber = bh.parseNumField(record[87:94])
+}
+
+func (bh *BatchHeader) String() string {
+	return fmt.Sprintf("%v%v%v%v%v%v%v%v%v%v%v%v%v",
+		bh.recordType,
+		bh.ServiceClassCode,
+		bh.CompanyName,
+		bh.CompanyDiscretionaryData,
+		bh.CompanyIdentification,
+		bh.StandardEntryClassCode,
+		bh.CompanyEntryDescription,
+		bh.CompanyDescriptiveDate,
+		bh.EffectiveEntryDate(),
+		bh.settlementDate,
+		bh.OriginatorStatusCode,
+		bh.leftPad(strconv.Itoa(bh.OdfiIdentification), "0", 8),
+		bh.leftPad(strconv.Itoa(bh.BatchNumber), "0", 7),
+	)
 }
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops that parsing.
 func (bh *BatchHeader) Validate() (bool, error) {
+	if bh.recordType != "5" {
+		return false, ErrRecordType
+	}
+	if !bh.isValidServiceClass(bh.ServiceClassCode) {
+		return false, ErrServiceClass
+	}
+	if !bh.isValidSECCode(bh.StandardEntryClassCode) {
+		return false, ErrSECCode
+	}
+	if !bh.isOriginatorStatusCode(bh.OriginatorStatusCode) {
+		return false, ErrOrigStatusCode
+	}
+
 	return true, nil
+}
+
+// EffectiveEntryDate get the EffectiveEntryDate in YYMMDD format
+func (bh *BatchHeader) EffectiveEntryDate() string {
+	return bh.formatSimpleDate(bh.effectiveEntryDate)
 }

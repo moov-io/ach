@@ -16,10 +16,10 @@ func TestParseBatchHeader(t *testing.T) {
 	r.record = line
 	record := r.parseBatchHeader()
 
-	if record.RecordType != "5" {
-		t.Errorf("RecordType Expected '5' got: %v", record.RecordType)
+	if record.recordType != "5" {
+		t.Errorf("RecordType Expected '5' got: %v", record.recordType)
 	}
-	if record.ServiceClassCode != "225" {
+	if record.ServiceClassCode != 225 {
 		t.Errorf("ServiceClassCode Expected '225' got: %v", record.ServiceClassCode)
 	}
 	if record.CompanyName != "companyname     " {
@@ -40,19 +40,74 @@ func TestParseBatchHeader(t *testing.T) {
 	if record.CompanyDescriptiveDate != "000002" {
 		t.Errorf("CompanyDescriptiveDate Expected '000002' got: %v", record.CompanyDescriptiveDate)
 	}
-	if record.EffectiveEntryDate != "080730" {
-		t.Errorf("EffectiveEntryDate Expected '080730' got: %v", record.EffectiveEntryDate)
+	if record.EffectiveEntryDate() != "080730" {
+		t.Errorf("EffectiveEntryDate Expected '080730' got: %v", record.EffectiveEntryDate())
 	}
-	if record.SettlementDate != "   " {
-		t.Errorf("SettlementDate Expected '   ' got: %v", record.SettlementDate)
+	if record.settlementDate != "   " {
+		t.Errorf("SettlementDate Expected '   ' got: %v", record.settlementDate)
 	}
-	if record.OriginatorStatusCode != "1" {
+	if record.OriginatorStatusCode != 1 {
 		t.Errorf("OriginatorStatusCode Expected 1 got: %v", record.OriginatorStatusCode)
 	}
-	if record.OdfiIdentification != "07640125" {
+	if record.OdfiIdentification != 7640125 {
 		t.Errorf("OdfiIdentification Expected '07640125' got: %v", record.OdfiIdentification)
 	}
-	if record.BatchNumber != "0000001" {
+	if record.BatchNumber != 0000001 {
 		t.Errorf("BatchNumber Expected '0000001' got: %v", record.BatchNumber)
+	}
+}
+
+// TestBHString validats that a known parsed file can be return to a string of the same value
+func TestBHString(t *testing.T) {
+	var line = "5225companyname                         origid    PPDCHECKPAYMT000002080730   1076401250000001"
+	r := NewReader(strings.NewReader(line))
+	r.record = line
+	record := r.parseBatchHeader()
+
+	if record.String() != line {
+		t.Errorf("Strings do not match")
+	}
+}
+
+// TestValidateBHRecordType ensure error if recordType is not 5
+func TestValidateBHRecordType(t *testing.T) {
+	bh := NewBatchHeader()
+	bh.recordType = "2"
+	_, err := bh.Validate()
+	if !strings.Contains(err.Error(), ErrRecordType.Error()) {
+		t.Errorf("Expected RecordType Error got: %v", err)
+	}
+}
+
+// TestInvalidServiceCode ensure error if service class is not valid
+func TestInvalidServiceCode(t *testing.T) {
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = 123
+	_, err := bh.Validate()
+	if !strings.Contains(err.Error(), ErrServiceClass.Error()) {
+		t.Errorf("Expected Service Class Error got: %v", err)
+	}
+}
+
+// TestValidateInvalidServiceCode ensure error if service class is not valid
+func TestInvalidSECCode(t *testing.T) {
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = 200
+	bh.StandardEntryClassCode = "ABC"
+	_, err := bh.Validate()
+	if !strings.Contains(err.Error(), ErrSECCode.Error()) {
+		t.Errorf("Expected SEC CodeError got: %v", err)
+	}
+}
+
+// TestInvalidOrigStatusCode ensure error if originator status code is not valid
+func TestInvalidOrigStatusCode(t *testing.T) {
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = 200
+	bh.StandardEntryClassCode = "PPD"
+	bh.OriginatorStatusCode = 3
+	_, err := bh.Validate()
+	if !strings.Contains(err.Error(), ErrOrigStatusCode.Error()) {
+		t.Errorf("Expected Originator Status CodeError got: %v", err)
 	}
 }
