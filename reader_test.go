@@ -42,5 +42,16 @@ func TestTwoFileHeaders(t *testing.T) {
 	if !strings.Contains(err.Error(), ErrFileHeader.Error()) {
 		t.Errorf("Expected RecordType Error got: %v", err)
 	}
+}
+
+func TestTwoFileControls(t *testing.T) {
+	var line = "9000001000001000000010005320001000000010500000000000000                                       "
+	var twoControls = line + "\n" + line
+	r := NewReader(strings.NewReader(twoControls))
+	_, err := r.Read()
+
+	if !strings.Contains(err.Error(), ErrFileControl.Error()) {
+		t.Errorf("Expected File Control Error got: %v", err)
+	}
 
 }

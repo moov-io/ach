@@ -71,18 +71,6 @@ func TestString(t *testing.T) {
 	}
 }
 
-// TestValidateRecordType check for error on wrong record type
-// func TestValidateRecordType(t *testing.T) {
-// 	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
-// 	r := NewReader(strings.NewReader(line))
-// 	r.record = line
-// 	record := r.parseFileHeader()
-//
-// 	if record.String() != line {
-// 		t.Errorf("Strings do not match")
-// 	}
-// }
-
 // TestValidateRecordType ensure error if recordType is not 1
 func TestValidateRecordType(t *testing.T) {
 	fh := NewFileHeader()

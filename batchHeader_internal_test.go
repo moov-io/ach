@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-// TestParseBatch Header parses a known Batch Header Record string.
+// TestParseBatchHeader parses a known Batch Header Record string.
 func TestParseBatchHeader(t *testing.T) {
 	var line = "5225companyname                         origid    PPDCHECKPAYMT000002080730   1076401250000001"
 	r := NewReader(strings.NewReader(line))
