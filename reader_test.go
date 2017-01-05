@@ -6,6 +6,7 @@ package ach
 
 import (
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -16,46 +17,51 @@ func TestDecode(t *testing.T) {
 		t.Errorf("%s: ", err)
 	}
 	defer f.Close()
-	_, err = Decode(f)
+	r := NewReader(f)
+	_, err = r.Read()
 	if err != nil {
-		t.Errorf("Can not ach. ecode ach file: %v", err)
+		t.Errorf("Can not ach.read ach file: %v", err)
 	}
 }
 
 // TestParseFileHeader parses a known File Header Record string.
 func TestParseFileHeader(t *testing.T) {
 	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
-	record := parseFileHeader(line)
+	r := NewReader(strings.NewReader(line))
+	r.record = line
+	record := r.parseFileHeader()
 
-	if record.RecordType != "1" {
-		t.Errorf("RecordType Expected 1 got: %v", record.RecordType)
+	if record.recordType != "1" {
+		t.Errorf("RecordType Expected 1 got: %v", record.recordType)
 	}
-	if record.PriorityCode != "01" {
-		t.Errorf("PriorityCode Expected 01 got: %v", record.PriorityCode)
+	if record.priorityCode != "01" {
+		t.Errorf("PriorityCode Expected 01 got: %v", record.priorityCode)
 	}
-	if record.ImmediateDestination != " 076401251" {
-		t.Errorf("ImmediateDestination Expected ' 076401251' got: %v", record.ImmediateDestination)
+	if record.ImmediateDestination() != " 076401251" {
+		t.Errorf("ImmediateDestination Expected ' 076401251' got: %v", record.ImmediateDestination())
 	}
-	if record.ImmediateOrigin != " 076401251" {
-		t.Errorf("ImmediateOrigin Expected '   076401251' got: %v", record.ImmediateOrigin)
+	if record.ImmediateOrigin() != " 076401251" {
+		t.Errorf("ImmediateOrigin Expected '   076401251' got: %v", record.ImmediateOrigin())
 	}
-	if record.FileCreationDate != "080729" {
-		t.Errorf("FileCreationDate Expected '080729' got:'%v'", record.FileCreationDate)
+
+	if record.FileCreationDate() != "080729" {
+		t.Errorf("FileCreationDate Expected '080729' got:'%v'", record.FileCreationDate())
 	}
-	if record.FileCreationTime != "1511" {
-		t.Errorf("FileCreationTime Expected '1511' got:'%v'", record.FileCreationTime)
+	if record.FileCreationTime() != "1511" {
+		t.Errorf("FileCreationTime Expected '1511' got:'%v'", record.FileCreationTime())
 	}
-	if record.FileIdModifier != "A" {
-		t.Errorf("FileIdModifier Expected 'A' got:'%v'", record.FileIdModifier)
+
+	if record.FileIDModifier != "A" {
+		t.Errorf("FileIDModifier Expected 'A' got:'%v'", record.FileIDModifier)
 	}
-	if record.RecordSize != "094" {
-		t.Errorf("RecordSize Expected '094' got:'%v'", record.RecordSize)
+	if record.recordSize != "094" {
+		t.Errorf("RecordSize Expected '094' got:'%v'", record.recordSize)
 	}
-	if record.BlockingFactor != "10" {
-		t.Errorf("BlockingFactor Expected '10' got:'%v'", record.BlockingFactor)
+	if record.blockingFactor != "10" {
+		t.Errorf("BlockingFactor Expected '10' got:'%v'", record.blockingFactor)
 	}
-	if record.FormatCode != "1" {
-		t.Errorf("FormatCode Expected '1' got:'%v'", record.FormatCode)
+	if record.formatCode != "1" {
+		t.Errorf("FormatCode Expected '1' got:'%v'", record.formatCode)
 	}
 	if record.ImmediateDestinationName != "achdestname            " {
 		t.Errorf("ImmediateDestinationName Expected 'achdestname           ' got:'%v'", record.ImmediateDestinationName)
@@ -68,10 +74,24 @@ func TestParseFileHeader(t *testing.T) {
 	}
 }
 
+func TestFileHeaderString(t *testing.T) {
+	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
+	r := NewReader(strings.NewReader(line))
+	r.record = line
+	record := r.parseFileHeader()
+
+	if record.String() != line {
+		t.Errorf("Strings do not match")
+	}
+}
+
 // TestParseBatch Header parses a known Batch Header Record string.
 func TestParseBatchHeader(t *testing.T) {
 	var line = "5225companyname                         origid    PPDCHECKPAYMT000002080730   1076401250000001"
-	record := parseBatchHeader(line)
+	r := NewReader(strings.NewReader(line))
+	r.record = line
+	record := r.parseBatchHeader()
+
 	if record.RecordType != "5" {
 		t.Errorf("RecordType Expected '5' got: %v", record.RecordType)
 	}
@@ -116,7 +136,10 @@ func TestParseBatchHeader(t *testing.T) {
 // TestParseEntryDetail Header parses a known Entry Detail Record string.
 func TestParseEntryDetail(t *testing.T) {
 	var line = "62705320001912345            0000010500c-1            Arnold Wade           DD0076401255655291"
-	record := parseEntryDetail(line)
+	r := NewReader(strings.NewReader(line))
+	r.record = line
+	record := r.parseEntryDetail()
+
 	if record.RecordType != "6" {
 		t.Errorf("RecordType Expected '6' got: %v", record.RecordType)
 	}
@@ -162,7 +185,10 @@ func TestParseEntryDetail(t *testing.T) {
 func TestParseAddendaRecord(t *testing.T) {
 	var line = "710WEB                                        DIEGO MAY                                0000001"
 
-	record := parseAddendaRecord(line)
+	r := NewReader(strings.NewReader(line))
+	r.record = line
+	record := r.parseAddendaRecord()
+
 	if record.RecordType != "7" {
 		t.Errorf("RecordType Expected '7' got: %v", record.RecordType)
 	}
@@ -183,7 +209,10 @@ func TestParseAddendaRecord(t *testing.T) {
 // TestParseBatchControl parses a known Batch ControlRecord string.
 func TestParseBatchControl(t *testing.T) {
 	var line = "82250000010005320001000000010500000000000000origid                             076401250000001"
-	record := parseBatchControl(line)
+	r := NewReader(strings.NewReader(line))
+	r.record = line
+	record := r.parseBatchControl()
+
 	if record.RecordType != "8" {
 		t.Errorf("RecordType Expected '8' got: %v", record.RecordType)
 	}
@@ -222,7 +251,10 @@ func TestParseBatchControl(t *testing.T) {
 // TestParseFileControl parses a known File Control Record string.
 func TestParseFileControl(t *testing.T) {
 	var line = "9000001000001000000010005320001000000010500000000000000                                       "
-	record := parseFileControl(line)
+	r := NewReader(strings.NewReader(line))
+	r.record = line
+	record := r.parseFileControl()
+
 	if record.RecordType != "9" {
 		t.Errorf("RecordType Expected '9' got: %v", record.RecordType)
 	}
@@ -246,6 +278,27 @@ func TestParseFileControl(t *testing.T) {
 	}
 	if record.Reserved != "                                       " {
 		t.Errorf("Reserved Expected '                                       ' got: %v", record.Reserved)
+	}
+
+}
+
+func TestRecordTypeUnknown(t *testing.T) {
+	var line = "301 076401251 0764012510807291511A094101achdestname            companyname                    "
+	r := NewReader(strings.NewReader(line))
+	_, err := r.Read()
+	if !strings.Contains(err.Error(), ErrRecordType.Error()) {
+		t.Errorf("Expected RecordType Error got: %v", err)
+	}
+}
+
+func TestTwoFileHeaders(t *testing.T) {
+	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
+	var twoHeaders = line + "\n" + line
+	r := NewReader(strings.NewReader(twoHeaders))
+	_, err := r.Read()
+
+	if !strings.Contains(err.Error(), ErrFileHeader.Error()) {
+		t.Errorf("Expected RecordType Error got: %v", err)
 	}
 
 }
