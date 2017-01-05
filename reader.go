@@ -33,6 +33,7 @@ var (
 	ErrRecordLen    = errors.New("Wrong number of fields in record expect 94")
 	ErrBatchControl = errors.New("No terminating batch control record found in file")
 	ErrRecordType   = errors.New("Unhandled Record Type")
+	ErrFileHeader   = errors.New("None or more than one File Headers exists")
 )
 
 // Reader reads records from a ACH-encoded file.
@@ -90,6 +91,10 @@ func (r *Reader) Read() (file File, err error) {
 		r.record = string(line)
 		switch r.record[:1] {
 		case headerPos:
+			if (FileHeader{}) != file.FileHeader {
+				// Their can only be one File Header per File exit
+				return file, r.error(ErrFileHeader)
+			}
 			file.FileHeader = r.parseFileHeader()
 		case batchPos:
 			file.BatchHeader = r.parseBatchHeader()
@@ -109,6 +114,12 @@ func (r *Reader) Read() (file File, err error) {
 		}
 
 	}
+
+	if (FileHeader{}) == file.FileHeader {
+		// Their must be at least one file header
+		return file, r.error(ErrFileHeader)
+	}
+
 	// TODO: number of lines in file must be divisable by 10 the blocking factor
 	//fmt.Printf("Number of lines in file: %v \n", r.line)
 	return file, nil

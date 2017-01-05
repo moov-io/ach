@@ -292,12 +292,15 @@ func TestRecordTypeUnknown(t *testing.T) {
 }
 
 func TestTwoFileHeaders(t *testing.T) {
-	var line = "301 076401251 0764012510807291511A094101achdestname            companyname                    "
-	r := NewReader(strings.NewReader(line))
+	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
+	var twoHeaders = line + "\n" + line
+	r := NewReader(strings.NewReader(twoHeaders))
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), "Unhandled Record Type") {
+
+	if !strings.Contains(err.Error(), ErrFileHeader.Error()) {
 		t.Errorf("Expected RecordType Error got: %v", err)
 	}
+
 }
 
 // Ghetto test function for when I need to prove something to myself.
