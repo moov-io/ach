@@ -45,7 +45,7 @@ type FileHeader struct {
 	// letters starting at A through Z for each subsequent file that is created for
 	// a single system date. (34-34) 1 numeric 0-9 or uppercase alpha A-Z.
 	// I have yet to see this ID not A
-	FileIdModifier string
+	FileIDModifier string
 
 	// RecordSize indicates the number of characters contained in each
 	// record. At this time, the value "094" must be used.
@@ -76,12 +76,12 @@ type FileHeader struct {
 	Validator
 }
 
-// NewReader returns a new FileHeader with default values for none exported fields
+// NewFileHeader returns a new FileHeader with default values for none exported fields
 func NewFileHeader() *FileHeader {
 	return &FileHeader{
 		recordType:     "1",
 		priorityCode:   "01",
-		FileIdModifier: "A",
+		FileIDModifier: "A",
 		recordSize:     "094",
 		blockingFactor: "10",
 		formatCode:     "1",
@@ -104,7 +104,7 @@ func (fh *FileHeader) parse(record string) {
 	// 30-33 The current time in HHMM format
 	fh.fileCreationTime = fh.parseFileCreationTime(record[29:33])
 	// 35-37 Always "A"
-	fh.FileIdModifier = record[33:34]
+	fh.FileIDModifier = record[33:34]
 	// 35-37 always "094"
 	fh.recordSize = record[34:37]
 	//38-39 always "10"
@@ -129,7 +129,7 @@ func (fh *FileHeader) String() string {
 		fh.ImmediateOrigin(),
 		fh.FileCreationDate(),
 		fh.FileCreationTime(),
-		fh.FileIdModifier,
+		fh.FileIDModifier,
 		fh.recordSize,
 		fh.blockingFactor,
 		fh.formatCode,
@@ -140,18 +140,22 @@ func (fh *FileHeader) String() string {
 
 }
 
+// FileCreationDate gets the file cereation date in YYMMDD format
 func (fh *FileHeader) FileCreationDate() string {
 	return fh.formatFileCreationDate(fh.fileCreationDate)
 }
 
+// FileCreationTime gets the file creation time in HHMM format
 func (fh *FileHeader) FileCreationTime() string {
 	return fh.formatFileCreationTime(fh.fileCreationTime)
 }
 
+// ImmediateDestination gets the immidiate destination number with zero padding
 func (fh *FileHeader) ImmediateDestination() string {
 	return " " + fh.leftPad(strconv.Itoa(fh.immediateDestination), "0", 9)
 }
 
+// ImmediateOrigin gets the immidiate origen number with 0 padding
 func (fh *FileHeader) ImmediateOrigin() string {
 	return " " + fh.leftPad(strconv.Itoa(fh.immediateOrigin), "0", 9)
 }

@@ -10,7 +10,9 @@ wadearnold/ach
 Package 'wadearnold/ach' implements a file decoder and encoder for parsing [ACH](https://en.wikipedia.org/wiki/Automated_Clearing_House
 ) Automated Clearing House files. ACH is the primary method of electronic money movement throughout the United States.
 
-Their are several kinds of ACH files PPD, PPD+, CCD, CCD+, and CTX; this package currently supports the (PPD) Prearranged Payment and Deposit Entry type transactions described by [NACHA](https://www.nacha.org//) Operating Rules
+## Project Status
+
+ACH is at an early stage and under active development. Please star the project if you are interested in its development or join the development. 
 
 ## Install
 

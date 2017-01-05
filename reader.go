@@ -1,7 +1,7 @@
 // Copyright 2016 The ACH Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
-//
+
 package ach
 
 import (
@@ -12,6 +12,7 @@ import (
 )
 
 const (
+	// RecordLength character count of each line representing a letter in a file
 	RecordLength = 94
 )
 

@@ -51,8 +51,8 @@ func TestParseFileHeader(t *testing.T) {
 		t.Errorf("FileCreationTime Expected '1511' got:'%v'", record.FileCreationTime())
 	}
 
-	if record.FileIdModifier != "A" {
-		t.Errorf("FileIdModifier Expected 'A' got:'%v'", record.FileIdModifier)
+	if record.FileIDModifier != "A" {
+		t.Errorf("FileIDModifier Expected 'A' got:'%v'", record.FileIDModifier)
 	}
 	if record.recordSize != "094" {
 		t.Errorf("RecordSize Expected '094' got:'%v'", record.recordSize)
@@ -283,6 +283,15 @@ func TestParseFileControl(t *testing.T) {
 }
 
 func TestRecordTypeUnknown(t *testing.T) {
+	var line = "301 076401251 0764012510807291511A094101achdestname            companyname                    "
+	r := NewReader(strings.NewReader(line))
+	_, err := r.Read()
+	if !strings.Contains(err.Error(), "Unhandled Record Type") {
+		t.Errorf("Expected RecordType Error got: %v", err)
+	}
+}
+
+func TestTwoFileHeaders(t *testing.T) {
 	var line = "301 076401251 0764012510807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
