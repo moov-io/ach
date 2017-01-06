@@ -78,8 +78,8 @@ type BatchHeader struct {
 	// OriginatorStatusCode '1'
 	OriginatorStatusCode int
 
-	//OdfiIdentification First 8 digits of the originating DFI transit routing number
-	OdfiIdentification int
+	//ODFIIdentification First 8 digits of the originating DFI transit routing number
+	ODFIIdentification int
 
 	// BatchNumber is assigned in ascending sequence to each batch by the ODFI
 	// or its Sending Point in a given file of entries. Since the batch number
@@ -131,7 +131,7 @@ func (bh *BatchHeader) Parse(record string) {
 	bh.OriginatorStatusCode = bh.parseNumField(record[78:79])
 	// 80-87 Your ODFI's routing number without the last digit. The last digit is simply a
 	// checksum digit, which is why it is not necessary
-	bh.OdfiIdentification = bh.parseNumField(record[79:87])
+	bh.ODFIIdentification = bh.parseNumField(record[79:87])
 	// 88-94 Sequential number of this Batch Header Recor
 	// For example, put "1" if this is the first Batch Header Record in the file
 	bh.BatchNumber = bh.parseNumField(record[87:94])
@@ -150,7 +150,7 @@ func (bh *BatchHeader) String() string {
 		bh.EffectiveEntryDate(),
 		bh.settlementDate,
 		bh.OriginatorStatusCode,
-		bh.leftPad(strconv.Itoa(bh.OdfiIdentification), "0", 8),
+		bh.leftPad(strconv.Itoa(bh.ODFIIdentification), "0", 8),
 		bh.leftPad(strconv.Itoa(bh.BatchNumber), "0", 7),
 	)
 }
@@ -161,10 +161,10 @@ func (bh *BatchHeader) Validate() (bool, error) {
 	if bh.recordType != "5" {
 		return false, ErrRecordType
 	}
-	if !bh.isValidServiceClass(bh.ServiceClassCode) {
+	if !bh.iServiceClass(bh.ServiceClassCode) {
 		return false, ErrServiceClass
 	}
-	if !bh.isValidSECCode(bh.StandardEntryClassCode) {
+	if !bh.isSECCode(bh.StandardEntryClassCode) {
 		return false, ErrSECCode
 	}
 	if !bh.isOriginatorStatusCode(bh.OriginatorStatusCode) {

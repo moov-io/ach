@@ -11,8 +11,8 @@ import (
 // Validator is common validation and formating of golang types to ach type strings
 type Validator struct{}
 
-// isValidServiceClass returns true if a valid service class code
-func (v *Validator) isValidServiceClass(code int) bool {
+// iServiceClass returns true if a valid service class code
+func (v *Validator) iServiceClass(code int) bool {
 	switch code {
 	case
 		// ACH Mixed Debits and Credits
@@ -28,8 +28,8 @@ func (v *Validator) isValidServiceClass(code int) bool {
 	return false
 }
 
-// isValidSECCode returns true if a SEC Code is found
-func (v *Validator) isValidSECCode(code string) bool {
+// isSECCode returns true if a SEC Code is found
+func (v *Validator) isSECCode(code string) bool {
 	switch code {
 	case
 		"ACK", "ADV", "ARC", "ATX", "BOC", "CCD", "CIE", "COR", "CTX", "DNE", "ENR",
@@ -49,6 +49,31 @@ func (v *Validator) isOriginatorStatusCode(code int) bool {
 		1,
 		// Originator is a Government Agency or other agency not subject to ACH Rules
 		2:
+		return true
+	}
+	return false
+}
+
+func isTransactionCode(code int) bool {
+	switch code {
+	case
+		// TransactionCode if the recievers account is:
+		// Credit (deposit) to checking account ‘22’
+		22,
+		// Prenote for credit to checking account ‘23’
+		23,
+		// Debit (withdrawal) to checking account ‘27’
+		27,
+		// Prenote for debit to checking account ‘28’
+		28,
+		// Credit to savings account ‘32’
+		32,
+		// Prenote for credit to savings account ‘33’
+		33,
+		// Debit to savings account ‘37’
+		37,
+		// Prenote for debit to savings account ‘38’
+		38:
 		return true
 	}
 	return false
