@@ -38,12 +38,12 @@ func (f *File) addBatch(batch Batch) []Batch {
 // Batch holds the Batch Header and Batch Control and all Entry Records
 type Batch struct {
 	Header  BatchHeader
-	Entrys  []EntryDetail
+	Entries []EntryDetail
 	Control BatchControl
 }
 
 // addEntryDetail appends an EntryDetail to the Batch
 func (b *Batch) addEntryDetail(entry EntryDetail) []EntryDetail {
-	b.Entrys = append(b.Entrys, entry)
-	return b.Entrys
+	b.Entries = append(b.Entries, entry)
+	return b.Entries
 }
