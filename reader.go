@@ -32,22 +32,25 @@ func (e *ParseError) Error() string {
 // additional errors can occur in the Record
 var (
 	ErrRecordLen         = errors.New("Wrong number of fields in record expect 94")
-	ErrBatchControl      = errors.New("No terminating batch control record found in file")
+	ErrBatchControl      = errors.New("No terminating batch control record found in file for previous batch")
 	ErrUnknownRecordType = errors.New("Unhandled Record Type")
 	ErrFileHeader        = errors.New("None or more than one File Headers exists")
 	ErrFileControl       = errors.New("None or more than one Batch Control exists")
+	ErrEntryOutside      = errors.New("Entry detail record outside of a batch")
 )
 
 // Reader reads records from a ACH-encoded file.
 type Reader struct {
 	// r handles the IO.Reader sent to be parser.
 	r *bufio.Reader
+	// file being parsed r
+	file File
+	// currentBatch is the current Batch entries being parsed
+	currentBatch Batch
 	// line number of the file being parsed
 	line int
 	// record holds the current record type being parser.
 	record string
-	// field number of the record currently being parsed
-	//field string
 }
 
 // error creates a new ParseError based on err.
@@ -69,7 +72,7 @@ func NewReader(r io.Reader) *Reader {
 // Read reads each line of the ACH file and defines which parser to use based
 // on the first character of each line. It also enforces ACH formating rules and returns
 // the appropriate error if issues are found.
-func (r *Reader) Read() (file File, err error) {
+func (r *Reader) Read() (File, error) {
 	// read through the entire file
 	for {
 		line, _, err := r.r.ReadLine()
@@ -79,105 +82,125 @@ func (r *Reader) Read() (file File, err error) {
 			} else {
 				fmt.Printf("%s when reading file", err)
 				// TODO: return nil, error
+				// "File cannot be read"
 			}
 		}
-		// Only 94 ASCII characters to a line
-
-		if len(line) != RecordLength {
-			return file, r.error(ErrRecordLen)
-		}
-		// TODO: Check that all characters are accepter.
-
 		r.line++
+		// Only 94 ASCII characters to a line
+		if len(line) != RecordLength {
+			return r.file, r.error(ErrRecordLen)
+		}
 
 		r.record = string(line)
 		switch r.record[:1] {
 		case headerPos:
-			if (FileHeader{}) != file.FileHeader {
-				// Their can only be one File Header per File exit
-				return file, r.error(ErrFileHeader)
-			}
-			file.FileHeader = r.parseFileHeader()
-			v, err := file.FileHeader.Validate()
-			if !v {
-				r.record = "FileHeader"
-				return file, r.error(err)
+			err = r.parseFileHeader()
+			if err != nil {
+				return r.file, err
 			}
 		case batchPos:
-			file.BatchHeader = r.parseBatchHeader()
-			v, err := file.BatchHeader.Validate()
-			if !v {
-				r.record = "BatchHeader"
-				return file, r.error(err)
+			err = r.parseBatchHeader()
+			if err != nil {
+				return r.file, err
 			}
 		case entryDetailPos:
-			file.EntryDetail = r.parseEntryDetail()
-			v, err := file.EntryDetail.Validate()
-			if !v {
-				r.record = "EntryDetail"
-				return file, r.error(err)
+			err = r.parseEntryDetail()
+			if err != nil {
+				return r.file, err
 			}
 		case entryAddendaPos:
-			file.Addenda = r.parseAddenda()
-			v, err := file.Addenda.Validate()
+			r.file.Addenda = r.parseAddenda()
+			v, err := r.file.Addenda.Validate()
 			if !v {
 				r.record = "Addenda"
-				return file, r.error(err)
+				return r.file, r.error(err)
 			}
 		case batchControlPos:
-			file.BatchControl = r.parseBatchControl()
-			v, err := file.BatchControl.Validate()
-			if !v {
-				r.record = "BatchControl"
-				return file, r.error(err)
+			err = r.parseBatchControl()
+			if err != nil {
+				return r.file, err
 			}
 		case fileControlPos:
-			if (FileControl{}) != file.FileControl {
+			if (FileControl{}) != r.file.FileControl {
 				// Their can only be one File Control per File exit
-				return file, r.error(ErrFileControl)
+				return r.file, r.error(ErrFileControl)
 			}
-			file.FileControl = r.parseFileControl()
-			v, err := file.FileControl.Validate()
+			r.file.FileControl = r.parseFileControl()
+			v, err := r.file.FileControl.Validate()
 			if !v {
 				r.record = "FileControl"
-				return file, r.error(err)
+				return r.file, r.error(err)
 			}
 		default:
-			return file, r.error(ErrUnknownRecordType)
+			return r.file, r.error(ErrUnknownRecordType)
 		}
 
 	}
 
-	if (FileHeader{}) == file.FileHeader {
+	if (FileHeader{}) == r.file.Header {
 		// Their must be at least one file header
-		return file, r.error(ErrFileHeader)
+		return r.file, r.error(ErrFileHeader)
 	}
-	if (FileControl{}) == file.FileControl {
+	if (FileControl{}) == r.file.FileControl {
 		// Their must be at least one file control
-		return file, r.error(ErrFileControl)
+		return r.file, r.error(ErrFileControl)
 	}
 
 	// TODO: number of lines in file must be divisable by 10 the blocking factor
 	//fmt.Printf("Number of lines in file: %v \n", r.line)
-	return file, nil
+	return r.file, nil
 }
 
 // parseFileHeader takes the input record string and parses the FileHeaderRecord values
-func (r *Reader) parseFileHeader() (fh FileHeader) {
-	fh.Parse(r.record)
-	return fh
+func (r *Reader) parseFileHeader() error {
+	if (FileHeader{}) != r.file.Header {
+		// Their can only be one File Header per File exit
+		return r.error(ErrFileHeader)
+	}
+	r.file.Header.Parse(r.record)
+	v, err := r.file.Header.Validate()
+	if !v {
+		r.record = "FileHeader"
+		return r.error(err)
+	}
+	return nil
 }
 
 // parseBatchHeader takes the input record string and parses the FileHeaderRecord values
-func (r *Reader) parseBatchHeader() (bh BatchHeader) {
-	bh.Parse(r.record)
-	return bh
+func (r *Reader) parseBatchHeader() error {
+	if (BatchHeader{}) != r.currentBatch.Header {
+		// Ensure we have an empty Batch
+		return r.error(ErrBatchControl)
+	}
+	r.currentBatch.Header.Parse(r.record)
+	v, err := r.currentBatch.Header.Validate()
+	if !v {
+		r.record = "BatchHeader"
+		return r.error(err)
+	}
+	return nil
 }
 
 // parseEntryDetail takes the input record string and parses the EntryDetailRecord values
-func (r *Reader) parseEntryDetail() (ed EntryDetail) {
-	ed.Parse(r.record)
-	return ed
+func (r *Reader) parseEntryDetail() error {
+	if (BatchHeader{}) == r.currentBatch.Header {
+		return r.error(ErrEntryOutside)
+	}
+	if r.currentBatch.Header.StandardEntryClassCode == "PPD" {
+		ed := EntryDetail{}
+		ed.Parse(r.record)
+		v, err := ed.Validate()
+		if !v {
+			r.record = "EntryDetail"
+			return r.error(err)
+		}
+		r.currentBatch.addEntryDetail(ed)
+	} else {
+		return r.error(errors.New("Support for detail entries of standard entry class " +
+			r.currentBatch.Header.StandardEntryClassCode + " has not been implemented"))
+	}
+
+	return nil
 }
 
 // parseAddendaRecord takes the input record string and parses the AddendaRecord values
@@ -187,9 +210,16 @@ func (r *Reader) parseAddenda() (addenda Addenda) {
 }
 
 // parseBatchControl takes the input record string and parses the BatchControlRecord values
-func (r *Reader) parseBatchControl() (bc BatchControl) {
-	bc.Parse(r.record)
-	return bc
+func (r *Reader) parseBatchControl() error {
+	r.currentBatch.Control.Parse(r.record)
+	v, err := r.currentBatch.Control.Validate()
+	if !v {
+		r.record = "BatchControl"
+		return r.error(err)
+	}
+	r.file.addBatch(r.currentBatch)
+	r.currentBatch = Batch{}
+	return nil
 }
 
 // parseFileControl takes the input record string and parses the FileControlRecord values

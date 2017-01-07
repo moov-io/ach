@@ -40,7 +40,7 @@ func TestTwoFileHeaders(t *testing.T) {
 	_, err := r.Read()
 
 	if !strings.Contains(err.Error(), ErrFileHeader.Error()) {
-		t.Errorf("Expected RecordType Error got: %v", err)
+		t.Errorf("Expected File Header Error got: %v", err)
 	}
 }
 

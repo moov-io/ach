@@ -14,7 +14,11 @@ func TestParseFileHeader(t *testing.T) {
 	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
 	r.record = line
-	record := r.parseFileHeader()
+	err := r.parseFileHeader()
+	if err != nil {
+		t.Errorf("unknown error: %v", err)
+	}
+	record := r.file.Header
 
 	if record.recordType != "1" {
 		t.Errorf("RecordType Expected 1 got: %v", record.recordType)
@@ -64,7 +68,11 @@ func TestFHString(t *testing.T) {
 	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
 	r.record = line
-	record := r.parseFileHeader()
+	err := r.parseFileHeader()
+	if err != nil {
+		t.Errorf("unknown error: %v", err)
+	}
+	record := r.file.Header
 
 	if record.String() != line {
 		t.Errorf("Strings do not match")

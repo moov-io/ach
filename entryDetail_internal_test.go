@@ -13,8 +13,13 @@ import (
 func TestParseEntryDetail(t *testing.T) {
 	var line = "62705320001912345            0000010500c-1            Arnold Wade           DD0076401255655291"
 	r := NewReader(strings.NewReader(line))
+	r.currentBatch.Header.StandardEntryClassCode = "PPD"
 	r.record = line
-	record := r.parseEntryDetail()
+	err := r.parseEntryDetail()
+	if err != nil {
+		t.Errorf("unknown error: %v", err)
+	}
+	record := r.currentBatch.Entrys[0]
 
 	if record.recordType != "6" {
 		t.Errorf("RecordType Expected '6' got: %v", record.recordType)
@@ -56,8 +61,13 @@ func TestParseEntryDetail(t *testing.T) {
 func TestEDString(t *testing.T) {
 	var line = "62705320001912345            0000010500c-1            Arnold Wade           DD0076401255655291"
 	r := NewReader(strings.NewReader(line))
+	r.currentBatch.Header.StandardEntryClassCode = "PPD"
 	r.record = line
-	record := r.parseEntryDetail()
+	err := r.parseEntryDetail()
+	if err != nil {
+		t.Errorf("unknown error: %v", err)
+	}
+	record := r.currentBatch.Entrys[0]
 
 	if record.String() != line {
 		t.Errorf("Strings do not match")
