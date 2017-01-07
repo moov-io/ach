@@ -39,25 +39,11 @@ func (v *Validator) isSECCode(code string) bool {
 	return false
 }
 
-// isOriginatorStatusCode ensures status code is valid
-func (v *Validator) isOriginatorStatusCode(code int) bool {
+// isTransactionCode ensures TransactionCode code is valid
+func (v *Validator) isTransactionCode(code int) bool {
 	switch code {
+	// TransactionCode if the recievers account is:
 	case
-		// ADV file - prepared by an ACH Operator
-		0,
-		//Originator is a financial institution
-		1,
-		// Originator is a Government Agency or other agency not subject to ACH Rules
-		2:
-		return true
-	}
-	return false
-}
-
-func isTransactionCode(code int) bool {
-	switch code {
-	case
-		// TransactionCode if the recievers account is:
 		// Credit (deposit) to checking account ‘22’
 		22,
 		// Prenote for credit to checking account ‘23’
@@ -79,9 +65,25 @@ func isTransactionCode(code int) bool {
 	return false
 }
 
+// isOriginatorStatusCode ensures status code is valid
+func (v *Validator) isOriginatorStatusCode(code int) bool {
+	switch code {
+	case
+		// ADV file - prepared by an ACH Operator
+		0,
+		//Originator is a financial institution
+		1,
+		// Originator is a Government Agency or other agency not subject to ACH Rules
+		2:
+		return true
+	}
+	return false
+}
+
 func (v *Validator) parseNumField(r string) (s int) {
 	s, err := strconv.Atoi(strings.TrimSpace(r))
 	if err != nil {
+		// TODO: This is horrible
 		fmt.Printf("%v", err)
 		return
 	}

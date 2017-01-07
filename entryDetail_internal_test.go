@@ -73,3 +73,13 @@ func TestValidateEDRecordType(t *testing.T) {
 		t.Errorf("Expected RecordType Error got: %v", err)
 	}
 }
+
+// TestValidateEDTransactionCode ensure error if TransactionCode is not valid
+func TestValidateEDTransactionCode(t *testing.T) {
+	ed := NewEntryDetail()
+	ed.TransactionCode = 63
+	_, err := ed.Validate()
+	if !strings.Contains(err.Error(), ErrTransactionCode.Error()) {
+		t.Errorf("Expected Transaction Code Error got: %v", err)
+	}
+}

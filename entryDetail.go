@@ -1,8 +1,14 @@
 package ach
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
+)
+
+// Errors Specific to a Batch Entry Detail Record
+var (
+	ErrTransactionCode = errors.New("Invalid Transaction Code")
 )
 
 // EntryDetail contains the actual transaction data for an individual entry.
@@ -127,6 +133,10 @@ func (ed *EntryDetail) Validate() (bool, error) {
 	if ed.recordType != "6" {
 		return false, ErrRecordType
 	}
+	if !ed.isTransactionCode(ed.TransactionCode) {
+		return false, ErrTransactionCode
+	}
+
 	return true, nil
 }
 
