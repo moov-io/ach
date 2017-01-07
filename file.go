@@ -26,11 +26,7 @@ type File struct {
 	Control FileControl
 
 	// TODO: remove
-	BatchHeader
-	EntryDetail
 	Addenda
-	BatchControl
-	FileControl
 }
 
 // addEntryDetail appends an EntryDetail to the Batch

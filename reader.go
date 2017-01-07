@@ -25,7 +25,7 @@ type ParseError struct {
 }
 
 func (e *ParseError) Error() string {
-	return fmt.Sprintf("line %d, Record  %s: %s", e.Line, e.Record, e.Err)
+	return fmt.Sprintf("LineNum: %d, RecordName:  %s, Error: %s ", e.Line, e.Record, e.Err)
 }
 
 // These are the errors that can be returned in Parse.Error
@@ -111,11 +111,9 @@ func (r *Reader) Read() (File, error) {
 				return r.file, err
 			}
 		case entryAddendaPos:
-			r.file.Addenda = r.parseAddenda()
-			v, err := r.file.Addenda.Validate()
-			if !v {
-				r.recordName = "Addenda"
-				return r.file, r.error(err)
+			err = r.parseAddenda()
+			if err != nil {
+				return r.file, err
 			}
 		case batchControlPos:
 			err = r.parseBatchControl()
@@ -199,9 +197,14 @@ func (r *Reader) parseEntryDetail() error {
 }
 
 // parseAddendaRecord takes the input record string and parses the AddendaRecord values
-func (r *Reader) parseAddenda() (addenda Addenda) {
-	addenda.Parse(r.line)
-	return addenda
+func (r *Reader) parseAddenda() error {
+	r.recordName = "Addenda"
+	r.file.Addenda.Parse(r.line)
+	v, err := r.file.Addenda.Validate()
+	if !v {
+		return r.error(err)
+	}
+	return nil
 }
 
 // parseBatchControl takes the input record string and parses the BatchControlRecord values

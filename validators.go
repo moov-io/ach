@@ -50,7 +50,11 @@ func (v *Validator) isTypeCode(code string) bool {
 		// Notification of Change and Refused Notification of Change Entry
 		"98",
 		// Return, Dishonored Return and Contested Dishonored Return Entries
-		"99":
+		"99",
+		//  IAT forward Entries and IAT Returns
+		"10", "11", "12", "13", "14", "15", "16", "17",
+		// CCD Addenda Record
+		"05":
 		return true
 	}
 	return false
