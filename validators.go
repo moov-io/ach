@@ -12,7 +12,7 @@ import (
 type Validator struct{}
 
 // iServiceClass returns true if a valid service class code
-func (v *Validator) iServiceClass(code int) bool {
+func (v *Validator) isServiceClass(code int) bool {
 	switch code {
 	case
 		// ACH Mixed Debits and Credits

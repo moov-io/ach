@@ -79,14 +79,14 @@ type BatchHeader struct {
 	OriginatorStatusCode int
 
 	//ODFIIdentification First 8 digits of the originating DFI transit routing number
-	ODFIIdentification int
+	odfiIdentification int
 
 	// BatchNumber is assigned in ascending sequence to each batch by the ODFI
 	// or its Sending Point in a given file of entries. Since the batch number
 	// in the Batch Header Record and the Batch Control Record is the same,
 	// the ascending sequence number should be assigned by batch and not by
 	// record.
-	BatchNumber int
+	batchNumber int
 
 	// Validator is composed for data conversion and validation
 	Validator
@@ -131,12 +131,13 @@ func (bh *BatchHeader) Parse(record string) {
 	bh.OriginatorStatusCode = bh.parseNumField(record[78:79])
 	// 80-87 Your ODFI's routing number without the last digit. The last digit is simply a
 	// checksum digit, which is why it is not necessary
-	bh.ODFIIdentification = bh.parseNumField(record[79:87])
+	bh.odfiIdentification = bh.parseNumField(record[79:87])
 	// 88-94 Sequential number of this Batch Header Recor
 	// For example, put "1" if this is the first Batch Header Record in the file
-	bh.BatchNumber = bh.parseNumField(record[87:94])
+	bh.batchNumber = bh.parseNumField(record[87:94])
 }
 
+// String writes the BatchHeader struct to a 94 character string.
 func (bh *BatchHeader) String() string {
 	return fmt.Sprintf("%v%v%v%v%v%v%v%v%v%v%v%v%v",
 		bh.recordType,
@@ -150,8 +151,8 @@ func (bh *BatchHeader) String() string {
 		bh.EffectiveEntryDate(),
 		bh.settlementDate,
 		bh.OriginatorStatusCode,
-		bh.leftPad(strconv.Itoa(bh.ODFIIdentification), "0", 8),
-		bh.leftPad(strconv.Itoa(bh.BatchNumber), "0", 7),
+		bh.ODFIIdentification(),
+		bh.BatchNumber(),
 	)
 }
 
@@ -161,7 +162,7 @@ func (bh *BatchHeader) Validate() (bool, error) {
 	if bh.recordType != "5" {
 		return false, ErrRecordType
 	}
-	if !bh.iServiceClass(bh.ServiceClassCode) {
+	if !bh.isServiceClass(bh.ServiceClassCode) {
 		return false, ErrServiceClass
 	}
 	if !bh.isSECCode(bh.StandardEntryClassCode) {
@@ -177,4 +178,14 @@ func (bh *BatchHeader) Validate() (bool, error) {
 // EffectiveEntryDate get the EffectiveEntryDate in YYMMDD format
 func (bh *BatchHeader) EffectiveEntryDate() string {
 	return bh.formatSimpleDate(bh.effectiveEntryDate)
+}
+
+// ODFIIdentification get the odfi number zero padded
+func (bh *BatchHeader) ODFIIdentification() string {
+	return bh.leftPad(strconv.Itoa(bh.odfiIdentification), "0", 8)
+}
+
+// BatchNumber get the batch number zero padded
+func (bh *BatchHeader) BatchNumber() string {
+	return bh.leftPad(strconv.Itoa(bh.batchNumber), "0", 7)
 }

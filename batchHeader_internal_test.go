@@ -49,11 +49,11 @@ func TestParseBatchHeader(t *testing.T) {
 	if record.OriginatorStatusCode != 1 {
 		t.Errorf("OriginatorStatusCode Expected 1 got: %v", record.OriginatorStatusCode)
 	}
-	if record.ODFIIdentification != 7640125 {
-		t.Errorf("OdfiIdentification Expected '07640125' got: %v", record.ODFIIdentification)
+	if record.ODFIIdentification() != "07640125" {
+		t.Errorf("OdfiIdentification Expected '07640125' got: %v", record.ODFIIdentification())
 	}
-	if record.BatchNumber != 0000001 {
-		t.Errorf("BatchNumber Expected '0000001' got: %v", record.BatchNumber)
+	if record.BatchNumber() != "0000001" {
+		t.Errorf("BatchNumber Expected '0000001' got: %v", record.BatchNumber())
 	}
 }
 
