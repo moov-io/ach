@@ -13,8 +13,12 @@ import (
 func TestParseFileControl(t *testing.T) {
 	var line = "9000001000001000000010005320001000000010500000000000000                                       "
 	r := NewReader(strings.NewReader(line))
-	r.record = line
-	record := r.parseFileControl()
+	r.line = line
+	err := r.parseFileControl()
+	if err != nil {
+		t.Errorf("unknown error: %v", err)
+	}
+	record := r.file.Control
 
 	if record.recordType != "9" {
 		t.Errorf("RecordType Expected '9' got: %v", record.recordType)
@@ -46,8 +50,12 @@ func TestParseFileControl(t *testing.T) {
 func TestFCString(t *testing.T) {
 	var line = "9000001000001000000010005320001000000010500000000000000                                       "
 	r := NewReader(strings.NewReader(line))
-	r.record = line
-	record := r.parseFileControl()
+	r.line = line
+	err := r.parseFileControl()
+	if err != nil {
+		t.Errorf("unknown error: %v", err)
+	}
+	record := r.file.Control
 	if record.String() != line {
 		t.Errorf("\nStrings do not match %s\n %s", line, record.String())
 	}

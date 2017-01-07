@@ -13,7 +13,7 @@ import (
 func TestParseBatchControl(t *testing.T) {
 	var line = "82250000010005320001000000010500000000000000origid                             076401250000001"
 	r := NewReader(strings.NewReader(line))
-	r.record = line
+	r.line = line
 	err := r.parseBatchControl()
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
@@ -59,7 +59,7 @@ func TestParseBatchControl(t *testing.T) {
 func TestBCString(t *testing.T) {
 	var line = "82250000010005320001000000010500000000000000origid                             076401250000001"
 	r := NewReader(strings.NewReader(line))
-	r.record = line
+	r.line = line
 	err := r.parseBatchControl()
 	if err != nil {
 		t.Errorf("unknown error: %v", err)

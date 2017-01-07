@@ -14,7 +14,7 @@ func TestParseAddenda(t *testing.T) {
 	var line = "710WEB                                        DIEGO MAY                                0000001"
 
 	r := NewReader(strings.NewReader(line))
-	r.record = line
+	r.line = line
 	record := r.parseAddenda()
 
 	if record.recordType != "7" {
@@ -38,7 +38,7 @@ func TestParseAddenda(t *testing.T) {
 func TestAddendaString(t *testing.T) {
 	var line = "710WEB                                        DIEGO MAY                                0000001"
 	r := NewReader(strings.NewReader(line))
-	r.record = line
+	r.line = line
 	record := r.parseAddenda()
 	if record.String() != line {
 		t.Errorf("Strings do not match")

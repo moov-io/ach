@@ -13,7 +13,7 @@ import (
 func TestParseBatchHeader(t *testing.T) {
 	var line = "5225companyname                         origid    PPDCHECKPAYMT000002080730   1076401250000001"
 	r := NewReader(strings.NewReader(line))
-	r.record = line
+	r.line = line
 	err := r.parseBatchHeader()
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
@@ -65,7 +65,7 @@ func TestParseBatchHeader(t *testing.T) {
 func TestBHString(t *testing.T) {
 	var line = "5225companyname                         origid    PPDCHECKPAYMT000002080730   1076401250000001"
 	r := NewReader(strings.NewReader(line))
-	r.record = line
+	r.line = line
 	err := r.parseBatchHeader()
 	if err != nil {
 		t.Errorf("unknown error: %v", err)

@@ -35,7 +35,7 @@ var (
 	ErrBatchControl      = errors.New("No terminating batch control record found in file for previous batch")
 	ErrUnknownRecordType = errors.New("Unhandled Record Type")
 	ErrFileHeader        = errors.New("None or more than one File Headers exists")
-	ErrFileControl       = errors.New("None or more than one Batch Control exists")
+	ErrFileControl       = errors.New("None or more than one File Control exists")
 	ErrEntryOutside      = errors.New("Entry detail record outside of a batch")
 )
 
@@ -43,21 +43,23 @@ var (
 type Reader struct {
 	// r handles the IO.Reader sent to be parser.
 	r *bufio.Reader
-	// file being parsed r
+	// file is ach.file model being built as r is parsed.
 	file File
+	// line is the current line being parsed from the input r
+	line string
 	// currentBatch is the current Batch entries being parsed
 	currentBatch Batch
 	// line number of the file being parsed
-	line int
-	// record holds the current record type being parser.
-	record string
+	lineNum int
+	// recordName holds the current record name being parsed.
+	recordName string
 }
 
 // error creates a new ParseError based on err.
 func (r *Reader) error(err error) error {
 	return &ParseError{
-		Line:   r.line,
-		Record: r.record,
+		Line:   r.lineNum,
+		Record: r.recordName,
 		Err:    err,
 	}
 }
@@ -75,7 +77,7 @@ func NewReader(r io.Reader) *Reader {
 func (r *Reader) Read() (File, error) {
 	// read through the entire file
 	for {
-		line, _, err := r.r.ReadLine()
+		i, _, err := r.r.ReadLine()
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -85,14 +87,14 @@ func (r *Reader) Read() (File, error) {
 				// "File cannot be read"
 			}
 		}
-		r.line++
+		r.line = string(i)
+		r.lineNum++
 		// Only 94 ASCII characters to a line
-		if len(line) != RecordLength {
+		if len(r.line) != RecordLength {
 			return r.file, r.error(ErrRecordLen)
 		}
 
-		r.record = string(line)
-		switch r.record[:1] {
+		switch r.line[:1] {
 		case headerPos:
 			err = r.parseFileHeader()
 			if err != nil {
@@ -112,7 +114,7 @@ func (r *Reader) Read() (File, error) {
 			r.file.Addenda = r.parseAddenda()
 			v, err := r.file.Addenda.Validate()
 			if !v {
-				r.record = "Addenda"
+				r.recordName = "Addenda"
 				return r.file, r.error(err)
 			}
 		case batchControlPos:
@@ -121,27 +123,21 @@ func (r *Reader) Read() (File, error) {
 				return r.file, err
 			}
 		case fileControlPos:
-			if (FileControl{}) != r.file.FileControl {
-				// Their can only be one File Control per File exit
-				return r.file, r.error(ErrFileControl)
-			}
-			r.file.FileControl = r.parseFileControl()
-			v, err := r.file.FileControl.Validate()
-			if !v {
-				r.record = "FileControl"
-				return r.file, r.error(err)
+			err = r.parseFileControl()
+			if err != nil {
+				return r.file, err
 			}
 		default:
 			return r.file, r.error(ErrUnknownRecordType)
 		}
-
 	}
 
 	if (FileHeader{}) == r.file.Header {
 		// Their must be at least one file header
 		return r.file, r.error(ErrFileHeader)
 	}
-	if (FileControl{}) == r.file.FileControl {
+
+	if (FileControl{}) == r.file.Control {
 		// Their must be at least one file control
 		return r.file, r.error(ErrFileControl)
 	}
@@ -153,14 +149,14 @@ func (r *Reader) Read() (File, error) {
 
 // parseFileHeader takes the input record string and parses the FileHeaderRecord values
 func (r *Reader) parseFileHeader() error {
+	r.recordName = "FileHeader"
 	if (FileHeader{}) != r.file.Header {
 		// Their can only be one File Header per File exit
 		return r.error(ErrFileHeader)
 	}
-	r.file.Header.Parse(r.record)
+	r.file.Header.Parse(r.line)
 	v, err := r.file.Header.Validate()
 	if !v {
-		r.record = "FileHeader"
 		return r.error(err)
 	}
 	return nil
@@ -168,14 +164,14 @@ func (r *Reader) parseFileHeader() error {
 
 // parseBatchHeader takes the input record string and parses the FileHeaderRecord values
 func (r *Reader) parseBatchHeader() error {
+	r.recordName = "BatchHeader"
 	if (BatchHeader{}) != r.currentBatch.Header {
 		// Ensure we have an empty Batch
 		return r.error(ErrBatchControl)
 	}
-	r.currentBatch.Header.Parse(r.record)
+	r.currentBatch.Header.Parse(r.line)
 	v, err := r.currentBatch.Header.Validate()
 	if !v {
-		r.record = "BatchHeader"
 		return r.error(err)
 	}
 	return nil
@@ -183,15 +179,15 @@ func (r *Reader) parseBatchHeader() error {
 
 // parseEntryDetail takes the input record string and parses the EntryDetailRecord values
 func (r *Reader) parseEntryDetail() error {
+	r.recordName = "EntryDetail"
 	if (BatchHeader{}) == r.currentBatch.Header {
 		return r.error(ErrEntryOutside)
 	}
 	if r.currentBatch.Header.StandardEntryClassCode == "PPD" {
 		ed := EntryDetail{}
-		ed.Parse(r.record)
+		ed.Parse(r.line)
 		v, err := ed.Validate()
 		if !v {
-			r.record = "EntryDetail"
 			return r.error(err)
 		}
 		r.currentBatch.addEntryDetail(ed)
@@ -199,22 +195,21 @@ func (r *Reader) parseEntryDetail() error {
 		return r.error(errors.New("Support for detail entries of standard entry class " +
 			r.currentBatch.Header.StandardEntryClassCode + " has not been implemented"))
 	}
-
 	return nil
 }
 
 // parseAddendaRecord takes the input record string and parses the AddendaRecord values
 func (r *Reader) parseAddenda() (addenda Addenda) {
-	addenda.Parse(r.record)
+	addenda.Parse(r.line)
 	return addenda
 }
 
 // parseBatchControl takes the input record string and parses the BatchControlRecord values
 func (r *Reader) parseBatchControl() error {
-	r.currentBatch.Control.Parse(r.record)
+	r.recordName = "BatchControl"
+	r.currentBatch.Control.Parse(r.line)
 	v, err := r.currentBatch.Control.Validate()
 	if !v {
-		r.record = "BatchControl"
 		return r.error(err)
 	}
 	r.file.addBatch(r.currentBatch)
@@ -223,7 +218,16 @@ func (r *Reader) parseBatchControl() error {
 }
 
 // parseFileControl takes the input record string and parses the FileControlRecord values
-func (r *Reader) parseFileControl() (fc FileControl) {
-	fc.Parse(r.record)
-	return fc
+func (r *Reader) parseFileControl() error {
+	r.recordName = "FileControl"
+	if (FileControl{}) != r.file.Control {
+		// Their can only be one File Control per File exit
+		return r.error(ErrFileControl)
+	}
+	r.file.Control.Parse(r.line)
+	v, err := r.file.Control.Validate()
+	if !v {
+		return r.error(err)
+	}
+	return nil
 }

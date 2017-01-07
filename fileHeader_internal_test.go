@@ -13,7 +13,7 @@ import (
 func TestParseFileHeader(t *testing.T) {
 	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
-	r.record = line
+	r.line = line
 	err := r.parseFileHeader()
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
@@ -67,7 +67,7 @@ func TestParseFileHeader(t *testing.T) {
 func TestFHString(t *testing.T) {
 	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
-	r.record = line
+	r.line = line
 	err := r.parseFileHeader()
 	if err != nil {
 		t.Errorf("unknown error: %v", err)

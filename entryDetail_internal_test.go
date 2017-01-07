@@ -14,7 +14,7 @@ func TestParseEntryDetail(t *testing.T) {
 	var line = "62705320001912345            0000010500c-1            Arnold Wade           DD0076401255655291"
 	r := NewReader(strings.NewReader(line))
 	r.currentBatch.Header.StandardEntryClassCode = "PPD"
-	r.record = line
+	r.line = line
 	err := r.parseEntryDetail()
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
@@ -62,7 +62,7 @@ func TestEDString(t *testing.T) {
 	var line = "62705320001912345            0000010500c-1            Arnold Wade           DD0076401255655291"
 	r := NewReader(strings.NewReader(line))
 	r.currentBatch.Header.StandardEntryClassCode = "PPD"
-	r.record = line
+	r.line = line
 	err := r.parseEntryDetail()
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
