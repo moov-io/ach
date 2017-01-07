@@ -136,7 +136,6 @@ func (fh *FileHeader) Parse(record string) {
 
 // String writes the FileHeader struct to a 94 character string.
 func (fh *FileHeader) String() string {
-
 	return fmt.Sprintf("%v%v%v%v%v%v%v%v%v%v%v%v%v",
 		fh.recordType,
 		fh.priorityCode,
