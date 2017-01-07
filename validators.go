@@ -39,6 +39,23 @@ func (v *Validator) isSECCode(code string) bool {
 	return false
 }
 
+// isTypeCode returns true if a valid type code is found
+func (v *Validator) isTypeCode(code string) bool {
+	switch code {
+	case
+		// For POS, SHR or MTE Entries
+		"02",
+		// Addenda Record (ACK, ATX, CCD, CIE, CTX, DNE, ENR, PPD, TRX and WEB Entries
+		"08",
+		// Notification of Change and Refused Notification of Change Entry
+		"98",
+		// Return, Dishonored Return and Contested Dishonored Return Entries
+		"99":
+		return true
+	}
+	return false
+}
+
 // isTransactionCode ensures TransactionCode code is valid
 func (v *Validator) isTransactionCode(code int) bool {
 	switch code {
