@@ -31,12 +31,14 @@ func (e *ParseError) Error() string {
 // These are the errors that can be returned in Parse.Error
 // additional errors can occur in the Record
 var (
-	ErrRecordLen         = errors.New("Wrong number of fields in record expect 94")
-	ErrBatchControl      = errors.New("No terminating batch control record found in file for previous batch")
-	ErrUnknownRecordType = errors.New("Unhandled Record Type")
-	ErrFileHeader        = errors.New("None or more than one File Headers exists")
-	ErrFileControl       = errors.New("None or more than one File Control exists")
-	ErrEntryOutside      = errors.New("Entry detail record outside of a batch")
+	ErrRecordLen          = errors.New("Wrong number of fields in record expect 94")
+	ErrBatchControl       = errors.New("No terminating batch control record found in file for previous batch")
+	ErrUnknownRecordType  = errors.New("Unhandled Record Type")
+	ErrFileHeader         = errors.New("None or more than one File Headers exists")
+	ErrFileControl        = errors.New("None or more than one File Control exists")
+	ErrEntryOutside       = errors.New("Entry Detail record outside of a batch")
+	ErrAddendaOutside     = errors.New("Entry Addenda without a preceeding Entry Detail")
+	ErrAddendaNoIndicator = errors.New("Addenda without Entry Detail Addenda Inicator")
 )
 
 // Reader reads records from a ACH-encoded file.
@@ -141,7 +143,6 @@ func (r *Reader) Read() (File, error) {
 	}
 
 	// TODO: number of lines in file must be divisable by 10 the blocking factor
-	//fmt.Printf("Number of lines in file: %v \n", r.line)
 	return r.file, nil
 }
 
@@ -199,11 +200,28 @@ func (r *Reader) parseEntryDetail() error {
 // parseAddendaRecord takes the input record string and parses the AddendaRecord values
 func (r *Reader) parseAddenda() error {
 	r.recordName = "Addenda"
-	r.file.Addenda.Parse(r.line)
-	v, err := r.file.Addenda.Validate()
-	if !v {
-		return r.error(err)
+	if len(r.currentBatch.Entries) == 0 {
+		return r.error(ErrAddendaOutside)
 	}
+	entryIndex := len(r.currentBatch.Entries) - 1
+	entry := r.currentBatch.Entries[entryIndex]
+	if r.currentBatch.Header.StandardEntryClassCode == "PPD" {
+		if entry.AddendaRecordIndicator == 1 {
+			addenda := Addenda{}
+			addenda.Parse(r.line)
+			v, err := addenda.Validate()
+			if !v {
+				return r.error(err)
+			}
+			r.currentBatch.Entries[entryIndex].addAddenda(addenda)
+		} else {
+			return r.error(ErrAddendaNoIndicator)
+		}
+	} else {
+		return r.error(errors.New("Support for Addenda records for standard entry class " +
+			r.currentBatch.Header.StandardEntryClassCode + " has not been implemented"))
+	}
+
 	return nil
 }
 

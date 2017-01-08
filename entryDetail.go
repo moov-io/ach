@@ -72,6 +72,9 @@ type EntryDetail struct {
 	// with an entry or item rather than a physical record.
 	traceNumber int
 
+	// Addendums a list of Addenda for the Entry Detail
+	Addendums []Addenda
+
 	// Validator is composed for data conversion and validation
 	Validator
 }
@@ -138,6 +141,12 @@ func (ed *EntryDetail) Validate() (bool, error) {
 	}
 
 	return true, nil
+}
+
+// addAddenda appends an EntryDetail to the Addendums
+func (ed *EntryDetail) addAddenda(addenda Addenda) []Addenda {
+	ed.Addendums = append(ed.Addendums, addenda)
+	return ed.Addendums
 }
 
 // RDFIIdentification get the rdfiIdentification with zero padding
