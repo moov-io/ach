@@ -21,10 +21,29 @@ const (
 
 // File contains the structures of a parsed ACH File.
 type File struct {
-	FileHeader
-	BatchHeader
-	EntryDetail
+	Header  FileHeader
+	Batches []Batch
+	Control FileControl
+
+	// TODO: remove
 	Addenda
-	BatchControl
-	FileControl
+}
+
+// addEntryDetail appends an EntryDetail to the Batch
+func (f *File) addBatch(batch Batch) []Batch {
+	f.Batches = append(f.Batches, batch)
+	return f.Batches
+}
+
+// Batch holds the Batch Header and Batch Control and all Entry Records
+type Batch struct {
+	Header  BatchHeader
+	Entries []EntryDetail
+	Control BatchControl
+}
+
+// addEntryDetail appends an EntryDetail to the Batch
+func (b *Batch) addEntryDetail(entry EntryDetail) []EntryDetail {
+	b.Entries = append(b.Entries, entry)
+	return b.Entries
 }

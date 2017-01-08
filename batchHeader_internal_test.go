@@ -13,8 +13,12 @@ import (
 func TestParseBatchHeader(t *testing.T) {
 	var line = "5225companyname                         origid    PPDCHECKPAYMT000002080730   1076401250000001"
 	r := NewReader(strings.NewReader(line))
-	r.record = line
-	record := r.parseBatchHeader()
+	r.line = line
+	err := r.parseBatchHeader()
+	if err != nil {
+		t.Errorf("unknown error: %v", err)
+	}
+	record := r.currentBatch.Header
 
 	if record.recordType != "5" {
 		t.Errorf("RecordType Expected '5' got: %v", record.recordType)
@@ -61,8 +65,12 @@ func TestParseBatchHeader(t *testing.T) {
 func TestBHString(t *testing.T) {
 	var line = "5225companyname                         origid    PPDCHECKPAYMT000002080730   1076401250000001"
 	r := NewReader(strings.NewReader(line))
-	r.record = line
-	record := r.parseBatchHeader()
+	r.line = line
+	err := r.parseBatchHeader()
+	if err != nil {
+		t.Errorf("unknown error: %v", err)
+	}
+	record := r.currentBatch.Header
 
 	if record.String() != line {
 		t.Errorf("Strings do not match")
