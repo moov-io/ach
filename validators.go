@@ -142,25 +142,25 @@ func (v *Validator) isUpperAlphanumeric(s string) (b bool) {
 }
 
 // isAlphanumeric checks if a string only contains ASCII alphanumeric characters
-func (v *Validator) isAlphanumeric(s string) (b bool) {
-	if regexp.MustCompile(`[^ a-zA-Z0-9_*\/]+`).MatchString(s) {
-		// ^[ A-Za-z0-9_@./#&+-]*$/
-		return false
-	}
-	return true
-}
-
-// isLetter checks if a string contains only ASCII letters
-func (v *Validator) isLetter(s string) bool {
-	fmt.Println(s)
-	for _, r := range s {
-		fmt.Printf("%v ", r)
-		if (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') {
-			return false
-		}
-	}
-	return true
-}
+// func (v *Validator) isAlphanumeric(s string) (b bool) {
+// 	if regexp.MustCompile(`[^ a-zA-Z0-9_*\/]+`).MatchString(s) {
+// 		// ^[ A-Za-z0-9_@./#&+-]*$/
+// 		return false
+// 	}
+// 	return true
+// }
+//
+// // isLetter checks if a string contains only ASCII letters
+// func (v *Validator) isLetter(s string) bool {
+// 	fmt.Println(s)
+// 	for _, r := range s {
+// 		fmt.Printf("%v ", r)
+// 		if (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') {
+// 			return false
+// 		}
+// 	}
+// 	return true
+// }
 
 // rightPad takes a string and padds the left side of s to overallLen with padStr.
 func (v *Validator) rightPad(s string, padStr string, overallLen int) string {
