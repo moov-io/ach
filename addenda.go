@@ -28,13 +28,15 @@ type Addenda struct {
 	// the same as the last seven digits of the trace number of the related
 	// Entry Detail Record or Corporate Entry Detail Record.
 	EntryDetailSequenceNumber string
-	// Validator is composed for data conversion and validation
+	// Validator is composed for data validation
 	Validator
+	// Converters is composed for ACH to golang Converters
+	Converters
 }
 
 // NewAddenda returns a new Addenda with default values for none exported fields
-func NewAddenda() Addenda {
-	return Addenda{
+func NewAddenda() *Addenda {
+	return &Addenda{
 		recordType: "7",
 	}
 }

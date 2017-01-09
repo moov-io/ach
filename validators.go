@@ -1,12 +1,6 @@
 package ach
 
-import (
-	"fmt"
-	"regexp"
-	"strconv"
-	"strings"
-	"time"
-)
+import "regexp"
 
 // Validator is common validation and formating of golang types to ach type strings
 type Validator struct{}
@@ -101,38 +95,6 @@ func (v *Validator) isOriginatorStatusCode(code int) bool {
 	return false
 }
 
-func (v *Validator) parseNumField(r string) (s int) {
-	s, err := strconv.Atoi(strings.TrimSpace(r))
-	if err != nil {
-		// TODO: This is horrible
-		fmt.Printf("%v", err)
-		return
-	}
-	return s
-}
-
-// formatSimpleDate takes a time.Time and returns a string of YYMMDD
-func (v *Validator) formatSimpleDate(t time.Time) string {
-	return t.Format("060102")
-}
-
-// parseSimpleDate returns a time.Time when passed time as YYMMDD
-func (v *Validator) parseSimpleDate(s string) time.Time {
-	t, _ := time.Parse("060102", s)
-	return t
-}
-
-// formatSimpleTime returns a string of HHMM when  passed a time.Time
-func (v *Validator) formatSimpleTime(t time.Time) string {
-	return t.Format("1504")
-}
-
-// parseSimpleTime returns a time.Time when passed a string of HHMM
-func (v *Validator) parseSimpleTime(s string) time.Time {
-	t, _ := time.Parse("1504", s)
-	return t
-}
-
 // isUpperAlphanumeric checks if string only contains ASCII alphanumeric upper case characters
 func (v *Validator) isUpperAlphanumeric(s string) (b bool) {
 	if regexp.MustCompile(`[^A-Z0-9]+`).MatchString(s) {
@@ -161,19 +123,3 @@ func (v *Validator) isUpperAlphanumeric(s string) (b bool) {
 // 	}
 // 	return true
 // }
-
-// rightPad takes a string and padds the left side of s to overallLen with padStr.
-func (v *Validator) rightPad(s string, padStr string, overallLen int) string {
-	var padCountInt int
-	padCountInt = 1 + (overallLen - len(padStr))
-	var retStr = s + strings.Repeat(padStr, padCountInt)
-	return retStr[:overallLen]
-}
-
-// leftPad takes a string and padds the right side of s to overallLen with padStr.
-func (v *Validator) leftPad(s string, padStr string, overallLen int) string {
-	var padCountInt int
-	padCountInt = 1 + (overallLen - len(padStr))
-	var retStr = strings.Repeat(padStr, padCountInt) + s
-	return retStr[(len(retStr) - overallLen):]
-}

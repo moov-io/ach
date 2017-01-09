@@ -57,8 +57,10 @@ type BatchControl struct {
 	// in the Batch Header Record and the Batch Control Record is the same,
 	// the ascending sequence number should be assigned by batch and not by record.
 	batchNumber int
-	// Validator is composed for data conversion and validation
+	// Validator is composed for data validation
 	Validator
+	// Converters is composed for ACH to golang Converters
+	Converters
 }
 
 // Parse takes the input record string and parses the EntryDetail values

@@ -74,9 +74,10 @@ type EntryDetail struct {
 
 	// Addendums a list of Addenda for the Entry Detail
 	Addendums []Addenda
-
-	// Validator is composed for data conversion and validation
+	// Validator is composed for data validation
 	Validator
+	// Converters is composed for ACH to golang Converters
+	Converters
 }
 
 // NewEntryDetail returns a new EntryDetail with default values for none exported fields
