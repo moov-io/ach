@@ -58,8 +58,8 @@ func TestParseFileHeader(t *testing.T) {
 	if record.ImmediateOriginNameField() != "companyname            " {
 		t.Errorf("ImmidiateOriginName Expected 'companyname          ' got: '%v'", record.ImmediateOriginNameField())
 	}
-	if record.ReferenceCode != "        " {
-		t.Errorf("ReferenceCode Expected '        ' got:'%v'", record.ReferenceCode)
+	if record.ReferenceCodeField() != "        " {
+		t.Errorf("ReferenceCode Expected '        ' got:'%v'", record.ReferenceCodeField())
 	}
 }
 

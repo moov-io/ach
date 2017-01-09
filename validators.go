@@ -1,9 +1,19 @@
 package ach
 
-import "regexp"
+import (
+	"errors"
+	"regexp"
+)
 
 // Validator is common validation and formating of golang types to ach type strings
 type Validator struct{}
+
+// Errors specific to validation
+var (
+	ErrValidAlphanumeric   = errors.New("Field has non alphanumeric characters ")
+	ErrValidAlpha          = errors.New("Field has non alpha characters ")
+	ErrValidFieldInclusion = errors.New("A mandatory field has a zero value")
+)
 
 // iServiceClass returns true if a valid service class code
 func (v *Validator) isServiceClass(code int) bool {
@@ -104,14 +114,14 @@ func (v *Validator) isUpperAlphanumeric(s string) (b bool) {
 }
 
 // isAlphanumeric checks if a string only contains ASCII alphanumeric characters
-// func (v *Validator) isAlphanumeric(s string) (b bool) {
-// 	if regexp.MustCompile(`[^ a-zA-Z0-9_*\/]+`).MatchString(s) {
-// 		// ^[ A-Za-z0-9_@./#&+-]*$/
-// 		return false
-// 	}
-// 	return true
-// }
-//
+func (v *Validator) isAlphanumeric(s string) (b bool) {
+	if regexp.MustCompile(`[^ a-zA-Z0-9_*\/]+`).MatchString(s) {
+		// ^[ A-Za-z0-9_@./#&+-]*$/
+		return false
+	}
+	return true
+}
+
 // // isLetter checks if a string contains only ASCII letters
 // func (v *Validator) isLetter(s string) bool {
 // 	fmt.Println(s)

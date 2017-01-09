@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -129,11 +130,11 @@ func (fh *FileHeader) Parse(record string) {
 	//40 always "1"
 	fh.formatCode = "1"
 	//41-63 The name of the ODFI. example "SILICON VALLEY BANK    "
-	fh.ImmediateDestinationName = record[40:63]
+	fh.ImmediateDestinationName = strings.TrimSpace(record[40:63])
 	//64-86 ACH operator or sending point that is sending the file
-	fh.ImmediateOriginName = record[63:86]
+	fh.ImmediateOriginName = strings.TrimSpace(record[63:86])
 	//97-94 Optional field that may be used to describe the ACH file for internal accounting purposes
-	fh.ReferenceCode = record[86:94]
+	fh.ReferenceCode = strings.TrimSpace(record[86:94])
 }
 
 // String writes the FileHeader struct to a 94 character string.
@@ -157,8 +158,13 @@ func (fh *FileHeader) String() string {
 }
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
-// The first error encountered is returned and stops that parsing.
+// The first error encountered is returned and stops the parsing.
 func (fh *FileHeader) Validate() (bool, error) {
+
+	v, err := fh.fieldInclusion()
+	if !v {
+		return false, error(err)
+	}
 
 	if fh.recordType != "1" {
 		return false, ErrRecordType
@@ -175,12 +181,38 @@ func (fh *FileHeader) Validate() (bool, error) {
 	if fh.formatCode != "1" {
 		return false, ErrFormatCode
 	}
+	if !fh.isAlphanumeric(fh.ImmediateDestinationName) {
+		return false, ErrValidAlphanumeric
+	}
+	if !fh.isAlphanumeric(fh.ImmediateOriginName) {
+		return false, ErrValidAlphanumeric
+	}
+	if !fh.isAlphanumeric(fh.ReferenceCode) {
+		return false, ErrValidAlphanumeric
+	}
+
 	// todo: handle test cases for before date
 	/*
 		if fh.fileCreationDate.Before(time.Now()) {
 			return false, ErrFileCreationDate
 		}
 	*/
+	return true, nil
+}
+
+// fieldInclusion validate mandatory fields are not default values. If fields are
+// invalid the ACH transfer will be returned.
+func (fh *FileHeader) fieldInclusion() (bool, error) {
+	if fh.recordType == "" &&
+		fh.ImmediateDestination == 0 &&
+		fh.ImmediateOrigin == 0 &&
+		fh.FileCreationDate.IsZero() &&
+		fh.FileIDModifier == "" &&
+		fh.recordSize == "" &&
+		fh.blockingFactor == "" &&
+		fh.formatCode == "" {
+		return false, ErrValidFieldInclusion
+	}
 	return true, nil
 }
 

@@ -61,3 +61,5 @@ func (v *Converters) leftPad(s string, padStr string, overallLen int) string {
 	var retStr = strings.Repeat(padStr, padCountInt) + s
 	return retStr[(len(retStr) - overallLen):]
 }
+
+// @TODO remove decimel space from amount int
