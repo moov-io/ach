@@ -27,8 +27,8 @@ func TestParseEntryDetail(t *testing.T) {
 	if record.TransactionCode != 27 {
 		t.Errorf("TransactionCode Expected '27' got: %v", record.TransactionCode)
 	}
-	if record.RDFIIdentification() != "05320001" {
-		t.Errorf("RDFIIdentification Expected '05320001' got: '%v'", record.RDFIIdentification())
+	if record.RDFIIdentificationField() != "05320001" {
+		t.Errorf("RDFIIdentification Expected '05320001' got: '%v'", record.RDFIIdentificationField())
 	}
 	if record.CheckDigit != 9 {
 		t.Errorf("CheckDigit Expected '9' got: %v", record.CheckDigit)

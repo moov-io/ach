@@ -13,6 +13,7 @@ var (
 	ErrValidAlphanumeric   = errors.New("Field has non alphanumeric characters ")
 	ErrValidAlpha          = errors.New("Field has non alpha characters ")
 	ErrValidFieldInclusion = errors.New("A mandatory field has a zero value")
+	ErrValidFieldLength    = errors.New("Field length is invalid")
 )
 
 // iServiceClass returns true if a valid service class code
@@ -115,7 +116,7 @@ func (v *Validator) isUpperAlphanumeric(s string) (b bool) {
 
 // isAlphanumeric checks if a string only contains ASCII alphanumeric characters
 func (v *Validator) isAlphanumeric(s string) (b bool) {
-	if regexp.MustCompile(`[^ a-zA-Z0-9_*\/]+`).MatchString(s) {
+	if regexp.MustCompile(`[^ a-zA-Z0-9_*-\/]+`).MatchString(s) {
 		// ^[ A-Za-z0-9_@./#&+-]*$/
 		return false
 	}
