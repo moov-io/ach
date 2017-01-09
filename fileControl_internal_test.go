@@ -23,23 +23,23 @@ func TestParseFileControl(t *testing.T) {
 	if record.recordType != "9" {
 		t.Errorf("RecordType Expected '9' got: %v", record.recordType)
 	}
-	if record.BatchCount() != "000001" {
-		t.Errorf("BatchCount Expected '000001' got: %v", record.BatchCount())
+	if record.BatchCountField() != "000001" {
+		t.Errorf("BatchCount Expected '000001' got: %v", record.BatchCountField())
 	}
-	if record.BlockCount() != "000001" {
-		t.Errorf("BlockCount Expected '000001' got: %v", record.BlockCount())
+	if record.BlockCountField() != "000001" {
+		t.Errorf("BlockCount Expected '000001' got: %v", record.BlockCountField())
 	}
-	if record.EntryAddendaCount() != "00000001" {
-		t.Errorf("EntryAddendaCount Expected '00000001' got: %v", record.EntryAddendaCount())
+	if record.EntryAddendaCountField() != "00000001" {
+		t.Errorf("EntryAddendaCount Expected '00000001' got: %v", record.EntryAddendaCountField())
 	}
-	if record.EntryHash() != "0005320001" {
-		t.Errorf("EntryHash Expected '0005320001' got: %v", record.EntryHash())
+	if record.EntryHashField() != "0005320001" {
+		t.Errorf("EntryHash Expected '0005320001' got: %v", record.EntryHashField())
 	}
-	if record.TotalDebitEntryDollarAmountInFile() != "000000010500" {
-		t.Errorf("TotalDebitEntryDollarAmountInFile Expected '0005000000010500' got: %v", record.TotalDebitEntryDollarAmountInFile())
+	if record.TotalDebitEntryDollarAmountInFileField() != "000000010500" {
+		t.Errorf("TotalDebitEntryDollarAmountInFile Expected '0005000000010500' got: %v", record.TotalDebitEntryDollarAmountInFileField())
 	}
-	if record.TotalCreditEntryDollarAmountInFile() != "000000000000" {
-		t.Errorf("TotalCreditEntryDollarAmountInFile Expected '000000000000' got: %v", record.TotalCreditEntryDollarAmountInFile())
+	if record.TotalCreditEntryDollarAmountInFileField() != "000000000000" {
+		t.Errorf("TotalCreditEntryDollarAmountInFile Expected '000000000000' got: %v", record.TotalCreditEntryDollarAmountInFileField())
 	}
 	if record.reserved != "                                       " {
 		t.Errorf("Reserved Expected '                                       ' got: %v", record.reserved)
