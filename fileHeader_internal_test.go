@@ -26,18 +26,18 @@ func TestParseFileHeader(t *testing.T) {
 	if record.priorityCode != "01" {
 		t.Errorf("PriorityCode Expected 01 got: %v", record.priorityCode)
 	}
-	if record.ImmediateDestination() != " 076401251" {
-		t.Errorf("ImmediateDestination Expected ' 076401251' got: %v", record.ImmediateDestination())
+	if record.ImmediateDestinationField() != " 076401251" {
+		t.Errorf("ImmediateDestination Expected ' 076401251' got: %v", record.ImmediateDestinationField())
 	}
-	if record.ImmediateOrigin() != " 076401251" {
-		t.Errorf("ImmediateOrigin Expected '   076401251' got: %v", record.ImmediateOrigin())
+	if record.ImmediateOriginField() != " 076401251" {
+		t.Errorf("ImmediateOrigin Expected '   076401251' got: %v", record.ImmediateOriginField())
 	}
 
-	if record.FileCreationDate() != "080729" {
-		t.Errorf("FileCreationDate Expected '080729' got:'%v'", record.FileCreationDate())
+	if record.FileCreationDateField() != "080729" {
+		t.Errorf("FileCreationDate Expected '080729' got:'%v'", record.FileCreationDateField())
 	}
-	if record.FileCreationTime() != "1511" {
-		t.Errorf("FileCreationTime Expected '1511' got:'%v'", record.FileCreationTime())
+	if record.FileCreationTimeField() != "1511" {
+		t.Errorf("FileCreationTime Expected '1511' got:'%v'", record.FileCreationTimeField())
 	}
 
 	if record.FileIDModifier != "A" {
@@ -52,14 +52,14 @@ func TestParseFileHeader(t *testing.T) {
 	if record.formatCode != "1" {
 		t.Errorf("FormatCode Expected '1' got:'%v'", record.formatCode)
 	}
-	if record.ImmediateDestinationName != "achdestname            " {
-		t.Errorf("ImmediateDestinationName Expected 'achdestname           ' got:'%v'", record.ImmediateDestinationName)
+	if record.ImmediateDestinationNameField() != "achdestname            " {
+		t.Errorf("ImmediateDestinationName Expected 'achdestname           ' got:'%v'", record.ImmediateDestinationNameField())
 	}
-	if record.ImmidiateOriginName != "companyname            " {
-		t.Errorf("ImmidiateOriginName Expected 'companyname          ' got: '%v'", record.ImmidiateOriginName)
+	if record.ImmediateOriginNameField() != "companyname            " {
+		t.Errorf("ImmidiateOriginName Expected 'companyname          ' got: '%v'", record.ImmediateOriginNameField())
 	}
-	if record.ReferenceCode != "        " {
-		t.Errorf("ReferenceCode Expected '        ' got:'%v'", record.ReferenceCode)
+	if record.ReferenceCodeField() != "        " {
+		t.Errorf("ReferenceCode Expected '        ' got:'%v'", record.ReferenceCodeField())
 	}
 }
 

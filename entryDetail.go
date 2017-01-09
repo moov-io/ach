@@ -30,7 +30,7 @@ type EntryDetail struct {
 	TransactionCode int
 
 	// rdfiIdentification is the RDFI's routing number without the last digit.
-	rdfiIdentification int
+	RDFIIdentification int
 
 	// CheckDigit the last digit of the RDFI's routing number
 	CheckDigit int
@@ -74,9 +74,10 @@ type EntryDetail struct {
 
 	// Addendums a list of Addenda for the Entry Detail
 	Addendums []Addenda
-
-	// Validator is composed for data conversion and validation
+	// Validator is composed for data validation
 	Validator
+	// Converters is composed for ACH to golang Converters
+	Converters
 }
 
 // NewEntryDetail returns a new EntryDetail with default values for none exported fields
@@ -89,11 +90,11 @@ func NewEntryDetail() *EntryDetail {
 // Parse takes the input record string and parses the EntryDetail values
 func (ed *EntryDetail) Parse(record string) {
 	// 1-1 Always "6"
-	ed.recordType = record[:1]
+	ed.recordType = "6"
 	// 2-3 is checking credit 22 debit 27 savings credit 32 debit 37
 	ed.TransactionCode = ed.parseNumField(record[1:3])
 	// 4-11 the RDFI's routing number without the last digit.
-	ed.rdfiIdentification = ed.parseNumField(record[3:11])
+	ed.RDFIIdentification = ed.parseNumField(record[3:11])
 	// 12-12 The last digit of the RDFI's routing number
 	ed.CheckDigit = ed.parseNumField(record[11:12])
 	// 13-29 The receiver's bank account number you are crediting/debiting
@@ -119,7 +120,7 @@ func (ed *EntryDetail) String() string {
 	return fmt.Sprintf("%v%v%v%v%v%v%v%v%v%v%v",
 		ed.recordType,
 		ed.TransactionCode,
-		ed.RDFIIdentification(),
+		ed.RDFIIdentificationField(),
 		ed.CheckDigit,
 		ed.DFIAccountNumber(),
 		ed.Amount(),
@@ -133,13 +134,45 @@ func (ed *EntryDetail) String() string {
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops that parsing.
 func (ed *EntryDetail) Validate() (bool, error) {
+	v, err := ed.fieldInclusion()
+	if !v {
+		return false, error(err)
+	}
+
 	if ed.recordType != "6" {
 		return false, ErrRecordType
 	}
 	if !ed.isTransactionCode(ed.TransactionCode) {
 		return false, ErrTransactionCode
 	}
+	if !ed.isAlphanumeric(ed.dfiAccountNumber) {
+		return false, ErrValidAlphanumeric
+	}
+	if !ed.isAlphanumeric(ed.IndividualIdentificationNumber) {
+		return false, ErrValidAlphanumeric
+	}
+	if !ed.isAlphanumeric(ed.IndividualName) {
+		return false, ErrValidAlphanumeric
+	}
+	if !ed.isAlphanumeric(ed.DiscretionaryData) {
+		return false, ErrValidAlphanumeric
+	}
 
+	return true, nil
+}
+
+// fieldInclusion validate mandatory fields are not default values. If fields are
+// invalid the ACH transfer will be returned.
+func (ed *EntryDetail) fieldInclusion() (bool, error) {
+	if ed.recordType == "" &&
+		ed.TransactionCode == 0 &&
+		ed.RDFIIdentification == 0 &&
+		ed.CheckDigit == 0 &&
+		ed.amount == 0 &&
+		ed.IndividualName == "" &&
+		ed.TraceNumber() == "" {
+		return false, ErrValidFieldInclusion
+	}
 	return true, nil
 }
 
@@ -149,9 +182,9 @@ func (ed *EntryDetail) addAddenda(addenda Addenda) []Addenda {
 	return ed.Addendums
 }
 
-// RDFIIdentification get the rdfiIdentification with zero padding
-func (ed *EntryDetail) RDFIIdentification() string {
-	return ed.leftPad(strconv.Itoa(ed.rdfiIdentification), "0", 8)
+// RDFIIdentificationField get the rdfiIdentification with zero padding
+func (ed *EntryDetail) RDFIIdentificationField() string {
+	return ed.leftPad(strconv.Itoa(ed.RDFIIdentification), "0", 8)
 }
 
 // DFIAccountNumber gets the dfiAccountNumber with space padding

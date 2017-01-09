@@ -26,32 +26,32 @@ func TestParseBatchControl(t *testing.T) {
 	if record.ServiceClassCode != 225 {
 		t.Errorf("ServiceClassCode Expected '225' got: %v", record.ServiceClassCode)
 	}
-	if record.EntryAddendaCount() != "000001" {
-		t.Errorf("EntryAddendaCount Expected '000001' got: %v", record.EntryAddendaCount())
+	if record.EntryAddendaCountField() != "000001" {
+		t.Errorf("EntryAddendaCount Expected '000001' got: %v", record.EntryAddendaCountField())
 	}
-	if record.EntryHash() != "0005320001" {
-		t.Errorf("EntryHash Expected '0005320001' got: %v", record.EntryHash())
+	if record.EntryHashField() != "0005320001" {
+		t.Errorf("EntryHash Expected '0005320001' got: %v", record.EntryHashField())
 	}
-	if record.TotalDebitEntryDollarAmount() != "000000010500" {
-		t.Errorf("TotalDebitEntryDollarAmount Expected '000000010500' got: %v", record.TotalDebitEntryDollarAmount())
+	if record.TotalDebitEntryDollarAmountField() != "000000010500" {
+		t.Errorf("TotalDebitEntryDollarAmount Expected '000000010500' got: %v", record.TotalDebitEntryDollarAmountField())
 	}
-	if record.TotalCreditEntryDollarAmount() != "000000000000" {
-		t.Errorf("TotalCreditEntryDollarAmount Expected '000000000000' got: %v", record.TotalCreditEntryDollarAmount())
+	if record.TotalCreditEntryDollarAmountField() != "000000000000" {
+		t.Errorf("TotalCreditEntryDollarAmount Expected '000000000000' got: %v", record.TotalCreditEntryDollarAmountField())
 	}
-	if record.CompanyIdentification != "origid    " {
-		t.Errorf("CompanyIdentification Expected 'origid    ' got: %v", record.CompanyIdentification)
+	if record.CompanyIdentificationField() != "origid    " {
+		t.Errorf("CompanyIdentification Expected 'origid    ' got: %v", record.CompanyIdentificationField())
 	}
-	if record.MessageAuthenticationCode != "                   " {
-		t.Errorf("MessageAuthenticationCode Expected '                   ' got: %v", record.MessageAuthenticationCode)
+	if record.MessageAuthenticationCodeField() != "                   " {
+		t.Errorf("MessageAuthenticationCode Expected '                   ' got: %v", record.MessageAuthenticationCodeField())
 	}
-	if record.Reserved != "      " {
-		t.Errorf("Reserved Expected '      ' got: %v", record.Reserved)
+	if record.reserved != "      " {
+		t.Errorf("Reserved Expected '      ' got: %v", record.reserved)
 	}
-	if record.OdfiIdentification != "07640125" {
-		t.Errorf("OdfiIdentification Expected '07640125' got: %v", record.OdfiIdentification)
+	if record.ODFIIdentificationField() != "07640125" {
+		t.Errorf("OdfiIdentification Expected '07640125' got: %v", record.ODFIIdentificationField())
 	}
-	if record.BatchNumber() != "0000001" {
-		t.Errorf("BatchNumber Expected '0000001' got: %v", record.BatchNumber())
+	if record.BatchNumberField() != "0000001" {
+		t.Errorf("BatchNumber Expected '0000001' got: %v", record.BatchNumberField())
 	}
 }
 

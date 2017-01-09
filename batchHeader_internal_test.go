@@ -5,6 +5,7 @@
 package ach
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -26,26 +27,26 @@ func TestParseBatchHeader(t *testing.T) {
 	if record.ServiceClassCode != 225 {
 		t.Errorf("ServiceClassCode Expected '225' got: %v", record.ServiceClassCode)
 	}
-	if record.CompanyName != "companyname     " {
-		t.Errorf("CompanyName Expected 'companyname    ' got: '%v'", record.CompanyName)
+	if record.CompanyNameField() != "companyname     " {
+		t.Errorf("CompanyName Expected 'companyname    ' got: '%v'", record.CompanyNameField())
 	}
-	if record.CompanyDiscretionaryData != "                    " {
-		t.Errorf("CompanyDiscretionaryData Expected '                    ' got: %v", record.CompanyDiscretionaryData)
+	if record.CompanyDiscretionaryDataField() != "                    " {
+		t.Errorf("CompanyDiscretionaryData Expected '                    ' got: %v", record.CompanyDiscretionaryDataField())
 	}
-	if record.CompanyIdentification != "origid    " {
-		t.Errorf("CompanyIdentification Expected 'origid    ' got: %v", record.CompanyIdentification)
+	if record.CompanyIdentificationField() != "origid    " {
+		t.Errorf("CompanyIdentification Expected 'origid    ' got: %v", record.CompanyIdentificationField())
 	}
 	if record.StandardEntryClassCode != "PPD" {
 		t.Errorf("StandardEntryClassCode Expected 'PPD' got: %v", record.StandardEntryClassCode)
 	}
-	if record.CompanyEntryDescription != "CHECKPAYMT" {
-		t.Errorf("CompanyEntryDescription Expected 'CHECKPAYMT' got: %v", record.CompanyEntryDescription)
+	if record.CompanyEntryDescriptionField() != "CHECKPAYMT" {
+		t.Errorf("CompanyEntryDescription Expected 'CHECKPAYMT' got: %v", record.CompanyEntryDescriptionField())
 	}
 	if record.CompanyDescriptiveDate != "000002" {
 		t.Errorf("CompanyDescriptiveDate Expected '000002' got: %v", record.CompanyDescriptiveDate)
 	}
-	if record.EffectiveEntryDate() != "080730" {
-		t.Errorf("EffectiveEntryDate Expected '080730' got: %v", record.EffectiveEntryDate())
+	if record.EffectiveEntryDateField() != "080730" {
+		t.Errorf("EffectiveEntryDate Expected '080730' got: %v", record.EffectiveEntryDateField())
 	}
 	if record.settlementDate != "   " {
 		t.Errorf("SettlementDate Expected '   ' got: %v", record.settlementDate)
@@ -53,11 +54,11 @@ func TestParseBatchHeader(t *testing.T) {
 	if record.OriginatorStatusCode != 1 {
 		t.Errorf("OriginatorStatusCode Expected 1 got: %v", record.OriginatorStatusCode)
 	}
-	if record.ODFIIdentification() != "07640125" {
-		t.Errorf("OdfiIdentification Expected '07640125' got: %v", record.ODFIIdentification())
+	if record.ODFIIdentificationField() != "07640125" {
+		t.Errorf("OdfiIdentification Expected '07640125' got: %v", record.ODFIIdentificationField())
 	}
-	if record.BatchNumber() != "0000001" {
-		t.Errorf("BatchNumber Expected '0000001' got: %v", record.BatchNumber())
+	if record.BatchNumberField() != "0000001" {
+		t.Errorf("BatchNumber Expected '0000001' got: %v", record.BatchNumberField())
 	}
 }
 
@@ -74,6 +75,8 @@ func TestBHString(t *testing.T) {
 
 	if record.String() != line {
 		t.Errorf("Strings do not match")
+
+		fmt.Printf("%s \n %s", line, r.currentBatch.Header.String())
 	}
 }
 

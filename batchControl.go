@@ -3,6 +3,7 @@ package ach
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 // BatchControl contains entry counts, dollar total and has totals for all
@@ -17,18 +18,18 @@ type BatchControl struct {
 	ServiceClassCode int
 	// EntryAddendaCount is a tally of each Entry Detail Record and each Addenda
 	// Record processed, within either the batch or file as appropriate.
-	entryAddendaCount int
+	EntryAddendaCount int
 	// EntryHash the Receiving DFI Identification in each Entry Detail Record is hashed
 	// to provide a check against inadvertent alteration of data contents due
 	// to hardware failure or program erro
 	//
 	// In this context the Entry Hash is the sum of the corresponding fields in the
 	// Entry Detail Records on the file.
-	entryHash int
+	EntryHash int
 	// TotalDebitEntryDollarAmount Contains accumulated Entry debit totals within the batch.
-	totalDebitEntryDollarAmount int
+	TotalDebitEntryDollarAmount int
 	// TotalCreditEntryDollarAmount Contains accumulated Entry credit totals within the batch.
-	totalCreditEntryDollarAmount int
+	TotalCreditEntryDollarAmount int
 	// CompanyIdentification is an alphameric code used to identify an Originato
 	// The Company Identification Field must be included on all
 	// prenotification records and on each entry initiated puruant to such
@@ -49,43 +50,45 @@ type BatchControl struct {
 	// of this field are blank.
 	MessageAuthenticationCode string
 	// Reserved for the future - Blank, 6 characters long
-	Reserved string
+	reserved string
 	// OdfiIdentification the routing number is used to identify the DFI originating entries within a given branch.
-	OdfiIdentification string
+	ODFIIdentification int
 	// BatchNumber this number is assigned in ascending sequence to each batch by the ODFI
 	// or its Sending Point in a given file of entries. Since the batch number
 	// in the Batch Header Record and the Batch Control Record is the same,
 	// the ascending sequence number should be assigned by batch and not by record.
-	batchNumber int
-	// Validator is composed for data conversion and validation
+	BatchNumber int
+	// Validator is composed for data validation
 	Validator
+	// Converters is composed for ACH to golang Converters
+	Converters
 }
 
 // Parse takes the input record string and parses the EntryDetail values
 func (bc *BatchControl) Parse(record string) {
 	// 1-1 Always "8"
-	bc.recordType = record[:1]
+	bc.recordType = "8"
 	// 2-4 This is the same as the "Service code" field in previous Batch Header Record
 	bc.ServiceClassCode = bc.parseNumField(record[1:4])
 	// 5-10 Total number of Entry Detail Record in the batch
-	bc.entryAddendaCount = bc.parseNumField(record[4:10])
+	bc.EntryAddendaCount = bc.parseNumField(record[4:10])
 	// 11-20 Total of all positions 4-11 on each Entry Detail Record in the batch. This is essentially the sum of all the RDFI routing numbers in the batch.
 	// If the sum exceeds 10 digits (because you have lots of Entry Detail Records), lop off the most significant digits of the sum until there are only 10
-	bc.entryHash = bc.parseNumField(record[10:20])
+	bc.EntryHash = bc.parseNumField(record[10:20])
 	// 21-32 Number of cents of debit entries within the batch
-	bc.totalDebitEntryDollarAmount = bc.parseNumField(record[20:32])
+	bc.TotalDebitEntryDollarAmount = bc.parseNumField(record[20:32])
 	// 33-44 Number of cents of credit entries within the batch
-	bc.totalCreditEntryDollarAmount = bc.parseNumField(record[32:44])
+	bc.TotalCreditEntryDollarAmount = bc.parseNumField(record[32:44])
 	// 45-54 This is the same as the "Company identification" field in previous Batch Header Record
-	bc.CompanyIdentification = record[44:54]
+	bc.CompanyIdentification = strings.TrimSpace(record[44:54])
 	// 55-73 Seems to always be blank
-	bc.MessageAuthenticationCode = record[54:73]
+	bc.MessageAuthenticationCode = strings.TrimSpace(record[54:73])
 	// 74-79 Always blank (just fill with spaces)
-	bc.Reserved = record[73:79]
+	bc.reserved = "      "
 	// 80-87 This is the same as the "ODFI identification" field in previous Batch Header Record
-	bc.OdfiIdentification = record[79:87]
+	bc.ODFIIdentification = bc.parseNumField(record[79:87])
 	// 88-94 This is the same as the "Batch number" field in previous Batch Header Record
-	bc.batchNumber = bc.parseNumField(record[87:94])
+	bc.BatchNumber = bc.parseNumField(record[87:94])
 }
 
 // NewBatchControl returns a new BatchControl with default values for none exported fields
@@ -100,51 +103,88 @@ func (bc *BatchControl) String() string {
 	return fmt.Sprintf("%v%v%v%v%v%v%v%v%v%v%v",
 		bc.recordType,
 		bc.ServiceClassCode,
-		bc.EntryAddendaCount(),
-		bc.EntryHash(),
-		bc.TotalDebitEntryDollarAmount(),
-		bc.TotalCreditEntryDollarAmount(),
-		bc.CompanyIdentification,
-		bc.MessageAuthenticationCode,
-		bc.Reserved,
-		bc.OdfiIdentification,
-		bc.BatchNumber(),
+		bc.EntryAddendaCountField(),
+		bc.EntryHashField(),
+		bc.TotalDebitEntryDollarAmountField(),
+		bc.TotalCreditEntryDollarAmountField(),
+		bc.CompanyIdentificationField(),
+		bc.MessageAuthenticationCodeField(),
+		"      ",
+		bc.ODFIIdentificationField(),
+		bc.BatchNumberField(),
 	)
 }
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops that parsing.
 func (bc *BatchControl) Validate() (bool, error) {
+	v, err := bc.fieldInclusion()
+	if !v {
+		return false, error(err)
+	}
+
 	if bc.recordType != "8" {
 		return false, ErrRecordType
 	}
 	if !bc.isServiceClass(bc.ServiceClassCode) {
 		return false, ErrServiceClass
 	}
+
+	if !bc.isAlphanumeric(bc.CompanyIdentification) {
+		return false, ErrValidAlphanumeric
+	}
+	if !bc.isAlphanumeric(bc.MessageAuthenticationCode) {
+		return false, ErrValidAlphanumeric
+	}
+
 	return true, nil
 }
 
-// EntryAddendaCount gets a string of the addenda count zero padded
-func (bc *BatchControl) EntryAddendaCount() string {
-	return bc.leftPad(strconv.Itoa(bc.entryAddendaCount), "0", 6)
+// fieldInclusion validate mandatory fields are not default values. If fields are
+// invalid the ACH transfer will be returned.
+func (bc *BatchControl) fieldInclusion() (bool, error) {
+	if bc.recordType == "" {
+		return false, ErrValidFieldInclusion
+	}
+	return true, nil
 }
 
-// EntryHash get a zero padded EntryHash
-func (bc *BatchControl) EntryHash() string {
-	return bc.leftPad(strconv.Itoa(bc.entryHash), "0", 10)
+// EntryAddendaCountField gets a string of the addenda count zero padded
+func (bc *BatchControl) EntryAddendaCountField() string {
+	return bc.leftPad(strconv.Itoa(bc.EntryAddendaCount), "0", 6)
 }
 
-//TotalDebitEntryDollarAmount get a zero padded Debity Entry Amount
-func (bc *BatchControl) TotalDebitEntryDollarAmount() string {
-	return bc.leftPad(strconv.Itoa(bc.totalDebitEntryDollarAmount), "0", 12)
+// EntryHashField get a zero padded EntryHash
+func (bc *BatchControl) EntryHashField() string {
+	return bc.leftPad(strconv.Itoa(bc.EntryHash), "0", 10)
 }
 
-// TotalCreditEntryDollarAmount get a zero padded Credit Entry Amount
-func (bc *BatchControl) TotalCreditEntryDollarAmount() string {
-	return bc.leftPad(strconv.Itoa(bc.totalCreditEntryDollarAmount), "0", 12)
+//TotalDebitEntryDollarAmountField get a zero padded Debity Entry Amount
+func (bc *BatchControl) TotalDebitEntryDollarAmountField() string {
+	return bc.leftPad(strconv.Itoa(bc.TotalDebitEntryDollarAmount), "0", 12)
 }
 
-// BatchNumber gets a string of the batch number zero padded
-func (bc *BatchControl) BatchNumber() string {
-	return bc.leftPad(strconv.Itoa(bc.batchNumber), "0", 7)
+// TotalCreditEntryDollarAmountField get a zero padded Credit Entry Amount
+func (bc *BatchControl) TotalCreditEntryDollarAmountField() string {
+	return bc.leftPad(strconv.Itoa(bc.TotalCreditEntryDollarAmount), "0", 12)
+}
+
+// CompanyIdentificationField get the CompanyIdentification righ padded
+func (bc *BatchControl) CompanyIdentificationField() string {
+	return bc.rightPad(bc.CompanyIdentification, " ", 10)
+}
+
+// MessageAuthenticationCodeField get the MessageAuthenticationCode right padded
+func (bc *BatchControl) MessageAuthenticationCodeField() string {
+	return bc.rightPad(bc.MessageAuthenticationCode, " ", 19)
+}
+
+// ODFIIdentificationField get the odfi number zero padded
+func (bc *BatchControl) ODFIIdentificationField() string {
+	return bc.leftPad(strconv.Itoa(bc.ODFIIdentification), "0", 8)
+}
+
+// BatchNumberField gets a string of the batch number zero padded
+func (bc *BatchControl) BatchNumberField() string {
+	return bc.leftPad(strconv.Itoa(bc.BatchNumber), "0", 7)
 }
