@@ -11,7 +11,7 @@ import (
 
 // TestParseAddendaRecord parses a known Addenda Record string.
 func TestParseAddenda(t *testing.T) {
-	var line = "710WEB                                        DIEGO MAY                                0000001"
+	var line = "710WEB                                        DIEGO MAY                            00010000001"
 
 	r := NewReader(strings.NewReader(line))
 	r.currentBatch.Header.StandardEntryClassCode = "PPD"
@@ -29,20 +29,20 @@ func TestParseAddenda(t *testing.T) {
 	if record.TypeCode != "10" {
 		t.Errorf("TypeCode Expected 10 got: %v", record.TypeCode)
 	}
-	if record.PaymentRelatedInformation != "WEB                                        DIEGO MAY                            " {
-		t.Errorf("PaymentRelatedInformation Expected 'WEB                                        DIEGO MAY                            ' got: %v", record.PaymentRelatedInformation)
+	if record.PaymentRelatedInformationField() != "WEB                                        DIEGO MAY                            " {
+		t.Errorf("PaymentRelatedInformation Expected 'WEB                                        DIEGO MAY                            ' got: %v", record.PaymentRelatedInformationField())
 	}
-	if record.SequenceNumber != "    " {
-		t.Errorf("SequenceNumber Expected '    ' got: %v", record.SequenceNumber)
+	if record.SequenceNumberField() != "0001" {
+		t.Errorf("SequenceNumber Expected '0001' got: %v", record.SequenceNumberField())
 	}
-	if record.EntryDetailSequenceNumber != "0000001" {
-		t.Errorf("EntryDetailSequenceNumber Expected '0000001' got: %v", record.EntryDetailSequenceNumber)
+	if record.EntryDetailSequenceNumberField() != "0000001" {
+		t.Errorf("EntryDetailSequenceNumber Expected '0000001' got: %v", record.EntryDetailSequenceNumberField())
 	}
 }
 
 // TestAddendaString validats that a known parsed file can be return to a string of the same value
 func TestAddendaString(t *testing.T) {
-	var line = "710WEB                                        DIEGO MAY                                0000001"
+	var line = "710WEB                                        DIEGO MAY                            00010000001"
 	r := NewReader(strings.NewReader(line))
 	r.currentBatch.Header.StandardEntryClassCode = "PPD"
 	r.currentBatch.addEntryDetail(EntryDetail{AddendaRecordIndicator: 1})

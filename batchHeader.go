@@ -179,6 +179,19 @@ func (bh *BatchHeader) Validate() (bool, error) {
 		return false, ErrOrigStatusCode
 	}
 
+	if !bh.isAlphanumeric(bh.CompanyName) {
+		return false, ErrValidAlphanumeric
+	}
+	if !bh.isAlphanumeric(bh.CompanyDiscretionaryData) {
+		return false, ErrValidAlphanumeric
+	}
+	if !bh.isAlphanumeric(bh.CompanyIdentification) {
+		return false, ErrValidAlphanumeric
+	}
+	if !bh.isAlphanumeric(bh.CompanyEntryDescription) {
+		return false, ErrValidAlphanumeric
+	}
+
 	return true, nil
 }
 
