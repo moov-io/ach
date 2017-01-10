@@ -11,7 +11,7 @@ import (
 )
 
 // TestDecode is a complete file decoding test.
-func TestDecode(t *testing.T) {
+func TestPPDDebitRead(t *testing.T) {
 	f, err := os.Open("./testdata/ppd-debit.ach")
 	if err != nil {
 		t.Errorf("%s: ", err)
