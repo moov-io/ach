@@ -41,6 +41,11 @@ var (
 	ErrAddendaNoIndicator = errors.New("Addenda without Entry Detail Addenda Inicator")
 )
 
+// currently support SEC codes
+const (
+	ppd = "PPD"
+)
+
 // Reader reads records from a ACH-encoded file.
 type Reader struct {
 	// r handles the IO.Reader sent to be parser.
@@ -142,6 +147,8 @@ func (r *Reader) Read() (File, error) {
 		return r.file, r.error(ErrFileControl)
 	}
 
+	// TODO: Validate cross Record type values
+
 	// TODO: number of lines in file must be divisable by 10 the blocking factor
 	return r.file, nil
 }
@@ -182,7 +189,7 @@ func (r *Reader) parseEntryDetail() error {
 	if (BatchHeader{}) == r.currentBatch.Header {
 		return r.error(ErrEntryOutside)
 	}
-	if r.currentBatch.Header.StandardEntryClassCode == "PPD" {
+	if r.currentBatch.Header.StandardEntryClassCode == ppd {
 		ed := EntryDetail{}
 		ed.Parse(r.line)
 		v, err := ed.Validate()
@@ -205,7 +212,7 @@ func (r *Reader) parseAddenda() error {
 	}
 	entryIndex := len(r.currentBatch.Entries) - 1
 	entry := r.currentBatch.Entries[entryIndex]
-	if r.currentBatch.Header.StandardEntryClassCode == "PPD" {
+	if r.currentBatch.Header.StandardEntryClassCode == ppd {
 		if entry.AddendaRecordIndicator == 1 {
 			addenda := Addenda{}
 			addenda.Parse(r.line)
@@ -233,6 +240,12 @@ func (r *Reader) parseBatchControl() error {
 	if !v {
 		return r.error(err)
 	}
+
+	v, err = r.currentBatch.Validate()
+	if !v {
+		return r.error(err)
+	}
+
 	r.file.addBatch(r.currentBatch)
 	r.currentBatch = Batch{}
 	return nil

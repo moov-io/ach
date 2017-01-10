@@ -40,7 +40,7 @@ type EntryDetail struct {
 	dfiAccountNumber string
 
 	// Amount Number of cents you are debiting/crediting this account
-	amount int
+	Amount int
 
 	// IndividualIdentificationNumber n internal identification (alphanumeric) that
 	// you use to uniquely identify this Entry Detail Record
@@ -70,7 +70,7 @@ type EntryDetail struct {
 	// For addenda Records, the Trace Number will be identical to the Trace Number
 	// in the associated Entry Detail Record, since the Trace Number is associated
 	// with an entry or item rather than a physical record.
-	traceNumber int
+	TraceNumber int
 
 	// Addendums a list of Addenda for the Entry Detail
 	Addendums []Addenda
@@ -100,7 +100,7 @@ func (ed *EntryDetail) Parse(record string) {
 	// 13-29 The receiver's bank account number you are crediting/debiting
 	ed.dfiAccountNumber = record[12:29]
 	// 30-39 Number of cents you are debiting/crediting this account
-	ed.amount = ed.parseNumField(record[29:39])
+	ed.Amount = ed.parseNumField(record[29:39])
 	// 40-54 An internal identification (alphanumeric) that you use to uniquely identify this Entry Detail Record
 	ed.IndividualIdentificationNumber = record[39:54]
 	// 55-76 The name of the receiver, usually the name on the bank account
@@ -112,7 +112,7 @@ func (ed *EntryDetail) Parse(record string) {
 	ed.AddendaRecordIndicator = ed.parseNumField(record[78:79])
 	// 80-84 An internal identification (alphanumeric) that you use to uniquely identify
 	// this Entry Detail Recor This number should be unique to the transaction and will help identify the transaction in case of an inquiry
-	ed.traceNumber = ed.parseNumField(record[79:94])
+	ed.TraceNumber = ed.parseNumField(record[79:94])
 }
 
 // String writes the EntryDetail struct to a 94 character string.
@@ -123,12 +123,12 @@ func (ed *EntryDetail) String() string {
 		ed.RDFIIdentificationField(),
 		ed.CheckDigit,
 		ed.DFIAccountNumber(),
-		ed.Amount(),
+		ed.AmountField(),
 		ed.IndividualIdentificationNumber,
 		ed.IndividualName,
 		ed.DiscretionaryData,
 		ed.AddendaRecordIndicator,
-		ed.TraceNumber())
+		ed.TraceNumberField())
 }
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
@@ -168,9 +168,9 @@ func (ed *EntryDetail) fieldInclusion() (bool, error) {
 		ed.TransactionCode == 0 &&
 		ed.RDFIIdentification == 0 &&
 		ed.CheckDigit == 0 &&
-		ed.amount == 0 &&
+		ed.Amount == 0 &&
 		ed.IndividualName == "" &&
-		ed.TraceNumber() == "" {
+		ed.TraceNumber == 0 {
 		return false, ErrValidFieldInclusion
 	}
 	return true, nil
@@ -192,12 +192,12 @@ func (ed *EntryDetail) DFIAccountNumber() string {
 	return ed.leftPad(ed.dfiAccountNumber, " ", 17)
 }
 
-// Amount returns a zero padded string of amount
-func (ed *EntryDetail) Amount() string {
-	return ed.leftPad(strconv.Itoa(ed.amount), "0", 10)
+// AmountField returns a zero padded string of amount
+func (ed *EntryDetail) AmountField() string {
+	return ed.leftPad(strconv.Itoa(ed.Amount), "0", 10)
 }
 
-// TraceNumber returns a zero padded traceNumber string
-func (ed *EntryDetail) TraceNumber() string {
-	return ed.leftPad(strconv.Itoa(ed.traceNumber), "0", 15)
+// TraceNumberField returns a zero padded traceNumber string
+func (ed *EntryDetail) TraceNumberField() string {
+	return ed.leftPad(strconv.Itoa(ed.TraceNumber), "0", 15)
 }

@@ -122,15 +122,3 @@ func (v *Validator) isAlphanumeric(s string) (b bool) {
 	}
 	return true
 }
-
-// // isLetter checks if a string contains only ASCII letters
-// func (v *Validator) isLetter(s string) bool {
-// 	fmt.Println(s)
-// 	for _, r := range s {
-// 		fmt.Printf("%v ", r)
-// 		if (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') {
-// 			return false
-// 		}
-// 	}
-// 	return true
-// }

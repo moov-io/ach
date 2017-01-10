@@ -8,6 +8,8 @@
 // https://en.wikipedia.org/wiki/Automated_Clearing_House
 package ach
 
+import "errors"
+
 // First position of all Record Types. These codes are uniquily assigned to
 // the first byte of each row in a file.
 const (
@@ -35,6 +37,11 @@ func (f *File) addBatch(batch Batch) []Batch {
 	return f.Batches
 }
 
+// Errors specific to parsing a Batch container
+var (
+	ErrBatchAscendingTraceNumber = errors.New("Individual Entry Detail Records within individual batches must be in ascending Trace Number order")
+)
+
 // Batch holds the Batch Header and Batch Control and all Entry Records
 type Batch struct {
 	Header  BatchHeader
@@ -43,7 +50,30 @@ type Batch struct {
 }
 
 // addEntryDetail appends an EntryDetail to the Batch
-func (b *Batch) addEntryDetail(entry EntryDetail) []EntryDetail {
-	b.Entries = append(b.Entries, entry)
-	return b.Entries
+func (batch *Batch) addEntryDetail(entry EntryDetail) []EntryDetail {
+	batch.Entries = append(batch.Entries, entry)
+	return batch.Entries
+}
+
+// Validate NACHA rules on the entire batch before being added to a File
+func (batch *Batch) Validate() (bool, error) {
+	v, err := batch.isSequenceAscending()
+	if !v {
+		return false, err
+	}
+	return true, nil
+}
+
+// isSequenceAscending Individual Entry Detail Records within individual batches must
+// be in ascending Trace Number order (although Trace Numbers need not necessarily be consecutive).
+func (batch *Batch) isSequenceAscending() (bool, error) {
+
+	lastSeq := 0
+	for _, seq := range batch.Entries {
+		if seq.TraceNumber < lastSeq {
+			return false, ErrBatchAscendingTraceNumber
+		}
+		lastSeq = seq.TraceNumber
+	}
+	return true, nil
 }
