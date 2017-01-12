@@ -14,8 +14,7 @@ func TestParseFileHeader(t *testing.T) {
 	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
 	r.line = line
-	err := r.parseFileHeader()
-	if err != nil {
+	if err := r.parseFileHeader(); err != nil {
 		t.Errorf("unknown error: %v", err)
 	}
 	record := r.file.Header
@@ -83,19 +82,21 @@ func TestFHString(t *testing.T) {
 func TestValidateFHRecordType(t *testing.T) {
 	fh := NewFileHeader()
 	fh.recordType = "2"
-	_, err := fh.Validate()
-	if !strings.Contains(err.Error(), ErrRecordType.Error()) {
-		t.Errorf("Expected RecordType Error got: %v", err)
+	if err := fh.Validate(); err != nil {
+		if !strings.Contains(err.Error(), ErrRecordType.Error()) {
+			t.Errorf("Expected RecordType Error got: %v", err)
+		}
 	}
 }
 
 // TestValidateIDModifier ensure ID Modiier is upper alphanumeric
 func TestValidateIDModifier(t *testing.T) {
 	fh := NewFileHeader()
-	fh.FileIDModifier = "a"
-	_, err := fh.Validate()
-	if !strings.Contains(err.Error(), ErrIDModifier.Error()) {
-		t.Errorf("Expected ID Modifier Error got: %v", err)
+	fh.FileIDModifier = "A"
+	if err := fh.Validate(); err != nil {
+		if !strings.Contains(err.Error(), ErrValidFieldLength.Error()) {
+			t.Errorf("Expected ID Modifier Error got: %v", err)
+		}
 	}
 }
 
@@ -103,9 +104,10 @@ func TestValidateIDModifier(t *testing.T) {
 func TestValidateRecordSize(t *testing.T) {
 	fh := NewFileHeader()
 	fh.recordSize = "666"
-	_, err := fh.Validate()
-	if !strings.Contains(err.Error(), ErrRecordSize.Error()) {
-		t.Errorf("Expected Record Size Error got: %v", err)
+	if err := fh.Validate(); err != nil {
+		if !strings.Contains(err.Error(), ErrRecordSize.Error()) {
+			t.Errorf("Expected Record Size Error got: %v", err)
+		}
 	}
 }
 
@@ -113,9 +115,10 @@ func TestValidateRecordSize(t *testing.T) {
 func TestBlockingFactor(t *testing.T) {
 	fh := NewFileHeader()
 	fh.blockingFactor = "99"
-	_, err := fh.Validate()
-	if !strings.Contains(err.Error(), ErrBlockingFactor.Error()) {
-		t.Errorf("Expected Blocking Factor Error got: %v", err)
+	if err := fh.Validate(); err != nil {
+		if !strings.Contains(err.Error(), ErrBlockingFactor.Error()) {
+			t.Errorf("Expected Blocking Factor Error got: %v", err)
+		}
 	}
 }
 
@@ -123,8 +126,9 @@ func TestBlockingFactor(t *testing.T) {
 func TestFormatCode(t *testing.T) {
 	fh := NewFileHeader()
 	fh.formatCode = "2"
-	_, err := fh.Validate()
-	if !strings.Contains(err.Error(), ErrFormatCode.Error()) {
-		t.Errorf("Expected Format Code Error got: %v", err)
+	if err := fh.Validate(); err != nil {
+		if !strings.Contains(err.Error(), ErrFormatCode.Error()) {
+			t.Errorf("Expected Format Code Error got: %v", err)
+		}
 	}
 }

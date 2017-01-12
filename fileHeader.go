@@ -14,8 +14,8 @@ import (
 
 // Errors specific to a File Header Record
 var (
-	ErrRecordType       = errors.New("Wrong Record type")
-	ErrIDModifier       = errors.New("File ID Modifier is not uppercase A-Z or 0-9")
+	ErrRecordType = errors.New("Wrong Record type")
+
 	ErrRecordSize       = errors.New("Record size is not 094")
 	ErrBlockingFactor   = errors.New("Blocking Factor is not 10")
 	ErrFormatCode       = errors.New("Format Code is not 1.")
@@ -159,36 +159,40 @@ func (fh *FileHeader) String() string {
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops the parsing.
-func (fh *FileHeader) Validate() (bool, error) {
+func (fh *FileHeader) Validate() error {
 
-	v, err := fh.fieldInclusion()
-	if !v {
-		return false, error(err)
+	if err := fh.fieldInclusion(); err != nil {
+		return err
 	}
-
 	if fh.recordType != "1" {
-		return false, ErrRecordType
+		return ErrRecordType
 	}
-	if !fh.isUpperAlphanumeric(fh.FileIDModifier) && (len(fh.FileIDModifier) == 1) {
-		return false, ErrIDModifier
+
+	if err := fh.isUpperAlphanumeric(fh.FileIDModifier); err != nil {
+		return err
 	}
+
+	if len(fh.FileIDModifier) != 1 {
+		return ErrValidFieldLength
+	}
+
 	if fh.recordSize != "094" {
-		return false, ErrRecordSize
+		return ErrRecordSize
 	}
 	if fh.blockingFactor != "10" {
-		return false, ErrBlockingFactor
+		return ErrBlockingFactor
 	}
 	if fh.formatCode != "1" {
-		return false, ErrFormatCode
+		return ErrFormatCode
 	}
-	if !fh.isAlphanumeric(fh.ImmediateDestinationName) {
-		return false, ErrValidAlphanumeric
+	if err := fh.isAlphanumeric(fh.ImmediateDestinationName); err != nil {
+		return err
 	}
-	if !fh.isAlphanumeric(fh.ImmediateOriginName) {
-		return false, ErrValidAlphanumeric
+	if err := fh.isAlphanumeric(fh.ImmediateOriginName); err != nil {
+		return err
 	}
-	if !fh.isAlphanumeric(fh.ReferenceCode) {
-		return false, ErrValidAlphanumeric
+	if err := fh.isAlphanumeric(fh.ReferenceCode); err != nil {
+		return err
 	}
 
 	// todo: handle test cases for before date
@@ -197,12 +201,12 @@ func (fh *FileHeader) Validate() (bool, error) {
 			return false, ErrFileCreationDate
 		}
 	*/
-	return true, nil
+	return nil
 }
 
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
-func (fh *FileHeader) fieldInclusion() (bool, error) {
+func (fh *FileHeader) fieldInclusion() error {
 	if fh.recordType == "" &&
 		fh.ImmediateDestination == 0 &&
 		fh.ImmediateOrigin == 0 &&
@@ -211,9 +215,9 @@ func (fh *FileHeader) fieldInclusion() (bool, error) {
 		fh.recordSize == "" &&
 		fh.blockingFactor == "" &&
 		fh.formatCode == "" {
-		return false, ErrValidFieldInclusion
+		return ErrValidFieldInclusion
 	}
-	return true, nil
+	return nil
 }
 
 // ImmediateDestinationField gets the immidiate destination number with zero padding

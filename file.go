@@ -8,6 +8,8 @@
 // https://en.wikipedia.org/wiki/Automated_Clearing_House
 package ach
 
+import "errors"
+
 // First position of all Record Types. These codes are uniquily assigned to
 // the first byte of each row in a file.
 const (
@@ -35,6 +37,16 @@ func (f *File) addBatch(batch Batch) []Batch {
 	return f.Batches
 }
 
+// Errors specific to parsing a Batch container
+var (
+	ErrBatchServiceClassMismatch = errors.New("Service Class Code is not the same in Header and Control")
+	ErrBatchEntryCountMismatch   = errors.New("Batch Entry Count is out-of-balance with number of Entries")
+	ErrBatchAmountMismatch       = errors.New("Batch Control debit and credit amounts are not the same as sum of Entries")
+
+	ErrBatchNumberMismatch       = errors.New("Batch Number is not the same in Header as Control")
+	ErrBatchAscendingTraceNumber = errors.New("Trace Numbers on the File are not in ascending sequence within a batch")
+)
+
 // Batch holds the Batch Header and Batch Control and all Entry Records
 type Batch struct {
 	Header  BatchHeader
@@ -43,7 +55,99 @@ type Batch struct {
 }
 
 // addEntryDetail appends an EntryDetail to the Batch
-func (b *Batch) addEntryDetail(entry EntryDetail) []EntryDetail {
-	b.Entries = append(b.Entries, entry)
-	return b.Entries
+func (batch *Batch) addEntryDetail(entry EntryDetail) []EntryDetail {
+	batch.Entries = append(batch.Entries, entry)
+	return batch.Entries
+}
+
+// Validate NACHA rules on the entire batch before being added to a File
+func (batch *Batch) Validate() error {
+	if err := batch.isServiceClassMismatch(); err != nil {
+		return err
+	}
+
+	if err := batch.isBatchEntryCountMismatch(); err != nil {
+		return err
+	}
+
+	if err := batch.isBatchNumberMismatch(); err != nil {
+		return err
+	}
+	if err := batch.isSequenceAscending(); err != nil {
+		return err
+	}
+
+	if err := batch.isBatchAmountMismatch(); err != nil {
+		return err
+	}
+	return nil
+}
+
+// isServiceClassMismatch validate batch header and control codes are the same
+func (batch *Batch) isServiceClassMismatch() error {
+	if batch.Header.ServiceClassCode != batch.Control.ServiceClassCode {
+		return ErrBatchServiceClassMismatch
+	}
+	return nil
+}
+
+// isBatchEntryCountMismatch validate Entry count is accurate
+func (batch *Batch) isBatchEntryCountMismatch() error {
+	if len(batch.Entries) != batch.Control.EntryAddendaCount {
+		return ErrBatchEntryCountMismatch
+	}
+	return nil
+}
+
+// isBatchAmountMismatch validate Amount is the same as what is in the Entries
+func (batch *Batch) isBatchAmountMismatch() error {
+	debit := 0
+	credit := 0
+	savingsCredit := 0
+	savingsDebit := 0
+	for _, seq := range batch.Entries {
+		if seq.TransactionCode == 22 || seq.TransactionCode == 23 {
+			credit = credit + seq.Amount
+		}
+		if seq.TransactionCode == 27 || seq.TransactionCode == 28 {
+			debit = debit + seq.Amount
+		}
+		if seq.TransactionCode == 32 || seq.TransactionCode == 33 {
+			savingsCredit = savingsCredit + seq.Amount
+		}
+		if seq.TransactionCode == 37 || seq.TransactionCode == 38 {
+			savingsDebit = savingsDebit + seq.Amount
+		}
+
+		// TODO: current unsure of what to do with savings credits and debits.
+		if debit != batch.Control.TotalDebitEntryDollarAmount {
+			return ErrBatchAmountMismatch
+		}
+		if credit != batch.Control.TotalCreditEntryDollarAmount {
+			return ErrBatchAmountMismatch
+		}
+	}
+
+	return nil
+}
+
+// isBatchNumberMismatch validate batch header and control numbers are the same
+func (batch *Batch) isBatchNumberMismatch() error {
+	if batch.Header.BatchNumber != batch.Control.BatchNumber {
+		return ErrBatchNumberMismatch
+	}
+	return nil
+}
+
+// isSequenceAscending Individual Entry Detail Records within individual batches must
+// be in ascending Trace Number order (although Trace Numbers need not necessarily be consecutive).
+func (batch *Batch) isSequenceAscending() error {
+	lastSeq := 0
+	for _, seq := range batch.Entries {
+		if seq.TraceNumber < lastSeq {
+			return ErrBatchAscendingTraceNumber
+		}
+		lastSeq = seq.TraceNumber
+	}
+	return nil
 }

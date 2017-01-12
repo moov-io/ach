@@ -1,15 +1,9 @@
 package ach
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
-)
-
-// Errors specific to a Batach Addenda Record
-var (
-	ErrAddendaTypeCode = errors.New("Invalid Addenda Type Code")
 )
 
 // Addenda provides business transaction information in a machine
@@ -71,36 +65,34 @@ func (addenda *Addenda) String() string {
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops that parsing.
-func (addenda *Addenda) Validate() (bool, error) {
-	v, err := addenda.fieldInclusion()
-	if !v {
-		return false, error(err)
+func (addenda *Addenda) Validate() error {
+	if err := addenda.fieldInclusion(); err != nil {
+		return err
 	}
-
 	if addenda.recordType != "7" {
-		return false, ErrRecordType
+		return ErrRecordType
 	}
-	if !addenda.isTypeCode(addenda.TypeCode) {
-		return false, ErrAddendaTypeCode
+	if err := addenda.isTypeCode(addenda.TypeCode); err != nil {
+		return err
+	}
+	if err := addenda.isAlphanumeric(addenda.PaymentRelatedInformation); err != nil {
+		fmt.Println(addenda.PaymentRelatedInformation)
+		return err
 	}
 
-	if !addenda.isAlphanumeric(addenda.PaymentRelatedInformation) {
-		return false, ErrValidAlphanumeric
-	}
-
-	return true, nil
+	return nil
 }
 
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
-func (addenda *Addenda) fieldInclusion() (bool, error) {
+func (addenda *Addenda) fieldInclusion() error {
 	if addenda.recordType == "" &&
 		addenda.TypeCode == "" &&
 		addenda.SequenceNumber == 0 &&
 		addenda.EntryDetailSequenceNumber == 0 {
-		return false, ErrValidFieldInclusion
+		return ErrValidFieldInclusion
 	}
-	return true, nil
+	return nil
 }
 
 // PaymentRelatedInformationField returns a zero padded PaymentRelatedInformation string

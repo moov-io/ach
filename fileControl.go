@@ -82,26 +82,25 @@ func (fc *FileControl) String() string {
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops that parsing.
-func (fc *FileControl) Validate() (bool, error) {
-	v, err := fc.fieldInclusion()
-	if !v {
-		return false, error(err)
+func (fc *FileControl) Validate() error {
+	if err := fc.fieldInclusion(); err != nil {
+		return err
 	}
 	if fc.recordType != "9" {
-		return false, ErrRecordType
+		return ErrRecordType
 	}
-	return true, nil
+	return nil
 }
 
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
-func (fc *FileControl) fieldInclusion() (bool, error) {
+func (fc *FileControl) fieldInclusion() error {
 	if fc.recordType == "" &&
 		fc.BatchCount == 0 &&
 		fc.BlockCount == 0 {
-		return false, ErrValidFieldInclusion
+		return ErrValidFieldInclusion
 	}
-	return true, nil
+	return nil
 }
 
 // BatchCountField gets a string of the batch count zero padded

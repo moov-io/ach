@@ -41,6 +41,11 @@ var (
 	ErrAddendaNoIndicator = errors.New("Addenda without Entry Detail Addenda Inicator")
 )
 
+// currently support SEC codes
+const (
+	ppd = "PPD"
+)
+
 // Reader reads records from a ACH-encoded file.
 type Reader struct {
 	// r handles the IO.Reader sent to be parser.
@@ -142,6 +147,8 @@ func (r *Reader) Read() (File, error) {
 		return r.file, r.error(ErrFileControl)
 	}
 
+	// TODO: Validate cross Record type values
+
 	// TODO: number of lines in file must be divisable by 10 the blocking factor
 	return r.file, nil
 }
@@ -154,8 +161,8 @@ func (r *Reader) parseFileHeader() error {
 		return r.error(ErrFileHeader)
 	}
 	r.file.Header.Parse(r.line)
-	v, err := r.file.Header.Validate()
-	if !v {
+
+	if err := r.file.Header.Validate(); err != nil {
 		return r.error(err)
 	}
 	return nil
@@ -169,8 +176,7 @@ func (r *Reader) parseBatchHeader() error {
 		return r.error(ErrBatchControl)
 	}
 	r.currentBatch.Header.Parse(r.line)
-	v, err := r.currentBatch.Header.Validate()
-	if !v {
+	if err := r.currentBatch.Header.Validate(); err != nil {
 		return r.error(err)
 	}
 	return nil
@@ -182,11 +188,10 @@ func (r *Reader) parseEntryDetail() error {
 	if (BatchHeader{}) == r.currentBatch.Header {
 		return r.error(ErrEntryOutside)
 	}
-	if r.currentBatch.Header.StandardEntryClassCode == "PPD" {
+	if r.currentBatch.Header.StandardEntryClassCode == ppd {
 		ed := EntryDetail{}
 		ed.Parse(r.line)
-		v, err := ed.Validate()
-		if !v {
+		if err := ed.Validate(); err != nil {
 			return r.error(err)
 		}
 		r.currentBatch.addEntryDetail(ed)
@@ -205,12 +210,11 @@ func (r *Reader) parseAddenda() error {
 	}
 	entryIndex := len(r.currentBatch.Entries) - 1
 	entry := r.currentBatch.Entries[entryIndex]
-	if r.currentBatch.Header.StandardEntryClassCode == "PPD" {
+	if r.currentBatch.Header.StandardEntryClassCode == ppd {
 		if entry.AddendaRecordIndicator == 1 {
 			addenda := Addenda{}
 			addenda.Parse(r.line)
-			v, err := addenda.Validate()
-			if !v {
+			if err := addenda.Validate(); err != nil {
 				return r.error(err)
 			}
 			r.currentBatch.Entries[entryIndex].addAddenda(addenda)
@@ -229,8 +233,13 @@ func (r *Reader) parseAddenda() error {
 func (r *Reader) parseBatchControl() error {
 	r.recordName = "BatchControl"
 	r.currentBatch.Control.Parse(r.line)
-	v, err := r.currentBatch.Control.Validate()
-	if !v {
+
+	/*
+		if _, err := r.currentBatch.Control.Validate(); err != nil {
+			return r.error(err)
+		}
+	*/
+	if err := r.currentBatch.Validate(); err != nil {
 		return r.error(err)
 	}
 	r.file.addBatch(r.currentBatch)
@@ -246,8 +255,7 @@ func (r *Reader) parseFileControl() error {
 		return r.error(ErrFileControl)
 	}
 	r.file.Control.Parse(r.line)
-	v, err := r.file.Control.Validate()
-	if !v {
+	if err := r.file.Control.Validate(); err != nil {
 		return r.error(err)
 	}
 	return nil

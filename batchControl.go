@@ -117,36 +117,35 @@ func (bc *BatchControl) String() string {
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops that parsing.
-func (bc *BatchControl) Validate() (bool, error) {
-	v, err := bc.fieldInclusion()
-	if !v {
-		return false, error(err)
+func (bc *BatchControl) Validate() error {
+	if err := bc.fieldInclusion(); err != nil {
+		return err
 	}
-
 	if bc.recordType != "8" {
-		return false, ErrRecordType
+		return ErrRecordType
 	}
-	if !bc.isServiceClass(bc.ServiceClassCode) {
-		return false, ErrServiceClass
-	}
-
-	if !bc.isAlphanumeric(bc.CompanyIdentification) {
-		return false, ErrValidAlphanumeric
-	}
-	if !bc.isAlphanumeric(bc.MessageAuthenticationCode) {
-		return false, ErrValidAlphanumeric
+	if err := bc.isServiceClass(bc.ServiceClassCode); err != nil {
+		return ErrServiceClass
 	}
 
-	return true, nil
+	if err := bc.isAlphanumeric(bc.CompanyIdentification); err != nil {
+		return err
+	}
+
+	if err := bc.isAlphanumeric(bc.MessageAuthenticationCode); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
-func (bc *BatchControl) fieldInclusion() (bool, error) {
+func (bc *BatchControl) fieldInclusion() error {
 	if bc.recordType == "" {
-		return false, ErrValidFieldInclusion
+		return ErrValidFieldInclusion
 	}
-	return true, nil
+	return nil
 }
 
 // EntryAddendaCountField gets a string of the addenda count zero padded

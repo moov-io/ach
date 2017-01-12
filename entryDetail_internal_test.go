@@ -36,8 +36,8 @@ func TestParseEntryDetail(t *testing.T) {
 	if record.DFIAccountNumber() != "12345            " {
 		t.Errorf("DfiAccountNumber Expected '12345            ' got: %v", record.DFIAccountNumber())
 	}
-	if record.Amount() != "0000010500" {
-		t.Errorf("Amount Expected '0000010500' got: %v", record.Amount())
+	if record.AmountField() != "0000010500" {
+		t.Errorf("Amount Expected '0000010500' got: %v", record.AmountField())
 	}
 
 	if record.IndividualIdentificationNumber != "c-1            " {
@@ -52,8 +52,8 @@ func TestParseEntryDetail(t *testing.T) {
 	if record.AddendaRecordIndicator != 0 {
 		t.Errorf("AddendaRecordIndicator Expected '0' got: %v", record.AddendaRecordIndicator)
 	}
-	if record.TraceNumber() != "076401255655291" {
-		t.Errorf("TraceNumber Expected '076401255655291' got: %v", record.TraceNumber())
+	if record.TraceNumberField() != "076401255655291" {
+		t.Errorf("TraceNumber Expected '076401255655291' got: %v", record.TraceNumberField())
 	}
 }
 
@@ -78,9 +78,10 @@ func TestEDString(t *testing.T) {
 func TestValidateEDRecordType(t *testing.T) {
 	ed := NewEntryDetail()
 	ed.recordType = "2"
-	_, err := ed.Validate()
-	if !strings.Contains(err.Error(), ErrRecordType.Error()) {
-		t.Errorf("Expected RecordType Error got: %v", err)
+	if err := ed.Validate(); err != nil {
+		if !strings.Contains(err.Error(), ErrRecordType.Error()) {
+			t.Errorf("Expected RecordType Error got: %v", err)
+		}
 	}
 }
 
@@ -88,8 +89,9 @@ func TestValidateEDRecordType(t *testing.T) {
 func TestValidateEDTransactionCode(t *testing.T) {
 	ed := NewEntryDetail()
 	ed.TransactionCode = 63
-	_, err := ed.Validate()
-	if !strings.Contains(err.Error(), ErrTransactionCode.Error()) {
-		t.Errorf("Expected Transaction Code Error got: %v", err)
+	if err := ed.Validate(); err != nil {
+		if !strings.Contains(err.Error(), ErrTransactionCode.Error()) {
+			t.Errorf("Expected Transaction Code Error got: %v", err)
+		}
 	}
 }

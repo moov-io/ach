@@ -15,7 +15,7 @@ func TestParseAddenda(t *testing.T) {
 
 	r := NewReader(strings.NewReader(line))
 	r.currentBatch.Header.StandardEntryClassCode = "PPD"
-	r.currentBatch.addEntryDetail(EntryDetail{AddendaRecordIndicator: 1})
+	r.currentBatch.addEntryDetail(EntryDetail{TransactionCode: 22, AddendaRecordIndicator: 1})
 	r.line = line
 	err := r.parseAddenda()
 	if err != nil {
@@ -61,9 +61,10 @@ func TestAddendaString(t *testing.T) {
 func TestValidateAddendaRecordType(t *testing.T) {
 	addenda := NewAddenda()
 	addenda.recordType = "2"
-	_, err := addenda.Validate()
-	if !strings.Contains(err.Error(), ErrRecordType.Error()) {
-		t.Errorf("Expected RecordType Error got: %v", err)
+	if err := addenda.Validate(); err != nil {
+		if !strings.Contains(err.Error(), ErrRecordType.Error()) {
+			t.Errorf("Expected RecordType Error got: %v", err)
+		}
 	}
 }
 
@@ -71,8 +72,9 @@ func TestValidateAddendaRecordType(t *testing.T) {
 func TestValidateAddendaTypeCode(t *testing.T) {
 	addenda := NewAddenda()
 	addenda.TypeCode = "23"
-	_, err := addenda.Validate()
-	if !strings.Contains(err.Error(), ErrAddendaTypeCode.Error()) {
-		t.Errorf("Expected Type Code Error got: %v", err)
+	if err := addenda.Validate(); err != nil {
+		if !strings.Contains(err.Error(), ErrAddendaTypeCode.Error()) {
+			t.Errorf("Expected Type Code Error got: %v", err)
+		}
 	}
 }

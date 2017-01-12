@@ -10,14 +10,20 @@ type Validator struct{}
 
 // Errors specific to validation
 var (
-	ErrValidAlphanumeric   = errors.New("Field has non alphanumeric characters ")
-	ErrValidAlpha          = errors.New("Field has non alpha characters ")
+	ErrValidAlphanumeric   = errors.New("Field has non alphanumeric characters")
+	ErrValidAlpha          = errors.New("Field has non alpha characters")
+	ErrUpperAlpha          = errors.New("Field is not uppercase A-Z or 0-9")
 	ErrValidFieldInclusion = errors.New("A mandatory field has a zero value")
 	ErrValidFieldLength    = errors.New("Field length is invalid")
+	ErrServiceClass        = errors.New("Invalid Service Class Code")
+	ErrSECCode             = errors.New("Invalid Standard Entry Class Code")
+	ErrOrigStatusCode      = errors.New("Invalid Originator Status Code")
+	ErrAddendaTypeCode     = errors.New("Invalid Addenda Type Code")
+	ErrTransactionCode     = errors.New("Invalid Transaction Code")
 )
 
 // iServiceClass returns true if a valid service class code
-func (v *Validator) isServiceClass(code int) bool {
+func (v *Validator) isServiceClass(code int) error {
 	switch code {
 	case
 		// ACH Mixed Debits and Credits
@@ -28,24 +34,24 @@ func (v *Validator) isServiceClass(code int) bool {
 		225,
 		// ACH Automated Accounting Advices
 		280:
-		return true
+		return nil
 	}
-	return false
+	return ErrServiceClass
 }
 
 // isSECCode returns true if a SEC Code is found
-func (v *Validator) isSECCode(code string) bool {
+func (v *Validator) isSECCode(code string) error {
 	switch code {
 	case
 		"ACK", "ADV", "ARC", "ATX", "BOC", "CCD", "CIE", "COR", "CTX", "DNE", "ENR",
 		"IAT", "MTE", "POS", "PPD", "POP", "RCK", "SHR", "TEL", "TRC", "TRX", "WEB", "XCK":
-		return true
+		return nil
 	}
-	return false
+	return ErrSECCode
 }
 
 // isTypeCode returns true if a valid type code is found
-func (v *Validator) isTypeCode(code string) bool {
+func (v *Validator) isTypeCode(code string) error {
 	switch code {
 	case
 		// For POS, SHR or MTE Entries
@@ -60,13 +66,13 @@ func (v *Validator) isTypeCode(code string) bool {
 		"10", "11", "12", "13", "14", "15", "16", "17",
 		// CCD Addenda Record
 		"05":
-		return true
+		return nil
 	}
-	return false
+	return ErrAddendaTypeCode
 }
 
 // isTransactionCode ensures TransactionCode code is valid
-func (v *Validator) isTransactionCode(code int) bool {
+func (v *Validator) isTransactionCode(code int) error {
 	switch code {
 	// TransactionCode if the recievers account is:
 	case
@@ -86,13 +92,13 @@ func (v *Validator) isTransactionCode(code int) bool {
 		37,
 		// Prenote for debit to savings account ‘38’
 		38:
-		return true
+		return nil
 	}
-	return false
+	return ErrTransactionCode
 }
 
 // isOriginatorStatusCode ensures status code is valid
-func (v *Validator) isOriginatorStatusCode(code int) bool {
+func (v *Validator) isOriginatorStatusCode(code int) error {
 	switch code {
 	case
 		// ADV file - prepared by an ACH Operator
@@ -101,36 +107,24 @@ func (v *Validator) isOriginatorStatusCode(code int) bool {
 		1,
 		// Originator is a Government Agency or other agency not subject to ACH Rules
 		2:
-		return true
+		return nil
 	}
-	return false
+	return ErrOrigStatusCode
 }
 
 // isUpperAlphanumeric checks if string only contains ASCII alphanumeric upper case characters
-func (v *Validator) isUpperAlphanumeric(s string) (b bool) {
+func (v *Validator) isUpperAlphanumeric(s string) error {
 	if regexp.MustCompile(`[^A-Z0-9]+`).MatchString(s) {
-		return false
+		return ErrUpperAlpha
 	}
-	return true
+	return nil
 }
 
 // isAlphanumeric checks if a string only contains ASCII alphanumeric characters
-func (v *Validator) isAlphanumeric(s string) (b bool) {
+func (v *Validator) isAlphanumeric(s string) error {
 	if regexp.MustCompile(`[^ a-zA-Z0-9_*-\/]+`).MatchString(s) {
 		// ^[ A-Za-z0-9_@./#&+-]*$/
-		return false
+		return ErrValidAlphanumeric
 	}
-	return true
+	return nil
 }
-
-// // isLetter checks if a string contains only ASCII letters
-// func (v *Validator) isLetter(s string) bool {
-// 	fmt.Println(s)
-// 	for _, r := range s {
-// 		fmt.Printf("%v ", r)
-// 		if (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') {
-// 			return false
-// 		}
-// 	}
-// 	return true
-// }

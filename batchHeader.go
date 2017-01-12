@@ -1,18 +1,10 @@
 package ach
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
-)
-
-// Errors specific to a Batch Header Record
-var (
-	ErrServiceClass   = errors.New("Invalid Service Class Code")
-	ErrSECCode        = errors.New("Invalid Standard Entry Class Code")
-	ErrOrigStatusCode = errors.New("Invalid Originator Status Code")
 )
 
 // ErrServiceClass
@@ -160,44 +152,41 @@ func (bh *BatchHeader) String() string {
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops that parsing.
-func (bh *BatchHeader) Validate() (bool, error) {
-	v, err := bh.fieldInclusion()
-	if !v {
-		return false, error(err)
+func (bh *BatchHeader) Validate() error {
+	if err := bh.fieldInclusion(); err != nil {
+		return err
 	}
-
 	if bh.recordType != "5" {
-		return false, ErrRecordType
+		return ErrRecordType
 	}
-	if !bh.isServiceClass(bh.ServiceClassCode) {
-		return false, ErrServiceClass
+	if err := bh.isServiceClass(bh.ServiceClassCode); err != nil {
+		return err
 	}
-	if !bh.isSECCode(bh.StandardEntryClassCode) {
-		return false, ErrSECCode
+	if err := bh.isSECCode(bh.StandardEntryClassCode); err != nil {
+		return err
 	}
-	if !bh.isOriginatorStatusCode(bh.OriginatorStatusCode) {
-		return false, ErrOrigStatusCode
+	if err := bh.isOriginatorStatusCode(bh.OriginatorStatusCode); err != nil {
+		return err
+	}
+	if err := bh.isAlphanumeric(bh.CompanyName); err != nil {
+		return err
+	}
+	if err := bh.isAlphanumeric(bh.CompanyDiscretionaryData); err != nil {
+		return err
+	}
+	if err := bh.isAlphanumeric(bh.CompanyIdentification); err != nil {
+		return err
+	}
+	if err := bh.isAlphanumeric(bh.CompanyEntryDescription); err != nil {
+		return err
 	}
 
-	if !bh.isAlphanumeric(bh.CompanyName) {
-		return false, ErrValidAlphanumeric
-	}
-	if !bh.isAlphanumeric(bh.CompanyDiscretionaryData) {
-		return false, ErrValidAlphanumeric
-	}
-	if !bh.isAlphanumeric(bh.CompanyIdentification) {
-		return false, ErrValidAlphanumeric
-	}
-	if !bh.isAlphanumeric(bh.CompanyEntryDescription) {
-		return false, ErrValidAlphanumeric
-	}
-
-	return true, nil
+	return nil
 }
 
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
-func (bh *BatchHeader) fieldInclusion() (bool, error) {
+func (bh *BatchHeader) fieldInclusion() error {
 	if bh.recordType == "" &&
 		bh.ServiceClassCode == 0 &&
 		bh.CompanyName == "" &&
@@ -207,9 +196,9 @@ func (bh *BatchHeader) fieldInclusion() (bool, error) {
 		bh.OriginatorStatusCode == 0 &&
 		bh.ODFIIdentification == 0 &&
 		bh.BatchNumber == 0 {
-		return false, ErrValidFieldInclusion
+		return ErrValidFieldInclusion
 	}
-	return true, nil
+	return nil
 }
 
 // CompanyNameField get the CompanyName left padded

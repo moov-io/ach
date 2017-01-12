@@ -84,19 +84,22 @@ func TestBHString(t *testing.T) {
 func TestValidateBHRecordType(t *testing.T) {
 	bh := NewBatchHeader()
 	bh.recordType = "2"
-	_, err := bh.Validate()
-	if !strings.Contains(err.Error(), ErrRecordType.Error()) {
-		t.Errorf("Expected RecordType Error got: %v", err)
+	if err := bh.Validate(); err != nil {
+		if !strings.Contains(err.Error(), ErrRecordType.Error()) {
+			t.Errorf("Expected RecordType Error got: %v", err)
+		}
 	}
+
 }
 
 // TestInvalidServiceCode ensure error if service class is not valid
 func TestInvalidServiceCode(t *testing.T) {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = 123
-	_, err := bh.Validate()
-	if !strings.Contains(err.Error(), ErrServiceClass.Error()) {
-		t.Errorf("Expected Service Class Error got: %v", err)
+	if err := bh.Validate(); err != nil {
+		if !strings.Contains(err.Error(), ErrServiceClass.Error()) {
+			t.Errorf("Expected Service Class Error got: %v", err)
+		}
 	}
 }
 
@@ -105,9 +108,10 @@ func TestInvalidSECCode(t *testing.T) {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = 200
 	bh.StandardEntryClassCode = "ABC"
-	_, err := bh.Validate()
-	if !strings.Contains(err.Error(), ErrSECCode.Error()) {
-		t.Errorf("Expected SEC CodeError got: %v", err)
+	if err := bh.Validate(); err != nil {
+		if !strings.Contains(err.Error(), ErrSECCode.Error()) {
+			t.Errorf("Expected SEC CodeError got: %v", err)
+		}
 	}
 }
 
@@ -117,8 +121,9 @@ func TestInvalidOrigStatusCode(t *testing.T) {
 	bh.ServiceClassCode = 200
 	bh.StandardEntryClassCode = "PPD"
 	bh.OriginatorStatusCode = 3
-	_, err := bh.Validate()
-	if !strings.Contains(err.Error(), ErrOrigStatusCode.Error()) {
-		t.Errorf("Expected Originator Status CodeError got: %v", err)
+	if err := bh.Validate(); err != nil {
+		if !strings.Contains(err.Error(), ErrOrigStatusCode.Error()) {
+			t.Errorf("Expected Originator Status CodeError got: %v", err)
+		}
 	}
 }
