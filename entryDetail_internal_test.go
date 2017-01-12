@@ -78,9 +78,10 @@ func TestEDString(t *testing.T) {
 func TestValidateEDRecordType(t *testing.T) {
 	ed := NewEntryDetail()
 	ed.recordType = "2"
-	_, err := ed.Validate()
-	if !strings.Contains(err.Error(), ErrRecordType.Error()) {
-		t.Errorf("Expected RecordType Error got: %v", err)
+	if err := ed.Validate(); err != nil {
+		if !strings.Contains(err.Error(), ErrRecordType.Error()) {
+			t.Errorf("Expected RecordType Error got: %v", err)
+		}
 	}
 }
 
@@ -88,8 +89,9 @@ func TestValidateEDRecordType(t *testing.T) {
 func TestValidateEDTransactionCode(t *testing.T) {
 	ed := NewEntryDetail()
 	ed.TransactionCode = 63
-	_, err := ed.Validate()
-	if !strings.Contains(err.Error(), ErrTransactionCode.Error()) {
-		t.Errorf("Expected Transaction Code Error got: %v", err)
+	if err := ed.Validate(); err != nil {
+		if !strings.Contains(err.Error(), ErrTransactionCode.Error()) {
+			t.Errorf("Expected Transaction Code Error got: %v", err)
+		}
 	}
 }

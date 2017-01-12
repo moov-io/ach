@@ -65,8 +65,11 @@ func TestFCString(t *testing.T) {
 func TestValidateFCRecordType(t *testing.T) {
 	fc := NewBatchControl()
 	fc.recordType = "2"
-	_, err := fc.Validate()
-	if !strings.Contains(err.Error(), ErrRecordType.Error()) {
-		t.Errorf("Expected RecordType Error got: %v", err)
+
+	if err := fc.Validate(); err != nil {
+		if !strings.Contains(err.Error(), ErrRecordType.Error()) {
+			t.Errorf("Expected RecordType Error got: %v", err)
+		}
+
 	}
 }

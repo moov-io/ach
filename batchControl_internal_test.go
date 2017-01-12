@@ -16,7 +16,7 @@ func TestParseBatchControl(t *testing.T) {
 	r.line = line
 	r.currentBatch.Header.BatchNumber = 1
 	r.currentBatch.Header.ServiceClassCode = 225
-	r.currentBatch.addEntryDetail(EntryDetail{Amount: 10500})
+	r.currentBatch.addEntryDetail(EntryDetail{TransactionCode: 27, Amount: 10500})
 	err := r.parseBatchControl()
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
@@ -65,7 +65,7 @@ func TestBCString(t *testing.T) {
 	r.line = line
 	r.currentBatch.Header.BatchNumber = 1
 	r.currentBatch.Header.ServiceClassCode = 225
-	r.currentBatch.addEntryDetail(EntryDetail{Amount: 10500})
+	r.currentBatch.addEntryDetail(EntryDetail{TransactionCode: 27, Amount: 10500})
 	err := r.parseBatchControl()
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
@@ -81,8 +81,9 @@ func TestBCString(t *testing.T) {
 func TestValidateBCRecordType(t *testing.T) {
 	bc := NewBatchControl()
 	bc.recordType = "2"
-	_, err := bc.Validate()
-	if !strings.Contains(err.Error(), ErrRecordType.Error()) {
-		t.Errorf("Expected RecordType Error got: %v", err)
+	if err := bc.Validate(); err != nil {
+		if !strings.Contains(err.Error(), ErrRecordType.Error()) {
+			t.Errorf("Expected RecordType Error got: %v", err)
+		}
 	}
 }

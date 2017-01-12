@@ -1,14 +1,8 @@
 package ach
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
-)
-
-// Errors Specific to a Batch Entry Detail Record
-var (
-	ErrTransactionCode = errors.New("Invalid Transaction Code")
 )
 
 // EntryDetail contains the actual transaction data for an individual entry.
@@ -133,37 +127,35 @@ func (ed *EntryDetail) String() string {
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops that parsing.
-func (ed *EntryDetail) Validate() (bool, error) {
-	v, err := ed.fieldInclusion()
-	if !v {
-		return false, error(err)
+func (ed *EntryDetail) Validate() error {
+	if err := ed.fieldInclusion(); err != nil {
+		return err
 	}
-
 	if ed.recordType != "6" {
-		return false, ErrRecordType
+		return ErrRecordType
 	}
-	if !ed.isTransactionCode(ed.TransactionCode) {
-		return false, ErrTransactionCode
+	if err := ed.isTransactionCode(ed.TransactionCode); err != nil {
+		return err
 	}
-	if !ed.isAlphanumeric(ed.dfiAccountNumber) {
-		return false, ErrValidAlphanumeric
+	if err := ed.isAlphanumeric(ed.dfiAccountNumber); err != nil {
+		return err
 	}
-	if !ed.isAlphanumeric(ed.IndividualIdentificationNumber) {
-		return false, ErrValidAlphanumeric
+	if err := ed.isAlphanumeric(ed.IndividualIdentificationNumber); err != nil {
+		return err
 	}
-	if !ed.isAlphanumeric(ed.IndividualName) {
-		return false, ErrValidAlphanumeric
+	if err := ed.isAlphanumeric(ed.IndividualName); err != nil {
+		return err
 	}
-	if !ed.isAlphanumeric(ed.DiscretionaryData) {
-		return false, ErrValidAlphanumeric
+	if err := ed.isAlphanumeric(ed.DiscretionaryData); err != nil {
+		return err
 	}
 
-	return true, nil
+	return nil
 }
 
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
-func (ed *EntryDetail) fieldInclusion() (bool, error) {
+func (ed *EntryDetail) fieldInclusion() error {
 	if ed.recordType == "" &&
 		ed.TransactionCode == 0 &&
 		ed.RDFIIdentification == 0 &&
@@ -171,9 +163,9 @@ func (ed *EntryDetail) fieldInclusion() (bool, error) {
 		ed.Amount == 0 &&
 		ed.IndividualName == "" &&
 		ed.TraceNumber == 0 {
-		return false, ErrValidFieldInclusion
+		return ErrValidFieldInclusion
 	}
-	return true, nil
+	return nil
 }
 
 // addAddenda appends an EntryDetail to the Addendums

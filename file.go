@@ -40,7 +40,9 @@ func (f *File) addBatch(batch Batch) []Batch {
 // Errors specific to parsing a Batch container
 var (
 	ErrBatchServiceClassMismatch = errors.New("Service Class Code is not the same in Header and Control")
-	ErrBatchEntryCountMismatch   = errors.New("Batch Entry Count is out-of-balance with number of entries")
+	ErrBatchEntryCountMismatch   = errors.New("Batch Entry Count is out-of-balance with number of Entries")
+	ErrBatchAmountMismatch       = errors.New("Batch Control debit and credit amounts are not the same as sum of Entries")
+
 	ErrBatchNumberMismatch       = errors.New("Batch Number is not the same in Header as Control")
 	ErrBatchAscendingTraceNumber = errors.New("Trace Numbers on the File are not in ascending sequence within a batch")
 )
@@ -59,63 +61,93 @@ func (batch *Batch) addEntryDetail(entry EntryDetail) []EntryDetail {
 }
 
 // Validate NACHA rules on the entire batch before being added to a File
-func (batch *Batch) Validate() (bool, error) {
-	v, err := batch.isServiceClassMismatch()
-	if !v {
-		return false, err
+func (batch *Batch) Validate() error {
+	if err := batch.isServiceClassMismatch(); err != nil {
+		return err
 	}
 
-	v, err = batch.isBatchEntryCountMismatch()
-	if !v {
-		return false, err
+	if err := batch.isBatchEntryCountMismatch(); err != nil {
+		return err
 	}
 
-	v, err = batch.isBatchNumberMismatch()
-	if !v {
-		return false, err
+	if err := batch.isBatchNumberMismatch(); err != nil {
+		return err
+	}
+	if err := batch.isSequenceAscending(); err != nil {
+		return err
 	}
 
-	v, err = batch.isSequenceAscending()
-	if !v {
-		return false, err
+	if err := batch.isBatchAmountMismatch(); err != nil {
+		return err
 	}
-
-	return true, nil
+	return nil
 }
 
 // isServiceClassMismatch validate batch header and control codes are the same
-func (batch *Batch) isServiceClassMismatch() (bool, error) {
+func (batch *Batch) isServiceClassMismatch() error {
 	if batch.Header.ServiceClassCode != batch.Control.ServiceClassCode {
-		return false, ErrBatchServiceClassMismatch
+		return ErrBatchServiceClassMismatch
 	}
-	return true, nil
+	return nil
 }
 
 // isBatchEntryCountMismatch validate Entry count is accurate
-func (batch *Batch) isBatchEntryCountMismatch() (bool, error) {
+func (batch *Batch) isBatchEntryCountMismatch() error {
 	if len(batch.Entries) != batch.Control.EntryAddendaCount {
-		return false, ErrBatchEntryCountMismatch
+		return ErrBatchEntryCountMismatch
 	}
-	return true, nil
+	return nil
+}
+
+// isBatchAmountMismatch validate Amount is the same as what is in the Entries
+func (batch *Batch) isBatchAmountMismatch() error {
+	debit := 0
+	credit := 0
+	savingsCredit := 0
+	savingsDebit := 0
+	for _, seq := range batch.Entries {
+		if seq.TransactionCode == 22 || seq.TransactionCode == 23 {
+			credit = credit + seq.Amount
+		}
+		if seq.TransactionCode == 27 || seq.TransactionCode == 28 {
+			debit = debit + seq.Amount
+		}
+		if seq.TransactionCode == 32 || seq.TransactionCode == 33 {
+			savingsCredit = savingsCredit + seq.Amount
+		}
+		if seq.TransactionCode == 37 || seq.TransactionCode == 38 {
+			savingsDebit = savingsDebit + seq.Amount
+		}
+
+		// TODO: current unsure of what to do with savings credits and debits.
+		if debit != batch.Control.TotalDebitEntryDollarAmount {
+			return ErrBatchAmountMismatch
+		}
+		if credit != batch.Control.TotalCreditEntryDollarAmount {
+			return ErrBatchAmountMismatch
+		}
+	}
+
+	return nil
 }
 
 // isBatchNumberMismatch validate batch header and control numbers are the same
-func (batch *Batch) isBatchNumberMismatch() (bool, error) {
+func (batch *Batch) isBatchNumberMismatch() error {
 	if batch.Header.BatchNumber != batch.Control.BatchNumber {
-		return false, ErrBatchNumberMismatch
+		return ErrBatchNumberMismatch
 	}
-	return true, nil
+	return nil
 }
 
 // isSequenceAscending Individual Entry Detail Records within individual batches must
 // be in ascending Trace Number order (although Trace Numbers need not necessarily be consecutive).
-func (batch *Batch) isSequenceAscending() (bool, error) {
+func (batch *Batch) isSequenceAscending() error {
 	lastSeq := 0
 	for _, seq := range batch.Entries {
 		if seq.TraceNumber < lastSeq {
-			return false, ErrBatchAscendingTraceNumber
+			return ErrBatchAscendingTraceNumber
 		}
 		lastSeq = seq.TraceNumber
 	}
-	return true, nil
+	return nil
 }
