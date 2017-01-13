@@ -8,7 +8,10 @@
 // https://en.wikipedia.org/wiki/Automated_Clearing_House
 package ach
 
-import "errors"
+import (
+	"errors"
+	"strconv"
+)
 
 // First position of all Record Types. These codes are uniquily assigned to
 // the first byte of each row in a file.
@@ -45,6 +48,7 @@ var (
 
 	ErrBatchNumberMismatch       = errors.New("Batch Number is not the same in Header as Control")
 	ErrBatchAscendingTraceNumber = errors.New("Trace Numbers on the File are not in ascending sequence within a batch")
+	ErrValidEntryHash            = errors.New("Entry Hash is not equal to the sum of Entry Detail RDFI Identification")
 )
 
 // Batch holds the Batch Header and Batch Control and all Entry Records
@@ -52,6 +56,8 @@ type Batch struct {
 	Header  BatchHeader
 	Entries []EntryDetail
 	Control BatchControl
+	// Converters is composed for ACH to golang Converters
+	Converters
 }
 
 // addEntryDetail appends an EntryDetail to the Batch
@@ -78,6 +84,10 @@ func (batch *Batch) Validate() error {
 	}
 
 	if err := batch.isBatchAmountMismatch(); err != nil {
+		return err
+	}
+
+	if err := batch.isEntryHashMismatch(); err != nil {
 		return err
 	}
 	return nil
@@ -148,6 +158,20 @@ func (batch *Batch) isSequenceAscending() error {
 			return ErrBatchAscendingTraceNumber
 		}
 		lastSeq = seq.TraceNumber
+	}
+	return nil
+}
+
+func (batch *Batch) isEntryHashMismatch() error {
+	hash := 0
+	for _, seq := range batch.Entries {
+		hash = hash + seq.RDFIIdentification
+	}
+	// need to keep just the first 10 digits
+	// TODO: Need test cases on this adding up more than ten digits
+	hashField := batch.leftPad(strconv.Itoa(hash), "0", 10)
+	if hashField != batch.Control.EntryHashField() {
+		return ErrValidEntryHash
 	}
 	return nil
 }
