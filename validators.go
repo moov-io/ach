@@ -2,7 +2,9 @@ package ach
 
 import (
 	"errors"
+	"math"
 	"regexp"
+	"strconv"
 )
 
 // Validator is common validation and formating of golang types to ach type strings
@@ -20,6 +22,7 @@ var (
 	ErrOrigStatusCode      = errors.New("Invalid Originator Status Code")
 	ErrAddendaTypeCode     = errors.New("Invalid Addenda Type Code")
 	ErrTransactionCode     = errors.New("Invalid Transaction Code")
+	ErrValidCheckDigit     = errors.New("Check Digit does not match calculated check digit")
 )
 
 // iServiceClass returns true if a valid service class code
@@ -127,4 +130,49 @@ func (v *Validator) isAlphanumeric(s string) error {
 		return ErrValidAlphanumeric
 	}
 	return nil
+}
+
+// isOriginatorStatusCode ensures status code is valid
+func (v *Validator) isCheckDigit(routingNumber string, checkDigit int) error {
+	if v.CalculateCheckDigit(routingNumber) != checkDigit {
+		return ErrValidCheckDigit
+	}
+	return nil
+}
+
+// CalculateCheckDigit returns a check digit for a rounting number
+// Multiply each digit in the Routing number by a weighting factor. The weighting factors for each digit are:
+// Position: 1 2 3 4 5 6 7 8
+// Weights : 3 7 1 3 7 1 3 7
+// Add the results of the eight multiplications
+// Subtract the sum from the next highest multiple of 10.
+// The result is the Check Digit
+func (v *Validator) CalculateCheckDigit(routingNumber string) int {
+	var routeIndex [8]string
+	for i := 0; i < 8; i++ {
+		routeIndex[i] = string(routingNumber[i])
+	}
+	n, _ := strconv.Atoi(routeIndex[0])
+	sum := (n * 3)
+	n, _ = strconv.Atoi(routeIndex[1])
+	sum = sum + (n * 7)
+	n, _ = strconv.Atoi(routeIndex[2])
+	sum = sum + n // multiply by 1
+	n, _ = strconv.Atoi(routeIndex[3])
+	sum = sum + (n * 3)
+	n, _ = strconv.Atoi(routeIndex[4])
+	sum = sum + (n * 7)
+	n, _ = strconv.Atoi(routeIndex[5])
+	sum = sum + n // multiply by 1
+	n, _ = strconv.Atoi(routeIndex[6])
+	sum = sum + (n * 3)
+	n, _ = strconv.Atoi(routeIndex[7])
+	sum = sum + (n * 7)
+
+	return v.roundUp10(sum) - sum
+}
+
+// roundUp10 round number up to the next ten spot.
+func (v *Validator) roundUp10(n int) int {
+	return int(math.Ceil(float64(n)/10.0)) * 10
 }
