@@ -149,6 +149,9 @@ func (ed *EntryDetail) Validate() error {
 	if err := ed.isAlphanumeric(ed.DiscretionaryData); err != nil {
 		return err
 	}
+	if err := ed.isCheckDigit(ed.RDFIIdentificationField(), ed.CheckDigit); err != nil {
+		return err
+	}
 
 	return nil
 }
