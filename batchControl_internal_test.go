@@ -24,7 +24,7 @@ func TestParseBatchControl(t *testing.T) {
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
 	}
-	record := r.file.Batches[0].Control
+	record := r.currentBatch.Control
 
 	if record.recordType != "8" {
 		t.Errorf("RecordType Expected '8' got: %v", record.recordType)
@@ -75,7 +75,7 @@ func TestBCString(t *testing.T) {
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
 	}
-	record := r.file.Batches[0].Control
+	record := r.currentBatch.Control
 
 	if record.String() != line {
 		t.Errorf("Strings do not match")

@@ -127,6 +127,11 @@ func (r *Reader) Read() (File, error) {
 			if err != nil {
 				return r.file, err
 			}
+			if err = r.currentBatch.Validate(); err != nil {
+				return r.file, r.error(err)
+			}
+			r.file.addBatch(r.currentBatch)
+			r.currentBatch = Batch{}
 		case fileControlPos:
 			err = r.parseFileControl()
 			if err != nil {
@@ -233,17 +238,9 @@ func (r *Reader) parseAddenda() error {
 func (r *Reader) parseBatchControl() error {
 	r.recordName = "BatchControl"
 	r.currentBatch.Control.Parse(r.line)
-
-	/*
-		if _, err := r.currentBatch.Control.Validate(); err != nil {
-			return r.error(err)
-		}
-	*/
-	if err := r.currentBatch.Validate(); err != nil {
+	if err := r.currentBatch.Control.Validate(); err != nil {
 		return r.error(err)
 	}
-	r.file.addBatch(r.currentBatch)
-	r.currentBatch = Batch{}
 	return nil
 }
 
