@@ -18,10 +18,10 @@ var (
 	ErrBatchServiceClassMismatch = errors.New("Service Class Code is not the same in Header and Control")
 	ErrBatchEntryCountMismatch   = errors.New("Batch Entry Count is out-of-balance with number of Entries")
 	ErrBatchAmountMismatch       = errors.New("Batch Control debit and credit amounts are not the same as sum of Entries")
-
 	ErrBatchNumberMismatch       = errors.New("Batch Number is not the same in Header as Control")
 	ErrBatchAscendingTraceNumber = errors.New("Trace Numbers on the File are not in ascending sequence within a batch")
 	ErrValidEntryHash            = errors.New("Entry Hash is not equal to the sum of Entry Detail RDFI Identification")
+	ErrBatchOriginatorDNE        = errors.New("Originator Status Code is not equal to “2” for DNE if the Transaction Code is 23 or 33")
 )
 
 // Batch holds the Batch Header and Batch Control and all Entry Records
@@ -41,8 +41,9 @@ func (batch *Batch) addEntryDetail(entry EntryDetail) []EntryDetail {
 
 // Validate NACHA rules on the entire batch before being added to a File
 func (batch *Batch) Validate() error {
-	if err := batch.isServiceClassMismatch(); err != nil {
-		return err
+	// validate batch header and control codes are the same
+	if batch.Header.ServiceClassCode != batch.Control.ServiceClassCode {
+		return ErrBatchServiceClassMismatch
 	}
 
 	if err := batch.isBatchEntryCountMismatch(); err != nil {
@@ -63,18 +64,17 @@ func (batch *Batch) Validate() error {
 	if err := batch.isEntryHashMismatch(); err != nil {
 		return err
 	}
-	return nil
-}
 
-// isServiceClassMismatch validate batch header and control codes are the same
-func (batch *Batch) isServiceClassMismatch() error {
-	if batch.Header.ServiceClassCode != batch.Control.ServiceClassCode {
-		return ErrBatchServiceClassMismatch
+	if err := batch.isOriginatorDNEMismatch(); err != nil {
+		return err
 	}
+
 	return nil
 }
 
 // isBatchEntryCountMismatch validate Entry count is accurate
+// The Entry/Addenda Count Field is a tally of each Entry Detail and Addenda
+// Record processed within the batch
 func (batch *Batch) isBatchEntryCountMismatch() error {
 	entryCount := 0
 	for _, entry := range batch.Entries {
@@ -87,6 +87,8 @@ func (batch *Batch) isBatchEntryCountMismatch() error {
 }
 
 // isBatchAmountMismatch validate Amount is the same as what is in the Entries
+// The Total Debit and Credit Entry Dollar Amount fields contain accumulated
+// Entry Detail debit and credit totals within a given batch
 func (batch *Batch) isBatchAmountMismatch() error {
 	debit := 0
 	credit := 0
@@ -139,6 +141,9 @@ func (batch *Batch) isSequenceAscending() error {
 	return nil
 }
 
+// isEntryHashMismatch validates the hash by recalulating the result
+// This field is prepared by hashing the 8-digit Routing Number in each entry.
+// The Entry Hash provides a check against inadvertent alteration of data
 func (batch *Batch) isEntryHashMismatch() error {
 	hash := 0
 	for _, seq := range batch.Entries {
@@ -149,6 +154,18 @@ func (batch *Batch) isEntryHashMismatch() error {
 	hashField := batch.leftPad(strconv.Itoa(hash), "0", 10)
 	if hashField != batch.Control.EntryHashField() {
 		return ErrValidEntryHash
+	}
+	return nil
+}
+
+// The Originator Status Code is not equal to “2” for DNE if the Transaction Code is 23 or 33
+func (batch *Batch) isOriginatorDNEMismatch() error {
+	if batch.Header.OriginatorStatusCode != 2 {
+		for _, entry := range batch.Entries {
+			if entry.TransactionCode == 23 || entry.TransactionCode == 33 {
+				return ErrBatchOriginatorDNE
+			}
+		}
 	}
 	return nil
 }
