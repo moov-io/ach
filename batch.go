@@ -22,6 +22,7 @@ var (
 	ErrBatchAscendingTraceNumber = errors.New("Trace Numbers on the File are not in ascending sequence within a batch")
 	ErrValidEntryHash            = errors.New("Entry Hash is not equal to the sum of Entry Detail RDFI Identification")
 	ErrBatchOriginatorDNE        = errors.New("Originator Status Code is not equal to “2” for DNE if the Transaction Code is 23 or 33")
+	ErrBatchCompanyID            = errors.New("Company Identification must match the Company ID from the batch header record")
 )
 
 // Batch holds the Batch Header and Batch Control and all Entry Records
@@ -44,6 +45,11 @@ func (batch *Batch) Validate() error {
 	// validate batch header and control codes are the same
 	if batch.Header.ServiceClassCode != batch.Control.ServiceClassCode {
 		return ErrBatchServiceClassMismatch
+	}
+
+	// Company Identification must match the Company ID from the batch header record
+	if batch.Header.CompanyIdentification != batch.Control.CompanyIdentification {
+		return ErrBatchCompanyID
 	}
 
 	if err := batch.isBatchEntryCountMismatch(); err != nil {
