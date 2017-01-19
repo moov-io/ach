@@ -128,6 +128,7 @@ func (r *Reader) Read() (File, error) {
 				return r.file, err
 			}
 			if err = r.currentBatch.Validate(); err != nil {
+				r.recordName = "Batches"
 				return r.file, r.error(err)
 			}
 			r.file.addBatch(r.currentBatch)
