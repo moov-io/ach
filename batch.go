@@ -23,6 +23,7 @@ var (
 	ErrValidEntryHash            = errors.New("Entry Hash is not equal to the sum of Entry Detail RDFI Identification")
 	ErrBatchOriginatorDNE        = errors.New("Originator Status Code is not equal to “2” for DNE if the Transaction Code is 23 or 33")
 	ErrBatchCompanyID            = errors.New("Company Identification must match the Company ID from the batch header record")
+	ErrBatchODFIIDMismatch       = errors.New("Batch Control ODFI Identification must be the same as batch header")
 )
 
 // Batch holds the Batch Header and Batch Control and all Entry Records
@@ -46,10 +47,13 @@ func (batch *Batch) Validate() error {
 	if batch.Header.ServiceClassCode != batch.Control.ServiceClassCode {
 		return ErrBatchServiceClassMismatch
 	}
-
 	// Company Identification must match the Company ID from the batch header record
 	if batch.Header.CompanyIdentification != batch.Control.CompanyIdentification {
 		return ErrBatchCompanyID
+	}
+	// Control ODFI Identification must be the same as batch header
+	if batch.Header.ODFIIdentification != batch.Control.ODFIIdentification {
+		return ErrBatchODFIIDMismatch
 	}
 
 	if err := batch.isBatchEntryCountMismatch(); err != nil {
