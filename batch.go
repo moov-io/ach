@@ -10,6 +10,7 @@ package ach
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 )
 
@@ -19,11 +20,12 @@ var (
 	ErrBatchEntryCountMismatch   = errors.New("Batch Entry Count is out-of-balance with number of Entries")
 	ErrBatchAmountMismatch       = errors.New("Batch Control debit and credit amounts are not the same as sum of Entries")
 	ErrBatchNumberMismatch       = errors.New("Batch Number is not the same in Header as Control")
-	ErrBatchAscendingTraceNumber = errors.New("Trace Numbers on the File are not in ascending sequence within a batch")
+	ErrBatchAscendingTraceNumber = errors.New("Trace Numbers on the File are not in ascending entryuence within a batch")
 	ErrValidEntryHash            = errors.New("Entry Hash is not equal to the sum of Entry Detail RDFI Identification")
 	ErrBatchOriginatorDNE        = errors.New("Originator Status Code is not equal to “2” for DNE if the Transaction Code is 23 or 33")
 	ErrBatchCompanyID            = errors.New("Company Identification must match the Company ID from the batch header record")
 	ErrBatchODFIIDMismatch       = errors.New("Batch Control ODFI Identification must be the same as batch header")
+	ErrBatchTraceNumberNotODFI   = errors.New("Trace Number in an Entry Detail Record are not the same as the ODFI Routing Number")
 )
 
 // Batch holds the Batch Header and Batch Control and all Entry Records
@@ -56,13 +58,15 @@ func (batch *Batch) Validate() error {
 		return ErrBatchODFIIDMismatch
 	}
 
+	// batch number header and control must match
+	if batch.Header.BatchNumber != batch.Control.BatchNumber {
+		return ErrBatchNumberMismatch
+	}
+
 	if err := batch.isBatchEntryCountMismatch(); err != nil {
 		return err
 	}
 
-	if err := batch.isBatchNumberMismatch(); err != nil {
-		return err
-	}
 	if err := batch.isSequenceAscending(); err != nil {
 		return err
 	}
@@ -76,6 +80,10 @@ func (batch *Batch) Validate() error {
 	}
 
 	if err := batch.isOriginatorDNEMismatch(); err != nil {
+		return err
+	}
+
+	if err := batch.isTraceNumberODFI(); err != nil {
 		return err
 	}
 
@@ -130,23 +138,15 @@ func (batch *Batch) isBatchAmountMismatch() error {
 	return nil
 }
 
-// isBatchNumberMismatch validate batch header and control numbers are the same
-func (batch *Batch) isBatchNumberMismatch() error {
-	if batch.Header.BatchNumber != batch.Control.BatchNumber {
-		return ErrBatchNumberMismatch
-	}
-	return nil
-}
-
 // isSequenceAscending Individual Entry Detail Records within individual batches must
 // be in ascending Trace Number order (although Trace Numbers need not necessarily be consecutive).
 func (batch *Batch) isSequenceAscending() error {
 	lastSeq := 0
-	for _, seq := range batch.Entries {
-		if seq.TraceNumber < lastSeq {
+	for _, entry := range batch.Entries {
+		if entry.TraceNumber < lastSeq {
 			return ErrBatchAscendingTraceNumber
 		}
-		lastSeq = seq.TraceNumber
+		lastSeq = entry.TraceNumber
 	}
 	return nil
 }
@@ -156,8 +156,8 @@ func (batch *Batch) isSequenceAscending() error {
 // The Entry Hash provides a check against inadvertent alteration of data
 func (batch *Batch) isEntryHashMismatch() error {
 	hash := 0
-	for _, seq := range batch.Entries {
-		hash = hash + seq.RDFIIdentification
+	for _, entry := range batch.Entries {
+		hash = hash + entry.RDFIIdentification
 	}
 	// need to keep just the first 10 digits
 	// TODO: Need test cases on this adding up more than ten digits
@@ -177,5 +177,18 @@ func (batch *Batch) isOriginatorDNEMismatch() error {
 			}
 		}
 	}
+	return nil
+}
+
+// isTraceNumberODFI checks if the first 8 positions of the entry detail trace number
+// match the batch header odfi
+func (batch *Batch) isTraceNumberODFI() error {
+	for _, entry := range batch.Entries {
+		if batch.Header.ODFIIdentificationField() != entry.TraceNumberField()[:8] {
+			fmt.Printf("header odfi: %s trace slice: %s", batch.Header.ODFIIdentificationField(), entry.TraceNumberField()[:8])
+			return ErrBatchTraceNumberNotODFI
+		}
+	}
+
 	return nil
 }
