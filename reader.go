@@ -25,7 +25,7 @@ type ParseError struct {
 }
 
 func (e *ParseError) Error() string {
-	return fmt.Sprintf("LineNum: %d, RecordName:  %s, Error: %s ", e.Line, e.Record, e.Err)
+	return fmt.Sprintf("LineNum: %d, RecordName:  %s: %s \n", e.Line, e.Record, e.Err)
 }
 
 // These are the errors that can be returned in Parse.Error
@@ -39,6 +39,7 @@ var (
 	ErrEntryOutside       = errors.New("Entry Detail record outside of a batch")
 	ErrAddendaOutside     = errors.New("Entry Addenda without a preceeding Entry Detail")
 	ErrAddendaNoIndicator = errors.New("Addenda without Entry Detail Addenda Inicator")
+	//Err
 )
 
 // currently support SEC codes
@@ -82,6 +83,7 @@ func NewReader(r io.Reader) *Reader {
 // on the first character of each line. It also enforces ACH formating rules and returns
 // the appropriate error if issues are found.
 func (r *Reader) Read() (File, error) {
+	r.lineNum = -1
 	// read through the entire file
 	for {
 		i, _, err := r.r.ReadLine()
@@ -202,8 +204,8 @@ func (r *Reader) parseEntryDetail() error {
 		}
 		r.currentBatch.addEntryDetail(ed)
 	} else {
-		return r.error(errors.New("Support for detail entries of standard entry class " +
-			r.currentBatch.Header.StandardEntryClassCode + " has not been implemented"))
+		return r.error(errors.New("Support for Detail Entries of SEC(standard entry class): " +
+			r.currentBatch.Header.StandardEntryClassCode + ", has not been implemented"))
 	}
 	return nil
 }

@@ -125,14 +125,14 @@ func (batch *Batch) isBatchAmountMismatch() error {
 		if entry.TransactionCode == 37 || entry.TransactionCode == 38 {
 			savingsDebit = savingsDebit + entry.Amount
 		}
+	}
 
-		// TODO: current unsure of what to do with savings credits and debits.
-		if debit != batch.Control.TotalDebitEntryDollarAmount {
-			return ErrBatchAmountMismatch
-		}
-		if credit != batch.Control.TotalCreditEntryDollarAmount {
-			return ErrBatchAmountMismatch
-		}
+	// TODO: current unsure of what to do with savings credits and debits.
+	if debit != batch.Control.TotalDebitEntryDollarAmount {
+		return ErrBatchAmountMismatch
+	}
+	if credit != batch.Control.TotalCreditEntryDollarAmount {
+		return ErrBatchAmountMismatch
 	}
 
 	return nil
