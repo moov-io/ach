@@ -2,7 +2,6 @@ package ach
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -203,22 +202,22 @@ func (bh *BatchHeader) fieldInclusion() error {
 
 // CompanyNameField get the CompanyName left padded
 func (bh *BatchHeader) CompanyNameField() string {
-	return bh.rightPad(bh.CompanyName, " ", 16)
+	return bh.alphaField(bh.CompanyName, 16)
 }
 
 // CompanyDiscretionaryDataField get the CompanyDiscretionaryData left padded
 func (bh *BatchHeader) CompanyDiscretionaryDataField() string {
-	return bh.rightPad(bh.CompanyDiscretionaryData, " ", 20)
+	return bh.alphaField(bh.CompanyDiscretionaryData, 20)
 }
 
 // CompanyIdentificationField get the CompanyIdentification left padded
 func (bh *BatchHeader) CompanyIdentificationField() string {
-	return bh.rightPad(bh.CompanyIdentification, " ", 10)
+	return bh.alphaField(bh.CompanyIdentification, 10)
 }
 
 // CompanyEntryDescriptionField get the CompanyEntryDescription left padded
 func (bh *BatchHeader) CompanyEntryDescriptionField() string {
-	return bh.rightPad(bh.CompanyEntryDescription, " ", 10)
+	return bh.alphaField(bh.CompanyEntryDescription, 10)
 }
 
 // EffectiveEntryDateField get the EffectiveEntryDate in YYMMDD format
@@ -228,14 +227,14 @@ func (bh *BatchHeader) EffectiveEntryDateField() string {
 
 // ODFIIdentificationField get the odfi number zero padded
 func (bh *BatchHeader) ODFIIdentificationField() string {
-	return bh.leftPad(strconv.Itoa(bh.ODFIIdentification), "0", 8)
+	return bh.numericField(bh.ODFIIdentification, 8)
 }
 
 // BatchNumberField get the batch number zero padded
 func (bh *BatchHeader) BatchNumberField() string {
-	return bh.leftPad(strconv.Itoa(bh.BatchNumber), "0", 7)
+	return bh.numericField(bh.BatchNumber, 7)
 }
 
 func (bh *BatchHeader) settlementDateField() string {
-	return bh.leftPad(bh.settlementDate, " ", 3)
+	return bh.alphaField(bh.settlementDate, 3)
 }

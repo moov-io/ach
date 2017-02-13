@@ -2,7 +2,6 @@ package ach
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 )
 
@@ -97,15 +96,15 @@ func (addenda *Addenda) fieldInclusion() error {
 
 // PaymentRelatedInformationField returns a zero padded PaymentRelatedInformation string
 func (addenda *Addenda) PaymentRelatedInformationField() string {
-	return addenda.rightPad(addenda.PaymentRelatedInformation, " ", 80)
+	return addenda.alphaField(addenda.PaymentRelatedInformation, 80)
 }
 
 // SequenceNumberField returns a zero padded SequenceNumber string
 func (addenda *Addenda) SequenceNumberField() string {
-	return addenda.leftPad(strconv.Itoa(addenda.SequenceNumber), "0", 4)
+	return addenda.numericField(addenda.SequenceNumber, 4)
 }
 
 // EntryDetailSequenceNumberField returns a zero padded EntryDetailSequenceNumber string
 func (addenda *Addenda) EntryDetailSequenceNumberField() string {
-	return addenda.leftPad(strconv.Itoa(addenda.EntryDetailSequenceNumber), "0", 7)
+	return addenda.numericField(addenda.EntryDetailSequenceNumber, 7)
 }

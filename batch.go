@@ -11,7 +11,6 @@ package ach
 import (
 	"errors"
 	"fmt"
-	"strconv"
 )
 
 // Errors specific to parsing a Batch container
@@ -125,14 +124,14 @@ func (batch *Batch) isBatchAmountMismatch() error {
 		if entry.TransactionCode == 37 || entry.TransactionCode == 38 {
 			savingsDebit = savingsDebit + entry.Amount
 		}
+	}
 
-		// TODO: current unsure of what to do with savings credits and debits.
-		if debit != batch.Control.TotalDebitEntryDollarAmount {
-			return ErrBatchAmountMismatch
-		}
-		if credit != batch.Control.TotalCreditEntryDollarAmount {
-			return ErrBatchAmountMismatch
-		}
+	// TODO: current unsure of what to do with savings credits and debits.
+	if debit != batch.Control.TotalDebitEntryDollarAmount {
+		return ErrBatchAmountMismatch
+	}
+	if credit != batch.Control.TotalCreditEntryDollarAmount {
+		return ErrBatchAmountMismatch
 	}
 
 	return nil
@@ -161,7 +160,7 @@ func (batch *Batch) isEntryHashMismatch() error {
 	}
 	// need to keep just the first 10 digits
 	// TODO: Need test cases on this adding up more than ten digits
-	hashField := batch.leftPad(strconv.Itoa(hash), "0", 10)
+	hashField := batch.numericField(hash, 10)
 	if hashField != batch.Control.EntryHashField() {
 		return ErrValidEntryHash
 	}

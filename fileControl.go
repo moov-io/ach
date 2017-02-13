@@ -1,9 +1,6 @@
 package ach
 
-import (
-	"fmt"
-	"strconv"
-)
+import "fmt"
 
 // FileControl record contains entry counts, dollar totals and hash
 // totals accumulated from each batch control record in the file.
@@ -105,30 +102,30 @@ func (fc *FileControl) fieldInclusion() error {
 
 // BatchCountField gets a string of the batch count zero padded
 func (fc *FileControl) BatchCountField() string {
-	return fc.leftPad(strconv.Itoa(fc.BatchCount), "0", 6)
+	return fc.numericField(fc.BatchCount, 6)
 }
 
 // BlockCountField gets a string of the block count zero padded
 func (fc *FileControl) BlockCountField() string {
-	return fc.leftPad(strconv.Itoa(fc.BlockCount), "0", 6)
+	return fc.numericField(fc.BlockCount, 6)
 }
 
 // EntryAddendaCountField gets a string of entry addenda batch count zero padded
 func (fc *FileControl) EntryAddendaCountField() string {
-	return fc.leftPad(strconv.Itoa(fc.EntryAddendaCount), "0", 8)
+	return fc.numericField(fc.EntryAddendaCount, 8)
 }
 
 // EntryHashField gets a string of entry hash zero padded
 func (fc *FileControl) EntryHashField() string {
-	return fc.leftPad(strconv.Itoa(fc.EntryHash), "0", 10)
+	return fc.numericField(fc.EntryHash, 10)
 }
 
 // TotalDebitEntryDollarAmountInFileField get a zero padded Total debit Entry Amount
 func (fc *FileControl) TotalDebitEntryDollarAmountInFileField() string {
-	return fc.leftPad(strconv.Itoa(fc.TotalDebitEntryDollarAmountInFile), "0", 12)
+	return fc.numericField(fc.TotalDebitEntryDollarAmountInFile, 12)
 }
 
 // TotalCreditEntryDollarAmountInFileField get a zero padded Total credit Entry Amount
 func (fc *FileControl) TotalCreditEntryDollarAmountInFileField() string {
-	return fc.leftPad(strconv.Itoa(fc.TotalCreditEntryDollarAmountInFile), "0", 12)
+	return fc.numericField(fc.TotalCreditEntryDollarAmountInFile, 12)
 }

@@ -1,9 +1,6 @@
 package ach
 
-import (
-	"fmt"
-	"strconv"
-)
+import "fmt"
 
 // EntryDetail contains the actual transaction data for an individual entry.
 // Fields include those designating the entry as a deposit (credit) or
@@ -179,20 +176,20 @@ func (ed *EntryDetail) addAddenda(addenda Addenda) []Addenda {
 
 // RDFIIdentificationField get the rdfiIdentification with zero padding
 func (ed *EntryDetail) RDFIIdentificationField() string {
-	return ed.leftPad(strconv.Itoa(ed.RDFIIdentification), "0", 8)
+	return ed.numericField(ed.RDFIIdentification, 8)
 }
 
 // DFIAccountNumber gets the dfiAccountNumber with space padding
 func (ed *EntryDetail) DFIAccountNumber() string {
-	return ed.leftPad(ed.dfiAccountNumber, " ", 17)
+	return ed.alphaField(ed.dfiAccountNumber, 17)
 }
 
 // AmountField returns a zero padded string of amount
 func (ed *EntryDetail) AmountField() string {
-	return ed.leftPad(strconv.Itoa(ed.Amount), "0", 10)
+	return ed.numericField(ed.Amount, 10)
 }
 
 // TraceNumberField returns a zero padded traceNumber string
 func (ed *EntryDetail) TraceNumberField() string {
-	return ed.leftPad(strconv.Itoa(ed.TraceNumber), "0", 15)
+	return ed.numericField(ed.TraceNumber, 15)
 }

@@ -7,7 +7,6 @@ package ach
 import (
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -222,12 +221,12 @@ func (fh *FileHeader) fieldInclusion() error {
 
 // ImmediateDestinationField gets the immidiate destination number with zero padding
 func (fh *FileHeader) ImmediateDestinationField() string {
-	return " " + fh.leftPad(strconv.Itoa(fh.ImmediateDestination), "0", 9)
+	return " " + fh.numericField(fh.ImmediateDestination, 9)
 }
 
 // ImmediateOriginField gets the immidiate origen number with 0 padding
 func (fh *FileHeader) ImmediateOriginField() string {
-	return " " + fh.leftPad(strconv.Itoa(fh.ImmediateOrigin), "0", 9)
+	return " " + fh.numericField(fh.ImmediateOrigin, 9)
 }
 
 // FileCreationDateField gets the file cereation date in YYMMDD format
@@ -242,15 +241,15 @@ func (fh *FileHeader) FileCreationTimeField() string {
 
 // ImmediateDestinationNameField gets the ImmediateDestinationName field padded
 func (fh *FileHeader) ImmediateDestinationNameField() string {
-	return fh.rightPad(fh.ImmediateDestinationName, " ", 23)
+	return fh.alphaField(fh.ImmediateDestinationName, 23)
 }
 
 // ImmediateOriginNameField gets the ImmImmediateOriginName field padded
 func (fh *FileHeader) ImmediateOriginNameField() string {
-	return fh.rightPad(fh.ImmediateOriginName, " ", 23)
+	return fh.alphaField(fh.ImmediateOriginName, 23)
 }
 
 // ReferenceCodeField gets the ReferenceCode field padded
 func (fh *FileHeader) ReferenceCodeField() string {
-	return fh.rightPad(fh.ReferenceCode, " ", 8)
+	return fh.alphaField(fh.ReferenceCode, 8)
 }

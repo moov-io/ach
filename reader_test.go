@@ -24,6 +24,21 @@ func TestPPDDebitRead(t *testing.T) {
 	}
 }
 
+/*
+func TestMultiBatchFile(t *testing.T) {
+	f, err := os.Open("./testdata/20110805A.ach")
+	if err != nil {
+		t.Errorf("%s: ", err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+	if err != nil {
+		t.Errorf("Can not ach.read file: %v", err)
+	}
+}
+*/
+
 func TestRecordTypeUnknown(t *testing.T) {
 	var line = "301 076401251 0764012510807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
