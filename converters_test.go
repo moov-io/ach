@@ -15,6 +15,7 @@ func TestAlphaFieldShort(t *testing.T) {
 	}
 }
 
+// TestAlphaFieldLong ensure that string is left justified and sliced to max
 func TestAlphaFieldLong(t *testing.T) {
 	c := Converters{}
 	result := c.alphaField("abcdEFGH123", 10)
@@ -23,6 +24,7 @@ func TestAlphaFieldLong(t *testing.T) {
 	}
 }
 
+// TestNumericFieldShort ensures zero padding and right justified
 func TestNumericFieldShort(t *testing.T) {
 	c := Converters{}
 	result := c.numericField(12345, 10)
@@ -31,10 +33,20 @@ func TestNumericFieldShort(t *testing.T) {
 	}
 }
 
+// TestNumericFieldLong right justified and sliced to max length
 func TestNumericFieldLong(t *testing.T) {
 	c := Converters{}
 	result := c.numericField(123456, 5)
 	if result != "23456" {
+		t.Errorf("Right justified zero got: '%v'", result)
+	}
+}
+
+//TestParseNumField handle zero and spaces in number conversion
+func TestParseNumField(t *testing.T) {
+	c := Converters{}
+	result := c.parseNumField(" 012345")
+	if result != 12345 {
 		t.Errorf("Right justified zero got: '%v'", result)
 	}
 }

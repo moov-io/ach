@@ -5,7 +5,6 @@
 package ach
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -15,12 +14,7 @@ import (
 type Converters struct{}
 
 func (c *Converters) parseNumField(r string) (s int) {
-	s, err := strconv.Atoi(strings.TrimSpace(r))
-	if err != nil {
-		// TODO: This is horrible
-		fmt.Printf("%v", err)
-		return
-	}
+	s, _ = strconv.Atoi(strings.TrimSpace(r))
 	return s
 }
 
@@ -60,8 +54,6 @@ func (c *Converters) alphaField(s string, max uint) string {
 
 // numericField right-justified, unisigned, and zero filled
 func (c *Converters) numericField(n int, max uint) string {
-	// @TODO remove decimel space from amount int
-
 	s := strconv.Itoa(n)
 	ln := uint(len(s))
 	if ln > max {
