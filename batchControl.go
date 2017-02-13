@@ -2,7 +2,6 @@ package ach
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 )
 
@@ -150,40 +149,40 @@ func (bc *BatchControl) fieldInclusion() error {
 
 // EntryAddendaCountField gets a string of the addenda count zero padded
 func (bc *BatchControl) EntryAddendaCountField() string {
-	return bc.leftPad(strconv.Itoa(bc.EntryAddendaCount), "0", 6)
+	return bc.numericField(bc.EntryAddendaCount, 6)
 }
 
 // EntryHashField get a zero padded EntryHash
 func (bc *BatchControl) EntryHashField() string {
-	return bc.leftPad(strconv.Itoa(bc.EntryHash), "0", 10)
+	return bc.numericField(bc.EntryHash, 10)
 }
 
 //TotalDebitEntryDollarAmountField get a zero padded Debity Entry Amount
 func (bc *BatchControl) TotalDebitEntryDollarAmountField() string {
-	return bc.leftPad(strconv.Itoa(bc.TotalDebitEntryDollarAmount), "0", 12)
+	return bc.numericField(bc.TotalDebitEntryDollarAmount, 12)
 }
 
 // TotalCreditEntryDollarAmountField get a zero padded Credit Entry Amount
 func (bc *BatchControl) TotalCreditEntryDollarAmountField() string {
-	return bc.leftPad(strconv.Itoa(bc.TotalCreditEntryDollarAmount), "0", 12)
+	return bc.numericField(bc.TotalCreditEntryDollarAmount, 12)
 }
 
 // CompanyIdentificationField get the CompanyIdentification righ padded
 func (bc *BatchControl) CompanyIdentificationField() string {
-	return bc.rightPad(bc.CompanyIdentification, " ", 10)
+	return bc.alphaField(bc.CompanyIdentification, 10)
 }
 
 // MessageAuthenticationCodeField get the MessageAuthenticationCode right padded
 func (bc *BatchControl) MessageAuthenticationCodeField() string {
-	return bc.rightPad(bc.MessageAuthenticationCode, " ", 19)
+	return bc.alphaField(bc.MessageAuthenticationCode, 19)
 }
 
 // ODFIIdentificationField get the odfi number zero padded
 func (bc *BatchControl) ODFIIdentificationField() string {
-	return bc.leftPad(strconv.Itoa(bc.ODFIIdentification), "0", 8)
+	return bc.numericField(bc.ODFIIdentification, 8)
 }
 
 // BatchNumberField gets a string of the batch number zero padded
 func (bc *BatchControl) BatchNumberField() string {
-	return bc.leftPad(strconv.Itoa(bc.BatchNumber), "0", 7)
+	return bc.numericField(bc.BatchNumber, 7)
 }
