@@ -125,6 +125,9 @@ func (r *Reader) Read() (File, error) {
 			if err := r.parseFileControl(); err != nil {
 				return r.file, err
 			}
+			if err := r.file.Validate(); err != nil {
+				return r.file, err
+			}
 		default:
 			return r.file, r.error(ErrUnknownRecordType)
 		}
