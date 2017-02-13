@@ -31,6 +31,7 @@ func (e *ParseError) Error() string {
 // These are the errors that can be returned in Parse.Error
 // additional errors can occur in the Record
 var (
+	ErrFileRead           = errors.New("File could not be read")
 	ErrRecordLen          = errors.New("Wrong number of fields in record expect 94")
 	ErrBatchControl       = errors.New("No terminating batch control record found in file for previous batch")
 	ErrUnknownRecordType  = errors.New("Unhandled Record Type")
@@ -50,7 +51,7 @@ const (
 // Reader reads records from a ACH-encoded file.
 type Reader struct {
 	// r handles the IO.Reader sent to be parser.
-	r *bufio.Reader
+	scanner *bufio.Scanner
 	// file is ach.file model being built as r is parsed.
 	file File
 	// line is the current line being parsed from the input r
@@ -75,7 +76,7 @@ func (r *Reader) error(err error) error {
 // NewReader returns a new Reader that reads from r.
 func NewReader(r io.Reader) *Reader {
 	return &Reader{
-		r: bufio.NewReader(r),
+		scanner: bufio.NewScanner(r),
 	}
 }
 
@@ -85,18 +86,8 @@ func NewReader(r io.Reader) *Reader {
 func (r *Reader) Read() (File, error) {
 	r.lineNum = -1
 	// read through the entire file
-	for {
-		i, _, err := r.r.ReadLine()
-		if err != nil {
-			if err == io.EOF {
-				break
-			} else {
-				fmt.Printf("%s when reading file", err)
-				// TODO: return nil, error
-				// "File cannot be read"
-			}
-		}
-		r.line = string(i)
+	for r.scanner.Scan() {
+		r.line = r.scanner.Text()
 		r.lineNum++
 		// Only 94 ASCII characters to a line
 		if len(r.line) != RecordLength {
@@ -105,44 +96,41 @@ func (r *Reader) Read() (File, error) {
 
 		switch r.line[:1] {
 		case headerPos:
-			err = r.parseFileHeader()
-			if err != nil {
+			if err := r.parseFileHeader(); err != nil {
 				return r.file, err
 			}
 		case batchPos:
-			err = r.parseBatchHeader()
-			if err != nil {
+			if err := r.parseBatchHeader(); err != nil {
 				return r.file, err
 			}
 		case entryDetailPos:
-			err = r.parseEntryDetail()
-			if err != nil {
+			if err := r.parseEntryDetail(); err != nil {
 				return r.file, err
 			}
 		case entryAddendaPos:
-			err = r.parseAddenda()
-			if err != nil {
+			if err := r.parseAddenda(); err != nil {
 				return r.file, err
 			}
 		case batchControlPos:
-			err = r.parseBatchControl()
-			if err != nil {
+			if err := r.parseBatchControl(); err != nil {
 				return r.file, err
 			}
-			if err = r.currentBatch.Validate(); err != nil {
+			if err := r.currentBatch.Validate(); err != nil {
 				r.recordName = "Batches"
 				return r.file, r.error(err)
 			}
 			r.file.addBatch(r.currentBatch)
 			r.currentBatch = Batch{}
 		case fileControlPos:
-			err = r.parseFileControl()
-			if err != nil {
+			if err := r.parseFileControl(); err != nil {
 				return r.file, err
 			}
 		default:
 			return r.file, r.error(ErrUnknownRecordType)
 		}
+	}
+	if err := r.scanner.Err(); err != nil {
+		return r.file, r.error(ErrFileRead)
 	}
 
 	if (FileHeader{}) == r.file.Header {
@@ -230,8 +218,8 @@ func (r *Reader) parseAddenda() error {
 			return r.error(ErrAddendaNoIndicator)
 		}
 	} else {
-		return r.error(errors.New("Support for Addenda records for standard entry class " +
-			r.currentBatch.Header.StandardEntryClassCode + " has not been implemented"))
+		return r.error(errors.New("Support for Addenda records for SEC(Standard Entry Class): " +
+			r.currentBatch.Header.StandardEntryClassCode + ", has not been implemented"))
 	}
 
 	return nil
