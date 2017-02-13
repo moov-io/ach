@@ -25,3 +25,24 @@ func TestBatchCountError(t *testing.T) {
 		}
 	}
 }
+
+func TestFileEntryAddendaError(t *testing.T) {
+	r := NewReader(strings.NewReader(" "))
+	mockBatch := Batch{}
+	mockBatch.Control.EntryAddendaCount = 1
+	r.file.addBatch(mockBatch)
+	r.file.Control.BatchCount = 1
+	r.file.Control.EntryAddendaCount = 1
+	if err := r.file.Validate(); err != nil {
+		t.Errorf("Unexpected File.Validation error: %v", err.Error())
+	}
+
+	// more entries than the file control
+	r.file.Control.EntryAddendaCount = 5
+	if err := r.file.Validate(); err != nil {
+		if err != ErrFileEntryCount {
+			t.Errorf("Unexpected File.Validation error: %v", err.Error())
+		}
+	}
+
+}

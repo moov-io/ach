@@ -24,6 +24,7 @@ const (
 // Errors specific to parsing a Batch container
 var (
 	ErrFileBatchCount = errors.New("Total Number of Batches in file is out-of-balance with File Control")
+	ErrFileEntryCount = errors.New("Total Entries and Addenda count is out-of-balance with File Control")
 )
 
 // File contains the structures of a parsed ACH File.
@@ -31,9 +32,6 @@ type File struct {
 	Header  FileHeader
 	Batches []Batch
 	Control FileControl
-
-	// TODO: remove
-	Addenda
 }
 
 // addEntryDetail appends an EntryDetail to the Batch
@@ -48,12 +46,28 @@ func (f *File) Validate() error {
 	if f.Control.BatchCount != len(f.Batches) {
 		return ErrFileBatchCount
 	}
+
+	if err := f.isEntryAddendaCount(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 // TODO: isEntryHashMismatch
 // This field is prepared by hashing the RDFI’s 8-digit Routing Number in each entry.
 //The Entry Hash provides a check against inadvertent alteration of data
+func (f *File) isEntryAddendaCount() error {
+	count := 0
+	// we assume that each batch block has already validated the addenda count in batch control.
+	for _, batch := range f.Batches {
+		count += batch.Control.EntryAddendaCount
+	}
+	if f.Control.EntryAddendaCount != count {
+		return ErrFileEntryCount
+	}
+	return nil
+}
 
 // TODO: isFileAmountMismatch
 // The Total Debit and Credit Entry Dollar Amounts Fields contain accumulated
