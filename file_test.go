@@ -44,5 +44,52 @@ func TestFileEntryAddendaError(t *testing.T) {
 			t.Errorf("Unexpected File.Validation error: %v", err.Error())
 		}
 	}
+}
 
+func TestFileDebitAmount(t *testing.T) {
+
+	r := NewReader(strings.NewReader(" "))
+	mockBatch := Batch{}
+	mockBatch.Control.EntryAddendaCount = 1
+	mockBatch.Control.TotalDebitEntryDollarAmount = 10500
+
+	r.file.addBatch(mockBatch)
+	r.file.Control.BatchCount = 1
+	r.file.Control.EntryAddendaCount = 1
+	r.file.Control.TotalDebitEntryDollarAmountInFile = 10500
+
+	if err := r.file.Validate(); err != nil {
+		t.Errorf("Unexpected File.Validation error: %v", err.Error())
+	}
+
+	r.file.Control.TotalDebitEntryDollarAmountInFile = 0
+	if err := r.file.Validate(); err != nil {
+		if err != ErrFileDebitAmount {
+			t.Errorf("Unexpected File.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestFileCreditAmount(t *testing.T) {
+
+	r := NewReader(strings.NewReader(" "))
+	mockBatch := Batch{}
+	mockBatch.Control.EntryAddendaCount = 1
+	mockBatch.Control.TotalCreditEntryDollarAmount = 10500
+
+	r.file.addBatch(mockBatch)
+	r.file.Control.BatchCount = 1
+	r.file.Control.EntryAddendaCount = 1
+	r.file.Control.TotalCreditEntryDollarAmountInFile = 10500
+
+	if err := r.file.Validate(); err != nil {
+		t.Errorf("Unexpected File.Validation error: %v", err.Error())
+	}
+
+	r.file.Control.TotalCreditEntryDollarAmountInFile = 0
+	if err := r.file.Validate(); err != nil {
+		if err != ErrFileCreditAmount {
+			t.Errorf("Unexpected File.Validation error: %v", err.Error())
+		}
+	}
 }

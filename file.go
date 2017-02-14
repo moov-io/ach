@@ -23,8 +23,10 @@ const (
 
 // Errors specific to parsing a Batch container
 var (
-	ErrFileBatchCount = errors.New("Total Number of Batches in file is out-of-balance with File Control")
-	ErrFileEntryCount = errors.New("Total Entries and Addenda count is out-of-balance with File Control")
+	ErrFileBatchCount   = errors.New("Total Number of Batches in file is out-of-balance with File Control")
+	ErrFileEntryCount   = errors.New("Total Entries and Addenda count is out-of-balance with File Control")
+	ErrFileDebitAmount  = errors.New("Total Debit amountis out-of-balance with File Control")
+	ErrFileCreditAmount = errors.New("Total Credit amountis out-of-balance with File Control")
 )
 
 // File contains the structures of a parsed ACH File.
@@ -51,6 +53,10 @@ func (f *File) Validate() error {
 		return err
 	}
 
+	if err := f.isFileAmount(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -73,4 +79,18 @@ func (f *File) isEntryAddendaCount() error {
 // The Total Debit and Credit Entry Dollar Amounts Fields contain accumulated
 // Entry Detail debit and credit totals within the file
 
-// TODO:
+func (f *File) isFileAmount() error {
+	debit := 0
+	credit := 0
+	for _, batch := range f.Batches {
+		debit += batch.Control.TotalDebitEntryDollarAmount
+		credit += batch.Control.TotalCreditEntryDollarAmount
+	}
+	if f.Control.TotalDebitEntryDollarAmountInFile != debit {
+		return ErrFileDebitAmount
+	}
+	if f.Control.TotalCreditEntryDollarAmountInFile != credit {
+		return ErrFileCreditAmount
+	}
+	return nil
+}
