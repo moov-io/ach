@@ -8,10 +8,7 @@
 // https://en.wikipedia.org/wiki/Automated_Clearing_House
 package ach
 
-import (
-	"errors"
-	"fmt"
-)
+import "errors"
 
 // Errors specific to parsing a Batch container
 var (
@@ -158,8 +155,6 @@ func (batch *Batch) isEntryHashMismatch() error {
 	for _, entry := range batch.Entries {
 		hash = hash + entry.RDFIIdentification
 	}
-	// need to keep just the first 10 digits
-	// TODO: Need test cases on this adding up more than ten digits
 	hashField := batch.numericField(hash, 10)
 	if hashField != batch.Control.EntryHashField() {
 		return ErrValidEntryHash
@@ -184,7 +179,7 @@ func (batch *Batch) isOriginatorDNEMismatch() error {
 func (batch *Batch) isTraceNumberODFI() error {
 	for _, entry := range batch.Entries {
 		if batch.Header.ODFIIdentificationField() != entry.TraceNumberField()[:8] {
-			fmt.Printf("header odfi: %s trace slice: %s", batch.Header.ODFIIdentificationField(), entry.TraceNumberField()[:8])
+			//fmt.Printf("header odfi: %s trace slice: %s", batch.Header.ODFIIdentificationField(), entry.TraceNumberField()[:8])
 			return ErrBatchTraceNumberNotODFI
 		}
 	}

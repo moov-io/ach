@@ -63,6 +63,10 @@ func TestTwoFileControls(t *testing.T) {
 	var line = "9000001000001000000010005320001000000010500000000000000                                       "
 	var twoControls = line + "\n" + line
 	r := NewReader(strings.NewReader(twoControls))
+	batch := Batch{}
+	batch.Control.EntryAddendaCount = 1
+	batch.Control.TotalDebitEntryDollarAmount = 10500
+	r.file.addBatch(batch)
 	_, err := r.Read()
 
 	if !strings.Contains(err.Error(), ErrFileControl.Error()) {

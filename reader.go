@@ -125,6 +125,9 @@ func (r *Reader) Read() (File, error) {
 			if err := r.parseFileControl(); err != nil {
 				return r.file, err
 			}
+			if err := r.file.Validate(); err != nil {
+				return r.file, err
+			}
 		default:
 			return r.file, r.error(ErrUnknownRecordType)
 		}
@@ -146,6 +149,7 @@ func (r *Reader) Read() (File, error) {
 	// TODO: Validate cross Record type values
 
 	// TODO: number of lines in file must be divisable by 10 the blocking factor
+	// TODO: Validate File Control Blocking factor is the total number of blocks. lines/10 = blocks
 	return r.file, nil
 }
 
