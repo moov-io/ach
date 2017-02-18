@@ -53,7 +53,7 @@ type Reader struct {
 	// r handles the IO.Reader sent to be parser.
 	scanner *bufio.Scanner
 	// file is ach.file model being built as r is parsed.
-	file File
+	File File
 	// line is the current line being parsed from the input r
 	line string
 	// currentBatch is the current Batch entries being parsed
@@ -91,78 +91,78 @@ func (r *Reader) Read() (File, error) {
 		r.lineNum++
 		// Only 94 ASCII characters to a line
 		if len(r.line) != RecordLength {
-			return r.file, r.error(ErrRecordLen)
+			return r.File, r.error(ErrRecordLen)
 		}
 
 		switch r.line[:1] {
 		case headerPos:
 			if err := r.parseFileHeader(); err != nil {
-				return r.file, err
+				return r.File, err
 			}
 		case batchPos:
 			if err := r.parseBatchHeader(); err != nil {
-				return r.file, err
+				return r.File, err
 			}
 		case entryDetailPos:
 			if err := r.parseEntryDetail(); err != nil {
-				return r.file, err
+				return r.File, err
 			}
 		case entryAddendaPos:
 			if err := r.parseAddenda(); err != nil {
-				return r.file, err
+				return r.File, err
 			}
 		case batchControlPos:
 			if err := r.parseBatchControl(); err != nil {
-				return r.file, err
+				return r.File, err
 			}
 			if err := r.currentBatch.Validate(); err != nil {
 				r.recordName = "Batches"
-				return r.file, r.error(err)
+				return r.File, r.error(err)
 			}
-			r.file.addBatch(r.currentBatch)
+			r.File.addBatch(r.currentBatch)
 			r.currentBatch = Batch{}
 		case fileControlPos:
 			if err := r.parseFileControl(); err != nil {
-				return r.file, err
+				return r.File, err
 			}
-			if err := r.file.Validate(); err != nil {
-				return r.file, err
+			if err := r.File.Validate(); err != nil {
+				return r.File, err
 			}
 		default:
-			return r.file, r.error(ErrUnknownRecordType)
+			return r.File, r.error(ErrUnknownRecordType)
 		}
 	}
 	if err := r.scanner.Err(); err != nil {
-		return r.file, r.error(ErrFileRead)
+		return r.File, r.error(ErrFileRead)
 	}
 
-	if (FileHeader{}) == r.file.Header {
+	if (FileHeader{}) == r.File.Header {
 		// Their must be at least one file header
-		return r.file, r.error(ErrFileHeader)
+		return r.File, r.error(ErrFileHeader)
 	}
 
-	if (FileControl{}) == r.file.Control {
+	if (FileControl{}) == r.File.Control {
 		// Their must be at least one file control
-		return r.file, r.error(ErrFileControl)
+		return r.File, r.error(ErrFileControl)
 	}
 
 	// TODO: Validate cross Record type values
 
 	// TODO: number of lines in file must be divisable by 10 the blocking factor
 	// TODO: Validate File Control Blocking factor is the total number of blocks. lines/10 = blocks
-	return r.file, nil
+	return r.File, nil
 }
 
 // parseFileHeader takes the input record string and parses the FileHeaderRecord values
 func (r *Reader) parseFileHeader() error {
 	r.recordName = "FileHeader"
-	if (FileHeader{}) != r.file.Header {
+	if (FileHeader{}) != r.File.Header {
 		// Their can only be one File Header per File exit
 		return r.error(ErrFileHeader)
 	}
-	r.file.Header.Parse(r.line)
+	r.File.Header.Parse(r.line)
 
-	if err := r.file.Header.Validate(); err != nil {
+	if err := r.File.Header.Validate(); err != nil {
 		return r.error(err)
 	}
 	return nil
@@ -242,12 +242,12 @@ func (r *Reader) parseBatchControl() error {
 // parseFileControl takes the input record string and parses the FileControlRecord values
 func (r *Reader) parseFileControl() error {
 	r.recordName = "FileControl"
-	if (FileControl{}) != r.file.Control {
+	if (FileControl{}) != r.File.Control {
 		// Their can only be one File Control per File exit
 		return r.error(ErrFileControl)
 	}
-	r.file.Control.Parse(r.line)
-	if err := r.file.Control.Validate(); err != nil {
+	r.File.Control.Parse(r.line)
+	if err := r.File.Control.Validate(); err != nil {
 		return r.error(err)
 	}
 	return nil
