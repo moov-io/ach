@@ -66,7 +66,7 @@ func TestTwoFileControls(t *testing.T) {
 	batch := Batch{}
 	batch.Control.EntryAddendaCount = 1
 	batch.Control.TotalDebitEntryDollarAmount = 10500
-	r.file.addBatch(batch)
+	r.File.addBatch(batch)
 	_, err := r.Read()
 
 	if !strings.Contains(err.Error(), ErrFileControl.Error()) {

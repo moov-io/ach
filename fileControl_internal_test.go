@@ -18,7 +18,7 @@ func TestParseFileControl(t *testing.T) {
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
 	}
-	record := r.file.Control
+	record := r.File.Control
 
 	if record.recordType != "9" {
 		t.Errorf("RecordType Expected '9' got: %v", record.recordType)
@@ -55,7 +55,7 @@ func TestFCString(t *testing.T) {
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
 	}
-	record := r.file.Control
+	record := r.File.Control
 	if record.String() != line {
 		t.Errorf("\nStrings do not match %s\n %s", line, record.String())
 	}
