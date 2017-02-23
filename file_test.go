@@ -71,7 +71,6 @@ func TestFileDebitAmount(t *testing.T) {
 }
 
 func TestFileCreditAmount(t *testing.T) {
-
 	r := NewReader(strings.NewReader(" "))
 	mockBatch := Batch{}
 	mockBatch.Control.EntryAddendaCount = 1
