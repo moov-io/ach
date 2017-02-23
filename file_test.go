@@ -92,3 +92,34 @@ func TestFileCreditAmount(t *testing.T) {
 		}
 	}
 }
+
+func TestFileEntryHash(t *testing.T) {
+	r := NewReader(strings.NewReader(" "))
+	mockBatch1 := Batch{}
+	mockBatch1.Control.EntryAddendaCount = 1
+	mockBatch1.Control.TotalCreditEntryDollarAmount = 10500
+	mockBatch1.Control.EntryHash = 1212121212
+
+	mockBatch2 := Batch{}
+	mockBatch2.Control.EntryAddendaCount = 1
+	mockBatch2.Control.TotalCreditEntryDollarAmount = 10500
+	mockBatch2.Control.EntryHash = 2121212121
+
+	r.File.addBatch(mockBatch1)
+	r.File.addBatch(mockBatch2)
+
+	r.File.Control.BatchCount = 2
+	r.File.Control.EntryAddendaCount = 2
+	r.File.Control.TotalCreditEntryDollarAmountInFile = 21000
+	r.File.Control.EntryHash = 3333333333
+	if err := r.File.Validate(); err != nil {
+		t.Errorf("Unexpected File.Validation error: %v", err.Error())
+	}
+
+	r.File.Control.EntryHash = 0
+	if err := r.File.Validate(); err != nil {
+		if err != ErrFileEntryHash {
+			t.Errorf("Unexpected File.Validation error: %v", err.Error())
+		}
+	}
+}
