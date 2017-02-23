@@ -16,12 +16,15 @@ var (
 	ErrBatchEntryCountMismatch   = errors.New("Batch Entry Count is out-of-balance with number of Entries")
 	ErrBatchAmountMismatch       = errors.New("Batch Control debit and credit amounts are not the same as sum of Entries")
 	ErrBatchNumberMismatch       = errors.New("Batch Number is not the same in Header as Control")
-	ErrBatchAscendingTraceNumber = errors.New("Trace Numbers on the File are not in ascending entryuence within a batch")
+	ErrBatchAscendingTraceNumber = errors.New("Trace Numbers on the File are not in ascending order within a batch")
+	ErrBatchAddendaSequence      = errors.New("Addenda Sequence numbers are not in ascending order")
 	ErrValidEntryHash            = errors.New("Entry Hash is not equal to the sum of Entry Detail RDFI Identification")
 	ErrBatchOriginatorDNE        = errors.New("Originator Status Code is not equal to “2” for DNE if the Transaction Code is 23 or 33")
 	ErrBatchCompanyID            = errors.New("Company Identification must match the Company ID from the batch header record")
 	ErrBatchODFIIDMismatch       = errors.New("Batch Control ODFI Identification must be the same as batch header")
 	ErrBatchTraceNumberNotODFI   = errors.New("Trace Number in an Entry Detail Record are not the same as the ODFI Routing Number")
+	ErrBatchAddendaIndicator     = errors.New("Addenda found with no Addenda Indicator in proceeding Entry Detail")
+	ErrBatchAddendaTraceNumber   = errors.New("Addenda Entry Detail Sequence number does not match proceeding Entry Detail Trace Number")
 )
 
 // Batch holds the Batch Header and Batch Control and all Entry Records
@@ -83,6 +86,10 @@ func (batch *Batch) Validate() error {
 		return err
 	}
 
+	if err := batch.isAddendaSequence(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -106,8 +113,6 @@ func (batch *Batch) isBatchEntryCountMismatch() error {
 func (batch *Batch) isBatchAmountMismatch() error {
 	debit := 0
 	credit := 0
-	savingsCredit := 0
-	savingsDebit := 0
 	for _, entry := range batch.Entries {
 		if entry.TransactionCode == 22 || entry.TransactionCode == 23 {
 			credit = credit + entry.Amount
@@ -115,15 +120,15 @@ func (batch *Batch) isBatchAmountMismatch() error {
 		if entry.TransactionCode == 27 || entry.TransactionCode == 28 {
 			debit = debit + entry.Amount
 		}
+		// savings credit
 		if entry.TransactionCode == 32 || entry.TransactionCode == 33 {
-			savingsCredit = savingsCredit + entry.Amount
+			credit = credit + entry.Amount
 		}
+		// savings debit
 		if entry.TransactionCode == 37 || entry.TransactionCode == 38 {
-			savingsDebit = savingsDebit + entry.Amount
+			debit = debit + entry.Amount
 		}
 	}
-
-	// TODO: current unsure of what to do with savings credits and debits.
 	if debit != batch.Control.TotalDebitEntryDollarAmount {
 		return ErrBatchAmountMismatch
 	}
@@ -137,9 +142,9 @@ func (batch *Batch) isBatchAmountMismatch() error {
 // isSequenceAscending Individual Entry Detail Records within individual batches must
 // be in ascending Trace Number order (although Trace Numbers need not necessarily be consecutive).
 func (batch *Batch) isSequenceAscending() error {
-	lastSeq := 0
+	lastSeq := -1
 	for _, entry := range batch.Entries {
-		if entry.TraceNumber < lastSeq {
+		if entry.TraceNumber <= lastSeq {
 			return ErrBatchAscendingTraceNumber
 		}
 		lastSeq = entry.TraceNumber
@@ -179,10 +184,34 @@ func (batch *Batch) isOriginatorDNEMismatch() error {
 func (batch *Batch) isTraceNumberODFI() error {
 	for _, entry := range batch.Entries {
 		if batch.Header.ODFIIdentificationField() != entry.TraceNumberField()[:8] {
-			//fmt.Printf("header odfi: %s trace slice: %s", batch.Header.ODFIIdentificationField(), entry.TraceNumberField()[:8])
 			return ErrBatchTraceNumberNotODFI
 		}
 	}
 
+	return nil
+}
+
+// isAddendaSequence check multiple errors on addenda records in the batch entries
+func (batch *Batch) isAddendaSequence() error {
+	for _, entry := range batch.Entries {
+		if len(entry.Addendums) > 0 {
+			// addenda without indicator flag of 1
+			if entry.AddendaRecordIndicator != 1 {
+				return ErrBatchAddendaIndicator
+			}
+			seq := -1
+			// check if sequence is assending
+			for _, addenda := range entry.Addendums {
+				if !(addenda.SequenceNumber > seq) {
+					return ErrBatchAddendaSequence
+				}
+				seq = addenda.SequenceNumber
+				// check that we are in the correct Entry Detail
+				if !(addenda.EntryDetailSequenceNumberField() == entry.TraceNumberField()[8:]) {
+					return ErrBatchAddendaTraceNumber
+				}
+			}
+		}
+	}
 	return nil
 }
