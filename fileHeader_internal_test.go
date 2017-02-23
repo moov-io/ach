@@ -1,6 +1,6 @@
 // Copyright 2017 The ACH Authors
 // Use of this source code is governed by an Apache License
-// license that can be found in the LICENSE file.
+// license that can be found in the LICENSE File.
 
 package ach
 
@@ -17,7 +17,7 @@ func TestParseFileHeader(t *testing.T) {
 	if err := r.parseFileHeader(); err != nil {
 		t.Errorf("unknown error: %v", err)
 	}
-	record := r.file.Header
+	record := r.File.Header
 
 	if record.recordType != "1" {
 		t.Errorf("RecordType Expected 1 got: %v", record.recordType)
@@ -71,7 +71,7 @@ func TestFHString(t *testing.T) {
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
 	}
-	record := r.file.Header
+	record := r.File.Header
 
 	if record.String() != line {
 		t.Errorf("Strings do not match")
