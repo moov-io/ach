@@ -10,6 +10,18 @@ import (
 	"testing"
 )
 
+func mockBatchHeader() BatchHeader {
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = 220
+	bh.StandardEntryClassCode = "PPD"
+	bh.CompanyName = "ACME Corporation"
+	bh.CompanyIdentification = "123456789"
+	bh.CompanyEntryDescription = "PAYROLL"
+	bh.ODFIIdentification = 6200001
+	bh.BatchNumber = 1
+	return bh
+}
+
 // TestParseBatchHeader parses a known Batch Header Record string.
 func TestParseBatchHeader(t *testing.T) {
 	var line = "5225companyname                         origid    PPDCHECKPAYMT000002080730   1076401250000001"
@@ -82,7 +94,7 @@ func TestBHString(t *testing.T) {
 
 // TestValidateBHRecordType ensure error if recordType is not 5
 func TestValidateBHRecordType(t *testing.T) {
-	bh := NewBatchHeader()
+	bh := mockBatchHeader()
 	bh.recordType = "2"
 	if err := bh.Validate(); err != nil {
 		if !strings.Contains(err.Error(), ErrRecordType.Error()) {
@@ -94,7 +106,7 @@ func TestValidateBHRecordType(t *testing.T) {
 
 // TestInvalidServiceCode ensure error if service class is not valid
 func TestInvalidServiceCode(t *testing.T) {
-	bh := NewBatchHeader()
+	bh := mockBatchHeader()
 	bh.ServiceClassCode = 123
 	if err := bh.Validate(); err != nil {
 		if !strings.Contains(err.Error(), ErrServiceClass.Error()) {
@@ -105,8 +117,7 @@ func TestInvalidServiceCode(t *testing.T) {
 
 // TestValidateInvalidServiceCode ensure error if service class is not valid
 func TestInvalidSECCode(t *testing.T) {
-	bh := NewBatchHeader()
-	bh.ServiceClassCode = 200
+	bh := mockBatchHeader()
 	bh.StandardEntryClassCode = "ABC"
 	if err := bh.Validate(); err != nil {
 		if !strings.Contains(err.Error(), ErrSECCode.Error()) {
@@ -117,13 +128,86 @@ func TestInvalidSECCode(t *testing.T) {
 
 // TestInvalidOrigStatusCode ensure error if originator status code is not valid
 func TestInvalidOrigStatusCode(t *testing.T) {
-	bh := NewBatchHeader()
-	bh.ServiceClassCode = 200
-	bh.StandardEntryClassCode = "PPD"
+	bh := mockBatchHeader()
 	bh.OriginatorStatusCode = 3
 	if err := bh.Validate(); err != nil {
 		if !strings.Contains(err.Error(), ErrOrigStatusCode.Error()) {
 			t.Errorf("Expected Originator Status CodeError got: %v", err)
+		}
+	}
+}
+
+func TestBatchHeaderFieldInclusion(t *testing.T) {
+	bh := mockBatchHeader()
+	// works properly
+	if err := bh.Validate(); err != nil {
+		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+	}
+	// create error is mismatch
+	bh.BatchNumber = 0
+	if err := bh.Validate(); err != nil {
+		if err != ErrValidFieldInclusion {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestBatchHeaderCompanyNameAlphaNumeric(t *testing.T) {
+	bh := mockBatchHeader()
+	// works properly
+	if err := bh.Validate(); err != nil {
+		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+	}
+	// create error is mismatch
+	bh.CompanyName = "AT&T"
+	if err := bh.Validate(); err != nil {
+		if err != ErrValidAlphanumeric {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestBatchCompanyDiscretionaryDataAlphaNumeric(t *testing.T) {
+	bh := mockBatchHeader()
+	// works properly
+	if err := bh.Validate(); err != nil {
+		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+	}
+	// create error is mismatch
+	bh.CompanyDiscretionaryData = "Invoice: #12345"
+	if err := bh.Validate(); err != nil {
+		if err != ErrValidAlphanumeric {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestBatchCompanyIdentificationAlphaNumeric(t *testing.T) {
+	bh := mockBatchHeader()
+	// works properly
+	if err := bh.Validate(); err != nil {
+		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+	}
+	// create error is mismatch
+	bh.CompanyIdentification = "EIN:12345"
+	if err := bh.Validate(); err != nil {
+		if err != ErrValidAlphanumeric {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestBatchCompanyEntryDescriptionAlphaNumeric(t *testing.T) {
+	bh := mockBatchHeader()
+	// works properly
+	if err := bh.Validate(); err != nil {
+		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+	}
+	// create error is mismatch
+	bh.CompanyEntryDescription = "P@YROLL"
+	if err := bh.Validate(); err != nil {
+		if err != ErrValidAlphanumeric {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}
 }

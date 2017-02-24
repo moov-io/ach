@@ -86,9 +86,10 @@ type BatchHeader struct {
 }
 
 // NewBatchHeader returns a new BatchHeader with default valus for none exported fields
-func NewBatchHeader() *BatchHeader {
-	return &BatchHeader{
-		recordType: "5",
+func NewBatchHeader() BatchHeader {
+	return BatchHeader{
+		recordType:           "5",
+		OriginatorStatusCode: 1,
 	}
 }
 
@@ -186,14 +187,14 @@ func (bh *BatchHeader) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (bh *BatchHeader) fieldInclusion() error {
-	if bh.recordType == "" &&
-		bh.ServiceClassCode == 0 &&
-		bh.CompanyName == "" &&
-		bh.CompanyIdentification == "" &&
-		bh.StandardEntryClassCode == "" &&
-		bh.CompanyEntryDescription == "" &&
-		bh.OriginatorStatusCode == 0 &&
-		bh.ODFIIdentification == 0 &&
+	if bh.recordType == "" ||
+		bh.ServiceClassCode == 0 ||
+		bh.CompanyName == "" ||
+		bh.CompanyIdentification == "" ||
+		bh.StandardEntryClassCode == "" ||
+		bh.CompanyEntryDescription == "" ||
+		bh.OriginatorStatusCode == 0 ||
+		bh.ODFIIdentification == 0 ||
 		bh.BatchNumber == 0 {
 		return ErrValidFieldInclusion
 	}
