@@ -27,6 +27,7 @@ var (
 	ErrFileEntryCount   = errors.New("Total Entries and Addenda count is out-of-balance with File Control")
 	ErrFileDebitAmount  = errors.New("Total Debit amountis out-of-balance with File Control")
 	ErrFileCreditAmount = errors.New("Total Credit amountis out-of-balance with File Control")
+	ErrFileEntryHash    = errors.New("Calculated Batch Control Entry hash does not match File Control Entry Hash")
 )
 
 // File contains the structures of a parsed ACH File.
@@ -34,6 +35,8 @@ type File struct {
 	Header  FileHeader
 	Batches []Batch
 	Control FileControl
+	// Converters is composed for ACH to golang Converters
+	Converters
 }
 
 // addEntryDetail appends an EntryDetail to the Batch
@@ -57,6 +60,10 @@ func (f *File) Validate() error {
 		return err
 	}
 
+	if err := f.isEntryHashMismatch(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -75,10 +82,8 @@ func (f *File) isEntryAddendaCount() error {
 	return nil
 }
 
-// TODO: isFileAmountMismatch
-// The Total Debit and Credit Entry Dollar Amounts Fields contain accumulated
+// isFileAmount tThe Total Debit and Credit Entry Dollar Amounts Fields contain accumulated
 // Entry Detail debit and credit totals within the file
-
 func (f *File) isFileAmount() error {
 	debit := 0
 	credit := 0
@@ -91,6 +96,21 @@ func (f *File) isFileAmount() error {
 	}
 	if f.Control.TotalCreditEntryDollarAmountInFile != credit {
 		return ErrFileCreditAmount
+	}
+	return nil
+}
+
+// isEntryHashMismatch validates the hash by recalulating the result
+// This field is prepared by hashing the 8-digit Routing Number in each batch.
+// The Entry Hash provides a check against inadvertent alteration of data
+func (f *File) isEntryHashMismatch() error {
+	hash := 0
+	for _, batch := range f.Batches {
+		hash = hash + batch.Control.EntryHash
+	}
+	hashField := f.numericField(hash, 10)
+	if hashField != f.Control.EntryHashField() {
+		return ErrFileEntryHash
 	}
 	return nil
 }
