@@ -24,6 +24,20 @@ func TestPPDDebitRead(t *testing.T) {
 	}
 }
 
+// TestDecode is a complete file decoding test.
+func TestPPDDebitFiexedLengthRead(t *testing.T) {
+	f, err := os.Open("./testdata/ppd-debit-fixedLength.ach")
+	if err != nil {
+		t.Errorf("%s: ", err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+	if err != nil {
+		t.Errorf("Can not ach.read file: %v", err)
+	}
+}
+
 /*
 func TestMultiBatchFile(t *testing.T) {
 	f, err := os.Open("./testdata/20110805A.ach")
