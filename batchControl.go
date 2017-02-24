@@ -91,8 +91,8 @@ func (bc *BatchControl) Parse(record string) {
 }
 
 // NewBatchControl returns a new BatchControl with default values for none exported fields
-func NewBatchControl() *BatchControl {
-	return &BatchControl{
+func NewBatchControl() BatchControl {
+	return BatchControl{
 		recordType: "8",
 	}
 }
@@ -141,7 +141,11 @@ func (bc *BatchControl) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (bc *BatchControl) fieldInclusion() error {
-	if bc.recordType == "" {
+	if bc.recordType == "" ||
+		bc.ServiceClassCode == 0 ||
+		bc.EntryHash == 0 ||
+		bc.ODFIIdentification == 0 ||
+		bc.BatchNumber == 0 {
 		return ErrValidFieldInclusion
 	}
 	return nil

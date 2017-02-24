@@ -94,8 +94,8 @@ type FileHeader struct {
 }
 
 // NewFileHeader returns a new FileHeader with default values for none exported fields
-func NewFileHeader() *FileHeader {
-	return &FileHeader{
+func NewFileHeader() FileHeader {
+	return FileHeader{
 		recordType:     "1",
 		priorityCode:   "01",
 		FileIDModifier: "A",
@@ -166,15 +166,12 @@ func (fh *FileHeader) Validate() error {
 	if fh.recordType != "1" {
 		return ErrRecordType
 	}
-
 	if err := fh.isUpperAlphanumeric(fh.FileIDModifier); err != nil {
 		return err
 	}
-
 	if len(fh.FileIDModifier) != 1 {
 		return ErrValidFieldLength
 	}
-
 	if fh.recordSize != "094" {
 		return ErrRecordSize
 	}
@@ -206,13 +203,13 @@ func (fh *FileHeader) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (fh *FileHeader) fieldInclusion() error {
-	if fh.recordType == "" &&
-		fh.ImmediateDestination == 0 &&
-		fh.ImmediateOrigin == 0 &&
-		fh.FileCreationDate.IsZero() &&
-		fh.FileIDModifier == "" &&
-		fh.recordSize == "" &&
-		fh.blockingFactor == "" &&
+	if fh.recordType == "" ||
+		fh.ImmediateDestination == 0 ||
+		fh.ImmediateOrigin == 0 ||
+		fh.FileCreationDate.IsZero() ||
+		fh.FileIDModifier == "" ||
+		fh.recordSize == "" ||
+		fh.blockingFactor == "" ||
 		fh.formatCode == "" {
 		return ErrValidFieldInclusion
 	}
