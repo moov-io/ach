@@ -87,51 +87,31 @@ func (r *Reader) Read() (File, error) {
 	r.lineNum = -1
 	// read through the entire file
 	for r.scanner.Scan() {
-		r.line = r.scanner.Text()
+		line := r.scanner.Text()
 		r.lineNum++
+
+		lineLength := len(line)
+
+		// handle the situation where there are no line breaks
+		if r.lineNum == 0 && lineLength > RecordLength && lineLength%RecordLength == 0 {
+			if err := r.processFixedWidthFile(&line); err != nil {
+				return r.File, err
+			}
+			break
+		}
+
 		// Only 94 ASCII characters to a line
-		if len(r.line) != RecordLength {
+		if lineLength != RecordLength {
 			return r.File, r.error(ErrRecordLen)
 		}
 
-		switch r.line[:1] {
-		case headerPos:
-			if err := r.parseFileHeader(); err != nil {
-				return r.File, err
-			}
-		case batchPos:
-			if err := r.parseBatchHeader(); err != nil {
-				return r.File, err
-			}
-		case entryDetailPos:
-			if err := r.parseEntryDetail(); err != nil {
-				return r.File, err
-			}
-		case entryAddendaPos:
-			if err := r.parseAddenda(); err != nil {
-				return r.File, err
-			}
-		case batchControlPos:
-			if err := r.parseBatchControl(); err != nil {
-				return r.File, err
-			}
-			if err := r.currentBatch.Validate(); err != nil {
-				r.recordName = "Batches"
-				return r.File, r.error(err)
-			}
-			r.File.addBatch(r.currentBatch)
-			r.currentBatch = Batch{}
-		case fileControlPos:
-			if err := r.parseFileControl(); err != nil {
-				return r.File, err
-			}
-			if err := r.File.Validate(); err != nil {
-				return r.File, err
-			}
-		default:
-			return r.File, r.error(ErrUnknownRecordType)
+		r.line = line
+
+		if err := r.parseLine(); err != nil {
+			return r.File, err
 		}
 	}
+
 	if err := r.scanner.Err(); err != nil {
 		return r.File, r.error(ErrFileRead)
 	}
@@ -151,6 +131,64 @@ func (r *Reader) Read() (File, error) {
 	// TODO: number of lines in file must be divisable by 10 the blocking factor
 	// TODO: Validate File Control Blocking factor is the total number of blocks. lines/10 = blocks
 	return r.File, nil
+}
+
+func (r *Reader) processFixedWidthFile(line *string) error {
+	// it should be safe to parse this byte by byte since ACH files are ascii only
+	record := ""
+	for i, c := range *line {
+		record = record + string(c)
+		if i > 0 && (i+1)%RecordLength == 0 {
+			r.line = record
+			if err := r.parseLine(); err != nil {
+				return err
+			}
+			record = ""
+		}
+	}
+	return nil
+}
+
+func (r *Reader) parseLine() error {
+	switch r.line[:1] {
+	case headerPos:
+		if err := r.parseFileHeader(); err != nil {
+			return err
+		}
+	case batchPos:
+		if err := r.parseBatchHeader(); err != nil {
+			return err
+		}
+	case entryDetailPos:
+		if err := r.parseEntryDetail(); err != nil {
+			return err
+		}
+	case entryAddendaPos:
+		if err := r.parseAddenda(); err != nil {
+			return err
+		}
+	case batchControlPos:
+		if err := r.parseBatchControl(); err != nil {
+			return err
+		}
+		if err := r.currentBatch.Validate(); err != nil {
+			r.recordName = "Batches"
+			return r.error(err)
+		}
+		r.File.addBatch(r.currentBatch)
+		r.currentBatch = Batch{}
+	case fileControlPos:
+		if err := r.parseFileControl(); err != nil {
+			return err
+		}
+		if err := r.File.Validate(); err != nil {
+			return err
+		}
+	default:
+		return r.error(ErrUnknownRecordType)
+	}
+
+	return nil
 }
 
 // parseFileHeader takes the input record string and parses the FileHeaderRecord values
