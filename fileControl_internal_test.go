@@ -63,7 +63,7 @@ func TestFCString(t *testing.T) {
 
 // TestValidateFCRecordType ensure error if recordType is not 9
 func TestValidateFCRecordType(t *testing.T) {
-	fc := NewBatchControl()
+	fc := NewFileControl()
 	fc.recordType = "2"
 
 	if err := fc.Validate(); err != nil {
