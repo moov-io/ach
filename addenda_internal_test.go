@@ -9,6 +9,14 @@ import (
 	"testing"
 )
 
+func mockAddenda() Addenda {
+	addenda := NewAddenda()
+	addenda.TypeCode = "08"
+	addenda.SequenceNumber = 1
+	addenda.EntryDetailSequenceNumber = 1234567
+	return addenda
+}
+
 // TestParseAddendaRecord parses a known Addenda Record string.
 func TestParseAddenda(t *testing.T) {
 	var line = "710WEB                                        DIEGO MAY                            00010000001"
@@ -59,7 +67,7 @@ func TestAddendaString(t *testing.T) {
 
 // TestValidateAddendaRecordType ensure error if recordType is not 7
 func TestValidateAddendaRecordType(t *testing.T) {
-	addenda := NewAddenda()
+	addenda := mockAddenda()
 	addenda.recordType = "2"
 	if err := addenda.Validate(); err != nil {
 		if !strings.Contains(err.Error(), ErrRecordType.Error()) {
@@ -70,11 +78,41 @@ func TestValidateAddendaRecordType(t *testing.T) {
 
 // TestValidateAddendaRecordType ensure error if recordType is not 7
 func TestValidateAddendaTypeCode(t *testing.T) {
-	addenda := NewAddenda()
+	addenda := mockAddenda()
 	addenda.TypeCode = "23"
 	if err := addenda.Validate(); err != nil {
 		if !strings.Contains(err.Error(), ErrAddendaTypeCode.Error()) {
 			t.Errorf("Expected Type Code Error got: %v", err)
+		}
+	}
+}
+
+func TestAddendaFieldInclusion(t *testing.T) {
+	addenda := mockAddenda()
+	// works properly
+	if err := addenda.Validate(); err != nil {
+		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+	}
+	// create error is mismatch
+	addenda.EntryDetailSequenceNumber = 0
+	if err := addenda.Validate(); err != nil {
+		if err != ErrValidFieldInclusion {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestAddendaPaymentRelatedInformationAlphaNumeric(t *testing.T) {
+	addenda := mockAddenda()
+	// works properly
+	if err := addenda.Validate(); err != nil {
+		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+	}
+	// create error is mismatch
+	addenda.PaymentRelatedInformation = "@!"
+	if err := addenda.Validate(); err != nil {
+		if err != ErrValidAlphanumeric {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}
 }
