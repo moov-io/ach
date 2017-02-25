@@ -72,8 +72,8 @@ type EntryDetail struct {
 }
 
 // NewEntryDetail returns a new EntryDetail with default values for none exported fields
-func NewEntryDetail() *EntryDetail {
-	return &EntryDetail{
+func NewEntryDetail() EntryDetail {
+	return EntryDetail{
 		recordType: "6",
 	}
 }
@@ -156,12 +156,12 @@ func (ed *EntryDetail) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (ed *EntryDetail) fieldInclusion() error {
-	if ed.recordType == "" &&
-		ed.TransactionCode == 0 &&
-		ed.RDFIIdentification == 0 &&
-		ed.CheckDigit == 0 &&
-		ed.Amount == 0 &&
-		ed.IndividualName == "" &&
+	if ed.recordType == "" ||
+		ed.TransactionCode == 0 ||
+		ed.RDFIIdentification == 0 ||
+		ed.CheckDigit == 0 ||
+		ed.Amount == 0 ||
+		ed.IndividualName == "" ||
 		ed.TraceNumber == 0 {
 		return ErrValidFieldInclusion
 	}

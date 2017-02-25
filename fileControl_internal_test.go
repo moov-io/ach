@@ -9,6 +9,15 @@ import (
 	"testing"
 )
 
+func mockFileControl() FileControl {
+	fc := NewFileControl()
+	fc.BatchCount = 1
+	fc.BlockCount = 1
+	fc.EntryAddendaCount = 1
+	fc.EntryHash = 5320001
+	return fc
+}
+
 // TestParseFileControl parses a known File Control Record string.
 func TestParseFileControl(t *testing.T) {
 	var line = "9000001000001000000010005320001000000010500000000000000                                       "
@@ -18,7 +27,7 @@ func TestParseFileControl(t *testing.T) {
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
 	}
-	record := r.file.Control
+	record := r.File.Control
 
 	if record.recordType != "9" {
 		t.Errorf("RecordType Expected '9' got: %v", record.recordType)
@@ -55,7 +64,7 @@ func TestFCString(t *testing.T) {
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
 	}
-	record := r.file.Control
+	record := r.File.Control
 	if record.String() != line {
 		t.Errorf("\nStrings do not match %s\n %s", line, record.String())
 	}
@@ -63,13 +72,27 @@ func TestFCString(t *testing.T) {
 
 // TestValidateFCRecordType ensure error if recordType is not 9
 func TestValidateFCRecordType(t *testing.T) {
-	fc := NewBatchControl()
+	fc := mockFileControl()
 	fc.recordType = "2"
 
 	if err := fc.Validate(); err != nil {
 		if !strings.Contains(err.Error(), ErrRecordType.Error()) {
 			t.Errorf("Expected RecordType Error got: %v", err)
 		}
+	}
+}
 
+func TestFCFieldInclusion(t *testing.T) {
+	fc := mockFileControl()
+	// works properly
+	if err := fc.Validate(); err != nil {
+		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+	}
+	// create error is mismatch
+	fc.BatchCount = 0
+	if err := fc.Validate(); err != nil {
+		if err != ErrValidFieldInclusion {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
 	}
 }

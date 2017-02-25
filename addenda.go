@@ -30,8 +30,8 @@ type Addenda struct {
 }
 
 // NewAddenda returns a new Addenda with default values for none exported fields
-func NewAddenda() *Addenda {
-	return &Addenda{
+func NewAddenda() Addenda {
+	return Addenda{
 		recordType: "7",
 	}
 }
@@ -75,7 +75,6 @@ func (addenda *Addenda) Validate() error {
 		return err
 	}
 	if err := addenda.isAlphanumeric(addenda.PaymentRelatedInformation); err != nil {
-		fmt.Println(addenda.PaymentRelatedInformation)
 		return err
 	}
 
@@ -85,9 +84,9 @@ func (addenda *Addenda) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (addenda *Addenda) fieldInclusion() error {
-	if addenda.recordType == "" &&
-		addenda.TypeCode == "" &&
-		addenda.SequenceNumber == 0 &&
+	if addenda.recordType == "" ||
+		addenda.TypeCode == "" ||
+		addenda.SequenceNumber == 0 ||
 		addenda.EntryDetailSequenceNumber == 0 {
 		return ErrValidFieldInclusion
 	}

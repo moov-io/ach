@@ -56,8 +56,8 @@ func (fc *FileControl) Parse(record string) {
 }
 
 // NewFileControl returns a new FileControl with default values for none exported fields
-func NewFileControl() *FileControl {
-	return &FileControl{
+func NewFileControl() FileControl {
+	return FileControl{
 		recordType: "9",
 		reserved:   "                                       ",
 	}
@@ -92,9 +92,11 @@ func (fc *FileControl) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (fc *FileControl) fieldInclusion() error {
-	if fc.recordType == "" &&
-		fc.BatchCount == 0 &&
-		fc.BlockCount == 0 {
+	if fc.recordType == "" ||
+		fc.BatchCount == 0 ||
+		fc.BlockCount == 0 ||
+		fc.EntryAddendaCount == 0 ||
+		fc.EntryHash == 0 {
 		return ErrValidFieldInclusion
 	}
 	return nil
