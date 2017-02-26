@@ -117,12 +117,12 @@ func (r *Reader) Read() (File, error) {
 	}
 
 	if (FileHeader{}) == r.File.Header {
-		// Their must be only one file header
+		// Their must be at least one File Header
 		return r.File, r.error(ErrFileHeader)
 	}
 
 	if (FileControl{}) == r.File.Control {
-		// Their must be at least one file control
+		// Their must be at least one File Control
 		return r.File, r.error(ErrFileControl)
 	}
 
@@ -196,7 +196,7 @@ func (r *Reader) parseFileHeader() error {
 	r.recordName = "FileHeader"
 	if (FileHeader{}) != r.File.Header {
 		// Their can only be one File Header per File exit
-		return r.error(ErrFileHeader)
+		return ErrFileHeader
 	}
 	r.File.Header.Parse(r.line)
 

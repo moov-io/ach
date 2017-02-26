@@ -236,3 +236,13 @@ func TestFileFileControlErr(t *testing.T) {
 		t.Errorf("Unexpected read.Read() error: %v", err)
 	}
 }
+
+// TestFileLongErr Batch Header Service Class is 000 which does not validate
+func TestFileLongErr(t *testing.T) {
+	line := "101 076401251 0764012510807291511A094101achdestname            companyname                    5000companyname                         origid    PPDCHECKPAYMT000002080730   1076401250000001"
+	r := NewReader(strings.NewReader(line))
+	_, err := r.Read()
+	if !strings.Contains(err.Error(), ErrValidFieldInclusion.Error()) {
+		t.Errorf("Unexpected read.Read() error: %v", err)
+	}
+}
