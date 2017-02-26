@@ -38,7 +38,7 @@ var (
 	ErrFileHeader         = errors.New("None or more than one File Headers exists")
 	ErrFileControl        = errors.New("None or more than one File Control exists")
 	ErrEntryOutside       = errors.New("Entry Detail record outside of a batch")
-	ErrAddendaOutside     = errors.New("Entry Addenda without a preceeding Entry Detail")
+	ErrAddendaOutside     = errors.New("Entry Addenda without a preceding Entry Detail")
 	ErrAddendaNoIndicator = errors.New("Addenda without Entry Detail Addenda Inicator")
 	//Err
 )

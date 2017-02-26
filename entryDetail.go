@@ -9,7 +9,7 @@ import "fmt"
 type EntryDetail struct {
 	// RecordType defines the type of record in the block. 6
 	recordType string
-	// TransactionCode if the recievers account is:
+	// TransactionCode if the receivers account is:
 	// Credit (deposit) to checking account ‘22’
 	// Prenote for credit to checking account ‘23’
 	// Debit (withdrawal) to checking account ‘27’

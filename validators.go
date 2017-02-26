@@ -77,7 +77,7 @@ func (v *Validator) isTypeCode(code string) error {
 // isTransactionCode ensures TransactionCode code is valid
 func (v *Validator) isTransactionCode(code int) error {
 	switch code {
-	// TransactionCode if the recievers account is:
+	// TransactionCode if the receivers account is:
 	case
 		// Credit (deposit) to checking account ‘22’
 		22,

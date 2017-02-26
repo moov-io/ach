@@ -42,7 +42,7 @@ type FileHeader struct {
 	// ImmediateOrigin contains the Routing Number of the ACH Operator or sending
 	// point that is sending the file. The 10 character field begins with
 	// a blank in the first position, followed by the four digit Federal Reserve
-	// Routing Symbol, the four digit ABA Insitution Identifier, and the Check
+	// Routing Symbol, the four digit ABA Institution Identifier, and the Check
 	// Digit (bTTTTAAAAC).
 	ImmediateOrigin int
 
@@ -216,12 +216,12 @@ func (fh *FileHeader) fieldInclusion() error {
 	return nil
 }
 
-// ImmediateDestinationField gets the immidiate destination number with zero padding
+// ImmediateDestinationField gets the immediate destination number with zero padding
 func (fh *FileHeader) ImmediateDestinationField() string {
 	return " " + fh.numericField(fh.ImmediateDestination, 9)
 }
 
-// ImmediateOriginField gets the immidiate origen number with 0 padding
+// ImmediateOriginField gets the immediate origen number with 0 padding
 func (fh *FileHeader) ImmediateOriginField() string {
 	return " " + fh.numericField(fh.ImmediateOrigin, 9)
 }
