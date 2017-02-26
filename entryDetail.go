@@ -115,9 +115,9 @@ func (ed *EntryDetail) String() string {
 		ed.CheckDigit,
 		ed.DFIAccountNumber(),
 		ed.AmountField(),
-		ed.IndividualIdentificationNumber,
-		ed.IndividualName,
-		ed.DiscretionaryData,
+		ed.IndividualIdentificationNumberField(),
+		ed.IndividualNameField(),
+		ed.DiscretionaryDataField(),
 		ed.AddendaRecordIndicator,
 		ed.TraceNumberField())
 }
@@ -170,6 +170,7 @@ func (ed *EntryDetail) fieldInclusion() error {
 
 // addAddenda appends an EntryDetail to the Addendums
 func (ed *EntryDetail) addAddenda(addenda Addenda) []Addenda {
+	ed.AddendaRecordIndicator = 1
 	ed.Addendums = append(ed.Addendums, addenda)
 	return ed.Addendums
 }
@@ -187,6 +188,21 @@ func (ed *EntryDetail) DFIAccountNumber() string {
 // AmountField returns a zero padded string of amount
 func (ed *EntryDetail) AmountField() string {
 	return ed.numericField(ed.Amount, 10)
+}
+
+// IndividualIdentificationNumberField returns a space padded string of IndividualIdentificationNumber
+func (ed *EntryDetail) IndividualIdentificationNumberField() string {
+	return ed.alphaField(ed.IndividualIdentificationNumber, 15)
+}
+
+// IndividualNameField returns a space padded string of IndividualName
+func (ed *EntryDetail) IndividualNameField() string {
+	return ed.alphaField(ed.IndividualName, 22)
+}
+
+// DiscretionaryDataField returns a space padded string of DiscretionaryData
+func (ed *EntryDetail) DiscretionaryDataField() string {
+	return ed.alphaField(ed.DiscretionaryData, 2)
 }
 
 // TraceNumberField returns a zero padded traceNumber string

@@ -141,7 +141,7 @@ func (bh *BatchHeader) String() string {
 		bh.CompanyIdentificationField(),
 		bh.StandardEntryClassCode,
 		bh.CompanyEntryDescriptionField(),
-		bh.CompanyDescriptiveDate,
+		bh.CompanyDescriptiveDateField(),
 		bh.EffectiveEntryDateField(),
 		bh.settlementDateField(),
 		bh.OriginatorStatusCode,
@@ -219,6 +219,11 @@ func (bh *BatchHeader) CompanyIdentificationField() string {
 // CompanyEntryDescriptionField get the CompanyEntryDescription left padded
 func (bh *BatchHeader) CompanyEntryDescriptionField() string {
 	return bh.alphaField(bh.CompanyEntryDescription, 10)
+}
+
+// CompanyDescriptiveDateField get the CompanyDescriptiveDate left padded
+func (bh *BatchHeader) CompanyDescriptiveDateField() string {
+	return bh.alphaField(bh.CompanyDescriptiveDate, 6)
 }
 
 // EffectiveEntryDateField get the EffectiveEntryDate in YYMMDD format

@@ -25,14 +25,14 @@ type ParseError struct {
 }
 
 func (e *ParseError) Error() string {
-	return fmt.Sprintf("LineNum: %d, RecordName:  %s: %s \n", e.Line, e.Record, e.Err)
+	return fmt.Sprintf("LineNum:%d, RecordName:%s : %s \n", e.Line, e.Record, e.Err)
 }
 
 // These are the errors that can be returned in Parse.Error
 // additional errors can occur in the Record
 var (
 	ErrFileRead           = errors.New("File could not be read")
-	ErrRecordLen          = errors.New("Wrong number of fields in record expect 94")
+	ErrRecordLen          = errors.New("Wrong number of characters in record expected 94")
 	ErrBatchControl       = errors.New("No terminating batch control record found in file for previous batch")
 	ErrUnknownRecordType  = errors.New("Unhandled Record Type")
 	ErrFileHeader         = errors.New("None or more than one File Headers exists")
@@ -95,7 +95,7 @@ func (r *Reader) Read() (File, error) {
 		// handle the situation where there are no line breaks
 		if r.lineNum == 0 && lineLength > RecordLength && lineLength%RecordLength == 0 {
 			if err := r.processFixedWidthFile(&line); err != nil {
-				return r.File, err
+				return r.File, r.error(err)
 			}
 			break
 		}
@@ -108,7 +108,7 @@ func (r *Reader) Read() (File, error) {
 		r.line = line
 
 		if err := r.parseLine(); err != nil {
-			return r.File, err
+			return r.File, r.error(err)
 		}
 	}
 
@@ -117,7 +117,7 @@ func (r *Reader) Read() (File, error) {
 	}
 
 	if (FileHeader{}) == r.File.Header {
-		// Their must be at least one file header
+		// Their must be only one file header
 		return r.File, r.error(ErrFileHeader)
 	}
 
@@ -173,7 +173,7 @@ func (r *Reader) parseLine() error {
 		}
 		if err := r.currentBatch.Validate(); err != nil {
 			r.recordName = "Batches"
-			return r.error(err)
+			return err
 		}
 		r.File.addBatch(r.currentBatch)
 		r.currentBatch = Batch{}
@@ -201,7 +201,7 @@ func (r *Reader) parseFileHeader() error {
 	r.File.Header.Parse(r.line)
 
 	if err := r.File.Header.Validate(); err != nil {
-		return r.error(err)
+		return err
 	}
 	return nil
 }
@@ -211,11 +211,11 @@ func (r *Reader) parseBatchHeader() error {
 	r.recordName = "BatchHeader"
 	if (BatchHeader{}) != r.currentBatch.Header {
 		// Ensure we have an empty Batch
-		return r.error(ErrBatchControl)
+		return ErrBatchControl
 	}
 	r.currentBatch.Header.Parse(r.line)
 	if err := r.currentBatch.Header.Validate(); err != nil {
-		return r.error(err)
+		return err
 	}
 	return nil
 }
@@ -224,18 +224,18 @@ func (r *Reader) parseBatchHeader() error {
 func (r *Reader) parseEntryDetail() error {
 	r.recordName = "EntryDetail"
 	if (BatchHeader{}) == r.currentBatch.Header {
-		return r.error(ErrEntryOutside)
+		return ErrEntryOutside
 	}
 	if r.currentBatch.Header.StandardEntryClassCode == ppd {
 		ed := EntryDetail{}
 		ed.Parse(r.line)
 		if err := ed.Validate(); err != nil {
-			return r.error(err)
+			return err
 		}
 		r.currentBatch.addEntryDetail(ed)
 	} else {
-		return r.error(errors.New("Support for Detail Entries of SEC(standard entry class): " +
-			r.currentBatch.Header.StandardEntryClassCode + ", has not been implemented"))
+		return errors.New("Support for Detail Entries of SEC(standard entry class): " +
+			r.currentBatch.Header.StandardEntryClassCode + ", has not been implemented")
 	}
 	return nil
 }
@@ -244,7 +244,7 @@ func (r *Reader) parseEntryDetail() error {
 func (r *Reader) parseAddenda() error {
 	r.recordName = "Addenda"
 	if len(r.currentBatch.Entries) == 0 {
-		return r.error(ErrAddendaOutside)
+		return ErrAddendaOutside
 	}
 	entryIndex := len(r.currentBatch.Entries) - 1
 	entry := r.currentBatch.Entries[entryIndex]
@@ -253,17 +253,20 @@ func (r *Reader) parseAddenda() error {
 			addenda := Addenda{}
 			addenda.Parse(r.line)
 			if err := addenda.Validate(); err != nil {
-				return r.error(err)
+				return err
 			}
 			r.currentBatch.Entries[entryIndex].addAddenda(addenda)
 		} else {
-			return r.error(ErrAddendaNoIndicator)
+			return ErrAddendaNoIndicator
 		}
-	} else {
-		return r.error(errors.New("Support for Addenda records for SEC(Standard Entry Class): " +
-			r.currentBatch.Header.StandardEntryClassCode + ", has not been implemented"))
 	}
-
+	// Currently Dead code until Additional SEC codes are supported by BatchHeader
+	/*
+		else {
+			return errors.New("Support for Addenda records for SEC(Standard Entry Class): " +
+				r.currentBatch.Header.StandardEntryClassCode + ", has not been implemented")
+		}
+	*/
 	return nil
 }
 
@@ -272,7 +275,7 @@ func (r *Reader) parseBatchControl() error {
 	r.recordName = "BatchControl"
 	r.currentBatch.Control.Parse(r.line)
 	if err := r.currentBatch.Control.Validate(); err != nil {
-		return r.error(err)
+		return err
 	}
 	return nil
 }
@@ -282,11 +285,11 @@ func (r *Reader) parseFileControl() error {
 	r.recordName = "FileControl"
 	if (FileControl{}) != r.File.Control {
 		// Their can only be one File Control per File exit
-		return r.error(ErrFileControl)
+		return ErrFileControl
 	}
 	r.File.Control.Parse(r.line)
 	if err := r.File.Control.Validate(); err != nil {
-		return r.error(err)
+		return err
 	}
 	return nil
 }
