@@ -102,7 +102,7 @@ func TestValidateBCRecordType(t *testing.T) {
 	}
 }
 
-func TestBCisServiceClassn(t *testing.T) {
+func TestBCisServiceClassErr(t *testing.T) {
 	bc := mockBatchControl()
 	// works properly
 	if err := bc.Validate(); err != nil {
@@ -111,7 +111,8 @@ func TestBCisServiceClassn(t *testing.T) {
 	// create error is mismatch
 	bc.ServiceClassCode = 123
 	if err := bc.Validate(); err != nil {
-		if err != ErrServiceClass {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}
@@ -121,12 +122,16 @@ func TestBCFieldInclusion(t *testing.T) {
 	bc := mockBatchControl()
 	// works properly
 	if err := bc.Validate(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
 	}
 	// create error is mismatch
 	bc.BatchNumber = 0
 	if err := bc.Validate(); err != nil {
-		if err != ErrValidFieldInclusion {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}
@@ -136,12 +141,16 @@ func TestBCCompanyIdentificationAlphaNumeric(t *testing.T) {
 	bc := mockBatchControl()
 	// works properly
 	if err := bc.Validate(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
 	}
 	// create error is mismatch
 	bc.CompanyIdentification = "@!"
 	if err := bc.Validate(); err != nil {
-		if err != ErrValidAlphanumeric {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}
@@ -151,12 +160,16 @@ func TestBCMessageAuthenticationCodeAlphaNumeric(t *testing.T) {
 	bc := mockBatchControl()
 	// works properly
 	if err := bc.Validate(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
 	}
 	// create error is mismatch
 	bc.MessageAuthenticationCode = "@!"
 	if err := bc.Validate(); err != nil {
-		if err != ErrValidAlphanumeric {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}

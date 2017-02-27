@@ -222,7 +222,7 @@ func TestFileBatchControlErr(t *testing.T) {
 	bc.EntryHash = 0
 	r := NewReader(strings.NewReader(bc.String()))
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), ErrValidFieldInclusion.Error()) {
+	if !strings.Contains(err.Error(), ErrBatchServiceClassMismatch.Error()) {
 		t.Errorf("Unexpected read.Read() error: %v", err)
 	}
 }
@@ -242,7 +242,7 @@ func TestFileLongErr(t *testing.T) {
 	line := "101 076401251 0764012510807291511A094101achdestname            companyname                    5000companyname                         origid    PPDCHECKPAYMT000002080730   1076401250000001"
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), ErrValidFieldInclusion.Error()) {
+	if !strings.Contains(err.Error(), ErrServiceClass.Error()) {
 		t.Errorf("Unexpected read.Read() error: %v", err)
 	}
 }

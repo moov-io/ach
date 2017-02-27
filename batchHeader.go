@@ -157,28 +157,28 @@ func (bh *BatchHeader) Validate() error {
 		return err
 	}
 	if bh.recordType != "5" {
-		return ErrRecordType
+		return &ValidateError{FieldName: "recordType", Value: bh.recordType, Err: ErrRecordType}
 	}
 	if err := bh.isServiceClass(bh.ServiceClassCode); err != nil {
-		return err
+		return &ValidateError{FieldName: "ServiceClassCode", Value: string(bh.ServiceClassCode), Err: err}
 	}
 	if err := bh.isSECCode(bh.StandardEntryClassCode); err != nil {
-		return err
+		return &ValidateError{FieldName: "ServiceClassCode", Value: string(bh.ServiceClassCode), Err: err}
 	}
 	if err := bh.isOriginatorStatusCode(bh.OriginatorStatusCode); err != nil {
-		return err
+		return &ValidateError{FieldName: "OriginatorStatusCode", Value: string(bh.OriginatorStatusCode), Err: err}
 	}
 	if err := bh.isAlphanumeric(bh.CompanyName); err != nil {
-		return err
+		return &ValidateError{FieldName: "CompanyName", Value: string(bh.CompanyName), Err: err}
 	}
 	if err := bh.isAlphanumeric(bh.CompanyDiscretionaryData); err != nil {
-		return err
+		return &ValidateError{FieldName: "CompanyDiscretionaryData", Value: string(bh.CompanyDiscretionaryData), Err: err}
 	}
 	if err := bh.isAlphanumeric(bh.CompanyIdentification); err != nil {
-		return err
+		return &ValidateError{FieldName: "CompanyIdentification", Value: string(bh.CompanyIdentification), Err: err}
 	}
 	if err := bh.isAlphanumeric(bh.CompanyEntryDescription); err != nil {
-		return err
+		return &ValidateError{FieldName: "CompanyEntryDescription", Value: string(bh.CompanyEntryDescription), Err: err}
 	}
 
 	return nil
@@ -187,17 +187,34 @@ func (bh *BatchHeader) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (bh *BatchHeader) fieldInclusion() error {
-	if bh.recordType == "" ||
-		bh.ServiceClassCode == 0 ||
-		bh.CompanyName == "" ||
-		bh.CompanyIdentification == "" ||
-		bh.StandardEntryClassCode == "" ||
-		bh.CompanyEntryDescription == "" ||
-		bh.OriginatorStatusCode == 0 ||
-		bh.ODFIIdentification == 0 ||
-		bh.BatchNumber == 0 {
-		return ErrValidFieldInclusion
+	if bh.recordType == "" {
+		return &ValidateError{FieldName: "recordType", Value: bh.recordType, Err: ErrRecordType}
 	}
+	if bh.ServiceClassCode == 0 {
+		return &ValidateError{FieldName: "ServiceClassCode", Value: string(bh.ServiceClassCode), Err: ErrServiceClass}
+	}
+	if bh.CompanyName == "" {
+		return &ValidateError{FieldName: "CompanyName", Value: bh.CompanyName, Err: ErrValidFieldInclusion}
+	}
+	if bh.CompanyIdentification == "" {
+		return &ValidateError{FieldName: "CompanyIdentification", Value: bh.CompanyIdentification, Err: ErrValidFieldInclusion}
+	}
+	if bh.StandardEntryClassCode == "" {
+		return &ValidateError{FieldName: "StandardEntryClassCode", Value: bh.StandardEntryClassCode, Err: ErrSECCode}
+	}
+	if bh.CompanyEntryDescription == "" {
+		return &ValidateError{FieldName: "CompanyEntryDescription", Value: bh.CompanyEntryDescription, Err: ErrValidFieldInclusion}
+	}
+	if bh.OriginatorStatusCode == 0 {
+		return &ValidateError{FieldName: "OriginatorStatusCode", Value: string(bh.OriginatorStatusCode), Err: ErrValidFieldInclusion}
+	}
+	if bh.ODFIIdentification == 0 {
+		return &ValidateError{FieldName: "ODFIIdentification", Value: string(bh.ODFIIdentification), Err: ErrValidFieldInclusion}
+	}
+	if bh.BatchNumber == 0 {
+		return &ValidateError{FieldName: "BatchNumber", Value: string(bh.BatchNumber), Err: ErrValidFieldInclusion}
+	}
+
 	return nil
 }
 

@@ -25,7 +25,7 @@ type ParseError struct {
 }
 
 func (e *ParseError) Error() string {
-	return fmt.Sprintf("LineNum:%d, RecordName:%s : %s \n", e.Line, e.Record, e.Err)
+	return fmt.Sprintf("Parse error @ LineNum:%d RecordName:%s %s \n", e.Line, e.Record, e.Err)
 }
 
 // These are the errors that can be returned in Parse.Error
@@ -89,7 +89,6 @@ func (r *Reader) Read() (File, error) {
 	for r.scanner.Scan() {
 		line := r.scanner.Text()
 		r.lineNum++
-
 		lineLength := len(line)
 
 		// handle the situation where there are no line breaks
