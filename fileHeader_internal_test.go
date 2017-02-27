@@ -152,7 +152,8 @@ func TestFHFieldInculsion(t *testing.T) {
 	// create error is mismatch
 	fh.ImmediateOrigin = 0
 	if err := fh.Validate(); err != nil {
-		if err != ErrValidFieldInclusion {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}
@@ -168,14 +169,16 @@ func TestUpperLengthFileID(t *testing.T) {
 	fh.FileIDModifier = "a"
 
 	if err := fh.Validate(); err != nil {
-		if err != ErrUpperAlpha {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}
 
 	fh.FileIDModifier = "AA"
 	if err := fh.Validate(); err != nil {
-		if err != ErrValidFieldLength {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}
@@ -191,7 +194,8 @@ func TestImmediateDestinationNameAlphaNumeric(t *testing.T) {
 	// create error is mismatch
 	fh.ImmediateDestinationName = "Big @$$ Bank"
 	if err := fh.Validate(); err != nil {
-		if err != ErrValidAlphanumeric {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}
@@ -207,7 +211,8 @@ func TestImmediateOriginNameAlphaNumeric(t *testing.T) {
 	// create error is mismatch
 	fh.ImmediateOriginName = "Big @$$ Bank"
 	if err := fh.Validate(); err != nil {
-		if err != ErrValidAlphanumeric {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}
@@ -223,7 +228,8 @@ func TestImmediateReferenceCodeAlphaNumeric(t *testing.T) {
 	// create error is mismatch
 	fh.ReferenceCode = "!@#$%^"
 	if err := fh.Validate(); err != nil {
-		if err != ErrValidAlphanumeric {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}
