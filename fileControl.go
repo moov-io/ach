@@ -84,7 +84,7 @@ func (fc *FileControl) Validate() error {
 		return err
 	}
 	if fc.recordType != "9" {
-		return ErrRecordType
+		return &ValidateError{FieldName: "recordType", Value: fc.recordType, Err: ErrRecordType}
 	}
 	return nil
 }
@@ -92,12 +92,20 @@ func (fc *FileControl) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (fc *FileControl) fieldInclusion() error {
-	if fc.recordType == "" ||
-		fc.BatchCount == 0 ||
-		fc.BlockCount == 0 ||
-		fc.EntryAddendaCount == 0 ||
-		fc.EntryHash == 0 {
-		return ErrValidFieldInclusion
+	if fc.recordType == "" {
+		return &ValidateError{FieldName: "recordType", Value: fc.recordType, Err: ErrRecordType}
+	}
+	if fc.BatchCount == 0 {
+		return &ValidateError{FieldName: "BatchCount", Value: string(fc.BatchCount), Err: ErrValidFieldInclusion}
+	}
+	if fc.BlockCount == 0 {
+		return &ValidateError{FieldName: "BlockCount", Value: string(fc.BlockCount), Err: ErrValidFieldInclusion}
+	}
+	if fc.EntryAddendaCount == 0 {
+		return &ValidateError{FieldName: "EntryAddendaCount", Value: string(fc.EntryAddendaCount), Err: ErrValidFieldInclusion}
+	}
+	if fc.EntryHash == 0 {
+		return &ValidateError{FieldName: "EntryAddendaCount", Value: string(fc.EntryAddendaCount), Err: ErrValidFieldInclusion}
 	}
 	return nil
 }

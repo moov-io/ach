@@ -2,6 +2,7 @@ package ach
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"regexp"
 	"strconv"
@@ -10,12 +11,23 @@ import (
 // Validator is common validation and formating of golang types to ach type strings
 type Validator struct{}
 
+// ValidateError is returned for errors at a field level in a record
+type ValidateError struct {
+	FieldName string // field name where error happend
+	Value     string // value that cause error
+	Err       error  // the actual error
+}
+
+func (e *ValidateError) Error() string {
+	return fmt.Sprintf("FieldName:%s Value:%s msg: %s ", e.FieldName, e.Value, e.Err)
+}
+
 // Errors specific to validation
 var (
 	ErrValidAlphanumeric   = errors.New("Field has non alphanumeric characters")
 	ErrValidAlpha          = errors.New("Field has non alpha characters")
 	ErrUpperAlpha          = errors.New("Field is not uppercase A-Z or 0-9")
-	ErrValidFieldInclusion = errors.New("A mandatory field has a zero value")
+	ErrValidFieldInclusion = errors.New("A mandatory field has a default value")
 	ErrValidFieldLength    = errors.New("Field length is invalid")
 	ErrServiceClass        = errors.New("Invalid Service Class Code")
 	ErrSECCode             = errors.New("Invalid Standard Entry Class Code")

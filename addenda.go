@@ -69,13 +69,13 @@ func (addenda *Addenda) Validate() error {
 		return err
 	}
 	if addenda.recordType != "7" {
-		return ErrRecordType
+		return &ValidateError{FieldName: "recordType", Value: addenda.recordType, Err: ErrRecordType}
 	}
 	if err := addenda.isTypeCode(addenda.TypeCode); err != nil {
-		return err
+		return &ValidateError{FieldName: "TypeCode", Value: addenda.TypeCode, Err: err}
 	}
 	if err := addenda.isAlphanumeric(addenda.PaymentRelatedInformation); err != nil {
-		return err
+		return &ValidateError{FieldName: "PaymentRelatedInformation", Value: addenda.PaymentRelatedInformation, Err: err}
 	}
 
 	return nil
@@ -84,11 +84,17 @@ func (addenda *Addenda) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (addenda *Addenda) fieldInclusion() error {
-	if addenda.recordType == "" ||
-		addenda.TypeCode == "" ||
-		addenda.SequenceNumber == 0 ||
-		addenda.EntryDetailSequenceNumber == 0 {
-		return ErrValidFieldInclusion
+	if addenda.recordType == "" {
+		return &ValidateError{FieldName: "recordType", Value: addenda.recordType, Err: ErrRecordType}
+	}
+	if addenda.TypeCode == "" {
+		return &ValidateError{FieldName: "recordType", Value: addenda.recordType, Err: ErrAddendaTypeCode}
+	}
+	if addenda.SequenceNumber == 0 {
+		return &ValidateError{FieldName: "SequenceNumber", Value: string(addenda.SequenceNumber), Err: ErrValidFieldInclusion}
+	}
+	if addenda.EntryDetailSequenceNumber == 0 {
+		return &ValidateError{FieldName: "EntryDetailSequenceNumber", Value: string(addenda.EntryDetailSequenceNumber), Err: ErrValidFieldInclusion}
 	}
 	return nil
 }

@@ -91,7 +91,8 @@ func TestFCFieldInclusion(t *testing.T) {
 	// create error is mismatch
 	fc.BatchCount = 0
 	if err := fc.Validate(); err != nil {
-		if err != ErrValidFieldInclusion {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}

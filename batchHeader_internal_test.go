@@ -146,7 +146,8 @@ func TestBatchHeaderFieldInclusion(t *testing.T) {
 	// create error is mismatch
 	bh.BatchNumber = 0
 	if err := bh.Validate(); err != nil {
-		if err != ErrValidFieldInclusion {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}
@@ -161,7 +162,8 @@ func TestBatchHeaderCompanyNameAlphaNumeric(t *testing.T) {
 	// create error is mismatch
 	bh.CompanyName = "AT&T"
 	if err := bh.Validate(); err != nil {
-		if err != ErrValidAlphanumeric {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}
@@ -176,7 +178,8 @@ func TestBatchCompanyDiscretionaryDataAlphaNumeric(t *testing.T) {
 	// create error is mismatch
 	bh.CompanyDiscretionaryData = "Invoice: #12345"
 	if err := bh.Validate(); err != nil {
-		if err != ErrValidAlphanumeric {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}
@@ -191,7 +194,8 @@ func TestBatchCompanyIdentificationAlphaNumeric(t *testing.T) {
 	// create error is mismatch
 	bh.CompanyIdentification = "EIN:12345"
 	if err := bh.Validate(); err != nil {
-		if err != ErrValidAlphanumeric {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}
@@ -206,7 +210,8 @@ func TestBatchCompanyEntryDescriptionAlphaNumeric(t *testing.T) {
 	// create error is mismatch
 	bh.CompanyEntryDescription = "P@YROLL"
 	if err := bh.Validate(); err != nil {
-		if err != ErrValidAlphanumeric {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}
