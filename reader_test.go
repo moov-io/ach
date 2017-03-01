@@ -52,7 +52,6 @@ func TestMultiBatchFile(t *testing.T) {
 	}
 }
 */
-
 func TestRecordTypeUnknown(t *testing.T) {
 	var line = "301 076401251 0764012510807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))

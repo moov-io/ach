@@ -25,7 +25,7 @@ type ParseError struct {
 }
 
 func (e *ParseError) Error() string {
-	return fmt.Sprintf("Parse error @ LineNum:%d RecordName:%s %s \n", e.Line, e.Record, e.Err)
+	return fmt.Sprintf("LineNum:%d, RecordName:%s : %s \n", e.Line, e.Record, e.Err)
 }
 
 // These are the errors that can be returned in Parse.Error
@@ -84,7 +84,7 @@ func NewReader(r io.Reader) *Reader {
 // on the first character of each line. It also enforces ACH formating rules and returns
 // the appropriate error if issues are found.
 func (r *Reader) Read() (File, error) {
-	r.lineNum = -1
+	r.lineNum = 0
 	// read through the entire file
 	for r.scanner.Scan() {
 		line := r.scanner.Text()
@@ -92,7 +92,7 @@ func (r *Reader) Read() (File, error) {
 		lineLength := len(line)
 
 		// handle the situation where there are no line breaks
-		if r.lineNum == 0 && lineLength > RecordLength && lineLength%RecordLength == 0 {
+		if r.lineNum == 1 && lineLength > RecordLength && lineLength%RecordLength == 0 {
 			if err := r.processFixedWidthFile(&line); err != nil {
 				return r.File, r.error(err)
 			}
@@ -225,7 +225,8 @@ func (r *Reader) parseEntryDetail() error {
 	if (BatchHeader{}) == r.currentBatch.Header {
 		return ErrEntryOutside
 	}
-	if r.currentBatch.Header.StandardEntryClassCode == ppd {
+	sec := r.currentBatch.Header.StandardEntryClassCode
+	if sec == ppd || sec == "IAT" {
 		ed := EntryDetail{}
 		ed.Parse(r.line)
 		if err := ed.Validate(); err != nil {
@@ -233,7 +234,7 @@ func (r *Reader) parseEntryDetail() error {
 		}
 		r.currentBatch.addEntryDetail(ed)
 	} else {
-		return errors.New("Support for Detail Entries of SEC(standard entry class): " +
+		return errors.New("Support for EntryDetail of SEC(standard entry class): " +
 			r.currentBatch.Header.StandardEntryClassCode + ", has not been implemented")
 	}
 	return nil
@@ -247,7 +248,8 @@ func (r *Reader) parseAddenda() error {
 	}
 	entryIndex := len(r.currentBatch.Entries) - 1
 	entry := r.currentBatch.Entries[entryIndex]
-	if r.currentBatch.Header.StandardEntryClassCode == ppd {
+	sec := r.currentBatch.Header.StandardEntryClassCode
+	if sec == ppd || sec == "IAT" {
 		if entry.AddendaRecordIndicator == 1 {
 			addenda := Addenda{}
 			addenda.Parse(r.line)

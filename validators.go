@@ -37,13 +37,6 @@ var (
 	ErrValidCheckDigit     = errors.New("Check Digit does not match calculated check digit")
 )
 
-// Inclusion does basic booolen logic check and builds an error message
-func (v *Validator) Inclusion(s *[]string, check bool, errMsg string, args ...string) {
-	if !check {
-		*s = append(*s, fmt.Sprint(errMsg, args))
-	}
-}
-
 // iServiceClass returns true if a valid service class code
 func (v *Validator) isServiceClass(code int) error {
 	switch code {

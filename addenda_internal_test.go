@@ -70,7 +70,8 @@ func TestValidateAddendaRecordType(t *testing.T) {
 	addenda := mockAddenda()
 	addenda.recordType = "2"
 	if err := addenda.Validate(); err != nil {
-		if !strings.Contains(err.Error(), ErrRecordType.Error()) {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Expected RecordType Error got: %v", err)
 		}
 	}
@@ -81,7 +82,8 @@ func TestValidateAddendaTypeCode(t *testing.T) {
 	addenda := mockAddenda()
 	addenda.TypeCode = "23"
 	if err := addenda.Validate(); err != nil {
-		if !strings.Contains(err.Error(), ErrAddendaTypeCode.Error()) {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Expected Type Code Error got: %v", err)
 		}
 	}
@@ -96,7 +98,8 @@ func TestAddendaFieldInclusion(t *testing.T) {
 	// create error is mismatch
 	addenda.EntryDetailSequenceNumber = 0
 	if err := addenda.Validate(); err != nil {
-		if err != ErrValidFieldInclusion {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}
@@ -111,7 +114,8 @@ func TestAddendaPaymentRelatedInformationAlphaNumeric(t *testing.T) {
 	// create error is mismatch
 	addenda.PaymentRelatedInformation = "@!"
 	if err := addenda.Validate(); err != nil {
-		if err != ErrValidAlphanumeric {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}

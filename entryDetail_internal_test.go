@@ -116,7 +116,8 @@ func TestEDFieldInclusion(t *testing.T) {
 	// create error is mismatch
 	ed.Amount = 0
 	if err := ed.Validate(); err != nil {
-		if err != ErrValidFieldInclusion {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}
@@ -131,7 +132,8 @@ func TestEDdfiAccountNumberAlphaNumeric(t *testing.T) {
 	// create error is mismatch
 	ed.dfiAccountNumber = "74647#999!"
 	if err := ed.Validate(); err != nil {
-		if err != ErrValidAlphanumeric {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}
@@ -146,7 +148,8 @@ func TestEDIndividualIdentificationNumberAlphaNumeric(t *testing.T) {
 	// create error is mismatch
 	ed.IndividualIdentificationNumber = "#12345!"
 	if err := ed.Validate(); err != nil {
-		if err != ErrValidAlphanumeric {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}
@@ -161,7 +164,8 @@ func TestEDIndividualNameAlphaNumeric(t *testing.T) {
 	// create error is mismatch
 	ed.IndividualName = "W@DE"
 	if err := ed.Validate(); err != nil {
-		if err != ErrValidAlphanumeric {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}
@@ -176,7 +180,8 @@ func TestEDDiscretionaryDataAlphaNumeric(t *testing.T) {
 	// create error is mismatch
 	ed.DiscretionaryData = "@!"
 	if err := ed.Validate(); err != nil {
-		if err != ErrValidAlphanumeric {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}
@@ -191,7 +196,8 @@ func TestEDisCheckDigit(t *testing.T) {
 	// create error is mismatch
 	ed.CheckDigit = 1
 	if err := ed.Validate(); err != nil {
-		if err != ErrValidCheckDigit {
+		_, ok := err.(*ValidateError)
+		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
 	}

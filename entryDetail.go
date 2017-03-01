@@ -129,41 +129,52 @@ func (ed *EntryDetail) Validate() error {
 		return err
 	}
 	if ed.recordType != "6" {
-		return ErrRecordType
+		return &ValidateError{FieldName: "recordType", Value: ed.recordType, Err: ErrRecordType}
 	}
 	if err := ed.isTransactionCode(ed.TransactionCode); err != nil {
-		return err
+		return &ValidateError{FieldName: "TransactionCode", Value: string(ed.TransactionCode), Err: err}
 	}
 	if err := ed.isAlphanumeric(ed.dfiAccountNumber); err != nil {
-		return err
+		return &ValidateError{FieldName: "dfiAccountNumber", Value: ed.dfiAccountNumber, Err: err}
 	}
 	if err := ed.isAlphanumeric(ed.IndividualIdentificationNumber); err != nil {
-		return err
+		return &ValidateError{FieldName: "IndividualIdentificationNumber", Value: ed.IndividualIdentificationNumber, Err: err}
 	}
 	if err := ed.isAlphanumeric(ed.IndividualName); err != nil {
-		return err
+		return &ValidateError{FieldName: "IndividualName", Value: ed.IndividualName, Err: err}
 	}
 	if err := ed.isAlphanumeric(ed.DiscretionaryData); err != nil {
-		return err
+		return &ValidateError{FieldName: "DiscretionaryData", Value: ed.DiscretionaryData, Err: err}
 	}
 	if err := ed.isCheckDigit(ed.RDFIIdentificationField(), ed.CheckDigit); err != nil {
-		return err
+		return &ValidateError{FieldName: "CheckDigit", Value: string(ed.CheckDigit), Err: err}
 	}
-
 	return nil
 }
 
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (ed *EntryDetail) fieldInclusion() error {
-	if ed.recordType == "" ||
-		ed.TransactionCode == 0 ||
-		ed.RDFIIdentification == 0 ||
-		ed.CheckDigit == 0 ||
-		ed.Amount == 0 ||
-		ed.IndividualName == "" ||
-		ed.TraceNumber == 0 {
-		return ErrValidFieldInclusion
+	if ed.recordType == "" {
+		return &ValidateError{FieldName: "recordType", Value: ed.recordType, Err: ErrRecordType}
+	}
+	if ed.TransactionCode == 0 {
+		return &ValidateError{FieldName: "TransactionCode", Value: string(ed.TransactionCode), Err: ErrValidFieldInclusion}
+	}
+	if ed.RDFIIdentification == 0 {
+		return &ValidateError{FieldName: "RDFIIdentification", Value: string(ed.RDFIIdentification), Err: ErrValidFieldInclusion}
+	}
+	if ed.CheckDigit == 0 {
+		return &ValidateError{FieldName: "CheckDigit", Value: string(ed.CheckDigit), Err: ErrValidFieldInclusion}
+	}
+	if ed.Amount == 0 {
+		return &ValidateError{FieldName: "Amount", Value: string(ed.Amount), Err: ErrValidFieldInclusion}
+	}
+	if ed.IndividualName == "" {
+		return &ValidateError{FieldName: "IndividualName", Value: ed.IndividualName, Err: ErrValidFieldInclusion}
+	}
+	if ed.TraceNumber == 0 {
+		return &ValidateError{FieldName: "TraceNumber", Value: string(ed.TraceNumber), Err: ErrValidFieldInclusion}
 	}
 	return nil
 }
