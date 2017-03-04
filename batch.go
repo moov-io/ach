@@ -29,7 +29,7 @@ type Batch struct {
 	Entries []EntryDetail
 	Control BatchControl
 	// Converters is composed for ACH to golang Converters
-	Converters
+	converters
 }
 
 // addEntryDetail appends an EntryDetail to the Batch

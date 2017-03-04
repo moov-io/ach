@@ -83,10 +83,10 @@ type BatchHeader struct {
 	// the ascending sequence number should be assigned by batch and not by
 	// record.
 	BatchNumber int
-	// Validator is composed for data validation
-	Validator
-	// Converters is composed for ACH to golang Converters
-	Converters
+	// validator is composed for data validation
+	validator
+	// converters is composed for ACH to golang Converters
+	converters
 }
 
 // NewBatchHeader returns a new BatchHeader with default valus for none exported fields

@@ -12,8 +12,8 @@ import (
 	"strconv"
 )
 
-// Validator is common validation and formating of golang types to ach type strings
-type Validator struct{}
+// validator is common validation and formating of golang types to ach type strings
+type validator struct{}
 
 // ValidateError is returned for errors at a field level in a record
 type ValidateError struct {
@@ -42,7 +42,7 @@ var (
 )
 
 // iServiceClass returns true if a valid service class code
-func (v *Validator) isServiceClass(code int) error {
+func (v *validator) isServiceClass(code int) error {
 	switch code {
 	case
 		// ACH Mixed Debits and Credits
@@ -59,7 +59,7 @@ func (v *Validator) isServiceClass(code int) error {
 }
 
 // isSECCode returns true if a SEC Code is found
-func (v *Validator) isSECCode(code string) error {
+func (v *validator) isSECCode(code string) error {
 	switch code {
 	case
 		"ACK", "ADV", "ARC", "ATX", "BOC", "CCD", "CIE", "COR", "CTX", "DNE", "ENR",
@@ -70,7 +70,7 @@ func (v *Validator) isSECCode(code string) error {
 }
 
 // isTypeCode returns true if a valid type code is found
-func (v *Validator) isTypeCode(code string) error {
+func (v *validator) isTypeCode(code string) error {
 	switch code {
 	case
 		// For POS, SHR or MTE Entries
@@ -91,7 +91,7 @@ func (v *Validator) isTypeCode(code string) error {
 }
 
 // isTransactionCode ensures TransactionCode code is valid
-func (v *Validator) isTransactionCode(code int) error {
+func (v *validator) isTransactionCode(code int) error {
 	switch code {
 	// TransactionCode if the receivers account is:
 	case
@@ -117,7 +117,7 @@ func (v *Validator) isTransactionCode(code int) error {
 }
 
 // isOriginatorStatusCode ensures status code is valid
-func (v *Validator) isOriginatorStatusCode(code int) error {
+func (v *validator) isOriginatorStatusCode(code int) error {
 	switch code {
 	case
 		// ADV file - prepared by an ACH Operator
@@ -132,7 +132,7 @@ func (v *Validator) isOriginatorStatusCode(code int) error {
 }
 
 // isUpperAlphanumeric checks if string only contains ASCII alphanumeric upper case characters
-func (v *Validator) isUpperAlphanumeric(s string) error {
+func (v *validator) isUpperAlphanumeric(s string) error {
 	if regexp.MustCompile(`[^A-Z0-9]+`).MatchString(s) {
 		return ErrUpperAlpha
 	}
@@ -140,7 +140,7 @@ func (v *Validator) isUpperAlphanumeric(s string) error {
 }
 
 // isAlphanumeric checks if a string only contains ASCII alphanumeric characters
-func (v *Validator) isAlphanumeric(s string) error {
+func (v *validator) isAlphanumeric(s string) error {
 	if regexp.MustCompile(`[^ a-zA-Z0-9_*-\/]+`).MatchString(s) {
 		// ^[ A-Za-z0-9_@./#&+-]*$/
 		return ErrValidAlphanumeric
@@ -149,7 +149,7 @@ func (v *Validator) isAlphanumeric(s string) error {
 }
 
 // isOriginatorStatusCode ensures status code is valid
-func (v *Validator) isCheckDigit(routingNumber string, checkDigit int) error {
+func (v *validator) isCheckDigit(routingNumber string, checkDigit int) error {
 	if v.CalculateCheckDigit(routingNumber) != checkDigit {
 		return ErrValidCheckDigit
 	}
@@ -163,7 +163,7 @@ func (v *Validator) isCheckDigit(routingNumber string, checkDigit int) error {
 // Add the results of the eight multiplications
 // Subtract the sum from the next highest multiple of 10.
 // The result is the Check Digit
-func (v *Validator) CalculateCheckDigit(routingNumber string) int {
+func (v *validator) CalculateCheckDigit(routingNumber string) int {
 	var routeIndex [8]string
 	for i := 0; i < 8; i++ {
 		routeIndex[i] = string(routingNumber[i])
@@ -189,6 +189,6 @@ func (v *Validator) CalculateCheckDigit(routingNumber string) int {
 }
 
 // roundUp10 round number up to the next ten spot.
-func (v *Validator) roundUp10(n int) int {
+func (v *validator) roundUp10(n int) int {
 	return int(math.Ceil(float64(n)/10.0)) * 10
 }

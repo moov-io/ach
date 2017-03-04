@@ -32,10 +32,10 @@ type FileControl struct {
 	TotalCreditEntryDollarAmountInFile int
 	// Reserved should be blank.
 	reserved string
-	// Validator is composed for data validation
-	Validator
-	// Converters is composed for ACH to golang Converters
-	Converters
+	// validator is composed for data validation
+	validator
+	// converters is composed for ACH to golang Converters
+	converters
 }
 
 // Parse takes the input record string and parses the FileControl values

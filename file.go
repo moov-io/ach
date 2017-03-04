@@ -35,8 +35,10 @@ type File struct {
 	Header  FileHeader
 	Batches []Batch
 	Control FileControl
-	// Converters is composed for ACH to golang Converters
-	Converters
+	// converters is composed for ACH to golang Converters
+	converters
+
+	//
 }
 
 // addEntryDetail appends an EntryDetail to the Batch
@@ -104,7 +106,6 @@ func (f *File) ValidateAll() error {
 	return nil
 }
 
-// TODO: isEntryHashMismatch
 // This field is prepared by hashing the RDFI’s 8-digit Routing Number in each entry.
 //The Entry Hash provides a check against inadvertent alteration of data
 func (f *File) isEntryAddendaCount() error {
@@ -138,16 +139,24 @@ func (f *File) isFileAmount() error {
 }
 
 // isEntryHashMismatch validates the hash by recalulating the result
-// This field is prepared by hashing the 8-digit Routing Number in each batch.
-// The Entry Hash provides a check against inadvertent alteration of data
 func (f *File) isEntryHashMismatch() error {
-	hash := 0
-	for _, batch := range f.Batches {
-		hash = hash + batch.Control.EntryHash
-	}
-	hashField := f.numericField(hash, 10)
+	hashField := f.calculateEntryHash()
 	if hashField != f.Control.EntryHashField() {
 		return ErrFileEntryHash
 	}
 	return nil
+}
+
+// calculateEntryHash This field is prepared by hashing the 8-digit Routing Number in each batch.
+// The Entry Hash provides a check against inadvertent alteration of data
+func (f *File) calculateEntryHash() string {
+	hash := 0
+	for _, batch := range f.Batches {
+		hash = hash + batch.Control.EntryHash
+	}
+	return f.numericField(hash, 10)
+}
+
+func (f *File) generateFileControl() {
+
 }
