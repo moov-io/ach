@@ -67,6 +67,43 @@ func (f *File) Validate() error {
 	return nil
 }
 
+// ValidateAll walks the enture file data structure and validates each record
+func (f *File) ValidateAll() error {
+
+	// validate inward out of the File Struct
+	for _, batch := range f.Batches {
+		for _, entry := range batch.Entries {
+			for _, addenda := range entry.Addendums {
+				if err := addenda.Validate(); err != nil {
+					return err
+				}
+			}
+			if err := entry.Validate(); err != nil {
+				return err
+			}
+		}
+		if err := batch.Header.Validate(); err != nil {
+			return err
+		}
+		if err := batch.Control.Validate(); err != nil {
+			return err
+		}
+		if err := batch.Validate(); err != nil {
+			return err
+		}
+	}
+	if err := f.Header.Validate(); err != nil {
+		return err
+	}
+	if err := f.Control.Validate(); err != nil {
+		return err
+	}
+	if err := f.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+
 // TODO: isEntryHashMismatch
 // This field is prepared by hashing the RDFI’s 8-digit Routing Number in each entry.
 //The Entry Hash provides a check against inadvertent alteration of data

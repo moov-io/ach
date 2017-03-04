@@ -22,6 +22,10 @@ func TestPPDDebitRead(t *testing.T) {
 	if err != nil {
 		t.Errorf("Can not ach.read file: %v", err)
 	}
+	err = r.File.ValidateAll()
+	if err != nil {
+		t.Errorf("Could not validate entire read file: %v", err)
+	}
 }
 
 // TestDecode is a complete file decoding test.

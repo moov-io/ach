@@ -28,7 +28,7 @@ func NewWriter(w io.Writer) *Writer {
 // Writer writes a single ach.file record to w
 func (w *Writer) Write(file File) error {
 	// TODO: add ValidateAll to ach.file to recursively ensure we have a valid records
-	if err := file.Validate(); err != nil {
+	if err := file.ValidateAll(); err != nil {
 		return err
 	}
 
