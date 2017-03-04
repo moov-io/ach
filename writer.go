@@ -27,29 +27,41 @@ func NewWriter(w io.Writer) *Writer {
 
 // Writer writes a single ach.file record to w
 func (w *Writer) Write(file File) error {
-	var err error
 	// TODO: add ValidateAll to ach.file to recursively ensure we have a valid records
-	if err = file.Validate(); err != nil {
+	if err := file.Validate(); err != nil {
 		return err
 	}
 
 	// Iterate over all records in the file
-	_, err = w.w.WriteString(file.Header.String())
-	for _, batch := range file.Batches {
-		_, err = w.w.WriteString(batch.Header.String())
-		for _, entry := range batch.Entries {
-			_, err = w.w.WriteString(entry.String())
-			for _, addenda := range entry.Addendums {
-				_, err = w.w.WriteString(addenda.String())
-			}
-		}
-		_, err = w.w.WriteString(batch.Control.String())
-	}
-	_, err = w.w.WriteString(file.Control.String())
-
-	if err != nil {
+	if _, err := w.w.WriteString(file.Header.String()); err != nil {
 		return err
 	}
+
+	if _, err := w.w.WriteString(file.Header.String()); err != nil {
+		return err
+	}
+	for _, batch := range file.Batches {
+		if _, err := w.w.WriteString(batch.Header.String()); err != nil {
+			return err
+		}
+		for _, entry := range batch.Entries {
+			if _, err := w.w.WriteString(entry.String()); err != nil {
+				return err
+			}
+			for _, addenda := range entry.Addendums {
+				if _, err := w.w.WriteString(addenda.String()); err != nil {
+					return err
+				}
+			}
+		}
+		if _, err := w.w.WriteString(batch.Control.String()); err != nil {
+			return err
+		}
+	}
+	if _, err := w.w.WriteString(file.Control.String()); err != nil {
+		return err
+	}
+
 	return nil
 }
 
