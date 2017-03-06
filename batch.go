@@ -109,6 +109,12 @@ func (batch *Batch) Build() error {
 		entryCount = entryCount + 1 + len(entry.Addendums)
 		batch.Entries[i].setTraceNumber(batch.Header.ODFIIdentification, seq)
 		seq++
+		addendaSeq := 1
+		for x := range entry.Addendums {
+			batch.Entries[i].Addendums[x].SequenceNumber = addendaSeq
+			batch.Entries[i].Addendums[x].EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
+			addendaSeq++
+		}
 	}
 
 	// build a BatchControl record

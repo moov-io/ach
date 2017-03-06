@@ -5,7 +5,6 @@
 package ach
 
 import (
-	"fmt"
 	"testing"
 	"time"
 )
@@ -352,24 +351,15 @@ func TestBatchBuild(t *testing.T) {
 	entry.IndividualIdentificationNumber = "658-888-2468" // Unique ID for payment
 	entry.IndividualName = "Wade Arnold"
 	entry.setTraceNumber(header.ODFIIdentification, 1)
-	//a1 := NewAddenda()
-	//a1.SequenceNumber = 1
-	//a1.EntryDetailSequenceNumber = 0000001
-	//a2 := NewAddenda()
-	//a2.SequenceNumber = 2
-	//a2.EntryDetailSequenceNumber = 0000001
-	//e1.AddendaRecordIndicator = 1
-	//e1.TraceNumber = 1234567890000001
-	//e1.addAddenda(a1)
-	//e1.addAddenda(a2)
+	a1 := NewAddenda()
+	a2 := NewAddenda()
+	entry.addAddenda(a1)
+	entry.addAddenda(a2)
 	mockBatch.addEntryDetail(entry)
-	//mockBatch.Control.EntryAddendaCount = 3
-	//mockBatch.Header.ODFIIdentification = 123456789
-	//mockBatch.Control.ODFIIdentification = 123456789
 	if err := mockBatch.Build(); err != nil {
 		t.Errorf("Unexpected Batch.Build error: %v", err.Error())
 	}
-	fmt.Printf("Batch: %+v \n", mockBatch)
+	//fmt.Printf("Batch: %+v \n", mockBatch)
 
 	if err := mockBatch.Validate(); err != nil {
 		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
