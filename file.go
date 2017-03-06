@@ -25,8 +25,8 @@ const (
 var (
 	ErrFileBatchCount   = errors.New("Total Number of Batches in file is out-of-balance with File Control")
 	ErrFileEntryCount   = errors.New("Total Entries and Addenda count is out-of-balance with File Control")
-	ErrFileDebitAmount  = errors.New("Total Debit amountis out-of-balance with File Control")
-	ErrFileCreditAmount = errors.New("Total Credit amountis out-of-balance with File Control")
+	ErrFileDebitAmount  = errors.New("Total Debit amount is out-of-balance with File Control")
+	ErrFileCreditAmount = errors.New("Total Credit amount is out-of-balance with File Control")
 	ErrFileEntryHash    = errors.New("Calculated Batch Control Entry hash does not match File Control Entry Hash")
 )
 
@@ -38,10 +38,15 @@ type File struct {
 	// converters is composed for ACH to golang Converters
 	converters
 
-	//
+	// values for constructing file contro file
+	totalRecordsInFile                 int
+	fileEntryAddendaCount              int
+	fileEntryHashSum                   int
+	totalDebitEntryDollarAmountInFile  int
+	totalCreditEntryDollarAmountInFile int
 }
 
-// addEntryDetail appends an EntryDetail to the Batch
+// addBatch appends a Batch to the ach.File
 func (f *File) addBatch(batch Batch) []Batch {
 	f.Batches = append(f.Batches, batch)
 	return f.Batches
@@ -152,11 +157,7 @@ func (f *File) isEntryHashMismatch() error {
 func (f *File) calculateEntryHash() string {
 	hash := 0
 	for _, batch := range f.Batches {
-		hash = hash + batch.Control.EntryHash
+		hash = hash + batch.Control.validate
 	}
 	return f.numericField(hash, 10)
-}
-
-func (f *File) generateFileControl() {
-
 }

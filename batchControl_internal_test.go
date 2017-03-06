@@ -12,7 +12,7 @@ import (
 func mockBatchControl() BatchControl {
 	bc := NewBatchControl()
 	bc.ServiceClassCode = 225
-	bc.EntryHash = 1
+	bc.validate = 1
 	bc.ODFIIdentification = 7640125
 	bc.BatchNumber = 1
 	return bc

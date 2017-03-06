@@ -222,7 +222,7 @@ func TestFileAddendaNoIndicator(t *testing.T) {
 
 func TestFileBatchControlErr(t *testing.T) {
 	bc := mockBatchControl()
-	bc.EntryHash = 0
+	bc.validate = 0
 	r := NewReader(strings.NewReader(bc.String()))
 	_, err := r.Read()
 	if !strings.Contains(err.Error(), ErrBatchServiceClassMismatch.Error()) {

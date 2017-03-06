@@ -22,13 +22,13 @@ type BatchControl struct {
 	// EntryAddendaCount is a tally of each Entry Detail Record and each Addenda
 	// Record processed, within either the batch or file as appropriate.
 	EntryAddendaCount int
-	// EntryHash the Receiving DFI Identification in each Entry Detail Record is hashed
+	// validate the Receiving DFI Identification in each Entry Detail Record is hashed
 	// to provide a check against inadvertent alteration of data contents due
 	// to hardware failure or program erro
 	//
 	// In this context the Entry Hash is the sum of the corresponding fields in the
 	// Entry Detail Records on the file.
-	EntryHash int
+	validate int
 	// TotalDebitEntryDollarAmount Contains accumulated Entry debit totals within the batch.
 	TotalDebitEntryDollarAmount int
 	// TotalCreditEntryDollarAmount Contains accumulated Entry credit totals within the batch.
@@ -77,7 +77,7 @@ func (bc *BatchControl) Parse(record string) {
 	bc.EntryAddendaCount = bc.parseNumField(record[4:10])
 	// 11-20 Total of all positions 4-11 on each Entry Detail Record in the batch. This is essentially the sum of all the RDFI routing numbers in the batch.
 	// If the sum exceeds 10 digits (because you have lots of Entry Detail Records), lop off the most significant digits of the sum until there are only 10
-	bc.EntryHash = bc.parseNumField(record[10:20])
+	bc.validate = bc.parseNumField(record[10:20])
 	// 21-32 Number of cents of debit entries within the batch
 	bc.TotalDebitEntryDollarAmount = bc.parseNumField(record[20:32])
 	// 33-44 Number of cents of credit entries within the batch
@@ -167,7 +167,7 @@ func (bc *BatchControl) EntryAddendaCountField() string {
 
 // EntryHashField get a zero padded EntryHash
 func (bc *BatchControl) EntryHashField() string {
-	return bc.numericField(bc.EntryHash, 10)
+	return bc.numericField(bc.validate, 10)
 }
 
 //TotalDebitEntryDollarAmountField get a zero padded Debity Entry Amount

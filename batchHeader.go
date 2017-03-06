@@ -94,6 +94,7 @@ func NewBatchHeader() BatchHeader {
 	return BatchHeader{
 		recordType:           "5",
 		OriginatorStatusCode: 1,
+		BatchNumber:          1,
 	}
 }
 

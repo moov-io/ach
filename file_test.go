@@ -98,12 +98,12 @@ func TestFileEntryHash(t *testing.T) {
 	mockBatch1 := Batch{}
 	mockBatch1.Control.EntryAddendaCount = 1
 	mockBatch1.Control.TotalCreditEntryDollarAmount = 10500
-	mockBatch1.Control.EntryHash = 1212121212
+	mockBatch1.Control.validate = 1212121212
 
 	mockBatch2 := Batch{}
 	mockBatch2.Control.EntryAddendaCount = 1
 	mockBatch2.Control.TotalCreditEntryDollarAmount = 10500
-	mockBatch2.Control.EntryHash = 2121212121
+	mockBatch2.Control.validate = 2121212121
 
 	r.File.addBatch(mockBatch1)
 	r.File.addBatch(mockBatch2)

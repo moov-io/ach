@@ -4,7 +4,11 @@
 
 package ach
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+	"time"
+)
 
 // TestBatchEntryCountMismatc check for control out-of-balance error.
 func TestBatchEntryCountMismatch(t *testing.T) {
@@ -185,13 +189,13 @@ func TestBatchIsEntryHashMismatch(t *testing.T) {
 	mockBatch.addEntryDetail(e1)
 	mockBatch.addEntryDetail(e2)
 	mockBatch.Control.EntryAddendaCount = 2
-	mockBatch.Control.EntryHash = 222222222
+	mockBatch.Control.validate = 222222222
 	// works properly
 	if err := mockBatch.Validate(); err != nil {
 		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 	}
 	// create error
-	mockBatch.Control.EntryHash = 1
+	mockBatch.Control.validate = 1
 	if err := mockBatch.Validate(); err != nil {
 		if err != ErrValidEntryHash {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
@@ -324,5 +328,50 @@ func TestBatchAddendaTraceNumber(t *testing.T) {
 		if err != ErrBatchAddendaTraceNumber {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
+	}
+}
+
+func TestBatchBuild(t *testing.T) {
+	mockBatch := Batch{}
+	header := NewBatchHeader()
+	header.ServiceClassCode = 200
+	header.CompanyName = "MY BEST COMP."
+	header.CompanyDiscretionaryData = "INCLUDES OVERTIME"
+	header.CompanyIdentification = "1419871234"
+	header.StandardEntryClassCode = "PPD"
+	header.CompanyEntryDescription = "PAYROLL"
+	header.EffectiveEntryDate = time.Now()
+	header.ODFIIdentification = 109991234
+	mockBatch.Header = header
+
+	entry := NewEntryDetail()
+	entry.TransactionCode = 22                            // ACH Credit
+	entry.setRDFI(81086674)                               // scottrade bank routing number
+	entry.dfiAccountNumber = "62292250"                   // scottrade account number
+	entry.Amount = 1000000                                // 1k dollars
+	entry.IndividualIdentificationNumber = "658-888-2468" // Unique ID for payment
+	entry.IndividualName = "Wade Arnold"
+	entry.setTraceNumber(header.ODFIIdentification, 1)
+	//a1 := NewAddenda()
+	//a1.SequenceNumber = 1
+	//a1.EntryDetailSequenceNumber = 0000001
+	//a2 := NewAddenda()
+	//a2.SequenceNumber = 2
+	//a2.EntryDetailSequenceNumber = 0000001
+	//e1.AddendaRecordIndicator = 1
+	//e1.TraceNumber = 1234567890000001
+	//e1.addAddenda(a1)
+	//e1.addAddenda(a2)
+	mockBatch.addEntryDetail(entry)
+	//mockBatch.Control.EntryAddendaCount = 3
+	//mockBatch.Header.ODFIIdentification = 123456789
+	//mockBatch.Control.ODFIIdentification = 123456789
+	if err := mockBatch.Build(); err != nil {
+		t.Errorf("Unexpected Batch.Build error: %v", err.Error())
+	}
+	fmt.Printf("Batch: %+v \n", mockBatch)
+
+	if err := mockBatch.Validate(); err != nil {
+		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 	}
 }
