@@ -106,14 +106,14 @@ func TestBCisServiceClassErr(t *testing.T) {
 	bc := mockBatchControl()
 	// works properly
 	if err := bc.Validate(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		t.Errorf("Unexpected BatchControl error: %v", err.Error())
 	}
 	// create error is mismatch
 	bc.ServiceClassCode = 123
 	if err := bc.Validate(); err != nil {
 		_, ok := err.(*ValidateError)
 		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+			t.Errorf("Unexpected BatchControl error: %v", err.Error())
 		}
 	}
 }
@@ -124,7 +124,7 @@ func TestBCFieldInclusion(t *testing.T) {
 	if err := bc.Validate(); err != nil {
 		_, ok := err.(*ValidateError)
 		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+			t.Errorf("Unexpected BatchControl error: %v", err.Error())
 		}
 	}
 	// create error is mismatch
@@ -132,7 +132,7 @@ func TestBCFieldInclusion(t *testing.T) {
 	if err := bc.Validate(); err != nil {
 		_, ok := err.(*ValidateError)
 		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+			t.Errorf("Unexpected BatchControl error: %v", err.Error())
 		}
 	}
 }
@@ -143,7 +143,7 @@ func TestBCCompanyIdentificationAlphaNumeric(t *testing.T) {
 	if err := bc.Validate(); err != nil {
 		_, ok := err.(*ValidateError)
 		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+			t.Errorf("Unexpected BatchControl error: %v", err.Error())
 		}
 	}
 	// create error is mismatch
@@ -151,7 +151,7 @@ func TestBCCompanyIdentificationAlphaNumeric(t *testing.T) {
 	if err := bc.Validate(); err != nil {
 		_, ok := err.(*ValidateError)
 		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+			t.Errorf("Unexpected BatchControl error: %v", err.Error())
 		}
 	}
 }
@@ -162,7 +162,7 @@ func TestBCMessageAuthenticationCodeAlphaNumeric(t *testing.T) {
 	if err := bc.Validate(); err != nil {
 		_, ok := err.(*ValidateError)
 		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+			t.Errorf("Unexpected BatchControl error: %v", err.Error())
 		}
 	}
 	// create error is mismatch
@@ -170,7 +170,7 @@ func TestBCMessageAuthenticationCodeAlphaNumeric(t *testing.T) {
 	if err := bc.Validate(); err != nil {
 		_, ok := err.(*ValidateError)
 		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+			t.Errorf("Unexpected BatchControl error: %v", err.Error())
 		}
 	}
 }

@@ -33,6 +33,7 @@ type Addenda struct {
 func NewAddenda() Addenda {
 	return Addenda{
 		recordType: "7",
+		TypeCode:   "05",
 	}
 }
 

@@ -93,14 +93,14 @@ func TestAddendaFieldInclusion(t *testing.T) {
 	addenda := mockAddenda()
 	// works properly
 	if err := addenda.Validate(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		t.Errorf("Unexpected Addenda error: %v", err.Error())
 	}
 	// create error is mismatch
 	addenda.EntryDetailSequenceNumber = 0
 	if err := addenda.Validate(); err != nil {
 		_, ok := err.(*ValidateError)
 		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+			t.Errorf("Unexpected Addenda error: %v", err.Error())
 		}
 	}
 }
@@ -109,14 +109,14 @@ func TestAddendaPaymentRelatedInformationAlphaNumeric(t *testing.T) {
 	addenda := mockAddenda()
 	// works properly
 	if err := addenda.Validate(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		t.Errorf("Unexpected Addenda error: %v", err.Error())
 	}
 	// create error is mismatch
 	addenda.PaymentRelatedInformation = "@!"
 	if err := addenda.Validate(); err != nil {
 		_, ok := err.(*ValidateError)
 		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+			t.Errorf("Unexpected Addenda error: %v", err.Error())
 		}
 	}
 }

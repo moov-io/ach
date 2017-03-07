@@ -361,7 +361,7 @@ func TestBatchBuild(t *testing.T) {
 	}
 	//fmt.Printf("Batch: %+v \n", mockBatch)
 
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.ValidateAll(); err != nil {
 		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 	}
 }

@@ -197,7 +197,7 @@ func (ed *EntryDetail) addAddenda(addenda Addenda) []Addenda {
 func (ed *EntryDetail) setRDFI(rdfi int) *EntryDetail {
 	s := ed.numericField(rdfi, 9)
 	ed.RDFIIdentification = ed.parseNumField(s[:8])
-	ed.CheckDigit = ed.parseNumField(s[9:])
+	ed.CheckDigit = ed.parseNumField(s[8:9])
 	return ed
 }
 

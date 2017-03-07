@@ -93,6 +93,31 @@ func (batch *Batch) Validate() error {
 	return nil
 }
 
+// ValidateAll validate all dependency records in the batch.
+func (batch *Batch) ValidateAll() error {
+	if err := batch.Header.Validate(); err != nil {
+		return err
+	}
+	for _, entry := range batch.Entries {
+		if err := entry.Validate(); err != nil {
+			return err
+		}
+		for _, addenda := range entry.Addendums {
+			if err := addenda.Validate(); err != nil {
+				return err
+			}
+		}
+	}
+	if err := batch.Control.Validate(); err != nil {
+		return err
+	}
+	// Validate the Batch wrapper.
+	if err := batch.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+
 // Build takes Batch Header and Entries and builds a valid batch
 func (batch *Batch) Build() error {
 	// Requires a valid BatchHeader
