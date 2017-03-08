@@ -2,13 +2,11 @@
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
-// Package ach reads and writes (ACH) Automated Clearing House files. ACH is the
-// primary method of electronic money movemenet through the United States.
-//
-// https://en.wikipedia.org/wiki/Automated_Clearing_House
 package ach
 
-import "errors"
+import (
+	"errors"
+)
 
 // Errors specific to parsing a Batch container
 var (
@@ -25,21 +23,42 @@ var (
 	ErrBatchTraceNumberNotODFI   = errors.New("Trace Number in an Entry Detail Record are not the same as the ODFI Routing Number")
 	ErrBatchAddendaIndicator     = errors.New("Addenda found with no Addenda Indicator in proceeding Entry Detail")
 	ErrBatchAddendaTraceNumber   = errors.New("Addenda Entry Detail Sequence number does not match proceeding Entry Detail Trace Number")
+	ErrBatchEntries              = errors.New("Batch must have Entrie Record(s) to be built")
 )
 
 // Batch holds the Batch Header and Batch Control and all Entry Records
 type Batch struct {
-	Header  BatchHeader
-	Entries []EntryDetail
-	Control BatchControl
+	Header  *BatchHeader
+	Entries []*EntryDetail
+	Control *BatchControl
 	// Converters is composed for ACH to golang Converters
-	Converters
+	converters
+}
+
+// NewBatch buildes a batch
+func NewBatch() *Batch {
+	return new(Batch).setHeader(NewBatchHeader()).setControl(NewBatchControl())
+}
+
+// setHeader appends an BatchHeader to the Batch
+func (batch *Batch) setHeader(batchHeader *BatchHeader) *Batch {
+	batch.Header = batchHeader
+	return batch
+}
+
+// setControl appends an BatchControl to the Batch
+func (batch *Batch) setControl(batchControl *BatchControl) *Batch {
+	batch.Control = batchControl
+	return batch
 }
 
 // addEntryDetail appends an EntryDetail to the Batch
-func (batch *Batch) addEntryDetail(entry EntryDetail) []EntryDetail {
+//func (batch *Batch) addEntryDetail(entry EntryDetail) []EntryDetail {
+func (batch *Batch) addEntryDetail(entry *EntryDetail) *Batch {
+	//entry.setTraceNumber(batch.Header.ODFIIdentification, 1)
 	batch.Entries = append(batch.Entries, entry)
-	return batch.Entries
+	//	return batch.Entries
+	return batch
 }
 
 // Validate NACHA rules on the entire batch before being added to a File
@@ -93,6 +112,69 @@ func (batch *Batch) Validate() error {
 	return nil
 }
 
+// ValidateAll validate all dependency records in the batch.
+func (batch *Batch) ValidateAll() error {
+	if err := batch.Header.Validate(); err != nil {
+		return err
+	}
+	for _, entry := range batch.Entries {
+		if err := entry.Validate(); err != nil {
+			return err
+		}
+		for _, addenda := range entry.Addendums {
+			if err := addenda.Validate(); err != nil {
+				return err
+			}
+		}
+	}
+	if err := batch.Control.Validate(); err != nil {
+		return err
+	}
+	// Validate the Batch wrapper.
+	if err := batch.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Build takes Batch Header and Entries and builds a valid batch
+func (batch *Batch) Build() error {
+	// Requires a valid BatchHeader
+	if err := batch.Header.Validate(); err != nil {
+		return err
+	}
+	if len(batch.Entries) <= 0 {
+		return ErrBatchEntries
+	}
+	// build controls and sequence numbers
+	entryCount := 0
+	seq := 1
+	for i, entry := range batch.Entries {
+		entryCount = entryCount + 1 + len(entry.Addendums)
+		batch.Entries[i].setTraceNumber(batch.Header.ODFIIdentification, seq)
+		seq++
+		addendaSeq := 1
+		for x := range entry.Addendums {
+			batch.Entries[i].Addendums[x].SequenceNumber = addendaSeq
+			batch.Entries[i].Addendums[x].EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
+			addendaSeq++
+		}
+	}
+
+	// build a BatchControl record
+	bc := NewBatchControl()
+	bc.ServiceClassCode = batch.Header.ServiceClassCode
+	bc.CompanyIdentification = batch.Header.CompanyIdentification
+	bc.ODFIIdentification = batch.Header.ODFIIdentification
+	bc.BatchNumber = batch.Header.BatchNumber
+	bc.EntryAddendaCount = entryCount
+	bc.EntryHash = batch.parseNumField(batch.calculateEntryHash())
+	bc.TotalCreditEntryDollarAmount, bc.TotalDebitEntryDollarAmount = batch.calculateBatchAmounts()
+	batch.Control = bc
+
+	return nil
+}
+
 // isBatchEntryCountMismatch validate Entry count is accurate
 // The Entry/Addenda Count Field is a tally of each Entry Detail and Addenda
 // Record processed within the batch
@@ -111,8 +193,21 @@ func (batch *Batch) isBatchEntryCountMismatch() error {
 // The Total Debit and Credit Entry Dollar Amount fields contain accumulated
 // Entry Detail debit and credit totals within a given batch
 func (batch *Batch) isBatchAmountMismatch() error {
-	debit := 0
-	credit := 0
+	credit, debit := batch.calculateBatchAmounts()
+	//fmt.Printf("debit: %v batch debit: %v \n", debit, batch.Control.TotalDebitEntryDollarAmount)
+
+	if debit != batch.Control.TotalDebitEntryDollarAmount {
+		return ErrBatchAmountMismatch
+	}
+	//fmt.Printf("credit: %v batch credit: %v \n", credit, batch.Control.TotalCreditEntryDollarAmount)
+
+	if credit != batch.Control.TotalCreditEntryDollarAmount {
+		return ErrBatchAmountMismatch
+	}
+	return nil
+}
+
+func (batch *Batch) calculateBatchAmounts() (credit int, debit int) {
 	for _, entry := range batch.Entries {
 		if entry.TransactionCode == 22 || entry.TransactionCode == 23 {
 			credit = credit + entry.Amount
@@ -129,14 +224,7 @@ func (batch *Batch) isBatchAmountMismatch() error {
 			debit = debit + entry.Amount
 		}
 	}
-	if debit != batch.Control.TotalDebitEntryDollarAmount {
-		return ErrBatchAmountMismatch
-	}
-	if credit != batch.Control.TotalCreditEntryDollarAmount {
-		return ErrBatchAmountMismatch
-	}
-
-	return nil
+	return credit, debit
 }
 
 // isSequenceAscending Individual Entry Detail Records within individual batches must
@@ -153,18 +241,22 @@ func (batch *Batch) isSequenceAscending() error {
 }
 
 // isEntryHashMismatch validates the hash by recalulating the result
-// This field is prepared by hashing the 8-digit Routing Number in each entry.
-// The Entry Hash provides a check against inadvertent alteration of data
 func (batch *Batch) isEntryHashMismatch() error {
-	hash := 0
-	for _, entry := range batch.Entries {
-		hash = hash + entry.RDFIIdentification
-	}
-	hashField := batch.numericField(hash, 10)
+	hashField := batch.calculateEntryHash()
 	if hashField != batch.Control.EntryHashField() {
 		return ErrValidEntryHash
 	}
 	return nil
+}
+
+// calculateEntryHash This field is prepared by hashing the 8-digit Routing Number in each entry.
+// The Entry Hash provides a check against inadvertent alteration of data
+func (batch *Batch) calculateEntryHash() string {
+	hash := 0
+	for _, entry := range batch.Entries {
+		hash = hash + entry.RDFIIdentification
+	}
+	return batch.numericField(hash, 10)
 }
 
 // The Originator Status Code is not equal to “2” for DNE if the Transaction Code is 23 or 33

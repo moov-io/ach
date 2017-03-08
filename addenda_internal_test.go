@@ -23,7 +23,7 @@ func TestParseAddenda(t *testing.T) {
 
 	r := NewReader(strings.NewReader(line))
 	r.currentBatch.Header.StandardEntryClassCode = "PPD"
-	r.currentBatch.addEntryDetail(EntryDetail{TransactionCode: 22, AddendaRecordIndicator: 1})
+	r.currentBatch.addEntryDetail(&EntryDetail{TransactionCode: 22, AddendaRecordIndicator: 1})
 	r.line = line
 	err := r.parseAddenda()
 	if err != nil {
@@ -53,7 +53,7 @@ func TestAddendaString(t *testing.T) {
 	var line = "710WEB                                        DIEGO MAY                            00010000001"
 	r := NewReader(strings.NewReader(line))
 	r.currentBatch.Header.StandardEntryClassCode = "PPD"
-	r.currentBatch.addEntryDetail(EntryDetail{AddendaRecordIndicator: 1})
+	r.currentBatch.addEntryDetail(&EntryDetail{AddendaRecordIndicator: 1})
 	r.line = line
 	err := r.parseAddenda()
 	if err != nil {
@@ -93,14 +93,14 @@ func TestAddendaFieldInclusion(t *testing.T) {
 	addenda := mockAddenda()
 	// works properly
 	if err := addenda.Validate(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		t.Errorf("Unexpected Addenda error: %v", err.Error())
 	}
 	// create error is mismatch
 	addenda.EntryDetailSequenceNumber = 0
 	if err := addenda.Validate(); err != nil {
 		_, ok := err.(*ValidateError)
 		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+			t.Errorf("Unexpected Addenda error: %v", err.Error())
 		}
 	}
 }
@@ -109,14 +109,14 @@ func TestAddendaPaymentRelatedInformationAlphaNumeric(t *testing.T) {
 	addenda := mockAddenda()
 	// works properly
 	if err := addenda.Validate(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		t.Errorf("Unexpected Addenda error: %v", err.Error())
 	}
 	// create error is mismatch
 	addenda.PaymentRelatedInformation = "@!"
 	if err := addenda.Validate(); err != nil {
 		_, ok := err.(*ValidateError)
 		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+			t.Errorf("Unexpected Addenda error: %v", err.Error())
 		}
 	}
 }

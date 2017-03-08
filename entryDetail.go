@@ -1,3 +1,7 @@
+// Copyright 2017 The ACH Authors
+// Use of this source code is governed by an Apache License
+// license that can be found in the LICENSE file.
+
 package ach
 
 import "fmt"
@@ -21,6 +25,7 @@ type EntryDetail struct {
 	TransactionCode int
 
 	// rdfiIdentification is the RDFI's routing number without the last digit.
+	// Receiving Depository Financial Institution
 	RDFIIdentification int
 
 	// CheckDigit the last digit of the RDFI's routing number
@@ -46,6 +51,8 @@ type EntryDetail struct {
 	// be a single two-character code, or two distince one-character codes,
 	// according to the needs of the ODFI and/or Originator involved. This
 	// field must be returned intact for any returned entry.
+	//
+	// WEB uses the Discretionary Data Field as the Payment Type Code
 	DiscretionaryData string
 
 	// AddendaRecordIndicator indicates the existence of an Addenda Record.
@@ -65,15 +72,15 @@ type EntryDetail struct {
 
 	// Addendums a list of Addenda for the Entry Detail
 	Addendums []Addenda
-	// Validator is composed for data validation
-	Validator
-	// Converters is composed for ACH to golang Converters
-	Converters
+	// validator is composed for data validation
+	validator
+	// converters is composed for ACH to golang Converters
+	converters
 }
 
 // NewEntryDetail returns a new EntryDetail with default values for none exported fields
-func NewEntryDetail() EntryDetail {
-	return EntryDetail{
+func NewEntryDetail() *EntryDetail {
+	return &EntryDetail{
 		recordType: "6",
 	}
 }
@@ -184,6 +191,20 @@ func (ed *EntryDetail) addAddenda(addenda Addenda) []Addenda {
 	ed.AddendaRecordIndicator = 1
 	ed.Addendums = append(ed.Addendums, addenda)
 	return ed.Addendums
+}
+
+// setRDFI takes the 9 digit RDFI account number and seperates it for RDFIIdentification and CheckDigit
+func (ed *EntryDetail) setRDFI(rdfi int) *EntryDetail {
+	s := ed.numericField(rdfi, 9)
+	ed.RDFIIdentification = ed.parseNumField(s[:8])
+	ed.CheckDigit = ed.parseNumField(s[8:9])
+	return ed
+}
+
+// setTraceNumber takes first 8 digits of RDFI and catinates a sequence number onto the TraceNumber
+func (ed *EntryDetail) setTraceNumber(RDFIIdentification int, seq int) {
+	trace := ed.numericField(RDFIIdentification, 8) + ed.numericField(seq, 7)
+	ed.TraceNumber = ed.parseNumField(trace)
 }
 
 // RDFIIdentificationField get the rdfiIdentification with zero padding

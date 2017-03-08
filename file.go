@@ -25,24 +25,46 @@ const (
 var (
 	ErrFileBatchCount   = errors.New("Total Number of Batches in file is out-of-balance with File Control")
 	ErrFileEntryCount   = errors.New("Total Entries and Addenda count is out-of-balance with File Control")
-	ErrFileDebitAmount  = errors.New("Total Debit amountis out-of-balance with File Control")
-	ErrFileCreditAmount = errors.New("Total Credit amountis out-of-balance with File Control")
+	ErrFileDebitAmount  = errors.New("Total Debit amount is out-of-balance with File Control")
+	ErrFileCreditAmount = errors.New("Total Credit amount is out-of-balance with File Control")
 	ErrFileEntryHash    = errors.New("Calculated Batch Control Entry hash does not match File Control Entry Hash")
 )
 
 // File contains the structures of a parsed ACH File.
 type File struct {
 	Header  FileHeader
-	Batches []Batch
+	Batches []*Batch
 	Control FileControl
-	// Converters is composed for ACH to golang Converters
-	Converters
+	// converters is composed for ACH to golang Converters
+	converters
+
+	// values for constructing file contro file
+	totalRecordsInFile                 int
+	fileEntryAddendaCount              int
+	fileEntryHashSum                   int
+	totalDebitEntryDollarAmountInFile  int
+	totalCreditEntryDollarAmountInFile int
 }
 
-// addEntryDetail appends an EntryDetail to the Batch
-func (f *File) addBatch(batch Batch) []Batch {
+// NewFile constucuts a file template.
+func NewFile() *File {
+	return &File{
+		Header: NewFileHeader(),
+		// Batches: []Batch, TODO need a NewBatch
+		Control: NewFileControl(),
+	}
+}
+
+// addBatch appends a Batch to the ach.File
+func (f *File) addBatch(batch *Batch) []*Batch {
 	f.Batches = append(f.Batches, batch)
 	return f.Batches
+}
+
+// setHeader allows for header to be built.
+func (f *File) setHeader(h FileHeader) *File {
+	f.Header = h
+	return f
 }
 
 // Validate NACHA rules on the entire batch before being added to a File
@@ -67,7 +89,27 @@ func (f *File) Validate() error {
 	return nil
 }
 
-// TODO: isEntryHashMismatch
+// ValidateAll walks the enture file data structure and validates each record
+func (f *File) ValidateAll() error {
+
+	// validate inward out of the File Struct
+	for _, batch := range f.Batches {
+		if err := batch.ValidateAll(); err != nil {
+			return err
+		}
+	}
+	if err := f.Header.Validate(); err != nil {
+		return err
+	}
+	if err := f.Control.Validate(); err != nil {
+		return err
+	}
+	if err := f.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+
 // This field is prepared by hashing the RDFI’s 8-digit Routing Number in each entry.
 //The Entry Hash provides a check against inadvertent alteration of data
 func (f *File) isEntryAddendaCount() error {
@@ -101,16 +143,20 @@ func (f *File) isFileAmount() error {
 }
 
 // isEntryHashMismatch validates the hash by recalulating the result
-// This field is prepared by hashing the 8-digit Routing Number in each batch.
-// The Entry Hash provides a check against inadvertent alteration of data
 func (f *File) isEntryHashMismatch() error {
-	hash := 0
-	for _, batch := range f.Batches {
-		hash = hash + batch.Control.EntryHash
-	}
-	hashField := f.numericField(hash, 10)
+	hashField := f.calculateEntryHash()
 	if hashField != f.Control.EntryHashField() {
 		return ErrFileEntryHash
 	}
 	return nil
+}
+
+// calculateEntryHash This field is prepared by hashing the 8-digit Routing Number in each batch.
+// The Entry Hash provides a check against inadvertent alteration of data
+func (f *File) calculateEntryHash() string {
+	hash := 0
+	for _, batch := range f.Batches {
+		hash = hash + batch.Control.EntryHash
+	}
+	return f.numericField(hash, 10)
 }

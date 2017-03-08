@@ -1,3 +1,7 @@
+// Copyright 2017 The ACH Authors
+// Use of this source code is governed by an Apache License
+// license that can be found in the LICENSE file.
+
 package ach
 
 import (
@@ -79,17 +83,18 @@ type BatchHeader struct {
 	// the ascending sequence number should be assigned by batch and not by
 	// record.
 	BatchNumber int
-	// Validator is composed for data validation
-	Validator
-	// Converters is composed for ACH to golang Converters
-	Converters
+	// validator is composed for data validation
+	validator
+	// converters is composed for ACH to golang Converters
+	converters
 }
 
 // NewBatchHeader returns a new BatchHeader with default valus for none exported fields
-func NewBatchHeader() BatchHeader {
-	return BatchHeader{
+func NewBatchHeader() *BatchHeader {
+	return &BatchHeader{
 		recordType:           "5",
 		OriginatorStatusCode: 1,
+		BatchNumber:          1,
 	}
 }
 

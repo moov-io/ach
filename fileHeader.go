@@ -87,10 +87,10 @@ type FileHeader struct {
 
 	// ReferenceCode is reserved for information pertinent to the Originator.
 	ReferenceCode string
-	// Validator is composed for data validation
-	Validator
-	// Converters is composed for ACH to golang Converters
-	Converters
+	// validator is composed for data validation
+	validator
+	// converters is composed for ACH to golang Converters
+	converters
 }
 
 // NewFileHeader returns a new FileHeader with default values for none exported fields
