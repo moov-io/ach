@@ -12,13 +12,13 @@ import (
 // TestBatchCountError tests for to many batch counts
 func TestBatchCountError(t *testing.T) {
 	r := NewReader(strings.NewReader(" "))
-	r.File.addBatch(Batch{})
+	r.File.addBatch(NewBatch())
 	r.File.Control.BatchCount = 1
 	if err := r.File.Validate(); err != nil {
 		t.Errorf("Unexpected File.Validation error: %v", err.Error())
 	}
 	// More batches than the file control count.
-	r.File.addBatch(Batch{})
+	r.File.addBatch(&Batch{})
 	if err := r.File.Validate(); err != nil {
 		if err != ErrFileBatchCount {
 			t.Errorf("Unexpected File.Validation error: %v", err.Error())
@@ -28,7 +28,7 @@ func TestBatchCountError(t *testing.T) {
 
 func TestFileEntryAddendaError(t *testing.T) {
 	r := NewReader(strings.NewReader(" "))
-	mockBatch := Batch{}
+	mockBatch := NewBatch()
 	mockBatch.Control.EntryAddendaCount = 1
 	r.File.addBatch(mockBatch)
 	r.File.Control.BatchCount = 1
@@ -49,7 +49,7 @@ func TestFileEntryAddendaError(t *testing.T) {
 func TestFileDebitAmount(t *testing.T) {
 
 	r := NewReader(strings.NewReader(" "))
-	mockBatch := Batch{}
+	mockBatch := NewBatch()
 	mockBatch.Control.EntryAddendaCount = 1
 	mockBatch.Control.TotalDebitEntryDollarAmount = 10500
 
@@ -72,7 +72,7 @@ func TestFileDebitAmount(t *testing.T) {
 
 func TestFileCreditAmount(t *testing.T) {
 	r := NewReader(strings.NewReader(" "))
-	mockBatch := Batch{}
+	mockBatch := NewBatch()
 	mockBatch.Control.EntryAddendaCount = 1
 	mockBatch.Control.TotalCreditEntryDollarAmount = 10500
 
@@ -95,15 +95,15 @@ func TestFileCreditAmount(t *testing.T) {
 
 func TestFileEntryHash(t *testing.T) {
 	r := NewReader(strings.NewReader(" "))
-	mockBatch1 := Batch{}
+	mockBatch1 := NewBatch()
 	mockBatch1.Control.EntryAddendaCount = 1
 	mockBatch1.Control.TotalCreditEntryDollarAmount = 10500
-	mockBatch1.Control.validate = 1212121212
+	mockBatch1.Control.EntryHash = 1212121212
 
-	mockBatch2 := Batch{}
+	mockBatch2 := NewBatch()
 	mockBatch2.Control.EntryAddendaCount = 1
 	mockBatch2.Control.TotalCreditEntryDollarAmount = 10500
-	mockBatch2.Control.validate = 2121212121
+	mockBatch2.Control.EntryHash = 2121212121
 
 	r.File.addBatch(mockBatch1)
 	r.File.addBatch(mockBatch2)

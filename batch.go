@@ -28,18 +28,37 @@ var (
 
 // Batch holds the Batch Header and Batch Control and all Entry Records
 type Batch struct {
-	Header  BatchHeader
-	Entries []EntryDetail
-	Control BatchControl
+	Header  *BatchHeader
+	Entries []*EntryDetail
+	Control *BatchControl
 	// Converters is composed for ACH to golang Converters
 	converters
 }
 
+// NewBatch buildes a batch
+func NewBatch() *Batch {
+	return new(Batch).setHeader(NewBatchHeader()).setControl(NewBatchControl())
+}
+
+// setHeader appends an BatchHeader to the Batch
+func (batch *Batch) setHeader(batchHeader *BatchHeader) *Batch {
+	batch.Header = batchHeader
+	return batch
+}
+
+// setControl appends an BatchControl to the Batch
+func (batch *Batch) setControl(batchControl *BatchControl) *Batch {
+	batch.Control = batchControl
+	return batch
+}
+
 // addEntryDetail appends an EntryDetail to the Batch
-func (batch *Batch) addEntryDetail(entry EntryDetail) []EntryDetail {
+//func (batch *Batch) addEntryDetail(entry EntryDetail) []EntryDetail {
+func (batch *Batch) addEntryDetail(entry *EntryDetail) *Batch {
 	//entry.setTraceNumber(batch.Header.ODFIIdentification, 1)
 	batch.Entries = append(batch.Entries, entry)
-	return batch.Entries
+	//	return batch.Entries
+	return batch
 }
 
 // Validate NACHA rules on the entire batch before being added to a File
@@ -149,9 +168,8 @@ func (batch *Batch) Build() error {
 	bc.ODFIIdentification = batch.Header.ODFIIdentification
 	bc.BatchNumber = batch.Header.BatchNumber
 	bc.EntryAddendaCount = entryCount
-	bc.validate = batch.parseNumField(batch.calculateEntryHash())
+	bc.EntryHash = batch.parseNumField(batch.calculateEntryHash())
 	bc.TotalCreditEntryDollarAmount, bc.TotalDebitEntryDollarAmount = batch.calculateBatchAmounts()
-
 	batch.Control = bc
 
 	return nil

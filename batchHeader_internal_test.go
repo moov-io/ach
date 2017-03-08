@@ -5,12 +5,11 @@
 package ach
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 )
 
-func mockBatchHeader() BatchHeader {
+func mockBatchHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = 220
 	bh.StandardEntryClassCode = "PPD"
@@ -28,6 +27,8 @@ func TestParseBatchHeader(t *testing.T) {
 	r := NewReader(strings.NewReader(line))
 	r.line = line
 	err := r.parseBatchHeader()
+	//fmt.Printf("holler %+v \n", r.currentBatch.Header)
+
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
 	}
@@ -88,7 +89,7 @@ func TestBHString(t *testing.T) {
 	if record.String() != line {
 		t.Errorf("Strings do not match")
 
-		fmt.Printf("%s \n %s", line, r.currentBatch.Header.String())
+		//fmt.Printf("%s \n %s", line, r.currentBatch.Header.String())
 	}
 }
 

@@ -33,6 +33,7 @@ func (e *ParseError) Error() string {
 var (
 	ErrFileRead           = errors.New("File could not be read")
 	ErrRecordLen          = errors.New("Wrong number of characters in record expected 94")
+	ErrBatchHeader        = errors.New("None or More than one Batch Headers exist in Batch.")
 	ErrBatchControl       = errors.New("No terminating batch control record found in file for previous batch")
 	ErrUnknownRecordType  = errors.New("Unhandled Record Type")
 	ErrFileHeader         = errors.New("None or more than one File Headers exists")
@@ -57,7 +58,7 @@ type Reader struct {
 	// line is the current line being parsed from the input r
 	line string
 	// currentBatch is the current Batch entries being parsed
-	currentBatch Batch
+	currentBatch *Batch
 	// line number of the file being parsed
 	lineNum int
 	// recordName holds the current record name being parsed.
@@ -76,7 +77,8 @@ func (r *Reader) error(err error) error {
 // NewReader returns a new Reader that reads from r.
 func NewReader(r io.Reader) *Reader {
 	return &Reader{
-		scanner: bufio.NewScanner(r),
+		scanner:      bufio.NewScanner(r),
+		currentBatch: NewBatch(),
 	}
 }
 
@@ -175,7 +177,7 @@ func (r *Reader) parseLine() error {
 			return err
 		}
 		r.File.addBatch(r.currentBatch)
-		r.currentBatch = Batch{}
+		r.currentBatch = new(Batch)
 	case fileControlPos:
 		if err := r.parseFileControl(); err != nil {
 			return err
@@ -208,9 +210,9 @@ func (r *Reader) parseFileHeader() error {
 // parseBatchHeader takes the input record string and parses the FileHeaderRecord values
 func (r *Reader) parseBatchHeader() error {
 	r.recordName = "BatchHeader"
-	if (BatchHeader{}) != r.currentBatch.Header {
+	if r.currentBatch.Header.ServiceClassCode != 0 {
 		// Ensure we have an empty Batch
-		return ErrBatchControl
+		return ErrBatchHeader
 	}
 	r.currentBatch.Header.Parse(r.line)
 	if err := r.currentBatch.Header.Validate(); err != nil {
@@ -222,12 +224,12 @@ func (r *Reader) parseBatchHeader() error {
 // parseEntryDetail takes the input record string and parses the EntryDetailRecord values
 func (r *Reader) parseEntryDetail() error {
 	r.recordName = "EntryDetail"
-	if (BatchHeader{}) == r.currentBatch.Header {
+	if r.currentBatch.Header.ServiceClassCode == 0 {
 		return ErrEntryOutside
 	}
 	sec := r.currentBatch.Header.StandardEntryClassCode
-	if sec == ppd || sec == "IAT" {
-		ed := EntryDetail{}
+	if sec == ppd {
+		ed := new(EntryDetail)
 		ed.Parse(r.line)
 		if err := ed.Validate(); err != nil {
 			return err
@@ -249,7 +251,7 @@ func (r *Reader) parseAddenda() error {
 	entryIndex := len(r.currentBatch.Entries) - 1
 	entry := r.currentBatch.Entries[entryIndex]
 	sec := r.currentBatch.Header.StandardEntryClassCode
-	if sec == ppd || sec == "IAT" {
+	if sec == ppd {
 		if entry.AddendaRecordIndicator == 1 {
 			addenda := Addenda{}
 			addenda.Parse(r.line)
@@ -274,6 +276,7 @@ func (r *Reader) parseAddenda() error {
 // parseBatchControl takes the input record string and parses the BatchControlRecord values
 func (r *Reader) parseBatchControl() error {
 	r.recordName = "BatchControl"
+	//fmt.Printf("control: %+v \n", r.currentBatch.Control)
 	r.currentBatch.Control.Parse(r.line)
 	if err := r.currentBatch.Control.Validate(); err != nil {
 		return err

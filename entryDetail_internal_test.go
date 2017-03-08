@@ -9,11 +9,10 @@ import (
 	"testing"
 )
 
-func mockEntryDetail() EntryDetail {
+func mockEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 22
-	entry.RDFIIdentification = 910129
-	entry.CheckDigit = 8
+	entry.setRDFI(9101298)
 	entry.Amount = 100000000
 	entry.IndividualName = "Wade Arnold"
 	entry.TraceNumber = 123456789
@@ -24,7 +23,7 @@ func mockEntryDetail() EntryDetail {
 func TestParseEntryDetail(t *testing.T) {
 	var line = "62705320001912345            0000010500c-1            Arnold Wade           DD0076401255655291"
 	r := NewReader(strings.NewReader(line))
-	r.currentBatch.Header.StandardEntryClassCode = "PPD"
+	r.currentBatch = NewBatch().setHeader(mockBatchHeader())
 	r.line = line
 	err := r.parseEntryDetail()
 	if err != nil {
@@ -72,7 +71,7 @@ func TestParseEntryDetail(t *testing.T) {
 func TestEDString(t *testing.T) {
 	var line = "62705320001912345            0000010500c-1            Arnold Wade           DD0076401255655291"
 	r := NewReader(strings.NewReader(line))
-	r.currentBatch.Header.StandardEntryClassCode = "PPD"
+	r.currentBatch = NewBatch().setHeader(mockBatchHeader())
 	r.line = line
 	err := r.parseEntryDetail()
 	if err != nil {

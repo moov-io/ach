@@ -79,8 +79,8 @@ type EntryDetail struct {
 }
 
 // NewEntryDetail returns a new EntryDetail with default values for none exported fields
-func NewEntryDetail() EntryDetail {
-	return EntryDetail{
+func NewEntryDetail() *EntryDetail {
+	return &EntryDetail{
 		recordType: "6",
 	}
 }

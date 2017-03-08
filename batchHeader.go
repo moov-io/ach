@@ -90,8 +90,8 @@ type BatchHeader struct {
 }
 
 // NewBatchHeader returns a new BatchHeader with default valus for none exported fields
-func NewBatchHeader() BatchHeader {
-	return BatchHeader{
+func NewBatchHeader() *BatchHeader {
+	return &BatchHeader{
 		recordType:           "5",
 		OriginatorStatusCode: 1,
 		BatchNumber:          1,

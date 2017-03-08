@@ -23,7 +23,7 @@ func TestParseAddenda(t *testing.T) {
 
 	r := NewReader(strings.NewReader(line))
 	r.currentBatch.Header.StandardEntryClassCode = "PPD"
-	r.currentBatch.addEntryDetail(EntryDetail{TransactionCode: 22, AddendaRecordIndicator: 1})
+	r.currentBatch.addEntryDetail(&EntryDetail{TransactionCode: 22, AddendaRecordIndicator: 1})
 	r.line = line
 	err := r.parseAddenda()
 	if err != nil {
@@ -53,7 +53,7 @@ func TestAddendaString(t *testing.T) {
 	var line = "710WEB                                        DIEGO MAY                            00010000001"
 	r := NewReader(strings.NewReader(line))
 	r.currentBatch.Header.StandardEntryClassCode = "PPD"
-	r.currentBatch.addEntryDetail(EntryDetail{AddendaRecordIndicator: 1})
+	r.currentBatch.addEntryDetail(&EntryDetail{AddendaRecordIndicator: 1})
 	r.line = line
 	err := r.parseAddenda()
 	if err != nil {

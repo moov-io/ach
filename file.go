@@ -33,7 +33,7 @@ var (
 // File contains the structures of a parsed ACH File.
 type File struct {
 	Header  FileHeader
-	Batches []Batch
+	Batches []*Batch
 	Control FileControl
 	// converters is composed for ACH to golang Converters
 	converters
@@ -46,10 +46,25 @@ type File struct {
 	totalCreditEntryDollarAmountInFile int
 }
 
+// NewFile constucuts a file template.
+func NewFile() *File {
+	return &File{
+		Header: NewFileHeader(),
+		// Batches: []Batch, TODO need a NewBatch
+		Control: NewFileControl(),
+	}
+}
+
 // addBatch appends a Batch to the ach.File
-func (f *File) addBatch(batch Batch) []Batch {
+func (f *File) addBatch(batch *Batch) []*Batch {
 	f.Batches = append(f.Batches, batch)
 	return f.Batches
+}
+
+// setHeader allows for header to be built.
+func (f *File) setHeader(h FileHeader) *File {
+	f.Header = h
+	return f
 }
 
 // Validate NACHA rules on the entire batch before being added to a File
@@ -79,23 +94,7 @@ func (f *File) ValidateAll() error {
 
 	// validate inward out of the File Struct
 	for _, batch := range f.Batches {
-		for _, entry := range batch.Entries {
-			for _, addenda := range entry.Addendums {
-				if err := addenda.Validate(); err != nil {
-					return err
-				}
-			}
-			if err := entry.Validate(); err != nil {
-				return err
-			}
-		}
-		if err := batch.Header.Validate(); err != nil {
-			return err
-		}
-		if err := batch.Control.Validate(); err != nil {
-			return err
-		}
-		if err := batch.Validate(); err != nil {
+		if err := batch.ValidateAll(); err != nil {
 			return err
 		}
 	}
@@ -157,7 +156,7 @@ func (f *File) isEntryHashMismatch() error {
 func (f *File) calculateEntryHash() string {
 	hash := 0
 	for _, batch := range f.Batches {
-		hash = hash + batch.Control.validate
+		hash = hash + batch.Control.EntryHash
 	}
 	return f.numericField(hash, 10)
 }

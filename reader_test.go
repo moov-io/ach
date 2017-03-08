@@ -21,10 +21,12 @@ func TestPPDDebitRead(t *testing.T) {
 	_, err = r.Read()
 	if err != nil {
 		t.Errorf("Can not ach.read file: %v", err)
+		//fmt.Printf("%+v \n", r.File.Batches[0])
 	}
 	err = r.File.ValidateAll()
 	if err != nil {
 		t.Errorf("Could not validate entire read file: %v", err)
+		//fmt.Printf("%+v", r.File)
 	}
 }
 
@@ -80,7 +82,7 @@ func TestTwoFileControls(t *testing.T) {
 	var line = "9000001000001000000010005320001000000010500000000000000                                       "
 	var twoControls = line + "\n" + line
 	r := NewReader(strings.NewReader(twoControls))
-	batch := Batch{}
+	batch := NewBatch()
 	batch.Control.EntryAddendaCount = 1
 	batch.Control.TotalDebitEntryDollarAmount = 10500
 	r.File.Control.EntryHash = 5320001
@@ -174,7 +176,7 @@ func TestFileEntryDetailNotPPD(t *testing.T) {
 	ed.CheckDigit = 0
 	line := ed.String()
 	r := NewReader(strings.NewReader(line))
-	r.currentBatch.Header = mockBatchHeader()
+	r.currentBatch.setHeader(mockBatchHeader())
 	r.currentBatch.Header.StandardEntryClassCode = "ABCXYZ"
 	_, err := r.Read()
 	if !strings.Contains(err.Error(), "ABCXYZ") {
@@ -222,7 +224,7 @@ func TestFileAddendaNoIndicator(t *testing.T) {
 
 func TestFileBatchControlErr(t *testing.T) {
 	bc := mockBatchControl()
-	bc.validate = 0
+	bc.EntryHash = 0
 	r := NewReader(strings.NewReader(bc.String()))
 	_, err := r.Read()
 	if !strings.Contains(err.Error(), ErrBatchServiceClassMismatch.Error()) {
