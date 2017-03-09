@@ -8,7 +8,9 @@
 // https://en.wikipedia.org/wiki/Automated_Clearing_House
 package ach
 
-import "errors"
+import (
+	"errors"
+)
 
 // First position of all Record Types. These codes are uniquily assigned to
 // the first byte of each row in a file.
@@ -28,6 +30,7 @@ var (
 	ErrFileDebitAmount  = errors.New("Total Debit amount is out-of-balance with File Control")
 	ErrFileCreditAmount = errors.New("Total Credit amount is out-of-balance with File Control")
 	ErrFileEntryHash    = errors.New("Calculated Batch Control Entry hash does not match File Control Entry Hash")
+	ErrFileBatches      = errors.New("File must have []*Batches to be built")
 )
 
 // File contains the structures of a parsed ACH File.
@@ -37,13 +40,6 @@ type File struct {
 	Control FileControl
 	// converters is composed for ACH to golang Converters
 	converters
-
-	// values for constructing file contro file
-	totalRecordsInFile                 int
-	fileEntryAddendaCount              int
-	fileEntryHashSum                   int
-	totalDebitEntryDollarAmountInFile  int
-	totalCreditEntryDollarAmountInFile int
 }
 
 // NewFile constucuts a file template.
@@ -55,14 +51,65 @@ func NewFile() *File {
 	}
 }
 
-// addBatch appends a Batch to the ach.File
-func (f *File) addBatch(batch *Batch) []*Batch {
+// Build creates a valid file and requires that the FileHeader and at least one Batch
+func (f *File) Build() error {
+	// Requires a valid FileHeader to build FileControl
+	if err := f.Header.Validate(); err != nil {
+		return err
+	}
+	// Requires at least one Batch in the new file.
+	if len(f.Batches) <= 0 {
+		return ErrFileBatches
+	}
+	// increment for FileHeader and reset if build was called twice do to error
+	totalRecordsInFile := 1
+	batchSeq := 1
+	fileEntryAddendaCount := 0
+	fileEntryHashSum := 0
+	totalDebitAmount := 0
+	totalCreditAmount := 0
+	for i, batch := range f.Batches {
+		// create ascending batch numbers
+		f.Batches[i].Header.BatchNumber = batchSeq
+		f.Batches[i].Control.BatchNumber = batchSeq
+		batchSeq++
+		// sum file entry and addenda records. Assume batch.Build() batch properly calculated control
+		fileEntryAddendaCount = fileEntryAddendaCount + batch.Control.EntryAddendaCount
+		// add 2 for Batch header/control + entry added count
+		totalRecordsInFile = totalRecordsInFile + 2 + batch.Control.EntryAddendaCount
+		// sum hash from batch control. Assume Batch.Build properly calculated field.
+		fileEntryHashSum = fileEntryHashSum + batch.Control.EntryHash
+		totalDebitAmount = totalDebitAmount + batch.Control.TotalDebitEntryDollarAmount
+		totalCreditAmount = totalCreditAmount + batch.Control.TotalCreditEntryDollarAmount
+
+	}
+	// create FileControl from calculated values
+	fc := NewFileControl()
+	fc.BatchCount = batchSeq - 1
+	// blocking factor of 10 is static default value in f.Header.blockingFactor.
+	if (totalRecordsInFile % 10) != 0 {
+		fc.BlockCount = totalRecordsInFile/10 + 1
+	} else {
+		fc.BlockCount = totalRecordsInFile / 10
+	}
+	fc.BlockCount = totalRecordsInFile
+	fc.EntryAddendaCount = fileEntryAddendaCount
+	fc.EntryHash = fileEntryHashSum
+	fc.TotalDebitEntryDollarAmountInFile = totalDebitAmount
+	fc.TotalCreditEntryDollarAmountInFile = totalCreditAmount
+
+	f.Control = fc
+	return nil
+}
+
+// AddBatch appends a Batch to the ach.File
+func (f *File) AddBatch(batch *Batch) []*Batch {
 	f.Batches = append(f.Batches, batch)
 	return f.Batches
 }
 
-// setHeader allows for header to be built.
-func (f *File) setHeader(h FileHeader) *File {
+// SetHeader allows for header to be built.
+func (f *File) SetHeader(h FileHeader) *File {
 	f.Header = h
 	return f
 }

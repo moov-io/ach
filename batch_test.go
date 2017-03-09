@@ -11,11 +11,11 @@ import (
 
 // TestBatchEntryCountMismatc check for control out-of-balance error.
 func TestBatchEntryCountMismatch(t *testing.T) {
-	mockBatch := NewBatch().setHeader(mockBatchHeader())
+	mockBatch := NewBatch().SetHeader(mockBatchHeader())
 	e := mockEntryDetail()
 	a := mockAddenda()
-	e.addAddenda(a)
-	mockBatch.addEntryDetail(e)
+	e.AddAddenda(a)
+	mockBatch.AddEntryDetail(e)
 	mockBatch.Build()
 	// works properly
 	if err := mockBatch.Validate(); err != nil {
@@ -31,8 +31,8 @@ func TestBatchEntryCountMismatch(t *testing.T) {
 }
 
 func TestBatchServiceClassMismatch(t *testing.T) {
-	mockBatch := NewBatch().setHeader(mockBatchHeader())
-	mockBatch.addEntryDetail(mockEntryDetail())
+	mockBatch := NewBatch().SetHeader(mockBatchHeader())
+	mockBatch.AddEntryDetail(mockEntryDetail())
 	mockBatch.Build()
 
 	// works properly
@@ -49,8 +49,8 @@ func TestBatchServiceClassMismatch(t *testing.T) {
 }
 
 func TestBatchCompanyIdentification(t *testing.T) {
-	mockBatch := NewBatch().setHeader(mockBatchHeader())
-	mockBatch.addEntryDetail(mockEntryDetail())
+	mockBatch := NewBatch().SetHeader(mockBatchHeader())
+	mockBatch.AddEntryDetail(mockEntryDetail())
 	mockBatch.Build()
 	// works properly
 	if err := mockBatch.Validate(); err != nil {
@@ -66,8 +66,8 @@ func TestBatchCompanyIdentification(t *testing.T) {
 }
 
 func TestBatchODFIIDMismatch(t *testing.T) {
-	mockBatch := NewBatch().setHeader(mockBatchHeader())
-	mockBatch.addEntryDetail(mockEntryDetail())
+	mockBatch := NewBatch().SetHeader(mockBatchHeader())
+	mockBatch.AddEntryDetail(mockEntryDetail())
 	mockBatch.Build()
 	// works properly
 	if err := mockBatch.Validate(); err != nil {
@@ -83,8 +83,8 @@ func TestBatchODFIIDMismatch(t *testing.T) {
 }
 
 func TestBatchNumberMismatch(t *testing.T) {
-	mockBatch := NewBatch().setHeader(mockBatchHeader())
-	mockBatch.addEntryDetail(mockEntryDetail())
+	mockBatch := NewBatch().SetHeader(mockBatchHeader())
+	mockBatch.AddEntryDetail(mockEntryDetail())
 	mockBatch.Build()
 	// works properly
 	if err := mockBatch.Validate(); err != nil {
@@ -100,9 +100,9 @@ func TestBatchNumberMismatch(t *testing.T) {
 }
 
 func TestBatchIsSequenceAscending(t *testing.T) {
-	mockBatch := NewBatch().setHeader(mockBatchHeader())
-	mockBatch.addEntryDetail(mockEntryDetail())
-	mockBatch.addEntryDetail(mockEntryDetail())
+	mockBatch := NewBatch().SetHeader(mockBatchHeader())
+	mockBatch.AddEntryDetail(mockEntryDetail())
+	mockBatch.AddEntryDetail(mockEntryDetail())
 	mockBatch.Build()
 	// works properly
 	if err := mockBatch.Validate(); err != nil {
@@ -111,7 +111,7 @@ func TestBatchIsSequenceAscending(t *testing.T) {
 	// create error
 	e3 := mockEntryDetail()
 	e3.TraceNumber = 0
-	mockBatch.addEntryDetail(e3)
+	mockBatch.AddEntryDetail(e3)
 	mockBatch.Control.EntryAddendaCount = 3
 	if err := mockBatch.Validate(); err != nil {
 		if err != ErrBatchAscendingTraceNumber {
@@ -122,15 +122,15 @@ func TestBatchIsSequenceAscending(t *testing.T) {
 
 // isBatchAmountMismatch
 func TestCreditBatchIsBatchAmountMismatch(t *testing.T) {
-	mockBatch := NewBatch().setHeader(mockBatchHeader())
+	mockBatch := NewBatch().SetHeader(mockBatchHeader())
 	e1 := mockEntryDetail()
 	e1.TransactionCode = 22
 	e1.Amount = 100
 	e2 := mockEntryDetail()
 	e2.TransactionCode = 22
 	e2.Amount = 100
-	mockBatch.addEntryDetail(e1)
-	mockBatch.addEntryDetail(e2)
+	mockBatch.AddEntryDetail(e1)
+	mockBatch.AddEntryDetail(e2)
 	mockBatch.Build()
 	// works properly
 	if err := mockBatch.Validate(); err != nil {
@@ -146,15 +146,15 @@ func TestCreditBatchIsBatchAmountMismatch(t *testing.T) {
 }
 
 func TestSavingsBatchIsBatchAmountMismatch(t *testing.T) {
-	mockBatch := NewBatch().setHeader(mockBatchHeader())
+	mockBatch := NewBatch().SetHeader(mockBatchHeader())
 	e1 := mockEntryDetail()
 	e1.TransactionCode = 32
 	e1.Amount = 100
 	e2 := mockEntryDetail()
 	e2.TransactionCode = 37
 	e2.Amount = 100
-	mockBatch.addEntryDetail(e1)
-	mockBatch.addEntryDetail(e2)
+	mockBatch.AddEntryDetail(e1)
+	mockBatch.AddEntryDetail(e2)
 	mockBatch.Build()
 	// works properly
 	if err := mockBatch.Validate(); err != nil {
@@ -170,9 +170,9 @@ func TestSavingsBatchIsBatchAmountMismatch(t *testing.T) {
 }
 
 func TestBatchIsEntryHashMismatch(t *testing.T) {
-	mockBatch := NewBatch().setHeader(mockBatchHeader())
-	mockBatch.addEntryDetail(mockEntryDetail())
-	mockBatch.addEntryDetail(mockEntryDetail())
+	mockBatch := NewBatch().SetHeader(mockBatchHeader())
+	mockBatch.AddEntryDetail(mockEntryDetail())
+	mockBatch.AddEntryDetail(mockEntryDetail())
 	mockBatch.Build()
 	// works properly
 	if err := mockBatch.Validate(); err != nil {
@@ -189,8 +189,8 @@ func TestBatchIsEntryHashMismatch(t *testing.T) {
 
 // isOriginatorDNEMismatch
 func TestBatchIsOriginatorDNEMismatch(t *testing.T) {
-	mockBatch := NewBatch().setHeader(mockBatchHeader())
-	mockBatch.addEntryDetail(mockEntryDetail())
+	mockBatch := NewBatch().SetHeader(mockBatchHeader())
+	mockBatch.AddEntryDetail(mockEntryDetail())
 	mockBatch.Build()
 	// works properly
 	if err := mockBatch.Validate(); err != nil {
@@ -208,8 +208,8 @@ func TestBatchIsOriginatorDNEMismatch(t *testing.T) {
 
 // ErrBatchTraceNumberNotODFI
 func TestBatchTraceNumberNotODFI(t *testing.T) {
-	mockBatch := NewBatch().setHeader(mockBatchHeader())
-	mockBatch.addEntryDetail(mockEntryDetail())
+	mockBatch := NewBatch().SetHeader(mockBatchHeader())
+	mockBatch.AddEntryDetail(mockEntryDetail())
 	mockBatch.Build()
 	// works properly
 	if err := mockBatch.Validate(); err != nil {
@@ -226,10 +226,10 @@ func TestBatchTraceNumberNotODFI(t *testing.T) {
 
 // ErrBatchAddendaIndicator
 func TestBatchAddendaIndicator(t *testing.T) {
-	mockBatch := NewBatch().setHeader(mockBatchHeader())
+	mockBatch := NewBatch().SetHeader(mockBatchHeader())
 	ed := mockEntryDetail()
-	ed.addAddenda(mockAddenda())
-	mockBatch.addEntryDetail(ed)
+	ed.AddAddenda(mockAddenda())
+	mockBatch.AddEntryDetail(ed)
 	mockBatch.Build()
 
 	// works properly
@@ -247,10 +247,10 @@ func TestBatchAddendaIndicator(t *testing.T) {
 
 // isAddendaSequence
 func TestBatchAddendaSequence(t *testing.T) {
-	mockBatch := NewBatch().setHeader(mockBatchHeader())
+	mockBatch := NewBatch().SetHeader(mockBatchHeader())
 	ed := mockEntryDetail()
-	ed.addAddenda(mockAddenda())
-	mockBatch.addEntryDetail(ed)
+	ed.AddAddenda(mockAddenda())
+	mockBatch.AddEntryDetail(ed)
 	mockBatch.Build()
 	// works properly
 	if err := mockBatch.Validate(); err != nil {
@@ -267,11 +267,11 @@ func TestBatchAddendaSequence(t *testing.T) {
 
 // ErrBatchAddendaTraceNumber
 func TestBatchAddendaTraceNumber(t *testing.T) {
-	mockBatch := NewBatch().setHeader(mockBatchHeader())
+	mockBatch := NewBatch().SetHeader(mockBatchHeader())
 	ed := mockEntryDetail()
-	ed.addAddenda(mockAddenda())
-	ed.addAddenda(mockAddenda())
-	mockBatch.addEntryDetail(ed)
+	ed.AddAddenda(mockAddenda())
+	ed.AddAddenda(mockAddenda())
+	mockBatch.AddEntryDetail(ed)
 	mockBatch.Build()
 
 	// works properly
@@ -310,9 +310,9 @@ func TestBatchBuild(t *testing.T) {
 	entry.setTraceNumber(header.ODFIIdentification, 1)
 	a1 := NewAddenda()
 	a2 := NewAddenda()
-	entry.addAddenda(a1)
-	entry.addAddenda(a2)
-	mockBatch.addEntryDetail(entry)
+	entry.AddAddenda(a1)
+	entry.AddAddenda(a2)
+	mockBatch.AddEntryDetail(entry)
 	if err := mockBatch.Build(); err != nil {
 		t.Errorf("Unexpected Batch.Build error: %v", err.Error())
 	}

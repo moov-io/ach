@@ -29,7 +29,7 @@ func TestParseBatchControl(t *testing.T) {
 	r.currentBatch.Header.CompanyIdentification = "origid"
 	r.currentBatch.Header.ODFIIdentification = 7640125
 
-	r.currentBatch.addEntryDetail(&EntryDetail{TransactionCode: 27, Amount: 10500, RDFIIdentification: 5320001, TraceNumber: 76401255655291})
+	r.currentBatch.AddEntryDetail(&EntryDetail{TransactionCode: 27, Amount: 10500, RDFIIdentification: 5320001, TraceNumber: 76401255655291})
 	//fmt.Printf("%+v \n", r.line)
 	err := r.parseBatchControl()
 	if err != nil {
@@ -81,7 +81,7 @@ func TestBCString(t *testing.T) {
 	r.currentBatch.Header.ServiceClassCode = 225
 	r.currentBatch.Header.CompanyIdentification = "origid"
 	r.currentBatch.Header.ODFIIdentification = 7640125
-	r.currentBatch.addEntryDetail(&EntryDetail{TransactionCode: 27, Amount: 10500, RDFIIdentification: 5320001, TraceNumber: 76401255655291})
+	r.currentBatch.AddEntryDetail(&EntryDetail{TransactionCode: 27, Amount: 10500, RDFIIdentification: 5320001, TraceNumber: 76401255655291})
 	err := r.parseBatchControl()
 	if err != nil {
 		t.Errorf("unknown error: %v", err)

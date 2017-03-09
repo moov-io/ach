@@ -16,6 +16,8 @@ func mockFileHeader() FileHeader {
 	fh.ImmediateDestination = 9876543210
 	fh.ImmediateOrigin = 1234567890
 	fh.FileCreationDate = time.Now()
+	fh.ImmediateDestinationName = "Federal Reserve Bank"
+	fh.ImmediateOriginName = "My Bank Name"
 	return fh
 }
 
