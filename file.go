@@ -136,7 +136,7 @@ func (f *File) Validate() error {
 	return nil
 }
 
-// ValidateAll walks the enture file data structure and validates each record
+// ValidateAll walks the enture data structure and validates each record
 func (f *File) ValidateAll() error {
 
 	// validate inward out of the File Struct
