@@ -14,7 +14,9 @@ Package 'moov-io/ach' implements a file reader and writer for parsing [ACH](http
 
 ACH is at an early stage and under active development. Please star the project if you are interested in its development or join the development.
 
-## Install
+Library currently supports the reading and writting of PPD (Prearranged payment and deposits)
+
+## Usage and examples
 
 With a [correctly configured](https://golang.org/doc/install#testing) Go toolchain:
 
@@ -22,6 +24,9 @@ With a [correctly configured](https://golang.org/doc/install#testing) Go toolcha
 go get -u github.com/moov-io/ach
 ```
 
+See [godoc.org/github.com/moov-io/ach](https://godoc.org/github.com/moov-io/ach) for usage.
+
+Examples exist in projects [example](https://github.com/moov-io/ach/tree/master/example) folder 
 
 # Contributing
 
