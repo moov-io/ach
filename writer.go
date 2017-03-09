@@ -26,39 +26,36 @@ func NewWriter(w io.Writer) *Writer {
 }
 
 // Writer writes a single ach.file record to w
-func (w *Writer) Write(file File) error {
+func (w *Writer) Write(file *File) error {
 	// TODO: add ValidateAll to ach.file to recursively ensure we have a valid records
 	if err := file.ValidateAll(); err != nil {
 		return err
 	}
 
 	// Iterate over all records in the file
-	if _, err := w.w.WriteString(file.Header.String()); err != nil {
+	if _, err := w.w.WriteString(file.Header.String() + "\n"); err != nil {
 		return err
 	}
 
-	if _, err := w.w.WriteString(file.Header.String()); err != nil {
-		return err
-	}
 	for _, batch := range file.Batches {
-		if _, err := w.w.WriteString(batch.Header.String()); err != nil {
+		if _, err := w.w.WriteString(batch.Header.String() + "\n"); err != nil {
 			return err
 		}
 		for _, entry := range batch.Entries {
-			if _, err := w.w.WriteString(entry.String()); err != nil {
+			if _, err := w.w.WriteString(entry.String() + "\n"); err != nil {
 				return err
 			}
 			for _, addenda := range entry.Addendums {
-				if _, err := w.w.WriteString(addenda.String()); err != nil {
+				if _, err := w.w.WriteString(addenda.String() + "\n"); err != nil {
 					return err
 				}
 			}
 		}
-		if _, err := w.w.WriteString(batch.Control.String()); err != nil {
+		if _, err := w.w.WriteString(batch.Control.String() + "\n"); err != nil {
 			return err
 		}
 	}
-	if _, err := w.w.WriteString(file.Control.String()); err != nil {
+	if _, err := w.w.WriteString(file.Control.String() + "\n"); err != nil {
 		return err
 	}
 
@@ -78,7 +75,7 @@ func (w *Writer) Error() error {
 }
 
 // WriteAll writes multiple ach.fieles to w using Write and then calls Flush.
-func (w *Writer) WriteAll(files []File) error {
+func (w *Writer) WriteAll(files []*File) error {
 	for _, file := range files {
 		err := w.Write(file)
 		// TODO if one of the files errors at a Writer struct flag to decide if

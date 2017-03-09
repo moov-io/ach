@@ -8,7 +8,9 @@
 // https://en.wikipedia.org/wiki/Automated_Clearing_House
 package ach
 
-import "errors"
+import (
+	"errors"
+)
 
 // First position of all Record Types. These codes are uniquily assigned to
 // the first byte of each row in a file.
@@ -28,6 +30,7 @@ var (
 	ErrFileDebitAmount  = errors.New("Total Debit amount is out-of-balance with File Control")
 	ErrFileCreditAmount = errors.New("Total Credit amount is out-of-balance with File Control")
 	ErrFileEntryHash    = errors.New("Calculated Batch Control Entry hash does not match File Control Entry Hash")
+	ErrFileBatches      = errors.New("File must have []*Batches to be built")
 )
 
 // File contains the structures of a parsed ACH File.
@@ -37,13 +40,6 @@ type File struct {
 	Control FileControl
 	// converters is composed for ACH to golang Converters
 	converters
-
-	// values for constructing file contro file
-	totalRecordsInFile                 int
-	fileEntryAddendaCount              int
-	fileEntryHashSum                   int
-	totalDebitEntryDollarAmountInFile  int
-	totalCreditEntryDollarAmountInFile int
 }
 
 // NewFile constucuts a file template.
@@ -53,6 +49,64 @@ func NewFile() *File {
 		// Batches: []Batch, TODO need a NewBatch
 		Control: NewFileControl(),
 	}
+}
+
+// Build creates a valid file and requires that the FileHeader and at least one Batch
+func (f *File) Build() error {
+	// Requires a valid FileHeader to build FileControl
+	if err := f.Header.Validate(); err != nil {
+		return err
+	}
+	// Requires at least one Batch in the new file.
+	if len(f.Batches) <= 0 {
+		return ErrFileBatches
+	}
+	// TODO calculates sum of all recieving depository in each 6 record Entry Details. If Sum is is more than 10 positions, truncate left most Numbers #90
+	// TODO calculates Hash Sum of all recieving depository funancial instiutions in '6' record EntryDetail. If the sum is more than 10, truncate leftmost numbers #91
+	// TODO calculates total of all debit abounts in '8' record Batch Control #92
+	// TODO calculates total of all credit amounts in '8' record Batch Control #93
+	// TODO calculate blocking as devisable by 10 factor and write 9'z for remainder #94
+	// TODO calculate Block Count contains the number of blocks (a block is 940 characters) in the File, including both the File Header and File Control Records. #95
+
+	// increment for FileHeader and reset if build was called twice do to error
+	totalRecordsInFile := 1
+	batchSeq := 1
+	fileEntryAddendaCount := 0
+	fileEntryHashSum := 0
+	totalDebitAmount := 0
+	totalCreditAmount := 0
+	for i, batch := range f.Batches {
+		// create ascending batch numbers
+		f.Batches[i].Header.BatchNumber = batchSeq
+		f.Batches[i].Control.BatchNumber = batchSeq
+		batchSeq++
+		// sum file entry and addenda records. Assume batch.Build() batch properly calculated control
+		fileEntryAddendaCount = fileEntryAddendaCount + batch.Control.EntryAddendaCount
+		// add 2 for Batch header/control + entry added count
+		totalRecordsInFile = totalRecordsInFile + 2 + batch.Control.EntryAddendaCount
+		// sum hash from batch control. Assume Batch.Build properly calculated field.
+		fileEntryHashSum = fileEntryHashSum + batch.Control.EntryHash
+		totalDebitAmount = totalDebitAmount + batch.Control.TotalDebitEntryDollarAmount
+		totalCreditAmount = totalCreditAmount + batch.Control.TotalCreditEntryDollarAmount
+
+	}
+	// create FileControl from calculated values
+	fc := NewFileControl()
+	fc.BatchCount = batchSeq - 1
+	// blocking factor of 10 is static default value in f.Header.blockingFactor.
+	if (totalRecordsInFile % 10) != 0 {
+		fc.BlockCount = totalRecordsInFile/10 + 1
+	} else {
+		fc.BlockCount = totalRecordsInFile / 10
+	}
+	fc.BlockCount = totalRecordsInFile
+	fc.EntryAddendaCount = fileEntryAddendaCount
+	fc.EntryHash = fileEntryHashSum
+	fc.TotalDebitEntryDollarAmountInFile = totalDebitAmount
+	fc.TotalCreditEntryDollarAmountInFile = totalCreditAmount
+
+	f.Control = fc
+	return nil
 }
 
 // addBatch appends a Batch to the ach.File
