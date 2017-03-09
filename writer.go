@@ -7,6 +7,7 @@ package ach
 import (
 	"bufio"
 	"io"
+	"strings"
 )
 
 // A Writer writes an ach.file to a NACHA encoded file.
@@ -15,7 +16,8 @@ import (
 // NACHA formted files.
 //
 type Writer struct {
-	w *bufio.Writer
+	w       *bufio.Writer
+	lineNum int //current line being written
 }
 
 // NewWriter returns a new Writer that writes to w.
@@ -27,36 +29,49 @@ func NewWriter(w io.Writer) *Writer {
 
 // Writer writes a single ach.file record to w
 func (w *Writer) Write(file *File) error {
-	// TODO: add ValidateAll to ach.file to recursively ensure we have a valid records
 	if err := file.ValidateAll(); err != nil {
 		return err
 	}
 
+	w.lineNum = 0
 	// Iterate over all records in the file
 	if _, err := w.w.WriteString(file.Header.String() + "\n"); err != nil {
 		return err
 	}
+	w.lineNum++
 
 	for _, batch := range file.Batches {
 		if _, err := w.w.WriteString(batch.Header.String() + "\n"); err != nil {
 			return err
 		}
+		w.lineNum++
 		for _, entry := range batch.Entries {
 			if _, err := w.w.WriteString(entry.String() + "\n"); err != nil {
 				return err
 			}
+			w.lineNum++
 			for _, addenda := range entry.Addendums {
 				if _, err := w.w.WriteString(addenda.String() + "\n"); err != nil {
 					return err
 				}
+				w.lineNum++
 			}
 		}
 		if _, err := w.w.WriteString(batch.Control.String() + "\n"); err != nil {
 			return err
 		}
+		w.lineNum++
 	}
 	if _, err := w.w.WriteString(file.Control.String() + "\n"); err != nil {
 		return err
+	}
+	w.lineNum++
+
+	// pad the final block
+	for i := 0; i < w.lineNum%10; i++ {
+		if _, err := w.w.WriteString(strings.Repeat("9", 94) + "\n"); err != nil {
+			return err
+		}
 	}
 
 	return nil

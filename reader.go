@@ -41,7 +41,6 @@ var (
 	ErrEntryOutside       = errors.New("Entry Detail record outside of a batch")
 	ErrAddendaOutside     = errors.New("Entry Addenda without a preceding Entry Detail")
 	ErrAddendaNoIndicator = errors.New("Addenda without Entry Detail Addenda Inicator")
-	//Err
 )
 
 // currently support SEC codes
@@ -179,6 +178,10 @@ func (r *Reader) parseLine() error {
 		r.File.addBatch(r.currentBatch)
 		r.currentBatch = new(Batch)
 	case fileControlPos:
+		if r.line[:2] == "99" {
+			// final blocking padding
+			break
+		}
 		if err := r.parseFileControl(); err != nil {
 			return err
 		}

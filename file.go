@@ -61,13 +61,6 @@ func (f *File) Build() error {
 	if len(f.Batches) <= 0 {
 		return ErrFileBatches
 	}
-	// TODO calculates sum of all recieving depository in each 6 record Entry Details. If Sum is is more than 10 positions, truncate left most Numbers #90
-	// TODO calculates Hash Sum of all recieving depository funancial instiutions in '6' record EntryDetail. If the sum is more than 10, truncate leftmost numbers #91
-	// TODO calculates total of all debit abounts in '8' record Batch Control #92
-	// TODO calculates total of all credit amounts in '8' record Batch Control #93
-	// TODO calculate blocking as devisable by 10 factor and write 9'z for remainder #94
-	// TODO calculate Block Count contains the number of blocks (a block is 940 characters) in the File, including both the File Header and File Control Records. #95
-
 	// increment for FileHeader and reset if build was called twice do to error
 	totalRecordsInFile := 1
 	batchSeq := 1

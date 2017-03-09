@@ -28,7 +28,7 @@ func TestPPDWrite(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unexpected error: %s\n", err)
 	}
-
+	//	fmt.Print(b.String())
 	r := NewReader(strings.NewReader(b.String()))
 	_, err = r.Read()
 	if err != nil {
