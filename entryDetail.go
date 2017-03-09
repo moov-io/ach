@@ -31,9 +31,9 @@ type EntryDetail struct {
 	// CheckDigit the last digit of the RDFI's routing number
 	CheckDigit int
 
-	// dfiAccountNumber is the receiver's bank account number you are crediting/debiting.
+	// DFIAccountNumber is the receiver's bank account number you are crediting/debiting.
 	// It important to note that this is an alphanumeric field, so its space padded, no zero padded
-	dfiAccountNumber string
+	DFIAccountNumber string
 
 	// Amount Number of cents you are debiting/crediting this account
 	Amount int
@@ -96,7 +96,7 @@ func (ed *EntryDetail) Parse(record string) {
 	// 12-12 The last digit of the RDFI's routing number
 	ed.CheckDigit = ed.parseNumField(record[11:12])
 	// 13-29 The receiver's bank account number you are crediting/debiting
-	ed.dfiAccountNumber = record[12:29]
+	ed.DFIAccountNumber = record[12:29]
 	// 30-39 Number of cents you are debiting/crediting this account
 	ed.Amount = ed.parseNumField(record[29:39])
 	// 40-54 An internal identification (alphanumeric) that you use to uniquely identify this Entry Detail Record
@@ -120,7 +120,7 @@ func (ed *EntryDetail) String() string {
 		ed.TransactionCode,
 		ed.RDFIIdentificationField(),
 		ed.CheckDigit,
-		ed.DFIAccountNumber(),
+		ed.DFIAccountNumberField(),
 		ed.AmountField(),
 		ed.IndividualIdentificationNumberField(),
 		ed.IndividualNameField(),
@@ -141,8 +141,8 @@ func (ed *EntryDetail) Validate() error {
 	if err := ed.isTransactionCode(ed.TransactionCode); err != nil {
 		return &ValidateError{FieldName: "TransactionCode", Value: string(ed.TransactionCode), Err: err}
 	}
-	if err := ed.isAlphanumeric(ed.dfiAccountNumber); err != nil {
-		return &ValidateError{FieldName: "dfiAccountNumber", Value: ed.dfiAccountNumber, Err: err}
+	if err := ed.isAlphanumeric(ed.DFIAccountNumber); err != nil {
+		return &ValidateError{FieldName: "DFIAccountNumber", Value: ed.DFIAccountNumber, Err: err}
 	}
 	if err := ed.isAlphanumeric(ed.IndividualIdentificationNumber); err != nil {
 		return &ValidateError{FieldName: "IndividualIdentificationNumber", Value: ed.IndividualIdentificationNumber, Err: err}
@@ -173,6 +173,9 @@ func (ed *EntryDetail) fieldInclusion() error {
 	}
 	if ed.CheckDigit == 0 {
 		return &ValidateError{FieldName: "CheckDigit", Value: string(ed.CheckDigit), Err: ErrValidFieldInclusion}
+	}
+	if ed.DFIAccountNumber == "" {
+		return &ValidateError{FieldName: "DFIAccountNumber", Value: ed.DFIAccountNumber, Err: ErrValidFieldInclusion}
 	}
 	if ed.Amount == 0 {
 		return &ValidateError{FieldName: "Amount", Value: string(ed.Amount), Err: ErrValidFieldInclusion}
@@ -212,9 +215,9 @@ func (ed *EntryDetail) RDFIIdentificationField() string {
 	return ed.numericField(ed.RDFIIdentification, 8)
 }
 
-// DFIAccountNumber gets the dfiAccountNumber with space padding
-func (ed *EntryDetail) DFIAccountNumber() string {
-	return ed.alphaField(ed.dfiAccountNumber, 17)
+// DFIAccountNumberField gets the DFIAccountNumber with space padding
+func (ed *EntryDetail) DFIAccountNumberField() string {
+	return ed.alphaField(ed.DFIAccountNumber, 17)
 }
 
 // AmountField returns a zero padded string of amount

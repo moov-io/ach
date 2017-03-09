@@ -303,7 +303,7 @@ func TestBatchBuild(t *testing.T) {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 22                            // ACH Credit
 	entry.SetRDFI(81086674)                               // scottrade bank routing number
-	entry.dfiAccountNumber = "62292250"                   // scottrade account number
+	entry.DFIAccountNumber = "62292250"                   // scottrade account number
 	entry.Amount = 1000000                                // 1k dollars
 	entry.IndividualIdentificationNumber = "658-888-2468" // Unique ID for payment
 	entry.IndividualName = "Wade Arnold"

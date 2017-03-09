@@ -13,6 +13,7 @@ func mockEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 22
 	entry.SetRDFI(9101298)
+	entry.DFIAccountNumber = "123456789"
 	entry.Amount = 100000000
 	entry.IndividualName = "Wade Arnold"
 	entry.TraceNumber = 123456789
@@ -43,8 +44,8 @@ func TestParseEntryDetail(t *testing.T) {
 	if record.CheckDigit != 9 {
 		t.Errorf("CheckDigit Expected '9' got: %v", record.CheckDigit)
 	}
-	if record.DFIAccountNumber() != "12345            " {
-		t.Errorf("DfiAccountNumber Expected '12345            ' got: %v", record.DFIAccountNumber())
+	if record.DFIAccountNumberField() != "12345            " {
+		t.Errorf("DfiAccountNumber Expected '12345            ' got: %v", record.DFIAccountNumberField())
 	}
 	if record.AmountField() != "0000010500" {
 		t.Errorf("Amount Expected '0000010500' got: %v", record.AmountField())
@@ -129,7 +130,7 @@ func TestEDdfiAccountNumberAlphaNumeric(t *testing.T) {
 		t.Errorf("Unexpected Entry Detail error: %v", err.Error())
 	}
 	// create error is mismatch
-	ed.dfiAccountNumber = "74647#999!"
+	ed.DFIAccountNumber = "74647#999!"
 	if err := ed.Validate(); err != nil {
 		_, ok := err.(*ValidateError)
 		if !ok {
