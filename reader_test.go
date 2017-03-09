@@ -86,7 +86,7 @@ func TestTwoFileControls(t *testing.T) {
 	batch.Control.EntryAddendaCount = 1
 	batch.Control.TotalDebitEntryDollarAmount = 10500
 	r.File.Control.EntryHash = 5320001
-	r.File.addBatch(batch)
+	r.File.AddBatch(batch)
 	_, err := r.Read()
 
 	if !strings.Contains(err.Error(), ErrFileControl.Error()) {
@@ -176,7 +176,7 @@ func TestFileEntryDetailNotPPD(t *testing.T) {
 	ed.CheckDigit = 0
 	line := ed.String()
 	r := NewReader(strings.NewReader(line))
-	r.currentBatch.setHeader(mockBatchHeader())
+	r.currentBatch.SetHeader(mockBatchHeader())
 	r.currentBatch.Header.StandardEntryClassCode = "ABCXYZ"
 	_, err := r.Read()
 	if !strings.Contains(err.Error(), "ABCXYZ") {
@@ -190,7 +190,7 @@ func TestFileAddenda(t *testing.T) {
 	ed := mockEntryDetail()
 	addenda := mockAddenda()
 	addenda.SequenceNumber = 0
-	ed.addAddenda(addenda)
+	ed.AddAddenda(addenda)
 	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendums[0].String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()

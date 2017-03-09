@@ -12,13 +12,13 @@ import (
 // TestBatchCountError tests for to many batch counts
 func TestBatchCountError(t *testing.T) {
 	r := NewReader(strings.NewReader(" "))
-	r.File.addBatch(NewBatch())
+	r.File.AddBatch(NewBatch())
 	r.File.Control.BatchCount = 1
 	if err := r.File.Validate(); err != nil {
 		t.Errorf("Unexpected File.Validation error: %v", err.Error())
 	}
 	// More batches than the file control count.
-	r.File.addBatch(&Batch{})
+	r.File.AddBatch(&Batch{})
 	if err := r.File.Validate(); err != nil {
 		if err != ErrFileBatchCount {
 			t.Errorf("Unexpected File.Validation error: %v", err.Error())
@@ -30,7 +30,7 @@ func TestFileEntryAddendaError(t *testing.T) {
 	r := NewReader(strings.NewReader(" "))
 	mockBatch := NewBatch()
 	mockBatch.Control.EntryAddendaCount = 1
-	r.File.addBatch(mockBatch)
+	r.File.AddBatch(mockBatch)
 	r.File.Control.BatchCount = 1
 	r.File.Control.EntryAddendaCount = 1
 	if err := r.File.Validate(); err != nil {
@@ -53,7 +53,7 @@ func TestFileDebitAmount(t *testing.T) {
 	mockBatch.Control.EntryAddendaCount = 1
 	mockBatch.Control.TotalDebitEntryDollarAmount = 10500
 
-	r.File.addBatch(mockBatch)
+	r.File.AddBatch(mockBatch)
 	r.File.Control.BatchCount = 1
 	r.File.Control.EntryAddendaCount = 1
 	r.File.Control.TotalDebitEntryDollarAmountInFile = 10500
@@ -76,7 +76,7 @@ func TestFileCreditAmount(t *testing.T) {
 	mockBatch.Control.EntryAddendaCount = 1
 	mockBatch.Control.TotalCreditEntryDollarAmount = 10500
 
-	r.File.addBatch(mockBatch)
+	r.File.AddBatch(mockBatch)
 	r.File.Control.BatchCount = 1
 	r.File.Control.EntryAddendaCount = 1
 	r.File.Control.TotalCreditEntryDollarAmountInFile = 10500
@@ -105,8 +105,8 @@ func TestFileEntryHash(t *testing.T) {
 	mockBatch2.Control.TotalCreditEntryDollarAmount = 10500
 	mockBatch2.Control.EntryHash = 2121212121
 
-	r.File.addBatch(mockBatch1)
-	r.File.addBatch(mockBatch2)
+	r.File.AddBatch(mockBatch1)
+	r.File.AddBatch(mockBatch2)
 
 	r.File.Control.BatchCount = 2
 	r.File.Control.EntryAddendaCount = 2

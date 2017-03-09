@@ -102,14 +102,14 @@ func (f *File) Build() error {
 	return nil
 }
 
-// addBatch appends a Batch to the ach.File
-func (f *File) addBatch(batch *Batch) []*Batch {
+// AddBatch appends a Batch to the ach.File
+func (f *File) AddBatch(batch *Batch) []*Batch {
 	f.Batches = append(f.Batches, batch)
 	return f.Batches
 }
 
-// setHeader allows for header to be built.
-func (f *File) setHeader(h FileHeader) *File {
+// SetHeader allows for header to be built.
+func (f *File) SetHeader(h FileHeader) *File {
 	f.Header = h
 	return f
 }

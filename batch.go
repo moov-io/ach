@@ -37,7 +37,7 @@ type Batch struct {
 
 // NewBatch returns an *Batch
 func NewBatch() *Batch {
-	return new(Batch).setHeader(NewBatchHeader()).setControl(NewBatchControl())
+	return new(Batch).SetHeader(NewBatchHeader()).SetControl(NewBatchControl())
 }
 
 // Validate NACHA rules on the entire batch before being added to a File
@@ -154,21 +154,21 @@ func (batch *Batch) Build() error {
 	return nil
 }
 
-// setHeader appends an BatchHeader to the Batch
-func (batch *Batch) setHeader(batchHeader *BatchHeader) *Batch {
+// SetHeader appends an BatchHeader to the Batch
+func (batch *Batch) SetHeader(batchHeader *BatchHeader) *Batch {
 	batch.Header = batchHeader
 	return batch
 }
 
-// setControl appends an BatchControl to the Batch
-func (batch *Batch) setControl(batchControl *BatchControl) *Batch {
+// SetControl appends an BatchControl to the Batch
+func (batch *Batch) SetControl(batchControl *BatchControl) *Batch {
 	batch.Control = batchControl
 	return batch
 }
 
-// addEntryDetail appends an EntryDetail to the Batch
-//func (batch *Batch) addEntryDetail(entry EntryDetail) []EntryDetail {
-func (batch *Batch) addEntryDetail(entry *EntryDetail) *Batch {
+// AddEntryDetail appends an EntryDetail to the Batch
+//func (batch *Batch) AddEntryDetail(entry EntryDetail) []EntryDetail {
+func (batch *Batch) AddEntryDetail(entry *EntryDetail) *Batch {
 	//entry.setTraceNumber(batch.Header.ODFIIdentification, 1)
 	batch.Entries = append(batch.Entries, entry)
 	//	return batch.Entries

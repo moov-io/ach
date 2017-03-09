@@ -7,12 +7,12 @@ import (
 )
 
 func TestPPDWrite(t *testing.T) {
-	file := NewFile().setHeader(mockFileHeader())
+	file := NewFile().SetHeader(mockFileHeader())
 	entry := mockEntryDetail()
-	entry.addAddenda(mockAddenda())
-	batch := NewBatch().setHeader(mockBatchHeader()).addEntryDetail(entry)
+	entry.AddAddenda(mockAddenda())
+	batch := NewBatch().SetHeader(mockBatchHeader()).AddEntryDetail(entry)
 	batch.Build()
-	file.addBatch(batch)
+	file.AddBatch(batch)
 	file.Build()
 	if err := file.Build(); err != nil {
 		t.Errorf("Could not build file: %v", err)

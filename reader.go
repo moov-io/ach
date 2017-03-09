@@ -126,10 +126,6 @@ func (r *Reader) Read() (File, error) {
 		return r.File, r.error(ErrFileControl)
 	}
 
-	// TODO: Validate cross Record type values
-
-	// TODO: number of lines in file must be divisable by 10 the blocking factor
-	// TODO: Validate File Control Blocking factor is the total number of blocks. lines/10 = blocks
 	return r.File, nil
 }
 
@@ -175,7 +171,7 @@ func (r *Reader) parseLine() error {
 			r.recordName = "Batches"
 			return err
 		}
-		r.File.addBatch(r.currentBatch)
+		r.File.AddBatch(r.currentBatch)
 		r.currentBatch = new(Batch)
 	case fileControlPos:
 		if r.line[:2] == "99" {
@@ -237,7 +233,7 @@ func (r *Reader) parseEntryDetail() error {
 		if err := ed.Validate(); err != nil {
 			return err
 		}
-		r.currentBatch.addEntryDetail(ed)
+		r.currentBatch.AddEntryDetail(ed)
 	} else {
 		return errors.New("Support for EntryDetail of SEC(standard entry class): " +
 			r.currentBatch.Header.StandardEntryClassCode + ", has not been implemented")
@@ -261,7 +257,7 @@ func (r *Reader) parseAddenda() error {
 			if err := addenda.Validate(); err != nil {
 				return err
 			}
-			r.currentBatch.Entries[entryIndex].addAddenda(addenda)
+			r.currentBatch.Entries[entryIndex].AddAddenda(addenda)
 		} else {
 			return ErrAddendaNoIndicator
 		}

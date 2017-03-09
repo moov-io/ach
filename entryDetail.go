@@ -186,8 +186,8 @@ func (ed *EntryDetail) fieldInclusion() error {
 	return nil
 }
 
-// addAddenda appends an EntryDetail to the Addendums
-func (ed *EntryDetail) addAddenda(addenda Addenda) []Addenda {
+// AddAddenda appends an EntryDetail to the Addendums
+func (ed *EntryDetail) AddAddenda(addenda Addenda) []Addenda {
 	ed.AddendaRecordIndicator = 1
 	ed.Addendums = append(ed.Addendums, addenda)
 	return ed.Addendums
