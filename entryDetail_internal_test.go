@@ -12,7 +12,7 @@ import (
 func mockEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 22
-	entry.setRDFI(9101298)
+	entry.SetRDFI(9101298)
 	entry.Amount = 100000000
 	entry.IndividualName = "Wade Arnold"
 	entry.TraceNumber = 123456789
@@ -204,7 +204,7 @@ func TestEDisCheckDigit(t *testing.T) {
 
 func TestEDSetRDFI(t *testing.T) {
 	ed := NewEntryDetail()
-	ed.setRDFI(81086674)
+	ed.SetRDFI(81086674)
 	if ed.RDFIIdentification != 8108667 {
 		t.Errorf("RDFI identification")
 	}

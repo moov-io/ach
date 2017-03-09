@@ -193,8 +193,8 @@ func (ed *EntryDetail) AddAddenda(addenda Addenda) []Addenda {
 	return ed.Addendums
 }
 
-// setRDFI takes the 9 digit RDFI account number and seperates it for RDFIIdentification and CheckDigit
-func (ed *EntryDetail) setRDFI(rdfi int) *EntryDetail {
+// SetRDFI takes the 9 digit RDFI account number and seperates it for RDFIIdentification and CheckDigit
+func (ed *EntryDetail) SetRDFI(rdfi int) *EntryDetail {
 	s := ed.numericField(rdfi, 9)
 	ed.RDFIIdentification = ed.parseNumField(s[:8])
 	ed.CheckDigit = ed.parseNumField(s[8:9])
