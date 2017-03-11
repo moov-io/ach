@@ -217,3 +217,69 @@ func TestBatchCompanyEntryDescriptionAlphaNumeric(t *testing.T) {
 		}
 	}
 }
+
+func TestBHFieldInclusionRecordType(t *testing.T) {
+	bh := mockBatchHeader()
+	bh.recordType = ""
+	if err := bh.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestBHFieldInclusionCompanyName(t *testing.T) {
+	bh := mockBatchHeader()
+	bh.CompanyName = ""
+	if err := bh.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestBHFieldInclusionCompanyIdentification(t *testing.T) {
+	bh := mockBatchHeader()
+	bh.CompanyIdentification = ""
+	if err := bh.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestBHFieldInclusionStandardEntryClassCode(t *testing.T) {
+	bh := mockBatchHeader()
+	bh.StandardEntryClassCode = ""
+	if err := bh.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestBHFieldInclusionCompanyEntryDescription(t *testing.T) {
+	bh := mockBatchHeader()
+	bh.CompanyEntryDescription = ""
+	if err := bh.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestBHFieldInclusionOriginatorStatusCode(t *testing.T) {
+	bh := mockBatchHeader()
+	bh.OriginatorStatusCode = 0
+	if err := bh.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}

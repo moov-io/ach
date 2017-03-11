@@ -13,8 +13,7 @@ import (
 
 // Errors specific to a File Header Record
 var (
-	ErrRecordType = errors.New("Wrong Record type")
-
+	ErrRecordType       = errors.New("Wrong Record type")
 	ErrRecordSize       = errors.New("Record size is not 094")
 	ErrBlockingFactor   = errors.New("Blocking Factor is not 10")
 	ErrFormatCode       = errors.New("Format Code is not 1.")
