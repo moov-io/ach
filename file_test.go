@@ -123,3 +123,94 @@ func TestFileEntryHash(t *testing.T) {
 		}
 	}
 }
+
+func TestFileBlockCount10(t *testing.T) {
+	file := NewFile().SetHeader(mockFileHeader())
+	batch := NewBatch().SetHeader(mockBatchHeader())
+	batch.AddEntryDetail(mockEntryDetail())
+	batch.AddEntryDetail(mockEntryDetail())
+	batch.AddEntryDetail(mockEntryDetail())
+	batch.AddEntryDetail(mockEntryDetail())
+	batch.AddEntryDetail(mockEntryDetail())
+	batch.AddEntryDetail(mockEntryDetail())
+	batch.Build()
+	file.AddBatch(batch)
+	file.Build()
+
+	// ensure with 10 records in file we don't get 2 for a block count
+	if err := file.ValidateAll(); err != nil {
+		t.Errorf("Unexpected File.Validation error: %v", err.Error())
+	}
+	if file.Control.BlockCount != 1 {
+		t.Errorf("Unexpected block count in file expect 1 got: %v", file.Control.BlockCount)
+	}
+}
+
+func TestFileBuildBadFileHeader(t *testing.T) {
+	file := NewFile().SetHeader(FileHeader{})
+	if err := file.Build(); err != nil {
+		if !strings.Contains(err.Error(), ErrRecordType.Error()) {
+			t.Errorf("Unexpected File.Build error: %v", err.Error())
+		}
+	}
+}
+
+func TestFileBuildNoBatch(t *testing.T) {
+	file := NewFile().SetHeader(mockFileHeader())
+	if err := file.Build(); err != nil {
+		if !strings.Contains(err.Error(), ErrFileBatches.Error()) {
+			t.Errorf("Unexpected File.Build error: %v", err.Error())
+		}
+	}
+}
+
+func TestFileValidateAllBatch(t *testing.T) {
+	file := NewFile().SetHeader(mockFileHeader())
+	batch := NewBatch().SetHeader(mockBatchHeader())
+	batch.AddEntryDetail(mockEntryDetail())
+	batch.Build()
+	file.AddBatch(batch)
+	file.Build()
+	// break the file header
+	file.Batches[0].Header.ODFIIdentification = 0
+	if err := file.ValidateAll(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected File.ValidationAll error: %v", err.Error())
+		}
+	}
+}
+
+func TestFileValidateAllFileHeader(t *testing.T) {
+	file := NewFile().SetHeader(mockFileHeader())
+	batch := NewBatch().SetHeader(mockBatchHeader())
+	batch.AddEntryDetail(mockEntryDetail())
+	batch.Build()
+	file.AddBatch(batch)
+	file.Build()
+	// break the file header
+	file.Header.ImmediateOrigin = 0
+	if err := file.ValidateAll(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected File.ValidationAll error: %v", err.Error())
+		}
+	}
+}
+
+func TestFileValidateAllFileControl(t *testing.T) {
+	file := NewFile().SetHeader(mockFileHeader())
+	batch := NewBatch().SetHeader(mockBatchHeader())
+	batch.AddEntryDetail(mockEntryDetail())
+	batch.Build()
+	file.AddBatch(batch)
+	file.Build()
+	// break the file header
+	file.Control.BatchCount = 0
+	if err := file.ValidateAll(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected File.ValidationAll error: %v", err.Error())
+		}
+	}
+}

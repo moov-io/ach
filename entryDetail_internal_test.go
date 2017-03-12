@@ -212,5 +212,81 @@ func TestEDSetRDFI(t *testing.T) {
 	if ed.CheckDigit != 4 {
 		t.Errorf("Unexpected check digit")
 	}
+}
 
+func TestEDFieldInclusionRecordType(t *testing.T) {
+	entry := mockEntryDetail()
+	entry.recordType = ""
+	if err := entry.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestEDFieldInclusionTransactionCode(t *testing.T) {
+	entry := mockEntryDetail()
+	entry.TransactionCode = 0
+	if err := entry.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestEDFieldInclusionRDFIIdentification(t *testing.T) {
+	entry := mockEntryDetail()
+	entry.RDFIIdentification = 0
+	if err := entry.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestEDFieldInclusionCheckDigit(t *testing.T) {
+	entry := mockEntryDetail()
+	entry.CheckDigit = 0
+	if err := entry.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestEDFieldInclusionDFIAccountNumber(t *testing.T) {
+	entry := mockEntryDetail()
+	entry.DFIAccountNumber = ""
+	if err := entry.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestEDFieldInclusionIndividualName(t *testing.T) {
+	entry := mockEntryDetail()
+	entry.IndividualName = ""
+	if err := entry.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestEDFieldInclusionTraceNumber(t *testing.T) {
+	entry := mockEntryDetail()
+	entry.TraceNumber = 0
+	if err := entry.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
 }

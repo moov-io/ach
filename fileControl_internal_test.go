@@ -97,3 +97,47 @@ func TestFCFieldInclusion(t *testing.T) {
 		}
 	}
 }
+
+func TestFCFieldInclusionRecordType(t *testing.T) {
+	fc := mockFileControl()
+	fc.recordType = ""
+	if err := fc.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestFCFieldInclusionBlockCount(t *testing.T) {
+	fc := mockFileControl()
+	fc.BlockCount = 0
+	if err := fc.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestFCFieldInclusionEntryAddendaCount(t *testing.T) {
+	fc := mockFileControl()
+	fc.EntryAddendaCount = 0
+	if err := fc.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestFCFieldInclusionEntryHash(t *testing.T) {
+	fc := mockFileControl()
+	fc.EntryHash = 0
+	if err := fc.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}

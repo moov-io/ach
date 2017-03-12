@@ -176,3 +176,36 @@ func TestBCMessageAuthenticationCodeAlphaNumeric(t *testing.T) {
 		}
 	}
 }
+
+func TestBCFieldInclusionRecordType(t *testing.T) {
+	bc := mockBatchControl()
+	bc.recordType = ""
+	if err := bc.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestBCFieldInclusionServiceClassCode(t *testing.T) {
+	bc := mockBatchControl()
+	bc.ServiceClassCode = 0
+	if err := bc.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestBCFieldInclusionODFIIdentification(t *testing.T) {
+	bc := mockBatchControl()
+	bc.ODFIIdentification = 0
+	if err := bc.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}

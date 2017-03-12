@@ -236,3 +236,69 @@ func TestImmediateReferenceCodeAlphaNumeric(t *testing.T) {
 		}
 	}
 }
+
+func TestFHFieldInclusionRecordType(t *testing.T) {
+	fh := mockFileHeader()
+	fh.recordType = ""
+	if err := fh.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestFHFieldInclusionImmediatDestination(t *testing.T) {
+	fh := mockFileHeader()
+	fh.ImmediateDestination = 0
+	if err := fh.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestFHFieldInclusionFileIDModifier(t *testing.T) {
+	fh := mockFileHeader()
+	fh.FileIDModifier = ""
+	if err := fh.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestFHFieldInclusionRecordSize(t *testing.T) {
+	fh := mockFileHeader()
+	fh.recordSize = ""
+	if err := fh.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestFHFieldInclusionBlockingFactor(t *testing.T) {
+	fh := mockFileHeader()
+	fh.blockingFactor = ""
+	if err := fh.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}
+
+func TestFHFieldInclusionFormatCode(t *testing.T) {
+	fh := mockFileHeader()
+	fh.formatCode = ""
+	if err := fh.Validate(); err != nil {
+		_, ok := err.(*ValidateError)
+		if !ok {
+			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		}
+	}
+}

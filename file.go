@@ -61,8 +61,8 @@ func (f *File) Build() error {
 	if len(f.Batches) <= 0 {
 		return ErrFileBatches
 	}
-	// increment for FileHeader and reset if build was called twice do to error
-	totalRecordsInFile := 1
+	// add 2 for FileHeader/control and reset if build was called twice do to error
+	totalRecordsInFile := 2
 	batchSeq := 1
 	fileEntryAddendaCount := 0
 	fileEntryHashSum := 0
@@ -92,12 +92,10 @@ func (f *File) Build() error {
 	} else {
 		fc.BlockCount = totalRecordsInFile / 10
 	}
-	fc.BlockCount = totalRecordsInFile
 	fc.EntryAddendaCount = fileEntryAddendaCount
 	fc.EntryHash = fileEntryHashSum
 	fc.TotalDebitEntryDollarAmountInFile = totalDebitAmount
 	fc.TotalCreditEntryDollarAmountInFile = totalCreditAmount
-
 	f.Control = fc
 	return nil
 }
