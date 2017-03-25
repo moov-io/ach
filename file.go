@@ -97,6 +97,10 @@ func (f *File) Build() error {
 	fc.TotalDebitEntryDollarAmountInFile = totalDebitAmount
 	fc.TotalCreditEntryDollarAmountInFile = totalCreditAmount
 	f.Control = fc
+
+	if err := f.ValidateAll(); err != nil {
+		return err
+	}
 	return nil
 }
 

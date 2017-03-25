@@ -18,7 +18,7 @@ func TestBatchCountError(t *testing.T) {
 		t.Errorf("Unexpected File.Validation error: %v", err.Error())
 	}
 	// More batches than the file control count.
-	r.File.AddBatch(&Batch{})
+	r.File.AddBatch(NewBatch())
 	if err := r.File.Validate(); err != nil {
 		if err != ErrFileBatchCount {
 			t.Errorf("Unexpected File.Validation error: %v", err.Error())
@@ -135,10 +135,9 @@ func TestFileBlockCount10(t *testing.T) {
 	batch.AddEntryDetail(mockEntryDetail())
 	batch.Build()
 	file.AddBatch(batch)
-	file.Build()
 
 	// ensure with 10 records in file we don't get 2 for a block count
-	if err := file.ValidateAll(); err != nil {
+	if err := file.Build(); err != nil {
 		t.Errorf("Unexpected File.Validation error: %v", err.Error())
 	}
 	if file.Control.BlockCount != 1 {
@@ -170,10 +169,9 @@ func TestFileValidateAllBatch(t *testing.T) {
 	batch.AddEntryDetail(mockEntryDetail())
 	batch.Build()
 	file.AddBatch(batch)
-	file.Build()
 	// break the file header
 	file.Batches[0].Header.ODFIIdentification = 0
-	if err := file.ValidateAll(); err != nil {
+	if err := file.Build(); err != nil {
 		_, ok := err.(*ValidateError)
 		if !ok {
 			t.Errorf("Unexpected File.ValidationAll error: %v", err.Error())
@@ -187,10 +185,9 @@ func TestFileValidateAllFileHeader(t *testing.T) {
 	batch.AddEntryDetail(mockEntryDetail())
 	batch.Build()
 	file.AddBatch(batch)
-	file.Build()
 	// break the file header
 	file.Header.ImmediateOrigin = 0
-	if err := file.ValidateAll(); err != nil {
+	if err := file.Build(); err != nil {
 		_, ok := err.(*ValidateError)
 		if !ok {
 			t.Errorf("Unexpected File.ValidationAll error: %v", err.Error())
@@ -204,10 +201,9 @@ func TestFileValidateAllFileControl(t *testing.T) {
 	batch.AddEntryDetail(mockEntryDetail())
 	batch.Build()
 	file.AddBatch(batch)
-	file.Build()
 	// break the file header
 	file.Control.BatchCount = 0
-	if err := file.ValidateAll(); err != nil {
+	if err := file.Build(); err != nil {
 		_, ok := err.(*ValidateError)
 		if !ok {
 			t.Errorf("Unexpected File.ValidationAll error: %v", err.Error())

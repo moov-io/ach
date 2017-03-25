@@ -151,6 +151,10 @@ func (batch *Batch) Build() error {
 	bc.TotalCreditEntryDollarAmount, bc.TotalDebitEntryDollarAmount = batch.calculateBatchAmounts()
 	batch.Control = bc
 
+	// Validate the built batch
+	if err := batch.ValidateAll(); err != nil {
+		return err
+	}
 	return nil
 }
 
