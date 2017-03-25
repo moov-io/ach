@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -43,25 +43,22 @@ func main() {
 	// build the batch
 	batch := ach.NewBatch().SetHeader(bh)
 	batch.AddEntryDetail(entry)
-	batch.Build()
+	if err := batch.Build(); err != nil {
+		log.Fatalf("Unexpected error building batch: %s\n", err)
+	}
 
 	// build the file
 	file := ach.NewFile()
 	file.SetHeader(fh)
 	file.AddBatch(batch)
-	file.Build()
-
-	// ensure everything is validated
-	if err := file.ValidateAll(); err != nil {
-		fmt.Printf("Could not validate built file: %v", err)
+	if err := file.Build(); err != nil {
+		log.Fatalf("Unexpected error building file: %s\n", err)
 	}
 
 	// write the file to std out. Anything io.Writer
 	w := ach.NewWriter(os.Stdout)
-	err := w.WriteAll([]*ach.File{file})
-	if err != nil {
-		fmt.Printf("Unexpected error: %s\n", err)
+	if err := w.WriteAll([]*ach.File{file}); err != nil {
+		log.Fatalf("Unexpected error: %s\n", err)
 	}
 	w.Flush()
-
 }
