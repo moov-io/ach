@@ -68,7 +68,7 @@ func (w *Writer) Write(file *File) error {
 	w.lineNum++
 
 	// pad the final block
-	for i := 0; i < w.lineNum%10; i++ {
+	for i := 0; i < (10-(w.lineNum%10)) && w.lineNum%10 != 0; i++ {
 		if _, err := w.w.WriteString(strings.Repeat("9", 94) + "\n"); err != nil {
 			return err
 		}
