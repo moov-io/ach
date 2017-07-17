@@ -26,8 +26,8 @@ var (
 	ErrBatchEntries              = errors.New("Batch must have Entrie Record(s) to be built")
 )
 
-// Batch holds the Batch Header and Batch Control and all Entry Records
-type Batch struct {
+// BatchPPD holds the Batch Header and Batch Control and all Entry Records for PPD Entries
+type BatchPPD struct {
 	Header  *BatchHeader
 	Entries []*EntryDetail
 	Control *BatchControl
@@ -36,12 +36,12 @@ type Batch struct {
 }
 
 // NewBatch returns an *Batch
-func NewBatch() *Batch {
-	return new(Batch).SetHeader(NewBatchHeader()).SetControl(NewBatchControl())
+func NewBatch() *BatchPPD {
+	return new(BatchPPD).SetHeader(NewBatchHeader()).SetControl(NewBatchControl())
 }
 
 // Validate NACHA rules on the entire batch before being added to a File
-func (batch *Batch) Validate() error {
+func (batch *BatchPPD) Validate() error {
 	// validate batch header and control codes are the same
 	if batch.Header.ServiceClassCode != batch.Control.ServiceClassCode {
 		return ErrBatchServiceClassMismatch
@@ -92,7 +92,7 @@ func (batch *Batch) Validate() error {
 }
 
 // ValidateAll validate all dependency records in the batch.
-func (batch *Batch) ValidateAll() error {
+func (batch *BatchPPD) ValidateAll() error {
 	if err := batch.Header.Validate(); err != nil {
 		return err
 	}
@@ -117,7 +117,7 @@ func (batch *Batch) ValidateAll() error {
 }
 
 // Build takes Batch Header and Entries and builds a valid batch
-func (batch *Batch) Build() error {
+func (batch *BatchPPD) Build() error {
 	// Requires a valid BatchHeader
 	if err := batch.Header.Validate(); err != nil {
 		return err
@@ -159,20 +159,20 @@ func (batch *Batch) Build() error {
 }
 
 // SetHeader appends an BatchHeader to the Batch
-func (batch *Batch) SetHeader(batchHeader *BatchHeader) *Batch {
+func (batch *BatchPPD) SetHeader(batchHeader *BatchHeader) *BatchPPD {
 	batch.Header = batchHeader
 	return batch
 }
 
 // SetControl appends an BatchControl to the Batch
-func (batch *Batch) SetControl(batchControl *BatchControl) *Batch {
+func (batch *BatchPPD) SetControl(batchControl *BatchControl) *BatchPPD {
 	batch.Control = batchControl
 	return batch
 }
 
 // AddEntryDetail appends an EntryDetail to the Batch
 //func (batch *Batch) AddEntryDetail(entry EntryDetail) []EntryDetail {
-func (batch *Batch) AddEntryDetail(entry *EntryDetail) *Batch {
+func (batch *BatchPPD) AddEntryDetail(entry *EntryDetail) *BatchPPD {
 	//entry.setTraceNumber(batch.Header.ODFIIdentification, 1)
 	batch.Entries = append(batch.Entries, entry)
 	//	return batch.Entries
@@ -182,7 +182,7 @@ func (batch *Batch) AddEntryDetail(entry *EntryDetail) *Batch {
 // isBatchEntryCountMismatch validate Entry count is accurate
 // The Entry/Addenda Count Field is a tally of each Entry Detail and Addenda
 // Record processed within the batch
-func (batch *Batch) isBatchEntryCountMismatch() error {
+func (batch *BatchPPD) isBatchEntryCountMismatch() error {
 	entryCount := 0
 	for _, entry := range batch.Entries {
 		entryCount = entryCount + 1 + len(entry.Addendums)
@@ -196,7 +196,7 @@ func (batch *Batch) isBatchEntryCountMismatch() error {
 // isBatchAmountMismatch validate Amount is the same as what is in the Entries
 // The Total Debit and Credit Entry Dollar Amount fields contain accumulated
 // Entry Detail debit and credit totals within a given batch
-func (batch *Batch) isBatchAmountMismatch() error {
+func (batch *BatchPPD) isBatchAmountMismatch() error {
 	credit, debit := batch.calculateBatchAmounts()
 	//fmt.Printf("debit: %v batch debit: %v \n", debit, batch.Control.TotalDebitEntryDollarAmount)
 
@@ -211,7 +211,7 @@ func (batch *Batch) isBatchAmountMismatch() error {
 	return nil
 }
 
-func (batch *Batch) calculateBatchAmounts() (credit int, debit int) {
+func (batch *BatchPPD) calculateBatchAmounts() (credit int, debit int) {
 	for _, entry := range batch.Entries {
 		if entry.TransactionCode == 22 || entry.TransactionCode == 23 {
 			credit = credit + entry.Amount
@@ -233,7 +233,7 @@ func (batch *Batch) calculateBatchAmounts() (credit int, debit int) {
 
 // isSequenceAscending Individual Entry Detail Records within individual batches must
 // be in ascending Trace Number order (although Trace Numbers need not necessarily be consecutive).
-func (batch *Batch) isSequenceAscending() error {
+func (batch *BatchPPD) isSequenceAscending() error {
 	lastSeq := -1
 	for _, entry := range batch.Entries {
 		if entry.TraceNumber <= lastSeq {
@@ -245,7 +245,7 @@ func (batch *Batch) isSequenceAscending() error {
 }
 
 // isEntryHashMismatch validates the hash by recalulating the result
-func (batch *Batch) isEntryHashMismatch() error {
+func (batch *BatchPPD) isEntryHashMismatch() error {
 	hashField := batch.calculateEntryHash()
 	if hashField != batch.Control.EntryHashField() {
 		return ErrValidEntryHash
@@ -255,7 +255,7 @@ func (batch *Batch) isEntryHashMismatch() error {
 
 // calculateEntryHash This field is prepared by hashing the 8-digit Routing Number in each entry.
 // The Entry Hash provides a check against inadvertent alteration of data
-func (batch *Batch) calculateEntryHash() string {
+func (batch *BatchPPD) calculateEntryHash() string {
 	hash := 0
 	for _, entry := range batch.Entries {
 		hash = hash + entry.RDFIIdentification
@@ -264,7 +264,7 @@ func (batch *Batch) calculateEntryHash() string {
 }
 
 // The Originator Status Code is not equal to “2” for DNE if the Transaction Code is 23 or 33
-func (batch *Batch) isOriginatorDNEMismatch() error {
+func (batch *BatchPPD) isOriginatorDNEMismatch() error {
 	if batch.Header.OriginatorStatusCode != 2 {
 		for _, entry := range batch.Entries {
 			if entry.TransactionCode == 23 || entry.TransactionCode == 33 {
@@ -277,7 +277,7 @@ func (batch *Batch) isOriginatorDNEMismatch() error {
 
 // isTraceNumberODFI checks if the first 8 positions of the entry detail trace number
 // match the batch header odfi
-func (batch *Batch) isTraceNumberODFI() error {
+func (batch *BatchPPD) isTraceNumberODFI() error {
 	for _, entry := range batch.Entries {
 		if batch.Header.ODFIIdentificationField() != entry.TraceNumberField()[:8] {
 			return ErrBatchTraceNumberNotODFI
@@ -288,7 +288,7 @@ func (batch *Batch) isTraceNumberODFI() error {
 }
 
 // isAddendaSequence check multiple errors on addenda records in the batch entries
-func (batch *Batch) isAddendaSequence() error {
+func (batch *BatchPPD) isAddendaSequence() error {
 	for _, entry := range batch.Entries {
 		if len(entry.Addendums) > 0 {
 			// addenda without indicator flag of 1

@@ -57,7 +57,7 @@ type Reader struct {
 	// line is the current line being parsed from the input r
 	line string
 	// currentBatch is the current Batch entries being parsed
-	currentBatch *Batch
+	currentBatch *BatchPPD
 	// line number of the file being parsed
 	lineNum int
 	// recordName holds the current record name being parsed.
@@ -172,7 +172,8 @@ func (r *Reader) parseLine() error {
 			return err
 		}
 		r.File.AddBatch(r.currentBatch)
-		r.currentBatch = new(Batch)
+		// @TODO do not create a new batch here. Needs to be nil until we know the SEC type
+		r.currentBatch = new(BatchPPD)
 	case fileControlPos:
 		if r.line[:2] == "99" {
 			// final blocking padding
@@ -209,10 +210,12 @@ func (r *Reader) parseFileHeader() error {
 // parseBatchHeader takes the input record string and parses the FileHeaderRecord values
 func (r *Reader) parseBatchHeader() error {
 	r.recordName = "BatchHeader"
+	// @TODO make sure we have a nil currentBatch
 	if r.currentBatch.Header.ServiceClassCode != 0 {
 		// Ensure we have an empty Batch
 		return ErrBatchHeader
 	}
+	// @TODO parse the Batch Header to find the SEC code before ecreating the Batch
 	r.currentBatch.Header.Parse(r.line)
 	if err := r.currentBatch.Header.Validate(); err != nil {
 		return err
