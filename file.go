@@ -36,7 +36,7 @@ var (
 // File contains the structures of a parsed ACH File.
 type File struct {
 	Header  FileHeader
-	Batches []*BatchPPD
+	Batches []Batcher
 	Control FileControl
 	// converters is composed for ACH to golang Converters
 	converters
@@ -105,7 +105,7 @@ func (f *File) Build() error {
 }
 
 // AddBatch appends a Batch to the ach.File
-func (f *File) AddBatch(batch *BatchPPD) []*BatchPPD {
+func (f *File) AddBatch(batch Batcher) []Batcher {
 	f.Batches = append(f.Batches, batch)
 	return f.Batches
 }

@@ -139,12 +139,12 @@ func TestFileEntryHash(t *testing.T) {
 func TestFileBlockCount10(t *testing.T) {
 	file := NewFile().SetHeader(mockFileHeader())
 	batch := NewBatch().SetHeader(mockBatchHeader())
-	batch.AddEntryDetail(mockEntryDetail())
-	batch.AddEntryDetail(mockEntryDetail())
-	batch.AddEntryDetail(mockEntryDetail())
-	batch.AddEntryDetail(mockEntryDetail())
-	batch.AddEntryDetail(mockEntryDetail())
-	batch.AddEntryDetail(mockEntryDetail())
+	batch.AddEntry(mockEntryDetail())
+	batch.AddEntry(mockEntryDetail())
+	batch.AddEntry(mockEntryDetail())
+	batch.AddEntry(mockEntryDetail())
+	batch.AddEntry(mockEntryDetail())
+	batch.AddEntry(mockEntryDetail())
 	batch.Build()
 	file.AddBatch(batch)
 
@@ -178,7 +178,7 @@ func TestFileBuildNoBatch(t *testing.T) {
 func TestFileValidateAllBatch(t *testing.T) {
 	file := NewFile().SetHeader(mockFileHeader())
 	batch := NewBatch().SetHeader(mockBatchHeader())
-	batch.AddEntryDetail(mockEntryDetail())
+	batch.AddEntry(mockEntryDetail())
 	batch.Build()
 	file.AddBatch(batch)
 	// break the file header
@@ -194,7 +194,7 @@ func TestFileValidateAllBatch(t *testing.T) {
 func TestFileValidateAllFileHeader(t *testing.T) {
 	file := NewFile().SetHeader(mockFileHeader())
 	batch := NewBatch().SetHeader(mockBatchHeader())
-	batch.AddEntryDetail(mockEntryDetail())
+	batch.AddEntry(mockEntryDetail())
 	batch.Build()
 	file.AddBatch(batch)
 	// break the file header
@@ -210,7 +210,7 @@ func TestFileValidateAllFileHeader(t *testing.T) {
 func TestFileValidateAllFileControl(t *testing.T) {
 	file := NewFile().SetHeader(mockFileHeader())
 	batch := NewBatch().SetHeader(mockBatchHeader())
-	batch.AddEntryDetail(mockEntryDetail())
+	batch.AddEntry(mockEntryDetail())
 	batch.Build()
 	file.AddBatch(batch)
 	// break the file header

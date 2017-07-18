@@ -29,7 +29,7 @@ var (
 // BatchPPD holds the Batch Header and Batch Control and all Entry Records for PPD Entries
 type BatchPPD struct {
 	header  *BatchHeader
-	Entries []*EntryDetail
+	entries []*EntryDetail
 	control *BatchControl
 	// Converters is composed for ACH to golang Converters
 	converters
@@ -98,7 +98,7 @@ func (batch *BatchPPD) ValidateAll() error {
 	if err := batch.header.Validate(); err != nil {
 		return err
 	}
-	for _, entry := range batch.Entries {
+	for _, entry := range batch.entries {
 		if err := entry.Validate(); err != nil {
 			return err
 		}
@@ -124,20 +124,20 @@ func (batch *BatchPPD) Build() error {
 	if err := batch.header.Validate(); err != nil {
 		return err
 	}
-	if len(batch.Entries) <= 0 {
+	if len(batch.entries) <= 0 {
 		return ErrBatchEntries
 	}
 	// build controls and sequence numbers
 	entryCount := 0
 	seq := 1
-	for i, entry := range batch.Entries {
+	for i, entry := range batch.entries {
 		entryCount = entryCount + 1 + len(entry.Addendums)
-		batch.Entries[i].setTraceNumber(batch.header.ODFIIdentification, seq)
+		batch.entries[i].setTraceNumber(batch.header.ODFIIdentification, seq)
 		seq++
 		addendaSeq := 1
 		for x := range entry.Addendums {
-			batch.Entries[i].Addendums[x].SequenceNumber = addendaSeq
-			batch.Entries[i].Addendums[x].EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
+			batch.entries[i].Addendums[x].SequenceNumber = addendaSeq
+			batch.entries[i].Addendums[x].EntryDetailSequenceNumber = batch.parseNumField(batch.entries[i].TraceNumberField()[8:])
 			addendaSeq++
 		}
 	}
@@ -177,17 +177,22 @@ func (batch *BatchPPD) SetControl(batchControl *BatchControl) *BatchPPD {
 	return batch
 }
 
-// GetHeader returns the curent Batch header
+// GetControl returns the curent Batch Control
 func (batch *BatchPPD) GetControl() *BatchControl {
 	return batch.control
 }
 
-// AddEntryDetail appends an EntryDetail to the Batch
+// GetEntries returns a slice of entry details for the batch
+func (batch *BatchPPD) GetEntries() []*EntryDetail {
+	return batch.entries
+}
+
+// AddEntry appends an EntryDetail to the Batch
 //func (batch *Batch) AddEntryDetail(entry EntryDetail) []EntryDetail {
-func (batch *BatchPPD) AddEntryDetail(entry *EntryDetail) *BatchPPD {
+func (batch *BatchPPD) AddEntry(entry *EntryDetail) Batcher {
 	//entry.setTraceNumber(batch.header.ODFIIdentification, 1)
-	batch.Entries = append(batch.Entries, entry)
-	//	return batch.Entries
+	batch.entries = append(batch.entries, entry)
+	//	return batch.entries
 	return batch
 }
 
@@ -196,7 +201,7 @@ func (batch *BatchPPD) AddEntryDetail(entry *EntryDetail) *BatchPPD {
 // Record processed within the batch
 func (batch *BatchPPD) isBatchEntryCountMismatch() error {
 	entryCount := 0
-	for _, entry := range batch.Entries {
+	for _, entry := range batch.entries {
 		entryCount = entryCount + 1 + len(entry.Addendums)
 	}
 	if entryCount != batch.control.EntryAddendaCount {
@@ -224,7 +229,7 @@ func (batch *BatchPPD) isBatchAmountMismatch() error {
 }
 
 func (batch *BatchPPD) calculateBatchAmounts() (credit int, debit int) {
-	for _, entry := range batch.Entries {
+	for _, entry := range batch.entries {
 		if entry.TransactionCode == 22 || entry.TransactionCode == 23 {
 			credit = credit + entry.Amount
 		}
@@ -247,7 +252,7 @@ func (batch *BatchPPD) calculateBatchAmounts() (credit int, debit int) {
 // be in ascending Trace Number order (although Trace Numbers need not necessarily be consecutive).
 func (batch *BatchPPD) isSequenceAscending() error {
 	lastSeq := -1
-	for _, entry := range batch.Entries {
+	for _, entry := range batch.entries {
 		if entry.TraceNumber <= lastSeq {
 			return ErrBatchAscendingTraceNumber
 		}
@@ -269,7 +274,7 @@ func (batch *BatchPPD) isEntryHashMismatch() error {
 // The Entry Hash provides a check against inadvertent alteration of data
 func (batch *BatchPPD) calculateEntryHash() string {
 	hash := 0
-	for _, entry := range batch.Entries {
+	for _, entry := range batch.entries {
 		hash = hash + entry.RDFIIdentification
 	}
 	return batch.numericField(hash, 10)
@@ -278,7 +283,7 @@ func (batch *BatchPPD) calculateEntryHash() string {
 // The Originator Status Code is not equal to “2” for DNE if the Transaction Code is 23 or 33
 func (batch *BatchPPD) isOriginatorDNEMismatch() error {
 	if batch.header.OriginatorStatusCode != 2 {
-		for _, entry := range batch.Entries {
+		for _, entry := range batch.entries {
 			if entry.TransactionCode == 23 || entry.TransactionCode == 33 {
 				return ErrBatchOriginatorDNE
 			}
@@ -290,7 +295,7 @@ func (batch *BatchPPD) isOriginatorDNEMismatch() error {
 // isTraceNumberODFI checks if the first 8 positions of the entry detail trace number
 // match the batch header odfi
 func (batch *BatchPPD) isTraceNumberODFI() error {
-	for _, entry := range batch.Entries {
+	for _, entry := range batch.entries {
 		if batch.header.ODFIIdentificationField() != entry.TraceNumberField()[:8] {
 			return ErrBatchTraceNumberNotODFI
 		}
@@ -301,7 +306,7 @@ func (batch *BatchPPD) isTraceNumberODFI() error {
 
 // isAddendaSequence check multiple errors on addenda records in the batch entries
 func (batch *BatchPPD) isAddendaSequence() error {
-	for _, entry := range batch.Entries {
+	for _, entry := range batch.entries {
 		if len(entry.Addendums) > 0 {
 			// addenda without indicator flag of 1
 			if entry.AddendaRecordIndicator != 1 {

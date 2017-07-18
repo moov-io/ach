@@ -30,7 +30,7 @@ func TestParseEntryDetail(t *testing.T) {
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
 	}
-	record := r.currentBatch.Entries[0]
+	record := r.currentBatch.GetEntries()[0]
 
 	if record.recordType != "6" {
 		t.Errorf("RecordType Expected '6' got: %v", record.recordType)
@@ -78,7 +78,7 @@ func TestEDString(t *testing.T) {
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
 	}
-	record := r.currentBatch.Entries[0]
+	record := r.currentBatch.GetEntries()[0]
 
 	if record.String() != line {
 		t.Errorf("Strings do not match")

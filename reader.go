@@ -57,7 +57,7 @@ type Reader struct {
 	// line is the current line being parsed from the input r
 	line string
 	// currentBatch is the current Batch entries being parsed
-	currentBatch *BatchPPD
+	currentBatch Batcher
 	// line number of the file being parsed
 	lineNum int
 	// recordName holds the current record name being parsed.
@@ -242,7 +242,7 @@ func (r *Reader) parseEntryDetail() error {
 		if err := ed.Validate(); err != nil {
 			return err
 		}
-		r.currentBatch.AddEntryDetail(ed)
+		r.currentBatch.AddEntry(ed)
 	} else {
 		return errors.New("Support for EntryDetail of SEC(standard entry class): " +
 			r.currentBatch.GetHeader().StandardEntryClassCode + ", has not been implemented")
@@ -254,11 +254,11 @@ func (r *Reader) parseEntryDetail() error {
 func (r *Reader) parseAddenda() error {
 	r.recordName = "Addenda"
 	// @TODO should not be able to access Entries directly. Needs GetEntries
-	if len(r.currentBatch.Entries) == 0 {
+	if len(r.currentBatch.GetEntries()) == 0 {
 		return ErrAddendaOutside
 	}
-	entryIndex := len(r.currentBatch.Entries) - 1
-	entry := r.currentBatch.Entries[entryIndex]
+	entryIndex := len(r.currentBatch.GetEntries()) - 1
+	entry := r.currentBatch.GetEntries()[entryIndex]
 	sec := r.currentBatch.GetHeader().StandardEntryClassCode
 	if sec == ppd {
 		if entry.AddendaRecordIndicator == 1 {
@@ -267,7 +267,7 @@ func (r *Reader) parseAddenda() error {
 			if err := addenda.Validate(); err != nil {
 				return err
 			}
-			r.currentBatch.Entries[entryIndex].AddAddenda(addenda)
+			r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda)
 		} else {
 			return ErrAddendaNoIndicator
 		}
