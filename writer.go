@@ -41,7 +41,7 @@ func (w *Writer) Write(file *File) error {
 	w.lineNum++
 
 	for _, batch := range file.Batches {
-		if _, err := w.w.WriteString(batch.Header.String() + "\n"); err != nil {
+		if _, err := w.w.WriteString(batch.GetHeader().String() + "\n"); err != nil {
 			return err
 		}
 		w.lineNum++
@@ -57,7 +57,7 @@ func (w *Writer) Write(file *File) error {
 				w.lineNum++
 			}
 		}
-		if _, err := w.w.WriteString(batch.Control.String() + "\n"); err != nil {
+		if _, err := w.w.WriteString(batch.GetControl().String() + "\n"); err != nil {
 			return err
 		}
 		w.lineNum++

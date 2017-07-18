@@ -83,10 +83,13 @@ func TestTwoFileControls(t *testing.T) {
 	var twoControls = line + "\n" + line
 	r := NewReader(strings.NewReader(twoControls))
 	batch := NewBatch()
-	batch.Control.EntryAddendaCount = 1
-	batch.Control.TotalDebitEntryDollarAmount = 10500
-	r.File.Control.EntryHash = 5320001
+	bc := BatchControl{EntryAddendaCount: 1,
+		TotalDebitEntryDollarAmount: 10500,
+		EntryHash:                   5320001}
+	r.currentBatch.SetControl(&bc)
+
 	r.File.AddBatch(batch)
+	r.File.Control.EntryHash = 5320001
 	_, err := r.Read()
 
 	if !strings.Contains(err.Error(), ErrFileControl.Error()) {
@@ -140,7 +143,7 @@ func TestFileBatchHeaderErr(t *testing.T) {
 func TestFileBatchHeaderDuplicate(t *testing.T) {
 	bh := mockBatchHeader()
 	r := NewReader(strings.NewReader(bh.String()))
-	r.currentBatch.Header = bh
+	r.currentBatch.SetHeader(bh)
 	_, err := r.Read()
 	if !strings.Contains(err.Error(), "BatchHeader") {
 		t.Errorf("Unexpected read.Read() error: %v", err)
@@ -163,7 +166,7 @@ func TestFileEntryDetail(t *testing.T) {
 	ed.CheckDigit = 0
 	line := ed.String()
 	r := NewReader(strings.NewReader(line))
-	r.currentBatch.Header = mockBatchHeader()
+	r.currentBatch.SetHeader(mockBatchHeader())
 	_, err := r.Read()
 	if !strings.Contains(err.Error(), ErrValidFieldInclusion.Error()) {
 		t.Errorf("Unexpected read.Read() error: %v", err)
@@ -177,7 +180,7 @@ func TestFileEntryDetailNotPPD(t *testing.T) {
 	line := ed.String()
 	r := NewReader(strings.NewReader(line))
 	r.currentBatch.SetHeader(mockBatchHeader())
-	r.currentBatch.Header.StandardEntryClassCode = "ABCXYZ"
+	r.currentBatch.GetHeader().StandardEntryClassCode = "ABCXYZ"
 	_, err := r.Read()
 	if !strings.Contains(err.Error(), "ABCXYZ") {
 		t.Errorf("Unexpected read.Read() error: %v", err)

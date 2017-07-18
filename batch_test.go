@@ -23,7 +23,7 @@ func TestBatchEntryCountMismatch(t *testing.T) {
 		t.Errorf("Unexpected Batch.Build error: %v", err.Error())
 	}
 	// create error is mismatch
-	mockBatch.Control.EntryAddendaCount = 1
+	mockBatch.GetControl().EntryAddendaCount = 1
 	if err := mockBatch.Build(); err != nil {
 		if err != ErrBatchEntryCountMismatch {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
@@ -40,7 +40,7 @@ func TestBatchServiceClassMismatch(t *testing.T) {
 		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 	}
 	// create error is mismatch
-	mockBatch.Control.ServiceClassCode = 225
+	mockBatch.GetControl().ServiceClassCode = 225
 	if err := mockBatch.Build(); err != nil {
 		if err != ErrBatchServiceClassMismatch {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
@@ -56,7 +56,7 @@ func TestBatchCompanyIdentification(t *testing.T) {
 		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 	}
 	// create error is mismatch
-	mockBatch.Control.CompanyIdentification = "XYZ Inc"
+	mockBatch.GetControl().CompanyIdentification = "XYZ Inc"
 	if err := mockBatch.Build(); err != nil {
 		if err != ErrBatchCompanyID {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
@@ -72,7 +72,7 @@ func TestBatchODFIIDMismatch(t *testing.T) {
 		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 	}
 	// create error is mismatch
-	mockBatch.Control.ODFIIdentification = 987654321
+	mockBatch.GetControl().ODFIIdentification = 987654321
 	if err := mockBatch.Build(); err != nil {
 		if err != ErrBatchODFIIDMismatch {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
@@ -88,7 +88,7 @@ func TestBatchNumberMismatch(t *testing.T) {
 		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 	}
 	// create error is mismatch
-	mockBatch.Control.BatchNumber = 2
+	mockBatch.GetControl().BatchNumber = 2
 	if err := mockBatch.Build(); err != nil {
 		if err != ErrBatchNumberMismatch {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
@@ -108,7 +108,7 @@ func TestBatchIsSequenceAscending(t *testing.T) {
 	e3 := mockEntryDetail()
 	e3.TraceNumber = 0
 	mockBatch.AddEntryDetail(e3)
-	mockBatch.Control.EntryAddendaCount = 3
+	mockBatch.GetControl().EntryAddendaCount = 3
 	if err := mockBatch.Build(); err != nil {
 		if err != ErrBatchAscendingTraceNumber {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
@@ -132,7 +132,7 @@ func TestCreditBatchIsBatchAmountMismatch(t *testing.T) {
 		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 	}
 	// create error
-	mockBatch.Control.TotalCreditEntryDollarAmount = 1
+	mockBatch.GetControl().TotalCreditEntryDollarAmount = 1
 	if err := mockBatch.Build(); err != nil {
 		if err != ErrBatchAmountMismatch {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
@@ -155,7 +155,7 @@ func TestSavingsBatchIsBatchAmountMismatch(t *testing.T) {
 		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 	}
 	// create error
-	mockBatch.Control.TotalDebitEntryDollarAmount = 1
+	mockBatch.GetControl().TotalDebitEntryDollarAmount = 1
 	if err := mockBatch.Build(); err != nil {
 		if err != ErrBatchAmountMismatch {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
@@ -172,7 +172,7 @@ func TestBatchIsEntryHashMismatch(t *testing.T) {
 		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 	}
 	// create error
-	mockBatch.Control.EntryHash = 0
+	mockBatch.GetControl().EntryHash = 0
 	if err := mockBatch.Build(); err != nil {
 		if err != ErrValidEntryHash {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
@@ -189,7 +189,7 @@ func TestBatchIsOriginatorDNEMismatch(t *testing.T) {
 		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 	}
 	// Make it fail
-	mockBatch.Header.OriginatorStatusCode = 1
+	mockBatch.GetHeader().OriginatorStatusCode = 1
 
 	if err := mockBatch.Build(); err != nil {
 		if err != ErrBatchOriginatorDNE {
@@ -284,7 +284,7 @@ func TestBatchBuild(t *testing.T) {
 	header.CompanyEntryDescription = "PAYROLL"
 	header.EffectiveEntryDate = time.Now()
 	header.ODFIIdentification = 109991234
-	mockBatch.Header = header
+	mockBatch.SetHeader(header)
 
 	entry := NewEntryDetail()
 	entry.TransactionCode = 22                            // ACH Credit
@@ -313,7 +313,7 @@ func TestBatchValidateAllBH(t *testing.T) {
 	mockBatch.Build()
 
 	// Make it fail
-	mockBatch.Header.ODFIIdentification = 0
+	mockBatch.GetHeader().ODFIIdentification = 0
 	if err := mockBatch.ValidateAll(); err != nil {
 		_, ok := err.(*ValidateError)
 		if !ok {
@@ -367,7 +367,7 @@ func TestBatchValidateAllBatchControl(t *testing.T) {
 	mockBatch.Build()
 
 	// Make it fail
-	mockBatch.Control.ODFIIdentification = 0
+	mockBatch.GetControl().ODFIIdentification = 0
 	if err := mockBatch.ValidateAll(); err != nil {
 		_, ok := err.(*ValidateError)
 		if !ok {
@@ -383,7 +383,7 @@ func TestBatchBuildHeader(t *testing.T) {
 	ed.AddAddenda(mockAddenda())
 	mockBatch.AddEntryDetail(ed)
 
-	mockBatch.Header.ODFIIdentification = 0
+	mockBatch.GetHeader().ODFIIdentification = 0
 	if err := mockBatch.Build(); err != nil {
 		_, ok := err.(*ValidateError)
 		if !ok {
@@ -409,7 +409,7 @@ func TestBatchDNEMismatch(t *testing.T) {
 	mockBatch.AddEntryDetail(ed)
 	mockBatch.Build()
 
-	mockBatch.Header.OriginatorStatusCode = 1
+	mockBatch.GetHeader().OriginatorStatusCode = 1
 	mockBatch.Entries[0].TransactionCode = 23
 	if err := mockBatch.Build(); err != nil {
 		if !strings.Contains(err.Error(), ErrBatchOriginatorDNE.Error()) {

@@ -28,35 +28,37 @@ var (
 
 // BatchPPD holds the Batch Header and Batch Control and all Entry Records for PPD Entries
 type BatchPPD struct {
-	Header  *BatchHeader
+	header  *BatchHeader
 	Entries []*EntryDetail
-	Control *BatchControl
+	control *BatchControl
 	// Converters is composed for ACH to golang Converters
 	converters
 }
 
-// NewBatch returns an *Batch
+// NewBatch returns a *BatchPPD
 func NewBatch() *BatchPPD {
-	return new(BatchPPD).SetHeader(NewBatchHeader()).SetControl(NewBatchControl())
+	batch := new(BatchPPD).SetHeader(NewBatchHeader()).SetControl(NewBatchControl())
+	batch.GetHeader().StandardEntryClassCode = "PPD"
+	return batch
 }
 
 // Validate NACHA rules on the entire batch before being added to a File
 func (batch *BatchPPD) Validate() error {
 	// validate batch header and control codes are the same
-	if batch.Header.ServiceClassCode != batch.Control.ServiceClassCode {
+	if batch.header.ServiceClassCode != batch.control.ServiceClassCode {
 		return ErrBatchServiceClassMismatch
 	}
 	// Company Identification must match the Company ID from the batch header record
-	if batch.Header.CompanyIdentification != batch.Control.CompanyIdentification {
+	if batch.header.CompanyIdentification != batch.control.CompanyIdentification {
 		return ErrBatchCompanyID
 	}
 	// Control ODFI Identification must be the same as batch header
-	if batch.Header.ODFIIdentification != batch.Control.ODFIIdentification {
+	if batch.header.ODFIIdentification != batch.control.ODFIIdentification {
 		return ErrBatchODFIIDMismatch
 	}
 
 	// batch number header and control must match
-	if batch.Header.BatchNumber != batch.Control.BatchNumber {
+	if batch.header.BatchNumber != batch.control.BatchNumber {
 		return ErrBatchNumberMismatch
 	}
 
@@ -93,7 +95,7 @@ func (batch *BatchPPD) Validate() error {
 
 // ValidateAll validate all dependency records in the batch.
 func (batch *BatchPPD) ValidateAll() error {
-	if err := batch.Header.Validate(); err != nil {
+	if err := batch.header.Validate(); err != nil {
 		return err
 	}
 	for _, entry := range batch.Entries {
@@ -106,7 +108,7 @@ func (batch *BatchPPD) ValidateAll() error {
 			}
 		}
 	}
-	if err := batch.Control.Validate(); err != nil {
+	if err := batch.control.Validate(); err != nil {
 		return err
 	}
 	// Validate the Batch wrapper.
@@ -119,7 +121,7 @@ func (batch *BatchPPD) ValidateAll() error {
 // Build takes Batch Header and Entries and builds a valid batch
 func (batch *BatchPPD) Build() error {
 	// Requires a valid BatchHeader
-	if err := batch.Header.Validate(); err != nil {
+	if err := batch.header.Validate(); err != nil {
 		return err
 	}
 	if len(batch.Entries) <= 0 {
@@ -130,7 +132,7 @@ func (batch *BatchPPD) Build() error {
 	seq := 1
 	for i, entry := range batch.Entries {
 		entryCount = entryCount + 1 + len(entry.Addendums)
-		batch.Entries[i].setTraceNumber(batch.Header.ODFIIdentification, seq)
+		batch.Entries[i].setTraceNumber(batch.header.ODFIIdentification, seq)
 		seq++
 		addendaSeq := 1
 		for x := range entry.Addendums {
@@ -142,14 +144,14 @@ func (batch *BatchPPD) Build() error {
 
 	// build a BatchControl record
 	bc := NewBatchControl()
-	bc.ServiceClassCode = batch.Header.ServiceClassCode
-	bc.CompanyIdentification = batch.Header.CompanyIdentification
-	bc.ODFIIdentification = batch.Header.ODFIIdentification
-	bc.BatchNumber = batch.Header.BatchNumber
+	bc.ServiceClassCode = batch.header.ServiceClassCode
+	bc.CompanyIdentification = batch.header.CompanyIdentification
+	bc.ODFIIdentification = batch.header.ODFIIdentification
+	bc.BatchNumber = batch.header.BatchNumber
 	bc.EntryAddendaCount = entryCount
 	bc.EntryHash = batch.parseNumField(batch.calculateEntryHash())
 	bc.TotalCreditEntryDollarAmount, bc.TotalDebitEntryDollarAmount = batch.calculateBatchAmounts()
-	batch.Control = bc
+	batch.control = bc
 
 	// Validate the built batch
 	if err := batch.ValidateAll(); err != nil {
@@ -160,20 +162,30 @@ func (batch *BatchPPD) Build() error {
 
 // SetHeader appends an BatchHeader to the Batch
 func (batch *BatchPPD) SetHeader(batchHeader *BatchHeader) *BatchPPD {
-	batch.Header = batchHeader
+	batch.header = batchHeader
 	return batch
+}
+
+// GetHeader returns the curent Batch header
+func (batch *BatchPPD) GetHeader() *BatchHeader {
+	return batch.header
 }
 
 // SetControl appends an BatchControl to the Batch
 func (batch *BatchPPD) SetControl(batchControl *BatchControl) *BatchPPD {
-	batch.Control = batchControl
+	batch.control = batchControl
 	return batch
+}
+
+// GetHeader returns the curent Batch header
+func (batch *BatchPPD) GetControl() *BatchControl {
+	return batch.control
 }
 
 // AddEntryDetail appends an EntryDetail to the Batch
 //func (batch *Batch) AddEntryDetail(entry EntryDetail) []EntryDetail {
 func (batch *BatchPPD) AddEntryDetail(entry *EntryDetail) *BatchPPD {
-	//entry.setTraceNumber(batch.Header.ODFIIdentification, 1)
+	//entry.setTraceNumber(batch.header.ODFIIdentification, 1)
 	batch.Entries = append(batch.Entries, entry)
 	//	return batch.Entries
 	return batch
@@ -187,7 +199,7 @@ func (batch *BatchPPD) isBatchEntryCountMismatch() error {
 	for _, entry := range batch.Entries {
 		entryCount = entryCount + 1 + len(entry.Addendums)
 	}
-	if entryCount != batch.Control.EntryAddendaCount {
+	if entryCount != batch.control.EntryAddendaCount {
 		return ErrBatchEntryCountMismatch
 	}
 	return nil
@@ -200,12 +212,12 @@ func (batch *BatchPPD) isBatchAmountMismatch() error {
 	credit, debit := batch.calculateBatchAmounts()
 	//fmt.Printf("debit: %v batch debit: %v \n", debit, batch.Control.TotalDebitEntryDollarAmount)
 
-	if debit != batch.Control.TotalDebitEntryDollarAmount {
+	if debit != batch.control.TotalDebitEntryDollarAmount {
 		return ErrBatchAmountMismatch
 	}
 	//fmt.Printf("credit: %v batch credit: %v \n", credit, batch.Control.TotalCreditEntryDollarAmount)
 
-	if credit != batch.Control.TotalCreditEntryDollarAmount {
+	if credit != batch.control.TotalCreditEntryDollarAmount {
 		return ErrBatchAmountMismatch
 	}
 	return nil
@@ -247,7 +259,7 @@ func (batch *BatchPPD) isSequenceAscending() error {
 // isEntryHashMismatch validates the hash by recalulating the result
 func (batch *BatchPPD) isEntryHashMismatch() error {
 	hashField := batch.calculateEntryHash()
-	if hashField != batch.Control.EntryHashField() {
+	if hashField != batch.control.EntryHashField() {
 		return ErrValidEntryHash
 	}
 	return nil
@@ -265,7 +277,7 @@ func (batch *BatchPPD) calculateEntryHash() string {
 
 // The Originator Status Code is not equal to “2” for DNE if the Transaction Code is 23 or 33
 func (batch *BatchPPD) isOriginatorDNEMismatch() error {
-	if batch.Header.OriginatorStatusCode != 2 {
+	if batch.header.OriginatorStatusCode != 2 {
 		for _, entry := range batch.Entries {
 			if entry.TransactionCode == 23 || entry.TransactionCode == 33 {
 				return ErrBatchOriginatorDNE
@@ -279,7 +291,7 @@ func (batch *BatchPPD) isOriginatorDNEMismatch() error {
 // match the batch header odfi
 func (batch *BatchPPD) isTraceNumberODFI() error {
 	for _, entry := range batch.Entries {
-		if batch.Header.ODFIIdentificationField() != entry.TraceNumberField()[:8] {
+		if batch.header.ODFIIdentificationField() != entry.TraceNumberField()[:8] {
 			return ErrBatchTraceNumberNotODFI
 		}
 	}
