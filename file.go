@@ -36,7 +36,7 @@ var (
 // File contains the structures of a parsed ACH File.
 type File struct {
 	Header  FileHeader
-	Batches []*Batch
+	Batches []Batcher
 	Control FileControl
 	// converters is composed for ACH to golang Converters
 	converters
@@ -46,7 +46,7 @@ type File struct {
 func NewFile() *File {
 	return &File{
 		Header: NewFileHeader(),
-		// Batches: []Batch, TODO need a NewBatch
+		// Batches: []Batch, TODO need a NewBatchPPD
 		Control: NewFileControl(),
 	}
 }
@@ -70,17 +70,17 @@ func (f *File) Build() error {
 	totalCreditAmount := 0
 	for i, batch := range f.Batches {
 		// create ascending batch numbers
-		f.Batches[i].Header.BatchNumber = batchSeq
-		f.Batches[i].Control.BatchNumber = batchSeq
+		f.Batches[i].GetHeader().BatchNumber = batchSeq
+		f.Batches[i].GetControl().BatchNumber = batchSeq
 		batchSeq++
 		// sum file entry and addenda records. Assume batch.Build() batch properly calculated control
-		fileEntryAddendaCount = fileEntryAddendaCount + batch.Control.EntryAddendaCount
+		fileEntryAddendaCount = fileEntryAddendaCount + batch.GetControl().EntryAddendaCount
 		// add 2 for Batch header/control + entry added count
-		totalRecordsInFile = totalRecordsInFile + 2 + batch.Control.EntryAddendaCount
+		totalRecordsInFile = totalRecordsInFile + 2 + batch.GetControl().EntryAddendaCount
 		// sum hash from batch control. Assume Batch.Build properly calculated field.
-		fileEntryHashSum = fileEntryHashSum + batch.Control.EntryHash
-		totalDebitAmount = totalDebitAmount + batch.Control.TotalDebitEntryDollarAmount
-		totalCreditAmount = totalCreditAmount + batch.Control.TotalCreditEntryDollarAmount
+		fileEntryHashSum = fileEntryHashSum + batch.GetControl().EntryHash
+		totalDebitAmount = totalDebitAmount + batch.GetControl().TotalDebitEntryDollarAmount
+		totalCreditAmount = totalCreditAmount + batch.GetControl().TotalCreditEntryDollarAmount
 
 	}
 	// create FileControl from calculated values
@@ -105,7 +105,7 @@ func (f *File) Build() error {
 }
 
 // AddBatch appends a Batch to the ach.File
-func (f *File) AddBatch(batch *Batch) []*Batch {
+func (f *File) AddBatch(batch Batcher) []Batcher {
 	f.Batches = append(f.Batches, batch)
 	return f.Batches
 }
@@ -165,7 +165,7 @@ func (f *File) isEntryAddendaCount() error {
 	count := 0
 	// we assume that each batch block has already validated the addenda count in batch control.
 	for _, batch := range f.Batches {
-		count += batch.Control.EntryAddendaCount
+		count += batch.GetControl().EntryAddendaCount
 	}
 	if f.Control.EntryAddendaCount != count {
 		return ErrFileEntryCount
@@ -179,8 +179,8 @@ func (f *File) isFileAmount() error {
 	debit := 0
 	credit := 0
 	for _, batch := range f.Batches {
-		debit += batch.Control.TotalDebitEntryDollarAmount
-		credit += batch.Control.TotalCreditEntryDollarAmount
+		debit += batch.GetControl().TotalDebitEntryDollarAmount
+		credit += batch.GetControl().TotalCreditEntryDollarAmount
 	}
 	if f.Control.TotalDebitEntryDollarAmountInFile != debit {
 		return ErrFileDebitAmount
@@ -205,7 +205,7 @@ func (f *File) isEntryHashMismatch() error {
 func (f *File) calculateEntryHash() string {
 	hash := 0
 	for _, batch := range f.Batches {
-		hash = hash + batch.Control.EntryHash
+		hash = hash + batch.GetControl().EntryHash
 	}
 	return f.numericField(hash, 10)
 }
