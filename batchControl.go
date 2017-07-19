@@ -94,8 +94,8 @@ func (bc *BatchControl) Parse(record string) {
 	bc.BatchNumber = bc.parseNumField(record[87:94])
 }
 
-// NewBatchPPDControl returns a new BatchControl with default values for none exported fields
-func NewBatchPPDControl() *BatchControl {
+// NewBatchControl returns a new BatchControl with default values for none exported fields
+func NewBatchControl() *BatchControl {
 	return &BatchControl{
 		recordType: "8",
 	}

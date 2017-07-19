@@ -23,7 +23,7 @@ func main() {
 	fh.ImmediateOriginName = "My Bank Name"
 
 	// BatchHeader identifies the originating entity and the type of transactions contained in the batch
-	bh := ach.NewBatchPPDHeader()
+	bh := ach.NewBatchHeader()
 	bh.ServiceClassCode = 220          // ACH credit pushes money out, 225 debits/pulls money in.
 	bh.CompanyName = "Name on Account" // The name of the company/person that has relationship with reciever
 	bh.CompanyIdentification = strconv.Itoa(fh.ImmediateOrigin)
@@ -43,8 +43,9 @@ func main() {
 	entry.IndividualName = "Reciever Account Name" // Identifies the reciever of the transaction
 
 	// build the batch
-	batch := ach.NewBatchPPD().SetHeader(bh)
-	batch.AddEntryDetail(entry)
+	batch := ach.NewBatchPPD()
+	batch.SetHeader(bh)
+	batch.AddEntry(entry)
 	if err := batch.Build(); err != nil {
 		log.Fatalf("Unexpected error building batch: %s\n", err)
 	}

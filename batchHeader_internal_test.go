@@ -10,7 +10,7 @@ import (
 )
 
 func mockBatchHeader() *BatchHeader {
-	bh := NewBatchPPDHeader()
+	bh := NewBatchHeader()
 	bh.ServiceClassCode = 220
 	bh.StandardEntryClassCode = "PPD"
 	bh.CompanyName = "ACME Corporation"
