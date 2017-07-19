@@ -10,16 +10,12 @@ package ach
 // * Some SEC codes require specific data in predetermined fields within the ACH record
 type Batcher interface {
 	GetHeader() *BatchHeader
-	SetHeader(*BatchHeader) *BatchPPD
+	SetHeader(*BatchHeader)
 	GetControl() *BatchControl
-	SetControl(*BatchControl) *BatchPPD
+	SetControl(*BatchControl)
 	GetEntries() []*EntryDetail
 	AddEntry(*EntryDetail) Batcher
 	Build() error
 	Validate() error
 	ValidateAll() error
-	//AddEntryDetail(*EntryDetail) batcher
-	// many other functions need to be added.
-	// ValidateAll() error
-	//
 }

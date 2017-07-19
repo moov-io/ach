@@ -1,7 +1,6 @@
 package ach
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -12,5 +11,5 @@ func TestBatcher(t *testing.T) {
 }
 
 func whatABatch(batch Batcher) {
-	fmt.Printf("Batch Header: %v", batch.GetHeader().StandardEntryClassCode)
+	//fmt.Printf("Batch Header: %v", batch.GetHeader().StandardEntryClassCode)
 }

@@ -37,8 +37,10 @@ type BatchPPD struct {
 
 // NewBatch returns a *BatchPPD
 func NewBatch() *BatchPPD {
-	batch := new(BatchPPD).SetHeader(NewBatchHeader()).SetControl(NewBatchControl())
-	batch.GetHeader().StandardEntryClassCode = "PPD"
+	batch := new(BatchPPD)
+	batch.SetHeader(NewBatchHeader())
+	batch.SetControl(NewBatchControl())
+	batch.GetHeader().StandardEntryClassCode = ppd
 	return batch
 }
 
@@ -161,9 +163,8 @@ func (batch *BatchPPD) Build() error {
 }
 
 // SetHeader appends an BatchHeader to the Batch
-func (batch *BatchPPD) SetHeader(batchHeader *BatchHeader) *BatchPPD {
+func (batch *BatchPPD) SetHeader(batchHeader *BatchHeader) {
 	batch.header = batchHeader
-	return batch
 }
 
 // GetHeader returns the curent Batch header
@@ -172,9 +173,8 @@ func (batch *BatchPPD) GetHeader() *BatchHeader {
 }
 
 // SetControl appends an BatchControl to the Batch
-func (batch *BatchPPD) SetControl(batchControl *BatchControl) *BatchPPD {
+func (batch *BatchPPD) SetControl(batchControl *BatchControl) {
 	batch.control = batchControl
-	return batch
 }
 
 // GetControl returns the curent Batch Control
@@ -193,7 +193,7 @@ func (batch *BatchPPD) AddEntry(entry *EntryDetail) Batcher {
 	//entry.setTraceNumber(batch.header.ODFIIdentification, 1)
 	batch.entries = append(batch.entries, entry)
 	//	return batch.entries
-	return batch
+	return Batcher(batch)
 }
 
 // isBatchEntryCountMismatch validate Entry count is accurate

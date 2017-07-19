@@ -75,15 +75,15 @@ func (r *Reader) error(err error) error {
 
 // addCurrentBatch creates the current batch type for the file being read. A successful
 // current batch will be added to r.File once parsed.
-func (r *Reader) addCurrentBatch(batch *BatchPPD) {
+func (r *Reader) addCurrentBatch(batch Batcher) {
 	r.currentBatch = batch
 }
 
 // NewReader returns a new Reader that reads from r.
 func NewReader(r io.Reader) *Reader {
 	return &Reader{
-		scanner:      bufio.NewScanner(r),
-		currentBatch: NewBatch(),
+		scanner: bufio.NewScanner(r),
+		//currentBatch: NewBatch(),
 	}
 }
 
@@ -216,13 +216,23 @@ func (r *Reader) parseFileHeader() error {
 // parseBatchHeader takes the input record string and parses the FileHeaderRecord values
 func (r *Reader) parseBatchHeader() error {
 	r.recordName = "BatchHeader"
-	// @TODO make sure we have a nil currentBatch
-	if r.currentBatch.GetHeader().ServiceClassCode != 0 {
-		// Ensure we have an empty Batch
+	if r.currentBatch != nil {
 		return ErrBatchHeader
 	}
+
 	// @TODO parse the Batch Header to find the SEC code before ecreating the Batch
-	r.currentBatch.GetHeader().Parse(r.line)
+	bh := NewBatchHeader()
+	bh.Parse(r.line)
+	switch sec := bh.StandardEntryClassCode; sec {
+	case ppd:
+		r.addCurrentBatch(NewBatch())
+	// @TODO add additional batch types to creation
+	default:
+		return errors.New("Support for Batch's of SEC(standard entry class): " +
+			sec + ", has not been implemented")
+	}
+	r.currentBatch.SetHeader(bh)
+
 	if err := r.currentBatch.GetHeader().Validate(); err != nil {
 		return err
 	}
@@ -232,28 +242,36 @@ func (r *Reader) parseBatchHeader() error {
 // parseEntryDetail takes the input record string and parses the EntryDetailRecord values
 func (r *Reader) parseEntryDetail() error {
 	r.recordName = "EntryDetail"
-	if r.currentBatch.GetHeader().ServiceClassCode == 0 {
+	if r.currentBatch == nil {
 		return ErrEntryOutside
 	}
-	sec := r.currentBatch.GetHeader().StandardEntryClassCode
-	if sec == ppd {
-		ed := new(EntryDetail)
+	// @TODO change to EntryDetailer once interface is implmented
+	ed := new(EntryDetail)
+
+	switch sec := r.currentBatch.GetHeader().StandardEntryClassCode; sec {
+	case "PPD":
 		ed.Parse(r.line)
 		if err := ed.Validate(); err != nil {
 			return err
 		}
-		r.currentBatch.AddEntry(ed)
-	} else {
+	//case "CCD":
+	default:
 		return errors.New("Support for EntryDetail of SEC(standard entry class): " +
-			r.currentBatch.GetHeader().StandardEntryClassCode + ", has not been implemented")
+			sec + ", has not been implemented")
 	}
+
+	r.currentBatch.AddEntry(ed)
+
 	return nil
 }
 
 // parseAddendaRecord takes the input record string and parses the AddendaRecord values
 func (r *Reader) parseAddenda() error {
 	r.recordName = "Addenda"
-	// @TODO should not be able to access Entries directly. Needs GetEntries
+
+	if r.currentBatch == nil {
+		return ErrAddendaOutside
+	}
 	if len(r.currentBatch.GetEntries()) == 0 {
 		return ErrAddendaOutside
 	}
@@ -285,7 +303,10 @@ func (r *Reader) parseAddenda() error {
 // parseBatchControl takes the input record string and parses the BatchControlRecord values
 func (r *Reader) parseBatchControl() error {
 	r.recordName = "BatchControl"
-	//fmt.Printf("control: %+v \n", r.currentBatch.Control)
+	if r.currentBatch == nil {
+		return ErrBatchHeader
+	}
+
 	r.currentBatch.GetControl().Parse(r.line)
 	if err := r.currentBatch.GetControl().Validate(); err != nil {
 		return err
