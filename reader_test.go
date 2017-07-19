@@ -21,12 +21,10 @@ func TestPPDDebitRead(t *testing.T) {
 	_, err = r.Read()
 	if err != nil {
 		t.Errorf("Can not ach.read file: %v", err)
-		//fmt.Printf("%+v \n", r.File.Batches[0])
 	}
 	err = r.File.ValidateAll()
 	if err != nil {
 		t.Errorf("Could not validate entire read file: %v", err)
-		//fmt.Printf("%+v", r.File)
 	}
 }
 
@@ -82,11 +80,14 @@ func TestTwoFileControls(t *testing.T) {
 	var line = "9000001000001000000010005320001000000010500000000000000                                       "
 	var twoControls = line + "\n" + line
 	r := NewReader(strings.NewReader(twoControls))
-	batch := NewBatch()
-	batch.Control.EntryAddendaCount = 1
-	batch.Control.TotalDebitEntryDollarAmount = 10500
+	r.addCurrentBatch(NewBatchPPD())
+	bc := BatchControl{EntryAddendaCount: 1,
+		TotalDebitEntryDollarAmount: 10500,
+		EntryHash:                   5320001}
+	r.currentBatch.SetControl(&bc)
+
+	r.File.AddBatch(r.currentBatch)
 	r.File.Control.EntryHash = 5320001
-	r.File.AddBatch(batch)
 	_, err := r.Read()
 
 	if !strings.Contains(err.Error(), ErrFileControl.Error()) {
@@ -138,9 +139,12 @@ func TestFileBatchHeaderErr(t *testing.T) {
 
 // TestFileBatchHeaderErr Error when two batch headers exists in a current batch
 func TestFileBatchHeaderDuplicate(t *testing.T) {
+	// create a new Batch header string
 	bh := mockBatchHeader()
 	r := NewReader(strings.NewReader(bh.String()))
-	r.currentBatch.Header = bh
+	// instantitate a batch header in the reader
+	r.addCurrentBatch(NewBatchPPD())
+	// read should fail because it is parsing a second batch header and there can only be one.
 	_, err := r.Read()
 	if !strings.Contains(err.Error(), "BatchHeader") {
 		t.Errorf("Unexpected read.Read() error: %v", err)
@@ -163,7 +167,8 @@ func TestFileEntryDetail(t *testing.T) {
 	ed.CheckDigit = 0
 	line := ed.String()
 	r := NewReader(strings.NewReader(line))
-	r.currentBatch.Header = mockBatchHeader()
+	r.addCurrentBatch(NewBatchPPD())
+	r.currentBatch.SetHeader(mockBatchHeader())
 	_, err := r.Read()
 	if !strings.Contains(err.Error(), ErrValidFieldInclusion.Error()) {
 		t.Errorf("Unexpected read.Read() error: %v", err)
@@ -176,8 +181,9 @@ func TestFileEntryDetailNotPPD(t *testing.T) {
 	ed.CheckDigit = 0
 	line := ed.String()
 	r := NewReader(strings.NewReader(line))
+	r.addCurrentBatch(NewBatchPPD())
 	r.currentBatch.SetHeader(mockBatchHeader())
-	r.currentBatch.Header.StandardEntryClassCode = "ABCXYZ"
+	r.currentBatch.GetHeader().StandardEntryClassCode = "ABCXYZ"
 	_, err := r.Read()
 	if !strings.Contains(err.Error(), "ABCXYZ") {
 		t.Errorf("Unexpected read.Read() error: %v", err)
@@ -222,17 +228,8 @@ func TestFileAddendaNoIndicator(t *testing.T) {
 	}
 }
 
-func TestFileBatchControlErr(t *testing.T) {
-	bc := mockBatchControl()
-	bc.EntryHash = 0
-	r := NewReader(strings.NewReader(bc.String()))
-	_, err := r.Read()
-	if !strings.Contains(err.Error(), ErrBatchServiceClassMismatch.Error()) {
-		t.Errorf("Unexpected read.Read() error: %v", err)
-	}
-}
-
 func TestFileFileControlErr(t *testing.T) {
+
 	fc := mockFileControl()
 	fc.BatchCount = 0
 	r := NewReader(strings.NewReader(fc.String()))

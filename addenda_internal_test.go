@@ -22,14 +22,15 @@ func TestParseAddenda(t *testing.T) {
 	var line = "710WEB                                        DIEGO MAY                            00010000001"
 
 	r := NewReader(strings.NewReader(line))
-	r.currentBatch.Header.StandardEntryClassCode = "PPD"
-	r.currentBatch.AddEntryDetail(&EntryDetail{TransactionCode: 22, AddendaRecordIndicator: 1})
+	r.addCurrentBatch(NewBatchPPD())
+	r.currentBatch.GetHeader().StandardEntryClassCode = "PPD"
+	r.currentBatch.AddEntry(&EntryDetail{TransactionCode: 22, AddendaRecordIndicator: 1})
 	r.line = line
 	err := r.parseAddenda()
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
 	}
-	record := r.currentBatch.Entries[0].Addendums[0]
+	record := r.currentBatch.GetEntries()[0].Addendums[0]
 
 	if record.recordType != "7" {
 		t.Errorf("RecordType Expected '7' got: %v", record.recordType)
@@ -52,14 +53,15 @@ func TestParseAddenda(t *testing.T) {
 func TestAddendaString(t *testing.T) {
 	var line = "710WEB                                        DIEGO MAY                            00010000001"
 	r := NewReader(strings.NewReader(line))
-	r.currentBatch.Header.StandardEntryClassCode = "PPD"
-	r.currentBatch.AddEntryDetail(&EntryDetail{AddendaRecordIndicator: 1})
+	r.addCurrentBatch(NewBatchPPD())
+	r.currentBatch.GetHeader().StandardEntryClassCode = "PPD"
+	r.currentBatch.AddEntry(&EntryDetail{AddendaRecordIndicator: 1})
 	r.line = line
 	err := r.parseAddenda()
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
 	}
-	record := r.currentBatch.Entries[0].Addendums[0]
+	record := r.currentBatch.GetEntries()[0].Addendums[0]
 	if record.String() != line {
 		t.Errorf("Strings do not match")
 	}
