@@ -80,7 +80,7 @@ func TestTwoFileControls(t *testing.T) {
 	var line = "9000001000001000000010005320001000000010500000000000000                                       "
 	var twoControls = line + "\n" + line
 	r := NewReader(strings.NewReader(twoControls))
-	r.addCurrentBatch(NewBatch())
+	r.addCurrentBatch(NewBatchPPD())
 	bc := BatchControl{EntryAddendaCount: 1,
 		TotalDebitEntryDollarAmount: 10500,
 		EntryHash:                   5320001}
@@ -143,7 +143,7 @@ func TestFileBatchHeaderDuplicate(t *testing.T) {
 	bh := mockBatchHeader()
 	r := NewReader(strings.NewReader(bh.String()))
 	// instantitate a batch header in the reader
-	r.addCurrentBatch(NewBatch())
+	r.addCurrentBatch(NewBatchPPD())
 	// read should fail because it is parsing a second batch header and there can only be one.
 	_, err := r.Read()
 	if !strings.Contains(err.Error(), "BatchHeader") {
@@ -167,7 +167,7 @@ func TestFileEntryDetail(t *testing.T) {
 	ed.CheckDigit = 0
 	line := ed.String()
 	r := NewReader(strings.NewReader(line))
-	r.addCurrentBatch(NewBatch())
+	r.addCurrentBatch(NewBatchPPD())
 	r.currentBatch.SetHeader(mockBatchHeader())
 	_, err := r.Read()
 	if !strings.Contains(err.Error(), ErrValidFieldInclusion.Error()) {
@@ -181,7 +181,7 @@ func TestFileEntryDetailNotPPD(t *testing.T) {
 	ed.CheckDigit = 0
 	line := ed.String()
 	r := NewReader(strings.NewReader(line))
-	r.addCurrentBatch(NewBatch())
+	r.addCurrentBatch(NewBatchPPD())
 	r.currentBatch.SetHeader(mockBatchHeader())
 	r.currentBatch.GetHeader().StandardEntryClassCode = "ABCXYZ"
 	_, err := r.Read()

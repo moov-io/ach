@@ -12,13 +12,13 @@ import (
 // TestBatchCountError tests for to many batch counts
 func TestBatchCountError(t *testing.T) {
 	r := NewReader(strings.NewReader(" "))
-	r.File.AddBatch(NewBatch())
+	r.File.AddBatch(NewBatchPPD())
 	r.File.Control.BatchCount = 1
 	if err := r.File.Validate(); err != nil {
 		t.Errorf("Unexpected File.Validation error: %v", err.Error())
 	}
 	// More batches than the file control count.
-	r.File.AddBatch(NewBatch())
+	r.File.AddBatch(NewBatchPPD())
 	if err := r.File.Validate(); err != nil {
 		if err != ErrFileBatchCount {
 			t.Errorf("Unexpected File.Validation error: %v", err.Error())
@@ -28,7 +28,7 @@ func TestBatchCountError(t *testing.T) {
 
 func TestFileEntryAddendaError(t *testing.T) {
 	r := NewReader(strings.NewReader(" "))
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.GetControl().EntryAddendaCount = 1
 	r.File.AddBatch(mockBatch)
 	r.File.Control.BatchCount = 1
@@ -49,7 +49,7 @@ func TestFileEntryAddendaError(t *testing.T) {
 func TestFileDebitAmount(t *testing.T) {
 
 	r := NewReader(strings.NewReader(" "))
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	bc := BatchControl{
 		EntryAddendaCount:           1,
 		TotalDebitEntryDollarAmount: 105000,
@@ -75,7 +75,7 @@ func TestFileDebitAmount(t *testing.T) {
 
 func TestFileCreditAmount(t *testing.T) {
 	r := NewReader(strings.NewReader(" "))
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	bc := BatchControl{
 		EntryAddendaCount:            1,
 		TotalCreditEntryDollarAmount: 10500,
@@ -101,7 +101,7 @@ func TestFileCreditAmount(t *testing.T) {
 
 func TestFileEntryHash(t *testing.T) {
 	r := NewReader(strings.NewReader(" "))
-	mockBatch1 := NewBatch()
+	mockBatch1 := NewBatchPPD()
 	bc := BatchControl{
 		EntryAddendaCount:            1,
 		TotalCreditEntryDollarAmount: 10500,
@@ -109,7 +109,7 @@ func TestFileEntryHash(t *testing.T) {
 	}
 	mockBatch1.SetControl(&bc)
 
-	mockBatch2 := NewBatch()
+	mockBatch2 := NewBatchPPD()
 	bc2 := BatchControl{
 		EntryAddendaCount:            1,
 		TotalCreditEntryDollarAmount: 10500,
@@ -138,7 +138,7 @@ func TestFileEntryHash(t *testing.T) {
 
 func TestFileBlockCount10(t *testing.T) {
 	file := NewFile().SetHeader(mockFileHeader())
-	batch := NewBatch()
+	batch := NewBatchPPD()
 	batch.SetHeader(mockBatchHeader())
 	batch.AddEntry(mockEntryDetail())
 	batch.AddEntry(mockEntryDetail())
@@ -178,7 +178,7 @@ func TestFileBuildNoBatch(t *testing.T) {
 
 func TestFileValidateAllBatch(t *testing.T) {
 	file := NewFile().SetHeader(mockFileHeader())
-	batch := NewBatch()
+	batch := NewBatchPPD()
 	batch.SetHeader(mockBatchHeader())
 	batch.AddEntry(mockEntryDetail())
 	batch.Build()
@@ -195,7 +195,7 @@ func TestFileValidateAllBatch(t *testing.T) {
 
 func TestFileValidateAllFileHeader(t *testing.T) {
 	file := NewFile().SetHeader(mockFileHeader())
-	batch := NewBatch()
+	batch := NewBatchPPD()
 	batch.SetHeader(mockBatchHeader())
 	batch.AddEntry(mockEntryDetail())
 	batch.Build()
@@ -212,7 +212,7 @@ func TestFileValidateAllFileHeader(t *testing.T) {
 
 func TestFileValidateAllFileControl(t *testing.T) {
 	file := NewFile().SetHeader(mockFileHeader())
-	batch := NewBatch()
+	batch := NewBatchPPD()
 	batch.SetHeader(mockBatchHeader())
 	batch.AddEntry(mockEntryDetail())
 	batch.Build()

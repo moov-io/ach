@@ -46,7 +46,7 @@ type File struct {
 func NewFile() *File {
 	return &File{
 		Header: NewFileHeader(),
-		// Batches: []Batch, TODO need a NewBatch
+		// Batches: []Batch, TODO need a NewBatchPPD
 		Control: NewFileControl(),
 	}
 }

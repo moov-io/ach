@@ -24,7 +24,7 @@ func mockEntryDetail() *EntryDetail {
 func TestParseEntryDetail(t *testing.T) {
 	var line = "62705320001912345            0000010500c-1            Arnold Wade           DD0076401255655291"
 	r := NewReader(strings.NewReader(line))
-	r.addCurrentBatch(NewBatch())
+	r.addCurrentBatch(NewBatchPPD())
 	r.currentBatch.SetHeader(mockBatchHeader())
 	r.line = line
 	err := r.parseEntryDetail()
@@ -73,7 +73,7 @@ func TestParseEntryDetail(t *testing.T) {
 func TestEDString(t *testing.T) {
 	var line = "62705320001912345            0000010500c-1            Arnold Wade           DD0076401255655291"
 	r := NewReader(strings.NewReader(line))
-	r.addCurrentBatch(NewBatch())
+	r.addCurrentBatch(NewBatchPPD())
 	r.currentBatch.SetHeader(mockBatchHeader())
 	r.line = line
 	err := r.parseEntryDetail()

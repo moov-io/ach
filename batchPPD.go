@@ -35,11 +35,13 @@ type BatchPPD struct {
 	converters
 }
 
-// NewBatch returns a *BatchPPD
-func NewBatch() *BatchPPD {
+// NewBatchPPD returns a *BatchPPD
+func NewBatchPPD() *BatchPPD {
 	batch := new(BatchPPD)
-	batch.SetHeader(NewBatchHeader())
-	batch.SetControl(NewBatchControl())
+	bh := NewBatchPPDHeader()
+	bh.StandardEntryClassCode = ppd
+	batch.SetHeader(bh)
+	batch.SetControl(NewBatchPPDControl())
 	batch.GetHeader().StandardEntryClassCode = ppd
 	return batch
 }
@@ -145,7 +147,7 @@ func (batch *BatchPPD) Build() error {
 	}
 
 	// build a BatchControl record
-	bc := NewBatchControl()
+	bc := NewBatchPPDControl()
 	bc.ServiceClassCode = batch.header.ServiceClassCode
 	bc.CompanyIdentification = batch.header.CompanyIdentification
 	bc.ODFIIdentification = batch.header.ODFIIdentification

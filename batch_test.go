@@ -12,7 +12,7 @@ import (
 
 // TestBatchEntryCountMismatc check for control out-of-balance error.
 func TestBatchEntryCountMismatch(t *testing.T) {
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	e := mockEntryDetail()
 	a := mockAddenda()
@@ -33,7 +33,7 @@ func TestBatchEntryCountMismatch(t *testing.T) {
 }
 
 func TestBatchServiceClassMismatch(t *testing.T) {
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	mockBatch.AddEntry(mockEntryDetail())
 
@@ -51,7 +51,7 @@ func TestBatchServiceClassMismatch(t *testing.T) {
 }
 
 func TestBatchCompanyIdentification(t *testing.T) {
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	mockBatch.AddEntry(mockEntryDetail())
 	// works properly
@@ -68,7 +68,7 @@ func TestBatchCompanyIdentification(t *testing.T) {
 }
 
 func TestBatchODFIIDMismatch(t *testing.T) {
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	mockBatch.AddEntry(mockEntryDetail())
 	// works properly
@@ -85,7 +85,7 @@ func TestBatchODFIIDMismatch(t *testing.T) {
 }
 
 func TestBatchNumberMismatch(t *testing.T) {
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	mockBatch.AddEntry(mockEntryDetail())
 	// works properly
@@ -102,7 +102,7 @@ func TestBatchNumberMismatch(t *testing.T) {
 }
 
 func TestBatchIsSequenceAscending(t *testing.T) {
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	mockBatch.AddEntry(mockEntryDetail())
 	mockBatch.AddEntry(mockEntryDetail())
@@ -124,7 +124,7 @@ func TestBatchIsSequenceAscending(t *testing.T) {
 
 // isBatchAmountMismatch
 func TestCreditBatchIsBatchAmountMismatch(t *testing.T) {
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	e1 := mockEntryDetail()
 	e1.TransactionCode = 22
@@ -148,7 +148,7 @@ func TestCreditBatchIsBatchAmountMismatch(t *testing.T) {
 }
 
 func TestSavingsBatchIsBatchAmountMismatch(t *testing.T) {
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	e1 := mockEntryDetail()
 	e1.TransactionCode = 32
@@ -172,7 +172,7 @@ func TestSavingsBatchIsBatchAmountMismatch(t *testing.T) {
 }
 
 func TestBatchIsEntryHashMismatch(t *testing.T) {
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	mockBatch.AddEntry(mockEntryDetail())
 	mockBatch.AddEntry(mockEntryDetail())
@@ -191,7 +191,7 @@ func TestBatchIsEntryHashMismatch(t *testing.T) {
 
 // isOriginatorDNEMismatch
 func TestBatchIsOriginatorDNEMismatch(t *testing.T) {
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	mockBatch.AddEntry(mockEntryDetail())
 	// works properly
@@ -210,7 +210,7 @@ func TestBatchIsOriginatorDNEMismatch(t *testing.T) {
 
 // ErrBatchTraceNumberNotODFI
 func TestBatchTraceNumberNotODFI(t *testing.T) {
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	mockBatch.AddEntry(mockEntryDetail())
 	// works properly
@@ -228,7 +228,7 @@ func TestBatchTraceNumberNotODFI(t *testing.T) {
 
 // ErrBatchAddendaIndicator
 func TestBatchAddendaIndicator(t *testing.T) {
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	ed := mockEntryDetail()
 	ed.AddAddenda(mockAddenda())
@@ -248,7 +248,7 @@ func TestBatchAddendaIndicator(t *testing.T) {
 
 // isAddendaSequence
 func TestBatchAddendaSequence(t *testing.T) {
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	ed := mockEntryDetail()
 	ed.AddAddenda(mockAddenda())
@@ -268,7 +268,7 @@ func TestBatchAddendaSequence(t *testing.T) {
 
 // ErrBatchAddendaTraceNumber
 func TestBatchAddendaTraceNumber(t *testing.T) {
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	ed := mockEntryDetail()
 	ed.AddAddenda(mockAddenda())
@@ -288,8 +288,8 @@ func TestBatchAddendaTraceNumber(t *testing.T) {
 }
 
 func TestBatchBuild(t *testing.T) {
-	mockBatch := NewBatch()
-	header := NewBatchHeader()
+	mockBatch := NewBatchPPD()
+	header := NewBatchPPDHeader()
 	header.ServiceClassCode = 200
 	header.CompanyName = "MY BEST COMP."
 	header.CompanyDiscretionaryData = "INCLUDES OVERTIME"
@@ -319,7 +319,7 @@ func TestBatchBuild(t *testing.T) {
 }
 
 func TestBatchValidateAllBH(t *testing.T) {
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	ed := mockEntryDetail()
 	ed.AddAddenda(mockAddenda())
@@ -338,7 +338,7 @@ func TestBatchValidateAllBH(t *testing.T) {
 }
 
 func TestBatchValidateAllED(t *testing.T) {
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	ed := mockEntryDetail()
 	ed.AddAddenda(mockAddenda())
@@ -357,7 +357,7 @@ func TestBatchValidateAllED(t *testing.T) {
 }
 
 func TestBatchValidateAllAddenda(t *testing.T) {
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	ed := mockEntryDetail()
 	ed.AddAddenda(mockAddenda())
@@ -376,7 +376,7 @@ func TestBatchValidateAllAddenda(t *testing.T) {
 }
 
 func TestBatchValidateAllBatchControl(t *testing.T) {
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	ed := mockEntryDetail()
 	ed.AddAddenda(mockAddenda())
@@ -395,7 +395,7 @@ func TestBatchValidateAllBatchControl(t *testing.T) {
 }
 
 func TestBatchBuildHeader(t *testing.T) {
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	ed := mockEntryDetail()
 	ed.AddAddenda(mockAddenda())
@@ -412,7 +412,7 @@ func TestBatchBuildHeader(t *testing.T) {
 }
 
 func TestBatchBuildNoEntries(t *testing.T) {
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	if err := mockBatch.Build(); err != nil {
 		if !strings.Contains(err.Error(), ErrBatchEntries.Error()) {
@@ -422,7 +422,7 @@ func TestBatchBuildNoEntries(t *testing.T) {
 }
 
 func TestBatchDNEMismatch(t *testing.T) {
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	ed := mockEntryDetail()
 	ed.AddAddenda(mockAddenda())
@@ -440,7 +440,7 @@ func TestBatchDNEMismatch(t *testing.T) {
 }
 
 func TestBatchAddendaSeq(t *testing.T) {
-	mockBatch := NewBatch()
+	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	ed := mockEntryDetail()
 	ed.AddAddenda(mockAddenda())

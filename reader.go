@@ -83,7 +83,6 @@ func (r *Reader) addCurrentBatch(batch Batcher) {
 func NewReader(r io.Reader) *Reader {
 	return &Reader{
 		scanner: bufio.NewScanner(r),
-		//currentBatch: NewBatch(),
 	}
 }
 
@@ -178,8 +177,7 @@ func (r *Reader) parseLine() error {
 			return err
 		}
 		r.File.AddBatch(r.currentBatch)
-		// @TODO do not create a new batch here. Needs to be nil until we know the SEC type
-		r.addCurrentBatch(new(BatchPPD))
+		r.currentBatch = nil
 	case fileControlPos:
 		if r.line[:2] == "99" {
 			// final blocking padding
@@ -219,13 +217,11 @@ func (r *Reader) parseBatchHeader() error {
 	if r.currentBatch != nil {
 		return ErrBatchHeader
 	}
-
-	// @TODO parse the Batch Header to find the SEC code before ecreating the Batch
-	bh := NewBatchHeader()
+	bh := NewBatchPPDHeader()
 	bh.Parse(r.line)
 	switch sec := bh.StandardEntryClassCode; sec {
 	case ppd:
-		r.addCurrentBatch(NewBatch())
+		r.addCurrentBatch(NewBatchPPD())
 	// @TODO add additional batch types to creation
 	default:
 		return errors.New("Support for Batch's of SEC(standard entry class): " +
@@ -245,11 +241,11 @@ func (r *Reader) parseEntryDetail() error {
 	if r.currentBatch == nil {
 		return ErrEntryOutside
 	}
-	// @TODO change to EntryDetailer once interface is implmented
+	// @TODO change to EntryDetailer once interface is implmented if EntryDetails change
 	ed := new(EntryDetail)
 
 	switch sec := r.currentBatch.GetHeader().StandardEntryClassCode; sec {
-	case "PPD":
+	case ppd:
 		ed.Parse(r.line)
 		if err := ed.Validate(); err != nil {
 			return err
@@ -261,7 +257,6 @@ func (r *Reader) parseEntryDetail() error {
 	}
 
 	r.currentBatch.AddEntry(ed)
-
 	return nil
 }
 
@@ -277,8 +272,9 @@ func (r *Reader) parseAddenda() error {
 	}
 	entryIndex := len(r.currentBatch.GetEntries()) - 1
 	entry := r.currentBatch.GetEntries()[entryIndex]
-	sec := r.currentBatch.GetHeader().StandardEntryClassCode
-	if sec == ppd {
+
+	switch sec := r.currentBatch.GetHeader().StandardEntryClassCode; sec {
+	case ppd:
 		if entry.AddendaRecordIndicator == 1 {
 			addenda := Addenda{}
 			addenda.Parse(r.line)
@@ -289,14 +285,12 @@ func (r *Reader) parseAddenda() error {
 		} else {
 			return ErrAddendaNoIndicator
 		}
+	// case "CCD":
+	default:
+		return errors.New("Support for addenda of SEC(standard entry class): " +
+			sec + ", has not been implemented")
 	}
-	// Currently Dead code until Additional SEC codes are supported by BatchHeader
-	/*
-		else {
-			return errors.New("Support for Addenda records for SEC(Standard Entry Class): " +
-				r.currentBatch.Header.StandardEntryClassCode + ", has not been implemented")
-		}
-	*/
+
 	return nil
 }
 

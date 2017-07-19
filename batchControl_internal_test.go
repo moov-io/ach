@@ -10,7 +10,7 @@ import (
 )
 
 func mockBatchControl() *BatchControl {
-	bc := NewBatchControl()
+	bc := NewBatchPPDControl()
 	bc.ServiceClassCode = 220
 	bc.CompanyIdentification = "123456789"
 	bc.EntryHash = 1
@@ -24,7 +24,7 @@ func TestParseBatchControl(t *testing.T) {
 	var line = "82250000010005320001000000010500000000000000origid                             076401250000001"
 	r := NewReader(strings.NewReader(line))
 	r.line = line
-	r.addCurrentBatch(NewBatch())
+	r.addCurrentBatch(NewBatchPPD())
 	bh := BatchHeader{BatchNumber: 1,
 		ServiceClassCode:      225,
 		CompanyIdentification: "origid",
@@ -79,7 +79,7 @@ func TestBCString(t *testing.T) {
 	var line = "82250000010005320001000000010500000000000000origid                             076401250000001"
 	r := NewReader(strings.NewReader(line))
 	r.line = line
-	r.addCurrentBatch(NewBatch())
+	r.addCurrentBatch(NewBatchPPD())
 	bh := BatchHeader{BatchNumber: 1,
 		ServiceClassCode:      225,
 		CompanyIdentification: "origid",
