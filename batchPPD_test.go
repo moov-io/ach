@@ -289,7 +289,7 @@ func TestBatchAddendaTraceNumber(t *testing.T) {
 
 func TestBatchBuild(t *testing.T) {
 	mockBatch := NewBatchPPD()
-	header := NewBatchPPDHeader()
+	header := NewBatchHeader()
 	header.ServiceClassCode = 200
 	header.CompanyName = "MY BEST COMP."
 	header.CompanyDiscretionaryData = "INCLUDES OVERTIME"

@@ -217,7 +217,7 @@ func (r *Reader) parseBatchHeader() error {
 	if r.currentBatch != nil {
 		return ErrBatchHeader
 	}
-	bh := NewBatchPPDHeader()
+	bh := NewBatchHeader()
 	bh.Parse(r.line)
 	switch sec := bh.StandardEntryClassCode; sec {
 	case ppd:

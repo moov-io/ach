@@ -10,7 +10,7 @@ import (
 )
 
 func mockBatchControl() *BatchControl {
-	bc := NewBatchPPDControl()
+	bc := NewBatchControl()
 	bc.ServiceClassCode = 220
 	bc.CompanyIdentification = "123456789"
 	bc.EntryHash = 1
