@@ -6,7 +6,6 @@ package ach
 
 import (
 	"fmt"
-	"sezzle/nacha/logging"
 )
 
 // EntryDetail contains the actual transaction data for an individual entry.
@@ -136,35 +135,27 @@ func (ed *EntryDetail) String() string {
 // The first error encountered is returned and stops that parsing.
 func (ed *EntryDetail) Validate() error {
 	if err := ed.fieldInclusion(); err != nil {
-		logging.Error(err)
 		return err
 	}
 	if ed.recordType != "6" {
-		logging.Error("Record type 0")
 		return &ValidateError{FieldName: "recordType", Value: ed.recordType, Err: ErrRecordType}
 	}
 	if err := ed.isTransactionCode(ed.TransactionCode); err != nil {
-		logging.Error(err)
 		return &ValidateError{FieldName: "TransactionCode", Value: string(ed.TransactionCode), Err: err}
 	}
 	if err := ed.isAlphanumeric(ed.DFIAccountNumber); err != nil {
-		logging.Error(err)
 		return &ValidateError{FieldName: "DFIAccountNumber", Value: ed.DFIAccountNumber, Err: err}
 	}
 	if err := ed.isAlphanumeric(ed.IndividualIdentificationNumber); err != nil {
-		logging.Error(err)
 		return &ValidateError{FieldName: "IndividualIdentificationNumber", Value: ed.IndividualIdentificationNumber, Err: err}
 	}
 	if err := ed.isAlphanumeric(ed.IndividualName); err != nil {
-		logging.Error(err)
 		return &ValidateError{FieldName: "IndividualName", Value: ed.IndividualName, Err: err}
 	}
 	if err := ed.isAlphanumeric(ed.DiscretionaryData); err != nil {
-		logging.Error(err)
 		return &ValidateError{FieldName: "DiscretionaryData", Value: ed.DiscretionaryData, Err: err}
 	}
 	if err := ed.isCheckDigit(ed.RDFIIdentificationField(), ed.CheckDigit); err != nil {
-		logging.Error(err)
 		return &ValidateError{FieldName: "CheckDigit", Value: string(ed.CheckDigit), Err: err}
 	}
 	return nil
