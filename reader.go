@@ -45,7 +45,7 @@ var (
 
 // currently support SEC codes
 const (
-	ppd = "PPD"
+	ppd = "WEB"
 )
 
 // Reader reads records from a ACH-encoded file.
@@ -57,7 +57,7 @@ type Reader struct {
 	// line is the current line being parsed from the input r
 	line string
 	// currentBatch is the current Batch entries being parsed
-	currentBatch Batcher
+	currentBatch *Batch
 	// line number of the file being parsed
 	lineNum int
 	// recordName holds the current record name being parsed.
@@ -73,16 +73,11 @@ func (r *Reader) error(err error) error {
 	}
 }
 
-// addCurrentBatch creates the current batch type for the file being read. A successful
-// current batch will be added to r.File once parsed.
-func (r *Reader) addCurrentBatch(batch Batcher) {
-	r.currentBatch = batch
-}
-
 // NewReader returns a new Reader that reads from r.
 func NewReader(r io.Reader) *Reader {
 	return &Reader{
-		scanner: bufio.NewScanner(r),
+		scanner:      bufio.NewScanner(r),
+		currentBatch: NewBatch(),
 	}
 }
 
@@ -172,12 +167,12 @@ func (r *Reader) parseLine() error {
 		if err := r.parseBatchControl(); err != nil {
 			return err
 		}
-		if err := r.currentBatch.Validate(); err != nil {
-			r.recordName = "Batches"
-			return err
-		}
+		// if err := r.currentBatch.Validate(); err != nil {
+		// 	r.recordName = "Batches"
+		// 	return err
+		// }
 		r.File.AddBatch(r.currentBatch)
-		r.currentBatch = nil
+		r.currentBatch = new(Batch)
 	case fileControlPos:
 		if r.line[:2] == "99" {
 			// final blocking padding
@@ -186,9 +181,9 @@ func (r *Reader) parseLine() error {
 		if err := r.parseFileControl(); err != nil {
 			return err
 		}
-		if err := r.File.Validate(); err != nil {
-			return err
-		}
+		// if err := r.File.Validate(); err != nil {
+		// 	return err
+		// }
 	default:
 		return r.error(ErrUnknownRecordType)
 	}
@@ -205,106 +200,86 @@ func (r *Reader) parseFileHeader() error {
 	}
 	r.File.Header.Parse(r.line)
 
-	if err := r.File.Header.Validate(); err != nil {
-		return err
-	}
+	// if err := r.File.Header.Validate(); err != nil {
+	// 	return err
+	// }
 	return nil
 }
 
 // parseBatchHeader takes the input record string and parses the FileHeaderRecord values
 func (r *Reader) parseBatchHeader() error {
 	r.recordName = "BatchHeader"
-	if r.currentBatch != nil {
+	if r.currentBatch.Header.ServiceClassCode != 0 {
+		// Ensure we have an empty Batch
 		return ErrBatchHeader
 	}
-	bh := NewBatchHeader()
-	bh.Parse(r.line)
-	switch sec := bh.StandardEntryClassCode; sec {
-	case ppd:
-		r.addCurrentBatch(NewBatchPPD())
-	// @TODO add additional batch types to creation
-	default:
-		return errors.New("Support for Batch's of SEC(standard entry class): " +
-			sec + ", has not been implemented")
-	}
-	r.currentBatch.SetHeader(bh)
-
-	if err := r.currentBatch.GetHeader().Validate(); err != nil {
-		return err
-	}
+	r.currentBatch.Header.Parse(r.line)
+	// if err := r.currentBatch.Header.Validate(); err != nil {
+	// 	return err
+	// }
 	return nil
 }
 
 // parseEntryDetail takes the input record string and parses the EntryDetailRecord values
 func (r *Reader) parseEntryDetail() error {
 	r.recordName = "EntryDetail"
-	if r.currentBatch == nil {
+	if r.currentBatch.Header.ServiceClassCode == 0 {
 		return ErrEntryOutside
 	}
-	// @TODO change to EntryDetailer once interface is implmented if EntryDetails change
-	ed := new(EntryDetail)
-
-	switch sec := r.currentBatch.GetHeader().StandardEntryClassCode; sec {
-	case ppd:
+	sec := r.currentBatch.Header.StandardEntryClassCode
+	if sec == ppd {
+		ed := new(EntryDetail)
 		ed.Parse(r.line)
-		if err := ed.Validate(); err != nil {
-			return err
-		}
-	//case "CCD":
-	default:
+		// if err := ed.Validate(); err != nil {
+		// 	return err
+		// }
+		r.currentBatch.AddEntryDetail(ed)
+	} else {
 		return errors.New("Support for EntryDetail of SEC(standard entry class): " +
-			sec + ", has not been implemented")
+			r.currentBatch.Header.StandardEntryClassCode + ", has not been implemented")
 	}
-
-	r.currentBatch.AddEntry(ed)
 	return nil
 }
 
 // parseAddendaRecord takes the input record string and parses the AddendaRecord values
 func (r *Reader) parseAddenda() error {
 	r.recordName = "Addenda"
-
-	if r.currentBatch == nil {
+	if len(r.currentBatch.Entries) == 0 {
 		return ErrAddendaOutside
 	}
-	if len(r.currentBatch.GetEntries()) == 0 {
-		return ErrAddendaOutside
-	}
-	entryIndex := len(r.currentBatch.GetEntries()) - 1
-	entry := r.currentBatch.GetEntries()[entryIndex]
-
-	switch sec := r.currentBatch.GetHeader().StandardEntryClassCode; sec {
-	case ppd:
+	entryIndex := len(r.currentBatch.Entries) - 1
+	entry := r.currentBatch.Entries[entryIndex]
+	sec := r.currentBatch.Header.StandardEntryClassCode
+	if sec == ppd {
 		if entry.AddendaRecordIndicator == 1 {
 			addenda := Addenda{}
 			addenda.Parse(r.line)
-			if err := addenda.Validate(); err != nil {
-				return err
-			}
-			r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda)
+			// if err := addenda.Validate(); err != nil {
+			// 	return err
+			// }
+			r.currentBatch.Entries[entryIndex].AddAddenda(addenda)
 		} else {
 			return ErrAddendaNoIndicator
 		}
-	// case "CCD":
-	default:
-		return errors.New("Support for addenda of SEC(standard entry class): " +
-			sec + ", has not been implemented")
 	}
-
+	// Currently Dead code until Additional SEC codes are supported by BatchHeader
+	/*
+		else {
+			return errors.New("Support for Addenda records for SEC(Standard Entry Class): " +
+				r.currentBatch.Header.StandardEntryClassCode + ", has not been implemented")
+		}
+	*/
 	return nil
 }
 
 // parseBatchControl takes the input record string and parses the BatchControlRecord values
 func (r *Reader) parseBatchControl() error {
 	r.recordName = "BatchControl"
-	if r.currentBatch == nil {
-		return ErrBatchHeader
-	}
-
-	r.currentBatch.GetControl().Parse(r.line)
-	if err := r.currentBatch.GetControl().Validate(); err != nil {
-		return err
-	}
+	//fmt.Printf("control: %+v \n", r.currentBatch.Control)
+	r.currentBatch.Control.Parse(r.line)
+	// if err := r.currentBatch.Control.Validate(); err != nil {
+	// 	return err
+	// }
 	return nil
 }
 
@@ -316,8 +291,8 @@ func (r *Reader) parseFileControl() error {
 		return ErrFileControl
 	}
 	r.File.Control.Parse(r.line)
-	if err := r.File.Control.Validate(); err != nil {
-		return err
-	}
+	// if err := r.File.Control.Validate(); err != nil {
+	// 	return err
+	// }
 	return nil
 }
