@@ -24,18 +24,20 @@ func TestParseBatchControl(t *testing.T) {
 	var line = "82250000010005320001000000010500000000000000origid                             076401250000001"
 	r := NewReader(strings.NewReader(line))
 	r.line = line
-	r.currentBatch.Header.BatchNumber = 1
-	r.currentBatch.Header.ServiceClassCode = 225
-	r.currentBatch.Header.CompanyIdentification = "origid"
-	r.currentBatch.Header.ODFIIdentification = 7640125
+	r.addCurrentBatch(NewBatchPPD())
+	bh := BatchHeader{BatchNumber: 1,
+		ServiceClassCode:      225,
+		CompanyIdentification: "origid",
+		ODFIIdentification:    7640125}
+	r.currentBatch.SetHeader(&bh)
 
-	r.currentBatch.AddEntryDetail(&EntryDetail{TransactionCode: 27, Amount: 10500, RDFIIdentification: 5320001, TraceNumber: 76401255655291})
+	r.currentBatch.AddEntry(&EntryDetail{TransactionCode: 27, Amount: 10500, RDFIIdentification: 5320001, TraceNumber: 76401255655291})
 	//fmt.Printf("%+v \n", r.line)
 	err := r.parseBatchControl()
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
 	}
-	record := r.currentBatch.Control
+	record := r.currentBatch.GetControl()
 
 	if record.recordType != "8" {
 		t.Errorf("RecordType Expected '8' got: %v", record.recordType)
@@ -77,16 +79,19 @@ func TestBCString(t *testing.T) {
 	var line = "82250000010005320001000000010500000000000000origid                             076401250000001"
 	r := NewReader(strings.NewReader(line))
 	r.line = line
-	r.currentBatch.Header.BatchNumber = 1
-	r.currentBatch.Header.ServiceClassCode = 225
-	r.currentBatch.Header.CompanyIdentification = "origid"
-	r.currentBatch.Header.ODFIIdentification = 7640125
-	r.currentBatch.AddEntryDetail(&EntryDetail{TransactionCode: 27, Amount: 10500, RDFIIdentification: 5320001, TraceNumber: 76401255655291})
+	r.addCurrentBatch(NewBatchPPD())
+	bh := BatchHeader{BatchNumber: 1,
+		ServiceClassCode:      225,
+		CompanyIdentification: "origid",
+		ODFIIdentification:    7640125}
+	r.currentBatch.SetHeader(&bh)
+
+	r.currentBatch.AddEntry(&EntryDetail{TransactionCode: 27, Amount: 10500, RDFIIdentification: 5320001, TraceNumber: 76401255655291})
 	err := r.parseBatchControl()
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
 	}
-	record := r.currentBatch.Control
+	record := r.currentBatch.GetControl()
 
 	if record.String() != line {
 		t.Errorf("Strings do not match")

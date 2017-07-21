@@ -32,7 +32,7 @@ func TestParseBatchHeader(t *testing.T) {
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
 	}
-	record := r.currentBatch.Header
+	record := r.currentBatch.GetHeader()
 
 	if record.recordType != "5" {
 		t.Errorf("RecordType Expected '5' got: %v", record.recordType)
@@ -84,7 +84,7 @@ func TestBHString(t *testing.T) {
 	if err != nil {
 		t.Errorf("unknown error: %v", err)
 	}
-	record := r.currentBatch.Header
+	record := r.currentBatch.GetHeader()
 
 	if record.String() != line {
 		t.Errorf("Strings do not match")

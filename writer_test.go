@@ -10,7 +10,9 @@ func TestPPDWrite(t *testing.T) {
 	file := NewFile().SetHeader(mockFileHeader())
 	entry := mockEntryDetail()
 	entry.AddAddenda(mockAddenda())
-	batch := NewBatch().SetHeader(mockBatchHeader()).AddEntryDetail(entry)
+	batch := NewBatchPPD()
+	batch.SetHeader(mockBatchHeader())
+	batch.AddEntry(entry)
 	batch.Build()
 	file.AddBatch(batch)
 	file.Build()
@@ -28,16 +30,13 @@ func TestPPDWrite(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unexpected error: %s\n", err)
 	}
-	//	fmt.Print(b.String())
 	r := NewReader(strings.NewReader(b.String()))
 	_, err = r.Read()
 	if err != nil {
 		t.Errorf("Can not ach.Read generated file: %v", err)
-		//fmt.Printf("%+v \n", r.File.Batches[0])
 	}
 	err = r.File.ValidateAll()
 	if err != nil {
 		t.Errorf("Could not validate entire generated file: %v", err)
-		//fmt.Printf("%+v", r.File)
 	}
 }
