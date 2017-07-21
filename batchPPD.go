@@ -4,28 +4,6 @@
 
 package ach
 
-import (
-	"errors"
-)
-
-// Errors specific to parsing a Batch container
-var (
-	ErrBatchServiceClassMismatch = errors.New("Service Class Code is not the same in Header and Control")
-	ErrBatchEntryCountMismatch   = errors.New("Batch Entry Count is out-of-balance with number of Entries")
-	ErrBatchAmountMismatch       = errors.New("Batch Control debit and credit amounts are not the same as sum of Entries")
-	ErrBatchNumberMismatch       = errors.New("Batch Number is not the same in Header as Control")
-	ErrBatchAscendingTraceNumber = errors.New("Trace Numbers on the File are not in ascending order within a batch")
-	ErrBatchAddendaSequence      = errors.New("Addenda Sequence numbers are not in ascending order")
-	ErrValidEntryHash            = errors.New("Entry Hash is not equal to the sum of Entry Detail RDFI Identification")
-	ErrBatchOriginatorDNE        = errors.New("Originator Status Code is not equal to “2” for DNE if the Transaction Code is 23 or 33")
-	ErrBatchCompanyID            = errors.New("Company Identification must match the Company ID from the batch header record")
-	ErrBatchODFIIDMismatch       = errors.New("Batch Control ODFI Identification must be the same as batch header")
-	ErrBatchTraceNumberNotODFI   = errors.New("Trace Number in an Entry Detail Record are not the same as the ODFI Routing Number")
-	ErrBatchAddendaIndicator     = errors.New("Addenda found with no Addenda Indicator in proceeding Entry Detail")
-	ErrBatchAddendaTraceNumber   = errors.New("Addenda Entry Detail Sequence number does not match proceeding Entry Detail Trace Number")
-	ErrBatchEntries              = errors.New("Batch must have Entrie Record(s) to be built")
-)
-
 // BatchPPD holds the Batch Header and Batch Control and all Entry Records for PPD Entries
 type BatchPPD struct {
 	header  *BatchHeader
