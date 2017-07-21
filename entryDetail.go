@@ -4,7 +4,9 @@
 
 package ach
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // EntryDetail contains the actual transaction data for an individual entry.
 // Fields include those designating the entry as a deposit (credit) or
