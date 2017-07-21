@@ -57,7 +57,7 @@ type Reader struct {
 	// line is the current line being parsed from the input r
 	line string
 	// currentBatch is the current Batch entries being parsed
-	currentBatch Batcher
+	currentBatch *Batch
 	// line number of the file being parsed
 	lineNum int
 	// recordName holds the current record name being parsed.
@@ -73,16 +73,11 @@ func (r *Reader) error(err error) error {
 	}
 }
 
-// addCurrentBatch creates the current batch type for the file being read. A successful
-// current batch will be added to r.File once parsed.
-func (r *Reader) addCurrentBatch(batch Batcher) {
-	r.currentBatch = batch
-}
-
 // NewReader returns a new Reader that reads from r.
 func NewReader(r io.Reader) *Reader {
 	return &Reader{
-		scanner: bufio.NewScanner(r),
+		scanner:      bufio.NewScanner(r),
+		currentBatch: NewBatch(),
 	}
 }
 
@@ -177,7 +172,7 @@ func (r *Reader) parseLine() error {
 		// 	return err
 		// }
 		r.File.AddBatch(r.currentBatch)
-		r.currentBatch = nil
+		r.currentBatch = new(Batch)
 	case fileControlPos:
 		if r.line[:2] == "99" {
 			// final blocking padding
@@ -214,7 +209,8 @@ func (r *Reader) parseFileHeader() error {
 // parseBatchHeader takes the input record string and parses the FileHeaderRecord values
 func (r *Reader) parseBatchHeader() error {
 	r.recordName = "BatchHeader"
-	if r.currentBatch != nil {
+	if r.currentBatch.Header.ServiceClassCode != 0 {
+		// Ensure we have an empty Batch
 		return ErrBatchHeader
 	}
 	r.currentBatch.Header.Parse(r.line)
@@ -228,14 +224,12 @@ func (r *Reader) parseBatchHeader() error {
 // parseEntryDetail takes the input record string and parses the EntryDetailRecord values
 func (r *Reader) parseEntryDetail() error {
 	r.recordName = "EntryDetail"
-	if r.currentBatch == nil {
+	if r.currentBatch.Header.ServiceClassCode == 0 {
 		return ErrEntryOutside
 	}
-	// @TODO change to EntryDetailer once interface is implmented if EntryDetails change
-	ed := new(EntryDetail)
-
-	switch sec := r.currentBatch.GetHeader().StandardEntryClassCode; sec {
-	case ppd:
+	sec := r.currentBatch.Header.StandardEntryClassCode
+	if sec == ppd {
+		ed := new(EntryDetail)
 		ed.Parse(r.line)
 		// if err := ed.Validate(); err != nil {
 		// 	return err
@@ -244,28 +238,21 @@ func (r *Reader) parseEntryDetail() error {
 	} else {
 
 		return errors.New("Support for EntryDetail of SEC(standard entry class): " +
-			sec + ", has not been implemented")
+			r.currentBatch.Header.StandardEntryClassCode + ", has not been implemented")
 	}
-
-	r.currentBatch.AddEntry(ed)
 	return nil
 }
 
 // parseAddendaRecord takes the input record string and parses the AddendaRecord values
 func (r *Reader) parseAddenda() error {
 	r.recordName = "Addenda"
-
-	if r.currentBatch == nil {
+	if len(r.currentBatch.Entries) == 0 {
 		return ErrAddendaOutside
 	}
-	if len(r.currentBatch.GetEntries()) == 0 {
-		return ErrAddendaOutside
-	}
-	entryIndex := len(r.currentBatch.GetEntries()) - 1
-	entry := r.currentBatch.GetEntries()[entryIndex]
-
-	switch sec := r.currentBatch.GetHeader().StandardEntryClassCode; sec {
-	case ppd:
+	entryIndex := len(r.currentBatch.Entries) - 1
+	entry := r.currentBatch.Entries[entryIndex]
+	sec := r.currentBatch.Header.StandardEntryClassCode
+	if sec == ppd {
 		if entry.AddendaRecordIndicator == 1 {
 			addenda := Addenda{}
 			addenda.Parse(r.line)
@@ -276,12 +263,14 @@ func (r *Reader) parseAddenda() error {
 		} else {
 			return ErrAddendaNoIndicator
 		}
-	// case "CCD":
-	default:
-		return errors.New("Support for addenda of SEC(standard entry class): " +
-			sec + ", has not been implemented")
 	}
-
+	// Currently Dead code until Additional SEC codes are supported by BatchHeader
+	/*
+		else {
+			return errors.New("Support for Addenda records for SEC(Standard Entry Class): " +
+				r.currentBatch.Header.StandardEntryClassCode + ", has not been implemented")
+		}
+	*/
 	return nil
 }
 
