@@ -45,7 +45,7 @@ var (
 
 // currently support SEC codes
 const (
-	ppd = "PPD"
+	ppd = "WEB"
 )
 
 // Reader reads records from a ACH-encoded file.
@@ -167,10 +167,10 @@ func (r *Reader) parseLine() error {
 		if err := r.parseBatchControl(); err != nil {
 			return err
 		}
-		if err := r.currentBatch.Validate(); err != nil {
-			r.recordName = "Batches"
-			return err
-		}
+		// if err := r.currentBatch.Validate(); err != nil {
+		// 	r.recordName = "Batches"
+		// 	return err
+		// }
 		r.File.AddBatch(r.currentBatch)
 		r.currentBatch = new(Batch)
 	case fileControlPos:
@@ -181,9 +181,9 @@ func (r *Reader) parseLine() error {
 		if err := r.parseFileControl(); err != nil {
 			return err
 		}
-		if err := r.File.Validate(); err != nil {
-			return err
-		}
+		// if err := r.File.Validate(); err != nil {
+		// 	return err
+		// }
 	default:
 		return r.error(ErrUnknownRecordType)
 	}
@@ -200,9 +200,9 @@ func (r *Reader) parseFileHeader() error {
 	}
 	r.File.Header.Parse(r.line)
 
-	if err := r.File.Header.Validate(); err != nil {
-		return err
-	}
+	// if err := r.File.Header.Validate(); err != nil {
+	// 	return err
+	// }
 	return nil
 }
 
@@ -214,9 +214,9 @@ func (r *Reader) parseBatchHeader() error {
 		return ErrBatchHeader
 	}
 	r.currentBatch.Header.Parse(r.line)
-	if err := r.currentBatch.Header.Validate(); err != nil {
-		return err
-	}
+	// if err := r.currentBatch.Header.Validate(); err != nil {
+	// 	return err
+	// }
 	return nil
 }
 
@@ -230,9 +230,9 @@ func (r *Reader) parseEntryDetail() error {
 	if sec == ppd {
 		ed := new(EntryDetail)
 		ed.Parse(r.line)
-		if err := ed.Validate(); err != nil {
-			return err
-		}
+		// if err := ed.Validate(); err != nil {
+		// 	return err
+		// }
 		r.currentBatch.AddEntryDetail(ed)
 	} else {
 		return errors.New("Support for EntryDetail of SEC(standard entry class): " +
@@ -254,9 +254,9 @@ func (r *Reader) parseAddenda() error {
 		if entry.AddendaRecordIndicator == 1 {
 			addenda := Addenda{}
 			addenda.Parse(r.line)
-			if err := addenda.Validate(); err != nil {
-				return err
-			}
+			// if err := addenda.Validate(); err != nil {
+			// 	return err
+			// }
 			r.currentBatch.Entries[entryIndex].AddAddenda(addenda)
 		} else {
 			return ErrAddendaNoIndicator
@@ -277,9 +277,9 @@ func (r *Reader) parseBatchControl() error {
 	r.recordName = "BatchControl"
 	//fmt.Printf("control: %+v \n", r.currentBatch.Control)
 	r.currentBatch.Control.Parse(r.line)
-	if err := r.currentBatch.Control.Validate(); err != nil {
-		return err
-	}
+	// if err := r.currentBatch.Control.Validate(); err != nil {
+	// 	return err
+	// }
 	return nil
 }
 
@@ -291,8 +291,8 @@ func (r *Reader) parseFileControl() error {
 		return ErrFileControl
 	}
 	r.File.Control.Parse(r.line)
-	if err := r.File.Control.Validate(); err != nil {
-		return err
-	}
+	// if err := r.File.Control.Validate(); err != nil {
+	// 	return err
+	// }
 	return nil
 }
