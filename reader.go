@@ -217,6 +217,7 @@ func (r *Reader) parseBatchHeader() error {
 	// if err := r.currentBatch.Header.Validate(); err != nil {
 	// 	return err
 	// }
+
 	return nil
 }
 
@@ -235,6 +236,7 @@ func (r *Reader) parseEntryDetail() error {
 		// }
 		r.currentBatch.AddEntryDetail(ed)
 	} else {
+
 		return errors.New("Support for EntryDetail of SEC(standard entry class): " +
 			r.currentBatch.Header.StandardEntryClassCode + ", has not been implemented")
 	}
@@ -280,6 +282,7 @@ func (r *Reader) parseBatchControl() error {
 	// if err := r.currentBatch.Control.Validate(); err != nil {
 	// 	return err
 	// }
+
 	return nil
 }
 

@@ -4,10 +4,7 @@
 
 package ach
 
-import (
-	"fmt"
-	"sezzle/nacha/logging"
-)
+import "fmt"
 
 // EntryDetail contains the actual transaction data for an individual entry.
 // Fields include those designating the entry as a deposit (credit) or
