@@ -88,7 +88,8 @@ func (fc *FileControl) Validate() error {
 		return err
 	}
 	if fc.recordType != "9" {
-		return &ValidateError{FieldName: "recordType", Value: fc.recordType, Err: ErrRecordType}
+		msg := fmt.Sprintf(msgRecordType, 9)
+		return &FieldError{FieldName: "recordType", Value: fc.recordType, Msg: msg}
 	}
 	return nil
 }
@@ -97,19 +98,19 @@ func (fc *FileControl) Validate() error {
 // invalid the ACH transfer will be returned.
 func (fc *FileControl) fieldInclusion() error {
 	if fc.recordType == "" {
-		return &ValidateError{FieldName: "recordType", Value: fc.recordType, Err: ErrRecordType}
+		return &FieldError{FieldName: "recordType", Value: fc.recordType, Msg: msgFieldInclusion}
 	}
 	if fc.BatchCount == 0 {
-		return &ValidateError{FieldName: "BatchCount", Value: string(fc.BatchCount), Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "BatchCount", Value: fc.BatchCountField(), Msg: msgFieldInclusion}
 	}
 	if fc.BlockCount == 0 {
-		return &ValidateError{FieldName: "BlockCount", Value: string(fc.BlockCount), Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "BlockCount", Value: fc.BlockCountField(), Msg: msgFieldInclusion}
 	}
 	if fc.EntryAddendaCount == 0 {
-		return &ValidateError{FieldName: "EntryAddendaCount", Value: string(fc.EntryAddendaCount), Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "EntryAddendaCount", Value: fc.EntryAddendaCountField(), Msg: msgFieldInclusion}
 	}
 	if fc.EntryHash == 0 {
-		return &ValidateError{FieldName: "EntryAddendaCount", Value: string(fc.EntryAddendaCount), Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "EntryAddendaCount", Value: fc.EntryAddendaCountField(), Msg: msgFieldInclusion}
 	}
 	return nil
 }

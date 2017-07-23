@@ -20,8 +20,10 @@ func TestBatchCountError(t *testing.T) {
 	// More batches than the file control count.
 	r.File.AddBatch(NewBatchPPD())
 	if err := r.File.Validate(); err != nil {
-		if err != ErrFileBatchCount {
-			t.Errorf("Unexpected File.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "BatchCount" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -161,8 +163,10 @@ func TestFileBlockCount10(t *testing.T) {
 func TestFileBuildBadFileHeader(t *testing.T) {
 	file := NewFile().SetHeader(FileHeader{})
 	if err := file.Build(); err != nil {
-		if !strings.Contains(err.Error(), ErrRecordType.Error()) {
-			t.Errorf("Unexpected File.Build error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -186,7 +190,7 @@ func TestFileValidateAllBatch(t *testing.T) {
 	// break the file header
 	file.Batches[0].GetHeader().ODFIIdentification = 0
 	if err := file.Build(); err != nil {
-		_, ok := err.(*ValidateError)
+		_, ok := err.(*FieldError)
 		if !ok {
 			t.Errorf("Unexpected File.ValidationAll error: %v", err.Error())
 		}
@@ -203,7 +207,7 @@ func TestFileValidateAllFileHeader(t *testing.T) {
 	// break the file header
 	file.Header.ImmediateOrigin = 0
 	if err := file.Build(); err != nil {
-		_, ok := err.(*ValidateError)
+		_, ok := err.(*FieldError)
 		if !ok {
 			t.Errorf("Unexpected File.ValidationAll error: %v", err.Error())
 		}
@@ -220,7 +224,7 @@ func TestFileValidateAllFileControl(t *testing.T) {
 	// break the file header
 	file.Control.BatchCount = 0
 	if err := file.Build(); err != nil {
-		_, ok := err.(*ValidateError)
+		_, ok := err.(*FieldError)
 		if !ok {
 			t.Errorf("Unexpected File.ValidationAll error: %v", err.Error())
 		}

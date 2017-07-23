@@ -121,7 +121,7 @@ func TestFileFileHeaderErr(t *testing.T) {
 	// necessary to have a file control not nil
 	r.File.Control = mockFileControl()
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), ErrValidFieldInclusion.Error()) {
+	if !strings.Contains(err.Error(), msgFieldInclusion) {
 		t.Errorf("Unexpected read.Read() error: %v", err)
 	}
 }
@@ -132,7 +132,7 @@ func TestFileBatchHeaderErr(t *testing.T) {
 	bh.ODFIIdentification = 0
 	r := NewReader(strings.NewReader(bh.String()))
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), ErrValidFieldInclusion.Error()) {
+	if !strings.Contains(err.Error(), msgFieldInclusion) {
 		t.Errorf("Unexpected read.Read() error: %v", err)
 	}
 }
@@ -170,7 +170,7 @@ func TestFileEntryDetail(t *testing.T) {
 	r.addCurrentBatch(NewBatchPPD())
 	r.currentBatch.SetHeader(mockBatchHeader())
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), ErrValidFieldInclusion.Error()) {
+	if !strings.Contains(err.Error(), msgFieldInclusion) {
 		t.Errorf("Unexpected read.Read() error: %v", err)
 	}
 }
@@ -234,7 +234,7 @@ func TestFileFileControlErr(t *testing.T) {
 	fc.BatchCount = 0
 	r := NewReader(strings.NewReader(fc.String()))
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), ErrValidFieldInclusion.Error()) {
+	if !strings.Contains(err.Error(), msgFieldInclusion) {
 		t.Errorf("Unexpected read.Read() error: %v", err)
 	}
 }
@@ -244,7 +244,13 @@ func TestFileLongErr(t *testing.T) {
 	line := "101 076401251 0764012510807291511A094101achdestname            companyname                    5000companyname                         origid    PPDCHECKPAYMT000002080730   1076401250000001"
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), ErrServiceClass.Error()) {
-		t.Errorf("Unexpected read.Read() error: %v", err)
+	if e, ok := err.(*ParseError); ok {
+		if e, ok := e.Err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Error(err)
+			}
+		}
+
 	}
+
 }

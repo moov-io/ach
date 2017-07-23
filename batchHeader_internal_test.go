@@ -98,8 +98,10 @@ func TestValidateBHRecordType(t *testing.T) {
 	bh := mockBatchHeader()
 	bh.recordType = "2"
 	if err := bh.Validate(); err != nil {
-		if !strings.Contains(err.Error(), ErrRecordType.Error()) {
-			t.Errorf("Expected RecordType Error got: %v", err)
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "recordType" {
+				t.Error(err)
+			}
 		}
 	}
 
@@ -110,8 +112,10 @@ func TestInvalidServiceCode(t *testing.T) {
 	bh := mockBatchHeader()
 	bh.ServiceClassCode = 123
 	if err := bh.Validate(); err != nil {
-		if !strings.Contains(err.Error(), ErrServiceClass.Error()) {
-			t.Errorf("Expected Service Class Error got: %v", err)
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "ServiceClassCode" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -119,10 +123,13 @@ func TestInvalidServiceCode(t *testing.T) {
 // TestValidateInvalidServiceCode ensure error if service class is not valid
 func TestInvalidSECCode(t *testing.T) {
 	bh := mockBatchHeader()
-	bh.StandardEntryClassCode = "ABC"
+	//fmt.Print(bh)
+	bh.StandardEntryClassCode = "123"
 	if err := bh.Validate(); err != nil {
-		if !strings.Contains(err.Error(), ErrSECCode.Error()) {
-			t.Errorf("Expected SEC CodeError got: %v", err)
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "StandardEntryClassCode" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -132,8 +139,10 @@ func TestInvalidOrigStatusCode(t *testing.T) {
 	bh := mockBatchHeader()
 	bh.OriginatorStatusCode = 3
 	if err := bh.Validate(); err != nil {
-		if !strings.Contains(err.Error(), ErrOrigStatusCode.Error()) {
-			t.Errorf("Expected Originator Status CodeError got: %v", err)
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "OriginatorStatusCode" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -142,14 +151,15 @@ func TestBatchHeaderFieldInclusion(t *testing.T) {
 	bh := mockBatchHeader()
 	// works properly
 	if err := bh.Validate(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		t.Error(err)
 	}
 	// create error is mismatch
 	bh.BatchNumber = 0
 	if err := bh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "BatchNumber" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -158,14 +168,15 @@ func TestBatchHeaderCompanyNameAlphaNumeric(t *testing.T) {
 	bh := mockBatchHeader()
 	// works properly
 	if err := bh.Validate(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		t.Error(err)
 	}
 	// create error is mismatch
 	bh.CompanyName = "AT&T"
 	if err := bh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "CompanyName" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -174,14 +185,15 @@ func TestBatchCompanyDiscretionaryDataAlphaNumeric(t *testing.T) {
 	bh := mockBatchHeader()
 	// works properly
 	if err := bh.Validate(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		t.Error(err)
 	}
 	// create error is mismatch
 	bh.CompanyDiscretionaryData = "Invoice: #12345"
 	if err := bh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "CompanyDiscretionaryData" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -190,14 +202,15 @@ func TestBatchCompanyIdentificationAlphaNumeric(t *testing.T) {
 	bh := mockBatchHeader()
 	// works properly
 	if err := bh.Validate(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		t.Error(err)
 	}
 	// create error is mismatch
 	bh.CompanyIdentification = "EIN:12345"
 	if err := bh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "CompanyIdentification" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -206,14 +219,15 @@ func TestBatchCompanyEntryDescriptionAlphaNumeric(t *testing.T) {
 	bh := mockBatchHeader()
 	// works properly
 	if err := bh.Validate(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		t.Error(err)
 	}
 	// create error is mismatch
 	bh.CompanyEntryDescription = "P@YROLL"
 	if err := bh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "CompanyEntryDescription" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -222,9 +236,10 @@ func TestBHFieldInclusionRecordType(t *testing.T) {
 	bh := mockBatchHeader()
 	bh.recordType = ""
 	if err := bh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "recordType" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -233,9 +248,10 @@ func TestBHFieldInclusionCompanyName(t *testing.T) {
 	bh := mockBatchHeader()
 	bh.CompanyName = ""
 	if err := bh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "CompanyName" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -244,9 +260,10 @@ func TestBHFieldInclusionCompanyIdentification(t *testing.T) {
 	bh := mockBatchHeader()
 	bh.CompanyIdentification = ""
 	if err := bh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "CompanyIdentification" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -255,9 +272,10 @@ func TestBHFieldInclusionStandardEntryClassCode(t *testing.T) {
 	bh := mockBatchHeader()
 	bh.StandardEntryClassCode = ""
 	if err := bh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "StandardEntryClassCode" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -266,9 +284,10 @@ func TestBHFieldInclusionCompanyEntryDescription(t *testing.T) {
 	bh := mockBatchHeader()
 	bh.CompanyEntryDescription = ""
 	if err := bh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "CompanyEntryDescription" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -277,9 +296,10 @@ func TestBHFieldInclusionOriginatorStatusCode(t *testing.T) {
 	bh := mockBatchHeader()
 	bh.OriginatorStatusCode = 0
 	if err := bh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "OriginatorStatusCode" {
+				t.Error(err)
+			}
 		}
 	}
 }

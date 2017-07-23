@@ -95,8 +95,10 @@ func TestValidateFHRecordType(t *testing.T) {
 	fh := mockFileHeader()
 	fh.recordType = "2"
 	if err := fh.Validate(); err != nil {
-		if !strings.Contains(err.Error(), ErrRecordType.Error()) {
-			t.Errorf("Expected RecordType Error got: %v", err)
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "recordType" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -104,10 +106,12 @@ func TestValidateFHRecordType(t *testing.T) {
 // TestValidateIDModifier ensure ID Modiier is upper alphanumeric
 func TestValidateIDModifier(t *testing.T) {
 	fh := mockFileHeader()
-	fh.FileIDModifier = "A"
+	fh.FileIDModifier = "a"
 	if err := fh.Validate(); err != nil {
-		if !strings.Contains(err.Error(), ErrValidFieldLength.Error()) {
-			t.Errorf("Expected ID Modifier Error got: %v", err)
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "FileIDModifier" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -117,8 +121,10 @@ func TestValidateRecordSize(t *testing.T) {
 	fh := mockFileHeader()
 	fh.recordSize = "666"
 	if err := fh.Validate(); err != nil {
-		if !strings.Contains(err.Error(), ErrRecordSize.Error()) {
-			t.Errorf("Expected Record Size Error got: %v", err)
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "recordSize" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -128,8 +134,10 @@ func TestBlockingFactor(t *testing.T) {
 	fh := mockFileHeader()
 	fh.blockingFactor = "99"
 	if err := fh.Validate(); err != nil {
-		if !strings.Contains(err.Error(), ErrBlockingFactor.Error()) {
-			t.Errorf("Expected Blocking Factor Error got: %v", err)
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "blockingFactor" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -139,8 +147,10 @@ func TestFormatCode(t *testing.T) {
 	fh := mockFileHeader()
 	fh.formatCode = "2"
 	if err := fh.Validate(); err != nil {
-		if !strings.Contains(err.Error(), ErrFormatCode.Error()) {
-			t.Errorf("Expected Format Code Error got: %v", err)
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "formatCode" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -149,14 +159,15 @@ func TestFHFieldInculsion(t *testing.T) {
 	fh := mockFileHeader()
 	// works properly
 	if err := fh.Validate(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		t.Error(err)
 	}
 	// create error is mismatch
 	fh.ImmediateOrigin = 0
 	if err := fh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -165,23 +176,25 @@ func TestUpperLengthFileID(t *testing.T) {
 	fh := mockFileHeader()
 	// works properly
 	if err := fh.Validate(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		t.Error(err)
 	}
 	// create error is mismatch
 	fh.FileIDModifier = "a"
 
 	if err := fh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "FileIDModifier" {
+				t.Error(err)
+			}
 		}
 	}
 
 	fh.FileIDModifier = "AA"
 	if err := fh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "FileIDModifier" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -191,14 +204,15 @@ func TestImmediateDestinationNameAlphaNumeric(t *testing.T) {
 	// works properly
 	fh.ImmediateDestinationName = "Super Big Bank"
 	if err := fh.Validate(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		t.Error(err)
 	}
 	// create error is mismatch
 	fh.ImmediateDestinationName = "Big @$$ Bank"
 	if err := fh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "ImmediateDestinationName" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -208,14 +222,15 @@ func TestImmediateOriginNameAlphaNumeric(t *testing.T) {
 	// works properly
 	fh.ImmediateOriginName = "Super Big Bank"
 	if err := fh.Validate(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		t.Error(err)
 	}
 	// create error is mismatch
-	fh.ImmediateOriginName = "Big @$$ Bank"
+	fh.ImmediateOriginName = "Bigger @$$ Bank"
 	if err := fh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "ImmediateOriginName" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -225,14 +240,15 @@ func TestImmediateReferenceCodeAlphaNumeric(t *testing.T) {
 	// works properly
 	fh.ReferenceCode = " "
 	if err := fh.Validate(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		t.Error(err)
 	}
 	// create error is mismatch
 	fh.ReferenceCode = "!@#$%^"
 	if err := fh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "ReferenceCode" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -241,9 +257,10 @@ func TestFHFieldInclusionRecordType(t *testing.T) {
 	fh := mockFileHeader()
 	fh.recordType = ""
 	if err := fh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -252,9 +269,10 @@ func TestFHFieldInclusionImmediatDestination(t *testing.T) {
 	fh := mockFileHeader()
 	fh.ImmediateDestination = 0
 	if err := fh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -263,9 +281,10 @@ func TestFHFieldInclusionFileIDModifier(t *testing.T) {
 	fh := mockFileHeader()
 	fh.FileIDModifier = ""
 	if err := fh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -274,9 +293,10 @@ func TestFHFieldInclusionRecordSize(t *testing.T) {
 	fh := mockFileHeader()
 	fh.recordSize = ""
 	if err := fh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -285,9 +305,10 @@ func TestFHFieldInclusionBlockingFactor(t *testing.T) {
 	fh := mockFileHeader()
 	fh.blockingFactor = ""
 	if err := fh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -296,9 +317,10 @@ func TestFHFieldInclusionFormatCode(t *testing.T) {
 	fh := mockFileHeader()
 	fh.formatCode = ""
 	if err := fh.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Error(err)
+			}
 		}
 	}
 }

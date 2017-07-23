@@ -15,30 +15,33 @@ import (
 // validator is common validation and formating of golang types to ach type strings
 type validator struct{}
 
-// ValidateError is returned for errors at a field level in a record
-type ValidateError struct {
+// FieldError is returned for errors at a field level in a record
+type FieldError struct {
 	FieldName string // field name where error happend
 	Value     string // value that cause error
-	Err       error  // the actual error
+	Msg       string // context of the error.
 }
 
-func (e *ValidateError) Error() string {
-	return fmt.Sprintf("FieldName:%s Value:%s msg: %s ", e.FieldName, e.Value, e.Err)
+// Error message is constructed
+// FieldName Msg Value
+// Example1: BatchCount $% has none alphanumeric characters
+// Example2: BatchCount 5 is out-of-balance with file count 6
+func (e *FieldError) Error() string {
+	return fmt.Sprintf("%s %s %s ", e.FieldName, e.Value, e.Msg)
 }
 
 // Errors specific to validation
 var (
-	ErrValidAlphanumeric   = errors.New("Field has non alphanumeric characters")
-	ErrValidAlpha          = errors.New("Field has non alpha characters")
-	ErrUpperAlpha          = errors.New("Field is not uppercase A-Z or 0-9")
-	ErrValidFieldInclusion = errors.New("A mandatory field has a default value")
-	ErrValidFieldLength    = errors.New("Field length is invalid")
-	ErrServiceClass        = errors.New("Invalid Service Class Code")
-	ErrSECCode             = errors.New("Invalid Standard Entry Class Code")
-	ErrOrigStatusCode      = errors.New("Invalid Originator Status Code")
-	ErrAddendaTypeCode     = errors.New("Invalid Addenda Type Code")
-	ErrTransactionCode     = errors.New("Invalid Transaction Code")
-	ErrValidCheckDigit     = errors.New("Check Digit does not match calculated check digit")
+	msgAlphanumeric     = "has non alphanumeric characters"
+	msgUpperAlpha       = "is not uppercase A-Z or 0-9"
+	msgFieldInclusion   = "is a mandatory field and has a default value"
+	msgValidFieldLength = "is not length %d"
+	msgServiceClass     = "is an invalid Service Class Code"
+	msgSECCode          = "is an invalid Standard Entry Class Code"
+	msgOrigStatusCode   = "is an invalid Originator Status Code"
+	msgAddendaTypeCode  = "is an invalid Addenda Type Code"
+	msgTransactionCode  = "is an invalid Transaction Code"
+	msgValidCheckDigit  = "does not match calculated check digit %d"
 )
 
 // iServiceClass returns true if a valid service class code
@@ -55,7 +58,7 @@ func (v *validator) isServiceClass(code int) error {
 		280:
 		return nil
 	}
-	return ErrServiceClass
+	return errors.New(msgServiceClass)
 }
 
 // isSECCode returns true if a SEC Code is found
@@ -66,7 +69,7 @@ func (v *validator) isSECCode(code string) error {
 		"IAT", "MTE", "POS", "PPD", "POP", "RCK", "SHR", "TEL", "TRC", "TRX", "WEB", "XCK":
 		return nil
 	}
-	return ErrSECCode
+	return errors.New(msgSECCode)
 }
 
 // isTypeCode returns true if a valid type code is found
@@ -87,7 +90,7 @@ func (v *validator) isTypeCode(code string) error {
 		"05":
 		return nil
 	}
-	return ErrAddendaTypeCode
+	return errors.New(msgAddendaTypeCode)
 }
 
 // isTransactionCode ensures TransactionCode code is valid
@@ -113,7 +116,7 @@ func (v *validator) isTransactionCode(code int) error {
 		38:
 		return nil
 	}
-	return ErrTransactionCode
+	return errors.New(msgTransactionCode)
 }
 
 // isOriginatorStatusCode ensures status code is valid
@@ -128,13 +131,13 @@ func (v *validator) isOriginatorStatusCode(code int) error {
 		2:
 		return nil
 	}
-	return ErrOrigStatusCode
+	return errors.New(msgOrigStatusCode)
 }
 
 // isUpperAlphanumeric checks if string only contains ASCII alphanumeric upper case characters
 func (v *validator) isUpperAlphanumeric(s string) error {
 	if regexp.MustCompile(`[^A-Z0-9]+`).MatchString(s) {
-		return ErrUpperAlpha
+		return errors.New(msgUpperAlpha)
 	}
 	return nil
 }
@@ -143,18 +146,23 @@ func (v *validator) isUpperAlphanumeric(s string) error {
 func (v *validator) isAlphanumeric(s string) error {
 	if regexp.MustCompile(`[^ a-zA-Z0-9_*-\/]+`).MatchString(s) {
 		// ^[ A-Za-z0-9_@./#&+-]*$/
-		return ErrValidAlphanumeric
+		return errors.New(msgAlphanumeric)
 	}
 	return nil
 }
 
 // isOriginatorStatusCode ensures status code is valid
+/*
 func (v *validator) isCheckDigit(routingNumber string, checkDigit int) error {
-	if v.CalculateCheckDigit(routingNumber) != checkDigit {
-		return ErrValidCheckDigit
+	calculated := v.CalculateCheckDigit(routingNumber)
+	if calculated != checkDigit {
+		msg := fmt.Sprintf(msgValidCheckDigit, calculated)
+		return &FieldError{FieldName: "RoutingNumber", Value: routingNumber, Msg: msg}
+		//return msgValidCheckDigit
 	}
 	return nil
 }
+*/
 
 // CalculateCheckDigit returns a check digit for a rounting number
 // Multiply each digit in the Routing number by a weighting factor. The weighting factors for each digit are:

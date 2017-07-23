@@ -6,9 +6,10 @@ package ach
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"io"
+
+	"github.com/pkg/errors"
 )
 
 const (

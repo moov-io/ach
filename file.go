@@ -10,6 +10,8 @@ package ach
 
 import (
 	"errors"
+	"fmt"
+	"strconv"
 )
 
 // First position of all Record Types. These codes are uniquily assigned to
@@ -23,9 +25,9 @@ const (
 	fileControlPos  = "9"
 )
 
-// Errors specific to parsing a Batch container
+// Errors strings specific to parsing a Batch container
 var (
-	ErrFileBatchCount   = errors.New("Total Number of Batches in file is out-of-balance with File Control")
+	msgFileBatchCount   = "is out-of-balance with total Batches %d in file "
 	ErrFileEntryCount   = errors.New("Total Entries and Addenda count is out-of-balance with File Control")
 	ErrFileDebitAmount  = errors.New("Total Debit amount is out-of-balance with File Control")
 	ErrFileCreditAmount = errors.New("Total Credit amount is out-of-balance with File Control")
@@ -120,7 +122,9 @@ func (f *File) SetHeader(h FileHeader) *File {
 func (f *File) Validate() error {
 	// The value of the Batch Count Field is equal to the number of Company/Batch/Header Records in the file.
 	if f.Control.BatchCount != len(f.Batches) {
-		return ErrFileBatchCount
+		msg := fmt.Sprintf(msgFileBatchCount, f.Control.BatchCount)
+		err := &FieldError{FieldName: "BatchCount", Value: strconv.Itoa(len(f.Batches)), Msg: msg}
+		return err
 	}
 
 	if err := f.isEntryAddendaCount(); err != nil {

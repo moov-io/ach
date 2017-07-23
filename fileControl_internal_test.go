@@ -76,8 +76,10 @@ func TestValidateFCRecordType(t *testing.T) {
 	fc.recordType = "2"
 
 	if err := fc.Validate(); err != nil {
-		if !strings.Contains(err.Error(), ErrRecordType.Error()) {
-			t.Errorf("Expected RecordType Error got: %v", err)
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "recordType" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -86,14 +88,15 @@ func TestFCFieldInclusion(t *testing.T) {
 	fc := mockFileControl()
 	// works properly
 	if err := fc.Validate(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		t.Error(err)
 	}
 	// create error is mismatch
 	fc.BatchCount = 0
 	if err := fc.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -102,9 +105,10 @@ func TestFCFieldInclusionRecordType(t *testing.T) {
 	fc := mockFileControl()
 	fc.recordType = ""
 	if err := fc.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -113,9 +117,10 @@ func TestFCFieldInclusionBlockCount(t *testing.T) {
 	fc := mockFileControl()
 	fc.BlockCount = 0
 	if err := fc.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -124,9 +129,10 @@ func TestFCFieldInclusionEntryAddendaCount(t *testing.T) {
 	fc := mockFileControl()
 	fc.EntryAddendaCount = 0
 	if err := fc.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -135,9 +141,10 @@ func TestFCFieldInclusionEntryHash(t *testing.T) {
 	fc := mockFileControl()
 	fc.EntryHash = 0
 	if err := fc.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Error(err)
+			}
 		}
 	}
 }

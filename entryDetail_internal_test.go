@@ -92,8 +92,10 @@ func TestValidateEDRecordType(t *testing.T) {
 	ed := mockEntryDetail()
 	ed.recordType = "2"
 	if err := ed.Validate(); err != nil {
-		if !strings.Contains(err.Error(), ErrRecordType.Error()) {
-			t.Errorf("Expected RecordType Error got: %v", err)
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "recordType" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -103,8 +105,10 @@ func TestValidateEDTransactionCode(t *testing.T) {
 	ed := mockEntryDetail()
 	ed.TransactionCode = 63
 	if err := ed.Validate(); err != nil {
-		if !strings.Contains(err.Error(), ErrTransactionCode.Error()) {
-			t.Errorf("Expected Transaction Code Error got: %v", err)
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "TransactionCode" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -113,14 +117,15 @@ func TestEDFieldInclusion(t *testing.T) {
 	ed := mockEntryDetail()
 	// works properly
 	if err := ed.Validate(); err != nil {
-		t.Errorf("Unexpected Entry Detail error: %v", err.Error())
+		t.Error(err)
 	}
 	// create error is mismatch
 	ed.Amount = 0
 	if err := ed.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Entry Detail error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -129,14 +134,15 @@ func TestEDdfiAccountNumberAlphaNumeric(t *testing.T) {
 	ed := mockEntryDetail()
 	// works properly
 	if err := ed.Validate(); err != nil {
-		t.Errorf("Unexpected Entry Detail error: %v", err.Error())
+		t.Error(err)
 	}
 	// create error is mismatch
 	ed.DFIAccountNumber = "74647#999!"
 	if err := ed.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Entry Detail error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "DFIAccountNumber" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -145,14 +151,15 @@ func TestEDIndividualIdentificationNumberAlphaNumeric(t *testing.T) {
 	ed := mockEntryDetail()
 	// works properly
 	if err := ed.Validate(); err != nil {
-		t.Errorf("Unexpected Entry Detail error: %v", err.Error())
+		t.Error(err)
 	}
 	// create error is mismatch
 	ed.IndividualIdentificationNumber = "#12345!"
 	if err := ed.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Entry Detail error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "IndividualIdentificationNumber" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -161,14 +168,15 @@ func TestEDIndividualNameAlphaNumeric(t *testing.T) {
 	ed := mockEntryDetail()
 	// works properly
 	if err := ed.Validate(); err != nil {
-		t.Errorf("Unexpected Entry Detail error: %v", err.Error())
+		t.Error(err)
 	}
 	// create error is mismatch
 	ed.IndividualName = "W@DE"
 	if err := ed.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Entry Detail error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "IndividualName" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -177,14 +185,15 @@ func TestEDDiscretionaryDataAlphaNumeric(t *testing.T) {
 	ed := mockEntryDetail()
 	// works properly
 	if err := ed.Validate(); err != nil {
-		t.Errorf("Unexpected Entry Detail error: %v", err.Error())
+		t.Error(err)
 	}
 	// create error is mismatch
 	ed.DiscretionaryData = "@!"
 	if err := ed.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Entry Detail error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "DiscretionaryData" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -193,14 +202,15 @@ func TestEDisCheckDigit(t *testing.T) {
 	ed := mockEntryDetail()
 	// works properly
 	if err := ed.Validate(); err != nil {
-		t.Errorf("Unexpected Entry Detail error: %v", err.Error())
+		t.Error(err)
 	}
 	// create error is mismatch
 	ed.CheckDigit = 1
 	if err := ed.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Entry Detail error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "RDFIIdentification" {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -209,10 +219,10 @@ func TestEDSetRDFI(t *testing.T) {
 	ed := NewEntryDetail()
 	ed.SetRDFI(81086674)
 	if ed.RDFIIdentification != 8108667 {
-		t.Errorf("RDFI identification")
+		t.Error("RDFI identification")
 	}
 	if ed.CheckDigit != 4 {
-		t.Errorf("Unexpected check digit")
+		t.Error("Unexpected check digit")
 	}
 }
 
@@ -220,9 +230,10 @@ func TestEDFieldInclusionRecordType(t *testing.T) {
 	entry := mockEntryDetail()
 	entry.recordType = ""
 	if err := entry.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -231,9 +242,10 @@ func TestEDFieldInclusionTransactionCode(t *testing.T) {
 	entry := mockEntryDetail()
 	entry.TransactionCode = 0
 	if err := entry.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -242,9 +254,10 @@ func TestEDFieldInclusionRDFIIdentification(t *testing.T) {
 	entry := mockEntryDetail()
 	entry.RDFIIdentification = 0
 	if err := entry.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -253,9 +266,10 @@ func TestEDFieldInclusionCheckDigit(t *testing.T) {
 	entry := mockEntryDetail()
 	entry.CheckDigit = 0
 	if err := entry.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -264,9 +278,10 @@ func TestEDFieldInclusionDFIAccountNumber(t *testing.T) {
 	entry := mockEntryDetail()
 	entry.DFIAccountNumber = ""
 	if err := entry.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -275,9 +290,10 @@ func TestEDFieldInclusionIndividualName(t *testing.T) {
 	entry := mockEntryDetail()
 	entry.IndividualName = ""
 	if err := entry.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Error(err)
+			}
 		}
 	}
 }
@@ -286,9 +302,10 @@ func TestEDFieldInclusionTraceNumber(t *testing.T) {
 	entry := mockEntryDetail()
 	entry.TraceNumber = 0
 	if err := entry.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Error(err)
+			}
 		}
 	}
 }

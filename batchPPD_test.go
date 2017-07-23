@@ -330,7 +330,7 @@ func TestBatchValidateAllBH(t *testing.T) {
 	// Make it fail
 	mockBatch.GetHeader().ODFIIdentification = 0
 	if err := mockBatch.ValidateAll(); err != nil {
-		_, ok := err.(*ValidateError)
+		_, ok := err.(*FieldError)
 		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
@@ -349,7 +349,7 @@ func TestBatchValidateAllED(t *testing.T) {
 	// Make it fail
 	mockBatch.GetEntries()[0].DFIAccountNumber = ""
 	if err := mockBatch.ValidateAll(); err != nil {
-		_, ok := err.(*ValidateError)
+		_, ok := err.(*FieldError)
 		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
@@ -368,7 +368,7 @@ func TestBatchValidateAllAddenda(t *testing.T) {
 	// Make it fail
 	mockBatch.GetEntries()[0].Addendums[0].TypeCode = ""
 	if err := mockBatch.ValidateAll(); err != nil {
-		_, ok := err.(*ValidateError)
+		_, ok := err.(*FieldError)
 		if !ok {
 			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
 		}
@@ -387,7 +387,7 @@ func TestBatchValidateAllBatchControl(t *testing.T) {
 	// Make it fail
 	mockBatch.GetControl().ODFIIdentification = 0
 	if err := mockBatch.ValidateAll(); err != nil {
-		_, ok := err.(*ValidateError)
+		_, ok := err.(*FieldError)
 		if !ok {
 			t.Errorf("Unexpected Batch.ValidationAll error: %v", err.Error())
 		}
@@ -404,7 +404,7 @@ func TestBatchBuildHeader(t *testing.T) {
 
 	mockBatch.GetHeader().ODFIIdentification = 0
 	if err := mockBatch.Build(); err != nil {
-		_, ok := err.(*ValidateError)
+		_, ok := err.(*FieldError)
 		if !ok {
 			t.Errorf("Unexpected Batch.Build error: %v", err.Error())
 		}
