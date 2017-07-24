@@ -135,7 +135,7 @@ func (f *File) Validate() error {
 		return err
 	}
 
-	if err := f.isEntryHashMismatch(); err != nil {
+	if err := f.isEntryHash(); err != nil {
 		return err
 	}
 
@@ -195,8 +195,8 @@ func (f *File) isFileAmount() error {
 	return nil
 }
 
-// isEntryHashMismatch validates the hash by recalulating the result
-func (f *File) isEntryHashMismatch() error {
+// isEntryHash validates the hash by recalulating the result
+func (f *File) isEntryHash() error {
 	hashField := f.calculateEntryHash()
 	if hashField != f.Control.EntryHashField() {
 		return ErrFileEntryHash

@@ -5,25 +5,7 @@
 package ach
 
 import (
-	"errors"
-)
-
-// Errors specific to parsing a Batch container
-var (
-	ErrBatchServiceClassMismatch = errors.New("Service Class Code is not the same in Header and Control")
-	ErrBatchEntryCountMismatch   = errors.New("Batch Entry Count is out-of-balance with number of Entries")
-	ErrBatchAmountMismatch       = errors.New("Batch Control debit and credit amounts are not the same as sum of Entries")
-	ErrBatchNumberMismatch       = errors.New("Batch Number is not the same in Header as Control")
-	ErrBatchAscendingTraceNumber = errors.New("Trace Numbers on the File are not in ascending order within a batch")
-	ErrBatchAddendaSequence      = errors.New("Addenda Sequence numbers are not in ascending order")
-	ErrValidEntryHash            = errors.New("Entry Hash is not equal to the sum of Entry Detail RDFI Identification")
-	ErrBatchOriginatorDNE        = errors.New("Originator Status Code is not equal to “2” for DNE if the Transaction Code is 23 or 33")
-	ErrBatchCompanyID            = errors.New("Company Identification must match the Company ID from the batch header record")
-	ErrBatchODFIIDMismatch       = errors.New("Batch Control ODFI Identification must be the same as batch header")
-	ErrBatchTraceNumberNotODFI   = errors.New("Trace Number in an Entry Detail Record are not the same as the ODFI Routing Number")
-	ErrBatchAddendaIndicator     = errors.New("Addenda found with no Addenda Indicator in proceeding Entry Detail")
-	ErrBatchAddendaTraceNumber   = errors.New("Addenda Entry Detail Sequence number does not match proceeding Entry Detail Trace Number")
-	ErrBatchEntries              = errors.New("Batch must have Entrie Record(s) to be built")
+	"fmt"
 )
 
 // BatchPPD holds the Batch Header and Batch Control and all Entry Records for PPD Entries
@@ -46,27 +28,31 @@ func NewBatchPPD() *BatchPPD {
 	return batch
 }
 
-// Validate NACHA rules on the entire batch before being added to a File
+// Validate checks valid NACHA batch rules. Assumes properly parsed records.
 func (batch *BatchPPD) Validate() error {
+	batchNumber := batch.header.BatchNumber
 	// validate batch header and control codes are the same
 	if batch.header.ServiceClassCode != batch.control.ServiceClassCode {
-		return ErrBatchServiceClassMismatch
+		msg := fmt.Sprintf(msgBatchHeaderControlEquality, batch.header.ServiceClassCode, batch.control.ServiceClassCode)
+		return &BatchError{BatchNumber: batchNumber, FieldName: "ServiceClassCode", Msg: msg}
 	}
 	// Company Identification must match the Company ID from the batch header record
 	if batch.header.CompanyIdentification != batch.control.CompanyIdentification {
-		return ErrBatchCompanyID
+		msg := fmt.Sprintf(msgBatchHeaderControlEquality, batch.header.CompanyIdentification, batch.control.CompanyIdentification)
+		return &BatchError{BatchNumber: batchNumber, FieldName: "CompanyIdentification", Msg: msg}
 	}
 	// Control ODFI Identification must be the same as batch header
 	if batch.header.ODFIIdentification != batch.control.ODFIIdentification {
-		return ErrBatchODFIIDMismatch
+		msg := fmt.Sprintf(msgBatchHeaderControlEquality, batch.header.ODFIIdentification, batch.control.ODFIIdentification)
+		return &BatchError{BatchNumber: batchNumber, FieldName: "ODFIIdentification", Msg: msg}
 	}
-
 	// batch number header and control must match
 	if batch.header.BatchNumber != batch.control.BatchNumber {
-		return ErrBatchNumberMismatch
+		msg := fmt.Sprintf(msgBatchHeaderControlEquality, batch.header.ODFIIdentification, batch.control.ODFIIdentification)
+		return &BatchError{BatchNumber: batchNumber, FieldName: "BatchNumber", Msg: msg}
 	}
 
-	if err := batch.isBatchEntryCountMismatch(); err != nil {
+	if err := batch.isBatchEntryCount(); err != nil {
 		return err
 	}
 
@@ -74,15 +60,15 @@ func (batch *BatchPPD) Validate() error {
 		return err
 	}
 
-	if err := batch.isBatchAmountMismatch(); err != nil {
+	if err := batch.isBatchAmount(); err != nil {
 		return err
 	}
 
-	if err := batch.isEntryHashMismatch(); err != nil {
+	if err := batch.isEntryHash(); err != nil {
 		return err
 	}
 
-	if err := batch.isOriginatorDNEMismatch(); err != nil {
+	if err := batch.isOriginatorDNE(); err != nil {
 		return err
 	}
 
@@ -97,7 +83,7 @@ func (batch *BatchPPD) Validate() error {
 	return nil
 }
 
-// ValidateAll validate all dependency records in the batch.
+// ValidateAll is a deep validation of all recods within the batch
 func (batch *BatchPPD) ValidateAll() error {
 	if err := batch.header.Validate(); err != nil {
 		return err
@@ -129,7 +115,7 @@ func (batch *BatchPPD) Build() error {
 		return err
 	}
 	if len(batch.entries) <= 0 {
-		return ErrBatchEntries
+		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "entries", Msg: msgBatchEntries}
 	}
 	// build controls and sequence numbers
 	entryCount := 0
@@ -157,7 +143,7 @@ func (batch *BatchPPD) Build() error {
 	bc.TotalCreditEntryDollarAmount, bc.TotalDebitEntryDollarAmount = batch.calculateBatchAmounts()
 	batch.control = bc
 
-	// Validate the built batch
+	// validate should pass if we built everything properly
 	if err := batch.ValidateAll(); err != nil {
 		return err
 	}
@@ -198,34 +184,34 @@ func (batch *BatchPPD) AddEntry(entry *EntryDetail) Batcher {
 	return Batcher(batch)
 }
 
-// isBatchEntryCountMismatch validate Entry count is accurate
+// isBatchEntryCount validate Entry count is accurate
 // The Entry/Addenda Count Field is a tally of each Entry Detail and Addenda
 // Record processed within the batch
-func (batch *BatchPPD) isBatchEntryCountMismatch() error {
+func (batch *BatchPPD) isBatchEntryCount() error {
 	entryCount := 0
 	for _, entry := range batch.entries {
 		entryCount = entryCount + 1 + len(entry.Addendums)
 	}
 	if entryCount != batch.control.EntryAddendaCount {
-		return ErrBatchEntryCountMismatch
+		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, entryCount, batch.control.EntryAddendaCount)
+		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "EntryAddendaCount", Msg: msg}
 	}
 	return nil
 }
 
-// isBatchAmountMismatch validate Amount is the same as what is in the Entries
+// isBatchAmount validate Amount is the same as what is in the Entries
 // The Total Debit and Credit Entry Dollar Amount fields contain accumulated
 // Entry Detail debit and credit totals within a given batch
-func (batch *BatchPPD) isBatchAmountMismatch() error {
+func (batch *BatchPPD) isBatchAmount() error {
 	credit, debit := batch.calculateBatchAmounts()
-	//fmt.Printf("debit: %v batch debit: %v \n", debit, batch.Control.TotalDebitEntryDollarAmount)
-
 	if debit != batch.control.TotalDebitEntryDollarAmount {
-		return ErrBatchAmountMismatch
+		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, debit, batch.control.TotalDebitEntryDollarAmount)
+		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TotalDebitEntryDollarAmount", Msg: msg}
 	}
-	//fmt.Printf("credit: %v batch credit: %v \n", credit, batch.Control.TotalCreditEntryDollarAmount)
 
 	if credit != batch.control.TotalCreditEntryDollarAmount {
-		return ErrBatchAmountMismatch
+		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, credit, batch.control.TotalCreditEntryDollarAmount)
+		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TotalCreditEntryDollarAmount", Msg: msg}
 	}
 	return nil
 }
@@ -256,18 +242,20 @@ func (batch *BatchPPD) isSequenceAscending() error {
 	lastSeq := -1
 	for _, entry := range batch.entries {
 		if entry.TraceNumber <= lastSeq {
-			return ErrBatchAscendingTraceNumber
+			msg := fmt.Sprintf(msgBatchAscending, entry.TraceNumber, lastSeq)
+			return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
 		}
 		lastSeq = entry.TraceNumber
 	}
 	return nil
 }
 
-// isEntryHashMismatch validates the hash by recalulating the result
-func (batch *BatchPPD) isEntryHashMismatch() error {
+// isEntryHash validates the hash by recalulating the result
+func (batch *BatchPPD) isEntryHash() error {
 	hashField := batch.calculateEntryHash()
 	if hashField != batch.control.EntryHashField() {
-		return ErrValidEntryHash
+		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, hashField, batch.control.EntryHashField())
+		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "EntryHash", Msg: msg}
 	}
 	return nil
 }
@@ -283,11 +271,12 @@ func (batch *BatchPPD) calculateEntryHash() string {
 }
 
 // The Originator Status Code is not equal to “2” for DNE if the Transaction Code is 23 or 33
-func (batch *BatchPPD) isOriginatorDNEMismatch() error {
+func (batch *BatchPPD) isOriginatorDNE() error {
 	if batch.header.OriginatorStatusCode != 2 {
 		for _, entry := range batch.entries {
 			if entry.TransactionCode == 23 || entry.TransactionCode == 33 {
-				return ErrBatchOriginatorDNE
+				msg := fmt.Sprintf(msgBatchOriginatorDNE, batch.header.OriginatorStatusCode)
+				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "OriginatorStatusCode", Msg: msg}
 			}
 		}
 	}
@@ -299,7 +288,8 @@ func (batch *BatchPPD) isOriginatorDNEMismatch() error {
 func (batch *BatchPPD) isTraceNumberODFI() error {
 	for _, entry := range batch.entries {
 		if batch.header.ODFIIdentificationField() != entry.TraceNumberField()[:8] {
-			return ErrBatchTraceNumberNotODFI
+			msg := fmt.Sprintf(msgBatchTraceNumberNotODFI, batch.header.ODFIIdentificationField(), entry.TraceNumberField()[:8])
+			return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "ODFIIdentificationField", Msg: msg}
 		}
 	}
 
@@ -312,18 +302,20 @@ func (batch *BatchPPD) isAddendaSequence() error {
 		if len(entry.Addendums) > 0 {
 			// addenda without indicator flag of 1
 			if entry.AddendaRecordIndicator != 1 {
-				return ErrBatchAddendaIndicator
+				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "AddendaRecordIndicator", Msg: msgBatchAddendaIndicator}
 			}
-			seq := -1
+			lastSeq := -1
 			// check if sequence is assending
 			for _, addenda := range entry.Addendums {
-				if !(addenda.SequenceNumber > seq) {
-					return ErrBatchAddendaSequence
+				if addenda.SequenceNumber < lastSeq {
+					msg := fmt.Sprintf(msgBatchAscending, addenda.SequenceNumber, lastSeq)
+					return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "SequenceNumber", Msg: msg}
 				}
-				seq = addenda.SequenceNumber
+				lastSeq = addenda.SequenceNumber
 				// check that we are in the correct Entry Detail
 				if !(addenda.EntryDetailSequenceNumberField() == entry.TraceNumberField()[8:]) {
-					return ErrBatchAddendaTraceNumber
+					msg := fmt.Sprintf(msgBatchAddendaTraceNumber, addenda.EntryDetailSequenceNumberField(), entry.TraceNumberField()[8:])
+					return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
 				}
 			}
 		}
