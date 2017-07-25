@@ -32,8 +32,9 @@ type Addenda struct {
 // NewAddenda returns a new Addenda with default values for none exported fields
 func NewAddenda() Addenda {
 	return Addenda{
-		recordType: "7",
-		TypeCode:   "05",
+		recordType:     "7",
+		TypeCode:       "05",
+		SequenceNumber: 1,
 	}
 }
 

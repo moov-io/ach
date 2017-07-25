@@ -22,8 +22,7 @@ func TestPPDDebitRead(t *testing.T) {
 	if err != nil {
 		t.Errorf("Can not ach.read file: %v", err)
 	}
-	err = r.File.ValidateAll()
-	if err != nil {
+	if err = r.File.ValidateAll(); err != nil {
 		t.Errorf("Could not validate entire read file: %v", err)
 	}
 }
@@ -42,20 +41,6 @@ func TestPPDDebitFiexedLengthRead(t *testing.T) {
 	}
 }
 
-/*
-func TestMultiBatchFile(t *testing.T) {
-	f, err := os.Open("./testdata/20110805A.ach")
-	if err != nil {
-		t.Errorf("%s: ", err)
-	}
-	defer f.Close()
-	r := NewReader(f)
-	_, err = r.Read()
-	if err != nil {
-		t.Errorf("Can not ach.read file: %v", err)
-	}
-}
-*/
 func TestRecordTypeUnknown(t *testing.T) {
 	var line = "301 076401251 0764012510807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
@@ -229,7 +214,6 @@ func TestFileAddendaNoIndicator(t *testing.T) {
 }
 
 func TestFileFileControlErr(t *testing.T) {
-
 	fc := mockFileControl()
 	fc.BatchCount = 0
 	r := NewReader(strings.NewReader(fc.String()))
@@ -247,10 +231,8 @@ func TestFileLongErr(t *testing.T) {
 	if e, ok := err.(*ParseError); ok {
 		if e, ok := e.Err.(*FieldError); ok {
 			if e.Msg != msgFieldInclusion {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
-
 	}
-
 }

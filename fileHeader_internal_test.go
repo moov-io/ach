@@ -21,13 +21,33 @@ func mockFileHeader() FileHeader {
 	return fh
 }
 
+func TestMockFileHeader(t *testing.T) {
+	fh := mockFileHeader()
+	if err := fh.Validate(); err != nil {
+		t.Error("mockFileHeader does not validate and will break other tests")
+	}
+	if fh.ImmediateDestination != 9876543210 {
+		t.Error("ImmediateDestination depedendent default value has changed")
+	}
+	if fh.ImmediateOrigin != 1234567890 {
+		t.Error("ImmediateOrigin depedendent default value has changed")
+	}
+	if fh.ImmediateDestinationName != "Federal Reserve Bank" {
+		t.Error("ImmediateDestinationName depedendent default value has changed")
+	}
+	if fh.ImmediateOriginName != "My Bank Name" {
+		t.Error("ImmediateOriginName depedendent default value has changed")
+	}
+
+}
+
 // TestParseFileHeader parses a known File Header Record string.
 func TestParseFileHeader(t *testing.T) {
 	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
 	r.line = line
 	if err := r.parseFileHeader(); err != nil {
-		t.Errorf("unknown error: %v", err)
+		t.Errorf("%T: %s", err, err)
 	}
 	record := r.File.Header
 
@@ -79,9 +99,8 @@ func TestFHString(t *testing.T) {
 	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
 	r.line = line
-	err := r.parseFileHeader()
-	if err != nil {
-		t.Errorf("unknown error: %v", err)
+	if err := r.parseFileHeader(); err != nil {
+		t.Errorf("%T: %s", err, err)
 	}
 	record := r.File.Header
 
@@ -97,7 +116,7 @@ func TestValidateFHRecordType(t *testing.T) {
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "recordType" {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -110,7 +129,7 @@ func TestValidateIDModifier(t *testing.T) {
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "FileIDModifier" {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -123,7 +142,7 @@ func TestValidateRecordSize(t *testing.T) {
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "recordSize" {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -136,7 +155,7 @@ func TestBlockingFactor(t *testing.T) {
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "blockingFactor" {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -149,7 +168,7 @@ func TestFormatCode(t *testing.T) {
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "formatCode" {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -157,16 +176,11 @@ func TestFormatCode(t *testing.T) {
 
 func TestFHFieldInculsion(t *testing.T) {
 	fh := mockFileHeader()
-	// works properly
-	if err := fh.Validate(); err != nil {
-		t.Error(err)
-	}
-	// create error is mismatch
 	fh.ImmediateOrigin = 0
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.Msg != msgFieldInclusion {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -174,17 +188,11 @@ func TestFHFieldInculsion(t *testing.T) {
 
 func TestUpperLengthFileID(t *testing.T) {
 	fh := mockFileHeader()
-	// works properly
-	if err := fh.Validate(); err != nil {
-		t.Error(err)
-	}
-	// create error is mismatch
 	fh.FileIDModifier = "a"
-
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "FileIDModifier" {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -193,7 +201,7 @@ func TestUpperLengthFileID(t *testing.T) {
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "FileIDModifier" {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -201,17 +209,12 @@ func TestUpperLengthFileID(t *testing.T) {
 
 func TestImmediateDestinationNameAlphaNumeric(t *testing.T) {
 	fh := mockFileHeader()
-	// works properly
 	fh.ImmediateDestinationName = "Super Big Bank"
-	if err := fh.Validate(); err != nil {
-		t.Error(err)
-	}
-	// create error is mismatch
 	fh.ImmediateDestinationName = "Big @$$ Bank"
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "ImmediateDestinationName" {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -219,17 +222,12 @@ func TestImmediateDestinationNameAlphaNumeric(t *testing.T) {
 
 func TestImmediateOriginNameAlphaNumeric(t *testing.T) {
 	fh := mockFileHeader()
-	// works properly
 	fh.ImmediateOriginName = "Super Big Bank"
-	if err := fh.Validate(); err != nil {
-		t.Error(err)
-	}
-	// create error is mismatch
 	fh.ImmediateOriginName = "Bigger @$$ Bank"
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "ImmediateOriginName" {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -237,17 +235,12 @@ func TestImmediateOriginNameAlphaNumeric(t *testing.T) {
 
 func TestImmediateReferenceCodeAlphaNumeric(t *testing.T) {
 	fh := mockFileHeader()
-	// works properly
 	fh.ReferenceCode = " "
-	if err := fh.Validate(); err != nil {
-		t.Error(err)
-	}
-	// create error is mismatch
 	fh.ReferenceCode = "!@#$%^"
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "ReferenceCode" {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -259,7 +252,7 @@ func TestFHFieldInclusionRecordType(t *testing.T) {
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.Msg != msgFieldInclusion {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -271,7 +264,7 @@ func TestFHFieldInclusionImmediatDestination(t *testing.T) {
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.Msg != msgFieldInclusion {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -283,7 +276,7 @@ func TestFHFieldInclusionFileIDModifier(t *testing.T) {
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.Msg != msgFieldInclusion {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -295,7 +288,7 @@ func TestFHFieldInclusionRecordSize(t *testing.T) {
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.Msg != msgFieldInclusion {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -307,7 +300,7 @@ func TestFHFieldInclusionBlockingFactor(t *testing.T) {
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.Msg != msgFieldInclusion {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -319,7 +312,7 @@ func TestFHFieldInclusionFormatCode(t *testing.T) {
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.Msg != msgFieldInclusion {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}

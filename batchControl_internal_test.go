@@ -13,10 +13,24 @@ func mockBatchControl() *BatchControl {
 	bc := NewBatchControl()
 	bc.ServiceClassCode = 220
 	bc.CompanyIdentification = "123456789"
-	bc.EntryHash = 1
 	bc.ODFIIdentification = 6200001
-	bc.BatchNumber = 1
 	return bc
+}
+
+func TestMockBatchControl(t *testing.T) {
+	bc := mockBatchControl()
+	if err := bc.Validate(); err != nil {
+		t.Error("mockBatchControl does not validate and will break other tests")
+	}
+	if bc.ServiceClassCode != 220 {
+		t.Error("ServiceClassCode depedendent default value has changed")
+	}
+	if bc.CompanyIdentification != "123456789" {
+		t.Error("CompanyIdentification depedendent default value has changed")
+	}
+	if bc.ODFIIdentification != 6200001 {
+		t.Error("ODFIIdentification depedendent default value has changed")
+	}
 }
 
 // TestParseBatchControl parses a known Batch ControlRecord string.
@@ -32,10 +46,8 @@ func TestParseBatchControl(t *testing.T) {
 	r.currentBatch.SetHeader(&bh)
 
 	r.currentBatch.AddEntry(&EntryDetail{TransactionCode: 27, Amount: 10500, RDFIIdentification: 5320001, TraceNumber: 76401255655291})
-	//fmt.Printf("%+v \n", r.line)
-	err := r.parseBatchControl()
-	if err != nil {
-		t.Errorf("unknown error: %v", err)
+	if err := r.parseBatchControl(); err != nil {
+		t.Errorf("%T: %s", err, err)
 	}
 	record := r.currentBatch.GetControl()
 
@@ -87,9 +99,8 @@ func TestBCString(t *testing.T) {
 	r.currentBatch.SetHeader(&bh)
 
 	r.currentBatch.AddEntry(&EntryDetail{TransactionCode: 27, Amount: 10500, RDFIIdentification: 5320001, TraceNumber: 76401255655291})
-	err := r.parseBatchControl()
-	if err != nil {
-		t.Error(err)
+	if err := r.parseBatchControl(); err != nil {
+		t.Errorf("%T: %s", err, err)
 	}
 	record := r.currentBatch.GetControl()
 
@@ -105,7 +116,7 @@ func TestValidateBCRecordType(t *testing.T) {
 	if err := bc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "recordType" {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -113,16 +124,11 @@ func TestValidateBCRecordType(t *testing.T) {
 
 func TestBCisServiceClassErr(t *testing.T) {
 	bc := mockBatchControl()
-	// works properly
-	if err := bc.Validate(); err != nil {
-		t.Error(err)
-	}
-	// create error is mismatch
 	bc.ServiceClassCode = 123
 	if err := bc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "ServiceClassCode" {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -130,16 +136,11 @@ func TestBCisServiceClassErr(t *testing.T) {
 
 func TestBCBatchNumber(t *testing.T) {
 	bc := mockBatchControl()
-	// works properly
-	if err := bc.Validate(); err != nil {
-		t.Error(err)
-	}
-	// create error is mismatch
 	bc.BatchNumber = 0
 	if err := bc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "BatchNumber" {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -147,16 +148,11 @@ func TestBCBatchNumber(t *testing.T) {
 
 func TestBCCompanyIdentificationAlphaNumeric(t *testing.T) {
 	bc := mockBatchControl()
-	// works properly
-	if err := bc.Validate(); err != nil {
-		t.Error(err)
-	}
-	// create error is mismatch
 	bc.CompanyIdentification = "@!"
 	if err := bc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "CompanyIdentification" {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -164,17 +160,11 @@ func TestBCCompanyIdentificationAlphaNumeric(t *testing.T) {
 
 func TestBCMessageAuthenticationCodeAlphaNumeric(t *testing.T) {
 	bc := mockBatchControl()
-	// works properly
-	if err := bc.Validate(); err != nil {
-		t.Error(err)
-	}
-
-	// create error is mismatch
 	bc.MessageAuthenticationCode = "@!"
 	if err := bc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "MessageAuthenticationCode" {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -186,7 +176,7 @@ func TestBCFieldInclusionRecordType(t *testing.T) {
 	if err := bc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.Msg != msgFieldInclusion {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -198,7 +188,7 @@ func TestBCFieldInclusionServiceClassCode(t *testing.T) {
 	if err := bc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.Msg != msgFieldInclusion {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}
@@ -210,7 +200,7 @@ func TestBCFieldInclusionODFIIdentification(t *testing.T) {
 	if err := bc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.Msg != msgFieldInclusion {
-				t.Error(err)
+				t.Errorf("%T: %s", err, err)
 			}
 		}
 	}

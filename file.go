@@ -9,7 +9,6 @@
 package ach
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 )
@@ -27,28 +26,34 @@ const (
 
 // Errors strings specific to parsing a Batch container
 var (
-	msgFileBatchCount   = "is out-of-balance with total Batches %d in file "
-	ErrFileEntryCount   = errors.New("Total Entries and Addenda count is out-of-balance with File Control")
-	ErrFileDebitAmount  = errors.New("Total Debit amount is out-of-balance with File Control")
-	ErrFileCreditAmount = errors.New("Total Credit amount is out-of-balance with File Control")
-	ErrFileEntryHash    = errors.New("Calculated Batch Control Entry hash does not match File Control Entry Hash")
-	ErrFileBatches      = errors.New("File must have []*Batches to be built")
+	msgFileControlEquality           = "header %v is not equal to control %v"
+	msgFileCalculatedControlEquality = "calculated %v is out-of-balance with control %v"
 )
+
+// FileError is an error describing issues validating a file
+type FileError struct {
+	FieldName string
+	Value     string
+	Msg       string
+}
+
+func (e FileError) Error() string {
+	return fmt.Sprintf("%s %s", e.FieldName, e.Msg)
+}
 
 // File contains the structures of a parsed ACH File.
 type File struct {
 	Header  FileHeader
 	Batches []Batcher
 	Control FileControl
-	// converters is composed for ACH to golang Converters
+
 	converters
 }
 
 // NewFile constucuts a file template.
 func NewFile() *File {
 	return &File{
-		Header: NewFileHeader(),
-		// Batches: []Batch, TODO need a NewBatchPPD
+		Header:  NewFileHeader(),
 		Control: NewFileControl(),
 	}
 }
@@ -61,7 +66,7 @@ func (f *File) Build() error {
 	}
 	// Requires at least one Batch in the new file.
 	if len(f.Batches) <= 0 {
-		return ErrFileBatches
+		return &FileError{FieldName: "Batchs", Value: strconv.Itoa(len(f.Batches)), Msg: "must have []*Batches to be built"}
 	}
 	// add 2 for FileHeader/control and reset if build was called twice do to error
 	totalRecordsInFile := 2
@@ -122,9 +127,8 @@ func (f *File) SetHeader(h FileHeader) *File {
 func (f *File) Validate() error {
 	// The value of the Batch Count Field is equal to the number of Company/Batch/Header Records in the file.
 	if f.Control.BatchCount != len(f.Batches) {
-		msg := fmt.Sprintf(msgFileBatchCount, f.Control.BatchCount)
-		err := &FieldError{FieldName: "BatchCount", Value: strconv.Itoa(len(f.Batches)), Msg: msg}
-		return err
+		msg := fmt.Sprintf(msgFileCalculatedControlEquality, len(f.Batches), f.Control.BatchCount)
+		return &FileError{FieldName: "BatchCount", Value: strconv.Itoa(len(f.Batches)), Msg: msg}
 	}
 
 	if err := f.isEntryAddendaCount(); err != nil {
@@ -163,16 +167,17 @@ func (f *File) ValidateAll() error {
 	return nil
 }
 
-// This field is prepared by hashing the RDFI’s 8-digit Routing Number in each entry.
+// isEntryAddenda is prepared by hashing the RDFI’s 8-digit Routing Number in each entry.
 //The Entry Hash provides a check against inadvertent alteration of data
 func (f *File) isEntryAddendaCount() error {
 	count := 0
-	// we assume that each batch block has already validated the addenda count in batch control.
+	// we assume that each batch block has already validated the addenda count is accurate in batch control.
 	for _, batch := range f.Batches {
 		count += batch.GetControl().EntryAddendaCount
 	}
 	if f.Control.EntryAddendaCount != count {
-		return ErrFileEntryCount
+		msg := fmt.Sprintf(msgFileCalculatedControlEquality, count, f.Control.EntryAddendaCount)
+		return &FileError{FieldName: "EntryAddendaCount", Value: f.Control.EntryAddendaCountField(), Msg: msg}
 	}
 	return nil
 }
@@ -187,10 +192,12 @@ func (f *File) isFileAmount() error {
 		credit += batch.GetControl().TotalCreditEntryDollarAmount
 	}
 	if f.Control.TotalDebitEntryDollarAmountInFile != debit {
-		return ErrFileDebitAmount
+		msg := fmt.Sprintf(msgFileCalculatedControlEquality, debit, f.Control.TotalDebitEntryDollarAmountInFile)
+		return &FileError{FieldName: "TotalDebitEntryDollarAmountInFile", Value: f.Control.TotalDebitEntryDollarAmountInFileField(), Msg: msg}
 	}
 	if f.Control.TotalCreditEntryDollarAmountInFile != credit {
-		return ErrFileCreditAmount
+		msg := fmt.Sprintf(msgFileCalculatedControlEquality, credit, f.Control.TotalCreditEntryDollarAmountInFile)
+		return &FileError{FieldName: "TotalCreditEntryDollarAmountInFile", Value: f.Control.TotalCreditEntryDollarAmountInFileField(), Msg: msg}
 	}
 	return nil
 }
@@ -199,7 +206,8 @@ func (f *File) isFileAmount() error {
 func (f *File) isEntryHash() error {
 	hashField := f.calculateEntryHash()
 	if hashField != f.Control.EntryHashField() {
-		return ErrFileEntryHash
+		msg := fmt.Sprintf(msgFileCalculatedControlEquality, hashField, f.Control.EntryHashField())
+		return &FileError{FieldName: "EntryHash", Value: f.Control.EntryHashField(), Msg: msg}
 	}
 	return nil
 }

@@ -114,6 +114,7 @@ func (batch *BatchPPD) Build() error {
 	if err := batch.header.Validate(); err != nil {
 		return err
 	}
+	// Specific to Batch type.
 	if len(batch.entries) <= 0 {
 		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "entries", Msg: msgBatchEntries}
 	}
@@ -143,9 +144,9 @@ func (batch *BatchPPD) Build() error {
 	bc.TotalCreditEntryDollarAmount, bc.TotalDebitEntryDollarAmount = batch.calculateBatchAmounts()
 	batch.control = bc
 
-	// validate should pass if we built everything properly
+	// validate checks that the above build covered all validation checks
 	if err := batch.ValidateAll(); err != nil {
-		return err
+		return err // only errors if source code of build is inconcisstent with validate
 	}
 	return nil
 }
@@ -176,9 +177,7 @@ func (batch *BatchPPD) GetEntries() []*EntryDetail {
 }
 
 // AddEntry appends an EntryDetail to the Batch
-//func (batch *Batch) AddEntryDetail(entry EntryDetail) []EntryDetail {
 func (batch *BatchPPD) AddEntry(entry *EntryDetail) Batcher {
-	//entry.setTraceNumber(batch.header.ODFIIdentification, 1)
 	batch.entries = append(batch.entries, entry)
 	//	return batch.entries
 	return Batcher(batch)

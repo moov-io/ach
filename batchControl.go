@@ -98,7 +98,9 @@ func (bc *BatchControl) Parse(record string) {
 // NewBatchControl returns a new BatchControl with default values for none exported fields
 func NewBatchControl() *BatchControl {
 	return &BatchControl{
-		recordType: "8",
+		recordType:  "8",
+		EntryHash:   1,
+		BatchNumber: 1,
 	}
 }
 
