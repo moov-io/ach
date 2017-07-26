@@ -10,34 +10,46 @@ import (
 	"testing"
 )
 
-// TestDecode is a complete file decoding test.
-func TestPPDDebitRead(t *testing.T) {
-	f, err := os.Open("./testdata/ppd-debit.ach")
-	if err != nil {
-		t.Errorf("%s: ", err)
+func TestParseError(t *testing.T) {
+	e := &FieldError{FieldName: "testField", Value: "nil", Msg: "could not parse"}
+	err := &ParseError{Line: 63, Err: e}
+	if err.Error() != "line:63 *ach.FieldError testField nil could not parse" {
+		t.Error("ParseError error string formating has changed")
 	}
-	defer f.Close()
-	r := NewReader(f)
-	_, err = r.Read()
-	if err != nil {
-		t.Errorf("Can not ach.read file: %v", err)
-	}
-	if err = r.File.ValidateAll(); err != nil {
-		t.Errorf("Could not validate entire read file: %v", err)
+	err.Record = "TestRecord"
+	if err.Error() != "line:63 record:TestRecord *ach.FieldError testField nil could not parse" {
+		t.Error("ParseError error string formating has changed")
 	}
 }
 
-// TestDecode is a complete file decoding test.
-func TestPPDDebitFiexedLengthRead(t *testing.T) {
-	f, err := os.Open("./testdata/ppd-debit-fixedLength.ach")
+// TestDecode is a complete file decoding test. A canary test
+func TestPPDDebitRead(t *testing.T) {
+	f, err := os.Open("./testdata/ppd-debit.ach")
 	if err != nil {
-		t.Errorf("%s: ", err)
+		t.Errorf("%T: %s", err, err)
 	}
 	defer f.Close()
 	r := NewReader(f)
 	_, err = r.Read()
 	if err != nil {
-		t.Errorf("Can not ach.read file: %v", err)
+		t.Errorf("%T: %s", err, err)
+	}
+	if err = r.File.ValidateAll(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestDecode is a complete file decoding test. A canary test
+func TestPPDDebitFiexedLengthRead(t *testing.T) {
+	f, err := os.Open("./testdata/ppd-debit-fixedLength.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -45,8 +57,14 @@ func TestRecordTypeUnknown(t *testing.T) {
 	var line = "301 076401251 0764012510807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), ErrUnknownRecordType.Error()) {
-		t.Errorf("Expected RecordType Error got: %v", err)
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*FileError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", e, e)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
 	}
 }
 
@@ -55,9 +73,14 @@ func TestTwoFileHeaders(t *testing.T) {
 	var twoHeaders = line + "\n" + line
 	r := NewReader(strings.NewReader(twoHeaders))
 	_, err := r.Read()
-
-	if !strings.Contains(err.Error(), ErrFileHeader.Error()) {
-		t.Errorf("Expected File Header Error got: %v", err)
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*FileError); ok {
+			if e.Msg != msgFileControl {
+				t.Errorf("%T: %s", e, e)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
 	}
 }
 
@@ -74,27 +97,44 @@ func TestTwoFileControls(t *testing.T) {
 	r.File.AddBatch(r.currentBatch)
 	r.File.Control.EntryHash = 5320001
 	_, err := r.Read()
-
-	if !strings.Contains(err.Error(), ErrFileControl.Error()) {
-		t.Errorf("Expected File Control Error got: %v", err)
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*FileError); ok {
+			if e.Msg != msgFileControl {
+				t.Errorf("%T: %s", e, e)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
 	}
 }
 
 func TestFileLineShort(t *testing.T) {
-	var line = "1 line is only 90 characters                                               !"
+	var line = "1 line is only 70 characters ........................................!"
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), ErrRecordLen.Error()) {
-		t.Errorf("Unexpected read.Read() error: %v", err)
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*FileError); ok {
+			if e.FieldName != "RecordLength" {
+				t.Errorf("%T: %s", e, e)
+			}
+		} else {
+			t.Errorf("%T: %s", e, e)
+		}
 	}
 }
 
 func TestFileLineLong(t *testing.T) {
-	var line = "1 line is only 100 characters                                                        !"
+	var line = "1 line is 100 characters ..........................................................................!"
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), ErrRecordLen.Error()) {
-		t.Errorf("Unexpected read.Read() error: %v", err)
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*FileError); ok {
+			if e.FieldName != "RecordLength" {
+				t.Errorf("%T: %s", e, e)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
 	}
 }
 
@@ -106,8 +146,14 @@ func TestFileFileHeaderErr(t *testing.T) {
 	// necessary to have a file control not nil
 	r.File.Control = mockFileControl()
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), msgFieldInclusion) {
-		t.Errorf("Unexpected read.Read() error: %v", err)
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", e, e)
+			}
+		}
+	} else {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -117,8 +163,14 @@ func TestFileBatchHeaderErr(t *testing.T) {
 	bh.ODFIIdentification = 0
 	r := NewReader(strings.NewReader(bh.String()))
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), msgFieldInclusion) {
-		t.Errorf("Unexpected read.Read() error: %v", err)
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", e, e)
+			}
+		}
+	} else {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -131,8 +183,14 @@ func TestFileBatchHeaderDuplicate(t *testing.T) {
 	r.addCurrentBatch(NewBatchPPD())
 	// read should fail because it is parsing a second batch header and there can only be one.
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), "BatchHeader") {
-		t.Errorf("Unexpected read.Read() error: %v", err)
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", e, e)
+			}
+		}
+	} else {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -141,8 +199,14 @@ func TestFileEntryDetailOutsideBatch(t *testing.T) {
 	ed := mockEntryDetail()
 	r := NewReader(strings.NewReader(ed.String()))
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), ErrEntryOutside.Error()) {
-		t.Errorf("Unexpected read.Read() error: %v", err)
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*FileError); ok {
+			if e.Msg != msgFileBatchOutside {
+				t.Errorf("%T: %s", e, e)
+			}
+		}
+	} else {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -155,13 +219,19 @@ func TestFileEntryDetail(t *testing.T) {
 	r.addCurrentBatch(NewBatchPPD())
 	r.currentBatch.SetHeader(mockBatchHeader())
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), msgFieldInclusion) {
-		t.Errorf("Unexpected read.Read() error: %v", err)
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", e, e)
+			}
+		}
+	} else {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
-// TestFileEntryDetailNotPPD validation error populates through the reader
-func TestFileEntryDetailNotPPD(t *testing.T) {
+// TestFileEntryDetailSECNoSupport validation error populates through the reader
+func TestFileEntryDetailSECNoSupport(t *testing.T) {
 	ed := mockEntryDetail()
 	ed.CheckDigit = 0
 	line := ed.String()
@@ -170,8 +240,14 @@ func TestFileEntryDetailNotPPD(t *testing.T) {
 	r.currentBatch.SetHeader(mockBatchHeader())
 	r.currentBatch.GetHeader().StandardEntryClassCode = "ABCXYZ"
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), "ABCXYZ") {
-		t.Errorf("Unexpected read.Read() error: %v", err)
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*FieldError); ok {
+			if e.FieldName != "StandardEntryClassCode" {
+				t.Errorf("%T: %s", e, e)
+			}
+		}
+	} else {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -185,8 +261,16 @@ func TestFileAddenda(t *testing.T) {
 	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendums[0].String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), "Addenda") {
-		t.Errorf("Unexpected read.Read() error: %v", err)
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*FieldError); ok {
+				if e.Msg != msgFieldInclusion {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
 	}
 }
 
@@ -195,8 +279,16 @@ func TestFileAddendaOutsideBatch(t *testing.T) {
 	addenda := mockAddenda()
 	r := NewReader(strings.NewReader(addenda.String()))
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), ErrAddendaOutside.Error()) {
-		t.Errorf("Unexpected read.Read() error: %v", err)
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*FileError); ok {
+				if e.Msg != msgFileBatchOutside {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
 	}
 }
 
@@ -208,8 +300,14 @@ func TestFileAddendaNoIndicator(t *testing.T) {
 	line := bh.String() + "\n" + ed.String() + "\n" + addenda.String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), ErrAddendaNoIndicator.Error()) {
-		t.Errorf("Unexpected read.Read() error: %v", err)
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*FileError); ok {
+			if e.FieldName != "AddendaRecordIndicator" {
+				t.Errorf("%T: %s", e, e)
+			}
+		}
+	} else {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -218,8 +316,14 @@ func TestFileFileControlErr(t *testing.T) {
 	fc.BatchCount = 0
 	r := NewReader(strings.NewReader(fc.String()))
 	_, err := r.Read()
-	if !strings.Contains(err.Error(), msgFieldInclusion) {
-		t.Errorf("Unexpected read.Read() error: %v", err)
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", e, e)
+			}
+		}
+	} else {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

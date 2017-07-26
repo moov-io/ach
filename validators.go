@@ -27,7 +27,7 @@ type FieldError struct {
 // Example1: BatchCount $% has none alphanumeric characters
 // Example2: BatchCount 5 is out-of-balance with file count 6
 func (e *FieldError) Error() string {
-	return fmt.Sprintf("%s %s %s ", e.FieldName, e.Value, e.Msg)
+	return fmt.Sprintf("%s %s %s", e.FieldName, e.Value, e.Msg)
 }
 
 // Errors specific to validation

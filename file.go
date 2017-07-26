@@ -22,12 +22,28 @@ const (
 	entryAddendaPos = "7"
 	batchControlPos = "8"
 	fileControlPos  = "9"
+
+	// RecordLength character count of each line representing a letter in a file
+	RecordLength = 94
+)
+
+// currently supported SEC codes
+const (
+	ppd = "PPD"
 )
 
 // Errors strings specific to parsing a Batch container
 var (
 	msgFileControlEquality           = "header %v is not equal to control %v"
 	msgFileCalculatedControlEquality = "calculated %v is out-of-balance with control %v"
+	// specific messages
+	msgRecordLength      = "must be 94 characters and found %d"
+	msgFileBatchOutside  = "outside of current batch"
+	msgFileBatchInside   = "inside of current batch"
+	msgFileControl       = "none or more than one file control exists"
+	msgFileHeader        = "none or more than one file headers exists"
+	msgUnknownRecordType = "%s is an unknown record type"
+	msgFileNoneSEC       = "%v SEC(standard entry class) is not implemented"
 )
 
 // FileError is an error describing issues validating a file
@@ -37,7 +53,7 @@ type FileError struct {
 	Msg       string
 }
 
-func (e FileError) Error() string {
+func (e *FileError) Error() string {
 	return fmt.Sprintf("%s %s", e.FieldName, e.Msg)
 }
 

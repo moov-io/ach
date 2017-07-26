@@ -28,7 +28,6 @@ func TestMockBatchHeader(t *testing.T) {
 	if bh.ServiceClassCode != 220 {
 		t.Error("ServiceClassCode depedendent default value has changed")
 	}
-
 	if bh.StandardEntryClassCode != "PPD" {
 		t.Error("StandardEntryClassCode depedendent default value has changed")
 	}

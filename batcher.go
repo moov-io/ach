@@ -31,7 +31,7 @@ type BatchError struct {
 	Msg         string
 }
 
-func (e BatchError) Error() string {
+func (e *BatchError) Error() string {
 	return fmt.Sprintf("BatchNumber %d %s %s", e.BatchNumber, e.FieldName, e.Msg)
 }
 

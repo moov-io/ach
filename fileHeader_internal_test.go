@@ -38,7 +38,6 @@ func TestMockFileHeader(t *testing.T) {
 	if fh.ImmediateOriginName != "My Bank Name" {
 		t.Error("ImmediateOriginName depedendent default value has changed")
 	}
-
 }
 
 // TestParseFileHeader parses a known File Header Record string.
