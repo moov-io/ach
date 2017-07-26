@@ -32,8 +32,9 @@ type Addenda struct {
 // NewAddenda returns a new Addenda with default values for none exported fields
 func NewAddenda() Addenda {
 	return Addenda{
-		recordType: "7",
-		TypeCode:   "05",
+		recordType:     "7",
+		TypeCode:       "05",
+		SequenceNumber: 1,
 	}
 }
 
@@ -70,13 +71,14 @@ func (addenda *Addenda) Validate() error {
 		return err
 	}
 	if addenda.recordType != "7" {
-		return &ValidateError{FieldName: "recordType", Value: addenda.recordType, Err: ErrRecordType}
+		msg := fmt.Sprintf(msgRecordType, 7)
+		return &FieldError{FieldName: "recordType", Value: addenda.recordType, Msg: msg}
 	}
 	if err := addenda.isTypeCode(addenda.TypeCode); err != nil {
-		return &ValidateError{FieldName: "TypeCode", Value: addenda.TypeCode, Err: err}
+		return &FieldError{FieldName: "TypeCode", Value: addenda.TypeCode, Msg: err.Error()}
 	}
 	if err := addenda.isAlphanumeric(addenda.PaymentRelatedInformation); err != nil {
-		return &ValidateError{FieldName: "PaymentRelatedInformation", Value: addenda.PaymentRelatedInformation, Err: err}
+		return &FieldError{FieldName: "PaymentRelatedInformation", Value: addenda.PaymentRelatedInformation, Msg: err.Error()}
 	}
 
 	return nil
@@ -86,16 +88,16 @@ func (addenda *Addenda) Validate() error {
 // invalid the ACH transfer will be returned.
 func (addenda *Addenda) fieldInclusion() error {
 	if addenda.recordType == "" {
-		return &ValidateError{FieldName: "recordType", Value: addenda.recordType, Err: ErrRecordType}
+		return &FieldError{FieldName: "recordType", Value: addenda.recordType, Msg: msgFieldInclusion}
 	}
 	if addenda.TypeCode == "" {
-		return &ValidateError{FieldName: "recordType", Value: addenda.recordType, Err: ErrAddendaTypeCode}
+		return &FieldError{FieldName: "TypeCode", Value: addenda.TypeCode, Msg: msgFieldInclusion}
 	}
 	if addenda.SequenceNumber == 0 {
-		return &ValidateError{FieldName: "SequenceNumber", Value: string(addenda.SequenceNumber), Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "SequenceNumber", Value: addenda.SequenceNumberField(), Msg: msgFieldInclusion}
 	}
 	if addenda.EntryDetailSequenceNumber == 0 {
-		return &ValidateError{FieldName: "EntryDetailSequenceNumber", Value: string(addenda.EntryDetailSequenceNumber), Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "EntryDetailSequenceNumber", Value: addenda.EntryDetailSequenceNumberField(), Msg: msgFieldInclusion}
 	}
 	return nil
 }

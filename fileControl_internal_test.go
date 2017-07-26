@@ -18,6 +18,25 @@ func mockFileControl() FileControl {
 	return fc
 }
 
+func TestMockFileControl(t *testing.T) {
+	fc := mockFileControl()
+	if err := fc.Validate(); err != nil {
+		t.Error("mockFileControl does not validate and will break other tests")
+	}
+	if fc.BatchCount != 1 {
+		t.Error("BatchCount depedendent default value has changed")
+	}
+	if fc.BlockCount != 1 {
+		t.Error("BlockCount depedendent default value has changed")
+	}
+	if fc.EntryAddendaCount != 1 {
+		t.Error("EntryAddendaCount depedendent default value has changed")
+	}
+	if fc.EntryHash != 5320001 {
+		t.Error("EntryHash depedendent default value has changed")
+	}
+}
+
 // TestParseFileControl parses a known File Control Record string.
 func TestParseFileControl(t *testing.T) {
 	var line = "9000001000001000000010005320001000000010500000000000000                                       "
@@ -25,7 +44,7 @@ func TestParseFileControl(t *testing.T) {
 	r.line = line
 	err := r.parseFileControl()
 	if err != nil {
-		t.Errorf("unknown error: %v", err)
+		t.Errorf("%T: %s", err, err)
 	}
 	record := r.File.Control
 
@@ -62,7 +81,7 @@ func TestFCString(t *testing.T) {
 	r.line = line
 	err := r.parseFileControl()
 	if err != nil {
-		t.Errorf("unknown error: %v", err)
+		t.Errorf("%T: %s", err, err)
 	}
 	record := r.File.Control
 	if record.String() != line {
@@ -76,24 +95,22 @@ func TestValidateFCRecordType(t *testing.T) {
 	fc.recordType = "2"
 
 	if err := fc.Validate(); err != nil {
-		if !strings.Contains(err.Error(), ErrRecordType.Error()) {
-			t.Errorf("Expected RecordType Error got: %v", err)
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
 		}
 	}
 }
 
 func TestFCFieldInclusion(t *testing.T) {
 	fc := mockFileControl()
-	// works properly
-	if err := fc.Validate(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
-	}
-	// create error is mismatch
 	fc.BatchCount = 0
 	if err := fc.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", err, err)
+			}
 		}
 	}
 }
@@ -102,9 +119,10 @@ func TestFCFieldInclusionRecordType(t *testing.T) {
 	fc := mockFileControl()
 	fc.recordType = ""
 	if err := fc.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", err, err)
+			}
 		}
 	}
 }
@@ -113,9 +131,10 @@ func TestFCFieldInclusionBlockCount(t *testing.T) {
 	fc := mockFileControl()
 	fc.BlockCount = 0
 	if err := fc.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", err, err)
+			}
 		}
 	}
 }
@@ -124,9 +143,10 @@ func TestFCFieldInclusionEntryAddendaCount(t *testing.T) {
 	fc := mockFileControl()
 	fc.EntryAddendaCount = 0
 	if err := fc.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", err, err)
+			}
 		}
 	}
 }
@@ -135,9 +155,10 @@ func TestFCFieldInclusionEntryHash(t *testing.T) {
 	fc := mockFileControl()
 	fc.EntryHash = 0
 	if err := fc.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", err, err)
+			}
 		}
 	}
 }

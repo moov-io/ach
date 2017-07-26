@@ -6,6 +6,7 @@ package ach
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -97,7 +98,9 @@ func (bc *BatchControl) Parse(record string) {
 // NewBatchControl returns a new BatchControl with default values for none exported fields
 func NewBatchControl() *BatchControl {
 	return &BatchControl{
-		recordType: "8",
+		recordType:  "8",
+		EntryHash:   1,
+		BatchNumber: 1,
 	}
 }
 
@@ -125,18 +128,19 @@ func (bc *BatchControl) Validate() error {
 		return err
 	}
 	if bc.recordType != "8" {
-		return &ValidateError{FieldName: "recordType", Value: bc.recordType, Err: ErrRecordType}
+		msg := fmt.Sprintf(msgRecordType, 7)
+		return &FieldError{FieldName: "recordType", Value: bc.recordType, Msg: msg}
 	}
 	if err := bc.isServiceClass(bc.ServiceClassCode); err != nil {
-		return &ValidateError{FieldName: "ServiceClassCode", Value: string(bc.ServiceClassCode), Err: ErrServiceClass}
+		return &FieldError{FieldName: "ServiceClassCode", Value: strconv.Itoa(bc.ServiceClassCode), Msg: err.Error()}
 	}
 
 	if err := bc.isAlphanumeric(bc.CompanyIdentification); err != nil {
-		return &ValidateError{FieldName: "CompanyIdentification", Value: bc.CompanyIdentification, Err: err}
+		return &FieldError{FieldName: "CompanyIdentification", Value: bc.CompanyIdentification, Msg: err.Error()}
 	}
 
 	if err := bc.isAlphanumeric(bc.MessageAuthenticationCode); err != nil {
-		return &ValidateError{FieldName: "MessageAuthenticationCode", Value: bc.MessageAuthenticationCode, Err: err}
+		return &FieldError{FieldName: "MessageAuthenticationCode", Value: bc.MessageAuthenticationCode, Msg: err.Error()}
 	}
 
 	return nil
@@ -146,16 +150,16 @@ func (bc *BatchControl) Validate() error {
 // invalid the ACH transfer will be returned.
 func (bc *BatchControl) fieldInclusion() error {
 	if bc.recordType == "" {
-		return &ValidateError{FieldName: "recordType", Value: bc.recordType, Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "recordType", Value: bc.recordType, Msg: msgFieldInclusion}
 	}
 	if bc.ServiceClassCode == 0 {
-		return &ValidateError{FieldName: "ServiceClassCode", Value: string(bc.ServiceClassCode), Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "ServiceClassCode", Value: strconv.Itoa(bc.ServiceClassCode), Msg: msgFieldInclusion}
 	}
 	if bc.ODFIIdentification == 0 {
-		return &ValidateError{FieldName: "ODFIIdentification", Value: string(bc.ODFIIdentification), Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "ODFIIdentification", Value: bc.ODFIIdentificationField(), Msg: msgFieldInclusion}
 	}
 	if bc.BatchNumber == 0 {
-		return &ValidateError{FieldName: "BatchNumber", Value: string(bc.BatchNumber), Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "BatchNumber", Value: bc.BatchNumberField(), Msg: msgFieldInclusion}
 	}
 	return nil
 }

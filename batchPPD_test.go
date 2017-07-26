@@ -5,125 +5,84 @@
 package ach
 
 import (
-	"strings"
 	"testing"
 	"time"
 )
 
-// TestBatchEntryCountMismatc check for control out-of-balance error.
-func TestBatchEntryCountMismatch(t *testing.T) {
-	mockBatch := NewBatchPPD()
-	mockBatch.SetHeader(mockBatchHeader())
-	e := mockEntryDetail()
-	a := mockAddenda()
-	e.AddAddenda(a)
-	mockBatch.AddEntry(e)
-
-	// works properly
-	if err := mockBatch.Build(); err != nil {
-		t.Errorf("Unexpected Batch.Build error: %v", err.Error())
-	}
-	// create error is mismatch
-	mockBatch.GetControl().EntryAddendaCount = 1
-	if err := mockBatch.Build(); err != nil {
-		if err != ErrBatchEntryCountMismatch {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
-		}
-	}
-}
-
-func TestBatchServiceClassMismatch(t *testing.T) {
+func mockBatchPPD() *BatchPPD {
 	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	mockBatch.AddEntry(mockEntryDetail())
-
-	// works properly
 	if err := mockBatch.Build(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		panic(err)
 	}
-	// create error is mismatch
+	return mockBatch
+}
+
+func TestBatchError(t *testing.T) {
+	err := &BatchError{BatchNumber: 1, FieldName: "mock", Msg: "test message"}
+	if err.Error() != "BatchNumber 1 mock test message" {
+		t.Error("BatchError Error has changed formatting")
+	}
+}
+
+func TestBatchServiceClassCodeEsquality(t *testing.T) {
+	mockBatch := mockBatchPPD()
 	mockBatch.GetControl().ServiceClassCode = 225
-	if err := mockBatch.Build(); err != nil {
-		if err != ErrBatchServiceClassMismatch {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ServiceClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
 
 func TestBatchCompanyIdentification(t *testing.T) {
-	mockBatch := NewBatchPPD()
-	mockBatch.SetHeader(mockBatchHeader())
-	mockBatch.AddEntry(mockEntryDetail())
-	// works properly
-	if err := mockBatch.Build(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
-	}
-	// create error is mismatch
+	mockBatch := mockBatchPPD()
 	mockBatch.GetControl().CompanyIdentification = "XYZ Inc"
-	if err := mockBatch.Build(); err != nil {
-		if err != ErrBatchCompanyID {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "CompanyIdentification" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
 
 func TestBatchODFIIDMismatch(t *testing.T) {
-	mockBatch := NewBatchPPD()
-	mockBatch.SetHeader(mockBatchHeader())
-	mockBatch.AddEntry(mockEntryDetail())
-	// works properly
-	if err := mockBatch.Build(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
-	}
-	// create error is mismatch
+	mockBatch := mockBatchPPD()
 	mockBatch.GetControl().ODFIIdentification = 987654321
-	if err := mockBatch.Build(); err != nil {
-		if err != ErrBatchODFIIDMismatch {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ODFIIdentification" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
 
 func TestBatchNumberMismatch(t *testing.T) {
-	mockBatch := NewBatchPPD()
-	mockBatch.SetHeader(mockBatchHeader())
-	mockBatch.AddEntry(mockEntryDetail())
-	// works properly
-	if err := mockBatch.Build(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
-	}
-	// create error is mismatch
+	mockBatch := mockBatchPPD()
 	mockBatch.GetControl().BatchNumber = 2
-	if err := mockBatch.Build(); err != nil {
-		if err != ErrBatchNumberMismatch {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "BatchNumber" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
 
-func TestBatchIsSequenceAscending(t *testing.T) {
-	mockBatch := NewBatchPPD()
-	mockBatch.SetHeader(mockBatchHeader())
-	mockBatch.AddEntry(mockEntryDetail())
-	mockBatch.AddEntry(mockEntryDetail())
-	// works properly
-	if err := mockBatch.Build(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
-	}
-	// create error
-	e3 := mockEntryDetail()
-	e3.TraceNumber = 0
-	mockBatch.AddEntry(e3)
-	mockBatch.GetControl().EntryAddendaCount = 3
-	if err := mockBatch.Build(); err != nil {
-		if err != ErrBatchAscendingTraceNumber {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
-		}
-	}
-}
-
-// isBatchAmountMismatch
-func TestCreditBatchIsBatchAmountMismatch(t *testing.T) {
+func TestCreditBatchisBatchAmount(t *testing.T) {
 	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	e1 := mockEntryDetail()
@@ -134,20 +93,23 @@ func TestCreditBatchIsBatchAmountMismatch(t *testing.T) {
 	e2.Amount = 100
 	mockBatch.AddEntry(e1)
 	mockBatch.AddEntry(e2)
-	// works properly
 	if err := mockBatch.Build(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		t.Errorf("%T: %s", err, err)
 	}
-	// create error
+
 	mockBatch.GetControl().TotalCreditEntryDollarAmount = 1
-	if err := mockBatch.Build(); err != nil {
-		if err != ErrBatchAmountMismatch {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TotalCreditEntryDollarAmount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
 
-func TestSavingsBatchIsBatchAmountMismatch(t *testing.T) {
+func TestSavingsBatchisBatchAmount(t *testing.T) {
 	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	e1 := mockEntryDetail()
@@ -158,131 +120,166 @@ func TestSavingsBatchIsBatchAmountMismatch(t *testing.T) {
 	e2.Amount = 100
 	mockBatch.AddEntry(e1)
 	mockBatch.AddEntry(e2)
-	// works properly
 	if err := mockBatch.Build(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		t.Errorf("%T: %s", err, err)
 	}
-	// create error
+
 	mockBatch.GetControl().TotalDebitEntryDollarAmount = 1
-	if err := mockBatch.Build(); err != nil {
-		if err != ErrBatchAmountMismatch {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TotalDebitEntryDollarAmount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
 
-func TestBatchIsEntryHashMismatch(t *testing.T) {
-	mockBatch := NewBatchPPD()
-	mockBatch.SetHeader(mockBatchHeader())
-	mockBatch.AddEntry(mockEntryDetail())
-	mockBatch.AddEntry(mockEntryDetail())
-	// works properly
-	if err := mockBatch.Build(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
-	}
-	// create error
-	mockBatch.GetControl().EntryHash = 0
-	if err := mockBatch.Build(); err != nil {
-		if err != ErrValidEntryHash {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+func TestBatchisEntryHash(t *testing.T) {
+	mockBatch := mockBatchPPD()
+	mockBatch.GetControl().EntryHash = 1
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "EntryHash" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
 
-// isOriginatorDNEMismatch
-func TestBatchIsOriginatorDNEMismatch(t *testing.T) {
+func TestBatchDNEMismatch(t *testing.T) {
 	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
-	mockBatch.AddEntry(mockEntryDetail())
-	// works properly
-	if err := mockBatch.Build(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
-	}
-	// Make it fail
+	ed := mockEntryDetail()
+	ed.AddAddenda(mockAddenda())
+	ed.AddAddenda(mockAddenda())
+	mockBatch.AddEntry(ed)
+	mockBatch.Build()
+
 	mockBatch.GetHeader().OriginatorStatusCode = 1
-
-	if err := mockBatch.Build(); err != nil {
-		if err != ErrBatchOriginatorDNE {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+	mockBatch.GetEntries()[0].TransactionCode = 23
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "OriginatorStatusCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
 
-// ErrBatchTraceNumberNotODFI
 func TestBatchTraceNumberNotODFI(t *testing.T) {
-	mockBatch := NewBatchPPD()
-	mockBatch.SetHeader(mockBatchHeader())
-	mockBatch.AddEntry(mockEntryDetail())
-	// works properly
-	if err := mockBatch.Build(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
-	}
-	// Make it fail
-	mockBatch.GetEntries()[0].TraceNumber = 1
-	if err := mockBatch.Build(); err != nil {
-		if err != ErrBatchTraceNumberNotODFI {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+	mockBatch := mockBatchPPD()
+	mockBatch.GetEntries()[0].setTraceNumber(12345678, 1)
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ODFIIdentificationField" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
 
-// ErrBatchAddendaIndicator
+func TestBatchEntryCountEquality(t *testing.T) {
+	mockBatch := NewBatchPPD()
+	mockBatch.SetHeader(mockBatchHeader())
+	e := mockEntryDetail()
+	a := mockAddenda()
+	e.AddAddenda(a)
+	mockBatch.AddEntry(e)
+	if err := mockBatch.Build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	mockBatch.GetControl().EntryAddendaCount = 1
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "EntryAddendaCount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
 func TestBatchAddendaIndicator(t *testing.T) {
-	mockBatch := NewBatchPPD()
-	mockBatch.SetHeader(mockBatchHeader())
-	ed := mockEntryDetail()
-	ed.AddAddenda(mockAddenda())
-	mockBatch.AddEntry(ed)
-	// works properly
-	if err := mockBatch.Build(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
-	}
-	// Make it fail
+	mockBatch := mockBatchPPD()
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 0
-	if err := mockBatch.Build(); err != nil {
-		if err != ErrBatchAddendaIndicator {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+	mockBatch.GetControl().EntryAddendaCount = 2
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "AddendaRecordIndicator" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
 
-// isAddendaSequence
-func TestBatchAddendaSequence(t *testing.T) {
+func TestBatchIsAddendaSeqAscending(t *testing.T) {
 	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	ed := mockEntryDetail()
 	ed.AddAddenda(mockAddenda())
+	ed.AddAddenda(mockAddenda())
 	mockBatch.AddEntry(ed)
-	// works properly
-	if err := mockBatch.Build(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
-	}
-	// Make it fail
-	mockBatch.GetEntries()[0].Addendums[0].SequenceNumber = 10
-	if err := mockBatch.Build(); err != nil {
-		if err != ErrBatchAddendaSequence {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+	mockBatch.Build()
+
+	mockBatch.GetEntries()[0].Addendums[0].SequenceNumber = 2
+	mockBatch.GetEntries()[0].Addendums[1].SequenceNumber = 1
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "SequenceNumber" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
 
-// ErrBatchAddendaTraceNumber
+func TestBatchIsSequenceAscending(t *testing.T) {
+	mockBatch := mockBatchPPD()
+	e3 := mockEntryDetail()
+	e3.TraceNumber = 0
+	mockBatch.AddEntry(e3)
+	mockBatch.GetControl().EntryAddendaCount = 2
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TraceNumber" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
 func TestBatchAddendaTraceNumber(t *testing.T) {
-	mockBatch := NewBatchPPD()
-	mockBatch.SetHeader(mockBatchHeader())
-	ed := mockEntryDetail()
-	ed.AddAddenda(mockAddenda())
-	ed.AddAddenda(mockAddenda())
-	mockBatch.AddEntry(ed)
-	// works properly
+	mockBatch := mockBatchPPD()
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
 	if err := mockBatch.Build(); err != nil {
-		t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		t.Errorf("%T: %s", err, err)
 	}
-	// Make it fail
+
 	mockBatch.GetEntries()[0].Addendums[0].EntryDetailSequenceNumber = 99
-	if err := mockBatch.Build(); err != nil {
-		if err != ErrBatchAddendaTraceNumber {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TraceNumber" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
@@ -314,99 +311,81 @@ func TestBatchBuild(t *testing.T) {
 	entry.AddAddenda(a2)
 	mockBatch.AddEntry(entry)
 	if err := mockBatch.Build(); err != nil {
-		t.Errorf("Unexpected Batch.Build error: %v", err.Error())
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
-func TestBatchValidateAllBH(t *testing.T) {
-	mockBatch := NewBatchPPD()
-	mockBatch.SetHeader(mockBatchHeader())
-	ed := mockEntryDetail()
-	ed.AddAddenda(mockAddenda())
-	ed.AddAddenda(mockAddenda())
-	mockBatch.AddEntry(ed)
-	mockBatch.Build()
-
-	// Make it fail
-	mockBatch.GetHeader().ODFIIdentification = 0
-	if err := mockBatch.ValidateAll(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
-		}
-	}
-}
-
-func TestBatchValidateAllED(t *testing.T) {
-	mockBatch := NewBatchPPD()
-	mockBatch.SetHeader(mockBatchHeader())
-	ed := mockEntryDetail()
-	ed.AddAddenda(mockAddenda())
-	ed.AddAddenda(mockAddenda())
-	mockBatch.AddEntry(ed)
-	mockBatch.Build()
-
-	// Make it fail
+func TestBatchValidateAllEntries(t *testing.T) {
+	mockBatch := mockBatchPPD()
 	mockBatch.GetEntries()[0].DFIAccountNumber = ""
 	if err := mockBatch.ValidateAll(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
 
 func TestBatchValidateAllAddenda(t *testing.T) {
-	mockBatch := NewBatchPPD()
-	mockBatch.SetHeader(mockBatchHeader())
-	ed := mockEntryDetail()
-	ed.AddAddenda(mockAddenda())
-	ed.AddAddenda(mockAddenda())
-	mockBatch.AddEntry(ed)
-	mockBatch.Build()
+	mockBatch := mockBatchPPD()
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
+	if err := mockBatch.Build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
 
-	// Make it fail
 	mockBatch.GetEntries()[0].Addendums[0].TypeCode = ""
 	if err := mockBatch.ValidateAll(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
 
 func TestBatchValidateAllBatchControl(t *testing.T) {
-	mockBatch := NewBatchPPD()
-	mockBatch.SetHeader(mockBatchHeader())
-	ed := mockEntryDetail()
-	ed.AddAddenda(mockAddenda())
-	ed.AddAddenda(mockAddenda())
-	mockBatch.AddEntry(ed)
-	mockBatch.Build()
-
-	// Make it fail
+	mockBatch := mockBatchPPD()
 	mockBatch.GetControl().ODFIIdentification = 0
 	if err := mockBatch.ValidateAll(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.ValidationAll error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
 
-func TestBatchBuildHeader(t *testing.T) {
-	mockBatch := NewBatchPPD()
-	mockBatch.SetHeader(mockBatchHeader())
-	ed := mockEntryDetail()
-	ed.AddAddenda(mockAddenda())
-	ed.AddAddenda(mockAddenda())
-	mockBatch.AddEntry(ed)
-
+func TestBatchValidateAllHeader(t *testing.T) {
+	mockBatch := mockBatchPPD()
 	mockBatch.GetHeader().ODFIIdentification = 0
-	if err := mockBatch.Build(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Batch.Build error: %v", err.Error())
+	if err := mockBatch.ValidateAll(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+func TestBatchValidateAllODFI(t *testing.T) {
+	mockBatch := mockBatchPPD()
+	mockBatch.GetHeader().ODFIIdentification = 123456
+	if err := mockBatch.ValidateAll(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ODFIIdentification" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
@@ -415,44 +394,26 @@ func TestBatchBuildNoEntries(t *testing.T) {
 	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	if err := mockBatch.Build(); err != nil {
-		if !strings.Contains(err.Error(), ErrBatchEntries.Error()) {
-			t.Errorf("Unexpected Batch.Build error: %v", err.Error())
+		if e, ok := err.(*BatchError); ok {
+			if e.Msg != msgBatchEntries {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
 
-func TestBatchDNEMismatch(t *testing.T) {
-	mockBatch := NewBatchPPD()
-	mockBatch.SetHeader(mockBatchHeader())
-	ed := mockEntryDetail()
-	ed.AddAddenda(mockAddenda())
-	ed.AddAddenda(mockAddenda())
-	mockBatch.AddEntry(ed)
-	mockBatch.Build()
-
-	mockBatch.GetHeader().OriginatorStatusCode = 1
-	mockBatch.GetEntries()[0].TransactionCode = 23
+func TestBatchBuildHeader(t *testing.T) {
+	mockBatch := mockBatchPPD()
+	mockBatch.GetHeader().CompanyIdentification = ""
 	if err := mockBatch.Build(); err != nil {
-		if !strings.Contains(err.Error(), ErrBatchOriginatorDNE.Error()) {
-			t.Errorf("Unexpected Batch.validation error: %v", err.Error())
-		}
-	}
-}
-
-func TestBatchAddendaSeq(t *testing.T) {
-	mockBatch := NewBatchPPD()
-	mockBatch.SetHeader(mockBatchHeader())
-	ed := mockEntryDetail()
-	ed.AddAddenda(mockAddenda())
-	ed.AddAddenda(mockAddenda())
-	mockBatch.AddEntry(ed)
-	mockBatch.Build()
-
-	mockBatch.GetEntries()[0].Addendums[0].SequenceNumber = 2
-	mockBatch.GetEntries()[0].Addendums[1].SequenceNumber = 1
-	if err := mockBatch.Build(); err != nil {
-		if !strings.Contains(err.Error(), ErrBatchAddendaSequence.Error()) {
-			t.Errorf("Unexpected Batch.validation error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }

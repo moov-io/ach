@@ -18,20 +18,15 @@ ACH is at an early stage and under active development. Please star the project i
 
 
 ## Project Roadmap
-* Support Return Entries
-* Support WEB, CCD, IAT Entries
+* Support SEC WEB
+* Additional SEC codes will be added based on library users needs. Please open an issue with a valid test file.
 
 ## Usage and examples
-
-With a [correctly configured](https://golang.org/doc/install#testing) Go toolchain:
-
-```sh
-go get -u github.com/moov-io/ach
-```
-
 See [godoc.org/github.com/moov-io/ach](https://godoc.org/github.com/moov-io/ach) for usage.
 
-Examples exist in projects [example](https://github.com/moov-io/ach/tree/master/example) folder 
+ACH.Read() returns an error of type ParseError. A ParseError is an error with Line and Record name values. A ParseError.err holds the underlying error of type FieldError, FileError, or BatchError with specific information about record validation
+
+Examples exist in projects [example](https://github.com/moov-io/ach/tree/master/example) folder
 
 # Contributing
 
