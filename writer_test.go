@@ -15,28 +15,26 @@ func TestPPDWrite(t *testing.T) {
 	batch.AddEntry(entry)
 	batch.Build()
 	file.AddBatch(batch)
-	file.Build()
+
 	if err := file.Build(); err != nil {
-		t.Errorf("Could not build file: %v", err)
+		t.Errorf("%T: %s", err, err)
 	}
 	if err := file.ValidateAll(); err != nil {
-		t.Errorf("Could not validate built file: %v", err)
+		t.Errorf("%T: %s", err, err)
 	}
 
 	b := &bytes.Buffer{}
 	f := NewWriter(b)
 
-	err := f.WriteAll([]*File{file})
-	if err != nil {
-		t.Errorf("Unexpected error: %s\n", err)
+	if err := f.WriteAll([]*File{file}); err != nil {
+		t.Errorf("%T: %s", err, err)
 	}
 	r := NewReader(strings.NewReader(b.String()))
-	_, err = r.Read()
+	_, err := r.Read()
 	if err != nil {
-		t.Errorf("Can not ach.Read generated file: %v", err)
+		t.Errorf("%T: %s", err, err)
 	}
-	err = r.File.ValidateAll()
-	if err != nil {
-		t.Errorf("Could not validate entire generated file: %v", err)
+	if err = r.File.ValidateAll(); err != nil {
+		t.Errorf("%T: %s", err, err)
 	}
 }

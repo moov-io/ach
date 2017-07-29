@@ -1,5 +1,9 @@
 package ach
 
+import (
+	"fmt"
+)
+
 // Batcher abstract the different ACH batch types that can exist in a file.
 // Each batch type is defined by SEC (Standard Entry Class) code in the Batch Header
 // * SEC identifies the payment type (product) found within an ACH batch-using a 3-character code
@@ -19,3 +23,28 @@ type Batcher interface {
 	Validate() error
 	ValidateAll() error
 }
+
+// BatchError is an Error that describes batch validation issues
+type BatchError struct {
+	BatchNumber int
+	FieldName   string
+	Msg         string
+}
+
+func (e *BatchError) Error() string {
+	return fmt.Sprintf("BatchNumber %d %s %s", e.BatchNumber, e.FieldName, e.Msg)
+}
+
+// Errors specific to parsing a Batch container
+var (
+	// generic messages
+	msgBatchHeaderControlEquality     = "header %v is not equal to control %v"
+	msgBatchCalculatedControlEquality = "calculated %v is out-of-balance with control %v"
+	msgBatchAscending                 = "%v is less than last %v. Must be in ascending order"
+	// specific messages for error
+	msgBatchOriginatorDNE      = "%v is not “2” for DNE with entry transaction code of 23 or 33"
+	msgBatchTraceNumberNotODFI = "%v in header does not match entry trace number %v"
+	msgBatchAddendaIndicator   = "is 0 but found addenda record(s)"
+	msgBatchAddendaTraceNumber = "%v does not match proceeding entry detail trace number %v"
+	msgBatchEntries            = "must have Entrie Record(s) to be built"
+)

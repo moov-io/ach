@@ -6,11 +6,12 @@ package ach
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 )
 
-// ErrServiceClass
+// msgServiceClass
 
 // BatchHeader identifies the originating entity and the type of transactions
 // contained in the batch (i.e., the standard entry class, PPD for consumer, CCD
@@ -162,28 +163,29 @@ func (bh *BatchHeader) Validate() error {
 		return err
 	}
 	if bh.recordType != "5" {
-		return &ValidateError{FieldName: "recordType", Value: bh.recordType, Err: ErrRecordType}
+		msg := fmt.Sprintf(msgRecordType, 5)
+		return &FieldError{FieldName: "recordType", Value: bh.recordType, Msg: msg}
 	}
 	if err := bh.isServiceClass(bh.ServiceClassCode); err != nil {
-		return &ValidateError{FieldName: "ServiceClassCode", Value: string(bh.ServiceClassCode), Err: err}
+		return &FieldError{FieldName: "ServiceClassCode", Value: strconv.Itoa(bh.ServiceClassCode), Msg: err.Error()}
 	}
 	if err := bh.isSECCode(bh.StandardEntryClassCode); err != nil {
-		return &ValidateError{FieldName: "ServiceClassCode", Value: string(bh.ServiceClassCode), Err: err}
+		return &FieldError{FieldName: "StandardEntryClassCode", Value: bh.StandardEntryClassCode, Msg: err.Error()}
 	}
 	if err := bh.isOriginatorStatusCode(bh.OriginatorStatusCode); err != nil {
-		return &ValidateError{FieldName: "OriginatorStatusCode", Value: string(bh.OriginatorStatusCode), Err: err}
+		return &FieldError{FieldName: "OriginatorStatusCode", Value: strconv.Itoa(bh.OriginatorStatusCode), Msg: err.Error()}
 	}
 	if err := bh.isAlphanumeric(bh.CompanyName); err != nil {
-		return &ValidateError{FieldName: "CompanyName", Value: string(bh.CompanyName), Err: err}
+		return &FieldError{FieldName: "CompanyName", Value: bh.CompanyName, Msg: err.Error()}
 	}
 	if err := bh.isAlphanumeric(bh.CompanyDiscretionaryData); err != nil {
-		return &ValidateError{FieldName: "CompanyDiscretionaryData", Value: string(bh.CompanyDiscretionaryData), Err: err}
+		return &FieldError{FieldName: "CompanyDiscretionaryData", Value: bh.CompanyDiscretionaryData, Msg: err.Error()}
 	}
 	if err := bh.isAlphanumeric(bh.CompanyIdentification); err != nil {
-		return &ValidateError{FieldName: "CompanyIdentification", Value: string(bh.CompanyIdentification), Err: err}
+		return &FieldError{FieldName: "CompanyIdentification", Value: bh.CompanyIdentification, Msg: err.Error()}
 	}
 	if err := bh.isAlphanumeric(bh.CompanyEntryDescription); err != nil {
-		return &ValidateError{FieldName: "CompanyEntryDescription", Value: string(bh.CompanyEntryDescription), Err: err}
+		return &FieldError{FieldName: "CompanyEntryDescription", Value: bh.CompanyEntryDescription, Msg: err.Error()}
 	}
 
 	return nil
@@ -193,31 +195,31 @@ func (bh *BatchHeader) Validate() error {
 // invalid the ACH transfer will be returned.
 func (bh *BatchHeader) fieldInclusion() error {
 	if bh.recordType == "" {
-		return &ValidateError{FieldName: "recordType", Value: bh.recordType, Err: ErrRecordType}
+		return &FieldError{FieldName: "recordType", Value: bh.recordType, Msg: msgFieldInclusion}
 	}
 	if bh.ServiceClassCode == 0 {
-		return &ValidateError{FieldName: "ServiceClassCode", Value: string(bh.ServiceClassCode), Err: ErrServiceClass}
+		return &FieldError{FieldName: "ServiceClassCode", Value: strconv.Itoa(bh.ServiceClassCode), Msg: msgFieldInclusion}
 	}
 	if bh.CompanyName == "" {
-		return &ValidateError{FieldName: "CompanyName", Value: bh.CompanyName, Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "CompanyName", Value: bh.CompanyName, Msg: msgFieldInclusion}
 	}
 	if bh.CompanyIdentification == "" {
-		return &ValidateError{FieldName: "CompanyIdentification", Value: bh.CompanyIdentification, Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "CompanyIdentification", Value: bh.CompanyIdentification, Msg: msgFieldInclusion}
 	}
 	if bh.StandardEntryClassCode == "" {
-		return &ValidateError{FieldName: "StandardEntryClassCode", Value: bh.StandardEntryClassCode, Err: ErrSECCode}
+		return &FieldError{FieldName: "StandardEntryClassCode", Value: bh.StandardEntryClassCode, Msg: msgFieldInclusion}
 	}
 	if bh.CompanyEntryDescription == "" {
-		return &ValidateError{FieldName: "CompanyEntryDescription", Value: bh.CompanyEntryDescription, Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "CompanyEntryDescription", Value: bh.CompanyEntryDescription, Msg: msgFieldInclusion}
 	}
 	if bh.OriginatorStatusCode == 0 {
-		return &ValidateError{FieldName: "OriginatorStatusCode", Value: string(bh.OriginatorStatusCode), Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "OriginatorStatusCode", Value: strconv.Itoa(bh.OriginatorStatusCode), Msg: msgFieldInclusion}
 	}
 	if bh.ODFIIdentification == 0 {
-		return &ValidateError{FieldName: "ODFIIdentification", Value: string(bh.ODFIIdentification), Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "ODFIIdentification", Value: bh.ODFIIdentificationField(), Msg: msgFieldInclusion}
 	}
 	if bh.BatchNumber == 0 {
-		return &ValidateError{FieldName: "BatchNumber", Value: string(bh.BatchNumber), Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "BatchNumber", Value: strconv.Itoa(bh.BatchNumber), Msg: msgFieldInclusion}
 	}
 
 	return nil

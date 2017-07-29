@@ -5,7 +5,6 @@
 package ach
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -13,11 +12,11 @@ import (
 
 // Errors specific to a File Header Record
 var (
-	ErrRecordType       = errors.New("Wrong Record type")
-	ErrRecordSize       = errors.New("Record size is not 094")
-	ErrBlockingFactor   = errors.New("Blocking Factor is not 10")
-	ErrFormatCode       = errors.New("Format Code is not 1.")
-	ErrFileCreationDate = errors.New("File was created before today")
+	msgRecordType       = "recieved expecting %d"
+	msgRecordSize       = "is not 094"
+	msgBlockingFactor   = "is not 10"
+	msgFormatCode       = "is not 1"
+	msgFileCreationDate = "was created before " + time.Now().String()
 )
 
 // FileHeader is a Record designating physical file characteristics and identify
@@ -163,31 +162,33 @@ func (fh *FileHeader) Validate() error {
 		return err
 	}
 	if fh.recordType != "1" {
-		return &ValidateError{FieldName: "recordType", Value: fh.recordType, Err: ErrRecordType}
+		msg := fmt.Sprintf(msgRecordType, 1)
+		return &FieldError{FieldName: "recordType", Value: fh.recordType, Msg: msg}
 	}
 	if err := fh.isUpperAlphanumeric(fh.FileIDModifier); err != nil {
-		return &ValidateError{FieldName: "FileIDModifier", Value: fh.FileIDModifier, Err: err}
+		return &FieldError{FieldName: "FileIDModifier", Value: fh.FileIDModifier, Msg: err.Error()}
 	}
 	if len(fh.FileIDModifier) != 1 {
-		return &ValidateError{FieldName: "FileIDModifier", Value: fh.FileIDModifier, Err: ErrValidFieldLength}
+		msg := fmt.Sprintf(msgValidFieldLength, 1)
+		return &FieldError{FieldName: "FileIDModifier", Value: fh.FileIDModifier, Msg: msg}
 	}
 	if fh.recordSize != "094" {
-		return &ValidateError{FieldName: "recordSize", Value: fh.recordSize, Err: ErrRecordSize}
+		return &FieldError{FieldName: "recordSize", Value: fh.recordSize, Msg: msgRecordSize}
 	}
 	if fh.blockingFactor != "10" {
-		return &ValidateError{FieldName: "blockingFactor", Value: fh.blockingFactor, Err: ErrBlockingFactor}
+		return &FieldError{FieldName: "blockingFactor", Value: fh.blockingFactor, Msg: msgBlockingFactor}
 	}
 	if fh.formatCode != "1" {
-		return &ValidateError{FieldName: "formatCode", Value: fh.formatCode, Err: ErrFormatCode}
+		return &FieldError{FieldName: "formatCode", Value: fh.formatCode, Msg: msgFormatCode}
 	}
 	if err := fh.isAlphanumeric(fh.ImmediateDestinationName); err != nil {
-		return &ValidateError{FieldName: "ImmediateDestinationName", Value: fh.ImmediateDestinationName, Err: err}
+		return &FieldError{FieldName: "ImmediateDestinationName", Value: fh.ImmediateDestinationName, Msg: err.Error()}
 	}
 	if err := fh.isAlphanumeric(fh.ImmediateOriginName); err != nil {
-		return &ValidateError{FieldName: "ImmediateOriginName", Value: fh.ImmediateOriginName, Err: err}
+		return &FieldError{FieldName: "ImmediateOriginName", Value: fh.ImmediateOriginName, Msg: err.Error()}
 	}
 	if err := fh.isAlphanumeric(fh.ReferenceCode); err != nil {
-		return &ValidateError{FieldName: "ReferenceCode", Value: fh.ReferenceCode, Err: err}
+		return &FieldError{FieldName: "ReferenceCode", Value: fh.ReferenceCode, Msg: err.Error()}
 	}
 
 	// todo: handle test cases for before date
@@ -203,28 +204,28 @@ func (fh *FileHeader) Validate() error {
 // invalid the ACH transfer will be returned.
 func (fh *FileHeader) fieldInclusion() error {
 	if fh.recordType == "" {
-		return &ValidateError{FieldName: "recordType", Value: fh.recordType, Err: ErrRecordType}
+		return &FieldError{FieldName: "recordType", Value: fh.recordType, Msg: msgFieldInclusion}
 	}
 	if fh.ImmediateDestination == 0 {
-		return &ValidateError{FieldName: "ImmediateDestination", Value: string(fh.ImmediateDestination), Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "ImmediateDestination", Value: fh.ImmediateDestinationField(), Msg: msgFieldInclusion}
 	}
 	if fh.ImmediateOrigin == 0 {
-		return &ValidateError{FieldName: "ImmediateOrigin", Value: string(fh.ImmediateOrigin), Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "ImmediateOrigin", Value: fh.ImmediateOriginField(), Msg: msgFieldInclusion}
 	}
 	if fh.FileCreationDate.IsZero() {
-		return &ValidateError{FieldName: "FileCreationDate", Value: fh.FileCreationDate.String(), Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "FileCreationDate", Value: fh.FileCreationDate.String(), Msg: msgFieldInclusion}
 	}
 	if fh.FileIDModifier == "" {
-		return &ValidateError{FieldName: "FileIDModifier", Value: fh.FileIDModifier, Err: ErrRecordType}
+		return &FieldError{FieldName: "FileIDModifier", Value: fh.FileIDModifier, Msg: msgFieldInclusion}
 	}
 	if fh.recordSize == "" {
-		return &ValidateError{FieldName: "recordSize", Value: fh.recordSize, Err: ErrRecordType}
+		return &FieldError{FieldName: "recordSize", Value: fh.recordSize, Msg: msgFieldInclusion}
 	}
 	if fh.blockingFactor == "" {
-		return &ValidateError{FieldName: "blockingFactor", Value: fh.blockingFactor, Err: ErrRecordType}
+		return &FieldError{FieldName: "blockingFactor", Value: fh.blockingFactor, Msg: msgFieldInclusion}
 	}
 	if fh.formatCode == "" {
-		return &ValidateError{FieldName: "formatCode", Value: fh.formatCode, Err: ErrRecordType}
+		return &FieldError{FieldName: "formatCode", Value: fh.formatCode, Msg: msgFieldInclusion}
 	}
 	return nil
 }

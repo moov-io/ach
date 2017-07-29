@@ -5,133 +5,104 @@
 package ach
 
 import (
-	"strings"
 	"testing"
 )
 
-// TestBatchCountError tests for to many batch counts
-func TestBatchCountError(t *testing.T) {
-	r := NewReader(strings.NewReader(" "))
-	r.File.AddBatch(NewBatchPPD())
-	r.File.Control.BatchCount = 1
-	if err := r.File.Validate(); err != nil {
-		t.Errorf("Unexpected File.Validation error: %v", err.Error())
+func mockFilePPD() *File {
+	mockFile := NewFile()
+	mockFile.SetHeader(mockFileHeader())
+	mockBatch := mockBatchPPD()
+	mockFile.AddBatch(mockBatch)
+	if err := mockFile.Build(); err != nil {
+		panic(err)
 	}
+	return mockFile
+}
+
+func TestFileError(t *testing.T) {
+	err := &FileError{FieldName: "mock", Msg: "test message"}
+	if err.Error() != "mock test message" {
+		t.Error("FileError Error has changed formatting")
+	}
+}
+
+// TestFileBatchCount if calculated count is different from control
+func TestFileBatchCount(t *testing.T) {
+	file := mockFilePPD()
+
 	// More batches than the file control count.
-	r.File.AddBatch(NewBatchPPD())
-	if err := r.File.Validate(); err != nil {
-		if err != ErrFileBatchCount {
-			t.Errorf("Unexpected File.Validation error: %v", err.Error())
+	file.AddBatch(mockBatchPPD())
+	if err := file.Validate(); err != nil {
+		if e, ok := err.(*FileError); ok {
+			if e.FieldName != "BatchCount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
 
-func TestFileEntryAddendaError(t *testing.T) {
-	r := NewReader(strings.NewReader(" "))
-	mockBatch := NewBatchPPD()
-	mockBatch.GetControl().EntryAddendaCount = 1
-	r.File.AddBatch(mockBatch)
-	r.File.Control.BatchCount = 1
-	r.File.Control.EntryAddendaCount = 1
-	if err := r.File.Validate(); err != nil {
-		t.Errorf("Unexpected File.Validation error: %v", err.Error())
-	}
+func TestFileEntryAddenda(t *testing.T) {
+	file := mockFilePPD()
 
 	// more entries than the file control
-	r.File.Control.EntryAddendaCount = 5
-	if err := r.File.Validate(); err != nil {
-		if err != ErrFileEntryCount {
-			t.Errorf("Unexpected File.Validation error: %v", err.Error())
+	file.Control.EntryAddendaCount = 5
+	if err := file.Validate(); err != nil {
+		if e, ok := err.(*FileError); ok {
+			if e.FieldName != "EntryAddendaCount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
 
 func TestFileDebitAmount(t *testing.T) {
+	file := mockFilePPD()
 
-	r := NewReader(strings.NewReader(" "))
-	mockBatch := NewBatchPPD()
-	bc := BatchControl{
-		EntryAddendaCount:           1,
-		TotalDebitEntryDollarAmount: 105000,
-	}
-	mockBatch.SetControl(&bc)
-
-	r.File.AddBatch(mockBatch)
-	r.File.Control.BatchCount = 1
-	r.File.Control.EntryAddendaCount = 1
-	r.File.Control.TotalDebitEntryDollarAmountInFile = 105000
-
-	if err := r.File.Validate(); err != nil {
-		t.Errorf("Unexpected File.Validation error: %v", err.Error())
-	}
-
-	r.File.Control.TotalDebitEntryDollarAmountInFile = 0
-	if err := r.File.Validate(); err != nil {
-		if err != ErrFileDebitAmount {
-			t.Errorf("Unexpected File.Validation error: %v", err.Error())
+	// inequality in total debit amount
+	file.Control.TotalDebitEntryDollarAmountInFile = 63
+	if err := file.Validate(); err != nil {
+		if e, ok := err.(*FileError); ok {
+			if e.FieldName != "TotalDebitEntryDollarAmountInFile" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
 
 func TestFileCreditAmount(t *testing.T) {
-	r := NewReader(strings.NewReader(" "))
-	mockBatch := NewBatchPPD()
-	bc := BatchControl{
-		EntryAddendaCount:            1,
-		TotalCreditEntryDollarAmount: 10500,
-	}
-	mockBatch.SetControl(&bc)
+	file := mockFilePPD()
 
-	r.File.AddBatch(mockBatch)
-	r.File.Control.BatchCount = 1
-	r.File.Control.EntryAddendaCount = 1
-	r.File.Control.TotalCreditEntryDollarAmountInFile = 10500
-
-	if err := r.File.Validate(); err != nil {
-		t.Errorf("Unexpected File.Validation error: %v", err.Error())
-	}
-
-	r.File.Control.TotalCreditEntryDollarAmountInFile = 0
-	if err := r.File.Validate(); err != nil {
-		if err != ErrFileCreditAmount {
-			t.Errorf("Unexpected File.Validation error: %v", err.Error())
+	// inequality in total debit amount
+	file.Control.TotalCreditEntryDollarAmountInFile = 63
+	if err := file.Validate(); err != nil {
+		if e, ok := err.(*FileError); ok {
+			if e.FieldName != "TotalCreditEntryDollarAmountInFile" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
 
 func TestFileEntryHash(t *testing.T) {
-	r := NewReader(strings.NewReader(" "))
-	mockBatch1 := NewBatchPPD()
-	bc := BatchControl{
-		EntryAddendaCount:            1,
-		TotalCreditEntryDollarAmount: 10500,
-		EntryHash:                    1212121212,
-	}
-	mockBatch1.SetControl(&bc)
-
-	mockBatch2 := NewBatchPPD()
-	bc2 := BatchControl{
-		EntryAddendaCount:            1,
-		TotalCreditEntryDollarAmount: 10500,
-		EntryHash:                    2121212121,
-	}
-	mockBatch2.SetControl(&bc2)
-
-	r.File.AddBatch(mockBatch1)
-	r.File.AddBatch(mockBatch2)
-
-	r.File.Control.BatchCount = 2
-	r.File.Control.EntryAddendaCount = 2
-	r.File.Control.TotalCreditEntryDollarAmountInFile = 21000
-	r.File.Control.EntryHash = 3333333333
-	if err := r.File.Validate(); err != nil {
-		t.Errorf("Unexpected File.Validation error: %v", err.Error())
-	}
-
-	r.File.Control.EntryHash = 0
-	if err := r.File.Validate(); err != nil {
-		if err != ErrFileEntryHash {
-			t.Errorf("Unexpected File.Validation error: %v", err.Error())
+	file := mockFilePPD()
+	file.AddBatch(mockBatchPPD())
+	file.Build()
+	file.Control.EntryHash = 63
+	if err := file.Validate(); err != nil {
+		if e, ok := err.(*FileError); ok {
+			if e.FieldName != "EntryHash" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
@@ -148,21 +119,34 @@ func TestFileBlockCount10(t *testing.T) {
 	batch.AddEntry(mockEntryDetail())
 	batch.Build()
 	file.AddBatch(batch)
+	if err := file.Build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
 
 	// ensure with 10 records in file we don't get 2 for a block count
-	if err := file.Build(); err != nil {
-		t.Errorf("Unexpected File.Validation error: %v", err.Error())
-	}
 	if file.Control.BlockCount != 1 {
-		t.Errorf("Unexpected block count in file expect 1 got: %v", file.Control.BlockCount)
+		t.Error("BlockCount on 10 records is not equal to 1")
+	}
+	// make 11th record which should produce BlockCount of 2
+	file.Batches[0].AddEntry(mockEntryDetail())
+	file.Batches[0].Build() // File.Build does not re-build Batches
+	if err := file.Build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if file.Control.BlockCount != 2 {
+		t.Error("BlockCount on 11 records is not equal to 2")
 	}
 }
 
 func TestFileBuildBadFileHeader(t *testing.T) {
 	file := NewFile().SetHeader(FileHeader{})
 	if err := file.Build(); err != nil {
-		if !strings.Contains(err.Error(), ErrRecordType.Error()) {
-			t.Errorf("Unexpected File.Build error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
@@ -170,59 +154,57 @@ func TestFileBuildBadFileHeader(t *testing.T) {
 func TestFileBuildNoBatch(t *testing.T) {
 	file := NewFile().SetHeader(mockFileHeader())
 	if err := file.Build(); err != nil {
-		if !strings.Contains(err.Error(), ErrFileBatches.Error()) {
-			t.Errorf("Unexpected File.Build error: %v", err.Error())
+		if e, ok := err.(*FileError); ok {
+			if e.FieldName != "Batchs" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
 
 func TestFileValidateAllBatch(t *testing.T) {
-	file := NewFile().SetHeader(mockFileHeader())
-	batch := NewBatchPPD()
-	batch.SetHeader(mockBatchHeader())
-	batch.AddEntry(mockEntryDetail())
-	batch.Build()
-	file.AddBatch(batch)
+	file := mockFilePPD()
 	// break the file header
 	file.Batches[0].GetHeader().ODFIIdentification = 0
-	if err := file.Build(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected File.ValidationAll error: %v", err.Error())
+	if err := file.ValidateAll(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
 
 func TestFileValidateAllFileHeader(t *testing.T) {
-	file := NewFile().SetHeader(mockFileHeader())
-	batch := NewBatchPPD()
-	batch.SetHeader(mockBatchHeader())
-	batch.AddEntry(mockEntryDetail())
-	batch.Build()
-	file.AddBatch(batch)
+	file := mockFilePPD()
 	// break the file header
 	file.Header.ImmediateOrigin = 0
-	if err := file.Build(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected File.ValidationAll error: %v", err.Error())
+	if err := file.ValidateAll(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }
 
 func TestFileValidateAllFileControl(t *testing.T) {
-	file := NewFile().SetHeader(mockFileHeader())
-	batch := NewBatchPPD()
-	batch.SetHeader(mockBatchHeader())
-	batch.AddEntry(mockEntryDetail())
-	batch.Build()
-	file.AddBatch(batch)
+	file := mockFilePPD()
 	// break the file header
 	file.Control.BatchCount = 0
-	if err := file.Build(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected File.ValidationAll error: %v", err.Error())
+	if err := file.ValidateAll(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
 	}
 }

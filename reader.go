@@ -6,14 +6,9 @@ package ach
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"io"
-)
-
-const (
-	// RecordLength character count of each line representing a letter in a file
-	RecordLength = 94
+	"strconv"
 )
 
 // ParseError is returned for parsing reader errors.
@@ -25,28 +20,11 @@ type ParseError struct {
 }
 
 func (e *ParseError) Error() string {
-	return fmt.Sprintf("LineNum:%d, RecordName:%s : %s \n", e.Line, e.Record, e.Err)
+	if e.Record == "" {
+		return fmt.Sprintf("line:%d %T %s", e.Line, e.Err, e.Err)
+	}
+	return fmt.Sprintf("line:%d record:%s %T %s", e.Line, e.Record, e.Err, e.Err)
 }
-
-// These are the errors that can be returned in Parse.Error
-// additional errors can occur in the Record
-var (
-	ErrFileRead           = errors.New("File could not be read")
-	ErrRecordLen          = errors.New("Wrong number of characters in record expected 94")
-	ErrBatchHeader        = errors.New("None or More than one Batch Headers exist in Batch.")
-	ErrBatchControl       = errors.New("No terminating batch control record found in file for previous batch")
-	ErrUnknownRecordType  = errors.New("Unhandled Record Type")
-	ErrFileHeader         = errors.New("None or more than one File Headers exists")
-	ErrFileControl        = errors.New("None or more than one File Control exists")
-	ErrEntryOutside       = errors.New("Entry Detail record outside of a batch")
-	ErrAddendaOutside     = errors.New("Entry Addenda without a preceding Entry Detail")
-	ErrAddendaNoIndicator = errors.New("Addenda without Entry Detail Addenda Inicator")
-)
-
-// currently support SEC codes
-const (
-	ppd = "PPD"
-)
 
 // Reader reads records from a ACH-encoded file.
 type Reader struct {
@@ -79,7 +57,7 @@ func (r *Reader) addCurrentBatch(batch Batcher) {
 	r.currentBatch = batch
 }
 
-// NewReader returns a new Reader that reads from r.
+// NewReader returns a new ACH Reader that reads from r.
 func NewReader(r io.Reader) *Reader {
 	return &Reader{
 		scanner: bufio.NewScanner(r),
@@ -100,35 +78,39 @@ func (r *Reader) Read() (File, error) {
 		// handle the situation where there are no line breaks
 		if r.lineNum == 1 && lineLength > RecordLength && lineLength%RecordLength == 0 {
 			if err := r.processFixedWidthFile(&line); err != nil {
-				return r.File, r.error(err)
+				return r.File, err
 			}
 			break
 		}
 
 		// Only 94 ASCII characters to a line
 		if lineLength != RecordLength {
-			return r.File, r.error(ErrRecordLen)
+			msg := fmt.Sprintf(msgRecordLength, lineLength)
+			err := &FileError{FieldName: "RecordLength", Value: strconv.Itoa(lineLength), Msg: msg}
+			return r.File, r.error(err)
 		}
 
 		r.line = line
 
 		if err := r.parseLine(); err != nil {
-			return r.File, r.error(err)
+			return r.File, err
 		}
 	}
 
 	if err := r.scanner.Err(); err != nil {
-		return r.File, r.error(ErrFileRead)
+		return r.File, err
 	}
 
 	if (FileHeader{}) == r.File.Header {
 		// Their must be at least one File Header
-		return r.File, r.error(ErrFileHeader)
+		r.recordName = "FileHeader"
+		return r.File, r.error(&FileError{Msg: msgFileHeader})
 	}
 
 	if (FileControl{}) == r.File.Control {
 		// Their must be at least one File Control
-		return r.File, r.error(ErrFileControl)
+		r.recordName = "FileControl"
+		return r.File, r.error(&FileError{Msg: msgFileControl})
 	}
 
 	return r.File, nil
@@ -190,7 +172,8 @@ func (r *Reader) parseLine() error {
 			return err
 		}
 	default:
-		return r.error(ErrUnknownRecordType)
+		msg := fmt.Sprintf(msgUnknownRecordType, r.line[:1])
+		return r.error(&FileError{FieldName: "recordType", Value: r.line[:1], Msg: msg})
 	}
 
 	return nil
@@ -201,12 +184,12 @@ func (r *Reader) parseFileHeader() error {
 	r.recordName = "FileHeader"
 	if (FileHeader{}) != r.File.Header {
 		// Their can only be one File Header per File exit
-		return ErrFileHeader
+		r.error(&FileError{Msg: msgFileHeader})
 	}
 	r.File.Header.Parse(r.line)
 
 	if err := r.File.Header.Validate(); err != nil {
-		return err
+		return r.error(err)
 	}
 	return nil
 }
@@ -215,7 +198,8 @@ func (r *Reader) parseFileHeader() error {
 func (r *Reader) parseBatchHeader() error {
 	r.recordName = "BatchHeader"
 	if r.currentBatch != nil {
-		return ErrBatchHeader
+		// batch header inside of current batch
+		return r.error(&FileError{Msg: msgFileBatchInside})
 	}
 	bh := NewBatchHeader()
 	bh.Parse(r.line)
@@ -224,13 +208,13 @@ func (r *Reader) parseBatchHeader() error {
 		r.addCurrentBatch(NewBatchPPD())
 	// @TODO add additional batch types to creation
 	default:
-		return errors.New("Support for Batch's of SEC(standard entry class): " +
-			sec + ", has not been implemented")
+		msg := fmt.Sprintf(msgFileNoneSEC, sec)
+		return r.error(&FileError{FieldName: "StandardEntryClassCode", Msg: msg})
 	}
 	r.currentBatch.SetHeader(bh)
 
 	if err := r.currentBatch.GetHeader().Validate(); err != nil {
-		return err
+		return r.error(err)
 	}
 	return nil
 }
@@ -239,7 +223,7 @@ func (r *Reader) parseBatchHeader() error {
 func (r *Reader) parseEntryDetail() error {
 	r.recordName = "EntryDetail"
 	if r.currentBatch == nil {
-		return ErrEntryOutside
+		return r.error(&FileError{Msg: msgFileBatchOutside})
 	}
 	// @TODO change to EntryDetailer once interface is implmented if EntryDetails change
 	ed := new(EntryDetail)
@@ -248,12 +232,12 @@ func (r *Reader) parseEntryDetail() error {
 	case ppd:
 		ed.Parse(r.line)
 		if err := ed.Validate(); err != nil {
-			return err
+			return r.error(err)
 		}
-	//case "CCD":
+	//case "WEB":
 	default:
-		return errors.New("Support for EntryDetail of SEC(standard entry class): " +
-			sec + ", has not been implemented")
+		msg := fmt.Sprintf(msgFileNoneSEC, sec)
+		return r.error(&FileError{FieldName: "StandardEntryClassCode", Msg: msg})
 	}
 
 	r.currentBatch.AddEntry(ed)
@@ -265,10 +249,11 @@ func (r *Reader) parseAddenda() error {
 	r.recordName = "Addenda"
 
 	if r.currentBatch == nil {
-		return ErrAddendaOutside
+		msg := fmt.Sprintf(msgFileBatchOutside)
+		return r.error(&FileError{FieldName: "Addenda", Msg: msg})
 	}
 	if len(r.currentBatch.GetEntries()) == 0 {
-		return ErrAddendaOutside
+		return r.error(&FileError{FieldName: "Addenda", Msg: msgFileBatchOutside})
 	}
 	entryIndex := len(r.currentBatch.GetEntries()) - 1
 	entry := r.currentBatch.GetEntries()[entryIndex]
@@ -279,18 +264,18 @@ func (r *Reader) parseAddenda() error {
 			addenda := Addenda{}
 			addenda.Parse(r.line)
 			if err := addenda.Validate(); err != nil {
-				return err
+				return r.error(err)
 			}
 			r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda)
 		} else {
-			return ErrAddendaNoIndicator
+			msg := fmt.Sprintf(msgBatchAddendaIndicator)
+			return r.error(&FileError{FieldName: "AddendaRecordIndicator", Msg: msg})
 		}
 	// case "CCD":
 	default:
-		return errors.New("Support for addenda of SEC(standard entry class): " +
-			sec + ", has not been implemented")
+		msg := fmt.Sprintf(msgFileNoneSEC, sec)
+		return r.error(&FileError{FieldName: "StandardEntryClassCode", Msg: msg})
 	}
-
 	return nil
 }
 
@@ -298,12 +283,12 @@ func (r *Reader) parseAddenda() error {
 func (r *Reader) parseBatchControl() error {
 	r.recordName = "BatchControl"
 	if r.currentBatch == nil {
-		return ErrBatchHeader
+		// batch Control without a current batch
+		return r.error(&FileError{Msg: msgFileBatchOutside})
 	}
-
 	r.currentBatch.GetControl().Parse(r.line)
 	if err := r.currentBatch.GetControl().Validate(); err != nil {
-		return err
+		return r.error(err)
 	}
 	return nil
 }
@@ -312,12 +297,12 @@ func (r *Reader) parseBatchControl() error {
 func (r *Reader) parseFileControl() error {
 	r.recordName = "FileControl"
 	if (FileControl{}) != r.File.Control {
-		// Their can only be one File Control per File exit
-		return ErrFileControl
+		// Can be only one file control per file
+		return r.error(&FileError{Msg: msgFileControl})
 	}
 	r.File.Control.Parse(r.line)
 	if err := r.File.Control.Validate(); err != nil {
-		return err
+		return r.error(err)
 	}
 	return nil
 }

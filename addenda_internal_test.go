@@ -11,13 +11,20 @@ import (
 
 func mockAddenda() Addenda {
 	addenda := NewAddenda()
-	addenda.TypeCode = "08"
-	addenda.SequenceNumber = 1
 	addenda.EntryDetailSequenceNumber = 1234567
 	return addenda
 }
 
-// TestParseAddendaRecord parses a known Addenda Record string.
+func TestMockAddenda(t *testing.T) {
+	addenda := mockAddenda()
+	if err := addenda.Validate(); err != nil {
+		t.Error("mockAddenda does not validate and will break other tests")
+	}
+	if addenda.EntryDetailSequenceNumber != 1234567 {
+		t.Error("EntryDetailSequenceNumber depedendent default value has changed")
+	}
+}
+
 func TestParseAddenda(t *testing.T) {
 	var line = "710WEB                                        DIEGO MAY                            00010000001"
 
@@ -28,7 +35,7 @@ func TestParseAddenda(t *testing.T) {
 	r.line = line
 	err := r.parseAddenda()
 	if err != nil {
-		t.Errorf("unknown error: %v", err)
+		t.Errorf("%T: %s", err, err)
 	}
 	record := r.currentBatch.GetEntries()[0].Addendums[0]
 
@@ -59,7 +66,7 @@ func TestAddendaString(t *testing.T) {
 	r.line = line
 	err := r.parseAddenda()
 	if err != nil {
-		t.Errorf("unknown error: %v", err)
+		t.Errorf("%T: %s", err, err)
 	}
 	record := r.currentBatch.GetEntries()[0].Addendums[0]
 	if record.String() != line {
@@ -67,58 +74,62 @@ func TestAddendaString(t *testing.T) {
 	}
 }
 
-// TestValidateAddendaRecordType ensure error if recordType is not 7
 func TestValidateAddendaRecordType(t *testing.T) {
 	addenda := mockAddenda()
 	addenda.recordType = "2"
 	if err := addenda.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Expected RecordType Error got: %v", err)
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
 		}
 	}
 }
 
-// TestValidateAddendaRecordType ensure error if recordType is not 7
 func TestValidateAddendaTypeCode(t *testing.T) {
 	addenda := mockAddenda()
 	addenda.TypeCode = "23"
 	if err := addenda.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Expected Type Code Error got: %v", err)
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
 		}
 	}
 }
 
 func TestAddendaFieldInclusion(t *testing.T) {
 	addenda := mockAddenda()
-	// works properly
-	if err := addenda.Validate(); err != nil {
-		t.Errorf("Unexpected Addenda error: %v", err.Error())
-	}
-	// create error is mismatch
 	addenda.EntryDetailSequenceNumber = 0
 	if err := addenda.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Addenda error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "EntryDetailSequenceNumber" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+func TestAddendaFieldInclusionRecordType(t *testing.T) {
+	addenda := mockAddenda()
+	addenda.recordType = ""
+	if err := addenda.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", err, err)
+			}
 		}
 	}
 }
 
 func TestAddendaPaymentRelatedInformationAlphaNumeric(t *testing.T) {
 	addenda := mockAddenda()
-	// works properly
-	if err := addenda.Validate(); err != nil {
-		t.Errorf("Unexpected Addenda error: %v", err.Error())
-	}
-	// create error is mismatch
 	addenda.PaymentRelatedInformation = "@!"
 	if err := addenda.Validate(); err != nil {
-		_, ok := err.(*ValidateError)
-		if !ok {
-			t.Errorf("Unexpected Addenda error: %v", err.Error())
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "PaymentRelatedInformation" {
+				t.Errorf("%T: %s", err, err)
+			}
 		}
 	}
 }

@@ -4,7 +4,10 @@
 
 package ach
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 // EntryDetail contains the actual transaction data for an individual entry.
 // Fields include those designating the entry as a deposit (credit) or
@@ -136,26 +139,31 @@ func (ed *EntryDetail) Validate() error {
 		return err
 	}
 	if ed.recordType != "6" {
-		return &ValidateError{FieldName: "recordType", Value: ed.recordType, Err: ErrRecordType}
+		msg := fmt.Sprintf(msgRecordType, 6)
+		return &FieldError{FieldName: "recordType", Value: ed.recordType, Msg: msg}
 	}
 	if err := ed.isTransactionCode(ed.TransactionCode); err != nil {
-		return &ValidateError{FieldName: "TransactionCode", Value: string(ed.TransactionCode), Err: err}
+		return &FieldError{FieldName: "TransactionCode", Value: strconv.Itoa(ed.TransactionCode), Msg: err.Error()}
 	}
 	if err := ed.isAlphanumeric(ed.DFIAccountNumber); err != nil {
-		return &ValidateError{FieldName: "DFIAccountNumber", Value: ed.DFIAccountNumber, Err: err}
+		return &FieldError{FieldName: "DFIAccountNumber", Value: ed.DFIAccountNumber, Msg: err.Error()}
 	}
 	if err := ed.isAlphanumeric(ed.IndividualIdentificationNumber); err != nil {
-		return &ValidateError{FieldName: "IndividualIdentificationNumber", Value: ed.IndividualIdentificationNumber, Err: err}
+		return &FieldError{FieldName: "IndividualIdentificationNumber", Value: ed.IndividualIdentificationNumber, Msg: err.Error()}
 	}
 	if err := ed.isAlphanumeric(ed.IndividualName); err != nil {
-		return &ValidateError{FieldName: "IndividualName", Value: ed.IndividualName, Err: err}
+		return &FieldError{FieldName: "IndividualName", Value: ed.IndividualName, Msg: err.Error()}
 	}
 	if err := ed.isAlphanumeric(ed.DiscretionaryData); err != nil {
-		return &ValidateError{FieldName: "DiscretionaryData", Value: ed.DiscretionaryData, Err: err}
+		return &FieldError{FieldName: "DiscretionaryData", Value: ed.DiscretionaryData, Msg: err.Error()}
 	}
-	if err := ed.isCheckDigit(ed.RDFIIdentificationField(), ed.CheckDigit); err != nil {
-		return &ValidateError{FieldName: "CheckDigit", Value: string(ed.CheckDigit), Err: err}
+	calculated := ed.CalculateCheckDigit(ed.RDFIIdentificationField())
+	if calculated != ed.CheckDigit {
+		msg := fmt.Sprintf(msgValidCheckDigit, calculated)
+		return &FieldError{FieldName: "RDFIIdentification", Value: ed.RDFIIdentificationField(), Msg: msg}
+		//return msgValidCheckDigit
 	}
+
 	return nil
 }
 
@@ -163,28 +171,28 @@ func (ed *EntryDetail) Validate() error {
 // invalid the ACH transfer will be returned.
 func (ed *EntryDetail) fieldInclusion() error {
 	if ed.recordType == "" {
-		return &ValidateError{FieldName: "recordType", Value: ed.recordType, Err: ErrRecordType}
+		return &FieldError{FieldName: "recordType", Value: ed.recordType, Msg: msgFieldInclusion}
 	}
 	if ed.TransactionCode == 0 {
-		return &ValidateError{FieldName: "TransactionCode", Value: string(ed.TransactionCode), Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "TransactionCode", Value: strconv.Itoa(ed.TransactionCode), Msg: msgFieldInclusion}
 	}
 	if ed.RDFIIdentification == 0 {
-		return &ValidateError{FieldName: "RDFIIdentification", Value: string(ed.RDFIIdentification), Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "RDFIIdentification", Value: ed.RDFIIdentificationField(), Msg: msgFieldInclusion}
 	}
 	if ed.CheckDigit == 0 {
-		return &ValidateError{FieldName: "CheckDigit", Value: string(ed.CheckDigit), Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "CheckDigit", Value: strconv.Itoa(ed.CheckDigit), Msg: msgFieldInclusion}
 	}
 	if ed.DFIAccountNumber == "" {
-		return &ValidateError{FieldName: "DFIAccountNumber", Value: ed.DFIAccountNumber, Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "DFIAccountNumber", Value: ed.DFIAccountNumber, Msg: msgFieldInclusion}
 	}
 	if ed.Amount == 0 {
-		return &ValidateError{FieldName: "Amount", Value: string(ed.Amount), Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "Amount", Value: ed.AmountField(), Msg: msgFieldInclusion}
 	}
 	if ed.IndividualName == "" {
-		return &ValidateError{FieldName: "IndividualName", Value: ed.IndividualName, Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "IndividualName", Value: ed.IndividualName, Msg: msgFieldInclusion}
 	}
 	if ed.TraceNumber == 0 {
-		return &ValidateError{FieldName: "TraceNumber", Value: string(ed.TraceNumber), Err: ErrValidFieldInclusion}
+		return &FieldError{FieldName: "TraceNumber", Value: ed.TraceNumberField(), Msg: msgFieldInclusion}
 	}
 	return nil
 }
