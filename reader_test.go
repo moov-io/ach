@@ -5,6 +5,8 @@
 package ach
 
 import (
+	"bytes"
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -326,6 +328,98 @@ func TestFileFileControlErr(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
+func TestFileBatchHeaderSEC(t *testing.T) {
+	bh := mockBatchHeader()
+	bh.StandardEntryClassCode = "ABC"
+	r := NewReader(strings.NewReader(bh.String()))
+	_, err := r.Read()
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*FileError); ok {
+			if e.FieldName != "StandardEntryClassCode" {
+				t.Errorf("%T: %s", e, e)
+			}
+		}
+	} else {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+func TestFileFileControlNoCurrentBatch(t *testing.T) {
+	bc := mockBatchControl()
+	r := NewReader(strings.NewReader(bc.String()))
+	_, err := r.Read()
+	if p, ok := err.(*ParseError); ok {
+		if p.Record != "BatchControl" {
+			t.Errorf("%T: %s", p, p)
+		}
+	} else {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+func TestFileBatchControlValidate(t *testing.T) {
+	bh := mockBatchHeader()
+	ed := mockEntryDetail()
+	bc := mockBatchControl()
+	bc.CompanyIdentification = "B1G C0M@NY"
+	line := bh.String() + "\n" + ed.String() + "\n" + bc.String()
+	r := NewReader(strings.NewReader(line))
+	_, err := r.Read()
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*FieldError); ok {
+			if e.FieldName != "CompanyIdentification" {
+				t.Errorf("%T: %s", e, e)
+			}
+		}
+	} else {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+func TestFileAddBatchValidation(t *testing.T) {
+	bh := mockBatchHeader()
+	ed := mockEntryDetail()
+	bc := mockBatchControl()
+	line := bh.String() + "\n" + ed.String() + "\n" + bc.String()
+	r := NewReader(strings.NewReader(line))
+	_, err := r.Read()
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*BatchError); ok {
+			if e.FieldName != "EntryAddendaCount" {
+				t.Errorf("%T: %s", e, e)
+			}
+		}
+	} else {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+func TestFileHeaderExists(t *testing.T) {
+	file := mockFilePPD()
+	file.SetHeader(FileHeader{})
+	buf := new(bytes.Buffer)
+	w := NewWriter(buf)
+	w.Write(file)
+	w.Flush()
+	//println(buf.String())
+	r := NewReader(strings.NewReader(buf.String()))
+	f, err := r.Read()
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*FileError); ok {
+				if e.Msg != msgFileHeader {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			// error is nil if the file was parsed properly.
+			t.Errorf("%T: %s", err, err)
+		}
+	} else {
+		fmt.Println(f.Header.String())
+	}
+
+}
 
 // TestFileLongErr Batch Header Service Class is 000 which does not validate
 func TestFileLongErr(t *testing.T) {
@@ -338,5 +432,22 @@ func TestFileLongErr(t *testing.T) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
+	}
+}
+
+func TestFileAddendaOutsideEntry(t *testing.T) {
+	bh := mockBatchHeader()
+	addenda := mockAddenda()
+	line := bh.String() + "\n" + addenda.String()
+	r := NewReader(strings.NewReader(line))
+	_, err := r.Read()
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*FileError); ok {
+			if e.FieldName != "Addenda" {
+				t.Errorf("%T: %s", e, e)
+			}
+		}
+	} else {
+		t.Errorf("%T: %s", err, err)
 	}
 }

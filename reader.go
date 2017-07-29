@@ -75,38 +75,27 @@ func (r *Reader) Read() (File, error) {
 		r.lineNum++
 		lineLength := len(line)
 
-		// handle the situation where there are no line breaks
-		if r.lineNum == 1 && lineLength > RecordLength && lineLength%RecordLength == 0 {
+		switch {
+		case r.lineNum == 1 && lineLength > RecordLength && lineLength%RecordLength == 0:
 			if err := r.processFixedWidthFile(&line); err != nil {
 				return r.File, err
 			}
-			break
-		}
-
-		// Only 94 ASCII characters to a line
-		if lineLength != RecordLength {
+		case lineLength != RecordLength:
 			msg := fmt.Sprintf(msgRecordLength, lineLength)
 			err := &FileError{FieldName: "RecordLength", Value: strconv.Itoa(lineLength), Msg: msg}
 			return r.File, r.error(err)
-		}
-
-		r.line = line
-
-		if err := r.parseLine(); err != nil {
-			return r.File, err
+		default:
+			r.line = line
+			if err := r.parseLine(); err != nil {
+				return r.File, err
+			}
 		}
 	}
-
-	if err := r.scanner.Err(); err != nil {
-		return r.File, err
-	}
-
 	if (FileHeader{}) == r.File.Header {
 		// Their must be at least one File Header
 		r.recordName = "FileHeader"
 		return r.File, r.error(&FileError{Msg: msgFileHeader})
 	}
-
 	if (FileControl{}) == r.File.Control {
 		// Their must be at least one File Control
 		r.recordName = "FileControl"
@@ -156,7 +145,7 @@ func (r *Reader) parseLine() error {
 		}
 		if err := r.currentBatch.Validate(); err != nil {
 			r.recordName = "Batches"
-			return err
+			return r.error(err)
 		}
 		r.File.AddBatch(r.currentBatch)
 		r.currentBatch = nil
@@ -168,14 +157,10 @@ func (r *Reader) parseLine() error {
 		if err := r.parseFileControl(); err != nil {
 			return err
 		}
-		if err := r.File.Validate(); err != nil {
-			return err
-		}
 	default:
 		msg := fmt.Sprintf(msgUnknownRecordType, r.line[:1])
 		return r.error(&FileError{FieldName: "recordType", Value: r.line[:1], Msg: msg})
 	}
-
 	return nil
 }
 
@@ -271,11 +256,15 @@ func (r *Reader) parseAddenda() error {
 			msg := fmt.Sprintf(msgBatchAddendaIndicator)
 			return r.error(&FileError{FieldName: "AddendaRecordIndicator", Msg: msg})
 		}
-	// case "CCD":
-	default:
-		msg := fmt.Sprintf(msgFileNoneSEC, sec)
-		return r.error(&FileError{FieldName: "StandardEntryClassCode", Msg: msg})
 	}
+	// case "CCD":
+	// this code can only be executed if the EntryDetail supports the SEC code
+	/*
+		default:
+			msg := fmt.Sprintf(msgFileNoneSEC, sec)
+			return r.error(&FileError{FieldName: "StandardEntryClassCode", Msg: msg})
+		}
+	*/
 	return nil
 }
 
