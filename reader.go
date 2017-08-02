@@ -263,6 +263,9 @@ func (r *Reader) parseAddenda() error {
 			msg := fmt.Sprintf(msgBatchAddendaIndicator)
 			return r.error(&FileError{FieldName: "AddendaRecordIndicator", Msg: msg})
 		}
+	case ccd:
+	case web:
+
 	}
 	// case "CCD":
 	// this code can only be executed if the EntryDetail supports the SEC code
