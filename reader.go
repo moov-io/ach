@@ -226,7 +226,16 @@ func (r *Reader) parseEntryDetail() error {
 		if err := ed.Validate(); err != nil {
 			return r.error(err)
 		}
-	//case "WEB":
+	case web:
+		ed.Parse(r.line)
+		if err := ed.Validate(); err != nil {
+			return r.error(err)
+		}
+	case ccd:
+		ed.Parse(r.line)
+		if err := ed.Validate(); err != nil {
+			return r.error(err)
+		}
 	default:
 		msg := fmt.Sprintf(msgFileNoneSEC, sec)
 		return r.error(&FileError{FieldName: "StandardEntryClassCode", Msg: msg})
