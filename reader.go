@@ -191,6 +191,13 @@ func (r *Reader) parseBatchHeader() error {
 	switch sec := bh.StandardEntryClassCode; sec {
 	case ppd:
 		r.addCurrentBatch(NewBatchPPD())
+		break
+	case web:
+		r.addCurrentBatch(NewBatchWEB())
+		break
+	case ccd:
+		r.addCurrentBatch(NewBatchCCD())
+		break
 	// @TODO add additional batch types to creation
 	default:
 		msg := fmt.Sprintf(msgFileNoneSEC, sec)
