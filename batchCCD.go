@@ -187,14 +187,14 @@ func (batch *BatchCCD) AddEntry(entry *EntryDetail) Batcher {
 // The Entry/Addenda Count Field is a tally of each Entry Detail and Addenda
 // Record processed within the batch
 func (batch *BatchCCD) isBatchEntryCount() error {
-	entryCount := 0
-	for _, entry := range batch.entries {
-		entryCount = entryCount + 1 + len(entry.Addendums)
-	}
-	if entryCount != batch.control.EntryAddendaCount {
-		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, entryCount, batch.control.EntryAddendaCount)
-		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "EntryAddendaCount", Msg: msg}
-	}
+	// entryCount := 0
+	// for _, entry := range batch.entries {
+	// 	entryCount = entryCount + 1 + len(entry.Addendums)
+	// }
+	// if entryCount != batch.control.EntryAddendaCount {
+	// 	msg := fmt.Sprintf(msgBatchCalculatedControlEquality, entryCount, batch.control.EntryAddendaCount)
+	// 	return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "EntryAddendaCount", Msg: msg}
+	// }
 	return nil
 }
 
