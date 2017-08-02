@@ -8,8 +8,8 @@ import (
 	"fmt"
 )
 
-// BatchWEB holds the Batch Header and Batch Control and all Entry Records for PPD Entries
-type BatchWEB struct {
+// BatchCCD holds the Batch Header and Batch Control and all Entry Records for PPD Entries
+type BatchCCD struct {
 	header  *BatchHeader
 	entries []*EntryDetail
 	control *BatchControl
@@ -17,19 +17,19 @@ type BatchWEB struct {
 	converters
 }
 
-// NewBatchWEB returns a *BatchWEB
-func NewBatchWEB() *BatchWEB {
-	batch := new(BatchWEB)
+// NewBatchCCD returns a *BatchCCD
+func NewBatchCCD() *BatchCCD {
+	batch := new(BatchCCD)
 	bh := NewBatchHeader()
-	bh.StandardEntryClassCode = web
+	bh.StandardEntryClassCode = ccd
 	batch.SetHeader(bh)
 	batch.SetControl(NewBatchControl())
-	batch.GetHeader().StandardEntryClassCode = web
+	batch.GetHeader().StandardEntryClassCode = ccd
 	return batch
 }
 
 // Validate checks valid NACHA batch rules. Assumes properly parsed records.
-func (batch *BatchWEB) Validate() error {
+func (batch *BatchCCD) Validate() error {
 	batchNumber := batch.header.BatchNumber
 	// validate batch header and control codes are the same
 	if batch.header.ServiceClassCode != batch.control.ServiceClassCode {
@@ -84,7 +84,7 @@ func (batch *BatchWEB) Validate() error {
 }
 
 // ValidateAll is a deep validation of all recods within the batch
-func (batch *BatchWEB) ValidateAll() error {
+func (batch *BatchCCD) ValidateAll() error {
 	if err := batch.header.Validate(); err != nil {
 		return err
 	}
@@ -109,7 +109,7 @@ func (batch *BatchWEB) ValidateAll() error {
 }
 
 // Build takes Batch Header and Entries and builds a valid batch
-func (batch *BatchWEB) Build() error {
+func (batch *BatchCCD) Build() error {
 	// Requires a valid BatchHeader
 	if err := batch.header.Validate(); err != nil {
 		return err
@@ -152,32 +152,32 @@ func (batch *BatchWEB) Build() error {
 }
 
 // SetHeader appends an BatchHeader to the Batch
-func (batch *BatchWEB) SetHeader(batchHeader *BatchHeader) {
+func (batch *BatchCCD) SetHeader(batchHeader *BatchHeader) {
 	batch.header = batchHeader
 }
 
 // GetHeader returns the curent Batch header
-func (batch *BatchWEB) GetHeader() *BatchHeader {
+func (batch *BatchCCD) GetHeader() *BatchHeader {
 	return batch.header
 }
 
 // SetControl appends an BatchControl to the Batch
-func (batch *BatchWEB) SetControl(batchControl *BatchControl) {
+func (batch *BatchCCD) SetControl(batchControl *BatchControl) {
 	batch.control = batchControl
 }
 
 // GetControl returns the curent Batch Control
-func (batch *BatchWEB) GetControl() *BatchControl {
+func (batch *BatchCCD) GetControl() *BatchControl {
 	return batch.control
 }
 
 // GetEntries returns a slice of entry details for the batch
-func (batch *BatchWEB) GetEntries() []*EntryDetail {
+func (batch *BatchCCD) GetEntries() []*EntryDetail {
 	return batch.entries
 }
 
 // AddEntry appends an EntryDetail to the Batch
-func (batch *BatchWEB) AddEntry(entry *EntryDetail) Batcher {
+func (batch *BatchCCD) AddEntry(entry *EntryDetail) Batcher {
 	batch.entries = append(batch.entries, entry)
 	//	return batch.entries
 	return Batcher(batch)
@@ -186,7 +186,7 @@ func (batch *BatchWEB) AddEntry(entry *EntryDetail) Batcher {
 // isBatchEntryCount validate Entry count is accurate
 // The Entry/Addenda Count Field is a tally of each Entry Detail and Addenda
 // Record processed within the batch
-func (batch *BatchWEB) isBatchEntryCount() error {
+func (batch *BatchCCD) isBatchEntryCount() error {
 	entryCount := 0
 	for _, entry := range batch.entries {
 		entryCount = entryCount + 1 + len(entry.Addendums)
@@ -201,7 +201,7 @@ func (batch *BatchWEB) isBatchEntryCount() error {
 // isBatchAmount validate Amount is the same as what is in the Entries
 // The Total Debit and Credit Entry Dollar Amount fields contain accumulated
 // Entry Detail debit and credit totals within a given batch
-func (batch *BatchWEB) isBatchAmount() error {
+func (batch *BatchCCD) isBatchAmount() error {
 	credit, debit := batch.calculateBatchAmounts()
 	if debit != batch.control.TotalDebitEntryDollarAmount {
 		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, debit, batch.control.TotalDebitEntryDollarAmount)
@@ -215,7 +215,7 @@ func (batch *BatchWEB) isBatchAmount() error {
 	return nil
 }
 
-func (batch *BatchWEB) calculateBatchAmounts() (credit int, debit int) {
+func (batch *BatchCCD) calculateBatchAmounts() (credit int, debit int) {
 	for _, entry := range batch.entries {
 		if entry.TransactionCode == 22 || entry.TransactionCode == 23 {
 			credit = credit + entry.Amount
@@ -237,7 +237,7 @@ func (batch *BatchWEB) calculateBatchAmounts() (credit int, debit int) {
 
 // isSequenceAscending Individual Entry Detail Records within individual batches must
 // be in ascending Trace Number order (although Trace Numbers need not necessarily be consecutive).
-func (batch *BatchWEB) isSequenceAscending() error {
+func (batch *BatchCCD) isSequenceAscending() error {
 	lastSeq := -1
 	for _, entry := range batch.entries {
 		if entry.TraceNumber <= lastSeq {
@@ -250,7 +250,7 @@ func (batch *BatchWEB) isSequenceAscending() error {
 }
 
 // isEntryHash validates the hash by recalulating the result
-func (batch *BatchWEB) isEntryHash() error {
+func (batch *BatchCCD) isEntryHash() error {
 	hashField := batch.calculateEntryHash()
 	if hashField != batch.control.EntryHashField() {
 		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, hashField, batch.control.EntryHashField())
@@ -261,7 +261,7 @@ func (batch *BatchWEB) isEntryHash() error {
 
 // calculateEntryHash This field is prepared by hashing the 8-digit Routing Number in each entry.
 // The Entry Hash provides a check against inadvertent alteration of data
-func (batch *BatchWEB) calculateEntryHash() string {
+func (batch *BatchCCD) calculateEntryHash() string {
 	hash := 0
 	for _, entry := range batch.entries {
 		hash = hash + entry.RDFIIdentification
@@ -270,7 +270,7 @@ func (batch *BatchWEB) calculateEntryHash() string {
 }
 
 // The Originator Status Code is not equal to “2” for DNE if the Transaction Code is 23 or 33
-func (batch *BatchWEB) isOriginatorDNE() error {
+func (batch *BatchCCD) isOriginatorDNE() error {
 	if batch.header.OriginatorStatusCode != 2 {
 		for _, entry := range batch.entries {
 			if entry.TransactionCode == 23 || entry.TransactionCode == 33 {
@@ -284,7 +284,7 @@ func (batch *BatchWEB) isOriginatorDNE() error {
 
 // isTraceNumberODFI checks if the first 8 positions of the entry detail trace number
 // match the batch header odfi
-func (batch *BatchWEB) isTraceNumberODFI() error {
+func (batch *BatchCCD) isTraceNumberODFI() error {
 	for _, entry := range batch.entries {
 		if batch.header.ODFIIdentificationField() != entry.TraceNumberField()[:8] {
 			msg := fmt.Sprintf(msgBatchTraceNumberNotODFI, batch.header.ODFIIdentificationField(), entry.TraceNumberField()[:8])
@@ -296,7 +296,7 @@ func (batch *BatchWEB) isTraceNumberODFI() error {
 }
 
 // isAddendaSequence check multiple errors on addenda records in the batch entries
-func (batch *BatchWEB) isAddendaSequence() error {
+func (batch *BatchCCD) isAddendaSequence() error {
 	for _, entry := range batch.entries {
 		if len(entry.Addendums) > 0 {
 			// addenda without indicator flag of 1
