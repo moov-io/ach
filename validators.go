@@ -98,10 +98,15 @@ func (v *validator) isTransactionCode(code int) error {
 	switch code {
 	// TransactionCode if the receivers account is:
 	case
+		// Automated Return or Notification of Change for
+		// original transaction code '22', '23, '24'
+		21,
 		// Credit (deposit) to checking account ‘22’
 		22,
 		// Prenote for credit to checking account ‘23’
 		23,
+		// Zero dollar with remittance data (CCD/CTX only)
+		24,
 		// Debit (withdrawal) to checking account ‘27’
 		27,
 		// Prenote for debit to checking account ‘28’
@@ -110,10 +115,15 @@ func (v *validator) isTransactionCode(code int) error {
 		32,
 		// Prenote for credit to savings account ‘33’
 		33,
+		// Autmoated Return or Notification of Change for
+		// original transaction code '37', '38', '39
+		36,
 		// Debit to savings account ‘37’
 		37,
 		// Prenote for debit to savings account ‘38’
-		38:
+		38,
+		// Zero dollar with remittance data (CCD/CTX only)
+		39:
 		return nil
 	}
 	return errors.New(msgTransactionCode)
