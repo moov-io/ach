@@ -212,9 +212,9 @@ func (fh *FileHeader) fieldInclusion() error {
 	if fh.ImmediateOrigin == 0 {
 		return &FieldError{FieldName: "ImmediateOrigin", Value: fh.ImmediateOriginField(), Msg: msgFieldInclusion}
 	}
-	if fh.FileCreationDate.IsZero() {
-		return &FieldError{FieldName: "FileCreationDate", Value: fh.FileCreationDate.String(), Msg: msgFieldInclusion}
-	}
+	// if fh.FileCreationDate.IsZero() {
+	// 	return &FieldError{FieldName: "FileCreationDate", Value: fh.FileCreationDate.String(), Msg: msgFieldInclusion}
+	// }
 	if fh.FileIDModifier == "" {
 		return &FieldError{FieldName: "FileIDModifier", Value: fh.FileIDModifier, Msg: msgFieldInclusion}
 	}
