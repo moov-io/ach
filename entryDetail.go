@@ -160,8 +160,7 @@ func (ed *EntryDetail) Validate() error {
 	calculated := ed.CalculateCheckDigit(ed.RDFIIdentificationField())
 	if calculated != ed.CheckDigit {
 		msg := fmt.Sprintf(msgValidCheckDigit, calculated)
-		return &FieldError{FieldName: "RDFIIdentification", Value: ed.RDFIIdentificationField(), Msg: msg}
-		//return msgValidCheckDigit
+		return &FieldError{FieldName: "RDFIIdentification", Value: strconv.Itoa(ed.CheckDigit), Msg: msg}
 	}
 
 	return nil
@@ -178,9 +177,6 @@ func (ed *EntryDetail) fieldInclusion() error {
 	}
 	if ed.RDFIIdentification == 0 {
 		return &FieldError{FieldName: "RDFIIdentification", Value: ed.RDFIIdentificationField(), Msg: msgFieldInclusion}
-	}
-	if ed.CheckDigit == 0 {
-		return &FieldError{FieldName: "CheckDigit", Value: strconv.Itoa(ed.CheckDigit), Msg: msgFieldInclusion}
 	}
 	if ed.DFIAccountNumber == "" {
 		return &FieldError{FieldName: "DFIAccountNumber", Value: ed.DFIAccountNumber, Msg: msgFieldInclusion}

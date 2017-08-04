@@ -215,7 +215,7 @@ func TestFileEntryDetailOutsideBatch(t *testing.T) {
 // TestFileEntryDetail validation error populates through the reader
 func TestFileEntryDetail(t *testing.T) {
 	ed := mockEntryDetail()
-	ed.CheckDigit = 0
+	ed.TransactionCode = 0
 	line := ed.String()
 	r := NewReader(strings.NewReader(line))
 	r.addCurrentBatch(NewBatchPPD())

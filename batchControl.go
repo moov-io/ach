@@ -158,9 +158,6 @@ func (bc *BatchControl) fieldInclusion() error {
 	if bc.ODFIIdentification == 0 {
 		return &FieldError{FieldName: "ODFIIdentification", Value: bc.ODFIIdentificationField(), Msg: msgFieldInclusion}
 	}
-	if bc.BatchNumber == 0 {
-		return &FieldError{FieldName: "BatchNumber", Value: bc.BatchNumberField(), Msg: msgFieldInclusion}
-	}
 	return nil
 }
 
