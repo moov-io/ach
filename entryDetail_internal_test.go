@@ -147,7 +147,7 @@ func TestEDFieldInclusion(t *testing.T) {
 
 func TestEDdfiAccountNumberAlphaNumeric(t *testing.T) {
 	ed := mockEntryDetail()
-	ed.DFIAccountNumber = "74647#999!"
+	ed.DFIAccountNumber = "®"
 	if err := ed.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "DFIAccountNumber" {
@@ -159,7 +159,7 @@ func TestEDdfiAccountNumberAlphaNumeric(t *testing.T) {
 
 func TestEDIndividualIdentificationNumberAlphaNumeric(t *testing.T) {
 	ed := mockEntryDetail()
-	ed.IndividualIdentificationNumber = "#12345!"
+	ed.IndividualIdentificationNumber = "®"
 	if err := ed.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "IndividualIdentificationNumber" {
@@ -171,7 +171,7 @@ func TestEDIndividualIdentificationNumberAlphaNumeric(t *testing.T) {
 
 func TestEDIndividualNameAlphaNumeric(t *testing.T) {
 	ed := mockEntryDetail()
-	ed.IndividualName = "W@DE"
+	ed.IndividualName = "W®DE"
 	if err := ed.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "IndividualName" {
@@ -183,7 +183,7 @@ func TestEDIndividualNameAlphaNumeric(t *testing.T) {
 
 func TestEDDiscretionaryDataAlphaNumeric(t *testing.T) {
 	ed := mockEntryDetail()
-	ed.DiscretionaryData = "@!"
+	ed.DiscretionaryData = "®!"
 	if err := ed.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "DiscretionaryData" {

@@ -361,7 +361,7 @@ func TestFileBatchControlValidate(t *testing.T) {
 	bh := mockBatchHeader()
 	ed := mockEntryDetail()
 	bc := mockBatchControl()
-	bc.CompanyIdentification = "B1G C0M@NY"
+	bc.CompanyIdentification = "B1G C0MP®NY"
 	line := bh.String() + "\n" + ed.String() + "\n" + bc.String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()

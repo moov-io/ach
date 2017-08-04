@@ -136,7 +136,7 @@ func (v *validator) isOriginatorStatusCode(code int) error {
 
 // isUpperAlphanumeric checks if string only contains ASCII alphanumeric upper case characters
 func (v *validator) isUpperAlphanumeric(s string) error {
-	if regexp.MustCompile(`[^A-Z0-9]+`).MatchString(s) {
+	if regexp.MustCompile(`[^ A-Z0-9!"#$%&'()*+,-.\\/:;<>=?@\[\]^_{}|~]+`).MatchString(s) {
 		return errors.New(msgUpperAlpha)
 	}
 	return nil
@@ -144,7 +144,7 @@ func (v *validator) isUpperAlphanumeric(s string) error {
 
 // isAlphanumeric checks if a string only contains ASCII alphanumeric characters
 func (v *validator) isAlphanumeric(s string) error {
-	if regexp.MustCompile(`[^ a-zA-Z0-9_*-\/]+`).MatchString(s) {
+	if regexp.MustCompile(`[^ \w!"#$%&'()*+,-.\\/:;<>=?@\[\]^_{}|~]+`).MatchString(s) {
 		// ^[ A-Za-z0-9_@./#&+-]*$/
 		return errors.New(msgAlphanumeric)
 	}

@@ -124,7 +124,7 @@ func TestAddendaFieldInclusionRecordType(t *testing.T) {
 
 func TestAddendaPaymentRelatedInformationAlphaNumeric(t *testing.T) {
 	addenda := mockAddenda()
-	addenda.PaymentRelatedInformation = "@!"
+	addenda.PaymentRelatedInformation = "®©"
 	if err := addenda.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "PaymentRelatedInformation" {
