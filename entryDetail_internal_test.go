@@ -252,18 +252,6 @@ func TestEDFieldInclusionRDFIIdentification(t *testing.T) {
 	}
 }
 
-func TestEDFieldInclusionCheckDigit(t *testing.T) {
-	entry := mockEntryDetail()
-	entry.CheckDigit = 0
-	if err := entry.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
-	}
-}
-
 func TestEDFieldInclusionDFIAccountNumber(t *testing.T) {
 	entry := mockEntryDetail()
 	entry.DFIAccountNumber = ""
