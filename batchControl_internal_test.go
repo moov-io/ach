@@ -148,7 +148,7 @@ func TestBCBatchNumber(t *testing.T) {
 
 func TestBCCompanyIdentificationAlphaNumeric(t *testing.T) {
 	bc := mockBatchControl()
-	bc.CompanyIdentification = "@!"
+	bc.CompanyIdentification = "®"
 	if err := bc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "CompanyIdentification" {
@@ -160,7 +160,7 @@ func TestBCCompanyIdentificationAlphaNumeric(t *testing.T) {
 
 func TestBCMessageAuthenticationCodeAlphaNumeric(t *testing.T) {
 	bc := mockBatchControl()
-	bc.MessageAuthenticationCode = "@!"
+	bc.MessageAuthenticationCode = "®"
 	if err := bc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "MessageAuthenticationCode" {
