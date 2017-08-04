@@ -124,7 +124,7 @@ func TestValidateFHRecordType(t *testing.T) {
 // TestValidateIDModifier ensure ID Modiier is upper alphanumeric
 func TestValidateIDModifier(t *testing.T) {
 	fh := mockFileHeader()
-	fh.FileIDModifier = "a"
+	fh.FileIDModifier = "®"
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "FileIDModifier" {
@@ -209,7 +209,7 @@ func TestUpperLengthFileID(t *testing.T) {
 func TestImmediateDestinationNameAlphaNumeric(t *testing.T) {
 	fh := mockFileHeader()
 	fh.ImmediateDestinationName = "Super Big Bank"
-	fh.ImmediateDestinationName = "Big @$$ Bank"
+	fh.ImmediateDestinationName = "Big ®$$ Bank"
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "ImmediateDestinationName" {
@@ -222,7 +222,7 @@ func TestImmediateDestinationNameAlphaNumeric(t *testing.T) {
 func TestImmediateOriginNameAlphaNumeric(t *testing.T) {
 	fh := mockFileHeader()
 	fh.ImmediateOriginName = "Super Big Bank"
-	fh.ImmediateOriginName = "Bigger @$$ Bank"
+	fh.ImmediateOriginName = "Bigger ®$$ Bank"
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "ImmediateOriginName" {
@@ -235,7 +235,7 @@ func TestImmediateOriginNameAlphaNumeric(t *testing.T) {
 func TestImmediateReferenceCodeAlphaNumeric(t *testing.T) {
 	fh := mockFileHeader()
 	fh.ReferenceCode = " "
-	fh.ReferenceCode = "!@#$%^"
+	fh.ReferenceCode = "®"
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "ReferenceCode" {
