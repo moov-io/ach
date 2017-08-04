@@ -177,7 +177,7 @@ func TestBatchHeaderFieldInclusion(t *testing.T) {
 
 func TestBatchHeaderCompanyNameAlphaNumeric(t *testing.T) {
 	bh := mockBatchHeader()
-	bh.CompanyName = "AT&T"
+	bh.CompanyName = "AT&T®"
 	if err := bh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "CompanyName" {
@@ -189,7 +189,7 @@ func TestBatchHeaderCompanyNameAlphaNumeric(t *testing.T) {
 
 func TestBatchCompanyDiscretionaryDataAlphaNumeric(t *testing.T) {
 	bh := mockBatchHeader()
-	bh.CompanyDiscretionaryData = "Invoice: #12345"
+	bh.CompanyDiscretionaryData = "®"
 	if err := bh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "CompanyDiscretionaryData" {
@@ -201,7 +201,7 @@ func TestBatchCompanyDiscretionaryDataAlphaNumeric(t *testing.T) {
 
 func TestBatchCompanyIdentificationAlphaNumeric(t *testing.T) {
 	bh := mockBatchHeader()
-	bh.CompanyIdentification = "EIN:12345"
+	bh.CompanyIdentification = "®"
 	if err := bh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "CompanyIdentification" {
@@ -213,7 +213,7 @@ func TestBatchCompanyIdentificationAlphaNumeric(t *testing.T) {
 
 func TestBatchCompanyEntryDescriptionAlphaNumeric(t *testing.T) {
 	bh := mockBatchHeader()
-	bh.CompanyEntryDescription = "P@YROLL"
+	bh.CompanyEntryDescription = "P®YROLL"
 	if err := bh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "CompanyEntryDescription" {
