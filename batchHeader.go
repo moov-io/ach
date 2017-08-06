@@ -17,7 +17,7 @@ import (
 // contained in the batch (i.e., the standard entry class, PPD for consumer, CCD
 // or CTX for corporate). This record also contains the effective date, or desired
 // settlement date, for all entries contained in this batch. The settlement date
-// field is not entered as it is determined by the ACH operato
+// field is not entered as it is determined by the ACH operator
 type BatchHeader struct {
 	// RecordType defines the type of record in the block. 5
 	recordType string
@@ -90,13 +90,26 @@ type BatchHeader struct {
 	converters
 }
 
-// NewBatchHeader returns a new BatchHeader with default valus for none exported fields
-func NewBatchHeader() *BatchHeader {
-	return &BatchHeader{
+// NewBatchHeader returns a new BatchHeader with default values for none exported fields
+func NewBatchHeader(params ...BatchParam) *BatchHeader {
+	bh := &BatchHeader{
 		recordType:           "5",
 		OriginatorStatusCode: 1,
 		BatchNumber:          1,
 	}
+	if len(params) > 0 {
+		println("holler")
+		bh.ServiceClassCode = params[0].ServiceClassCode
+		bh.CompanyName = params[0].CompanyName
+		bh.CompanyIdentification = params[0].CompanyIdentification
+		bh.StandardEntryClassCode = params[0].StandardEntryClass
+		bh.CompanyEntryDescription = params[0].CompanyEntryDescription
+		bh.CompanyDescriptiveDate = params[0].CompanyDescriptiveDate
+		bh.EffectiveEntryDate = bh.parseSimpleDate(params[0].EffectiveEntryDate)
+		bh.ODFIIdentification = bh.parseNumField(params[0].ODFIIdentification)
+		return bh
+	}
+	return bh
 }
 
 // Parse takes the input record string and parses the BatchHeader values
@@ -132,7 +145,7 @@ func (bh *BatchHeader) Parse(record string) {
 	// 80-87 Your ODFI's routing number without the last digit. The last digit is simply a
 	// checksum digit, which is why it is not necessary
 	bh.ODFIIdentification = bh.parseNumField(record[79:87])
-	// 88-94 Sequential number of this Batch Header Recor
+	// 88-94 Sequential number of this Batch Header Record
 	// For example, put "1" if this is the first Batch Header Record in the file
 	bh.BatchNumber = bh.parseNumField(record[87:94])
 }

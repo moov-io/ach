@@ -26,22 +26,22 @@ func TestMockBatchHeader(t *testing.T) {
 		t.Error("mockBatchHeader does not validate and will break other tests")
 	}
 	if bh.ServiceClassCode != 220 {
-		t.Error("ServiceClassCode depedendent default value has changed")
+		t.Error("ServiceClassCode dependent default value has changed")
 	}
 	if bh.StandardEntryClassCode != "PPD" {
-		t.Error("StandardEntryClassCode depedendent default value has changed")
+		t.Error("StandardEntryClassCode dependent default value has changed")
 	}
 	if bh.CompanyName != "ACME Corporation" {
-		t.Error("CompanyName depedendent default value has changed")
+		t.Error("CompanyName dependent default value has changed")
 	}
 	if bh.CompanyIdentification != "123456789" {
-		t.Error("CompanyIdentification depedendent default value has changed")
+		t.Error("CompanyIdentification dependent default value has changed")
 	}
 	if bh.CompanyEntryDescription != "PAYROLL" {
-		t.Error("CompanyEntryDescription depedendent default value has changed")
+		t.Error("CompanyEntryDescription dependent default value has changed")
 	}
 	if bh.ODFIIdentification != 6200001 {
-		t.Error("ODFIIdentification depedendent default value has changed")
+		t.Error("ODFIIdentification dependent default value has changed")
 	}
 }
 
