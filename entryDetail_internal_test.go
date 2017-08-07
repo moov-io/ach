@@ -26,19 +26,19 @@ func TestMockEntryDetail(t *testing.T) {
 		t.Error("mockEntryDetail does not validate and will break other tests")
 	}
 	if entry.TransactionCode != 22 {
-		t.Error("TransactionCode depedendent default value has changed")
+		t.Error("TransactionCode dependent default value has changed")
 	}
 	if entry.DFIAccountNumber != "123456789" {
-		t.Error("DFIAccountNumber depedendent default value has changed")
+		t.Error("DFIAccountNumber dependent default value has changed")
 	}
 	if entry.Amount != 100000000 {
-		t.Error("Amount depedendent default value has changed")
+		t.Error("Amount dependent default value has changed")
 	}
 	if entry.IndividualName != "Wade Arnold" {
-		t.Error("IndividualName depedendent default value has changed")
+		t.Error("IndividualName dependent default value has changed")
 	}
 	if entry.TraceNumber != 123456789 {
-		t.Error("TraceNumber depedendent default value has changed")
+		t.Error("TraceNumber dependent default value has changed")
 	}
 }
 

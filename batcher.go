@@ -35,6 +35,18 @@ func (e *BatchError) Error() string {
 	return fmt.Sprintf("BatchNumber %d %s %s", e.BatchNumber, e.FieldName, e.Msg)
 }
 
+// BatchParam is a subset of BatchHeader used for simplifying the build process.
+type BatchParam struct {
+	ServiceClassCode        string `json:"service_class_code"`
+	CompanyName             string `json:"company_name"`
+	CompanyIdentification   string `json:"company_identification"`
+	StandardEntryClass      string `json:"standard_entry_class"`
+	CompanyEntryDescription string `json:"company_entry_description"`
+	CompanyDescriptiveDate  string `json:"company_descriptive_date"`
+	EffectiveEntryDate      string `json:"effective_entry_date"`
+	ODFIIdentification      string `json:"ODFI_identification"`
+}
+
 // Errors specific to parsing a Batch container
 var (
 	// generic messages
@@ -46,5 +58,5 @@ var (
 	msgBatchTraceNumberNotODFI = "%v in header does not match entry trace number %v"
 	msgBatchAddendaIndicator   = "is 0 but found addenda record(s)"
 	msgBatchAddendaTraceNumber = "%v does not match proceeding entry detail trace number %v"
-	msgBatchEntries            = "must have Entrie Record(s) to be built"
+	msgBatchEntries            = "must have Entry Record(s) to be built"
 )

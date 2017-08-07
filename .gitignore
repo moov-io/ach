@@ -11,6 +11,13 @@
 _obj
 _test
 
+# VSCode ignore
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
 # Architecture specific extensions/prefixes
 *.[568vq]
 [568vq].out
