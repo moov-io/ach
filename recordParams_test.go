@@ -66,13 +66,12 @@ func TestAddendaParam(t *testing.T) {
 
 func TestBuildFileParam(t *testing.T) {
 	// To create a file
-	file := NewFile(
-		FileParam{
-			ImmediateDestination:     "0210000890",
-			ImmediateOrigin:          "123456789",
-			ImmediateDestinationName: "Your Bank",
-			ImmediateOriginName:      "Your Company",
-			ReferenceCode:            "#00000A1"})
+	file := NewFile(FileParam{
+		ImmediateDestination:     "0210000890",
+		ImmediateOrigin:          "123456789",
+		ImmediateDestinationName: "Your Bank",
+		ImmediateOriginName:      "Your Company",
+		ReferenceCode:            "#00000A1"})
 
 	// To create a batch
 	batch := NewBatchPPD(BatchParam{
