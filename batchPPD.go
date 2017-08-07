@@ -18,13 +18,20 @@ type BatchPPD struct {
 }
 
 // NewBatchPPD returns a *BatchPPD
-func NewBatchPPD() *BatchPPD {
+func NewBatchPPD(params ...BatchParam) *BatchPPD {
 	batch := new(BatchPPD)
+	batch.SetControl(NewBatchControl())
+
+	if len(params) > 0 {
+		bh := NewBatchHeader(params[0])
+		// override user SEC code for BatchPPD
+		bh.StandardEntryClassCode = ppd
+		batch.SetHeader(bh)
+		return batch
+	}
 	bh := NewBatchHeader()
 	bh.StandardEntryClassCode = ppd
 	batch.SetHeader(bh)
-	batch.SetControl(NewBatchControl())
-	batch.GetHeader().StandardEntryClassCode = ppd
 	return batch
 }
 
@@ -146,7 +153,7 @@ func (batch *BatchPPD) Build() error {
 
 	// validate checks that the above build covered all validation checks
 	if err := batch.ValidateAll(); err != nil {
-		return err // only errors if source code of build is inconcisstent with validate
+		return err // only errors if source code of batch.build is inconsistent with batch.validate
 	}
 	return nil
 }
@@ -249,7 +256,7 @@ func (batch *BatchPPD) isSequenceAscending() error {
 	return nil
 }
 
-// isEntryHash validates the hash by recalulating the result
+// isEntryHash validates the hash by recalculating the result
 func (batch *BatchPPD) isEntryHash() error {
 	hashField := batch.calculateEntryHash()
 	if hashField != batch.control.EntryHashField() {

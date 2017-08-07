@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package ach reads and writes (ACH) Automated Clearing House files. ACH is the
-// primary method of electronic money movemenet through the United States.
+// primary method of electronic money movement through the United States.
 //
 // https://en.wikipedia.org/wiki/Automated_Clearing_House
 package ach
@@ -13,7 +13,7 @@ import (
 	"strconv"
 )
 
-// First position of all Record Types. These codes are uniquily assigned to
+// First position of all Record Types. These codes are uniquely assigned to
 // the first byte of each row in a file.
 const (
 	headerPos       = "1"
@@ -66,8 +66,25 @@ type File struct {
 	converters
 }
 
-// NewFile constucuts a file template.
-func NewFile() *File {
+// FileParam is the minimal fields required to make a ach file header
+type FileParam struct {
+	ImmediateDestination     string `json:"immediate_destination"`
+	ImmediateOrigin          string `json:"immediate_origin"`
+	ImmediateDestinationName string `json:"immediate_destination_name"`
+	ImmediateOriginName      string `json:"immediate_origin_name"`
+	ReferenceCode            string `json:"reference_code,omitempty"`
+}
+
+// NewFile constructs a file template.
+func NewFile(params ...FileParam) *File {
+	if len(params) > 0 {
+		fh := NewFileHeader(params[0])
+		return &File{
+			Header:  fh,
+			Control: NewFileControl(),
+		}
+
+	}
 	return &File{
 		Header:  NewFileHeader(),
 		Control: NewFileControl(),
@@ -162,7 +179,7 @@ func (f *File) Validate() error {
 	return nil
 }
 
-// ValidateAll walks the enture data structure and validates each record
+// ValidateAll walks the data structure and validates each record
 func (f *File) ValidateAll() error {
 
 	// validate inward out of the File Struct
@@ -218,7 +235,7 @@ func (f *File) isFileAmount() error {
 	return nil
 }
 
-// isEntryHash validates the hash by recalulating the result
+// isEntryHash validates the hash by recalculating the result
 func (f *File) isEntryHash() error {
 	hashField := f.calculateEntryHash()
 	if hashField != f.Control.EntryHashField() {

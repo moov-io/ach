@@ -51,7 +51,7 @@ type EntryDetail struct {
 	// DiscretionaryData allows ODFIs to include codes, of significance only to them,
 	// to enable specialized handling of the entry. There will be no
 	// standardized interpretation for the value of this field. It can either
-	// be a single two-character code, or two distince one-character codes,
+	// be a single two-character code, or two distinct one-character codes,
 	// according to the needs of the ODFI and/or Originator involved. This
 	// field must be returned intact for any returned entry.
 	//
@@ -81,11 +81,35 @@ type EntryDetail struct {
 	converters
 }
 
+// EntryParam is the minimal fields required to make a ach entry
+type EntryParam struct {
+	ReceivingDFI      string `json:"receiving_dfi"`
+	RDFIAccount       string `json:"rdfi_account"`
+	Amount            string `json:"amount"`
+	IDNumber          string `json:"id_number,omitempty"`
+	IndividualName    string `json:"individual_name"`
+	DiscretionaryData string `json:"discretionary_data,omitempty"`
+	TransactionCode   string `json:"transaction_code"`
+}
+
 // NewEntryDetail returns a new EntryDetail with default values for none exported fields
-func NewEntryDetail() *EntryDetail {
-	return &EntryDetail{
+func NewEntryDetail(params ...EntryParam) *EntryDetail {
+	entry := &EntryDetail{
 		recordType: "6",
 	}
+	if len(params) > 0 {
+		entry.SetRDFI(entry.parseNumField(params[0].ReceivingDFI))
+		entry.DFIAccountNumber = params[0].RDFIAccount
+		entry.Amount = entry.parseNumField(params[0].Amount)
+		entry.IndividualIdentificationNumber = params[0].IDNumber
+		entry.IndividualName = params[0].IndividualName
+		entry.DiscretionaryData = params[0].DiscretionaryData
+		entry.TransactionCode = entry.parseNumField(params[0].TransactionCode)
+
+		entry.setTraceNumber(entry.RDFIIdentification, 1)
+		return entry
+	}
+	return entry
 }
 
 // Parse takes the input record string and parses the EntryDetail values
@@ -200,7 +224,7 @@ func (ed *EntryDetail) AddAddenda(addenda Addenda) []Addenda {
 	return ed.Addendums
 }
 
-// SetRDFI takes the 9 digit RDFI account number and seperates it for RDFIIdentification and CheckDigit
+// SetRDFI takes the 9 digit RDFI account number and separates it for RDFIIdentification and CheckDigit
 func (ed *EntryDetail) SetRDFI(rdfi int) *EntryDetail {
 	s := ed.numericField(rdfi, 9)
 	ed.RDFIIdentification = ed.parseNumField(s[:8])
@@ -208,7 +232,7 @@ func (ed *EntryDetail) SetRDFI(rdfi int) *EntryDetail {
 	return ed
 }
 
-// setTraceNumber takes first 8 digits of RDFI and catinates a sequence number onto the TraceNumber
+// setTraceNumber takes first 8 digits of RDFI and concatenates a sequence number onto the TraceNumber
 func (ed *EntryDetail) setTraceNumber(RDFIIdentification int, seq int) {
 	trace := ed.numericField(RDFIIdentification, 8) + ed.numericField(seq, 7)
 	ed.TraceNumber = ed.parseNumField(trace)

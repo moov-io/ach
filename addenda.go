@@ -19,23 +19,35 @@ type Addenda struct {
 	// be a "1".
 	SequenceNumber int
 	// EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
-	// Detail or Corporate Entry Detail Record's trace numbe This number is
+	// Detail or Corporate Entry Detail Record's trace number This number is
 	// the same as the last seven digits of the trace number of the related
 	// Entry Detail Record or Corporate Entry Detail Record.
 	EntryDetailSequenceNumber int
 	// validator is composed for data validation
 	validator
-	// converters is composed for ACH to golang Converters
+	// converters is composed for ACH to GoLang Converters
 	converters
 }
 
+// AddendaParam is the minimal fields required to make a ach addenda
+type AddendaParam struct {
+	PaymentRelatedInfo string `json:"payment_related_info"`
+}
+
 // NewAddenda returns a new Addenda with default values for none exported fields
-func NewAddenda() Addenda {
-	return Addenda{
-		recordType:     "7",
-		TypeCode:       "05",
-		SequenceNumber: 1,
+func NewAddenda(params ...AddendaParam) Addenda {
+	addenda := Addenda{
+		recordType:                "7",
+		TypeCode:                  "05",
+		SequenceNumber:            1,
+		EntryDetailSequenceNumber: 1,
 	}
+
+	if len(params) > 0 {
+		addenda.PaymentRelatedInformation = params[0].PaymentRelatedInfo
+		return addenda
+	}
+	return addenda
 }
 
 // Parse takes the input record string and parses the Addenda values
@@ -44,7 +56,7 @@ func (addenda *Addenda) Parse(record string) {
 	addenda.recordType = "7"
 	// 2-3 Defines the specific explanation and format for the addenda information contained in the same record
 	addenda.TypeCode = record[1:3]
-	// 4-83 Based on the information entere (04-83) 80 alphanumeric
+	// 4-83 Based on the information entered (04-83) 80 alphanumeric
 	addenda.PaymentRelatedInformation = strings.TrimSpace(record[3:83])
 	// 84-87 SequenceNumber is consecutively assigned to each Addenda Record following
 	// an Entry Detail Record

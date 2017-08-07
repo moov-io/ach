@@ -21,7 +21,7 @@ func TestMockAddenda(t *testing.T) {
 		t.Error("mockAddenda does not validate and will break other tests")
 	}
 	if addenda.EntryDetailSequenceNumber != 1234567 {
-		t.Error("EntryDetailSequenceNumber depedendent default value has changed")
+		t.Error("EntryDetailSequenceNumber dependent default value has changed")
 	}
 }
 

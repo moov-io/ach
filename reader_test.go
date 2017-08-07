@@ -42,7 +42,7 @@ func TestPPDDebitRead(t *testing.T) {
 }
 
 // TestDecode is a complete file decoding test. A canary test
-func TestPPDDebitFiexedLengthRead(t *testing.T) {
+func TestPPDDebitFixedLengthRead(t *testing.T) {
 	f, err := os.Open("./testdata/ppd-debit-fixedLength.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)

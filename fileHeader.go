@@ -12,7 +12,7 @@ import (
 
 // Errors specific to a File Header Record
 var (
-	msgRecordType       = "recieved expecting %d"
+	msgRecordType       = "received expecting %d"
 	msgRecordSize       = "is not 094"
 	msgBlockingFactor   = "is not 10"
 	msgFormatCode       = "is not 1"
@@ -27,7 +27,7 @@ type FileHeader struct {
 	// RecordType defines the type of record in the block. headerPos
 	recordType string
 
-	// PriorityCode conists of the numerals 01
+	// PriorityCode consists of the numerals 01
 	priorityCode string
 
 	// ImmediateDestination contains the Routing Number of the ACH Operator or receiving
@@ -87,13 +87,13 @@ type FileHeader struct {
 	ReferenceCode string
 	// validator is composed for data validation
 	validator
-	// converters is composed for ACH to golang Converters
+	// converters is composed for ACH to GoLang Converters
 	converters
 }
 
 // NewFileHeader returns a new FileHeader with default values for none exported fields
-func NewFileHeader() FileHeader {
-	return FileHeader{
+func NewFileHeader(params ...FileParam) FileHeader {
+	fh := FileHeader{
 		recordType:     "1",
 		priorityCode:   "01",
 		FileIDModifier: "A",
@@ -101,6 +101,16 @@ func NewFileHeader() FileHeader {
 		blockingFactor: "10",
 		formatCode:     "1",
 	}
+	if len(params) > 0 {
+		fh.ImmediateDestination = fh.parseNumField(params[0].ImmediateDestination)
+		fh.ImmediateOrigin = fh.parseNumField(params[0].ImmediateOrigin)
+		fh.ImmediateDestinationName = params[0].ImmediateDestinationName
+		fh.ImmediateOriginName = params[0].ImmediateOriginName
+		fh.ReferenceCode = params[0].ReferenceCode
+		fh.FileCreationDate = time.Now()
+		return fh
+	}
+	return fh
 }
 
 // Parse takes the input record string and parses the FileHeader values
@@ -109,7 +119,7 @@ func (fh *FileHeader) Parse(record string) {
 	fh.recordType = "1"
 	// (2-3) Always "01"
 	fh.priorityCode = "01"
-	// (4-13) A blank space followed by your ODFI's routing numbefh. For example: " 121140399"
+	// (4-13) A blank space followed by your ODFI's routing number. For example: " 121140399"
 	fh.ImmediateDestination = fh.parseNumField(record[3:13])
 	// (14-23) A 10-digit number assigned to you by the ODFI once they approve you to originate ACH files through them
 	fh.ImmediateOrigin = fh.parseNumField(record[13:23])
@@ -235,12 +245,12 @@ func (fh *FileHeader) ImmediateDestinationField() string {
 	return " " + fh.numericField(fh.ImmediateDestination, 9)
 }
 
-// ImmediateOriginField gets the immediate origen number with 0 padding
+// ImmediateOriginField gets the immediate origin number with 0 padding
 func (fh *FileHeader) ImmediateOriginField() string {
 	return " " + fh.numericField(fh.ImmediateOrigin, 9)
 }
 
-// FileCreationDateField gets the file cereation date in YYMMDD format
+// FileCreationDateField gets the file creation date in YYMMDD format
 func (fh *FileHeader) FileCreationDateField() string {
 	return fh.formatSimpleDate(fh.FileCreationDate)
 }
