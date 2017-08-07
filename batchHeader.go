@@ -98,8 +98,7 @@ func NewBatchHeader(params ...BatchParam) *BatchHeader {
 		BatchNumber:          1,
 	}
 	if len(params) > 0 {
-		println("holler")
-		bh.ServiceClassCode = params[0].ServiceClassCode
+		bh.ServiceClassCode = bh.parseNumField(params[0].ServiceClassCode)
 		bh.CompanyName = params[0].CompanyName
 		bh.CompanyIdentification = params[0].CompanyIdentification
 		bh.StandardEntryClassCode = params[0].StandardEntryClass
