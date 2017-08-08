@@ -12,9 +12,9 @@ Package 'moov-io/ach' implements a file reader and writer for parsing [ACH](http
 
 ## Project Status
 
-ACH is at an early stage and under active development. Please star the project if you are interested in its development or join the development.
+ACH is at an early stage and under active development. Please star the project if you are interested in its progress.
 
-* Library currently supports the reading and writting of PPD (Prearranged payment and deposits)
+* Library currently supports the reading and writing of PPD (Prearranged payment and deposits)
 
 
 ## Project Roadmap
@@ -22,11 +22,106 @@ ACH is at an early stage and under active development. Please star the project i
 * Additional SEC codes will be added based on library users needs. Please open an issue with a valid test file.
 
 ## Usage and examples
-See [godoc.org/github.com/moov-io/ach](https://godoc.org/github.com/moov-io/ach) for usage.
+Examples exist in projects [example](https://github.com/moov-io/ach/tree/master/example) folder. The following is based on [simple file creation](https://github.com/moov-io/ach/tree/master/example/simple-file-creation)
 
-ACH.Read() returns an error of type ParseError. A ParseError is an error with Line and Record name values. A ParseError.err holds the underlying error of type FieldError, FileError, or BatchError with specific information about record validation
+ To create a file
+ 
+ ```go
+	file := ach.NewFile(ach.FileParam{
+		ImmediateDestination:     "0210000890",
+		ImmediateOrigin:          "123456789",
+		ImmediateDestinationName: "Your Bank",
+		ImmediateOriginName:      "Your Company",
+		ReferenceCode:            "#00000A1"})
+```
 
-Examples exist in projects [example](https://github.com/moov-io/ach/tree/master/example) folder
+To create a batch
+
+ ```go
+	batch := ach.NewBatchPPD(ach.BatchParam{
+		ServiceClassCode:        "220",
+		CompanyName:             "Your Company",
+		StandardEntryClass:      "PPD",
+		CompanyIdentification:   "123456789",
+		CompanyEntryDescription: "Trans. Description",
+		CompanyDescriptiveDate:  "Oct 23",
+		ODFIIdentification:      "123456789"})
+```
+
+To create an entry
+
+ ```go
+	entry := ach.NewEntryDetail(ach.EntryParam{
+		ReceivingDFI:      "102001017",
+		RDFIAccount:       "5343121",
+		Amount:            "17500",
+		TransactionCode:   "22",
+		IDNumber:          "ABC##jvkdjfuiwn",
+		IndividualName:    "Bob Smith",
+		DiscretionaryData: "B1"})
+```
+
+To add one or more optional addenda records for an entry
+
+ ```go
+	addenda := ach.NewAddenda(ach.AddendaParam{
+		PaymentRelatedInfo: "bonus pay for amazing work on #OSS"})
+	entry.AddAddenda(addenda)
+```
+
+Entries are added to batches like so:
+
+ ```go
+	batch.AddEntry(entry)
+```
+
+When all of the Entries are added to the batch we can build the batch.
+
+ ```go
+	if err := batch.Build(); err != nil {
+		fmt.Printf("%T: %s", err, err)
+	}
+  ```
+
+And batches are added to files much the same way:
+
+ ```go
+	file.AddBatch(batch)
+```
+
+Once we added all our batches we must build the file
+
+ ```go
+	if err := file.Build(); err != nil {
+		fmt.Printf("%T: %s", err, err)
+	}
+```
+
+Finally we wnt to write the file to an io.Writer
+
+ ```go
+	w := ach.NewWriter(os.Stdout)
+	if err := w.Write(file); err != nil {
+		fmt.Printf("%T: %s", err, err)
+	}
+	w.Flush()
+}
+```
+
+Which will generate a well formed ACH flat file. 
+
+```text
+101 210000890 1234567891708080000A094101Your Bank              Your Company           #00000A1
+5220Your Company                        123456789 PPDTrans. DesOct 23010101   1234567890000001
+6221020010175343121          0000017500ABC##jvkdjfuiwnBob Smith             B11234567890000001
+705bonus pay for amazing work on #OSS                                              00010000001
+82200000020010200101000000000000000000017500123456789                          234567890000001
+9000001000001000000020010200101000000000000000000017500                                       
+9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+```
 
 # Contributing
 
@@ -59,10 +154,11 @@ We use GitHub to manage reviews of pull requests.
 
 ![ACH File Layout](https://github.com/moov-io/ach/blob/master/documentation/ach_file_structure_shg.gif)
 
-## Prior Art
+## Insperation 
 * [ACH:Builder - Tools for Building ACH](http://search.cpan.org/~tkeefer/ACH-Builder-0.03/lib/ACH/Builder.pm)
 * [mosscode / ach](https://github.com/mosscode/ach)
 * [Helper for building ACH files in Ruby](https://github.com/jm81/ach)
+* [Glenselle / nACH2](https://github.com/glenselle/nACH2)
 
 ## License
 Apache License 2.0 See [LICENSE](LICENSE) for details.
