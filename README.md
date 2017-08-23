@@ -226,6 +226,7 @@ Finally add the batch type to the NewBatch factory in batch.go.
 case "MTE":
 		return NewBatchPPD(bp), nil
 //...
+```
 
 Pull request require a batchMTE_test.go file that covers the logic of the type. 
 
