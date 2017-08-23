@@ -46,6 +46,7 @@ func main() {
 
 	batch.AddEntry(entry)
 
+
 	// When all of the Entries are added to the batch we must create it.
 
 	if err := batch.Create(); err != nil {

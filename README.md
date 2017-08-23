@@ -36,6 +36,7 @@ Examples exist in projects [example](https://github.com/moov-io/ach/tree/master/
 ```
 
 To create a batch
+
 Errors only if payment type is not supported
 
  ```go
@@ -80,6 +81,7 @@ When all of the Entries are added to the batch we can create the batch.
 
  ```go
 	if err := batch.Create(); err != nil {
+
 		fmt.Printf("%T: %s", err, err)
 	}
   ```
@@ -225,7 +227,7 @@ case "MTE":
 		return NewBatchPPD(bp), nil
 //...
 
-Pull request require a batchMTE_test file that covers the logic of the type. 
+Pull request require a batchMTE_test.go file that covers the logic of the type. 
 
 ## References  
 * [Wikipeda: Automated Clearing House](http://en.wikipedia.org/wiki/Automated_Clearing_House)
