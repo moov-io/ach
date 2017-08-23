@@ -16,8 +16,8 @@ import (
 // First position of all Record Types. These codes are uniquely assigned to
 // the first byte of each row in a file.
 const (
-	headerPos       = "1"
-	batchPos        = "5"
+	fileHeaderPos   = "1"
+	batchHeaderPos  = "5"
 	entryDetailPos  = "6"
 	entryAddendaPos = "7"
 	batchControlPos = "8"
@@ -68,8 +68,11 @@ type File struct {
 
 // FileParam is the minimal fields required to make a ach file header
 type FileParam struct {
-	ImmediateDestination     string `json:"immediate_destination"`
-	ImmediateOrigin          string `json:"immediate_origin"`
+	// ImmediateDestination is the originating banks ABA routing number. Frequently your banks ABA routing number.
+	ImmediateDestination string `json:"immediate_destination"`
+	// ImmediateOrigin
+	ImmediateOrigin string `json:"immediate_origin"`
+	// ImmediateDestinationName is the originating banks name.
 	ImmediateDestinationName string `json:"immediate_destination_name"`
 	ImmediateOriginName      string `json:"immediate_origin_name"`
 	ReferenceCode            string `json:"reference_code,omitempty"`
@@ -91,8 +94,8 @@ func NewFile(params ...FileParam) *File {
 	}
 }
 
-// Build creates a valid file and requires that the FileHeader and at least one Batch
-func (f *File) Build() error {
+// Create creates a valid file and requires that the FileHeader and at least one Batch
+func (f *File) Create() error {
 	// Requires a valid FileHeader to build FileControl
 	if err := f.Header.Validate(); err != nil {
 		return err
@@ -113,7 +116,7 @@ func (f *File) Build() error {
 		f.Batches[i].GetHeader().BatchNumber = batchSeq
 		f.Batches[i].GetControl().BatchNumber = batchSeq
 		batchSeq++
-		// sum file entry and addenda records. Assume batch.Build() batch properly calculated control
+		// sum file entry and addenda records. Assume batch.Create() batch properly calculated control
 		fileEntryAddendaCount = fileEntryAddendaCount + batch.GetControl().EntryAddendaCount
 		// add 2 for Batch header/control + entry added count
 		totalRecordsInFile = totalRecordsInFile + 2 + batch.GetControl().EntryAddendaCount
@@ -138,9 +141,6 @@ func (f *File) Build() error {
 	fc.TotalCreditEntryDollarAmountInFile = totalCreditAmount
 	f.Control = fc
 
-	if err := f.ValidateAll(); err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -176,27 +176,6 @@ func (f *File) Validate() error {
 		return err
 	}
 
-	return nil
-}
-
-// ValidateAll walks the data structure and validates each record
-func (f *File) ValidateAll() error {
-
-	// validate inward out of the File Struct
-	for _, batch := range f.Batches {
-		if err := batch.ValidateAll(); err != nil {
-			return err
-		}
-	}
-	if err := f.Header.Validate(); err != nil {
-		return err
-	}
-	if err := f.Control.Validate(); err != nil {
-		return err
-	}
-	if err := f.Validate(); err != nil {
-		return err
-	}
 	return nil
 }
 

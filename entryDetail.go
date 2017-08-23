@@ -73,8 +73,8 @@ type EntryDetail struct {
 	// with an entry or item rather than a physical record.
 	TraceNumber int
 
-	// Addendums a list of Addenda for the Entry Detail
-	Addendums []Addenda
+	// Addendum a list of Addenda for the Entry Detail
+	Addendum []Addenda
 	// validator is composed for data validation
 	validator
 	// converters is composed for ACH to golang Converters
@@ -217,11 +217,11 @@ func (ed *EntryDetail) fieldInclusion() error {
 	return nil
 }
 
-// AddAddenda appends an EntryDetail to the Addendums
+// AddAddenda appends an EntryDetail to the Addendum
 func (ed *EntryDetail) AddAddenda(addenda Addenda) []Addenda {
 	ed.AddendaRecordIndicator = 1
-	ed.Addendums = append(ed.Addendums, addenda)
-	return ed.Addendums
+	ed.Addendum = append(ed.Addendum, addenda)
+	return ed.Addendum
 }
 
 // SetRDFI takes the 9 digit RDFI account number and separates it for RDFIIdentification and CheckDigit

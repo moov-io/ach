@@ -13,7 +13,7 @@ func mockBatchPPD() *BatchPPD {
 	mockBatch := NewBatchPPD()
 	mockBatch.SetHeader(mockBatchHeader())
 	mockBatch.AddEntry(mockEntryDetail())
-	if err := mockBatch.Build(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		panic(err)
 	}
 	return mockBatch
@@ -93,7 +93,7 @@ func TestCreditBatchisBatchAmount(t *testing.T) {
 	e2.Amount = 100
 	mockBatch.AddEntry(e1)
 	mockBatch.AddEntry(e2)
-	if err := mockBatch.Build(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 
@@ -120,7 +120,7 @@ func TestSavingsBatchisBatchAmount(t *testing.T) {
 	e2.Amount = 100
 	mockBatch.AddEntry(e1)
 	mockBatch.AddEntry(e2)
-	if err := mockBatch.Build(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 
@@ -157,7 +157,7 @@ func TestBatchDNEMismatch(t *testing.T) {
 	ed.AddAddenda(mockAddenda())
 	ed.AddAddenda(mockAddenda())
 	mockBatch.AddEntry(ed)
-	mockBatch.Build()
+	mockBatch.Create()
 
 	mockBatch.GetHeader().OriginatorStatusCode = 1
 	mockBatch.GetEntries()[0].TransactionCode = 23
@@ -193,7 +193,7 @@ func TestBatchEntryCountEquality(t *testing.T) {
 	a := mockAddenda()
 	e.AddAddenda(a)
 	mockBatch.AddEntry(e)
-	if err := mockBatch.Build(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 
@@ -232,10 +232,10 @@ func TestBatchIsAddendaSeqAscending(t *testing.T) {
 	ed.AddAddenda(mockAddenda())
 	ed.AddAddenda(mockAddenda())
 	mockBatch.AddEntry(ed)
-	mockBatch.Build()
+	mockBatch.Create()
 
-	mockBatch.GetEntries()[0].Addendums[0].SequenceNumber = 2
-	mockBatch.GetEntries()[0].Addendums[1].SequenceNumber = 1
+	mockBatch.GetEntries()[0].Addendum[0].SequenceNumber = 2
+	mockBatch.GetEntries()[0].Addendum[1].SequenceNumber = 1
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "SequenceNumber" {
@@ -268,11 +268,11 @@ func TestBatchAddendaTraceNumber(t *testing.T) {
 	mockBatch := mockBatchPPD()
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
-	if err := mockBatch.Build(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	mockBatch.GetEntries()[0].Addendums[0].EntryDetailSequenceNumber = 99
+	mockBatch.GetEntries()[0].Addendum[0].EntryDetailSequenceNumber = 99
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TraceNumber" {
@@ -310,110 +310,7 @@ func TestBatchBuild(t *testing.T) {
 	entry.AddAddenda(a1)
 	entry.AddAddenda(a2)
 	mockBatch.AddEntry(entry)
-	if err := mockBatch.Build(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
-	}
-}
-
-func TestBatchValidateAllEntries(t *testing.T) {
-	mockBatch := mockBatchPPD()
-	mockBatch.GetEntries()[0].DFIAccountNumber = ""
-	if err := mockBatch.ValidateAll(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
-	}
-}
-
-func TestBatchValidateAllAddenda(t *testing.T) {
-	mockBatch := mockBatchPPD()
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
-	if err := mockBatch.Build(); err != nil {
-		t.Errorf("%T: %s", err, err)
-	}
-
-	mockBatch.GetEntries()[0].Addendums[0].TypeCode = ""
-	if err := mockBatch.ValidateAll(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
-	}
-}
-
-func TestBatchValidateAllBatchControl(t *testing.T) {
-	mockBatch := mockBatchPPD()
-	mockBatch.GetControl().ODFIIdentification = 0
-	if err := mockBatch.ValidateAll(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
-	}
-}
-
-func TestBatchValidateAllHeader(t *testing.T) {
-	mockBatch := mockBatchPPD()
-	mockBatch.GetHeader().ODFIIdentification = 0
-	if err := mockBatch.ValidateAll(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
-	}
-}
-
-func TestBatchValidateAllODFI(t *testing.T) {
-	mockBatch := mockBatchPPD()
-	mockBatch.GetHeader().ODFIIdentification = 123456
-	if err := mockBatch.ValidateAll(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ODFIIdentification" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
-	}
-}
-
-func TestBatchBuildNoEntries(t *testing.T) {
-	mockBatch := NewBatchPPD()
-	mockBatch.SetHeader(mockBatchHeader())
-	if err := mockBatch.Build(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.Msg != msgBatchEntries {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
-	}
-}
-
-func TestBatchBuildHeader(t *testing.T) {
-	mockBatch := mockBatchPPD()
-	mockBatch.GetHeader().CompanyIdentification = ""
-	if err := mockBatch.Build(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
 	}
 }

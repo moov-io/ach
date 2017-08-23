@@ -13,13 +13,13 @@ func TestPPDWrite(t *testing.T) {
 	batch := NewBatchPPD()
 	batch.SetHeader(mockBatchHeader())
 	batch.AddEntry(entry)
-	batch.Build()
+	batch.Create()
 	file.AddBatch(batch)
 
-	if err := file.Build(); err != nil {
+	if err := file.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
-	if err := file.ValidateAll(); err != nil {
+	if err := file.Validate(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 
@@ -34,7 +34,7 @@ func TestPPDWrite(t *testing.T) {
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
-	if err = r.File.ValidateAll(); err != nil {
+	if err = r.File.Validate(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 }

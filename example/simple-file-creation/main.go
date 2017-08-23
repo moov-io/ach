@@ -16,8 +16,9 @@ func main() {
 		ImmediateOriginName:      "Your Company",
 		ReferenceCode:            "#00000A1"})
 
-	// To create a batch
-	batch := ach.NewBatchPPD(ach.BatchParam{
+	// To create a batch.
+	// Errors only if payment type is not supported.
+	batch, _ := ach.NewBatch(ach.BatchParam{
 		ServiceClassCode:        "220",
 		CompanyName:             "Your Company",
 		StandardEntryClass:      "PPD",
@@ -45,9 +46,9 @@ func main() {
 
 	batch.AddEntry(entry)
 
-	// When all of the Entries are added to the batch we must build it.
+	// When all of the Entries are added to the batch we must create it.
 
-	if err := batch.Build(); err != nil {
+	if err := batch.Create(); err != nil {
 		fmt.Printf("%T: %s", err, err)
 	}
 
@@ -55,9 +56,9 @@ func main() {
 
 	file.AddBatch(batch)
 
-	// Once we added all our batches we must build the file
+	// Once we added all our batches we must create the file
 
-	if err := file.Build(); err != nil {
+	if err := file.Create(); err != nil {
 		fmt.Printf("%T: %s", err, err)
 	}
 

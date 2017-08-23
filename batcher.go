@@ -11,17 +11,16 @@ import (
 //    * Determines format of the entry detail records
 //    * Determines addenda records (required or optional PLUS one or up to 9,999 records)
 //    * Determines rules to follow (return timeframes)
-// * Some SEC codes require specific data in predetermined fields within the ACH record
+// 	  * Some SEC codes require specific data in predetermined fields within the ACH record
 type Batcher interface {
 	GetHeader() *BatchHeader
 	SetHeader(*BatchHeader)
 	GetControl() *BatchControl
 	SetControl(*BatchControl)
 	GetEntries() []*EntryDetail
-	AddEntry(*EntryDetail) Batcher
-	Build() error
+	AddEntry(*EntryDetail)
+	Create() error
 	Validate() error
-	ValidateAll() error
 }
 
 // BatchError is an Error that describes batch validation issues
@@ -35,16 +34,28 @@ func (e *BatchError) Error() string {
 	return fmt.Sprintf("BatchNumber %d %s %s", e.BatchNumber, e.FieldName, e.Msg)
 }
 
-// BatchParam is a subset of BatchHeader used for simplifying the build process.
+// BatchParam contains information about the company(Originator) and the type of detail records to follow.
+// It is a subset of BatchHeader used for simplifying the client api build process.
 type BatchParam struct {
-	ServiceClassCode        string `json:"service_class_code"`
-	CompanyName             string `json:"company_name"`
-	CompanyIdentification   string `json:"company_identification"`
-	StandardEntryClass      string `json:"standard_entry_class"`
+	// ServiceClassCode a three digit code identifies:
+	// 	- 200 mixed debits and credits
+	// 	- 220 credits only
+	// 	- 225 debits only
+	ServiceClassCode string `json:"service_class_code"`
+	// CompanyName is the legal company name making the transaction.
+	CompanyName string `json:"company_name"`
+	// CompanyIdentification is assigned by your bank to identify your company. Frequently the federal tax ID
+	CompanyIdentification string `json:"company_identification"`
+	// StandardEntryClass identifies the payment type (product) found within the batch using a 3-character code
+	StandardEntryClass string `json:"standard_entry_class"`
+	// CompanyEntryDescription describes the transaction. For example "PAYROLL"
 	CompanyEntryDescription string `json:"company_entry_description"`
-	CompanyDescriptiveDate  string `json:"company_descriptive_date"`
-	EffectiveEntryDate      string `json:"effective_entry_date"`
-	ODFIIdentification      string `json:"ODFI_identification"`
+	// CompanyDescriptiveDate a date chosen to identify the transactions in YYMMDD format.
+	CompanyDescriptiveDate string `json:"company_descriptive_date"`
+	// Date transactions are to be posted to the receivers’ account in YYMMDD format.
+	EffectiveEntryDate string `json:"effective_entry_date"`
+	// ODFIIdentification originating ODFI's routing number without the last digit
+	ODFIIdentification string `json:"ODFI_identification"`
 }
 
 // Errors specific to parsing a Batch container

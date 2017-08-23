@@ -1,33 +1,29 @@
-// Copyright 2017 The ACH Authors
-// Use of this source code is governed by an Apache License
-// license that can be found in the LICENSE file.
-
 package ach
 
-// BatchPPD holds the Batch Header and Batch Control and all Entry Records for PPD Entries
-type BatchPPD struct {
+// BatchWEB creates a batch file that handles SEC payment type WEB
+type BatchWEB struct {
 	batch
 }
 
-// NewBatchPPD returns a *BatchPPD
-func NewBatchPPD(params ...BatchParam) *BatchPPD {
-	batch := new(BatchPPD)
+// NewBatchWEB returns a *BatchWEB
+func NewBatchWEB(params ...BatchParam) *BatchWEB {
+	batch := new(BatchWEB)
 	batch.SetControl(NewBatchControl())
 
 	if len(params) > 0 {
 		bh := NewBatchHeader(params[0])
-		bh.StandardEntryClassCode = ppd
+		bh.StandardEntryClassCode = "WEB"
 		batch.SetHeader(bh)
 		return batch
 	}
 	bh := NewBatchHeader()
-	bh.StandardEntryClassCode = ppd
+	bh.StandardEntryClassCode = "WEB"
 	batch.SetHeader(bh)
 	return batch
 }
 
-// Validate checks valid NACHA batch rules. Assumes properly parsed records.
-func (batch *BatchPPD) Validate() error {
+// Validate ensures the batch meets NACHA rules specific to this batch type.
+func (batch *BatchWEB) Validate() error {
 	// basic verification of the batch before we validate specific rules.
 	if err := batch.verify(); err != nil {
 		return err
@@ -39,8 +35,8 @@ func (batch *BatchPPD) Validate() error {
 	return nil
 }
 
-// Create takes Batch Header and Entries and builds a valid batch
-func (batch *BatchPPD) Create() error {
+// Create builds the batch sequence numbers and batch control. Additional creation
+func (batch *BatchWEB) Create() error {
 	// generates sequence numbers and batch control
 	if err := batch.build(); err != nil {
 		return err

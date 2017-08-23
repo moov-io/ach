@@ -5,8 +5,6 @@
 package ach
 
 import (
-	"bytes"
-	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -36,7 +34,23 @@ func TestPPDDebitRead(t *testing.T) {
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
-	if err = r.File.ValidateAll(); err != nil {
+	if err = r.File.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+func TestWEBDebitRead(t *testing.T) {
+	f, err := os.Open("./testdata/web-debit.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err = r.File.Validate(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -232,27 +246,6 @@ func TestFileEntryDetail(t *testing.T) {
 	}
 }
 
-// TestFileEntryDetailSECNoSupport validation error populates through the reader
-func TestFileEntryDetailSECNoSupport(t *testing.T) {
-	ed := mockEntryDetail()
-	ed.CheckDigit = 0
-	line := ed.String()
-	r := NewReader(strings.NewReader(line))
-	r.addCurrentBatch(NewBatchPPD())
-	r.currentBatch.SetHeader(mockBatchHeader())
-	r.currentBatch.GetHeader().StandardEntryClassCode = "ABCXYZ"
-	_, err := r.Read()
-	if p, ok := err.(*ParseError); ok {
-		if e, ok := p.Err.(*FieldError); ok {
-			if e.FieldName != "StandardEntryClassCode" {
-				t.Errorf("%T: %s", e, e)
-			}
-		}
-	} else {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
 // TestFileAddenda validation error populates through the reader
 func TestFileAddenda(t *testing.T) {
 	bh := mockBatchHeader()
@@ -260,7 +253,7 @@ func TestFileAddenda(t *testing.T) {
 	addenda := mockAddenda()
 	addenda.SequenceNumber = 0
 	ed.AddAddenda(addenda)
-	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendums[0].String()
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
 	if err != nil {
@@ -394,6 +387,7 @@ func TestFileAddBatchValidation(t *testing.T) {
 	}
 }
 
+/**
 func TestFileHeaderExists(t *testing.T) {
 	file := mockFilePPD()
 	file.SetHeader(FileHeader{})
@@ -401,7 +395,6 @@ func TestFileHeaderExists(t *testing.T) {
 	w := NewWriter(buf)
 	w.Write(file)
 	w.Flush()
-	//println(buf.String())
 	r := NewReader(strings.NewReader(buf.String()))
 	f, err := r.Read()
 	if err != nil {
@@ -418,8 +411,8 @@ func TestFileHeaderExists(t *testing.T) {
 	} else {
 		fmt.Println(f.Header.String())
 	}
-
 }
+**/
 
 // TestFileLongErr Batch Header Service Class is 000 which does not validate
 func TestFileLongErr(t *testing.T) {

@@ -13,7 +13,7 @@ func mockFilePPD() *File {
 	mockFile.SetHeader(mockFileHeader())
 	mockBatch := mockBatchPPD()
 	mockFile.AddBatch(mockBatch)
-	if err := mockFile.Build(); err != nil {
+	if err := mockFile.Create(); err != nil {
 		panic(err)
 	}
 	return mockFile
@@ -94,7 +94,7 @@ func TestFileCreditAmount(t *testing.T) {
 func TestFileEntryHash(t *testing.T) {
 	file := mockFilePPD()
 	file.AddBatch(mockBatchPPD())
-	file.Build()
+	file.Create()
 	file.Control.EntryHash = 63
 	if err := file.Validate(); err != nil {
 		if e, ok := err.(*FileError); ok {
@@ -117,9 +117,9 @@ func TestFileBlockCount10(t *testing.T) {
 	batch.AddEntry(mockEntryDetail())
 	batch.AddEntry(mockEntryDetail())
 	batch.AddEntry(mockEntryDetail())
-	batch.Build()
+	batch.Create()
 	file.AddBatch(batch)
-	if err := file.Build(); err != nil {
+	if err := file.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 
@@ -129,8 +129,8 @@ func TestFileBlockCount10(t *testing.T) {
 	}
 	// make 11th record which should produce BlockCount of 2
 	file.Batches[0].AddEntry(mockEntryDetail())
-	file.Batches[0].Build() // File.Build does not re-build Batches
-	if err := file.Build(); err != nil {
+	file.Batches[0].Create() // File.Build does not re-build Batches
+	if err := file.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 	if file.Control.BlockCount != 2 {
@@ -140,7 +140,7 @@ func TestFileBlockCount10(t *testing.T) {
 
 func TestFileBuildBadFileHeader(t *testing.T) {
 	file := NewFile().SetHeader(FileHeader{})
-	if err := file.Build(); err != nil {
+	if err := file.Create(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.Msg != msgFieldInclusion {
 				t.Errorf("%T: %s", err, err)
@@ -153,54 +153,9 @@ func TestFileBuildBadFileHeader(t *testing.T) {
 
 func TestFileBuildNoBatch(t *testing.T) {
 	file := NewFile().SetHeader(mockFileHeader())
-	if err := file.Build(); err != nil {
+	if err := file.Create(); err != nil {
 		if e, ok := err.(*FileError); ok {
 			if e.FieldName != "Batchs" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
-	}
-}
-
-func TestFileValidateAllBatch(t *testing.T) {
-	file := mockFilePPD()
-	// break the file header
-	file.Batches[0].GetHeader().ODFIIdentification = 0
-	if err := file.ValidateAll(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
-	}
-}
-
-func TestFileValidateAllFileHeader(t *testing.T) {
-	file := mockFilePPD()
-	// break the file header
-	file.Header.ImmediateOrigin = 0
-	if err := file.ValidateAll(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
-	}
-}
-
-func TestFileValidateAllFileControl(t *testing.T) {
-	file := mockFilePPD()
-	// break the file header
-	file.Control.BatchCount = 0
-	if err := file.ValidateAll(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {

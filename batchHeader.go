@@ -230,9 +230,6 @@ func (bh *BatchHeader) fieldInclusion() error {
 	if bh.ODFIIdentification == 0 {
 		return &FieldError{FieldName: "ODFIIdentification", Value: bh.ODFIIdentificationField(), Msg: msgFieldInclusion}
 	}
-	if bh.BatchNumber == 0 {
-		return &FieldError{FieldName: "BatchNumber", Value: strconv.Itoa(bh.BatchNumber), Msg: msgFieldInclusion}
-	}
 
 	return nil
 }

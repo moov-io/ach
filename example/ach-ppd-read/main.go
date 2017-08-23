@@ -20,11 +20,11 @@ func main() {
 		fmt.Printf("Issue reading file: %+v \n", err)
 	}
 	// ensure we have a validated file structure
-	if r.File.ValidateAll(); err != nil {
+	if r.File.Validate(); err != nil {
 		fmt.Printf("Could not validate entire read file: %v", err)
 	}
 	// If you trust the file but it's formating is off building will probably resolve the malformed file.
-	if r.File.Build(); err != nil {
+	if r.File.Create(); err != nil {
 		fmt.Printf("Could not build file with read properties: %v", err)
 	}
 
