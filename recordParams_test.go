@@ -1,7 +1,7 @@
 package ach
 
 import (
-	"os"
+	"bytes"
 	"testing"
 )
 
@@ -73,8 +73,8 @@ func TestBuildFileParam(t *testing.T) {
 		ImmediateOriginName:      "Your Company",
 		ReferenceCode:            "#00000A1"})
 
-	// To create a batch
-	batch := NewBatchPPD(BatchParam{
+	// To create a batch. Errors only if payment type is not supported.
+	batch, _ := NewBatch(BatchParam{
 		ServiceClassCode:        "220",
 		CompanyName:             "Your Company",
 		StandardEntryClass:      "PPD",
@@ -90,7 +90,7 @@ func TestBuildFileParam(t *testing.T) {
 		Amount:            "17500",
 		TransactionCode:   "22",
 		IDNumber:          "ABC##jvkdjfuiwn",
-		IndividualName:    "Bob Smith",
+		IndividualName:    "Robert Smith",
 		DiscretionaryData: "B1"})
 
 	// To add one or more optional addenda records for an entry
@@ -105,7 +105,7 @@ func TestBuildFileParam(t *testing.T) {
 
 	// When all of the Entries are added to the batch we must build it.
 
-	if err := batch.Build(); err != nil {
+	if err := batch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 
@@ -115,14 +115,15 @@ func TestBuildFileParam(t *testing.T) {
 
 	// Once we added all our batches we must build the file
 
-	if err := file.Build(); err != nil {
+	if err := file.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	// Finally we wnt to write the file to an io.Writer
-	w := NewWriter(os.Stdout)
+	// Finally we write the file to an io.Writer
+	var b bytes.Buffer
+	w := NewWriter(&b)
 	if err := w.WriteAll([]*File{file}); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
-	//w.Flush()
+	w.Flush()
 }

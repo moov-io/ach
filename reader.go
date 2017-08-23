@@ -123,11 +123,11 @@ func (r *Reader) processFixedWidthFile(line *string) error {
 
 func (r *Reader) parseLine() error {
 	switch r.line[:1] {
-	case headerPos:
+	case fileHeaderPos:
 		if err := r.parseFileHeader(); err != nil {
 			return err
 		}
-	case batchPos:
+	case batchHeaderPos:
 		if err := r.parseBatchHeader(); err != nil {
 			return err
 		}
@@ -186,21 +186,23 @@ func (r *Reader) parseBatchHeader() error {
 		// batch header inside of current batch
 		return r.error(&FileError{Msg: msgFileBatchInside})
 	}
+
+	// Ensure we have a valid batch header before building a batch.
 	bh := NewBatchHeader()
 	bh.Parse(r.line)
-	switch sec := bh.StandardEntryClassCode; sec {
-	case ppd:
-		r.addCurrentBatch(NewBatchPPD())
-	// @TODO add additional batch types to creation
-	default:
-		msg := fmt.Sprintf(msgFileNoneSEC, sec)
-		return r.error(&FileError{FieldName: "StandardEntryClassCode", Msg: msg})
-	}
-	r.currentBatch.SetHeader(bh)
-
-	if err := r.currentBatch.GetHeader().Validate(); err != nil {
+	if err := bh.Validate(); err != nil {
 		return r.error(err)
 	}
+
+	// Passing SEC type into NewBatch creates a Batcher of SEC code type.
+	batch, err := NewBatch(BatchParam{
+		StandardEntryClass: bh.StandardEntryClassCode})
+	if err != nil {
+		return r.error(err)
+	}
+
+	batch.SetHeader(bh)
+	r.addCurrentBatch(batch)
 	return nil
 }
 
@@ -210,21 +212,11 @@ func (r *Reader) parseEntryDetail() error {
 	if r.currentBatch == nil {
 		return r.error(&FileError{Msg: msgFileBatchOutside})
 	}
-	// @TODO change to EntryDetailer once interface is implmented if EntryDetails change
 	ed := new(EntryDetail)
-
-	switch sec := r.currentBatch.GetHeader().StandardEntryClassCode; sec {
-	case ppd:
-		ed.Parse(r.line)
-		if err := ed.Validate(); err != nil {
-			return r.error(err)
-		}
-	//case "WEB":
-	default:
-		msg := fmt.Sprintf(msgFileNoneSEC, sec)
-		return r.error(&FileError{FieldName: "StandardEntryClassCode", Msg: msg})
+	ed.Parse(r.line)
+	if err := ed.Validate(); err != nil {
+		return r.error(err)
 	}
-
 	r.currentBatch.AddEntry(ed)
 	return nil
 }
@@ -257,14 +249,7 @@ func (r *Reader) parseAddenda() error {
 			return r.error(&FileError{FieldName: "AddendaRecordIndicator", Msg: msg})
 		}
 	}
-	// case "CCD":
-	// this code can only be executed if the EntryDetail supports the SEC code
-	/*
-		default:
-			msg := fmt.Sprintf(msgFileNoneSEC, sec)
-			return r.error(&FileError{FieldName: "StandardEntryClassCode", Msg: msg})
-		}
-	*/
+
 	return nil
 }
 

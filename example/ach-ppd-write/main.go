@@ -46,7 +46,7 @@ func main() {
 	batch := ach.NewBatchPPD()
 	batch.SetHeader(bh)
 	batch.AddEntry(entry)
-	if err := batch.Build(); err != nil {
+	if err := batch.Create(); err != nil {
 		log.Fatalf("Unexpected error building batch: %s\n", err)
 	}
 
@@ -54,7 +54,7 @@ func main() {
 	file := ach.NewFile()
 	file.SetHeader(fh)
 	file.AddBatch(batch)
-	if err := file.Build(); err != nil {
+	if err := file.Create(); err != nil {
 		log.Fatalf("Unexpected error building file: %s\n", err)
 	}
 

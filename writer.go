@@ -29,7 +29,7 @@ func NewWriter(w io.Writer) *Writer {
 
 // Writer writes a single ach.file record to w
 func (w *Writer) Write(file *File) error {
-	if err := file.ValidateAll(); err != nil {
+	if err := file.Validate(); err != nil {
 		return err
 	}
 
@@ -50,7 +50,7 @@ func (w *Writer) Write(file *File) error {
 				return err
 			}
 			w.lineNum++
-			for _, addenda := range entry.Addendums {
+			for _, addenda := range entry.Addendum {
 				if _, err := w.w.WriteString(addenda.String() + "\n"); err != nil {
 					return err
 				}

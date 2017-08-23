@@ -37,7 +37,7 @@ func TestParseAddenda(t *testing.T) {
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
-	record := r.currentBatch.GetEntries()[0].Addendums[0]
+	record := r.currentBatch.GetEntries()[0].Addendum[0]
 
 	if record.recordType != "7" {
 		t.Errorf("RecordType Expected '7' got: %v", record.recordType)
@@ -68,7 +68,7 @@ func TestAddendaString(t *testing.T) {
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
-	record := r.currentBatch.GetEntries()[0].Addendums[0]
+	record := r.currentBatch.GetEntries()[0].Addendum[0]
 	if record.String() != line {
 		t.Errorf("Strings do not match")
 	}
