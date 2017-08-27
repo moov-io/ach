@@ -26,7 +26,7 @@ func TestBatchError(t *testing.T) {
 	}
 }
 
-func TestBatchServiceClassCodeEsquality(t *testing.T) {
+func TestBatchServiceClassCodeEquality(t *testing.T) {
 	mockBatch := mockBatchPPD()
 	mockBatch.GetControl().ServiceClassCode = 225
 	if err := mockBatch.Validate(); err != nil {
@@ -267,7 +267,6 @@ func TestBatchIsSequenceAscending(t *testing.T) {
 func TestBatchAddendaTraceNumber(t *testing.T) {
 	mockBatch := mockBatchPPD()
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
 	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -306,9 +305,7 @@ func TestBatchBuild(t *testing.T) {
 	entry.IndividualName = "Wade Arnold"
 	entry.setTraceNumber(header.ODFIIdentification, 1)
 	a1 := NewAddenda()
-	a2 := NewAddenda()
 	entry.AddAddenda(a1)
-	entry.AddAddenda(a2)
 	mockBatch.AddEntry(entry)
 	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
