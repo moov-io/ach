@@ -1,6 +1,10 @@
 package ach
 
-// BatchWEB creates a batch file that handles SEC payment type WEB
+import "fmt"
+
+// BatchWEB creates a batch file that handles SEC payment type WEB.
+// Entry submitted pursuant to an authorization obtained solely via the Internet or a wireless network
+// For consumer accounts only.
 type BatchWEB struct {
 	batch
 }
@@ -31,7 +35,10 @@ func (batch *BatchWEB) Validate() error {
 	// Add configuration based validation for this type.
 	// ... batch.isAddendaCount(1)
 	// Add type specific validation.
-	// ...
+	if batch.header.StandardEntryClassCode != "WEB" {
+		msg := fmt.Sprintf(msgBatchSECType, batch.header.StandardEntryClassCode, "WEB")
+		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
+	}
 	return nil
 }
 
@@ -41,8 +48,6 @@ func (batch *BatchWEB) Create() error {
 	if err := batch.build(); err != nil {
 		return err
 	}
-	// Additional steps specific to batch type
-	// ...
 
 	if err := batch.Validate(); err != nil {
 		return err

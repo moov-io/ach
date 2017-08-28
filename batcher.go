@@ -65,10 +65,12 @@ var (
 	msgBatchCalculatedControlEquality = "calculated %v is out-of-balance with control %v"
 	msgBatchAscending                 = "%v is less than last %v. Must be in ascending order"
 	// specific messages for error
-	msgBatchOriginatorDNE      = "%v is not “2” for DNE with entry transaction code of 23 or 33"
-	msgBatchTraceNumberNotODFI = "%v in header does not match entry trace number %v"
-	msgBatchAddendaIndicator   = "is 0 but found addenda record(s)"
-	msgBatchAddendaTraceNumber = "%v does not match proceeding entry detail trace number %v"
-	msgBatchEntries            = "must have Entry Record(s) to be built"
-	msgBatchAddendaCount       = "%v addendum found where %v is allowed for batch type %v"
+	msgBatchOriginatorDNE         = "%v is not “2” for DNE with entry transaction code of 23 or 33"
+	msgBatchTraceNumberNotODFI    = "%v in header does not match entry trace number %v"
+	msgBatchAddendaIndicator      = "is 0 but found addenda record(s)"
+	msgBatchAddendaTraceNumber    = "%v does not match proceeding entry detail trace number %v"
+	msgBatchEntries               = "must have Entry Record(s) to be built"
+	msgBatchAddendaCount          = "%v addendum found where %v is allowed for batch type %v"
+	msgBatchTransactionCodeCredit = "entry Transaction Code %v a credit is not allowed"
+	msgBatchSECType               = "header SEC type code %v for batch type %v"
 )

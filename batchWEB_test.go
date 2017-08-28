@@ -2,9 +2,20 @@ package ach
 
 import "testing"
 
+func mockBatchWEBHeader() *BatchHeader {
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = 220
+	bh.StandardEntryClassCode = "WEB"
+	bh.CompanyName = "Your Company, inc"
+	bh.CompanyIdentification = "123456789"
+	bh.CompanyEntryDescription = "Online Order"
+	bh.ODFIIdentification = 6200001
+	return bh
+}
+
 func mockBatchWEB() *BatchWEB {
 	mockBatch := NewBatchWEB()
-	mockBatch.SetHeader(mockBatchHeader())
+	mockBatch.SetHeader(mockBatchWEBHeader())
 	mockBatch.AddEntry(mockEntryDetail())
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
 	if err := mockBatch.Create(); err != nil {
@@ -28,4 +39,13 @@ func TestBatchWEBAddendumCount(t *testing.T) {
 			t.Errorf("%T: %s", err, err)
 		}
 	}
+}
+
+func TestBatchWEBPaymentTypeSingleEntry(t *testing.T) {
+	//mockBatch := mockBatchWEB()
+}
+
+func TestBatchWEBDebitOnly(t *testing.T) {
+
+	//mockBatch := mockBatchWEB()
 }
