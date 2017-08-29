@@ -45,7 +45,7 @@ func TestEntryParam(t *testing.T) {
 		ReceivingDFI:      "102001017",
 		RDFIAccount:       "5343121",
 		Amount:            "17500",
-		TransactionCode:   "22",
+		TransactionCode:   "27",
 		IDNumber:          "ABC##jvkdjfuiwn",
 		IndividualName:    "Bob Smith",
 		DiscretionaryData: "B1"})
@@ -75,7 +75,7 @@ func TestBuildFileParam(t *testing.T) {
 
 	// To create a batch. Errors only if payment type is not supported.
 	batch, _ := NewBatch(BatchParam{
-		ServiceClassCode:        "220",
+		ServiceClassCode:        "225",
 		CompanyName:             "Your Company",
 		StandardEntryClass:      "PPD",
 		CompanyIdentification:   "123456789",
@@ -88,7 +88,7 @@ func TestBuildFileParam(t *testing.T) {
 		ReceivingDFI:      "102001017",
 		RDFIAccount:       "5343121",
 		Amount:            "17500",
-		TransactionCode:   "22",
+		TransactionCode:   "27",
 		IDNumber:          "ABC##jvkdjfuiwn",
 		IndividualName:    "Robert Smith",
 		DiscretionaryData: "B1"})
@@ -110,6 +110,39 @@ func TestBuildFileParam(t *testing.T) {
 	}
 
 	// And batches are added to files much the same way:
+
+	file.AddBatch(batch)
+
+	// Now add a new batch for accepting payments on the web
+
+	batch, _ = NewBatch(BatchParam{
+		ServiceClassCode:        "220",
+		CompanyName:             "Your Company",
+		StandardEntryClass:      "WEB",
+		CompanyIdentification:   "123456789",
+		CompanyEntryDescription: "monthly subscription",
+		CompanyDescriptiveDate:  "Oct 23",
+		ODFIIdentification:      "123456789"})
+
+	// Add an entry and define if it is a single or reoccuring payment
+	// The following is a reoccuring payment for $7.99
+
+	entry = NewEntryDetail(EntryParam{
+		ReceivingDFI:      "102001017",
+		RDFIAccount:       "5343121",
+		Amount:            "799",
+		TransactionCode:   "22",
+		IDNumber:          "#123456",
+		IndividualName:    "Wade Arnold",
+		DiscretionaryData: "R"})
+
+	addenda = NewAddenda(AddendaParam{
+		PaymentRelatedInfo: "Monthly Membership Subscription"})
+
+	// add the entry to the batch
+	entry.AddAddenda(addenda)
+
+	// add the second batch to the file
 
 	file.AddBatch(batch)
 
