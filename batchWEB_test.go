@@ -72,3 +72,20 @@ func TestBatchWEBDebitOnly(t *testing.T) {
 	}
 
 }
+
+// Nor more than 1 batch per entry detail record can exist
+func TestBatchWebAddenda(t *testing.T) {
+	mockBatch := mockBatchWEB()
+	// mock batch already has one addenda. Creating two addenda should error
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "AddendaCount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+}

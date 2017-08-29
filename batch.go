@@ -75,11 +75,6 @@ func (batch *batch) verify() error {
 	if err := batch.isAddendaSequence(); err != nil {
 		return err
 	}
-
-	if err := batch.isAddendaCount(); err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -292,17 +287,9 @@ func (batch *batch) isAddendaSequence() error {
 }
 
 // isAddendaCount iterates through each entry detail and checks the number of addendum is greater than the count paramater otherwise it returns an error.
-func (batch *batch) isAddendaCount() error {
-	var count = 0
-	// Following SEC codes allow for none or one Addendum
-	oneAddendum := []string{"PPD", "WEB", "CCD", "CIE", "DNE", "MTE", "POS", "SHR"}
-	for _, v := range oneAddendum {
-		if v == batch.header.StandardEntryClassCode {
-			count = 1
-			break
-		}
-	}
-
+// Following SEC codes allow for none or one Addendum
+// "PPD", "WEB", "CCD", "CIE", "DNE", "MTE", "POS", "SHR"
+func (batch *batch) isAddendaCount(count int) error {
 	for _, entry := range batch.entries {
 		if len(entry.Addendum) > count {
 			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), count, batch.header.StandardEntryClassCode)
