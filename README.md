@@ -14,12 +14,14 @@ Package 'moov-io/ach' implements a file reader and writer for parsing [ACH](http
 
 ACH is at an early stage and under active development. Please star the project if you are interested in its progress.
 
-* Library currently supports the reading and writing of PPD (Prearranged payment and deposits)
+* Library currently supports the reading and writing 
+	* PPD (Prearranged payment and deposits)
+	* WEB (Internet-initiated Entries )
 
 
 ## Project Roadmap
-* Support SEC WEB
 * Additional SEC codes will be added based on library users needs. Please open an issue with a valid test file.
+* Review the project issues for more detailed information
 
 ## Usage and examples
 Examples exist in projects [example](https://github.com/moov-io/ach/tree/master/example) folder. The following is based on [simple file creation](https://github.com/moov-io/ach/tree/master/example/simple-file-creation)
