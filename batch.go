@@ -27,6 +27,15 @@ func NewBatch(bp BatchParam) (Batcher, error) {
 // verify checks basic valid NACHA batch rules. Assumes properly parsed records. This does not mean it is a valid batch as validity is tied to each batch type
 func (batch *batch) verify() error {
 	batchNumber := batch.header.BatchNumber
+
+	// verify field inclusion in all the records of the batch.
+	if err := batch.isFieldInclusion(); err != nil {
+		// convert the field error in to a batch error for a consistent api
+		if e, ok := err.(*FieldError); ok {
+			return &BatchError{BatchNumber: batchNumber, FieldName: e.FieldName, Msg: e.Msg}
+		}
+		return &BatchError{BatchNumber: batchNumber, FieldName: "FieldError", Msg: err.Error()}
+	}
 	// validate batch header and control codes are the same
 	if batch.header.ServiceClassCode != batch.control.ServiceClassCode {
 		msg := fmt.Sprintf(msgBatchHeaderControlEquality, batch.header.ServiceClassCode, batch.control.ServiceClassCode)
@@ -75,7 +84,6 @@ func (batch *batch) verify() error {
 	if err := batch.isAddendaSequence(); err != nil {
 		return err
 	}
-
 	return nil
 }
 
@@ -146,6 +154,27 @@ func (batch *batch) GetEntries() []*EntryDetail {
 // AddEntry appends an EntryDetail to the Batch
 func (batch *batch) AddEntry(entry *EntryDetail) {
 	batch.entries = append(batch.entries, entry)
+}
+
+// isFieldInclusion iterates through all the records in the batch and verifies against default fields
+func (batch *batch) isFieldInclusion() error {
+	if err := batch.header.Validate(); err != nil {
+		return err
+	}
+	for _, entry := range batch.entries {
+		if err := entry.Validate(); err != nil {
+			return err
+		}
+		for _, addenda := range entry.Addendum {
+			if err := addenda.Validate(); err != nil {
+				return nil
+			}
+		}
+	}
+	if err := batch.control.Validate(); err != nil {
+		return err
+	}
+	return nil
 }
 
 // isBatchEntryCount validate Entry count is accurate
@@ -281,6 +310,32 @@ func (batch *batch) isAddendaSequence() error {
 					msg := fmt.Sprintf(msgBatchAddendaTraceNumber, addenda.EntryDetailSequenceNumberField(), entry.TraceNumberField()[8:])
 					return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
 				}
+			}
+		}
+	}
+	return nil
+}
+
+// isAddendaCount iterates through each entry detail and checks the number of addendum is greater than the count paramater otherwise it returns an error.
+// Following SEC codes allow for none or one Addendum
+// "PPD", "WEB", "CCD", "CIE", "DNE", "MTE", "POS", "SHR"
+func (batch *batch) isAddendaCount(count int) error {
+	for _, entry := range batch.entries {
+		if len(entry.Addendum) > count {
+			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), count, batch.header.StandardEntryClassCode)
+			return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+		}
+	}
+	return nil
+}
+
+// isTypeCode takes a typecode string and verifies addenda records match
+func (batch *batch) isTypeCode(typeCode string) error {
+	for _, entry := range batch.entries {
+		for _, addenda := range entry.Addendum {
+			if addenda.TypeCode != typeCode {
+				msg := fmt.Sprintf(msgBatchTypeCode, addenda.TypeCode, typeCode, batch.header.StandardEntryClassCode)
+				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TypeCode", Msg: msg}
 			}
 		}
 	}

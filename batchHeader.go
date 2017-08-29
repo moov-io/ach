@@ -21,10 +21,12 @@ import (
 type BatchHeader struct {
 	// RecordType defines the type of record in the block. 5
 	recordType string
+
 	// ServiceClassCode ACH Mixed Debits and Credits ‘200’
 	// ACH Credits Only ‘220’
 	// ACH Debits Only ‘225'
 	ServiceClassCode int
+
 	// CompanyName the company originating the entries in the batch
 	CompanyName string
 
@@ -34,6 +36,7 @@ type BatchHeader struct {
 	// interpretation for the value of the field. This field must be returned
 	// intact on any return entry.
 	CompanyDiscretionaryData string
+
 	// CompanyIdentification The 9 digit FEIN number (proceeded by a predetermined
 	// alpha or numeric character) of the entity in the company name field
 	CompanyIdentification string
@@ -84,8 +87,10 @@ type BatchHeader struct {
 	// the ascending sequence number should be assigned by batch and not by
 	// record.
 	BatchNumber int
+
 	// validator is composed for data validation
 	validator
+
 	// converters is composed for ACH to golang Converters
 	converters
 }

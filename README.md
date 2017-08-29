@@ -57,7 +57,7 @@ To create an entry
 		ReceivingDFI:      "102001017",
 		RDFIAccount:       "5343121",
 		Amount:            "17500",
-		TransactionCode:   "22",
+		TransactionCode:   "27",
 		IDNumber:          "ABC##jvkdjfuiwn",
 		IndividualName:    "Bob Smith",
 		DiscretionaryData: "B1"})
@@ -81,7 +81,6 @@ When all of the Entries are added to the batch we can create the batch.
 
  ```go
 	if err := batch.Create(); err != nil {
-
 		fmt.Printf("%T: %s", err, err)
 	}
   ```
@@ -90,6 +89,50 @@ And batches are added to files much the same way:
 
  ```go
 	file.AddBatch(batch)
+```
+
+Now add a new batch for accepting payments on the web
+
+```go
+	batch2, _ := ach.NewBatch(ach.BatchParam{
+		ServiceClassCode:        "220",
+		CompanyName:             "Your Company",
+		StandardEntryClass:      "WEB",
+		CompanyIdentification:   "123456789",
+		CompanyEntryDescription: "subscr",
+		CompanyDescriptiveDate:  "Oct 23",
+		ODFIIdentification:      "123456789"})
+```
+
+Add an entry and define if it is a single or reoccurring payment. The following is a reoccurring payment for $7.99
+
+```go
+	entry2 := ach.NewEntryDetail(ach.EntryParam{
+		ReceivingDFI:      "102001017",
+		RDFIAccount:       "5343121",
+		Amount:            "799",
+		TransactionCode:   "22",
+		IDNumber:          "#123456",
+		IndividualName:    "Wade Arnold",
+		DiscretionaryData: "R"})
+
+	addenda2 := ach.NewAddenda(ach.AddendaParam{
+		PaymentRelatedInfo: "Monthly Membership Subscription"})
+```
+
+Add the entry to the batch
+```go
+	entry2.AddAddenda(addenda2)
+```
+
+Create and add the second batch
+
+```go
+	batch2.AddEntry(entry2)
+	if err := batch2.Create(); err != nil {
+		fmt.Printf("%T: %s", err, err)
+	}
+	file.AddBatch(batch2)
 ```
 
 Once we added all our batches we must build the file
@@ -114,16 +157,16 @@ Finally we wnt to write the file to an io.Writer
 Which will generate a well formed ACH flat file. 
 
 ```text
-101 210000890 1234567891708080000A094101Your Bank              Your Company           #00000A1
-5220Your Company                        123456789 PPDTrans. DesOct 23010101   1234567890000001
-6221020010175343121          0000017500ABC##jvkdjfuiwnBob Smith             B11234567890000001
+101 210000890 1234567891708290000A094101Your Bank              Your Company           #00000A1
+5200Your Company                        123456789 PPDTrans. DesOct 23010101   1234567890000001
+6271020010175343121          0000017500#456789        Bob Smith             B11234567890000001
 705bonus pay for amazing work on #OSS                                              00010000001
-82200000020010200101000000000000000000017500123456789                          234567890000001
-9000001000001000000020010200101000000000000000000017500                                       
-9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
-9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
-9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
-9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+82000000020010200101000000017500000000000000123456789                          234567890000001
+5220Your Company                        123456789 WEBsubscr    Oct 23010101   1234567890000002
+6221020010175343121          0000000799#123456        Wade Arnold           R 1234567890000001
+705Monthly Membership Subscription                                                 00010000001
+82200000020010200101000000000000000000000799123456789                          234567890000002
+9000002000001000000040020400202000000017500000000000799 
 ```
 
 # Contributing
