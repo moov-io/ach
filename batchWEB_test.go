@@ -87,5 +87,21 @@ func TestBatchWebAddenda(t *testing.T) {
 			t.Errorf("%T: %s", err, err)
 		}
 	}
+}
 
+// Individual name is a mandatory field
+func TestBatchWebIndividualNameRequired(t *testing.T) {
+	mockBatch := mockBatchWEB()
+	// mock batch already has one addenda. Creating two addenda should error
+	mockBatch.GetEntries()[0].IndividualName = ""
+	if err := mockBatch.Validate(); err != nil {
+		println(err)
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "IndividualName" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
 }

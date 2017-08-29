@@ -250,7 +250,7 @@ func TestBatchIsAddendaSeqAscending(t *testing.T) {
 func TestBatchIsSequenceAscending(t *testing.T) {
 	mockBatch := mockBatchPPD()
 	e3 := mockEntryDetail()
-	e3.TraceNumber = 0
+	e3.TraceNumber = 1
 	mockBatch.AddEntry(e3)
 	mockBatch.GetControl().EntryAddendaCount = 2
 	if err := mockBatch.Validate(); err != nil {
