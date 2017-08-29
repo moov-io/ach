@@ -1,6 +1,9 @@
 package ach
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // BatchWEB creates a batch file that handles SEC payment type WEB.
 // Entry submitted pursuant to an authorization obtained solely via the Internet or a wireless network
@@ -8,6 +11,10 @@ import "fmt"
 type BatchWEB struct {
 	batch
 }
+
+var (
+	msgBatchWebPaymentType = "%v is not a valid payment type S (single entry) or R (recurring)"
+)
 
 // NewBatchWEB returns a *BatchWEB
 func NewBatchWEB(params ...BatchParam) *BatchWEB {
@@ -47,6 +54,10 @@ func (batch *BatchWEB) Validate() error {
 		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
+	if err := batch.isPaymentTypeCode(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -59,6 +70,19 @@ func (batch *BatchWEB) Create() error {
 
 	if err := batch.Validate(); err != nil {
 		return err
+	}
+	return nil
+}
+
+// isPaymentTypeCode checks that the Entry detail records have either:
+// "R" For a recurring WEB Entry
+// "S" For a Single-Entry WEB Entry
+func (batch *BatchWEB) isPaymentTypeCode() error {
+	for _, entry := range batch.entries {
+		if !strings.Contains(strings.ToUpper(entry.PaymentType()), "S") && !strings.Contains(strings.ToUpper(entry.PaymentType()), "R") {
+			msg := fmt.Sprintf(msgBatchWebPaymentType, entry.PaymentType())
+			return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "PaymentType", Msg: msg}
+		}
 	}
 	return nil
 }

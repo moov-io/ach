@@ -268,6 +268,14 @@ func (ed *EntryDetail) DiscretionaryDataField() string {
 	return ed.alphaField(ed.DiscretionaryData, 2)
 }
 
+// PaymentType returns the discretionary data field used in web batch files
+func (ed *EntryDetail) PaymentType() string {
+	if ed.DiscretionaryData == "" {
+		ed.DiscretionaryData = "S"
+	}
+	return ed.DiscretionaryDataField()
+}
+
 // TraceNumberField returns a zero padded traceNumber string
 func (ed *EntryDetail) TraceNumberField() string {
 	return ed.numericField(ed.TraceNumber, 15)

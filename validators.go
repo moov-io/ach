@@ -78,7 +78,7 @@ func (v *validator) isTypeCode(code string) error {
 	case
 		// For POS, SHR or MTE Entries
 		"02",
-		// Addenda Record (ACK, ATX, CCD, CIE, CTX, DNE, ENR, PPD, TRX and WEB Entries
+		// Addenda Record 
 		"08",
 		// Notification of Change and Refused Notification of Change Entry
 		"98",
@@ -86,7 +86,7 @@ func (v *validator) isTypeCode(code string) error {
 		"99",
 		//  IAT forward Entries and IAT Returns
 		"10", "11", "12", "13", "14", "15", "16", "17",
-		// CCD Addenda Record
+		// ACK, ATX, CCD, CIE, CTX, DNE, ENR, PPD, TRX and WEB Entries
 		"05":
 		return nil
 	}
