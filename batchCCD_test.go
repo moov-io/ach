@@ -2,32 +2,32 @@ package ach
 
 import "testing"
 
-func mockBatchWEBHeader() *BatchHeader {
+func mockBatchCCDHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = 220
-	bh.StandardEntryClassCode = "WEB"
+	bh.StandardEntryClassCode = "CCD"
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "123456789"
-	bh.CompanyEntryDescription = "Online Order"
+	bh.CompanyEntryDescription = "Vndr Pay"
 	bh.ODFIIdentification = 6200001
 	return bh
 }
 
-func mockWEBEntryDetail() *EntryDetail {
+func mockCCDEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 22
-	entry.SetRDFI(9101298)
-	entry.DFIAccountNumber = "123456789"
-	entry.Amount = 100000000
+	entry.TransactionCode = 27
+	entry.SetRDFI(91012987)
+	entry.DFIAccountNumber = "744-5678-99"
+	entry.Amount = 5000000
 	entry.IndividualName = "Wade Arnold"
 	entry.TraceNumber = 123456789
 	entry.DiscretionaryData = "S"
 	return entry
 }
 
-func mockBatchWEB() *BatchWEB {
+func mockBatchCCD() *BatchWEB {
 	mockBatch := NewBatchWEB()
-	mockBatch.SetHeader(mockBatchWEBHeader())
+	mockBatch.SetHeader(mockBatchCCDHeader())
 	mockBatch.AddEntry(mockWEBEntryDetail())
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
 	if err := mockBatch.Create(); err != nil {
@@ -36,9 +36,9 @@ func mockBatchWEB() *BatchWEB {
 	return mockBatch
 }
 
-// A Batch web can only have one addendum per entry detail
-func TestBatchWEBAddendumCount(t *testing.T) {
-	mockBatch := mockBatchWEB()
+// A Batch CCD can only have one addendum per entry detail
+func TestBatchCCDAddendumCount(t *testing.T) {
+	mockBatch := mockBatchCCD()
 	// Adding a second addenda to the mock entry
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
 
@@ -53,14 +53,14 @@ func TestBatchWEBAddendumCount(t *testing.T) {
 	}
 }
 
-// No more than 1 batch per entry detail record can exist
-func TestBatchWebAddenda(t *testing.T) {
-	mockBatch := mockBatchWEB()
+// Individual name is a mandatory field
+func TestBatchCCDReceivingCompanyName(t *testing.T) {
+	mockBatch := mockBatchCCD()
 	// mock batch already has one addenda. Creating two addenda should error
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
-	if err := mockBatch.Create(); err != nil {
+	mockBatch.GetEntries()[0].IndividualName = ""
+	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaCount" {
+			if e.FieldName != "IndividualName" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -69,9 +69,8 @@ func TestBatchWebAddenda(t *testing.T) {
 	}
 }
 
-// Individual name is a mandatory field
-func TestBatchWebIndividualNameRequired(t *testing.T) {
-	mockBatch := mockBatchWEB()
+func TestBatchCCDIdentificationNumber(t *testing.T) {
+	mockBatch := mockBatchCCD()
 	// mock batch already has one addenda. Creating two addenda should error
 	mockBatch.GetEntries()[0].IndividualName = ""
 	if err := mockBatch.Validate(); err != nil {
@@ -86,8 +85,8 @@ func TestBatchWebIndividualNameRequired(t *testing.T) {
 }
 
 // verify addenda type code is 05
-func TestBatchWEBAddendaTypeCode(t *testing.T) {
-	mockBatch := mockBatchWEB()
+func TestBatchCCDAddendaTypeCode(t *testing.T) {
+	mockBatch := mockBatchCCD()
 	mockBatch.GetEntries()[0].Addendum[0].TypeCode = "07"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -100,28 +99,13 @@ func TestBatchWEBAddendaTypeCode(t *testing.T) {
 	}
 }
 
-// verify that the standard entry class code is WEB for batchWeb
-func TestBatchWebSEC(t *testing.T) {
-	mockBatch := mockBatchWEB()
+// verify that the standard entry class code is CCD for batchCCD
+func TestBatchCCDSEC(t *testing.T) {
+	mockBatch := mockBatchCCD()
 	mockBatch.header.StandardEntryClassCode = "RCK"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
-	}
-}
-
-// verify that the entry detail payment type / discretionary data is either single or reoccurring for the
-func TestBatchWebPaymentType(t *testing.T) {
-	mockBatch := mockBatchWEB()
-	mockBatch.GetEntries()[0].DiscretionaryData = "AA"
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "PaymentType" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
