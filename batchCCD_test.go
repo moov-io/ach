@@ -16,7 +16,7 @@ func mockBatchCCDHeader() *BatchHeader {
 func mockCCDEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 27
-	entry.SetRDFI(91012987)
+	entry.SetRDFI(9101298)
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 5000000
 	entry.IndividualName = "Wade Arnold"
@@ -25,10 +25,10 @@ func mockCCDEntryDetail() *EntryDetail {
 	return entry
 }
 
-func mockBatchCCD() *BatchWEB {
-	mockBatch := NewBatchWEB()
+func mockBatchCCD() *BatchCCD {
+	mockBatch := NewBatchCCD()
 	mockBatch.SetHeader(mockBatchCCDHeader())
-	mockBatch.AddEntry(mockWEBEntryDetail())
+	mockBatch.AddEntry(mockCCDEntryDetail())
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
 	if err := mockBatch.Create(); err != nil {
 		panic(err)

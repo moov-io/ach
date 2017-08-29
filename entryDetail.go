@@ -41,9 +41,9 @@ type EntryDetail struct {
 	// Amount Number of cents you are debiting/crediting this account
 	Amount int
 
-	// IndividualIdentificationNumber n internal identification (alphanumeric) that
+	// IdentificationNumber n internal identification (alphanumeric) that
 	// you use to uniquely identify this Entry Detail Record
-	IndividualIdentificationNumber string
+	IdentificationNumber string
 
 	// IndividualName The name of the receiver, usually the name on the bank account
 	IndividualName string
@@ -101,7 +101,7 @@ func NewEntryDetail(params ...EntryParam) *EntryDetail {
 		entry.SetRDFI(entry.parseNumField(params[0].ReceivingDFI))
 		entry.DFIAccountNumber = params[0].RDFIAccount
 		entry.Amount = entry.parseNumField(params[0].Amount)
-		entry.IndividualIdentificationNumber = params[0].IDNumber
+		entry.IdentificationNumber = params[0].IDNumber
 		entry.IndividualName = params[0].IndividualName
 		entry.DiscretionaryData = params[0].DiscretionaryData
 		entry.TransactionCode = entry.parseNumField(params[0].TransactionCode)
@@ -127,7 +127,7 @@ func (ed *EntryDetail) Parse(record string) {
 	// 30-39 Number of cents you are debiting/crediting this account
 	ed.Amount = ed.parseNumField(record[29:39])
 	// 40-54 An internal identification (alphanumeric) that you use to uniquely identify this Entry Detail Record
-	ed.IndividualIdentificationNumber = record[39:54]
+	ed.IdentificationNumber = record[39:54]
 	// 55-76 The name of the receiver, usually the name on the bank account
 	ed.IndividualName = record[54:76]
 	// 77-78 allows ODFIs to include codes of significance only to them
@@ -149,7 +149,7 @@ func (ed *EntryDetail) String() string {
 		ed.CheckDigit,
 		ed.DFIAccountNumberField(),
 		ed.AmountField(),
-		ed.IndividualIdentificationNumberField(),
+		ed.IdentificationNumberField(),
 		ed.IndividualNameField(),
 		ed.DiscretionaryDataField(),
 		ed.AddendaRecordIndicator,
@@ -172,8 +172,8 @@ func (ed *EntryDetail) Validate() error {
 	if err := ed.isAlphanumeric(ed.DFIAccountNumber); err != nil {
 		return &FieldError{FieldName: "DFIAccountNumber", Value: ed.DFIAccountNumber, Msg: err.Error()}
 	}
-	if err := ed.isAlphanumeric(ed.IndividualIdentificationNumber); err != nil {
-		return &FieldError{FieldName: "IndividualIdentificationNumber", Value: ed.IndividualIdentificationNumber, Msg: err.Error()}
+	if err := ed.isAlphanumeric(ed.IdentificationNumber); err != nil {
+		return &FieldError{FieldName: "IdentificationNumber", Value: ed.IdentificationNumber, Msg: err.Error()}
 	}
 	if err := ed.isAlphanumeric(ed.IndividualName); err != nil {
 		return &FieldError{FieldName: "IndividualName", Value: ed.IndividualName, Msg: err.Error()}
@@ -253,9 +253,9 @@ func (ed *EntryDetail) AmountField() string {
 	return ed.numericField(ed.Amount, 10)
 }
 
-// IndividualIdentificationNumberField returns a space padded string of IndividualIdentificationNumber
-func (ed *EntryDetail) IndividualIdentificationNumberField() string {
-	return ed.alphaField(ed.IndividualIdentificationNumber, 15)
+// IdentificationNumberField returns a space padded string of IdentificationNumber
+func (ed *EntryDetail) IdentificationNumberField() string {
+	return ed.alphaField(ed.IdentificationNumber, 15)
 }
 
 // IndividualNameField returns a space padded string of IndividualName
