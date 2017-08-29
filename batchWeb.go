@@ -33,14 +33,20 @@ func (batch *BatchWEB) Validate() error {
 		return err
 	}
 	// Add configuration based validation for this type.
+	// Web can have up to one addenda per entry record
 	if err := batch.isAddendaCount(1); err != nil {
 		return err
 	}
+	if err := batch.isTypeCode("05"); err != nil {
+		return err
+	}
+
 	// Add type specific validation.
 	if batch.header.StandardEntryClassCode != "WEB" {
 		msg := fmt.Sprintf(msgBatchSECType, batch.header.StandardEntryClassCode, "WEB")
 		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
+
 	return nil
 }
 

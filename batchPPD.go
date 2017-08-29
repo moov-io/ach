@@ -38,6 +38,9 @@ func (batch *BatchPPD) Validate() error {
 	if err := batch.isAddendaCount(1); err != nil {
 		return err
 	}
+	if err := batch.isTypeCode("05"); err != nil {
+		return err
+	}
 
 	// Add type specific validation.
 	// ...

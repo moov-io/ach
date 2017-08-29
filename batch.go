@@ -328,3 +328,16 @@ func (batch *batch) isAddendaCount(count int) error {
 	}
 	return nil
 }
+
+// isTypeCode takes a typecode string and verifies addenda records match
+func (batch *batch) isTypeCode(typeCode string) error {
+	for _, entry := range batch.entries {
+		for _, addenda := range entry.Addendum {
+			if addenda.TypeCode != typeCode {
+				msg := fmt.Sprintf(msgBatchTypeCode, addenda.TypeCode, typeCode, batch.header.StandardEntryClassCode)
+				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+			}
+		}
+	}
+	return nil
+}

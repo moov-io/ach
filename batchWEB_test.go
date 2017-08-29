@@ -95,9 +95,23 @@ func TestBatchWebIndividualNameRequired(t *testing.T) {
 	// mock batch already has one addenda. Creating two addenda should error
 	mockBatch.GetEntries()[0].IndividualName = ""
 	if err := mockBatch.Validate(); err != nil {
-		println(err)
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "IndividualName" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// verify addenda type code is 05
+func TestAddendaTypeCode(t *testing.T) {
+	mockBatch := mockBatchWEB()
+	mockBatch.GetEntries()[0].Addendum[0].TypeCode = "07"
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
