@@ -33,7 +33,9 @@ func (batch *BatchWEB) Validate() error {
 		return err
 	}
 	// Add configuration based validation for this type.
-	// ... batch.isAddendaCount(1)
+	if err := batch.isAddendaCount(1); err != nil {
+		return err
+	}
 	// Add type specific validation.
 	if batch.header.StandardEntryClassCode != "WEB" {
 		msg := fmt.Sprintf(msgBatchSECType, batch.header.StandardEntryClassCode, "WEB")

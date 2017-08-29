@@ -71,6 +71,6 @@ var (
 	msgBatchAddendaTraceNumber    = "%v does not match proceeding entry detail trace number %v"
 	msgBatchEntries               = "must have Entry Record(s) to be built"
 	msgBatchAddendaCount          = "%v addendum found where %v is allowed for batch type %v"
-	msgBatchTransactionCodeCredit = "entry Transaction Code %v a credit is not allowed"
+	msgBatchTransactionCodeCredit = "%v a credit is not allowed"
 	msgBatchSECType               = "header SEC type code %v for batch type %v"
 )

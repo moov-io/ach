@@ -13,10 +13,21 @@ func mockBatchWEBHeader() *BatchHeader {
 	return bh
 }
 
+func mockWEBEntryDetail() *EntryDetail {
+	entry := NewEntryDetail()
+	entry.TransactionCode = 27
+	entry.SetRDFI(9101298)
+	entry.DFIAccountNumber = "123456789"
+	entry.Amount = 100000000
+	entry.IndividualName = "Wade Arnold"
+	entry.TraceNumber = 123456789
+	return entry
+}
+
 func mockBatchWEB() *BatchWEB {
 	mockBatch := NewBatchWEB()
 	mockBatch.SetHeader(mockBatchWEBHeader())
-	mockBatch.AddEntry(mockEntryDetail())
+	mockBatch.AddEntry(mockWEBEntryDetail())
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
 	if err := mockBatch.Create(); err != nil {
 		panic(err)
@@ -46,6 +57,18 @@ func TestBatchWEBPaymentTypeSingleEntry(t *testing.T) {
 }
 
 func TestBatchWEBDebitOnly(t *testing.T) {
+	mockBatch := mockBatchWEB()
+	// make the entry a credit
+	mockBatch.GetEntries()[0].TransactionCode = 22
+	// re-create batch to rebuild control and create runs validate
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TransactionCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
 
-	//mockBatch := mockBatchWEB()
 }

@@ -33,7 +33,12 @@ func (batch *BatchPPD) Validate() error {
 		return err
 	}
 	// Add configuration based validation for this type.
-	// ... batch.isAddendaCount(1)
+
+	// Batch can have one addenda per entry record
+	if err := batch.isAddendaCount(1); err != nil {
+		return err
+	}
+
 	// Add type specific validation.
 	// ...
 	return nil
