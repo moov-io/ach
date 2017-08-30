@@ -17,6 +17,7 @@ ACH is at an early stage and under active development. Please star the project i
 * Library currently supports the reading and writing 
 	* PPD (Prearranged payment and deposits)
 	* WEB (Internet-initiated Entries )
+	* CCD (Corporate credit or debit)
 
 
 ## Project Roadmap
