@@ -18,6 +18,8 @@ func NewBatch(bp BatchParam) (Batcher, error) {
 		return NewBatchPPD(bp), nil
 	case "WEB":
 		return NewBatchWEB(bp), nil
+	case "CCD":
+		return NewBatchCCD(bp), nil
 	default:
 		msg := fmt.Sprintf(msgFileNoneSEC, sec)
 		return nil, &FileError{FieldName: "StandardEntryClassCode", Msg: msg}

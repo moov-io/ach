@@ -87,7 +87,8 @@ type EntryParam struct {
 	RDFIAccount       string `json:"rdfi_account"`
 	Amount            string `json:"amount"`
 	IDNumber          string `json:"id_number,omitempty"`
-	IndividualName    string `json:"individual_name"`
+	IndividualName    string `json:"individual_name,omitempty"`
+	ReceivingCompany  string `json:"receiving_company,omitempty"`
 	DiscretionaryData string `json:"discretionary_data,omitempty"`
 	TransactionCode   string `json:"transaction_code"`
 }
@@ -102,7 +103,11 @@ func NewEntryDetail(params ...EntryParam) *EntryDetail {
 		entry.DFIAccountNumber = params[0].RDFIAccount
 		entry.Amount = entry.parseNumField(params[0].Amount)
 		entry.IdentificationNumber = params[0].IDNumber
-		entry.IndividualName = params[0].IndividualName
+		if params[0].IndividualName != "" {
+			entry.IndividualName = params[0].IndividualName
+		} else {
+			entry.IndividualName = params[0].ReceivingCompany
+		}
 		entry.DiscretionaryData = params[0].DiscretionaryData
 		entry.TransactionCode = entry.parseNumField(params[0].TransactionCode)
 
@@ -261,6 +266,11 @@ func (ed *EntryDetail) IdentificationNumberField() string {
 // IndividualNameField returns a space padded string of IndividualName
 func (ed *EntryDetail) IndividualNameField() string {
 	return ed.alphaField(ed.IndividualName, 22)
+}
+
+// ReceivingCompanyField is used in CCD files but returns the underlying IndividualName field
+func (ed *EntryDetail) ReceivingCompanyField() string {
+	return ed.IndividualNameField()
 }
 
 // DiscretionaryDataField returns a space padded string of DiscretionaryData

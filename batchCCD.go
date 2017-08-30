@@ -49,10 +49,6 @@ func (batch *BatchCCD) Validate() error {
 		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
-	// verify individual identification number
-
-	// verify Recieving company name
-
 	return nil
 }
 

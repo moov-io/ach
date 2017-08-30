@@ -19,7 +19,8 @@ func mockCCDEntryDetail() *EntryDetail {
 	entry.SetRDFI(9101298)
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 5000000
-	entry.IndividualName = "Wade Arnold"
+	entry.IdentificationNumber = "location #23"
+	entry.IndividualName = "Best Co. #23"
 	entry.TraceNumber = 123456789
 	entry.DiscretionaryData = "S"
 	return entry
@@ -41,7 +42,6 @@ func TestBatchCCDAddendumCount(t *testing.T) {
 	mockBatch := mockBatchCCD()
 	// Adding a second addenda to the mock entry
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
-
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "EntryAddendaCount" {
@@ -53,25 +53,10 @@ func TestBatchCCDAddendumCount(t *testing.T) {
 	}
 }
 
-// Individual name is a mandatory field
+// receiving company / Individual name is a mandatory field
 func TestBatchCCDReceivingCompanyName(t *testing.T) {
 	mockBatch := mockBatchCCD()
-	// mock batch already has one addenda. Creating two addenda should error
-	mockBatch.GetEntries()[0].IndividualName = ""
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "IndividualName" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
-	}
-}
-
-func TestBatchCCDIdentificationNumber(t *testing.T) {
-	mockBatch := mockBatchCCD()
-	// mock batch already has one addenda. Creating two addenda should error
+	// modify the Individual name / receiving company to nothing
 	mockBatch.GetEntries()[0].IndividualName = ""
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
