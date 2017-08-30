@@ -297,11 +297,11 @@ func TestBatchBuild(t *testing.T) {
 	mockBatch.SetHeader(header)
 
 	entry := NewEntryDetail()
-	entry.TransactionCode = 22                            // ACH Credit
-	entry.SetRDFI(81086674)                               // scottrade bank routing number
-	entry.DFIAccountNumber = "62292250"                   // scottrade account number
-	entry.Amount = 1000000                                // 1k dollars
-	entry.IndividualIdentificationNumber = "658-888-2468" // Unique ID for payment
+	entry.TransactionCode = 22                  // ACH Credit
+	entry.SetRDFI(81086674)                     // scottrade bank routing number
+	entry.DFIAccountNumber = "62292250"         // scottrade account number
+	entry.Amount = 1000000                      // 1k dollars
+	entry.IdentificationNumber = "658-888-2468" // Unique ID for payment
 	entry.IndividualName = "Wade Arnold"
 	entry.setTraceNumber(header.ODFIIdentification, 1)
 	a1 := NewAddenda()

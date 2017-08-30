@@ -86,7 +86,7 @@ func TestBatchWebIndividualNameRequired(t *testing.T) {
 }
 
 // verify addenda type code is 05
-func TestBatchAddendaTypeCode(t *testing.T) {
+func TestBatchWEBAddendaTypeCode(t *testing.T) {
 	mockBatch := mockBatchWEB()
 	mockBatch.GetEntries()[0].Addendum[0].TypeCode = "07"
 	if err := mockBatch.Validate(); err != nil {

@@ -73,8 +73,8 @@ func TestParseEntryDetail(t *testing.T) {
 		t.Errorf("Amount Expected '0000010500' got: %v", record.AmountField())
 	}
 
-	if record.IndividualIdentificationNumber != "c-1            " {
-		t.Errorf("IndividualIdentificationNumber Expected 'c-1            ' got: %v", record.IndividualIdentificationNumber)
+	if record.IdentificationNumber != "c-1            " {
+		t.Errorf("IdentificationNumber Expected 'c-1            ' got: %v", record.IdentificationNumber)
 	}
 	if record.IndividualName != "Arnold Wade           " {
 		t.Errorf("IndividualName Expected 'Arnold Wade           ' got: %v", record.IndividualName)
@@ -157,12 +157,12 @@ func TestEDdfiAccountNumberAlphaNumeric(t *testing.T) {
 	}
 }
 
-func TestEDIndividualIdentificationNumberAlphaNumeric(t *testing.T) {
+func TestEDIdentificationNumberAlphaNumeric(t *testing.T) {
 	ed := mockEntryDetail()
-	ed.IndividualIdentificationNumber = "®"
+	ed.IdentificationNumber = "®"
 	if err := ed.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "IndividualIdentificationNumber" {
+			if e.FieldName != "IdentificationNumber" {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
