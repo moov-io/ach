@@ -234,7 +234,7 @@ Validate is designed to enforce the NACHA rules for the MTE payment type. Valida
 
 ```go
 // Validate checks valid NACHA batch rules. Assumes properly parsed records.
-func (batch *BatchPPD) Validate() error {
+func (batch *BatchMTE) Validate() error {
 	// basic verification of the batch before we validate specific rules.
 	if err := batch.verify(); err != nil {
 		return err
@@ -250,7 +250,7 @@ Create takes the Batch Header and Entry details and creates the proper sequence 
 
 ```go
 // Create takes Batch Header and Entries and builds a valid batch
-func (batch *BatchPPD) Create() error {
+func (batch *BatchMTE) Create() error {
 	// generates sequence numbers and batch control
 	if err := batch.build(); err != nil {
 		return err
@@ -270,7 +270,7 @@ Finally add the batch type to the NewBatch factory in batch.go.
 ```go
 //...
 case "MTE":
-		return NewBatchPPD(bp), nil
+		return NewBatchMTE(bp), nil
 //...
 ```
 
