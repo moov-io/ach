@@ -56,6 +56,24 @@ func TestBatchPPDCreate(t *testing.T) {
 	}
 }
 
+func TestBatchPPDTypeCode(t *testing.T) {
+	mockBatch := mockBatchPPD()
+	// change an addendum to an invalid type code
+	a := mockAddenda()
+	a.TypeCode = "63"
+	mockBatch.GetEntries()[0].AddAddenda(a)
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
 func TestBatchCompanyIdentification(t *testing.T) {
 	mockBatch := mockBatchPPD()
 	mockBatch.GetControl().CompanyIdentification = "XYZ Inc"
