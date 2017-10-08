@@ -40,6 +40,22 @@ func TestBatchServiceClassCodeEquality(t *testing.T) {
 	}
 }
 
+func TestBatchPPDCreate(t *testing.T) {
+	mockBatch := mockBatchPPD()
+	// can not have default values in Batch Header to build batch
+	mockBatch.GetHeader().ServiceClassCode = 0
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ServiceClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
 func TestBatchCompanyIdentification(t *testing.T) {
 	mockBatch := mockBatchPPD()
 	mockBatch.GetControl().CompanyIdentification = "XYZ Inc"
