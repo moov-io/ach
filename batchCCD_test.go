@@ -115,6 +115,23 @@ func TestBatchCCDAddendaCount(t *testing.T) {
 		}
 	}
 }
+
+func TestBatchCCDCreate(t *testing.T) {
+	mockBatch := mockBatchCCD()
+	// Batch Header information is required to Create a batch.
+	mockBatch.GetHeader().ServiceClassCode = 0
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ServiceClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
 func TestBatchCCDParam(t *testing.T) {
 
 	batch, _ := NewBatch(BatchParam{
