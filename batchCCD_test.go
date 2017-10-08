@@ -101,6 +101,20 @@ func TestBatchCCDSEC(t *testing.T) {
 	}
 }
 
+func TestBatchCCDAddendaCount(t *testing.T) {
+	mockBatch := mockBatchCCD()
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
+	mockBatch.build()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "AddendaCount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
 func TestBatchCCDParam(t *testing.T) {
 
 	batch, _ := NewBatch(BatchParam{
