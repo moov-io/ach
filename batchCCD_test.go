@@ -1,6 +1,8 @@
 package ach
 
-import "testing"
+import (
+	"testing"
+)
 
 func mockBatchCCDHeader() *BatchHeader {
 	bh := NewBatchHeader()
@@ -97,4 +99,53 @@ func TestBatchCCDSEC(t *testing.T) {
 			t.Errorf("%T: %s", err, err)
 		}
 	}
+}
+
+func TestBatchCCDAddendaCount(t *testing.T) {
+	mockBatch := mockBatchCCD()
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "AddendaCount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+func TestBatchCCDCreate(t *testing.T) {
+	mockBatch := mockBatchCCD()
+	// Batch Header information is required to Create a batch.
+	mockBatch.GetHeader().ServiceClassCode = 0
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ServiceClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+func TestBatchCCDParam(t *testing.T) {
+
+	batch, _ := NewBatch(BatchParam{
+		ServiceClassCode:        "220",
+		CompanyName:             "Your Company, inc",
+		StandardEntryClass:      "CCD",
+		CompanyIdentification:   "123456789",
+		CompanyEntryDescription: "Vndr Pay",
+		CompanyDescriptiveDate:  "Oct 23",
+		ODFIIdentification:      "123456789"})
+
+	_, ok := batch.(*BatchCCD)
+	if !ok {
+		t.Error("Expecting BachCCD")
+	}
+
 }

@@ -55,6 +55,21 @@ func TestEntryParam(t *testing.T) {
 	}
 }
 
+func TestEntryParamPaymentType(t *testing.T) {
+	entry := NewEntryDetail(EntryParam{
+		ReceivingDFI:    "102001017",
+		RDFIAccount:     "5343121",
+		Amount:          "17500",
+		TransactionCode: "27",
+		IDNumber:        "ABC##jvkdjfuiwn",
+		IndividualName:  "Bob Smith",
+		PaymentType:     "R"})
+
+	if err := entry.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
 func TestAddendaParam(t *testing.T) {
 	addenda := NewAddenda(AddendaParam{
 		PaymentRelatedInfo: "Currently string needs ASC X12 Interchange Control Structures",
