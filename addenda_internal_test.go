@@ -133,3 +133,15 @@ func TestAddendaPaymentRelatedInformationAlphaNumeric(t *testing.T) {
 		}
 	}
 }
+
+func TestAddendaTyeCodeNil(t *testing.T) {
+	addenda := mockAddenda()
+	addenda.TypeCode = ""
+	if err := addenda.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}

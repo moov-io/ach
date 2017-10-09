@@ -55,6 +55,35 @@ func TestEntryParam(t *testing.T) {
 	}
 }
 
+func TestEntryParamPaymentType(t *testing.T) {
+	entry := NewEntryDetail(EntryParam{
+		ReceivingDFI:    "102001017",
+		RDFIAccount:     "5343121",
+		Amount:          "17500",
+		TransactionCode: "27",
+		IDNumber:        "ABC##jvkdjfuiwn",
+		IndividualName:  "Bob Smith",
+		PaymentType:     "R"})
+
+	if err := entry.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+func TestEntryParamReceivingCompany(t *testing.T) {
+	entry := NewEntryDetail(EntryParam{
+		ReceivingDFI:     "102001017",
+		RDFIAccount:      "5343121",
+		Amount:           "17500",
+		TransactionCode:  "27",
+		IDNumber:         "location #23",
+		ReceivingCompany: "Best Co. #23"})
+
+	if err := entry.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
 func TestAddendaParam(t *testing.T) {
 	addenda := NewAddenda(AddendaParam{
 		PaymentRelatedInfo: "Currently string needs ASC X12 Interchange Control Structures",
@@ -128,13 +157,13 @@ func TestBuildFileParam(t *testing.T) {
 	// The following is a reoccuring payment for $7.99
 
 	entry = NewEntryDetail(EntryParam{
-		ReceivingDFI:      "102001017",
-		RDFIAccount:       "5343121",
-		Amount:            "799",
-		TransactionCode:   "22",
-		IDNumber:          "#123456",
-		IndividualName:    "Wade Arnold",
-		DiscretionaryData: "R"})
+		ReceivingDFI:    "102001017",
+		RDFIAccount:     "5343121",
+		Amount:          "799",
+		TransactionCode: "22",
+		IDNumber:        "#123456",
+		IndividualName:  "Wade Arnold",
+		PaymentType:     "R"})
 
 	addenda = NewAddenda(AddendaParam{
 		PaymentRelatedInfo: "Monthly Membership Subscription"})

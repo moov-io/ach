@@ -1,6 +1,8 @@
 package ach
 
-import "testing"
+import (
+	"testing"
+)
 
 func mockBatchCCDHeader() *BatchHeader {
 	bh := NewBatchHeader()
@@ -20,7 +22,7 @@ func mockCCDEntryDetail() *EntryDetail {
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 5000000
 	entry.IdentificationNumber = "location #23"
-	entry.IndividualName = "Best Co. #23"
+	entry.SetReceivingCompany("Best Co. #23")
 	entry.TraceNumber = 123456789
 	entry.DiscretionaryData = "S"
 	return entry
@@ -57,7 +59,7 @@ func TestBatchCCDAddendumCount(t *testing.T) {
 func TestBatchCCDReceivingCompanyName(t *testing.T) {
 	mockBatch := mockBatchCCD()
 	// modify the Individual name / receiving company to nothing
-	mockBatch.GetEntries()[0].IndividualName = ""
+	mockBatch.GetEntries()[0].SetReceivingCompany("")
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "IndividualName" {
@@ -97,4 +99,53 @@ func TestBatchCCDSEC(t *testing.T) {
 			t.Errorf("%T: %s", err, err)
 		}
 	}
+}
+
+func TestBatchCCDAddendaCount(t *testing.T) {
+	mockBatch := mockBatchCCD()
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "AddendaCount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+func TestBatchCCDCreate(t *testing.T) {
+	mockBatch := mockBatchCCD()
+	// Batch Header information is required to Create a batch.
+	mockBatch.GetHeader().ServiceClassCode = 0
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ServiceClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+func TestBatchCCDParam(t *testing.T) {
+
+	batch, _ := NewBatch(BatchParam{
+		ServiceClassCode:        "220",
+		CompanyName:             "Your Company, inc",
+		StandardEntryClass:      "CCD",
+		CompanyIdentification:   "123456789",
+		CompanyEntryDescription: "Vndr Pay",
+		CompanyDescriptiveDate:  "Oct 23",
+		ODFIIdentification:      "123456789"})
+
+	_, ok := batch.(*BatchCCD)
+	if !ok {
+		t.Error("Expecting BachCCD")
+	}
+
 }
