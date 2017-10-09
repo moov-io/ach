@@ -129,3 +129,18 @@ func TestBatchWebPaymentType(t *testing.T) {
 		}
 	}
 }
+
+func TestBatchWebCreate(t *testing.T) {
+	mockBatch := mockBatchWEB()
+	// Must have valid batch header to create a batch
+	mockBatch.GetHeader().ServiceClassCode = 63
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "ServiceClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
