@@ -7,6 +7,7 @@ package ach
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 // EntryDetail contains the actual transaction data for an individual entry.
@@ -90,6 +91,7 @@ type EntryParam struct {
 	IndividualName    string `json:"individual_name,omitempty"`
 	ReceivingCompany  string `json:"receiving_company,omitempty"`
 	DiscretionaryData string `json:"discretionary_data,omitempty"`
+	PaymentType       string `json:"payment_type,omitempty"`
 	TransactionCode   string `json:"transaction_code"`
 }
 
@@ -108,7 +110,11 @@ func NewEntryDetail(params ...EntryParam) *EntryDetail {
 		} else {
 			entry.IndividualName = params[0].ReceivingCompany
 		}
-		entry.DiscretionaryData = params[0].DiscretionaryData
+		if params[0].PaymentType != "" {
+			entry.SetPaymentType(params[0].PaymentType)
+		} else {
+			entry.DiscretionaryData = params[0].DiscretionaryData
+		}
 		entry.TransactionCode = entry.parseNumField(params[0].TransactionCode)
 
 		entry.setTraceNumber(entry.RDFIIdentification, 1)
@@ -136,6 +142,7 @@ func (ed *EntryDetail) Parse(record string) {
 	// 55-76 The name of the receiver, usually the name on the bank account
 	ed.IndividualName = record[54:76]
 	// 77-78 allows ODFIs to include codes of significance only to them
+	// For WEB transaction this field is the PaymentType which is either R(reoccurring) or S(single)
 	// normally blank
 	ed.DiscretionaryData = record[76:78]
 	// 79-79 1 if addenda exists 0 if it does not
@@ -278,12 +285,21 @@ func (ed *EntryDetail) DiscretionaryDataField() string {
 	return ed.alphaField(ed.DiscretionaryData, 2)
 }
 
-// PaymentType returns the discretionary data field used in web batch files
-func (ed *EntryDetail) PaymentType() string {
-	if ed.DiscretionaryData == "" {
+// PaymentType returns the discretionary data field used in WEB batch files
+func (ed *EntryDetail) PaymentTypeField() string {
+	// because DiscretionaryData can be changed outside of PaymentType we reset the value for safety
+	ed.SetPaymentType(ed.DiscretionaryData)
+	return ed.DiscretionaryData
+}
+
+// SetPaymentType as R (Reoccuring) all other values will result in S (single)
+func (ed *EntryDetail) SetPaymentType(t string) {
+	t = strings.ToUpper(strings.TrimSpace(t))
+	if t == "R" {
+		ed.DiscretionaryData = "R"
+	} else {
 		ed.DiscretionaryData = "S"
 	}
-	return ed.DiscretionaryDataField()
 }
 
 // TraceNumberField returns a zero padded traceNumber string
