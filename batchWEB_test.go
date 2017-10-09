@@ -21,7 +21,7 @@ func mockWEBEntryDetail() *EntryDetail {
 	entry.Amount = 100000000
 	entry.IndividualName = "Wade Arnold"
 	entry.TraceNumber = 123456789
-	entry.DiscretionaryData = "S"
+	entry.SetPaymentType("S")
 	return entry
 }
 
@@ -122,6 +122,21 @@ func TestBatchWebPaymentType(t *testing.T) {
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "PaymentType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+func TestBatchWebCreate(t *testing.T) {
+	mockBatch := mockBatchWEB()
+	// Must have valid batch header to create a batch
+	mockBatch.GetHeader().ServiceClassCode = 63
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "ServiceClassCode" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {

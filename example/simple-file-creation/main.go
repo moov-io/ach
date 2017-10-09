@@ -71,13 +71,13 @@ func main() {
 	// The following is a reoccuring payment for $7.99
 
 	entry2 := ach.NewEntryDetail(ach.EntryParam{
-		ReceivingDFI:      "102001017",
-		RDFIAccount:       "5343121",
-		Amount:            "799",
-		TransactionCode:   "22",
-		IDNumber:          "#123456",
-		IndividualName:    "Wade Arnold",
-		DiscretionaryData: "R"})
+		ReceivingDFI:    "102001017",
+		RDFIAccount:     "5343121",
+		Amount:          "799",
+		TransactionCode: "22",
+		IDNumber:        "#123456",
+		IndividualName:  "Wade Arnold",
+		PaymentType:     "R"})
 
 	addenda2 := ach.NewAddenda(ach.AddendaParam{
 		PaymentRelatedInfo: "Monthly Membership Subscription"})

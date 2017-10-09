@@ -79,8 +79,8 @@ func (batch *BatchWEB) Create() error {
 // "S" For a Single-Entry WEB Entry
 func (batch *BatchWEB) isPaymentTypeCode() error {
 	for _, entry := range batch.entries {
-		if !strings.Contains(strings.ToUpper(entry.PaymentType()), "S") && !strings.Contains(strings.ToUpper(entry.PaymentType()), "R") {
-			msg := fmt.Sprintf(msgBatchWebPaymentType, entry.PaymentType())
+		if !strings.Contains(strings.ToUpper(entry.PaymentTypeField()), "S") && !strings.Contains(strings.ToUpper(entry.PaymentTypeField()), "R") {
+			msg := fmt.Sprintf(msgBatchWebPaymentType, entry.PaymentTypeField())
 			return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "PaymentType", Msg: msg}
 		}
 	}
