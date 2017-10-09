@@ -280,6 +280,10 @@ func (ed *EntryDetail) ReceivingCompanyField() string {
 	return ed.IndividualNameField()
 }
 
+func (ed *EntryDetail) SetReceivingCompany(s string) {
+	ed.IndividualName = s
+}
+
 // DiscretionaryDataField returns a space padded string of DiscretionaryData
 func (ed *EntryDetail) DiscretionaryDataField() string {
 	return ed.alphaField(ed.DiscretionaryData, 2)

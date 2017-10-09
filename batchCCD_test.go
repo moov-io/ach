@@ -22,7 +22,7 @@ func mockCCDEntryDetail() *EntryDetail {
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 5000000
 	entry.IdentificationNumber = "location #23"
-	entry.IndividualName = "Best Co. #23"
+	entry.SetReceivingCompany("Best Co. #23")
 	entry.TraceNumber = 123456789
 	entry.DiscretionaryData = "S"
 	return entry
@@ -59,7 +59,7 @@ func TestBatchCCDAddendumCount(t *testing.T) {
 func TestBatchCCDReceivingCompanyName(t *testing.T) {
 	mockBatch := mockBatchCCD()
 	// modify the Individual name / receiving company to nothing
-	mockBatch.GetEntries()[0].IndividualName = ""
+	mockBatch.GetEntries()[0].SetReceivingCompany("")
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "IndividualName" {
