@@ -7,7 +7,6 @@ package ach
 import (
 	"fmt"
 	"strconv"
-	"strings"
 )
 
 // EntryDetail contains the actual transaction data for an individual entry.
@@ -74,8 +73,10 @@ type EntryDetail struct {
 	// with an entry or item rather than a physical record.
 	TraceNumber int
 
-	// Addendum a list of Addenda for the Entry Detail
-	Addendum []Addenda
+	// Addendum a list of Addenda for the Entry
+	// keeping separarte lists for different types of addenda...
+	Addendum       []Addenda
+	ReturnAddendum []ReturnAddenda
 	// validator is composed for data validation
 	validator
 	// converters is composed for ACH to golang Converters
@@ -91,7 +92,6 @@ type EntryParam struct {
 	IndividualName    string `json:"individual_name,omitempty"`
 	ReceivingCompany  string `json:"receiving_company,omitempty"`
 	DiscretionaryData string `json:"discretionary_data,omitempty"`
-	PaymentType       string `json:"payment_type,omitempty"`
 	TransactionCode   string `json:"transaction_code"`
 }
 
@@ -110,11 +110,7 @@ func NewEntryDetail(params ...EntryParam) *EntryDetail {
 		} else {
 			entry.IndividualName = params[0].ReceivingCompany
 		}
-		if params[0].PaymentType != "" {
-			entry.SetPaymentType(params[0].PaymentType)
-		} else {
-			entry.DiscretionaryData = params[0].DiscretionaryData
-		}
+		entry.DiscretionaryData = params[0].DiscretionaryData
 		entry.TransactionCode = entry.parseNumField(params[0].TransactionCode)
 
 		entry.setTraceNumber(entry.RDFIIdentification, 1)
@@ -142,7 +138,6 @@ func (ed *EntryDetail) Parse(record string) {
 	// 55-76 The name of the receiver, usually the name on the bank account
 	ed.IndividualName = record[54:76]
 	// 77-78 allows ODFIs to include codes of significance only to them
-	// For WEB transaction this field is the PaymentType which is either R(reoccurring) or S(single)
 	// normally blank
 	ed.DiscretionaryData = record[76:78]
 	// 79-79 1 if addenda exists 0 if it does not
@@ -217,9 +212,11 @@ func (ed *EntryDetail) fieldInclusion() error {
 	if ed.DFIAccountNumber == "" {
 		return &FieldError{FieldName: "DFIAccountNumber", Value: ed.DFIAccountNumber, Msg: msgFieldInclusion}
 	}
-	if ed.Amount == 0 {
-		return &FieldError{FieldName: "Amount", Value: ed.AmountField(), Msg: msgFieldInclusion}
-	}
+	// amount can be 0 if it's COR, should probably be more specific...
+	/*
+		if ed.Amount == 0 {
+			return &FieldError{FieldName: "Amount", Value: ed.AmountField(), Msg: msgFieldInclusion}
+		}*/
 	if ed.IndividualName == "" {
 		return &FieldError{FieldName: "IndividualName", Value: ed.IndividualName, Msg: msgFieldInclusion}
 	}
@@ -232,8 +229,23 @@ func (ed *EntryDetail) fieldInclusion() error {
 // AddAddenda appends an EntryDetail to the Addendum
 func (ed *EntryDetail) AddAddenda(addenda Addenda) []Addenda {
 	ed.AddendaRecordIndicator = 1
+	// checks to make sure that we only have either or, not both
+	if ed.ReturnAddendum != nil {
+		return nil
+	}
 	ed.Addendum = append(ed.Addendum, addenda)
 	return ed.Addendum
+}
+
+// AddReturnAddenda appends an ReturnAddendum to the entry
+func (ed *EntryDetail) AddReturnAddenda(returnAddendum ReturnAddenda) []ReturnAddenda {
+	ed.AddendaRecordIndicator = 1
+	// checks to make sure that we only have either or, not both
+	if ed.Addendum != nil {
+		return nil
+	}
+	ed.ReturnAddendum = append(ed.ReturnAddendum, returnAddendum)
+	return ed.ReturnAddendum
 }
 
 // SetRDFI takes the 9 digit RDFI account number and separates it for RDFIIdentification and CheckDigit
@@ -280,33 +292,25 @@ func (ed *EntryDetail) ReceivingCompanyField() string {
 	return ed.IndividualNameField()
 }
 
-func (ed *EntryDetail) SetReceivingCompany(s string) {
-	ed.IndividualName = s
-}
-
 // DiscretionaryDataField returns a space padded string of DiscretionaryData
 func (ed *EntryDetail) DiscretionaryDataField() string {
 	return ed.alphaField(ed.DiscretionaryData, 2)
 }
 
-// PaymentType returns the discretionary data field used in WEB batch files
-func (ed *EntryDetail) PaymentTypeField() string {
-	// because DiscretionaryData can be changed outside of PaymentType we reset the value for safety
-	ed.SetPaymentType(ed.DiscretionaryData)
-	return ed.DiscretionaryData
-}
-
-// SetPaymentType as R (Reoccuring) all other values will result in S (single)
-func (ed *EntryDetail) SetPaymentType(t string) {
-	t = strings.ToUpper(strings.TrimSpace(t))
-	if t == "R" {
-		ed.DiscretionaryData = "R"
-	} else {
+// PaymentType returns the discretionary data field used in web batch files
+func (ed *EntryDetail) PaymentType() string {
+	if ed.DiscretionaryData == "" {
 		ed.DiscretionaryData = "S"
 	}
+	return ed.DiscretionaryDataField()
 }
 
 // TraceNumberField returns a zero padded traceNumber string
 func (ed *EntryDetail) TraceNumberField() string {
 	return ed.numericField(ed.TraceNumber, 15)
+}
+
+// HasReturnAddenda returns true if entry has return addenda
+func (ed *EntryDetail) HasReturnAddenda() bool {
+	return ed.ReturnAddendum != nil
 }

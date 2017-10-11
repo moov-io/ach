@@ -30,6 +30,9 @@ const (
 // currently supported SEC codes
 const (
 	ppd = "PPD"
+	web = "WEB"
+	ccd = "CCD"
+	cor = "COR"
 )
 
 // Errors strings specific to parsing a Batch container

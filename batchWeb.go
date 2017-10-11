@@ -12,10 +12,6 @@ type BatchWEB struct {
 	batch
 }
 
-var (
-	msgBatchWebPaymentType = "%v is not a valid payment type S (single entry) or R (recurring)"
-)
-
 // NewBatchWEB returns a *BatchWEB
 func NewBatchWEB(params ...BatchParam) *BatchWEB {
 	batch := new(BatchWEB)
@@ -79,8 +75,8 @@ func (batch *BatchWEB) Create() error {
 // "S" For a Single-Entry WEB Entry
 func (batch *BatchWEB) isPaymentTypeCode() error {
 	for _, entry := range batch.entries {
-		if !strings.Contains(strings.ToUpper(entry.PaymentTypeField()), "S") && !strings.Contains(strings.ToUpper(entry.PaymentTypeField()), "R") {
-			msg := fmt.Sprintf(msgBatchWebPaymentType, entry.PaymentTypeField())
+		if !strings.Contains(strings.ToUpper(entry.PaymentType()), "S") && !strings.Contains(strings.ToUpper(entry.PaymentType()), "R") {
+			msg := fmt.Sprintf(msgBatchWebPaymentType, entry.PaymentType())
 			return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "PaymentType", Msg: msg}
 		}
 	}

@@ -20,6 +20,8 @@ func NewBatch(bp BatchParam) (Batcher, error) {
 		return NewBatchWEB(bp), nil
 	case "CCD":
 		return NewBatchCCD(bp), nil
+	case "COR":
+		return NewBatchCOR(bp), nil
 	default:
 		msg := fmt.Sprintf(msgFileNoneSEC, sec)
 		return nil, &FileError{FieldName: "StandardEntryClassCode", Msg: msg}
@@ -323,9 +325,16 @@ func (batch *batch) isAddendaSequence() error {
 // "PPD", "WEB", "CCD", "CIE", "DNE", "MTE", "POS", "SHR"
 func (batch *batch) isAddendaCount(count int) error {
 	for _, entry := range batch.entries {
-		if len(entry.Addendum) > count {
-			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), count, batch.header.StandardEntryClassCode)
-			return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+		if !entry.HasReturnAddenda() {
+			if len(entry.Addendum) > count {
+				msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), count, batch.header.StandardEntryClassCode)
+				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+			}
+		} else {
+			if len(entry.ReturnAddendum) > count {
+				msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.ReturnAddendum), count, batch.header.StandardEntryClassCode)
+				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "ReturnAddendaCount", Msg: msg}
+			}
 		}
 	}
 	return nil
