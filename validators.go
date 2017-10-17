@@ -107,6 +107,8 @@ func (v *validator) isTransactionCode(code int) error {
 		23,
 		// Zero dollar with remittance data (CCD/CTX only)
 		24,
+		// Automated Return or Notification of Change for original transaction code 27, 28, or 29
+		26,
 		// Debit (withdrawal) to checking account ‘27’
 		27,
 		// Prenote for debit to checking account ‘28’
