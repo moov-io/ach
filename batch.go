@@ -187,7 +187,7 @@ func (batch *batch) isFieldInclusion() error {
 func (batch *batch) isBatchEntryCount() error {
 	entryCount := 0
 	for _, entry := range batch.entries {
-		entryCount = entryCount + 1 + len(entry.Addendum)
+		entryCount = entryCount + 1 + len(entry.Addendum) + len(entry.ReturnAddendum)
 	}
 	if entryCount != batch.control.EntryAddendaCount {
 		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, entryCount, batch.control.EntryAddendaCount)
@@ -215,18 +215,10 @@ func (batch *batch) isBatchAmount() error {
 
 func (batch *batch) calculateBatchAmounts() (credit int, debit int) {
 	for _, entry := range batch.entries {
-		if entry.TransactionCode == 22 || entry.TransactionCode == 23 {
+		if entry.TransactionCode == 21 || entry.TransactionCode == 22 || entry.TransactionCode == 23 || entry.TransactionCode == 32 || entry.TransactionCode == 33 {
 			credit = credit + entry.Amount
 		}
-		if entry.TransactionCode == 27 || entry.TransactionCode == 28 {
-			debit = debit + entry.Amount
-		}
-		// savings credit
-		if entry.TransactionCode == 32 || entry.TransactionCode == 33 {
-			credit = credit + entry.Amount
-		}
-		// savings debit
-		if entry.TransactionCode == 37 || entry.TransactionCode == 38 {
+		if entry.TransactionCode == 26 || entry.TransactionCode == 27 || entry.TransactionCode == 28 || entry.TransactionCode == 37 || entry.TransactionCode == 38 {
 			debit = debit + entry.Amount
 		}
 	}
