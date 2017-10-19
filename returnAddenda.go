@@ -1,23 +1,43 @@
 package ach
 
-// written
-
 import (
 	"strings"
 	"time"
 )
 
-// ReturnAddenda utilized for COR return types.
+// When a Return Entry is prepared, the original Company/Batch Header Record, the original Entry Detail Record,
+// and the Company/Batch Control Record are copied for return to the Originator.
+//
+// The Return Entry is a new Entry. These Entries must be assigned new batch and trace numbers, new identification numbers for the returning institution,
+// appropriate transaction codes, etc., as required per format specifications.
+//
+// See Appendix Four: Return Entries in the NACHA Corporate
+
+var (
+	returnCodeDict = map[string]*returnCode{}
+
+	// Error messages specific to Return Addenda
+	msgReturnAddendaReturnCode = "found is not a valid return code"
+)
+
+func init() {
+	// populate the returnCode map with lookup values
+	returnCodeDict = makeReturnCodeDict()
+}
+
+// ReturnAddenda utilized for Notification of Change Entry (COR) and Return types.
 type ReturnAddenda struct {
 	// RecordType defines the type of record in the block. entryAddendaPos 7
 	recordType string
 	// TypeCode Addenda types code '99'
 	TypeCode string
-
-	ReturnCode         string
-	OriginalTrace      int
-	DateOfDeath        time.Time
-	OriginalDFI        string
+	// ReturnCode (Return Reason / Change Code) must exist in returnCodeDict
+	ReturnCode    string
+	OriginalTrace int
+	// DateOfDeath or Reserved holds date can be null for COR
+	DateOfDeath time.Time
+	OriginalDFI string
+	// AddendaInformation or Corrected Data
 	AddendaInformation string
 	Trace              int
 
@@ -25,6 +45,22 @@ type ReturnAddenda struct {
 	validator
 	// converters is composed for ACH to GoLang Converters
 	converters
+}
+
+// returnCode holds a return Code, Reason/Title, and Description
+//
+// Table of return codes exists in Part 4.2 of the NACHA corporate rules and guidelines
+type returnCode struct {
+	Code, Reason, Description string
+}
+
+// NewReturnAddenda returns a new ReturnAddenda with default values for none exported fields
+func NewReturnAddenda(params ...AddendaParam) ReturnAddenda {
+	rAddenda := ReturnAddenda{
+		recordType: "7",
+		TypeCode:   "99",
+	}
+	return rAddenda
 }
 
 // Parse takes the input record string and parses the ReturnAddenda values
@@ -48,12 +84,62 @@ func (returnAddenda *ReturnAddenda) Parse(record string) {
 	returnAddenda.Trace = returnAddenda.parseNumField(record[79:94])
 }
 
-// TODO: implement later
+// Validate verifies NACHA rules for ReturnAddenda
 func (returnAddenda *ReturnAddenda) Validate() error {
+	println(len(returnCodeDict))
+	_, ok := returnCodeDict[returnAddenda.ReturnCode]
+	if !ok {
+		// Return Addenda requires a valid ReturnCode
+		return &FieldError{FieldName: "ReturnCode", Value: returnAddenda.ReturnCode, Msg: msgReturnAddendaReturnCode}
+	}
 	return nil
 }
 
-// TODO: implement later
-func (returnAddenda *ReturnAddenda) convertDateOfDeath() error {
-	return nil
+func makeReturnCodeDict() map[string]*returnCode {
+	dict := make(map[string]*returnCode)
+
+	codes := []returnCode{
+		// Return Reason Codes for RDFIs
+		{"R01", "Insufficient Funds", "Available balance is not sufficient to cover the dollar value of the debit entry"},
+		{"R02", "Account Closed", "Previously active account has been closed by customer or RDFI"},
+		{"R03", "No Account/Unable to Locate Account", "Account number structure is valid and passes editing process, but does not correspond to individual or is not an open account"},
+		{"R04", "Invalid Account Number", "Account number structure not valid; entry may fail check digit validation or may contain an incorrect number of digits."},
+		{"R05", "Improper Debit to Consumer Account", "A CCD, CTX, or CBR debit entry was transmitted to a Consumer Account of the Receiver and was not authorized by the Receiver"},
+		{"R06", "Returned per ODFI's Request", "ODFI has requested RDFI to return the ACH entry (optional to RDFI - ODFI indemnifies RDFI)}"},
+		{"R07", "Authorization Revoked by Customer", "Consumer, who previously authorized ACH payment, has revoked authorization from Originator (must be returned no later than 60 days from settlement date and customer must sign affidavit)"},
+		{"R08", "Payment Stopped", "Receiver of a recurring debit transaction has stopped payment to a specific ACH debit. RDFI should verify the Receiver's intent when a request for stop payment is made to insure this is not intended to be a revocation of authorization"},
+		{"R09", "Uncollected Funds", "Sufficient book or ledger balance exists to satisfy dollar value of the transaction, but the dollar value of transaction is in process of collection (i.e., uncollected checks) or cash reserve balance below dollar value of the debit entry."},
+		{"R10", "Customer Advises Not Authorized", "Consumer has advised RDFI that Originator of transaction is not authorized to debit account (must be returned no later than 60 days from settlement date of original entry and customer must sign affidavit)."},
+		{"R11", "Check Truncation Entry Returned", "Used when returning a check safekeeping entry; RDFI should use appropriate field in addenda record to specify reason for return (i.e., 'exceeds dollar limit,' 'stale date,' etc.)."},
+		{"R12", "Branch Sold to Another DFI", "Financial institution receives entry destined for an account at a branch that has been sold to another financial institution."},
+		{"R13", "RDFI not qualified to participate", "Financial institution does not receive commercial ACH entries"},
+		{"R14", "Representative payee deceased or unable to continue in that capacity", "The representative payee authorized to accept entries on behalf of a beneficiary is either deceased or unable to continue in that capacity"},
+		{"R15", "Beneficiary or bank account holder", "(Other than representative payee) deceased* - (1) the beneficiary entitled to payments is deceased or (2) the bank account holder other than a representative payee is deceased"},
+		{"R16", "Bank account frozen", "Funds in bank account are unavailable due to action by RDFI or legal order"},
+		{"R17", "File record edit criteria", "Fields rejected by RDFI processing (identified in return addenda)"},
+		{"R18", "Improper effective entry date", "Entries have been presented prior to the first available processing window for the effective date."},
+		{"R19", "Amount field error", "Improper formatting of the amount field"},
+		{"R20", "Non-payment bank account", "Entry destined for non-payment bank account defined by reg."},
+		{"R21", "Invalid company ID number", "The company ID information not valid (normally CIE entries)"},
+		{"R22", "Invalid individual ID number", "Individual id used by receiver is incorrect (CIE entries)"},
+		{"R23", "Credit entry refused by receiver", "Receiver returned entry because minimum or exact amount not remitted, bank account is subject to litigation, or payment represents an overpayment, originator is not known to receiver or receiver has not authorized this credit entry to this bank account"},
+		{"R24", "Duplicate entry", "RDFI has received a duplicate entry"},
+		{"R25", "Addenda error", "Improper formatting of the addenda record information"},
+		{"R26", "Mandatory field error", "Improper information in one of the mandatory fields"},
+		{"R27", "Trace number error", "Original entry trace number is not valid for return entry; or addenda trace numbers do not correspond with entry detail record"},
+		{"R28", "Transit routing number check digit error", "Check digit for the transit routing number is incorrect"},
+		{"R29", "Corporate customer advises not authorized", "RDFI has bee notified by corporate receiver that debit entry of originator is not authorized"},
+		{"R30", "RDFI not participant in check truncation program", "Financial institution not participating in automated check safekeeping application"},
+		{"R31", "Permissible return entry (CCD and CTX only)", "RDFI has been notified by the ODFI that it agrees to accept a CCD or CTX return entry"},
+		{"R32", "RDFI non-settlement", "RDFI is not able to settle the entry"},
+		{"R33", "Return of XCK entry", "RDFI determines at its sole discretion to return an XCK entry; an XCK return entry may be initiated by midnight of the sixtieth day following the settlement date if the XCK entry"},
+		{"R34", "Limited participation RDFI", "RDFI participation has been limited by a federal or state supervisor"},
+		{"R35", "Return of improper debit entry", "ACH debit not permitted for use with the CIE standard entry class code (except for reversals)"},
+		// More return codes will be added when more SEC types are added to the library.
+	}
+	// populate the map
+	for _, code := range codes {
+		dict[code.Code] = &code
+	}
+	return dict
 }
