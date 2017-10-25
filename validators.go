@@ -107,6 +107,8 @@ func (v *validator) isTransactionCode(code int) error {
 		23,
 		// Zero dollar with remittance data (CCD/CTX only)
 		24,
+		// Automated Return or Notification of Change for original transaction code 27, 28, or 29
+		26,
 		// Debit (withdrawal) to checking account ‘27’
 		27,
 		// Prenote for debit to checking account ‘28’
@@ -162,7 +164,6 @@ func (v *validator) isAlphanumeric(s string) error {
 }
 
 // isOriginatorStatusCode ensures status code is valid
-/*
 func (v *validator) isCheckDigit(routingNumber string, checkDigit int) error {
 	calculated := v.CalculateCheckDigit(routingNumber)
 	if calculated != checkDigit {
@@ -172,7 +173,6 @@ func (v *validator) isCheckDigit(routingNumber string, checkDigit int) error {
 	}
 	return nil
 }
-*/
 
 // CalculateCheckDigit returns a check digit for a rounting number
 // Multiply each digit in the Routing number by a weighting factor. The weighting factors for each digit are:

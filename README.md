@@ -117,7 +117,7 @@ Add an entry and define if it is a single or reoccurring payment. The following 
 		TransactionCode:   "22",
 		IDNumber:          "#123456",
 		IndividualName:    "Wade Arnold",
-		PaymentType: 		"R"})
+		DiscretionaryData: "R"})
 
 	addenda2 := ach.NewAddenda(ach.AddendaParam{
 		PaymentRelatedInfo: "Monthly Membership Subscription"})

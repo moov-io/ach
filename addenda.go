@@ -1,9 +1,14 @@
 package ach
 
 import (
+	"flag"
 	"fmt"
 	"strings"
 )
+
+func init() {
+	flag.Lookup("alsologtostderr").Value.Set("true")
+}
 
 // Addenda provides business transaction information in a machine
 // readable format. It is usually formatted according to ANSI, ASC, X12 Standard
@@ -63,7 +68,6 @@ func (addenda *Addenda) Parse(record string) {
 	addenda.SequenceNumber = addenda.parseNumField(record[83:87])
 	// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
 	addenda.EntryDetailSequenceNumber = addenda.parseNumField(record[87:94])
-
 }
 
 // String writes the Addenda struct to a 94 character string.
