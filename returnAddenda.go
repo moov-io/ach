@@ -1,6 +1,7 @@
 package ach
 
 import (
+	"fmt"
 	"strings"
 	"time"
 )
@@ -31,15 +32,21 @@ type ReturnAddenda struct {
 	recordType string
 	// TypeCode Addenda types code '99'
 	TypeCode string
-	// ReturnCode (Return Reason / Change Code) must exist in returnCodeDict
-	ReturnCode    string
+	// ReturnCode field contains a standard code used by an ACH Operator or RDFI to describe the reason for returning an Entry.
+	// Must exist in returnCodeDict
+	ReturnCode string
+	// OriginalTrace This field contains the Trace Number as originally included on the forward Entry or Prenotification.
+	// The RDFI must include the Original Entry Trace Number in the Addenda Record of an Entry being returned to an ODFI,
+	// in the Addenda Record of an NOC, within an Acknowledgment Entry, or with an RDFI request for a copy of an authorization.
 	OriginalTrace int
-	// DateOfDeath or Reserved holds date can be null for COR
+	// DateOfDeath The field date of death is to be supplied on Entries being returned for reason of death (return reason codes R14 and R15).
 	DateOfDeath time.Time
-	OriginalDFI string
-	// AddendaInformation or Corrected Data
+	// OriginalDFI field contains the Receiving DFI Identification (addenda.RDFIIdentification) as originally included on the forward Entry or Prenotification that the RDFI is returning or correcting.
+	OriginalDFI int
+	// AddendaInformation
 	AddendaInformation string
-	Trace              int
+	// TraceNumber matches the Entry Detail Trace Number of the entry being returned.
+	TraceNumber int
 
 	// validator is composed for data validation
 	validator
@@ -75,24 +82,73 @@ func (returnAddenda *ReturnAddenda) Parse(record string) {
 	returnAddenda.OriginalTrace = returnAddenda.parseNumField(record[6:21])
 	// 22-27, might be a date or blank
 	returnAddenda.DateOfDeath = returnAddenda.parseSimpleDate(record[21:27])
-
 	// 28-35
-	returnAddenda.OriginalDFI = record[27:35]
+	returnAddenda.OriginalDFI = returnAddenda.parseNumField(record[27:35])
 	// 36-79
 	returnAddenda.AddendaInformation = strings.TrimSpace(record[35:79])
 	// 80-94
-	returnAddenda.Trace = returnAddenda.parseNumField(record[79:94])
+	returnAddenda.TraceNumber = returnAddenda.parseNumField(record[79:94])
+}
+
+// String writes the ReturnAddenda struct to a 94 character string
+func (returnAddenda *ReturnAddenda) String() string {
+	return fmt.Sprintf("%v%v%v%v%v%v%v%v",
+		returnAddenda.recordType,
+		returnAddenda.TypeCode,
+		returnAddenda.ReturnCode,
+		returnAddenda.OriginalTraceField(),
+		returnAddenda.DateOfDeathField(),
+		returnAddenda.OriginalDFIField(),
+		returnAddenda.AddendaInformationField(),
+		returnAddenda.TraceNumberField(),
+	)
 }
 
 // Validate verifies NACHA rules for ReturnAddenda
 func (returnAddenda *ReturnAddenda) Validate() error {
-	println(len(returnCodeDict))
+
+	if returnAddenda.recordType != "7" {
+		msg := fmt.Sprintf(msgRecordType, 7)
+		return &FieldError{FieldName: "recordType", Value: returnAddenda.recordType, Msg: msg}
+	}
+	// @TODO Type Code should be 99.
+
 	_, ok := returnCodeDict[returnAddenda.ReturnCode]
 	if !ok {
 		// Return Addenda requires a valid ReturnCode
 		return &FieldError{FieldName: "ReturnCode", Value: returnAddenda.ReturnCode, Msg: msgReturnAddendaReturnCode}
 	}
 	return nil
+}
+
+// OriginalTraceField returns a zero padded OriginalTrace string
+func (returnAddenda *ReturnAddenda) OriginalTraceField() string {
+	return returnAddenda.numericField(returnAddenda.OriginalTrace, 15)
+}
+
+// DateOfDeathField returns a space padded DateOfDeath string
+func (returnAddenda *ReturnAddenda) DateOfDeathField() string {
+	// Return space padded 6 characters if it is a zero value of DateOfDeath
+	if returnAddenda.DateOfDeath.IsZero() {
+		return returnAddenda.alphaField("", 6)
+	}
+	// YYMMDD
+	return returnAddenda.formatSimpleDate(returnAddenda.DateOfDeath)
+}
+
+// OriginalDFIField returns a zero padded OriginalDFI string
+func (returnAddenda *ReturnAddenda) OriginalDFIField() string {
+	return returnAddenda.numericField(returnAddenda.OriginalDFI, 8)
+}
+
+//AddendaInformationField returns a space padded AddendaInformation string
+func (returnAddenda *ReturnAddenda) AddendaInformationField() string {
+	return returnAddenda.alphaField(returnAddenda.AddendaInformation, 44)
+}
+
+// TraceNumberField returns a zero padded traceNumber string
+func (returnAddenda *ReturnAddenda) TraceNumberField() string {
+	return returnAddenda.numericField(returnAddenda.TraceNumber, 15)
 }
 
 func makeReturnCodeDict() map[string]*returnCode {
