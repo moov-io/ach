@@ -76,6 +76,8 @@ type EntryDetail struct {
 
 	// Addendum a list of Addenda for the Entry Detail
 	Addendum []Addenda
+	// ReturnAddendum stores COR sec return types. These are processed separately
+	ReturnAddendum []ReturnAddenda
 	// validator is composed for data validation
 	validator
 	// converters is composed for ACH to golang Converters
@@ -217,9 +219,10 @@ func (ed *EntryDetail) fieldInclusion() error {
 	if ed.DFIAccountNumber == "" {
 		return &FieldError{FieldName: "DFIAccountNumber", Value: ed.DFIAccountNumber, Msg: msgFieldInclusion}
 	}
-	if ed.Amount == 0 {
+	// TODO: amount can be 0 if it's COR, should probably be more specific...
+	/*if ed.Amount == 0 {
 		return &FieldError{FieldName: "Amount", Value: ed.AmountField(), Msg: msgFieldInclusion}
-	}
+	}*/
 	if ed.IndividualName == "" {
 		return &FieldError{FieldName: "IndividualName", Value: ed.IndividualName, Msg: msgFieldInclusion}
 	}
@@ -232,8 +235,23 @@ func (ed *EntryDetail) fieldInclusion() error {
 // AddAddenda appends an EntryDetail to the Addendum
 func (ed *EntryDetail) AddAddenda(addenda Addenda) []Addenda {
 	ed.AddendaRecordIndicator = 1
+	// checks to make sure that we only have either or, not both
+	if ed.ReturnAddendum != nil {
+		return nil
+	}
 	ed.Addendum = append(ed.Addendum, addenda)
 	return ed.Addendum
+}
+
+// AddReturnAddenda appends an ReturnAddendum to the entry
+func (ed *EntryDetail) AddReturnAddenda(returnAddendum ReturnAddenda) []ReturnAddenda {
+	ed.AddendaRecordIndicator = 1
+	// checks to make sure that we only have either or, not both
+	if ed.Addendum != nil {
+		return nil
+	}
+	ed.ReturnAddendum = append(ed.ReturnAddendum, returnAddendum)
+	return ed.ReturnAddendum
 }
 
 // SetRDFI takes the 9 digit RDFI account number and separates it for RDFIIdentification and CheckDigit
@@ -280,6 +298,7 @@ func (ed *EntryDetail) ReceivingCompanyField() string {
 	return ed.IndividualNameField()
 }
 
+// SetReceivingCompany setter for CCD receiving company individual name
 func (ed *EntryDetail) SetReceivingCompany(s string) {
 	ed.IndividualName = s
 }
@@ -289,7 +308,7 @@ func (ed *EntryDetail) DiscretionaryDataField() string {
 	return ed.alphaField(ed.DiscretionaryData, 2)
 }
 
-// PaymentType returns the discretionary data field used in WEB batch files
+// PaymentTypeField returns the discretionary data field used in WEB batch files
 func (ed *EntryDetail) PaymentTypeField() string {
 	// because DiscretionaryData can be changed outside of PaymentType we reset the value for safety
 	ed.SetPaymentType(ed.DiscretionaryData)
@@ -309,4 +328,9 @@ func (ed *EntryDetail) SetPaymentType(t string) {
 // TraceNumberField returns a zero padded traceNumber string
 func (ed *EntryDetail) TraceNumberField() string {
 	return ed.numericField(ed.TraceNumber, 15)
+}
+
+// HasReturnAddenda returns true if entry has return addenda
+func (ed *EntryDetail) HasReturnAddenda() bool {
+	return ed.ReturnAddendum != nil
 }
