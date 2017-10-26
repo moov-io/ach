@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-// BatchCOR COR - Automated Notification of Change or Refused Notification of Change
+// BatchCOR COR - Automated Notification of Change (NOC) or Refused Notification of Change
 // This Standard Entry Class Code is used by an RDFI or ODFI when originating a Notification of Change or Refused Notification of Change in automated format.
 // It is also used by the ACH operator that converts paper Notifications of Change to automated format.
 type BatchCOR struct {
@@ -48,6 +48,8 @@ func (batch *BatchCOR) Validate() error {
 		msg := fmt.Sprintf(msgBatchSECType, batch.header.StandardEntryClassCode, "COR")
 		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
+
+	// TODO check that addenda is type AddendaNOC
 
 	return nil
 }

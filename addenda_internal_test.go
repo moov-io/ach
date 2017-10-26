@@ -9,8 +9,9 @@ import (
 	"testing"
 )
 
-func mockAddenda() Addenda {
-	addenda := NewAddenda()
+func mockAddenda() *Addenda {
+	a, _ := NewAddenda()
+	addenda := a.(*Addenda)
 	addenda.EntryDetailSequenceNumber = 1234567
 	return addenda
 }
@@ -26,7 +27,7 @@ func TestMockAddenda(t *testing.T) {
 }
 
 func TestParseAddenda(t *testing.T) {
-	var line = "710WEB                                        DIEGO MAY                            00010000001"
+	var line = "705WEB                                        DIEGO MAY                            00010000001"
 
 	r := NewReader(strings.NewReader(line))
 	r.addCurrentBatch(NewBatchPPD())
@@ -37,13 +38,13 @@ func TestParseAddenda(t *testing.T) {
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
-	record := r.currentBatch.GetEntries()[0].Addendum[0]
+	record := r.currentBatch.GetEntries()[0].Addendum[0].(*Addenda)
 
 	if record.recordType != "7" {
 		t.Errorf("RecordType Expected '7' got: %v", record.recordType)
 	}
-	if record.TypeCode != "10" {
-		t.Errorf("TypeCode Expected 10 got: %v", record.TypeCode)
+	if record.TypeCode() != "05" {
+		t.Errorf("TypeCode Expected 10 got: %v", record.TypeCode())
 	}
 	if record.PaymentRelatedInformationField() != "WEB                                        DIEGO MAY                            " {
 		t.Errorf("PaymentRelatedInformation Expected 'WEB                                        DIEGO MAY                            ' got: %v", record.PaymentRelatedInformationField())
@@ -58,7 +59,7 @@ func TestParseAddenda(t *testing.T) {
 
 // TestAddendaString validats that a known parsed file can be return to a string of the same value
 func TestAddendaString(t *testing.T) {
-	var line = "710WEB                                        DIEGO MAY                            00010000001"
+	var line = "705WEB                                        DIEGO MAY                            00010000001"
 	r := NewReader(strings.NewReader(line))
 	r.addCurrentBatch(NewBatchPPD())
 	r.currentBatch.GetHeader().StandardEntryClassCode = "PPD"
@@ -88,7 +89,7 @@ func TestValidateAddendaRecordType(t *testing.T) {
 
 func TestValidateAddendaTypeCode(t *testing.T) {
 	addenda := mockAddenda()
-	addenda.TypeCode = "23"
+	addenda.typeCode = "23"
 	if err := addenda.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -136,7 +137,7 @@ func TestAddendaPaymentRelatedInformationAlphaNumeric(t *testing.T) {
 
 func TestAddendaTyeCodeNil(t *testing.T) {
 	addenda := mockAddenda()
-	addenda.TypeCode = ""
+	addenda.typeCode = ""
 	if err := addenda.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {

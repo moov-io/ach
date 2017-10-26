@@ -84,7 +84,7 @@ func (batch *batch) verify() error {
 	if err := batch.isTraceNumberODFI(); err != nil {
 		return err
 	}
-
+	// TODO this is specific to batch SEC types and should be called by that validator
 	if err := batch.isAddendaSequence(); err != nil {
 		return err
 	}
@@ -110,8 +110,11 @@ func (batch *batch) build() error {
 		seq++
 		addendaSeq := 1
 		for x := range entry.Addendum {
-			batch.entries[i].Addendum[x].SequenceNumber = addendaSeq
-			batch.entries[i].Addendum[x].EntryDetailSequenceNumber = batch.parseNumField(batch.entries[i].TraceNumberField()[8:])
+			// sequences don't exist in NOC or Return addenda
+			if a, ok := batch.entries[i].Addendum[x].(*Addenda); ok {
+				a.SequenceNumber = addendaSeq
+				a.EntryDetailSequenceNumber = batch.parseNumField(batch.entries[i].TraceNumberField()[8:])
+			}
 			addendaSeq++
 		}
 	}
@@ -296,15 +299,19 @@ func (batch *batch) isAddendaSequence() error {
 			lastSeq := -1
 			// check if sequence is assending
 			for _, addenda := range entry.Addendum {
-				if addenda.SequenceNumber < lastSeq {
-					msg := fmt.Sprintf(msgBatchAscending, addenda.SequenceNumber, lastSeq)
-					return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "SequenceNumber", Msg: msg}
-				}
-				lastSeq = addenda.SequenceNumber
-				// check that we are in the correct Entry Detail
-				if !(addenda.EntryDetailSequenceNumberField() == entry.TraceNumberField()[8:]) {
-					msg := fmt.Sprintf(msgBatchAddendaTraceNumber, addenda.EntryDetailSequenceNumberField(), entry.TraceNumberField()[8:])
-					return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
+				// sequences don't exist in NOC or Return addenda
+				if a, ok := addenda.(*Addenda); ok {
+
+					if a.SequenceNumber < lastSeq {
+						msg := fmt.Sprintf(msgBatchAscending, a.SequenceNumber, lastSeq)
+						return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "SequenceNumber", Msg: msg}
+					}
+					lastSeq = a.SequenceNumber
+					// check that we are in the correct Entry Detail
+					if !(a.EntryDetailSequenceNumberField() == entry.TraceNumberField()[8:]) {
+						msg := fmt.Sprintf(msgBatchAddendaTraceNumber, a.EntryDetailSequenceNumberField(), entry.TraceNumberField()[8:])
+						return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
+					}
 				}
 			}
 		}
@@ -336,7 +343,7 @@ func (batch *batch) isAddendaCount(count int) error {
 func (batch *batch) isTypeCode(typeCode string) error {
 	for _, entry := range batch.entries {
 		for _, addenda := range entry.Addendum {
-			if addenda.TypeCode != typeCode {
+			if addenda.TypeCode() != typeCode {
 				msg := fmt.Sprintf(msgBatchTypeCode, addenda.TypeCode, typeCode, batch.header.StandardEntryClassCode)
 				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TypeCode", Msg: msg}
 			}

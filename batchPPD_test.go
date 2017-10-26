@@ -60,7 +60,7 @@ func TestBatchPPDTypeCode(t *testing.T) {
 	mockBatch := mockBatchPPD()
 	// change an addendum to an invalid type code
 	a := mockAddenda()
-	a.TypeCode = "63"
+	a.typeCode = "63"
 	mockBatch.GetEntries()[0].AddAddenda(a)
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
@@ -268,8 +268,8 @@ func TestBatchIsAddendaSeqAscending(t *testing.T) {
 	mockBatch.AddEntry(ed)
 	mockBatch.Create()
 
-	mockBatch.GetEntries()[0].Addendum[0].SequenceNumber = 2
-	mockBatch.GetEntries()[0].Addendum[1].SequenceNumber = 1
+	mockBatch.GetEntries()[0].Addendum[0].(*Addenda).SequenceNumber = 2
+	mockBatch.GetEntries()[0].Addendum[1].(*Addenda).SequenceNumber = 1
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "SequenceNumber" {
@@ -305,7 +305,7 @@ func TestBatchAddendaTraceNumber(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	mockBatch.GetEntries()[0].Addendum[0].EntryDetailSequenceNumber = 99
+	mockBatch.GetEntries()[0].Addendum[0].(*Addenda).EntryDetailSequenceNumber = 99
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TraceNumber" {
@@ -338,7 +338,7 @@ func TestBatchBuild(t *testing.T) {
 	entry.IdentificationNumber = "658-888-2468" // Unique ID for payment
 	entry.IndividualName = "Wade Arnold"
 	entry.setTraceNumber(header.ODFIIdentification, 1)
-	a1 := NewAddenda()
+	a1, _ := NewAddenda()
 	entry.AddAddenda(a1)
 	mockBatch.AddEntry(entry)
 	if err := mockBatch.Create(); err != nil {

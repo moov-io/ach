@@ -75,8 +75,8 @@ type EntryDetail struct {
 	TraceNumber int
 
 	// Addendum a list of Addenda for the Entry Detail
-	Addendum []Addenda
-	// ReturnAddendum stores COR sec return types. These are processed separately
+	Addendum []Addendumer
+	// ReturnAddendum stores return types. These are processed separately
 	ReturnAddendum []ReturnAddenda
 	// validator is composed for data validation
 	validator
@@ -150,7 +150,7 @@ func (ed *EntryDetail) Parse(record string) {
 	// 79-79 1 if addenda exists 0 if it does not
 	ed.AddendaRecordIndicator = ed.parseNumField(record[78:79])
 	// 80-84 An internal identification (alphanumeric) that you use to uniquely identify
-	// this Entry Detail Recor This number should be unique to the transaction and will help identify the transaction in case of an inquiry
+	// this Entry Detail Record This number should be unique to the transaction and will help identify the transaction in case of an inquiry
 	ed.TraceNumber = ed.parseNumField(record[79:94])
 }
 
@@ -232,8 +232,8 @@ func (ed *EntryDetail) fieldInclusion() error {
 	return nil
 }
 
-// AddAddenda appends an EntryDetail to the Addendum
-func (ed *EntryDetail) AddAddenda(addenda Addenda) []Addenda {
+// AddAddenda appends an Addendumer to the EntryDetail
+func (ed *EntryDetail) AddAddenda(addenda Addendumer) []Addendumer {
 	ed.AddendaRecordIndicator = 1
 	// checks to make sure that we only have either or, not both
 	if ed.ReturnAddendum != nil {
