@@ -14,6 +14,7 @@ func mockReturnAddenda() *ReturnAddenda {
 	rAddenda.typeCode = "99"
 	rAddenda.ReturnCode = "R07"
 	rAddenda.AddendaInformation = "Authorization Revoked"
+	rAddenda.OriginalDFI = 9101298
 
 	return rAddenda
 }
@@ -129,7 +130,7 @@ func TestReturnAddendaDateOfDeathField(t *testing.T) {
 
 func TestReturnAddendaOriginalDFIField(t *testing.T) {
 	rAddenda := mockReturnAddenda()
-	exp := "00000000"
+	exp := "09101298"
 	if rAddenda.OriginalDFIField() != exp {
 		t.Errorf("expected %v received %v", exp, rAddenda.OriginalDFIField())
 	}
