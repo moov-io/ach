@@ -54,7 +54,14 @@ type changeCode struct {
 func NewAddendaNOC(params ...AddendaParam) *AddendaNOC {
 	addendaNOC := &AddendaNOC{
 		recordType: "7",
-		typeCode:   "99",
+		typeCode:   "98",
+	}
+	if len(params) > 0 {
+		addendaNOC.ChangeCode = params[0].ChangeCode
+		addendaNOC.OriginalTrace = addendaNOC.parseNumField(params[0].OriginalTrace)
+		addendaNOC.OriginalDFI = addendaNOC.parseNumField(params[0].OriginalDFI)
+		addendaNOC.CorrectedData = params[0].CorrectedData
+		addendaNOC.TraceNumber = addendaNOC.parseNumField(params[0].TraceNumber)
 	}
 	return addendaNOC
 }

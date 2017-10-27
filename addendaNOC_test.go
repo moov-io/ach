@@ -1,6 +1,9 @@
 package ach
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func mockAddendaNOC() *AddendaNOC {
 	aNOC := NewAddendaNOC()
@@ -108,5 +111,43 @@ func TestAddendaNOCTraceNumberField(t *testing.T) {
 	exp := "091012980000088"
 	if aNOC.TraceNumberField() != exp {
 		t.Errorf("expected %v received %v", exp, aNOC.TraceNumberField())
+	}
+}
+
+func TestAddendaNOCNewAddendaParam(t *testing.T) {
+	aParam := AddendaParam{
+		TypeCode:      "98",
+		ChangeCode:    "C01",
+		OriginalTrace: "12345",
+		OriginalDFI:   "9101298",
+		CorrectedData: "1918171614",
+		TraceNumber:   "91012980000088",
+	}
+
+	a, err := NewAddenda(aParam)
+	if err != nil {
+		t.Errorf("AddendaNOC from NewAddenda: %v", err)
+	}
+	aNOC, ok := a.(*AddendaNOC)
+	if !ok {
+		t.Errorf("expecting *AddendaNOC received %T ", a)
+	}
+	if aNOC.TypeCode() != aParam.TypeCode {
+		t.Errorf("expected %v got %v", aParam.TypeCode, aNOC.TypeCode())
+	}
+	if aNOC.ChangeCode != aParam.ChangeCode {
+		t.Errorf("expected %v got %v", aParam.ChangeCode, aNOC.ChangeCode)
+	}
+	if !strings.Contains(aNOC.OriginalTraceField(), aParam.OriginalTrace) {
+		t.Errorf("expected %v got %v", aParam.OriginalTrace, aNOC.OriginalTrace)
+	}
+	if !strings.Contains(aNOC.OriginalDFIField(), aParam.OriginalDFI) {
+		t.Errorf("expected %v got %v", aParam.OriginalDFI, aNOC.OriginalDFI)
+	}
+	if aNOC.CorrectedData != aParam.CorrectedData {
+		t.Errorf("expected %v got %v", aParam.CorrectedData, aNOC.CorrectedData)
+	}
+	if !strings.Contains(aNOC.TraceNumberField(), aParam.TraceNumber) {
+		t.Errorf("expected %v got %v", aParam.TraceNumber, aNOC.TraceNumber)
 	}
 }
