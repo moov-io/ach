@@ -344,7 +344,7 @@ func (batch *batch) isTypeCode(typeCode string) error {
 	for _, entry := range batch.entries {
 		for _, addenda := range entry.Addendum {
 			if addenda.TypeCode() != typeCode {
-				msg := fmt.Sprintf(msgBatchTypeCode, addenda.TypeCode, typeCode, batch.header.StandardEntryClassCode)
+				msg := fmt.Sprintf(msgBatchTypeCode, addenda.TypeCode(), typeCode, batch.header.StandardEntryClassCode)
 				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TypeCode", Msg: msg}
 			}
 		}

@@ -28,13 +28,11 @@ func mockCOREntryDetail() *EntryDetail {
 	return entry
 }
 
-// TODO make a addendaNOC for COR batches
-
 func mockBatchCOR() *BatchCOR {
 	mockBatch := NewBatchCOR()
 	mockBatch.SetHeader(mockBatchCORHeader())
 	mockBatch.AddEntry(mockCOREntryDetail())
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
+	mockBatch.GetEntries()[0].AddAddenda(mockAddendaNOC())
 	if err := mockBatch.Create(); err != nil {
 		panic(err)
 	}
