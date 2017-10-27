@@ -31,7 +31,7 @@ type ReturnAddenda struct {
 	// RecordType defines the type of record in the block. entryAddendaPos 7
 	recordType string
 	// TypeCode Addenda types code '99'
-	TypeCode string
+	typeCode string
 	// ReturnCode field contains a standard code used by an ACH Operator or RDFI to describe the reason for returning an Entry.
 	// Must exist in returnCodeDict
 	ReturnCode string
@@ -62,10 +62,10 @@ type returnCode struct {
 }
 
 // NewReturnAddenda returns a new ReturnAddenda with default values for none exported fields
-func NewReturnAddenda(params ...AddendaParam) ReturnAddenda {
-	rAddenda := ReturnAddenda{
+func NewReturnAddenda(params ...AddendaParam) *ReturnAddenda {
+	rAddenda := &ReturnAddenda{
 		recordType: "7",
-		TypeCode:   "99",
+		typeCode:   "99",
 	}
 	return rAddenda
 }
@@ -75,7 +75,7 @@ func (returnAddenda *ReturnAddenda) Parse(record string) {
 	// 1-1 Always "7"
 	returnAddenda.recordType = "7"
 	// 2-3 Defines the specific explanation and format for the addenda information contained in the same record
-	returnAddenda.TypeCode = record[1:3]
+	returnAddenda.typeCode = record[1:3]
 	// 4-6
 	returnAddenda.ReturnCode = record[3:6]
 	// 7-21
@@ -94,7 +94,7 @@ func (returnAddenda *ReturnAddenda) Parse(record string) {
 func (returnAddenda *ReturnAddenda) String() string {
 	return fmt.Sprintf("%v%v%v%v%v%v%v%v",
 		returnAddenda.recordType,
-		returnAddenda.TypeCode,
+		returnAddenda.TypeCode(),
 		returnAddenda.ReturnCode,
 		returnAddenda.OriginalTraceField(),
 		returnAddenda.DateOfDeathField(),
@@ -119,6 +119,11 @@ func (returnAddenda *ReturnAddenda) Validate() error {
 		return &FieldError{FieldName: "ReturnCode", Value: returnAddenda.ReturnCode, Msg: msgReturnAddendaReturnCode}
 	}
 	return nil
+}
+
+// TypeCode defines the format of the underlying addenda record
+func (returnAddenda *ReturnAddenda) TypeCode() string {
+	return returnAddenda.typeCode
 }
 
 // OriginalTraceField returns a zero padded OriginalTrace string

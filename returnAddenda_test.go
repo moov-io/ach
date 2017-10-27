@@ -9,9 +9,10 @@ import (
 	"time"
 )
 
-func mockReturnAddenda() ReturnAddenda {
+func mockReturnAddenda() *ReturnAddenda {
 	rAddenda := NewReturnAddenda()
-	rAddenda.TypeCode = "R07"
+	rAddenda.typeCode = "99"
+	rAddenda.ReturnCode = "R07"
 	rAddenda.AddendaInformation = "Authorization Revoked"
 
 	return rAddenda
@@ -29,8 +30,8 @@ func TestReturnAddendaParse(t *testing.T) {
 	if rAddenda.recordType != "7" {
 		t.Errorf("expected %v got %v", "7", rAddenda.recordType)
 	}
-	if rAddenda.TypeCode != "99" {
-		t.Errorf("expected %v got %v", "99", rAddenda.TypeCode)
+	if rAddenda.typeCode != "99" {
+		t.Errorf("expected %v got %v", "99", rAddenda.typeCode)
 	}
 	if rAddenda.ReturnCode != "R07" {
 		t.Errorf("expected %v got %v", "R07", rAddenda.ReturnCode)

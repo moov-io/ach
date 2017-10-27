@@ -45,8 +45,7 @@ func NewAddenda(params ...AddendaParam) (Addendumer, error) {
 		}
 		switch typeCode := params[0].TypeCode; typeCode {
 		case "99":
-			return nil, nil
-			//return NewReturnAddenda(), nil
+			return NewReturnAddenda(), nil
 		case "05":
 			addenda := Addenda{
 				recordType:                "7",
