@@ -33,6 +33,14 @@ type Addenda struct {
 type AddendaParam struct {
 	TypeCode           string `json:"type_code,omitempty"`
 	PaymentRelatedInfo string `json:"payment_related_info,omitempty"`
+	TraceNumber        string `json:"trace_number,omitempty"`
+	// Following Fields are used for Return addenda
+	ReturnCode    string `json:"return_code,omitempty"`
+	OriginalTrace string `json:"original_trace,omitempty"`
+	AddendaInfo   string `json:"addenda_info,omitempty"`
+	OriginalDFI   string `json:"original_dfi,omitempty"`
+	// Following fields are used for NOC(notification of change) addenda w/ return fields
+	ChangeCode string `json:"return_code,omitempty"`
 }
 
 // NewAddenda returns a new Addenda with default values for none exported fields
@@ -44,8 +52,6 @@ func NewAddenda(params ...AddendaParam) (Addendumer, error) {
 			params[0].TypeCode = "05"
 		}
 		switch typeCode := params[0].TypeCode; typeCode {
-		case "99":
-			return NewReturnAddenda(), nil
 		case "05":
 			addenda := Addenda{
 				recordType:                "7",
@@ -55,6 +61,10 @@ func NewAddenda(params ...AddendaParam) (Addendumer, error) {
 			}
 			addenda.PaymentRelatedInformation = params[0].PaymentRelatedInfo
 			return &addenda, nil
+		case "98":
+			return NewAddendaNOC(params[0]), nil
+		case "99":
+			return NewReturnAddenda(params[0]), nil
 		default:
 			msg := fmt.Sprintf("Addenda Type Code %v is not supported", typeCode)
 			return nil, &FileError{FieldName: "TypeCode", Msg: msg}

@@ -67,6 +67,13 @@ func NewReturnAddenda(params ...AddendaParam) *ReturnAddenda {
 		recordType: "7",
 		typeCode:   "99",
 	}
+	if len(params) > 0 {
+		rAddenda.ReturnCode = params[0].ReturnCode
+		rAddenda.OriginalTrace = rAddenda.parseNumField(params[0].OriginalTrace)
+		rAddenda.OriginalDFI = rAddenda.parseNumField(params[0].OriginalDFI)
+		rAddenda.AddendaInformation = params[0].AddendaInfo
+		rAddenda.TraceNumber = rAddenda.parseNumField(params[0].TraceNumber)
+	}
 	return rAddenda
 }
 
