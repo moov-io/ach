@@ -10,10 +10,13 @@ import (
 )
 
 func mockAddenda() *Addenda {
-	a, _ := NewAddenda()
-	addenda := a.(*Addenda)
-	addenda.EntryDetailSequenceNumber = 1234567
-	return addenda
+	addenda := Addenda{
+		recordType:                "7",
+		typeCode:                  "05",
+		SequenceNumber:            1,
+		EntryDetailSequenceNumber: 1234567,
+	}
+	return &addenda
 }
 
 func TestMockAddenda(t *testing.T) {
