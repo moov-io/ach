@@ -40,7 +40,7 @@ type AddendaParam struct {
 	AddendaInfo   string `json:"addenda_info,omitempty"`
 	OriginalDFI   string `json:"original_dfi,omitempty"`
 	// Following fields are used for NOC(notification of change) addenda w/ return fields
-	ChangeCode    string `json:"return_code,omitempty"`
+	ChangeCode    string `json:"change_code,omitempty"`
 	CorrectedData string `json:"corrected_data,omitempty"`
 }
 
