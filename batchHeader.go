@@ -99,7 +99,7 @@ type BatchHeader struct {
 func NewBatchHeader(params ...BatchParam) *BatchHeader {
 	bh := &BatchHeader{
 		recordType:           "5",
-		OriginatorStatusCode: 1,
+		OriginatorStatusCode: 0, //Prepared by an Originator
 		BatchNumber:          1,
 	}
 	if len(params) > 0 {
@@ -228,9 +228,6 @@ func (bh *BatchHeader) fieldInclusion() error {
 	}
 	if bh.CompanyEntryDescription == "" {
 		return &FieldError{FieldName: "CompanyEntryDescription", Value: bh.CompanyEntryDescription, Msg: msgFieldInclusion}
-	}
-	if bh.OriginatorStatusCode == 0 {
-		return &FieldError{FieldName: "OriginatorStatusCode", Value: strconv.Itoa(bh.OriginatorStatusCode), Msg: msgFieldInclusion}
 	}
 	if bh.ODFIIdentification == 0 {
 		return &FieldError{FieldName: "ODFIIdentification", Value: bh.ODFIIdentificationField(), Msg: msgFieldInclusion}
