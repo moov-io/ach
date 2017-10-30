@@ -72,7 +72,7 @@ func TestBatchCORParam(t *testing.T) {
 	}
 }
 
-func TestBatchCORAddendumCount(t *testing.T) {
+func TestBatchCORAddendumCountTwo(t *testing.T) {
 	mockBatch := mockBatchCOR()
 	// Adding a second addenda to the mock entry
 	mockBatch.GetEntries()[0].AddAddenda(mockAddendaNOC())
@@ -80,7 +80,39 @@ func TestBatchCORAddendumCount(t *testing.T) {
 	if err := mockBatch.Create(); err != nil {
 		//	fmt.Printf("err: %v \n", err)
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaCount" {
+			if e.FieldName != "Addendum" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+func TestBatchCORAddendaCountZero(t *testing.T) {
+	mockBatch := NewBatchCOR()
+	mockBatch.SetHeader(mockBatchCORHeader())
+	mockBatch.AddEntry(mockCOREntryDetail())
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addendum" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// check that Addendum is of type AddendaNOC
+func TestBatchCORAddendaType(t *testing.T) {
+	mockBatch := NewBatchCOR()
+	mockBatch.SetHeader(mockBatchCORHeader())
+	mockBatch.AddEntry(mockCOREntryDetail())
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addendum" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {

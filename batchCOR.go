@@ -12,6 +12,8 @@ type BatchCOR struct {
 }
 
 var msgBatchCORAmount = "debit:%v credit:%v entry detail amount fields must be zero for SEC type COR"
+var msgBatchCORAddenda = "found and 1 AddendaNOC is required for SEC Type COR"
+var msgBatchCORAddendaType = "%T found where AddendaNOC is required for SEC type NOC"
 
 // NewBatchCOR returns a *BatchCOR
 func NewBatchCOR(params ...BatchParam) *BatchCOR {
@@ -38,10 +40,7 @@ func (batch *BatchCOR) Validate() error {
 	}
 	// Add configuration based validation for this type.
 	// Web can have up to one addenda per entry record
-	if err := batch.isAddendaCount(1); err != nil {
-		return err
-	}
-	if err := batch.isTypeCode("98"); err != nil {
+	if err := batch.isAddendaNOC(); err != nil {
 		return err
 	}
 
@@ -56,15 +55,7 @@ func (batch *BatchCOR) Validate() error {
 	if batch.control.TotalCreditEntryDollarAmount != 0 || batch.control.TotalDebitEntryDollarAmount != 0 {
 		msg := fmt.Sprintf(msgBatchCORAmount, batch.control.TotalCreditEntryDollarAmount, batch.control.TotalDebitEntryDollarAmount)
 		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "Amount", Msg: msg}
-
 	}
-
-	// TODO the Addenda Record must exist:
-	// - type NOC,
-	// - type code 98
-	// - validated change code
-	// - amount zero
-	// - and Corrected information must not be null
 
 	return nil
 }
@@ -78,6 +69,30 @@ func (batch *BatchCOR) Create() error {
 
 	if err := batch.Validate(); err != nil {
 		return err
+	}
+	return nil
+}
+
+// isAddendaNOC verifies that a AddendaNoc exists for each EntryDetail and is Validated
+func (batch *BatchCOR) isAddendaNOC() error {
+	for _, entry := range batch.entries {
+		// Addenda type must be equal to 1
+		if len(entry.Addendum) != 1 {
+			return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "Addendum", Msg: msgBatchCORAddenda}
+		}
+		// Addenda type assertion must be AddendaNOC
+		aNOC, ok := entry.Addendum[0].(*AddendaNOC)
+		if !ok {
+			msg := fmt.Sprintf(msgBatchCORAddendaType, entry.Addendum[0])
+			return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "Addendum", Msg: msg}
+		}
+		// AddendaNOC must be Validated
+		if err := aNOC.Validate(); err != nil {
+			// convert the field error in to a batch error for a consistent api
+			if e, ok := err.(*FieldError); ok {
+				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: e.FieldName, Msg: e.Msg}
+			}
+		}
 	}
 	return nil
 }
