@@ -1,6 +1,8 @@
 package ach
 
-import "testing"
+import (
+	"testing"
+)
 
 // TODO make all the mock values cor fields
 
@@ -45,6 +47,69 @@ func TestBatchCORSEC(t *testing.T) {
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+func TestBatchCORParam(t *testing.T) {
+
+	batch, _ := NewBatch(BatchParam{
+		ServiceClassCode:        "220",
+		CompanyName:             "Your Company, inc",
+		StandardEntryClass:      "COR",
+		CompanyIdentification:   "123456789",
+		CompanyEntryDescription: "Vndr Pay",
+		CompanyDescriptiveDate:  "Oct 23",
+		ODFIIdentification:      "123456789"})
+
+	_, ok := batch.(*BatchCOR)
+	if !ok {
+		t.Error("Expecting BachCOR")
+	}
+}
+
+func TestBatchCORAddendumCount(t *testing.T) {
+	mockBatch := mockBatchCOR()
+	// Adding a second addenda to the mock entry
+	mockBatch.GetEntries()[0].AddAddenda(mockAddendaNOC())
+
+	if err := mockBatch.Create(); err != nil {
+		//	fmt.Printf("err: %v \n", err)
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "AddendaCount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+func TestBatchCORAddendaTypeCode(t *testing.T) {
+	mockBatch := mockBatchCOR()
+	mockBatch.GetEntries()[0].Addendum[0].(*AddendaNOC).typeCode = "07"
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+func TestBatchCORCreate(t *testing.T) {
+	mockBatch := mockBatchCOR()
+	// Must have valid batch header to create a batch
+	mockBatch.GetHeader().ServiceClassCode = 63
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "ServiceClassCode" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {

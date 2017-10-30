@@ -6,7 +6,7 @@ import (
 
 // BatchCOR COR - Automated Notification of Change (NOC) or Refused Notification of Change
 // This Standard Entry Class Code is used by an RDFI or ODFI when originating a Notification of Change or Refused Notification of Change in automated format.
-// It is also used by the ACH operator that converts paper Notifications of Change to automated format.
+// A Notification of Change may be created by an RDFI to notify the ODFI that a posted Entry or Prenotification Entry contains invalid or erroneous information and should be changed.
 type BatchCOR struct {
 	batch
 }

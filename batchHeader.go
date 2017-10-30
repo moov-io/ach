@@ -75,7 +75,10 @@ type BatchHeader struct {
 	// SettlementDate Leave blank, this field is inserted by the ACH operator
 	settlementDate string
 
-	// OriginatorStatusCode '1'
+	// OriginatorStatusCode refers to the ODFI initiating the Entry.
+	// 0 ADV File prepared by an ACH Operator.
+	// 1 This code identifies the Originator as a depository financial institution.
+	// 2 This code identifies the Originator as a Federal Government entity or agency.
 	OriginatorStatusCode int
 
 	//ODFIIdentification First 8 digits of the originating DFI transit routing number
@@ -204,7 +207,6 @@ func (bh *BatchHeader) Validate() error {
 	if err := bh.isAlphanumeric(bh.CompanyEntryDescription); err != nil {
 		return &FieldError{FieldName: "CompanyEntryDescription", Value: bh.CompanyEntryDescription, Msg: err.Error()}
 	}
-
 	return nil
 }
 
@@ -232,7 +234,6 @@ func (bh *BatchHeader) fieldInclusion() error {
 	if bh.ODFIIdentification == 0 {
 		return &FieldError{FieldName: "ODFIIdentification", Value: bh.ODFIIdentificationField(), Msg: msgFieldInclusion}
 	}
-
 	return nil
 }
 
