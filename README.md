@@ -26,11 +26,7 @@ ACH is at an early stage and under active development. Please star the project i
 * Review the project issues for more detailed information
 
 ## Usage and examples
-[Read a file]((#read-a-file))
-
-[Create a file]((#create-a-file))
-
-Examples exist in projects [example](https://github.com/moov-io/ach/tree/master/example) folder. 
+The following is a high level of reading and writing an ach file. Examples exist in projects [example](https://github.com/moov-io/ach/tree/master/example) folder with more details.
 
 ### Read a file
 
