@@ -221,7 +221,7 @@ func (r *Reader) parseEntryDetail() error {
 	return nil
 }
 
-// parseAddendaRecord takes the input record string and parses the AddendaRecord values
+// parseAddendaRecord takes the input record string and create an Addenda Type appended to the last EntryDetail
 func (r *Reader) parseAddenda() error {
 	r.recordName = "Addenda"
 
@@ -235,31 +235,21 @@ func (r *Reader) parseAddenda() error {
 	entryIndex := len(r.currentBatch.GetEntries()) - 1
 	entry := r.currentBatch.GetEntries()[entryIndex]
 
-	switch sec := r.currentBatch.GetHeader().StandardEntryClassCode; sec {
-	case ppd:
-		if entry.AddendaRecordIndicator == 1 {
-			addenda := Addenda{}
-			addenda.Parse(r.line)
-			if err := addenda.Validate(); err != nil {
-				return r.error(err)
-			}
-			r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda)
-		} else {
-			msg := fmt.Sprintf(msgBatchAddendaIndicator)
-			return r.error(&FileError{FieldName: "AddendaRecordIndicator", Msg: msg})
+	if entry.AddendaRecordIndicator == 1 {
+		// Passing TypeCode type into NewAddenda creates a Addendumer of type copde type.
+		addenda, err := NewAddenda(AddendaParam{
+			TypeCode: r.line[1:3]})
+		if err != nil {
+			return r.error(err)
 		}
-	case web, ccd, cor: // only care for returns
-		if entry.AddendaRecordIndicator == 1 {
-			returnAddenda := ReturnAddenda{}
-			returnAddenda.Parse(r.line)
-			if err := returnAddenda.Validate(); err != nil {
-				return r.error(err)
-			}
-			r.currentBatch.GetEntries()[entryIndex].AddReturnAddenda(returnAddenda)
-		} else {
-			msg := fmt.Sprintf(msgBatchAddendaIndicator)
-			return r.error(&FileError{FieldName: "AddendaRecordIndicator", Msg: msg})
+		addenda.Parse(r.line)
+		if err := addenda.Validate(); err != nil {
+			return r.error(err)
 		}
+		r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda)
+	} else {
+		msg := fmt.Sprintf(msgBatchAddendaIndicator)
+		return r.error(&FileError{FieldName: "AddendaRecordIndicator", Msg: msg})
 	}
 
 	return nil

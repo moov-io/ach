@@ -11,12 +11,12 @@ import (
 
 func main() {
 	// Example transfer to write an ACH PPD file to send/credit a external institutions account
-	// Important: All financial instituions are different and will require registration and exact field values.
+	// Important: All financial institutions are different and will require registration and exact field values.
 
 	// Set originator bank ODFI and destination Operator for the financial institution
-	// this is the funding/recieving source of the transfer
+	// this is the funding/receiving source of the transfer
 	fh := ach.NewFileHeader()
-	fh.ImmediateDestination = 9876543210 // A blank space followed by your ODFI's transit/routing numbe
+	fh.ImmediateDestination = 9876543210 // A blank space followed by your ODFI's transit/routing number
 	fh.ImmediateOrigin = 1234567890      // Organization or Company FED ID usually 1 and FEIN/SSN. Assigned by your ODFI
 	fh.FileCreationDate = time.Now()     // Todays Date
 	fh.ImmediateDestinationName = "Federal Reserve Bank"
@@ -25,22 +25,22 @@ func main() {
 	// BatchHeader identifies the originating entity and the type of transactions contained in the batch
 	bh := ach.NewBatchHeader()
 	bh.ServiceClassCode = 220          // ACH credit pushes money out, 225 debits/pulls money in.
-	bh.CompanyName = "Name on Account" // The name of the company/person that has relationship with reciever
+	bh.CompanyName = "Name on Account" // The name of the company/person that has relationship with receiver
 	bh.CompanyIdentification = strconv.Itoa(fh.ImmediateOrigin)
 	bh.StandardEntryClassCode = "PPD"         // Consumer destination vs Company CCD
-	bh.CompanyEntryDescription = "REG.SALARY" // will be on recieving accounts statement
+	bh.CompanyEntryDescription = "REG.SALARY" // will be on receiving accounts statement
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
 	bh.ODFIIdentification = 12345678 // first 8 digits of your bank account
 
-	// Identifies the recievers account information
-	// can be multiple entrys per batch
+	// Identifies the receivers account information
+	// can be multiple entry's per batch
 	entry := ach.NewEntryDetail()
 	// Identifies the entry as a debit and credit entry AND to what type of account (Savings, DDA, Loan
 	entry.TransactionCode = 22                     // Code 22: Credit (deposit) to checking account
-	entry.SetRDFI(9101298)                         // Recievers bank transit rounting number
-	entry.DFIAccountNumber = "12345678"            // Recievers bank account number
-	entry.Amount = 100000000                       // Amount of transaction with no decimil. One dollar and eleven cents = 111
-	entry.IndividualName = "Reciever Account Name" // Identifies the reciever of the transaction
+	entry.SetRDFI(9101298)                         // Receivers bank transit routing number
+	entry.DFIAccountNumber = "12345678"            // Receivers bank account number
+	entry.Amount = 100000000                       // Amount of transaction with no decimal. One dollar and eleven cents = 111
+	entry.IndividualName = "Receiver Account Name" // Identifies the receiver of the transaction
 
 	// build the batch
 	batch := ach.NewBatchPPD()

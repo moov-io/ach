@@ -15,18 +15,18 @@ func main() {
 		log.Panicf("Can not open file: %s: \n", err)
 	}
 	r := ach.NewReader(f)
-	_, err = r.Read()
+	achFile, err := r.Read()
 	if err != nil {
 		fmt.Printf("Issue reading file: %+v \n", err)
 	}
 	// ensure we have a validated file structure
-	if r.File.Validate(); err != nil {
+	if achFile.Validate(); err != nil {
 		fmt.Printf("Could not validate entire read file: %v", err)
 	}
 	// If you trust the file but it's formating is off building will probably resolve the malformed file.
-	if r.File.Create(); err != nil {
+	if achFile.Create(); err != nil {
 		fmt.Printf("Could not build file with read properties: %v", err)
 	}
 
-	fmt.Printf("total amount debit: %v \n", r.File.Control.TotalDebitEntryDollarAmountInFile)
+	fmt.Printf("total amount debit: %v \n", achFile.Control.TotalDebitEntryDollarAmountInFile)
 }

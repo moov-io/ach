@@ -36,23 +36,6 @@ func mockBatchWEB() *BatchWEB {
 	return mockBatch
 }
 
-// A Batch web can only have one addendum per entry detail
-func TestBatchWEBAddendumCount(t *testing.T) {
-	mockBatch := mockBatchWEB()
-	// Adding a second addenda to the mock entry
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
-
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "EntryAddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
-	}
-}
-
 // No more than 1 batch per entry detail record can exist
 func TestBatchWebAddenda(t *testing.T) {
 	mockBatch := mockBatchWEB()
@@ -88,7 +71,7 @@ func TestBatchWebIndividualNameRequired(t *testing.T) {
 // verify addenda type code is 05
 func TestBatchWEBAddendaTypeCode(t *testing.T) {
 	mockBatch := mockBatchWEB()
-	mockBatch.GetEntries()[0].Addendum[0].TypeCode = "07"
+	mockBatch.GetEntries()[0].Addendum[0].(*Addenda).typeCode = "07"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
