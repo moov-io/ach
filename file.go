@@ -66,6 +66,9 @@ type File struct {
 	Batches []Batcher
 	Control FileControl
 
+	// NotificationOfChange (Notification of change) is a slice of references to BatchCOR in file.Batches
+	NotificationOfChange []*BatchCOR
+
 	converters
 }
 
@@ -105,7 +108,7 @@ func (f *File) Create() error {
 	}
 	// Requires at least one Batch in the new file.
 	if len(f.Batches) <= 0 {
-		return &FileError{FieldName: "Batchs", Value: strconv.Itoa(len(f.Batches)), Msg: "must have []*Batches to be built"}
+		return &FileError{FieldName: "Batches", Value: strconv.Itoa(len(f.Batches)), Msg: "must have []*Batches to be built"}
 	}
 	// add 2 for FileHeader/control and reset if build was called twice do to error
 	totalRecordsInFile := 2
@@ -149,6 +152,10 @@ func (f *File) Create() error {
 
 // AddBatch appends a Batch to the ach.File
 func (f *File) AddBatch(batch Batcher) []Batcher {
+	switch batch.(type) {
+	case *BatchCOR:
+		f.NotificationOfChange = append(f.NotificationOfChange, batch.(*BatchCOR))
+	}
 	f.Batches = append(f.Batches, batch)
 	return f.Batches
 }
