@@ -22,7 +22,7 @@ func mockCOREntryDetail() *EntryDetail {
 	entry.TransactionCode = 27
 	entry.SetRDFI(9101298)
 	entry.DFIAccountNumber = "744-5678-99"
-	entry.Amount = 5000000
+	entry.Amount = 0
 	entry.IdentificationNumber = "location #23"
 	entry.SetReceivingCompany("Best Co. #23")
 	entry.TraceNumber = 123456789
@@ -95,6 +95,20 @@ func TestBatchCORAddendaTypeCode(t *testing.T) {
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+func TestBatchCORAmount(t *testing.T) {
+	mockBatch := mockBatchCOR()
+	mockBatch.GetEntries()[0].Amount = 9999
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Amount" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {

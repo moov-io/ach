@@ -11,6 +11,8 @@ type BatchCOR struct {
 	batch
 }
 
+var msgBatchCORAmount = "debit:%v credit:%v entry detail amount fields must be zero for SEC type COR"
+
 // NewBatchCOR returns a *BatchCOR
 func NewBatchCOR(params ...BatchParam) *BatchCOR {
 	batch := new(BatchCOR)
@@ -49,7 +51,20 @@ func (batch *BatchCOR) Validate() error {
 		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
-	// TODO check that addenda is type AddendaNOC
+	// The Amount field must be zero
+	// batch.verify calls batch.isBatchAmount which ensures the batch.Control values are accurate.
+	if batch.control.TotalCreditEntryDollarAmount != 0 || batch.control.TotalDebitEntryDollarAmount != 0 {
+		msg := fmt.Sprintf(msgBatchCORAmount, batch.control.TotalCreditEntryDollarAmount, batch.control.TotalDebitEntryDollarAmount)
+		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "Amount", Msg: msg}
+
+	}
+
+	// TODO the Addenda Record must exist:
+	// - type NOC,
+	// - type code 98
+	// - validated change code
+	// - amount zero
+	// - and Corrected information must not be null
 
 	return nil
 }
