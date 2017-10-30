@@ -18,6 +18,7 @@ ACH is at an early stage and under active development. Please star the project i
 	* PPD (Prearranged payment and deposits)
 	* WEB (Internet-initiated Entries )
 	* CCD (Corporate credit or debit)
+	* COR (Automated Notification of Change(NOC))
 
 
 ## Project Roadmap
@@ -25,17 +26,48 @@ ACH is at an early stage and under active development. Please star the project i
 * Review the project issues for more detailed information
 
 ## Usage and examples
-Examples exist in projects [example](https://github.com/moov-io/ach/tree/master/example) folder. The following is based on [simple file creation](https://github.com/moov-io/ach/tree/master/example/simple-file-creation)
+[Read a file]((#read-a-file))
 
- To create a file
+[Create a file]((#create-a-file))
+
+Examples exist in projects [example](https://github.com/moov-io/ach/tree/master/example) folder. 
+
+### Read a file
+
+```go
+// open a file for reading or pass any io.Reader NewReader()
+f, err := os.Open("name-of-your-ach-file.ach")
+if err != nil {
+	log.Panicf("Can not open local file: %s: \n", err)
+}
+r := ach.NewReader(f)
+achFile, err := r.Read()
+if err != nil {
+	fmt.Printf("Issue reading file: %+v \n", err)
+}
+// ensure we have a validated file structure
+if achFile.Validate(); err != nil {
+	fmt.Printf("Could not validate entire read file: %v", err)
+}
+// Check if any Notifications Of Change exist in the file 
+if len(achFile.NotificationOfChange) > 0 {
+	for _, batch := range achFile.NotificationOfChange {
+		aNOC := batch.GetEntries()[0].Addendum[0].(*AddendaNOC)
+		println(aNOC.CorrectedData)
+	} 
+} 
+```	
+
+### Create a file
+The following is based on [simple file creation](https://github.com/moov-io/ach/tree/master/example/simple-file-creation)
  
  ```go
-	file := ach.NewFile(ach.FileParam{
-		ImmediateDestination:     "0210000890",
-		ImmediateOrigin:          "123456789",
-		ImmediateDestinationName: "Your Bank",
-		ImmediateOriginName:      "Your Company",
-		ReferenceCode:            "#00000A1"})
+file := ach.NewFile(ach.FileParam{
+	ImmediateDestination:     "0210000890",
+	ImmediateOrigin:          "123456789",
+	ImmediateDestinationName: "Your Bank",
+	ImmediateOriginName:      "Your Company",
+	ReferenceCode:            "#00000A1"})
 ```
 
 To create a batch
@@ -43,117 +75,117 @@ To create a batch
 Errors only if payment type is not supported
 
  ```go
-	batch := ach.NewBatch(ach.BatchParam{
-		ServiceClassCode:        "220",
-		CompanyName:             "Your Company",
-		StandardEntryClass:      "PPD",
-		CompanyIdentification:   "123456789",
-		CompanyEntryDescription: "Trans. Description",
-		CompanyDescriptiveDate:  "Oct 23",
-		ODFIIdentification:      "123456789"})
+batch := ach.NewBatch(ach.BatchParam{
+	ServiceClassCode:        "220",
+	CompanyName:             "Your Company",
+	StandardEntryClass:      "PPD",
+	CompanyIdentification:   "123456789",
+	CompanyEntryDescription: "Trans. Description",
+	CompanyDescriptiveDate:  "Oct 23",
+	ODFIIdentification:      "123456789"})
 ```
 
 To create an entry
 
  ```go
-	entry := ach.NewEntryDetail(ach.EntryParam{
-		ReceivingDFI:      "102001017",
-		RDFIAccount:       "5343121",
-		Amount:            "17500",
-		TransactionCode:   "27",
-		IDNumber:          "ABC##jvkdjfuiwn",
-		IndividualName:    "Bob Smith",
-		DiscretionaryData: "B1"})
+entry := ach.NewEntryDetail(ach.EntryParam{
+	ReceivingDFI:      "102001017",
+	RDFIAccount:       "5343121",
+	Amount:            "17500",
+	TransactionCode:   "27",
+	IDNumber:          "ABC##jvkdjfuiwn",
+	IndividualName:    "Bob Smith",
+	DiscretionaryData: "B1"})
 ```
 
 To add one or more optional addenda records for an entry
 
  ```go
-	addenda := ach.NewAddenda(ach.AddendaParam{
-		PaymentRelatedInfo: "bonus pay for amazing work on #OSS"})
-	entry.AddAddenda(addenda)
+addenda := ach.NewAddenda(ach.AddendaParam{
+	PaymentRelatedInfo: "bonus pay for amazing work on #OSS"})
+entry.AddAddenda(addenda)
 ```
 
 Entries are added to batches like so:
 
  ```go
-	batch.AddEntry(entry)
+batch.AddEntry(entry)
 ```
 
 When all of the Entries are added to the batch we can create the batch.
 
  ```go
-	if err := batch.Create(); err != nil {
-		fmt.Printf("%T: %s", err, err)
-	}
+if err := batch.Create(); err != nil {
+	fmt.Printf("%T: %s", err, err)
+}
   ```
 
 And batches are added to files much the same way:
 
  ```go
-	file.AddBatch(batch)
+file.AddBatch(batch)
 ```
 
 Now add a new batch for accepting payments on the web
 
 ```go
-	batch2, _ := ach.NewBatch(ach.BatchParam{
-		ServiceClassCode:        "220",
-		CompanyName:             "Your Company",
-		StandardEntryClass:      "WEB",
-		CompanyIdentification:   "123456789",
-		CompanyEntryDescription: "subscr",
-		CompanyDescriptiveDate:  "Oct 23",
-		ODFIIdentification:      "123456789"})
+batch2, _ := ach.NewBatch(ach.BatchParam{
+	ServiceClassCode:        "220",
+	CompanyName:             "Your Company",
+	StandardEntryClass:      "WEB",
+	CompanyIdentification:   "123456789",
+	CompanyEntryDescription: "subscr",
+	CompanyDescriptiveDate:  "Oct 23",
+	ODFIIdentification:      "123456789"})
 ```
 
 Add an entry and define if it is a single or reoccurring payment. The following is a reoccurring payment for $7.99
 
 ```go
-	entry2 := ach.NewEntryDetail(ach.EntryParam{
-		ReceivingDFI:      "102001017",
-		RDFIAccount:       "5343121",
-		Amount:            "799",
-		TransactionCode:   "22",
-		IDNumber:          "#123456",
-		IndividualName:    "Wade Arnold",
-		PaymentType: 		"R"})
+entry2 := ach.NewEntryDetail(ach.EntryParam{
+	ReceivingDFI:      "102001017",
+	RDFIAccount:       "5343121",
+	Amount:            "799",
+	TransactionCode:   "22",
+	IDNumber:          "#123456",
+	IndividualName:    "Wade Arnold",
+	PaymentType: 		"R"})
 
-	addenda2 := ach.NewAddenda(ach.AddendaParam{
-		PaymentRelatedInfo: "Monthly Membership Subscription"})
+addenda2 := ach.NewAddenda(ach.AddendaParam{
+	PaymentRelatedInfo: "Monthly Membership Subscription"})
 ```
 
 Add the entry to the batch
 ```go
-	entry2.AddAddenda(addenda2)
+entry2.AddAddenda(addenda2)
 ```
 
 Create and add the second batch
 
 ```go
-	batch2.AddEntry(entry2)
-	if err := batch2.Create(); err != nil {
-		fmt.Printf("%T: %s", err, err)
-	}
-	file.AddBatch(batch2)
+batch2.AddEntry(entry2)
+if err := batch2.Create(); err != nil {
+	fmt.Printf("%T: %s", err, err)
+}
+file.AddBatch(batch2)
 ```
 
 Once we added all our batches we must build the file
 
  ```go
-	if err := file.Create(); err != nil {
-		fmt.Printf("%T: %s", err, err)
-	}
+if err := file.Create(); err != nil {
+	fmt.Printf("%T: %s", err, err)
+}
 ```
 
-Finally we wnt to write the file to an io.Writer
+Finally we want to write the file to an io.Writer
 
  ```go
-	w := ach.NewWriter(os.Stdout)
-	if err := w.Write(file); err != nil {
-		fmt.Printf("%T: %s", err, err)
-	}
-	w.Flush()
+w := ach.NewWriter(os.Stdout)
+if err := w.Write(file); err != nil {
+	fmt.Printf("%T: %s", err, err)
+}
+w.Flush()
 }
 ```
 
