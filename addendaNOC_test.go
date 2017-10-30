@@ -54,7 +54,49 @@ func TestAddendaNOCString(t *testing.T) {
 	}
 }
 
-func TestNOCAddendaValidateTrue(t *testing.T) {
+func TestAddendaNOCValidRecordType(t *testing.T) {
+	aNOC := mockAddendaNOC()
+	aNOC.recordType = "63"
+	if err := aNOC.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+func TestAddendaNOCValidTypeCode(t *testing.T) {
+	aNOC := mockAddendaNOC()
+	aNOC.typeCode = "05"
+	if err := aNOC.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+func TestAddendaNOCValidCorrectedData(t *testing.T) {
+	aNOC := mockAddendaNOC()
+	aNOC.CorrectedData = ""
+	if err := aNOC.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "CorrectedData" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+func TestAddendaNOCValidateTrue(t *testing.T) {
 	aNOC := mockAddendaNOC()
 	aNOC.ChangeCode = "C11"
 	if err := aNOC.Validate(); err != nil {
@@ -67,7 +109,6 @@ func TestNOCAddendaValidateTrue(t *testing.T) {
 		}
 	}
 }
-
 func TestAddendaNOCValidateChangeCodeFalse(t *testing.T) {
 	aNOC := mockAddendaNOC()
 	aNOC.ChangeCode = "C63"

@@ -36,7 +36,9 @@ var (
 	changeCodeDict = map[string]*changeCode{}
 
 	// Error messages specific to AddendaNOC
-	msgAddendaNOCChangeCode = "found is not a valid addenda Change Code"
+	msgAddendaNOCChangeCode    = "found is not a valid addenda Change Code"
+	msgAddendaNOCTypeCode      = "is not AddendaNOC type code of 98"
+	msgAddendaNOCCorrectedData = "must contain the corrected information corresponding to the Change Code"
 )
 
 func init() {
@@ -101,19 +103,26 @@ func (addendaNOC *AddendaNOC) String() string {
 
 // Validate verifies NACHA rules for AddendaNOC
 func (addendaNOC *AddendaNOC) Validate() error {
-
 	if addendaNOC.recordType != "7" {
 		msg := fmt.Sprintf(msgRecordType, 7)
 		return &FieldError{FieldName: "recordType", Value: addendaNOC.recordType, Msg: msg}
 	}
-	// @TODO Type Code should be 99.
+	// Type Code must be 98
+	if addendaNOC.typeCode != "98" {
+		return &FieldError{FieldName: "TypeCode", Value: addendaNOC.typeCode, Msg: msgAddendaTypeCode}
+	}
 
+	// AddendaNOC requires a valid ChangeCode
 	_, ok := changeCodeDict[addendaNOC.ChangeCode]
 	if !ok {
-		// TODO update for ChangeCodeDict
-		// Return Addenda requires a valid ReturnCode
 		return &FieldError{FieldName: "ChangeCode", Value: addendaNOC.ChangeCode, Msg: msgAddendaNOCChangeCode}
 	}
+
+	// AddendaNOC Record must contain the corrected information corresponding to the Change Code used
+	if addendaNOC.CorrectedData == "" {
+		return &FieldError{FieldName: "CorrectedData", Value: addendaNOC.CorrectedData, Msg: msgAddendaNOCCorrectedData}
+	}
+
 	return nil
 }
 
