@@ -38,7 +38,7 @@ func main() {
 		DiscretionaryData: "B1"})
 
 	// To add one or more optional addenda records for an entry
-	addenda := ach.NewAddenda(ach.AddendaParam{
+	addenda, _ := ach.NewAddenda(ach.AddendaParam{
 		PaymentRelatedInfo: "bonus pay for amazing work on #OSS"})
 	entry.AddAddenda(addenda)
 
@@ -79,7 +79,7 @@ func main() {
 		IndividualName:  "Wade Arnold",
 		PaymentType:     "R"})
 
-	addenda2 := ach.NewAddenda(ach.AddendaParam{
+	addenda2, _ := ach.NewAddenda(ach.AddendaParam{
 		PaymentRelatedInfo: "Monthly Membership Subscription"})
 
 	// add the entry to the batch

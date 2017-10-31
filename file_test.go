@@ -155,11 +155,24 @@ func TestFileBuildNoBatch(t *testing.T) {
 	file := NewFile().SetHeader(mockFileHeader())
 	if err := file.Create(); err != nil {
 		if e, ok := err.(*FileError); ok {
-			if e.FieldName != "Batchs" {
+			if e.FieldName != "Batches" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
 			t.Errorf("%T: %s", err, err)
 		}
+	}
+}
+
+// Check if a file contains BatchNOC notification of change
+func TestFileNotificationOfChange(t *testing.T) {
+	file := NewFile().SetHeader(mockFileHeader())
+	file.AddBatch(mockBatchPPD())
+	bCOR := mockBatchCOR()
+	file.AddBatch(bCOR)
+	file.Create()
+
+	if file.NotificationOfChange[0] != bCOR {
+		t.Error("BatchCOR added to File.AddBatch should exist in NotificationOfChange")
 	}
 }

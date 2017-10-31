@@ -85,7 +85,7 @@ func TestEntryParamReceivingCompany(t *testing.T) {
 }
 
 func TestAddendaParam(t *testing.T) {
-	addenda := NewAddenda(AddendaParam{
+	addenda, _ := NewAddenda(AddendaParam{
 		PaymentRelatedInfo: "Currently string needs ASC X12 Interchange Control Structures",
 	})
 	if err := addenda.Validate(); err != nil {
@@ -124,7 +124,7 @@ func TestBuildFileParam(t *testing.T) {
 
 	// To add one or more optional addenda records for an entry
 
-	addenda := NewAddenda(AddendaParam{
+	addenda, _ := NewAddenda(AddendaParam{
 		PaymentRelatedInfo: "bonus pay for amazing work on #OSS"})
 	entry.AddAddenda(addenda)
 
@@ -165,7 +165,7 @@ func TestBuildFileParam(t *testing.T) {
 		IndividualName:  "Wade Arnold",
 		PaymentType:     "R"})
 
-	addenda = NewAddenda(AddendaParam{
+	addenda, _ = NewAddenda(AddendaParam{
 		PaymentRelatedInfo: "Monthly Membership Subscription"})
 
 	// add the entry to the batch
