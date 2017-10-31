@@ -63,18 +63,18 @@ type returnCode struct {
 
 // NewAddendaReturn returns a new AddendaReturn with default values for none exported fields
 func NewAddendaReturn(params ...AddendaParam) *AddendaReturn {
-	rAddenda := &AddendaReturn{
+	addendaReturn := &AddendaReturn{
 		recordType: "7",
 		typeCode:   "99",
 	}
 	if len(params) > 0 {
-		rAddenda.ReturnCode = params[0].ReturnCode
-		rAddenda.OriginalTrace = rAddenda.parseNumField(params[0].OriginalTrace)
-		rAddenda.OriginalDFI = rAddenda.parseNumField(params[0].OriginalDFI)
-		rAddenda.AddendaInformation = params[0].AddendaInfo
-		rAddenda.TraceNumber = rAddenda.parseNumField(params[0].TraceNumber)
+		addendaReturn.ReturnCode = params[0].ReturnCode
+		addendaReturn.OriginalTrace = addendaReturn.parseNumField(params[0].OriginalTrace)
+		addendaReturn.OriginalDFI = addendaReturn.parseNumField(params[0].OriginalDFI)
+		addendaReturn.AddendaInformation = params[0].AddendaInfo
+		addendaReturn.TraceNumber = addendaReturn.parseNumField(params[0].TraceNumber)
 	}
-	return rAddenda
+	return addendaReturn
 }
 
 // Parse takes the input record string and parses the AddendaReturn values

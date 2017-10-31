@@ -11,14 +11,14 @@ import (
 )
 
 func mockAddendaReturn() *AddendaReturn {
-	rAddenda := NewAddendaReturn()
-	rAddenda.typeCode = "99"
-	rAddenda.ReturnCode = "R07"
-	rAddenda.OriginalTrace = 99912340000015
-	rAddenda.AddendaInformation = "Authorization Revoked"
-	rAddenda.OriginalDFI = 9101298
+	addendaReturn := NewAddendaReturn()
+	addendaReturn.typeCode = "99"
+	addendaReturn.ReturnCode = "R07"
+	addendaReturn.OriginalTrace = 99912340000015
+	addendaReturn.AddendaInformation = "Authorization Revoked"
+	addendaReturn.OriginalDFI = 9101298
 
-	return rAddenda
+	return addendaReturn
 }
 
 func TestMockAddendaReturn(t *testing.T) {
@@ -26,43 +26,43 @@ func TestMockAddendaReturn(t *testing.T) {
 }
 
 func TestAddendaReturnParse(t *testing.T) {
-	rAddenda := NewAddendaReturn()
+	addendaReturn := NewAddendaReturn()
 	line := "799R07099912340000015      09101298Authorization revoked                       091012980000066"
-	rAddenda.Parse(line)
+	addendaReturn.Parse(line)
 	// walk the addendaReturn struct
-	if rAddenda.recordType != "7" {
-		t.Errorf("expected %v got %v", "7", rAddenda.recordType)
+	if addendaReturn.recordType != "7" {
+		t.Errorf("expected %v got %v", "7", addendaReturn.recordType)
 	}
-	if rAddenda.typeCode != "99" {
-		t.Errorf("expected %v got %v", "99", rAddenda.typeCode)
+	if addendaReturn.typeCode != "99" {
+		t.Errorf("expected %v got %v", "99", addendaReturn.typeCode)
 	}
-	if rAddenda.ReturnCode != "R07" {
-		t.Errorf("expected %v got %v", "R07", rAddenda.ReturnCode)
+	if addendaReturn.ReturnCode != "R07" {
+		t.Errorf("expected %v got %v", "R07", addendaReturn.ReturnCode)
 	}
-	if rAddenda.OriginalTrace != 99912340000015 {
-		t.Errorf("expected: %v got: %v", 99912340000015, rAddenda.OriginalTrace)
+	if addendaReturn.OriginalTrace != 99912340000015 {
+		t.Errorf("expected: %v got: %v", 99912340000015, addendaReturn.OriginalTrace)
 	}
-	if rAddenda.DateOfDeath.IsZero() != true {
-		t.Errorf("expected: %v got: %v", time.Time{}, rAddenda.DateOfDeath)
+	if addendaReturn.DateOfDeath.IsZero() != true {
+		t.Errorf("expected: %v got: %v", time.Time{}, addendaReturn.DateOfDeath)
 	}
-	if rAddenda.OriginalDFI != 9101298 {
-		t.Errorf("expected: %v got: %v", 9101298, rAddenda.OriginalDFI)
+	if addendaReturn.OriginalDFI != 9101298 {
+		t.Errorf("expected: %v got: %v", 9101298, addendaReturn.OriginalDFI)
 	}
-	if rAddenda.AddendaInformation != "Authorization revoked" {
-		t.Errorf("expected: %v got: %v", "Authorization revoked", rAddenda.AddendaInformation)
+	if addendaReturn.AddendaInformation != "Authorization revoked" {
+		t.Errorf("expected: %v got: %v", "Authorization revoked", addendaReturn.AddendaInformation)
 	}
-	if rAddenda.TraceNumber != 91012980000066 {
-		t.Errorf("expected: %v got: %v", 91012980000066, rAddenda.TraceNumber)
+	if addendaReturn.TraceNumber != 91012980000066 {
+		t.Errorf("expected: %v got: %v", 91012980000066, addendaReturn.TraceNumber)
 	}
 }
 
 func TestAddendaReturnString(t *testing.T) {
-	rAddenda := NewAddendaReturn()
+	addendaReturn := NewAddendaReturn()
 	line := "799R07099912340000015      09101298Authorization revoked                       091012980000066"
-	rAddenda.Parse(line)
+	addendaReturn.Parse(line)
 
-	if rAddenda.String() != line {
-		t.Errorf("\n expected: %v\n got     : %v", line, rAddenda.String())
+	if addendaReturn.String() != line {
+		t.Errorf("\n expected: %v\n got     : %v", line, addendaReturn.String())
 	}
 }
 
@@ -82,9 +82,9 @@ func TestAddendaReturnMakeReturnCodeDict(t *testing.T) {
 }
 
 func TestAddendaReturnValidateTrue(t *testing.T) {
-	rAddenda := mockAddendaReturn()
-	rAddenda.ReturnCode = "R13"
-	if err := rAddenda.Validate(); err != nil {
+	addendaReturn := mockAddendaReturn()
+	addendaReturn.ReturnCode = "R13"
+	if err := addendaReturn.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "ReturnCode" {
 				t.Errorf("%T: %s", err, err)
@@ -96,9 +96,9 @@ func TestAddendaReturnValidateTrue(t *testing.T) {
 }
 
 func TestAddendaReturnValidateReturnCodeFalse(t *testing.T) {
-	rAddenda := mockAddendaReturn()
-	rAddenda.ReturnCode = ""
-	if err := rAddenda.Validate(); err != nil {
+	addendaReturn := mockAddendaReturn()
+	addendaReturn.ReturnCode = ""
+	if err := addendaReturn.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "ReturnCode" {
 				t.Errorf("%T: %s", err, err)
@@ -110,48 +110,48 @@ func TestAddendaReturnValidateReturnCodeFalse(t *testing.T) {
 }
 
 func TestAddendaReturnOriginalTraceField(t *testing.T) {
-	rAddenda := mockAddendaReturn()
-	rAddenda.OriginalTrace = 12345
-	if rAddenda.OriginalTraceField() != "000000000012345" {
-		t.Errorf("expected %v received %v", "000000000012345", rAddenda.OriginalTraceField())
+	addendaReturn := mockAddendaReturn()
+	addendaReturn.OriginalTrace = 12345
+	if addendaReturn.OriginalTraceField() != "000000000012345" {
+		t.Errorf("expected %v received %v", "000000000012345", addendaReturn.OriginalTraceField())
 	}
 }
 
 func TestAddendaReturnDateOfDeathField(t *testing.T) {
-	rAddenda := mockAddendaReturn()
+	addendaReturn := mockAddendaReturn()
 	// Check for all zeros
-	if rAddenda.DateOfDeathField() != "      " {
-		t.Errorf("expected %v received %v", "      ", rAddenda.DateOfDeathField())
+	if addendaReturn.DateOfDeathField() != "      " {
+		t.Errorf("expected %v received %v", "      ", addendaReturn.DateOfDeathField())
 	}
 	// Year: 1978 Month: October Day: 23
-	rAddenda.DateOfDeath = time.Date(1978, time.October, 23, 0, 0, 0, 0, time.UTC)
-	if rAddenda.DateOfDeathField() != "781023" {
-		t.Errorf("expected %v received %v", "781023", rAddenda.DateOfDeathField())
+	addendaReturn.DateOfDeath = time.Date(1978, time.October, 23, 0, 0, 0, 0, time.UTC)
+	if addendaReturn.DateOfDeathField() != "781023" {
+		t.Errorf("expected %v received %v", "781023", addendaReturn.DateOfDeathField())
 	}
 }
 
 func TestAddendaReturnOriginalDFIField(t *testing.T) {
-	rAddenda := mockAddendaReturn()
+	addendaReturn := mockAddendaReturn()
 	exp := "09101298"
-	if rAddenda.OriginalDFIField() != exp {
-		t.Errorf("expected %v received %v", exp, rAddenda.OriginalDFIField())
+	if addendaReturn.OriginalDFIField() != exp {
+		t.Errorf("expected %v received %v", exp, addendaReturn.OriginalDFIField())
 	}
 }
 
 func TestAddendaReturnAddendaInformationField(t *testing.T) {
-	rAddenda := mockAddendaReturn()
+	addendaReturn := mockAddendaReturn()
 	exp := "Authorization Revoked                       "
-	if rAddenda.AddendaInformationField() != exp {
-		t.Errorf("expected %v received %v", exp, rAddenda.AddendaInformationField())
+	if addendaReturn.AddendaInformationField() != exp {
+		t.Errorf("expected %v received %v", exp, addendaReturn.AddendaInformationField())
 	}
 }
 
 func TestAddendaReturnTraceNumberField(t *testing.T) {
-	rAddenda := mockAddendaReturn()
-	rAddenda.TraceNumber = 91012980000066
+	addendaReturn := mockAddendaReturn()
+	addendaReturn.TraceNumber = 91012980000066
 	exp := "091012980000066"
-	if rAddenda.TraceNumberField() != exp {
-		t.Errorf("expected %v received %v", exp, rAddenda.TraceNumberField())
+	if addendaReturn.TraceNumberField() != exp {
+		t.Errorf("expected %v received %v", exp, addendaReturn.TraceNumberField())
 	}
 }
 
@@ -169,26 +169,26 @@ func TestAddendaReturnNewAddendaParam(t *testing.T) {
 	if err != nil {
 		t.Errorf("addendaReturn from NewAddeda: %v", err)
 	}
-	rAddenda, ok := a.(*AddendaReturn)
+	addendaReturn, ok := a.(*AddendaReturn)
 	if !ok {
 		t.Errorf("expecting *AddendaReturn received %T ", a)
 	}
-	if rAddenda.TypeCode() != aParam.TypeCode {
-		t.Errorf("expected %v got %v", aParam.TypeCode, rAddenda.TypeCode())
+	if addendaReturn.TypeCode() != aParam.TypeCode {
+		t.Errorf("expected %v got %v", aParam.TypeCode, addendaReturn.TypeCode())
 	}
-	if rAddenda.ReturnCode != aParam.ReturnCode {
-		t.Errorf("expected %v got %v", aParam.ReturnCode, rAddenda.ReturnCode)
+	if addendaReturn.ReturnCode != aParam.ReturnCode {
+		t.Errorf("expected %v got %v", aParam.ReturnCode, addendaReturn.ReturnCode)
 	}
-	if !strings.Contains(rAddenda.OriginalTraceField(), aParam.OriginalTrace) {
-		t.Errorf("expected %v got %v", aParam.OriginalTrace, rAddenda.OriginalTrace)
+	if !strings.Contains(addendaReturn.OriginalTraceField(), aParam.OriginalTrace) {
+		t.Errorf("expected %v got %v", aParam.OriginalTrace, addendaReturn.OriginalTrace)
 	}
-	if !strings.Contains(rAddenda.OriginalDFIField(), aParam.OriginalDFI) {
-		t.Errorf("expected %v got %v", aParam.OriginalDFI, rAddenda.OriginalDFI)
+	if !strings.Contains(addendaReturn.OriginalDFIField(), aParam.OriginalDFI) {
+		t.Errorf("expected %v got %v", aParam.OriginalDFI, addendaReturn.OriginalDFI)
 	}
-	if rAddenda.AddendaInformation != aParam.AddendaInfo {
-		t.Errorf("expected %v got %v", aParam.AddendaInfo, rAddenda.AddendaInformation)
+	if addendaReturn.AddendaInformation != aParam.AddendaInfo {
+		t.Errorf("expected %v got %v", aParam.AddendaInfo, addendaReturn.AddendaInformation)
 	}
-	if !strings.Contains(rAddenda.TraceNumberField(), aParam.TraceNumber) {
-		t.Errorf("expected %v got %v", aParam.TraceNumber, rAddenda.TraceNumber)
+	if !strings.Contains(addendaReturn.TraceNumberField(), aParam.TraceNumber) {
+		t.Errorf("expected %v got %v", aParam.TraceNumber, addendaReturn.TraceNumber)
 	}
 }
