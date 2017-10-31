@@ -65,7 +65,7 @@ func NewAddenda(params ...AddendaParam) (Addendumer, error) {
 		case "98":
 			return NewAddendaNOC(params[0]), nil
 		case "99":
-			return NewReturnAddenda(params[0]), nil
+			return NewAddendaReturn(params[0]), nil
 		default:
 			msg := fmt.Sprintf("Addenda Type Code %v is not supported", typeCode)
 			return nil, &FileError{FieldName: "TypeCode", Msg: msg}

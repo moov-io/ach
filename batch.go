@@ -324,7 +324,7 @@ func (batch *batch) isAddendaSequence() error {
 // "PPD", "WEB", "CCD", "CIE", "DNE", "MTE", "POS", "SHR"
 func (batch *batch) isAddendaCount(count int) error {
 	for _, entry := range batch.entries {
-		if !entry.HasReturnAddenda() {
+		if !entry.HasAddendaReturn() {
 			if len(entry.Addendum) > count {
 				msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), count, batch.header.StandardEntryClassCode)
 				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
@@ -332,7 +332,7 @@ func (batch *batch) isAddendaCount(count int) error {
 		} else {
 			if len(entry.ReturnAddendum) > count {
 				msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.ReturnAddendum), count, batch.header.StandardEntryClassCode)
-				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "ReturnAddendaCount", Msg: msg}
+				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "AddendaReturnCount", Msg: msg}
 			}
 		}
 	}
