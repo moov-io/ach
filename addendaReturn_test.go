@@ -10,8 +10,8 @@ import (
 	"time"
 )
 
-func mockReturnAddenda() *ReturnAddenda {
-	rAddenda := NewReturnAddenda()
+func mockAddendaReturn() *AddendaReturn {
+	rAddenda := NewAddendaReturn()
 	rAddenda.typeCode = "99"
 	rAddenda.ReturnCode = "R07"
 	rAddenda.OriginalTrace = 99912340000015
@@ -21,15 +21,15 @@ func mockReturnAddenda() *ReturnAddenda {
 	return rAddenda
 }
 
-func TestMockReturnAddenda(t *testing.T) {
+func TestMockAddendaReturn(t *testing.T) {
 	// TODO: build a mock addenda
 }
 
-func TestReturnAddendaParse(t *testing.T) {
-	rAddenda := NewReturnAddenda()
+func TestAddendaReturnParse(t *testing.T) {
+	rAddenda := NewAddendaReturn()
 	line := "799R07099912340000015      09101298Authorization revoked                       091012980000066"
 	rAddenda.Parse(line)
-	// walk the returnAddenda struct
+	// walk the addendaReturn struct
 	if rAddenda.recordType != "7" {
 		t.Errorf("expected %v got %v", "7", rAddenda.recordType)
 	}
@@ -56,8 +56,8 @@ func TestReturnAddendaParse(t *testing.T) {
 	}
 }
 
-func TestReturnAddendaString(t *testing.T) {
-	rAddenda := NewReturnAddenda()
+func TestAddendaReturnString(t *testing.T) {
+	rAddenda := NewAddendaReturn()
 	line := "799R07099912340000015      09101298Authorization revoked                       091012980000066"
 	rAddenda.Parse(line)
 
@@ -67,7 +67,7 @@ func TestReturnAddendaString(t *testing.T) {
 }
 
 // This is not an exported function but utilized for validation
-func TestReturnAddendaMakeReturnCodeDict(t *testing.T) {
+func TestAddendaReturnMakeReturnCodeDict(t *testing.T) {
 	codes := makeReturnCodeDict()
 	// check if known code is present
 	_, prs := codes["R01"]
@@ -81,8 +81,8 @@ func TestReturnAddendaMakeReturnCodeDict(t *testing.T) {
 	}
 }
 
-func TestReturnAddendaValidateTrue(t *testing.T) {
-	rAddenda := mockReturnAddenda()
+func TestAddendaReturnValidateTrue(t *testing.T) {
+	rAddenda := mockAddendaReturn()
 	rAddenda.ReturnCode = "R13"
 	if err := rAddenda.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
@@ -95,8 +95,8 @@ func TestReturnAddendaValidateTrue(t *testing.T) {
 	}
 }
 
-func TestReturnAddendaValidateReturnCodeFalse(t *testing.T) {
-	rAddenda := mockReturnAddenda()
+func TestAddendaReturnValidateReturnCodeFalse(t *testing.T) {
+	rAddenda := mockAddendaReturn()
 	rAddenda.ReturnCode = ""
 	if err := rAddenda.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
@@ -109,16 +109,16 @@ func TestReturnAddendaValidateReturnCodeFalse(t *testing.T) {
 	}
 }
 
-func TestReturnAddendaOriginalTraceField(t *testing.T) {
-	rAddenda := mockReturnAddenda()
+func TestAddendaReturnOriginalTraceField(t *testing.T) {
+	rAddenda := mockAddendaReturn()
 	rAddenda.OriginalTrace = 12345
 	if rAddenda.OriginalTraceField() != "000000000012345" {
 		t.Errorf("expected %v received %v", "000000000012345", rAddenda.OriginalTraceField())
 	}
 }
 
-func TestReturnAddendaDateOfDeathField(t *testing.T) {
-	rAddenda := mockReturnAddenda()
+func TestAddendaReturnDateOfDeathField(t *testing.T) {
+	rAddenda := mockAddendaReturn()
 	// Check for all zeros
 	if rAddenda.DateOfDeathField() != "      " {
 		t.Errorf("expected %v received %v", "      ", rAddenda.DateOfDeathField())
@@ -130,24 +130,24 @@ func TestReturnAddendaDateOfDeathField(t *testing.T) {
 	}
 }
 
-func TestReturnAddendaOriginalDFIField(t *testing.T) {
-	rAddenda := mockReturnAddenda()
+func TestAddendaReturnOriginalDFIField(t *testing.T) {
+	rAddenda := mockAddendaReturn()
 	exp := "09101298"
 	if rAddenda.OriginalDFIField() != exp {
 		t.Errorf("expected %v received %v", exp, rAddenda.OriginalDFIField())
 	}
 }
 
-func TestReturnAddendaAddendaInformationField(t *testing.T) {
-	rAddenda := mockReturnAddenda()
+func TestAddendaReturnAddendaInformationField(t *testing.T) {
+	rAddenda := mockAddendaReturn()
 	exp := "Authorization Revoked                       "
 	if rAddenda.AddendaInformationField() != exp {
 		t.Errorf("expected %v received %v", exp, rAddenda.AddendaInformationField())
 	}
 }
 
-func TestReturnAddendaTraceNumberField(t *testing.T) {
-	rAddenda := mockReturnAddenda()
+func TestAddendaReturnTraceNumberField(t *testing.T) {
+	rAddenda := mockAddendaReturn()
 	rAddenda.TraceNumber = 91012980000066
 	exp := "091012980000066"
 	if rAddenda.TraceNumberField() != exp {
@@ -155,7 +155,7 @@ func TestReturnAddendaTraceNumberField(t *testing.T) {
 	}
 }
 
-func TestReturnAddendaNewAddendaParam(t *testing.T) {
+func TestAddendaReturnNewAddendaParam(t *testing.T) {
 	aParam := AddendaParam{
 		TypeCode:      "99",
 		ReturnCode:    "R07",
@@ -167,11 +167,11 @@ func TestReturnAddendaNewAddendaParam(t *testing.T) {
 
 	a, err := NewAddenda(aParam)
 	if err != nil {
-		t.Errorf("returnAddenda from NewAddeda: %v", err)
+		t.Errorf("addendaReturn from NewAddeda: %v", err)
 	}
-	rAddenda, ok := a.(*ReturnAddenda)
+	rAddenda, ok := a.(*AddendaReturn)
 	if !ok {
-		t.Errorf("expecting *ReturnAddenda received %T ", a)
+		t.Errorf("expecting *AddendaReturn received %T ", a)
 	}
 	if rAddenda.TypeCode() != aParam.TypeCode {
 		t.Errorf("expected %v got %v", aParam.TypeCode, rAddenda.TypeCode())

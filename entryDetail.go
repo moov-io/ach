@@ -77,7 +77,7 @@ type EntryDetail struct {
 	// Addendum a list of Addenda for the Entry Detail
 	Addendum []Addendumer
 	// ReturnAddendum stores return types. These are processed separately
-	ReturnAddendum []ReturnAddenda
+	ReturnAddendum []AddendaReturn
 	// validator is composed for data validation
 	validator
 	// converters is composed for ACH to golang Converters
@@ -243,8 +243,8 @@ func (ed *EntryDetail) AddAddenda(addenda Addendumer) []Addendumer {
 	return ed.Addendum
 }
 
-// AddReturnAddenda appends an ReturnAddendum to the entry
-func (ed *EntryDetail) AddReturnAddenda(returnAddendum ReturnAddenda) []ReturnAddenda {
+// AddAddendaReturn appends an ReturnAddendum to the entry
+func (ed *EntryDetail) AddAddendaReturn(returnAddendum AddendaReturn) []AddendaReturn {
 	ed.AddendaRecordIndicator = 1
 	// checks to make sure that we only have either or, not both
 	if ed.Addendum != nil {
@@ -330,7 +330,7 @@ func (ed *EntryDetail) TraceNumberField() string {
 	return ed.numericField(ed.TraceNumber, 15)
 }
 
-// HasReturnAddenda returns true if entry has return addenda
-func (ed *EntryDetail) HasReturnAddenda() bool {
+// HasAddendaReturn returns true if entry has return addenda
+func (ed *EntryDetail) HasAddendaReturn() bool {
 	return ed.ReturnAddendum != nil
 }
