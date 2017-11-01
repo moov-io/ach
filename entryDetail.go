@@ -236,11 +236,8 @@ func (ed *EntryDetail) AddAddenda(addenda Addendumer) []Addendumer {
 	switch addenda.(type) {
 	case *AddendaReturn:
 		ed.isReturn = true
-		// Only 1 Addendum can exist for returns. Overwrite existing AddendaReturn
-		if ed.Addendum != nil {
-			ed.Addendum[0] = addenda
-			return ed.Addendum
-		}
+		// Only 1 Addendum can exist for returns. Overwrite existing Addendum
+		ed.Addendum = nil
 		ed.Addendum = append(ed.Addendum, addenda)
 		return ed.Addendum
 	}
