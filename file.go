@@ -68,6 +68,8 @@ type File struct {
 
 	// NotificationOfChange (Notification of change) is a slice of references to BatchCOR in file.Batches
 	NotificationOfChange []*BatchCOR
+	// ReturnEntries is a slice of references to file.Batches that contain return entires
+	ReturnEntries []Batcher
 
 	converters
 }
@@ -155,6 +157,9 @@ func (f *File) AddBatch(batch Batcher) []Batcher {
 	switch batch.(type) {
 	case *BatchCOR:
 		f.NotificationOfChange = append(f.NotificationOfChange, batch.(*BatchCOR))
+	}
+	if batch.IsReturn() {
+		f.ReturnEntries = append(f.ReturnEntries, batch)
 	}
 	f.Batches = append(f.Batches, batch)
 	return f.Batches

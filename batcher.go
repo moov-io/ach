@@ -21,6 +21,7 @@ type Batcher interface {
 	AddEntry(*EntryDetail)
 	Create() error
 	Validate() error
+	IsReturn() bool
 }
 
 // BatchError is an Error that describes batch validation issues
