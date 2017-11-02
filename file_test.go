@@ -5,6 +5,7 @@
 package ach
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -175,4 +176,34 @@ func TestFileNotificationOfChange(t *testing.T) {
 	if file.NotificationOfChange[0] != bCOR {
 		t.Error("BatchCOR added to File.AddBatch should exist in NotificationOfChange")
 	}
+}
+
+func TestFileReturnEntries(t *testing.T) {
+	// create or copy the entry to be returned record
+	entry := mockEntryDetail()
+	// Add the addenda return with appropriate ReturnCode and addenda information
+	entry.AddAddenda(mockAddendaReturn())
+	// create or copy the previous batch header of the item being returned
+	batchHeader := mockBatchHeader()
+	// create or copy the batch to be returned
+	batch, err := NewBatch(BatchParam{StandardEntryClass: batchHeader.StandardEntryClassCode})
+	if err != nil {
+		t.Error(err.Error())
+	}
+	// Add the entry to be returned to the batch
+	batch.AddEntry(entry)
+	// Create the batch
+	batch.Create()
+	// Add the batch to your file.
+	file := NewFile().SetHeader(mockFileHeader())
+	file.AddBatch(batch)
+	// Create the return file
+	if err := file.Create(); err != nil {
+		t.Error(err.Error())
+	}
+
+	for i := range file.ReturnEntries {
+		fmt.Printf("%+v\n", file.ReturnEntries[i])
+	}
+
 }

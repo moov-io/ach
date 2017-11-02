@@ -287,3 +287,28 @@ func TestEDFieldInclusionTraceNumber(t *testing.T) {
 		}
 	}
 }
+
+func TestEDAddAddendaAddendaReturn(t *testing.T) {
+	entry := mockEntryDetail()
+	entry.AddAddenda(mockAddendaReturn())
+	if !entry.isReturn {
+		t.Error("AddendaReturn added and isReturn is false")
+	}
+	if entry.AddendaRecordIndicator != 1 {
+		t.Error("AddendaReturn added and record indicator is not 1")
+	}
+
+}
+
+func TestEDAddAddendaAddendaReturnTwice(t *testing.T) {
+	entry := mockEntryDetail()
+	entry.AddAddenda(mockAddendaReturn())
+	entry.AddAddenda(mockAddendaReturn())
+	if !entry.isReturn {
+		t.Error("AddendaReturn added and isReturn is false")
+	}
+
+	if len(entry.Addendum) != 1 {
+		t.Error("AddendaReturn added and isReturn is false")
+	}
+}

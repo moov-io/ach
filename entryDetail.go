@@ -28,7 +28,7 @@ type EntryDetail struct {
 	// Prenote for debit to savings account ‘38’
 	TransactionCode int
 
-	// rdfiIdentification is the RDFI's routing number without the last digit.
+	// RDFIIdentification is the RDFI's routing number without the last digit.
 	// Receiving Depository Financial Institution
 	RDFIIdentification int
 
@@ -78,6 +78,8 @@ type EntryDetail struct {
 	Addendum []Addendumer
 	// ReturnAddendum stores return types. These are processed separately
 	ReturnAddendum []AddendaReturn
+	// isReturn indicates the existence of a AddendaReturn in Addendum
+	isReturn bool
 	// validator is composed for data validation
 	validator
 	// converters is composed for ACH to golang Converters
@@ -200,7 +202,6 @@ func (ed *EntryDetail) Validate() error {
 		msg := fmt.Sprintf(msgValidCheckDigit, calculated)
 		return &FieldError{FieldName: "RDFIIdentification", Value: strconv.Itoa(ed.CheckDigit), Msg: msg}
 	}
-
 	return nil
 }
 
@@ -219,10 +220,6 @@ func (ed *EntryDetail) fieldInclusion() error {
 	if ed.DFIAccountNumber == "" {
 		return &FieldError{FieldName: "DFIAccountNumber", Value: ed.DFIAccountNumber, Msg: msgFieldInclusion}
 	}
-	// TODO: amount can be 0 if it's COR, should probably be more specific...
-	/*if ed.Amount == 0 {
-		return &FieldError{FieldName: "Amount", Value: ed.AmountField(), Msg: msgFieldInclusion}
-	}*/
 	if ed.IndividualName == "" {
 		return &FieldError{FieldName: "IndividualName", Value: ed.IndividualName, Msg: msgFieldInclusion}
 	}
@@ -236,11 +233,24 @@ func (ed *EntryDetail) fieldInclusion() error {
 func (ed *EntryDetail) AddAddenda(addenda Addendumer) []Addendumer {
 	ed.AddendaRecordIndicator = 1
 	// checks to make sure that we only have either or, not both
-	if ed.ReturnAddendum != nil {
-		return nil
+	switch addenda.(type) {
+	case *AddendaReturn:
+		ed.isReturn = true
+		// Only 1 Addendum can exist for returns. Overwrite existing Addendum
+		ed.Addendum = nil
+		ed.Addendum = append(ed.Addendum, addenda)
+		return ed.Addendum
+	case *AddendaNOC:
+		// Only 1 Addendum can exist for Notification of Change. Overwrite existing Addendum
+		ed.Addendum = nil
+		ed.Addendum = append(ed.Addendum, addenda)
+		return ed.Addendum
+	default:
+		// Batch type needs to validate number of addendum
+		ed.isReturn = false
+		ed.Addendum = append(ed.Addendum, addenda)
+		return ed.Addendum
 	}
-	ed.Addendum = append(ed.Addendum, addenda)
-	return ed.Addendum
 }
 
 // AddAddendaReturn appends an ReturnAddendum to the entry
