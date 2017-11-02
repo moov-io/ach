@@ -52,6 +52,13 @@ if len(achFile.NotificationOfChange) > 0 {
 		println(aNOC.CorrectedData)
 	} 
 } 
+// Check if any Return Entries exist in the file 
+if len(achFile.ReturnEntries) > 0 {
+	for _, batch := range achFile.ReturnEntries {
+		aReturn := batch.GetEntries()[0].Addendum[0].(*AddendaReturn)
+		println(aReturn.ReturnCode)
+	} 
+}
 ```	
 
 ### Create a file
