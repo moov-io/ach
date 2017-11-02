@@ -209,7 +209,7 @@ Which will generate a well formed ACH flat file.
 ```
 # Mailing lists
 
-Users trade notes on the Google group moov-users (send mail to moov-users@googlegroups.com). You must join the group in order to post. 
+Users trade notes on the Google group moov-users (send mail to moov-users@googlegroups.com). You must join the [moov-users](https://groups.google.com/forum/#!forum/moov-users)forumn in order to post. 
 
 # Contributing
 
