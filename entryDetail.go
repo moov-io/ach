@@ -240,10 +240,17 @@ func (ed *EntryDetail) AddAddenda(addenda Addendumer) []Addendumer {
 		ed.Addendum = nil
 		ed.Addendum = append(ed.Addendum, addenda)
 		return ed.Addendum
+	case *AddendaNOC:
+		// Only 1 Addendum can exist for Notification of Change. Overwrite existing Addendum
+		ed.Addendum = nil
+		ed.Addendum = append(ed.Addendum, addenda)
+		return ed.Addendum
+	default:
+		// Batch type needs to validate number of addendum
+		ed.isReturn = false
+		ed.Addendum = append(ed.Addendum, addenda)
+		return ed.Addendum
 	}
-	ed.isReturn = false
-	ed.Addendum = append(ed.Addendum, addenda)
-	return ed.Addendum
 }
 
 // AddAddendaReturn appends an ReturnAddendum to the entry
