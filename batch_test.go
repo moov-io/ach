@@ -42,7 +42,7 @@ func TestCreditBatchisBatchAmount(t *testing.T) {
 	e2.Amount = 100
 	mockBatch.AddEntry(e1)
 	mockBatch.AddEntry(e2)
-	if err := mockBatch.verify(); err != nil {
+	if err := mockBatch.build(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 
@@ -230,5 +230,18 @@ func TestBatchAddendaTraceNumber(t *testing.T) {
 		} else {
 			t.Errorf("%T: %s", err, err)
 		}
+	}
+}
+
+func TestNewBatchDefault(t *testing.T) {
+	_, err := NewBatch(BatchParam{
+		StandardEntryClass: "NIL"})
+
+	if e, ok := err.(*FileError); ok {
+		if e.FieldName != "StandardEntryClassCode" {
+			t.Errorf("%T: %s", err, err)
+		}
+	} else {
+		t.Errorf("%T: %s", err, err)
 	}
 }

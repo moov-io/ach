@@ -26,9 +26,9 @@ func NewBatch(bp BatchParam) (Batcher, error) {
 	case "COR":
 		return NewBatchCOR(bp), nil
 	default:
-		msg := fmt.Sprintf(msgFileNoneSEC, sec)
-		return nil, &FileError{FieldName: "StandardEntryClassCode", Msg: msg}
 	}
+	msg := fmt.Sprintf(msgFileNoneSEC, bp.StandardEntryClass)
+	return nil, &FileError{FieldName: "StandardEntryClassCode", Msg: msg}
 }
 
 // verify checks basic valid NACHA batch rules. Assumes properly parsed records. This does not mean it is a valid batch as validity is tied to each batch type
