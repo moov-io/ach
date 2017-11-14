@@ -199,7 +199,7 @@ func (batch *batch) isFieldInclusion() error {
 func (batch *batch) isBatchEntryCount() error {
 	entryCount := 0
 	for _, entry := range batch.entries {
-		entryCount = entryCount + 1 + len(entry.Addendum) + len(entry.ReturnAddendum)
+		entryCount = entryCount + 1 + len(entry.Addendum)
 	}
 	if entryCount != batch.control.EntryAddendaCount {
 		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, entryCount, batch.control.EntryAddendaCount)
@@ -333,17 +333,11 @@ func (batch *batch) isAddendaSequence() error {
 // "PPD", "WEB", "CCD", "CIE", "DNE", "MTE", "POS", "SHR"
 func (batch *batch) isAddendaCount(count int) error {
 	for _, entry := range batch.entries {
-		if !entry.HasAddendaReturn() {
-			if len(entry.Addendum) > count {
-				msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), count, batch.header.StandardEntryClassCode)
-				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
-			}
-		} else {
-			if len(entry.ReturnAddendum) > count {
-				msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.ReturnAddendum), count, batch.header.StandardEntryClassCode)
-				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "AddendaReturnCount", Msg: msg}
-			}
+		if len(entry.Addendum) > count {
+			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), count, batch.header.StandardEntryClassCode)
+			return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 		}
+
 	}
 	return nil
 }

@@ -76,8 +76,6 @@ type EntryDetail struct {
 
 	// Addendum a list of Addenda for the Entry Detail
 	Addendum []Addendumer
-	// ReturnAddendum stores return types. These are processed separately
-	ReturnAddendum []AddendaReturn
 	// isReturn indicates the existence of a AddendaReturn in Addendum
 	isReturn bool
 	// validator is composed for data validation
@@ -253,17 +251,6 @@ func (ed *EntryDetail) AddAddenda(addenda Addendumer) []Addendumer {
 	}
 }
 
-// AddAddendaReturn appends an ReturnAddendum to the entry
-func (ed *EntryDetail) AddAddendaReturn(returnAddendum AddendaReturn) []AddendaReturn {
-	ed.AddendaRecordIndicator = 1
-	// checks to make sure that we only have either or, not both
-	if ed.Addendum != nil {
-		return nil
-	}
-	ed.ReturnAddendum = append(ed.ReturnAddendum, returnAddendum)
-	return ed.ReturnAddendum
-}
-
 // SetRDFI takes the 9 digit RDFI account number and separates it for RDFIIdentification and CheckDigit
 func (ed *EntryDetail) SetRDFI(rdfi int) *EntryDetail {
 	s := ed.numericField(rdfi, 9)
@@ -338,9 +325,4 @@ func (ed *EntryDetail) SetPaymentType(t string) {
 // TraceNumberField returns a zero padded traceNumber string
 func (ed *EntryDetail) TraceNumberField() string {
 	return ed.numericField(ed.TraceNumber, 15)
-}
-
-// HasAddendaReturn returns true if entry has return addenda
-func (ed *EntryDetail) HasAddendaReturn() bool {
-	return ed.ReturnAddendum != nil
 }
