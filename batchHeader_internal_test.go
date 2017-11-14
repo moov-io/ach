@@ -320,27 +320,4 @@ func TestBHtoBatchParam(t *testing.T) {
 	if bh.ODFIIdentification != bh.parseNumField(bp.ODFIIdentification) {
 		t.Errorf("ODFIIdentification Expected '%b' got: %s", bh.ODFIIdentification, bp.ODFIIdentification)
 	}
-
 }
-
-/*
-batch := NewBatchPPD(BatchParam{
-		ServiceClassCode:        "220",
-		CompanyName:             companyName,
-		StandardEntryClass:      "PPD",
-		CompanyIdentification:   "123456789",
-		CompanyEntryDescription: "Trans. Description",
-		CompanyDescriptiveDate:  "Oct 23",
-		ODFIIdentification:      "123456789"})
-
-*/
-/*
-		bh.ServiceClassCode = bh.parseNumField(params[0].ServiceClassCode)
-	bh.CompanyName = params[0].CompanyName
-	bh.CompanyIdentification = params[0].CompanyIdentification
-	bh.StandardEntryClassCode = params[0].StandardEntryClass
-	bh.CompanyEntryDescription = params[0].CompanyEntryDescription
-	bh.CompanyDescriptiveDate = params[0].CompanyDescriptiveDate
-	bh.EffectiveEntryDate = bh.parseSimpleDate(params[0].EffectiveEntryDate)
-	bh.ODFIIdentification = bh.parseNumField(params[0].ODFIIdentification)
-*/
