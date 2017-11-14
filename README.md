@@ -12,13 +12,14 @@ Package 'moov-io/ach' implements a file reader and writer for parsing [ACH](http
 
 ## Project Status
 
-ACH is at an early stage and under active development. Please star the project if you are interested in its progress.
+ACH is at an early stage and under active development but is already in product for multiple companies. Please star the project if you are interested in its progress.
 
 * Library currently supports the reading and writing 
 	* PPD (Prearranged payment and deposits)
 	* WEB (Internet-initiated Entries )
 	* CCD (Corporate credit or debit)
 	* COR (Automated Notification of Change(NOC))
+	* Return Entires
 
 
 ## Project Roadmap
@@ -206,6 +207,9 @@ Which will generate a well formed ACH flat file.
 82200000020010200101000000000000000000000799123456789                          234567890000002
 9000002000001000000040020400202000000017500000000000799 
 ```
+# Mailing lists
+
+Users trade notes on the Google group moov-users (send mail to moov-users@googlegroups.com). You must join the [moov-users](https://groups.google.com/forum/#!forum/moov-users)forumn in order to post. 
 
 # Contributing
 
