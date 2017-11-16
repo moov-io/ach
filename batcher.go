@@ -21,7 +21,8 @@ type Batcher interface {
 	AddEntry(*EntryDetail)
 	Create() error
 	Validate() error
-	IsReturn() bool
+	// Category defines if a Forward or Return
+	Category() string
 }
 
 // BatchError is an Error that describes batch validation issues

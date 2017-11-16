@@ -76,13 +76,19 @@ type EntryDetail struct {
 
 	// Addendum a list of Addenda for the Entry Detail
 	Addendum []Addendumer
-	// isReturn indicates the existence of a AddendaReturn in Addendum
-	isReturn bool
+	// Category defines if the entry is a Forward, Return, or NOC
+	Category string
 	// validator is composed for data validation
 	validator
 	// converters is composed for ACH to golang Converters
 	converters
 }
+
+const (
+	CategoryForward = "Forward"
+	CategoryReturn  = "Return"
+	CategoryNOC     = "NOC"
+)
 
 // EntryParam is the minimal fields required to make a ach entry
 type EntryParam struct {
@@ -101,6 +107,7 @@ type EntryParam struct {
 func NewEntryDetail(params ...EntryParam) *EntryDetail {
 	entry := &EntryDetail{
 		recordType: "6",
+		Category:   CategoryForward,
 	}
 	if len(params) > 0 {
 		entry.SetRDFI(entry.parseNumField(params[0].ReceivingDFI))
@@ -233,19 +240,17 @@ func (ed *EntryDetail) AddAddenda(addenda Addendumer) []Addendumer {
 	// checks to make sure that we only have either or, not both
 	switch addenda.(type) {
 	case *AddendaReturn:
-		ed.isReturn = true
-		// Only 1 Addendum can exist for returns. Overwrite existing Addendum
+		ed.Category = CategoryReturn
 		ed.Addendum = nil
 		ed.Addendum = append(ed.Addendum, addenda)
 		return ed.Addendum
 	case *AddendaNOC:
-		// Only 1 Addendum can exist for Notification of Change. Overwrite existing Addendum
+		ed.Category = CategoryNOC
 		ed.Addendum = nil
 		ed.Addendum = append(ed.Addendum, addenda)
 		return ed.Addendum
 	default:
-		// Batch type needs to validate number of addendum
-		ed.isReturn = false
+		ed.Category = CategoryForward
 		ed.Addendum = append(ed.Addendum, addenda)
 		return ed.Addendum
 	}

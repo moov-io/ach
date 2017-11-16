@@ -17,6 +17,7 @@ func mockEntryDetail() *EntryDetail {
 	entry.Amount = 100000000
 	entry.IndividualName = "Wade Arnold"
 	entry.TraceNumber = 123456789
+	entry.Category = CategoryForward
 	return entry
 }
 
@@ -291,7 +292,7 @@ func TestEDFieldInclusionTraceNumber(t *testing.T) {
 func TestEDAddAddendaAddendaReturn(t *testing.T) {
 	entry := mockEntryDetail()
 	entry.AddAddenda(mockAddendaReturn())
-	if !entry.isReturn {
+	if entry.Category != CategoryReturn {
 		t.Error("AddendaReturn added and isReturn is false")
 	}
 	if entry.AddendaRecordIndicator != 1 {
@@ -304,8 +305,8 @@ func TestEDAddAddendaAddendaReturnTwice(t *testing.T) {
 	entry := mockEntryDetail()
 	entry.AddAddenda(mockAddendaReturn())
 	entry.AddAddenda(mockAddendaReturn())
-	if !entry.isReturn {
-		t.Error("AddendaReturn added and isReturn is false")
+	if entry.Category != CategoryReturn {
+		t.Error("AddendaReturn added and Category is not CategoryReturn")
 	}
 
 	if len(entry.Addendum) != 1 {

@@ -8,8 +8,8 @@ type batch struct {
 	entries []*EntryDetail
 	control *BatchControl
 
-	// isReturn is true if a return entry was added to the batch
-	isReturn bool
+	// category defines if the entry is a Forward, Return, or NOC
+	category string
 	// Converters is composed for ACH to GoLang Converters
 	converters
 }
@@ -163,13 +163,13 @@ func (batch *batch) GetEntries() []*EntryDetail {
 
 // AddEntry appends an EntryDetail to the Batch
 func (batch *batch) AddEntry(entry *EntryDetail) {
-	batch.isReturn = entry.isReturn
+	batch.category = entry.Category
 	batch.entries = append(batch.entries, entry)
 }
 
 // IsReturn is true if the batch contains an Entry Return
-func (batch *batch) IsReturn() bool {
-	return batch.isReturn
+func (batch *batch) Category() string {
+	return batch.category
 }
 
 // isFieldInclusion iterates through all the records in the batch and verifies against default fields

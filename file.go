@@ -158,7 +158,7 @@ func (f *File) AddBatch(batch Batcher) []Batcher {
 	case *BatchCOR:
 		f.NotificationOfChange = append(f.NotificationOfChange, batch.(*BatchCOR))
 	}
-	if batch.IsReturn() {
+	if batch.Category() == CategoryReturn {
 		f.ReturnEntries = append(f.ReturnEntries, batch)
 	}
 	f.Batches = append(f.Batches, batch)
