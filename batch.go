@@ -91,6 +91,9 @@ func (batch *batch) verify() error {
 	if err := batch.isAddendaSequence(); err != nil {
 		return err
 	}
+	if err := batch.isCategory(); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -349,6 +352,22 @@ func (batch *batch) isTypeCode(typeCode string) error {
 			if addenda.TypeCode() != typeCode {
 				msg := fmt.Sprintf(msgBatchTypeCode, addenda.TypeCode(), typeCode, batch.header.StandardEntryClassCode)
 				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+			}
+		}
+	}
+	return nil
+}
+
+// isCategory verifies that a Forward and Return Category are not in the same batch
+func (batch *batch) isCategory() error {
+	category := batch.GetEntries()[0].Category
+	if len(batch.entries) > 1 {
+		for i := 1; i < len(batch.entries); i++ {
+			if batch.entries[i].Category == CategoryNOC {
+				continue
+			}
+			if batch.entries[i].Category != category {
+				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "Category", Msg: msgBatchForwardReturn}
 			}
 		}
 	}

@@ -77,4 +77,5 @@ var (
 	msgBatchTransactionCodeCredit = "%v a credit is not allowed"
 	msgBatchSECType               = "header SEC type code %v for batch type %v"
 	msgBatchTypeCode              = "%v found in addenda and expecting %v for batch type %v"
+	msgBatchForwardReturn         = "Forward and Return entries found in the same batch"
 )

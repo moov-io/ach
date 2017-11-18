@@ -245,3 +245,36 @@ func TestNewBatchDefault(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
+
+func TestBatchCategory(t *testing.T) {
+	mockBatch := mockBatch()
+	// Add a Addenda Return to the mock batch
+	mockBatch.GetEntries()[0].AddAddenda(mockAddendaReturn())
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	if mockBatch.Category() != CategoryReturn {
+		t.Errorf("AddendaReturn added to batch and category is %s", mockBatch.Category())
+	}
+}
+
+func TestBatchCategoryForwardReturn(t *testing.T) {
+	mockBatch := mockBatch()
+	// Add a Addenda Return to the mock batch
+	entry := mockEntryDetail()
+	entry.AddAddenda(mockAddendaReturn())
+	mockBatch.AddEntry(entry)
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Category" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
