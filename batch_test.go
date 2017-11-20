@@ -247,7 +247,6 @@ func TestNewBatchDefault(t *testing.T) {
 
 func TestBatchCategory(t *testing.T) {
 	mockBatch := mockBatch()
-	//	mockBatch.GetEntries()[0] = nil
 	// Add a Addenda Return to the mock batch
 	entry := mockEntryDetail()
 	entry.AddAddenda(mockAddendaReturn())
