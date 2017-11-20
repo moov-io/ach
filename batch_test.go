@@ -176,7 +176,6 @@ func TestBatchAddendaIndicator(t *testing.T) {
 
 func TestBatchIsAddendaSeqAscending(t *testing.T) {
 	mockBatch := mockBatch()
-	mockBatch.SetHeader(mockBatchHeader())
 	ed := mockEntryDetail()
 	ed.AddAddenda(mockAddenda())
 	ed.AddAddenda(mockAddenda())
@@ -248,8 +247,12 @@ func TestNewBatchDefault(t *testing.T) {
 
 func TestBatchCategory(t *testing.T) {
 	mockBatch := mockBatch()
+	//	mockBatch.GetEntries()[0] = nil
 	// Add a Addenda Return to the mock batch
-	mockBatch.GetEntries()[0].AddAddenda(mockAddendaReturn())
+	entry := mockEntryDetail()
+	entry.AddAddenda(mockAddendaReturn())
+	mockBatch.AddEntry(entry)
+
 	if err := mockBatch.build(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
