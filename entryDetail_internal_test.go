@@ -16,7 +16,7 @@ func mockEntryDetail() *EntryDetail {
 	entry.DFIAccountNumber = "123456789"
 	entry.Amount = 100000000
 	entry.IndividualName = "Wade Arnold"
-	entry.TraceNumber = 123456789
+	entry.setTraceNumber(6200001, 1)
 	entry.Category = CategoryForward
 	return entry
 }
@@ -38,8 +38,8 @@ func TestMockEntryDetail(t *testing.T) {
 	if entry.IndividualName != "Wade Arnold" {
 		t.Error("IndividualName dependent default value has changed")
 	}
-	if entry.TraceNumber != 123456789 {
-		t.Error("TraceNumber dependent default value has changed")
+	if entry.TraceNumber != 62000010000001 {
+		t.Errorf("TraceNumber dependent default value has changed %v", entry.TraceNumber)
 	}
 }
 

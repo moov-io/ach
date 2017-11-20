@@ -34,13 +34,13 @@ func TestBatchNumberMismatch(t *testing.T) {
 func TestCreditBatchisBatchAmount(t *testing.T) {
 	mockBatch := mockBatch()
 	mockBatch.SetHeader(mockBatchHeader())
-	e1 := mockEntryDetail()
+	e1 := mockBatch.GetEntries()[0]
 	e1.TransactionCode = 22
 	e1.Amount = 100
 	e2 := mockEntryDetail()
 	e2.TransactionCode = 22
 	e2.Amount = 100
-	mockBatch.AddEntry(e1)
+	e2.TraceNumber = e1.TraceNumber + 10
 	mockBatch.AddEntry(e2)
 	if err := mockBatch.build(); err != nil {
 		t.Errorf("%T: %s", err, err)
@@ -61,13 +61,14 @@ func TestCreditBatchisBatchAmount(t *testing.T) {
 func TestSavingsBatchisBatchAmount(t *testing.T) {
 	mockBatch := mockBatch()
 	mockBatch.SetHeader(mockBatchHeader())
-	e1 := mockEntryDetail()
+	e1 := mockBatch.GetEntries()[0]
 	e1.TransactionCode = 32
 	e1.Amount = 100
 	e2 := mockEntryDetail()
 	e2.TransactionCode = 37
 	e2.Amount = 100
-	mockBatch.AddEntry(e1)
+	e2.TraceNumber = e1.TraceNumber + 10
+
 	mockBatch.AddEntry(e2)
 	if err := mockBatch.build(); err != nil {
 		t.Errorf("%T: %s", err, err)
@@ -102,10 +103,9 @@ func TestBatchisEntryHash(t *testing.T) {
 func TestBatchDNEMismatch(t *testing.T) {
 	mockBatch := mockBatch()
 	mockBatch.SetHeader(mockBatchHeader())
-	ed := mockEntryDetail()
+	ed := mockBatch.GetEntries()[0]
 	ed.AddAddenda(mockAddenda())
 	ed.AddAddenda(mockAddenda())
-	mockBatch.AddEntry(ed)
 	mockBatch.build()
 
 	mockBatch.GetHeader().OriginatorStatusCode = 1
@@ -176,14 +176,13 @@ func TestBatchAddendaIndicator(t *testing.T) {
 
 func TestBatchIsAddendaSeqAscending(t *testing.T) {
 	mockBatch := mockBatch()
-	ed := mockEntryDetail()
+	ed := mockBatch.GetEntries()[0]
 	ed.AddAddenda(mockAddenda())
 	ed.AddAddenda(mockAddenda())
-	mockBatch.AddEntry(ed)
 	mockBatch.build()
 
-	mockBatch.GetEntries()[1].Addendum[0].(*Addenda).SequenceNumber = 2
-	mockBatch.GetEntries()[1].Addendum[1].(*Addenda).SequenceNumber = 1
+	mockBatch.GetEntries()[0].Addendum[0].(*Addenda).SequenceNumber = 2
+	mockBatch.GetEntries()[0].Addendum[1].(*Addenda).SequenceNumber = 1
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "SequenceNumber" {
@@ -266,6 +265,7 @@ func TestBatchCategoryForwardReturn(t *testing.T) {
 	// Add a Addenda Return to the mock batch
 	entry := mockEntryDetail()
 	entry.AddAddenda(mockAddendaReturn())
+	entry.TraceNumber = entry.TraceNumber + 10
 	mockBatch.AddEntry(entry)
 	if err := mockBatch.build(); err != nil {
 		t.Errorf("%T: %s", err, err)
@@ -278,5 +278,18 @@ func TestBatchCategoryForwardReturn(t *testing.T) {
 		} else {
 			t.Errorf("%T: %s", err, err)
 		}
+	}
+}
+
+// Don't over write a batch trace number when building if it already exists
+func TestBatchTraceNumberExists(t *testing.T) {
+	mockBatch := mockBatch()
+	entry := mockEntryDetail()
+	traceBefore := entry.TraceNumberField()
+	mockBatch.AddEntry(entry)
+	mockBatch.build()
+	traceAfter := mockBatch.GetEntries()[1].TraceNumberField()
+	if traceBefore != traceAfter {
+		t.Errorf("Trace number was set to %v before batch.build and is now %v\n", traceBefore, traceAfter)
 	}
 }

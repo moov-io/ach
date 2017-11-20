@@ -156,7 +156,7 @@ func (ed *EntryDetail) Parse(record string) {
 	ed.DiscretionaryData = record[76:78]
 	// 79-79 1 if addenda exists 0 if it does not
 	ed.AddendaRecordIndicator = ed.parseNumField(record[78:79])
-	// 80-84 An internal identification (alphanumeric) that you use to uniquely identify
+	// 80-94 An internal identification (alphanumeric) that you use to uniquely identify
 	// this Entry Detail Record This number should be unique to the transaction and will help identify the transaction in case of an inquiry
 	ed.TraceNumber = ed.parseNumField(record[79:94])
 }
