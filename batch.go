@@ -1,6 +1,9 @@
 package ach
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 // Batch holds the Batch Header and Batch Control and all Entry Records for PPD Entries
 type batch struct {
@@ -8,8 +11,8 @@ type batch struct {
 	entries []*EntryDetail
 	control *BatchControl
 
-	// isReturn is true if a return entry was added to the batch
-	isReturn bool
+	// category defines if the entry is a Forward, Return, or NOC
+	category string
 	// Converters is composed for ACH to GoLang Converters
 	converters
 }
@@ -26,9 +29,9 @@ func NewBatch(bp BatchParam) (Batcher, error) {
 	case "COR":
 		return NewBatchCOR(bp), nil
 	default:
-		msg := fmt.Sprintf(msgFileNoneSEC, sec)
-		return nil, &FileError{FieldName: "StandardEntryClassCode", Msg: msg}
 	}
+	msg := fmt.Sprintf(msgFileNoneSEC, bp.StandardEntryClass)
+	return nil, &FileError{FieldName: "StandardEntryClassCode", Msg: msg}
 }
 
 // verify checks basic valid NACHA batch rules. Assumes properly parsed records. This does not mean it is a valid batch as validity is tied to each batch type
@@ -91,6 +94,9 @@ func (batch *batch) verify() error {
 	if err := batch.isAddendaSequence(); err != nil {
 		return err
 	}
+	if err := batch.isCategory(); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -109,7 +115,14 @@ func (batch *batch) build() error {
 	seq := 1
 	for i, entry := range batch.entries {
 		entryCount = entryCount + 1 + len(entry.Addendum)
-		batch.entries[i].setTraceNumber(batch.header.ODFIIdentification, seq)
+		currentTraceNumberODFI, err := strconv.Atoi(entry.TraceNumberField()[:8])
+		if err != nil {
+			return err
+		}
+		// Add a sequenced TraceNumber if one is not already set. Have to keep original trance number Return and NOC entries
+		if currentTraceNumberODFI != batch.header.ODFIIdentification {
+			batch.entries[i].setTraceNumber(batch.header.ODFIIdentification, seq)
+		}
 		seq++
 		addendaSeq := 1
 		for x := range entry.Addendum {
@@ -163,13 +176,13 @@ func (batch *batch) GetEntries() []*EntryDetail {
 
 // AddEntry appends an EntryDetail to the Batch
 func (batch *batch) AddEntry(entry *EntryDetail) {
-	batch.isReturn = entry.isReturn
+	batch.category = entry.Category
 	batch.entries = append(batch.entries, entry)
 }
 
 // IsReturn is true if the batch contains an Entry Return
-func (batch *batch) IsReturn() bool {
-	return batch.isReturn
+func (batch *batch) Category() string {
+	return batch.category
 }
 
 // isFieldInclusion iterates through all the records in the batch and verifies against default fields
@@ -199,7 +212,7 @@ func (batch *batch) isFieldInclusion() error {
 func (batch *batch) isBatchEntryCount() error {
 	entryCount := 0
 	for _, entry := range batch.entries {
-		entryCount = entryCount + 1 + len(entry.Addendum) + len(entry.ReturnAddendum)
+		entryCount = entryCount + 1 + len(entry.Addendum)
 	}
 	if entryCount != batch.control.EntryAddendaCount {
 		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, entryCount, batch.control.EntryAddendaCount)
@@ -333,17 +346,11 @@ func (batch *batch) isAddendaSequence() error {
 // "PPD", "WEB", "CCD", "CIE", "DNE", "MTE", "POS", "SHR"
 func (batch *batch) isAddendaCount(count int) error {
 	for _, entry := range batch.entries {
-		if !entry.HasAddendaReturn() {
-			if len(entry.Addendum) > count {
-				msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), count, batch.header.StandardEntryClassCode)
-				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
-			}
-		} else {
-			if len(entry.ReturnAddendum) > count {
-				msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.ReturnAddendum), count, batch.header.StandardEntryClassCode)
-				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "AddendaReturnCount", Msg: msg}
-			}
+		if len(entry.Addendum) > count {
+			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), count, batch.header.StandardEntryClassCode)
+			return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 		}
+
 	}
 	return nil
 }
@@ -355,6 +362,22 @@ func (batch *batch) isTypeCode(typeCode string) error {
 			if addenda.TypeCode() != typeCode {
 				msg := fmt.Sprintf(msgBatchTypeCode, addenda.TypeCode(), typeCode, batch.header.StandardEntryClassCode)
 				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+			}
+		}
+	}
+	return nil
+}
+
+// isCategory verifies that a Forward and Return Category are not in the same batch
+func (batch *batch) isCategory() error {
+	category := batch.GetEntries()[0].Category
+	if len(batch.entries) > 1 {
+		for i := 1; i < len(batch.entries); i++ {
+			if batch.entries[i].Category == CategoryNOC {
+				continue
+			}
+			if batch.entries[i].Category != category {
+				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "Category", Msg: msgBatchForwardReturn}
 			}
 		}
 	}

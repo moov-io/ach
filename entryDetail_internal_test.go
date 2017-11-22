@@ -16,7 +16,8 @@ func mockEntryDetail() *EntryDetail {
 	entry.DFIAccountNumber = "123456789"
 	entry.Amount = 100000000
 	entry.IndividualName = "Wade Arnold"
-	entry.TraceNumber = 123456789
+	entry.setTraceNumber(6200001, 1)
+	entry.Category = CategoryForward
 	return entry
 }
 
@@ -37,8 +38,8 @@ func TestMockEntryDetail(t *testing.T) {
 	if entry.IndividualName != "Wade Arnold" {
 		t.Error("IndividualName dependent default value has changed")
 	}
-	if entry.TraceNumber != 123456789 {
-		t.Error("TraceNumber dependent default value has changed")
+	if entry.TraceNumber != 62000010000001 {
+		t.Errorf("TraceNumber dependent default value has changed %v", entry.TraceNumber)
 	}
 }
 
@@ -291,7 +292,7 @@ func TestEDFieldInclusionTraceNumber(t *testing.T) {
 func TestEDAddAddendaAddendaReturn(t *testing.T) {
 	entry := mockEntryDetail()
 	entry.AddAddenda(mockAddendaReturn())
-	if !entry.isReturn {
+	if entry.Category != CategoryReturn {
 		t.Error("AddendaReturn added and isReturn is false")
 	}
 	if entry.AddendaRecordIndicator != 1 {
@@ -304,8 +305,8 @@ func TestEDAddAddendaAddendaReturnTwice(t *testing.T) {
 	entry := mockEntryDetail()
 	entry.AddAddenda(mockAddendaReturn())
 	entry.AddAddenda(mockAddendaReturn())
-	if !entry.isReturn {
-		t.Error("AddendaReturn added and isReturn is false")
+	if entry.Category != CategoryReturn {
+		t.Error("AddendaReturn added and Category is not CategoryReturn")
 	}
 
 	if len(entry.Addendum) != 1 {

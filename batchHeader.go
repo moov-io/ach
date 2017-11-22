@@ -280,3 +280,17 @@ func (bh *BatchHeader) BatchNumberField() string {
 func (bh *BatchHeader) settlementDateField() string {
 	return bh.alphaField(bh.settlementDate, 3)
 }
+
+// BatchParam returns a BatchParam with the values from BatchHeader
+func (bh *BatchHeader) BatchParam() BatchParam {
+	bp := BatchParam{
+		ServiceClassCode:        strconv.Itoa(bh.ServiceClassCode),
+		CompanyName:             bh.CompanyNameField(),
+		CompanyIdentification:   bh.CompanyIdentification,
+		StandardEntryClass:      bh.StandardEntryClassCode,
+		CompanyEntryDescription: bh.CompanyEntryDescription,
+		CompanyDescriptiveDate:  bh.CompanyDescriptiveDateField(),
+		EffectiveEntryDate:      bh.EffectiveEntryDateField(),
+		ODFIIdentification:      bh.ODFIIdentificationField()}
+	return bp
+}

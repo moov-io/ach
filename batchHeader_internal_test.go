@@ -294,3 +294,30 @@ func TestBHFieldInclusionOriginatorStatusCode(t *testing.T) {
 		}
 	}
 }
+
+func TestBHtoBatchParam(t *testing.T) {
+	bh := mockBatchHeader()
+	bp := bh.BatchParam()
+
+	if bh.ServiceClassCode != bh.parseNumField(bp.ServiceClassCode) {
+		t.Errorf("ServiceClassCode Expected '%b' got: %s", bh.ServiceClassCode, bp.ServiceClassCode)
+	}
+	if bh.CompanyName != bp.CompanyName {
+		t.Errorf("CompanyName Expected '%s' got: %s", bh.CompanyName, bp.CompanyName)
+	}
+	if bh.StandardEntryClassCode != bp.StandardEntryClass {
+		t.Errorf("StandardEntryClass Expected '%s' got: %s", bh.StandardEntryClassCode, bp.StandardEntryClass)
+	}
+	if bh.CompanyIdentification != bp.CompanyIdentification {
+		t.Errorf("CompanyIdentification Expected '%s' got: %s", bh.CompanyIdentification, bp.CompanyIdentification)
+	}
+	if bh.CompanyEntryDescription != bp.CompanyEntryDescription {
+		t.Errorf("CompanyEntryDescription Expected '%s' got: %s", bh.CompanyEntryDescription, bp.CompanyEntryDescription)
+	}
+	if bh.CompanyDescriptiveDateField() != bp.CompanyDescriptiveDate {
+		t.Errorf("CompanyDescriptiveDate Expected '%s' got: %s", bh.CompanyDescriptiveDateField(), bp.CompanyDescriptiveDate)
+	}
+	if bh.ODFIIdentification != bh.parseNumField(bp.ODFIIdentification) {
+		t.Errorf("ODFIIdentification Expected '%b' got: %s", bh.ODFIIdentification, bp.ODFIIdentification)
+	}
+}

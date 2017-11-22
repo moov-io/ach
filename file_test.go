@@ -5,7 +5,6 @@
 package ach
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -202,8 +201,7 @@ func TestFileReturnEntries(t *testing.T) {
 		t.Error(err.Error())
 	}
 
-	for i := range file.ReturnEntries {
-		fmt.Printf("%+v\n", file.ReturnEntries[i])
+	if len(file.ReturnEntries) != 1 {
+		t.Errorf("1 file.ReturnEntries added and %v exist", len(file.ReturnEntries))
 	}
-
 }

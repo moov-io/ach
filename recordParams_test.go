@@ -110,7 +110,7 @@ func TestBuildFileParam(t *testing.T) {
 		CompanyIdentification:   "123456789",
 		CompanyEntryDescription: "Trans. Description",
 		CompanyDescriptiveDate:  "Oct 23",
-		ODFIIdentification:      "123456789"})
+		ODFIIdentification:      "12345678"})
 
 	// To create an entry
 	entry := NewEntryDetail(EntryParam{
