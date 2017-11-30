@@ -113,6 +113,8 @@ func (v *validator) isTransactionCode(code int) error {
 		27,
 		// Prenote for debit to checking account ‘28’
 		28,
+		// Automated Return or Notification of Change for original transaction code 32, 33, or 34
+		31,
 		// Credit to savings account ‘32’
 		32,
 		// Prenote for credit to savings account ‘33’
