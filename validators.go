@@ -98,8 +98,9 @@ func (v *validator) isTransactionCode(code int) error {
 	switch code {
 	// TransactionCode if the receivers account is:
 	case
-		// Automated Return or Notification of Change for
-		// original transaction code '22', '23, '24'
+		// Demand Credit Records (for checking, NOW, and share draft accounts)
+
+		// Automated Return or Notification of Change for original transaction code '22', '23, '24'
 		21,
 		// Credit (deposit) to checking account ‘22’
 		22,
@@ -107,25 +108,98 @@ func (v *validator) isTransactionCode(code int) error {
 		23,
 		// Zero dollar with remittance data (CCD/CTX only)
 		24,
+
+		// Demand Debit Records (for checking, NOW, and share draft accounts)
+
 		// Automated Return or Notification of Change for original transaction code 27, 28, or 29
 		26,
 		// Debit (withdrawal) to checking account ‘27’
 		27,
 		// Prenote for debit to checking account ‘28’
 		28,
+		// Zero dollar with remittance data (for CCD, CTX, and IAT Entries only)
+		29,
+
+		// Savings Account Credit Records
+
+		// Return or Notification of Change for original transaction code 32, 33, or 34
+		31,
 		// Credit to savings account ‘32’
 		32,
 		// Prenote for credit to savings account ‘33’
 		33,
-		// Autmoated Return or Notification of Change for
-		// original transaction code '37', '38', '39
+		// Zero dollar with remittance data (for CCD, CTX, and IAT Entries only); Acknowledgment Entries (ACK and ATX Entries only)
+		34,
+
+		// Savings Account Debit Records
+
+		// Automated Return or Notification of Change for original transaction code '37', '38', '39
 		36,
 		// Debit to savings account ‘37’
 		37,
 		// Prenote for debit to savings account ‘38’
 		38,
 		// Zero dollar with remittance data (CCD/CTX only)
-		39:
+		39,
+
+		// Financial Institution General Ledger Credit Records
+
+		//Return or Notification of Change for original transaction code 42, 43, or 44
+		41,
+		// General Ledger Credit
+		42,
+		// Prenotification of General Ledger Credit (non-dollar)
+		43,
+		// Zero dollar with remittance data (for CCD and CTX Entries only)
+		44,
+
+		// Financial Institution General Ledger Debit Records
+
+		// Return or Notification of Change for original transaction code 47, 48, or 49
+		46,
+		//General Ledger Debit
+		47,
+		// Prenotification of General Ledger Debit (non-dollar)
+		48,
+		// Zero dollar with remittance data (for CCD and CTX only)
+		49,
+
+		// Loan Account Credit Records
+		// Return or Notification of Change for original transaction code 52, 53, or 54
+		51,
+		// Loan Account Credit
+		52,
+		// Prenotification of Loan Account Credit (non-dollar)
+		53,
+		// Zero dollar with remittance data (for CCD and CTX Entries only)
+		54,
+
+		// Loan Account Debit Records (for Reversals Only)
+
+		// Loan Account Debit (Reversals Only)
+		55,
+		// Return or Notification of Change for original transaction code 55
+		56,
+
+		// Accounting Records (for use in ADV Files only)
+		// These transaction codes represent accounting Entries.
+
+		// Credit for ACH debits originated
+		81,
+		//Debit for ACH credits originated
+		82,
+		// Credit for ACH credits received
+		83,
+		// Debit for ACH debits received
+		84,
+		// Credit for ACH credits in Rejected batches
+		85,
+		// Debit for ACH debits in Rejected batches
+		86,
+		// Summary credit for respondent ACH activity
+		87,
+		// Summary debit for respondent ACH activity
+		88:
 		return nil
 	}
 	return errors.New(msgTransactionCode)
