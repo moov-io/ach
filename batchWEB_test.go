@@ -20,7 +20,7 @@ func mockWEBEntryDetail() *EntryDetail {
 	entry.DFIAccountNumber = "123456789"
 	entry.Amount = 100000000
 	entry.IndividualName = "Wade Arnold"
-	entry.TraceNumber = 123456789
+	entry.setTraceNumber(6200001, 1)
 	entry.SetPaymentType("S")
 	return entry
 }

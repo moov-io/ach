@@ -76,15 +76,19 @@ type EntryDetail struct {
 
 	// Addendum a list of Addenda for the Entry Detail
 	Addendum []Addendumer
-	// ReturnAddendum stores return types. These are processed separately
-	ReturnAddendum []AddendaReturn
-	// isReturn indicates the existence of a AddendaReturn in Addendum
-	isReturn bool
+	// Category defines if the entry is a Forward, Return, or NOC
+	Category string
 	// validator is composed for data validation
 	validator
 	// converters is composed for ACH to golang Converters
 	converters
 }
+
+const (
+	CategoryForward = "Forward"
+	CategoryReturn  = "Return"
+	CategoryNOC     = "NOC"
+)
 
 // EntryParam is the minimal fields required to make a ach entry
 type EntryParam struct {
@@ -103,6 +107,7 @@ type EntryParam struct {
 func NewEntryDetail(params ...EntryParam) *EntryDetail {
 	entry := &EntryDetail{
 		recordType: "6",
+		Category:   CategoryForward,
 	}
 	if len(params) > 0 {
 		entry.SetRDFI(entry.parseNumField(params[0].ReceivingDFI))
@@ -151,7 +156,7 @@ func (ed *EntryDetail) Parse(record string) {
 	ed.DiscretionaryData = record[76:78]
 	// 79-79 1 if addenda exists 0 if it does not
 	ed.AddendaRecordIndicator = ed.parseNumField(record[78:79])
-	// 80-84 An internal identification (alphanumeric) that you use to uniquely identify
+	// 80-94 An internal identification (alphanumeric) that you use to uniquely identify
 	// this Entry Detail Record This number should be unique to the transaction and will help identify the transaction in case of an inquiry
 	ed.TraceNumber = ed.parseNumField(record[79:94])
 }
@@ -235,33 +240,20 @@ func (ed *EntryDetail) AddAddenda(addenda Addendumer) []Addendumer {
 	// checks to make sure that we only have either or, not both
 	switch addenda.(type) {
 	case *AddendaReturn:
-		ed.isReturn = true
-		// Only 1 Addendum can exist for returns. Overwrite existing Addendum
+		ed.Category = CategoryReturn
 		ed.Addendum = nil
 		ed.Addendum = append(ed.Addendum, addenda)
 		return ed.Addendum
 	case *AddendaNOC:
-		// Only 1 Addendum can exist for Notification of Change. Overwrite existing Addendum
+		ed.Category = CategoryNOC
 		ed.Addendum = nil
 		ed.Addendum = append(ed.Addendum, addenda)
 		return ed.Addendum
 	default:
-		// Batch type needs to validate number of addendum
-		ed.isReturn = false
+		ed.Category = CategoryForward
 		ed.Addendum = append(ed.Addendum, addenda)
 		return ed.Addendum
 	}
-}
-
-// AddAddendaReturn appends an ReturnAddendum to the entry
-func (ed *EntryDetail) AddAddendaReturn(returnAddendum AddendaReturn) []AddendaReturn {
-	ed.AddendaRecordIndicator = 1
-	// checks to make sure that we only have either or, not both
-	if ed.Addendum != nil {
-		return nil
-	}
-	ed.ReturnAddendum = append(ed.ReturnAddendum, returnAddendum)
-	return ed.ReturnAddendum
 }
 
 // SetRDFI takes the 9 digit RDFI account number and separates it for RDFIIdentification and CheckDigit
@@ -338,9 +330,4 @@ func (ed *EntryDetail) SetPaymentType(t string) {
 // TraceNumberField returns a zero padded traceNumber string
 func (ed *EntryDetail) TraceNumberField() string {
 	return ed.numericField(ed.TraceNumber, 15)
-}
-
-// HasAddendaReturn returns true if entry has return addenda
-func (ed *EntryDetail) HasAddendaReturn() bool {
-	return ed.ReturnAddendum != nil
 }

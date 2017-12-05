@@ -25,7 +25,7 @@ func mockCOREntryDetail() *EntryDetail {
 	entry.Amount = 0
 	entry.IdentificationNumber = "location #23"
 	entry.SetReceivingCompany("Best Co. #23")
-	entry.TraceNumber = 123456789
+	entry.setTraceNumber(6200001, 0)
 	entry.DiscretionaryData = "S"
 	return entry
 }
