@@ -54,5 +54,4 @@ var (
 	msgBatchSECType               = "header SEC type code %v for batch type %v"
 	msgBatchTypeCode              = "%v found in addenda and expecting %v for batch type %v"
 	msgBatchForwardReturn         = "Forward and Return entries found in the same batch"
-	msgBatchCreditOrDebit         = "%v found in batch that only allows %v"
 )
