@@ -3,6 +3,7 @@ package ach
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 // Batch holds the Batch Header and Batch Control and all Entry Records for PPD Entries
@@ -28,6 +29,8 @@ func NewBatch(bp BatchParam) (Batcher, error) {
 		return NewBatchCCD(bp), nil
 	case "COR":
 		return NewBatchCOR(bp), nil
+	case "TEL":
+		return NewBatchTEL(bp), nil
 	default:
 	}
 	msg := fmt.Sprintf(msgFileNoneSEC, bp.StandardEntryClass)
@@ -379,6 +382,20 @@ func (batch *batch) isCategory() error {
 			if batch.entries[i].Category != category {
 				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "Category", Msg: msgBatchForwardReturn}
 			}
+		}
+	}
+	return nil
+}
+
+// isPaymentTypeCode checks that the Entry detail records have either:
+// "R" For a recurring WEB Entry
+// "S" For a Single-Entry WEB Entry
+func (batch *batch) isPaymentTypeCode() error {
+	for _, entry := range batch.entries {
+		if !strings.Contains(strings.ToUpper(entry.PaymentTypeField()), "S") && !strings.Contains(strings.ToUpper(entry.PaymentTypeField()), "R") {
+			// TODO dead code because PaymentTypeField always returns S regardless of Discretionary Data value
+			msg := fmt.Sprintf(msgBatchWebPaymentType, entry.PaymentTypeField())
+			return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "PaymentType", Msg: msg}
 		}
 	}
 	return nil
