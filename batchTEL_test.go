@@ -42,7 +42,7 @@ func TestBatchTELParam(t *testing.T) {
 	batch, _ := NewBatch(mockBatchTELHeader().BatchParam())
 	err, ok := batch.(*BatchTEL)
 	if !ok {
-		t.Errorf("Expecting BatchTEL got %T: %s", err, err)
+		t.Errorf("Expecting BatchTEL got %T", err)
 	}
 }
 
