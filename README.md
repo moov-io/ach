@@ -12,12 +12,13 @@ Package 'moov-io/ach' implements a file reader and writer for parsing [ACH](http
 
 ## Project Status
 
-ACH is at an early stage and under active development but is already in product for multiple companies. Please star the project if you are interested in its progress.
+ACH is under active development but already in production for multiple companies. Please star the project if you are interested in its progress.
 
 * Library currently supports the reading and writing 
 	* PPD (Prearranged payment and deposits)
 	* WEB (Internet-initiated Entries )
 	* CCD (Corporate credit or debit)
+	* TEL (Telephone-Initiated Entry)
 	* COR (Automated Notification of Change(NOC))
 	* Return Entires
 
