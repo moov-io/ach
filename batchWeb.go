@@ -2,7 +2,6 @@ package ach
 
 import (
 	"fmt"
-	"strings"
 )
 
 // BatchWEB creates a batch file that handles SEC payment type WEB.
@@ -70,19 +69,6 @@ func (batch *BatchWEB) Create() error {
 
 	if err := batch.Validate(); err != nil {
 		return err
-	}
-	return nil
-}
-
-// isPaymentTypeCode checks that the Entry detail records have either:
-// "R" For a recurring WEB Entry
-// "S" For a Single-Entry WEB Entry
-func (batch *BatchWEB) isPaymentTypeCode() error {
-	for _, entry := range batch.entries {
-		if !strings.Contains(strings.ToUpper(entry.PaymentTypeField()), "S") && !strings.Contains(strings.ToUpper(entry.PaymentTypeField()), "R") {
-			msg := fmt.Sprintf(msgBatchWebPaymentType, entry.PaymentTypeField())
-			return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "PaymentType", Msg: msg}
-		}
 	}
 	return nil
 }

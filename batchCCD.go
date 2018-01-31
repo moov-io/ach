@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-// BatchCCD creates a batch file that handles SEC payment type CCD amd CCD+.
+// BatchCCD is a batch file that handles SEC payment type CCD amd CCD+.
 // Corporate credit or debit. Identifies an Entry initiated by an Organization to transfer funds to or from an account of that Organization or another Organization.
 // For commercial accounts only.
 type BatchCCD struct {

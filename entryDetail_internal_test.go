@@ -313,3 +313,15 @@ func TestEDAddAddendaAddendaReturnTwice(t *testing.T) {
 		t.Error("AddendaReturn added and isReturn is false")
 	}
 }
+
+func TestEDCreditOrDebit(t *testing.T) {
+	// TODO add more credit and debit transaction code's to this test
+	entry := mockEntryDetail()
+	if entry.CreditOrDebit() != "C" {
+		t.Errorf("TransactionCode %v expected a Credit(C) got %v", entry.TransactionCode, entry.CreditOrDebit())
+	}
+	entry.TransactionCode = 27
+	if entry.CreditOrDebit() != "D" {
+		t.Errorf("TransactionCode %v expected a Debit(D) got %v", entry.TransactionCode, entry.CreditOrDebit())
+	}
+}

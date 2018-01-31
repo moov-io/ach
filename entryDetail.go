@@ -331,3 +331,16 @@ func (ed *EntryDetail) SetPaymentType(t string) {
 func (ed *EntryDetail) TraceNumberField() string {
 	return ed.numericField(ed.TraceNumber, 15)
 }
+
+// CreditOrDebit returns a "C" for credit or "D" for debit based on the entry TransactionCode
+func (ed *EntryDetail) CreditOrDebit() string {
+	tc := strconv.Itoa(ed.TransactionCode)
+	// take the second number in the Transaction code
+	switch tc[1:2] {
+	case "1", "2", "3":
+		return "C"
+	case "6", "7", "8":
+		return "D"
+	}
+	return ""
+}

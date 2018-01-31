@@ -44,7 +44,7 @@ var (
 	msgValidCheckDigit  = "does not match calculated check digit %d"
 )
 
-// iServiceClass returns true if a valid service class code
+// iServiceClass returns true if a valid service class code of a batch is found
 func (v *validator) isServiceClass(code int) error {
 	switch code {
 	case
@@ -61,7 +61,7 @@ func (v *validator) isServiceClass(code int) error {
 	return errors.New(msgServiceClass)
 }
 
-// isSECCode returns true if a SEC Code is found
+// isSECCode returns true if a SEC Code of a Batch is found
 func (v *validator) isSECCode(code string) error {
 	switch code {
 	case
@@ -72,7 +72,9 @@ func (v *validator) isSECCode(code string) error {
 	return errors.New(msgSECCode)
 }
 
-// isTypeCode returns true if a valid type code is found
+// isTypeCode returns true if a valid type code of an Addendum is found
+//
+// The Addenda Type Code defines the specific interpretation and format for the addenda information contained in the Entry.
 func (v *validator) isTypeCode(code string) error {
 	switch code {
 	case
@@ -93,7 +95,24 @@ func (v *validator) isTypeCode(code string) error {
 	return errors.New(msgAddendaTypeCode)
 }
 
-// isTransactionCode ensures TransactionCode code is valid
+// isTransactionCode ensures TransactionCode of an Entry is valid
+//
+// The Tran Code is a two-digit code in positions 2 - 3 of the Entry Detail Record (6 Record) within an ACH File.
+// The first digit of the Tran Code indicates the account type to which the entry will post, where the number:
+//	"2"designates a Checking Account.
+//	"3"designates a Savings Account.
+// 	"4"designates a General Ledger Account.
+// 	"5"designates Loan Account.
+//The second digit of the Tran Code identifies the entry as:
+//	an original forward entry, where the number:
+//		"2"designates a credit. or
+//		"7"designates a debit.
+//	a return or NOC, where the number:
+//		"1"designates the return/NOC of a credit, or
+//		"6"designates a return/NOC of a debit.
+//	a pre-note or non-monetary informational transaction, where the number:
+//		"3"designates a credit, or
+//		"8"designates a debit.
 func (v *validator) isTransactionCode(code int) error {
 	switch code {
 	// TransactionCode if the receivers account is:
@@ -205,7 +224,7 @@ func (v *validator) isTransactionCode(code int) error {
 	return errors.New(msgTransactionCode)
 }
 
-// isOriginatorStatusCode ensures status code is valid
+// isOriginatorStatusCode ensures status code of a batch is valid
 func (v *validator) isOriginatorStatusCode(code int) error {
 	switch code {
 	case
@@ -237,20 +256,7 @@ func (v *validator) isAlphanumeric(s string) error {
 	return nil
 }
 
-// isOriginatorStatusCode ensures status code is valid
-/*
-func (v *validator) isCheckDigit(routingNumber string, checkDigit int) error {
-	calculated := v.CalculateCheckDigit(routingNumber)
-	if calculated != checkDigit {
-		msg := fmt.Sprintf(msgValidCheckDigit, calculated)
-		return &FieldError{FieldName: "RoutingNumber", Value: routingNumber, Msg: msg}
-		//return msgValidCheckDigit
-	}
-	return nil
-}
-*/
-
-// CalculateCheckDigit returns a check digit for a rounting number
+// CalculateCheckDigit returns a check digit for a routing number
 // Multiply each digit in the Routing number by a weighting factor. The weighting factors for each digit are:
 // Position: 1 2 3 4 5 6 7 8
 // Weights : 3 7 1 3 7 1 3 7
