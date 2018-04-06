@@ -205,3 +205,11 @@ func TestBCFieldInclusionODFIIdentification(t *testing.T) {
 		}
 	}
 }
+
+func TestBatchControlLength(t *testing.T) {
+	bc := NewBatchControl()
+	recordLength := len(bc.String())
+	if recordLength != 94 {
+		t.Errorf("Instantiated length of Batch Control string is not 94 but %v", recordLength)
+	}
+}
