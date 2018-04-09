@@ -10,18 +10,9 @@ type BatchTEL struct {
 }
 
 // NewBatchTEL returns a *BatchTEL
-func NewBatchTEL(params ...BatchParam) *BatchTEL {
+func NewBatchTEL(bh *BatchHeader) *BatchTEL {
 	batch := new(BatchTEL)
 	batch.SetControl(NewBatchControl())
-
-	if len(params) > 0 {
-		bh := NewBatchHeader(params[0])
-		bh.StandardEntryClassCode = "TEL"
-		batch.SetHeader(bh)
-		return batch
-	}
-	bh := NewBatchHeader()
-	bh.StandardEntryClassCode = "TEL"
 	batch.SetHeader(bh)
 	return batch
 }

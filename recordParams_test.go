@@ -1,8 +1,8 @@
 package ach
 
 import (
-	"bytes"
 	"testing"
+	"bytes"
 )
 
 func TestFileParam(t *testing.T) {
@@ -22,24 +22,20 @@ func TestFileParam(t *testing.T) {
 	}
 }
 
-func TestBatchParam(t *testing.T) {
-	companyName := "Your Company"
-	batch := NewBatchPPD(BatchParam{
-		ServiceClassCode:        "220",
-		CompanyName:             companyName,
-		StandardEntryClass:      "PPD",
-		CompanyIdentification:   "123456789",
-		CompanyEntryDescription: "Trans. Description",
-		CompanyDescriptiveDate:  "Oct 23",
-		ODFIIdentification:      "123456789"})
 
-	if err := batch.header.Validate(); err != nil {
+func TestBatchParam(t *testing.T) {
+	companyName := "ACME Corporation"
+	batch, _ := NewBatch(mockBatchPPDHeader())
+
+	bh := batch.GetHeader()
+	if err := bh.Validate(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
-	if batch.header.CompanyName != companyName {
+	if bh.CompanyName != companyName {
 		t.Errorf("BatchParam value was not copied to batch.header.CompanyName")
 	}
 }
+
 func TestEntryParam(t *testing.T) {
 	entry := NewEntryDetail(EntryParam{
 		ReceivingDFI:      "102001017",
@@ -103,14 +99,7 @@ func TestBuildFileParam(t *testing.T) {
 		ReferenceCode:            "#00000A1"})
 
 	// To create a batch. Errors only if payment type is not supported.
-	batch, _ := NewBatch(BatchParam{
-		ServiceClassCode:        "225",
-		CompanyName:             "Your Company",
-		StandardEntryClass:      "PPD",
-		CompanyIdentification:   "123456789",
-		CompanyEntryDescription: "Trans. Description",
-		CompanyDescriptiveDate:  "Oct 23",
-		ODFIIdentification:      "12345678"})
+	batch, _ := NewBatch(mockBatchHeader())
 
 	// To create an entry
 	entry := NewEntryDetail(EntryParam{
@@ -144,14 +133,7 @@ func TestBuildFileParam(t *testing.T) {
 
 	// Now add a new batch for accepting payments on the web
 
-	batch, _ = NewBatch(BatchParam{
-		ServiceClassCode:        "220",
-		CompanyName:             "Your Company",
-		StandardEntryClass:      "WEB",
-		CompanyIdentification:   "123456789",
-		CompanyEntryDescription: "monthly subscription",
-		CompanyDescriptiveDate:  "Oct 23",
-		ODFIIdentification:      "123456789"})
+	batch, _ = NewBatch(mockBatchWEBHeader())
 
 	// Add an entry and define if it is a single or reoccuring payment
 	// The following is a reoccuring payment for $7.99

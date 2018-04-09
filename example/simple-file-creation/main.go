@@ -5,6 +5,8 @@ import (
 	"os"
 
 	"github.com/moov-io/ach"
+	"strconv"
+	"time"
 )
 
 func main() {
@@ -18,14 +20,16 @@ func main() {
 
 	// To create a batch.
 	// Errors only if payment type is not supported.
-	batch, _ := ach.NewBatch(ach.BatchParam{
-		ServiceClassCode:        "200",
-		CompanyName:             "Your Company",
-		StandardEntryClass:      "PPD",
-		CompanyIdentification:   "123456789",
-		CompanyEntryDescription: "Trans. Description",
-		CompanyDescriptiveDate:  "Oct 23",
-		ODFIIdentification:      "123456789"})
+	bh := ach.NewBatchHeader()
+	bh.ServiceClassCode = 200
+	bh.CompanyName = "Your Company"
+	bh.CompanyIdentification = strconv.Itoa(file.Header.ImmediateOrigin)
+	bh.StandardEntryClassCode = "PPD"
+	bh.CompanyEntryDescription = "Trans. Description"
+	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
+	bh.ODFIIdentification = 123456789
+
+	batch, _ := ach.NewBatch(bh)
 
 	// To create an entry
 	entry := ach.NewEntryDetail(ach.EntryParam{
@@ -58,14 +62,16 @@ func main() {
 
 	// Now add a new batch for accepting payments on the web
 
-	batch2, _ := ach.NewBatch(ach.BatchParam{
-		ServiceClassCode:        "220",
-		CompanyName:             "Your Company",
-		StandardEntryClass:      "WEB",
-		CompanyIdentification:   "123456789",
-		CompanyEntryDescription: "subscr",
-		CompanyDescriptiveDate:  "Oct 23",
-		ODFIIdentification:      "123456789"})
+	bh2 := ach.NewBatchHeader()
+	bh2.ServiceClassCode = 220
+	bh2.CompanyName = "Your Company"
+	bh2.CompanyIdentification = strconv.Itoa(file.Header.ImmediateOrigin)
+	bh2.StandardEntryClassCode = "WEB"
+	bh2.CompanyEntryDescription = "Subscr"
+	bh2.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
+	bh2.ODFIIdentification = 123456789
+
+	batch2, _ := ach.NewBatch(bh2)
 
 	// Add an entry and define if it is a single or reoccuring payment
 	// The following is a reoccuring payment for $7.99
@@ -106,3 +112,5 @@ func main() {
 	}
 	w.Flush()
 }
+
+

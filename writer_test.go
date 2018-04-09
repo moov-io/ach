@@ -10,7 +10,7 @@ func TestPPDWrite(t *testing.T) {
 	file := NewFile().SetHeader(mockFileHeader())
 	entry := mockEntryDetail()
 	entry.AddAddenda(mockAddenda())
-	batch := NewBatchPPD()
+	batch := NewBatchPPD(mockBatchPPDHeader())
 	batch.SetHeader(mockBatchHeader())
 	batch.AddEntry(entry)
 	batch.Create()

@@ -195,12 +195,11 @@ func (r *Reader) parseBatchHeader() error {
 	}
 
 	// Passing SEC type into NewBatch creates a Batcher of SEC code type.
-	batch, err := NewBatch(bh.BatchParam())
+	batch, err := NewBatch(bh)
 	if err != nil {
 		return r.error(err)
 	}
 
-	batch.SetHeader(bh)
 	r.addCurrentBatch(batch)
 	return nil
 }

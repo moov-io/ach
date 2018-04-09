@@ -2,6 +2,7 @@ package ach
 
 import (
 	"testing"
+	"time"
 )
 
 // batch should never be used directly.
@@ -13,6 +14,19 @@ func mockBatch() *batch {
 		panic(err)
 	}
 	return mockBatch
+}
+
+// Invalid SEC CODE Batch Header
+func mockBatchInvalidSECHeader() *BatchHeader {
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = 220
+	bh.StandardEntryClassCode = "NIL"
+	bh.CompanyName = "ACME Corporation"
+	bh.CompanyIdentification = "123456789"
+	bh.CompanyEntryDescription = "PAYROLL"
+	bh.EffectiveEntryDate = time.Now()
+	bh.ODFIIdentification = 6200001
+	return bh
 }
 
 // Test cases that apply to all batch types
@@ -231,9 +245,9 @@ func TestBatchAddendaTraceNumber(t *testing.T) {
 	}
 }
 
+
 func TestNewBatchDefault(t *testing.T) {
-	_, err := NewBatch(BatchParam{
-		StandardEntryClass: "NIL"})
+	_, err := NewBatch(mockBatchInvalidSECHeader())
 
 	if e, ok := err.(*FileError); ok {
 		if e.FieldName != "StandardEntryClassCode" {
@@ -243,6 +257,8 @@ func TestNewBatchDefault(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
+
+
 
 func TestBatchCategory(t *testing.T) {
 	mockBatch := mockBatch()

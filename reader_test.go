@@ -104,7 +104,7 @@ func TestTwoFileControls(t *testing.T) {
 	var line = "9000001000001000000010005320001000000010500000000000000                                       "
 	var twoControls = line + "\n" + line
 	r := NewReader(strings.NewReader(twoControls))
-	r.addCurrentBatch(NewBatchPPD())
+	r.addCurrentBatch(NewBatchPPD(mockBatchPPDHeader()))
 	bc := BatchControl{EntryAddendaCount: 1,
 		TotalDebitEntryDollarAmount: 10500,
 		EntryHash:                   5320001}
@@ -193,10 +193,10 @@ func TestFileBatchHeaderErr(t *testing.T) {
 // TestFileBatchHeaderErr Error when two batch headers exists in a current batch
 func TestFileBatchHeaderDuplicate(t *testing.T) {
 	// create a new Batch header string
-	bh := mockBatchHeader()
+	bh := mockBatchPPDHeader()
 	r := NewReader(strings.NewReader(bh.String()))
 	// instantitate a batch header in the reader
-	r.addCurrentBatch(NewBatchPPD())
+	r.addCurrentBatch(NewBatchPPD(bh))
 	// read should fail because it is parsing a second batch header and there can only be one.
 	_, err := r.Read()
 	if p, ok := err.(*ParseError); ok {
@@ -232,7 +232,7 @@ func TestFileEntryDetail(t *testing.T) {
 	ed.TransactionCode = 0
 	line := ed.String()
 	r := NewReader(strings.NewReader(line))
-	r.addCurrentBatch(NewBatchPPD())
+	r.addCurrentBatch(NewBatchPPD(mockBatchPPDHeader()))
 	r.currentBatch.SetHeader(mockBatchHeader())
 	_, err := r.Read()
 	if p, ok := err.(*ParseError); ok {

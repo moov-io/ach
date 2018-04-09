@@ -31,14 +31,23 @@ func mockCOREntryDetail() *EntryDetail {
 }
 
 func mockBatchCOR() *BatchCOR {
-	mockBatch := NewBatchCOR()
-	mockBatch.SetHeader(mockBatchCORHeader())
+	mockBatch := NewBatchCOR(mockBatchCORHeader())
 	mockBatch.AddEntry(mockCOREntryDetail())
 	mockBatch.GetEntries()[0].AddAddenda(mockAddendaNOC())
 	if err := mockBatch.Create(); err != nil {
 		panic(err)
 	}
 	return mockBatch
+}
+
+// Test Batch Header
+func TestBatchCORHeader(t *testing.T) {
+	batch, _ := NewBatch(mockBatchCORHeader())
+
+	_, ok := batch.(*BatchCOR)
+	if !ok {
+		t.Error("Expecting BachCOR")
+	}
 }
 
 func TestBatchCORSEC(t *testing.T) {
@@ -52,23 +61,6 @@ func TestBatchCORSEC(t *testing.T) {
 		} else {
 			t.Errorf("%T: %s", err, err)
 		}
-	}
-}
-
-func TestBatchCORParam(t *testing.T) {
-
-	batch, _ := NewBatch(BatchParam{
-		ServiceClassCode:        "220",
-		CompanyName:             "Your Company, inc",
-		StandardEntryClass:      "COR",
-		CompanyIdentification:   "123456789",
-		CompanyEntryDescription: "Vndr Pay",
-		CompanyDescriptiveDate:  "Oct 23",
-		ODFIIdentification:      "123456789"})
-
-	_, ok := batch.(*BatchCOR)
-	if !ok {
-		t.Error("Expecting BachCOR")
 	}
 }
 
@@ -90,8 +82,7 @@ func TestBatchCORAddendumCountTwo(t *testing.T) {
 }
 
 func TestBatchCORAddendaCountZero(t *testing.T) {
-	mockBatch := NewBatchCOR()
-	mockBatch.SetHeader(mockBatchCORHeader())
+	mockBatch := NewBatchCOR(mockBatchCORHeader())
 	mockBatch.AddEntry(mockCOREntryDetail())
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -106,8 +97,7 @@ func TestBatchCORAddendaCountZero(t *testing.T) {
 
 // check that Addendum is of type AddendaNOC
 func TestBatchCORAddendaType(t *testing.T) {
-	mockBatch := NewBatchCOR()
-	mockBatch.SetHeader(mockBatchCORHeader())
+	mockBatch := NewBatchCOR(mockBatchCORHeader())
 	mockBatch.AddEntry(mockCOREntryDetail())
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
 	if err := mockBatch.Create(); err != nil {

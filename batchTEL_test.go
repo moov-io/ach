@@ -29,8 +29,7 @@ func mockTELEntryDetail() *EntryDetail {
 }
 
 func mockBatchTEL() *BatchTEL {
-	mockBatch := NewBatchTEL()
-	mockBatch.SetHeader(mockBatchTELHeader())
+	mockBatch := NewBatchTEL(mockBatchTELHeader())
 	mockBatch.AddEntry(mockTELEntryDetail())
 	if err := mockBatch.Create(); err != nil {
 		panic(err)
@@ -38,8 +37,8 @@ func mockBatchTEL() *BatchTEL {
 	return mockBatch
 }
 
-func TestBatchTELParam(t *testing.T) {
-	batch, _ := NewBatch(mockBatchTELHeader().BatchParam())
+func TestBatchTELHeader(t *testing.T) {
+	batch, _ := NewBatch(mockBatchTELHeader())
 	err, ok := batch.(*BatchTEL)
 	if !ok {
 		t.Errorf("Expecting BatchTEL got %T", err)

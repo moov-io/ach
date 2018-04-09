@@ -16,18 +16,9 @@ var msgBatchCORAddenda = "found and 1 AddendaNOC is required for SEC Type COR"
 var msgBatchCORAddendaType = "%T found where AddendaNOC is required for SEC type NOC"
 
 // NewBatchCOR returns a *BatchCOR
-func NewBatchCOR(params ...BatchParam) *BatchCOR {
+func NewBatchCOR(bh *BatchHeader) *BatchCOR {
 	batch := new(BatchCOR)
 	batch.SetControl(NewBatchControl())
-
-	if len(params) > 0 {
-		bh := NewBatchHeader(params[0])
-		bh.StandardEntryClassCode = "COR"
-		batch.SetHeader(bh)
-		return batch
-	}
-	bh := NewBatchHeader()
-	bh.StandardEntryClassCode = "COR"
 	batch.SetHeader(bh)
 	return batch
 }

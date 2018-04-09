@@ -109,8 +109,7 @@ func TestFileEntryHash(t *testing.T) {
 
 func TestFileBlockCount10(t *testing.T) {
 	file := NewFile().SetHeader(mockFileHeader())
-	batch := NewBatchPPD()
-	batch.SetHeader(mockBatchHeader())
+	batch := NewBatchPPD(mockBatchPPDHeader())
 	batch.AddEntry(mockEntryDetail())
 	batch.AddEntry(mockEntryDetail())
 	batch.AddEntry(mockEntryDetail())
@@ -185,7 +184,10 @@ func TestFileReturnEntries(t *testing.T) {
 	// create or copy the previous batch header of the item being returned
 	batchHeader := mockBatchHeader()
 	// create or copy the batch to be returned
-	batch, err := NewBatch(BatchParam{StandardEntryClass: batchHeader.StandardEntryClassCode})
+
+	//batch, err := NewBatch(BatchParam{StandardEntryClass: batchHeader.StandardEntryClassCode})
+	batch, err := NewBatch(batchHeader)
+
 	if err != nil {
 		t.Error(err.Error())
 	}

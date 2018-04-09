@@ -43,8 +43,7 @@ func main() {
 	entry.IndividualName = "Receiver Account Name" // Identifies the receiver of the transaction
 
 	// build the batch
-	batch := ach.NewBatchPPD()
-	batch.SetHeader(bh)
+	batch := ach.NewBatchPPD(bh)
 	batch.AddEntry(entry)
 	if err := batch.Create(); err != nil {
 		log.Fatalf("Unexpected error building batch: %s\n", err)

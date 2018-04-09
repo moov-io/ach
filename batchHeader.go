@@ -98,23 +98,12 @@ type BatchHeader struct {
 	converters
 }
 
-// NewBatchHeader returns a new BatchHeader with default values for none exported fields
-func NewBatchHeader(params ...BatchParam) *BatchHeader {
+// NewBatchHeader returns a new BatchHeader with default values for non exported fields
+func NewBatchHeader() *BatchHeader {
 	bh := &BatchHeader{
 		recordType:           "5",
 		OriginatorStatusCode: 0, //Prepared by an Originator
 		BatchNumber:          1,
-	}
-	if len(params) > 0 {
-		bh.ServiceClassCode = bh.parseNumField(params[0].ServiceClassCode)
-		bh.CompanyName = params[0].CompanyName
-		bh.CompanyIdentification = params[0].CompanyIdentification
-		bh.StandardEntryClassCode = params[0].StandardEntryClass
-		bh.CompanyEntryDescription = params[0].CompanyEntryDescription
-		bh.CompanyDescriptiveDate = params[0].CompanyDescriptiveDate
-		bh.EffectiveEntryDate = bh.parseSimpleDate(params[0].EffectiveEntryDate)
-		bh.ODFIIdentification = bh.parseNumField(params[0].ODFIIdentification)
-		return bh
 	}
 	return bh
 }
@@ -134,7 +123,7 @@ func (bh *BatchHeader) Parse(record string) {
 	bh.CompanyIdentification = strings.TrimSpace(record[40:50])
 	// 51-53 If the entries are PPD (credits/debits towards consumer account), use "PPD".
 	// If the entries are CCD (credits/debits towards corporate account), use "CCD".
-	// The difference between the 2 class codes are outside of the scope of this post, but generally most ACH transfers to consumer bank accounts should use "PPD"
+	// The difference between the 2 SEC codes are outside of the scope of this post.
 	bh.StandardEntryClassCode = record[50:53]
 	// 54-63 Your description of the transaction. This text will appear on the receivers’ bank statement.
 	// For example: "Payroll   "
@@ -279,18 +268,4 @@ func (bh *BatchHeader) BatchNumberField() string {
 
 func (bh *BatchHeader) settlementDateField() string {
 	return bh.alphaField(bh.settlementDate, 3)
-}
-
-// BatchParam returns a BatchParam with the values from BatchHeader
-func (bh *BatchHeader) BatchParam() BatchParam {
-	bp := BatchParam{
-		ServiceClassCode:        strconv.Itoa(bh.ServiceClassCode),
-		CompanyName:             bh.CompanyNameField(),
-		CompanyIdentification:   bh.CompanyIdentification,
-		StandardEntryClass:      bh.StandardEntryClassCode,
-		CompanyEntryDescription: bh.CompanyEntryDescription,
-		CompanyDescriptiveDate:  bh.CompanyDescriptiveDateField(),
-		EffectiveEntryDate:      bh.EffectiveEntryDateField(),
-		ODFIIdentification:      bh.ODFIIdentificationField()}
-	return bp
 }
