@@ -20,7 +20,7 @@ ACH is under active development but already in production for multiple companies
 	* CCD (Corporate credit or debit)
 	* TEL (Telephone-Initiated Entry)
 	* COR (Automated Notification of Change(NOC))
-	* Return Entires
+	* Return Entries
 
 
 ## Project Roadmap
@@ -75,20 +75,44 @@ file := ach.NewFile(ach.FileParam{
 	ReferenceCode:            "#00000A1"})
 ```
 
-To create a batch
+Explicitly create a PPD batch file. 
 
 Errors only if payment type is not supported
 
  ```go
-batch := ach.NewBatch(ach.BatchParam{
-	ServiceClassCode:        "220",
-	CompanyName:             "Your Company",
-	StandardEntryClass:      "PPD",
-	CompanyIdentification:   "123456789",
-	CompanyEntryDescription: "Trans. Description",
-	CompanyDescriptiveDate:  "Oct 23",
-	ODFIIdentification:      "123456789"})
+func mockBatchPPDHeader() *BatchHeader {
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = 220
+	bh.StandardEntryClassCode = "PPD"
+	bh.CompanyName = "ACME Corporation"
+	bh.CompanyIdentification = "123456789"
+	bh.CompanyEntryDescription = "PAYROLL"
+	bh.EffectiveEntryDate = time.Now()
+	bh.ODFIIdentification = 6200001
+	return bh
+}
+
+mockBatch := NewBatch(mockBatchPPDHeader())
 ```
+
+OR use the NewBatch factory
+
+ ```go
+func mockBatchPPDHeader() *BatchHeader {
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = 220
+	bh.StandardEntryClassCode = "PPD"
+	bh.CompanyName = "ACME Corporation"
+	bh.CompanyIdentification = "123456789"
+	bh.CompanyEntryDescription = "PAYROLL"
+	bh.EffectiveEntryDate = time.Now()
+	bh.ODFIIdentification = 6200001
+	return bh
+}
+
+mockBatch, _ := ach.NewBatch(mockBatchPPDHeader())
+```
+
 
 To create an entry
 
@@ -134,14 +158,18 @@ file.AddBatch(batch)
 Now add a new batch for accepting payments on the web
 
 ```go
-batch2, _ := ach.NewBatch(ach.BatchParam{
-	ServiceClassCode:        "220",
-	CompanyName:             "Your Company",
-	StandardEntryClass:      "WEB",
-	CompanyIdentification:   "123456789",
-	CompanyEntryDescription: "subscr",
-	CompanyDescriptiveDate:  "Oct 23",
-	ODFIIdentification:      "123456789"})
+func mockBatchWEBHeader() *BatchHeader {
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = 220
+	bh.StandardEntryClassCode = "WEB"
+	bh.CompanyName = "Your Company, inc"
+	bh.CompanyIdentification = "123456789"
+	bh.CompanyEntryDescription = "Online Order"
+	bh.ODFIIdentification = 6200001
+	return bh
+}
+
+batch2, _ := ach.NewBatch(mockBatchWEBHeader())
 ```
 
 Add an entry and define if it is a single or reoccurring payment. The following is a reoccurring payment for $7.99
@@ -249,18 +277,9 @@ type BatchMTE struct {
 Add the ability for the new type to be created. 
 
 ```go
-func NewBatchMTE(params ...BatchParam) *BatchMTE {
+func NewBatchMTE(bh *BatchHeader) *BatchMTE {
 	batch := new(BatchMTE)
 	batch.setControl(NewBatchControl)
-
-	if len(params) > 0 {
-		bh := NewBatchHeader(params[0])
-		bh.StandardEntryClassCode = "MTE"
-		batch.SetHeader(bh)
-		return batch
-	}
-	bh := NewBatchHeader()
-	bh.StandardEntryClassCode = "MTE"
 	batch.SetHeader(bh)
 	return batch
 }
@@ -310,7 +329,7 @@ Finally add the batch type to the NewBatch factory in batch.go.
 ```go
 //...
 case "MTE":
-		return NewBatchMTE(bp), nil
+		return NewBatchMTE(bh), nil
 //...
 ```
 
