@@ -18,22 +18,22 @@ type batch struct {
 	converters
 }
 
-// NewBatch takes a BatchParm and returns a matching SEC code batch type that is a batcher. Returns and error if the SEC code is not supported.
-func NewBatch(bp BatchParam) (Batcher, error) {
-	switch sec := bp.StandardEntryClass; sec {
+// NewBatch takes a BatchHeader and returns a matching SEC code batch type that is a batcher. Returns an error if the SEC code is not supported.
+func NewBatch(bh *BatchHeader) (Batcher, error) {
+	switch bh.StandardEntryClassCode {
 	case "PPD":
-		return NewBatchPPD(bp), nil
+		return NewBatchPPD(bh), nil
 	case "WEB":
-		return NewBatchWEB(bp), nil
+		return NewBatchWEB(bh), nil
 	case "CCD":
-		return NewBatchCCD(bp), nil
+		return NewBatchCCD(bh), nil
 	case "COR":
-		return NewBatchCOR(bp), nil
+		return NewBatchCOR(bh), nil
 	case "TEL":
-		return NewBatchTEL(bp), nil
+		return NewBatchTEL(bh), nil
 	default:
 	}
-	msg := fmt.Sprintf(msgFileNoneSEC, bp.StandardEntryClass)
+	msg := fmt.Sprintf(msgFileNoneSEC, bh.StandardEntryClassCode)
 	return nil, &FileError{FieldName: "StandardEntryClassCode", Msg: msg}
 }
 

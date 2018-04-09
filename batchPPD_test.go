@@ -9,10 +9,35 @@ import (
 	"time"
 )
 
+
+func mockBatchPPDHeader() *BatchHeader {
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = 220
+	bh.StandardEntryClassCode = "PPD"
+	bh.CompanyName = "ACME Corporation"
+	bh.CompanyIdentification = "123456789"
+	bh.CompanyEntryDescription = "PAYROLL"
+	bh.EffectiveEntryDate = time.Now()
+	bh.ODFIIdentification = 6200001
+	return bh
+}
+
+func mockPPDEntryDetail() *EntryDetail {
+	entry := NewEntryDetail()
+	entry.TransactionCode = 22
+	entry.SetRDFI(9101298)
+	entry.DFIAccountNumber = "123456789"
+	entry.Amount = 100000000
+	entry.IndividualName = "Wade Arnold"
+	entry.setTraceNumber(mockBatchPPDHeader().ODFIIdentification, 1)
+	//entry.setTraceNumber(6200001, 1)
+	entry.Category = CategoryForward
+	return entry
+}
+
 func mockBatchPPD() *BatchPPD {
-	mockBatch := NewBatchPPD()
-	mockBatch.SetHeader(mockBatchHeader())
-	mockBatch.AddEntry(mockEntryDetail())
+	mockBatch := NewBatchPPD(mockBatchPPDHeader())
+	mockBatch.AddEntry(mockPPDEntryDetail())
 	if err := mockBatch.Create(); err != nil {
 		panic(err)
 	}
@@ -103,7 +128,6 @@ func TestBatchODFIIDMismatch(t *testing.T) {
 }
 
 func TestBatchBuild(t *testing.T) {
-	mockBatch := NewBatchPPD()
 	header := NewBatchHeader()
 	header.ServiceClassCode = 200
 	header.CompanyName = "MY BEST COMP."
@@ -113,11 +137,12 @@ func TestBatchBuild(t *testing.T) {
 	header.CompanyEntryDescription = "PAYROLL"
 	header.EffectiveEntryDate = time.Now()
 	header.ODFIIdentification = 109991234
-	mockBatch.SetHeader(header)
+
+	mockBatch := NewBatchPPD(mockBatchPPDHeader())
 
 	entry := NewEntryDetail()
 	entry.TransactionCode = 22                  // ACH Credit
-	entry.SetRDFI(81086674)                     // scottrade bank routing number
+	entry.SetRDFI(81086674)                // scottrade bank routing number
 	entry.DFIAccountNumber = "62292250"         // scottrade account number
 	entry.Amount = 1000000                      // 1k dollars
 	entry.IdentificationNumber = "658-888-2468" // Unique ID for payment

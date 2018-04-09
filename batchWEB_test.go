@@ -26,8 +26,7 @@ func mockWEBEntryDetail() *EntryDetail {
 }
 
 func mockBatchWEB() *BatchWEB {
-	mockBatch := NewBatchWEB()
-	mockBatch.SetHeader(mockBatchWEBHeader())
+	mockBatch := NewBatchWEB(mockBatchWEBHeader())
 	mockBatch.AddEntry(mockWEBEntryDetail())
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
 	if err := mockBatch.Create(); err != nil {
@@ -37,6 +36,7 @@ func mockBatchWEB() *BatchWEB {
 }
 
 // No more than 1 batch per entry detail record can exist
+// No more than 1 addenda record per entry detail record can exist
 func TestBatchWebAddenda(t *testing.T) {
 	mockBatch := mockBatchWEB()
 	// mock batch already has one addenda. Creating two addenda should error

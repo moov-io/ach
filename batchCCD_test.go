@@ -29,14 +29,23 @@ func mockCCDEntryDetail() *EntryDetail {
 }
 
 func mockBatchCCD() *BatchCCD {
-	mockBatch := NewBatchCCD()
-	mockBatch.SetHeader(mockBatchCCDHeader())
+	mockBatch := NewBatchCCD(mockBatchCCDHeader())
 	mockBatch.AddEntry(mockCCDEntryDetail())
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
 	if err := mockBatch.Create(); err != nil {
 		panic(err)
 	}
 	return mockBatch
+}
+
+// Test Batch Header
+func TestBatchCCDHeader(t *testing.T) {
+	batch, _ := NewBatch(mockBatchCCDHeader())
+
+	_, ok := batch.(*BatchCCD)
+	if !ok {
+		t.Error("Expecting BatchCCD")
+	}
 }
 
 // A Batch CCD can only have one addendum per entry detail
@@ -130,22 +139,4 @@ func TestBatchCCDCreate(t *testing.T) {
 			t.Errorf("%T: %s", err, err)
 		}
 	}
-}
-
-func TestBatchCCDParam(t *testing.T) {
-
-	batch, _ := NewBatch(BatchParam{
-		ServiceClassCode:        "220",
-		CompanyName:             "Your Company, inc",
-		StandardEntryClass:      "CCD",
-		CompanyIdentification:   "123456789",
-		CompanyEntryDescription: "Vndr Pay",
-		CompanyDescriptiveDate:  "Oct 23",
-		ODFIIdentification:      "123456789"})
-
-	_, ok := batch.(*BatchCCD)
-	if !ok {
-		t.Error("Expecting BachCCD")
-	}
-
 }

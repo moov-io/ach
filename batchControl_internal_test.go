@@ -38,12 +38,11 @@ func TestParseBatchControl(t *testing.T) {
 	var line = "82250000010005320001000000010500000000000000origid                             076401250000001"
 	r := NewReader(strings.NewReader(line))
 	r.line = line
-	r.addCurrentBatch(NewBatchPPD())
 	bh := BatchHeader{BatchNumber: 1,
 		ServiceClassCode:      225,
 		CompanyIdentification: "origid",
 		ODFIIdentification:    7640125}
-	r.currentBatch.SetHeader(&bh)
+	r.addCurrentBatch(NewBatchPPD(&bh))
 
 	r.currentBatch.AddEntry(&EntryDetail{TransactionCode: 27, Amount: 10500, RDFIIdentification: 5320001, TraceNumber: 76401255655291})
 	if err := r.parseBatchControl(); err != nil {
@@ -91,12 +90,11 @@ func TestBCString(t *testing.T) {
 	var line = "82250000010005320001000000010500000000000000origid                             076401250000001"
 	r := NewReader(strings.NewReader(line))
 	r.line = line
-	r.addCurrentBatch(NewBatchPPD())
 	bh := BatchHeader{BatchNumber: 1,
 		ServiceClassCode:      225,
 		CompanyIdentification: "origid",
 		ODFIIdentification:    7640125}
-	r.currentBatch.SetHeader(&bh)
+	r.addCurrentBatch(NewBatchPPD(&bh))
 
 	r.currentBatch.AddEntry(&EntryDetail{TransactionCode: 27, Amount: 10500, RDFIIdentification: 5320001, TraceNumber: 76401255655291})
 	if err := r.parseBatchControl(); err != nil {
