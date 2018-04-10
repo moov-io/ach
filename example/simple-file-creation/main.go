@@ -11,12 +11,14 @@ import (
 
 func main() {
 	// To create a file
-	file := ach.NewFile(ach.FileParam{
-		ImmediateDestination:     "0210000890",
-		ImmediateOrigin:          "123456789",
-		ImmediateDestinationName: "Your Bank",
-		ImmediateOriginName:      "Your Company",
-		ReferenceCode:            "#00000A1"})
+	fh := ach.NewFileHeader()
+	fh.ImmediateDestination = 9876543210
+	fh.ImmediateOrigin = 1234567890
+	fh.FileCreationDate = time.Now()
+	fh.ImmediateDestinationName = "Federal Reserve Bank"
+	fh.ImmediateOriginName = "My Bank Name"
+	file := ach.NewFile()
+	file.SetHeader(fh)
 
 	// To create a batch.
 	// Errors only if payment type is not supported.

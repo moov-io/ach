@@ -6,18 +6,13 @@ import (
 )
 
 func TestFileParam(t *testing.T) {
-	f := NewFile(
-		FileParam{
-			ImmediateDestination:     "0210000890",
-			ImmediateOrigin:          "123456789",
-			ImmediateDestinationName: "Your Bank",
-			ImmediateOriginName:      "Your Company",
-			ReferenceCode:            "#00000A1"})
+	f := NewFile()
+	f.SetHeader(mockFileHeader())
 	if err := f.Header.Validate(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	if f.Header.ImmediateOriginName != "Your Company" {
+	if f.Header.ImmediateOriginName != "My Bank Name" {
 		t.Errorf("FileParam value was not copied to file.Header")
 	}
 }
@@ -91,12 +86,8 @@ func TestAddendaParam(t *testing.T) {
 
 func TestBuildFileParam(t *testing.T) {
 	// To create a file
-	file := NewFile(FileParam{
-		ImmediateDestination:     "0210000890",
-		ImmediateOrigin:          "123456789",
-		ImmediateDestinationName: "Your Bank",
-		ImmediateOriginName:      "Your Company",
-		ReferenceCode:            "#00000A1"})
+	file := NewFile()
+	file.SetHeader(mockFileHeader())
 
 	// To create a batch. Errors only if payment type is not supported.
 	batch, _ := NewBatch(mockBatchHeader())

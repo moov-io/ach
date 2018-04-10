@@ -67,12 +67,15 @@ if len(achFile.ReturnEntries) > 0 {
 The following is based on [simple file creation](https://github.com/moov-io/ach/tree/master/example/simple-file-creation)
  
  ```go
-file := ach.NewFile(ach.FileParam{
-	ImmediateDestination:     "0210000890",
-	ImmediateOrigin:          "123456789",
-	ImmediateDestinationName: "Your Bank",
-	ImmediateOriginName:      "Your Company",
-	ReferenceCode:            "#00000A1"})
+	fh := ach.NewFileHeader()
+	fh.ImmediateDestination = 9876543210 // A blank space followed by your ODFI's transit/routing number
+	fh.ImmediateOrigin = 1234567890      // Organization or Company FED ID usually 1 and FEIN/SSN. Assigned by your ODFI
+	fh.FileCreationDate = time.Now()     // Todays Date
+	fh.ImmediateDestinationName = "Federal Reserve Bank"
+	fh.ImmediateOriginName = "My Bank Name")
+
+	file := ach.NewFile()
+	file.SetHeader(fh)
 ```
 
 Explicitly create a PPD batch file. 
