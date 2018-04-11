@@ -79,14 +79,16 @@ func main() {
 	// Add an entry and define if it is a single or reoccuring payment
 	// The following is a reoccuring payment for $7.99
 
-	entry2 := ach.NewEntryDetail(ach.EntryParam{
-		ReceivingDFI:    "102001017",
-		RDFIAccount:     "5343121",
-		Amount:          "799",
-		TransactionCode: "22",
-		IDNumber:        "#123456",
-		IndividualName:  "Wade Arnold",
-		PaymentType:     "R"})
+	entry2 := ach.NewEntryDetail()
+	entry2.TransactionCode = 22
+	entry2.SetRDFI(102001017)
+	entry2.DFIAccountNumber = "5343121"
+	entry2.Amount = 799
+	entry2.IndividualName = "Wade Arnold"
+	entry2.SetTraceNumber(bh.ODFIIdentification, 1)
+	entry2.IdentificationNumber = "#123456"
+	entry.DiscretionaryData = "R"
+	entry2.Category = ach.CategoryForward
 
 	addenda2, _ := ach.NewAddenda(ach.AddendaParam{
 		PaymentRelatedInfo: "Monthly Membership Subscription"})

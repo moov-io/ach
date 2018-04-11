@@ -120,14 +120,15 @@ mockBatch, _ := ach.NewBatch(mockBatchPPDHeader())
 To create an entry
 
  ```go
-entry := ach.NewEntryDetail(ach.EntryParam{
-	ReceivingDFI:      "102001017",
-	RDFIAccount:       "5343121",
-	Amount:            "17500",
-	TransactionCode:   "27",
-	IDNumber:          "ABC##jvkdjfuiwn",
-	IndividualName:    "Bob Smith",
-	DiscretionaryData: "B1"})
+entry := ach.NewEntryDetail()
+entry.TransactionCode = 22
+entry.SetRDFI(9101298)
+entry.DFIAccountNumber = "123456789"
+entry.Amount = 100000000
+entry.IndividualName = "Wade Arnold"
+entry.SetTraceNumber(bh.ODFIIdentification, 1)
+entry.IdentificationNumber = "ABC##jvkdjfuiwn"
+entry.Category = ach.CategoryForward
 ```
 
 To add one or more optional addenda records for an entry
@@ -178,14 +179,16 @@ batch2, _ := ach.NewBatch(mockBatchWEBHeader())
 Add an entry and define if it is a single or reoccurring payment. The following is a reoccurring payment for $7.99
 
 ```go
-entry2 := ach.NewEntryDetail(ach.EntryParam{
-	ReceivingDFI:      "102001017",
-	RDFIAccount:       "5343121",
-	Amount:            "799",
-	TransactionCode:   "22",
-	IDNumber:          "#123456",
-	IndividualName:    "Wade Arnold",
-	PaymentType: 		"R"})
+entry2 := ach.NewEntryDetail()
+entry2.TransactionCode = 22
+entry2.SetRDFI(102001017)
+entry2.DFIAccountNumber = "5343121"
+entry2.Amount = 799
+entry2.IndividualName = "Wade Arnold"
+entry2.SetTraceNumber(bh.ODFIIdentification, 1)
+entry2.IdentificationNumber = "#123456"
+entry.DiscretionaryData = "R"
+entry2.Category = ach.CategoryForward
 
 addenda2 := ach.NewAddenda(ach.AddendaParam{
 	PaymentRelatedInfo: "Monthly Membership Subscription"})
