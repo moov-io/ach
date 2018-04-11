@@ -41,7 +41,13 @@ type BatchHeader struct {
 	// alpha or numeric character) of the entity in the company name field
 	CompanyIdentification string
 
-	// StandardEntryClassCode PPD’ for consumer transactions, ‘CCD’ or ‘CTX’ for corporate
+	// StandardEntryClassCode
+	// Identifies the payment type (product) found within an ACH batch-using a 3-character code.
+	// The SEC Code pertains to all items within batch.
+	// Determines format of the detail records.
+	// Determines addenda records (required or optional PLUS one or up to 9,999 records).
+	// Determines rules to follow (return time frames).
+	// Some SEC codes require specific data in predetermined fields within the ACH record
 	StandardEntryClassCode string
 
 	// CompanyEntryDescription A description of the entries contained in the batch

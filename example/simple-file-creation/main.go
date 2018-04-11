@@ -34,14 +34,15 @@ func main() {
 	batch, _ := ach.NewBatch(bh)
 
 	// To create an entry
-	entry := ach.NewEntryDetail(ach.EntryParam{
-		ReceivingDFI:      "102001017",
-		RDFIAccount:       "5343121",
-		Amount:            "17500",
-		TransactionCode:   "27",
-		IDNumber:          "#456789",
-		IndividualName:    "Bob Smith",
-		DiscretionaryData: "B1"})
+	entry := ach.NewEntryDetail()
+	entry.TransactionCode = 22
+	entry.SetRDFI(9101298)
+	entry.DFIAccountNumber = "123456789"
+	entry.Amount = 100000000
+	entry.IndividualName = "Wade Arnold"
+	entry.SetTraceNumber(bh.ODFIIdentification, 1)
+	entry.IdentificationNumber = "ABC##jvkdjfuiwn"
+	entry.Category = ach.CategoryForward
 
 	// To add one or more optional addenda records for an entry
 	addenda, _ := ach.NewAddenda(ach.AddendaParam{
@@ -114,5 +115,3 @@ func main() {
 	}
 	w.Flush()
 }
-
-

@@ -16,7 +16,21 @@ func mockEntryDetail() *EntryDetail {
 	entry.DFIAccountNumber = "123456789"
 	entry.Amount = 100000000
 	entry.IndividualName = "Wade Arnold"
-	entry.setTraceNumber(6200001, 1)
+	entry.SetTraceNumber(mockBatchHeader().ODFIIdentification, 1)
+	entry.IdentificationNumber = "ABC##jvkdjfuiwn"
+	entry.Category = CategoryForward
+	return entry
+}
+
+func mockEntryDemandDebit() *EntryDetail {
+	entry := NewEntryDetail()
+	entry.TransactionCode = 27
+	entry.SetRDFI(102001017)
+	entry.DFIAccountNumber = "5343121"
+	entry.Amount = 17500
+	entry.IndividualName = "Robert Smith"
+	entry.SetTraceNumber(mockBatchHeader().ODFIIdentification, 1)
+	entry.IdentificationNumber = "ABC##jvkdjfuiwn"
 	entry.Category = CategoryForward
 	return entry
 }
