@@ -76,8 +76,8 @@ func main() {
 
 	batch2, _ := ach.NewBatch(bh2)
 
-	// Add an entry and define if it is a single or reoccuring payment
-	// The following is a reoccuring payment for $7.99
+	// Add an entry and define if it is a single or reccuring payment
+	// The following is a reccuring payment for $7.99
 
 	entry2 := ach.NewEntryDetail()
 	entry2.TransactionCode = 22
@@ -85,9 +85,9 @@ func main() {
 	entry2.DFIAccountNumber = "5343121"
 	entry2.Amount = 799
 	entry2.IndividualName = "Wade Arnold"
-	entry2.SetTraceNumber(bh.ODFIIdentification, 1)
+	entry2.SetTraceNumber(bh2.ODFIIdentification, 2)
 	entry2.IdentificationNumber = "#123456"
-	entry.DiscretionaryData = "R"
+	entry2.DiscretionaryData = "R"
 	entry2.Category = ach.CategoryForward
 
 	addenda2, _ := ach.NewAddenda(ach.AddendaParam{
