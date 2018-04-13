@@ -92,7 +92,7 @@ type FileHeader struct {
 }
 
 // NewFileHeader returns a new FileHeader with default values for none exported fields
-func NewFileHeader(params ...FileParam) FileHeader {
+func NewFileHeader() FileHeader {
 	fh := FileHeader{
 		recordType:     "1",
 		priorityCode:   "01",
@@ -100,15 +100,6 @@ func NewFileHeader(params ...FileParam) FileHeader {
 		recordSize:     "094",
 		blockingFactor: "10",
 		formatCode:     "1",
-	}
-	if len(params) > 0 {
-		fh.ImmediateDestination = fh.parseNumField(params[0].ImmediateDestination)
-		fh.ImmediateOrigin = fh.parseNumField(params[0].ImmediateOrigin)
-		fh.ImmediateDestinationName = params[0].ImmediateDestinationName
-		fh.ImmediateOriginName = params[0].ImmediateOriginName
-		fh.ReferenceCode = params[0].ReferenceCode
-		fh.FileCreationDate = time.Now()
-		return fh
 	}
 	return fh
 }

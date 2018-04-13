@@ -137,7 +137,7 @@ func TestBatchDNEMismatch(t *testing.T) {
 
 func TestBatchTraceNumberNotODFI(t *testing.T) {
 	mockBatch := mockBatch()
-	mockBatch.GetEntries()[0].setTraceNumber(12345678, 1)
+	mockBatch.GetEntries()[0].SetTraceNumber(12345678, 1)
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ODFIIdentificationField" {
@@ -245,7 +245,6 @@ func TestBatchAddendaTraceNumber(t *testing.T) {
 	}
 }
 
-
 func TestNewBatchDefault(t *testing.T) {
 	_, err := NewBatch(mockBatchInvalidSECHeader())
 
@@ -257,8 +256,6 @@ func TestNewBatchDefault(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
-
-
 
 func TestBatchCategory(t *testing.T) {
 	mockBatch := mockBatch()

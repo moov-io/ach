@@ -23,7 +23,7 @@ func mockCCDEntryDetail() *EntryDetail {
 	entry.Amount = 5000000
 	entry.IdentificationNumber = "location #23"
 	entry.SetReceivingCompany("Best Co. #23")
-	entry.setTraceNumber(6200001, 123)
+	entry.SetTraceNumber(mockBatchCCDHeader().ODFIIdentification, 1)
 	entry.DiscretionaryData = "S"
 	return entry
 }

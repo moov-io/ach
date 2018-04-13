@@ -74,28 +74,8 @@ type File struct {
 	converters
 }
 
-// FileParam is the minimal fields required to make a ach file header
-type FileParam struct {
-	// ImmediateDestination is the originating banks ABA routing number. Frequently your banks ABA routing number.
-	ImmediateDestination string `json:"immediate_destination"`
-	// ImmediateOrigin
-	ImmediateOrigin string `json:"immediate_origin"`
-	// ImmediateDestinationName is the originating banks name.
-	ImmediateDestinationName string `json:"immediate_destination_name"`
-	ImmediateOriginName      string `json:"immediate_origin_name"`
-	ReferenceCode            string `json:"reference_code,omitempty"`
-}
-
 // NewFile constructs a file template.
-func NewFile(params ...FileParam) *File {
-	if len(params) > 0 {
-		fh := NewFileHeader(params[0])
-		return &File{
-			Header:  fh,
-			Control: NewFileControl(),
-		}
-
-	}
+func NewFile() *File {
 	return &File{
 		Header:  NewFileHeader(),
 		Control: NewFileControl(),

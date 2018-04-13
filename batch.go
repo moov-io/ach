@@ -124,7 +124,7 @@ func (batch *batch) build() error {
 		}
 		// Add a sequenced TraceNumber if one is not already set. Have to keep original trance number Return and NOC entries
 		if currentTraceNumberODFI != batch.header.ODFIIdentification {
-			batch.entries[i].setTraceNumber(batch.header.ODFIIdentification, seq)
+			batch.entries[i].SetTraceNumber(batch.header.ODFIIdentification, seq)
 		}
 		seq++
 		addendaSeq := 1
