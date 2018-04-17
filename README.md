@@ -134,8 +134,14 @@ entry.Category = ach.CategoryForward
 To add one or more optional addenda records for an entry
 
  ```go
-addenda := ach.NewAddenda(ach.AddendaParam{
-	PaymentRelatedInfo: "bonus pay for amazing work on #OSS"})
+addenda := NewAddenda05()
+addenda.PaymentRelatedInformation = "Bonus pay for amazing work on #OSS"
+addenda.SequenceNumber = 1
+addenda.EntryDetailSequenceNumber = 1234567
+```
+Add the addenda record to the detail entry 
+
+ ```go
 entry.AddAddenda(addenda)
 ```
 
@@ -190,8 +196,11 @@ entry2.IdentificationNumber = "#123456"
 entry.DiscretionaryData = "R"
 entry2.Category = ach.CategoryForward
 
-addenda2 := ach.NewAddenda(ach.AddendaParam{
-	PaymentRelatedInfo: "Monthly Membership Subscription"})
+
+addenda2 := NewAddenda05()
+addenda2.PaymentRelatedInformation = "Monthly Membership Subscription"
+addenda2.SequenceNumber = 1
+addenda2.EntryDetailSequenceNumber = 1234568
 ```
 
 Add the entry to the batch
