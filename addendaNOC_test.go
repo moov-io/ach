@@ -1,7 +1,6 @@
 package ach
 
 import (
-	"strings"
 	"testing"
 )
 
@@ -155,7 +154,7 @@ func TestAddendaNOCTraceNumberField(t *testing.T) {
 	}
 }
 
-func TestAddendaNOCNewAddendaParam(t *testing.T) {
+/*func TestAddendaNOCNewAddendaParam(t *testing.T) {
 	aParam := AddendaParam{
 		TypeCode:      "98",
 		ChangeCode:    "C01",
@@ -192,3 +191,4 @@ func TestAddendaNOCNewAddendaParam(t *testing.T) {
 		t.Errorf("expected %v got %v", aParam.TraceNumber, aNOC.TraceNumber)
 	}
 }
+*/

@@ -154,8 +154,8 @@ func TestBatchODFIIDMismatch(t *testing.T) {
 func TestBatchBuild(t *testing.T) {
 	mockBatch := NewBatchPPD(mockBatchPPDHeader2())
 	entry := mockPPDEntry2()
-	a1, _ := NewAddenda()
-	entry.AddAddenda(a1)
+	addenda05 := NewAddenda05()
+	entry.AddAddenda(addenda05)
 	mockBatch.AddEntry(entry)
 	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)

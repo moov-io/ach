@@ -19,8 +19,10 @@ func mockAddenda() *Addenda {
 	return &addenda
 }
 
+
 func TestMockAddenda(t *testing.T) {
 	addenda := mockAddenda()
+
 	if err := addenda.Validate(); err != nil {
 		t.Error("mockAddenda does not validate and will break other tests")
 	}
@@ -30,17 +32,24 @@ func TestMockAddenda(t *testing.T) {
 }
 
 func TestParseAddenda(t *testing.T) {
+	addendaWEB := NewAddenda()
 	var line = "705WEB                                        DIEGO MAY                            00010000001"
+	addendaWEB.Parse(line)
 
 	r := NewReader(strings.NewReader(line))
-	r.addCurrentBatch(NewBatchPPD(mockBatchPPDHeader()))
-	//r.currentBatch.GetHeader().StandardEntryClassCode = "PPD"
-	r.currentBatch.AddEntry(&EntryDetail{TransactionCode: 22, AddendaRecordIndicator: 1})
-	r.line = line
-	err := r.parseAddenda()
-	if err != nil {
-		t.Errorf("%T: %s", err, err)
-	}
+
+	//Add a new BatchWEB
+	r.addCurrentBatch(NewBatchWEB(mockBatchWEBHeader()))
+
+	//Add a WEB EntryDetail
+	entryDetail := mockWEBEntryDetail()
+
+	//Add an addenda to the WEB EntryDetail
+	entryDetail.AddAddenda(addendaWEB)
+
+	// add the WEB entry detail to the batch
+	r.currentBatch.AddEntry(entryDetail)
+
 	record := r.currentBatch.GetEntries()[0].Addendum[0].(*Addenda)
 
 	if record.recordType != "7" {
@@ -60,7 +69,7 @@ func TestParseAddenda(t *testing.T) {
 	}
 }
 
-// TestAddendaString validats that a known parsed file can be return to a string of the same value
+// TestAddendaString validates that a known parsed file can be return to a string of the same value
 func TestAddendaString(t *testing.T) {
 	var line = "705WEB                                        DIEGO MAY                            00010000001"
 	r := NewReader(strings.NewReader(line))
