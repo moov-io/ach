@@ -234,15 +234,29 @@ func (r *Reader) parseAddenda() error {
 	entry := r.currentBatch.GetEntries()[entryIndex]
 
 	if entry.AddendaRecordIndicator == 1 {
-		// Passing TypeCode type into NewAddenda creates a Addendumer of type copde type.
-
-		addenda05 := NewAddenda05()
-
-		addenda05.Parse(r.line)
-		if err := addenda05.Validate(); err != nil {
-			return r.error(err)
+		switch r.line[1:3] {
+		case "05":
+			addenda05 := NewAddenda05()
+			addenda05.Parse(r.line)
+			if err := addenda05.Validate(); err != nil {
+				return r.error(err)
+			}
+			r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda05)
+		case "98":
+			addenda98 := NewAddenda98()
+			addenda98.Parse(r.line)
+			if err := addenda98.Validate(); err != nil {
+				return r.error(err)
+			}
+			r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda98)
+		case "99":
+			addenda99 := NewAddenda99()
+			addenda99.Parse(r.line)
+			if err := addenda99.Validate(); err != nil {
+				return r.error(err)
+			}
+			r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda99)
 		}
-		r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda05)
 	} else {
 		msg := fmt.Sprintf(msgBatchAddendaIndicator)
 		return r.error(&FileError{FieldName: "AddendaRecordIndicator", Msg: msg})

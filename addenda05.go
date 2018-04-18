@@ -5,10 +5,9 @@ import (
 	"strings"
 )
 
-// Addenda05 provides business transaction information for Addenda Type Code 05 in a machine
-// readable format. It is usually formatted according to ANSI, ASC, X12 Standard.
-// This should be used in place addenda.go.  Future development to allow for use case
-// specific 05 addenda records.
+// Addenda05 is a Addendumer addenda which provides business transaction information for Addenda Type
+// Code 05 in a machine readable format. It is usually formatted according to ANSI, ASC, X12 Standard.
+// Future development to allow for use case specific 05 addenda records.
 
 type Addenda05 struct {
 	// RecordType defines the type of record in the block. entryAddenda05 Pos 7
@@ -34,7 +33,7 @@ type Addenda05 struct {
 
 // NewAddenda05 returns a new Addenda05 with default values for none exported fields
 
-func NewAddenda05() (*Addenda05) {
+func NewAddenda05() *Addenda05 {
 	addenda05 := new(Addenda05)
 	addenda05.recordType = "7"
 	addenda05.typeCode = "05"
@@ -130,4 +129,3 @@ func (addenda05 *Addenda05) EntryDetailSequenceNumberField() string {
 func (addenda05 *Addenda05) TypeCode() string {
 	return addenda05.typeCode
 }
-

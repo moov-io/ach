@@ -22,19 +22,6 @@ func mockEntryDetail() *EntryDetail {
 	return entry
 }
 
-func mockEntryDemandDebit() *EntryDetail {
-	entry := NewEntryDetail()
-	entry.TransactionCode = 27
-	entry.SetRDFI(102001017)
-	entry.DFIAccountNumber = "5343121"
-	entry.Amount = 17500
-	entry.IndividualName = "Robert Smith"
-	entry.SetTraceNumber(mockBatchHeader().ODFIIdentification, 1)
-	entry.IdentificationNumber = "ABC##jvkdjfuiwn"
-	entry.Category = CategoryForward
-	return entry
-}
-
 func TestMockEntryDetail(t *testing.T) {
 	entry := mockEntryDetail()
 	if err := entry.Validate(); err != nil {
@@ -303,28 +290,28 @@ func TestEDFieldInclusionTraceNumber(t *testing.T) {
 	}
 }
 
-func TestEDAddAddendaAddendaReturn(t *testing.T) {
+func TestEDAddAddendaAddenda99(t *testing.T) {
 	entry := mockEntryDetail()
-	entry.AddAddenda(mockAddendaReturn())
+	entry.AddAddenda(mockAddenda99())
 	if entry.Category != CategoryReturn {
-		t.Error("AddendaReturn added and isReturn is false")
+		t.Error("Addenda99 added and isReturn is false")
 	}
 	if entry.AddendaRecordIndicator != 1 {
-		t.Error("AddendaReturn added and record indicator is not 1")
+		t.Error("Addenda99 added and record indicator is not 1")
 	}
 
 }
 
-func TestEDAddAddendaAddendaReturnTwice(t *testing.T) {
+func TestEDAddAddendaAddenda99Twice(t *testing.T) {
 	entry := mockEntryDetail()
-	entry.AddAddenda(mockAddendaReturn())
-	entry.AddAddenda(mockAddendaReturn())
+	entry.AddAddenda(mockAddenda99())
+	entry.AddAddenda(mockAddenda99())
 	if entry.Category != CategoryReturn {
-		t.Error("AddendaReturn added and Category is not CategoryReturn")
+		t.Error("Addenda99 added and Category is not CategoryReturn")
 	}
 
 	if len(entry.Addendum) != 1 {
-		t.Error("AddendaReturn added and isReturn is false")
+		t.Error("Addenda99 added and isReturn is false")
 	}
 }
 

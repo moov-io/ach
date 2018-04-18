@@ -33,6 +33,7 @@ const (
 	web = "WEB"
 	ccd = "CCD"
 	cor = "COR"
+	tel = "TEL"
 )
 
 // Errors strings specific to parsing a Batch container

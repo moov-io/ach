@@ -50,14 +50,14 @@ if achFile.Validate(); err != nil {
 // Check if any Notifications Of Change exist in the file 
 if len(achFile.NotificationOfChange) > 0 {
 	for _, batch := range achFile.NotificationOfChange {
-		aNOC := batch.GetEntries()[0].Addendum[0].(*AddendaNOC)
-		println(aNOC.CorrectedData)
+		a98 := batch.GetEntries()[0].Addendum[0].(*Addenda98)
+		println(a98.CorrectedData)
 	} 
 } 
 // Check if any Return Entries exist in the file 
 if len(achFile.ReturnEntries) > 0 {
 	for _, batch := range achFile.ReturnEntries {
-		aReturn := batch.GetEntries()[0].Addendum[0].(*AddendaReturn)
+		aReturn := batch.GetEntries()[0].Addendum[0].(*Addenda99)
 		println(aReturn.ReturnCode)
 	} 
 }
@@ -136,8 +136,6 @@ To add one or more optional addenda records for an entry
  ```go
 addenda := NewAddenda05()
 addenda.PaymentRelatedInformation = "Bonus pay for amazing work on #OSS"
-addenda.SequenceNumber = 1
-addenda.EntryDetailSequenceNumber = 1234567
 ```
 Add the addenda record to the detail entry 
 
@@ -165,7 +163,7 @@ And batches are added to files much the same way:
 file.AddBatch(batch)
 ```
 
-Now add a new batch for accepting payments on the web
+Now add a new batch for accepting payments on the WEB
 
 ```go
 func mockBatchWEBHeader() *BatchHeader {
@@ -199,8 +197,6 @@ entry2.Category = ach.CategoryForward
 
 addenda2 := NewAddenda05()
 addenda2.PaymentRelatedInformation = "Monthly Membership Subscription"
-addenda2.SequenceNumber = 1
-addenda2.EntryDetailSequenceNumber = 1234568
 ```
 
 Add the entry to the batch

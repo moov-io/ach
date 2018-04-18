@@ -5,14 +5,14 @@
 package ach
 
 import (
-	"testing"
 	"strings"
+	"testing"
 )
 
 func mockAddenda05() *Addenda05 {
 	addenda05 := NewAddenda05()
-	addenda05.SequenceNumber =            1
-	addenda05.EntryDetailSequenceNumber = 1234567
+	addenda05.SequenceNumber = 1
+	addenda05.EntryDetailSequenceNumber = 0000001
 
 	return addenda05
 }
@@ -22,14 +22,13 @@ func TestMockAddenda05(t *testing.T) {
 	if err := addenda05.Validate(); err != nil {
 		t.Error("mockAddenda05 does not validate and will break other tests")
 	}
-	if addenda05.EntryDetailSequenceNumber != 1234567 {
+	if addenda05.EntryDetailSequenceNumber != 0000001 {
 		t.Error("EntryDetailSequenceNumber dependent default value has changed")
 	}
 }
 
 func TestParseAddenda05(t *testing.T) {
 	addendaPPD := NewAddenda05()
-	//var line = "705WEB                                        DIEGO MAY                            00010000001"
 	var line = "705PPD                                        DIEGO MAY                            00010000001"
 	addendaPPD.Parse(line)
 
@@ -148,4 +147,3 @@ func TestAddenda05TyeCodeNil(t *testing.T) {
 		}
 	}
 }
-

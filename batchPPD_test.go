@@ -108,7 +108,7 @@ func TestBatchPPDCreate(t *testing.T) {
 func TestBatchPPDTypeCode(t *testing.T) {
 	mockBatch := mockBatchPPD()
 	// change an addendum to an invalid type code
-	a := mockAddenda()
+	a := mockAddenda05()
 	a.typeCode = "63"
 	mockBatch.GetEntries()[0].AddAddenda(a)
 	mockBatch.Create()

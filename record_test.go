@@ -87,11 +87,8 @@ func TestBuildFile(t *testing.T) {
 	entry := mockPPDEntryDetail()
 
 	// To add one or more optional addenda records for an entry
-
 	addendaPPD := NewAddenda05()
 	addendaPPD.PaymentRelatedInformation = "Currently string needs ASC X12 Interchange Control Structures"
-	addendaPPD.SequenceNumber = 1
-	addendaPPD.EntryDetailSequenceNumber = 1234567
 
 	// Add the addenda record to the detail entry
 	entry.AddAddenda(addendaPPD)
@@ -119,11 +116,8 @@ func TestBuildFile(t *testing.T) {
 
 	entry = mockWEBEntryDetail()
 
-
 	addendaWEB := NewAddenda05()
 	addendaWEB.PaymentRelatedInformation = "Monthly Membership Subscription"
-	addendaWEB.SequenceNumber = 1
-	addendaWEB.EntryDetailSequenceNumber = 1234568
 
 	// Add the addenda record to the detail entry
 	entry.AddAddenda(addendaWEB)
