@@ -118,8 +118,8 @@ func TestBatchDNEMismatch(t *testing.T) {
 	mockBatch := mockBatch()
 	mockBatch.SetHeader(mockBatchHeader())
 	ed := mockBatch.GetEntries()[0]
-	ed.AddAddenda(mockAddenda())
-	ed.AddAddenda(mockAddenda())
+	ed.AddAddenda(mockAddenda05())
+	ed.AddAddenda(mockAddenda05())
 	mockBatch.build()
 
 	mockBatch.GetHeader().OriginatorStatusCode = 1
@@ -153,7 +153,7 @@ func TestBatchEntryCountEquality(t *testing.T) {
 	mockBatch := mockBatch()
 	mockBatch.SetHeader(mockBatchHeader())
 	e := mockEntryDetail()
-	a := mockAddenda()
+	a := mockAddenda05()
 	e.AddAddenda(a)
 	mockBatch.AddEntry(e)
 	if err := mockBatch.build(); err != nil {
@@ -174,7 +174,7 @@ func TestBatchEntryCountEquality(t *testing.T) {
 
 func TestBatchAddendaIndicator(t *testing.T) {
 	mockBatch := mockBatch()
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 0
 	mockBatch.GetControl().EntryAddendaCount = 2
 	if err := mockBatch.verify(); err != nil {
@@ -191,12 +191,12 @@ func TestBatchAddendaIndicator(t *testing.T) {
 func TestBatchIsAddendaSeqAscending(t *testing.T) {
 	mockBatch := mockBatch()
 	ed := mockBatch.GetEntries()[0]
-	ed.AddAddenda(mockAddenda())
-	ed.AddAddenda(mockAddenda())
+	ed.AddAddenda(mockAddenda05())
+	ed.AddAddenda(mockAddenda05())
 	mockBatch.build()
 
-	mockBatch.GetEntries()[0].Addendum[0].(*Addenda).SequenceNumber = 2
-	mockBatch.GetEntries()[0].Addendum[1].(*Addenda).SequenceNumber = 1
+	mockBatch.GetEntries()[0].Addendum[0].(*Addenda05).SequenceNumber = 2
+	mockBatch.GetEntries()[0].Addendum[1].(*Addenda05).SequenceNumber = 1
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "SequenceNumber" {
@@ -228,12 +228,12 @@ func TestBatchIsSequenceAscending(t *testing.T) {
 
 func TestBatchAddendaTraceNumber(t *testing.T) {
 	mockBatch := mockBatch()
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
 	if err := mockBatch.build(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	mockBatch.GetEntries()[0].Addendum[0].(*Addenda).EntryDetailSequenceNumber = 99
+	mockBatch.GetEntries()[0].Addendum[0].(*Addenda05).EntryDetailSequenceNumber = 99
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TraceNumber" {
@@ -261,7 +261,7 @@ func TestBatchCategory(t *testing.T) {
 	mockBatch := mockBatch()
 	// Add a Addenda Return to the mock batch
 	entry := mockEntryDetail()
-	entry.AddAddenda(mockAddendaReturn())
+	entry.AddAddenda(mockAddenda99())
 	mockBatch.AddEntry(entry)
 
 	if err := mockBatch.build(); err != nil {
@@ -269,7 +269,7 @@ func TestBatchCategory(t *testing.T) {
 	}
 
 	if mockBatch.Category() != CategoryReturn {
-		t.Errorf("AddendaReturn added to batch and category is %s", mockBatch.Category())
+		t.Errorf("Addenda99 added to batch and category is %s", mockBatch.Category())
 	}
 }
 
@@ -277,7 +277,7 @@ func TestBatchCategoryForwardReturn(t *testing.T) {
 	mockBatch := mockBatch()
 	// Add a Addenda Return to the mock batch
 	entry := mockEntryDetail()
-	entry.AddAddenda(mockAddendaReturn())
+	entry.AddAddenda(mockAddenda99())
 	entry.TraceNumber = entry.TraceNumber + 10
 	mockBatch.AddEntry(entry)
 	if err := mockBatch.build(); err != nil {

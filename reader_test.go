@@ -8,6 +8,8 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"bytes"
+	"fmt"
 )
 
 func TestParseError(t *testing.T) {
@@ -246,11 +248,11 @@ func TestFileEntryDetail(t *testing.T) {
 	}
 }
 
-// TestFileAddenda validation error populates through the reader
-func TestFileAddenda(t *testing.T) {
+// TestFileAddenda05 validation error populates through the reader
+func TestFileAddenda05(t *testing.T) {
 	bh := mockBatchHeader()
 	ed := mockEntryDetail()
-	addenda := mockAddenda()
+	addenda := mockAddenda05()
 	addenda.SequenceNumber = 0
 	ed.AddAddenda(addenda)
 	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
@@ -269,9 +271,58 @@ func TestFileAddenda(t *testing.T) {
 	}
 }
 
+func TestFileAddenda98(t *testing.T) {
+	bh := mockBatchHeader()
+	ed := mockEntryDetail()
+	addenda := mockAddenda98()
+
+	addenda.TraceNumber = 0000001
+	addenda.ChangeCode = "C10"
+	addenda.CorrectedData = "ACME One Corporation"
+	ed.AddAddenda(addenda)
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
+	r := NewReader(strings.NewReader(line))
+	_, err := r.Read()
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*FieldError); ok {
+				if e.Msg != msgFieldInclusion {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+func TestFileAddenda99(t *testing.T) {
+	bh := mockBatchHeader()
+	ed := mockEntryDetail()
+	addenda := mockAddenda99()
+	addenda.TraceNumber = 0000001
+	addenda.ReturnCode = "R02"
+	ed.AddAddenda(addenda)
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
+	r := NewReader(strings.NewReader(line))
+	_, err := r.Read()
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*FieldError); ok {
+				if e.Msg != msgFieldInclusion {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+
 // TestFileAddendaOutsideBatch validation error populates through the reader
 func TestFileAddendaOutsideBatch(t *testing.T) {
-	addenda := mockAddenda()
+	addenda := mockAddenda05()
 	r := NewReader(strings.NewReader(addenda.String()))
 	_, err := r.Read()
 	if err != nil {
@@ -291,7 +342,7 @@ func TestFileAddendaOutsideBatch(t *testing.T) {
 func TestFileAddendaNoIndicator(t *testing.T) {
 	bh := mockBatchHeader()
 	ed := mockEntryDetail()
-	addenda := mockAddenda()
+	addenda := mockAddenda05()
 	line := bh.String() + "\n" + ed.String() + "\n" + addenda.String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
@@ -387,10 +438,8 @@ func TestFileAddBatchValidation(t *testing.T) {
 	}
 }
 
-/**
 func TestFileHeaderExists(t *testing.T) {
 	file := mockFilePPD()
-	file.SetHeader(FileHeader{})
 	buf := new(bytes.Buffer)
 	w := NewWriter(buf)
 	w.Write(file)
@@ -412,7 +461,6 @@ func TestFileHeaderExists(t *testing.T) {
 		fmt.Println(f.Header.String())
 	}
 }
-**/
 
 // TestFileLongErr Batch Header Service Class is 000 which does not validate
 func TestFileLongErr(t *testing.T) {
@@ -430,7 +478,7 @@ func TestFileLongErr(t *testing.T) {
 
 func TestFileAddendaOutsideEntry(t *testing.T) {
 	bh := mockBatchHeader()
-	addenda := mockAddenda()
+	addenda := mockAddenda05()
 	line := bh.String() + "\n" + addenda.String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()

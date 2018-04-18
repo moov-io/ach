@@ -31,7 +31,7 @@ func mockCCDEntryDetail() *EntryDetail {
 func mockBatchCCD() *BatchCCD {
 	mockBatch := NewBatchCCD(mockBatchCCDHeader())
 	mockBatch.AddEntry(mockCCDEntryDetail())
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
 	if err := mockBatch.Create(); err != nil {
 		panic(err)
 	}
@@ -52,7 +52,7 @@ func TestBatchCCDHeader(t *testing.T) {
 func TestBatchCCDAddendumCount(t *testing.T) {
 	mockBatch := mockBatchCCD()
 	// Adding a second addenda to the mock entry
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "EntryAddendaCount" {
@@ -83,7 +83,7 @@ func TestBatchCCDReceivingCompanyName(t *testing.T) {
 // verify addenda type code is 05
 func TestBatchCCDAddendaTypeCode(t *testing.T) {
 	mockBatch := mockBatchCCD()
-	mockBatch.GetEntries()[0].Addendum[0].(*Addenda).typeCode = "07"
+	mockBatch.GetEntries()[0].Addendum[0].(*Addenda05).typeCode = "07"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
@@ -112,7 +112,7 @@ func TestBatchCCDSEC(t *testing.T) {
 
 func TestBatchCCDAddendaCount(t *testing.T) {
 	mockBatch := mockBatchCCD()
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

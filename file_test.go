@@ -180,7 +180,7 @@ func TestFileReturnEntries(t *testing.T) {
 	// create or copy the entry to be returned record
 	entry := mockEntryDetail()
 	// Add the addenda return with appropriate ReturnCode and addenda information
-	entry.AddAddenda(mockAddendaReturn())
+	entry.AddAddenda(mockAddenda99())
 	// create or copy the previous batch header of the item being returned
 	batchHeader := mockBatchHeader()
 	// create or copy the batch to be returned

@@ -206,16 +206,17 @@ func (ed *EntryDetail) AddAddenda(addenda Addendumer) []Addendumer {
 	ed.AddendaRecordIndicator = 1
 	// checks to make sure that we only have either or, not both
 	switch addenda.(type) {
-	case *AddendaReturn:
+	case *Addenda99:
 		ed.Category = CategoryReturn
 		ed.Addendum = nil
 		ed.Addendum = append(ed.Addendum, addenda)
 		return ed.Addendum
-	case *AddendaNOC:
+	case *Addenda98:
 		ed.Category = CategoryNOC
 		ed.Addendum = nil
 		ed.Addendum = append(ed.Addendum, addenda)
 		return ed.Addendum
+		// default is current *Addenda05
 	default:
 		ed.Category = CategoryForward
 		ed.Addendum = append(ed.Addendum, addenda)
