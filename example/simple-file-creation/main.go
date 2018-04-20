@@ -11,12 +11,14 @@ import (
 
 func main() {
 	// To create a file
-	file := ach.NewFile(ach.FileParam{
-		ImmediateDestination:     "0210000890",
-		ImmediateOrigin:          "123456789",
-		ImmediateDestinationName: "Your Bank",
-		ImmediateOriginName:      "Your Company",
-		ReferenceCode:            "#00000A1"})
+	fh := ach.NewFileHeader()
+	fh.ImmediateDestination = 9876543210
+	fh.ImmediateOrigin = 1234567890
+	fh.FileCreationDate = time.Now()
+	fh.ImmediateDestinationName = "Federal Reserve Bank"
+	fh.ImmediateOriginName = "My Bank Name"
+	file := ach.NewFile()
+	file.SetHeader(fh)
 
 	// To create a batch.
 	// Errors only if payment type is not supported.
@@ -32,14 +34,15 @@ func main() {
 	batch, _ := ach.NewBatch(bh)
 
 	// To create an entry
-	entry := ach.NewEntryDetail(ach.EntryParam{
-		ReceivingDFI:      "102001017",
-		RDFIAccount:       "5343121",
-		Amount:            "17500",
-		TransactionCode:   "27",
-		IDNumber:          "#456789",
-		IndividualName:    "Bob Smith",
-		DiscretionaryData: "B1"})
+	entry := ach.NewEntryDetail()
+	entry.TransactionCode = 22
+	entry.SetRDFI(9101298)
+	entry.DFIAccountNumber = "123456789"
+	entry.Amount = 100000000
+	entry.IndividualName = "Wade Arnold"
+	entry.SetTraceNumber(bh.ODFIIdentification, 1)
+	entry.IdentificationNumber = "ABC##jvkdjfuiwn"
+	entry.Category = ach.CategoryForward
 
 	// To add one or more optional addenda records for an entry
 	addenda, _ := ach.NewAddenda(ach.AddendaParam{
@@ -73,17 +76,19 @@ func main() {
 
 	batch2, _ := ach.NewBatch(bh2)
 
-	// Add an entry and define if it is a single or reoccuring payment
-	// The following is a reoccuring payment for $7.99
+	// Add an entry and define if it is a single or reccuring payment
+	// The following is a reccuring payment for $7.99
 
-	entry2 := ach.NewEntryDetail(ach.EntryParam{
-		ReceivingDFI:    "102001017",
-		RDFIAccount:     "5343121",
-		Amount:          "799",
-		TransactionCode: "22",
-		IDNumber:        "#123456",
-		IndividualName:  "Wade Arnold",
-		PaymentType:     "R"})
+	entry2 := ach.NewEntryDetail()
+	entry2.TransactionCode = 22
+	entry2.SetRDFI(102001017)
+	entry2.DFIAccountNumber = "5343121"
+	entry2.Amount = 799
+	entry2.IndividualName = "Wade Arnold"
+	entry2.SetTraceNumber(bh2.ODFIIdentification, 2)
+	entry2.IdentificationNumber = "#123456"
+	entry2.DiscretionaryData = "R"
+	entry2.Category = ach.CategoryForward
 
 	addenda2, _ := ach.NewAddenda(ach.AddendaParam{
 		PaymentRelatedInfo: "Monthly Membership Subscription"})
@@ -112,5 +117,3 @@ func main() {
 	}
 	w.Flush()
 }
-
-

@@ -50,14 +50,14 @@ if achFile.Validate(); err != nil {
 // Check if any Notifications Of Change exist in the file 
 if len(achFile.NotificationOfChange) > 0 {
 	for _, batch := range achFile.NotificationOfChange {
-		aNOC := batch.GetEntries()[0].Addendum[0].(*AddendaNOC)
-		println(aNOC.CorrectedData)
+		a98 := batch.GetEntries()[0].Addendum[0].(*Addenda98)
+		println(a98.CorrectedData)
 	} 
 } 
 // Check if any Return Entries exist in the file 
 if len(achFile.ReturnEntries) > 0 {
 	for _, batch := range achFile.ReturnEntries {
-		aReturn := batch.GetEntries()[0].Addendum[0].(*AddendaReturn)
+		aReturn := batch.GetEntries()[0].Addendum[0].(*Addenda99)
 		println(aReturn.ReturnCode)
 	} 
 }
@@ -67,12 +67,15 @@ if len(achFile.ReturnEntries) > 0 {
 The following is based on [simple file creation](https://github.com/moov-io/ach/tree/master/example/simple-file-creation)
  
  ```go
-file := ach.NewFile(ach.FileParam{
-	ImmediateDestination:     "0210000890",
-	ImmediateOrigin:          "123456789",
-	ImmediateDestinationName: "Your Bank",
-	ImmediateOriginName:      "Your Company",
-	ReferenceCode:            "#00000A1"})
+	fh := ach.NewFileHeader()
+	fh.ImmediateDestination = 9876543210 // A blank space followed by your ODFI's transit/routing number
+	fh.ImmediateOrigin = 1234567890      // Organization or Company FED ID usually 1 and FEIN/SSN. Assigned by your ODFI
+	fh.FileCreationDate = time.Now()     // Todays Date
+	fh.ImmediateDestinationName = "Federal Reserve Bank"
+	fh.ImmediateOriginName = "My Bank Name")
+
+	file := ach.NewFile()
+	file.SetHeader(fh)
 ```
 
 Explicitly create a PPD batch file. 
@@ -117,21 +120,26 @@ mockBatch, _ := ach.NewBatch(mockBatchPPDHeader())
 To create an entry
 
  ```go
-entry := ach.NewEntryDetail(ach.EntryParam{
-	ReceivingDFI:      "102001017",
-	RDFIAccount:       "5343121",
-	Amount:            "17500",
-	TransactionCode:   "27",
-	IDNumber:          "ABC##jvkdjfuiwn",
-	IndividualName:    "Bob Smith",
-	DiscretionaryData: "B1"})
+entry := ach.NewEntryDetail()
+entry.TransactionCode = 22
+entry.SetRDFI(9101298)
+entry.DFIAccountNumber = "123456789"
+entry.Amount = 100000000
+entry.IndividualName = "Wade Arnold"
+entry.SetTraceNumber(bh.ODFIIdentification, 1)
+entry.IdentificationNumber = "ABC##jvkdjfuiwn"
+entry.Category = ach.CategoryForward
 ```
 
 To add one or more optional addenda records for an entry
 
  ```go
-addenda := ach.NewAddenda(ach.AddendaParam{
-	PaymentRelatedInfo: "bonus pay for amazing work on #OSS"})
+addenda := NewAddenda05()
+addenda.PaymentRelatedInformation = "Bonus pay for amazing work on #OSS"
+```
+Add the addenda record to the detail entry 
+
+ ```go
 entry.AddAddenda(addenda)
 ```
 
@@ -155,7 +163,7 @@ And batches are added to files much the same way:
 file.AddBatch(batch)
 ```
 
-Now add a new batch for accepting payments on the web
+Now add a new batch for accepting payments on the WEB
 
 ```go
 func mockBatchWEBHeader() *BatchHeader {
@@ -175,17 +183,20 @@ batch2, _ := ach.NewBatch(mockBatchWEBHeader())
 Add an entry and define if it is a single or reoccurring payment. The following is a reoccurring payment for $7.99
 
 ```go
-entry2 := ach.NewEntryDetail(ach.EntryParam{
-	ReceivingDFI:      "102001017",
-	RDFIAccount:       "5343121",
-	Amount:            "799",
-	TransactionCode:   "22",
-	IDNumber:          "#123456",
-	IndividualName:    "Wade Arnold",
-	PaymentType: 		"R"})
+entry2 := ach.NewEntryDetail()
+entry2.TransactionCode = 22
+entry2.SetRDFI(102001017)
+entry2.DFIAccountNumber = "5343121"
+entry2.Amount = 799
+entry2.IndividualName = "Wade Arnold"
+entry2.SetTraceNumber(bh.ODFIIdentification, 1)
+entry2.IdentificationNumber = "#123456"
+entry.DiscretionaryData = "R"
+entry2.Category = ach.CategoryForward
 
-addenda2 := ach.NewAddenda(ach.AddendaParam{
-	PaymentRelatedInfo: "Monthly Membership Subscription"})
+
+addenda2 := NewAddenda05()
+addenda2.PaymentRelatedInformation = "Monthly Membership Subscription"
 ```
 
 Add the entry to the batch

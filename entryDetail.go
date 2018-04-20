@@ -90,44 +90,11 @@ const (
 	CategoryNOC     = "NOC"
 )
 
-// EntryParam is the minimal fields required to make a ach entry
-type EntryParam struct {
-	ReceivingDFI      string `json:"receiving_dfi"`
-	RDFIAccount       string `json:"rdfi_account"`
-	Amount            string `json:"amount"`
-	IDNumber          string `json:"id_number,omitempty"`
-	IndividualName    string `json:"individual_name,omitempty"`
-	ReceivingCompany  string `json:"receiving_company,omitempty"`
-	DiscretionaryData string `json:"discretionary_data,omitempty"`
-	PaymentType       string `json:"payment_type,omitempty"`
-	TransactionCode   string `json:"transaction_code"`
-}
-
-// NewEntryDetail returns a new EntryDetail with default values for none exported fields
-func NewEntryDetail(params ...EntryParam) *EntryDetail {
+// NewEntryDetail returns a new EntryDetail with default values for non exported fields
+func NewEntryDetail() *EntryDetail {
 	entry := &EntryDetail{
 		recordType: "6",
 		Category:   CategoryForward,
-	}
-	if len(params) > 0 {
-		entry.SetRDFI(entry.parseNumField(params[0].ReceivingDFI))
-		entry.DFIAccountNumber = params[0].RDFIAccount
-		entry.Amount = entry.parseNumField(params[0].Amount)
-		entry.IdentificationNumber = params[0].IDNumber
-		if params[0].IndividualName != "" {
-			entry.IndividualName = params[0].IndividualName
-		} else {
-			entry.IndividualName = params[0].ReceivingCompany
-		}
-		if params[0].PaymentType != "" {
-			entry.SetPaymentType(params[0].PaymentType)
-		} else {
-			entry.DiscretionaryData = params[0].DiscretionaryData
-		}
-		entry.TransactionCode = entry.parseNumField(params[0].TransactionCode)
-
-		entry.setTraceNumber(entry.RDFIIdentification, 1)
-		return entry
 	}
 	return entry
 }
@@ -239,16 +206,17 @@ func (ed *EntryDetail) AddAddenda(addenda Addendumer) []Addendumer {
 	ed.AddendaRecordIndicator = 1
 	// checks to make sure that we only have either or, not both
 	switch addenda.(type) {
-	case *AddendaReturn:
+	case *Addenda99:
 		ed.Category = CategoryReturn
 		ed.Addendum = nil
 		ed.Addendum = append(ed.Addendum, addenda)
 		return ed.Addendum
-	case *AddendaNOC:
+	case *Addenda98:
 		ed.Category = CategoryNOC
 		ed.Addendum = nil
 		ed.Addendum = append(ed.Addendum, addenda)
 		return ed.Addendum
+		// default is current *Addenda05
 	default:
 		ed.Category = CategoryForward
 		ed.Addendum = append(ed.Addendum, addenda)
@@ -264,9 +232,9 @@ func (ed *EntryDetail) SetRDFI(rdfi int) *EntryDetail {
 	return ed
 }
 
-// setTraceNumber takes first 8 digits of RDFI and concatenates a sequence number onto the TraceNumber
-func (ed *EntryDetail) setTraceNumber(RDFIIdentification int, seq int) {
-	trace := ed.numericField(RDFIIdentification, 8) + ed.numericField(seq, 7)
+// SetTraceNumber takes first 8 digits of ODFI and concatenates a sequence number onto the TraceNumber
+func (ed *EntryDetail) SetTraceNumber(ODFIIdentification int, seq int) {
+	trace := ed.numericField(ODFIIdentification, 8) + ed.numericField(seq, 7)
 	ed.TraceNumber = ed.parseNumField(trace)
 }
 
@@ -317,7 +285,7 @@ func (ed *EntryDetail) PaymentTypeField() string {
 	return ed.DiscretionaryData
 }
 
-// SetPaymentType as R (Reoccuring) all other values will result in S (single)
+// SetPaymentType as R (Reccuring) all other values will result in S (single)
 func (ed *EntryDetail) SetPaymentType(t string) {
 	t = strings.ToUpper(strings.TrimSpace(t))
 	if t == "R" {

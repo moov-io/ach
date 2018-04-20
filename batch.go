@@ -124,13 +124,13 @@ func (batch *batch) build() error {
 		}
 		// Add a sequenced TraceNumber if one is not already set. Have to keep original trance number Return and NOC entries
 		if currentTraceNumberODFI != batch.header.ODFIIdentification {
-			batch.entries[i].setTraceNumber(batch.header.ODFIIdentification, seq)
+			batch.entries[i].SetTraceNumber(batch.header.ODFIIdentification, seq)
 		}
 		seq++
 		addendaSeq := 1
 		for x := range entry.Addendum {
 			// sequences don't exist in NOC or Return addenda
-			if a, ok := batch.entries[i].Addendum[x].(*Addenda); ok {
+			if a, ok := batch.entries[i].Addendum[x].(*Addenda05); ok {
 				a.SequenceNumber = addendaSeq
 				a.EntryDetailSequenceNumber = batch.parseNumField(batch.entries[i].TraceNumberField()[8:])
 			}
@@ -325,7 +325,7 @@ func (batch *batch) isAddendaSequence() error {
 			// check if sequence is assending
 			for _, addenda := range entry.Addendum {
 				// sequences don't exist in NOC or Return addenda
-				if a, ok := addenda.(*Addenda); ok {
+				if a, ok := addenda.(*Addenda05); ok {
 
 					if a.SequenceNumber < lastSeq {
 						msg := fmt.Sprintf(msgBatchAscending, a.SequenceNumber, lastSeq)

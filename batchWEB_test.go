@@ -20,7 +20,7 @@ func mockWEBEntryDetail() *EntryDetail {
 	entry.DFIAccountNumber = "123456789"
 	entry.Amount = 100000000
 	entry.IndividualName = "Wade Arnold"
-	entry.setTraceNumber(6200001, 1)
+	entry.SetTraceNumber(mockBatchWEBHeader().ODFIIdentification, 1)
 	entry.SetPaymentType("S")
 	return entry
 }
@@ -28,7 +28,7 @@ func mockWEBEntryDetail() *EntryDetail {
 func mockBatchWEB() *BatchWEB {
 	mockBatch := NewBatchWEB(mockBatchWEBHeader())
 	mockBatch.AddEntry(mockWEBEntryDetail())
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
 	if err := mockBatch.Create(); err != nil {
 		panic(err)
 	}
@@ -40,7 +40,7 @@ func mockBatchWEB() *BatchWEB {
 func TestBatchWebAddenda(t *testing.T) {
 	mockBatch := mockBatchWEB()
 	// mock batch already has one addenda. Creating two addenda should error
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "AddendaCount" {
@@ -71,7 +71,7 @@ func TestBatchWebIndividualNameRequired(t *testing.T) {
 // verify addenda type code is 05
 func TestBatchWEBAddendaTypeCode(t *testing.T) {
 	mockBatch := mockBatchWEB()
-	mockBatch.GetEntries()[0].Addendum[0].(*Addenda).typeCode = "07"
+	mockBatch.GetEntries()[0].Addendum[0].(*Addenda05).typeCode = "07"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {

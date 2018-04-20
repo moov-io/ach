@@ -23,7 +23,7 @@ func mockTELEntryDetail() *EntryDetail {
 	entry.Amount = 5000000
 	entry.IdentificationNumber = "Phone 333-2222"
 	entry.IndividualName = "Wade Arnold"
-	entry.setTraceNumber(6200001, 123)
+	entry.SetTraceNumber(mockBatchTELHeader().ODFIIdentification, 123)
 	entry.SetPaymentType("S")
 	return entry
 }
@@ -64,7 +64,7 @@ func TestBatchTELCreate(t *testing.T) {
 func TestBatchTELAddendaCount(t *testing.T) {
 	mockBatch := mockBatchTEL()
 	// TEL can not have an addendum
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
