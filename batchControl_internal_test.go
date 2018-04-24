@@ -13,7 +13,7 @@ func mockBatchControl() *BatchControl {
 	bc := NewBatchControl()
 	bc.ServiceClassCode = 220
 	bc.CompanyIdentification = "123456789"
-	bc.ODFIIdentification = 6200001
+	bc.ODFIIdentification = "6200001"
 	return bc
 }
 
@@ -28,7 +28,7 @@ func TestMockBatchControl(t *testing.T) {
 	if bc.CompanyIdentification != "123456789" {
 		t.Error("CompanyIdentification depedendent default value has changed")
 	}
-	if bc.ODFIIdentification != 6200001 {
+	if bc.ODFIIdentification != "6200001" {
 		t.Error("ODFIIdentification depedendent default value has changed")
 	}
 }
@@ -41,7 +41,7 @@ func TestParseBatchControl(t *testing.T) {
 	bh := BatchHeader{BatchNumber: 1,
 		ServiceClassCode:      225,
 		CompanyIdentification: "origid",
-		ODFIIdentification:    7640125}
+		ODFIIdentification:    "7640125"}
 	r.addCurrentBatch(NewBatchPPD(&bh))
 
 	r.currentBatch.AddEntry(&EntryDetail{TransactionCode: 27, Amount: 10500, RDFIIdentification: 5320001, TraceNumber: 76401255655291})
@@ -93,7 +93,7 @@ func TestBCString(t *testing.T) {
 	bh := BatchHeader{BatchNumber: 1,
 		ServiceClassCode:      225,
 		CompanyIdentification: "origid",
-		ODFIIdentification:    7640125}
+		ODFIIdentification:    "7640125"}
 	r.addCurrentBatch(NewBatchPPD(&bh))
 
 	r.currentBatch.AddEntry(&EntryDetail{TransactionCode: 27, Amount: 10500, RDFIIdentification: 5320001, TraceNumber: 76401255655291})
@@ -194,7 +194,7 @@ func TestBCFieldInclusionServiceClassCode(t *testing.T) {
 
 func TestBCFieldInclusionODFIIdentification(t *testing.T) {
 	bc := mockBatchControl()
-	bc.ODFIIdentification = 0
+	bc.ODFIIdentification = "000000000"
 	if err := bc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.Msg != msgFieldInclusion {

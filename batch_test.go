@@ -25,7 +25,7 @@ func mockBatchInvalidSECHeader() *BatchHeader {
 	bh.CompanyIdentification = "123456789"
 	bh.CompanyEntryDescription = "PAYROLL"
 	bh.EffectiveEntryDate = time.Now()
-	bh.ODFIIdentification = 6200001
+	bh.ODFIIdentification = "6200001"
 	return bh
 }
 
@@ -137,7 +137,7 @@ func TestBatchDNEMismatch(t *testing.T) {
 
 func TestBatchTraceNumberNotODFI(t *testing.T) {
 	mockBatch := mockBatch()
-	mockBatch.GetEntries()[0].SetTraceNumber(12345678, 1)
+	mockBatch.GetEntries()[0].SetTraceNumber("12345678", 1)
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ODFIIdentificationField" {

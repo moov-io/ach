@@ -11,7 +11,7 @@ func mockBatchTELHeader() *BatchHeader {
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "123456789"
 	bh.CompanyEntryDescription = "Vndr Pay"
-	bh.ODFIIdentification = 6200001
+	bh.ODFIIdentification = "6200001"
 	return bh
 }
 

@@ -35,14 +35,14 @@ type FileHeader struct {
 	// a blank in the first position, followed by the four digit Federal Reserve
 	// Routing Symbol, the four digit ABA Institution Identifier, and the Check
 	// Digit (bTTTTAAAAC).
-	ImmediateDestination int
+	ImmediateDestination string
 
 	// ImmediateOrigin contains the Routing Number of the ACH Operator or sending
 	// point that is sending the file. The 10 character field begins with
 	// a blank in the first position, followed by the four digit Federal Reserve
 	// Routing Symbol, the four digit ABA Institution Identifier, and the Check
 	// Digit (bTTTTAAAAC).
-	ImmediateOrigin int
+	ImmediateOrigin string
 
 	// FileCreationDate is expressed in a "YYMMDD" format. The File Creation
 	// Date is the date on which the file is prepared by an ODFI (ACH input files)
@@ -111,9 +111,9 @@ func (fh *FileHeader) Parse(record string) {
 	// (2-3) Always "01"
 	fh.priorityCode = "01"
 	// (4-13) A blank space followed by your ODFI's routing number. For example: " 121140399"
-	fh.ImmediateDestination = fh.parseNumField(record[3:13])
+	fh.ImmediateDestination = fh.parseStringField(record[3:13])
 	// (14-23) A 10-digit number assigned to you by the ODFI once they approve you to originate ACH files through them
-	fh.ImmediateOrigin = fh.parseNumField(record[13:23])
+	fh.ImmediateOrigin = fh.parseStringField(record[13:23])
 	// 24-29 Today's date in YYMMDD format
 	// must be after todays date.
 	fh.FileCreationDate = fh.parseSimpleDate(record[23:29])
@@ -185,6 +185,14 @@ func (fh *FileHeader) Validate() error {
 	if err := fh.isAlphanumeric(fh.ImmediateDestinationName); err != nil {
 		return &FieldError{FieldName: "ImmediateDestinationName", Value: fh.ImmediateDestinationName, Msg: err.Error()}
 	}
+	//TODO: Verify these are the type of checks we want
+	if fh.ImmediateOrigin == "000000000" {
+		return &FieldError{FieldName: "ImmediateOrigin", Value: fh.ImmediateOrigin, Msg: msgFieldInclusion}
+	}
+	//TODO: Verify these are the type of checks we want
+	if fh.ImmediateDestination == "000000000" {
+		return &FieldError{FieldName: "ImmediateDestination", Value: fh.ImmediateDestination, Msg: msgFieldInclusion}
+	}
 	if err := fh.isAlphanumeric(fh.ImmediateOriginName); err != nil {
 		return &FieldError{FieldName: "ImmediateOriginName", Value: fh.ImmediateOriginName, Msg: err.Error()}
 	}
@@ -207,10 +215,10 @@ func (fh *FileHeader) fieldInclusion() error {
 	if fh.recordType == "" {
 		return &FieldError{FieldName: "recordType", Value: fh.recordType, Msg: msgFieldInclusion}
 	}
-	if fh.ImmediateDestination == 0 {
+	if fh.ImmediateDestination == "" {
 		return &FieldError{FieldName: "ImmediateDestination", Value: fh.ImmediateDestinationField(), Msg: msgFieldInclusion}
 	}
-	if fh.ImmediateOrigin == 0 {
+	if fh.ImmediateOrigin == "" {
 		return &FieldError{FieldName: "ImmediateOrigin", Value: fh.ImmediateOriginField(), Msg: msgFieldInclusion}
 	}
 	if fh.FileCreationDate.IsZero() {
@@ -233,12 +241,12 @@ func (fh *FileHeader) fieldInclusion() error {
 
 // ImmediateDestinationField gets the immediate destination number with zero padding
 func (fh *FileHeader) ImmediateDestinationField() string {
-	return " " + fh.numericField(fh.ImmediateDestination, 9)
+	return " " + fh.stringField(fh.ImmediateDestination, 9)
 }
 
 // ImmediateOriginField gets the immediate origin number with 0 padding
 func (fh *FileHeader) ImmediateOriginField() string {
-	return " " + fh.numericField(fh.ImmediateOrigin, 9)
+	return " " + fh.stringField(fh.ImmediateOrigin, 9)
 }
 
 // FileCreationDateField gets the file creation date in YYMMDD format

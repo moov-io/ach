@@ -159,7 +159,8 @@ func TestFileLineLong(t *testing.T) {
 // TestFileFileHeaderErr ensure a parse validation error flows back from the parser.
 func TestFileFileHeaderErr(t *testing.T) {
 	fh := mockFileHeader()
-	fh.ImmediateOrigin = 0
+	//fh.ImmediateOrigin = "0"
+	fh.ImmediateOrigin = ""
 	r := NewReader(strings.NewReader(fh.String()))
 	// necessary to have a file control not nil
 	r.File.Control = mockFileControl()
@@ -178,7 +179,8 @@ func TestFileFileHeaderErr(t *testing.T) {
 // TestFileBatchHeaderErr ensure a parse validation error flows back from the parser.
 func TestFileBatchHeaderErr(t *testing.T) {
 	bh := mockBatchHeader()
-	bh.ODFIIdentification = 0
+	//bh.ODFIIdentification = 0
+	bh.ODFIIdentification = ""
 	r := NewReader(strings.NewReader(bh.String()))
 	_, err := r.Read()
 	if p, ok := err.(*ParseError); ok {

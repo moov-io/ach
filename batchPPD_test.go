@@ -17,7 +17,7 @@ func mockBatchPPDHeader() *BatchHeader {
 	bh.CompanyIdentification = "123456789"
 	bh.CompanyEntryDescription = "PAYROLL"
 	bh.EffectiveEntryDate = time.Now()
-	bh.ODFIIdentification = 6200001
+	bh.ODFIIdentification = "6200001"
 	return bh
 }
 
@@ -42,7 +42,7 @@ func mockBatchPPDHeader2() *BatchHeader {
 	bh.StandardEntryClassCode = "PPD"
 	bh.CompanyEntryDescription = "PAYROLL"
 	bh.EffectiveEntryDate = time.Now()
-	bh.ODFIIdentification = 109991234
+	bh.ODFIIdentification = "109991234"
 	return bh
 }
 
@@ -139,7 +139,7 @@ func TestBatchCompanyIdentification(t *testing.T) {
 
 func TestBatchODFIIDMismatch(t *testing.T) {
 	mockBatch := mockBatchPPD()
-	mockBatch.GetControl().ODFIIdentification = 987654321
+	mockBatch.GetControl().ODFIIdentification = "987654321"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ODFIIdentification" {

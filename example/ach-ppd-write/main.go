@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/moov-io/ach"
@@ -16,8 +15,8 @@ func main() {
 	// Set originator bank ODFI and destination Operator for the financial institution
 	// this is the funding/receiving source of the transfer
 	fh := ach.NewFileHeader()
-	fh.ImmediateDestination = 9876543210 // A blank space followed by your ODFI's transit/routing number
-	fh.ImmediateOrigin = 1234567890      // Organization or Company FED ID usually 1 and FEIN/SSN. Assigned by your ODFI
+	fh.ImmediateDestination = "9876543210" // A blank space followed by your ODFI's transit/routing number
+	fh.ImmediateOrigin = "1234567890"     // Organization or Company FED ID usually 1 and FEIN/SSN. Assigned by your ODFI
 	fh.FileCreationDate = time.Now()     // Todays Date
 	fh.ImmediateDestinationName = "Federal Reserve Bank"
 	fh.ImmediateOriginName = "My Bank Name"
@@ -26,11 +25,11 @@ func main() {
 	bh := ach.NewBatchHeader()
 	bh.ServiceClassCode = 220          // ACH credit pushes money out, 225 debits/pulls money in.
 	bh.CompanyName = "Name on Account" // The name of the company/person that has relationship with receiver
-	bh.CompanyIdentification = strconv.Itoa(fh.ImmediateOrigin)
+	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = "PPD"         // Consumer destination vs Company CCD
 	bh.CompanyEntryDescription = "REG.SALARY" // will be on receiving accounts statement
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
-	bh.ODFIIdentification = 12345678 // first 8 digits of your bank account
+	bh.ODFIIdentification = "12345678" // first 8 digits of your bank account
 
 	// Identifies the receivers account information
 	// can be multiple entry's per batch

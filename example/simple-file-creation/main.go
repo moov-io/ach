@@ -5,15 +5,14 @@ import (
 	"os"
 
 	"github.com/moov-io/ach"
-	"strconv"
 	"time"
 )
 
 func main() {
 	// To create a file
 	fh := ach.NewFileHeader()
-	fh.ImmediateDestination = 9876543210
-	fh.ImmediateOrigin = 1234567890
+	fh.ImmediateDestination = "987654321"
+	fh.ImmediateOrigin = "123456789"
 	fh.FileCreationDate = time.Now()
 	fh.ImmediateDestinationName = "Federal Reserve Bank"
 	fh.ImmediateOriginName = "My Bank Name"
@@ -25,11 +24,11 @@ func main() {
 	bh := ach.NewBatchHeader()
 	bh.ServiceClassCode = 200
 	bh.CompanyName = "Your Company"
-	bh.CompanyIdentification = strconv.Itoa(file.Header.ImmediateOrigin)
+	bh.CompanyIdentification = file.Header.ImmediateOrigin
 	bh.StandardEntryClassCode = "PPD"
 	bh.CompanyEntryDescription = "Trans. Description"
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
-	bh.ODFIIdentification = 123456789
+	bh.ODFIIdentification = "12345678"
 
 	batch, _ := ach.NewBatch(bh)
 
@@ -37,7 +36,7 @@ func main() {
 	entry := ach.NewEntryDetail()
 	entry.TransactionCode = 22
 	entry.SetRDFI(9101298)
-	entry.DFIAccountNumber = "123456789"
+	entry.DFIAccountNumber = "999555121"
 	entry.Amount = 100000000
 	entry.IndividualName = "Wade Arnold"
 	entry.SetTraceNumber(bh.ODFIIdentification, 1)
@@ -69,11 +68,11 @@ func main() {
 	bh2 := ach.NewBatchHeader()
 	bh2.ServiceClassCode = 220
 	bh2.CompanyName = "Your Company"
-	bh2.CompanyIdentification = strconv.Itoa(file.Header.ImmediateOrigin)
+	bh2.CompanyIdentification = file.Header.ImmediateOrigin
 	bh2.StandardEntryClassCode = "WEB"
 	bh2.CompanyEntryDescription = "Subscr"
 	bh2.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
-	bh2.ODFIIdentification = 123456789
+	bh2.ODFIIdentification = "123456789"
 
 	batch2, _ := ach.NewBatch(bh2)
 

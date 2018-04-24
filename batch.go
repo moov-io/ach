@@ -2,8 +2,8 @@ package ach
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
+	"strconv"
 )
 
 // Batch holds the Batch Header and Batch Control and all Entry Records for PPD Entries
@@ -122,8 +122,14 @@ func (batch *batch) build() error {
 		if err != nil {
 			return err
 		}
+
+		batchHeaderODFI, err := strconv.Atoi(batch.header.ODFIIdentificationField() [:8])
+		if err != nil {
+			return err
+		}
+
 		// Add a sequenced TraceNumber if one is not already set. Have to keep original trance number Return and NOC entries
-		if currentTraceNumberODFI != batch.header.ODFIIdentification {
+		if currentTraceNumberODFI != batchHeaderODFI {
 			batch.entries[i].SetTraceNumber(batch.header.ODFIIdentification, seq)
 		}
 		seq++

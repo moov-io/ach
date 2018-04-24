@@ -233,8 +233,8 @@ func (ed *EntryDetail) SetRDFI(rdfi int) *EntryDetail {
 }
 
 // SetTraceNumber takes first 8 digits of ODFI and concatenates a sequence number onto the TraceNumber
-func (ed *EntryDetail) SetTraceNumber(ODFIIdentification int, seq int) {
-	trace := ed.numericField(ODFIIdentification, 8) + ed.numericField(seq, 7)
+func (ed *EntryDetail) SetTraceNumber(ODFIIdentification string, seq int) {
+	trace := ed.stringField(ODFIIdentification, 8) + ed.numericField(seq, 7)
 	ed.TraceNumber = ed.parseNumField(trace)
 }
 

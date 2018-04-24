@@ -16,7 +16,7 @@ func mockBatchHeader() *BatchHeader {
 	bh.CompanyName = "ACME Corporation"
 	bh.CompanyIdentification = "123456789"
 	bh.CompanyEntryDescription = "PAYROLL"
-	bh.ODFIIdentification = 6200001
+	bh.ODFIIdentification = "6200001"
 	return bh
 }
 
@@ -40,7 +40,7 @@ func TestMockBatchHeader(t *testing.T) {
 	if bh.CompanyEntryDescription != "PAYROLL" {
 		t.Error("CompanyEntryDescription dependent default value has changed")
 	}
-	if bh.ODFIIdentification != 6200001 {
+	if bh.ODFIIdentification != "6200001" {
 		t.Error("ODFIIdentification dependent default value has changed")
 	}
 }

@@ -18,6 +18,11 @@ func (c *converters) parseNumField(r string) (s int) {
 	return s
 }
 
+func (c *converters) parseStringField(r string) (s string) {
+	s = strings.TrimSpace(r)
+	return s
+}
+
 // formatSimpleDate takes a time.Time and returns a string of YYMMDD
 func (c *converters) formatSimpleDate(t time.Time) string {
 	return t.Format("060102")
@@ -55,6 +60,15 @@ func (c *converters) alphaField(s string, max uint) string {
 // numericField right-justified, unisigned, and zero filled
 func (c *converters) numericField(n int, max uint) string {
 	s := strconv.Itoa(n)
+	ln := uint(len(s))
+	if ln > max {
+		return s[ln-max:]
+	}
+	s = strings.Repeat("0", int(max-ln)) + s
+	return s
+}
+
+func (c *converters) stringField(s string, max uint) string {
 	ln := uint(len(s))
 	if ln > max {
 		return s[ln-max:]
