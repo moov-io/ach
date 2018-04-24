@@ -45,8 +45,9 @@ func main() {
 	entry.Category = ach.CategoryForward
 
 	// To add one or more optional addenda records for an entry
-	addenda, _ := ach.NewAddenda(ach.AddendaParam{
-		PaymentRelatedInfo: "bonus pay for amazing work on #OSS"})
+
+	addenda := ach.NewAddenda05()
+	addenda.PaymentRelatedInformation = "bonus pay for amazing work on #OSS"
 	entry.AddAddenda(addenda)
 
 	// Entries are added to batches like so:
@@ -90,15 +91,15 @@ func main() {
 	entry2.DiscretionaryData = "R"
 	entry2.Category = ach.CategoryForward
 
-	addenda2, _ := ach.NewAddenda(ach.AddendaParam{
-		PaymentRelatedInfo: "Monthly Membership Subscription"})
-
-	// add the entry to the batch
+	// To add one or more optional addenda records for an entry
+	addenda2 := ach.NewAddenda05()
+	addenda2.PaymentRelatedInformation = "Monthly Membership Subscription"
 	entry2.AddAddenda(addenda2)
 
-	// Create and add the second batch
-
+	// add the entry to the batch
 	batch2.AddEntry(entry2)
+
+	// Create and add the second batch
 	if err := batch2.Create(); err != nil {
 		fmt.Printf("%T: %s", err, err)
 	}
