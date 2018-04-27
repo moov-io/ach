@@ -45,8 +45,6 @@ func (c *converters) parseSimpleTime(s string) time.Time {
 	return t
 }
 
-//func (v *Converters) numericField()
-
 // alphaField Alphanumeric and Alphabetic fields are left-justified and space filled.
 func (c *converters) alphaField(s string, max uint) string {
 	ln := uint(len(s))
@@ -68,10 +66,11 @@ func (c *converters) numericField(n int, max uint) string {
 	return s
 }
 
-func (c *converters) stringField(s string, max uint) string {
+// stringField right-justified and zero filled
+func (c *converters) stringRTNField(s string, max uint) string {
 	ln := uint(len(s))
 	if ln > max {
-		return s[ln-max:]
+		return s[:max]
 	}
 	s = strings.Repeat("0", int(max-ln)) + s
 	return s

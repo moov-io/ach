@@ -122,7 +122,7 @@ To create an entry
  ```go
 entry := ach.NewEntryDetail()
 entry.TransactionCode = 22
-entry.SetRDFI(9101298)
+entry.SetRDFI("009101298")
 entry.DFIAccountNumber = "123456789"
 entry.Amount = 100000000
 entry.IndividualName = "Wade Arnold"

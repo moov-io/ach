@@ -20,7 +20,7 @@ type Addenda98 struct {
 	// in the Addenda Record of an 98, within an Acknowledgment Entry, or with an RDFI request for a copy of an authorization.
 	OriginalTrace int
 	// OriginalDFI field contains the Receiving DFI Identification (addenda.RDFIIdentification) as originally included on the forward Entry or Prenotification that the RDFI is returning or correcting.
-	OriginalDFI int
+	OriginalDFI string
 	// CorrectedData
 	CorrectedData string
 	// TraceNumber matches the Entry Detail Trace Number of the entry being returned.
@@ -72,7 +72,7 @@ func (addenda98 *Addenda98) Parse(record string) {
 	// 7-21
 	addenda98.OriginalTrace = addenda98.parseNumField(record[6:21])
 	// 28-35
-	addenda98.OriginalDFI = addenda98.parseNumField(record[27:35])
+	addenda98.OriginalDFI = addenda98.parseStringField(record[27:35])
 	// 36-64
 	addenda98.CorrectedData = strings.TrimSpace(record[35:64])
 	// 80-94
@@ -131,7 +131,7 @@ func (addenda98 *Addenda98) OriginalTraceField() string {
 
 // OriginalDFIField returns a zero padded OriginalDFI string
 func (addenda98 *Addenda98) OriginalDFIField() string {
-	return addenda98.numericField(addenda98.OriginalDFI, 8)
+	return addenda98.stringRTNField(addenda98.OriginalDFI, 8)
 }
 
 //CorrectedDataField returns a space padded CorrectedData string

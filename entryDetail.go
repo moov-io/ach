@@ -30,10 +30,10 @@ type EntryDetail struct {
 
 	// RDFIIdentification is the RDFI's routing number without the last digit.
 	// Receiving Depository Financial Institution
-	RDFIIdentification int
+	RDFIIdentification string
 
 	// CheckDigit the last digit of the RDFI's routing number
-	CheckDigit int
+	CheckDigit string
 
 	// DFIAccountNumber is the receiver's bank account number you are crediting/debiting.
 	// It important to note that this is an alphanumeric field, so its space padded, no zero padded
@@ -106,9 +106,9 @@ func (ed *EntryDetail) Parse(record string) {
 	// 2-3 is checking credit 22 debit 27 savings credit 32 debit 37
 	ed.TransactionCode = ed.parseNumField(record[1:3])
 	// 4-11 the RDFI's routing number without the last digit.
-	ed.RDFIIdentification = ed.parseNumField(record[3:11])
+	ed.RDFIIdentification = ed.parseStringField(record[3:11])
 	// 12-12 The last digit of the RDFI's routing number
-	ed.CheckDigit = ed.parseNumField(record[11:12])
+	ed.CheckDigit = ed.parseStringField(record[11:12])
 	// 13-29 The receiver's bank account number you are crediting/debiting
 	ed.DFIAccountNumber = record[12:29]
 	// 30-39 Number of cents you are debiting/crediting this account
@@ -169,10 +169,18 @@ func (ed *EntryDetail) Validate() error {
 	if err := ed.isAlphanumeric(ed.DiscretionaryData); err != nil {
 		return &FieldError{FieldName: "DiscretionaryData", Value: ed.DiscretionaryData, Msg: err.Error()}
 	}
+
 	calculated := ed.CalculateCheckDigit(ed.RDFIIdentificationField())
-	if calculated != ed.CheckDigit {
+
+	edCheckDigit, err := strconv.Atoi(ed.CheckDigit)
+
+	if err != nil {
 		msg := fmt.Sprintf(msgValidCheckDigit, calculated)
-		return &FieldError{FieldName: "RDFIIdentification", Value: strconv.Itoa(ed.CheckDigit), Msg: msg}
+		return &FieldError{FieldName: "RDFIIdentification", Value: ed.CheckDigit, Msg: msg}
+	}
+	if calculated != edCheckDigit {
+		msg := fmt.Sprintf(msgValidCheckDigit, calculated)
+		return &FieldError{FieldName: "RDFIIdentification", Value: ed.CheckDigit, Msg: msg}
 	}
 	return nil
 }
@@ -186,7 +194,7 @@ func (ed *EntryDetail) fieldInclusion() error {
 	if ed.TransactionCode == 0 {
 		return &FieldError{FieldName: "TransactionCode", Value: strconv.Itoa(ed.TransactionCode), Msg: msgFieldInclusion}
 	}
-	if ed.RDFIIdentification == 0 {
+	if ed.RDFIIdentification == "" {
 		return &FieldError{FieldName: "RDFIIdentification", Value: ed.RDFIIdentificationField(), Msg: msgFieldInclusion}
 	}
 	if ed.DFIAccountNumber == "" {
@@ -225,22 +233,22 @@ func (ed *EntryDetail) AddAddenda(addenda Addendumer) []Addendumer {
 }
 
 // SetRDFI takes the 9 digit RDFI account number and separates it for RDFIIdentification and CheckDigit
-func (ed *EntryDetail) SetRDFI(rdfi int) *EntryDetail {
-	s := ed.numericField(rdfi, 9)
-	ed.RDFIIdentification = ed.parseNumField(s[:8])
-	ed.CheckDigit = ed.parseNumField(s[8:9])
+func (ed *EntryDetail) SetRDFI(rdfi string) *EntryDetail {
+	s := ed.stringRTNField(rdfi, 9)
+	ed.RDFIIdentification = ed.parseStringField(s[:8])
+	ed.CheckDigit = ed.parseStringField(s[8:9])
 	return ed
 }
 
 // SetTraceNumber takes first 8 digits of ODFI and concatenates a sequence number onto the TraceNumber
 func (ed *EntryDetail) SetTraceNumber(ODFIIdentification string, seq int) {
-	trace := ed.stringField(ODFIIdentification, 8) + ed.numericField(seq, 7)
+	trace := ed.stringRTNField(ODFIIdentification, 8) + ed.numericField(seq, 7)
 	ed.TraceNumber = ed.parseNumField(trace)
 }
 
 // RDFIIdentificationField get the rdfiIdentification with zero padding
 func (ed *EntryDetail) RDFIIdentificationField() string {
-	return ed.numericField(ed.RDFIIdentification, 8)
+	return ed.stringRTNField(ed.RDFIIdentification, 8)
 }
 
 // DFIAccountNumberField gets the DFIAccountNumber with space padding

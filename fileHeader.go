@@ -31,17 +31,19 @@ type FileHeader struct {
 	priorityCode string
 
 	// ImmediateDestination contains the Routing Number of the ACH Operator or receiving
-	// point to which the file is being sent. The 10 character field begins with
-	// a blank in the first position, followed by the four digit Federal Reserve
-	// Routing Symbol, the four digit ABA Institution Identifier, and the Check
-	// Digit (bTTTTAAAAC).
+	// point to which the file is being sent.  The ach file format specifies a 10 character
+	// field  begins with a blank space in the first position, followed by the four digit
+	// Federal Reserve Routing Symbol, the four digit ABA Institution Identifier, and the Check
+	// Digit (bTTTTAAAAC).  ImmediateDestinationField() will append the blank space to the
+	// routing number.
 	ImmediateDestination string
 
 	// ImmediateOrigin contains the Routing Number of the ACH Operator or sending
-	// point that is sending the file. The 10 character field begins with
-	// a blank in the first position, followed by the four digit Federal Reserve
-	// Routing Symbol, the four digit ABA Institution Identifier, and the Check
-	// Digit (bTTTTAAAAC).
+	// point that is sending the file. The ach file format specifies a 10 character field
+	// which begins with a blank space in the first position, followed by the four digit
+	// Federal Reserve Routing Symbol, the four digit ABA Institution Identifier, and the Check
+	// Digit (bTTTTAAAAC).  ImmediateOriginField() will append the blank space to the routing
+	// number.
 	ImmediateOrigin string
 
 	// FileCreationDate is expressed in a "YYMMDD" format. The File Creation
@@ -241,12 +243,12 @@ func (fh *FileHeader) fieldInclusion() error {
 
 // ImmediateDestinationField gets the immediate destination number with zero padding
 func (fh *FileHeader) ImmediateDestinationField() string {
-	return " " + fh.stringField(fh.ImmediateDestination, 9)
+	return " " + fh.stringRTNField(fh.ImmediateDestination, 9)
 }
 
 // ImmediateOriginField gets the immediate origin number with 0 padding
 func (fh *FileHeader) ImmediateOriginField() string {
-	return " " + fh.stringField(fh.ImmediateOrigin, 9)
+	return " " + fh.stringRTNField(fh.ImmediateOrigin, 9)
 }
 
 // FileCreationDateField gets the file creation date in YYMMDD format

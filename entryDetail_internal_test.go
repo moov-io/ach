@@ -12,7 +12,7 @@ import (
 func mockEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 22
-	entry.SetRDFI(9101298)
+	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "123456789"
 	entry.Amount = 100000000
 	entry.IndividualName = "Wade Arnold"
@@ -39,7 +39,7 @@ func TestMockEntryDetail(t *testing.T) {
 	if entry.IndividualName != "Wade Arnold" {
 		t.Error("IndividualName dependent default value has changed")
 	}
-	if entry.TraceNumber != 62000010000001 {
+	if entry.TraceNumber != 121042880000001 {
 		t.Errorf("TraceNumber dependent default value has changed %v", entry.TraceNumber)
 	}
 }
@@ -65,7 +65,7 @@ func TestParseEntryDetail(t *testing.T) {
 	if record.RDFIIdentificationField() != "05320001" {
 		t.Errorf("RDFIIdentification Expected '05320001' got: '%v'", record.RDFIIdentificationField())
 	}
-	if record.CheckDigit != 9 {
+	if record.CheckDigit != "9" {
 		t.Errorf("CheckDigit Expected '9' got: %v", record.CheckDigit)
 	}
 	if record.DFIAccountNumberField() != "12345            " {
@@ -197,7 +197,7 @@ func TestEDDiscretionaryDataAlphaNumeric(t *testing.T) {
 
 func TestEDisCheckDigit(t *testing.T) {
 	ed := mockEntryDetail()
-	ed.CheckDigit = 1
+	ed.CheckDigit = "1"
 	if err := ed.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "RDFIIdentification" {
@@ -209,11 +209,11 @@ func TestEDisCheckDigit(t *testing.T) {
 
 func TestEDSetRDFI(t *testing.T) {
 	ed := NewEntryDetail()
-	ed.SetRDFI(81086674)
-	if ed.RDFIIdentification != 8108667 {
+	ed.SetRDFI("810866774")
+	if ed.RDFIIdentification != "81086677" {
 		t.Error("RDFI identification")
 	}
-	if ed.CheckDigit != 4 {
+	if ed.CheckDigit != "4" {
 		t.Error("Unexpected check digit")
 	}
 }
@@ -244,7 +244,7 @@ func TestEDFieldInclusionTransactionCode(t *testing.T) {
 
 func TestEDFieldInclusionRDFIIdentification(t *testing.T) {
 	entry := mockEntryDetail()
-	entry.RDFIIdentification = 0
+	entry.RDFIIdentification = ""
 	if err := entry.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.Msg != msgFieldInclusion {

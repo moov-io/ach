@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/moov-io/ach"
+	"github.com/bkmoovio/ach"
 	"time"
 )
 
 func main() {
 	// To create a file
 	fh := ach.NewFileHeader()
-	fh.ImmediateDestination = "987654321"
-	fh.ImmediateOrigin = "123456789"
+	fh.ImmediateDestination = "231380104"
+	fh.ImmediateOrigin = "121042882"
 	fh.FileCreationDate = time.Now()
 	fh.ImmediateDestinationName = "Federal Reserve Bank"
 	fh.ImmediateOriginName = "My Bank Name"
@@ -28,16 +28,16 @@ func main() {
 	bh.StandardEntryClassCode = "PPD"
 	bh.CompanyEntryDescription = "Trans. Description"
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
-	bh.ODFIIdentification = "12345678"
+	bh.ODFIIdentification = "121042882"
 
 	batch, _ := ach.NewBatch(bh)
 
 	// To create an entry
 	entry := ach.NewEntryDetail()
 	entry.TransactionCode = 22
-	entry.SetRDFI(9101298)
-	entry.DFIAccountNumber = "999555121"
-	entry.Amount = 100000000
+	entry.SetRDFI("231380104")
+	entry.DFIAccountNumber = "81967038518"
+	entry.Amount = 1000000
 	entry.IndividualName = "Wade Arnold"
 	entry.SetTraceNumber(bh.ODFIIdentification, 1)
 	entry.IdentificationNumber = "ABC##jvkdjfuiwn"
@@ -72,7 +72,7 @@ func main() {
 	bh2.StandardEntryClassCode = "WEB"
 	bh2.CompanyEntryDescription = "Subscr"
 	bh2.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
-	bh2.ODFIIdentification = "123456789"
+	bh2.ODFIIdentification = "121042882"
 
 	batch2, _ := ach.NewBatch(bh2)
 
@@ -81,8 +81,8 @@ func main() {
 
 	entry2 := ach.NewEntryDetail()
 	entry2.TransactionCode = 22
-	entry2.SetRDFI(102001017)
-	entry2.DFIAccountNumber = "5343121"
+	entry2.SetRDFI("231380104")
+	entry2.DFIAccountNumber = "81967038518"
 	entry2.Amount = 799
 	entry2.IndividualName = "Wade Arnold"
 	entry2.SetTraceNumber(bh2.ODFIIdentification, 2)

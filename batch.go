@@ -2,8 +2,8 @@ package ach
 
 import (
 	"fmt"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 // Batch holds the Batch Header and Batch Control and all Entry Records for PPD Entries
@@ -123,7 +123,7 @@ func (batch *batch) build() error {
 			return err
 		}
 
-		batchHeaderODFI, err := strconv.Atoi(batch.header.ODFIIdentificationField() [:8])
+		batchHeaderODFI, err := strconv.Atoi(batch.header.ODFIIdentificationField()[:8])
 		if err != nil {
 			return err
 		}
@@ -288,7 +288,10 @@ func (batch *batch) isEntryHash() error {
 func (batch *batch) calculateEntryHash() string {
 	hash := 0
 	for _, entry := range batch.entries {
-		hash = hash + entry.RDFIIdentification
+
+		entryRDFI, _ := strconv.Atoi(entry.RDFIIdentification)
+
+		hash = hash + entryRDFI
 	}
 	return batch.numericField(hash, 10)
 }

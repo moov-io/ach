@@ -8,7 +8,7 @@ func mockAddenda98() *Addenda98 {
 	addenda98 := NewAddenda98()
 	addenda98.ChangeCode = "C01"
 	addenda98.OriginalTrace = 12345
-	addenda98.OriginalDFI = 9101298
+	addenda98.OriginalDFI = "9101298"
 	addenda98.CorrectedData = "1918171614"
 	addenda98.TraceNumber = 91012980000088
 
@@ -32,8 +32,8 @@ func TestAddenda98Parse(t *testing.T) {
 	if addenda98.OriginalTrace != 99912340000015 {
 		t.Errorf("expected %v got %v", 99912340000015, addenda98.OriginalTrace)
 	}
-	if addenda98.OriginalDFI != 9101298 {
-		t.Errorf("expected %v got %v", 9101298, addenda98.OriginalDFI)
+	if addenda98.OriginalDFI != "09101298" {
+		t.Errorf("expected %s got %s", "09101298", addenda98.OriginalDFI)
 	}
 	if addenda98.CorrectedData != "1918171614" {
 		t.Errorf("expected %v got %v", "1918171614", addenda98.CorrectedData)

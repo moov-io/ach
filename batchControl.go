@@ -194,7 +194,7 @@ func (bc *BatchControl) MessageAuthenticationCodeField() string {
 
 // ODFIIdentificationField get the odfi number zero padded
 func (bc *BatchControl) ODFIIdentificationField() string {
-	return bc.stringField(bc.ODFIIdentification, 8)
+	return bc.stringRTNField(bc.ODFIIdentification, 8)
 }
 
 // BatchNumberField gets a string of the batch number zero padded

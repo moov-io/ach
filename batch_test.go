@@ -25,7 +25,7 @@ func mockBatchInvalidSECHeader() *BatchHeader {
 	bh.CompanyIdentification = "123456789"
 	bh.CompanyEntryDescription = "PAYROLL"
 	bh.EffectiveEntryDate = time.Now()
-	bh.ODFIIdentification = "6200001"
+	bh.ODFIIdentification = "123456789"
 	return bh
 }
 
