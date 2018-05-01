@@ -8,8 +8,6 @@ import (
 	"os"
 	"strings"
 	"testing"
-	"bytes"
-	"fmt"
 )
 
 func TestParseError(t *testing.T) {
@@ -437,30 +435,6 @@ func TestFileAddBatchValidation(t *testing.T) {
 		}
 	} else {
 		t.Errorf("%T: %s", err, err)
-	}
-}
-
-func TestFileHeaderExists(t *testing.T) {
-	file := mockFilePPD()
-	buf := new(bytes.Buffer)
-	w := NewWriter(buf)
-	w.Write(file)
-	w.Flush()
-	r := NewReader(strings.NewReader(buf.String()))
-	f, err := r.Read()
-	if err != nil {
-		if p, ok := err.(*ParseError); ok {
-			if e, ok := p.Err.(*FileError); ok {
-				if e.Msg != msgFileHeader {
-					t.Errorf("%T: %s", e, e)
-				}
-			}
-		} else {
-			// error is nil if the file was parsed properly.
-			t.Errorf("%T: %s", err, err)
-		}
-	} else {
-		fmt.Println(f.Header.String())
 	}
 }
 
