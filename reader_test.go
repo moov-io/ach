@@ -494,3 +494,22 @@ func TestFileAddendaOutsideEntry(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
+
+
+func TestFileFHImmediateOrigin(t *testing.T) {
+	fh := mockFileHeader()
+	fh.ImmediateDestination = ""
+	r := NewReader(strings.NewReader(fh.String()))
+	// necessary to have a file control not nil
+	r.File.Control = mockFileControl()
+	_, err := r.Read()
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", e, e)
+			}
+		}
+	} else {
+		t.Errorf("%T: %s", err, err)
+	}
+}

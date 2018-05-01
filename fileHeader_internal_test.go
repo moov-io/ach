@@ -259,7 +259,6 @@ func TestFHFieldInclusionRecordType(t *testing.T) {
 
 func TestFHFieldInclusionImmediatDestination(t *testing.T) {
 	fh := mockFileHeader()
-	//fh.ImmediateDestination = "0"
 	fh.ImmediateDestination = ""
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
@@ -321,18 +320,6 @@ func TestFHFieldInclusionFormatCode(t *testing.T) {
 func TestFHFieldInclusionCreationDate(t *testing.T) {
 	fh := mockFileHeader()
 	fh.FileCreationDate = time.Time{}
-	if err := fh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
-	}
-}
-
-func TestFHFieldInclusionImmediateDestination(t *testing.T) {
-	fh := mockFileHeader()
-	fh.ImmediateDestination = ""
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.Msg != msgFieldInclusion {
