@@ -16,6 +16,29 @@ func mockBatch() *batch {
 	return mockBatch
 }
 
+// Batch with mismatched Trace Number ODFI
+func mockBatchInvalidTraceNumberODFI() *batch {
+	mockBatch := &batch{}
+	mockBatch.SetHeader(mockBatchHeader())
+	mockBatch.AddEntry(mockEntryDetailInvalidTraceNumberODFI())
+	return mockBatch
+}
+
+// Entry Detail with mismatched Trace Number ODFI
+func mockEntryDetailInvalidTraceNumberODFI() *EntryDetail {
+	entry := NewEntryDetail()
+	entry.TransactionCode = 22
+	entry.SetRDFI("121042882")
+	entry.DFIAccountNumber = "123456789"
+	entry.Amount = 100000000
+	entry.IndividualName = "Wade Arnold"
+	entry.SetTraceNumber("9928272", 1)
+	entry.IdentificationNumber = "ABC##jvkdjfuiwn"
+	entry.Category = CategoryForward
+	return entry
+}
+
+
 // Invalid SEC CODE Batch Header
 func mockBatchInvalidSECHeader() *BatchHeader {
 	bh := NewBatchHeader()
@@ -319,4 +342,13 @@ func TestBatchFieldInclusion(t *testing.T) {
 			t.Errorf("%T: %s", err, err)
 		}
 	}
+}
+
+
+func TestBatchInvalidTraceNumberODFI(t *testing.T) {
+	mockBatch := mockBatchInvalidTraceNumberODFI()
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
 }
