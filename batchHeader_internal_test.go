@@ -294,3 +294,15 @@ func TestBHFieldInclusionOriginatorStatusCode(t *testing.T) {
 		}
 	}
 }
+
+func TestBHFieldInclusionODFIIdentification(t *testing.T) {
+	bh := mockBatchHeader()
+	bh.ODFIIdentification = ""
+	if err := bh.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "ODFIIdentification" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}

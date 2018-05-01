@@ -226,7 +226,7 @@ func (bh *BatchHeader) fieldInclusion() error {
 	if bh.CompanyEntryDescription == "" {
 		return &FieldError{FieldName: "CompanyEntryDescription", Value: bh.CompanyEntryDescription, Msg: msgFieldInclusion}
 	}
-	if bh.ODFIIdentification == "000000000" {
+	if bh.ODFIIdentification == "" {
 		return &FieldError{FieldName: "ODFIIdentification", Value: bh.ODFIIdentificationField(), Msg: msgFieldInclusion}
 	}
 	return nil
