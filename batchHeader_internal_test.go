@@ -14,9 +14,9 @@ func mockBatchHeader() *BatchHeader {
 	bh.ServiceClassCode = 220
 	bh.StandardEntryClassCode = "PPD"
 	bh.CompanyName = "ACME Corporation"
-	bh.CompanyIdentification = "123456789"
+	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "PAYROLL"
-	bh.ODFIIdentification = 6200001
+	bh.ODFIIdentification = "12104288"
 	return bh
 }
 
@@ -34,13 +34,13 @@ func TestMockBatchHeader(t *testing.T) {
 	if bh.CompanyName != "ACME Corporation" {
 		t.Error("CompanyName dependent default value has changed")
 	}
-	if bh.CompanyIdentification != "123456789" {
+	if bh.CompanyIdentification != "121042882" {
 		t.Error("CompanyIdentification dependent default value has changed")
 	}
 	if bh.CompanyEntryDescription != "PAYROLL" {
 		t.Error("CompanyEntryDescription dependent default value has changed")
 	}
-	if bh.ODFIIdentification != 6200001 {
+	if bh.ODFIIdentification != "12104288" {
 		t.Error("ODFIIdentification dependent default value has changed")
 	}
 }
@@ -289,6 +289,18 @@ func TestBHFieldInclusionOriginatorStatusCode(t *testing.T) {
 	if err := bh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "OriginatorStatusCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+func TestBHFieldInclusionODFIIdentification(t *testing.T) {
+	bh := mockBatchHeader()
+	bh.ODFIIdentification = ""
+	if err := bh.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "ODFIIdentification" {
 				t.Errorf("%T: %s", err, err)
 			}
 		}

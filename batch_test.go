@@ -16,6 +16,36 @@ func mockBatch() *batch {
 	return mockBatch
 }
 
+// Batch with mismatched Trace Number ODFI
+func mockBatchInvalidTraceNumberODFI() *batch {
+	mockBatch := &batch{}
+	mockBatch.SetHeader(mockBatchHeader())
+	mockBatch.AddEntry(mockEntryDetailInvalidTraceNumberODFI())
+	return mockBatch
+}
+
+// Entry Detail with mismatched Trace Number ODFI
+func mockEntryDetailInvalidTraceNumberODFI() *EntryDetail {
+	entry := NewEntryDetail()
+	entry.TransactionCode = 22
+	entry.SetRDFI("121042882")
+	entry.DFIAccountNumber = "123456789"
+	entry.Amount = 100000000
+	entry.IndividualName = "Wade Arnold"
+	entry.SetTraceNumber("9928272", 1)
+	entry.IdentificationNumber = "ABC##jvkdjfuiwn"
+	entry.Category = CategoryForward
+	return entry
+}
+
+
+// Batch with no entries
+func mockBatchNoEntry() *batch {
+	mockBatch := &batch{}
+	mockBatch.SetHeader(mockBatchHeader())
+	return mockBatch
+}
+
 // Invalid SEC CODE Batch Header
 func mockBatchInvalidSECHeader() *BatchHeader {
 	bh := NewBatchHeader()
@@ -25,7 +55,7 @@ func mockBatchInvalidSECHeader() *BatchHeader {
 	bh.CompanyIdentification = "123456789"
 	bh.CompanyEntryDescription = "PAYROLL"
 	bh.EffectiveEntryDate = time.Now()
-	bh.ODFIIdentification = 6200001
+	bh.ODFIIdentification = "123456789"
 	return bh
 }
 
@@ -137,7 +167,7 @@ func TestBatchDNEMismatch(t *testing.T) {
 
 func TestBatchTraceNumberNotODFI(t *testing.T) {
 	mockBatch := mockBatch()
-	mockBatch.GetEntries()[0].SetTraceNumber(12345678, 1)
+	mockBatch.GetEntries()[0].SetTraceNumber("12345678", 1)
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ODFIIdentificationField" {
@@ -304,5 +334,54 @@ func TestBatchTraceNumberExists(t *testing.T) {
 	traceAfter := mockBatch.GetEntries()[1].TraceNumberField()
 	if traceBefore != traceAfter {
 		t.Errorf("Trace number was set to %v before batch.build and is now %v\n", traceBefore, traceAfter)
+	}
+}
+
+func TestBatchFieldInclusion(t *testing.T) {
+	mockBatch := mockBatch()
+	mockBatch.header.ODFIIdentification = ""
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ODFIIdentification" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+
+func TestBatchInvalidTraceNumberODFI(t *testing.T) {
+	mockBatch := mockBatchInvalidTraceNumberODFI()
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+func TestBatchNoEntry(t *testing.T) {
+	mockBatch := mockBatchNoEntry()
+	if err := mockBatch.build(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "entries" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+func TestBatchControl(t *testing.T) {
+	mockBatch := mockBatch()
+	mockBatch.control.ODFIIdentification = ""
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ODFIIdentification" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
 	}
 }

@@ -8,8 +8,6 @@ import (
 	"os"
 	"strings"
 	"testing"
-	"bytes"
-	"fmt"
 )
 
 func TestParseError(t *testing.T) {
@@ -159,7 +157,8 @@ func TestFileLineLong(t *testing.T) {
 // TestFileFileHeaderErr ensure a parse validation error flows back from the parser.
 func TestFileFileHeaderErr(t *testing.T) {
 	fh := mockFileHeader()
-	fh.ImmediateOrigin = 0
+	//fh.ImmediateOrigin = "0"
+	fh.ImmediateOrigin = ""
 	r := NewReader(strings.NewReader(fh.String()))
 	// necessary to have a file control not nil
 	r.File.Control = mockFileControl()
@@ -178,7 +177,8 @@ func TestFileFileHeaderErr(t *testing.T) {
 // TestFileBatchHeaderErr ensure a parse validation error flows back from the parser.
 func TestFileBatchHeaderErr(t *testing.T) {
 	bh := mockBatchHeader()
-	bh.ODFIIdentification = 0
+	//bh.ODFIIdentification = 0
+	bh.ODFIIdentification = ""
 	r := NewReader(strings.NewReader(bh.String()))
 	_, err := r.Read()
 	if p, ok := err.(*ParseError); ok {
@@ -438,30 +438,6 @@ func TestFileAddBatchValidation(t *testing.T) {
 	}
 }
 
-func TestFileHeaderExists(t *testing.T) {
-	file := mockFilePPD()
-	buf := new(bytes.Buffer)
-	w := NewWriter(buf)
-	w.Write(file)
-	w.Flush()
-	r := NewReader(strings.NewReader(buf.String()))
-	f, err := r.Read()
-	if err != nil {
-		if p, ok := err.(*ParseError); ok {
-			if e, ok := p.Err.(*FileError); ok {
-				if e.Msg != msgFileHeader {
-					t.Errorf("%T: %s", e, e)
-				}
-			}
-		} else {
-			// error is nil if the file was parsed properly.
-			t.Errorf("%T: %s", err, err)
-		}
-	} else {
-		fmt.Println(f.Header.String())
-	}
-}
-
 // TestFileLongErr Batch Header Service Class is 000 which does not validate
 func TestFileLongErr(t *testing.T) {
 	line := "101 076401251 0764012510807291511A094101achdestname            companyname                    5000companyname                         origid    PPDCHECKPAYMT000002080730   1076401250000001"
@@ -485,6 +461,25 @@ func TestFileAddendaOutsideEntry(t *testing.T) {
 	if p, ok := err.(*ParseError); ok {
 		if e, ok := p.Err.(*FileError); ok {
 			if e.FieldName != "Addenda" {
+				t.Errorf("%T: %s", e, e)
+			}
+		}
+	} else {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+
+func TestFileFHImmediateOrigin(t *testing.T) {
+	fh := mockFileHeader()
+	fh.ImmediateDestination = ""
+	r := NewReader(strings.NewReader(fh.String()))
+	// necessary to have a file control not nil
+	r.File.Control = mockFileControl()
+	_, err := r.Read()
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
 				t.Errorf("%T: %s", e, e)
 			}
 		}

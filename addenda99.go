@@ -42,7 +42,7 @@ type Addenda99 struct {
 	// DateOfDeath The field date of death is to be supplied on Entries being returned for reason of death (return reason codes R14 and R15).
 	DateOfDeath time.Time
 	// OriginalDFI field contains the Receiving DFI Identification (addenda.RDFIIdentification) as originally included on the forward Entry or Prenotification that the RDFI is returning or correcting.
-	OriginalDFI int
+	OriginalDFI string
 	// AddendaInformation
 	AddendaInformation string
 	// TraceNumber matches the Entry Detail Trace Number of the entry being returned.
@@ -83,7 +83,7 @@ func (Addenda99 *Addenda99) Parse(record string) {
 	// 22-27, might be a date or blank
 	Addenda99.DateOfDeath = Addenda99.parseSimpleDate(record[21:27])
 	// 28-35
-	Addenda99.OriginalDFI = Addenda99.parseNumField(record[27:35])
+	Addenda99.OriginalDFI = Addenda99.parseStringField(record[27:35])
 	// 36-79
 	Addenda99.AddendaInformation = strings.TrimSpace(record[35:79])
 	// 80-94
@@ -143,7 +143,7 @@ func (Addenda99 *Addenda99) DateOfDeathField() string {
 
 // OriginalDFIField returns a zero padded OriginalDFI string
 func (Addenda99 *Addenda99) OriginalDFIField() string {
-	return Addenda99.numericField(Addenda99.OriginalDFI, 8)
+	return Addenda99.stringRTNField(Addenda99.OriginalDFI, 8)
 }
 
 //AddendaInformationField returns a space padded AddendaInformation string

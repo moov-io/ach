@@ -89,7 +89,7 @@ func (w *Writer) Error() error {
 	return err
 }
 
-// WriteAll writes multiple ach.fieles to w using Write and then calls Flush.
+// WriteAll writes multiple ach.files to w using Write and then calls Flush.
 func (w *Writer) WriteAll(files []*File) error {
 	for _, file := range files {
 		err := w.Write(file)

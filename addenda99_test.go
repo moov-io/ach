@@ -14,7 +14,7 @@ func mockAddenda99() *Addenda99 {
 	addenda99.ReturnCode = "R07"
 	addenda99.OriginalTrace = 99912340000015
 	addenda99.AddendaInformation = "Authorization Revoked"
-	addenda99.OriginalDFI = 9101298
+	addenda99.OriginalDFI = "9101298"
 
 	return addenda99
 }
@@ -39,8 +39,8 @@ func TestAddenda99Parse(t *testing.T) {
 	if addenda99.DateOfDeath.IsZero() != true {
 		t.Errorf("expected: %v got: %v", time.Time{}, addenda99.DateOfDeath)
 	}
-	if addenda99.OriginalDFI != 9101298 {
-		t.Errorf("expected: %v got: %v", 9101298, addenda99.OriginalDFI)
+	if addenda99.OriginalDFI != "09101298" {
+		t.Errorf("expected: %s got: %s", "09101298", addenda99.OriginalDFI)
 	}
 	if addenda99.AddendaInformation != "Authorization revoked" {
 		t.Errorf("expected: %v got: %v", "Authorization revoked", addenda99.AddendaInformation)

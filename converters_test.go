@@ -50,3 +50,38 @@ func TestParseNumField(t *testing.T) {
 		t.Errorf("Right justified zero got: '%v'", result)
 	}
 }
+
+//TestParseNumField handle zero and spaces in number conversion
+func TestParseStringField(t *testing.T) {
+	c := converters{}
+	result := c.parseStringField(" 012345")
+	if result != "012345" {
+		t.Errorf("Trim spaces: '%v'", result)
+	}
+}
+
+// TestNumericFieldShort ensures zero padding and right justified
+func TestRTNFieldShort(t *testing.T) {
+	c := converters{}
+	result := c.stringRTNField("123456", 8)
+	if result != "00123456" {
+		t.Errorf("Zero padding 8 character string : '%v'", result)
+	}
+}
+
+// TestNumericFieldLong right justified and sliced to max length
+func TestRTNFieldLong(t *testing.T) {
+	c := converters{}
+	result := c.stringRTNField("1234567899", 8)
+	if result != "12345678" {
+		t.Errorf("first 8 character string: '%v'", result)
+	}
+}
+
+func TestRTNFieldExact(t *testing.T) {
+	c := converters{}
+	result := c.stringRTNField("12345678", 8)
+	if result != "12345678" {
+		t.Errorf("first 8 character string: '%v'", result)
+	}
+}

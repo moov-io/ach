@@ -14,17 +14,17 @@ func mockBatchPPDHeader() *BatchHeader {
 	bh.ServiceClassCode = 220
 	bh.StandardEntryClassCode = "PPD"
 	bh.CompanyName = "ACME Corporation"
-	bh.CompanyIdentification = "123456789"
+	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "PAYROLL"
 	bh.EffectiveEntryDate = time.Now()
-	bh.ODFIIdentification = 6200001
+	bh.ODFIIdentification = "12104288"
 	return bh
 }
 
 func mockPPDEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 22
-	entry.SetRDFI(9101298)
+	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "123456789"
 	entry.Amount = 100000000
 	entry.IndividualName = "Wade Arnold"
@@ -38,20 +38,20 @@ func mockBatchPPDHeader2() *BatchHeader {
 	bh.ServiceClassCode = 200
 	bh.CompanyName = "MY BEST COMP."
 	bh.CompanyDiscretionaryData = "INCLUDES OVERTIME"
-	bh.CompanyIdentification = "1419871234"
+	bh.CompanyIdentification = "121042882"
 	bh.StandardEntryClassCode = "PPD"
 	bh.CompanyEntryDescription = "PAYROLL"
 	bh.EffectiveEntryDate = time.Now()
-	bh.ODFIIdentification = 109991234
+	bh.ODFIIdentification = "12104288"
 	return bh
 }
 
 func mockPPDEntry2() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 22                  // ACH Credit
-	entry.SetRDFI(81086674)                     // scottrade bank routing number
-	entry.DFIAccountNumber = "62292250"         // scottrade account number
-	entry.Amount = 1000000                      // 1k dollars
+	entry.TransactionCode = 22 // ACH Credit
+	entry.SetRDFI("231380104")
+	entry.DFIAccountNumber = "62292250"         // account number
+	entry.Amount = 100000                       // 1k dollars
 	entry.IdentificationNumber = "658-888-2468" // Unique ID for payment
 	entry.IndividualName = "Wade Arnold"
 	entry.SetTraceNumber(mockBatchPPDHeader2().ODFIIdentification, 1)
@@ -139,7 +139,7 @@ func TestBatchCompanyIdentification(t *testing.T) {
 
 func TestBatchODFIIDMismatch(t *testing.T) {
 	mockBatch := mockBatchPPD()
-	mockBatch.GetControl().ODFIIdentification = 987654321
+	mockBatch.GetControl().ODFIIdentification = "987654321"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ODFIIdentification" {
