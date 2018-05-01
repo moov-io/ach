@@ -173,11 +173,10 @@ func (ed *EntryDetail) Validate() error {
 	calculated := ed.CalculateCheckDigit(ed.RDFIIdentificationField())
 
 	edCheckDigit, err := strconv.Atoi(ed.CheckDigit)
-
 	if err != nil {
-		msg := fmt.Sprintf(msgValidCheckDigit, calculated)
-		return &FieldError{FieldName: "RDFIIdentification", Value: ed.CheckDigit, Msg: msg}
+		return err
 	}
+
 	if calculated != edCheckDigit {
 		msg := fmt.Sprintf(msgValidCheckDigit, calculated)
 		return &FieldError{FieldName: "RDFIIdentification", Value: ed.CheckDigit, Msg: msg}
