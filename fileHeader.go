@@ -187,11 +187,9 @@ func (fh *FileHeader) Validate() error {
 	if err := fh.isAlphanumeric(fh.ImmediateDestinationName); err != nil {
 		return &FieldError{FieldName: "ImmediateDestinationName", Value: fh.ImmediateDestinationName, Msg: err.Error()}
 	}
-	//TODO: Verify these are the type of checks we want
 	if fh.ImmediateOrigin == "000000000" {
 		return &FieldError{FieldName: "ImmediateOrigin", Value: fh.ImmediateOrigin, Msg: msgFieldInclusion}
 	}
-	//TODO: Verify these are the type of checks we want
 	if fh.ImmediateDestination == "000000000" {
 		return &FieldError{FieldName: "ImmediateDestination", Value: fh.ImmediateDestination, Msg: msgFieldInclusion}
 	}
