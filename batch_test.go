@@ -306,3 +306,17 @@ func TestBatchTraceNumberExists(t *testing.T) {
 		t.Errorf("Trace number was set to %v before batch.build and is now %v\n", traceBefore, traceAfter)
 	}
 }
+
+func TestBatchFieldInclusion(t *testing.T) {
+	mockBatch := mockBatch()
+	mockBatch.header.ODFIIdentification = ""
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ODFIIdentification" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
