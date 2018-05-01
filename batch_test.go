@@ -39,6 +39,13 @@ func mockEntryDetailInvalidTraceNumberODFI() *EntryDetail {
 }
 
 
+// Batch with no entries
+func mockBatchNoEntry() *batch {
+	mockBatch := &batch{}
+	mockBatch.SetHeader(mockBatchHeader())
+	return mockBatch
+}
+
 // Invalid SEC CODE Batch Header
 func mockBatchInvalidSECHeader() *BatchHeader {
 	bh := NewBatchHeader()
@@ -350,5 +357,31 @@ func TestBatchInvalidTraceNumberODFI(t *testing.T) {
 	if err := mockBatch.build(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
+}
 
+func TestBatchNoEntry(t *testing.T) {
+	mockBatch := mockBatchNoEntry()
+	if err := mockBatch.build(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "entries" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+func TestBatchControl(t *testing.T) {
+	mockBatch := mockBatch()
+	mockBatch.control.ODFIIdentification = ""
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ODFIIdentification" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
 }
