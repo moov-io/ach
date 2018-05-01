@@ -68,8 +68,8 @@ The following is based on [simple file creation](https://github.com/moov-io/ach/
  
  ```go
 	fh := ach.NewFileHeader()
-	fh.ImmediateDestination = 9876543210 // A blank space followed by your ODFI's transit/routing number
-	fh.ImmediateOrigin = 1234567890      // Organization or Company FED ID usually 1 and FEIN/SSN. Assigned by your ODFI
+	fh.ImmediateDestination = "9876543210" // A blank space followed by your ODFI's transit/routing number
+	fh.ImmediateOrigin = "1234567890"      // Organization or Company FED ID usually 1 and FEIN/SSN. Assigned by your ODFI
 	fh.FileCreationDate = time.Now()     // Todays Date
 	fh.ImmediateDestinationName = "Federal Reserve Bank"
 	fh.ImmediateOriginName = "My Bank Name")
@@ -91,7 +91,7 @@ func mockBatchPPDHeader() *BatchHeader {
 	bh.CompanyIdentification = "123456789"
 	bh.CompanyEntryDescription = "PAYROLL"
 	bh.EffectiveEntryDate = time.Now()
-	bh.ODFIIdentification = 6200001
+	bh.ODFIIdentification = "6200001"
 	return bh
 }
 
@@ -109,7 +109,7 @@ func mockBatchPPDHeader() *BatchHeader {
 	bh.CompanyIdentification = "123456789"
 	bh.CompanyEntryDescription = "PAYROLL"
 	bh.EffectiveEntryDate = time.Now()
-	bh.ODFIIdentification = 6200001
+	bh.ODFIIdentification = "6200001"
 	return bh
 }
 
@@ -173,7 +173,7 @@ func mockBatchWEBHeader() *BatchHeader {
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "123456789"
 	bh.CompanyEntryDescription = "Online Order"
-	bh.ODFIIdentification = 6200001
+	bh.ODFIIdentification = "6200001"
 	return bh
 }
 
