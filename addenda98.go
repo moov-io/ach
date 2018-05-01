@@ -5,9 +5,9 @@ import (
 	"strings"
 )
 
-// AddendaNOC is a Addendumer addenda record format for Notification OF Change(NOC)
+// Addenda98 is a Addendumer addenda record format for Notification OF Change(98)
 // The field contents for Notification of Change Entries must match the field contents of the original Entries
-type AddendaNOC struct {
+type Addenda98 struct {
 	// RecordType defines the type of record in the block. entryAddendaPos 7
 	recordType string
 	// TypeCode Addenda types code '98'
@@ -17,10 +17,10 @@ type AddendaNOC struct {
 	ChangeCode string
 	// OriginalTrace This field contains the Trace Number as originally included on the forward Entry or Prenotification.
 	// The RDFI must include the Original Entry Trace Number in the Addenda Record of an Entry being returned to an ODFI,
-	// in the Addenda Record of an NOC, within an Acknowledgment Entry, or with an RDFI request for a copy of an authorization.
+	// in the Addenda Record of an 98, within an Acknowledgment Entry, or with an RDFI request for a copy of an authorization.
 	OriginalTrace int
 	// OriginalDFI field contains the Receiving DFI Identification (addenda.RDFIIdentification) as originally included on the forward Entry or Prenotification that the RDFI is returning or correcting.
-	OriginalDFI int
+	OriginalDFI string
 	// CorrectedData
 	CorrectedData string
 	// TraceNumber matches the Entry Detail Trace Number of the entry being returned.
@@ -35,10 +35,10 @@ type AddendaNOC struct {
 var (
 	changeCodeDict = map[string]*changeCode{}
 
-	// Error messages specific to AddendaNOC
-	msgAddendaNOCChangeCode    = "found is not a valid addenda Change Code"
-	msgAddendaNOCTypeCode      = "is not AddendaNOC type code of 98"
-	msgAddendaNOCCorrectedData = "must contain the corrected information corresponding to the Change Code"
+	// Error messages specific to Addenda98
+	msgAddenda98ChangeCode    = "found is not a valid addenda Change Code"
+	msgAddenda98TypeCode      = "is not Addenda98 type code of 98"
+	msgAddenda98CorrectedData = "must contain the corrected information corresponding to the Change Code"
 )
 
 func init() {
@@ -52,103 +52,96 @@ type changeCode struct {
 	Code, Reason, Description string
 }
 
-// NewAddendaNOC returns an reference to an instantiated AddendaNOC with default values
-func NewAddendaNOC(params ...AddendaParam) *AddendaNOC {
-	addendaNOC := &AddendaNOC{
+// NewAddenda98 returns an reference to an instantiated Addenda98 with default values
+func NewAddenda98() *Addenda98 {
+	addenda98 := &Addenda98{
 		recordType: "7",
 		typeCode:   "98",
 	}
-	if len(params) > 0 {
-		addendaNOC.ChangeCode = params[0].ChangeCode
-		addendaNOC.OriginalTrace = addendaNOC.parseNumField(params[0].OriginalTrace)
-		addendaNOC.OriginalDFI = addendaNOC.parseNumField(params[0].OriginalDFI)
-		addendaNOC.CorrectedData = params[0].CorrectedData
-		addendaNOC.TraceNumber = addendaNOC.parseNumField(params[0].TraceNumber)
-	}
-	return addendaNOC
+	return addenda98
 }
 
-// Parse takes the input record string and parses the AddendaNOC values
-func (addendaNOC *AddendaNOC) Parse(record string) {
+// Parse takes the input record string and parses the Addenda98 values
+func (addenda98 *Addenda98) Parse(record string) {
 	// 1-1 Always "7"
-	addendaNOC.recordType = "7"
+	addenda98.recordType = "7"
 	// 2-3 Always "98"
-	addendaNOC.typeCode = record[1:3]
+	addenda98.typeCode = record[1:3]
 	// 4-6
-	addendaNOC.ChangeCode = record[3:6]
+	addenda98.ChangeCode = record[3:6]
 	// 7-21
-	addendaNOC.OriginalTrace = addendaNOC.parseNumField(record[6:21])
+	addenda98.OriginalTrace = addenda98.parseNumField(record[6:21])
 	// 28-35
-	addendaNOC.OriginalDFI = addendaNOC.parseNumField(record[27:35])
+	addenda98.OriginalDFI = addenda98.parseStringField(record[27:35])
 	// 36-64
-	addendaNOC.CorrectedData = strings.TrimSpace(record[35:64])
+	addenda98.CorrectedData = strings.TrimSpace(record[35:64])
 	// 80-94
-	addendaNOC.TraceNumber = addendaNOC.parseNumField(record[79:94])
+	addenda98.TraceNumber = addenda98.parseNumField(record[79:94])
 }
 
-// String writes the AddendaNOC struct to a 94 character string
-func (addendaNOC *AddendaNOC) String() string {
+// String writes the Addenda98 struct to a 94 character string
+func (addenda98 *Addenda98) String() string {
 	return fmt.Sprintf("%v%v%v%v%v%v%v%v%v",
-		addendaNOC.recordType,
-		addendaNOC.TypeCode(),
-		addendaNOC.ChangeCode,
-		addendaNOC.OriginalTraceField(),
+		addenda98.recordType,
+		addenda98.TypeCode(),
+		addenda98.ChangeCode,
+		addenda98.OriginalTraceField(),
 		"      ", //6 char reserved field
-		addendaNOC.OriginalDFIField(),
-		addendaNOC.CorrectedDataField(),
+		addenda98.OriginalDFIField(),
+		addenda98.CorrectedDataField(),
 		"               ", // 15 char reserved field
-		addendaNOC.TraceNumberField(),
+		addenda98.TraceNumberField(),
 	)
 }
 
-// Validate verifies NACHA rules for AddendaNOC
-func (addendaNOC *AddendaNOC) Validate() error {
-	if addendaNOC.recordType != "7" {
+// Validate verifies NACHA rules for Addenda98
+func (addenda98 *Addenda98) Validate() error {
+	if addenda98.recordType != "7" {
 		msg := fmt.Sprintf(msgRecordType, 7)
-		return &FieldError{FieldName: "recordType", Value: addendaNOC.recordType, Msg: msg}
+		return &FieldError{FieldName: "recordType", Value: addenda98.recordType, Msg: msg}
 	}
 	// Type Code must be 98
-	if addendaNOC.typeCode != "98" {
-		return &FieldError{FieldName: "TypeCode", Value: addendaNOC.typeCode, Msg: msgAddendaTypeCode}
+	if addenda98.typeCode != "98" {
+		return &FieldError{FieldName: "TypeCode", Value: addenda98.typeCode, Msg: msgAddendaTypeCode}
 	}
 
-	// AddendaNOC requires a valid ChangeCode
-	_, ok := changeCodeDict[addendaNOC.ChangeCode]
+	// Addenda98 requires a valid ChangeCode
+	_, ok := changeCodeDict[addenda98.ChangeCode]
 	if !ok {
-		return &FieldError{FieldName: "ChangeCode", Value: addendaNOC.ChangeCode, Msg: msgAddendaNOCChangeCode}
+		return &FieldError{FieldName: "ChangeCode", Value: addenda98.ChangeCode, Msg: msgAddenda98ChangeCode}
 	}
 
-	// AddendaNOC Record must contain the corrected information corresponding to the Change Code used
-	if addendaNOC.CorrectedData == "" {
-		return &FieldError{FieldName: "CorrectedData", Value: addendaNOC.CorrectedData, Msg: msgAddendaNOCCorrectedData}
+	// Addenda98 Record must contain the corrected information corresponding to the Change Code used
+	if addenda98.CorrectedData == "" {
+		return &FieldError{FieldName: "CorrectedData", Value: addenda98.CorrectedData, Msg: msgAddenda98CorrectedData}
 	}
 
 	return nil
 }
 
 // TypeCode defines the format of the underlying addenda record
-func (addendaNOC *AddendaNOC) TypeCode() string {
-	return addendaNOC.typeCode
+func (addenda98 *Addenda98) TypeCode() string {
+	return addenda98.typeCode
 }
 
 // OriginalTraceField returns a zero padded OriginalTrace string
-func (addendaNOC *AddendaNOC) OriginalTraceField() string {
-	return addendaNOC.numericField(addendaNOC.OriginalTrace, 15)
+func (addenda98 *Addenda98) OriginalTraceField() string {
+	return addenda98.numericField(addenda98.OriginalTrace, 15)
 }
 
 // OriginalDFIField returns a zero padded OriginalDFI string
-func (addendaNOC *AddendaNOC) OriginalDFIField() string {
-	return addendaNOC.numericField(addendaNOC.OriginalDFI, 8)
+func (addenda98 *Addenda98) OriginalDFIField() string {
+	return addenda98.stringRTNField(addenda98.OriginalDFI, 8)
 }
 
 //CorrectedDataField returns a space padded CorrectedData string
-func (addendaNOC *AddendaNOC) CorrectedDataField() string {
-	return addendaNOC.alphaField(addendaNOC.CorrectedData, 29)
+func (addenda98 *Addenda98) CorrectedDataField() string {
+	return addenda98.alphaField(addenda98.CorrectedData, 29)
 }
 
 // TraceNumberField returns a zero padded traceNumber string
-func (addendaNOC *AddendaNOC) TraceNumberField() string {
-	return addendaNOC.numericField(addendaNOC.TraceNumber, 15)
+func (addenda98 *Addenda98) TraceNumberField() string {
+	return addenda98.numericField(addenda98.TraceNumber, 15)
 }
 
 func makeChangeCodeDict() map[string]*changeCode {

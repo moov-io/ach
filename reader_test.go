@@ -8,6 +8,8 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"bytes"
+	"fmt"
 )
 
 func TestParseError(t *testing.T) {
@@ -104,7 +106,7 @@ func TestTwoFileControls(t *testing.T) {
 	var line = "9000001000001000000010005320001000000010500000000000000                                       "
 	var twoControls = line + "\n" + line
 	r := NewReader(strings.NewReader(twoControls))
-	r.addCurrentBatch(NewBatchPPD())
+	r.addCurrentBatch(NewBatchPPD(mockBatchPPDHeader()))
 	bc := BatchControl{EntryAddendaCount: 1,
 		TotalDebitEntryDollarAmount: 10500,
 		EntryHash:                   5320001}
@@ -157,7 +159,8 @@ func TestFileLineLong(t *testing.T) {
 // TestFileFileHeaderErr ensure a parse validation error flows back from the parser.
 func TestFileFileHeaderErr(t *testing.T) {
 	fh := mockFileHeader()
-	fh.ImmediateOrigin = 0
+	//fh.ImmediateOrigin = "0"
+	fh.ImmediateOrigin = ""
 	r := NewReader(strings.NewReader(fh.String()))
 	// necessary to have a file control not nil
 	r.File.Control = mockFileControl()
@@ -176,7 +179,8 @@ func TestFileFileHeaderErr(t *testing.T) {
 // TestFileBatchHeaderErr ensure a parse validation error flows back from the parser.
 func TestFileBatchHeaderErr(t *testing.T) {
 	bh := mockBatchHeader()
-	bh.ODFIIdentification = 0
+	//bh.ODFIIdentification = 0
+	bh.ODFIIdentification = ""
 	r := NewReader(strings.NewReader(bh.String()))
 	_, err := r.Read()
 	if p, ok := err.(*ParseError); ok {
@@ -193,10 +197,10 @@ func TestFileBatchHeaderErr(t *testing.T) {
 // TestFileBatchHeaderErr Error when two batch headers exists in a current batch
 func TestFileBatchHeaderDuplicate(t *testing.T) {
 	// create a new Batch header string
-	bh := mockBatchHeader()
+	bh := mockBatchPPDHeader()
 	r := NewReader(strings.NewReader(bh.String()))
 	// instantitate a batch header in the reader
-	r.addCurrentBatch(NewBatchPPD())
+	r.addCurrentBatch(NewBatchPPD(bh))
 	// read should fail because it is parsing a second batch header and there can only be one.
 	_, err := r.Read()
 	if p, ok := err.(*ParseError); ok {
@@ -232,7 +236,7 @@ func TestFileEntryDetail(t *testing.T) {
 	ed.TransactionCode = 0
 	line := ed.String()
 	r := NewReader(strings.NewReader(line))
-	r.addCurrentBatch(NewBatchPPD())
+	r.addCurrentBatch(NewBatchPPD(mockBatchPPDHeader()))
 	r.currentBatch.SetHeader(mockBatchHeader())
 	_, err := r.Read()
 	if p, ok := err.(*ParseError); ok {
@@ -246,11 +250,11 @@ func TestFileEntryDetail(t *testing.T) {
 	}
 }
 
-// TestFileAddenda validation error populates through the reader
-func TestFileAddenda(t *testing.T) {
+// TestFileAddenda05 validation error populates through the reader
+func TestFileAddenda05(t *testing.T) {
 	bh := mockBatchHeader()
 	ed := mockEntryDetail()
-	addenda := mockAddenda()
+	addenda := mockAddenda05()
 	addenda.SequenceNumber = 0
 	ed.AddAddenda(addenda)
 	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
@@ -269,9 +273,58 @@ func TestFileAddenda(t *testing.T) {
 	}
 }
 
+func TestFileAddenda98(t *testing.T) {
+	bh := mockBatchHeader()
+	ed := mockEntryDetail()
+	addenda := mockAddenda98()
+
+	addenda.TraceNumber = 0000001
+	addenda.ChangeCode = "C10"
+	addenda.CorrectedData = "ACME One Corporation"
+	ed.AddAddenda(addenda)
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
+	r := NewReader(strings.NewReader(line))
+	_, err := r.Read()
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*FieldError); ok {
+				if e.Msg != msgFieldInclusion {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+func TestFileAddenda99(t *testing.T) {
+	bh := mockBatchHeader()
+	ed := mockEntryDetail()
+	addenda := mockAddenda99()
+	addenda.TraceNumber = 0000001
+	addenda.ReturnCode = "R02"
+	ed.AddAddenda(addenda)
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
+	r := NewReader(strings.NewReader(line))
+	_, err := r.Read()
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*FieldError); ok {
+				if e.Msg != msgFieldInclusion {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+
 // TestFileAddendaOutsideBatch validation error populates through the reader
 func TestFileAddendaOutsideBatch(t *testing.T) {
-	addenda := mockAddenda()
+	addenda := mockAddenda05()
 	r := NewReader(strings.NewReader(addenda.String()))
 	_, err := r.Read()
 	if err != nil {
@@ -291,7 +344,7 @@ func TestFileAddendaOutsideBatch(t *testing.T) {
 func TestFileAddendaNoIndicator(t *testing.T) {
 	bh := mockBatchHeader()
 	ed := mockEntryDetail()
-	addenda := mockAddenda()
+	addenda := mockAddenda05()
 	line := bh.String() + "\n" + ed.String() + "\n" + addenda.String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
@@ -387,10 +440,8 @@ func TestFileAddBatchValidation(t *testing.T) {
 	}
 }
 
-/**
 func TestFileHeaderExists(t *testing.T) {
 	file := mockFilePPD()
-	file.SetHeader(FileHeader{})
 	buf := new(bytes.Buffer)
 	w := NewWriter(buf)
 	w.Write(file)
@@ -412,7 +463,6 @@ func TestFileHeaderExists(t *testing.T) {
 		fmt.Println(f.Header.String())
 	}
 }
-**/
 
 // TestFileLongErr Batch Header Service Class is 000 which does not validate
 func TestFileLongErr(t *testing.T) {
@@ -430,13 +480,32 @@ func TestFileLongErr(t *testing.T) {
 
 func TestFileAddendaOutsideEntry(t *testing.T) {
 	bh := mockBatchHeader()
-	addenda := mockAddenda()
+	addenda := mockAddenda05()
 	line := bh.String() + "\n" + addenda.String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
 	if p, ok := err.(*ParseError); ok {
 		if e, ok := p.Err.(*FileError); ok {
 			if e.FieldName != "Addenda" {
+				t.Errorf("%T: %s", e, e)
+			}
+		}
+	} else {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+
+func TestFileFHImmediateOrigin(t *testing.T) {
+	fh := mockFileHeader()
+	fh.ImmediateDestination = ""
+	r := NewReader(strings.NewReader(fh.String()))
+	// necessary to have a file control not nil
+	r.File.Control = mockFileControl()
+	_, err := r.Read()
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
 				t.Errorf("%T: %s", e, e)
 			}
 		}

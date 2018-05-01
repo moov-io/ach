@@ -10,18 +10,9 @@ type BatchPPD struct {
 }
 
 // NewBatchPPD returns a *BatchPPD
-func NewBatchPPD(params ...BatchParam) *BatchPPD {
+func NewBatchPPD(bh *BatchHeader) *BatchPPD {
 	batch := new(BatchPPD)
 	batch.SetControl(NewBatchControl())
-
-	if len(params) > 0 {
-		bh := NewBatchHeader(params[0])
-		bh.StandardEntryClassCode = ppd
-		batch.SetHeader(bh)
-		return batch
-	}
-	bh := NewBatchHeader()
-	bh.StandardEntryClassCode = ppd
 	batch.SetHeader(bh)
 	return batch
 }

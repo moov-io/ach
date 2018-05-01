@@ -41,7 +41,13 @@ type BatchHeader struct {
 	// alpha or numeric character) of the entity in the company name field
 	CompanyIdentification string
 
-	// StandardEntryClassCode PPD’ for consumer transactions, ‘CCD’ or ‘CTX’ for corporate
+	// StandardEntryClassCode
+	// Identifies the payment type (product) found within an ACH batch-using a 3-character code.
+	// The SEC Code pertains to all items within batch.
+	// Determines format of the detail records.
+	// Determines addenda records (required or optional PLUS one or up to 9,999 records).
+	// Determines rules to follow (return time frames).
+	// Some SEC codes require specific data in predetermined fields within the ACH record
 	StandardEntryClassCode string
 
 	// CompanyEntryDescription A description of the entries contained in the batch
@@ -82,7 +88,7 @@ type BatchHeader struct {
 	OriginatorStatusCode int
 
 	//ODFIIdentification First 8 digits of the originating DFI transit routing number
-	ODFIIdentification int
+	ODFIIdentification string
 
 	// BatchNumber is assigned in ascending sequence to each batch by the ODFI
 	// or its Sending Point in a given file of entries. Since the batch number
@@ -98,23 +104,12 @@ type BatchHeader struct {
 	converters
 }
 
-// NewBatchHeader returns a new BatchHeader with default values for none exported fields
-func NewBatchHeader(params ...BatchParam) *BatchHeader {
+// NewBatchHeader returns a new BatchHeader with default values for non exported fields
+func NewBatchHeader() *BatchHeader {
 	bh := &BatchHeader{
 		recordType:           "5",
 		OriginatorStatusCode: 0, //Prepared by an Originator
 		BatchNumber:          1,
-	}
-	if len(params) > 0 {
-		bh.ServiceClassCode = bh.parseNumField(params[0].ServiceClassCode)
-		bh.CompanyName = params[0].CompanyName
-		bh.CompanyIdentification = params[0].CompanyIdentification
-		bh.StandardEntryClassCode = params[0].StandardEntryClass
-		bh.CompanyEntryDescription = params[0].CompanyEntryDescription
-		bh.CompanyDescriptiveDate = params[0].CompanyDescriptiveDate
-		bh.EffectiveEntryDate = bh.parseSimpleDate(params[0].EffectiveEntryDate)
-		bh.ODFIIdentification = bh.parseNumField(params[0].ODFIIdentification)
-		return bh
 	}
 	return bh
 }
@@ -134,7 +129,7 @@ func (bh *BatchHeader) Parse(record string) {
 	bh.CompanyIdentification = strings.TrimSpace(record[40:50])
 	// 51-53 If the entries are PPD (credits/debits towards consumer account), use "PPD".
 	// If the entries are CCD (credits/debits towards corporate account), use "CCD".
-	// The difference between the 2 class codes are outside of the scope of this post, but generally most ACH transfers to consumer bank accounts should use "PPD"
+	// The difference between the 2 SEC codes are outside of the scope of this post.
 	bh.StandardEntryClassCode = record[50:53]
 	// 54-63 Your description of the transaction. This text will appear on the receivers’ bank statement.
 	// For example: "Payroll   "
@@ -151,7 +146,7 @@ func (bh *BatchHeader) Parse(record string) {
 	bh.OriginatorStatusCode = bh.parseNumField(record[78:79])
 	// 80-87 Your ODFI's routing number without the last digit. The last digit is simply a
 	// checksum digit, which is why it is not necessary
-	bh.ODFIIdentification = bh.parseNumField(record[79:87])
+	bh.ODFIIdentification = bh.parseStringField(record[79:87])
 	// 88-94 Sequential number of this Batch Header Record
 	// For example, put "1" if this is the first Batch Header Record in the file
 	bh.BatchNumber = bh.parseNumField(record[87:94])
@@ -231,7 +226,7 @@ func (bh *BatchHeader) fieldInclusion() error {
 	if bh.CompanyEntryDescription == "" {
 		return &FieldError{FieldName: "CompanyEntryDescription", Value: bh.CompanyEntryDescription, Msg: msgFieldInclusion}
 	}
-	if bh.ODFIIdentification == 0 {
+	if bh.ODFIIdentification == "" {
 		return &FieldError{FieldName: "ODFIIdentification", Value: bh.ODFIIdentificationField(), Msg: msgFieldInclusion}
 	}
 	return nil
@@ -269,7 +264,7 @@ func (bh *BatchHeader) EffectiveEntryDateField() string {
 
 // ODFIIdentificationField get the odfi number zero padded
 func (bh *BatchHeader) ODFIIdentificationField() string {
-	return bh.numericField(bh.ODFIIdentification, 8)
+	return bh.stringRTNField(bh.ODFIIdentification, 8)
 }
 
 // BatchNumberField get the batch number zero padded
@@ -279,18 +274,4 @@ func (bh *BatchHeader) BatchNumberField() string {
 
 func (bh *BatchHeader) settlementDateField() string {
 	return bh.alphaField(bh.settlementDate, 3)
-}
-
-// BatchParam returns a BatchParam with the values from BatchHeader
-func (bh *BatchHeader) BatchParam() BatchParam {
-	bp := BatchParam{
-		ServiceClassCode:        strconv.Itoa(bh.ServiceClassCode),
-		CompanyName:             bh.CompanyNameField(),
-		CompanyIdentification:   bh.CompanyIdentification,
-		StandardEntryClass:      bh.StandardEntryClassCode,
-		CompanyEntryDescription: bh.CompanyEntryDescription,
-		CompanyDescriptiveDate:  bh.CompanyDescriptiveDateField(),
-		EffectiveEntryDate:      bh.EffectiveEntryDateField(),
-		ODFIIdentification:      bh.ODFIIdentificationField()}
-	return bp
 }

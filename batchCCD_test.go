@@ -9,41 +9,50 @@ func mockBatchCCDHeader() *BatchHeader {
 	bh.ServiceClassCode = 220
 	bh.StandardEntryClassCode = "CCD"
 	bh.CompanyName = "Your Company, inc"
-	bh.CompanyIdentification = "123456789"
+	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "Vndr Pay"
-	bh.ODFIIdentification = 6200001
+	bh.ODFIIdentification = "121042882"
 	return bh
 }
 
 func mockCCDEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 27
-	entry.SetRDFI(9101298)
+	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 5000000
 	entry.IdentificationNumber = "location #23"
 	entry.SetReceivingCompany("Best Co. #23")
-	entry.setTraceNumber(6200001, 123)
+	entry.SetTraceNumber(mockBatchCCDHeader().ODFIIdentification, 1)
 	entry.DiscretionaryData = "S"
 	return entry
 }
 
 func mockBatchCCD() *BatchCCD {
-	mockBatch := NewBatchCCD()
-	mockBatch.SetHeader(mockBatchCCDHeader())
+	mockBatch := NewBatchCCD(mockBatchCCDHeader())
 	mockBatch.AddEntry(mockCCDEntryDetail())
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
 	if err := mockBatch.Create(); err != nil {
 		panic(err)
 	}
 	return mockBatch
 }
 
+// Test Batch Header
+func TestBatchCCDHeader(t *testing.T) {
+	batch, _ := NewBatch(mockBatchCCDHeader())
+
+	_, ok := batch.(*BatchCCD)
+	if !ok {
+		t.Error("Expecting BatchCCD")
+	}
+}
+
 // A Batch CCD can only have one addendum per entry detail
 func TestBatchCCDAddendumCount(t *testing.T) {
 	mockBatch := mockBatchCCD()
 	// Adding a second addenda to the mock entry
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "EntryAddendaCount" {
@@ -74,7 +83,7 @@ func TestBatchCCDReceivingCompanyName(t *testing.T) {
 // verify addenda type code is 05
 func TestBatchCCDAddendaTypeCode(t *testing.T) {
 	mockBatch := mockBatchCCD()
-	mockBatch.GetEntries()[0].Addendum[0].(*Addenda).typeCode = "07"
+	mockBatch.GetEntries()[0].Addendum[0].(*Addenda05).typeCode = "07"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
@@ -103,7 +112,7 @@ func TestBatchCCDSEC(t *testing.T) {
 
 func TestBatchCCDAddendaCount(t *testing.T) {
 	mockBatch := mockBatchCCD()
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -130,22 +139,4 @@ func TestBatchCCDCreate(t *testing.T) {
 			t.Errorf("%T: %s", err, err)
 		}
 	}
-}
-
-func TestBatchCCDParam(t *testing.T) {
-
-	batch, _ := NewBatch(BatchParam{
-		ServiceClassCode:        "220",
-		CompanyName:             "Your Company, inc",
-		StandardEntryClass:      "CCD",
-		CompanyIdentification:   "123456789",
-		CompanyEntryDescription: "Vndr Pay",
-		CompanyDescriptiveDate:  "Oct 23",
-		ODFIIdentification:      "123456789"})
-
-	_, ok := batch.(*BatchCCD)
-	if !ok {
-		t.Error("Expecting BachCCD")
-	}
-
 }
