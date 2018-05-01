@@ -318,3 +318,15 @@ func TestFHFieldInclusionFormatCode(t *testing.T) {
 		}
 	}
 }
+
+func TestFHFieldInclusionCreationDate(t *testing.T) {
+	fh := mockFileHeader()
+	fh.FileCreationDate = time.Time{}
+	if err := fh.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
