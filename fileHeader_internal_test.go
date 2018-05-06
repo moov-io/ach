@@ -42,6 +42,17 @@ func TestMockFileHeader(t *testing.T) {
 
 // TestParseFileHeader parses a known File Header Record string.
 func TestParseFileHeader(t *testing.T) {
+	parseFileHeader(t)
+}
+
+func BenchmarkParseFileHeader(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		parseFileHeader(b)
+	}
+}
+
+func parseFileHeader(t testing.TB) {
 	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
 	r.line = line
