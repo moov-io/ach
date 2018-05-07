@@ -56,7 +56,7 @@ type BatchControl struct {
 	// Reserved for the future - Blank, 6 characters long
 	reserved string
 	// OdfiIdentification the routing number is used to identify the DFI originating entries within a given branch.
-	ODFIIdentification int
+	ODFIIdentification string
 	// BatchNumber this number is assigned in ascending sequence to each batch by the ODFI
 	// or its Sending Point in a given file of entries. Since the batch number
 	// in the Batch Header Record and the Batch Control Record is the same,
@@ -90,7 +90,7 @@ func (bc *BatchControl) Parse(record string) {
 	// 74-79 Always blank (just fill with spaces)
 	bc.reserved = "      "
 	// 80-87 This is the same as the "ODFI identification" field in previous Batch Header Record
-	bc.ODFIIdentification = bc.parseNumField(record[79:87])
+	bc.ODFIIdentification = bc.parseStringField(record[79:87])
 	// 88-94 This is the same as the "Batch number" field in previous Batch Header Record
 	bc.BatchNumber = bc.parseNumField(record[87:94])
 }
@@ -156,7 +156,7 @@ func (bc *BatchControl) fieldInclusion() error {
 	if bc.ServiceClassCode == 0 {
 		return &FieldError{FieldName: "ServiceClassCode", Value: strconv.Itoa(bc.ServiceClassCode), Msg: msgFieldInclusion}
 	}
-	if bc.ODFIIdentification == 0 {
+	if bc.ODFIIdentification == "000000000" {
 		return &FieldError{FieldName: "ODFIIdentification", Value: bc.ODFIIdentificationField(), Msg: msgFieldInclusion}
 	}
 	return nil
@@ -194,7 +194,7 @@ func (bc *BatchControl) MessageAuthenticationCodeField() string {
 
 // ODFIIdentificationField get the odfi number zero padded
 func (bc *BatchControl) ODFIIdentificationField() string {
-	return bc.numericField(bc.ODFIIdentification, 8)
+	return bc.stringRTNField(bc.ODFIIdentification, 8)
 }
 
 // BatchNumberField gets a string of the batch number zero padded

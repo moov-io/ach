@@ -7,16 +7,16 @@ func mockBatchWEBHeader() *BatchHeader {
 	bh.ServiceClassCode = 220
 	bh.StandardEntryClassCode = "WEB"
 	bh.CompanyName = "Your Company, inc"
-	bh.CompanyIdentification = "123456789"
+	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "Online Order"
-	bh.ODFIIdentification = 6200001
+	bh.ODFIIdentification = "12104288"
 	return bh
 }
 
 func mockWEBEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 22
-	entry.SetRDFI(9101298)
+	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "123456789"
 	entry.Amount = 100000000
 	entry.IndividualName = "Wade Arnold"

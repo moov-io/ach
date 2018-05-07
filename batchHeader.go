@@ -88,7 +88,7 @@ type BatchHeader struct {
 	OriginatorStatusCode int
 
 	//ODFIIdentification First 8 digits of the originating DFI transit routing number
-	ODFIIdentification int
+	ODFIIdentification string
 
 	// BatchNumber is assigned in ascending sequence to each batch by the ODFI
 	// or its Sending Point in a given file of entries. Since the batch number
@@ -146,7 +146,7 @@ func (bh *BatchHeader) Parse(record string) {
 	bh.OriginatorStatusCode = bh.parseNumField(record[78:79])
 	// 80-87 Your ODFI's routing number without the last digit. The last digit is simply a
 	// checksum digit, which is why it is not necessary
-	bh.ODFIIdentification = bh.parseNumField(record[79:87])
+	bh.ODFIIdentification = bh.parseStringField(record[79:87])
 	// 88-94 Sequential number of this Batch Header Record
 	// For example, put "1" if this is the first Batch Header Record in the file
 	bh.BatchNumber = bh.parseNumField(record[87:94])
@@ -226,7 +226,7 @@ func (bh *BatchHeader) fieldInclusion() error {
 	if bh.CompanyEntryDescription == "" {
 		return &FieldError{FieldName: "CompanyEntryDescription", Value: bh.CompanyEntryDescription, Msg: msgFieldInclusion}
 	}
-	if bh.ODFIIdentification == 0 {
+	if bh.ODFIIdentification == "" {
 		return &FieldError{FieldName: "ODFIIdentification", Value: bh.ODFIIdentificationField(), Msg: msgFieldInclusion}
 	}
 	return nil
@@ -264,7 +264,7 @@ func (bh *BatchHeader) EffectiveEntryDateField() string {
 
 // ODFIIdentificationField get the odfi number zero padded
 func (bh *BatchHeader) ODFIIdentificationField() string {
-	return bh.numericField(bh.ODFIIdentification, 8)
+	return bh.stringRTNField(bh.ODFIIdentification, 8)
 }
 
 // BatchNumberField get the batch number zero padded

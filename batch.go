@@ -122,8 +122,14 @@ func (batch *batch) build() error {
 		if err != nil {
 			return err
 		}
+
+		batchHeaderODFI, err := strconv.Atoi(batch.header.ODFIIdentificationField()[:8])
+		if err != nil {
+			return err
+		}
+
 		// Add a sequenced TraceNumber if one is not already set. Have to keep original trance number Return and NOC entries
-		if currentTraceNumberODFI != batch.header.ODFIIdentification {
+		if currentTraceNumberODFI != batchHeaderODFI {
 			batch.entries[i].SetTraceNumber(batch.header.ODFIIdentification, seq)
 		}
 		seq++
@@ -282,7 +288,10 @@ func (batch *batch) isEntryHash() error {
 func (batch *batch) calculateEntryHash() string {
 	hash := 0
 	for _, entry := range batch.entries {
-		hash = hash + entry.RDFIIdentification
+
+		entryRDFI, _ := strconv.Atoi(entry.RDFIIdentification)
+
+		hash = hash + entryRDFI
 	}
 	return batch.numericField(hash, 10)
 }

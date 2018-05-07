@@ -11,16 +11,16 @@ func mockBatchCORHeader() *BatchHeader {
 	bh.ServiceClassCode = 220
 	bh.StandardEntryClassCode = "COR"
 	bh.CompanyName = "Your Company, inc"
-	bh.CompanyIdentification = "123456789"
+	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "Vndr Pay"
-	bh.ODFIIdentification = 6200001
+	bh.ODFIIdentification = "121042882"
 	return bh
 }
 
 func mockCOREntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 27
-	entry.SetRDFI(9101298)
+	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
 	entry.IdentificationNumber = "location #23"
