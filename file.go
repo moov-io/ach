@@ -27,15 +27,6 @@ const (
 	RecordLength = 94
 )
 
-// currently supported SEC codes
-const (
-	ppd = "PPD"
-	web = "WEB"
-	ccd = "CCD"
-	cor = "COR"
-	tel = "TEL"
-)
-
 // Errors strings specific to parsing a Batch container
 var (
 	msgFileCalculatedControlEquality = "calculated %v is out-of-balance with control %v"
