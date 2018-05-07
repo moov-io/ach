@@ -285,7 +285,7 @@ func (ed *EntryDetail) PaymentTypeField() string {
 	return ed.DiscretionaryData
 }
 
-// SetPaymentType as R (Reccuring) all other values will result in S (single)
+// SetPaymentType as R (Recurring) all other values will result in S (single)
 func (ed *EntryDetail) SetPaymentType(t string) {
 	t = strings.ToUpper(strings.TrimSpace(t))
 	if t == "R" {

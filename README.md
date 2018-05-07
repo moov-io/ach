@@ -359,7 +359,7 @@ Pull request require a batchMTE_test.go file that covers the logic of the type.
 
 ![ACH File Layout](https://github.com/moov-io/ach/blob/master/documentation/ach_file_structure_shg.gif)
 
-## Insperation 
+## Inspiration 
 * [ACH:Builder - Tools for Building ACH](http://search.cpan.org/~tkeefer/ACH-Builder-0.03/lib/ACH/Builder.pm)
 * [mosscode / ach](https://github.com/mosscode/ach)
 * [Helper for building ACH files in Ruby](https://github.com/jm81/ach)

@@ -17,7 +17,7 @@ type validator struct{}
 
 // FieldError is returned for errors at a field level in a record
 type FieldError struct {
-	FieldName string // field name where error happend
+	FieldName string // field name where error happened
 	Value     string // value that cause error
 	Msg       string // context of the error.
 }

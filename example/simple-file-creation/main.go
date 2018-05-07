@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/moov-io/ach"
 	"strconv"
 	"time"
+
+	"github.com/moov-io/ach"
 )
 
 func main() {
@@ -76,8 +77,8 @@ func main() {
 
 	batch2, _ := ach.NewBatch(bh2)
 
-	// Add an entry and define if it is a single or reccuring payment
-	// The following is a reccuring payment for $7.99
+	// Add an entry and define if it is a single or recurring payment
+	// The following is a recurring payment for $7.99
 
 	entry2 := ach.NewEntryDetail()
 	entry2.TransactionCode = 22
