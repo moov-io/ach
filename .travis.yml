@@ -4,5 +4,15 @@ go:
   - tip
 before_install:
   - go get github.com/mattn/goveralls
+  - go get -u honnef.co/go/tools/cmd/megacheck
+  - go get -u github.com/client9/misspell/cmd/misspell
+before_script:
+  - EXCLUDE_VENDOR=$(go list ./... | grep -v "/vendor/")
+  - go build
+  - $(exit $(go fmt $EXCLUDE_VENDOR | wc -l))
+  - go vet $EXCLUDE_VENDOR
+  - misspell -error -locale US .
+  - megacheck $EXCLUDE_VENDOR
 script:
+  - go test -i -race $EXCLUDE_VENDOR
   - $HOME/gopath/bin/goveralls -service=travis-ci -ignore=main,main.go,/example/,./example/
