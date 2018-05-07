@@ -37,7 +37,6 @@ var (
 
 	// Error messages specific to Addenda98
 	msgAddenda98ChangeCode    = "found is not a valid addenda Change Code"
-	msgAddenda98TypeCode      = "is not Addenda98 type code of 98"
 	msgAddenda98CorrectedData = "must contain the corrected information corresponding to the Change Code"
 )
 

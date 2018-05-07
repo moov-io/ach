@@ -224,7 +224,7 @@ func (r *Reader) parseAddenda() error {
 	r.recordName = "Addenda"
 
 	if r.currentBatch == nil {
-		msg := fmt.Sprintf(msgFileBatchOutside)
+		msg := fmt.Sprint(msgFileBatchOutside)
 		return r.error(&FileError{FieldName: "Addenda", Msg: msg})
 	}
 	if len(r.currentBatch.GetEntries()) == 0 {
@@ -258,7 +258,7 @@ func (r *Reader) parseAddenda() error {
 			r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda99)
 		}
 	} else {
-		msg := fmt.Sprintf(msgBatchAddendaIndicator)
+		msg := fmt.Sprint(msgBatchAddendaIndicator)
 		return r.error(&FileError{FieldName: "AddendaRecordIndicator", Msg: msg})
 	}
 

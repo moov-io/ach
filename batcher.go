@@ -42,7 +42,6 @@ var (
 	msgBatchHeaderControlEquality     = "header %v is not equal to control %v"
 	msgBatchCalculatedControlEquality = "calculated %v is out-of-balance with control %v"
 	msgBatchAscending                 = "%v is less than last %v. Must be in ascending order"
-	msgBatchFieldInclusion            = "%v is a required field "
 	// specific messages for error
 	msgBatchOriginatorDNE         = "%v is not “2” for DNE with entry transaction code of 23 or 33"
 	msgBatchTraceNumberNotODFI    = "%v in header does not match entry trace number %v"

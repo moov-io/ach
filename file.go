@@ -27,18 +27,8 @@ const (
 	RecordLength = 94
 )
 
-// currently supported SEC codes
-const (
-	ppd = "PPD"
-	web = "WEB"
-	ccd = "CCD"
-	cor = "COR"
-	tel = "TEL"
-)
-
 // Errors strings specific to parsing a Batch container
 var (
-	msgFileControlEquality           = "header %v is not equal to control %v"
 	msgFileCalculatedControlEquality = "calculated %v is out-of-balance with control %v"
 	// specific messages
 	msgRecordLength      = "must be 94 characters and found %d"

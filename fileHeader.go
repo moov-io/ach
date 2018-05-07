@@ -12,11 +12,10 @@ import (
 
 // Errors specific to a File Header Record
 var (
-	msgRecordType       = "received expecting %d"
-	msgRecordSize       = "is not 094"
-	msgBlockingFactor   = "is not 10"
-	msgFormatCode       = "is not 1"
-	msgFileCreationDate = "was created before " + time.Now().String()
+	msgRecordType     = "received expecting %d"
+	msgRecordSize     = "is not 094"
+	msgBlockingFactor = "is not 10"
+	msgFormatCode     = "is not 1"
 )
 
 // FileHeader is a Record designating physical file characteristics and identify
