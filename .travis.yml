@@ -4,5 +4,12 @@ go:
   - tip
 before_install:
   - go get github.com/mattn/goveralls
+  - go get -u honnef.co/go/tools/cmd/megacheck
+  - go get -u github.com/client9/misspell/cmd/misspell
+before_script:
+  - go build
+  - misspell -error -locale US .
+  - megacheck 
 script:
+  - go test -i -race
   - $HOME/gopath/bin/goveralls -service=travis-ci -ignore=main,main.go,/example/,./example/
