@@ -14,9 +14,9 @@ func mockBatchHeader() *BatchHeader {
 	bh.ServiceClassCode = 220
 	bh.StandardEntryClassCode = "PPD"
 	bh.CompanyName = "ACME Corporation"
-	bh.CompanyIdentification = "123456789"
+	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "PAYROLL"
-	bh.ODFIIdentification = 6200001
+	bh.ODFIIdentification = "12104288"
 	return bh
 }
 
@@ -34,13 +34,13 @@ func TestMockBatchHeader(t *testing.T) {
 	if bh.CompanyName != "ACME Corporation" {
 		t.Error("CompanyName dependent default value has changed")
 	}
-	if bh.CompanyIdentification != "123456789" {
+	if bh.CompanyIdentification != "121042882" {
 		t.Error("CompanyIdentification dependent default value has changed")
 	}
 	if bh.CompanyEntryDescription != "PAYROLL" {
 		t.Error("CompanyEntryDescription dependent default value has changed")
 	}
-	if bh.ODFIIdentification != 6200001 {
+	if bh.ODFIIdentification != "12104288" {
 		t.Error("ODFIIdentification dependent default value has changed")
 	}
 }
@@ -295,29 +295,14 @@ func TestBHFieldInclusionOriginatorStatusCode(t *testing.T) {
 	}
 }
 
-func TestBHtoBatchParam(t *testing.T) {
+func TestBHFieldInclusionODFIIdentification(t *testing.T) {
 	bh := mockBatchHeader()
-	bp := bh.BatchParam()
-
-	if bh.ServiceClassCode != bh.parseNumField(bp.ServiceClassCode) {
-		t.Errorf("ServiceClassCode Expected '%b' got: %s", bh.ServiceClassCode, bp.ServiceClassCode)
-	}
-	if bh.CompanyName != bp.CompanyName {
-		t.Errorf("CompanyName Expected '%s' got: %s", bh.CompanyName, bp.CompanyName)
-	}
-	if bh.StandardEntryClassCode != bp.StandardEntryClass {
-		t.Errorf("StandardEntryClass Expected '%s' got: %s", bh.StandardEntryClassCode, bp.StandardEntryClass)
-	}
-	if bh.CompanyIdentification != bp.CompanyIdentification {
-		t.Errorf("CompanyIdentification Expected '%s' got: %s", bh.CompanyIdentification, bp.CompanyIdentification)
-	}
-	if bh.CompanyEntryDescription != bp.CompanyEntryDescription {
-		t.Errorf("CompanyEntryDescription Expected '%s' got: %s", bh.CompanyEntryDescription, bp.CompanyEntryDescription)
-	}
-	if bh.CompanyDescriptiveDateField() != bp.CompanyDescriptiveDate {
-		t.Errorf("CompanyDescriptiveDate Expected '%s' got: %s", bh.CompanyDescriptiveDateField(), bp.CompanyDescriptiveDate)
-	}
-	if bh.ODFIIdentification != bh.parseNumField(bp.ODFIIdentification) {
-		t.Errorf("ODFIIdentification Expected '%b' got: %s", bh.ODFIIdentification, bp.ODFIIdentification)
+	bh.ODFIIdentification = ""
+	if err := bh.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "ODFIIdentification" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
 	}
 }

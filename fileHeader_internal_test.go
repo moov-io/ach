@@ -13,8 +13,8 @@ import (
 // mockFileHeader build a validate File Header for tests
 func mockFileHeader() FileHeader {
 	fh := NewFileHeader()
-	fh.ImmediateDestination = 9876543210
-	fh.ImmediateOrigin = 1234567890
+	fh.ImmediateDestination = "9876543210"
+	fh.ImmediateOrigin = "1234567890"
 	fh.FileCreationDate = time.Now()
 	fh.ImmediateDestinationName = "Federal Reserve Bank"
 	fh.ImmediateOriginName = "My Bank Name"
@@ -26,10 +26,10 @@ func TestMockFileHeader(t *testing.T) {
 	if err := fh.Validate(); err != nil {
 		t.Error("mockFileHeader does not validate and will break other tests")
 	}
-	if fh.ImmediateDestination != 9876543210 {
+	if fh.ImmediateDestination != "9876543210" {
 		t.Error("ImmediateDestination depedendent default value has changed")
 	}
-	if fh.ImmediateOrigin != 1234567890 {
+	if fh.ImmediateOrigin != "1234567890" {
 		t.Error("ImmediateOrigin depedendent default value has changed")
 	}
 	if fh.ImmediateDestinationName != "Federal Reserve Bank" {
@@ -184,9 +184,9 @@ func TestFormatCode(t *testing.T) {
 	}
 }
 
-func TestFHFieldInculsion(t *testing.T) {
+func TestFHFieldInclusion(t *testing.T) {
 	fh := mockFileHeader()
-	fh.ImmediateOrigin = 0
+	fh.ImmediateOrigin = ""
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.Msg != msgFieldInclusion {
@@ -270,7 +270,7 @@ func TestFHFieldInclusionRecordType(t *testing.T) {
 
 func TestFHFieldInclusionImmediatDestination(t *testing.T) {
 	fh := mockFileHeader()
-	fh.ImmediateDestination = 0
+	fh.ImmediateDestination = ""
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.Msg != msgFieldInclusion {
@@ -319,6 +319,18 @@ func TestFHFieldInclusionBlockingFactor(t *testing.T) {
 func TestFHFieldInclusionFormatCode(t *testing.T) {
 	fh := mockFileHeader()
 	fh.formatCode = ""
+	if err := fh.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+func TestFHFieldInclusionCreationDate(t *testing.T) {
+	fh := mockFileHeader()
+	fh.FileCreationDate = time.Time{}
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.Msg != msgFieldInclusion {

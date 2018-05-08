@@ -9,10 +9,59 @@ import (
 	"time"
 )
 
+func mockBatchPPDHeader() *BatchHeader {
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = 220
+	bh.StandardEntryClassCode = "PPD"
+	bh.CompanyName = "ACME Corporation"
+	bh.CompanyIdentification = "121042882"
+	bh.CompanyEntryDescription = "PAYROLL"
+	bh.EffectiveEntryDate = time.Now()
+	bh.ODFIIdentification = "12104288"
+	return bh
+}
+
+func mockPPDEntryDetail() *EntryDetail {
+	entry := NewEntryDetail()
+	entry.TransactionCode = 22
+	entry.SetRDFI("231380104")
+	entry.DFIAccountNumber = "123456789"
+	entry.Amount = 100000000
+	entry.IndividualName = "Wade Arnold"
+	entry.SetTraceNumber(mockBatchPPDHeader().ODFIIdentification, 1)
+	entry.Category = CategoryForward
+	return entry
+}
+
+func mockBatchPPDHeader2() *BatchHeader {
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = 200
+	bh.CompanyName = "MY BEST COMP."
+	bh.CompanyDiscretionaryData = "INCLUDES OVERTIME"
+	bh.CompanyIdentification = "121042882"
+	bh.StandardEntryClassCode = "PPD"
+	bh.CompanyEntryDescription = "PAYROLL"
+	bh.EffectiveEntryDate = time.Now()
+	bh.ODFIIdentification = "12104288"
+	return bh
+}
+
+func mockPPDEntry2() *EntryDetail {
+	entry := NewEntryDetail()
+	entry.TransactionCode = 22 // ACH Credit
+	entry.SetRDFI("231380104")
+	entry.DFIAccountNumber = "62292250"         // account number
+	entry.Amount = 100000                       // 1k dollars
+	entry.IdentificationNumber = "658-888-2468" // Unique ID for payment
+	entry.IndividualName = "Wade Arnold"
+	entry.SetTraceNumber(mockBatchPPDHeader2().ODFIIdentification, 1)
+	entry.Category = CategoryForward
+	return entry
+}
+
 func mockBatchPPD() *BatchPPD {
-	mockBatch := NewBatchPPD()
-	mockBatch.SetHeader(mockBatchHeader())
-	mockBatch.AddEntry(mockEntryDetail())
+	mockBatch := NewBatchPPD(mockBatchPPDHeader())
+	mockBatch.AddEntry(mockPPDEntryDetail())
 	if err := mockBatch.Create(); err != nil {
 		panic(err)
 	}
@@ -59,7 +108,7 @@ func TestBatchPPDCreate(t *testing.T) {
 func TestBatchPPDTypeCode(t *testing.T) {
 	mockBatch := mockBatchPPD()
 	// change an addendum to an invalid type code
-	a := mockAddenda()
+	a := mockAddenda05()
 	a.typeCode = "63"
 	mockBatch.GetEntries()[0].AddAddenda(a)
 	mockBatch.Create()
@@ -90,7 +139,7 @@ func TestBatchCompanyIdentification(t *testing.T) {
 
 func TestBatchODFIIDMismatch(t *testing.T) {
 	mockBatch := mockBatchPPD()
-	mockBatch.GetControl().ODFIIdentification = 987654321
+	mockBatch.GetControl().ODFIIdentification = "987654321"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ODFIIdentification" {
@@ -103,28 +152,10 @@ func TestBatchODFIIDMismatch(t *testing.T) {
 }
 
 func TestBatchBuild(t *testing.T) {
-	mockBatch := NewBatchPPD()
-	header := NewBatchHeader()
-	header.ServiceClassCode = 200
-	header.CompanyName = "MY BEST COMP."
-	header.CompanyDiscretionaryData = "INCLUDES OVERTIME"
-	header.CompanyIdentification = "1419871234"
-	header.StandardEntryClassCode = "PPD"
-	header.CompanyEntryDescription = "PAYROLL"
-	header.EffectiveEntryDate = time.Now()
-	header.ODFIIdentification = 109991234
-	mockBatch.SetHeader(header)
-
-	entry := NewEntryDetail()
-	entry.TransactionCode = 22                  // ACH Credit
-	entry.SetRDFI(81086674)                     // scottrade bank routing number
-	entry.DFIAccountNumber = "62292250"         // scottrade account number
-	entry.Amount = 1000000                      // 1k dollars
-	entry.IdentificationNumber = "658-888-2468" // Unique ID for payment
-	entry.IndividualName = "Wade Arnold"
-	entry.setTraceNumber(header.ODFIIdentification, 1)
-	a1, _ := NewAddenda()
-	entry.AddAddenda(a1)
+	mockBatch := NewBatchPPD(mockBatchPPDHeader2())
+	entry := mockPPDEntry2()
+	addenda05 := NewAddenda05()
+	entry.AddAddenda(addenda05)
 	mockBatch.AddEntry(entry)
 	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)

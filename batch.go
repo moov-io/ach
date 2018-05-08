@@ -18,22 +18,22 @@ type batch struct {
 	converters
 }
 
-// NewBatch takes a BatchParm and returns a matching SEC code batch type that is a batcher. Returns and error if the SEC code is not supported.
-func NewBatch(bp BatchParam) (Batcher, error) {
-	switch sec := bp.StandardEntryClass; sec {
+// NewBatch takes a BatchHeader and returns a matching SEC code batch type that is a batcher. Returns an error if the SEC code is not supported.
+func NewBatch(bh *BatchHeader) (Batcher, error) {
+	switch bh.StandardEntryClassCode {
 	case "PPD":
-		return NewBatchPPD(bp), nil
+		return NewBatchPPD(bh), nil
 	case "WEB":
-		return NewBatchWEB(bp), nil
+		return NewBatchWEB(bh), nil
 	case "CCD":
-		return NewBatchCCD(bp), nil
+		return NewBatchCCD(bh), nil
 	case "COR":
-		return NewBatchCOR(bp), nil
+		return NewBatchCOR(bh), nil
 	case "TEL":
-		return NewBatchTEL(bp), nil
+		return NewBatchTEL(bh), nil
 	default:
 	}
-	msg := fmt.Sprintf(msgFileNoneSEC, bp.StandardEntryClass)
+	msg := fmt.Sprintf(msgFileNoneSEC, bh.StandardEntryClassCode)
 	return nil, &FileError{FieldName: "StandardEntryClassCode", Msg: msg}
 }
 
@@ -122,15 +122,21 @@ func (batch *batch) build() error {
 		if err != nil {
 			return err
 		}
+
+		batchHeaderODFI, err := strconv.Atoi(batch.header.ODFIIdentificationField()[:8])
+		if err != nil {
+			return err
+		}
+
 		// Add a sequenced TraceNumber if one is not already set. Have to keep original trance number Return and NOC entries
-		if currentTraceNumberODFI != batch.header.ODFIIdentification {
-			batch.entries[i].setTraceNumber(batch.header.ODFIIdentification, seq)
+		if currentTraceNumberODFI != batchHeaderODFI {
+			batch.entries[i].SetTraceNumber(batch.header.ODFIIdentification, seq)
 		}
 		seq++
 		addendaSeq := 1
 		for x := range entry.Addendum {
 			// sequences don't exist in NOC or Return addenda
-			if a, ok := batch.entries[i].Addendum[x].(*Addenda); ok {
+			if a, ok := batch.entries[i].Addendum[x].(*Addenda05); ok {
 				a.SequenceNumber = addendaSeq
 				a.EntryDetailSequenceNumber = batch.parseNumField(batch.entries[i].TraceNumberField()[8:])
 			}
@@ -282,7 +288,10 @@ func (batch *batch) isEntryHash() error {
 func (batch *batch) calculateEntryHash() string {
 	hash := 0
 	for _, entry := range batch.entries {
-		hash = hash + entry.RDFIIdentification
+
+		entryRDFI, _ := strconv.Atoi(entry.RDFIIdentification)
+
+		hash = hash + entryRDFI
 	}
 	return batch.numericField(hash, 10)
 }
@@ -325,7 +334,7 @@ func (batch *batch) isAddendaSequence() error {
 			// check if sequence is assending
 			for _, addenda := range entry.Addendum {
 				// sequences don't exist in NOC or Return addenda
-				if a, ok := addenda.(*Addenda); ok {
+				if a, ok := addenda.(*Addenda05); ok {
 
 					if a.SequenceNumber < lastSeq {
 						msg := fmt.Sprintf(msgBatchAscending, a.SequenceNumber, lastSeq)

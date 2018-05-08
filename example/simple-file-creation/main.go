@@ -5,41 +5,48 @@ import (
 	"os"
 
 	"github.com/moov-io/ach"
+	"time"
 )
 
 func main() {
 	// To create a file
-	file := ach.NewFile(ach.FileParam{
-		ImmediateDestination:     "0210000890",
-		ImmediateOrigin:          "123456789",
-		ImmediateDestinationName: "Your Bank",
-		ImmediateOriginName:      "Your Company",
-		ReferenceCode:            "#00000A1"})
+	fh := ach.NewFileHeader()
+	fh.ImmediateDestination = "231380104"
+	fh.ImmediateOrigin = "121042882"
+	fh.FileCreationDate = time.Now()
+	fh.ImmediateDestinationName = "Federal Reserve Bank"
+	fh.ImmediateOriginName = "My Bank Name"
+	file := ach.NewFile()
+	file.SetHeader(fh)
 
 	// To create a batch.
 	// Errors only if payment type is not supported.
-	batch, _ := ach.NewBatch(ach.BatchParam{
-		ServiceClassCode:        "200",
-		CompanyName:             "Your Company",
-		StandardEntryClass:      "PPD",
-		CompanyIdentification:   "123456789",
-		CompanyEntryDescription: "Trans. Description",
-		CompanyDescriptiveDate:  "Oct 23",
-		ODFIIdentification:      "123456789"})
+	bh := ach.NewBatchHeader()
+	bh.ServiceClassCode = 200
+	bh.CompanyName = "Your Company"
+	bh.CompanyIdentification = file.Header.ImmediateOrigin
+	bh.StandardEntryClassCode = "PPD"
+	bh.CompanyEntryDescription = "Trans. Description"
+	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
+	bh.ODFIIdentification = "121042882"
+
+	batch, _ := ach.NewBatch(bh)
 
 	// To create an entry
-	entry := ach.NewEntryDetail(ach.EntryParam{
-		ReceivingDFI:      "102001017",
-		RDFIAccount:       "5343121",
-		Amount:            "17500",
-		TransactionCode:   "27",
-		IDNumber:          "#456789",
-		IndividualName:    "Bob Smith",
-		DiscretionaryData: "B1"})
+	entry := ach.NewEntryDetail()
+	entry.TransactionCode = 22
+	entry.SetRDFI("231380104")
+	entry.DFIAccountNumber = "81967038518"
+	entry.Amount = 1000000
+	entry.IndividualName = "Wade Arnold"
+	entry.SetTraceNumber(bh.ODFIIdentification, 1)
+	entry.IdentificationNumber = "ABC##jvkdjfuiwn"
+	entry.Category = ach.CategoryForward
 
 	// To add one or more optional addenda records for an entry
-	addenda, _ := ach.NewAddenda(ach.AddendaParam{
-		PaymentRelatedInfo: "bonus pay for amazing work on #OSS"})
+
+	addenda := ach.NewAddenda05()
+	addenda.PaymentRelatedInformation = "bonus pay for amazing work on #OSS"
 	entry.AddAddenda(addenda)
 
 	// Entries are added to batches like so:
@@ -58,36 +65,40 @@ func main() {
 
 	// Now add a new batch for accepting payments on the web
 
-	batch2, _ := ach.NewBatch(ach.BatchParam{
-		ServiceClassCode:        "220",
-		CompanyName:             "Your Company",
-		StandardEntryClass:      "WEB",
-		CompanyIdentification:   "123456789",
-		CompanyEntryDescription: "subscr",
-		CompanyDescriptiveDate:  "Oct 23",
-		ODFIIdentification:      "123456789"})
+	bh2 := ach.NewBatchHeader()
+	bh2.ServiceClassCode = 220
+	bh2.CompanyName = "Your Company"
+	bh2.CompanyIdentification = file.Header.ImmediateOrigin
+	bh2.StandardEntryClassCode = "WEB"
+	bh2.CompanyEntryDescription = "Subscr"
+	bh2.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
+	bh2.ODFIIdentification = "121042882"
 
-	// Add an entry and define if it is a single or reoccuring payment
-	// The following is a reoccuring payment for $7.99
+	batch2, _ := ach.NewBatch(bh2)
 
-	entry2 := ach.NewEntryDetail(ach.EntryParam{
-		ReceivingDFI:    "102001017",
-		RDFIAccount:     "5343121",
-		Amount:          "799",
-		TransactionCode: "22",
-		IDNumber:        "#123456",
-		IndividualName:  "Wade Arnold",
-		PaymentType:     "R"})
+	// Add an entry and define if it is a single or reccuring payment
+	// The following is a reccuring payment for $7.99
 
-	addenda2, _ := ach.NewAddenda(ach.AddendaParam{
-		PaymentRelatedInfo: "Monthly Membership Subscription"})
+	entry2 := ach.NewEntryDetail()
+	entry2.TransactionCode = 22
+	entry2.SetRDFI("231380104")
+	entry2.DFIAccountNumber = "81967038518"
+	entry2.Amount = 799
+	entry2.IndividualName = "Wade Arnold"
+	entry2.SetTraceNumber(bh2.ODFIIdentification, 2)
+	entry2.IdentificationNumber = "#123456"
+	entry2.DiscretionaryData = "R"
+	entry2.Category = ach.CategoryForward
 
-	// add the entry to the batch
+	// To add one or more optional addenda records for an entry
+	addenda2 := ach.NewAddenda05()
+	addenda2.PaymentRelatedInformation = "Monthly Membership Subscription"
 	entry2.AddAddenda(addenda2)
 
-	// Create and add the second batch
-
+	// add the entry to the batch
 	batch2.AddEntry(entry2)
+
+	// Create and add the second batch
 	if err := batch2.Create(); err != nil {
 		fmt.Printf("%T: %s", err, err)
 	}

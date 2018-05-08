@@ -195,12 +195,11 @@ func (r *Reader) parseBatchHeader() error {
 	}
 
 	// Passing SEC type into NewBatch creates a Batcher of SEC code type.
-	batch, err := NewBatch(bh.BatchParam())
+	batch, err := NewBatch(bh)
 	if err != nil {
 		return r.error(err)
 	}
 
-	batch.SetHeader(bh)
 	r.addCurrentBatch(batch)
 	return nil
 }
@@ -225,7 +224,7 @@ func (r *Reader) parseAddenda() error {
 	r.recordName = "Addenda"
 
 	if r.currentBatch == nil {
-		msg := fmt.Sprintf(msgFileBatchOutside)
+		msg := fmt.Sprint(msgFileBatchOutside)
 		return r.error(&FileError{FieldName: "Addenda", Msg: msg})
 	}
 	if len(r.currentBatch.GetEntries()) == 0 {
@@ -235,19 +234,31 @@ func (r *Reader) parseAddenda() error {
 	entry := r.currentBatch.GetEntries()[entryIndex]
 
 	if entry.AddendaRecordIndicator == 1 {
-		// Passing TypeCode type into NewAddenda creates a Addendumer of type copde type.
-		addenda, err := NewAddenda(AddendaParam{
-			TypeCode: r.line[1:3]})
-		if err != nil {
-			return r.error(err)
+		switch r.line[1:3] {
+		case "05":
+			addenda05 := NewAddenda05()
+			addenda05.Parse(r.line)
+			if err := addenda05.Validate(); err != nil {
+				return r.error(err)
+			}
+			r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda05)
+		case "98":
+			addenda98 := NewAddenda98()
+			addenda98.Parse(r.line)
+			if err := addenda98.Validate(); err != nil {
+				return r.error(err)
+			}
+			r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda98)
+		case "99":
+			addenda99 := NewAddenda99()
+			addenda99.Parse(r.line)
+			if err := addenda99.Validate(); err != nil {
+				return r.error(err)
+			}
+			r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda99)
 		}
-		addenda.Parse(r.line)
-		if err := addenda.Validate(); err != nil {
-			return r.error(err)
-		}
-		r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda)
 	} else {
-		msg := fmt.Sprintf(msgBatchAddendaIndicator)
+		msg := fmt.Sprint(msgBatchAddendaIndicator)
 		return r.error(&FileError{FieldName: "AddendaRecordIndicator", Msg: msg})
 	}
 
