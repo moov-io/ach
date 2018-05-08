@@ -20,7 +20,7 @@ ACH is under active development but already in production for multiple companies
 	* CCD (Corporate credit or debit)
 	* TEL (Telephone-Initiated Entry)
 	* COR (Automated Notification of Change(NOC))
-	* Return Entires
+	* Return Entries
 
 
 ## Project Roadmap
@@ -50,14 +50,14 @@ if achFile.Validate(); err != nil {
 // Check if any Notifications Of Change exist in the file 
 if len(achFile.NotificationOfChange) > 0 {
 	for _, batch := range achFile.NotificationOfChange {
-		aNOC := batch.GetEntries()[0].Addendum[0].(*AddendaNOC)
-		println(aNOC.CorrectedData)
+		a98 := batch.GetEntries()[0].Addendum[0].(*Addenda98)
+		println(a98.CorrectedData)
 	} 
 } 
 // Check if any Return Entries exist in the file 
 if len(achFile.ReturnEntries) > 0 {
 	for _, batch := range achFile.ReturnEntries {
-		aReturn := batch.GetEntries()[0].Addendum[0].(*AddendaReturn)
+		aReturn := batch.GetEntries()[0].Addendum[0].(*Addenda99)
 		println(aReturn.ReturnCode)
 	} 
 }
@@ -67,47 +67,79 @@ if len(achFile.ReturnEntries) > 0 {
 The following is based on [simple file creation](https://github.com/moov-io/ach/tree/master/example/simple-file-creation)
  
  ```go
-file := ach.NewFile(ach.FileParam{
-	ImmediateDestination:     "0210000890",
-	ImmediateOrigin:          "123456789",
-	ImmediateDestinationName: "Your Bank",
-	ImmediateOriginName:      "Your Company",
-	ReferenceCode:            "#00000A1"})
+	fh := ach.NewFileHeader()
+	fh.ImmediateDestination = "9876543210" // A blank space followed by your ODFI's transit/routing number
+	fh.ImmediateOrigin = "1234567890"      // Organization or Company FED ID usually 1 and FEIN/SSN. Assigned by your ODFI
+	fh.FileCreationDate = time.Now()     // Todays Date
+	fh.ImmediateDestinationName = "Federal Reserve Bank"
+	fh.ImmediateOriginName = "My Bank Name")
+
+	file := ach.NewFile()
+	file.SetHeader(fh)
 ```
 
-To create a batch
+Explicitly create a PPD batch file. 
 
 Errors only if payment type is not supported
 
  ```go
-batch := ach.NewBatch(ach.BatchParam{
-	ServiceClassCode:        "220",
-	CompanyName:             "Your Company",
-	StandardEntryClass:      "PPD",
-	CompanyIdentification:   "123456789",
-	CompanyEntryDescription: "Trans. Description",
-	CompanyDescriptiveDate:  "Oct 23",
-	ODFIIdentification:      "123456789"})
+func mockBatchPPDHeader() *BatchHeader {
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = 220
+	bh.StandardEntryClassCode = "PPD"
+	bh.CompanyName = "ACME Corporation"
+	bh.CompanyIdentification = "123456789"
+	bh.CompanyEntryDescription = "PAYROLL"
+	bh.EffectiveEntryDate = time.Now()
+	bh.ODFIIdentification = "6200001"
+	return bh
+}
+
+mockBatch := NewBatch(mockBatchPPDHeader())
 ```
+
+OR use the NewBatch factory
+
+ ```go
+func mockBatchPPDHeader() *BatchHeader {
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = 220
+	bh.StandardEntryClassCode = "PPD"
+	bh.CompanyName = "ACME Corporation"
+	bh.CompanyIdentification = "123456789"
+	bh.CompanyEntryDescription = "PAYROLL"
+	bh.EffectiveEntryDate = time.Now()
+	bh.ODFIIdentification = "6200001"
+	return bh
+}
+
+mockBatch, _ := ach.NewBatch(mockBatchPPDHeader())
+```
+
 
 To create an entry
 
  ```go
-entry := ach.NewEntryDetail(ach.EntryParam{
-	ReceivingDFI:      "102001017",
-	RDFIAccount:       "5343121",
-	Amount:            "17500",
-	TransactionCode:   "27",
-	IDNumber:          "ABC##jvkdjfuiwn",
-	IndividualName:    "Bob Smith",
-	DiscretionaryData: "B1"})
+entry := ach.NewEntryDetail()
+entry.TransactionCode = 22
+entry.SetRDFI("009101298")
+entry.DFIAccountNumber = "123456789"
+entry.Amount = 100000000
+entry.IndividualName = "Wade Arnold"
+entry.SetTraceNumber(bh.ODFIIdentification, 1)
+entry.IdentificationNumber = "ABC##jvkdjfuiwn"
+entry.Category = ach.CategoryForward
 ```
 
 To add one or more optional addenda records for an entry
 
  ```go
-addenda := ach.NewAddenda(ach.AddendaParam{
-	PaymentRelatedInfo: "bonus pay for amazing work on #OSS"})
+addenda := NewAddenda05()
+addenda.PaymentRelatedInformation = "Bonus pay for amazing work on #OSS"
+```
+Add the addenda record to the detail entry 
+
+ ```go
 entry.AddAddenda(addenda)
 ```
 
@@ -131,33 +163,40 @@ And batches are added to files much the same way:
 file.AddBatch(batch)
 ```
 
-Now add a new batch for accepting payments on the web
+Now add a new batch for accepting payments on the WEB
 
 ```go
-batch2, _ := ach.NewBatch(ach.BatchParam{
-	ServiceClassCode:        "220",
-	CompanyName:             "Your Company",
-	StandardEntryClass:      "WEB",
-	CompanyIdentification:   "123456789",
-	CompanyEntryDescription: "subscr",
-	CompanyDescriptiveDate:  "Oct 23",
-	ODFIIdentification:      "123456789"})
+func mockBatchWEBHeader() *BatchHeader {
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = 220
+	bh.StandardEntryClassCode = "WEB"
+	bh.CompanyName = "Your Company, inc"
+	bh.CompanyIdentification = "123456789"
+	bh.CompanyEntryDescription = "Online Order"
+	bh.ODFIIdentification = "6200001"
+	return bh
+}
+
+batch2, _ := ach.NewBatch(mockBatchWEBHeader())
 ```
 
 Add an entry and define if it is a single or reoccurring payment. The following is a reoccurring payment for $7.99
 
 ```go
-entry2 := ach.NewEntryDetail(ach.EntryParam{
-	ReceivingDFI:      "102001017",
-	RDFIAccount:       "5343121",
-	Amount:            "799",
-	TransactionCode:   "22",
-	IDNumber:          "#123456",
-	IndividualName:    "Wade Arnold",
-	PaymentType: 		"R"})
+entry2 := ach.NewEntryDetail()
+entry2.TransactionCode = 22
+entry2.SetRDFI(102001017)
+entry2.DFIAccountNumber = "5343121"
+entry2.Amount = 799
+entry2.IndividualName = "Wade Arnold"
+entry2.SetTraceNumber(bh.ODFIIdentification, 1)
+entry2.IdentificationNumber = "#123456"
+entry.DiscretionaryData = "R"
+entry2.Category = ach.CategoryForward
 
-addenda2 := ach.NewAddenda(ach.AddendaParam{
-	PaymentRelatedInfo: "Monthly Membership Subscription"})
+
+addenda2 := NewAddenda05()
+addenda2.PaymentRelatedInformation = "Monthly Membership Subscription"
 ```
 
 Add the entry to the batch
@@ -249,18 +288,9 @@ type BatchMTE struct {
 Add the ability for the new type to be created. 
 
 ```go
-func NewBatchMTE(params ...BatchParam) *BatchMTE {
+func NewBatchMTE(bh *BatchHeader) *BatchMTE {
 	batch := new(BatchMTE)
 	batch.setControl(NewBatchControl)
-
-	if len(params) > 0 {
-		bh := NewBatchHeader(params[0])
-		bh.StandardEntryClassCode = "MTE"
-		batch.SetHeader(bh)
-		return batch
-	}
-	bh := NewBatchHeader()
-	bh.StandardEntryClassCode = "MTE"
 	batch.SetHeader(bh)
 	return batch
 }
@@ -310,7 +340,7 @@ Finally add the batch type to the NewBatch factory in batch.go.
 ```go
 //...
 case "MTE":
-		return NewBatchMTE(bp), nil
+		return NewBatchMTE(bh), nil
 //...
 ```
 
@@ -329,7 +359,7 @@ Pull request require a batchMTE_test.go file that covers the logic of the type.
 
 ![ACH File Layout](https://github.com/moov-io/ach/blob/master/documentation/ach_file_structure_shg.gif)
 
-## Insperation 
+## Inspiration 
 * [ACH:Builder - Tools for Building ACH](http://search.cpan.org/~tkeefer/ACH-Builder-0.03/lib/ACH/Builder.pm)
 * [mosscode / ach](https://github.com/mosscode/ach)
 * [Helper for building ACH files in Ruby](https://github.com/jm81/ach)

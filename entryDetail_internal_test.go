@@ -12,11 +12,12 @@ import (
 func mockEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 22
-	entry.SetRDFI(9101298)
+	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "123456789"
 	entry.Amount = 100000000
 	entry.IndividualName = "Wade Arnold"
-	entry.setTraceNumber(6200001, 1)
+	entry.SetTraceNumber(mockBatchHeader().ODFIIdentification, 1)
+	entry.IdentificationNumber = "ABC##jvkdjfuiwn"
 	entry.Category = CategoryForward
 	return entry
 }
@@ -38,7 +39,7 @@ func TestMockEntryDetail(t *testing.T) {
 	if entry.IndividualName != "Wade Arnold" {
 		t.Error("IndividualName dependent default value has changed")
 	}
-	if entry.TraceNumber != 62000010000001 {
+	if entry.TraceNumber != 121042880000001 {
 		t.Errorf("TraceNumber dependent default value has changed %v", entry.TraceNumber)
 	}
 }
@@ -47,7 +48,7 @@ func TestMockEntryDetail(t *testing.T) {
 func TestParseEntryDetail(t *testing.T) {
 	var line = "62705320001912345            0000010500c-1            Arnold Wade           DD0076401255655291"
 	r := NewReader(strings.NewReader(line))
-	r.addCurrentBatch(NewBatchPPD())
+	r.addCurrentBatch(NewBatchPPD(mockBatchPPDHeader()))
 	r.currentBatch.SetHeader(mockBatchHeader())
 	r.line = line
 	if err := r.parseEntryDetail(); err != nil {
@@ -64,7 +65,7 @@ func TestParseEntryDetail(t *testing.T) {
 	if record.RDFIIdentificationField() != "05320001" {
 		t.Errorf("RDFIIdentification Expected '05320001' got: '%v'", record.RDFIIdentificationField())
 	}
-	if record.CheckDigit != 9 {
+	if record.CheckDigit != "9" {
 		t.Errorf("CheckDigit Expected '9' got: %v", record.CheckDigit)
 	}
 	if record.DFIAccountNumberField() != "12345            " {
@@ -95,7 +96,7 @@ func TestParseEntryDetail(t *testing.T) {
 func TestEDString(t *testing.T) {
 	var line = "62705320001912345            0000010500c-1            Arnold Wade           DD0076401255655291"
 	r := NewReader(strings.NewReader(line))
-	r.addCurrentBatch(NewBatchPPD())
+	r.addCurrentBatch(NewBatchPPD(mockBatchPPDHeader()))
 	r.currentBatch.SetHeader(mockBatchHeader())
 	r.line = line
 	if err := r.parseEntryDetail(); err != nil {
@@ -196,7 +197,7 @@ func TestEDDiscretionaryDataAlphaNumeric(t *testing.T) {
 
 func TestEDisCheckDigit(t *testing.T) {
 	ed := mockEntryDetail()
-	ed.CheckDigit = 1
+	ed.CheckDigit = "1"
 	if err := ed.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "RDFIIdentification" {
@@ -208,11 +209,11 @@ func TestEDisCheckDigit(t *testing.T) {
 
 func TestEDSetRDFI(t *testing.T) {
 	ed := NewEntryDetail()
-	ed.SetRDFI(81086674)
-	if ed.RDFIIdentification != 8108667 {
+	ed.SetRDFI("810866774")
+	if ed.RDFIIdentification != "81086677" {
 		t.Error("RDFI identification")
 	}
-	if ed.CheckDigit != 4 {
+	if ed.CheckDigit != "4" {
 		t.Error("Unexpected check digit")
 	}
 }
@@ -243,7 +244,7 @@ func TestEDFieldInclusionTransactionCode(t *testing.T) {
 
 func TestEDFieldInclusionRDFIIdentification(t *testing.T) {
 	entry := mockEntryDetail()
-	entry.RDFIIdentification = 0
+	entry.RDFIIdentification = ""
 	if err := entry.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.Msg != msgFieldInclusion {
@@ -289,28 +290,28 @@ func TestEDFieldInclusionTraceNumber(t *testing.T) {
 	}
 }
 
-func TestEDAddAddendaAddendaReturn(t *testing.T) {
+func TestEDAddAddendaAddenda99(t *testing.T) {
 	entry := mockEntryDetail()
-	entry.AddAddenda(mockAddendaReturn())
+	entry.AddAddenda(mockAddenda99())
 	if entry.Category != CategoryReturn {
-		t.Error("AddendaReturn added and isReturn is false")
+		t.Error("Addenda99 added and isReturn is false")
 	}
 	if entry.AddendaRecordIndicator != 1 {
-		t.Error("AddendaReturn added and record indicator is not 1")
+		t.Error("Addenda99 added and record indicator is not 1")
 	}
 
 }
 
-func TestEDAddAddendaAddendaReturnTwice(t *testing.T) {
+func TestEDAddAddendaAddenda99Twice(t *testing.T) {
 	entry := mockEntryDetail()
-	entry.AddAddenda(mockAddendaReturn())
-	entry.AddAddenda(mockAddendaReturn())
+	entry.AddAddenda(mockAddenda99())
+	entry.AddAddenda(mockAddenda99())
 	if entry.Category != CategoryReturn {
-		t.Error("AddendaReturn added and Category is not CategoryReturn")
+		t.Error("Addenda99 added and Category is not CategoryReturn")
 	}
 
 	if len(entry.Addendum) != 1 {
-		t.Error("AddendaReturn added and isReturn is false")
+		t.Error("Addenda99 added and isReturn is false")
 	}
 }
 

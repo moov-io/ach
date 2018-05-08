@@ -12,11 +12,10 @@ import (
 
 // Errors specific to a File Header Record
 var (
-	msgRecordType       = "received expecting %d"
-	msgRecordSize       = "is not 094"
-	msgBlockingFactor   = "is not 10"
-	msgFormatCode       = "is not 1"
-	msgFileCreationDate = "was created before " + time.Now().String()
+	msgRecordType     = "received expecting %d"
+	msgRecordSize     = "is not 094"
+	msgBlockingFactor = "is not 10"
+	msgFormatCode     = "is not 1"
 )
 
 // FileHeader is a Record designating physical file characteristics and identify
@@ -31,18 +30,20 @@ type FileHeader struct {
 	priorityCode string
 
 	// ImmediateDestination contains the Routing Number of the ACH Operator or receiving
-	// point to which the file is being sent. The 10 character field begins with
-	// a blank in the first position, followed by the four digit Federal Reserve
-	// Routing Symbol, the four digit ABA Institution Identifier, and the Check
-	// Digit (bTTTTAAAAC).
-	ImmediateDestination int
+	// point to which the file is being sent.  The ach file format specifies a 10 character
+	// field  begins with a blank space in the first position, followed by the four digit
+	// Federal Reserve Routing Symbol, the four digit ABA Institution Identifier, and the Check
+	// Digit (bTTTTAAAAC).  ImmediateDestinationField() will append the blank space to the
+	// routing number.
+	ImmediateDestination string
 
 	// ImmediateOrigin contains the Routing Number of the ACH Operator or sending
-	// point that is sending the file. The 10 character field begins with
-	// a blank in the first position, followed by the four digit Federal Reserve
-	// Routing Symbol, the four digit ABA Institution Identifier, and the Check
-	// Digit (bTTTTAAAAC).
-	ImmediateOrigin int
+	// point that is sending the file. The ach file format specifies a 10 character field
+	// which begins with a blank space in the first position, followed by the four digit
+	// Federal Reserve Routing Symbol, the four digit ABA Institution Identifier, and the Check
+	// Digit (bTTTTAAAAC).  ImmediateOriginField() will append the blank space to the routing
+	// number.
+	ImmediateOrigin string
 
 	// FileCreationDate is expressed in a "YYMMDD" format. The File Creation
 	// Date is the date on which the file is prepared by an ODFI (ACH input files)
@@ -92,7 +93,7 @@ type FileHeader struct {
 }
 
 // NewFileHeader returns a new FileHeader with default values for none exported fields
-func NewFileHeader(params ...FileParam) FileHeader {
+func NewFileHeader() FileHeader {
 	fh := FileHeader{
 		recordType:     "1",
 		priorityCode:   "01",
@@ -100,15 +101,6 @@ func NewFileHeader(params ...FileParam) FileHeader {
 		recordSize:     "094",
 		blockingFactor: "10",
 		formatCode:     "1",
-	}
-	if len(params) > 0 {
-		fh.ImmediateDestination = fh.parseNumField(params[0].ImmediateDestination)
-		fh.ImmediateOrigin = fh.parseNumField(params[0].ImmediateOrigin)
-		fh.ImmediateDestinationName = params[0].ImmediateDestinationName
-		fh.ImmediateOriginName = params[0].ImmediateOriginName
-		fh.ReferenceCode = params[0].ReferenceCode
-		fh.FileCreationDate = time.Now()
-		return fh
 	}
 	return fh
 }
@@ -120,9 +112,9 @@ func (fh *FileHeader) Parse(record string) {
 	// (2-3) Always "01"
 	fh.priorityCode = "01"
 	// (4-13) A blank space followed by your ODFI's routing number. For example: " 121140399"
-	fh.ImmediateDestination = fh.parseNumField(record[3:13])
+	fh.ImmediateDestination = fh.parseStringField(record[3:13])
 	// (14-23) A 10-digit number assigned to you by the ODFI once they approve you to originate ACH files through them
-	fh.ImmediateOrigin = fh.parseNumField(record[13:23])
+	fh.ImmediateOrigin = fh.parseStringField(record[13:23])
 	// 24-29 Today's date in YYMMDD format
 	// must be after todays date.
 	fh.FileCreationDate = fh.parseSimpleDate(record[23:29])
@@ -194,6 +186,12 @@ func (fh *FileHeader) Validate() error {
 	if err := fh.isAlphanumeric(fh.ImmediateDestinationName); err != nil {
 		return &FieldError{FieldName: "ImmediateDestinationName", Value: fh.ImmediateDestinationName, Msg: err.Error()}
 	}
+	if fh.ImmediateOrigin == "000000000" {
+		return &FieldError{FieldName: "ImmediateOrigin", Value: fh.ImmediateOrigin, Msg: msgFieldInclusion}
+	}
+	if fh.ImmediateDestination == "000000000" {
+		return &FieldError{FieldName: "ImmediateDestination", Value: fh.ImmediateDestination, Msg: msgFieldInclusion}
+	}
 	if err := fh.isAlphanumeric(fh.ImmediateOriginName); err != nil {
 		return &FieldError{FieldName: "ImmediateOriginName", Value: fh.ImmediateOriginName, Msg: err.Error()}
 	}
@@ -216,10 +214,10 @@ func (fh *FileHeader) fieldInclusion() error {
 	if fh.recordType == "" {
 		return &FieldError{FieldName: "recordType", Value: fh.recordType, Msg: msgFieldInclusion}
 	}
-	if fh.ImmediateDestination == 0 {
+	if fh.ImmediateDestination == "" {
 		return &FieldError{FieldName: "ImmediateDestination", Value: fh.ImmediateDestinationField(), Msg: msgFieldInclusion}
 	}
-	if fh.ImmediateOrigin == 0 {
+	if fh.ImmediateOrigin == "" {
 		return &FieldError{FieldName: "ImmediateOrigin", Value: fh.ImmediateOriginField(), Msg: msgFieldInclusion}
 	}
 	if fh.FileCreationDate.IsZero() {
@@ -242,12 +240,12 @@ func (fh *FileHeader) fieldInclusion() error {
 
 // ImmediateDestinationField gets the immediate destination number with zero padding
 func (fh *FileHeader) ImmediateDestinationField() string {
-	return " " + fh.numericField(fh.ImmediateDestination, 9)
+	return " " + fh.stringRTNField(fh.ImmediateDestination, 9)
 }
 
 // ImmediateOriginField gets the immediate origin number with 0 padding
 func (fh *FileHeader) ImmediateOriginField() string {
-	return " " + fh.numericField(fh.ImmediateOrigin, 9)
+	return " " + fh.stringRTNField(fh.ImmediateOrigin, 9)
 }
 
 // FileCreationDateField gets the file creation date in YYMMDD format

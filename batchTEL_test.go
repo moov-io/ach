@@ -9,28 +9,27 @@ func mockBatchTELHeader() *BatchHeader {
 	bh.ServiceClassCode = 225
 	bh.StandardEntryClassCode = "TEL"
 	bh.CompanyName = "Your Company, inc"
-	bh.CompanyIdentification = "123456789"
+	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "Vndr Pay"
-	bh.ODFIIdentification = 6200001
+	bh.ODFIIdentification = "12104288"
 	return bh
 }
 
 func mockTELEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 27
-	entry.SetRDFI(9101298)
+	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 5000000
 	entry.IdentificationNumber = "Phone 333-2222"
 	entry.IndividualName = "Wade Arnold"
-	entry.setTraceNumber(6200001, 123)
+	entry.SetTraceNumber(mockBatchTELHeader().ODFIIdentification, 123)
 	entry.SetPaymentType("S")
 	return entry
 }
 
 func mockBatchTEL() *BatchTEL {
-	mockBatch := NewBatchTEL()
-	mockBatch.SetHeader(mockBatchTELHeader())
+	mockBatch := NewBatchTEL(mockBatchTELHeader())
 	mockBatch.AddEntry(mockTELEntryDetail())
 	if err := mockBatch.Create(); err != nil {
 		panic(err)
@@ -38,8 +37,8 @@ func mockBatchTEL() *BatchTEL {
 	return mockBatch
 }
 
-func TestBatchTELParam(t *testing.T) {
-	batch, _ := NewBatch(mockBatchTELHeader().BatchParam())
+func TestBatchTELHeader(t *testing.T) {
+	batch, _ := NewBatch(mockBatchTELHeader())
 	err, ok := batch.(*BatchTEL)
 	if !ok {
 		t.Errorf("Expecting BatchTEL got %T", err)
@@ -65,7 +64,7 @@ func TestBatchTELCreate(t *testing.T) {
 func TestBatchTELAddendaCount(t *testing.T) {
 	mockBatch := mockBatchTEL()
 	// TEL can not have an addendum
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

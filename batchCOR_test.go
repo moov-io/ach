@@ -11,34 +11,43 @@ func mockBatchCORHeader() *BatchHeader {
 	bh.ServiceClassCode = 220
 	bh.StandardEntryClassCode = "COR"
 	bh.CompanyName = "Your Company, inc"
-	bh.CompanyIdentification = "123456789"
+	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "Vndr Pay"
-	bh.ODFIIdentification = 6200001
+	bh.ODFIIdentification = "121042882"
 	return bh
 }
 
 func mockCOREntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 27
-	entry.SetRDFI(9101298)
+	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
 	entry.IdentificationNumber = "location #23"
 	entry.SetReceivingCompany("Best Co. #23")
-	entry.setTraceNumber(6200001, 0)
+	entry.SetTraceNumber(mockBatchCORHeader().ODFIIdentification, 1)
 	entry.DiscretionaryData = "S"
 	return entry
 }
 
 func mockBatchCOR() *BatchCOR {
-	mockBatch := NewBatchCOR()
-	mockBatch.SetHeader(mockBatchCORHeader())
+	mockBatch := NewBatchCOR(mockBatchCORHeader())
 	mockBatch.AddEntry(mockCOREntryDetail())
-	mockBatch.GetEntries()[0].AddAddenda(mockAddendaNOC())
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98())
 	if err := mockBatch.Create(); err != nil {
 		panic(err)
 	}
 	return mockBatch
+}
+
+// Test Batch Header
+func TestBatchCORHeader(t *testing.T) {
+	batch, _ := NewBatch(mockBatchCORHeader())
+
+	_, ok := batch.(*BatchCOR)
+	if !ok {
+		t.Error("Expecting BachCOR")
+	}
 }
 
 func TestBatchCORSEC(t *testing.T) {
@@ -55,27 +64,10 @@ func TestBatchCORSEC(t *testing.T) {
 	}
 }
 
-func TestBatchCORParam(t *testing.T) {
-
-	batch, _ := NewBatch(BatchParam{
-		ServiceClassCode:        "220",
-		CompanyName:             "Your Company, inc",
-		StandardEntryClass:      "COR",
-		CompanyIdentification:   "123456789",
-		CompanyEntryDescription: "Vndr Pay",
-		CompanyDescriptiveDate:  "Oct 23",
-		ODFIIdentification:      "123456789"})
-
-	_, ok := batch.(*BatchCOR)
-	if !ok {
-		t.Error("Expecting BachCOR")
-	}
-}
-
 func TestBatchCORAddendumCountTwo(t *testing.T) {
 	mockBatch := mockBatchCOR()
 	// Adding a second addenda to the mock entry
-	mockBatch.GetEntries()[0].AddAddenda(mockAddendaNOC())
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98())
 
 	if err := mockBatch.Create(); err != nil {
 		//	fmt.Printf("err: %v \n", err)
@@ -90,8 +82,7 @@ func TestBatchCORAddendumCountTwo(t *testing.T) {
 }
 
 func TestBatchCORAddendaCountZero(t *testing.T) {
-	mockBatch := NewBatchCOR()
-	mockBatch.SetHeader(mockBatchCORHeader())
+	mockBatch := NewBatchCOR(mockBatchCORHeader())
 	mockBatch.AddEntry(mockCOREntryDetail())
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -104,12 +95,11 @@ func TestBatchCORAddendaCountZero(t *testing.T) {
 	}
 }
 
-// check that Addendum is of type AddendaNOC
+// check that Addendum is of type Addenda98
 func TestBatchCORAddendaType(t *testing.T) {
-	mockBatch := NewBatchCOR()
-	mockBatch.SetHeader(mockBatchCORHeader())
+	mockBatch := NewBatchCOR(mockBatchCORHeader())
 	mockBatch.AddEntry(mockCOREntryDetail())
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda())
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Addendum" {
@@ -123,7 +113,7 @@ func TestBatchCORAddendaType(t *testing.T) {
 
 func TestBatchCORAddendaTypeCode(t *testing.T) {
 	mockBatch := mockBatchCOR()
-	mockBatch.GetEntries()[0].Addendum[0].(*AddendaNOC).typeCode = "07"
+	mockBatch.GetEntries()[0].Addendum[0].(*Addenda98).typeCode = "07"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
