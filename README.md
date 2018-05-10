@@ -343,8 +343,39 @@ case "MTE":
 		return NewBatchMTE(bh), nil
 //...
 ```
-
 Pull request require a batchMTE_test.go file that covers the logic of the type. 
+
+Command line ACH file write, read, test, benchmark, profiling
+
+**Write:**
+
+github.com/moov-io/ach/cmd/writeACH
+
+main.go will create an ACH file with 4 batches each containing 1250 detail and addenda records 
+
+A custom path can be used by defining fPath ( e.g. -fPath=github.com/moov-io/_directory_ )
+
+Benchmark 
+
+github.com/moov-io/ach/cmd/writeACH>go test -bench=BenchmarkTestFileWrite  -count=5 > old
+
+Profiling
+
+github.com/moov-io/ach/cmd/writeACH>main -cpuprofile=writeACH.pprof
+
+**Read:**
+
+github.com/moov-io/ach/cmd/readACH
+
+Use fPath to define the file to be read ( e.g. -fPath=github.com/moov-io/ach/cmd/readACH/_filename_ )
+
+Benchmark 
+
+github.com/moov-io/ach/cmd/readACH>go test -bench=BenchmarkTestFileRead -count=5 > old
+
+Profiling
+
+github.com/moov-io/ach/cmd/readACH>main -fPath=_filename_ -cpuprofile=ReadACH.pprof
 
 ## References  
 * [Wikipeda: Automated Clearing House](http://en.wikipedia.org/wiki/Automated_Clearing_House)
