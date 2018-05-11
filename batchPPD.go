@@ -47,8 +47,5 @@ func (batch *BatchPPD) Create() error {
 	// Additional steps specific to batch type
 	// ...
 
-	if err := batch.Validate(); err != nil {
-		return err
-	}
-	return nil
+	return batch.Validate()
 }

@@ -42,11 +42,7 @@ func (batch *BatchTEL) Validate() error {
 		}
 	}
 
-	if err := batch.isPaymentTypeCode(); err != nil {
-		return err
-	}
-
-	return nil
+	return batch.isPaymentTypeCode()
 }
 
 // Create builds the batch sequence numbers and batch control. Additional creation
@@ -56,8 +52,5 @@ func (batch *BatchTEL) Create() error {
 		return err
 	}
 
-	if err := batch.Validate(); err != nil {
-		return err
-	}
-	return nil
+	return batch.Validate()
 }
