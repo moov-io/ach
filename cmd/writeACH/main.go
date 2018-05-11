@@ -63,23 +63,23 @@ func main() {
 		for i := 0; i < 1250; i++ {
 			entrySeq = entrySeq + 1
 
-			entry_entrySeq := ach.NewEntryDetail()
-			entry_entrySeq.TransactionCode = 22
-			entry_entrySeq.SetRDFI("231380104")
-			entry_entrySeq.DFIAccountNumber = "81967038518"
-			entry_entrySeq.Amount = 100000
-			entry_entrySeq.IndividualName = randomdata.FullName(randomdata.RandomGender)
-			entry_entrySeq.SetTraceNumber(bh.ODFIIdentification, entrySeq)
-			entry_entrySeq.IdentificationNumber = "#" + randomdata.RandStringRunes(13) + "#"
-			entry_entrySeq.Category = ach.CategoryForward
+			entryEntrySeq := ach.NewEntryDetail()
+			entryEntrySeq.TransactionCode = 22
+			entryEntrySeq.SetRDFI("231380104")
+			entryEntrySeq.DFIAccountNumber = "81967038518"
+			entryEntrySeq.Amount = 100000
+			entryEntrySeq.IndividualName = randomdata.FullName(randomdata.RandomGender)
+			entryEntrySeq.SetTraceNumber(bh.ODFIIdentification, entrySeq)
+			entryEntrySeq.IdentificationNumber = "#" + randomdata.RandStringRunes(13) + "#"
+			entryEntrySeq.Category = ach.CategoryForward
 
 			// Add addenda record for an entry
-			addenda_entrySeq := ach.NewAddenda05()
-			addenda_entrySeq.PaymentRelatedInformation = "bonus pay for amazing work on #OSS"
-			entry_entrySeq.AddAddenda(addenda_entrySeq)
+			addendaEntrySeq := ach.NewAddenda05()
+			addendaEntrySeq.PaymentRelatedInformation = "bonus pay for amazing work on #OSS"
+			entryEntrySeq.AddAddenda(addendaEntrySeq)
 
 			// Add entries
-			batch.AddEntry(entry_entrySeq)
+			batch.AddEntry(entryEntrySeq)
 
 		}
 
