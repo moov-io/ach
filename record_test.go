@@ -111,7 +111,7 @@ func TestBuildFile(t *testing.T) {
 
 	batch, _ = NewBatch(mockBatchWEBHeader())
 
-	// Add an entry and define if it is a single or reccuring payment
+	// Add an entry and define if it is a single or recurring payment
 	// The following is a reoccuring payment for $7.99
 
 	entry = mockWEBEntryDetail()

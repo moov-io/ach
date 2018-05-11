@@ -4,5 +4,25 @@ go:
   - tip
 before_install:
   - go get github.com/mattn/goveralls
+  - go get -u honnef.co/go/tools/cmd/megacheck
+  - go get -u github.com/client9/misspell/cmd/misspell
+  - go get -u golang.org/x/lint/golint
+  - go get github.com/fzipp/gocyclo
+
+before_script:
+  - GO_FILES=$(find . -iname '*.go' -type f | grep -v /example/) # All the .go files, excluding example/ vendor/
+  
+ # script always run to completion (set +e). All of these code checks are must haves
+# in a modern Go project.
 script:
-  - $HOME/gopath/bin/goveralls -service=travis-ci -ignore=main,main.go,/example/,./example/
+  - test -z $(gofmt -s -l $GO_FILES)         # Fail if a .go file hasn't been formatted with gofmt
+  # - go test -v -race $GO_FILES               # Run all the tests with the race detector enabled
+  - go vet $GO_FILES                         # go vet is the official Go static analyzer
+  - megacheck $GO_FILES                      # "go vet on steroids" + linter
+  - misspell -error -locale US .             # check for spelling errors
+  - gocyclo -over 19 $GO_FILES               # forbid code with huge functions
+  - golint -set_exit_status $(go list $GO_FILES) # one last linter
+  # output code coverage
+  - go test -v -covermode=count -coverprofile=coverage.out $GO_FILES
+  - goveralls -coverprofile=coverage.out -service travis-ci -repotoken $COVERALLS_TOKEN
+  
