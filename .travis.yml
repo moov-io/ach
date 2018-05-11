@@ -23,6 +23,6 @@ script:
   - gocyclo -over 19 $GO_FILES               # forbid code with huge functions
   - golint -set_exit_status $(go list $GO_FILES) # one last linter
   # output code coverage
-  - go test -v -covermode=count -coverprofile=coverage.out $GO_FILES
+  - go test -v -covermode=count -coverprofile=coverage.out .
   - goveralls -coverprofile=coverage.out -service travis-ci -repotoken $COVERALLS_TOKEN
   
