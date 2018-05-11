@@ -16,18 +16,9 @@ var (
 )
 
 // NewBatchWEB returns a *BatchWEB
-func NewBatchWEB(params ...BatchParam) *BatchWEB {
+func NewBatchWEB(bh *BatchHeader) *BatchWEB {
 	batch := new(BatchWEB)
 	batch.SetControl(NewBatchControl())
-
-	if len(params) > 0 {
-		bh := NewBatchHeader(params[0])
-		bh.StandardEntryClassCode = "WEB"
-		batch.SetHeader(bh)
-		return batch
-	}
-	bh := NewBatchHeader()
-	bh.StandardEntryClassCode = "WEB"
 	batch.SetHeader(bh)
 	return batch
 }
@@ -53,11 +44,7 @@ func (batch *BatchWEB) Validate() error {
 		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
-	if err := batch.isPaymentTypeCode(); err != nil {
-		return err
-	}
-
-	return nil
+	return batch.isPaymentTypeCode()
 }
 
 // Create builds the batch sequence numbers and batch control. Additional creation
@@ -67,8 +54,5 @@ func (batch *BatchWEB) Create() error {
 		return err
 	}
 
-	if err := batch.Validate(); err != nil {
-		return err
-	}
-	return nil
+	return batch.Validate()
 }

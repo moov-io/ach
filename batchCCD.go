@@ -12,18 +12,9 @@ type BatchCCD struct {
 }
 
 // NewBatchCCD returns a *BatchCCD
-func NewBatchCCD(params ...BatchParam) *BatchCCD {
+func NewBatchCCD(bh *BatchHeader) *BatchCCD {
 	batch := new(BatchCCD)
 	batch.SetControl(NewBatchControl())
-
-	if len(params) > 0 {
-		bh := NewBatchHeader(params[0])
-		bh.StandardEntryClassCode = "CCD"
-		batch.SetHeader(bh)
-		return batch
-	}
-	bh := NewBatchHeader()
-	bh.StandardEntryClassCode = "CCD"
 	batch.SetHeader(bh)
 	return batch
 }
@@ -59,8 +50,5 @@ func (batch *BatchCCD) Create() error {
 		return err
 	}
 
-	if err := batch.Validate(); err != nil {
-		return err
-	}
-	return nil
+	return batch.Validate()
 }

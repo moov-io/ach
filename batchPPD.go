@@ -10,18 +10,9 @@ type BatchPPD struct {
 }
 
 // NewBatchPPD returns a *BatchPPD
-func NewBatchPPD(params ...BatchParam) *BatchPPD {
+func NewBatchPPD(bh *BatchHeader) *BatchPPD {
 	batch := new(BatchPPD)
 	batch.SetControl(NewBatchControl())
-
-	if len(params) > 0 {
-		bh := NewBatchHeader(params[0])
-		bh.StandardEntryClassCode = ppd
-		batch.SetHeader(bh)
-		return batch
-	}
-	bh := NewBatchHeader()
-	bh.StandardEntryClassCode = ppd
 	batch.SetHeader(bh)
 	return batch
 }
@@ -56,8 +47,5 @@ func (batch *BatchPPD) Create() error {
 	// Additional steps specific to batch type
 	// ...
 
-	if err := batch.Validate(); err != nil {
-		return err
-	}
-	return nil
+	return batch.Validate()
 }

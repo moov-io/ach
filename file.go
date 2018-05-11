@@ -27,17 +27,8 @@ const (
 	RecordLength = 94
 )
 
-// currently supported SEC codes
-const (
-	ppd = "PPD"
-	web = "WEB"
-	ccd = "CCD"
-	cor = "COR"
-)
-
 // Errors strings specific to parsing a Batch container
 var (
-	msgFileControlEquality           = "header %v is not equal to control %v"
 	msgFileCalculatedControlEquality = "calculated %v is out-of-balance with control %v"
 	// specific messages
 	msgRecordLength      = "must be 94 characters and found %d"
@@ -74,28 +65,8 @@ type File struct {
 	converters
 }
 
-// FileParam is the minimal fields required to make a ach file header
-type FileParam struct {
-	// ImmediateDestination is the originating banks ABA routing number. Frequently your banks ABA routing number.
-	ImmediateDestination string `json:"immediate_destination"`
-	// ImmediateOrigin
-	ImmediateOrigin string `json:"immediate_origin"`
-	// ImmediateDestinationName is the originating banks name.
-	ImmediateDestinationName string `json:"immediate_destination_name"`
-	ImmediateOriginName      string `json:"immediate_origin_name"`
-	ReferenceCode            string `json:"reference_code,omitempty"`
-}
-
 // NewFile constructs a file template.
-func NewFile(params ...FileParam) *File {
-	if len(params) > 0 {
-		fh := NewFileHeader(params[0])
-		return &File{
-			Header:  fh,
-			Control: NewFileControl(),
-		}
-
-	}
+func NewFile() *File {
 	return &File{
 		Header:  NewFileHeader(),
 		Control: NewFileControl(),
@@ -187,11 +158,7 @@ func (f *File) Validate() error {
 		return err
 	}
 
-	if err := f.isEntryHash(); err != nil {
-		return err
-	}
-
-	return nil
+	return f.isEntryHash()
 }
 
 // isEntryAddenda is prepared by hashing the RDFI’s 8-digit Routing Number in each entry.
