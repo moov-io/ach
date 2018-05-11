@@ -50,8 +50,5 @@ func (batch *BatchCCD) Create() error {
 		return err
 	}
 
-	if err := batch.Validate(); err != nil {
-		return err
-	}
-	return nil
+	return batch.Validate()
 }
