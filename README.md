@@ -5,6 +5,7 @@ moov-io/ach
 [![Coverage Status](https://coveralls.io/repos/github/moov-io/ach/badge.svg?branch=master)](https://coveralls.io/github/moov-io/ach?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/moov-io/ach)](https://goreportcard.com/report/github.com/moov-io/ach)
 [![Apache 2 licensed](https://img.shields.io/badge/license-Apache2-blue.svg)](https://raw.githubusercontent.com/moov-io/ach/master/LICENSE)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmoov-io%2Fach.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmoov-io%2Fach?ref=badge_shield)
 
 
 Package 'moov-io/ach' implements a file reader and writer for parsing [ACH](https://en.wikipedia.org/wiki/Automated_Clearing_House
@@ -367,3 +368,6 @@ Pull request require a batchMTE_test.go file that covers the logic of the type.
 
 ## License
 Apache License 2.0 See [LICENSE](LICENSE) for details.
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmoov-io%2Fach.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmoov-io%2Fach?ref=badge_large)
