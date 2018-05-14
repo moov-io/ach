@@ -250,102 +250,16 @@ Which will generate a well formed ACH flat file.
 ```
 # Mailing lists
 
-Users trade notes on the Google group moov-users (send mail to moov-users@googlegroups.com). You must join the [moov-users](https://groups.google.com/forum/#!forum/moov-users)forumn in order to post. 
+## Getting help 
 
-# Contributing
+ channel | info 
+ ------- | -------
+ Google Group [moov-users](https://groups.google.com/forum/#!forum/moov-users)| The Moov users Google group is for contributors other people contributing to the Moov project. You can join them without a google account by sending an email to [moov-users+subscribe@googlegroups.com](mailto:moov-users+subscribe@googlegroups.com). After receiving the join-request message, you can simply reply to that to confirm the subscription.
+Twitter [@moov_io](https://twitter.com/moov_io)	| You can follow Moov.IO's Twitter feed to get updates on our project(s). You can also tweet us questions or just share blogs or stories.
+[GitHub Issue](https://github.com/moov-io) | If you are able to reproduce an problem please open a GitHub Issue under the specific project that caused the error. 
+[moov-io slack](http://moov-io.slack.com/) | Join our slack channel to have an interactive discussion about the development of the project. 
 
-We use GitHub to manage reviews of pull requests.
 
-* If you have a trivial fix or improvement, go ahead and create a pull
-  request, addressing (with `@...`) one or more of the maintainers
-  (see [AUTHORS.md](AUTHORS.md)) in the description of the pull request.
-
-* If you plan to do something more involved, first propose your ideas
-  in a Github issue. This will avoid unnecessary work and surely give
-  you and us a good deal of inspiration.
-
-* Relevant coding style guidelines are the [Go Code Review
-  Comments](https://code.google.com/p/go-wiki/wiki/CodeReviewComments)
-  and the _Formatting and style_ section of Peter Bourgon's [Go: Best
-  Practices for Production
-  Environments](http://peter.bourgon.org/go-in-production/#formatting-and-style).
-
-# Additional SEC (Standard Entry Class) code batch types. 
-SEC type's in the Batch Header record define the payment type of the following Entry Details and Addenda. The format of the records in the batch is the same between all payment types but NACHA defines different rules for the values that are held in each record field. To add support for an additional SEC type you will need to implement NACHA rules for that type. The vast majority of rules are implemented in ach.batch and then composed into Batch(SEC) for reuse. All Batch(SEC) types must be a ach.Batcher.
-
-1. Create a milestone for the new SEC type that you want supported. 
-2. Add issues to that milestone to meet the NACHA rules for the batch type. 
-3. Create a new struct of the batch type. In the following example we will use MTE(Machine Transfer Entry) as our example. 
-4. The following code would be place in a new file batchMTE.go next to the existing batch types.
-5. The code is stub code and the MTE type is not implemented. For concrete examples review the existing batch types in the source.  
-
-Create a new struct and compose ach.batch 
-
-```go
-type BatchMTE struct {
-	batch
-}
-```
-Add the ability for the new type to be created. 
-
-```go
-func NewBatchMTE(bh *BatchHeader) *BatchMTE {
-	batch := new(BatchMTE)
-	batch.setControl(NewBatchControl)
-	batch.SetHeader(bh)
-	return batch
-}
-```
-
-To support the Batcher interface you must add the following functions that are not implemented in ach.batch. 
-* Validate() error
-* Create() error 
-
-Validate is designed to enforce the NACHA rules for the MTE payment type. Validate is run after a batch of this type is read from a file. If you are creating a batch from code call validate afterwards. 
-
-```go
-// Validate checks valid NACHA batch rules. Assumes properly parsed records.
-func (batch *BatchMTE) Validate() error {
-	// basic verification of the batch before we validate specific rules.
-	if err := batch.verify(); err != nil {
-		return err
-	}
-	// Add configuration based validation for this type.
-	// ... batch.isAddendaCount(1)
-	// Add type specific validation.
-	// ...
-	return nil
-}
-```
-Create takes the Batch Header and Entry details and creates the proper sequence number and batch control. If additional logic specific to the SEC type is required it building a batch file it should be added here. 
-
-```go
-// Create takes Batch Header and Entries and builds a valid batch
-func (batch *BatchMTE) Create() error {
-	// generates sequence numbers and batch control
-	if err := batch.build(); err != nil {
-		return err
-	}
-	// Additional steps specific to batch type
-	// ...
-
-	if err := batch.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-```
-
-Finally add the batch type to the NewBatch factory in batch.go. 
-
-```go
-//...
-case "MTE":
-		return NewBatchMTE(bh), nil
-//...
-```
-
-Pull request require a batchMTE_test.go file that covers the logic of the type. 
 
 ## References  
 * [Wikipeda: Automated Clearing House](http://en.wikipedia.org/wiki/Automated_Clearing_House)
