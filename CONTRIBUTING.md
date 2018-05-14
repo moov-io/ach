@@ -34,7 +34,7 @@ A good quality PR will have the following characteristics:
 * It will have a title that reflects the work within, and a summary that helps to understand the context of the change.
 * There will be well written commit messages, with well crafted commits that tell the story of the development of this work.
 * Ideally it will be small and easy to understand. Single commit PRs are usually easy to submit, review, and merge.
-* The code contained within will meet the best practises set by the team wherever possible.
+* The code contained within will meet the best practices set by the team wherever possible.
 * A PR does not end at submission though. A code change is not made until it is merged and used in production.
 
 A good PR should be able to flow through a peer review system easily and quickly.
