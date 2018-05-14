@@ -248,9 +248,7 @@ Which will generate a well formed ACH flat file.
 82200000020010200101000000000000000000000799123456789                          234567890000002
 9000002000001000000040020400202000000017500000000000799 
 ```
-# Mailing lists
-
-## Getting help 
+# Getting help 
 
  channel | info 
  ------- | -------
@@ -259,26 +257,9 @@ Twitter [@moov_io](https://twitter.com/moov_io)	| You can follow Moov.IO's Twitt
 [GitHub Issue](https://github.com/moov-io) | If you are able to reproduce an problem please open a GitHub Issue under the specific project that caused the error. 
 [moov-io slack](http://moov-io.slack.com/) | Join our slack channel to have an interactive discussion about the development of the project. 
 
+# Contributing 
 
-
-## References  
-* [Wikipeda: Automated Clearing House](http://en.wikipedia.org/wiki/Automated_Clearing_House)
-* [Nacha ACH Network: How it Works](https://www.nacha.org/ach-network)
-* [Federal ACH Directory](https://www.frbservices.org/EPaymentsDirectory/search.html)
-
-## Format Specification
-* [NACHA ACH File Formatting](https://www.nacha.org/system/files/resources/AAP201%20-%20ACH%20File%20Formatting.pdf)
-* [PNC ACH File Specification](http://content.pncmc.com/live/pnc/corporate/treasury-management/ach-conversion/ACH-File-Specifications.pdf)
-* [Thomson Reuters ACH FIle Structure](http://cs.thomsonreuters.com/ua/acct_pr/acs/cs_us_en/pr/dd/ach_file_structure_and_content.htm)
-* [Gusto: How ACH Works: A developer perspective](http://engineering.gusto.com/how-ach-works-a-developer-perspective-part-4/)
-
-![ACH File Layout](https://github.com/moov-io/ach/blob/master/documentation/ach_file_structure_shg.gif)
-
-## Inspiration 
-* [ACH:Builder - Tools for Building ACH](http://search.cpan.org/~tkeefer/ACH-Builder-0.03/lib/ACH/Builder.pm)
-* [mosscode / ach](https://github.com/mosscode/ach)
-* [Helper for building ACH files in Ruby](https://github.com/jm81/ach)
-* [Glenselle / nACH2](https://github.com/glenselle/nACH2)
+Yes please! Please review our [Contributing guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) to get started! 
 
 ## License
 Apache License 2.0 See [LICENSE](LICENSE) for details.
