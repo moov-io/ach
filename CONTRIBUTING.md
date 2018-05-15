@@ -8,7 +8,7 @@ Stability is the hallmark of any good software. If you find an edge case that is
 
 Have a use case that we don't handle; or handle well! Start the discussion on our Google Group or open a GitHub Issue. We want to make the project meet the needs of the community and keeps you using our code.
 
-Please review our [Code of Conduct](CODE_OF_CONDUCT.md) to ensure you agree with the values of this project. 
+Please review our [Code of Conduct](CODE_OF_CONDUCT.md) to ensure you agree with the values of this project.
 
 We use GitHub to manage reviews of pull requests.
 
@@ -25,6 +25,8 @@ We use GitHub to manage reviews of pull requests.
   and the _Formatting and style_ section of Peter Bourgon's [Go: Best
   Practices for Production
   Environments](http://peter.bourgon.org/go-in-production/#formatting-and-style).
+
+* When in doubt follow the [Go Proverbs](https://go-proverbs.github.io/)
   
 ## Pull Requests
 
@@ -35,6 +37,7 @@ A good quality PR will have the following characteristics:
 * There will be well written commit messages, with well crafted commits that tell the story of the development of this work.
 * Ideally it will be small and easy to understand. Single commit PRs are usually easy to submit, review, and merge.
 * The code contained within will meet the best practices set by the team wherever possible.
+* The code is able to be merged.
 * A PR does not end at submission though. A code change is not made until it is merged and used in production.
 
 A good PR should be able to flow through a peer review system easily and quickly.
