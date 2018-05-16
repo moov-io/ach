@@ -53,9 +53,9 @@ func (e *FileError) Error() string {
 
 // File contains the structures of a parsed ACH File.
 type File struct {
-	Header  FileHeader
-	Batches []Batcher
-	Control FileControl
+	Header  FileHeader  `json:"fileHeader"`
+	Batches []Batcher   `json:"batches"`
+	Control FileControl `json:"fileControl"`
 
 	// NotificationOfChange (Notification of change) is a slice of references to BatchCOR in file.Batches
 	NotificationOfChange []*BatchCOR

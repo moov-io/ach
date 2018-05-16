@@ -14,17 +14,17 @@ type Addenda98 struct {
 	typeCode string
 	// ChangeCode field contains a standard code used by an ACH Operator or RDFI to describe the reason for a change Entry.
 	// Must exist in changeCodeDict
-	ChangeCode string
+	ChangeCode string `json:"changeCode"`
 	// OriginalTrace This field contains the Trace Number as originally included on the forward Entry or Prenotification.
 	// The RDFI must include the Original Entry Trace Number in the Addenda Record of an Entry being returned to an ODFI,
 	// in the Addenda Record of an 98, within an Acknowledgment Entry, or with an RDFI request for a copy of an authorization.
-	OriginalTrace int
+	OriginalTrace int `json:"originalTrace"`
 	// OriginalDFI field contains the Receiving DFI Identification (addenda.RDFIIdentification) as originally included on the forward Entry or Prenotification that the RDFI is returning or correcting.
-	OriginalDFI string
+	OriginalDFI string `json:"originalDFI"`
 	// CorrectedData
-	CorrectedData string
+	CorrectedData string `json:"correctedData"`
 	// TraceNumber matches the Entry Detail Trace Number of the entry being returned.
-	TraceNumber int
+	TraceNumber int `json:"traceNumber,omitempty"`
 
 	// validator is composed for data validation
 	validator
