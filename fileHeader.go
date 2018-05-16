@@ -35,7 +35,7 @@ type FileHeader struct {
 	// Federal Reserve Routing Symbol, the four digit ABA Institution Identifier, and the Check
 	// Digit (bTTTTAAAAC).  ImmediateDestinationField() will append the blank space to the
 	// routing number.
-	ImmediateDestination string
+	ImmediateDestination string `json:"immediateDestination"`
 
 	// ImmediateOrigin contains the Routing Number of the ACH Operator or sending
 	// point that is sending the file. The ach file format specifies a 10 character field
@@ -43,23 +43,23 @@ type FileHeader struct {
 	// Federal Reserve Routing Symbol, the four digit ABA Institution Identifier, and the Check
 	// Digit (bTTTTAAAAC).  ImmediateOriginField() will append the blank space to the routing
 	// number.
-	ImmediateOrigin string
+	ImmediateOrigin string `json:"immediateOrigin"`
 
 	// FileCreationDate is expressed in a "YYMMDD" format. The File Creation
 	// Date is the date on which the file is prepared by an ODFI (ACH input files)
 	// or the date (exchange date) on which a file is transmitted from ACH Operator
 	// to ACH Operator, or from ACH Operator to RDFIs (ACH output files).
-	FileCreationDate time.Time
+	FileCreationDate time.Time `json:"fileCreationDate"`
 
 	// FileCreationTime is expressed ina n "HHMM" (24 hour clock) format.
 	// The system time when the ACH file was created
-	FileCreationTime time.Time
+	FileCreationTime time.Time `json:"fileCreationTime"`
 
 	// This field should start at zero and increment by 1 (up to 9) and then go to
 	// letters starting at A through Z for each subsequent file that is created for
 	// a single system date. (34-34) 1 numeric 0-9 or uppercase alpha A-Z.
 	// I have yet to see this ID not A
-	FileIDModifier string
+	FileIDModifier string `json:"fileIDModifier,omitempty"`
 
 	// RecordSize indicates the number of characters contained in each
 	// record. At this time, the value "094" must be used.
@@ -78,14 +78,14 @@ type FileHeader struct {
 
 	// ImmediateDestinationName us the name of the ACH or receiving point for which that
 	// file is destined. Name corresponding to the ImmediateDestination
-	ImmediateDestinationName string
+	ImmediateDestinationName string `json:"immediateDestinationName"`
 
 	// ImmediateOriginName is the name of the ACH operator or sending point that is
 	// sending the file. Name corresponding to the ImmediateOrigin
-	ImmediateOriginName string
+	ImmediateOriginName string `json:"immediateOriginName"`
 
 	// ReferenceCode is reserved for information pertinent to the Originator.
-	ReferenceCode string
+	ReferenceCode string `json:"referenceCode,omitempty"`
 	// validator is composed for data validation
 	validator
 	// converters is composed for ACH to GoLang Converters

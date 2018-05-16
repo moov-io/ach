@@ -8,12 +8,12 @@ import (
 
 // Batch holds the Batch Header and Batch Control and all Entry Records for PPD Entries
 type batch struct {
-	header  *BatchHeader
-	entries []*EntryDetail
-	control *BatchControl
+	header  *BatchHeader   `json:"batchHeader,omitempty"`
+	entries []*EntryDetail `json:"entryDetails,omitempty"`
+	control *BatchControl  `json:"batchControl,omitempty"`
 
 	// category defines if the entry is a Forward, Return, or NOC
-	category string
+	category string `json:"category,omitempty"`
 	// Converters is composed for ACH to GoLang Converters
 	converters
 }
