@@ -38,7 +38,7 @@ func mockBatchCCD() *BatchCCD {
 	return mockBatch
 }
 
-// Batch CCD Header
+// testBatchCCDHeader creates a batch CCD header
 func testBatchCCDHeader(t testing.TB) {
 	batch, _ := NewBatch(mockBatchCCDHeader())
 	_, ok := batch.(*BatchCCD)
@@ -47,12 +47,12 @@ func testBatchCCDHeader(t testing.TB) {
 	}
 }
 
-// Test Batch CCD Header
+// TestBatchCCDHeader tests creating a batch CCD header
 func TestBatchCCDHeader(t *testing.T) {
 	testBatchCCDHeader(t)
 }
 
-// Benchmark Batch CCD Header
+// BenchmarkBatchCCDHeader benchmark creating a batch CCD header
 func BenchmarkBatchCCDHeader(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -60,7 +60,7 @@ func BenchmarkBatchCCDHeader(b *testing.B) {
 	}
 }
 
-// Batch control CCD can only have one addendum per entry detail
+// testBatchCCDAddendumCount batch control CCD can only have one addendum per entry detail
 func testBatchCCDAddendumCount(t testing.TB) {
 	mockBatch := mockBatchCCD()
 	// Adding a second addenda to the mock entry
@@ -76,12 +76,12 @@ func testBatchCCDAddendumCount(t testing.TB) {
 	}
 }
 
-// Test batch control CCD can only have one addendum per entry detail
+// TestBatchCCDAddendumCount tests batch control CCD can only have one addendum per entry detail
 func TestBatchCCDAddendumCount(t *testing.T) {
 	testBatchCCDAddendumCount(t)
 }
 
-// Benchmark batch control CCD can only have one addendum per entry detail
+// BenchmarkBatchCCDAddendumCoun benchmarks batch control CCD can only have one addendum per entry detail
 func BenchmarkBatchCCDAddendumCount(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -89,7 +89,7 @@ func BenchmarkBatchCCDAddendumCount(b *testing.B) {
 	}
 }
 
-// Receiving company / Individual name is a mandatory field
+// testBatchCCDReceivingCompanyName validates Receiving company / Individual name is a mandatory field
 func testBatchCCDReceivingCompanyName(t testing.TB) {
 	mockBatch := mockBatchCCD()
 	// modify the Individual name / receiving company to nothing
@@ -105,12 +105,12 @@ func testBatchCCDReceivingCompanyName(t testing.TB) {
 	}
 }
 
-// Test receiving company / Individual name is a mandatory field
+// TestBatchCCDReceivingCompanyName tests validating receiving company / Individual name is a mandatory field
 func TestBatchCCDReceivingCompanyName(t *testing.T) {
 	testBatchCCDReceivingCompanyName(t)
 }
 
-// Benchmark receiving company / Individual name is a mandatory field
+// BenchmarkBatchCCDReceivingCompanyName benchmarks validating receiving company / Individual name is a mandatory field
 func BenchmarkBatchCCDReceivingCompanyName(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -118,7 +118,7 @@ func BenchmarkBatchCCDReceivingCompanyName(b *testing.B) {
 	}
 }
 
-// Verify addenda type code is 05
+// testBatchCCDAddendaTypeCode verifies addenda type code is 05
 func testBatchCCDAddendaTypeCode(t testing.TB) {
 	mockBatch := mockBatchCCD()
 	mockBatch.GetEntries()[0].Addendum[0].(*Addenda05).typeCode = "07"
@@ -133,12 +133,12 @@ func testBatchCCDAddendaTypeCode(t testing.TB) {
 	}
 }
 
-// Test verify addenda type code is 05
+// TestBatchCCDAddendaTypeCode tests verifying addenda type code is 05
 func TestBatchCCDAddendaTypeCode(t *testing.T) {
 	testBatchCCDAddendaTypeCode(t)
 }
 
-// Benchmark verify addenda type code is 05
+// BenchmarkBatchCCDAddendaTypeCod benchmarks verifying addenda type code is 05
 func BenchmarkBatchCCDAddendaTypeCode(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -146,7 +146,7 @@ func BenchmarkBatchCCDAddendaTypeCode(b *testing.B) {
 	}
 }
 
-// Verify that the standard entry class code is CCD for batchCCD
+// testBatchCCDSEC verifies that the standard entry class code is CCD for batchCCD
 func testBatchCCDSEC(t testing.TB) {
 	mockBatch := mockBatchCCD()
 	mockBatch.header.StandardEntryClassCode = "RCK"
@@ -161,12 +161,12 @@ func testBatchCCDSEC(t testing.TB) {
 	}
 }
 
-// Test verify that the standard entry class code is CCD for batchCCD
+// TestBatchCCDSEC test verifying that the standard entry class code is CCD for batchCCD
 func TestBatchCCDSEC(t *testing.T) {
 	testBatchCCDSEC(t)
 }
 
-// Benchmark verify that the standard entry class code is CCD for batchCCD
+// BenchmarkBatchCCDSEC benchmarks verifying that the standard entry class code is CCD for batchCCD
 func BenchmarkBatchCCDSEC(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -174,7 +174,7 @@ func BenchmarkBatchCCDSEC(b *testing.B) {
 	}
 }
 
-// Verify batch CCD addenda count
+// testBatchCCDAddendaCount verifies batch CCD addenda count
 func testBatchCCDAddendaCount(t testing.TB) {
 	mockBatch := mockBatchCCD()
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
@@ -190,12 +190,12 @@ func testBatchCCDAddendaCount(t testing.TB) {
 	}
 }
 
-// Test verify batch CCD addenda count
+// TestBatchCCDAddendaCount tests verifying batch CCD addenda count
 func TestBatchCCDAddendaCount(t *testing.T) {
 	testBatchCCDAddendaCount(t)
 }
 
-// Benchmark verify batch CCD addenda count
+// BenchmarkBatchCCDAddendaCount benchmarks verifying batch CCD addenda count
 func BenchmarkBatchCCDAddendaCount(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -203,7 +203,7 @@ func BenchmarkBatchCCDAddendaCount(b *testing.B) {
 	}
 }
 
-// Batch CCD create
+// testBatchCCDCreate creates a batch CCD
 func testBatchCCDCreate(t testing.TB) {
 	mockBatch := mockBatchCCD()
 	// Batch Header information is required to Create a batch.
@@ -220,12 +220,12 @@ func testBatchCCDCreate(t testing.TB) {
 	}
 }
 
-// Test batch CCD create
+// TestBatchCCDCreate Test creating a batch CCD
 func TestBatchCCDCreate(t *testing.T) {
 	testBatchCCDCreate(t)
 }
 
-// Benchmark batch CCD create
+// BenchmarkBatchCCDCreate benchmark creating a batch CCD
 func BenchmarkBatchCCDCreate(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
