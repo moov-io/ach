@@ -47,6 +47,19 @@ func testMockBatchHeader(t testing.TB) {
 	}
 }
 
+// TestMockBatchHeader tests creating a batch header
+func TestMockBatchHeader(t *testing.T) {
+	testMockBatchHeader(t)
+}
+
+// BenchmarkMockBatchHeader benchmarks creating a batch header
+func BenchmarkMockBatchHeader(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testMockBatchHeader(b)
+	}
+}
+
 // testParseBatchHeader parses a known batch header record string
 func testParseBatchHeader(t testing.TB) {
 	var line = "5225companyname                         origid    PPDCHECKPAYMT000002080730   1076401250000001"
@@ -139,7 +152,7 @@ func BenchmarkBHString(b *testing.B) {
 	}
 }
 
-// testValidateBHRecordType verifies error if recordType is not 5
+// testValidateBHRecordType validates error if recordType is not 5
 func testValidateBHRecordType(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.recordType = "2"
@@ -152,12 +165,12 @@ func testValidateBHRecordType(t testing.TB) {
 	}
 }
 
-// TestValidateBHRecordType tests verifying error if recordType is not 5
+// TestValidateBHRecordType tests validating error if recordType is not 5
 func TestValidateBHRecordType(t *testing.T) {
 	testValidateBHRecordType(t)
 }
 
-// BenchmarkValidateBHRecordType benchmarks verifying error if recordType is not 5
+// BenchmarkValidateBHRecordType benchmarks validating error if recordType is not 5
 func BenchmarkValidateBHRecordType(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -165,7 +178,7 @@ func BenchmarkValidateBHRecordType(b *testing.B) {
 	}
 }
 
-// testInvalidServiceCode verifies error if service code is not valid
+// testInvalidServiceCode validates error if service code is not valid
 func testInvalidServiceCode(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.ServiceClassCode = 123
@@ -178,12 +191,12 @@ func testInvalidServiceCode(t testing.TB) {
 	}
 }
 
-// TestInvalidServiceCode tests verifying error if service code is not valid
+// TestInvalidServiceCode tests validating error if service code is not valid
 func TestInvalidServiceCode(t *testing.T) {
 	testInvalidServiceCode(t)
 }
 
-// BenchmarkInvalidServiceCode benchmarks verifying error if service code is not valid
+// BenchmarkInvalidServiceCode benchmarks validating error if service code is not valid
 func BenchmarkInvalidServiceCode(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -192,7 +205,7 @@ func BenchmarkInvalidServiceCode(b *testing.B) {
 }
 
 
-// testValidateInvalidSECCode verifies error if service class is not valid
+// testValidateInvalidSECCode validates error if service class is not valid
 func testInvalidSECCode(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.StandardEntryClassCode = "123"
@@ -205,12 +218,12 @@ func testInvalidSECCode(t testing.TB) {
 	}
 }
 
-// TestInvalidSECCode tests verifying error if service class is not valid
+// TestInvalidSECCode tests validating error if service class is not valid
 func TestInvalidSECCode(t *testing.T) {
 	testInvalidSECCode(t)
 }
 
-// BenchmarkInvalidSECCode benchmarks verifying error if service class is not valid
+// BenchmarkInvalidSECCode benchmarks validating error if service class is not valid
 func BenchmarkInvalidSECCode(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -218,7 +231,7 @@ func BenchmarkInvalidSECCode(b *testing.B) {
 	}
 }
 
-// testInvalidOrigStatusCode verifies error if originator status code is not valid
+// testInvalidOrigStatusCode validates error if originator status code is not valid
 func testInvalidOrigStatusCode(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.OriginatorStatusCode = 3
@@ -231,12 +244,12 @@ func testInvalidOrigStatusCode(t testing.TB) {
 	}
 }
 
-// TestInvalidOrigStatusCode tests verifying error if originator status code is not valid
+// TestInvalidOrigStatusCode tests validating error if originator status code is not valid
 func TestInvalidOrigStatusCode(t *testing.T) {
 	testInvalidOrigStatusCode(t)
 }
 
-// BenchmarkInvalidOrigStatusCode benchmarks  verifying error if originator status code is not valid
+// BenchmarkInvalidOrigStatusCode benchmarks  validating error if originator status code is not valid
 func BenchmarkInvalidOrigStatusCode(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -244,7 +257,7 @@ func BenchmarkInvalidOrigStatusCode(b *testing.B) {
 	}
 }
 
-// testBatchHeaderFieldInclusion verifies batch header field inclusion
+// testBatchHeaderFieldInclusion validates batch header field inclusion
 func testBatchHeaderFieldInclusion(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.BatchNumber = 0
@@ -257,12 +270,12 @@ func testBatchHeaderFieldInclusion(t testing.TB) {
 	}
 }
 
-// TestBatchHeaderFieldInclusion tests verifying batch header field inclusion
+// TestBatchHeaderFieldInclusion tests validating batch header field inclusion
 func TestBatchHeaderFieldInclusion(t *testing.T) {
 	testBatchHeaderFieldInclusion(t)
 }
 
-// BenchmarkBatchHeaderFieldInclusion benchmarks verifying batch header field inclusion
+// BenchmarkBatchHeaderFieldInclusion benchmarks validating batch header field inclusion
 func BenchmarkBatchHeaderFieldInclusion(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -270,7 +283,7 @@ func BenchmarkBatchHeaderFieldInclusion(b *testing.B) {
 	}
 }
 
-// testBatchHeaderCompanyNameAlphaNumeric verifies batch header company name is alphanumeric
+// testBatchHeaderCompanyNameAlphaNumeric validates batch header company name is alphanumeric
 func testBatchHeaderCompanyNameAlphaNumeric(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.CompanyName = "AT&T®"
@@ -283,12 +296,12 @@ func testBatchHeaderCompanyNameAlphaNumeric(t testing.TB) {
 	}
 }
 
-// TestBatchHeaderCompanyNameAlphaNumeric tests verifying batch header company name is alphanumeric
+// TestBatchHeaderCompanyNameAlphaNumeric tests validating batch header company name is alphanumeric
 func TestBatchHeaderCompanyNameAlphaNumeric(t *testing.T) {
 	testBatchHeaderCompanyNameAlphaNumeric(t)
 }
 
-// BenchmarkBatchHeaderCompanyNameAlphaNumeric benchmarks verifying batch header company name is alphanumeric
+// BenchmarkBatchHeaderCompanyNameAlphaNumeric benchmarks validating batch header company name is alphanumeric
 func BenchmarkBatchHeaderCompanyNameAlphaNumeric(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -296,7 +309,7 @@ func BenchmarkBatchHeaderCompanyNameAlphaNumeric(b *testing.B) {
 	}
 }
 
-// testBatchCompanyDiscretionaryDataAlphaNumeric verifies company discretionary data is alphanumeric
+// testBatchCompanyDiscretionaryDataAlphaNumeric validates company discretionary data is alphanumeric
 func testBatchCompanyDiscretionaryDataAlphaNumeric(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.CompanyDiscretionaryData = "®"
@@ -309,12 +322,12 @@ func testBatchCompanyDiscretionaryDataAlphaNumeric(t testing.TB) {
 	}
 }
 
-// TestBatchCompanyDiscretionaryDataAlphaNumeric tests verifying company discretionary data is alphanumeric
+// TestBatchCompanyDiscretionaryDataAlphaNumeric tests validating company discretionary data is alphanumeric
 func TestBatchCompanyDiscretionaryDataAlphaNumeric(t *testing.T) {
 	testBatchCompanyDiscretionaryDataAlphaNumeric(t)
 }
 
-// BenchmarkBatchCompanyDiscretionaryDataAlphaNumeric benchmarks verifying company discretionary data is alphanumeric
+// BenchmarkBatchCompanyDiscretionaryDataAlphaNumeric benchmarks validating company discretionary data is alphanumeric
 func BenchmarkBatchCompanyDiscretionaryDataAlphaNumeric(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -322,7 +335,7 @@ func BenchmarkBatchCompanyDiscretionaryDataAlphaNumeric(b *testing.B) {
 	}
 }
 
-// testBatchCompanyIdentificationAlphaNumeric verifies company identification is alphanumeric
+// testBatchCompanyIdentificationAlphaNumeric validates company identification is alphanumeric
 func testBatchCompanyIdentificationAlphaNumeric(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.CompanyIdentification = "®"
@@ -335,12 +348,12 @@ func testBatchCompanyIdentificationAlphaNumeric(t testing.TB) {
 	}
 }
 
-// TestBatchCompanyIdentificationAlphaNumeric tests verifying company identification is alphanumeric
+// TestBatchCompanyIdentificationAlphaNumeric tests validating company identification is alphanumeric
 func TestBatchCompanyIdentificationAlphaNumeric(t *testing.T) {
 	testBatchCompanyIdentificationAlphaNumeric(t)
 }
 
-// BenchmarkBatchCompanyIdentificationAlphaNumeric benchmarks verifying company identification is alphanumeric
+// BenchmarkBatchCompanyIdentificationAlphaNumeric benchmarks validating company identification is alphanumeric
 func BenchmarkBatchCompanyIdentificationAlphaNumeric(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -348,7 +361,7 @@ func BenchmarkBatchCompanyIdentificationAlphaNumeric(b *testing.B) {
 	}
 }
 
-// testBatchCompanyEntryDescriptionAlphaNumeric verifies company entry description is alphanumeric
+// testBatchCompanyEntryDescriptionAlphaNumeric validates company entry description is alphanumeric
 func testBatchCompanyEntryDescriptionAlphaNumeric(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.CompanyEntryDescription = "P®YROLL"
@@ -361,12 +374,12 @@ func testBatchCompanyEntryDescriptionAlphaNumeric(t testing.TB) {
 	}
 }
 
-// TestBatchCompanyEntryDescriptionAlphaNumeric tests verifying company entry description is alphanumeric
+// TestBatchCompanyEntryDescriptionAlphaNumeric tests validating company entry description is alphanumeric
 func TestBatchCompanyEntryDescriptionAlphaNumeric(t *testing.T) {
 	testBatchCompanyEntryDescriptionAlphaNumeric(t)
 }
 
-// BenchmarkBatchCompanyEntryDescriptionAlphaNumeric benchmarks verifying company entry description is alphanumeric
+// BenchmarkBatchCompanyEntryDescriptionAlphaNumeric benchmarks validating company entry description is alphanumeric
 func BenchmarkBatchCompanyEntryDescriptionAlphaNumeric(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -374,7 +387,7 @@ func BenchmarkBatchCompanyEntryDescriptionAlphaNumeric(b *testing.B) {
 	}
 }
 
-// testBHFieldInclusionRecordType verifies record type field inclusion
+// testBHFieldInclusionRecordType validates record type field inclusion
 func testBHFieldInclusionRecordType(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.recordType = ""
@@ -387,12 +400,12 @@ func testBHFieldInclusionRecordType(t testing.TB) {
 	}
 }
 
-// TestBHFieldInclusionRecordType tests verifying record type field inclusion
+// TestBHFieldInclusionRecordType tests validating record type field inclusion
 func TestBHFieldInclusionRecordType(t *testing.T) {
 	testBHFieldInclusionRecordType(t)
 }
 
-// BenchmarkBHFieldInclusionRecordType benchmarks verifying record type field inclusion
+// BenchmarkBHFieldInclusionRecordType benchmarks validating record type field inclusion
 func BenchmarkBHFieldInclusionRecordType(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -400,7 +413,7 @@ func BenchmarkBHFieldInclusionRecordType(b *testing.B) {
 	}
 }
 
-// testBHFieldInclusionCompanyName verifies company name field inclusion
+// testBHFieldInclusionCompanyName validates company name field inclusion
 func testBHFieldInclusionCompanyName(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.CompanyName = ""
@@ -413,12 +426,12 @@ func testBHFieldInclusionCompanyName(t testing.TB) {
 	}
 }
 
-// TestBHFieldInclusionCompanyName tests verifying company name field inclusion
+// TestBHFieldInclusionCompanyName tests validating company name field inclusion
 func TestBHFieldInclusionCompanyName(t *testing.T) {
 	testBHFieldInclusionCompanyName(t)
 }
 
-// BenchmarkBHFieldInclusionCompanyName benchmarks verifying company name field inclusion
+// BenchmarkBHFieldInclusionCompanyName benchmarks validating company name field inclusion
 func BenchmarkBHFieldInclusionCompanyName(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -426,7 +439,7 @@ func BenchmarkBHFieldInclusionCompanyName(b *testing.B) {
 	}
 }
 
-// testBHFieldInclusionCompanyIdentification verifies company identification field inclusion
+// testBHFieldInclusionCompanyIdentification validates company identification field inclusion
 func testBHFieldInclusionCompanyIdentification(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.CompanyIdentification = ""
@@ -439,12 +452,12 @@ func testBHFieldInclusionCompanyIdentification(t testing.TB) {
 	}
 }
 
-// TestBHFieldInclusionCompanyIdentification tests verifying company identification field inclusion
+// TestBHFieldInclusionCompanyIdentification tests validating company identification field inclusion
 func TestBHFieldInclusionCompanyIdentification(t *testing.T) {
 	testBHFieldInclusionCompanyIdentification(t)
 }
 
-// BenchmarkBHFieldInclusionCompanyIdentification benchmarks verifying company identification field inclusion
+// BenchmarkBHFieldInclusionCompanyIdentification benchmarks validating company identification field inclusion
 func BenchmarkBHFieldInclusionCompanyIdentification(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -452,7 +465,7 @@ func BenchmarkBHFieldInclusionCompanyIdentification(b *testing.B) {
 	}
 }
 
-// testBHFieldInclusionStandardEntryClassCode verifies SEC Code field inclusion
+// testBHFieldInclusionStandardEntryClassCode validates SEC Code field inclusion
 func testBHFieldInclusionStandardEntryClassCode(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.StandardEntryClassCode = ""
@@ -465,12 +478,12 @@ func testBHFieldInclusionStandardEntryClassCode(t testing.TB) {
 	}
 }
 
-// TestBHFieldInclusionStandardEntryClassCode tests verifying SEC Code field inclusion
+// TestBHFieldInclusionStandardEntryClassCode tests validating SEC Code field inclusion
 func TestBHFieldInclusionStandardEntryClassCode(t *testing.T) {
 	testBHFieldInclusionStandardEntryClassCode(t)
 }
 
-// BenchmarkBHFieldInclusionStandardEntryClassCode benchmarks verifying SEC Code field inclusion
+// BenchmarkBHFieldInclusionStandardEntryClassCode benchmarks validating SEC Code field inclusion
 func BenchmarkBHFieldInclusionStandardEntryClassCode(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -478,7 +491,7 @@ func BenchmarkBHFieldInclusionStandardEntryClassCode(b *testing.B) {
 	}
 }
 
-// testBHFieldInclusionCompanyEntryDescription verifies Company Entry Description field inclusion
+// testBHFieldInclusionCompanyEntryDescription validates Company Entry Description field inclusion
 func testBHFieldInclusionCompanyEntryDescription(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.CompanyEntryDescription = ""
@@ -491,12 +504,12 @@ func testBHFieldInclusionCompanyEntryDescription(t testing.TB) {
 	}
 }
 
-// TestBHFieldInclusionCompanyEntryDescription tests verifying Company Entry Description field inclusion
+// TestBHFieldInclusionCompanyEntryDescription tests validating Company Entry Description field inclusion
 func Test(t *testing.T) {
 	testBHFieldInclusionCompanyEntryDescription(t)
 }
 
-// BenchmarkBHFieldInclusionCompanyEntryDescription benchmarks verifying Company Entry Description field inclusion
+// BenchmarkBHFieldInclusionCompanyEntryDescription benchmarks validating Company Entry Description field inclusion
 func BenchmarkBHFieldInclusionCompanyEntryDescription(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -505,7 +518,7 @@ func BenchmarkBHFieldInclusionCompanyEntryDescription(b *testing.B) {
 }
 
 
-// testBHFieldInclusionOriginatorStatusCode verifies Originator Status Code field inclusion
+// testBHFieldInclusionOriginatorStatusCode validates Originator Status Code field inclusion
 func testBHFieldInclusionOriginatorStatusCode(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.OriginatorStatusCode = 0
@@ -518,12 +531,12 @@ func testBHFieldInclusionOriginatorStatusCode(t testing.TB) {
 	}
 }
 
-// TestBHFieldInclusionOriginatorStatusCode tests verifying Originator Status Code field inclusion
+// TestBHFieldInclusionOriginatorStatusCode tests validating Originator Status Code field inclusion
 func TestBHFieldInclusionOriginatorStatusCode(t *testing.T) {
 	testBHFieldInclusionOriginatorStatusCode(t)
 }
 
-// BenchmarkBHFieldInclusionOriginatorStatusCode benchmarks verifying Originator Status Code field inclusion
+// BenchmarkBHFieldInclusionOriginatorStatusCode benchmarks validating Originator Status Code field inclusion
 func BenchmarkBHFieldInclusionOriginatorStatusCode(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -532,7 +545,7 @@ func BenchmarkBHFieldInclusionOriginatorStatusCode(b *testing.B) {
 }
 
 
-// testBHFieldInclusionODFIIdentification verifies ODFIIdentification field inclusion
+// testBHFieldInclusionODFIIdentification validates ODFIIdentification field inclusion
 func testBHFieldInclusionODFIIdentification(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.ODFIIdentification = ""
@@ -545,12 +558,12 @@ func testBHFieldInclusionODFIIdentification(t testing.TB) {
 	}
 }
 
-// TestBHFieldInclusionODFIIdentification tests verifying ODFIIdentification field inclusion
+// TestBHFieldInclusionODFIIdentification tests validating ODFIIdentification field inclusion
 func TestBHFieldInclusionODFIIdentification(t *testing.T) {
 	testBHFieldInclusionODFIIdentification(t)
 }
 
-// BenchmarkBHFieldInclusionODFIIdentification benchmarks verifying ODFIIdentification field inclusion
+// BenchmarkBHFieldInclusionODFIIdentification benchmarks validating ODFIIdentification field inclusion
 func BenchmarkBHFieldInclusionODFIIdentification(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
