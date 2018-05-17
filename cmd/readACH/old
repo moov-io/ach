@@ -1,0 +1,32 @@
+total amount debit: 0 
+total amount credit: 500000000 
+C:\Users\Owner\AppData\Local\Temp\go-build543880490\b001\readACH.test.exe flag redefined: fPath
+--- FAIL: TestFileRead (0.00s)
+panic: C:\Users\Owner\AppData\Local\Temp\go-build543880490\b001\readACH.test.exe flag redefined: fPath [recovered]
+	panic: C:\Users\Owner\AppData\Local\Temp\go-build543880490\b001\readACH.test.exe flag redefined: fPath
+
+goroutine 20 [running]:
+testing.tRunner.func1(0xc0420ac2d0)
+	C:/Go/src/testing/testing.go:742 +0x2a4
+panic(0x532f80, 0xc042369d70)
+	C:/Go/src/runtime/panic.go:505 +0x237
+flag.(*FlagSet).Var(0xc042092000, 0x587060, 0xc042369d30, 0x56988e, 0x5, 0x56a171, 0x9)
+	C:/Go/src/flag/flag.go:810 +0x547
+flag.(*FlagSet).StringVar(0xc042092000, 0xc042369d30, 0x56988e, 0x5, 0x56bb10, 0x10, 0x56a171, 0x9)
+	C:/Go/src/flag/flag.go:713 +0x92
+flag.(*FlagSet).String(0xc042092000, 0x56988e, 0x5, 0x56bb10, 0x10, 0x56a171, 0x9, 0xc0420b0000)
+	C:/Go/src/flag/flag.go:726 +0x92
+flag.String(0x56988e, 0x5, 0x56bb10, 0x10, 0x56a171, 0x9, 0x0)
+	C:/Go/src/flag/flag.go:733 +0x70
+github.com/bkmoovio/ach/cmd/readACH.main()
+	C:/Users/Owner/go/src/github.com/bkmoovio/ach/cmd/readACH/main.go:15 +0x7c
+github.com/bkmoovio/ach/cmd/readACH.FileRead(0x588100, 0xc0420ac2d0)
+	C:/Users/Owner/go/src/github.com/bkmoovio/ach/cmd/readACH/main_test.go:20 +0x27
+github.com/bkmoovio/ach/cmd/readACH.TestFileRead(0xc0420ac2d0)
+	C:/Users/Owner/go/src/github.com/bkmoovio/ach/cmd/readACH/main_test.go:6 +0x3e
+testing.tRunner(0xc0420ac2d0, 0x575c00)
+	C:/Go/src/testing/testing.go:777 +0xd7
+created by testing.(*T).Run
+	C:/Go/src/testing/testing.go:824 +0x2e7
+exit status 2
+FAIL	github.com/bkmoovio/ach/cmd/readACH	4.474s
