@@ -19,7 +19,7 @@ func mockAddenda99() *Addenda99 {
 	return addenda99
 }
 
-func TestAddenda99Parse(t *testing.T) {
+func testAddenda99Parse(t testing.TB) {
 	addenda99 := NewAddenda99()
 	line := "799R07099912340000015      09101298Authorization revoked                       091012980000066"
 	addenda99.Parse(line)
@@ -50,7 +50,18 @@ func TestAddenda99Parse(t *testing.T) {
 	}
 }
 
-func TestAddenda99String(t *testing.T) {
+func TestAddenda99Parse(t *testing.T) {
+	testAddenda99Parse(t)
+}
+
+func BenchmarkAddenda99Parse(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda99Parse(b)
+	}
+}
+
+func testAddenda99String(t testing.TB) {
 	addenda99 := NewAddenda99()
 	line := "799R07099912340000015      09101298Authorization revoked                       091012980000066"
 	addenda99.Parse(line)
@@ -60,8 +71,19 @@ func TestAddenda99String(t *testing.T) {
 	}
 }
 
+func TestAddenda99String(t *testing.T) {
+	testAddenda99String(t)
+}
+
+func BenchmarkAddenda99String(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda99String(b)
+	}
+}
+
 // This is not an exported function but utilized for validation
-func TestAddenda99MakeReturnCodeDict(t *testing.T) {
+func testAddenda99MakeReturnCodeDict(t testing.TB) {
 	codes := makeReturnCodeDict()
 	// check if known code is present
 	_, prs := codes["R01"]
@@ -75,7 +97,18 @@ func TestAddenda99MakeReturnCodeDict(t *testing.T) {
 	}
 }
 
-func TestAddenda99ValidateTrue(t *testing.T) {
+func TestAddenda99MakeReturnCodeDict(t *testing.T) {
+	testAddenda99MakeReturnCodeDict(t)
+}
+
+func BenchmarkAddenda99MakeReturnCodeDict(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda99MakeReturnCodeDict(b)
+	}
+}
+
+func testAddenda99ValidateTrue(t testing.TB) {
 	addenda99 := mockAddenda99()
 	addenda99.ReturnCode = "R13"
 	if err := addenda99.Validate(); err != nil {
@@ -89,7 +122,18 @@ func TestAddenda99ValidateTrue(t *testing.T) {
 	}
 }
 
-func TestAddenda99ValidateReturnCodeFalse(t *testing.T) {
+func TestAddenda99ValidateTrue(t *testing.T) {
+	testAddenda99ValidateTrue(t)
+}
+
+func BenchmarkAddenda99ValidateTrue(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda99ValidateTrue(b)
+	}
+}
+
+func testAddenda99ValidateReturnCodeFalse(t testing.TB) {
 	addenda99 := mockAddenda99()
 	addenda99.ReturnCode = ""
 	if err := addenda99.Validate(); err != nil {
@@ -103,7 +147,18 @@ func TestAddenda99ValidateReturnCodeFalse(t *testing.T) {
 	}
 }
 
-func TestAddenda99OriginalTraceField(t *testing.T) {
+func TestAddenda99ValidateReturnCodeFalse(t *testing.T) {
+	testAddenda99ValidateReturnCodeFalse(t)
+}
+
+func BenchmarkAddenda99ValidateReturnCodeFalse(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda99ValidateReturnCodeFalse(b)
+	}
+}
+
+func testAddenda99OriginalTraceField(t testing.TB) {
 	addenda99 := mockAddenda99()
 	addenda99.OriginalTrace = 12345
 	if addenda99.OriginalTraceField() != "000000000012345" {
@@ -111,7 +166,18 @@ func TestAddenda99OriginalTraceField(t *testing.T) {
 	}
 }
 
-func TestAddenda99DateOfDeathField(t *testing.T) {
+func TestAddenda99OriginalTraceField(t *testing.T) {
+	testAddenda99OriginalTraceField(t)
+}
+
+func BenchmarkAddenda99OriginalTraceField(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda99OriginalTraceField(b)
+	}
+}
+
+func testAddenda99DateOfDeathField(t testing.TB) {
 	addenda99 := mockAddenda99()
 	// Check for all zeros
 	if addenda99.DateOfDeathField() != "      " {
@@ -124,7 +190,17 @@ func TestAddenda99DateOfDeathField(t *testing.T) {
 	}
 }
 
-func TestAddenda99OriginalDFIField(t *testing.T) {
+func TestAddenda99DateOfDeathField(t *testing.T) {
+	testAddenda99DateOfDeathField(t)
+}
+func BenchmarkAddenda99DateOfDeathField(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda99DateOfDeathField(b)
+	}
+}
+
+func testAddenda99OriginalDFIField(t testing.TB) {
 	addenda99 := mockAddenda99()
 	exp := "09101298"
 	if addenda99.OriginalDFIField() != exp {
@@ -132,7 +208,18 @@ func TestAddenda99OriginalDFIField(t *testing.T) {
 	}
 }
 
-func TestAddenda99AddendaInformationField(t *testing.T) {
+func TestAddenda99OriginalDFIField(t *testing.T) {
+	testAddenda99OriginalDFIField(t)
+}
+
+func BenchmarkAddenda99OriginalDFIField(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda99OriginalDFIField(b)
+	}
+}
+
+func testAddenda99AddendaInformationField(t testing.TB) {
 	addenda99 := mockAddenda99()
 	exp := "Authorization Revoked                       "
 	if addenda99.AddendaInformationField() != exp {
@@ -140,11 +227,33 @@ func TestAddenda99AddendaInformationField(t *testing.T) {
 	}
 }
 
-func TestAddenda99TraceNumberField(t *testing.T) {
+func TestAddenda99AddendaInformationField(t *testing.T) {
+	testAddenda99AddendaInformationField(t)
+}
+
+func BenchmarkAddenda99AddendaInformationField(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda99AddendaInformationField(b)
+	}
+}
+
+func testAddenda99TraceNumberField(t testing.TB) {
 	addenda99 := mockAddenda99()
 	addenda99.TraceNumber = 91012980000066
 	exp := "091012980000066"
 	if addenda99.TraceNumberField() != exp {
 		t.Errorf("expected %v received %v", exp, addenda99.TraceNumberField())
+	}
+}
+
+func TestAddenda99TraceNumberField(t *testing.T) {
+	testAddenda99TraceNumberField(t)
+}
+
+func BenchmarkAddenda99TraceNumberField(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda99TraceNumberField(b)
 	}
 }
