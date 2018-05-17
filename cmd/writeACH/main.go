@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/go-randomdata"
 	"github.com/moov-io/ach"
 	"log"
 	"os"
@@ -68,9 +67,11 @@ func main() {
 			entryEntrySeq.SetRDFI("231380104")
 			entryEntrySeq.DFIAccountNumber = "81967038518"
 			entryEntrySeq.Amount = 100000
-			entryEntrySeq.IndividualName = randomdata.FullName(randomdata.RandomGender)
+			//entryEntrySeq.IndividualName = randomdata.FullName(randomdata.RandomGender)
+			entryEntrySeq.IndividualName = "Steven Tander"
 			entryEntrySeq.SetTraceNumber(bh.ODFIIdentification, entrySeq)
-			entryEntrySeq.IdentificationNumber = "#" + randomdata.RandStringRunes(13) + "#"
+			//entryEntrySeq.IdentificationNumber = "#" + randomdata.RandStringRunes(13) + "#"
+			entryEntrySeq.IdentificationNumber = "#83738AB#"
 			entryEntrySeq.Category = ach.CategoryForward
 
 			// Add addenda record for an entry
