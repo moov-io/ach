@@ -85,9 +85,12 @@ type EntryDetail struct {
 }
 
 const (
+	// CategoryForward defines the entry as being sent to the receiving institution
 	CategoryForward = "Forward"
-	CategoryReturn  = "Return"
-	CategoryNOC     = "NOC"
+	// CategoryReturn defines the entry as being a return of a forward entry back to the originating institution
+	CategoryReturn = "Return"
+	// CategoryNOC defines the entry as being a notification of change of a forward entry to the originating institution
+	CategoryNOC = "NOC"
 )
 
 // NewEntryDetail returns a new EntryDetail with default values for non exported fields

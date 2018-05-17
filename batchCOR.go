@@ -58,10 +58,7 @@ func (batch *BatchCOR) Create() error {
 		return err
 	}
 
-	if err := batch.Validate(); err != nil {
-		return err
-	}
-	return nil
+	return batch.Validate()
 }
 
 // isAddenda98 verifies that a Addenda98 exists for each EntryDetail and is Validated

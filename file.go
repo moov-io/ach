@@ -158,11 +158,7 @@ func (f *File) Validate() error {
 		return err
 	}
 
-	if err := f.isEntryHash(); err != nil {
-		return err
-	}
-
-	return nil
+	return f.isEntryHash()
 }
 
 // isEntryAddenda is prepared by hashing the RDFI’s 8-digit Routing Number in each entry.
