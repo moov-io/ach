@@ -112,7 +112,7 @@ func BenchmarkParseBatchControl(b *testing.B) {
 	}
 }
 
-// TestBCString validates that a known parsed file can be return to a string of the same value
+// testBCString validates that a known parsed file can be return to a string of the same value
 func testBCString(t testing.TB) {
 	var line = "82250000010005320001000000010500000000000000origid                             076401250000001"
 	r := NewReader(strings.NewReader(line))
@@ -147,7 +147,7 @@ func BenchmarkBCString(b *testing.B) {
 	}
 }
 
-// TestValidateBCRecordType ensure error if recordType is not 8
+// testValidateBCRecordType ensure error if recordType is not 8
 func testValidateBCRecordType(t testing.TB) {
 	bc := mockBatchControl()
 	bc.recordType = "2"
@@ -268,7 +268,7 @@ func TestBCMessageAuthenticationCodeAlphaNumeric(t *testing.T) {
 	testBCMessageAuthenticationCodeAlphaNumeric(t)
 }
 
-// TestBCMessageAuthenticationCodeAlphaNumeric benchmarks verifying AuthenticationCode is AlphaNumeric
+// BenchmarkBCMessageAuthenticationCodeAlphaNumeric benchmarks verifying AuthenticationCode is AlphaNumeric
 func BenchmarkBCMessageAuthenticationCodeAlphaNumeric(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
