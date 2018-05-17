@@ -5,6 +5,7 @@ moov-io/ach
 [![Coverage Status](https://coveralls.io/repos/github/moov-io/ach/badge.svg?branch=master)](https://coveralls.io/github/moov-io/ach?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/moov-io/ach)](https://goreportcard.com/report/github.com/moov-io/ach)
 [![Apache 2 licensed](https://img.shields.io/badge/license-Apache2-blue.svg)](https://raw.githubusercontent.com/moov-io/ach/master/LICENSE)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmoov-io%2Fach.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmoov-io%2Fach?ref=badge_shield)
 
 
 Package 'moov-io/ach' implements a file reader and writer for parsing [ACH](https://en.wikipedia.org/wiki/Automated_Clearing_House
@@ -247,11 +248,16 @@ Which will generate a well formed ACH flat file.
 82200000020010200101000000000000000000000799123456789                          234567890000002
 9000002000001000000040020400202000000017500000000000799 
 ```
-# Mailing lists
+# Getting help 
 
-Users trade notes on the Google group moov-users (send mail to moov-users@googlegroups.com). You must join the [moov-users](https://groups.google.com/forum/#!forum/moov-users)forumn in order to post. 
+ channel | info 
+ ------- | -------
+ Google Group [moov-users](https://groups.google.com/forum/#!forum/moov-users)| The Moov users Google group is for contributors other people contributing to the Moov project. You can join them without a google account by sending an email to [moov-users+subscribe@googlegroups.com](mailto:moov-users+subscribe@googlegroups.com). After receiving the join-request message, you can simply reply to that to confirm the subscription.
+Twitter [@moov_io](https://twitter.com/moov_io)	| You can follow Moov.IO's Twitter feed to get updates on our project(s). You can also tweet us questions or just share blogs or stories.
+[GitHub Issue](https://github.com/moov-io) | If you are able to reproduce an problem please open a GitHub Issue under the specific project that caused the error. 
+[moov-io slack](http://moov-io.slack.com/) | Join our slack channel to have an interactive discussion about the development of the project. 
 
-# Contributing
+# Contributing 
 
 We use GitHub to manage reviews of pull requests.
 
@@ -394,7 +400,12 @@ github.com/moov-io/ach/cmd/readACH>main -fPath=_filename_ -cpuprofile=ReadACH.pp
 * [ACH:Builder - Tools for Building ACH](http://search.cpan.org/~tkeefer/ACH-Builder-0.03/lib/ACH/Builder.pm)
 * [mosscode / ach](https://github.com/mosscode/ach)
 * [Helper for building ACH files in Ruby](https://github.com/jm81/ach)
-* [Glenselle / nACH2](https://github.com/glenselle/nACH2)
+
+Yes please! Please review our [Contributing guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) to get started! 
+
 
 ## License
 Apache License 2.0 See [LICENSE](LICENSE) for details.
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmoov-io%2Fach.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmoov-io%2Fach?ref=badge_large)

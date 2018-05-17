@@ -319,7 +319,6 @@ func TestFileAddenda99(t *testing.T) {
 	}
 }
 
-
 // TestFileAddendaOutsideBatch validation error populates through the reader
 func TestFileAddendaOutsideBatch(t *testing.T) {
 	addenda := mockAddenda05()
@@ -468,7 +467,6 @@ func TestFileAddendaOutsideEntry(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
-
 
 func TestFileFHImmediateOrigin(t *testing.T) {
 	fh := mockFileHeader()

@@ -38,7 +38,6 @@ func mockEntryDetailInvalidTraceNumberODFI() *EntryDetail {
 	return entry
 }
 
-
 // Batch with no entries
 func mockBatchNoEntry() *batch {
 	mockBatch := &batch{}
@@ -350,7 +349,6 @@ func TestBatchFieldInclusion(t *testing.T) {
 		}
 	}
 }
-
 
 func TestBatchInvalidTraceNumberODFI(t *testing.T) {
 	mockBatch := mockBatchInvalidTraceNumberODFI()

@@ -97,10 +97,7 @@ func (batch *batch) verify() error {
 	if err := batch.isAddendaSequence(); err != nil {
 		return err
 	}
-	if err := batch.isCategory(); err != nil {
-		return err
-	}
-	return nil
+	return batch.isCategory()
 }
 
 // Build creates valid batch by building sequence numbers and batch batch control. An error is returned if
@@ -209,10 +206,7 @@ func (batch *batch) isFieldInclusion() error {
 			}
 		}
 	}
-	if err := batch.control.Validate(); err != nil {
-		return err
-	}
-	return nil
+	return batch.control.Validate()
 }
 
 // isBatchEntryCount validate Entry count is accurate
