@@ -15,7 +15,7 @@ func mockAddenda98() *Addenda98 {
 	return addenda98
 }
 
-func TestAddenda98Parse(t *testing.T) {
+func testAddenda98Parse(t testing.TB) {
 	addenda98 := NewAddenda98()
 	line := "798C01099912340000015      091012981918171614                                  091012980000088"
 	addenda98.Parse(line)
@@ -43,7 +43,18 @@ func TestAddenda98Parse(t *testing.T) {
 	}
 }
 
-func TestAddenda98String(t *testing.T) {
+func TestAddenda98Parse(t *testing.T) {
+	testAddenda98Parse(t)
+}
+
+func BenchmarkAddenda98Parse(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda98Parse(b)
+	}
+}
+
+func testAddenda98String(t testing.TB) {
 	addenda98 := NewAddenda98()
 	line := "798C01099912340000015      091012981918171614                                  091012980000088"
 	addenda98.Parse(line)
@@ -53,7 +64,18 @@ func TestAddenda98String(t *testing.T) {
 	}
 }
 
-func TestAddenda98ValidRecordType(t *testing.T) {
+func TestAddenda98String(t *testing.T) {
+	testAddenda98String(t)
+}
+
+func BenchmarkAddenda98String(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda98String(b)
+	}
+}
+
+func testAddenda98ValidRecordType(t testing.TB) {
 	addenda98 := mockAddenda98()
 	addenda98.recordType = "63"
 	if err := addenda98.Validate(); err != nil {
@@ -66,8 +88,18 @@ func TestAddenda98ValidRecordType(t *testing.T) {
 		}
 	}
 }
+func TestAddenda98ValidRecordType(t *testing.T) {
+	testAddenda98ValidRecordType(t)
+}
 
-func TestAddenda98ValidTypeCode(t *testing.T) {
+func BenchmarkAddenda98ValidRecordType(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda98ValidRecordType(b)
+	}
+}
+
+func testAddenda98ValidTypeCode(t testing.TB) {
 	addenda98 := mockAddenda98()
 	addenda98.typeCode = "05"
 	if err := addenda98.Validate(); err != nil {
@@ -81,7 +113,18 @@ func TestAddenda98ValidTypeCode(t *testing.T) {
 	}
 }
 
-func TestAddenda98ValidCorrectedData(t *testing.T) {
+func TestAddenda98ValidTypeCode(t *testing.T) {
+	testAddenda98ValidTypeCode(t)
+}
+
+func BenchmarkAddenda98ValidTypeCode(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda98ValidTypeCode(b)
+	}
+}
+
+func testAddenda98ValidCorrectedData(t testing.TB) {
 	addenda98 := mockAddenda98()
 	addenda98.CorrectedData = ""
 	if err := addenda98.Validate(); err != nil {
@@ -95,7 +138,18 @@ func TestAddenda98ValidCorrectedData(t *testing.T) {
 	}
 }
 
-func TestAddenda98ValidateTrue(t *testing.T) {
+func TestAddenda98ValidCorrectedData(t *testing.T) {
+	testAddenda98ValidCorrectedData(t)
+}
+
+func BenchmarkAddenda98ValidCorrectedData(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda98ValidCorrectedData(b)
+	}
+}
+
+func testAddenda98ValidateTrue(t testing.TB) {
 	addenda98 := mockAddenda98()
 	addenda98.ChangeCode = "C11"
 	if err := addenda98.Validate(); err != nil {
@@ -108,7 +162,19 @@ func TestAddenda98ValidateTrue(t *testing.T) {
 		}
 	}
 }
-func TestAddenda98ValidateChangeCodeFalse(t *testing.T) {
+
+func TestAddenda98ValidateTrue(t *testing.T) {
+	testAddenda98ValidateTrue(t)
+}
+
+func BenchmarkAddenda98ValidateTrue(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda98ValidateTrue(b)
+	}
+}
+
+func testAddenda98ValidateChangeCodeFalse(t testing.TB) {
 	addenda98 := mockAddenda98()
 	addenda98.ChangeCode = "C63"
 	if err := addenda98.Validate(); err != nil {
@@ -122,7 +188,18 @@ func TestAddenda98ValidateChangeCodeFalse(t *testing.T) {
 	}
 }
 
-func TestAddenda98OriginalTraceField(t *testing.T) {
+func TestAddenda98ValidateChangeCodeFalse(t *testing.T) {
+	testAddenda98ValidateChangeCodeFalse(t)
+}
+
+func BenchmarkAddenda98ValidateChangeCodeFalse(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda98ValidateChangeCodeFalse(b)
+	}
+}
+
+func testAddenda98OriginalTraceField(t testing.TB) {
 	addenda98 := mockAddenda98()
 	exp := "000000000012345"
 	if addenda98.OriginalTraceField() != exp {
@@ -130,7 +207,18 @@ func TestAddenda98OriginalTraceField(t *testing.T) {
 	}
 }
 
-func TestAddenda98OriginalDFIField(t *testing.T) {
+func TestAddenda98OriginalTraceField(t *testing.T) {
+	testAddenda98OriginalTraceField(t)
+}
+
+func BenchmarkAddenda98OriginalTraceField(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda98OriginalTraceField(b)
+	}
+}
+
+func testAddenda98OriginalDFIField(t testing.TB) {
 	addenda98 := mockAddenda98()
 	exp := "09101298"
 	if addenda98.OriginalDFIField() != exp {
@@ -138,7 +226,18 @@ func TestAddenda98OriginalDFIField(t *testing.T) {
 	}
 }
 
-func TestAddenda98CorrectedDataField(t *testing.T) {
+func TestAddenda98OriginalDFIField(t *testing.T) {
+	testAddenda98OriginalDFIField(t)
+}
+
+func BenchmarkAddenda98OriginalDFIField(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda98OriginalDFIField(b)
+	}
+}
+
+func testAddenda98CorrectedDataField(t testing.TB) {
 	addenda98 := mockAddenda98()
 	exp := "1918171614                   " // 29 char
 	if addenda98.CorrectedDataField() != exp {
@@ -146,10 +245,32 @@ func TestAddenda98CorrectedDataField(t *testing.T) {
 	}
 }
 
-func TestAddenda98TraceNumberField(t *testing.T) {
+func TestAddenda98CorrectedDataField(t *testing.T) {
+	testAddenda98CorrectedDataField(t)
+}
+
+func BenchmarkAddenda98CorrectedDataField(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda98CorrectedDataField(b)
+	}
+}
+
+func testAddenda98TraceNumberField(t testing.TB) {
 	addenda98 := mockAddenda98()
 	exp := "091012980000088"
 	if addenda98.TraceNumberField() != exp {
 		t.Errorf("expected %v received %v", exp, addenda98.TraceNumberField())
+	}
+}
+
+func TestAddenda98TraceNumberField(t *testing.T) {
+	testAddenda98TraceNumberField(t)
+}
+
+func BenchmarkAddenda98TraceNumberField(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda98TraceNumberField(b)
 	}
 }
