@@ -59,8 +59,7 @@ func mockBatchInvalidSECHeader() *BatchHeader {
 }
 
 // Test cases that apply to all batch types
-
-func TestBatchNumberMismatch(t *testing.T) {
+func testBatchNumberMismatch(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.GetControl().BatchNumber = 2
 	if err := mockBatch.verify(); err != nil {
@@ -74,7 +73,17 @@ func TestBatchNumberMismatch(t *testing.T) {
 	}
 }
 
-func TestCreditBatchisBatchAmount(t *testing.T) {
+func TestBatchNumberMismatch(t *testing.T) {
+	testBatchNumberMismatch(t)
+}
+func BenchmarkBatchNumberMismatch(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchNumberMismatch(b)
+	}
+}
+
+func testCreditBatchisBatchAmount(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.SetHeader(mockBatchHeader())
 	e1 := mockBatch.GetEntries()[0]
@@ -101,7 +110,18 @@ func TestCreditBatchisBatchAmount(t *testing.T) {
 	}
 }
 
-func TestSavingsBatchisBatchAmount(t *testing.T) {
+func TestCreditBatchisBatchAmount(t *testing.T) {
+	testCreditBatchisBatchAmount(t)
+}
+
+func BenchmarkCreditBatchisBatchAmount(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testCreditBatchisBatchAmount(b)
+	}
+
+}
+func testSavingsBatchisBatchAmount(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.SetHeader(mockBatchHeader())
 	e1 := mockBatch.GetEntries()[0]
@@ -129,7 +149,18 @@ func TestSavingsBatchisBatchAmount(t *testing.T) {
 	}
 }
 
-func TestBatchisEntryHash(t *testing.T) {
+func TestSavingsBatchisBatchAmount(t *testing.T) {
+	testSavingsBatchisBatchAmount(t)
+}
+
+func BenchmarkSavingsBatchisBatchAmount(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testSavingsBatchisBatchAmount(b)
+	}
+}
+
+func testBatchisEntryHash(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.GetControl().EntryHash = 1
 	if err := mockBatch.verify(); err != nil {
@@ -143,7 +174,18 @@ func TestBatchisEntryHash(t *testing.T) {
 	}
 }
 
-func TestBatchDNEMismatch(t *testing.T) {
+func TestBatchisEntryHash(t *testing.T) {
+	testBatchisEntryHash(t)
+}
+
+func BenchmarkBatchisEntryHash(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchisEntryHash(b)
+	}
+}
+
+func testBatchDNEMismatch(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.SetHeader(mockBatchHeader())
 	ed := mockBatch.GetEntries()[0]
@@ -164,7 +206,18 @@ func TestBatchDNEMismatch(t *testing.T) {
 	}
 }
 
-func TestBatchTraceNumberNotODFI(t *testing.T) {
+func TestBatchDNEMismatch(t *testing.T) {
+	testBatchDNEMismatch(t)
+}
+
+func BenchmarkBatchDNEMismatch(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchDNEMismatch(b)
+	}
+}
+
+func testBatchTraceNumberNotODFI(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.GetEntries()[0].SetTraceNumber("12345678", 1)
 	if err := mockBatch.verify(); err != nil {
@@ -178,7 +231,18 @@ func TestBatchTraceNumberNotODFI(t *testing.T) {
 	}
 }
 
-func TestBatchEntryCountEquality(t *testing.T) {
+func TestBatchTraceNumberNotODFI(t *testing.T) {
+	testBatchTraceNumberNotODFI(t)
+}
+
+func BenchmarkBatchTraceNumberNotODFI(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchTraceNumberNotODFI(b)
+	}
+}
+
+func testBatchEntryCountEquality(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.SetHeader(mockBatchHeader())
 	e := mockEntryDetail()
@@ -201,7 +265,18 @@ func TestBatchEntryCountEquality(t *testing.T) {
 	}
 }
 
-func TestBatchAddendaIndicator(t *testing.T) {
+func TestBatchEntryCountEquality(t *testing.T) {
+	testBatchEntryCountEquality(t)
+}
+
+func BenchmarkBatchEntryCountEquality(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchEntryCountEquality(b)
+	}
+}
+
+func testBatchAddendaIndicator(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 0
@@ -217,7 +292,18 @@ func TestBatchAddendaIndicator(t *testing.T) {
 	}
 }
 
-func TestBatchIsAddendaSeqAscending(t *testing.T) {
+func TestBatchAddendaIndicator(t *testing.T) {
+	testBatchAddendaIndicator(t)
+}
+
+func BenchmarkBatchAddendaIndicator(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchAddendaIndicator(b)
+	}
+}
+
+func testBatchIsAddendaSeqAscending(t testing.TB) {
 	mockBatch := mockBatch()
 	ed := mockBatch.GetEntries()[0]
 	ed.AddAddenda(mockAddenda05())
@@ -235,10 +321,19 @@ func TestBatchIsAddendaSeqAscending(t *testing.T) {
 			t.Errorf("%T: %s", err, err)
 		}
 	}
-
 }
 
-func TestBatchIsSequenceAscending(t *testing.T) {
+func TestBatchIsAddendaSeqAscending(t *testing.T) {
+	testBatchIsAddendaSeqAscending(t)
+}
+func BenchmarkBatchIsAddendaSeqAscending(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchIsAddendaSeqAscending(b)
+	}
+}
+
+func testBatchIsSequenceAscending(t testing.TB) {
 	mockBatch := mockBatch()
 	e3 := mockEntryDetail()
 	e3.TraceNumber = 1
@@ -255,7 +350,18 @@ func TestBatchIsSequenceAscending(t *testing.T) {
 	}
 }
 
-func TestBatchAddendaTraceNumber(t *testing.T) {
+func TestBatchIsSequenceAscending(t *testing.T) {
+	testBatchIsSequenceAscending(t)
+}
+
+func BenchmarkBatchIsSequenceAscending(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchIsSequenceAscending(b)
+	}
+}
+
+func testBatchAddendaTraceNumber(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
 	if err := mockBatch.build(); err != nil {
@@ -274,7 +380,17 @@ func TestBatchAddendaTraceNumber(t *testing.T) {
 	}
 }
 
-func TestNewBatchDefault(t *testing.T) {
+func TestBatchAddendaTraceNumber(t *testing.T) {
+	testBatchAddendaTraceNumber(t)
+}
+
+func BenchmarkBatchAddendaTraceNumber(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchAddendaTraceNumber(b)
+	}
+}
+func testNewBatchDefault(t testing.TB) {
 	_, err := NewBatch(mockBatchInvalidSECHeader())
 
 	if e, ok := err.(*FileError); ok {
@@ -286,7 +402,18 @@ func TestNewBatchDefault(t *testing.T) {
 	}
 }
 
-func TestBatchCategory(t *testing.T) {
+func TestNewBatchDefault(t *testing.T) {
+	testNewBatchDefault(t)
+}
+
+func BenchmarkNewBatchDefault(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testNewBatchDefault(b)
+	}
+}
+
+func testBatchCategory(t testing.TB) {
 	mockBatch := mockBatch()
 	// Add a Addenda Return to the mock batch
 	entry := mockEntryDetail()
@@ -302,7 +429,18 @@ func TestBatchCategory(t *testing.T) {
 	}
 }
 
-func TestBatchCategoryForwardReturn(t *testing.T) {
+func TestBatchCategory(t *testing.T) {
+	testBatchCategory(t)
+}
+
+func BenchmarkBatchCategory(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchCategory(b)
+	}
+}
+
+func testBatchCategoryForwardReturn(t testing.TB) {
 	mockBatch := mockBatch()
 	// Add a Addenda Return to the mock batch
 	entry := mockEntryDetail()
@@ -323,8 +461,18 @@ func TestBatchCategoryForwardReturn(t *testing.T) {
 	}
 }
 
+func TestBatchCategoryForwardReturn(t *testing.T) {
+	testBatchCategoryForwardReturn(t)
+}
+func BenchmarkBatchCategoryForwardReturn(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchCategoryForwardReturn(b)
+	}
+}
+
 // Don't over write a batch trace number when building if it already exists
-func TestBatchTraceNumberExists(t *testing.T) {
+func testBatchTraceNumberExists(t testing.TB) {
 	mockBatch := mockBatch()
 	entry := mockEntryDetail()
 	traceBefore := entry.TraceNumberField()
@@ -336,7 +484,18 @@ func TestBatchTraceNumberExists(t *testing.T) {
 	}
 }
 
-func TestBatchFieldInclusion(t *testing.T) {
+func TestBatchTraceNumberExists(t *testing.T) {
+	testBatchTraceNumberExists(t)
+}
+
+func BenchmarkBatchTraceNumberExists(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchTraceNumberExists(b)
+	}
+}
+
+func testBatchFieldInclusion(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.header.ODFIIdentification = ""
 	if err := mockBatch.verify(); err != nil {
@@ -350,14 +509,36 @@ func TestBatchFieldInclusion(t *testing.T) {
 	}
 }
 
-func TestBatchInvalidTraceNumberODFI(t *testing.T) {
+func TestBatchFieldInclusion(t *testing.T) {
+	testBatchFieldInclusion(t)
+}
+
+func BenchmarkBatchFieldInclusion(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchFieldInclusion(b)
+	}
+}
+
+func testBatchInvalidTraceNumberODFI(t testing.TB) {
 	mockBatch := mockBatchInvalidTraceNumberODFI()
 	if err := mockBatch.build(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 }
 
-func TestBatchNoEntry(t *testing.T) {
+func TestBatchInvalidTraceNumberODFI(t *testing.T) {
+	testBatchInvalidTraceNumberODFI(t)
+}
+
+func BenchmarkBatchInvalidTraceNumberODFI(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchInvalidTraceNumberODFI(b)
+	}
+}
+
+func testBatchNoEntry(t testing.TB) {
 	mockBatch := mockBatchNoEntry()
 	if err := mockBatch.build(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -370,7 +551,18 @@ func TestBatchNoEntry(t *testing.T) {
 	}
 }
 
-func TestBatchControl(t *testing.T) {
+func TestBatchNoEntry(t *testing.T) {
+	testBatchNoEntry(t)
+}
+
+func BenchmarkBatchNoEntry(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchNoEntry(b)
+	}
+}
+
+func testBatchControl(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.control.ODFIIdentification = ""
 	if err := mockBatch.verify(); err != nil {
@@ -381,5 +573,16 @@ func TestBatchControl(t *testing.T) {
 		} else {
 			t.Errorf("%T: %s", err, err)
 		}
+	}
+}
+
+func TestBatchControl(t *testing.T) {
+	testBatchControl(t)
+}
+
+func BenchmarkBatchControl(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchControl(b)
 	}
 }
