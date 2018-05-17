@@ -3,18 +3,18 @@ package main
 import "testing"
 
 func TestFileRead(t *testing.T) {
-	FileRead(t)
+	testFileRead(t)
 }
 
 //BenchmarkTestFileCreate benchmarks creating an ACH File
 func BenchmarkTestFileRead(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		FileRead(b)
+		testFileRead(b)
 	}
 }
 
 // FileCreate creates an ACH File
-func FileRead(t testing.TB) {
+func testFileRead(t testing.TB) {
 	main()
 }

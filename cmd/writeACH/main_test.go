@@ -6,18 +6,18 @@ import (
 
 // TestFileCreate tests creating an ACH File
 func TestFileWrite(t *testing.T) {
-	FileWrite(t)
+	testFileWrite(t)
 }
 
 //BenchmarkTestFileCreate benchmarks creating an ACH File
 func BenchmarkTestFileWrite(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		FileWrite(b)
+		testFileWrite(b)
 	}
 }
 
 // FileCreate creates an ACH File
-func FileWrite(t testing.TB) {
+func testFileWrite(t testing.TB) {
 	main()
 }
