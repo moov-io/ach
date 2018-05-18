@@ -27,7 +27,7 @@ func TestMockAddenda05(t *testing.T) {
 	}
 }
 
-func TestParseAddenda05(t *testing.T) {
+func testParseAddenda05(t testing.TB) {
 	addendaPPD := NewAddenda05()
 	var line = "705PPD                                        DIEGO MAY                            00010000001"
 	addendaPPD.Parse(line)
@@ -65,14 +65,36 @@ func TestParseAddenda05(t *testing.T) {
 	}
 }
 
+func TestParseAddenda05(t *testing.T) {
+	testParseAddenda05(t)
+}
+
+func BenchmarkParseAddenda05(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testParseAddenda05(b)
+	}
+}
+
 // TestAddenda05 String validates that a known parsed file can be return to a string of the same value
-func TestAddenda05String(t *testing.T) {
+func testAddenda05String(t testing.TB) {
 	addenda05 := NewAddenda05()
 	var line = "705WEB                                        DIEGO MAY                            00010000001"
 	addenda05.Parse(line)
 
 	if addenda05.String() != line {
 		t.Errorf("Strings do not match")
+	}
+}
+
+func TestAddenda05String(t *testing.T) {
+	testAddenda05String(t)
+}
+
+func BenchmarkAddenda05String(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda05String(b)
 	}
 }
 
