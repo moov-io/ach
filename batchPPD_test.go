@@ -152,7 +152,6 @@ func BenchmarkBatchPPDCreate(b *testing.B) {
 	}
 }
 
-
 // testBatchPPDTypeCode validates batch PPD type code
 func testBatchPPDTypeCode(t testing.TB) {
 	mockBatch := mockBatchPPD()

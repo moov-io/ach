@@ -169,7 +169,7 @@ func TestBatchCCDSEC(t *testing.T) {
 	testBatchCCDSEC(t)
 }
 
-// BenchmarkBatchCCDSEC benchmarks validating that the standard entry class code is CCD for batchCCD
+// BenchmarkBatchCCDSEC benchmarks validating that the standard entry class code is CCD for batch CCD
 func BenchmarkBatchCCDSEC(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
