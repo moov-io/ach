@@ -204,7 +204,6 @@ func BenchmarkInvalidServiceCode(b *testing.B) {
 	}
 }
 
-
 // testValidateInvalidSECCode validates error if service class is not valid
 func testInvalidSECCode(t testing.TB) {
 	bh := mockBatchHeader()
@@ -517,7 +516,6 @@ func BenchmarkBHFieldInclusionCompanyEntryDescription(b *testing.B) {
 	}
 }
 
-
 // testBHFieldInclusionOriginatorStatusCode validates Originator Status Code field inclusion
 func testBHFieldInclusionOriginatorStatusCode(t testing.TB) {
 	bh := mockBatchHeader()
@@ -543,7 +541,6 @@ func BenchmarkBHFieldInclusionOriginatorStatusCode(b *testing.B) {
 		testBHFieldInclusionOriginatorStatusCode(b)
 	}
 }
-
 
 // testBHFieldInclusionODFIIdentification validates ODFIIdentification field inclusion
 func testBHFieldInclusionODFIIdentification(t testing.TB) {
