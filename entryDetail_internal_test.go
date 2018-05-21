@@ -9,6 +9,7 @@ import (
 	"testing"
 )
 
+// mockEntryDetail creates an entry detail
 func mockEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 22
@@ -22,7 +23,8 @@ func mockEntryDetail() *EntryDetail {
 	return entry
 }
 
-func TestMockEntryDetail(t *testing.T) {
+// testMockEntryDetail validates an entry detail record
+func testMockEntryDetail(t testing.TB) {
 	entry := mockEntryDetail()
 	if err := entry.Validate(); err != nil {
 		t.Error("mockEntryDetail does not validate and will break other tests")
@@ -44,8 +46,21 @@ func TestMockEntryDetail(t *testing.T) {
 	}
 }
 
-// TestParseEntryDetail Header parses a known Entry Detail Record string.
-func TestParseEntryDetail(t *testing.T) {
+// TestMockEntryDetail tests validating an entry detail record
+func TestMockEntryDetail(t *testing.T) {
+	testMockEntryDetail(t)
+}
+
+// BenchmarkMockEntryDetail benchmarks validating an entry detail record
+func BenchmarkMockEntryDetail(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testMockEntryDetail(b)
+	}
+}
+
+// testParseEntryDetail parses a known entry detail record string.
+func testParseEntryDetail(t testing.TB) {
 	var line = "62705320001912345            0000010500c-1            Arnold Wade           DD0076401255655291"
 	r := NewReader(strings.NewReader(line))
 	r.addCurrentBatch(NewBatchPPD(mockBatchPPDHeader()))
@@ -92,8 +107,22 @@ func TestParseEntryDetail(t *testing.T) {
 	}
 }
 
-// TestEDString validats that a known parsed file can be return to a string of the same value
-func TestEDString(t *testing.T) {
+// TestParseEntryDetail tests parsing a known entry detail record string.
+func TestParseEntryDetail(t *testing.T) {
+	testParseEntryDetail(t)
+}
+
+// BenchmarkParseEntryDetail benchmarks parsing a known entry detail record string.
+func BenchmarkParseEntryDetail(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testParseEntryDetail(b)
+	}
+}
+
+// testEDString validates that a known parsed entry
+// detail can be returned to a string of the same value
+func testEDString(t testing.TB) {
 	var line = "62705320001912345            0000010500c-1            Arnold Wade           DD0076401255655291"
 	r := NewReader(strings.NewReader(line))
 	r.addCurrentBatch(NewBatchPPD(mockBatchPPDHeader()))
@@ -109,8 +138,23 @@ func TestEDString(t *testing.T) {
 	}
 }
 
-// TestValidateEDRecordType ensure error if recordType is not 6
-func TestValidateEDRecordType(t *testing.T) {
+// TestEDString tests validating that a known parsed entry
+// detail can be returned to a string of the same value
+func TestEDString(t *testing.T) {
+	testEDString(t)
+}
+
+// BenchmarkEDString benchmarks validating that a known parsed entry
+// detail can be returned to a string of the same value
+func BenchmarkEDString(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testEDString(b)
+	}
+}
+
+// testValidateEDRecordType validates error if recordType is not 6
+func testValidateEDRecordType(t testing.TB) {
 	ed := mockEntryDetail()
 	ed.recordType = "2"
 	if err := ed.Validate(); err != nil {
@@ -122,8 +166,21 @@ func TestValidateEDRecordType(t *testing.T) {
 	}
 }
 
-// TestValidateEDTransactionCode ensure error if TransactionCode is not valid
-func TestValidateEDTransactionCode(t *testing.T) {
+// TestValidateEDRecordType tests validating error if recordType is not 6
+func TestValidateEDRecordType(t *testing.T) {
+	testValidateEDRecordType(t)
+}
+
+// BenchmarkValidateEDRecordType benchmarks validating error if recordType is not 6
+func BenchmarkValidateEDRecordType(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testValidateEDRecordType(b)
+	}
+}
+
+// testValidateEDTransactionCode validates error if transaction code is not valid
+func testValidateEDTransactionCode(t testing.TB) {
 	ed := mockEntryDetail()
 	ed.TransactionCode = 63
 	if err := ed.Validate(); err != nil {
@@ -135,7 +192,21 @@ func TestValidateEDTransactionCode(t *testing.T) {
 	}
 }
 
-func TestEDFieldInclusion(t *testing.T) {
+// TestValidateEDTransactionCode tests validating error if transaction code is not valid
+func TestValidateEDTransactionCode(t *testing.T) {
+	testValidateEDTransactionCode(t)
+}
+
+// BenchmarkValidateEDTransactionCode benchmarks validating error if transaction code is not valid
+func BenchmarkValidateEDTransactionCode(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testValidateEDTransactionCode(b)
+	}
+}
+
+// testEDFieldInclusion validates entry detail field inclusion
+func testEDFieldInclusion(t testing.TB) {
 	ed := mockEntryDetail()
 	ed.Amount = 0
 	if err := ed.Validate(); err != nil {
@@ -147,7 +218,21 @@ func TestEDFieldInclusion(t *testing.T) {
 	}
 }
 
-func TestEDdfiAccountNumberAlphaNumeric(t *testing.T) {
+// TestEDFieldInclusion tests validating entry detail field inclusion
+func TestEDFieldInclusion(t *testing.T) {
+	testEDFieldInclusion(t)
+}
+
+// BenchmarkEDFieldInclusion benchmarks validating entry detail field inclusion
+func BenchmarkEDFieldInclusion(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testEDFieldInclusion(b)
+	}
+}
+
+// testEDdfiAccountNumberAlphaNumeric validates DFI account number is alpha numeric
+func testEDdfiAccountNumberAlphaNumeric(t testing.TB) {
 	ed := mockEntryDetail()
 	ed.DFIAccountNumber = "®"
 	if err := ed.Validate(); err != nil {
@@ -159,7 +244,21 @@ func TestEDdfiAccountNumberAlphaNumeric(t *testing.T) {
 	}
 }
 
-func TestEDIdentificationNumberAlphaNumeric(t *testing.T) {
+// TestEDdfiAccountNumberAlphaNumeric tests validating DFI account number is alpha numeric
+func TestEDdfiAccountNumberAlphaNumeric(t *testing.T) {
+	testEDdfiAccountNumberAlphaNumeric(t)
+}
+
+// BenchmarkEDdfiAccountNumberAlphaNumeric benchmarks validating DFI account number is alpha numeric
+func BenchmarkEDdfiAccountNumberAlphaNumeric(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testEDdfiAccountNumberAlphaNumeric(b)
+	}
+}
+
+// testEDIdentificationNumberAlphaNumeric validates identification number is alpha numeric
+func testEDIdentificationNumberAlphaNumeric(t testing.TB) {
 	ed := mockEntryDetail()
 	ed.IdentificationNumber = "®"
 	if err := ed.Validate(); err != nil {
@@ -171,7 +270,21 @@ func TestEDIdentificationNumberAlphaNumeric(t *testing.T) {
 	}
 }
 
-func TestEDIndividualNameAlphaNumeric(t *testing.T) {
+// TestEDIdentificationNumberAlphaNumeric tests validating identification number is alpha numeric
+func TestEDIdentificationNumberAlphaNumeric(t *testing.T) {
+	testEDIdentificationNumberAlphaNumeric(t)
+}
+
+// BenchmarkEDIdentificationNumberAlphaNumeric benchmarks validating identification number is alpha numeric
+func BenchmarkEDIdentificationNumberAlphaNumeric(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testEDIdentificationNumberAlphaNumeric(b)
+	}
+}
+
+// testEDIndividualNameAlphaNumeric validates individual name is alpha numeric
+func testEDIndividualNameAlphaNumeric(t testing.TB) {
 	ed := mockEntryDetail()
 	ed.IndividualName = "W®DE"
 	if err := ed.Validate(); err != nil {
@@ -183,7 +296,21 @@ func TestEDIndividualNameAlphaNumeric(t *testing.T) {
 	}
 }
 
-func TestEDDiscretionaryDataAlphaNumeric(t *testing.T) {
+// TestEDIndividualNameAlphaNumeric tests validating individual name is alpha numeric
+func TestEDIndividualNameAlphaNumeric(t *testing.T) {
+	testEDIndividualNameAlphaNumeric(t)
+}
+
+// BenchmarkEDIndividualNameAlphaNumeric benchmarks validating individual name is alpha numeric
+func BenchmarkEDIndividualNameAlphaNumeric(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testEDIndividualNameAlphaNumeric(b)
+	}
+}
+
+// testEDDiscretionaryDataAlphaNumeric validates discretionary data is alpha numeric
+func testEDDiscretionaryDataAlphaNumeric(t testing.TB) {
 	ed := mockEntryDetail()
 	ed.DiscretionaryData = "®!"
 	if err := ed.Validate(); err != nil {
@@ -195,7 +322,21 @@ func TestEDDiscretionaryDataAlphaNumeric(t *testing.T) {
 	}
 }
 
-func TestEDisCheckDigit(t *testing.T) {
+// TestEDDiscretionaryDataAlphaNumeric tests validating discretionary data is alpha numeric
+func TestEDDiscretionaryDataAlphaNumeric(t *testing.T) {
+	testEDDiscretionaryDataAlphaNumeric(t)
+}
+
+// BenchmarkEDDiscretionaryDataAlphaNumeric benchmarks validating discretionary data is alpha numeric
+func BenchmarkEDDiscretionaryDataAlphaNumeric(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testEDDiscretionaryDataAlphaNumeric(b)
+	}
+}
+
+// testEDisCheckDigit validates check digit
+func testEDisCheckDigit(t testing.TB) {
 	ed := mockEntryDetail()
 	ed.CheckDigit = "1"
 	if err := ed.Validate(); err != nil {
@@ -207,7 +348,21 @@ func TestEDisCheckDigit(t *testing.T) {
 	}
 }
 
-func TestEDSetRDFI(t *testing.T) {
+// TestEDisCheckDigit tests validating check digit
+func TestEDisCheckDigit(t *testing.T) {
+	testEDisCheckDigit(t)
+}
+
+// BenchmarkEDSetRDFI benchmarks validating check digit
+func BenchmarkEDisCheckDigit(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testEDisCheckDigit(b)
+	}
+}
+
+// testEDSetRDFI validates setting RDFI
+func testEDSetRDFI(t testing.TB) {
 	ed := NewEntryDetail()
 	ed.SetRDFI("810866774")
 	if ed.RDFIIdentification != "81086677" {
@@ -218,7 +373,21 @@ func TestEDSetRDFI(t *testing.T) {
 	}
 }
 
-func TestEDFieldInclusionRecordType(t *testing.T) {
+// TestEDSetRDFI tests validating setting RDFI
+func TestEDSetRDFI(t *testing.T) {
+	testEDSetRDFI(t)
+}
+
+// Benchmark benchmarks validating setting RDFI
+func BenchmarkEDSetRDFI(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testEDSetRDFI(b)
+	}
+}
+
+// testEDFieldInclusionRecordType validates record type field inclusion
+func testEDFieldInclusionRecordType(t testing.TB) {
 	entry := mockEntryDetail()
 	entry.recordType = ""
 	if err := entry.Validate(); err != nil {
@@ -230,7 +399,21 @@ func TestEDFieldInclusionRecordType(t *testing.T) {
 	}
 }
 
-func TestEDFieldInclusionTransactionCode(t *testing.T) {
+// TestEDFieldInclusionRecordType tests validating record type field inclusion
+func TestEDFieldInclusionRecordType(t *testing.T) {
+	testEDFieldInclusionRecordType(t)
+}
+
+// BenchmarkEDFieldInclusionRecordType benchmarks validating record type field inclusion
+func BenchmarkEDFieldInclusionRecordType(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testEDFieldInclusionRecordType(b)
+	}
+}
+
+// testEDFieldInclusionTransactionCode validates transaction code field inclusion
+func testEDFieldInclusionTransactionCode(t testing.TB) {
 	entry := mockEntryDetail()
 	entry.TransactionCode = 0
 	if err := entry.Validate(); err != nil {
@@ -242,7 +425,21 @@ func TestEDFieldInclusionTransactionCode(t *testing.T) {
 	}
 }
 
-func TestEDFieldInclusionRDFIIdentification(t *testing.T) {
+// TestEDFieldInclusionTransactionCode tests validating transaction code field inclusion
+func TestEDFieldInclusionTransactionCode(t *testing.T) {
+	testEDFieldInclusionTransactionCode(t)
+}
+
+// BenchmarkEDFieldInclusionTransactionCode benchmarks validating transaction code field inclusion
+func BenchmarkEDFieldInclusionTransactionCode(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testEDFieldInclusionTransactionCode(b)
+	}
+}
+
+// testEDFieldInclusionRDFIIdentification validates RDFI identification field inclusion
+func testEDFieldInclusionRDFIIdentification(t testing.TB) {
 	entry := mockEntryDetail()
 	entry.RDFIIdentification = ""
 	if err := entry.Validate(); err != nil {
@@ -254,7 +451,21 @@ func TestEDFieldInclusionRDFIIdentification(t *testing.T) {
 	}
 }
 
-func TestEDFieldInclusionDFIAccountNumber(t *testing.T) {
+// TestEDFieldInclusionRDFIIdentification tests validating RDFI identification field inclusion
+func TestEDFieldInclusionRDFIIdentification(t *testing.T) {
+	testEDFieldInclusionRDFIIdentification(t)
+}
+
+// BenchmarkEDFieldInclusionRDFIIdentification benchmarks validating RDFI identification field inclusion
+func BenchmarkEDFieldInclusionRDFIIdentification(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testEDFieldInclusionRDFIIdentification(b)
+	}
+}
+
+// testEDFieldInclusionDFIAccountNumber validates DFI account number field inclusion
+func testEDFieldInclusionDFIAccountNumber(t testing.TB) {
 	entry := mockEntryDetail()
 	entry.DFIAccountNumber = ""
 	if err := entry.Validate(); err != nil {
@@ -266,7 +477,21 @@ func TestEDFieldInclusionDFIAccountNumber(t *testing.T) {
 	}
 }
 
-func TestEDFieldInclusionIndividualName(t *testing.T) {
+// TestEDFieldInclusionDFIAccountNumber tests validating DFI account number field inclusion
+func TestEDFieldInclusionDFIAccountNumber(t *testing.T) {
+	testEDFieldInclusionDFIAccountNumber(t)
+}
+
+// BenchmarkEDFieldInclusionDFIAccountNumber benchmarks validating DFI account number field inclusion
+func BenchmarkEDFieldInclusionDFIAccountNumber(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testEDFieldInclusionDFIAccountNumber(b)
+	}
+}
+
+// testEDFieldInclusionIndividualName validates individual name field inclusion
+func testEDFieldInclusionIndividualName(t testing.TB) {
 	entry := mockEntryDetail()
 	entry.IndividualName = ""
 	if err := entry.Validate(); err != nil {
@@ -278,7 +503,21 @@ func TestEDFieldInclusionIndividualName(t *testing.T) {
 	}
 }
 
-func TestEDFieldInclusionTraceNumber(t *testing.T) {
+// TestEDFieldInclusionIndividualName tests validating individual name field inclusion
+func TestEDFieldInclusionIndividualName(t *testing.T) {
+	testEDFieldInclusionIndividualName(t)
+}
+
+// BenchmarkEDFieldInclusionIndividualName benchmarks validating individual name field inclusion
+func BenchmarkEDFieldInclusionIndividualName(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testEDFieldInclusionIndividualName(b)
+	}
+}
+
+// testEDFieldInclusionTraceNumber validates trace number field inclusion
+func testEDFieldInclusionTraceNumber(t testing.TB) {
 	entry := mockEntryDetail()
 	entry.TraceNumber = 0
 	if err := entry.Validate(); err != nil {
@@ -290,7 +529,21 @@ func TestEDFieldInclusionTraceNumber(t *testing.T) {
 	}
 }
 
-func TestEDAddAddendaAddenda99(t *testing.T) {
+// TestEDFieldInclusionTraceNumber tests validating trace number field inclusion
+func TestEDFieldInclusionTraceNumber(t *testing.T) {
+	testEDFieldInclusionTraceNumber(t)
+}
+
+// BenchmarkEDFieldInclusionTraceNumber benchmarks validating trace number field inclusion
+func BenchmarkEDFieldInclusionTraceNumber(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testEDFieldInclusionTraceNumber(b)
+	}
+}
+
+// testEDAddAddenda99 validates adding Addenda99 to an entry detail
+func testEDAddAddenda99(t testing.TB) {
 	entry := mockEntryDetail()
 	entry.AddAddenda(mockAddenda99())
 	if entry.Category != CategoryReturn {
@@ -302,7 +555,21 @@ func TestEDAddAddendaAddenda99(t *testing.T) {
 
 }
 
-func TestEDAddAddendaAddenda99Twice(t *testing.T) {
+// TestEDAddAddenda99 tests validating adding Addenda99 to an entry detail
+func TestEDAddAddenda99(t *testing.T) {
+	testEDAddAddenda99(t)
+}
+
+// BenchmarkEDAddAddenda99 benchmarks validating adding Addenda99 to an entry detail
+func BenchmarkEDAddAddenda99(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testEDAddAddenda99(b)
+	}
+}
+
+// testEDAddAddenda99Twice validates only one Addenda99 is added to an entry detail
+func testEDAddAddenda99Twice(t testing.TB) {
 	entry := mockEntryDetail()
 	entry.AddAddenda(mockAddenda99())
 	entry.AddAddenda(mockAddenda99())
@@ -315,7 +582,21 @@ func TestEDAddAddendaAddenda99Twice(t *testing.T) {
 	}
 }
 
-func TestEDCreditOrDebit(t *testing.T) {
+// TestEDAddAddenda99Twice tests validating only one Addenda99 is added to an entry detail
+func TestEDAddAddenda99Twice(t *testing.T) {
+	testEDAddAddenda99Twice(t)
+}
+
+// BenchmarkEDAddAddenda99Twice benchmarks validating only one Addenda99 is added to an entry detail
+func BenchmarkEDAddAddenda99Twice(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testEDAddAddenda99Twice(b)
+	}
+}
+
+// testEDCreditOrDebit validates debit and credit transaction code
+func testEDCreditOrDebit(t testing.TB) {
 	// TODO add more credit and debit transaction code's to this test
 	entry := mockEntryDetail()
 	if entry.CreditOrDebit() != "C" {
@@ -324,5 +605,18 @@ func TestEDCreditOrDebit(t *testing.T) {
 	entry.TransactionCode = 27
 	if entry.CreditOrDebit() != "D" {
 		t.Errorf("TransactionCode %v expected a Debit(D) got %v", entry.TransactionCode, entry.CreditOrDebit())
+	}
+}
+
+// TestEDCreditOrDebit tests validating debit and credit transaction code
+func TestEDCreditOrDebit(t *testing.T) {
+	testEDCreditOrDebit(t)
+}
+
+// BenchmarkEDCreditOrDebit benchmarks validating debit and credit transaction code
+func BenchmarkEDCreditOrDebit(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testEDCreditOrDebit(b)
 	}
 }

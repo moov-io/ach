@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// mockBatchPPDHeader creates a PPD batch header
 func mockBatchPPDHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = 220
@@ -21,6 +22,7 @@ func mockBatchPPDHeader() *BatchHeader {
 	return bh
 }
 
+// mockPPDEntryDetail creates a PPD Entry Detail
 func mockPPDEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 22
@@ -33,6 +35,7 @@ func mockPPDEntryDetail() *EntryDetail {
 	return entry
 }
 
+// mockBatchPPDHeader2 creates a 2nd PPD batch header
 func mockBatchPPDHeader2() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = 200
@@ -46,7 +49,8 @@ func mockBatchPPDHeader2() *BatchHeader {
 	return bh
 }
 
-func mockPPDEntry2() *EntryDetail {
+// mockPPDEntryDetail2 creates a 2nd PPD entry detail
+func mockPPDEntryDetail2() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 22 // ACH Credit
 	entry.SetRDFI("231380104")
@@ -59,6 +63,7 @@ func mockPPDEntry2() *EntryDetail {
 	return entry
 }
 
+// mockBatchPPD creates a PPD batch
 func mockBatchPPD() *BatchPPD {
 	mockBatch := NewBatchPPD(mockBatchPPDHeader())
 	mockBatch.AddEntry(mockPPDEntryDetail())
@@ -68,14 +73,29 @@ func mockBatchPPD() *BatchPPD {
 	return mockBatch
 }
 
-func TestBatchError(t *testing.T) {
+// testBatchError validates batch error handling
+func testBatchError(t testing.TB) {
 	err := &BatchError{BatchNumber: 1, FieldName: "mock", Msg: "test message"}
 	if err.Error() != "BatchNumber 1 mock test message" {
 		t.Error("BatchError Error has changed formatting")
 	}
 }
 
-func TestBatchServiceClassCodeEquality(t *testing.T) {
+// TestBatchError tests validating batch error handling
+func TestBatchError(t *testing.T) {
+	testBatchError(t)
+}
+
+// BenchmarkBatchError benchmarks validating batch error handling
+func BenchmarkBatchError(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchError(b)
+	}
+}
+
+// testBatchServiceClassCodeEquality validates service class code equality
+func testBatchServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchPPD()
 	mockBatch.GetControl().ServiceClassCode = 225
 	if err := mockBatch.Validate(); err != nil {
@@ -89,7 +109,21 @@ func TestBatchServiceClassCodeEquality(t *testing.T) {
 	}
 }
 
-func TestBatchPPDCreate(t *testing.T) {
+// TestBatchServiceClassCodeEquality tests validating service class code equality
+func TestBatchServiceClassCodeEquality(t *testing.T) {
+	testBatchServiceClassCodeEquality(t)
+}
+
+// BenchmarkBatchServiceClassCodeEquality benchmarks validating service class code equality
+func BenchmarkBatchServiceClassCodeEquality(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchServiceClassCodeEquality(b)
+	}
+}
+
+// BatchPPDCreate validates batch create for an invalid service code
+func testBatchPPDCreate(t testing.TB) {
 	mockBatch := mockBatchPPD()
 	// can not have default values in Batch Header to build batch
 	mockBatch.GetHeader().ServiceClassCode = 0
@@ -105,7 +139,21 @@ func TestBatchPPDCreate(t *testing.T) {
 	}
 }
 
-func TestBatchPPDTypeCode(t *testing.T) {
+// TestBatchPPDCreate tests validating batch create for an invalid service code
+func TestBatchPPDCreate(t *testing.T) {
+	testBatchPPDCreate(t)
+}
+
+// BenchmarkBatchPPDCreate benchmarks validating batch create for an invalid service code
+func BenchmarkBatchPPDCreate(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchPPDCreate(b)
+	}
+}
+
+// testBatchPPDTypeCode validates batch PPD type code
+func testBatchPPDTypeCode(t testing.TB) {
 	mockBatch := mockBatchPPD()
 	// change an addendum to an invalid type code
 	a := mockAddenda05()
@@ -123,7 +171,21 @@ func TestBatchPPDTypeCode(t *testing.T) {
 	}
 }
 
-func TestBatchCompanyIdentification(t *testing.T) {
+// TestBatchPPDTypeCode tests validating batch PPD type code
+func TestBatchPPDTypeCode(t *testing.T) {
+	testBatchPPDTypeCode(t)
+}
+
+// BenchmarkBatchPPDTypeCode benchmarks validating batch PPD type code
+func BenchmarkBatchPPDTypeCode(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchPPDTypeCode(b)
+	}
+}
+
+// testBatchCompanyIdentification validates batch PPD company identification
+func testBatchCompanyIdentification(t testing.TB) {
 	mockBatch := mockBatchPPD()
 	mockBatch.GetControl().CompanyIdentification = "XYZ Inc"
 	if err := mockBatch.Validate(); err != nil {
@@ -137,7 +199,22 @@ func TestBatchCompanyIdentification(t *testing.T) {
 	}
 }
 
-func TestBatchODFIIDMismatch(t *testing.T) {
+// TestBatchCompanyIdentification tests validating batch PPD company identification
+func TestBatchCompanyIdentification(t *testing.T) {
+	testBatchCompanyIdentification(t)
+}
+
+// BenchmarkBatchCompanyIdentification benchmarks validating batch PPD company identification
+func BenchmarkBatchCompanyIdentification(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchCompanyIdentification(b)
+	}
+}
+
+
+// testBatchODFIIDMismatch validates ODFIIdentification mismatch
+func testBatchODFIIDMismatch(t testing.TB) {
 	mockBatch := mockBatchPPD()
 	mockBatch.GetControl().ODFIIdentification = "987654321"
 	if err := mockBatch.Validate(); err != nil {
@@ -151,13 +228,40 @@ func TestBatchODFIIDMismatch(t *testing.T) {
 	}
 }
 
-func TestBatchBuild(t *testing.T) {
+// TestBatchODFIIDMismatch tests validating ODFIIdentification mismatch
+func TestBatchODFIIDMismatch(t *testing.T) {
+	testBatchODFIIDMismatch(t)
+}
+
+// BenchmarkBatchODFIIDMismatch benchmarks validating ODFIIdentification mismatch
+func BenchmarkBatchODFIIDMismatch(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchODFIIDMismatch(b)
+	}
+}
+
+// testBatchBuild builds a PPD batch
+func testBatchBuild(t testing.TB) {
 	mockBatch := NewBatchPPD(mockBatchPPDHeader2())
-	entry := mockPPDEntry2()
+	entry := mockPPDEntryDetail2()
 	addenda05 := NewAddenda05()
 	entry.AddAddenda(addenda05)
 	mockBatch.AddEntry(entry)
 	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestBatchBuild tests building a PPD batch
+func TestBatchBuild(t *testing.T) {
+	testBatchBuild(t)
+}
+
+// BenchmarkBatchBuild benchmarks building a PPD batch
+func BenchmarkBatchBuild(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchBuild(b)
 	}
 }

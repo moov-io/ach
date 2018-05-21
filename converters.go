@@ -66,7 +66,7 @@ func (c *converters) numericField(n int, max uint) string {
 	return s
 }
 
-// stringField right-justified and zero filled
+// stringRTNField slices to max length and zero filled
 func (c *converters) stringRTNField(s string, max uint) string {
 	ln := uint(len(s))
 	if ln > max {

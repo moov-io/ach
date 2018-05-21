@@ -4,6 +4,7 @@ import (
 	"testing"
 )
 
+// mockBatchTELHeader creates a TEL batch header
 func mockBatchTELHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = 225
@@ -15,6 +16,7 @@ func mockBatchTELHeader() *BatchHeader {
 	return bh
 }
 
+// mockTELEntryDetail creates a TEL entry detail
 func mockTELEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 27
@@ -28,6 +30,7 @@ func mockTELEntryDetail() *EntryDetail {
 	return entry
 }
 
+// mockBatchTEL creates a TEL batch
 func mockBatchTEL() *BatchTEL {
 	mockBatch := NewBatchTEL(mockBatchTELHeader())
 	mockBatch.AddEntry(mockTELEntryDetail())
@@ -37,7 +40,8 @@ func mockBatchTEL() *BatchTEL {
 	return mockBatch
 }
 
-func TestBatchTELHeader(t *testing.T) {
+// testBatchTELHeader creates a TEL batch header
+func testBatchTELHeader(t testing.TB) {
 	batch, _ := NewBatch(mockBatchTELHeader())
 	err, ok := batch.(*BatchTEL)
 	if !ok {
@@ -45,7 +49,21 @@ func TestBatchTELHeader(t *testing.T) {
 	}
 }
 
-func TestBatchTELCreate(t *testing.T) {
+// TestBatchTELHeader tests creating a TEL batch header
+func TestBatchTELHeader(t *testing.T) {
+	testBatchTELHeader(t)
+}
+
+// BenchmarkBatchTELHeader benchmarks creating a TEL batch header
+func BenchmarkBatchTELHeader(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchTELHeader(b)
+	}
+}
+
+// testBatchTELCreate validates batch create for an invalid service code
+func testBatchTELCreate(t testing.TB) {
 	mockBatch := mockBatchTEL()
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetHeader().ServiceClassCode = 0
@@ -61,7 +79,21 @@ func TestBatchTELCreate(t *testing.T) {
 	}
 }
 
-func TestBatchTELAddendaCount(t *testing.T) {
+// TestBatchTELCreate tests validating batch create for an invalid service code
+func TestBatchTELCreate(t *testing.T) {
+	testBatchTELCreate(t)
+}
+
+// BenchmarkBatchTELCreate benchmarks validating  batch create for an invalid service code
+func BenchmarkBatchTELCreate(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchTELCreate(b)
+	}
+}
+
+// testBatchTELAddendaCount validates addenda count for batch TEL
+func testBatchTELAddendaCount(t testing.TB) {
 	mockBatch := mockBatchTEL()
 	// TEL can not have an addendum
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
@@ -77,7 +109,21 @@ func TestBatchTELAddendaCount(t *testing.T) {
 	}
 }
 
-func TestBatchTELSEC(t *testing.T) {
+// TestBatchTELAddendaCount tests validating addenda count for batch TEL
+func TestBatchTELAddendaCount(t *testing.T) {
+	testBatchTELAddendaCount(t)
+}
+
+// BenchmarkBatchTELAddendaCount benchmarks validating addenda count for batch TEL
+func BenchmarkBatchTELAddendaCount(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchTELAddendaCount(b)
+	}
+}
+
+// testBatchTELSEC validates SEC code for batch TEL
+func testBatchTELSEC(t testing.TB) {
 	mockBatch := mockBatchTEL()
 	mockBatch.header.StandardEntryClassCode = "RCK"
 	if err := mockBatch.Validate(); err != nil {
@@ -91,7 +137,21 @@ func TestBatchTELSEC(t *testing.T) {
 	}
 }
 
-func TestBatchTELDebit(t *testing.T) {
+// TestBatchTELSEC tests validating SEC code for batch TEL
+func TestBatchTELSEC(t *testing.T) {
+	testBatchTELSEC(t)
+}
+
+// BenchmarkBatchTELSEC benchmarks validating SEC code for batch TEL
+func BenchmarkBatchTELSEC(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchTELSEC(b)
+	}
+}
+
+// testBatchTELDebit validates Transaction code for TEL entry detail
+func testBatchTELDebit(t testing.TB) {
 	mockBatch := mockBatchTEL()
 	mockBatch.GetEntries()[0].TransactionCode = 22
 	if err := mockBatch.Create(); err != nil {
@@ -105,8 +165,22 @@ func TestBatchTELDebit(t *testing.T) {
 	}
 }
 
-// verify that the entry detail payment type / discretionary data is either single or reoccurring for the
-func TestBatchTELPaymentType(t *testing.T) {
+// TestBatchTELDebit tests validating Transaction code for TEL entry detail
+func TestBatchTELDebit(t *testing.T) {
+	testBatchTELDebit(t)
+}
+
+// BenchmarkBatchTELDebit benchmarks validating Transaction code for TEL entry detail
+func BenchmarkBatchTELDebit(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchTELDebit(b)
+	}
+}
+
+// testBatchTELPaymentType validates that the entry detail
+// payment type / discretionary data is either single or reoccurring
+func testBatchTELPaymentType(t testing.TB) {
 	mockBatch := mockBatchTEL()
 	mockBatch.GetEntries()[0].DiscretionaryData = "AA"
 	if err := mockBatch.Validate(); err != nil {
@@ -118,5 +192,20 @@ func TestBatchTELPaymentType(t *testing.T) {
 		} else {
 			t.Errorf("%T: %s", err, err)
 		}
+	}
+}
+
+// TestBatchTELPaymentType tests validating that the entry detail
+// payment type / discretionary data is either single or reoccurring
+func TestBatchTELPaymentType(t *testing.T) {
+	testBatchTELPaymentType(t)
+}
+
+// BenchmarkBatchTELPaymentTyp benchmarks validating that the entry detail
+// payment type / discretionary data is either single or reoccurring
+func BenchmarkBatchTELPaymentType(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchTELPaymentType(b)
 	}
 }

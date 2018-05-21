@@ -6,7 +6,8 @@ import (
 	"testing"
 )
 
-func TestPPDWrite(t *testing.T) {
+// testPPDWrite writes a PPD ACH file
+func testPPDWrite(t testing.TB) {
 	file := NewFile().SetHeader(mockFileHeader())
 	entry := mockEntryDetail()
 	entry.AddAddenda(mockAddenda05())
@@ -36,5 +37,18 @@ func TestPPDWrite(t *testing.T) {
 	}
 	if err = r.File.Validate(); err != nil {
 		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestPPDWrite tests writing a PPD ACH file
+func TestPPDWrite(t *testing.T) {
+	testPPDWrite(t)
+}
+
+// BenchmarkPPDWrite benchmarks writing a PPD ACH file
+func BenchmarkPPDWrite(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testPPDWrite(b)
 	}
 }
