@@ -14,7 +14,7 @@ func mockBatchWEBHeader() *BatchHeader {
 	return bh
 }
 
-// mockWEBEntryDetail creates a WEB entry Detail
+// mockWEBEntryDetail creates a WEB entry detail
 func mockWEBEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 22
@@ -27,7 +27,7 @@ func mockWEBEntryDetail() *EntryDetail {
 	return entry
 }
 
-// mockBatchWEB creates a Web batch
+// mockBatchWEB creates a WEB batch
 func mockBatchWEB() *BatchWEB {
 	mockBatch := NewBatchWEB(mockBatchWEBHeader())
 	mockBatch.AddEntry(mockWEBEntryDetail())
@@ -55,13 +55,13 @@ func testBatchWebAddenda(t testing.TB) {
 	}
 }
 
-// TestBatchWebAddenda tests validating No more than 1 batch per entry detail
+// TestBatchWebAddenda tests validating no more than 1 batch per entry detail
 // record can exist and no more than 1 addenda record per entry detail record can exist
 func TestBatchWebAddenda(t *testing.T) {
 	testBatchWebAddenda(t)
 }
 
-// BenchmarkBatchWebAddenda benchmarks validating No more than 1 batch per entry detail
+// BenchmarkBatchWebAddenda benchmarks validating no more than 1 batch per entry detail
 // record can exist and no more than 1 addenda record per entry detail record can exist
 func BenchmarkBatchWebAddenda(b *testing.B) {
 	b.ReportAllocs()
@@ -142,12 +142,12 @@ func testBatchWebSEC(t testing.TB) {
 	}
 }
 
-// TestBatchWebSEC tests validating that the standard entry class code is WEB for batch Web
+// TestBatchWebSEC tests validating that the standard entry class code is WEB for batch WEB
 func TestBatchWebSEC(t *testing.T) {
 	testBatchWebSEC(t)
 }
 
-// BenchmarkBatchWebSEC benchmarks validating that the standard entry class code is WEB for batch Web
+// BenchmarkBatchWebSEC benchmarks validating that the standard entry class code is WEB for batch WEB
 func BenchmarkBatchWebSEC(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {

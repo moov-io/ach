@@ -9,6 +9,7 @@ import (
 	"testing"
 )
 
+// mockFileControl create a file control
 func mockFileControl() FileControl {
 	fc := NewFileControl()
 	fc.BatchCount = 1
@@ -18,7 +19,8 @@ func mockFileControl() FileControl {
 	return fc
 }
 
-func TestMockFileControl(t *testing.T) {
+// testMockFileControl validates a file control record
+func testMockFileControl(t testing.TB) {
 	fc := mockFileControl()
 	if err := fc.Validate(); err != nil {
 		t.Error("mockFileControl does not validate and will break other tests")
@@ -37,8 +39,21 @@ func TestMockFileControl(t *testing.T) {
 	}
 }
 
-// TestParseFileControl parses a known File Control Record string.
-func TestParseFileControl(t *testing.T) {
+// TestMockFileControl tests validating a file control record
+func TestMockFileControl(t *testing.T) {
+	testMockFileControl(t)
+}
+
+// BenchmarkMockFileControl benchmarks validating a file control record
+func BenchmarkMockFileControl(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testMockFileControl(b)
+	}
+}
+
+// testParseFileControl parses a known file control record string
+func testParseFileControl(t testing.TB) {
 	var line = "9000001000001000000010005320001000000010500000000000000                                       "
 	r := NewReader(strings.NewReader(line))
 	r.line = line
@@ -74,8 +89,21 @@ func TestParseFileControl(t *testing.T) {
 	}
 }
 
-// TestFCString validats that a known parsed file can be return to a string of the same value
-func TestFCString(t *testing.T) {
+// TestParseFileControl tests parsing a known file control record string
+func TestParseFileControl(t *testing.T) {
+	testParseFileControl(t)
+}
+
+// BenchmarkParseFileControl benchmarks parsing a known file control record string
+func BenchmarkParseFileControl(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testParseFileControl(b)
+	}
+}
+
+// testFCString validates that a known parsed file can be return to a string of the same value
+func testFCString(t testing.TB) {
 	var line = "9000001000001000000010005320001000000010500000000000000                                       "
 	r := NewReader(strings.NewReader(line))
 	r.line = line
@@ -89,8 +117,21 @@ func TestFCString(t *testing.T) {
 	}
 }
 
-// TestValidateFCRecordType ensure error if recordType is not 9
-func TestValidateFCRecordType(t *testing.T) {
+// TestFCString tests validating that a known parsed file can be return to a string of the same value
+func TestFCString(t *testing.T) {
+	testFCString(t)
+}
+
+// BenchmarkFCString benchmarks validating that a known parsed file can be return to a string of the same value
+func BenchmarkFCString(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFCString(b)
+	}
+}
+
+// testValidateFCRecordType validates error if recordType is not 9
+func testValidateFCRecordType(t testing.TB) {
 	fc := mockFileControl()
 	fc.recordType = "2"
 
@@ -103,7 +144,21 @@ func TestValidateFCRecordType(t *testing.T) {
 	}
 }
 
-func TestFCFieldInclusion(t *testing.T) {
+// TestValidateFCRecordType tests validating error if recordType is not 9
+func TestValidateFCRecordType(t *testing.T) {
+	testValidateFCRecordType(t)
+}
+
+// BenchmarkValidateFCRecordType benchmarks validating error if recordType is not 9
+func BenchmarkValidateFCRecordType(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testValidateFCRecordType(b)
+	}
+}
+
+// testFCFieldInclusion validates file control field inclusion
+func testFCFieldInclusion(t testing.TB) {
 	fc := mockFileControl()
 	fc.BatchCount = 0
 	if err := fc.Validate(); err != nil {
@@ -115,7 +170,21 @@ func TestFCFieldInclusion(t *testing.T) {
 	}
 }
 
-func TestFCFieldInclusionRecordType(t *testing.T) {
+// TestFCFieldInclusion tests validating file control field inclusion
+func TestFCFieldInclusion(t *testing.T) {
+	testFCFieldInclusion(t)
+}
+
+// BenchmarkFCFieldInclusion benchmarks validating file control field inclusion
+func BenchmarkFCFieldInclusion(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFCFieldInclusion(b)
+	}
+}
+
+// testFCFieldInclusionRecordType validates file control record type field inclusion
+func testFCFieldInclusionRecordType(t testing.TB) {
 	fc := mockFileControl()
 	fc.recordType = ""
 	if err := fc.Validate(); err != nil {
@@ -127,7 +196,21 @@ func TestFCFieldInclusionRecordType(t *testing.T) {
 	}
 }
 
-func TestFCFieldInclusionBlockCount(t *testing.T) {
+// TestFCFieldInclusionRecordType tests validating file control record type field inclusion
+func TestFCFieldInclusionRecordType(t *testing.T) {
+	testFCFieldInclusionRecordType(t)
+}
+
+// BenchmarkFCFieldInclusionRecordType benchmarks tests validating file control record type field inclusion
+func BenchmarkFCFieldInclusionRecordType(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFCFieldInclusionRecordType(b)
+	}
+}
+
+// testFCFieldInclusionBlockCount validates file control block count field inclusion
+func testFCFieldInclusionBlockCount(t testing.TB) {
 	fc := mockFileControl()
 	fc.BlockCount = 0
 	if err := fc.Validate(); err != nil {
@@ -139,7 +222,21 @@ func TestFCFieldInclusionBlockCount(t *testing.T) {
 	}
 }
 
-func TestFCFieldInclusionEntryAddendaCount(t *testing.T) {
+// TestFCFieldInclusionBlockCount tests validating file control block count field inclusion
+func TestFCFieldInclusionBlockCount(t *testing.T) {
+	testFCFieldInclusionBlockCount(t)
+}
+
+// BenchmarkFCFieldInclusionBlockCoun benchmarks validating file control block count field inclusion
+func BenchmarkFCFieldInclusionBlockCoun(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFCFieldInclusionBlockCount(b)
+	}
+}
+
+// testFCFieldInclusionEntryAddendaCount validates file control addenda count field inclusion
+func testFCFieldInclusionEntryAddendaCount(t testing.TB) {
 	fc := mockFileControl()
 	fc.EntryAddendaCount = 0
 	if err := fc.Validate(); err != nil {
@@ -151,7 +248,21 @@ func TestFCFieldInclusionEntryAddendaCount(t *testing.T) {
 	}
 }
 
-func TestFCFieldInclusionEntryHash(t *testing.T) {
+// TestFCFieldInclusionEntryAddendaCount tests validating file control addenda count field inclusion
+func TestFCFieldInclusionEntryAddendaCount(t *testing.T) {
+	testFCFieldInclusionEntryAddendaCount(t)
+}
+
+// BenchmarkFCFieldInclusionEntryAddendaCount benchmarks validating file control addenda count field inclusion
+func BenchmarkFCFieldInclusionEntryAddendaCount(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFCFieldInclusionEntryAddendaCount(b)
+	}
+}
+
+// testFCFieldInclusionEntryHash validates file control entry hash field inclusion
+func testFCFieldInclusionEntryHash(t testing.TB) {
 	fc := mockFileControl()
 	fc.EntryHash = 0
 	if err := fc.Validate(); err != nil {
@@ -160,5 +271,18 @@ func TestFCFieldInclusionEntryHash(t *testing.T) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
+	}
+}
+
+// TestFCFieldInclusionEntryHash tests validating file control entry hash field inclusion
+func TestFCFieldInclusionEntryHash(t *testing.T) {
+	testFCFieldInclusionEntryHash(t)
+}
+
+// BenchmarkFCFieldInclusionEntryHash benchmarks validating file control entry hash field inclusion
+func BenchmarkFCFieldInclusionEntryHash(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFCFieldInclusionEntryHash(b)
 	}
 }
