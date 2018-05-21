@@ -25,4 +25,6 @@ script:
   # output code coverage
   - go test -v -covermode=count -coverprofile=coverage.out .
   - goveralls -coverprofile=coverage.out -service travis-ci -repotoken $COVERALLS_TOKEN
-  
+  env:
+  global:
+    secure: otwALdLyiyV4ZEjqC7/QXdkpr8VXPqYdjBQRuDrYlu5jVmtNpm/ZxwCT2+0WfnSW4ZBNgKs3HXbw2L41prOn6miJ5vC+jzzC5IFTOErZj7dtv8M1j5LmlmyznpDaxMWhVv/t7ZN2V0dcLF8WeMIl4DHSDQIPGUW7cV3ENvf6ht2a+6A02SadR0KM1ce7rZiGRA/Asfm/XUI87sI8L/ZrH60Dc31RuxNmluVJH4tv/GCRmWQiEMX67vOe/04RpsVexXzex20Ft1/eh8nDe0qggZJ+QLcYl8h2gOXjq87O2gBFOxazOyrCPu4silSD4mNy03Zmc8QPdxQRnYn1UKLRy2UALwWFnB+O9py5N/2s4yMy14nuFe4iMAqkyv8mNmMdSsb/g4hc7NYWJmQahGRQi5dTPKrIwRlFc5VPRiKYLzeBVXNL1iewUjGv+c8AtchtRZZJKflqq/fu6tZGtj0fUCCAzvBFPDzduiO6y0M1S7bJ/H6d0zTxWQvoBTiFxmuZSD693Qe7CLnEZUiw8HJnTnNpJikTVDZYb53E+kv3vt7Psz+G0165ZU+SRn9HgQ4Mq5B0FhYr4+IUq1zXxX9/w0+PyNsOzluNtfYsc4NJ1GyfvIeoMTjuat08fNBnCyr+mdYZnrSnuz1B3ZZeFHsnIC81BUdHeqGha8K7tLwJdaw=
