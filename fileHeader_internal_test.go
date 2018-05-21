@@ -21,7 +21,8 @@ func mockFileHeader() FileHeader {
 	return fh
 }
 
-func TestMockFileHeader(t *testing.T) {
+// testMockFileHeader validates a file header
+func testMockFileHeader(t testing.TB) {
 	fh := mockFileHeader()
 	if err := fh.Validate(); err != nil {
 		t.Error("mockFileHeader does not validate and will break other tests")
@@ -40,18 +41,21 @@ func TestMockFileHeader(t *testing.T) {
 	}
 }
 
-// TestParseFileHeader parses a known File Header Record string.
-func TestParseFileHeader(t *testing.T) {
-	parseFileHeader(t)
+// TestMockFileHeader tests validating a file header
+func TestMockFileHeader(t *testing.T) {
+	testMockFileHeader(t)
 }
 
-func BenchmarkParseFileHeader(b *testing.B) {
+// BenchmarkMockFileHeader benchmarks validating a file header
+func BenchmarkMockFileHeader(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		parseFileHeader(b)
+		testMockFileHeader(b)
 	}
 }
 
+
+// parseFileHeader validates parsing a file header
 func parseFileHeader(t testing.TB) {
 	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
@@ -104,8 +108,21 @@ func parseFileHeader(t testing.TB) {
 	}
 }
 
-// TestString validats that a known parsed file can be return to a string of the same value
-func TestFHString(t *testing.T) {
+// TestParseFileHeader test validates parsing a file header
+func TestParseFileHeader(t *testing.T) {
+	parseFileHeader(t)
+}
+
+// BenchmarkParseFileHeader benchmark validates parsing a file header
+func BenchmarkParseFileHeader(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		parseFileHeader(b)
+	}
+}
+
+// testFHString validates that a known parsed file can return to a string of the same value
+func testFHString(t testing.TB) {
 	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
 	r.line = line
@@ -119,8 +136,22 @@ func TestFHString(t *testing.T) {
 	}
 }
 
-// TestValidateFHRecordType ensure error if recordType is not 1
-func TestValidateFHRecordType(t *testing.T) {
+// TestFHString tests validating that a known parsed file can return to a string of the same value
+func TestFHString(t *testing.T) {
+	testFHString(t)
+}
+
+// BenchmarkFHString benchmarks validating that a known parsed file
+// can return to a string of the same value
+func BenchmarkFHString(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFHString(b)
+	}
+}
+
+// testValidateFHRecordType validates error if record type is not 1
+func testValidateFHRecordType(t testing.TB) {
 	fh := mockFileHeader()
 	fh.recordType = "2"
 	if err := fh.Validate(); err != nil {
@@ -132,8 +163,21 @@ func TestValidateFHRecordType(t *testing.T) {
 	}
 }
 
-// TestValidateIDModifier ensure ID Modiier is upper alphanumeric
-func TestValidateIDModifier(t *testing.T) {
+// TestValidateFHRecordType tests validating error if record type is not 1
+func TestValidateFHRecordType(t *testing.T) {
+	testValidateFHRecordType(t)
+}
+
+// BenchmarkValidateFHRecordType benchmarks validating error if record type is not 1
+func BenchmarkValidateFHRecordType(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testValidateFHRecordType(b)
+	}
+}
+
+// testValidateIDModifier validates ID modifier is upper alphanumeric
+func testValidateIDModifier(t testing.TB) {
 	fh := mockFileHeader()
 	fh.FileIDModifier = "®"
 	if err := fh.Validate(); err != nil {
@@ -145,8 +189,22 @@ func TestValidateIDModifier(t *testing.T) {
 	}
 }
 
-// TestValidateRecordSize ensure record size is "094"
-func TestValidateRecordSize(t *testing.T) {
+
+// TestValidateIDModifier tests validating ID modifier is upper alphanumeric
+func TestValidateIDModifier(t *testing.T) {
+	testValidateIDModifier(t)
+}
+
+// BenchmarkValidateIDModifier benchmarks validating ID modifier is upper alphanumeric
+func BenchmarkValidateIDModifier(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testValidateIDModifier(b)
+	}
+}
+
+// testValidateRecordSize validates record size is "094"
+func testValidateRecordSize(t testing.TB) {
 	fh := mockFileHeader()
 	fh.recordSize = "666"
 	if err := fh.Validate(); err != nil {
@@ -158,8 +216,21 @@ func TestValidateRecordSize(t *testing.T) {
 	}
 }
 
-// TestBlockingFactor ensure blocking factor  is "10"
-func TestBlockingFactor(t *testing.T) {
+// TestValidateRecordSize tests validating record size is "094"
+func TestValidateRecordSize(t *testing.T) {
+	testValidateRecordSize(t)
+}
+
+// BenchmarkValidateRecordSize benchmarks validating record size is "094"
+func BenchmarkValidateRecordSize(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testValidateRecordSize(b)
+	}
+}
+
+// testBlockingFactor validates blocking factor  is "10"
+func testBlockingFactor(t testing.TB) {
 	fh := mockFileHeader()
 	fh.blockingFactor = "99"
 	if err := fh.Validate(); err != nil {
@@ -171,8 +242,21 @@ func TestBlockingFactor(t *testing.T) {
 	}
 }
 
-// TestFormatCode ensure format code is "1"
-func TestFormatCode(t *testing.T) {
+// TestBlockingFactor tests validating blocking factor  is "10"
+func TestBlockingFactor(t *testing.T) {
+	testBlockingFactor(t)
+}
+
+// BenchmarkBlockingFactor benchmarks validating blocking factor  is "10"
+func BenchmarkBlockingFactor(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBlockingFactor(b)
+	}
+}
+
+// testFormatCode validates format code is "1"
+func testFormatCode(t testing.TB) {
 	fh := mockFileHeader()
 	fh.formatCode = "2"
 	if err := fh.Validate(); err != nil {
@@ -184,7 +268,21 @@ func TestFormatCode(t *testing.T) {
 	}
 }
 
-func TestFHFieldInclusion(t *testing.T) {
+// TestFormatCode tests validating format code is "1"
+func TestFormatCode(t *testing.T) {
+	testFormatCode(t)
+}
+
+// BenchmarkFormatCode benchmarks validating format code is "1"
+func BenchmarkFormatCode(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFormatCode(b)
+	}
+}
+
+// testFHFieldInclusion validates file header field inclusion
+func testFHFieldInclusion(t testing.TB) {
 	fh := mockFileHeader()
 	fh.ImmediateOrigin = ""
 	if err := fh.Validate(); err != nil {
@@ -196,7 +294,21 @@ func TestFHFieldInclusion(t *testing.T) {
 	}
 }
 
-func TestUpperLengthFileID(t *testing.T) {
+// TestFHFieldInclusion tests validating file header field inclusion
+func TestFHFieldInclusion(t *testing.T) {
+	testFHFieldInclusion(t)
+}
+
+// BenchmarkFHFieldInclusion benchmarks validating file header field inclusion
+func BenchmarkFHFieldInclusion(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFHFieldInclusion(b)
+	}
+}
+
+// testUpperLengthFileID validates file ID
+func testUpperLengthFileID(t testing.TB) {
 	fh := mockFileHeader()
 	fh.FileIDModifier = "a"
 	if err := fh.Validate(); err != nil {
@@ -217,7 +329,21 @@ func TestUpperLengthFileID(t *testing.T) {
 	}
 }
 
-func TestImmediateDestinationNameAlphaNumeric(t *testing.T) {
+// TestUpperLengthFileID  tests validating file ID
+func TestUpperLengthFileID (t *testing.T) {
+	testUpperLengthFileID (t)
+}
+
+// BenchmarkUpperLengthFileID  benchmarks validating file ID
+func BenchmarkUpperLengthFileID (b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testUpperLengthFileID (b)
+	}
+}
+
+// testImmediateDestinationNameAlphaNumeric validates immediate destination name is alphanumeric
+func testImmediateDestinationNameAlphaNumeric(t testing.TB) {
 	fh := mockFileHeader()
 	fh.ImmediateDestinationName = "Super Big Bank"
 	fh.ImmediateDestinationName = "Big ®$$ Bank"
@@ -230,7 +356,23 @@ func TestImmediateDestinationNameAlphaNumeric(t *testing.T) {
 	}
 }
 
-func TestImmediateOriginNameAlphaNumeric(t *testing.T) {
+// TestImmediateDestinationNameAlphaNumeric tests validating
+// immediate destination name is alphanumeric
+func TestImmediateDestinationNameAlphaNumeric(t *testing.T) {
+	testImmediateDestinationNameAlphaNumeric(t)
+}
+
+// BenchmarkImmediateDestinationNameAlphaNumeric benchmarks validating
+// immediate destination name is alphanumeric
+func BenchmarkImmediateDestinationNameAlphaNumeric(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testImmediateDestinationNameAlphaNumeric(b)
+	}
+}
+
+// testImmediateOriginNameAlphaNumeric validates immediate origin name is alphanumeric
+func testImmediateOriginNameAlphaNumeric(t testing.TB) {
 	fh := mockFileHeader()
 	fh.ImmediateOriginName = "Super Big Bank"
 	fh.ImmediateOriginName = "Bigger ®$$ Bank"
@@ -243,7 +385,22 @@ func TestImmediateOriginNameAlphaNumeric(t *testing.T) {
 	}
 }
 
-func TestImmediateReferenceCodeAlphaNumeric(t *testing.T) {
+// TestImmediateOriginNameAlphaNumeric tests validating immediate origin name is alphanumeric
+func TestImmediateOriginNameAlphaNumeric(t *testing.T) {
+	testImmediateOriginNameAlphaNumeric(t)
+}
+
+// BenchmarkImmediateOriginNameAlphaNumeric benchmarks validating
+// immediate origin name is alphanumeric
+func BenchmarkImmediateOriginNameAlphaNumeric(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testImmediateOriginNameAlphaNumeric(b)
+	}
+}
+
+// testImmediateReferenceCodeAlphaNumeric validates immediate reference is alphanumeric
+func testImmediateReferenceCodeAlphaNumeric(t testing.TB) {
 	fh := mockFileHeader()
 	fh.ReferenceCode = " "
 	fh.ReferenceCode = "®"
@@ -256,7 +413,21 @@ func TestImmediateReferenceCodeAlphaNumeric(t *testing.T) {
 	}
 }
 
-func TestFHFieldInclusionRecordType(t *testing.T) {
+// TestImmediateReferenceCodeAlphaNumeric tests validating immediate reference is alphanumeric
+func TestImmediateReferenceCodeAlphaNumeric(t *testing.T) {
+	testImmediateReferenceCodeAlphaNumeric(t)
+}
+
+// BenchmarkImmediateReferenceCodeAlphaNumeric benchmarks validating immediate reference is alphanumeric
+func BenchmarkImmediateReferenceCodeAlphaNumeric(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testImmediateReferenceCodeAlphaNumeric(b)
+	}
+}
+
+// testFHFieldInclusionRecordType validates field inclusion
+func testFHFieldInclusionRecordType(t testing.TB) {
 	fh := mockFileHeader()
 	fh.recordType = ""
 	if err := fh.Validate(); err != nil {
@@ -268,7 +439,21 @@ func TestFHFieldInclusionRecordType(t *testing.T) {
 	}
 }
 
-func TestFHFieldInclusionImmediatDestination(t *testing.T) {
+// TestFHFieldInclusionRecordType tests validating field inclusion
+func TestFHFieldInclusionRecordType(t *testing.T) {
+	testFHFieldInclusionRecordType(t)
+}
+
+// BenchmarkFHFieldInclusionRecordType benchmarks validating field inclusion
+func BenchmarkFHFieldInclusionRecordType(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFHFieldInclusionRecordType(b)
+	}
+}
+
+// testFHFieldInclusionImmediateDestination validates immediate destination field inclusion
+func testFHFieldInclusionImmediateDestination(t testing.TB) {
 	fh := mockFileHeader()
 	fh.ImmediateDestination = ""
 	if err := fh.Validate(); err != nil {
@@ -280,7 +465,21 @@ func TestFHFieldInclusionImmediatDestination(t *testing.T) {
 	}
 }
 
-func TestFHFieldInclusionFileIDModifier(t *testing.T) {
+// TestFHFieldInclusionImmediateDestination tests validates immediate destination field inclusion
+func TestFHFieldInclusionImmediateDestination(t *testing.T) {
+	testFHFieldInclusionImmediateDestination(t)
+}
+
+// BenchmarkFHFieldInclusionImmediateDestination benchmarks validates immediate destination field inclusion
+func BenchmarkFHFieldInclusionImmediateDestination(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFHFieldInclusionImmediateDestination(b)
+	}
+}
+
+// testFHFieldInclusionFileIDModifier validates file ID modifier field inclusion
+func testFHFieldInclusionFileIDModifier(t testing.TB) {
 	fh := mockFileHeader()
 	fh.FileIDModifier = ""
 	if err := fh.Validate(); err != nil {
@@ -292,7 +491,21 @@ func TestFHFieldInclusionFileIDModifier(t *testing.T) {
 	}
 }
 
-func TestFHFieldInclusionRecordSize(t *testing.T) {
+// TestFHFieldInclusionFileIDModifier tests validating file ID modifier field inclusion
+func TestFHFieldInclusionFileIDModifier(t *testing.T) {
+	testFHFieldInclusionFileIDModifier(t)
+}
+
+// BenchmarkFHFieldInclusionFileIDModifier benchmarks validating file ID modifier field inclusion
+func BenchmarkFHFieldInclusionFileIDModifier(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFHFieldInclusionFileIDModifier(b)
+	}
+}
+
+// testFHFieldInclusionRecordSize validates record size field inclusion
+func testFHFieldInclusionRecordSize(t testing.TB) {
 	fh := mockFileHeader()
 	fh.recordSize = ""
 	if err := fh.Validate(); err != nil {
@@ -304,7 +517,21 @@ func TestFHFieldInclusionRecordSize(t *testing.T) {
 	}
 }
 
-func TestFHFieldInclusionBlockingFactor(t *testing.T) {
+// TestFHFieldInclusionRecordSize tests validating record size field inclusion
+func TestFHFieldInclusionRecordSize(t *testing.T) {
+	testFHFieldInclusionRecordSize(t)
+}
+
+// BenchmarkFHFieldInclusionRecordSize benchmarks validating record size field inclusion
+func BenchmarkFHFieldInclusionRecordSize(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFHFieldInclusionRecordSize(b)
+	}
+}
+
+// testFHFieldInclusionBlockingFactor validates blocking factor field inclusion
+func testFHFieldInclusionBlockingFactor(t testing.TB) {
 	fh := mockFileHeader()
 	fh.blockingFactor = ""
 	if err := fh.Validate(); err != nil {
@@ -316,7 +543,22 @@ func TestFHFieldInclusionBlockingFactor(t *testing.T) {
 	}
 }
 
-func TestFHFieldInclusionFormatCode(t *testing.T) {
+// TestFHFieldInclusionBlockingFactor tests validating blocking factor field inclusion
+func TestFHFieldInclusionBlockingFactor(t *testing.T) {
+	testFHFieldInclusionBlockingFactor(t)
+}
+
+// BenchmarkFHFieldInclusionBlockingFactor benchmarks
+// validating blocking factor field inclusion
+func BenchmarkFHFieldInclusionBlockingFactor(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFHFieldInclusionBlockingFactor(b)
+	}
+}
+
+// testFHFieldInclusionFormatCode validates format code field inclusion
+func testFHFieldInclusionFormatCode(t testing.TB) {
 	fh := mockFileHeader()
 	fh.formatCode = ""
 	if err := fh.Validate(); err != nil {
@@ -328,7 +570,21 @@ func TestFHFieldInclusionFormatCode(t *testing.T) {
 	}
 }
 
-func TestFHFieldInclusionCreationDate(t *testing.T) {
+// TestFHFieldInclusionFormatCode tests validating format code field inclusion
+func TestFHFieldInclusionFormatCode(t *testing.T) {
+	testFHFieldInclusionFormatCode(t)
+}
+
+// BenchmarkFHFieldInclusionFormatCode benchmarks validating format code field inclusion
+func BenchmarkFHFieldInclusionFormatCode(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFHFieldInclusionFormatCode(b)
+	}
+}
+
+// testFHFieldInclusionCreationDate validates creation date field inclusion
+func testFHFieldInclusionCreationDate(t testing.TB) {
 	fh := mockFileHeader()
 	fh.FileCreationDate = time.Time{}
 	if err := fh.Validate(); err != nil {
@@ -337,5 +593,18 @@ func TestFHFieldInclusionCreationDate(t *testing.T) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
+	}
+}
+
+// TestFHFieldInclusionCreationDate tests validating creation date field inclusion
+func TestFHFieldInclusionCreationDate(t *testing.T) {
+	testFHFieldInclusionCreationDate(t)
+}
+
+// BenchmarkFHFieldInclusionCreationDate benchmarks validating creation date field inclusion
+func BenchmarkFHFieldInclusionCreationDate(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFHFieldInclusionCreationDate(b)
 	}
 }

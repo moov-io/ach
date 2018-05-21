@@ -5,7 +5,8 @@ import (
 	"testing"
 )
 
-func TestFileRecord(t *testing.T) {
+// testFileRecord validates a file record
+func testFileRecord(t testing.TB) {
 	f := NewFile()
 	f.SetHeader(mockFileHeader())
 	if err := f.Header.Validate(); err != nil {
@@ -17,7 +18,21 @@ func TestFileRecord(t *testing.T) {
 	}
 }
 
-func TestBatchRecord(t *testing.T) {
+// TestFileRecord tests validating a file record
+func TestFileRecord(t *testing.T) {
+	testFileRecord(t)
+}
+
+// BenchmarkFileRecord benchmarks validating a file record
+func BenchmarkFileRecord(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFileRecord(b)
+	}
+}
+
+// testBatchRecord validates a batch record
+func testBatchRecord(t testing.TB) {
 	companyName := "ACME Corporation"
 	batch, _ := NewBatch(mockBatchPPDHeader())
 
@@ -30,7 +45,21 @@ func TestBatchRecord(t *testing.T) {
 	}
 }
 
-func TestEntryDetail(t *testing.T) {
+// TestBatchRecord tests validating a batch record
+func TestBatchRecord(t *testing.T) {
+	testBatchRecord(t)
+}
+
+// BenchmarkBatchRecord benchmarks validating a batch record
+func BenchmarkBatchRecord(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchRecord(b)
+	}
+}
+
+// testEntryDetail validates an entry detail record
+func testEntryDetail(t testing.TB) {
 	entry := mockEntryDetail()
 	//override mockEntryDetail
 	entry.TransactionCode = 27
@@ -40,19 +69,45 @@ func TestEntryDetail(t *testing.T) {
 	}
 }
 
-func TestEntryDetailPaymentType(t *testing.T) {
+// TestEntryDetail tests validating an entry detail record
+func TestEntryDetail(t *testing.T) {
+	testEntryDetail(t)
+}
 
+// BenchmarkEntryDetail benchmarks validating an entry detail record
+func BenchmarkEntryDetail(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testEntryDetail(b)
+	}
+}
+
+// testEntryDetailPaymentType validates an entry detail record payment type
+func testEntryDetailPaymentType(t testing.TB) {
 	entry := mockEntryDetail()
 	//override mockEntryDetail
 	entry.TransactionCode = 27
 	entry.DiscretionaryData = "R"
-
 	if err := entry.Validate(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 }
 
-func TestEntryDetailReceivingCompany(t *testing.T) {
+// TestEntryDetailPaymentType tests validating an entry detail record payment type
+func TestEntryDetailPaymentType(t *testing.T) {
+	testEntryDetailPaymentType(t)
+}
+
+// BenchmarkEntryDetailPaymentType benchmarks validating an entry detail record payment type
+func BenchmarkEntryDetailPaymentType(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testEntryDetailPaymentType(b)
+	}
+}
+
+//  testEntryDetailReceivingCompany validates an entry detail record receiving company
+func testEntryDetailReceivingCompany(t testing.TB) {
 	entry := mockEntryDetail()
 	//override mockEntryDetail
 	entry.TransactionCode = 27
@@ -64,7 +119,21 @@ func TestEntryDetailReceivingCompany(t *testing.T) {
 	}
 }
 
-func TestAddendaRecord(t *testing.T) {
+// TestEntryDetailReceivingCompany tests validating an entry detail record receiving company
+func TestEntryDetailReceivingCompany(t *testing.T) {
+	testEntryDetailReceivingCompany(t)
+}
+
+// BenchmarkEntryDetailReceivingCompany benchmarks validating an entry detail record receiving company
+func BenchmarkEntryDetailReceivingCompany(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testEntryDetailReceivingCompany(b)
+	}
+}
+
+// testAddendaRecord validates an addenda record
+func testAddendaRecord(t testing.TB) {
 	addenda05 := NewAddenda05()
 	addenda05.PaymentRelatedInformation = "Currently string needs ASC X12 Interchange Control Structures"
 	addenda05.SequenceNumber = 1
@@ -75,7 +144,21 @@ func TestAddendaRecord(t *testing.T) {
 	}
 }
 
-func TestBuildFile(t *testing.T) {
+// TestAddendaRecord tests validating an addenda record
+func TestAddendaRecord(t *testing.T) {
+	testAddendaRecord(t)
+}
+
+// BenchmarkAddendaRecord benchmarks validating an addenda record
+func BenchmarkAddendaRecord(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddendaRecord(b)
+	}
+}
+
+// testBuildFile validates building a file
+func testBuildFile(t testing.TB) {
 	// To create a file
 	file := NewFile()
 	file.SetHeader(mockFileHeader())
@@ -139,4 +222,17 @@ func TestBuildFile(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 	w.Flush()
+}
+
+// TestBuildFile tests validating building a file
+func TestBuildFile(t *testing.T) {
+	testBuildFile(t)
+}
+
+// BenchmarkBuildFile benchmarks validating building a file
+func BenchmarkBuildFile(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBuildFile(b)
+	}
 }

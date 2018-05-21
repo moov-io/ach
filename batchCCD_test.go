@@ -4,6 +4,7 @@ import (
 	"testing"
 )
 
+// mockBatchCCDHeader creates a CCD batch header
 func mockBatchCCDHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = 220
@@ -15,6 +16,7 @@ func mockBatchCCDHeader() *BatchHeader {
 	return bh
 }
 
+// mockCCDEntryDetail creates a CCD entry detail
 func mockCCDEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 27
@@ -28,6 +30,7 @@ func mockCCDEntryDetail() *EntryDetail {
 	return entry
 }
 
+// mockBatchCCD creates a CCD batch
 func mockBatchCCD() *BatchCCD {
 	mockBatch := NewBatchCCD(mockBatchCCDHeader())
 	mockBatch.AddEntry(mockCCDEntryDetail())
@@ -38,18 +41,30 @@ func mockBatchCCD() *BatchCCD {
 	return mockBatch
 }
 
-// Test Batch Header
-func TestBatchCCDHeader(t *testing.T) {
+// testBatchCCDHeader creates a CCD batch header
+func testBatchCCDHeader(t testing.TB) {
 	batch, _ := NewBatch(mockBatchCCDHeader())
-
 	_, ok := batch.(*BatchCCD)
 	if !ok {
 		t.Error("Expecting BatchCCD")
 	}
 }
 
-// A Batch CCD can only have one addendum per entry detail
-func TestBatchCCDAddendumCount(t *testing.T) {
+// TestBatchCCDHeader tests creating a CCD batch header
+func TestBatchCCDHeader(t *testing.T) {
+	testBatchCCDHeader(t)
+}
+
+// BenchmarkBatchCCDHeader benchmark creating a CCD batch header
+func BenchmarkBatchCCDHeader(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchCCDHeader(b)
+	}
+}
+
+// testBatchCCDAddendumCount batch control CCD can only have one addendum per entry detail
+func testBatchCCDAddendumCount(t testing.TB) {
 	mockBatch := mockBatchCCD()
 	// Adding a second addenda to the mock entry
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
@@ -64,8 +79,21 @@ func TestBatchCCDAddendumCount(t *testing.T) {
 	}
 }
 
-// receiving company / Individual name is a mandatory field
-func TestBatchCCDReceivingCompanyName(t *testing.T) {
+// TestBatchCCDAddendumCount tests batch control CCD can only have one addendum per entry detail
+func TestBatchCCDAddendumCount(t *testing.T) {
+	testBatchCCDAddendumCount(t)
+}
+
+// BenchmarkBatchCCDAddendumCoun benchmarks batch control CCD can only have one addendum per entry detail
+func BenchmarkBatchCCDAddendumCount(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchCCDAddendumCount(b)
+	}
+}
+
+// testBatchCCDReceivingCompanyName validates Receiving company / Individual name is a mandatory field
+func testBatchCCDReceivingCompanyName(t testing.TB) {
 	mockBatch := mockBatchCCD()
 	// modify the Individual name / receiving company to nothing
 	mockBatch.GetEntries()[0].SetReceivingCompany("")
@@ -80,8 +108,21 @@ func TestBatchCCDReceivingCompanyName(t *testing.T) {
 	}
 }
 
-// verify addenda type code is 05
-func TestBatchCCDAddendaTypeCode(t *testing.T) {
+// TestBatchCCDReceivingCompanyName tests validating receiving company / Individual name is a mandatory field
+func TestBatchCCDReceivingCompanyName(t *testing.T) {
+	testBatchCCDReceivingCompanyName(t)
+}
+
+// BenchmarkBatchCCDReceivingCompanyName benchmarks validating receiving company / Individual name is a mandatory field
+func BenchmarkBatchCCDReceivingCompanyName(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchCCDReceivingCompanyName(b)
+	}
+}
+
+// testBatchCCDAddendaTypeCode validates addenda type code is 05
+func testBatchCCDAddendaTypeCode(t testing.TB) {
 	mockBatch := mockBatchCCD()
 	mockBatch.GetEntries()[0].Addendum[0].(*Addenda05).typeCode = "07"
 	if err := mockBatch.Validate(); err != nil {
@@ -95,8 +136,21 @@ func TestBatchCCDAddendaTypeCode(t *testing.T) {
 	}
 }
 
-// verify that the standard entry class code is CCD for batchCCD
-func TestBatchCCDSEC(t *testing.T) {
+// TestBatchCCDAddendaTypeCode tests validating addenda type code is 05
+func TestBatchCCDAddendaTypeCode(t *testing.T) {
+	testBatchCCDAddendaTypeCode(t)
+}
+
+// BenchmarkBatchCCDAddendaTypeCod benchmarks validating addenda type code is 05
+func BenchmarkBatchCCDAddendaTypeCode(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchCCDAddendaTypeCode(b)
+	}
+}
+
+// testBatchCCDSEC validates that the standard entry class code is CCD for batchCCD
+func testBatchCCDSEC(t testing.TB) {
 	mockBatch := mockBatchCCD()
 	mockBatch.header.StandardEntryClassCode = "RCK"
 	if err := mockBatch.Validate(); err != nil {
@@ -110,7 +164,21 @@ func TestBatchCCDSEC(t *testing.T) {
 	}
 }
 
-func TestBatchCCDAddendaCount(t *testing.T) {
+// TestBatchCCDSEC tests validating that the standard entry class code is CCD for batchCCD
+func TestBatchCCDSEC(t *testing.T) {
+	testBatchCCDSEC(t)
+}
+
+// BenchmarkBatchCCDSEC benchmarks validating that the standard entry class code is CCD for batch CCD
+func BenchmarkBatchCCDSEC(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchCCDSEC(b)
+	}
+}
+
+// testBatchCCDAddendaCount validates batch CCD addenda count
+func testBatchCCDAddendaCount(t testing.TB) {
 	mockBatch := mockBatchCCD()
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
 	mockBatch.Create()
@@ -125,7 +193,21 @@ func TestBatchCCDAddendaCount(t *testing.T) {
 	}
 }
 
-func TestBatchCCDCreate(t *testing.T) {
+// TestBatchCCDAddendaCount tests validating batch CCD addenda count
+func TestBatchCCDAddendaCount(t *testing.T) {
+	testBatchCCDAddendaCount(t)
+}
+
+// BenchmarkBatchCCDAddendaCount benchmarks validating batch CCD addenda count
+func BenchmarkBatchCCDAddendaCount(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchCCDAddendaCount(b)
+	}
+}
+
+// testBatchCCDCreate creates a batch CCD
+func testBatchCCDCreate(t testing.TB) {
 	mockBatch := mockBatchCCD()
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetHeader().ServiceClassCode = 0
@@ -138,5 +220,18 @@ func TestBatchCCDCreate(t *testing.T) {
 		} else {
 			t.Errorf("%T: %s", err, err)
 		}
+	}
+}
+
+// TestBatchCCDCreate Test creating a batch CCD
+func TestBatchCCDCreate(t *testing.T) {
+	testBatchCCDCreate(t)
+}
+
+// BenchmarkBatchCCDCreate benchmark creating a batch CCD
+func BenchmarkBatchCCDCreate(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchCCDCreate(b)
 	}
 }

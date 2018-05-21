@@ -17,7 +17,8 @@ func mockBatchControl() *BatchControl {
 	return bc
 }
 
-func TestMockBatchControl(t *testing.T) {
+// testMockBatchControl tests mock batch control
+func testMockBatchControl(t testing.TB) {
 	bc := mockBatchControl()
 	if err := bc.Validate(); err != nil {
 		t.Error("mockBatchControl does not validate and will break other tests")
@@ -33,8 +34,21 @@ func TestMockBatchControl(t *testing.T) {
 	}
 }
 
+// TestMockBatchControl test mock batch control
+func TestMockBatchControl(t *testing.T) {
+	testMockBatchControl(t)
+}
+
+// BenchmarkMockBatchControl benchmarks mock batch control
+func BenchmarkMockBatchControl(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testMockBatchControl(b)
+	}
+}
+
 // TestParseBatchControl parses a known Batch ControlRecord string.
-func TestParseBatchControl(t *testing.T) {
+func testParseBatchControl(t testing.TB) {
 	var line = "82250000010005320001000000010500000000000000origid                             076401250000001"
 	r := NewReader(strings.NewReader(line))
 	r.line = line
@@ -85,8 +99,21 @@ func TestParseBatchControl(t *testing.T) {
 	}
 }
 
-// TestBCString validats that a known parsed file can be return to a string of the same value
-func TestBCString(t *testing.T) {
+// TestParseBatchControl tests parsing a known Batch ControlRecord string.
+func TestParseBatchControl(t *testing.T) {
+	testParseBatchControl(t)
+}
+
+// BenchmarkParseBatchControl benchmarks parsing a known Batch ControlRecord string.
+func BenchmarkParseBatchControl(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testParseBatchControl(b)
+	}
+}
+
+// testBCString validates that a known parsed file can be return to a string of the same value
+func testBCString(t testing.TB) {
 	var line = "82250000010005320001000000010500000000000000origid                             076401250000001"
 	r := NewReader(strings.NewReader(line))
 	r.line = line
@@ -107,8 +134,21 @@ func TestBCString(t *testing.T) {
 	}
 }
 
-// TestValidateBCRecordType ensure error if recordType is not 8
-func TestValidateBCRecordType(t *testing.T) {
+// TestBCString tests validating that a known parsed file can be return to a string of the same value
+func TestBCString(t *testing.T) {
+	testBCString(t)
+}
+
+// BenchmarkBCString benchmarks validating that a known parsed file can be return to a string of the same value
+func BenchmarkBCString(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBCString(b)
+	}
+}
+
+// testValidateBCRecordType ensure error if recordType is not 8
+func testValidateBCRecordType(t testing.TB) {
 	bc := mockBatchControl()
 	bc.recordType = "2"
 	if err := bc.Validate(); err != nil {
@@ -120,7 +160,21 @@ func TestValidateBCRecordType(t *testing.T) {
 	}
 }
 
-func TestBCisServiceClassErr(t *testing.T) {
+// TestValidateBCRecordType tests ensuring an error if recordType is not 8
+func TestValidateBCRecordType(t *testing.T) {
+	testValidateBCRecordType(t)
+}
+
+// BenchmarkValidateBCRecordType benchmarks ensuring an error if recordType is not 8
+func BenchmarkValidateBCRecordType(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testValidateBCRecordType(b)
+	}
+}
+
+// testBCisServiceClassErr verifies service class code
+func testBCisServiceClassErr(t testing.TB) {
 	bc := mockBatchControl()
 	bc.ServiceClassCode = 123
 	if err := bc.Validate(); err != nil {
@@ -132,7 +186,20 @@ func TestBCisServiceClassErr(t *testing.T) {
 	}
 }
 
-func TestBCBatchNumber(t *testing.T) {
+// TestBCisServiceClassErr tests verifying service class code
+func TestBCisServiceClassErr(t *testing.T) {
+	testBCisServiceClassErr(t)
+}
+
+// BenchmarkBCisServiceClassErr benchmarks verifying service class code
+func BenchmarkBCisServiceClassErr(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		testBCisServiceClassErr(b)
+	}
+}
+
+// testBCBatchNumber verifies batch number
+func testBCBatchNumber(t testing.TB) {
 	bc := mockBatchControl()
 	bc.BatchNumber = 0
 	if err := bc.Validate(); err != nil {
@@ -144,7 +211,21 @@ func TestBCBatchNumber(t *testing.T) {
 	}
 }
 
-func TestBCCompanyIdentificationAlphaNumeric(t *testing.T) {
+// TestBCBatchNumber tests verifying batch number
+func TestBCBatchNumber(t *testing.T) {
+	testBCBatchNumber(t)
+}
+
+// BenchmarkBCBatchNumber benchmarks verifying batch number
+func BenchmarkBCBatchNumber(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBCBatchNumber(b)
+	}
+}
+
+// testBCCompanyIdentificationAlphaNumeric verifies Company Identification is AlphaNumeric
+func testBCCompanyIdentificationAlphaNumeric(t testing.TB) {
 	bc := mockBatchControl()
 	bc.CompanyIdentification = "®"
 	if err := bc.Validate(); err != nil {
@@ -156,7 +237,21 @@ func TestBCCompanyIdentificationAlphaNumeric(t *testing.T) {
 	}
 }
 
-func TestBCMessageAuthenticationCodeAlphaNumeric(t *testing.T) {
+// TestBCCompanyIdentificationAlphaNumeric tests verifying Company Identification is AlphaNumeric
+func TestBCCompanyIdentificationAlphaNumeric(t *testing.T) {
+	testBCCompanyIdentificationAlphaNumeric(t)
+}
+
+// BenchmarkBCCompanyIdentificationAlphaNumeric benchmarks verifying Company Identification is AlphaNumeric
+func BenchmarkBCCompanyIdentificationAlphaNumeric(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBCCompanyIdentificationAlphaNumeric(b)
+	}
+}
+
+// testBCMessageAuthenticationCodeAlphaNumeric verifies AuthenticationCode is AlphaNumeric
+func testBCMessageAuthenticationCodeAlphaNumeric(t testing.TB) {
 	bc := mockBatchControl()
 	bc.MessageAuthenticationCode = "®"
 	if err := bc.Validate(); err != nil {
@@ -168,7 +263,21 @@ func TestBCMessageAuthenticationCodeAlphaNumeric(t *testing.T) {
 	}
 }
 
-func TestBCFieldInclusionRecordType(t *testing.T) {
+// TestBCMessageAuthenticationCodeAlphaNumeric tests verifying AuthenticationCode is AlphaNumeric
+func TestBCMessageAuthenticationCodeAlphaNumeric(t *testing.T) {
+	testBCMessageAuthenticationCodeAlphaNumeric(t)
+}
+
+// BenchmarkBCMessageAuthenticationCodeAlphaNumeric benchmarks verifying AuthenticationCode is AlphaNumeric
+func BenchmarkBCMessageAuthenticationCodeAlphaNumeric(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBCMessageAuthenticationCodeAlphaNumeric(b)
+	}
+}
+
+// testBCFieldInclusionRecordType verifies Record Type is included
+func testBCFieldInclusionRecordType(t testing.TB) {
 	bc := mockBatchControl()
 	bc.recordType = ""
 	if err := bc.Validate(); err != nil {
@@ -180,7 +289,21 @@ func TestBCFieldInclusionRecordType(t *testing.T) {
 	}
 }
 
-func TestBCFieldInclusionServiceClassCode(t *testing.T) {
+// TestBCFieldInclusionRecordType tests verifying Record Type is included
+func TestBCFieldInclusionRecordType(t *testing.T) {
+	testBCFieldInclusionRecordType(t)
+}
+
+// BenchmarkBCFieldInclusionRecordType benchmarks verifying Record Type is included
+func BenchmarkBCFieldInclusionRecordType(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBCFieldInclusionRecordType(b)
+	}
+}
+
+// testBCFieldInclusionServiceClassCode verifies Service Class Code is included
+func testBCFieldInclusionServiceClassCode(t testing.TB) {
 	bc := mockBatchControl()
 	bc.ServiceClassCode = 0
 	if err := bc.Validate(); err != nil {
@@ -192,7 +315,21 @@ func TestBCFieldInclusionServiceClassCode(t *testing.T) {
 	}
 }
 
-func TestBCFieldInclusionODFIIdentification(t *testing.T) {
+// TestBCFieldInclusionServiceClassCode tests verifying Service Class Code is included
+func TestBCFieldInclusionServiceClassCode(t *testing.T) {
+	testBCFieldInclusionServiceClassCode(t)
+}
+
+// BenchmarkBCFieldInclusionServiceClassCod benchmarks verifying Service Class Code is included
+func BenchmarkBCFieldInclusionServiceClassCode(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBCFieldInclusionServiceClassCode(b)
+	}
+}
+
+// testBCFieldInclusionODFIIdentification verifies batch control ODFIIdentification
+func testBCFieldInclusionODFIIdentification(t testing.TB) {
 	bc := mockBatchControl()
 	bc.ODFIIdentification = "000000000"
 	if err := bc.Validate(); err != nil {
@@ -204,10 +341,37 @@ func TestBCFieldInclusionODFIIdentification(t *testing.T) {
 	}
 }
 
-func TestBatchControlLength(t *testing.T) {
+// TestBCFieldInclusionODFIIdentification tests verifying batch control ODFIIdentification
+func TestBCFieldInclusionODFIIdentification(t *testing.T) {
+	testBCFieldInclusionODFIIdentification(t)
+}
+
+// BenchmarkBCFieldInclusionODFIIdentification benchmarks verifying batch control ODFIIdentification
+func BenchmarkBCFieldInclusionODFIIdentification(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBCFieldInclusionODFIIdentification(b)
+	}
+}
+
+// testBatchControlLength verifies batch control length
+func testBatchControlLength(t testing.TB) {
 	bc := NewBatchControl()
 	recordLength := len(bc.String())
 	if recordLength != 94 {
 		t.Errorf("Instantiated length of Batch Control string is not 94 but %v", recordLength)
+	}
+}
+
+// TestBatchControlLength tests verifying batch control length
+func TestBatchControlLength(t *testing.T) {
+	testBatchControlLength(t)
+}
+
+// BenchmarkBatchControlLength benchmarks verifying batch control length
+func BenchmarkBatchControlLength(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchControlLength(b)
 	}
 }

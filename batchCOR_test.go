@@ -6,6 +6,7 @@ import (
 
 // TODO make all the mock values cor fields
 
+// mockBatchCORHeader creates a COR batch header
 func mockBatchCORHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = 220
@@ -17,6 +18,7 @@ func mockBatchCORHeader() *BatchHeader {
 	return bh
 }
 
+// mockCOREntryDetail creates a COR entry detail
 func mockCOREntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 27
@@ -30,6 +32,7 @@ func mockCOREntryDetail() *EntryDetail {
 	return entry
 }
 
+//  mockBatchCOR creates a COR batch
 func mockBatchCOR() *BatchCOR {
 	mockBatch := NewBatchCOR(mockBatchCORHeader())
 	mockBatch.AddEntry(mockCOREntryDetail())
@@ -40,8 +43,8 @@ func mockBatchCOR() *BatchCOR {
 	return mockBatch
 }
 
-// Test Batch Header
-func TestBatchCORHeader(t *testing.T) {
+// testBatchCORHeader creates a COR batch header
+func testBatchCORHeader(t testing.TB) {
 	batch, _ := NewBatch(mockBatchCORHeader())
 
 	_, ok := batch.(*BatchCOR)
@@ -50,7 +53,21 @@ func TestBatchCORHeader(t *testing.T) {
 	}
 }
 
-func TestBatchCORSEC(t *testing.T) {
+// TestBatchCORHeader tests creating a COR batch header
+func TestBatchCORHeader(t *testing.T) {
+	testBatchCORHeader(t)
+}
+
+// BenchmarkBatchCORHeader benchmarks creating a COR batch header
+func BenchmarkBatchCORHeader(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchCORHeader(b)
+	}
+}
+
+// testBatchCORSEC validates COR SEC code
+func testBatchCORSEC(t testing.TB) {
 	mockBatch := mockBatchCOR()
 	mockBatch.header.StandardEntryClassCode = "RCK"
 	if err := mockBatch.Validate(); err != nil {
@@ -64,13 +81,25 @@ func TestBatchCORSEC(t *testing.T) {
 	}
 }
 
-func TestBatchCORAddendumCountTwo(t *testing.T) {
+// TestBatchCORSEC tests validating COR SEC code
+func TestBatchCORSEC(t *testing.T) {
+	testBatchCORSEC(t)
+}
+
+// BenchmarkBatchCORSEC benchmarks validating COR SEC code
+func BenchmarkBatchCORSEC(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchCORSEC(b)
+	}
+}
+
+//  testBatchCORAddendumCountTwo validates addendum count of 2
+func testBatchCORAddendumCountTwo(t testing.TB) {
 	mockBatch := mockBatchCOR()
 	// Adding a second addenda to the mock entry
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98())
-
 	if err := mockBatch.Create(); err != nil {
-		//	fmt.Printf("err: %v \n", err)
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Addendum" {
 				t.Errorf("%T: %s", err, err)
@@ -81,7 +110,21 @@ func TestBatchCORAddendumCountTwo(t *testing.T) {
 	}
 }
 
-func TestBatchCORAddendaCountZero(t *testing.T) {
+// TestBatchCORAddendumCountTwo tests validating addendum count of 2
+func TestBatchCORAddendumCountTwo(t *testing.T) {
+	testBatchCORAddendumCountTwo(t)
+}
+
+// BenchmarkBatchCORAddendumCountTwo benchmarks validating addendum count of 2
+func BenchmarkBatchCORAddendumCountTwo(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchCORAddendumCountTwo(b)
+	}
+}
+
+// testBatchCORAddendaCountZero validates addendum count of 0
+func testBatchCORAddendaCountZero(t testing.TB) {
 	mockBatch := NewBatchCOR(mockBatchCORHeader())
 	mockBatch.AddEntry(mockCOREntryDetail())
 	if err := mockBatch.Create(); err != nil {
@@ -95,8 +138,21 @@ func TestBatchCORAddendaCountZero(t *testing.T) {
 	}
 }
 
-// check that Addendum is of type Addenda98
-func TestBatchCORAddendaType(t *testing.T) {
+// TestBatchCORAddendaCountZero tests validating addendum count of 0
+func TestBatchCORAddendaCountZero(t *testing.T) {
+	testBatchCORAddendaCountZero(t)
+}
+
+// BenchmarkBatchCORAddendaCountZero benchmarks validating addendum count of 0
+func BenchmarkBatchCORAddendaCountZero(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchCORAddendaCountZero(b)
+	}
+}
+
+// testBatchCORAddendaType validates that Addendum is of type Addenda98
+func testBatchCORAddendaType(t testing.TB) {
 	mockBatch := NewBatchCOR(mockBatchCORHeader())
 	mockBatch.AddEntry(mockCOREntryDetail())
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
@@ -111,7 +167,21 @@ func TestBatchCORAddendaType(t *testing.T) {
 	}
 }
 
-func TestBatchCORAddendaTypeCode(t *testing.T) {
+// TestBatchCORAddendaType tests validating that Addendum is of type Addenda98
+func TestBatchCORAddendaType(t *testing.T) {
+	testBatchCORAddendaType(t)
+}
+
+// BenchmarkBatchCORAddendaType benchmarks validating that Addendum is of type Addenda98
+func BenchmarkBatchCORAddendaType(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchCORAddendaType(b)
+	}
+}
+
+// testBatchCORAddendaTypeCode validates Type Code
+func testBatchCORAddendaTypeCode(t testing.TB) {
 	mockBatch := mockBatchCOR()
 	mockBatch.GetEntries()[0].Addendum[0].(*Addenda98).typeCode = "07"
 	if err := mockBatch.Validate(); err != nil {
@@ -125,7 +195,21 @@ func TestBatchCORAddendaTypeCode(t *testing.T) {
 	}
 }
 
-func TestBatchCORAmount(t *testing.T) {
+// TestBatchCORAddendaTypeCode tests validating Type Code
+func TestBatchCORAddendaTypeCode(t *testing.T) {
+	testBatchCORAddendaTypeCode(t)
+}
+
+// BenchmarkBatchCORAddendaTypeCode benchmarks validating Type Code
+func BenchmarkBatchCORAddendaTypeCode(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchCORAddendaTypeCode(b)
+	}
+}
+
+// testBatchCORAmount validates batch COR amount
+func testBatchCORAmount(t testing.TB) {
 	mockBatch := mockBatchCOR()
 	mockBatch.GetEntries()[0].Amount = 9999
 	if err := mockBatch.Create(); err != nil {
@@ -139,7 +223,21 @@ func TestBatchCORAmount(t *testing.T) {
 	}
 }
 
-func TestBatchCORCreate(t *testing.T) {
+// TestBatchCORAmount tests validating batch COR amount
+func TestBatchCORAmount(t *testing.T) {
+	testBatchCORAmount(t)
+}
+
+// BenchmarkBatchCORAmount benchmarks validating batch COR amount
+func BenchmarkBatchCORAmount(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchCORAmount(b)
+	}
+}
+
+// testBatchCORCreate creates batch COR
+func testBatchCORCreate(t testing.TB) {
 	mockBatch := mockBatchCOR()
 	// Must have valid batch header to create a batch
 	mockBatch.GetHeader().ServiceClassCode = 63
@@ -151,5 +249,18 @@ func TestBatchCORCreate(t *testing.T) {
 		} else {
 			t.Errorf("%T: %s", err, err)
 		}
+	}
+}
+
+// TestBatchCORCreate tests creating batch COR
+func TestBatchCORCreate(t *testing.T) {
+	testBatchCORCreate(t)
+}
+
+// BenchmarkBatchCORCreate benchmarks creating batch COR
+func BenchmarkBatchCORCreate(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchCORCreate(b)
 	}
 }
