@@ -54,7 +54,6 @@ func BenchmarkMockFileHeader(b *testing.B) {
 	}
 }
 
-
 // parseFileHeader validates parsing a file header
 func parseFileHeader(t testing.TB) {
 	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
@@ -188,7 +187,6 @@ func testValidateIDModifier(t testing.TB) {
 		}
 	}
 }
-
 
 // TestValidateIDModifier tests validating ID modifier is upper alphanumeric
 func TestValidateIDModifier(t *testing.T) {
@@ -330,15 +328,15 @@ func testUpperLengthFileID(t testing.TB) {
 }
 
 // TestUpperLengthFileID  tests validating file ID
-func TestUpperLengthFileID (t *testing.T) {
-	testUpperLengthFileID (t)
+func TestUpperLengthFileID(t *testing.T) {
+	testUpperLengthFileID(t)
 }
 
 // BenchmarkUpperLengthFileID  benchmarks validating file ID
-func BenchmarkUpperLengthFileID (b *testing.B) {
+func BenchmarkUpperLengthFileID(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testUpperLengthFileID (b)
+		testUpperLengthFileID(b)
 	}
 }
 

@@ -212,7 +212,6 @@ func BenchmarkBatchCompanyIdentification(b *testing.B) {
 	}
 }
 
-
 // testBatchODFIIDMismatch validates ODFIIdentification mismatch
 func testBatchODFIIDMismatch(t testing.TB) {
 	mockBatch := mockBatchPPD()
