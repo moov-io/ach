@@ -12,6 +12,8 @@ import (
 // Addenda98 is a Addendumer addenda record format for Notification OF Change(98)
 // The field contents for Notification of Change Entries must match the field contents of the original Entries
 type Addenda98 struct {
+	// ID is a client defined string used as a reference to this record.
+	ID string `json:"id"`
 	// RecordType defines the type of record in the block. entryAddendaPos 7
 	recordType string
 	// TypeCode Addenda types code '98'

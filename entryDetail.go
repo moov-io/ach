@@ -15,6 +15,8 @@ import (
 // withdrawal (debit), the transit routing number for the entry recipient’s financial
 // institution, the account number (left justify,no zero fill), name, and dollar amount.
 type EntryDetail struct {
+	// ID is a client defined string used as a reference to this record.
+	ID string `json:"id"`
 	// RecordType defines the type of record in the block. 6
 	recordType string
 	// TransactionCode if the receivers account is:

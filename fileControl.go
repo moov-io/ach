@@ -9,6 +9,8 @@ import "fmt"
 // FileControl record contains entry counts, dollar totals and hash
 // totals accumulated from each batch control record in the file.
 type FileControl struct {
+	// ID is a client defined string used as a reference to this record.
+	ID string `json:"id"`
 	// RecordType defines the type of record in the block. fileControlPos 9
 	recordType string
 

@@ -34,15 +34,15 @@ func (batch *BatchTEL) Validate() error {
 	}
 
 	// Add type specific validation.
-	if batch.header.StandardEntryClassCode != "TEL" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.header.StandardEntryClassCode, "TEL")
-		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
+	if batch.Header.StandardEntryClassCode != "TEL" {
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "TEL")
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 	// can not have credits in TEL batches
-	for _, entry := range batch.entries {
+	for _, entry := range batch.Entries {
 		if entry.CreditOrDebit() != "D" {
 			msg := fmt.Sprintf(msgBatchTransactionCodeCredit, entry.IndividualName)
-			return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 		}
 	}
 

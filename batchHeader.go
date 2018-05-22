@@ -19,6 +19,8 @@ import (
 // settlement date, for all entries contained in this batch. The settlement date
 // field is not entered as it is determined by the ACH operator
 type BatchHeader struct {
+	// ID is a client defined string used as a reference to this record.
+	ID string `json:"id"`
 	// RecordType defines the type of record in the block. 5
 	recordType string
 

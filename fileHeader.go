@@ -23,12 +23,12 @@ var (
 // contained in the file. The file header also includes creation date and time
 // fields which can be used to uniquely identify a file.
 type FileHeader struct {
+	// ID is a client defined string used as a reference to this record.
+	ID string `json:"id"`
 	// RecordType defines the type of record in the block. headerPos
 	recordType string
-
 	// PriorityCode consists of the numerals 01
 	priorityCode string
-
 	// ImmediateDestination contains the Routing Number of the ACH Operator or receiving
 	// point to which the file is being sent.  The ach file format specifies a 10 character
 	// field  begins with a blank space in the first position, followed by the four digit

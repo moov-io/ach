@@ -125,7 +125,7 @@ func BenchmarkBatchTELAddendaCount(b *testing.B) {
 // testBatchTELSEC validates SEC code for batch TEL
 func testBatchTELSEC(t testing.TB) {
 	mockBatch := mockBatchTEL()
-	mockBatch.header.StandardEntryClassCode = "RCK"
+	mockBatch.Header.StandardEntryClassCode = "RCK"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {

@@ -32,6 +32,8 @@ func init() {
 
 // Addenda99 utilized for Notification of Change Entry (COR) and Return types.
 type Addenda99 struct {
+	// ID is a client defined string used as a reference to this record.
+	ID string `json:"id"`
 	// RecordType defines the type of record in the block. entryAddendaPos 7
 	recordType string
 	// TypeCode Addenda types code '99'

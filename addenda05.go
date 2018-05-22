@@ -12,6 +12,8 @@ import (
 // Addenda05 is a Addendumer addenda which provides business transaction information for Addenda Type
 // Code 05 in a machine readable format. It is usually formatted according to ANSI, ASC, X12 Standard.
 type Addenda05 struct {
+	// ID is a client defined string used as a reference to this record.
+	ID string `json:"id"`
 	// RecordType defines the type of record in the block. entryAddenda05 Pos 7
 	recordType string
 	// TypeCode Addenda05 types code '05'

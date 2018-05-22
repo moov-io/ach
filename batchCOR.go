@@ -40,16 +40,16 @@ func (batch *BatchCOR) Validate() error {
 	}
 
 	// Add type specific validation.
-	if batch.header.StandardEntryClassCode != "COR" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.header.StandardEntryClassCode, "COR")
-		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
+	if batch.Header.StandardEntryClassCode != "COR" {
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "COR")
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
 	// The Amount field must be zero
 	// batch.verify calls batch.isBatchAmount which ensures the batch.Control values are accurate.
-	if batch.control.TotalCreditEntryDollarAmount != 0 || batch.control.TotalDebitEntryDollarAmount != 0 {
-		msg := fmt.Sprintf(msgBatchCORAmount, batch.control.TotalCreditEntryDollarAmount, batch.control.TotalDebitEntryDollarAmount)
-		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "Amount", Msg: msg}
+	if batch.Control.TotalCreditEntryDollarAmount != 0 || batch.Control.TotalDebitEntryDollarAmount != 0 {
+		msg := fmt.Sprintf(msgBatchCORAmount, batch.Control.TotalCreditEntryDollarAmount, batch.Control.TotalDebitEntryDollarAmount)
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
 	}
 
 	return nil
@@ -67,22 +67,22 @@ func (batch *BatchCOR) Create() error {
 
 // isAddenda98 verifies that a Addenda98 exists for each EntryDetail and is Validated
 func (batch *BatchCOR) isAddenda98() error {
-	for _, entry := range batch.entries {
+	for _, entry := range batch.Entries {
 		// Addenda type must be equal to 1
 		if len(entry.Addendum) != 1 {
-			return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "Addendum", Msg: msgBatchCORAddenda}
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchCORAddenda}
 		}
 		// Addenda type assertion must be Addenda98
 		addenda98, ok := entry.Addendum[0].(*Addenda98)
 		if !ok {
 			msg := fmt.Sprintf(msgBatchCORAddendaType, entry.Addendum[0])
-			return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "Addendum", Msg: msg}
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
 		}
 		// Addenda98 must be Validated
 		if err := addenda98.Validate(); err != nil {
 			// convert the field error in to a batch error for a consistent api
 			if e, ok := err.(*FieldError); ok {
-				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: e.FieldName, Msg: e.Msg}
+				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: e.FieldName, Msg: e.Msg}
 			}
 		}
 	}
