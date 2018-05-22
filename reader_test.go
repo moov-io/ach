@@ -84,15 +84,15 @@ func testWEBDebitRead(t testing.TB) {
 }
 
 // TestWEBDebitRead tests validating reading a WEB debit
-func TestWEBDebitRead (t *testing.T) {
-	testWEBDebitRead (t)
+func TestWEBDebitRead(t *testing.T) {
+	testWEBDebitRead(t)
 }
 
 // BenchmarkWEBDebitRead benchmarks validating reading a WEB debit
-func BenchmarkWEBDebitRead (b *testing.B) {
+func BenchmarkWEBDebitRead(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testWEBDebitRead (b)
+		testWEBDebitRead(b)
 	}
 }
 
@@ -512,7 +512,6 @@ func BenchmarkFileAddenda98(b *testing.B) {
 	}
 }
 
-
 // testFileAddenda99 validates addenda 99
 func testFileAddenda99(t testing.TB) {
 	bh := mockBatchHeader()
@@ -699,6 +698,7 @@ func BenchmarkFileFileControlNoCurrentBatch(b *testing.B) {
 		testFileFileControlNoCurrentBatch(b)
 	}
 }
+
 // testFileBatchControlValidate validates a batch control
 func testFileBatchControlValidate(t testing.TB) {
 	bh := mockBatchHeader()
@@ -840,7 +840,6 @@ func testFileFHImmediateOrigin(t testing.TB) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
-
 
 // TestFileFHImmediateOrigin tests validating file header immediate origin
 func TestFileFHImmediateOrigin(t *testing.T) {
