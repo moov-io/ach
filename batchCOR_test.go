@@ -73,7 +73,7 @@ func BenchmarkBatchCORHeader(b *testing.B) {
 // testBatchCORSEC validates COR SEC code
 func testBatchCORSEC(t testing.TB) {
 	mockBatch := mockBatchCOR()
-	mockBatch.header.StandardEntryClassCode = "RCK"
+	mockBatch.Header.StandardEntryClassCode = "RCK"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {

@@ -45,7 +45,7 @@ func testBatchRecord(t testing.TB) {
 		t.Errorf("%T: %s", err, err)
 	}
 	if bh.CompanyName != companyName {
-		t.Errorf("BatchParam value was not copied to batch.header.CompanyName")
+		t.Errorf("BatchParam value was not copied to batch.Header.CompanyName")
 	}
 }
 

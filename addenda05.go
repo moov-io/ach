@@ -12,21 +12,23 @@ import (
 // Addenda05 is a Addendumer addenda which provides business transaction information for Addenda Type
 // Code 05 in a machine readable format. It is usually formatted according to ANSI, ASC, X12 Standard.
 type Addenda05 struct {
+	// ID is a client defined string used as a reference to this record.
+	ID string `json:"id"`
 	// RecordType defines the type of record in the block. entryAddenda05 Pos 7
 	recordType string
 	// TypeCode Addenda05 types code '05'
 	typeCode string
 	// PaymentRelatedInformation
-	PaymentRelatedInformation string
+	PaymentRelatedInformation string `json:"paymentRelatedInformation"`
 	// SequenceNumber is consecutively assigned to each Addenda05 Record following
 	// an Entry Detail Record. The first addenda05 sequence number must always
 	// be a "1".
-	SequenceNumber int
+	SequenceNumber int `json:"sequenceNumber,omitempty"`
 	// EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
 	// Detail or Corporate Entry Detail Record's trace number This number is
 	// the same as the last seven digits of the trace number of the related
 	// Entry Detail Record or Corporate Entry Detail Record.
-	EntryDetailSequenceNumber int
+	EntryDetailSequenceNumber int `json:"entryDetailSequenceNumber,omitempty"`
 	// validator is composed for data validation
 	validator
 	// converters is composed for ACH to GoLang Converters
