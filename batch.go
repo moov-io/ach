@@ -12,9 +12,11 @@ import (
 
 // Batch holds the Batch Header and Batch Control and all Entry Records for PPD Entries
 type batch struct {
-	header  *BatchHeader
-	entries []*EntryDetail
-	control *BatchControl
+	// ID is a client defined string used as a reference to this record.
+	ID      string         `json:"id"`
+	Header  *BatchHeader   `json:"batchHeader,omitempty"`
+	Entries []*EntryDetail `json:"entryDetails,omitempty"`
+	Control *BatchControl  `json:"batchControl,omitempty"`
 
 	// category defines if the entry is a Forward, Return, or NOC
 	category string
@@ -43,7 +45,7 @@ func NewBatch(bh *BatchHeader) (Batcher, error) {
 
 // verify checks basic valid NACHA batch rules. Assumes properly parsed records. This does not mean it is a valid batch as validity is tied to each batch type
 func (batch *batch) verify() error {
-	batchNumber := batch.header.BatchNumber
+	batchNumber := batch.Header.BatchNumber
 
 	// verify field inclusion in all the records of the batch.
 	if err := batch.isFieldInclusion(); err != nil {
@@ -54,23 +56,23 @@ func (batch *batch) verify() error {
 		return &BatchError{BatchNumber: batchNumber, FieldName: "FieldError", Msg: err.Error()}
 	}
 	// validate batch header and control codes are the same
-	if batch.header.ServiceClassCode != batch.control.ServiceClassCode {
-		msg := fmt.Sprintf(msgBatchHeaderControlEquality, batch.header.ServiceClassCode, batch.control.ServiceClassCode)
+	if batch.Header.ServiceClassCode != batch.Control.ServiceClassCode {
+		msg := fmt.Sprintf(msgBatchHeaderControlEquality, batch.Header.ServiceClassCode, batch.Control.ServiceClassCode)
 		return &BatchError{BatchNumber: batchNumber, FieldName: "ServiceClassCode", Msg: msg}
 	}
 	// Company Identification must match the Company ID from the batch header record
-	if batch.header.CompanyIdentification != batch.control.CompanyIdentification {
-		msg := fmt.Sprintf(msgBatchHeaderControlEquality, batch.header.CompanyIdentification, batch.control.CompanyIdentification)
+	if batch.Header.CompanyIdentification != batch.Control.CompanyIdentification {
+		msg := fmt.Sprintf(msgBatchHeaderControlEquality, batch.Header.CompanyIdentification, batch.Control.CompanyIdentification)
 		return &BatchError{BatchNumber: batchNumber, FieldName: "CompanyIdentification", Msg: msg}
 	}
 	// Control ODFI Identification must be the same as batch header
-	if batch.header.ODFIIdentification != batch.control.ODFIIdentification {
-		msg := fmt.Sprintf(msgBatchHeaderControlEquality, batch.header.ODFIIdentification, batch.control.ODFIIdentification)
+	if batch.Header.ODFIIdentification != batch.Control.ODFIIdentification {
+		msg := fmt.Sprintf(msgBatchHeaderControlEquality, batch.Header.ODFIIdentification, batch.Control.ODFIIdentification)
 		return &BatchError{BatchNumber: batchNumber, FieldName: "ODFIIdentification", Msg: msg}
 	}
 	// batch number header and control must match
-	if batch.header.BatchNumber != batch.control.BatchNumber {
-		msg := fmt.Sprintf(msgBatchHeaderControlEquality, batch.header.ODFIIdentification, batch.control.ODFIIdentification)
+	if batch.Header.BatchNumber != batch.Control.BatchNumber {
+		msg := fmt.Sprintf(msgBatchHeaderControlEquality, batch.Header.ODFIIdentification, batch.Control.ODFIIdentification)
 		return &BatchError{BatchNumber: batchNumber, FieldName: "BatchNumber", Msg: msg}
 	}
 
@@ -108,38 +110,38 @@ func (batch *batch) verify() error {
 // the batch being built has invalid records.
 func (batch *batch) build() error {
 	// Requires a valid BatchHeader
-	if err := batch.header.Validate(); err != nil {
+	if err := batch.Header.Validate(); err != nil {
 		return err
 	}
-	if len(batch.entries) <= 0 {
-		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "entries", Msg: msgBatchEntries}
+	if len(batch.Entries) <= 0 {
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "entries", Msg: msgBatchEntries}
 	}
 	// Create record sequence numbers
 	entryCount := 0
 	seq := 1
-	for i, entry := range batch.entries {
+	for i, entry := range batch.Entries {
 		entryCount = entryCount + 1 + len(entry.Addendum)
 		currentTraceNumberODFI, err := strconv.Atoi(entry.TraceNumberField()[:8])
 		if err != nil {
 			return err
 		}
 
-		batchHeaderODFI, err := strconv.Atoi(batch.header.ODFIIdentificationField()[:8])
+		batchHeaderODFI, err := strconv.Atoi(batch.Header.ODFIIdentificationField()[:8])
 		if err != nil {
 			return err
 		}
 
 		// Add a sequenced TraceNumber if one is not already set. Have to keep original trance number Return and NOC entries
 		if currentTraceNumberODFI != batchHeaderODFI {
-			batch.entries[i].SetTraceNumber(batch.header.ODFIIdentification, seq)
+			batch.Entries[i].SetTraceNumber(batch.Header.ODFIIdentification, seq)
 		}
 		seq++
 		addendaSeq := 1
 		for x := range entry.Addendum {
 			// sequences don't exist in NOC or Return addenda
-			if a, ok := batch.entries[i].Addendum[x].(*Addenda05); ok {
+			if a, ok := batch.Entries[i].Addendum[x].(*Addenda05); ok {
 				a.SequenceNumber = addendaSeq
-				a.EntryDetailSequenceNumber = batch.parseNumField(batch.entries[i].TraceNumberField()[8:])
+				a.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
 			}
 			addendaSeq++
 		}
@@ -147,47 +149,47 @@ func (batch *batch) build() error {
 
 	// build a BatchControl record
 	bc := NewBatchControl()
-	bc.ServiceClassCode = batch.header.ServiceClassCode
-	bc.CompanyIdentification = batch.header.CompanyIdentification
-	bc.ODFIIdentification = batch.header.ODFIIdentification
-	bc.BatchNumber = batch.header.BatchNumber
+	bc.ServiceClassCode = batch.Header.ServiceClassCode
+	bc.CompanyIdentification = batch.Header.CompanyIdentification
+	bc.ODFIIdentification = batch.Header.ODFIIdentification
+	bc.BatchNumber = batch.Header.BatchNumber
 	bc.EntryAddendaCount = entryCount
 	bc.EntryHash = batch.parseNumField(batch.calculateEntryHash())
 	bc.TotalCreditEntryDollarAmount, bc.TotalDebitEntryDollarAmount = batch.calculateBatchAmounts()
-	batch.control = bc
+	batch.Control = bc
 
 	return nil
 }
 
 // SetHeader appends an BatchHeader to the Batch
 func (batch *batch) SetHeader(batchHeader *BatchHeader) {
-	batch.header = batchHeader
+	batch.Header = batchHeader
 }
 
 // GetHeader returns the current Batch header
 func (batch *batch) GetHeader() *BatchHeader {
-	return batch.header
+	return batch.Header
 }
 
 // SetControl appends an BatchControl to the Batch
 func (batch *batch) SetControl(batchControl *BatchControl) {
-	batch.control = batchControl
+	batch.Control = batchControl
 }
 
 // GetControl returns the current Batch Control
 func (batch *batch) GetControl() *BatchControl {
-	return batch.control
+	return batch.Control
 }
 
 // GetEntries returns a slice of entry details for the batch
 func (batch *batch) GetEntries() []*EntryDetail {
-	return batch.entries
+	return batch.Entries
 }
 
 // AddEntry appends an EntryDetail to the Batch
 func (batch *batch) AddEntry(entry *EntryDetail) {
 	batch.category = entry.Category
-	batch.entries = append(batch.entries, entry)
+	batch.Entries = append(batch.Entries, entry)
 }
 
 // IsReturn is true if the batch contains an Entry Return
@@ -197,10 +199,10 @@ func (batch *batch) Category() string {
 
 // isFieldInclusion iterates through all the records in the batch and verifies against default fields
 func (batch *batch) isFieldInclusion() error {
-	if err := batch.header.Validate(); err != nil {
+	if err := batch.Header.Validate(); err != nil {
 		return err
 	}
-	for _, entry := range batch.entries {
+	for _, entry := range batch.Entries {
 		if err := entry.Validate(); err != nil {
 			return err
 		}
@@ -210,7 +212,7 @@ func (batch *batch) isFieldInclusion() error {
 			}
 		}
 	}
-	return batch.control.Validate()
+	return batch.Control.Validate()
 }
 
 // isBatchEntryCount validate Entry count is accurate
@@ -218,12 +220,12 @@ func (batch *batch) isFieldInclusion() error {
 // Record processed within the batch
 func (batch *batch) isBatchEntryCount() error {
 	entryCount := 0
-	for _, entry := range batch.entries {
+	for _, entry := range batch.Entries {
 		entryCount = entryCount + 1 + len(entry.Addendum)
 	}
-	if entryCount != batch.control.EntryAddendaCount {
-		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, entryCount, batch.control.EntryAddendaCount)
-		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "EntryAddendaCount", Msg: msg}
+	if entryCount != batch.Control.EntryAddendaCount {
+		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, entryCount, batch.Control.EntryAddendaCount)
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "EntryAddendaCount", Msg: msg}
 	}
 	return nil
 }
@@ -233,20 +235,20 @@ func (batch *batch) isBatchEntryCount() error {
 // Entry Detail debit and credit totals within a given batch
 func (batch *batch) isBatchAmount() error {
 	credit, debit := batch.calculateBatchAmounts()
-	if debit != batch.control.TotalDebitEntryDollarAmount {
-		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, debit, batch.control.TotalDebitEntryDollarAmount)
-		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TotalDebitEntryDollarAmount", Msg: msg}
+	if debit != batch.Control.TotalDebitEntryDollarAmount {
+		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, debit, batch.Control.TotalDebitEntryDollarAmount)
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TotalDebitEntryDollarAmount", Msg: msg}
 	}
 
-	if credit != batch.control.TotalCreditEntryDollarAmount {
-		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, credit, batch.control.TotalCreditEntryDollarAmount)
-		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TotalCreditEntryDollarAmount", Msg: msg}
+	if credit != batch.Control.TotalCreditEntryDollarAmount {
+		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, credit, batch.Control.TotalCreditEntryDollarAmount)
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TotalCreditEntryDollarAmount", Msg: msg}
 	}
 	return nil
 }
 
 func (batch *batch) calculateBatchAmounts() (credit int, debit int) {
-	for _, entry := range batch.entries {
+	for _, entry := range batch.Entries {
 		if entry.TransactionCode == 21 || entry.TransactionCode == 22 || entry.TransactionCode == 23 || entry.TransactionCode == 32 || entry.TransactionCode == 33 {
 			credit = credit + entry.Amount
 		}
@@ -261,10 +263,10 @@ func (batch *batch) calculateBatchAmounts() (credit int, debit int) {
 // be in ascending Trace Number order (although Trace Numbers need not necessarily be consecutive).
 func (batch *batch) isSequenceAscending() error {
 	lastSeq := -1
-	for _, entry := range batch.entries {
+	for _, entry := range batch.Entries {
 		if entry.TraceNumber <= lastSeq {
 			msg := fmt.Sprintf(msgBatchAscending, entry.TraceNumber, lastSeq)
-			return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
 		}
 		lastSeq = entry.TraceNumber
 	}
@@ -274,9 +276,9 @@ func (batch *batch) isSequenceAscending() error {
 // isEntryHash validates the hash by recalculating the result
 func (batch *batch) isEntryHash() error {
 	hashField := batch.calculateEntryHash()
-	if hashField != batch.control.EntryHashField() {
-		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, hashField, batch.control.EntryHashField())
-		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "EntryHash", Msg: msg}
+	if hashField != batch.Control.EntryHashField() {
+		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, hashField, batch.Control.EntryHashField())
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "EntryHash", Msg: msg}
 	}
 	return nil
 }
@@ -285,7 +287,7 @@ func (batch *batch) isEntryHash() error {
 // The Entry Hash provides a check against inadvertent alteration of data
 func (batch *batch) calculateEntryHash() string {
 	hash := 0
-	for _, entry := range batch.entries {
+	for _, entry := range batch.Entries {
 
 		entryRDFI, _ := strconv.Atoi(entry.RDFIIdentification)
 
@@ -296,11 +298,11 @@ func (batch *batch) calculateEntryHash() string {
 
 // The Originator Status Code is not equal to “2” for DNE if the Transaction Code is 23 or 33
 func (batch *batch) isOriginatorDNE() error {
-	if batch.header.OriginatorStatusCode != 2 {
-		for _, entry := range batch.entries {
+	if batch.Header.OriginatorStatusCode != 2 {
+		for _, entry := range batch.Entries {
 			if entry.TransactionCode == 23 || entry.TransactionCode == 33 {
-				msg := fmt.Sprintf(msgBatchOriginatorDNE, batch.header.OriginatorStatusCode)
-				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "OriginatorStatusCode", Msg: msg}
+				msg := fmt.Sprintf(msgBatchOriginatorDNE, batch.Header.OriginatorStatusCode)
+				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "OriginatorStatusCode", Msg: msg}
 			}
 		}
 	}
@@ -310,10 +312,10 @@ func (batch *batch) isOriginatorDNE() error {
 // isTraceNumberODFI checks if the first 8 positions of the entry detail trace number
 // match the batch header odfi
 func (batch *batch) isTraceNumberODFI() error {
-	for _, entry := range batch.entries {
-		if batch.header.ODFIIdentificationField() != entry.TraceNumberField()[:8] {
-			msg := fmt.Sprintf(msgBatchTraceNumberNotODFI, batch.header.ODFIIdentificationField(), entry.TraceNumberField()[:8])
-			return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "ODFIIdentificationField", Msg: msg}
+	for _, entry := range batch.Entries {
+		if batch.Header.ODFIIdentificationField() != entry.TraceNumberField()[:8] {
+			msg := fmt.Sprintf(msgBatchTraceNumberNotODFI, batch.Header.ODFIIdentificationField(), entry.TraceNumberField()[:8])
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ODFIIdentificationField", Msg: msg}
 		}
 	}
 
@@ -322,11 +324,11 @@ func (batch *batch) isTraceNumberODFI() error {
 
 // isAddendaSequence check multiple errors on addenda records in the batch entries
 func (batch *batch) isAddendaSequence() error {
-	for _, entry := range batch.entries {
+	for _, entry := range batch.Entries {
 		if len(entry.Addendum) > 0 {
 			// addenda without indicator flag of 1
 			if entry.AddendaRecordIndicator != 1 {
-				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "AddendaRecordIndicator", Msg: msgBatchAddendaIndicator}
+				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaRecordIndicator", Msg: msgBatchAddendaIndicator}
 			}
 			lastSeq := -1
 			// check if sequence is assending
@@ -336,13 +338,13 @@ func (batch *batch) isAddendaSequence() error {
 
 					if a.SequenceNumber < lastSeq {
 						msg := fmt.Sprintf(msgBatchAscending, a.SequenceNumber, lastSeq)
-						return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "SequenceNumber", Msg: msg}
+						return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "SequenceNumber", Msg: msg}
 					}
 					lastSeq = a.SequenceNumber
 					// check that we are in the correct Entry Detail
 					if !(a.EntryDetailSequenceNumberField() == entry.TraceNumberField()[8:]) {
 						msg := fmt.Sprintf(msgBatchAddendaTraceNumber, a.EntryDetailSequenceNumberField(), entry.TraceNumberField()[8:])
-						return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
+						return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
 					}
 				}
 			}
@@ -355,10 +357,10 @@ func (batch *batch) isAddendaSequence() error {
 // Following SEC codes allow for none or one Addendum
 // "PPD", "WEB", "CCD", "CIE", "DNE", "MTE", "POS", "SHR"
 func (batch *batch) isAddendaCount(count int) error {
-	for _, entry := range batch.entries {
+	for _, entry := range batch.Entries {
 		if len(entry.Addendum) > count {
-			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), count, batch.header.StandardEntryClassCode)
-			return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), count, batch.Header.StandardEntryClassCode)
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 		}
 
 	}
@@ -367,11 +369,11 @@ func (batch *batch) isAddendaCount(count int) error {
 
 // isTypeCode takes a typecode string and verifies addenda records match
 func (batch *batch) isTypeCode(typeCode string) error {
-	for _, entry := range batch.entries {
+	for _, entry := range batch.Entries {
 		for _, addenda := range entry.Addendum {
 			if addenda.TypeCode() != typeCode {
-				msg := fmt.Sprintf(msgBatchTypeCode, addenda.TypeCode(), typeCode, batch.header.StandardEntryClassCode)
-				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+				msg := fmt.Sprintf(msgBatchTypeCode, addenda.TypeCode(), typeCode, batch.Header.StandardEntryClassCode)
+				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
 			}
 		}
 	}
@@ -381,13 +383,13 @@ func (batch *batch) isTypeCode(typeCode string) error {
 // isCategory verifies that a Forward and Return Category are not in the same batch
 func (batch *batch) isCategory() error {
 	category := batch.GetEntries()[0].Category
-	if len(batch.entries) > 1 {
-		for i := 1; i < len(batch.entries); i++ {
-			if batch.entries[i].Category == CategoryNOC {
+	if len(batch.Entries) > 1 {
+		for i := 1; i < len(batch.Entries); i++ {
+			if batch.Entries[i].Category == CategoryNOC {
 				continue
 			}
-			if batch.entries[i].Category != category {
-				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "Category", Msg: msgBatchForwardReturn}
+			if batch.Entries[i].Category != category {
+				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Category", Msg: msgBatchForwardReturn}
 			}
 		}
 	}
@@ -398,11 +400,11 @@ func (batch *batch) isCategory() error {
 // "R" For a recurring WEB Entry
 // "S" For a Single-Entry WEB Entry
 func (batch *batch) isPaymentTypeCode() error {
-	for _, entry := range batch.entries {
+	for _, entry := range batch.Entries {
 		if !strings.Contains(strings.ToUpper(entry.PaymentTypeField()), "S") && !strings.Contains(strings.ToUpper(entry.PaymentTypeField()), "R") {
 			// TODO dead code because PaymentTypeField always returns S regardless of Discretionary Data value
 			msg := fmt.Sprintf(msgBatchWebPaymentType, entry.PaymentTypeField())
-			return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "PaymentType", Msg: msg}
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "PaymentType", Msg: msg}
 		}
 	}
 	return nil

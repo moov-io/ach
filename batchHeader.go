@@ -19,27 +19,29 @@ import (
 // settlement date, for all entries contained in this batch. The settlement date
 // field is not entered as it is determined by the ACH operator
 type BatchHeader struct {
+	// ID is a client defined string used as a reference to this record.
+	ID string `json:"id"`
 	// RecordType defines the type of record in the block. 5
 	recordType string
 
 	// ServiceClassCode ACH Mixed Debits and Credits ‘200’
 	// ACH Credits Only ‘220’
 	// ACH Debits Only ‘225'
-	ServiceClassCode int
+	ServiceClassCode int `json:"serviceClassCode"`
 
 	// CompanyName the company originating the entries in the batch
-	CompanyName string
+	CompanyName string `json:"companyName"`
 
 	// CompanyDiscretionaryData allows Originators and/or ODFIs to include codes (one or more),
 	// of significance only to them, to enable specialized handling of all
 	// subsequent entries in that batch. There will be no standardized
 	// interpretation for the value of the field. This field must be returned
 	// intact on any return entry.
-	CompanyDiscretionaryData string
+	CompanyDiscretionaryData string `json:"companyDiscretionaryData,omitempty"`
 
 	// CompanyIdentification The 9 digit FEIN number (proceeded by a predetermined
 	// alpha or numeric character) of the entity in the company name field
-	CompanyIdentification string
+	CompanyIdentification string `json:"companyIdentification"`
 
 	// StandardEntryClassCode
 	// Identifies the payment type (product) found within an ACH batch-using a 3-character code.
@@ -48,7 +50,7 @@ type BatchHeader struct {
 	// Determines addenda records (required or optional PLUS one or up to 9,999 records).
 	// Determines rules to follow (return time frames).
 	// Some SEC codes require specific data in predetermined fields within the ACH record
-	StandardEntryClassCode string
+	StandardEntryClassCode string `json:"standardEntryClassCode,omitempty"`
 
 	// CompanyEntryDescription A description of the entries contained in the batch
 	//
@@ -65,7 +67,7 @@ type BatchHeader struct {
 	//
 	// This field must contain the word "NONSETTLED" (left justified) when the
 	// batch contains entries which could not settle.
-	CompanyEntryDescription string
+	CompanyEntryDescription string `json:"companyEntryDescription,omitempty"`
 
 	// CompanyDescriptiveDate except as otherwise noted below, the Originator establishes this field
 	// as the date it would like to see displayed to the receiver for
@@ -73,10 +75,10 @@ type BatchHeader struct {
 	// computer or manual operation. It is solely for descriptive purposes.
 	// The RDFI should not assume any specific format. Examples of possible
 	// entries in this field are "011392,", "01 92," "JAN 13," "JAN 92," etc.
-	CompanyDescriptiveDate string
+	CompanyDescriptiveDate string `json:"companyDescriptiveDate,omitempty"`
 
 	// EffectiveEntryDate the date on which the entries are to settle
-	EffectiveEntryDate time.Time
+	EffectiveEntryDate time.Time `json:"effectiveEntryDate,omitempty"`
 
 	// SettlementDate Leave blank, this field is inserted by the ACH operator
 	settlementDate string
@@ -85,17 +87,17 @@ type BatchHeader struct {
 	// 0 ADV File prepared by an ACH Operator.
 	// 1 This code identifies the Originator as a depository financial institution.
 	// 2 This code identifies the Originator as a Federal Government entity or agency.
-	OriginatorStatusCode int
+	OriginatorStatusCode int `json:"originatorStatusCode,omitempty"`
 
 	//ODFIIdentification First 8 digits of the originating DFI transit routing number
-	ODFIIdentification string
+	ODFIIdentification string `json:"ODFIIdentification"`
 
 	// BatchNumber is assigned in ascending sequence to each batch by the ODFI
 	// or its Sending Point in a given file of entries. Since the batch number
 	// in the Batch Header Record and the Batch Control Record is the same,
 	// the ascending sequence number should be assigned by batch and not by
 	// record.
-	BatchNumber int
+	BatchNumber int `json:"batchNumber,omitempty"`
 
 	// validator is composed for data validation
 	validator

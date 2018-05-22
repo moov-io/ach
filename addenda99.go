@@ -32,25 +32,27 @@ func init() {
 
 // Addenda99 utilized for Notification of Change Entry (COR) and Return types.
 type Addenda99 struct {
+	// ID is a client defined string used as a reference to this record.
+	ID string `json:"id"`
 	// RecordType defines the type of record in the block. entryAddendaPos 7
 	recordType string
 	// TypeCode Addenda types code '99'
 	typeCode string
 	// ReturnCode field contains a standard code used by an ACH Operator or RDFI to describe the reason for returning an Entry.
 	// Must exist in returnCodeDict
-	ReturnCode string
+	ReturnCode string `json:"returnCode"`
 	// OriginalTrace This field contains the Trace Number as originally included on the forward Entry or Prenotification.
 	// The RDFI must include the Original Entry Trace Number in the Addenda Record of an Entry being returned to an ODFI,
 	// in the Addenda Record of an 98, within an Acknowledgment Entry, or with an RDFI request for a copy of an authorization.
-	OriginalTrace int
+	OriginalTrace int `json:"originalTrace"`
 	// DateOfDeath The field date of death is to be supplied on Entries being returned for reason of death (return reason codes R14 and R15).
-	DateOfDeath time.Time
+	DateOfDeath time.Time `json:"dateOfDeath"`
 	// OriginalDFI field contains the Receiving DFI Identification (addenda.RDFIIdentification) as originally included on the forward Entry or Prenotification that the RDFI is returning or correcting.
-	OriginalDFI string
+	OriginalDFI string `json:"originalDFI"`
 	// AddendaInformation
-	AddendaInformation string
+	AddendaInformation string `json:"addendaInformation,omitempty"`
 	// TraceNumber matches the Entry Detail Trace Number of the entry being returned.
-	TraceNumber int
+	TraceNumber int `json:"traceNumber,omitempty"`
 
 	// validator is composed for data validation
 	validator

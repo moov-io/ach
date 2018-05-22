@@ -156,7 +156,7 @@ func BenchmarkBatchCCDAddendaTypeCode(b *testing.B) {
 // testBatchCCDSEC validates that the standard entry class code is CCD for batchCCD
 func testBatchCCDSEC(t testing.TB) {
 	mockBatch := mockBatchCCD()
-	mockBatch.header.StandardEntryClassCode = "RCK"
+	mockBatch.Header.StandardEntryClassCode = "RCK"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {
