@@ -1,29 +1,20 @@
 language: go
 sudo: false
 go:
-  - tip
+- tip
 before_install:
-  - go get github.com/mattn/goveralls
-  - go get -u honnef.co/go/tools/cmd/megacheck
-  - go get -u github.com/client9/misspell/cmd/misspell
-  - go get -u golang.org/x/lint/golint
-  - go get github.com/fzipp/gocyclo
-
+- go get github.com/mattn/goveralls
+- go get -u honnef.co/go/tools/cmd/megacheck
+- go get -u github.com/client9/misspell/cmd/misspell
+- go get -u golang.org/x/lint/golint
+- go get github.com/fzipp/gocyclo
 before_script:
-  - GO_FILES=$(find . -iname '*.go' -type f | grep -v /example/ | grep -v /cmd/) # All the .go files, excluding example/ vendor/
-  
- # script always run to completion (set +e). All of these code checks are must haves
-# in a modern Go project.
+- GO_FILES=$(find . -iname '*.go' -type f | grep -v /example/ | grep -v /cmd/)
 script:
-  - test -z $(gofmt -s -l $GO_FILES)         # Fail if a .go file hasn't been formatted with gofmt
-  # - go test -v -race $GO_FILES               # Run all the tests with the race detector enabled
-  - go vet $GO_FILES                         # go vet is the official Go static analyzer
-  - megacheck $GO_FILES                      # "go vet on steroids" + linter
-  - misspell -error -locale US .             # check for spelling errors
-  - gocyclo -over 19 $GO_FILES               # forbid code with huge functions
-  - golint -set_exit_status $(go list $GO_FILES) # one last linter
-  # output code coverage
-  - goveralls -service=travis-ci
-env:
-  global:
-    secure: iQ3GSRYK0A+CBWNpFWRMxT8NaTTYDRa94LaS235qI56r0ggKj1jm5IXYnieOTSqT2kGq4sy+ztAOHkDmik0sfk33tzIPQUhbHpx6I7u5/JmKOS99hK4o3jDsaNY8lRUY/Cq/axN3tE2dKeqY3WWkVXp0HPM/Sy4z0eUNdks59lLphOQkYje6QE+FzaKxeqCV4k7xI0TVrG1cdSRQKp7MCplqifrHLB75QACrUK0nRQ8Xe/Zw/4kmodMfLhs59FVynsTzjS6Tp8WfslPqNOF8l+G7Bqy3NfDWUoMHLgvzlWttsDgBo0Q+o3syAn6HRRoZfwovTXwfaLV7dhtiKZ8+oVWF1+QNmfn9YW74HJylG8Od9bwxsWb2paAF7WmwY+a6xibk98qJWl3m6xsjFSqiV58Z4DiSU24r0KFmqbmc4SQmFf04bs+8rFT3kjnW0e6Ryg0Sgzxzeuls/zhm6DnJsb+D6odezzGqNYBo9kmiwDZptuSVx1Q5/tbcIVODYKSY6ouHNovper7d8BENS6v0NAApVtPs7yBSMrMp+VJqILOFgKqHQzHAMvq830+uJifMdKIp44WOHeRiZOwwt1Ks1jeXqOjsimMUzCCkUH/jbcJw897Vour94ovPgEoEbECORaykR9eUp43lXkC8CztQzTHCyoNGr/GbAfYixCkY2oo=
+- test -z $(gofmt -s -l $GO_FILES)
+- go vet $GO_FILES
+- megacheck $GO_FILES
+- misspell -error -locale US .
+- gocyclo -over 19 $GO_FILES
+- golint -set_exit_status $(go list $GO_FILES)
+- goveralls -service=travis-ci
