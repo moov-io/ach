@@ -1,29 +1,24 @@
 language: go
 sudo: false
 go:
-  - tip
-before_install:
-  - go get github.com/mattn/goveralls
-  - go get -u honnef.co/go/tools/cmd/megacheck
-  - go get -u github.com/client9/misspell/cmd/misspell
-  - go get -u golang.org/x/lint/golint
-  - go get github.com/fzipp/gocyclo
-
-before_script:
-  - GO_FILES=$(find . -iname '*.go' -type f | grep -v /example/ | grep -v /cmd/) # All the .go files, excluding example/ vendor/
-  
- # script always run to completion (set +e). All of these code checks are must haves
-# in a modern Go project.
-script:
-  - test -z $(gofmt -s -l $GO_FILES)         # Fail if a .go file hasn't been formatted with gofmt
-  # - go test -v -race $GO_FILES               # Run all the tests with the race detector enabled
-  - go vet $GO_FILES                         # go vet is the official Go static analyzer
-  - megacheck $GO_FILES                      # "go vet on steroids" + linter
-  - misspell -error -locale US .             # check for spelling errors
-  - gocyclo -over 19 $GO_FILES               # forbid code with huge functions
-  - golint -set_exit_status $(go list $GO_FILES) # one last linter
-  # output code coverage
-  - goveralls -service=travis-ci
+- tip
 env:
   global:
-    secure: otwALdLyiyV4ZEjqC7/QXdkpr8VXPqYdjBQRuDrYlu5jVmtNpm/ZxwCT2+0WfnSW4ZBNgKs3HXbw2L41prOn6miJ5vC+jzzC5IFTOErZj7dtv8M1j5LmlmyznpDaxMWhVv/t7ZN2V0dcLF8WeMIl4DHSDQIPGUW7cV3ENvf6ht2a+6A02SadR0KM1ce7rZiGRA/Asfm/XUI87sI8L/ZrH60Dc31RuxNmluVJH4tv/GCRmWQiEMX67vOe/04RpsVexXzex20Ft1/eh8nDe0qggZJ+QLcYl8h2gOXjq87O2gBFOxazOyrCPu4silSD4mNy03Zmc8QPdxQRnYn1UKLRy2UALwWFnB+O9py5N/2s4yMy14nuFe4iMAqkyv8mNmMdSsb/g4hc7NYWJmQahGRQi5dTPKrIwRlFc5VPRiKYLzeBVXNL1iewUjGv+c8AtchtRZZJKflqq/fu6tZGtj0fUCCAzvBFPDzduiO6y0M1S7bJ/H6d0zTxWQvoBTiFxmuZSD693Qe7CLnEZUiw8HJnTnNpJikTVDZYb53E+kv3vt7Psz+G0165ZU+SRn9HgQ4Mq5B0FhYr4+IUq1zXxX9/w0+PyNsOzluNtfYsc4NJ1GyfvIeoMTjuat08fNBnCyr+mdYZnrSnuz1B3ZZeFHsnIC81BUdHeqGha8K7tLwJdaw=
+    secure: QPkcX77j8QEqTwOYyLGItqvxYwE6Na5WaSZWjmhp48OlxYatWRHxJBwcFYSn1OWD5FMn+3oW39fHknReIxtrnhXMaNvI7x3/0gy4zujD/xZ2xAg7NsQ+l5buvEFO8/LEwwo0fp4knItFcBv8xH/ziJBJyXvgfMtj7Is4Q/pB1p6pWDdVy1vtAj3zH02bcqh1yXXS3HvcD8UhTszfU017gVNXDN1ow0rp1L3ainr3btrVK9izUxZfKvb7PlWJO1ogah7xNr/dIOJLsx2SfKgzKp+3H28L2WegtbzON74Op4jXvRywCwqjmUt/nwJ/Y9anunMNHT136h+ye4ziG1i/VdbWq0Q4PopQ8yYqinujG7SjfQio+wNCV2cwc2r/WjNBjbH0N9/Pflogq3RHvgy/9VtPif1tY+RrZCSntohoEZbYpVcFQFE1xDyf6xq/uLxVeEcCU33gqq7cKEfpcUgyCITa+yCPfBdtgkLBJ8h7Sew1j08D1kTKUW6g3D1epmwlCh/Z16oHG5VwSnCLGDjJy8wm/hQk1i/g7qeP7g24CfNzffzlFBCy88HhjzmrhUpcaTyfVVDf4h8wK6Zu/J3dHjHXQYwfiQRqpMa+2DYyjGgZhniccuh4GWolGZauDQdmO9SD4Ugyt9PEMk02i32ax3A4XE/Q6VNOam+qszviX3Q=
+before_install:
+- go get github.com/mattn/goveralls
+- go get -u honnef.co/go/tools/cmd/megacheck
+- go get -u github.com/client9/misspell/cmd/misspell
+- go get -u golang.org/x/lint/golint
+- go get github.com/fzipp/gocyclo
+before_script:
+- GO_FILES=$(find . -iname '*.go' -type f | grep -v /example/ | grep -v /cmd/)
+script:
+- test -z $(gofmt -s -l $GO_FILES)
+- go vet $GO_FILES
+- megacheck $GO_FILES
+- misspell -error -locale US .
+- gocyclo -over 19 $GO_FILES
+- golint -set_exit_status $(go list $GO_FILES)
+after_success:
+- goveralls -repotoken $COVERALLS_TOKEN
