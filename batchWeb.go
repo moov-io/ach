@@ -39,9 +39,9 @@ func (batch *BatchWEB) Validate() error {
 	}
 
 	// Add type specific validation.
-	if batch.header.StandardEntryClassCode != "WEB" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.header.StandardEntryClassCode, "WEB")
-		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
+	if batch.Header.StandardEntryClassCode != "WEB" {
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "WEB")
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
 	return batch.isPaymentTypeCode()

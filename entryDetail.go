@@ -15,6 +15,8 @@ import (
 // withdrawal (debit), the transit routing number for the entry recipient’s financial
 // institution, the account number (left justify,no zero fill), name, and dollar amount.
 type EntryDetail struct {
+	// ID is a client defined string used as a reference to this record.
+	ID string `json:"id"`
 	// RecordType defines the type of record in the block. 6
 	recordType string
 	// TransactionCode if the receivers account is:
@@ -26,28 +28,28 @@ type EntryDetail struct {
 	// Prenote for credit to savings account ‘33’
 	// Debit to savings account ‘37’
 	// Prenote for debit to savings account ‘38’
-	TransactionCode int
+	TransactionCode int `json:"transactionCode"`
 
 	// RDFIIdentification is the RDFI's routing number without the last digit.
 	// Receiving Depository Financial Institution
-	RDFIIdentification string
+	RDFIIdentification string `json:"RDFIIdentification"`
 
 	// CheckDigit the last digit of the RDFI's routing number
-	CheckDigit string
+	CheckDigit string `json:"checkDigit"`
 
 	// DFIAccountNumber is the receiver's bank account number you are crediting/debiting.
 	// It important to note that this is an alphanumeric field, so its space padded, no zero padded
-	DFIAccountNumber string
+	DFIAccountNumber string `json:"DFIAccountNumber"`
 
 	// Amount Number of cents you are debiting/crediting this account
-	Amount int
+	Amount int `json:"amount"`
 
-	// IdentificationNumber n internal identification (alphanumeric) that
+	// IdentificationNumber an internal identification (alphanumeric) that
 	// you use to uniquely identify this Entry Detail Record
-	IdentificationNumber string
+	IdentificationNumber string `json:"identificationNumber,omitempty"`
 
 	// IndividualName The name of the receiver, usually the name on the bank account
-	IndividualName string
+	IndividualName string `json:"individualName"`
 
 	// DiscretionaryData allows ODFIs to include codes, of significance only to them,
 	// to enable specialized handling of the entry. There will be no
@@ -57,12 +59,12 @@ type EntryDetail struct {
 	// field must be returned intact for any returned entry.
 	//
 	// WEB uses the Discretionary Data Field as the Payment Type Code
-	DiscretionaryData string
+	DiscretionaryData string `json:"discretionaryData,omitempty"`
 
 	// AddendaRecordIndicator indicates the existence of an Addenda Record.
 	// A value of "1" indicates that one ore more addenda records follow,
 	// and "0" means no such record is present.
-	AddendaRecordIndicator int
+	AddendaRecordIndicator int `json:"addendaRecordIndicator,omitempty"`
 
 	// TraceNumber assigned by the ODFI in ascending sequence, is included in each
 	// Entry Detail Record, Corporate Entry Detail Record, and addenda Record.
@@ -72,12 +74,12 @@ type EntryDetail struct {
 	// For addenda Records, the Trace Number will be identical to the Trace Number
 	// in the associated Entry Detail Record, since the Trace Number is associated
 	// with an entry or item rather than a physical record.
-	TraceNumber int
+	TraceNumber int `json:"traceNumber,omitempty"`
 
 	// Addendum a list of Addenda for the Entry Detail
-	Addendum []Addendumer
+	Addendum []Addendumer `json:"addendum,omitempty"`
 	// Category defines if the entry is a Forward, Return, or NOC
-	Category string
+	Category string `json:"category,omitempty"`
 	// validator is composed for data validation
 	validator
 	// converters is composed for ACH to golang Converters
