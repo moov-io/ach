@@ -53,6 +53,7 @@ func (e *FileError) Error() string {
 
 // File contains the structures of a parsed ACH File.
 type File struct {
+	// ID is a client defined string used as a reference to this record.
 	ID      string      `json:"id"`
 	Header  FileHeader  `json:"fileHeader"`
 	Batches []Batcher   `json:"batches"`
