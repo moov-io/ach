@@ -14,13 +14,13 @@ var (
 )
 
 // Service is a REST interface for interacting with ACH file structures
-// TODO: Add ctx to function paramaters to pass the client security token
+// TODO: Add ctx to function parameters to pass the client security token
 type Service interface {
 	// CreateFile creates a new ach file record and returns a resource ID
 	CreateFile(f ach.File) (string, error)
 	// AddFile retrieves a file based on the File id
 	GetFile(id string) (ach.File, error)
-	// GetFiles retrieves all files accessable from the client.
+	// GetFiles retrieves all files accessible from the client.
 	GetFiles() []ach.File
 	// DeleteFile takes a file resource ID and deletes it from the repository
 	DeleteFile(id string) error
