@@ -28,7 +28,6 @@ type BatchBOC struct {
 	batch
 }
 
-
 // NewBatchBOC returns a *BatchBOC
 func NewBatchBOC(bh *BatchHeader) *BatchBOC {
 	batch := new(BatchBOC)
@@ -72,13 +71,13 @@ func (batch *BatchBOC) Validate() error {
 
 		// Amount must be 25,000 or less
 		if entry.Amount > 2500000 {
-			msg := fmt.Sprintf(msgBatchAmount,"25,000", "BOC")
+			msg := fmt.Sprintf(msgBatchAmount, "25,000", "BOC")
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
 		}
 
 		// CheckSerialNumber underlying IdentificationNumber, must be defined
 		if entry.IdentificationNumber == "" {
-			msg := fmt.Sprintf(msgBatchCheckSerialNumber,  "BOC")
+			msg := fmt.Sprintf(msgBatchCheckSerialNumber, "BOC")
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "CheckSerialNumber", Msg: msg}
 		}
 	}
@@ -96,4 +95,3 @@ func (batch *BatchBOC) Create() error {
 
 	return batch.Validate()
 }
-

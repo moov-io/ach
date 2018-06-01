@@ -19,7 +19,7 @@ func mockBatchARCHeader() *BatchHeader {
 }
 
 // mockARCEntryDetail creates a BatchARC EntryDetail
-func mockARCEntryDetail() *EntryDetail{
+func mockARCEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 27
 	entry.SetRDFI("231380104")
@@ -55,7 +55,7 @@ func mockBatchARCHeaderCredit() *BatchHeader {
 }
 
 // mockARCEntryDetailCredit creates a ARC EntryDetail with a credit entry
-func mockARCEntryDetailCredit() *EntryDetail{
+func mockARCEntryDetailCredit() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 22
 	entry.SetRDFI("231380104")
@@ -97,7 +97,6 @@ func BenchmarkBatchARCHeader(b *testing.B) {
 	}
 }
 
-
 // testBatchARCCreate validates BatchARC create
 func testBatchARCCreate(t testing.TB) {
 	mockBatch := mockBatchARC()
@@ -121,7 +120,7 @@ func BenchmarkBatchARCCreate(b *testing.B) {
 }
 
 // testBatchARCStandardEntryClassCode validates BatchARC create for an invalid StandardEntryClassCode
-func testBatchARCStandardEntryClassCode (t testing.TB) {
+func testBatchARCStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchARC()
 	mockBatch.Header.StandardEntryClassCode = "WEB"
 	mockBatch.Create()
@@ -283,7 +282,7 @@ func testBatchARCCheckSerialNumber(t testing.TB) {
 
 // TestBatchARCCheckSerialNumber  tests validating BatchARC
 // CheckSerialNumber / IdentificationNumber is a mandatory field
-func TestBatchARCCheckSerialNumber (t *testing.T) {
+func TestBatchARCCheckSerialNumber(t *testing.T) {
 	testBatchARCCheckSerialNumber(t)
 }
 
@@ -311,7 +310,7 @@ func testBatchARCTransactionCode(t testing.TB) {
 }
 
 // TestBatchARCTransactionCode tests validating BatchARC TransactionCode is not a credit
-func TestBatchARCTransactionCode (t *testing.T) {
+func TestBatchARCTransactionCode(t *testing.T) {
 	testBatchARCTransactionCode(t)
 }
 

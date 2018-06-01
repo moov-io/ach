@@ -1,10 +1,10 @@
 package main
 
 import (
+	"github.com/moov-io/ach"
 	"log"
 	"os"
 	"time"
-	"github.com/moov-io/ach"
 )
 
 func main() {
@@ -14,10 +14,10 @@ func main() {
 	// Set originator bank ODFI and destination Operator for the financial institution
 	// this is the funding/receiving source of the transfer
 
-/*	f, err := os.Create( time.Now().UTC().Format("200601021504") + ".ach")
-	if err != nil {
-		fmt.Printf("%T: %s", err, err)
-	}*/
+	/*	f, err := os.Create( time.Now().UTC().Format("200601021504") + ".ach")
+		if err != nil {
+			fmt.Printf("%T: %s", err, err)
+		}*/
 
 	fh := ach.NewFileHeader()
 	fh.ImmediateDestination = "231380104" // Routing Number of the ACH Operator or receiving point to which the file is being sent
@@ -40,10 +40,10 @@ func main() {
 	// can be multiple entry's per batch
 	entry := ach.NewEntryDetail()
 	// Identifies the entry as a debit and credit entry AND to what type of account (Savings, DDA, Loan, GL)
-	entry.TransactionCode = 27         // Code 27: Debit (withdrawal) from checking account
+	entry.TransactionCode = 27          // Code 27: Debit (withdrawal) from checking account
 	entry.SetRDFI("231380104")          // Receivers bank transit routing number
 	entry.DFIAccountNumber = "12345678" // Receivers bank account number
-	entry.Amount = 2400            // Amount of transaction with no decimal. One dollar and eleven cents = 111
+	entry.Amount = 2400                 // Amount of transaction with no decimal. One dollar and eleven cents = 111
 	entry.SetTraceNumber(bh.ODFIIdentification, 1)
 	entry.IndividualName = "Wade Arnold" // Identifies the receiver of the transaction
 	entry.SetCheckSerialNumber("123123123")
@@ -72,4 +72,3 @@ func main() {
 	w.Flush()
 	//f.Close()
 }
-

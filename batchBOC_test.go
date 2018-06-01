@@ -19,7 +19,7 @@ func mockBatchBOCHeader() *BatchHeader {
 }
 
 // mockBOCEntryDetail creates a BatchBOC EntryDetail
-func mockBOCEntryDetail() *EntryDetail{
+func mockBOCEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 27
 	entry.SetRDFI("231380104")
@@ -55,7 +55,7 @@ func mockBatchBOCHeaderCredit() *BatchHeader {
 }
 
 // mockBOCEntryDetailCredit creates a BatchBOC EntryDetail with a credit
-func mockBOCEntryDetailCredit() *EntryDetail{
+func mockBOCEntryDetailCredit() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 22
 	entry.SetRDFI("231380104")
@@ -120,7 +120,7 @@ func BenchmarkBatchBOCCreate(b *testing.B) {
 }
 
 // testBatchBOCStandardEntryClassCode validates BatchBOC create for an invalid StandardEntryClassCode
-func testBatchBOCStandardEntryClassCode (t testing.TB) {
+func testBatchBOCStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchBOC()
 	mockBatch.Header.StandardEntryClassCode = "WEB"
 	mockBatch.Create()
@@ -281,7 +281,7 @@ func testBatchBOCCheckSerialNumber(t testing.TB) {
 }
 
 // TestBatchBOCCheckSerialNumber  tests validating BatchBOC CheckSerialNumber / IdentificationNumber is a mandatory field
-func TestBatchBOCCheckSerialNumber (t *testing.T) {
+func TestBatchBOCCheckSerialNumber(t *testing.T) {
 	testBatchBOCCheckSerialNumber(t)
 }
 
@@ -309,7 +309,7 @@ func testBatchBOCTransactionCode(t testing.TB) {
 }
 
 // TestBatchBOCTransactionCode tests validating BatchBOC TransactionCode is not a credit
-func TestBatchBOCTransactionCode (t *testing.T) {
+func TestBatchBOCTransactionCode(t *testing.T) {
 	testBatchBOCTransactionCode(t)
 }
 

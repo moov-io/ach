@@ -23,7 +23,6 @@ type BatchARC struct {
 	batch
 }
 
-
 // NewBatchARC returns a *BatchARC
 func NewBatchARC(bh *BatchHeader) *BatchARC {
 	batch := new(BatchARC)
@@ -67,13 +66,13 @@ func (batch *BatchARC) Validate() error {
 
 		// Amount must be 25,000 or less
 		if entry.Amount > 2500000 {
-			msg := fmt.Sprintf(msgBatchAmount,"25,000", "ARC")
+			msg := fmt.Sprintf(msgBatchAmount, "25,000", "ARC")
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
 		}
 
 		// CheckSerialNumber underlying IdentificationNumber, must be defined
 		if entry.IdentificationNumber == "" {
-			msg := fmt.Sprintf(msgBatchCheckSerialNumber,  "ARC")
+			msg := fmt.Sprintf(msgBatchCheckSerialNumber, "ARC")
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "CheckSerialNumber", Msg: msg}
 		}
 	}
@@ -91,5 +90,3 @@ func (batch *BatchARC) Create() error {
 
 	return batch.Validate()
 }
-
-

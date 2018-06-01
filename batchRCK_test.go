@@ -19,7 +19,7 @@ func mockBatchRCKHeader() *BatchHeader {
 }
 
 // mockRCKEntryDetail creates a BatchRCK ntryDetail
-func mockRCKEntryDetail() *EntryDetail{
+func mockRCKEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 27
 	entry.SetRDFI("231380104")
@@ -55,7 +55,7 @@ func mockBatchRCKHeaderCredit() *BatchHeader {
 }
 
 // mockRCKEntryDetailCredit creates a BatchRCK EntryDetail with a credit entry
-func mockRCKEntryDetailCredit() *EntryDetail{
+func mockRCKEntryDetailCredit() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 22
 	entry.SetRDFI("231380104")
@@ -74,7 +74,6 @@ func mockBatchRCKCredit() *BatchRCK {
 	mockBatch.AddEntry(mockRCKEntryDetailCredit())
 	return mockBatch
 }
-
 
 // testBatchRCKHeader creates a BatchRCK BatchHeader
 func testBatchRCKHeader(t testing.TB) {
@@ -121,7 +120,7 @@ func BenchmarkBatchRCKCreate(b *testing.B) {
 }
 
 // testBatchRCKStandardEntryClassCode validates BatchRCK create for an invalid StandardEntryClassCode
-func testBatchRCKStandardEntryClassCode (t testing.TB) {
+func testBatchRCKStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchRCK()
 	mockBatch.Header.StandardEntryClassCode = "WEB"
 	mockBatch.Create()
@@ -312,7 +311,7 @@ func testBatchRCKCheckSerialNumber(t testing.TB) {
 
 // TestBatchRCKCheckSerialNumber tests validating BatchRCK
 // CheckSerialNumber / IdentificationNumber is a mandatory field
-func TestBatchRCKCheckSerialNumber (t *testing.T) {
+func TestBatchRCKCheckSerialNumber(t *testing.T) {
 	testBatchRCKCheckSerialNumber(t)
 }
 
@@ -340,7 +339,7 @@ func testBatchRCKTransactionCode(t testing.TB) {
 }
 
 // TestBatchRCKTransactionCode tests validating BatchRCK TransactionCode is not a credit
-func TestBatchRCKTransactionCode (t *testing.T) {
+func TestBatchRCKTransactionCode(t *testing.T) {
 	testBatchRCKTransactionCode(t)
 }
 
