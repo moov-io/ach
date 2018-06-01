@@ -1,30 +1,10 @@
-C:\Users\Owner\AppData\Local\Temp\go-build176990002\b001\writeACH.test.exe flag redefined: fPath
---- FAIL: TestFileCreate (0.00s)
-panic: C:\Users\Owner\AppData\Local\Temp\go-build176990002\b001\writeACH.test.exe flag redefined: fPath [recovered]
-	panic: C:\Users\Owner\AppData\Local\Temp\go-build176990002\b001\writeACH.test.exe flag redefined: fPath
-
-goroutine 50 [running]:
-testing.tRunner.func1(0xc0420fe2d0)
-	C:/Go/src/testing/testing.go:742 +0x2a4
-panic(0x556400, 0xc042226270)
-	C:/Go/src/runtime/panic.go:505 +0x237
-flag.(*FlagSet).Var(0xc042092000, 0x5b1a40, 0xc042226230, 0x591fa0, 0x5, 0x59292e, 0x9)
-	C:/Go/src/flag/flag.go:810 +0x547
-flag.(*FlagSet).StringVar(0xc042092000, 0xc042226230, 0x591fa0, 0x5, 0x0, 0x0, 0x59292e, 0x9)
-	C:/Go/src/flag/flag.go:713 +0x92
-flag.(*FlagSet).String(0xc042092000, 0x591fa0, 0x5, 0x0, 0x0, 0x59292e, 0x9, 0x0)
-	C:/Go/src/flag/flag.go:726 +0x92
-flag.String(0x591fa0, 0x5, 0x0, 0x0, 0x59292e, 0x9, 0x0)
-	C:/Go/src/flag/flag.go:733 +0x70
-github.com/bkmoovio/ach/cmd/writeACH.main()
-	C:/Users/Owner/go/src/github.com/bkmoovio/ach/cmd/writeACH/main.go:18 +0x6f
-github.com/bkmoovio/ach/cmd/writeACH.FileCreate(0x5b3200, 0xc0420fe2d0)
-	C:/Users/Owner/go/src/github.com/bkmoovio/ach/cmd/writeACH/main_test.go:23 +0x27
-github.com/bkmoovio/ach/cmd/writeACH.TestFileCreate(0xc0420fe2d0)
-	C:/Users/Owner/go/src/github.com/bkmoovio/ach/cmd/writeACH/main_test.go:10 +0x3e
-testing.tRunner(0xc0420fe2d0, 0x59ef18)
-	C:/Go/src/testing/testing.go:777 +0xd7
-created by testing.(*T).Run
-	C:/Go/src/testing/testing.go:824 +0x2e7
-exit status 2
-FAIL	github.com/bkmoovio/ach/cmd/writeACH	0.579s
+goos: windows
+goarch: amd64
+pkg: github.com/bkmoovio/ach/cmd/writeACH
+BenchmarkTestFileWrite-8   	     100	  16101905 ns/op	 2325178 B/op	  119293 allocs/op
+BenchmarkTestFileWrite-8   	     100	  16306688 ns/op	 2325160 B/op	  119293 allocs/op
+BenchmarkTestFileWrite-8   	     100	  20868257 ns/op	 2325161 B/op	  119293 allocs/op
+BenchmarkTestFileWrite-8   	     100	  16199637 ns/op	 2325160 B/op	  119293 allocs/op
+BenchmarkTestFileWrite-8   	     100	  16090635 ns/op	 2325160 B/op	  119293 allocs/op
+PASS
+ok  	github.com/bkmoovio/ach/cmd/writeACH	10.120s

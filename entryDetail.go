@@ -1,4 +1,4 @@
-// Copyright 2017 The ACH Authors
+// Copyright 2018 The ACH Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -270,6 +270,18 @@ func (ed *EntryDetail) IdentificationNumberField() string {
 	return ed.alphaField(ed.IdentificationNumber, 15)
 }
 
+// CheckSerialNumberField is used in RCK, ARC, BOC files but returns
+// a space padded string of the underlying IdentificationNumber field
+func (ed *EntryDetail) CheckSerialNumberField() string {
+	return ed.alphaField(ed.IdentificationNumber, 15)
+}
+
+// SetCheckSerialNumber setter for RCK, ARC, BOC CheckSerialNumber
+// which is underlying IdentificationNumber
+func (ed *EntryDetail) SetCheckSerialNumber(s string) {
+	ed.IdentificationNumber = s
+}
+
 // IndividualNameField returns a space padded string of IndividualName
 func (ed *EntryDetail) IndividualNameField() string {
 	return ed.alphaField(ed.IndividualName, 22)
@@ -280,7 +292,7 @@ func (ed *EntryDetail) ReceivingCompanyField() string {
 	return ed.IndividualNameField()
 }
 
-// SetReceivingCompany setter for CCD receiving company individual name
+// SetReceivingCompany setter for CCD ReceivingCompany which is underlying IndividualName
 func (ed *EntryDetail) SetReceivingCompany(s string) {
 	ed.IndividualName = s
 }
@@ -290,7 +302,7 @@ func (ed *EntryDetail) DiscretionaryDataField() string {
 	return ed.alphaField(ed.DiscretionaryData, 2)
 }
 
-// PaymentTypeField returns the discretionary data field used in WEB batch files
+// PaymentTypeField returns the DiscretionaryData field used in WEB batch files
 func (ed *EntryDetail) PaymentTypeField() string {
 	// because DiscretionaryData can be changed outside of PaymentType we reset the value for safety
 	ed.SetPaymentType(ed.DiscretionaryData)
@@ -307,7 +319,7 @@ func (ed *EntryDetail) SetPaymentType(t string) {
 	}
 }
 
-// TraceNumberField returns a zero padded traceNumber string
+// TraceNumberField returns a zero padded TraceNumber string
 func (ed *EntryDetail) TraceNumberField() string {
 	return ed.numericField(ed.TraceNumber, 15)
 }
@@ -315,11 +327,11 @@ func (ed *EntryDetail) TraceNumberField() string {
 // CreditOrDebit returns a "C" for credit or "D" for debit based on the entry TransactionCode
 func (ed *EntryDetail) CreditOrDebit() string {
 	tc := strconv.Itoa(ed.TransactionCode)
-	// take the second number in the Transaction code
+	// take the second number in the TransactionCode
 	switch tc[1:2] {
-	case "1", "2", "3":
+	case "1", "2", "3", "4":
 		return "C"
-	case "6", "7", "8":
+	case "5","6", "7", "8", "9":
 		return "D"
 	}
 	return ""

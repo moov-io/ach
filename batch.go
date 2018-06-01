@@ -27,16 +27,22 @@ type batch struct {
 // NewBatch takes a BatchHeader and returns a matching SEC code batch type that is a batcher. Returns an error if the SEC code is not supported.
 func NewBatch(bh *BatchHeader) (Batcher, error) {
 	switch bh.StandardEntryClassCode {
-	case "PPD":
-		return NewBatchPPD(bh), nil
-	case "WEB":
-		return NewBatchWEB(bh), nil
+	case "ARC":
+		return NewBatchARC(bh), nil
+	case "BOC":
+		return NewBatchBOC(bh), nil
 	case "CCD":
 		return NewBatchCCD(bh), nil
 	case "COR":
 		return NewBatchCOR(bh), nil
+	case "PPD":
+		return NewBatchPPD(bh), nil
+	case "RCK":
+		return NewBatchRCK(bh), nil
 	case "TEL":
 		return NewBatchTEL(bh), nil
+	case "WEB":
+		return NewBatchWEB(bh), nil
 	default:
 	}
 	msg := fmt.Sprintf(msgFileNoneSEC, bh.StandardEntryClassCode)
