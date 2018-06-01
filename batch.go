@@ -71,7 +71,7 @@ func (batch *batch) verify() error {
 		msg := fmt.Sprintf(msgBatchHeaderControlEquality, batch.Header.CompanyIdentification, batch.Control.CompanyIdentification)
 		return &BatchError{BatchNumber: batchNumber, FieldName: "CompanyIdentification", Msg: msg}
 	}
-	// Control ODFI Identification must be the same as batch header
+	// Control ODFIIdentification must be the same as batch header
 	if batch.Header.ODFIIdentification != batch.Control.ODFIIdentification {
 		msg := fmt.Sprintf(msgBatchHeaderControlEquality, batch.Header.ODFIIdentification, batch.Control.ODFIIdentification)
 		return &BatchError{BatchNumber: batchNumber, FieldName: "ODFIIdentification", Msg: msg}
@@ -316,7 +316,7 @@ func (batch *batch) isOriginatorDNE() error {
 }
 
 // isTraceNumberODFI checks if the first 8 positions of the entry detail trace number
-// match the batch header odfi
+// match the batch header ODFI
 func (batch *batch) isTraceNumberODFI() error {
 	for _, entry := range batch.Entries {
 		if batch.Header.ODFIIdentificationField() != entry.TraceNumberField()[:8] {
@@ -337,7 +337,7 @@ func (batch *batch) isAddendaSequence() error {
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaRecordIndicator", Msg: msgBatchAddendaIndicator}
 			}
 			lastSeq := -1
-			// check if sequence is assending
+			// check if sequence is ascending
 			for _, addenda := range entry.Addendum {
 				// sequences don't exist in NOC or Return addenda
 				if a, ok := addenda.(*Addenda05); ok {
@@ -359,7 +359,7 @@ func (batch *batch) isAddendaSequence() error {
 	return nil
 }
 
-// isAddendaCount iterates through each entry detail and checks the number of addendum is greater than the count paramater otherwise it returns an error.
+// isAddendaCount iterates through each entry detail and checks the number of addendum is greater than the count parameter otherwise it returns an error.
 // Following SEC codes allow for none or one Addendum
 // "PPD", "WEB", "CCD", "CIE", "DNE", "MTE", "POS", "SHR"
 func (batch *batch) isAddendaCount(count int) error {
@@ -373,7 +373,7 @@ func (batch *batch) isAddendaCount(count int) error {
 	return nil
 }
 
-// isTypeCode takes a typecode string and verifies addenda records match
+// isTypeCode takes a TypeCode string and verifies Addenda records match
 func (batch *batch) isTypeCode(typeCode string) error {
 	for _, entry := range batch.Entries {
 		for _, addenda := range entry.Addendum {

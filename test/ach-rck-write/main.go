@@ -8,21 +8,13 @@ import (
 )
 
 func main() {
-	// Example transfer to write an ACH RCK file to send/credit a external institutions account
+	// Example transfer to write an ACH RCK file to debit a external institutions account
 	// Important: All financial institutions are different and will require registration and exact field values.
-
-	// Set originator bank ODFI and destination Operator for the financial institution
-	// this is the funding/receiving source of the transfer
-
-	/*	f, err := os.Create( time.Now().UTC().Format("200601021504") + ".ach")
-		if err != nil {
-			fmt.Printf("%T: %s", err, err)
-		}*/
 
 	fh := ach.NewFileHeader()
 	fh.ImmediateDestination = "231380104" // Routing Number of the ACH Operator or receiving point to which the file is being sent
 	fh.ImmediateOrigin = "121042882"      // Routing Number of the ACH Operator or sending point that is sending the file
-	fh.FileCreationDate = time.Now()      // Todays Date
+	fh.FileCreationDate = time.Now()      // Today's Date
 	fh.ImmediateDestinationName = "Federal Reserve Bank"
 	fh.ImmediateOriginName = "My Bank Name"
 
@@ -65,10 +57,8 @@ func main() {
 
 	// write the file to std out. Anything io.Writer
 	w := ach.NewWriter(os.Stdout)
-	//w := ach.NewWriter(f)
 	if err := w.WriteAll([]*ach.File{file}); err != nil {
 		log.Fatalf("Unexpected error: %s\n", err)
 	}
 	w.Flush()
-	//f.Close()
 }

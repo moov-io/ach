@@ -18,7 +18,7 @@ func mockBatchRCKHeader() *BatchHeader {
 	return bh
 }
 
-// mockRCKEntryDetail creates a BatchRCK ntryDetail
+// mockRCKEntryDetail creates a BatchRCK EntryDetail
 func mockRCKEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 27

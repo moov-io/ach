@@ -14,7 +14,7 @@ import (
 // * The SEC Code pertains to all items within batch
 //    * Determines format of the entry detail records
 //    * Determines addenda records (required or optional PLUS one or up to 9,999 records)
-//    * Determines rules to follow (return timeframes)
+//    * Determines rules to follow (return time frames)
 // 	  * Some SEC codes require specific data in predetermined fields within the ACH record
 type Batcher interface {
 	GetHeader() *BatchHeader
