@@ -21,6 +21,9 @@ ACH is under active development but already in production for multiple companies
 	* CCD (Corporate credit or debit)
 	* TEL (Telephone-Initiated Entry)
 	* COR (Automated Notification of Change(NOC))
+	* RCK (Represented Check Entries)
+	* BOC (Back Office Conversion)
+	* ARC (Accounts Receivable Entry)
 	* Return Entries
 
 

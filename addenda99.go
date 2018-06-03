@@ -169,10 +169,12 @@ func makeReturnCodeDict() map[string]*returnCode {
 		// Return Reason Codes for RDFIs
 		{"R01", "Insufficient Funds", "Available balance is not sufficient to cover the dollar value of the debit entry"},
 		{"R02", "Account Closed", "Previously active account has been closed by customer or RDFI"},
+		// R03 may not be used to return ARC, BOC or POP entries solely because they do not contain an Individual Name.
 		{"R03", "No Account/Unable to Locate Account", "Account number structure is valid and passes editing process, but does not correspond to individual or is not an open account"},
 		{"R04", "Invalid Account Number", "Account number structure not valid; entry may fail check digit validation or may contain an incorrect number of digits."},
 		{"R05", "Improper Debit to Consumer Account", "A CCD, CTX, or CBR debit entry was transmitted to a Consumer Account of the Receiver and was not authorized by the Receiver"},
 		{"R06", "Returned per ODFI's Request", "ODFI has requested RDFI to return the ACH entry (optional to RDFI - ODFI indemnifies RDFI)}"},
+		// R07 Prohibited use for ARC, BOC, POP and RCK.
 		{"R07", "Authorization Revoked by Customer", "Consumer, who previously authorized ACH payment, has revoked authorization from Originator (must be returned no later than 60 days from settlement date and customer must sign affidavit)"},
 		{"R08", "Payment Stopped", "Receiver of a recurring debit transaction has stopped payment to a specific ACH debit. RDFI should verify the Receiver's intent when a request for stop payment is made to insure this is not intended to be a revocation of authorization"},
 		{"R09", "Uncollected Funds", "Sufficient book or ledger balance exists to satisfy dollar value of the transaction, but the dollar value of transaction is in process of collection (i.e., uncollected checks) or cash reserve balance below dollar value of the debit entry."},
@@ -202,6 +204,13 @@ func makeReturnCodeDict() map[string]*returnCode {
 		{"R33", "Return of XCK entry", "RDFI determines at its sole discretion to return an XCK entry; an XCK return entry may be initiated by midnight of the sixtieth day following the settlement date if the XCK entry"},
 		{"R34", "Limited participation RDFI", "RDFI participation has been limited by a federal or state supervisor"},
 		{"R35", "Return of improper debit entry", "ACH debit not permitted for use with the CIE standard entry class code (except for reversals)"},
+		{"R37", "Source Document Presented for Payment (Adjustment Entry)", "The source document to which an ARC, BOC or POP entry relateshas been presented for payment. RDFI must obtain a Written Statement and return the entry within 60 days following Settlement Date"},
+		{"R38", "Stop Payment on Source Document (Adjustment Entry)", "A stop payment has been placed on the source document to which the ARC or BOC entry relates. RDFI must return no later than 60 days following Settlement Date. No Written Statement is required as the original stop payment form covers the return"},
+		{"R39", "Improper Source Document", "The RDFI has determined the source document used for the ARC, BOC or POP entry to its Receiver’s account is improper."},
+		{"R50", "State Law Affecting RCK Acceptance", "RDFI is located in a state that has not adopted Revised Article 4 of the UCC or the RDFI is located in a state that requires all canceled checks to be returned within the periodic statement"},
+		{"R51", "Item Related to RCK Entry is Ineligible or RCK Entry is Improper", "The item to which the RCK entry relates was not eligible, Originator did not provide notice of the RCK policy, signature on the item was not genuine, the item has been altered or amount of the entry was not accurately obtained from the item. RDFI must obtain a Written Statement and return the entry within 60 days following Settlement Date"},
+		{"R52", "Stop Payment on Item (Adjustment Entry)", "A stop payment has been placed on the item to which the RCK entry relates. RDFI must return no later than 60 days following Settlement Date. No Written Statement is required as the original stop payment form covers the return."},
+		{"R53", "Item and RCK Entry Presented for Payment (Adjustment Entry)", "Both the RCK entry and check have been presented forpayment. RDFI must obtain a Written Statement and return the entry within 60 days following Settlement Date"},
 		// More return codes will be added when more SEC types are added to the library.
 	}
 	// populate the map
