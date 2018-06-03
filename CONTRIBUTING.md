@@ -123,12 +123,57 @@ case "MTE":
 
 Pull request require a batchMTE_test.go file that covers the logic of the type. 
 
-## References  
+## Benchmarks and Profiling 
+
+**Write:**
+
+github.com/moov-io/ach/cmd/writeACH
+
+main.go will create an ACH file with 4 batches each containing 1250 detail and addenda records 
+
+A custom path can be used by defining fPath ( e.g. -fPath=github.com/moov-io/_directory_ )
+
+Benchmark 
+
+
+```bash
+github.com/moov-io/ach/cmd/writeACH>go test -bench=BenchmarkTestFileWrite  -count=5 > old
+```
+
+Profiling
+
+
+```bash
+github.com/moov-io/ach/cmd/writeACH>main -cpuprofile=writeACH.pprof
+```
+
+**Read:**
+
+```bash
+github.com/moov-io/ach/cmd/readACH
+```
+
+Use fPath to define the file to be read ( e.g. -fPath=github.com/moov-io/ach/cmd/readACH/_filename_ )
+
+Benchmark 
+
+```bash
+github.com/moov-io/ach/cmd/readACH>go test -bench=BenchmarkTestFileRead -count=5 > old
+```
+Profiling
+
+```bash
+github.com/moov-io/ach/cmd/readACH>main -fPath=_filename_ -cpuprofile=ReadACH.pprof
+```
+
+## References 
+
 * [Wikipeda: Automated Clearing House](http://en.wikipedia.org/wiki/Automated_Clearing_House)
 * [Nacha ACH Network: How it Works](https://www.nacha.org/ach-network)
 * [Federal ACH Directory](https://www.frbservices.org/EPaymentsDirectory/search.html)
 
 ## Format Specification
+
 * [NACHA ACH File Formatting](https://www.nacha.org/system/files/resources/AAP201%20-%20ACH%20File%20Formatting.pdf)
 * [PNC ACH File Specification](http://content.pncmc.com/live/pnc/corporate/treasury-management/ach-conversion/ACH-File-Specifications.pdf)
 * [Thomson Reuters ACH FIle Structure](http://cs.thomsonreuters.com/ua/acct_pr/acs/cs_us_en/pr/dd/ach_file_structure_and_content.htm)
@@ -137,6 +182,7 @@ Pull request require a batchMTE_test.go file that covers the logic of the type.
 ![ACH File Layout](https://github.com/moov-io/ach/blob/master/documentation/ach_file_structure_shg.gif)
 
 ## Inspiration 
+
 * [ACH:Builder - Tools for Building ACH](http://search.cpan.org/~tkeefer/ACH-Builder-0.03/lib/ACH/Builder.pm)
 * [mosscode / ach](https://github.com/mosscode/ach)
 * [Helper for building ACH files in Ruby](https://github.com/jm81/ach)
