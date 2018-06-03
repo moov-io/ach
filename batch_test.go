@@ -20,7 +20,7 @@ func mockBatch() *batch {
 	return mockBatch
 }
 
-// Batch with mismatched Trace Number ODFI
+// Batch with mismatched TraceNumber ODFI
 func mockBatchInvalidTraceNumberODFI() *batch {
 	mockBatch := &batch{}
 	mockBatch.SetHeader(mockBatchHeader())
@@ -28,7 +28,7 @@ func mockBatchInvalidTraceNumberODFI() *batch {
 	return mockBatch
 }
 
-// Entry Detail with mismatched Trace Number ODFI
+// EntryDetail with mismatched TraceNumber ODFI
 func mockEntryDetailInvalidTraceNumberODFI() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 22
@@ -49,7 +49,7 @@ func mockBatchNoEntry() *batch {
 	return mockBatch
 }
 
-// Invalid SEC CODE Batch Header
+// Invalid SEC CODE BatchHeader
 func mockBatchInvalidSECHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = 220

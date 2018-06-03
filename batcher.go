@@ -14,7 +14,7 @@ import (
 // * The SEC Code pertains to all items within batch
 //    * Determines format of the entry detail records
 //    * Determines addenda records (required or optional PLUS one or up to 9,999 records)
-//    * Determines rules to follow (return timeframes)
+//    * Determines rules to follow (return time frames)
 // 	  * Some SEC codes require specific data in predetermined fields within the ACH record
 type Batcher interface {
 	GetHeader() *BatchHeader
@@ -47,14 +47,18 @@ var (
 	msgBatchCalculatedControlEquality = "calculated %v is out-of-balance with control %v"
 	msgBatchAscending                 = "%v is less than last %v. Must be in ascending order"
 	// specific messages for error
-	msgBatchOriginatorDNE         = "%v is not “2” for DNE with entry transaction code of 23 or 33"
-	msgBatchTraceNumberNotODFI    = "%v in header does not match entry trace number %v"
-	msgBatchAddendaIndicator      = "is 0 but found addenda record(s)"
-	msgBatchAddendaTraceNumber    = "%v does not match proceeding entry detail trace number %v"
-	msgBatchEntries               = "must have Entry Record(s) to be built"
-	msgBatchAddendaCount          = "%v addendum found where %v is allowed for batch type %v"
-	msgBatchTransactionCodeCredit = "%v a credit is not allowed"
-	msgBatchSECType               = "header SEC type code %v for batch type %v"
-	msgBatchTypeCode              = "%v found in addenda and expecting %v for batch type %v"
-	msgBatchForwardReturn         = "Forward and Return entries found in the same batch"
+	msgBatchCompanyEntryDescription = "Company entry description %v is not valid for batch type %v"
+	msgBatchOriginatorDNE           = "%v is not “2” for DNE with entry transaction code of 23 or 33"
+	msgBatchTraceNumberNotODFI      = "%v in header does not match entry trace number %v"
+	msgBatchAddendaIndicator        = "is 0 but found addenda record(s)"
+	msgBatchAddendaTraceNumber      = "%v does not match proceeding entry detail trace number %v"
+	msgBatchEntries                 = "must have Entry Record(s) to be built"
+	msgBatchAddendaCount            = "%v addendum found where %v is allowed for batch type %v"
+	msgBatchTransactionCodeCredit   = "%v a credit is not allowed"
+	msgBatchSECType                 = "header SEC type code %v for batch type %v"
+	msgBatchTypeCode                = "%v found in addenda and expecting %v for batch type %v"
+	msgBatchServiceClassCode        = "Service Class Code %v is not valid for batch type %v"
+	msgBatchForwardReturn           = "Forward and Return entries found in the same batch"
+	msgBatchAmount                  = "Amount must be less than %v for SEC code %v"
+	msgBatchCheckSerialNumber       = "Check Serial Number is required for SEC code %v"
 )
