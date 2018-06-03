@@ -331,7 +331,7 @@ func (ed *EntryDetail) CreditOrDebit() string {
 	switch tc[1:2] {
 	case "1", "2", "3", "4":
 		return "C"
-	case "5","6", "7", "8", "9":
+	case "5", "6", "7", "8", "9":
 		return "D"
 	}
 	return ""
