@@ -294,7 +294,7 @@ func (ed *EntryDetail) SetPOPTerminalCity(s string) {
 	ed.IdentificationNumber = ed.IdentificationNumber + ed.alphaField(s, 4)
 }
 
-// SetPOPTerminalCity setter for POP Terminal State
+// SetPOPTerminalState setter for POP Terminal State
 // which is characters 14-15 of underlying CheckSerialNumber \ IdentificationNumber
 func (ed *EntryDetail) SetPOPTerminalState(s string) {
 	ed.IdentificationNumber = ed.IdentificationNumber + ed.alphaField(s, 2)
