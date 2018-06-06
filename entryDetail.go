@@ -282,6 +282,45 @@ func (ed *EntryDetail) SetCheckSerialNumber(s string) {
 	ed.IdentificationNumber = s
 }
 
+// SetPOPCheckSerialNumber setter for POP CheckSerialNumber
+// which is characters 1-9 of underlying CheckSerialNumber \ IdentificationNumber
+func (ed *EntryDetail) SetPOPCheckSerialNumber(s string) {
+	ed.IdentificationNumber = ed.alphaField(s, 9)
+}
+
+// SetPOPTerminalCity setter for POP Terminal City
+// which is characters 10-13 of underlying CheckSerialNumber \ IdentificationNumber
+func (ed *EntryDetail) SetPOPTerminalCity(s string) {
+	ed.IdentificationNumber = ed.IdentificationNumber + ed.alphaField(s, 4)
+}
+
+// SetPOPTerminalState setter for POP Terminal State
+// which is characters 14-15 of underlying CheckSerialNumber \ IdentificationNumber
+func (ed *EntryDetail) SetPOPTerminalState(s string) {
+	ed.IdentificationNumber = ed.IdentificationNumber + ed.alphaField(s, 2)
+}
+
+// POPCheckSerialNumberField is used in POP, characters 1-9 of underlying BatchPOP
+// CheckSerialNumber / IdentificationNumber
+func (ed *EntryDetail) POPCheckSerialNumberField() string {
+	//return ed.alphaField(ed.IdentificationNumber, 9)
+	return ed.parseStringField(ed.IdentificationNumber[0:9])
+}
+
+// POPTerminalCityField is used in POP, characters 10-13 of underlying BatchPOP
+// CheckSerialNumber / IdentificationNumber
+func (ed *EntryDetail) POPTerminalCityField() string {
+	//return ed.alphaField(ed.IdentificationNumber, 9)
+	return ed.parseStringField(ed.IdentificationNumber[9:13])
+}
+
+// POPTerminalStateField is used in POP, characters 14-15 of underlying BatchPOP
+// CheckSerialNumber / IdentificationNumber
+func (ed *EntryDetail) POPTerminalStateField() string {
+	//return ed.alphaField(ed.IdentificationNumber, 9)
+	return ed.parseStringField(ed.IdentificationNumber[13:15])
+}
+
 // IndividualNameField returns a space padded string of IndividualName
 func (ed *EntryDetail) IndividualNameField() string {
 	return ed.alphaField(ed.IndividualName, 22)
