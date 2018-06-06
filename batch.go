@@ -35,6 +35,8 @@ func NewBatch(bh *BatchHeader) (Batcher, error) {
 		return NewBatchCCD(bh), nil
 	case "COR":
 		return NewBatchCOR(bh), nil
+	case "POP":
+		return NewBatchPOP(bh), nil
 	case "PPD":
 		return NewBatchPPD(bh), nil
 	case "RCK":
