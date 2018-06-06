@@ -16,14 +16,15 @@ Package 'moov-io/ach' implements a file reader and writer for parsing [ACH](http
 ACH is under active development but already in production for multiple companies. Please star the project if you are interested in its progress.
 
 * Library currently supports the reading and writing 
-	* PPD (Prearranged payment and deposits)
-	* WEB (Internet-initiated Entries )
-	* CCD (Corporate credit or debit)
-	* TEL (Telephone-Initiated Entry)
-	* COR (Automated Notification of Change(NOC))
-	* RCK (Represented Check Entries)
+	* ARC (Accounts Receivable Entry
 	* BOC (Back Office Conversion)
-	* ARC (Accounts Receivable Entry)
+	* CCD (Corporate credit or debit)
+	* COR (Automated Notification of Change(NOC))
+	* POP (Point of Purchase)
+	* PPD (Prearranged payment and deposits)
+	* RCK (Represented Check Entries)
+	* TEL (Telephone-Initiated Entry)
+	* WEB (Internet-initiated Entries)
 	* Return Entries
 
 
