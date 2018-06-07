@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	// Example transfer to write an ACH POP file to debit a external institutions account
+	// Example transfer to write an ACH ARC file to debit an external institutions account
 	// Important: All financial institutions are different and will require registration and exact field values.
 
 	fh := ach.NewFileHeader()
@@ -21,10 +21,10 @@ func main() {
 	// BatchHeader identifies the originating entity and the type of transactions contained in the batch
 	bh := ach.NewBatchHeader()
 	bh.ServiceClassCode = 225     // ACH credit pushes money out, 225 debits/pulls money in.
-	bh.CompanyName = "Originator" // The name of the company/person that has relationship with receiver
+	bh.CompanyName = "Payee Name" // The name of the company/person that has relationship with receiver
 	bh.CompanyIdentification = fh.ImmediateOrigin
-	bh.StandardEntryClassCode = "POP"      // Consumer destination vs Company CCD
-	bh.CompanyEntryDescription = "ACH POP" // will be on receiving accounts statement
+	bh.StandardEntryClassCode = "ARC"      // Consumer destination vs Company CCD
+	bh.CompanyEntryDescription = "ACH ARC" // will be on receiving accounts statement
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
 	bh.ODFIIdentification = "121042882" // Originating Routing Number
 
@@ -35,15 +35,13 @@ func main() {
 	entry.TransactionCode = 27          // Code 27: Debit (withdrawal) from checking account
 	entry.SetRDFI("231380104")          // Receivers bank transit routing number
 	entry.DFIAccountNumber = "12345678" // Receivers bank account number
-	entry.Amount = 250500               // Amount of transaction with no decimal. One dollar and eleven cents = 111
+	entry.Amount = 250000               // Amount of transaction with no decimal. One dollar and eleven cents = 111
+	entry.SetCheckSerialNumber("123879654")
+	entry.SetReceivingCompany("ABC Company")
 	entry.SetTraceNumber(bh.ODFIIdentification, 1)
-	entry.IndividualName = "Wade Arnold" // Identifies the receiver of the transaction
-	entry.SetPOPCheckSerialNumber("123456")
-	entry.SetPOPTerminalCity("PHIL")
-	entry.SetPOPTerminalState("PA")
 
 	// build the batch
-	batch := ach.NewBatchPOP(bh)
+	batch := ach.NewBatchARC(bh)
 	batch.AddEntry(entry)
 	if err := batch.Create(); err != nil {
 		log.Fatalf("Unexpected error building batch: %s\n", err)
