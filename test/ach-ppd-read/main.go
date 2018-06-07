@@ -12,7 +12,7 @@ func main() {
 	// open a file for reading. Any io.Reader Can be used
 	f, err := os.Open("ppd-debit.ach")
 	if err != nil {
-		log.Panicf("Can not open file: %s: \n", err)
+		log.Fatal(err)
 	}
 	r := ach.NewReader(f)
 	achFile, err := r.Read()
