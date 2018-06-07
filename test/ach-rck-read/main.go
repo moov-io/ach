@@ -28,5 +28,7 @@ func main() {
 		fmt.Printf("Could not build file with read properties: %v", err)
 	}
 
-	fmt.Printf("total amount debit: %v \n", achFile.Control.TotalDebitEntryDollarAmountInFile)
+	fmt.Printf("Total Amount Debit: %v \n", achFile.Control.TotalDebitEntryDollarAmountInFile)
+	fmt.Printf("SEC Code: %v \n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
+	fmt.Printf("Check Serial Number: %v \n", achFile.Batches[0].GetEntries()[0].CheckSerialNumberField())
 }

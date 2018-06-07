@@ -17,7 +17,7 @@ func main() {
 	fh := ach.NewFileHeader()
 	fh.ImmediateDestination = "231380104" // Routing Number of the ACH Operator or receiving point to which the file is being sent
 	fh.ImmediateOrigin = "121042882"      // Routing Number of the ACH Operator or sending point that is sending the file
-	fh.FileCreationDate = time.Now()      // Todays Date
+	fh.FileCreationDate = time.Now()      // Today's Date
 	fh.ImmediateDestinationName = "Federal Reserve Bank"
 	fh.ImmediateOriginName = "My Bank Name"
 
