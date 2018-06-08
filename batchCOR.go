@@ -10,7 +10,7 @@ import (
 
 // BatchCOR COR - Automated Notification of Change (NOC) or Refused Notification of Change
 // This Standard Entry Class Code is used by an RDFI or ODFI when originating a Notification of Change or Refused Notification of Change in automated format.
-// A Notification of Change may be created by an RDFI to notify the ODFI that a posted Entry or Pre-notification Entry contains invalid or erroneous information and should be changed.
+// A Notification of Change may be created by an RDFI to notify the ODFI that a posted Entry or Prenotification Entry contains invalid or erroneous information and should be changed.
 type BatchCOR struct {
 	batch
 }
@@ -56,7 +56,7 @@ func (batch *BatchCOR) Validate() error {
 		// COR TransactionCode must be a Return or NOC transaction Code
 		// Return/NOC of a credit  21, 31, 41, 51
 		// Return/NOC of a debit 26, 36, 46, 56
-		if !entry.ReturnOrNOC() {
+		if entry.TransactionCodeDescription() != ReturnOrNoc {
 			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "COR")
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 		}
