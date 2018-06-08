@@ -386,7 +386,6 @@ func (ed *EntryDetail) ReturnOrNOC() bool {
    case "1", "6":
       return true
    default:
-      return false
    }
    return false
 }
