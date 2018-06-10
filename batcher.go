@@ -61,4 +61,5 @@ var (
 	msgBatchForwardReturn           = "Forward and Return entries found in the same batch"
 	msgBatchAmount                  = "Amount must be less than %v for SEC code %v"
 	msgBatchCheckSerialNumber       = "Check Serial Number is required for SEC code %v"
+	msgBatchTransactionCode         = "Transaction code %v is not allowed for batch type %v"
 )
