@@ -71,7 +71,7 @@ func main() {
 	bh2.CompanyName = "Your Company"
 	bh2.CompanyIdentification = file.Header.ImmediateOrigin
 	bh2.StandardEntryClassCode = "WEB"
-	bh2.CompanyEntryDescription = "Subscr"
+	bh2.CompanyEntryDescription = "Subscribe"
 	bh2.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
 	bh2.ODFIIdentification = "121042882"
 

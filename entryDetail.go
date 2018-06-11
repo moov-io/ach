@@ -93,6 +93,8 @@ const (
 	CategoryReturn = "Return"
 	// CategoryNOC defines the entry as being a notification of change of a forward entry to the originating institution
 	CategoryNOC = "NOC"
+	// ReturnOrNoc is the description for the  following TransactionCode: 21, 31, 41, 51, 26, 36, 46, 56
+	ReturnOrNoc = "RN"
 )
 
 // NewEntryDetail returns a new EntryDetail with default values for non exported fields
@@ -372,6 +374,20 @@ func (ed *EntryDetail) CreditOrDebit() string {
 		return "C"
 	case "5", "6", "7", "8", "9":
 		return "D"
+	}
+	return ""
+}
+
+// TransactionCodeDescription determines the transaction code description based on the second number
+// in the TransactionCode
+func (ed *EntryDetail) TransactionCodeDescription() string {
+	tc := strconv.Itoa(ed.TransactionCode)
+	// Take the second number in the TransactionCode
+	switch tc[1:2] {
+	// Return or NOC
+	case "1", "6":
+		return ReturnOrNoc
+	default:
 	}
 	return ""
 }

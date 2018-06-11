@@ -34,7 +34,7 @@ func (batch *BatchCOR) Validate() error {
 		return err
 	}
 	// Add configuration based validation for this type.
-	// Web can have up to one addenda per entry record
+	// COR Addenda must be Addenda98
 	if err := batch.isAddenda98(); err != nil {
 		return err
 	}
@@ -50,6 +50,17 @@ func (batch *BatchCOR) Validate() error {
 	if batch.Control.TotalCreditEntryDollarAmount != 0 || batch.Control.TotalDebitEntryDollarAmount != 0 {
 		msg := fmt.Sprintf(msgBatchCORAmount, batch.Control.TotalCreditEntryDollarAmount, batch.Control.TotalDebitEntryDollarAmount)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
+	}
+
+	for _, entry := range batch.Entries {
+		// COR TransactionCode must be a Return or NOC transaction Code
+		// Return/NOC of a credit  21, 31, 41, 51
+		// Return/NOC of a debit 26, 36, 46, 56
+		if entry.TransactionCodeDescription() != ReturnOrNoc {
+			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "COR")
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
+		}
+
 	}
 
 	return nil
