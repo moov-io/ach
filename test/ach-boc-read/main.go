@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/moov-io/ach"
 	"log"
 	"os"
+
+	"github.com/moov-io/ach"
 )
 
 func main() {
 	// open a file for reading. Any io.Reader Can be used
-	f, err := os.Open("pop-debit.ach")
+	f, err := os.Open("boc-debit.ach")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -29,7 +30,5 @@ func main() {
 
 	fmt.Printf("Total Amount Debit: %v \n", achFile.Control.TotalDebitEntryDollarAmountInFile)
 	fmt.Printf("SEC Code: %v \n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
-	fmt.Printf("POP Check Serial Number: %v \n", achFile.Batches[0].GetEntries()[0].POPCheckSerialNumberField())
-	fmt.Printf("POP Terminal City: %v \n", achFile.Batches[0].GetEntries()[0].POPTerminalCityField())
-	fmt.Printf("POP Terminal State: %v \n", achFile.Batches[0].GetEntries()[0].POPTerminalStateField())
+	fmt.Printf("Check Serial Number: %v \n", achFile.Batches[0].GetEntries()[0].CheckSerialNumberField())
 }
