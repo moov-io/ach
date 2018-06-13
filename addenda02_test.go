@@ -30,6 +30,78 @@ func TestMockAddenda02(t *testing.T) {
 	}
 }
 
+func testAddenda02ValidRecordType(t testing.TB) {
+	addenda02 := mockAddenda02()
+	addenda02.recordType = "63"
+	if err := addenda02.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+func TestAddenda02ValidRecordType(t *testing.T) {
+	testAddenda02ValidRecordType(t)
+}
+
+func BenchmarkAddenda02ValidRecordType(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda02ValidRecordType(b)
+	}
+}
+
+func testAddenda02ValidTypeCode(t testing.TB) {
+	addenda02 := mockAddenda02()
+	addenda02.typeCode = "65"
+	if err := addenda02.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+func TestAddenda02ValidTypeCode(t *testing.T) {
+	testAddenda02ValidTypeCode(t)
+}
+
+func BenchmarkAddenda02ValidTypeCode(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda02ValidTypeCode(b)
+	}
+}
+
+func testAddenda02TypeCode02(t testing.TB) {
+	addenda02 := mockAddenda02()
+	addenda02.typeCode = "05"
+	if err := addenda02.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+func TestAddenda02TypeCode02(t *testing.T) {
+	testAddenda02TypeCode02(t)
+}
+
+func BenchmarkAddenda02TypeCode02(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda02TypeCode02(b)
+	}
+}
+
 func testAddenda02RecordType(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.recordType = ""
