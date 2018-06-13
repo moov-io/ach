@@ -8,7 +8,7 @@ import "fmt"
 
 // BatchPOP holds the BatchHeader and BatchControl and all EntryDetail for POP Entries.
 //
-// Point of Purchase. A check presented in-person to a merchant for purchase is presented
+// Point-of-Purchase. A check presented in-person to a merchant for purchase is presented
 // as an ACH entry instead of a physical check.
 //
 // This ACH debit application is used by originators as a method of payment for the

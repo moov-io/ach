@@ -379,3 +379,30 @@ func BenchmarkBatchRCKAddendaCount(b *testing.B) {
 		testBatchRCKAddendaCount(b)
 	}
 }
+
+// testBatchRCKParseCheckSerialNumber validates BatchRCK create
+func testBatchRCKParseCheckSerialNumber(t testing.TB) {
+	mockBatch := mockBatchRCK()
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	checkSerialNumber := "123456789      "
+	if checkSerialNumber != mockBatch.GetEntries()[0].CheckSerialNumberField() {
+		t.Errorf("RecordType Expected '123456789' got: %v", mockBatch.GetEntries()[0].CheckSerialNumberField())
+	}
+}
+
+// TestBatchRCKParseCheckSerialNumber tests validating BatchRCK create
+func TestBatchRCKParseCheckSerialNumber(t *testing.T) {
+	testBatchRCKParseCheckSerialNumber(t)
+}
+
+// BenchmarkBatchRCKParseCheckSerialNumber benchmarks validating BatchRCK create
+func BenchmarkBatchRCKParseCheckSerialNumber(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchRCKParseCheckSerialNumber(b)
+	}
+}
