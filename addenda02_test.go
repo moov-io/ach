@@ -294,6 +294,9 @@ func testAddenda02String(t testing.TB) {
 	if addenda02.String() != line {
 		t.Errorf("Strings do not match")
 	}
+	if addenda02.TypeCode() != "02" {
+		t.Errorf("TypeCode Expected 02 got: %v", addenda02.TypeCode())
+	}
 }
 
 func TestAddenda02String(t *testing.T) {
