@@ -160,6 +160,34 @@ func BenchmarkBatchPOSServiceClassCodeEquality(b *testing.B) {
 	}
 }
 
+// testBatchPOSTransactionCode validates BatchPOS TransactionCode is not a credit
+func testBatchPOSTransactionCode(t testing.TB) {
+	mockBatch := mockBatchPOS()
+	mockBatch.GetEntries()[0].TransactionCode = 22
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TransactionCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchPOSTransactionCode tests validating BatchPOS TransactionCode is not a credit
+func TestBatchPOSTransactionCode(t *testing.T) {
+	testBatchPOSTransactionCode(t)
+}
+
+// BenchmarkBatchPOSTransactionCode benchmarks validating BatchPOS TransactionCode is not a credit
+func BenchmarkBatchPOSTransactionCode(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchPOSTransactionCode(b)
+	}
+}
+
 // testBatchPOSAddendaCount validates BatchPOS Addendum count of 2
 func testBatchPOSAddendaCount(t testing.TB) {
 	mockBatch := mockBatchPOS()
