@@ -59,8 +59,6 @@ func mockBatchPOS() *BatchPOS {
 	return mockBatch
 }
 
-
-
 // testBatchPOSHeader creates a BatchPOS BatchHeader
 func testBatchPOSHeader(t testing.TB) {
 	batch, _ := NewBatch(mockBatchPOSHeader())
