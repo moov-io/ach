@@ -24,7 +24,8 @@ type BatchPOS struct {
 	batch
 }
 
-var msgBatchPOSAddenda = "found and 1 Addenda02 is required for SEC Type POS"
+var msgBatchPOSAddenda = "found and 1 Addenda02 is required for SEC code POS"
+var msgBatchPOSAddendaType = "%T found where Addenda02 is required for SEC code POS"
 
 // NewBatchPOS returns a *BatchPOS
 func NewBatchPOS(bh *BatchHeader) *BatchPOS {
@@ -46,7 +47,6 @@ func (batch *BatchPOS) Validate() error {
 	if err := batch.isAddenda02(); err != nil {
 		return err
 	}
-
 	// Add type specific validation.
 	if batch.Header.StandardEntryClassCode != "POS" {
 		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "POS")
@@ -94,7 +94,7 @@ func (batch *BatchPOS) isAddenda02() error {
 		// Addenda type assertion must be Addenda02
 		addenda02, ok := entry.Addendum[0].(*Addenda02)
 		if !ok {
-			msg := fmt.Sprintf(msgBatchCORAddendaType, entry.Addendum[0])
+			msg := fmt.Sprintf(msgBatchPOSAddendaType, entry.Addendum[0])
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
 		}
 		// Addenda02 must be Validated
