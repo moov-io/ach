@@ -6,7 +6,6 @@ package ach
 
 import (
 	"testing"
-	"strings"
 )
 
 func mockAddenda02() *Addenda02 {
@@ -287,72 +286,23 @@ func BenchmarkAddenda02TerminalState(b *testing.B) {
 	}
 }
 
-func testParseAddenda02(t testing.TB) {
-	addendaPOS := NewAddenda02()
+// TestAddenda02 String validates that a known parsed file can be return to a string of the same value
+func testAddenda02String(t testing.TB) {
+	addenda02 := NewAddenda02()
 	var line = "702REFONEAREFTERM021000490612123456Target Store 0049          PHILADELPHIA   PA091012980000088"
-	addendaPOS.Parse(line)
-
-	r := NewReader(strings.NewReader(line))
-
-	//Add a new BatchPOS
-	r.addCurrentBatch(NewBatchPOS(mockBatchPOSHeader()))
-
-	//Add a POS EntryDetail
-	entryDetail := mockPOSEntryDetail()
-
-	//Add an addenda to the POS EntryDetail
-	entryDetail.AddAddenda(addendaPOS)
-
-	// add the POSentry detail to the batch
-	r.currentBatch.AddEntry(entryDetail)
-
-	record := r.currentBatch.GetEntries()[0].Addendum[0].(*Addenda02)
-
-	if record.recordType != "7" {
-		t.Errorf("RecordType Expected '7' got: %v", record.recordType)
-	}
-	if record.TypeCode() != "02" {
-		t.Errorf("TypeCode Expected 02 got: %v", record.TypeCode())
-	}
-	if record.ReferenceInformationOne != "REFONEA" {
-		t.Errorf("ReferenceInformationOne Expected 'REFONEA' got: %v", record.ReferenceInformationOneField())
-	}
-	if record.ReferenceInformationTwo != "REF" {
-		t.Errorf("ReferenceInformationTwo Expected 'REF' got: %v", record.ReferenceInformationTwoField())
-	}
-	if record.TerminalIdentificationCode != "TERM02" {
-		t.Errorf("TerminalIdentificationCode Expected 'TERM02' got: %v", record.TerminalIdentificationCodeField())
-	}
-	if record.TransactionSerialNumber != "100049" {
-		t.Errorf("TransactionSerialNumber Expected '100049' got: %v", record.TransactionSerialNumberField())
-	}
-	if record.TransactionDate != "0612" {
-		t.Errorf("TransactionDate Expected '0612' got: %v", record.TransactionDateField())
-	}
-	if record.AuthorizationCodeOrExpireDate != "123456" {
-		t.Errorf("AuthorizationCodeOrExpireDate Expected '123456' got: %v", record.AuthorizationCodeOrExpireDateField())
-	}
-	if record.TerminalLocation != "Target Store 0049" {
-		t.Errorf("TerminalLocation Expected 'Target Store 0049' got: %v", record.TerminalLocationField())
-	}
-	if record.TerminalCity != "PHILADELPHIA" {
-		t.Errorf("TerminalCity Expected '123456' got: %v", record.TerminalCityField())
-	}
-	if record.TerminalState != "PA" {
-		t.Errorf("TerminalState Expected '123456' got: %v", record.TerminalStateField())
-	}
-	if record.TraceNumber != 91012980000088 {
-		t.Errorf("TraceNumber Expected '91012980000088' got: %v", record.TraceNumberField())
+	addenda02.Parse(line)
+	if addenda02.String() != line {
+		t.Errorf("Strings do not match")
 	}
 }
 
-func TestParseAddenda02(t *testing.T) {
-	testParseAddenda02(t)
+func TestAddenda02String(t *testing.T) {
+	testAddenda02String(t)
 }
 
-func BenchmarkParseAddenda02(b *testing.B) {
+func BenchmarkAddenda02String(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testParseAddenda02(b)
+		testAddenda02String(b)
 	}
 }
