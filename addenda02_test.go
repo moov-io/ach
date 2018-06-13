@@ -4,10 +4,6 @@
 
 package ach
 
-import (
-	"testing"
-)
-
 func mockAddenda02() *Addenda02 {
 	addenda02 := NewAddenda02()
 	addenda02.ReferenceInformationOne = "REFONEA"
@@ -23,10 +19,4 @@ func mockAddenda02() *Addenda02 {
 	return addenda02
 }
 
-func TestMockAddenda02(t *testing.T) {
-	addenda02 := mockAddenda02()
-	if err := addenda02.Validate(); err != nil {
-		t.Error("mockAddenda02 does not validate and will break other tests")
-	}
-}
 
