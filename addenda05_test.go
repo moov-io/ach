@@ -27,6 +27,7 @@ func TestMockAddenda05(t *testing.T) {
 	}
 }
 
+// testParseAddenda05 parses an Addenda05 record for a PPD detail entry
 func testParseAddenda05(t testing.TB) {
 	addendaPPD := NewAddenda05()
 	var line = "705PPD                                        DIEGO MAY                            00010000001"
@@ -34,16 +35,16 @@ func testParseAddenda05(t testing.TB) {
 
 	r := NewReader(strings.NewReader(line))
 
-	//Add a new BatchWEB
+	//Add a new BatchPPD
 	r.addCurrentBatch(NewBatchPPD(mockBatchPPDHeader()))
 
-	//Add a WEB EntryDetail
+	//Add a PPDEntryDetail
 	entryDetail := mockPPDEntryDetail()
 
-	//Add an addenda to the WEB EntryDetail
+	//Add an addenda to the PPD EntryDetail
 	entryDetail.AddAddenda(addendaPPD)
 
-	// add the WEB entry detail to the batch
+	// add the PPD entry detail to the batch
 	r.currentBatch.AddEntry(entryDetail)
 
 	record := r.currentBatch.GetEntries()[0].Addendum[0].(*Addenda05)
@@ -52,7 +53,7 @@ func testParseAddenda05(t testing.TB) {
 		t.Errorf("RecordType Expected '7' got: %v", record.recordType)
 	}
 	if record.TypeCode() != "05" {
-		t.Errorf("TypeCode Expected 10 got: %v", record.TypeCode())
+		t.Errorf("TypeCode Expected 05 got: %v", record.TypeCode())
 	}
 	if record.PaymentRelatedInformationField() != "PPD                                        DIEGO MAY                            " {
 		t.Errorf("PaymentRelatedInformation Expected 'PPD                                        DIEGO MAY                            ' got: %v", record.PaymentRelatedInformationField())
@@ -65,10 +66,12 @@ func testParseAddenda05(t testing.TB) {
 	}
 }
 
+// TestParseAddenda05 tests parsing an Addenda05 record for a PPD detail entry
 func TestParseAddenda05(t *testing.T) {
 	testParseAddenda05(t)
 }
 
+// BenchmarkParseAddenda05 benchmarks parsing an Addenda05 record for a PPD detail entry
 func BenchmarkParseAddenda05(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -76,7 +79,7 @@ func BenchmarkParseAddenda05(b *testing.B) {
 	}
 }
 
-// TestAddenda05 String validates that a known parsed file can be return to a string of the same value
+// testAddenda05String validates that a known parsed file can be return to a string of the same value
 func testAddenda05String(t testing.TB) {
 	addenda05 := NewAddenda05()
 	var line = "705WEB                                        DIEGO MAY                            00010000001"
@@ -87,10 +90,12 @@ func testAddenda05String(t testing.TB) {
 	}
 }
 
+// TestAddenda05 String tests validating that a known parsed file can be return to a string of the same value
 func TestAddenda05String(t *testing.T) {
 	testAddenda05String(t)
 }
 
+// BenchmarkAddenda05 String benchmarks validating that a known parsed file can be return to a string of the same value
 func BenchmarkAddenda05String(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -158,7 +163,7 @@ func TestAddenda05PaymentRelatedInformationAlphaNumeric(t *testing.T) {
 	}
 }
 
-func TestAddenda05TyeCodeNil(t *testing.T) {
+func testAddenda05TypeCodeNil(t testing.TB) {
 	addenda05 := mockAddenda05()
 	addenda05.typeCode = ""
 	if err := addenda05.Validate(); err != nil {
@@ -167,5 +172,16 @@ func TestAddenda05TyeCodeNil(t *testing.T) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
+	}
+}
+
+func TestAddenda05TypeCodeNil(t *testing.T) {
+	testAddenda05TypeCodeNil(t)
+}
+
+func BenchmarkAddenda05TypeCodeNil(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda05TypeCodeNil(b)
 	}
 }
