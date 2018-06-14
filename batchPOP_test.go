@@ -429,3 +429,31 @@ func BenchmarkBatchPOPAddendaCount(b *testing.B) {
 		testBatchARCAddendaCount(b)
 	}
 }
+
+// testBatchPOPInvalidBuild validates an invalid batch build
+func testBatchPOPInvalidBuild(t testing.TB) {
+	mockBatch := mockBatchPOP()
+	mockBatch.GetHeader().recordType = "3"
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchPOPInvalidBuild tests validating an invalid batch build
+func TestBatchPOPInvalidBuild(t *testing.T) {
+	testBatchPOPInvalidBuild(t)
+}
+
+// BenchmarkBatchPOPInvalidBuild benchmarks validating an invalid batch build
+func BenchmarkBatchPOPInvalidBuild(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchPOPInvalidBuild(b)
+	}
+}
