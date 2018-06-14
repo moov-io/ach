@@ -4,7 +4,9 @@
 
 package ach
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // BatchPOS holds the BatchHeader and BatchControl and all EntryDetail for POS Entries.
 //
@@ -67,7 +69,12 @@ func (batch *BatchPOS) Validate() error {
 			msg := fmt.Sprintf(msgBatchTransactionCodeCredit, entry.TransactionCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 		}
-		//ToDo;  Additional validations
+		if err := entry.isCardTransactionType(entry.DiscretionaryData); err != nil {
+			msg := fmt.Sprintf(msgBatchCardTransactionType, entry.DiscretionaryData)
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "CardTransactionType", Msg: msg}
+		}
+
+		//ToDo;  Additional validations -  move isAddenda02 logic so we only range through a batch of entries once
 	}
 	return nil
 }

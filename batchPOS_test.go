@@ -290,6 +290,8 @@ func BenchmarkBatchPOSInvalidAddenda(b *testing.B) {
 	}
 }
 
+// ToDo: Using a FieldError may need to add a BatchError and use *BatchError
+
 // testBatchPOSInvalidBuild validates an invalid batch build
 func testBatchPOSInvalidBuild(t testing.TB) {
 	mockBatch := mockBatchPOS()
@@ -315,5 +317,33 @@ func BenchmarkBatchPOSInvalidBuild(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchPOSInvalidBuild(b)
+	}
+}
+
+// testBatchPOSCardTransactionType validates BatchPOS create for an invalid CardTransactionType
+func testBatchPOSCardTransactionType(t testing.TB) {
+	mockBatch := mockBatchPOS()
+	mockBatch.GetEntries()[0].DiscretionaryData = "555"
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "CardTransactionType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchPOSCardTransactionType tests validating BatchPOS create for an invalid CardTransactionType
+func TestBatchPOSCardTransactionType(t *testing.T) {
+	testBatchPOSCardTransactionType(t)
+}
+
+// BenchmarkBatchPOSCardTransactionType benchmarks validating BatchPOS create for an invalid CardTransactionType
+func BenchmarkBatchPOSCardTransactionType(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchPOSCardTransactionType(b)
 	}
 }
