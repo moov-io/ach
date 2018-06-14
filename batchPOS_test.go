@@ -119,8 +119,8 @@ func BenchmarkBatchPOSStandardEntryClassCode(b *testing.B) {
 
 // testBatchPOSServiceClassCodeEquality validates service class code equality
 func testBatchPOSServiceClassCodeEquality(t testing.TB) {
-	mockBatch := mockBatchPPD()
-	mockBatch.GetControl().ServiceClassCode = 220
+	mockBatch := mockBatchPOS()
+	mockBatch.GetControl().ServiceClassCode = 200
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
@@ -177,7 +177,7 @@ func BenchmarkBatchPOSTransactionCode(b *testing.B) {
 func testBatchPOSAddendaCount(t testing.TB) {
 	mockBatch := mockBatchPOS()
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda02())
-	mockBatch.Create()
+	//mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Addendum" {
@@ -287,5 +287,33 @@ func BenchmarkBatchPOSInvalidAddenda(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchPOSInvalidAddenda(b)
+	}
+}
+
+// testBatchInvalidBuild validates an invalid batch build
+func testBatchInvalidBuild(t testing.TB) {
+	mockBatch := mockBatchPOS()
+	mockBatch.GetHeader().recordType = "3"
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchInvalidBuild tests validating an invalid batch build
+func TestBatchInvalidBuild(t *testing.T) {
+	testBatchInvalidBuild(t)
+}
+
+// BenchmarkBatchInvalidBuild benchmarks validating an invalid batch build
+func BenchmarkBatchInvalidBuild(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchInvalidBuild(b)
 	}
 }
