@@ -299,13 +299,43 @@ func testAddenda02String(t testing.TB) {
 	}
 }
 
+// TestAddenda02String tests validating that a known parsed file can be return to a string of the same value
 func TestAddenda02String(t *testing.T) {
 	testAddenda02String(t)
 }
 
+// BenchmarkAddenda02String benchmarks validating that a known parsed file can be return to a string of the same value
 func BenchmarkAddenda02String(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testAddenda02String(b)
+	}
+}
+
+// testAddenda02TransactionDateMonth validates the month is valid for transactionDate
+func testAddenda02TransactionDateMonth(t testing.TB) {
+	addenda02 := mockAddenda02()
+	addenda02.TransactionDate = "1306"
+	if err := addenda02.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "TransactionDate" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestAddenda02TransactionDateMonth tests validating the month is valid for transactionDate
+func TestAddenda02TransactionDateMonth(t *testing.T) {
+	testAddenda02TransactionDateMonth(t)
+}
+
+// BenchmarkAddenda02TransactionDateMonth test validating the month is valid for transactionDate
+func BenchmarkAddenda02TransactionDateMonth(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda02TransactionDateMonth(b)
 	}
 }

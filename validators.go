@@ -27,6 +27,7 @@ var (
 	msgTransactionCode     = "is an invalid Transaction Code"
 	msgValidCheckDigit     = "does not match calculated check digit %d"
 	msgCardTransactionType = "is an invalid Card Transaction Type"
+	msgValidMonth          = "is an invalid month"
 )
 
 // validator is common validation and formatting of golang types to ach type strings
@@ -70,6 +71,17 @@ func (v *validator) isCardTransactionType(code string) error {
 		return nil
 	}
 	return errors.New(msgCardTransactionType)
+}
+
+// isMonth
+func (v *validator) isMonth(s string) error {
+	switch s {
+	case
+		"01", "02", "03", "04", "05", "06",
+		"07", "08", "09", "10", "11", "12":
+		return nil
+	}
+	return errors.New(msgValidMonth)
 }
 
 // isOriginatorStatusCode ensures status code of a batch is valid
@@ -297,7 +309,7 @@ func (v *validator) CalculateCheckDigit(routingNumber string) int {
 		routeIndex[i] = string(routingNumber[i])
 	}
 	n, _ := strconv.Atoi(routeIndex[0])
-	sum := (n * 3)
+	sum := n * 3
 	n, _ = strconv.Atoi(routeIndex[1])
 	sum = sum + (n * 7)
 	n, _ = strconv.Atoi(routeIndex[2])

@@ -120,7 +120,9 @@ func (addenda02 *Addenda02) Validate() error {
 	if addenda02.typeCode != "02" {
 		return &FieldError{FieldName: "TypeCode", Value: addenda02.typeCode, Msg: msgAddendaTypeCode}
 	}
-	// ToDo: Validation for TransactionDate MMDD
+	if err := addenda02.isMonth(addenda02.parseStringField(addenda02.TransactionDate[0:2])); err != nil {
+		return &FieldError{FieldName: "TransactionDate", Value: addenda02.parseStringField(addenda02.TransactionDate[0:2]), Msg: msgValidMonth}
+	}
 	return nil
 }
 
