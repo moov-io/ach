@@ -1,4 +1,4 @@
-// Copyright 2017 The ACH Authors
+// Copyright 2018 The ACH Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -55,7 +55,7 @@ func (c *converters) alphaField(s string, max uint) string {
 	return s
 }
 
-// numericField right-justified, unisigned, and zero filled
+// numericField right-justified, unsigned, and zero filled
 func (c *converters) numericField(n int, max uint) string {
 	s := strconv.Itoa(n)
 	ln := uint(len(s))

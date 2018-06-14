@@ -1,4 +1,4 @@
-// Copyright 2017 The ACH Authors
+// Copyright 2018 The ACH Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE File.
 
@@ -28,16 +28,16 @@ func testMockFileHeader(t testing.TB) {
 		t.Error("mockFileHeader does not validate and will break other tests")
 	}
 	if fh.ImmediateDestination != "9876543210" {
-		t.Error("ImmediateDestination depedendent default value has changed")
+		t.Error("ImmediateDestination dependent default value has changed")
 	}
 	if fh.ImmediateOrigin != "1234567890" {
-		t.Error("ImmediateOrigin depedendent default value has changed")
+		t.Error("ImmediateOrigin dependent default value has changed")
 	}
 	if fh.ImmediateDestinationName != "Federal Reserve Bank" {
-		t.Error("ImmediateDestinationName depedendent default value has changed")
+		t.Error("ImmediateDestinationName dependent default value has changed")
 	}
 	if fh.ImmediateOriginName != "My Bank Name" {
-		t.Error("ImmediateOriginName depedendent default value has changed")
+		t.Error("ImmediateOriginName dependent default value has changed")
 	}
 }
 
@@ -100,7 +100,7 @@ func parseFileHeader(t testing.TB) {
 		t.Errorf("ImmediateDestinationName Expected 'achdestname           ' got:'%v'", record.ImmediateDestinationNameField())
 	}
 	if record.ImmediateOriginNameField() != "companyname            " {
-		t.Errorf("ImmidiateOriginName Expected 'companyname          ' got: '%v'", record.ImmediateOriginNameField())
+		t.Errorf("ImmediateOriginName Expected 'companyname          ' got: '%v'", record.ImmediateOriginNameField())
 	}
 	if record.ReferenceCodeField() != "        " {
 		t.Errorf("ReferenceCode Expected '        ' got:'%v'", record.ReferenceCodeField())
