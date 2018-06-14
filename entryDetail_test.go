@@ -620,3 +620,29 @@ func BenchmarkEDCreditOrDebit(b *testing.B) {
 		testEDCreditOrDebit(b)
 	}
 }
+
+// testValidateEDCheckDigit validates CheckDigit error
+func testValidateEDCheckDigit(t testing.TB) {
+	ed := mockEntryDetail()
+	ed.CheckDigit = "XYZ"
+	if err := ed.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "CheckDigit" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+// TestValidateEDCheckDigit tests validating validates CheckDigit error
+func TestValidateEDCheckDigit(t *testing.T) {
+	testValidateEDCheckDigit(t)
+}
+
+// BenchmarkValidateEDCheckDigit benchmarks validating CheckDigit error
+func BenchmarkValidateEDCheckDigit(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testValidateEDCheckDigit(b)
+	}
+}
