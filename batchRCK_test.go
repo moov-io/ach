@@ -406,3 +406,31 @@ func BenchmarkBatchRCKParseCheckSerialNumber(b *testing.B) {
 		testBatchRCKParseCheckSerialNumber(b)
 	}
 }
+
+// testBatchRCKInvalidBuild validates an invalid batch build
+func testBatchRCKInvalidBuild(t testing.TB) {
+	mockBatch := mockBatchRCK()
+	mockBatch.GetHeader().recordType = "3"
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchRCKInvalidBuild tests validating an invalid batch build
+func TestBatchRCKInvalidBuild(t *testing.T) {
+	testBatchRCKInvalidBuild(t)
+}
+
+// BenchmarkBatchRCKInvalidBuild benchmarks validating an invalid batch build
+func BenchmarkRCKBatchInvalidBuild(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchRCKInvalidBuild(b)
+	}
+}
