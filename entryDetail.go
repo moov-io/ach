@@ -231,12 +231,7 @@ func (ed *EntryDetail) AddAddenda(addenda Addendumer) []Addendumer {
 		ed.Addendum = append(ed.Addendum, addenda)
 		return ed.Addendum
 		// default is current *Addenda05
-	case *Addenda02:
-		ed.Category = CategoryForward
-		ed.Addendum = nil
-		ed.Addendum = append(ed.Addendum, addenda)
-		return ed.Addendum
-		default:
+	default:
 		ed.Category = CategoryForward
 		ed.Addendum = append(ed.Addendum, addenda)
 		return ed.Addendum
