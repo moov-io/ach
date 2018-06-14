@@ -177,7 +177,7 @@ func BenchmarkBatchPOSTransactionCode(b *testing.B) {
 func testBatchPOSAddendaCount(t testing.TB) {
 	mockBatch := mockBatchPOS()
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda02())
-	//mockBatch.Create()
+	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Addendum" {
