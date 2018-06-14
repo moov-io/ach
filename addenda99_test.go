@@ -257,3 +257,27 @@ func BenchmarkAddenda99TraceNumberField(b *testing.B) {
 		testAddenda99TraceNumberField(b)
 	}
 }
+
+func testAddenda99ValidRecordType(t testing.TB) {
+	addenda99 := mockAddenda99()
+	addenda99.recordType = "63"
+	if err := addenda99.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+func TestAddenda99ValidRecordType(t *testing.T) {
+	testAddenda99ValidRecordType(t)
+}
+
+func BenchmarkAddenda99ValidRecordType(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda99ValidRecordType(b)
+	}
+}
