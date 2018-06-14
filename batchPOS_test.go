@@ -290,8 +290,8 @@ func BenchmarkBatchPOSInvalidAddenda(b *testing.B) {
 	}
 }
 
-// testBatchInvalidBuild validates an invalid batch build
-func testBatchInvalidBuild(t testing.TB) {
+// testBatchPOSInvalidBuild validates an invalid batch build
+func testBatchPOSInvalidBuild(t testing.TB) {
 	mockBatch := mockBatchPOS()
 	mockBatch.GetHeader().recordType = "3"
 	if err := mockBatch.Create(); err != nil {
@@ -305,15 +305,15 @@ func testBatchInvalidBuild(t testing.TB) {
 	}
 }
 
-// TestBatchInvalidBuild tests validating an invalid batch build
-func TestBatchInvalidBuild(t *testing.T) {
-	testBatchInvalidBuild(t)
+// TestBatchPOSInvalidBuild tests validating an invalid batch build
+func TestBatchPOSInvalidBuild(t *testing.T) {
+	testBatchPOSInvalidBuild(t)
 }
 
-// BenchmarkBatchInvalidBuild benchmarks validating an invalid batch build
-func BenchmarkBatchInvalidBuild(b *testing.B) {
+// BenchmarkBatchPOSInvalidBuild benchmarks validating an invalid batch build
+func BenchmarkBatchPOSInvalidBuild(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchInvalidBuild(b)
+		testBatchPOSInvalidBuild(b)
 	}
 }
