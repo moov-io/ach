@@ -148,6 +148,34 @@ func BenchmarkBatchBOCStandardEntryClassCode(b *testing.B) {
 	}
 }
 
+// testBatchBOCServiceClassCodeEquality validates service class code equality
+func testBatchBOCServiceClassCodeEquality(t testing.TB) {
+	mockBatch := mockBatchBOC()
+	mockBatch.GetControl().ServiceClassCode = 200
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ServiceClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchBOCServiceClassCodeEquality tests validating service class code equality
+func TestBatchBOCServiceClassCodeEquality(t *testing.T) {
+	testBatchBOCServiceClassCodeEquality(t)
+}
+
+// BenchmarkBatchBOCServiceClassCodeEquality benchmarks validating service class code equality
+func BenchmarkBatchBOCServiceClassCodeEquality(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchBOCServiceClassCodeEquality(b)
+	}
+}
+
 // testBatchBOCServiceClass200 validates BatchBOC create for an invalid ServiceClassCode 200
 func testBatchBOCServiceClass200(t testing.TB) {
 	mockBatch := mockBatchBOC()
