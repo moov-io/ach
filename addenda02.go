@@ -13,33 +13,38 @@ import (
 // Code 02 in a machine readable format. It is usually formatted according to ANSI, ASC, X12 Standard.
 type Addenda02 struct {
 	//ToDo: Verify which fields should be omitempty
-	//ToDo: Add mor descriptive comments
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
 	// RecordType defines the type of record in the block. entryAddenda02 Pos 7
 	recordType string
-	// TypeCode Addenda02 types code '02'
+	// TypeCode Addenda02 type code '02'
 	typeCode string
-	// ReferenceInformationOne
+	// ReferenceInformationOne may be used for additional reference numbers, identification numbers,
+	// or codes that the merchant needs to identify the particular transaction or customer.
 	ReferenceInformationOne string `json:"referenceInformationOne"`
-	// ReferenceInformationTwo
+	// ReferenceInformationTwo  may be used for additional reference numbers, identification numbers,
+	// or codes that the merchant needs to identify the particular transaction or customer.
 	ReferenceInformationTwo string `json:"referenceInformationTwo"`
-	// TerminalIdentificationCode
+	// TerminalIdentificationCode identifies an Electronic terminal with a unique code that allows
+	// a terminal owner and/or switching network to identify the terminal at which an Entry originated.
 	TerminalIdentificationCode string `json:"terminalIdentificationCode"`
-	// TransactionSerialNumber
+	// TransactionSerialNumber is assigned by the terminal at the time the transaction is originated.  The
+	// number, with the Terminal Identification Code, serves as an audit trail for the transaction and is
+	// usually assigned in ascending sequence.
 	TransactionSerialNumber string `json:"transactionSerialNumber"`
-	// TransactionDate MMDD
+	// TransactionDate expressed MMDD identifies the date on which the transaction occurred.
 	TransactionDate string `json:"transactionDate"`
-	// TraceNumber matches the Entry Detail Trace Number of the entry being returned.
-	// AuthorizationCodeOrExpireDate
+	// AuthorizationCodeOrExpireDate indicates the code that a card authorization center has
+	// furnished to the merchant.
 	AuthorizationCodeOrExpireDate string `json:"authorizationCodeOrExpireDate"`
-	// Terminal Location
+	// Terminal Location identifies the specific location of a terminal (i.e., street names of an
+	// intersection, address, etc.) in accordance with the requirements of Regulation E.
 	TerminalLocation string `json:"terminalLocation"`
-	// TerminalCity
+	// TerminalCity Identifies the city in which the electronic terminal is located.
 	TerminalCity string `json:"terminalCity"`
-	// TerminalState
+	// TerminalState Identifies the state in which the electronic terminal is located
 	TerminalState string `json:"terminalState"`
-	// TraceNumber matches the Entry Detail Trace Number of the entry being returned.
+	// TraceNumber Standard Entry Detail Trace Number
 	TraceNumber int `json:"traceNumber,omitempty"`
 	// validator is composed for data validation
 	validator

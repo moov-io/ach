@@ -19,7 +19,7 @@ func mockAddenda02() *Addenda02 {
 	addenda02.TerminalLocation = "Target Store 0049"
 	addenda02.TerminalCity = "PHILADELPHIA"
 	addenda02.TerminalState = "PA"
-	addenda02.TraceNumber = 91012980000088
+	addenda02.TraceNumber = 121042880000123
 	return addenda02
 }
 
@@ -289,7 +289,7 @@ func BenchmarkAddenda02TerminalState(b *testing.B) {
 // TestAddenda02 String validates that a known parsed file can be return to a string of the same value
 func testAddenda02String(t testing.TB) {
 	addenda02 := NewAddenda02()
-	var line = "702REFONEAREFTERM021000490612123456Target Store 0049          PHILADELPHIA   PA091012980000088"
+	var line = "702REFONEAREFTERM021000490612123456Target Store 0049          PHILADELPHIA   PA121042880000123"
 	addenda02.Parse(line)
 	if addenda02.String() != line {
 		t.Errorf("Strings do not match")
