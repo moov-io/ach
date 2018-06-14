@@ -46,18 +46,18 @@ func (batch *BatchPOS) Validate() error {
 	// Add configuration based validation for this type.
 
 	// Add type specific validation.
+
 	if batch.Header.StandardEntryClassCode != "POS" {
 		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "POS")
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
-	//ToDo;  Determine if this is needed
-	/*	// POS detail entries can only be a debit, ServiceClassCode must allow debits
-		switch batch.Header.ServiceClassCode {
-		case 200, 220, 280:
-			msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, "POS")
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
-		}*/
+	// POS detail entries can only be a debit, ServiceClassCode must allow debits
+	switch batch.Header.ServiceClassCode {
+	case 200, 220, 280:
+		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, "POS")
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
+	}
 
 	for _, entry := range batch.Entries {
 		// POS detail entries must be a debit
@@ -69,12 +69,13 @@ func (batch *BatchPOS) Validate() error {
 			msg := fmt.Sprintf(msgBatchCardTransactionType, entry.DiscretionaryData)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "CardTransactionType", Msg: msg}
 		}
+
+		// Addenda validations - POS Addenda must be Addenda02
+
 		// Addendum must be equal to 1
 		if len(entry.Addendum) != 1 {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchPOSAddenda}
 		}
-
-		// POS Addenda must be Addenda02
 
 		// Addenda type assertion must be Addenda02
 		addenda02, ok := entry.Addendum[0].(*Addenda02)
@@ -82,6 +83,7 @@ func (batch *BatchPOS) Validate() error {
 			msg := fmt.Sprintf(msgBatchPOSAddendaType, entry.Addendum[0])
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
 		}
+
 		// Addenda02 must be Validated
 		if err := addenda02.Validate(); err != nil {
 			// convert the field error in to a batch error for a consistent api
@@ -89,7 +91,6 @@ func (batch *BatchPOS) Validate() error {
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: e.FieldName, Msg: e.Msg}
 			}
 		}
-		//ToDo;  Additional validations
 	}
 	return nil
 }
@@ -102,6 +103,5 @@ func (batch *BatchPOS) Create() error {
 	}
 	// Additional steps specific to batch type
 	// ...
-
 	return batch.Validate()
 }

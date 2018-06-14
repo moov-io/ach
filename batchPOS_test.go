@@ -145,6 +145,93 @@ func BenchmarkBatchPOSServiceClassCodeEquality(b *testing.B) {
 	}
 }
 
+// testBatchPOSServiceClass200 validates BatchPOS create for an invalid ServiceClassCode 200
+func testBatchPOSServiceClass200(t testing.TB) {
+	mockBatch := mockBatchPOS()
+	mockBatch.Header.ServiceClassCode = 200
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ServiceClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchPOSServiceClass200 tests validating BatchPOS create for an invalid ServiceClassCode 200
+func TestBatchPOSServiceClass200(t *testing.T) {
+	testBatchPOSServiceClass200(t)
+}
+
+// BenchmarkBatchPOSServiceClass200 benchmarks validating BatchPOS create for an invalid ServiceClassCode 200
+func BenchmarkBatchPOSServiceClass200(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchPOSServiceClass200(b)
+	}
+}
+
+// testBatchPOSServiceClass220 validates BatchPOS create for an invalid ServiceClassCode 220
+func testBatchPOSServiceClass220(t testing.TB) {
+	mockBatch := mockBatchPOS()
+	mockBatch.Header.ServiceClassCode = 220
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ServiceClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchPOSServiceClass220 tests validating BatchPOS create for an invalid ServiceClassCode 220
+func TestBatchPOSServiceClass220(t *testing.T) {
+	testBatchPOSServiceClass220(t)
+}
+
+// BenchmarkBatchPOSServiceClass220 benchmarks validating BatchPOS create for an invalid ServiceClassCode 220
+func BenchmarkBatchPOSServiceClass220(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchPOSServiceClass220(b)
+	}
+}
+
+// testBatchPOSServiceClass280 validates BatchPOS create for an invalid ServiceClassCode 280
+func testBatchPOSServiceClass280(t testing.TB) {
+	mockBatch := mockBatchPOS()
+	mockBatch.Header.ServiceClassCode = 280
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ServiceClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchPOSServiceClass280 tests validating BatchPOS create for an invalid ServiceClassCode 280
+func TestBatchPOSServiceClass280(t *testing.T) {
+	testBatchPOSServiceClass280(t)
+}
+
+// BenchmarkBatchPOSServiceClass280 benchmarks validating BatchPOS create for an invalid ServiceClassCode 280
+func BenchmarkBatchPOSServiceClass280(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchPOSServiceClass280(b)
+	}
+}
+
 // testBatchPOSTransactionCode validates BatchPOS TransactionCode is not a credit
 func testBatchPOSTransactionCode(t testing.TB) {
 	mockBatch := mockBatchPOS()
