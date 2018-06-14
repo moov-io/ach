@@ -339,3 +339,143 @@ func BenchmarkAddenda02TransactionDateMonth(b *testing.B) {
 		testAddenda02TransactionDateMonth(b)
 	}
 }
+
+// testAddenda02TransactionDateDay validates the day is valid for transactionDate
+func testAddenda02TransactionDateDay(t testing.TB) {
+	addenda02 := mockAddenda02()
+	addenda02.TransactionDate = "0205"
+	if err := addenda02.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "TransactionDate" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestAddenda02TransactionDateDay tests validating the day is valid for transactionDate
+func TestAddenda02TransactionDateDay(t *testing.T) {
+	testAddenda02TransactionDateDay(t)
+}
+
+// BenchmarkAddenda02TransactionDateDay test validating the day is valid for transactionDate
+func BenchmarkAddenda02TransactionDateDay(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda02TransactionDateDay(b)
+	}
+}
+
+// testAddenda02TransactionDateFeb validates the day is valid for transactionDate
+func testAddenda02TransactionDateFeb(t testing.TB) {
+	addenda02 := mockAddenda02()
+	addenda02.TransactionDate = "0230"
+	if err := addenda02.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "TransactionDate" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestAddenda02TransactionDateFeb tests validating the day is valid for transactionDate
+func TestAddenda02TransactionDateFeb(t *testing.T) {
+	testAddenda02TransactionDateFeb(t)
+}
+
+// BenchmarkAddenda02TransactionDateFeb test validating the day is valid for transactionDate
+func BenchmarkAddenda02TransactionDateFeb(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda02TransactionDateFeb(b)
+	}
+}
+
+// testAddenda02TransactionDate30Day validates the day is valid for transactionDate
+func testAddenda02TransactionDate30Day(t testing.TB) {
+	addenda02 := mockAddenda02()
+	addenda02.TransactionDate = "0630"
+	if err := addenda02.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "TransactionDate" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestAddenda02TransactionDate30Day tests validating the day is valid for transactionDate
+func TestAddenda02TransactionDate30Day(t *testing.T) {
+	testAddenda02TransactionDate30Day(t)
+}
+
+// BenchmarkAddenda02TransactionDate30Day test validating the day is valid for transactionDate
+func BenchmarkAddenda02TransactionDate30Day(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda02TransactionDate30Day(b)
+	}
+}
+
+// testAddenda02TransactionDate31Day validates the day is valid for transactionDate
+func testAddenda02TransactionDate31Day(t testing.TB) {
+	addenda02 := mockAddenda02()
+	addenda02.TransactionDate = "0131"
+	if err := addenda02.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "TransactionDate" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestAddenda02TransactionDate31Day tests validating the day is valid for transactionDate
+func TestAddenda02TransactionDate31Day(t *testing.T) {
+	testAddenda02TransactionDate31Day(t)
+}
+
+// BenchmarkAddenda02TransactionDate31Day test validating the day is valid for transactionDate
+func BenchmarkAddenda02TransactionDate31Day(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda02TransactionDate31Day(b)
+	}
+}
+
+// testAddenda02TransactionDateInvalidDay validates the day is invalid for transactionDate
+func testAddenda02TransactionDateInvalidDay(t testing.TB) {
+	addenda02 := mockAddenda02()
+	addenda02.TransactionDate = "1039"
+	if err := addenda02.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "TransactionDate" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestAddenda02TransactionDateInvalidDay tests validating the day is invalid for transactionDate
+func TestAddenda02TransactionDateInvalidDay(t *testing.T) {
+	testAddenda02TransactionDateInvalidDay(t)
+}
+
+// BenchmarkAddenda02TransactionDateInvalidDay test validating the day is invalid for transactionDate
+func BenchmarkAddenda02TransactionDateInvalidDay(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda02TransactionDateInvalidDay(b)
+	}
+}

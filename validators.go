@@ -28,6 +28,7 @@ var (
 	msgValidCheckDigit     = "does not match calculated check digit %d"
 	msgCardTransactionType = "is an invalid Card Transaction Type"
 	msgValidMonth          = "is an invalid month"
+	msgValidDay            = "is an invalid day"
 )
 
 // validator is common validation and formatting of golang types to ach type strings
@@ -73,7 +74,7 @@ func (v *validator) isCardTransactionType(code string) error {
 	return errors.New(msgCardTransactionType)
 }
 
-// isMonth
+// isMonth validates a 2 digit month 01-12
 func (v *validator) isMonth(s string) error {
 	switch s {
 	case
@@ -82,6 +83,48 @@ func (v *validator) isMonth(s string) error {
 		return nil
 	}
 	return errors.New(msgValidMonth)
+}
+
+// isDay validates a 2 digit day based on a 2 digit month
+// month 01-12 day 01-31 based on month
+func (v *validator) isDay(m string, d string) error {
+	// ToDo: Future Consideration Leap Year - not sure if cards actually have 0229
+	switch m {
+	// February
+	case "02":
+		switch d {
+		case
+			"01", "02", "03", "04", "05", "06",
+			"07", "08", "09", "10", "11", "12",
+			"13", "14", "15", "16", "17", "18",
+			"19", "20", "21", "22", "23", "24",
+			"25", "26", "27", "28", "29":
+			return nil
+		}
+	// April, June, September, November
+	case "04", "06", "09", "11":
+		switch d {
+		case
+			"01", "02", "03", "04", "05", "06",
+			"07", "08", "09", "10", "11", "12",
+			"13", "14", "15", "16", "17", "18",
+			"19", "20", "21", "22", "23", "24",
+			"25", "26", "27", "28", "29", "30":
+			return nil
+		}
+	// January, March, May, July, August, October, December
+	case "01", "03", "05", "07", "08", "10", "12":
+		switch d {
+		case
+			"01", "02", "03", "04", "05", "06",
+			"07", "08", "09", "10", "11", "12",
+			"13", "14", "15", "16", "17", "18",
+			"19", "20", "21", "22", "23", "24",
+			"25", "26", "27", "28", "29", "30", "31":
+			return nil
+		}
+	}
+	return errors.New(msgValidDay)
 }
 
 // isOriginatorStatusCode ensures status code of a batch is valid

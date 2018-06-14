@@ -120,8 +120,14 @@ func (addenda02 *Addenda02) Validate() error {
 	if addenda02.typeCode != "02" {
 		return &FieldError{FieldName: "TypeCode", Value: addenda02.typeCode, Msg: msgAddendaTypeCode}
 	}
+	// TransactionDate Addenda02 ACH File format is MMDD.  Validate MM is 01-12.
 	if err := addenda02.isMonth(addenda02.parseStringField(addenda02.TransactionDate[0:2])); err != nil {
 		return &FieldError{FieldName: "TransactionDate", Value: addenda02.parseStringField(addenda02.TransactionDate[0:2]), Msg: msgValidMonth}
+	}
+	// TransactionDate Addenda02 ACH File format is MMDD.  If the month is valid, validate the day for the
+	// month 01-31 depending on month.
+	if err := addenda02.isDay(addenda02.parseStringField(addenda02.TransactionDate[0:2]), addenda02.parseStringField(addenda02.TransactionDate[2:4])); err != nil {
+		return &FieldError{FieldName: "TransactionDate", Value: addenda02.parseStringField(addenda02.TransactionDate[0:2]), Msg: msgValidDay}
 	}
 	return nil
 }
