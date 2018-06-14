@@ -349,31 +349,3 @@ func BenchmarkBatchBOCAddendaCount(b *testing.B) {
 		testBatchBOCAddendaCount(b)
 	}
 }
-
-// testBatchBOCInvalidBuild validates an invalid batch build
-func testBatchBOCInvalidBuild(t testing.TB) {
-	mockBatch := mockBatchBOC()
-	mockBatch.GetHeader().recordType = "3"
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
-	}
-}
-
-// TestBatchBOCInvalidBuild tests validating an invalid batch build
-func TestBatchBOCInvalidBuild(t *testing.T) {
-	testBatchBOCInvalidBuild(t)
-}
-
-// BenchmarkBatchBOCInvalidBuild benchmarks validating an invalid batch build
-func BenchmarkBatchBOCInvalidBuild(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testBatchBOCInvalidBuild(b)
-	}
-}
