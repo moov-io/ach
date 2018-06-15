@@ -19,6 +19,7 @@ var (
 	msgAlphanumeric        = "has non alphanumeric characters"
 	msgUpperAlpha          = "is not uppercase A-Z or 0-9"
 	msgFieldInclusion      = "is a mandatory field and has a default value"
+	msgFieldRequired       = "is a required field"
 	msgValidFieldLength    = "is not length %d"
 	msgServiceClass        = "is an invalid Service Class Code"
 	msgSECCode             = "is an invalid Standard Entry Class Code"

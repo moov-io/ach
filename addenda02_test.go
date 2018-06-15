@@ -153,7 +153,7 @@ func testAddenda02TerminalIdentificationCode(t testing.TB) {
 	addenda02.TerminalIdentificationCode = ""
 	if err := addenda02.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if e.Msg != msgFieldRequired {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -176,7 +176,7 @@ func testAddenda02TransactionSerialNumber(t testing.TB) {
 	addenda02.TransactionSerialNumber = ""
 	if err := addenda02.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if e.Msg != msgFieldRequired {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -199,7 +199,7 @@ func testAddenda02TransactionDate(t testing.TB) {
 	addenda02.TransactionDate = ""
 	if err := addenda02.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if e.Msg != msgFieldRequired {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -222,7 +222,7 @@ func testAddenda02TerminalLocation(t testing.TB) {
 	addenda02.TerminalLocation = ""
 	if err := addenda02.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if e.Msg != msgFieldRequired {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -245,7 +245,7 @@ func testAddenda02TerminalCity(t testing.TB) {
 	addenda02.TerminalCity = ""
 	if err := addenda02.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if e.Msg != msgFieldRequired {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -268,7 +268,7 @@ func testAddenda02TerminalState(t testing.TB) {
 	addenda02.TerminalState = ""
 	if err := addenda02.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if e.Msg != msgFieldRequired {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
