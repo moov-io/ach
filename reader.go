@@ -235,6 +235,14 @@ func (r *Reader) parseAddenda() error {
 
 	if entry.AddendaRecordIndicator == 1 {
 		switch r.line[1:3] {
+		case "02":
+			addenda02 := NewAddenda02()
+			addenda02.Parse(r.line)
+			if err := addenda02.Validate(); err != nil {
+				return r.error(err)
+			}
+			r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda02)
+
 		case "05":
 			addenda05 := NewAddenda05()
 			addenda05.Parse(r.line)

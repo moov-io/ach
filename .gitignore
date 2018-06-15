@@ -35,3 +35,4 @@ _testmain.go
 *.prof
 
 .vscode/launch.json
+test/ach-pos-read/pos-debit.ach
