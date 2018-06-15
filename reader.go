@@ -14,7 +14,7 @@ import (
 // ParseError is returned for parsing reader errors.
 // The first line is 1.
 type ParseError struct {
-	Line   int    // Line number where the error accurd
+	Line   int    // Line number where the error occurd
 	Record string // Name of the record type being parsed
 	Err    error  // The actual error
 }
@@ -65,7 +65,7 @@ func NewReader(r io.Reader) *Reader {
 }
 
 // Read reads each line of the ACH file and defines which parser to use based
-// on the first character of each line. It also enforces ACH formating rules and returns
+// on the first character of each line. It also enforces ACH formatting rules and returns
 // the appropriate error if issues are found.
 func (r *Reader) Read() (File, error) {
 	r.lineNum = 0
