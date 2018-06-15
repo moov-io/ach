@@ -149,6 +149,8 @@ func (addenda02 *Addenda02) fieldInclusion() error {
 	if addenda02.typeCode == "" {
 		return &FieldError{FieldName: "TypeCode", Value: addenda02.typeCode, Msg: msgFieldInclusion}
 	}
+
+	// ToDo: These are not mandatory fields should be outside of fieldInclusion
 	if addenda02.TerminalIdentificationCode == "" {
 		return &FieldError{FieldName: "TerminalIdentificationCode", Value: addenda02.TerminalIdentificationCode, Msg: msgFieldInclusion}
 	}
@@ -198,7 +200,6 @@ func (addenda02 *Addenda02) TransactionSerialNumberField() string {
 
 // TransactionDateField returns TransactionDate MMDD string
 func (addenda02 *Addenda02) TransactionDateField() string {
-	//ToDo: see about padding
 	return addenda02.TransactionDate
 }
 

@@ -14,7 +14,7 @@ import (
 // ParseError is returned for parsing reader errors.
 // The first line is 1.
 type ParseError struct {
-	Line   int    // Line number where the error occurd
+	Line   int    // Line number where the error occurred
 	Record string // Name of the record type being parsed
 	Err    error  // The actual error
 }
@@ -194,7 +194,7 @@ func (r *Reader) parseBatchHeader() error {
 		return r.error(err)
 	}
 
-	// Passing SEC type into NewBatch creates a Batcher of SEC code type.
+	// Passing BatchHeader into NewBatch creates a Batcher of SEC code type.
 	batch, err := NewBatch(bh)
 	if err != nil {
 		return r.error(err)
@@ -242,7 +242,6 @@ func (r *Reader) parseAddenda() error {
 				return r.error(err)
 			}
 			r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda02)
-
 		case "05":
 			addenda05 := NewAddenda05()
 			addenda05.Parse(r.line)
