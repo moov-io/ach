@@ -435,3 +435,28 @@ func BenchmarkBatchSHRCardTransactionType(b *testing.B) {
 		testBatchSHRCardTransactionType(b)
 	}
 }
+
+// testBatchSHRCardExpirationDateField validates SHRCardExpirationDate
+// characters 0-4 of underlying IdentificationNumber
+func testBatchSHRCardExpirationDateField(t testing.TB) {
+	mockBatch := mockBatchSHR()
+	ts := mockBatch.Entries[0].SHRCardExpirationDateField()
+	if ts != "0718" {
+		t.Error("Card Expiration Date is invalid")
+	}
+}
+
+// TestBatchSHRCardExpirationDateField tests validatingSHRCardExpirationDate
+// characters 0-4 of underlying IdentificationNumber
+func TestBatchSHRCardExpirationDateField(t *testing.T) {
+	testBatchSHRCardExpirationDateField(t)
+}
+
+// BenchmarkBatchPOPTerminalStateField benchmarks validating SHRCardExpirationDate
+// characters 0-4 of underlying IdentificationNumber
+func BenchmarkBatchSHRCardExpirationDateField(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchSHRCardExpirationDateField(b)
+	}
+}
