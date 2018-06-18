@@ -15,9 +15,24 @@ import (
 var (
 	upperAlphanumericRegex = regexp.MustCompile(`[^ A-Z0-9!"#$%&'()*+,-.\\/:;<>=?@\[\]^_{}|~]+`)
 	alphanumericRegex      = regexp.MustCompile(`[^ \w!"#$%&'()*+,-.\\/:;<>=?@\[\]^_{}|~]+`)
+	// Errors specific to validation
+	msgAlphanumeric        = "has non alphanumeric characters"
+	msgUpperAlpha          = "is not uppercase A-Z or 0-9"
+	msgFieldInclusion      = "is a mandatory field and has a default value"
+	msgFieldRequired       = "is a required field"
+	msgValidFieldLength    = "is not length %d"
+	msgServiceClass        = "is an invalid Service Class Code"
+	msgSECCode             = "is an invalid Standard Entry Class Code"
+	msgOrigStatusCode      = "is an invalid Originator Status Code"
+	msgAddendaTypeCode     = "is an invalid Addenda Type Code"
+	msgTransactionCode     = "is an invalid Transaction Code"
+	msgValidCheckDigit     = "does not match calculated check digit %d"
+	msgCardTransactionType = "is an invalid Card Transaction Type"
+	msgValidMonth          = "is an invalid month"
+	msgValidDay            = "is an invalid day"
 )
 
-// validator is common validation and formating of golang types to ach type strings
+// validator is common validation and formatting of golang types to ach type strings
 type validator struct{}
 
 // FieldError is returned for errors at a field level in a record
@@ -35,19 +50,109 @@ func (e *FieldError) Error() string {
 	return fmt.Sprintf("%s %s %s", e.FieldName, e.Value, e.Msg)
 }
 
-// Errors specific to validation
-var (
-	msgAlphanumeric     = "has non alphanumeric characters"
-	msgUpperAlpha       = "is not uppercase A-Z or 0-9"
-	msgFieldInclusion   = "is a mandatory field and has a default value"
-	msgValidFieldLength = "is not length %d"
-	msgServiceClass     = "is an invalid Service Class Code"
-	msgSECCode          = "is an invalid Standard Entry Class Code"
-	msgOrigStatusCode   = "is an invalid Originator Status Code"
-	msgAddendaTypeCode  = "is an invalid Addenda Type Code"
-	msgTransactionCode  = "is an invalid Transaction Code"
-	msgValidCheckDigit  = "does not match calculated check digit %d"
-)
+// isCardTransactionType ensures card transaction type of a batchPOS is valid
+func (v *validator) isCardTransactionType(code string) error {
+	switch code {
+	case
+		// Purchase of goods or services
+		"01",
+		// Cash
+		"02",
+		// Return Reversal
+		"03",
+		// Purchase Reversal
+		"11",
+		// Cash Reversal
+		"12",
+		// Return
+		"13",
+		// Adjustment
+		"21",
+		// Miscellaneous Transaction
+		"99":
+		return nil
+	}
+	return errors.New(msgCardTransactionType)
+}
+
+// isMonth validates a 2 digit month 01-12
+func (v *validator) isMonth(s string) error {
+	switch s {
+	case
+		"01", "02", "03", "04", "05", "06",
+		"07", "08", "09", "10", "11", "12":
+		return nil
+	}
+	return errors.New(msgValidMonth)
+}
+
+// isDay validates a 2 digit day based on a 2 digit month
+// month 01-12 day 01-31 based on month
+func (v *validator) isDay(m string, d string) error {
+	// ToDo: Future Consideration Leap Year - not sure if cards actually have 0229
+	switch m {
+	// February
+	case "02":
+		switch d {
+		case
+			"01", "02", "03", "04", "05", "06",
+			"07", "08", "09", "10", "11", "12",
+			"13", "14", "15", "16", "17", "18",
+			"19", "20", "21", "22", "23", "24",
+			"25", "26", "27", "28", "29":
+			return nil
+		}
+	// April, June, September, November
+	case "04", "06", "09", "11":
+		switch d {
+		case
+			"01", "02", "03", "04", "05", "06",
+			"07", "08", "09", "10", "11", "12",
+			"13", "14", "15", "16", "17", "18",
+			"19", "20", "21", "22", "23", "24",
+			"25", "26", "27", "28", "29", "30":
+			return nil
+		}
+	// January, March, May, July, August, October, December
+	case "01", "03", "05", "07", "08", "10", "12":
+		switch d {
+		case
+			"01", "02", "03", "04", "05", "06",
+			"07", "08", "09", "10", "11", "12",
+			"13", "14", "15", "16", "17", "18",
+			"19", "20", "21", "22", "23", "24",
+			"25", "26", "27", "28", "29", "30", "31":
+			return nil
+		}
+	}
+	return errors.New(msgValidDay)
+}
+
+// isOriginatorStatusCode ensures status code of a batch is valid
+func (v *validator) isOriginatorStatusCode(code int) error {
+	switch code {
+	case
+		// ADV file - prepared by an ACH Operator
+		0,
+		//Originator is a financial institution
+		1,
+		// Originator is a Government Agency or other agency not subject to ACH Rules
+		2:
+		return nil
+	}
+	return errors.New(msgOrigStatusCode)
+}
+
+// isSECCode returns true if a SEC Code of a Batch is found
+func (v *validator) isSECCode(code string) error {
+	switch code {
+	case
+		"ACK", "ADV", "ARC", "ATX", "BOC", "CCD", "CIE", "COR", "CTX", "DNE", "ENR",
+		"IAT", "MTE", "POS", "PPD", "POP", "RCK", "SHR", "TEL", "TRC", "TRX", "WEB", "XCK":
+		return nil
+	}
+	return errors.New(msgSECCode)
+}
 
 // iServiceClass returns true if a valid service class code of a batch is found
 func (v *validator) isServiceClass(code int) error {
@@ -64,17 +169,6 @@ func (v *validator) isServiceClass(code int) error {
 		return nil
 	}
 	return errors.New(msgServiceClass)
-}
-
-// isSECCode returns true if a SEC Code of a Batch is found
-func (v *validator) isSECCode(code string) error {
-	switch code {
-	case
-		"ACK", "ADV", "ARC", "ATX", "BOC", "CCD", "CIE", "COR", "CTX", "DNE", "ENR",
-		"IAT", "MTE", "POS", "PPD", "POP", "RCK", "SHR", "TEL", "TRC", "TRX", "WEB", "XCK":
-		return nil
-	}
-	return errors.New(msgSECCode)
 }
 
 // isTypeCode returns true if a valid type code of an Addendum is found
@@ -229,21 +323,6 @@ func (v *validator) isTransactionCode(code int) error {
 	return errors.New(msgTransactionCode)
 }
 
-// isOriginatorStatusCode ensures status code of a batch is valid
-func (v *validator) isOriginatorStatusCode(code int) error {
-	switch code {
-	case
-		// ADV file - prepared by an ACH Operator
-		0,
-		//Originator is a financial institution
-		1,
-		// Originator is a Government Agency or other agency not subject to ACH Rules
-		2:
-		return nil
-	}
-	return errors.New(msgOrigStatusCode)
-}
-
 // isUpperAlphanumeric checks if string only contains ASCII alphanumeric upper case characters
 func (v *validator) isUpperAlphanumeric(s string) error {
 	if upperAlphanumericRegex.MatchString(s) {
@@ -274,7 +353,7 @@ func (v *validator) CalculateCheckDigit(routingNumber string) int {
 		routeIndex[i] = string(routingNumber[i])
 	}
 	n, _ := strconv.Atoi(routeIndex[0])
-	sum := (n * 3)
+	sum := n * 3
 	n, _ = strconv.Atoi(routeIndex[1])
 	sum = sum + (n * 7)
 	n, _ = strconv.Atoi(routeIndex[2])

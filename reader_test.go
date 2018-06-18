@@ -15,11 +15,11 @@ func testParseError(t testing.TB) {
 	e := &FieldError{FieldName: "testField", Value: "nil", Msg: "could not parse"}
 	err := &ParseError{Line: 63, Err: e}
 	if err.Error() != "line:63 *ach.FieldError testField nil could not parse" {
-		t.Error("ParseError error string formating has changed")
+		t.Error("ParseError error string formatting has changed")
 	}
 	err.Record = "TestRecord"
 	if err.Error() != "line:63 record:TestRecord *ach.FieldError testField nil could not parse" {
-		t.Error("ParseError error string formating has changed")
+		t.Error("ParseError error string formatting has changed")
 	}
 }
 
@@ -347,7 +347,7 @@ func testFileBatchHeaderDuplicate(t testing.TB) {
 	// create a new Batch header string
 	bh := mockBatchPPDHeader()
 	r := NewReader(strings.NewReader(bh.String()))
-	// instantitate a batch header in the reader
+	// instantiate a batch header in the reader
 	r.addCurrentBatch(NewBatchPPD(bh))
 	// read should fail because it is parsing a second batch header and there can only be one.
 	_, err := r.Read()
@@ -437,7 +437,7 @@ func BenchmarkFileEntryDetail(b *testing.B) {
 	}
 }
 
-// testFileAddenda05 validates addenda 05
+// testFileAddenda05 validates error for an invalid addenda05
 func testFileAddenda05(t testing.TB) {
 	bh := mockBatchHeader()
 	ed := mockEntryDetail()
@@ -460,12 +460,12 @@ func testFileAddenda05(t testing.TB) {
 	}
 }
 
-// TestFileAddenda05 tests validating addenda 05
+// TestFileAddenda05 tests validating error for an invalid addenda05
 func TestFileAddenda05(t *testing.T) {
 	testFileAddenda05(t)
 }
 
-// BenchmarkFileAddenda05 benchmarks validating addenda 05
+// BenchmarkFileAddenda05 benchmarks validating error for an invalid addenda05
 func BenchmarkFileAddenda05(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -473,12 +473,120 @@ func BenchmarkFileAddenda05(b *testing.B) {
 	}
 }
 
-// testFileAddenda98 validates addenda 98
+// testFileAddenda02invalid validates error for an invalid addenda02
+func testFileAddenda02invalid(t testing.TB) {
+	bh := mockBatchPOSHeader()
+	ed := mockPOSEntryDetail()
+	addenda := mockAddenda02()
+	addenda.TransactionDate = "0000"
+	ed.AddAddenda(addenda)
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
+	r := NewReader(strings.NewReader(line))
+	_, err := r.Read()
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*FieldError); ok {
+				if e.FieldName != "TransactionDate" {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestFileAddenda02invalid tests validating error for an invalid addenda02
+func TestFileAddenda02invalid(t *testing.T) {
+	testFileAddenda02invalid(t)
+}
+
+// BenchmarkFileAddenda02invalid benchmarks validating error for an invalid addenda02
+func BenchmarkFileAddenda02invalid(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFileAddenda02invalid(b)
+	}
+}
+
+// testFileAddenda02 validates a valid addenda02
+func testFileAddenda02(t testing.TB) {
+	bh := mockBatchPOSHeader()
+	ed := mockPOSEntryDetail()
+	addenda := mockAddenda02()
+	ed.AddAddenda(addenda)
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
+	r := NewReader(strings.NewReader(line))
+	_, err := r.Read()
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*FieldError); ok {
+				if e.FieldName != "TransactionDate" {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestFileAddenda02invalid tests validating a valid addenda02
+func TestFileAddenda02(t *testing.T) {
+	testFileAddenda02(t)
+}
+
+// BenchmarkFileAddenda02 benchmarks validating a valid addenda02
+func BenchmarkFileAddenda02(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFileAddenda02(b)
+	}
+}
+
+// testFileAddenda98 validates error for an invalid addenda98
+func testFileAddenda98invalid(t testing.TB) {
+	bh := mockBatchPPDHeader()
+	ed := mockPPDEntryDetail()
+	addenda := mockAddenda98()
+	addenda.TraceNumber = 0000001
+	addenda.ChangeCode = "C50"
+	addenda.CorrectedData = "ACME One Corporation"
+	ed.AddAddenda(addenda)
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
+	r := NewReader(strings.NewReader(line))
+	_, err := r.Read()
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*FieldError); ok {
+				if e.FieldName != "ChangeCode" {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestFileAddenda98 tests validating error for an invalid addenda98
+func TestFileAddenda98invalid(t *testing.T) {
+	testFileAddenda98invalid(t)
+}
+
+// BenchmarkFileAddenda98 benchmarks validating error for an invalid addenda98
+func BenchmarkFileAddenda98invalid(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFileAddenda98invalid(b)
+	}
+}
+
+// testFileAddenda98 validates a valid addenda98
 func testFileAddenda98(t testing.TB) {
 	bh := mockBatchHeader()
 	ed := mockEntryDetail()
 	addenda := mockAddenda98()
-
 	addenda.TraceNumber = 0000001
 	addenda.ChangeCode = "C10"
 	addenda.CorrectedData = "ACME One Corporation"
@@ -499,12 +607,12 @@ func testFileAddenda98(t testing.TB) {
 	}
 }
 
-// TestFileAddenda98 tests validating addenda 98
+// TestFileAddenda98 tests validating a valid addenda98
 func TestFileAddenda98(t *testing.T) {
 	testFileAddenda98(t)
 }
 
-// BenchmarkFileAddenda98 benchmarks validating addenda 98
+// BenchmarkFileAddenda98 benchmarks validating a valid addenda98
 func BenchmarkFileAddenda98(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -512,7 +620,44 @@ func BenchmarkFileAddenda98(b *testing.B) {
 	}
 }
 
-// testFileAddenda99 validates addenda 99
+// testFileAddenda99invalid validates error for an invalid addenda99
+func testFileAddenda99invalid(t testing.TB) {
+	bh := mockBatchPPDHeader()
+	ed := mockPPDEntryDetail()
+	addenda := mockAddenda99()
+	addenda.TraceNumber = 0000001
+	addenda.ReturnCode = "100"
+	ed.AddAddenda(addenda)
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
+	r := NewReader(strings.NewReader(line))
+	_, err := r.Read()
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*FieldError); ok {
+				if e.FieldName != "ReturnCode" {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestFileAddenda99invalid tests validating error for an invalid addenda99
+func TestFileAddenda99invalid(t *testing.T) {
+	testFileAddenda99invalid(t)
+}
+
+// BenchmarkFileAddenda99invalid benchmarks validating error for an invalid addenda99
+func BenchmarkFileAddenda99invalid(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFileAddenda99invalid(b)
+	}
+}
+
+// testFileAddenda99 validates a valid addenda99
 func testFileAddenda99(t testing.TB) {
 	bh := mockBatchHeader()
 	ed := mockEntryDetail()
@@ -536,12 +681,12 @@ func testFileAddenda99(t testing.TB) {
 	}
 }
 
-// TestFileAddenda99 tests validating addenda 99
+// TestFileAddenda99 tests validating a valid addenda99
 func TestFileAddenda99(t *testing.T) {
 	testFileAddenda99(t)
 }
 
-// BenchmarkFileAddenda99 benchmarks validating addenda 99
+// BenchmarkFileAddenda99 benchmarks validating a valid addenda99
 func BenchmarkFileAddenda99(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {

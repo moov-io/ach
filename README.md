@@ -21,11 +21,16 @@ ACH is under active development but already in production for multiple companies
 	* CCD (Corporate credit or debit)
 	* COR (Automated Notification of Change(NOC))
 	* POP (Point of Purchase)
+	* POS (Point of Sale)
 	* PPD (Prearranged payment and deposits)
 	* RCK (Represented Check Entries)
 	* TEL (Telephone-Initiated Entry)
 	* WEB (Internet-initiated Entries)
 	* Return Entries
+	* Addenda Type Code 02
+	* Addenda Type Code 05
+	* Addenda Type Code 98
+	* Addenda Type Code 99
 
 
 ## Project Roadmap

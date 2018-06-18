@@ -148,6 +148,34 @@ func BenchmarkBatchRCKStandardEntryClassCode(b *testing.B) {
 	}
 }
 
+// testBatchRCKServiceClassCodeEquality validates service class code equality
+func testBatchRCKServiceClassCodeEquality(t testing.TB) {
+	mockBatch := mockBatchRCK()
+	mockBatch.GetControl().ServiceClassCode = 200
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ServiceClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchRCKServiceClassCodeEquality tests validating service class code equality
+func TestBatchRCKServiceClassCodeEquality(t *testing.T) {
+	testBatchRCKServiceClassCodeEquality(t)
+}
+
+// BenchmarkBatchRCKServiceClassCodeEquality benchmarks validating service class code equality
+func BenchmarkBatchRCKServiceClassCodeEquality(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchRCKServiceClassCodeEquality(b)
+	}
+}
+
 // testBatchRCKServiceClass200 validates BatchRCK create for an invalid ServiceClassCode 200
 func testBatchRCKServiceClass200(t testing.TB) {
 	mockBatch := mockBatchRCK()
@@ -404,5 +432,33 @@ func BenchmarkBatchRCKParseCheckSerialNumber(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchRCKParseCheckSerialNumber(b)
+	}
+}
+
+// testBatchRCKInvalidBuild validates an invalid batch build
+func testBatchRCKInvalidBuild(t testing.TB) {
+	mockBatch := mockBatchRCK()
+	mockBatch.GetHeader().recordType = "3"
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchRCKInvalidBuild tests validating an invalid batch build
+func TestBatchRCKInvalidBuild(t *testing.T) {
+	testBatchRCKInvalidBuild(t)
+}
+
+// BenchmarkBatchRCKInvalidBuild benchmarks validating an invalid batch build
+func BenchmarkRCKBatchInvalidBuild(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchRCKInvalidBuild(b)
 	}
 }
