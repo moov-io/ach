@@ -60,9 +60,9 @@ type File struct {
 	Control FileControl `json:"fileControl"`
 
 	// NotificationOfChange (Notification of change) is a slice of references to BatchCOR in file.Batches
-	NotificationOfChange []*BatchCOR
+	NotificationOfChange []*BatchCOR `json:"notificationOfChange,omitempty"`
 	// ReturnEntries is a slice of references to file.Batches that contain return entries
-	ReturnEntries []Batcher
+	ReturnEntries []Batcher `json:"returnEntries,omitempty"`
 
 	converters
 }
