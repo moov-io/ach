@@ -494,7 +494,7 @@ func testBatchSHRIndividualCardAccountNumberField(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	ts := mockBatch.Entries[0].SHRIndividualCardAccountNumberField()
 	if ts != 12345678910123456 {
-		t.Error("Document Reference Number is invalid")
+		t.Error("Individual Card Account Number is invalid")
 	}
 }
 
