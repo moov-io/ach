@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/bkmoovio/ach"
+	"github.com/moov-io/ach"
 	"log"
 	"os"
 )
