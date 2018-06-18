@@ -264,3 +264,33 @@ func BenchmarkBatchBuild(b *testing.B) {
 		testBatchBuild(b)
 	}
 }
+
+// testBatchPPDAddendaCount validates BatchPPD Addendum count of 2
+func testBatchPPDAddendaCount(t testing.TB) {
+	mockBatch := mockBatchPPD()
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "AddendaCount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchPPDAddendaCount tests validating BatchPPD Addendum count of 2
+func TestBatchPPDAddendaCount(t *testing.T) {
+	testBatchPPDAddendaCount(t)
+}
+
+// BenchmarkBatchPPDAddendaCount benchmarks validating BatchPPD Addendum count of 2
+func BenchmarkBatchPPDAddendaCount(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchPPDAddendaCount(b)
+	}
+}

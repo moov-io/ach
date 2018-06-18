@@ -1,4 +1,4 @@
-// Copyright 2017 The ACH Authors
+// Copyright 2018 The ACH Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -26,16 +26,16 @@ func testMockFileControl(t testing.TB) {
 		t.Error("mockFileControl does not validate and will break other tests")
 	}
 	if fc.BatchCount != 1 {
-		t.Error("BatchCount depedendent default value has changed")
+		t.Error("BatchCount dependent default value has changed")
 	}
 	if fc.BlockCount != 1 {
-		t.Error("BlockCount depedendent default value has changed")
+		t.Error("BlockCount dependent default value has changed")
 	}
 	if fc.EntryAddendaCount != 1 {
-		t.Error("EntryAddendaCount depedendent default value has changed")
+		t.Error("EntryAddendaCount dependent default value has changed")
 	}
 	if fc.EntryHash != 5320001 {
-		t.Error("EntryHash depedendent default value has changed")
+		t.Error("EntryHash dependent default value has changed")
 	}
 }
 
@@ -227,8 +227,8 @@ func TestFCFieldInclusionBlockCount(t *testing.T) {
 	testFCFieldInclusionBlockCount(t)
 }
 
-// BenchmarkFCFieldInclusionBlockCoun benchmarks validating file control block count field inclusion
-func BenchmarkFCFieldInclusionBlockCoun(b *testing.B) {
+// BenchmarkFCFieldInclusionBlockCount benchmarks validating file control block count field inclusion
+func BenchmarkFCFieldInclusionBlockCount(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testFCFieldInclusionBlockCount(b)

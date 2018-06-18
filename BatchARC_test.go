@@ -148,6 +148,34 @@ func BenchmarkBatchARCStandardEntryClassCode(b *testing.B) {
 	}
 }
 
+// testBatchARCServiceClassCodeEquality validates service class code equality
+func testBatchARCServiceClassCodeEquality(t testing.TB) {
+	mockBatch := mockBatchARC()
+	mockBatch.GetControl().ServiceClassCode = 200
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ServiceClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchARCServiceClassCodeEquality tests validating service class code equality
+func TestBatchARCServiceClassCodeEquality(t *testing.T) {
+	testBatchARCServiceClassCodeEquality(t)
+}
+
+// BenchmarkBatchARCServiceClassCodeEquality benchmarks validating service class code equality
+func BenchmarkBatchARCServiceClassCodeEquality(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchARCServiceClassCodeEquality(b)
+	}
+}
+
 // testBatchARCServiceClass200 validates BatchARC create for an invalid ServiceClassCode 200
 func testBatchARCServiceClass200(t testing.TB) {
 	mockBatch := mockBatchARC()
@@ -348,5 +376,33 @@ func BenchmarkBatchARCAddendaCount(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchARCAddendaCount(b)
+	}
+}
+
+// testBatchARCInvalidBuild validates an invalid batch build
+func testBatchARCInvalidBuild(t testing.TB) {
+	mockBatch := mockBatchARC()
+	mockBatch.GetHeader().recordType = "3"
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchARCInvalidBuild tests validating an invalid batch build
+func TestBatchARCInvalidBuild(t *testing.T) {
+	testBatchARCInvalidBuild(t)
+}
+
+// BenchmarkBatchARCInvalidBuild benchmarks validating an invalid batch build
+func BenchmarkBatchARCInvalidBuild(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchARCInvalidBuild(b)
 	}
 }

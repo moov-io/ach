@@ -62,4 +62,5 @@ var (
 	msgBatchAmount                  = "Amount must be less than %v for SEC code %v"
 	msgBatchCheckSerialNumber       = "Check Serial Number is required for SEC code %v"
 	msgBatchTransactionCode         = "Transaction code %v is not allowed for batch type %v"
+	msgBatchCardTransactionType     = "Card Transaction Type %v is invalid"
 )
