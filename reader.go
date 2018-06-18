@@ -14,7 +14,7 @@ import (
 // ParseError is returned for parsing reader errors.
 // The first line is 1.
 type ParseError struct {
-	Line   int    // Line number where the error accurd
+	Line   int    // Line number where the error occurred
 	Record string // Name of the record type being parsed
 	Err    error  // The actual error
 }
@@ -65,7 +65,7 @@ func NewReader(r io.Reader) *Reader {
 }
 
 // Read reads each line of the ACH file and defines which parser to use based
-// on the first character of each line. It also enforces ACH formating rules and returns
+// on the first character of each line. It also enforces ACH formatting rules and returns
 // the appropriate error if issues are found.
 func (r *Reader) Read() (File, error) {
 	r.lineNum = 0
@@ -194,7 +194,7 @@ func (r *Reader) parseBatchHeader() error {
 		return r.error(err)
 	}
 
-	// Passing SEC type into NewBatch creates a Batcher of SEC code type.
+	// Passing BatchHeader into NewBatch creates a Batcher of SEC code type.
 	batch, err := NewBatch(bh)
 	if err != nil {
 		return r.error(err)
@@ -235,6 +235,13 @@ func (r *Reader) parseAddenda() error {
 
 	if entry.AddendaRecordIndicator == 1 {
 		switch r.line[1:3] {
+		case "02":
+			addenda02 := NewAddenda02()
+			addenda02.Parse(r.line)
+			if err := addenda02.Validate(); err != nil {
+				return r.error(err)
+			}
+			r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda02)
 		case "05":
 			addenda05 := NewAddenda05()
 			addenda05.Parse(r.line)

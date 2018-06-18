@@ -148,6 +148,34 @@ func BenchmarkBatchRCKStandardEntryClassCode(b *testing.B) {
 	}
 }
 
+// testBatchRCKServiceClassCodeEquality validates service class code equality
+func testBatchRCKServiceClassCodeEquality(t testing.TB) {
+	mockBatch := mockBatchRCK()
+	mockBatch.GetControl().ServiceClassCode = 200
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ServiceClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchRCKServiceClassCodeEquality tests validating service class code equality
+func TestBatchRCKServiceClassCodeEquality(t *testing.T) {
+	testBatchRCKServiceClassCodeEquality(t)
+}
+
+// BenchmarkBatchRCKServiceClassCodeEquality benchmarks validating service class code equality
+func BenchmarkBatchRCKServiceClassCodeEquality(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchRCKServiceClassCodeEquality(b)
+	}
+}
+
 // testBatchRCKServiceClass200 validates BatchRCK create for an invalid ServiceClassCode 200
 func testBatchRCKServiceClass200(t testing.TB) {
 	mockBatch := mockBatchRCK()
@@ -377,5 +405,60 @@ func BenchmarkBatchRCKAddendaCount(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchRCKAddendaCount(b)
+	}
+}
+
+// testBatchRCKParseCheckSerialNumber validates BatchRCK create
+func testBatchRCKParseCheckSerialNumber(t testing.TB) {
+	mockBatch := mockBatchRCK()
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	checkSerialNumber := "123456789      "
+	if checkSerialNumber != mockBatch.GetEntries()[0].CheckSerialNumberField() {
+		t.Errorf("RecordType Expected '123456789' got: %v", mockBatch.GetEntries()[0].CheckSerialNumberField())
+	}
+}
+
+// TestBatchRCKParseCheckSerialNumber tests validating BatchRCK create
+func TestBatchRCKParseCheckSerialNumber(t *testing.T) {
+	testBatchRCKParseCheckSerialNumber(t)
+}
+
+// BenchmarkBatchRCKParseCheckSerialNumber benchmarks validating BatchRCK create
+func BenchmarkBatchRCKParseCheckSerialNumber(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchRCKParseCheckSerialNumber(b)
+	}
+}
+
+// testBatchRCKInvalidBuild validates an invalid batch build
+func testBatchRCKInvalidBuild(t testing.TB) {
+	mockBatch := mockBatchRCK()
+	mockBatch.GetHeader().recordType = "3"
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchRCKInvalidBuild tests validating an invalid batch build
+func TestBatchRCKInvalidBuild(t *testing.T) {
+	testBatchRCKInvalidBuild(t)
+}
+
+// BenchmarkBatchRCKInvalidBuild benchmarks validating an invalid batch build
+func BenchmarkRCKBatchInvalidBuild(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchRCKInvalidBuild(b)
 	}
 }

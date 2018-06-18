@@ -1,4 +1,4 @@
-// Copyright 2017 The ACH Authors
+// Copyright 2018 The ACH Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -61,7 +61,7 @@ type File struct {
 
 	// NotificationOfChange (Notification of change) is a slice of references to BatchCOR in file.Batches
 	NotificationOfChange []*BatchCOR
-	// ReturnEntries is a slice of references to file.Batches that contain return entires
+	// ReturnEntries is a slice of references to file.Batches that contain return entries
 	ReturnEntries []Batcher
 
 	converters

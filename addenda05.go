@@ -68,12 +68,6 @@ func (addenda05 *Addenda05) String() string {
 		addenda05.EntryDetailSequenceNumberField())
 }
 
-// SetPaymentRelatedInformation allows additional information about the transaction
-func (addenda05 *Addenda05) SetPaymentRelatedInformation(s string) *Addenda05 {
-	addenda05.PaymentRelatedInformation = s
-	return addenda05
-}
-
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops that parsing.
 func (addenda05 *Addenda05) Validate() error {

@@ -73,7 +73,7 @@ func BenchmarkBatchCORHeader(b *testing.B) {
 // testBatchCORSEC validates BatchCOR SEC code
 func testBatchCORSEC(t testing.TB) {
 	mockBatch := mockBatchCOR()
-	mockBatch.Header.StandardEntryClassCode = "COR"
+	mockBatch.Header.StandardEntryClassCode = "WEB"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {
@@ -323,5 +323,33 @@ func BenchmarkBatchCORCreate(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchCORCreate(b)
+	}
+}
+
+// testBatchCORServiceClassCodeEquality validates service class code equality
+func testBatchCORServiceClassCodeEquality(t testing.TB) {
+	mockBatch := mockBatchCOR()
+	mockBatch.GetControl().ServiceClassCode = 200
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ServiceClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchCORServiceClassCodeEquality tests validating service class code equality
+func TestBatchCORServiceClassCodeEquality(t *testing.T) {
+	testBatchCORServiceClassCodeEquality(t)
+}
+
+// BenchmarkBatchCORServiceClassCodeEquality benchmarks validating service class code equality
+func BenchmarkBatchCORServiceClassCodeEquality(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchCORServiceClassCodeEquality(b)
 	}
 }

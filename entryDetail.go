@@ -181,7 +181,7 @@ func (ed *EntryDetail) Validate() error {
 
 	edCheckDigit, err := strconv.Atoi(ed.CheckDigit)
 	if err != nil {
-		return err
+		return &FieldError{FieldName: "CheckDigit", Value: ed.CheckDigit, Msg: err.Error()}
 	}
 
 	if calculated != edCheckDigit {
@@ -230,7 +230,12 @@ func (ed *EntryDetail) AddAddenda(addenda Addendumer) []Addendumer {
 		ed.Addendum = nil
 		ed.Addendum = append(ed.Addendum, addenda)
 		return ed.Addendum
-		// default is current *Addenda05
+	case *Addenda02:
+		ed.Category = CategoryForward
+		ed.Addendum = nil
+		ed.Addendum = append(ed.Addendum, addenda)
+		return ed.Addendum
+	// default is current *Addenda05
 	default:
 		ed.Category = CategoryForward
 		ed.Addendum = append(ed.Addendum, addenda)
