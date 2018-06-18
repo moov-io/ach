@@ -4,7 +4,9 @@
 
 package ach
 
-import "testing"
+import (
+	"testing"
+)
 
 // mockBatchSHRHeader creates a BatchSHR BatchHeader
 func mockBatchSHRHeader() *BatchHeader {
@@ -458,5 +460,30 @@ func BenchmarkBatchSHRCardExpirationDateField(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchSHRCardExpirationDateField(b)
+	}
+}
+
+// testBatchSHRDocumentReferenceNumberField validates SHRDocumentReferenceNumberField
+// characters 5-15 of underlying IdentificationNumber
+func testBatchSHRDocumentReferenceNumberField(t testing.TB) {
+	mockBatch := mockBatchSHR()
+	ts := mockBatch.Entries[0].SHRDocumentReferenceNumberField()
+	if ts != 12345678910 {
+		t.Error("Document Reference Number is invalid")
+	}
+}
+
+// TestBatchSHRDocumentReferenceNumberFieldS tests validating SHRDocumentReferenceNumberField
+// characters 5-15 of underlying IdentificationNumber
+func TestBatchSHRDocumentReferenceNumberField(t *testing.T) {
+	testBatchSHRDocumentReferenceNumberField(t)
+}
+
+// BenchmarkBatchPOPTerminalStateField benchmarks validating SHRDocumentReferenceNumberField
+// characters 5-15 of underlying IdentificationNumber
+func BenchmarkSHRDocumentReferenceNumberField(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchSHRDocumentReferenceNumberField(b)
 	}
 }
