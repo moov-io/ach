@@ -454,7 +454,7 @@ func TestBatchSHRCardExpirationDateField(t *testing.T) {
 	testBatchSHRCardExpirationDateField(t)
 }
 
-// BenchmarkBatchPOPTerminalStateField benchmarks validating SHRCardExpirationDate
+// BenchmarkBatchSHRCardExpirationDateField benchmarks validating SHRCardExpirationDate
 // characters 0-4 of underlying IdentificationNumber
 func BenchmarkBatchSHRCardExpirationDateField(b *testing.B) {
 	b.ReportAllocs()
@@ -473,17 +473,42 @@ func testBatchSHRDocumentReferenceNumberField(t testing.TB) {
 	}
 }
 
-// TestBatchSHRDocumentReferenceNumberFieldS tests validating SHRDocumentReferenceNumberField
+// TestBatchSHRDocumentReferenceNumberField tests validating SHRDocumentReferenceNumberField
 // characters 5-15 of underlying IdentificationNumber
 func TestBatchSHRDocumentReferenceNumberField(t *testing.T) {
 	testBatchSHRDocumentReferenceNumberField(t)
 }
 
-// BenchmarkBatchPOPTerminalStateField benchmarks validating SHRDocumentReferenceNumberField
+// BenchmarkBatchSHRDocumentReferenceNumberField benchmarks validating SHRDocumentReferenceNumberField
 // characters 5-15 of underlying IdentificationNumber
 func BenchmarkSHRDocumentReferenceNumberField(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchSHRDocumentReferenceNumberField(b)
+	}
+}
+
+// testBatchSHRIndividualCardAccountNumberField validates SHRIndividualCardAccountNumberField
+// underlying IndividualName
+func testBatchSHRIndividualCardAccountNumberField(t testing.TB) {
+	mockBatch := mockBatchSHR()
+	ts := mockBatch.Entries[0].SHRIndividualCardAccountNumberField()
+	if ts != 12345678910123456 {
+		t.Error("Document Reference Number is invalid")
+	}
+}
+
+// TestBatchSHRIndividualCardAccountNumberField tests validating SHRIndividualCardAccountNumberField
+// characters 5-15 of underlying IndividualName
+func TestBatchSHRIndividualCardAccountNumberField(t *testing.T) {
+	testBatchSHRIndividualCardAccountNumberField(t)
+}
+
+// BenchmarkBatchSHRIndividualCardAccountNumberField benchmarks validating SHRIndividualCardAccountNumberField
+// characters 5-15 of underlying IndividualName
+func BenchmarkBatchSHRDocumentReferenceNumberField(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchSHRIndividualCardAccountNumberField(b)
 	}
 }
