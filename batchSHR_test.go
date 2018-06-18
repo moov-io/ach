@@ -512,3 +512,59 @@ func BenchmarkBatchSHRDocumentReferenceNumberField(b *testing.B) {
 		testBatchSHRIndividualCardAccountNumberField(b)
 	}
 }
+
+// testSHRCardExpirationDateMonth validates the month is valid for CardExpirationDate
+func testSHRCardExpirationDateMonth(t testing.TB) {
+	mockBatch := mockBatchSHR()
+	mockBatch.GetEntries()[0].SetSHRCardExpirationDate("1306")
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "CardExpirationDate" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestSHRCardExpirationDateMonth tests validating the month is valid for CardExpirationDate
+func TestSHRSHRCardExpirationDateMonth(t *testing.T) {
+	testSHRCardExpirationDateMonth(t)
+}
+
+// BenchmarkSHRCardExpirationDateMonth test validating the month is valid for CardExpirationDate
+func BenchmarkSHRCardExpirationDateMonth(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testSHRCardExpirationDateMonth(b)
+	}
+}
+
+// testSHRCardExpirationDateYear validates the year is valid for CardExpirationDate
+func testSHRCardExpirationDateYear(t testing.TB) {
+	mockBatch := mockBatchSHR()
+	mockBatch.GetEntries()[0].SetSHRCardExpirationDate("0612")
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "CardExpirationDate" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestSHRCardExpirationDateYear tests validating the year is valid for CardExpirationDate
+func TestSHRSHRCardExpirationDateYear(t *testing.T) {
+	testSHRCardExpirationDateYear(t)
+}
+
+// BenchmarkSHRCardExpirationDateYear test validating the year is valid for CardExpirationDate
+func BenchmarkSHRCardExpirationDateYear(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testSHRCardExpirationDateYear(b)
+	}
+}
