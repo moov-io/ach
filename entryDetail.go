@@ -331,7 +331,7 @@ func (ed *EntryDetail) POPTerminalStateField() string {
 // SetSHRCardExpirationDate format MMYY is used in SHR, characters 1-4 of underlying
 // IdentificationNumber
 func (ed *EntryDetail) SetSHRCardExpirationDate(s string) {
-	ed.IdentificationNumber = ed.alphaField(s,4)
+	ed.IdentificationNumber = ed.alphaField(s, 4)
 }
 
 // SetSHRDocumentReferenceNumber format int is used in SHR, characters 5-15 of underlying
