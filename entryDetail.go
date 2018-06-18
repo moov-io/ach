@@ -342,23 +342,24 @@ func (ed *EntryDetail) SetSHRDocumentReferenceNumber(i int) {
 
 // SetSHRIndividualCardAccountNumber format int is used in SHR, underlying
 // IndividualName
+// TODO:  Overflow for int
 func (ed *EntryDetail) SetSHRIndividualCardAccountNumber(i int) {
 	ed.IndividualName = ed.numericField(i, 22)
 }
 
-// SHRCardExpirationDate format MMYY is used in SHR, characters 1-4 of underlying
+// SHRCardExpirationDateField format MMYY is used in SHR, characters 1-4 of underlying
 // IdentificationNumber
 func (ed *EntryDetail) SHRCardExpirationDateField() string {
 	return ed.parseStringField(ed.IdentificationNumber[0:4])
 }
 
-// SHRDocumentReferenceNumber format int is used in SHR, characters 5-15 of underlying
+// SHRDocumentReferenceNumberField format int is used in SHR, characters 5-15 of underlying
 // IdentificationNumber
 func (ed *EntryDetail) SHRDocumentReferenceNumberField() int {
 	return ed.parseNumField(ed.IdentificationNumber[4:15])
 }
 
-// SHRIndividualCardAccountNumber format int is used in SHR, underlying
+// SHRIndividualCardAccountNumberField format int is used in SHR, underlying
 // IndividualName
 func (ed *EntryDetail) SHRIndividualCardAccountNumberField() int {
 	return ed.parseNumField(ed.IndividualName)
