@@ -21,10 +21,10 @@ type Addenda02 struct {
 	typeCode string
 	// ReferenceInformationOne may be used for additional reference numbers, identification numbers,
 	// or codes that the merchant needs to identify the particular transaction or customer.
-	ReferenceInformationOne string `json:"referenceInformationOne"`
+	ReferenceInformationOne string `json:"referenceInformationOne, omitempty"`
 	// ReferenceInformationTwo  may be used for additional reference numbers, identification numbers,
 	// or codes that the merchant needs to identify the particular transaction or customer.
-	ReferenceInformationTwo string `json:"referenceInformationTwo"`
+	ReferenceInformationTwo string `json:"referenceInformationTwo, omitempty"`
 	// TerminalIdentificationCode identifies an Electronic terminal with a unique code that allows
 	// a terminal owner and/or switching network to identify the terminal at which an Entry originated.
 	TerminalIdentificationCode string `json:"terminalIdentificationCode"`
@@ -36,7 +36,7 @@ type Addenda02 struct {
 	TransactionDate string `json:"transactionDate"`
 	// AuthorizationCodeOrExpireDate indicates the code that a card authorization center has
 	// furnished to the merchant.
-	AuthorizationCodeOrExpireDate string `json:"authorizationCodeOrExpireDate"`
+	AuthorizationCodeOrExpireDate string `json:"authorizationCodeOrExpireDate, omitempty"`
 	// Terminal Location identifies the specific location of a terminal (i.e., street names of an
 	// intersection, address, etc.) in accordance with the requirements of Regulation E.
 	TerminalLocation string `json:"terminalLocation"`
@@ -125,6 +125,31 @@ func (addenda02 *Addenda02) Validate() error {
 	if addenda02.typeCode != "02" {
 		return &FieldError{FieldName: "TypeCode", Value: addenda02.typeCode, Msg: msgAddendaTypeCode}
 	}
+	// TransactionDate Addenda02 ACH File format is MMDD.  Validate MM is 01-12.
+	if err := addenda02.isMonth(addenda02.parseStringField(addenda02.TransactionDate[0:2])); err != nil {
+		return &FieldError{FieldName: "TransactionDate", Value: addenda02.parseStringField(addenda02.TransactionDate[0:2]), Msg: msgValidMonth}
+	}
+	// TransactionDate Addenda02 ACH File format is MMDD.  If the month is valid, validate the day for the
+	// month 01-31 depending on month.
+	if err := addenda02.isDay(addenda02.parseStringField(addenda02.TransactionDate[0:2]), addenda02.parseStringField(addenda02.TransactionDate[2:4])); err != nil {
+		return &FieldError{FieldName: "TransactionDate", Value: addenda02.parseStringField(addenda02.TransactionDate[0:2]), Msg: msgValidDay}
+	}
+	return nil
+}
+
+// fieldInclusion validate mandatory fields are not default values  and rquired fields are defined. If fields are
+// invalid the ACH transfer will be returned.
+
+// ToDo: check if we should do fieldInclusion or validate on required fields
+
+func (addenda02 *Addenda02) fieldInclusion() error {
+	if addenda02.recordType == "" {
+		return &FieldError{FieldName: "recordType", Value: addenda02.recordType, Msg: msgFieldInclusion}
+	}
+	if addenda02.typeCode == "" {
+		return &FieldError{FieldName: "TypeCode", Value: addenda02.typeCode, Msg: msgFieldInclusion}
+	}
+	// Required Fields
 	if addenda02.TerminalIdentificationCode == "" {
 		return &FieldError{FieldName: "TerminalIdentificationCode", Value: addenda02.TerminalIdentificationCode, Msg: msgFieldRequired}
 	}
@@ -142,29 +167,6 @@ func (addenda02 *Addenda02) Validate() error {
 	}
 	if addenda02.TerminalState == "" {
 		return &FieldError{FieldName: "TerminalState", Value: addenda02.TerminalState, Msg: msgFieldRequired}
-	}
-	// ToDo: Determine if TraceNumber fieldInclusion is necessary
-	// TransactionDate Addenda02 ACH File format is MMDD.  Validate MM is 01-12.
-	if err := addenda02.isMonth(addenda02.parseStringField(addenda02.TransactionDate[0:2])); err != nil {
-		return &FieldError{FieldName: "TransactionDate", Value: addenda02.parseStringField(addenda02.TransactionDate[0:2]), Msg: msgValidMonth}
-	}
-	// TransactionDate Addenda02 ACH File format is MMDD.  If the month is valid, validate the day for the
-	// month 01-31 depending on month.
-	if err := addenda02.isDay(addenda02.parseStringField(addenda02.TransactionDate[0:2]), addenda02.parseStringField(addenda02.TransactionDate[2:4])); err != nil {
-		return &FieldError{FieldName: "TransactionDate", Value: addenda02.parseStringField(addenda02.TransactionDate[2:4]), Msg: msgValidDay}
-	}
-	return nil
-}
-
-// fieldInclusion validate mandatory fields are not default values. If fields are
-// invalid the ACH transfer will be returned.
-
-func (addenda02 *Addenda02) fieldInclusion() error {
-	if addenda02.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: addenda02.recordType, Msg: msgFieldInclusion}
-	}
-	if addenda02.typeCode == "" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda02.typeCode, Msg: msgFieldInclusion}
 	}
 	return nil
 }
