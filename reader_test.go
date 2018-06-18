@@ -38,7 +38,7 @@ func BenchmarkParseError(b *testing.B) {
 
 // testPPDDebitRead validates reading a PPD debit
 func testPPDDebitRead(t testing.TB) {
-	f, err := os.Open("./testdata/ppd-debit.ach")
+	f, err := os.Open("./test/data/ppd-debit.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -68,7 +68,7 @@ func BenchmarkPPDDebitRead(b *testing.B) {
 
 // testWEBDebitRead validates reading a WEB debit
 func testWEBDebitRead(t testing.TB) {
-	f, err := os.Open("./testdata/web-debit.ach")
+	f, err := os.Open("./test/data/web-debit.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -98,7 +98,7 @@ func BenchmarkWEBDebitRead(b *testing.B) {
 
 // testPPDDebitFixedLengthRead validates reading a PPD debit fixed width length
 func testPPDDebitFixedLengthRead(t testing.TB) {
-	f, err := os.Open("./testdata/ppd-debit-fixedLength.ach")
+	f, err := os.Open("./test/data/ppd-debit-fixedLength.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
