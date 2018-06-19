@@ -136,7 +136,7 @@ func (addenda98 *Addenda98) OriginalTraceField() string {
 
 // OriginalDFIField returns a zero padded OriginalDFI string
 func (addenda98 *Addenda98) OriginalDFIField() string {
-	return addenda98.stringRTNField(addenda98.OriginalDFI, 8)
+	return addenda98.stringField(addenda98.OriginalDFI, 8)
 }
 
 //CorrectedDataField returns a space padded CorrectedData string

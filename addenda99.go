@@ -149,7 +149,7 @@ func (Addenda99 *Addenda99) DateOfDeathField() string {
 
 // OriginalDFIField returns a zero padded OriginalDFI string
 func (Addenda99 *Addenda99) OriginalDFIField() string {
-	return Addenda99.stringRTNField(Addenda99.OriginalDFI, 8)
+	return Addenda99.stringField(Addenda99.OriginalDFI, 8)
 }
 
 //AddendaInformationField returns a space padded AddendaInformation string

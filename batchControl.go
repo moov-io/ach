@@ -36,7 +36,7 @@ type BatchControl struct {
 	TotalDebitEntryDollarAmount int `json:"totalDebit"`
 	// TotalCreditEntryDollarAmount Contains accumulated Entry credit totals within the batch.
 	TotalCreditEntryDollarAmount int `json:"totalCredit"`
-	// CompanyIdentification is an alphameric code used to identify an Originator
+	// CompanyIdentification is an alphanumeric code used to identify an Originator
 	// The Company Identification Field must be included on all
 	// prenotification records and on each entry initiated pursuant to such
 	// prenotification. The Company ID may begin with the ANSI one-digit
@@ -174,7 +174,7 @@ func (bc *BatchControl) EntryHashField() string {
 	return bc.numericField(bc.EntryHash, 10)
 }
 
-//TotalDebitEntryDollarAmountField get a zero padded Debity Entry Amount
+//TotalDebitEntryDollarAmountField get a zero padded Debit Entry Amount
 func (bc *BatchControl) TotalDebitEntryDollarAmountField() string {
 	return bc.numericField(bc.TotalDebitEntryDollarAmount, 12)
 }
@@ -184,7 +184,7 @@ func (bc *BatchControl) TotalCreditEntryDollarAmountField() string {
 	return bc.numericField(bc.TotalCreditEntryDollarAmount, 12)
 }
 
-// CompanyIdentificationField get the CompanyIdentification righ padded
+// CompanyIdentificationField get the CompanyIdentification right padded
 func (bc *BatchControl) CompanyIdentificationField() string {
 	return bc.alphaField(bc.CompanyIdentification, 10)
 }
@@ -196,7 +196,7 @@ func (bc *BatchControl) MessageAuthenticationCodeField() string {
 
 // ODFIIdentificationField get the odfi number zero padded
 func (bc *BatchControl) ODFIIdentificationField() string {
-	return bc.stringRTNField(bc.ODFIIdentification, 8)
+	return bc.stringField(bc.ODFIIdentification, 8)
 }
 
 // BatchNumberField gets a string of the batch number zero padded

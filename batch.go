@@ -43,6 +43,8 @@ func NewBatch(bh *BatchHeader) (Batcher, error) {
 		return NewBatchPPD(bh), nil
 	case "RCK":
 		return NewBatchRCK(bh), nil
+	case "SHR":
+		return NewBatchSHR(bh), nil
 	case "TEL":
 		return NewBatchTEL(bh), nil
 	case "WEB":
