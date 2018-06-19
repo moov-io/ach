@@ -35,3 +35,7 @@ _testmain.go
 *.prof
 
 .vscode/launch.json
+
+# code coverage
+coverage.html
+cover.out
