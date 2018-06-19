@@ -26,7 +26,8 @@ func mockPOSEntryDetail() *EntryDetail {
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
 	entry.IdentificationNumber = "45689033"
-	entry.SetReceivingCompany("ABC Company")
+	entry.IndividualName = "Wade Arnold"
+	//entry.SetReceivingCompany("ABC Company")
 	entry.SetTraceNumber(mockBatchPOSHeader().ODFIIdentification, 123)
 	entry.DiscretionaryData = "01"
 	entry.Category = CategoryForward

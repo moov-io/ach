@@ -116,7 +116,7 @@ func (fh *FileHeader) Parse(record string) {
 	// (14-23) A 10-digit number assigned to you by the ODFI once they approve you to originate ACH files through them
 	fh.ImmediateOrigin = fh.parseStringField(record[13:23])
 	// 24-29 Today's date in YYMMDD format
-	// must be after todays date.
+	// must be after today's date.
 	fh.FileCreationDate = fh.parseSimpleDate(record[23:29])
 	// 30-33 The current time in HHMM format
 	fh.FileCreationTime = fh.parseSimpleTime(record[29:33])
@@ -240,12 +240,12 @@ func (fh *FileHeader) fieldInclusion() error {
 
 // ImmediateDestinationField gets the immediate destination number with zero padding
 func (fh *FileHeader) ImmediateDestinationField() string {
-	return " " + fh.stringRTNField(fh.ImmediateDestination, 9)
+	return " " + fh.stringField(fh.ImmediateDestination, 9)
 }
 
 // ImmediateOriginField gets the immediate origin number with 0 padding
 func (fh *FileHeader) ImmediateOriginField() string {
-	return " " + fh.stringRTNField(fh.ImmediateOrigin, 9)
+	return " " + fh.stringField(fh.ImmediateOrigin, 9)
 }
 
 // FileCreationDateField gets the file creation date in YYMMDD format
