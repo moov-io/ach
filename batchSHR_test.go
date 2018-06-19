@@ -28,8 +28,8 @@ func mockSHREntryDetail() *EntryDetail {
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
 	entry.SetSHRCardExpirationDate("0718")
-	entry.SetSHRDocumentReferenceNumber(12345678910)
-	entry.SetSHRIndividualCardAccountNumber(12345678910123456)
+	entry.SetSHRDocumentReferenceNumber("12345678910")
+	entry.SetSHRIndividualCardAccountNumber("1234567891123456789")
 	entry.SetTraceNumber(mockBatchSHRHeader().ODFIIdentification, 123)
 	entry.DiscretionaryData = "01"
 	entry.Category = CategoryForward
@@ -468,7 +468,7 @@ func BenchmarkBatchSHRCardExpirationDateField(b *testing.B) {
 func testBatchSHRDocumentReferenceNumberField(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	ts := mockBatch.Entries[0].SHRDocumentReferenceNumberField()
-	if ts != 12345678910 {
+	if ts != "12345678910" {
 		t.Error("Document Reference Number is invalid")
 	}
 }
@@ -493,7 +493,7 @@ func BenchmarkSHRDocumentReferenceNumberField(b *testing.B) {
 func testBatchSHRIndividualCardAccountNumberField(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	ts := mockBatch.Entries[0].SHRIndividualCardAccountNumberField()
-	if ts != 12345678910123456 {
+	if ts != "0001234567891123456789" {
 		t.Error("Individual Card Account Number is invalid")
 	}
 }

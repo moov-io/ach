@@ -266,7 +266,7 @@ func (bh *BatchHeader) EffectiveEntryDateField() string {
 
 // ODFIIdentificationField get the odfi number zero padded
 func (bh *BatchHeader) ODFIIdentificationField() string {
-	return bh.stringRTNField(bh.ODFIIdentification, 8)
+	return bh.stringField(bh.ODFIIdentification, 8)
 }
 
 // BatchNumberField get the batch number zero padded
