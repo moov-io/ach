@@ -443,7 +443,7 @@ func BenchmarkBatchSHRCardTransactionType(b *testing.B) {
 func testBatchSHRCardExpirationDateField(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	ts := mockBatch.Entries[0].SHRCardExpirationDateField()
-	if ts != "0718" {
+	if ts != "0722" {
 		t.Error("Card Expiration Date is invalid")
 	}
 }
