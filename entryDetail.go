@@ -342,7 +342,6 @@ func (ed *EntryDetail) SetSHRDocumentReferenceNumber(s string) {
 
 // SetSHRIndividualCardAccountNumber format int is used in SHR, underlying
 // IndividualName
-
 func (ed *EntryDetail) SetSHRIndividualCardAccountNumber(s string) {
 	ed.IndividualName = ed.stringField(s, 22)
 }
