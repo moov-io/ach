@@ -27,7 +27,7 @@ func mockRCKEntryDetail() *EntryDetail {
 	entry.Amount = 2400
 	entry.SetCheckSerialNumber("123456789")
 	entry.IndividualName = "Wade Arnold"
-	entry.SetTraceNumber(mockBatchRCKHeader().ODFIIdentification, 123)
+	entry.SetTraceNumber(mockBatchRCKHeader().ODFIIdentification, 1)
 	entry.Category = CategoryForward
 	return entry
 }
@@ -63,7 +63,7 @@ func mockRCKEntryDetailCredit() *EntryDetail {
 	entry.Amount = 2400
 	entry.SetCheckSerialNumber("123456789")
 	entry.IndividualName = "Wade Arnold"
-	entry.SetTraceNumber(mockBatchRCKHeader().ODFIIdentification, 123)
+	entry.SetTraceNumber(mockBatchRCKHeader().ODFIIdentification, 1)
 	entry.Category = CategoryForward
 	return entry
 }
