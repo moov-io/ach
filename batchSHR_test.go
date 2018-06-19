@@ -27,7 +27,7 @@ func mockSHREntryDetail() *EntryDetail {
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
-	entry.SetSHRCardExpirationDate("0718")
+	entry.SetSHRCardExpirationDate("0722")
 	entry.SetSHRDocumentReferenceNumber("12345678910")
 	entry.SetSHRIndividualCardAccountNumber("1234567891123456789")
 	entry.SetTraceNumber(mockBatchSHRHeader().ODFIIdentification, 123)
