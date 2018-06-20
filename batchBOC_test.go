@@ -27,7 +27,7 @@ func mockBOCEntryDetail() *EntryDetail {
 	entry.Amount = 25000
 	entry.SetCheckSerialNumber("123456789")
 	entry.SetReceivingCompany("ABC Company")
-	entry.SetTraceNumber(mockBatchBOCHeader().ODFIIdentification, 123)
+	entry.SetTraceNumber(mockBatchBOCHeader().ODFIIdentification, 1)
 	entry.Category = CategoryForward
 	return entry
 }
@@ -63,7 +63,7 @@ func mockBOCEntryDetailCredit() *EntryDetail {
 	entry.Amount = 25000
 	entry.SetCheckSerialNumber("123456789")
 	entry.SetReceivingCompany("ABC Company")
-	entry.SetTraceNumber(mockBatchBOCHeader().ODFIIdentification, 123)
+	entry.SetTraceNumber(mockBatchBOCHeader().ODFIIdentification, 1)
 	entry.Category = CategoryForward
 	return entry
 }
