@@ -40,7 +40,7 @@ ACH is under active development but already in production for multiple companies
 * Review the project issues for more detailed information
 
 ## Usage and tests
-The following is a high level of reading and writing an ach file. Test exist in projects [test](https://github.com/moov-io/ach/tree/master/test) folder with more details.
+The following is a high level of reading and writing an ach file. Tests exist in projects [test](https://github.com/moov-io/ach/tree/master/test) folder with more details.
 
 ### Read a file
 
