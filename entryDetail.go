@@ -415,6 +415,7 @@ func (ed *EntryDetail) CreditOrDebit() string {
 		return "C"
 	case "5", "6", "7", "8", "9":
 		return "D"
+	default:
 	}
 	return ""
 }

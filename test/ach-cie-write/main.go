@@ -65,7 +65,7 @@ func main() {
 
 	// write the file to std out. Anything io.Writer
 	w := ach.NewWriter(os.Stdout)
-	if err := w.WriteAll([]*ach.File{file}); err != nil {
+	if err := w.Write(file); err != nil {
 		log.Fatalf("Unexpected error: %s\n", err)
 	}
 	w.Flush()

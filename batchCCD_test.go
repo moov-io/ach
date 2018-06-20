@@ -88,7 +88,7 @@ func TestBatchCCDAddendumCount(t *testing.T) {
 	testBatchCCDAddendumCount(t)
 }
 
-// BenchmarkBatchCCDAddendumCoun benchmarks batch control CCD can only have one addendum per entry detail
+// BenchmarkBatchCCDAddendumCount benchmarks batch control CCD can only have one addendum per entry detail
 func BenchmarkBatchCCDAddendumCount(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -237,5 +237,30 @@ func BenchmarkBatchCCDCreate(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchCCDCreate(b)
+	}
+}
+
+// testBatchCCDReceivingCompanyField validates CCDReceivingCompanyField
+// underlying IndividualName
+func testBatchCCDReceivingCompanyField(t testing.TB) {
+	mockBatch := mockBatchCCD()
+	ts := mockBatch.Entries[0].ReceivingCompanyField()
+	if ts != "Best Co. #23          " {
+		t.Error("Receiving Company Field is invalid")
+	}
+}
+
+// TestBatchCCDReceivingCompanyField tests validating CCDReceivingCompanyField
+// underlying IndividualName
+func TestBatchCCDReceivingCompanyFieldField(t *testing.T) {
+	testBatchCCDReceivingCompanyField(t)
+}
+
+// BenchmarkBatchCCDReceivingCompanyField benchmarks validating CCDReceivingCompanyField
+// underlying IndividualName
+func BenchmarkBatchCCDReceivingCompanyField(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchCCDReceivingCompanyField(b)
 	}
 }
