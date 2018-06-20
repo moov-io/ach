@@ -13,7 +13,7 @@ import (
 // A Writer writes an ach.file to a NACHA encoded file.
 //
 // As returned by NewWriter, a Writer writes ach.file structs into
-// NACHA formted files.
+// NACHA formatted files.
 //
 type Writer struct {
 	w       *bufio.Writer
@@ -35,43 +35,29 @@ func (w *Writer) Write(file *File) error {
 
 	w.lineNum = 0
 	// Iterate over all records in the file
-	if _, err := w.w.WriteString(file.Header.String() + "\n"); err != nil {
-		return err
-	}
+	w.w.WriteString(file.Header.String() + "\n")
 	w.lineNum++
 
 	for _, batch := range file.Batches {
-		if _, err := w.w.WriteString(batch.GetHeader().String() + "\n"); err != nil {
-			return err
-		}
+		w.w.WriteString(batch.GetHeader().String() + "\n")
 		w.lineNum++
 		for _, entry := range batch.GetEntries() {
-			if _, err := w.w.WriteString(entry.String() + "\n"); err != nil {
-				return err
-			}
+			w.w.WriteString(entry.String() + "\n")
 			w.lineNum++
 			for _, addenda := range entry.Addendum {
-				if _, err := w.w.WriteString(addenda.String() + "\n"); err != nil {
-					return err
-				}
+				w.w.WriteString(addenda.String() + "\n")
 				w.lineNum++
 			}
 		}
-		if _, err := w.w.WriteString(batch.GetControl().String() + "\n"); err != nil {
-			return err
-		}
+		w.w.WriteString(batch.GetControl().String() + "\n")
 		w.lineNum++
 	}
-	if _, err := w.w.WriteString(file.Control.String() + "\n"); err != nil {
-		return err
-	}
+	w.w.WriteString(file.Control.String() + "\n")
 	w.lineNum++
 
 	// pad the final block
 	for i := 0; i < (10-(w.lineNum%10)) && w.lineNum%10 != 0; i++ {
-		if _, err := w.w.WriteString(strings.Repeat("9", 94) + "\n"); err != nil {
-			return err
-		}
+		w.w.WriteString(strings.Repeat("9", 94) + "\n")
 	}
 
 	return nil
@@ -81,12 +67,6 @@ func (w *Writer) Write(file *File) error {
 // To check if an error occurred during the Flush, call Error.
 func (w *Writer) Flush() {
 	w.w.Flush()
-}
-
-// Error reports any error that has occurred during a previous Write or Flush.
-func (w *Writer) Error() error {
-	_, err := w.w.Write(nil)
-	return err
 }
 
 // WriteAll writes multiple ach.files to w using Write and then calls Flush.
