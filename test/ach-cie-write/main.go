@@ -1,14 +1,14 @@
 package main
 
 import (
-	"github.com/moov-io/ach"
+	"github.com/bkmoovio/ach"
 	"log"
 	"os"
 	"time"
 )
 
 func main() {
-	// Example transfer to write an ACH POS file to send/credit a external institutions account
+	// Example transfer to write an ACH CIE file to send/credit a external institutions account
 	// Important: All financial institutions are different and will require registration and exact field values.
 
 	// Set originator bank ODFI and destination Operator for the financial institution
@@ -22,11 +22,11 @@ func main() {
 
 	// BatchHeader identifies the originating entity and the type of transactions contained in the batch
 	bh := ach.NewBatchHeader()
-	bh.ServiceClassCode = 225          // ACH credit pushes money out, 225 debits/pulls money in.
+	bh.ServiceClassCode = 220          // ACH credit pushes money out, 225 debits/pulls money in.
 	bh.CompanyName = "Name on Account" // The name of the company/person that has relationship with receiver
 	bh.CompanyIdentification = fh.ImmediateOrigin
-	bh.StandardEntryClassCode = "POS"   // Consumer destination vs Company CCD
-	bh.CompanyEntryDescription = "Sale" // will be on receiving accounts statement
+	bh.StandardEntryClassCode = "CIE"      // Consumer destination vs Company CCD
+	bh.CompanyEntryDescription = "Payment" // will be on receiving accounts statement
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
 	bh.ODFIIdentification = "121042882" // Originating Routing Number
 
@@ -34,7 +34,7 @@ func main() {
 	// can be multiple entry's per batch
 	entry := ach.NewEntryDetail()
 	// Identifies the entry as a debit and credit entry AND to what type of account (Savings, DDA, Loan, GL)
-	entry.TransactionCode = 27          // Code 27: Debit (withdrawal) from checking account
+	entry.TransactionCode = 22          // Code 22: Credit to Store checking account
 	entry.SetRDFI("231380104")          // Receivers bank transit routing number
 	entry.DFIAccountNumber = "12345678" // Receivers bank account number
 	entry.Amount = 100000000            // Amount of transaction with no decimal. One dollar and eleven cents = 111
@@ -42,22 +42,15 @@ func main() {
 	entry.IndividualName = "Receiver Account Name" // Identifies the receiver of the transaction
 	entry.DiscretionaryData = "01"
 
-	addenda02 := ach.NewAddenda02()
-	addenda02.ReferenceInformationOne = "REFONEA"
-	addenda02.ReferenceInformationTwo = "REF"
-	addenda02.TerminalIdentificationCode = "TERM02"
-	addenda02.TransactionSerialNumber = "100049"
-	addenda02.TransactionDate = "0614"
-	addenda02.AuthorizationCodeOrExpireDate = "123456"
-	addenda02.TerminalLocation = "Target Store 0049"
-	addenda02.TerminalCity = "PHILADELPHIA"
-	addenda02.TerminalState = "PA"
-	addenda02.TraceNumber = 121042880000001
+	addenda05 := ach.NewAddenda05()
+	addenda05.PaymentRelatedInformation = "Credit Store Account"
+	addenda05.SequenceNumber = 1
+	addenda05.EntryDetailSequenceNumber = 0000001
 
 	// build the batch
-	batch := ach.NewBatchPOS(bh)
+	batch := ach.NewBatchCIE(bh)
 	batch.AddEntry(entry)
-	batch.GetEntries()[0].AddAddenda(addenda02)
+	batch.GetEntries()[0].AddAddenda(addenda05)
 	if err := batch.Create(); err != nil {
 		log.Fatalf("Unexpected error building batch: %s\n", err)
 	}

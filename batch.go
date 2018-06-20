@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-// Batch holds the Batch Header and Batch Control and all Entry Records for PPD Entries
+// Batch holds the Batch Header and Batch Control and all Entry Records
 type batch struct {
 	// ID is a client defined string used as a reference to this record.
 	ID      string         `json:"id"`
