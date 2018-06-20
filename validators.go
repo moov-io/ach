@@ -30,6 +30,7 @@ var (
 	msgCardTransactionType = "is an invalid Card Transaction Type"
 	msgValidMonth          = "is an invalid month"
 	msgValidDay            = "is an invalid day"
+	msgValidYear           = "is an invalid year"
 )
 
 // validator is common validation and formatting of golang types to ach type strings
@@ -73,6 +74,21 @@ func (v *validator) isCardTransactionType(code string) error {
 		return nil
 	}
 	return errors.New(msgCardTransactionType)
+}
+
+// isYear validates a 2 digit year 18-50 (2018 - 2050)
+// ToDo:  Add/remove more years as card expiration dates need/don't need them
+func (v *validator) isYear(s string) error {
+	switch s {
+	case
+		"18", "19",
+		"20", "21", "22", "23", "24", "25", "26", "27", "28", "29",
+		"30", "31", "32", "33", "34", "35", "36", "37", "38", "39",
+		"40", "41", "42", "43", "44", "45", "46", "47", "48", "49",
+		"50":
+		return nil
+	}
+	return errors.New(msgValidYear)
 }
 
 // isMonth validates a 2 digit month 01-12

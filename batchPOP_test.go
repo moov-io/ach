@@ -29,7 +29,7 @@ func mockPOPEntryDetail() *EntryDetail {
 	entry.SetPOPTerminalCity("PHIL")
 	entry.SetPOPTerminalState("PA")
 	entry.SetReceivingCompany("ABC Company")
-	entry.SetTraceNumber(mockBatchPOPHeader().ODFIIdentification, 123)
+	entry.SetTraceNumber(mockBatchPOPHeader().ODFIIdentification, 1)
 	entry.Category = CategoryForward
 	return entry
 }

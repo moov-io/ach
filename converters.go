@@ -66,8 +66,8 @@ func (c *converters) numericField(n int, max uint) string {
 	return s
 }
 
-// stringRTNField slices to max length and zero filled
-func (c *converters) stringRTNField(s string, max uint) string {
+// stringField slices to max length and zero filled
+func (c *converters) stringField(s string, max uint) string {
 	ln := uint(len(s))
 	if ln > max {
 		return s[:max]

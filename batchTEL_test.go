@@ -25,7 +25,7 @@ func mockTELEntryDetail() *EntryDetail {
 	entry.Amount = 5000000
 	entry.IdentificationNumber = "Phone 333-2222"
 	entry.IndividualName = "Wade Arnold"
-	entry.SetTraceNumber(mockBatchTELHeader().ODFIIdentification, 123)
+	entry.SetTraceNumber(mockBatchTELHeader().ODFIIdentification, 1)
 	entry.SetPaymentType("S")
 	return entry
 }

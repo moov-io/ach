@@ -141,7 +141,7 @@ func BenchmarkParseStringField(b *testing.B) {
 // testRTNFieldShort ensures zero padding and right justified
 func testRTNFieldShort(t testing.TB) {
 	c := converters{}
-	result := c.stringRTNField("123456", 8)
+	result := c.stringField("123456", 8)
 	if result != "00123456" {
 		t.Errorf("Zero padding 8 character string : '%v'", result)
 	}
@@ -163,7 +163,7 @@ func BenchmarkRTNFieldShort(b *testing.B) {
 // testRTNFieldLong ensures sliced to max length
 func testRTNFieldLong(t testing.TB) {
 	c := converters{}
-	result := c.stringRTNField("1234567899", 8)
+	result := c.stringField("1234567899", 8)
 	if result != "12345678" {
 		t.Errorf("first 8 character string: '%v'", result)
 	}
@@ -185,7 +185,7 @@ func BenchmarkRTNFieldLong(b *testing.B) {
 // testRTNFieldExact ensures exact match
 func testRTNFieldExact(t testing.TB) {
 	c := converters{}
-	result := c.stringRTNField("123456789", 9)
+	result := c.stringField("123456789", 9)
 	if result != "123456789" {
 		t.Errorf("first 9 character string: '%v'", result)
 	}

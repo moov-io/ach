@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	// Example transfer to write an ACH POS file to send/credit a external institutions account
+	// Example transfer to write an ACH SHR file to send/credit a external institutions account
 	// Important: All financial institutions are different and will require registration and exact field values.
 
 	// Set originator bank ODFI and destination Operator for the financial institution
@@ -25,8 +25,8 @@ func main() {
 	bh.ServiceClassCode = 225          // ACH credit pushes money out, 225 debits/pulls money in.
 	bh.CompanyName = "Name on Account" // The name of the company/person that has relationship with receiver
 	bh.CompanyIdentification = fh.ImmediateOrigin
-	bh.StandardEntryClassCode = "POS"   // Consumer destination vs Company CCD
-	bh.CompanyEntryDescription = "Sale" // will be on receiving accounts statement
+	bh.StandardEntryClassCode = "SHR"      // Consumer destination vs Company CCD
+	bh.CompanyEntryDescription = "Payment" // will be on receiving accounts statement
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
 	bh.ODFIIdentification = "121042882" // Originating Routing Number
 
@@ -34,12 +34,14 @@ func main() {
 	// can be multiple entry's per batch
 	entry := ach.NewEntryDetail()
 	// Identifies the entry as a debit and credit entry AND to what type of account (Savings, DDA, Loan, GL)
-	entry.TransactionCode = 27          // Code 27: Debit (withdrawal) from checking account
+	entry.TransactionCode = 27          // Code 22: Debit (withdrawal) from checking account
 	entry.SetRDFI("231380104")          // Receivers bank transit routing number
 	entry.DFIAccountNumber = "12345678" // Receivers bank account number
 	entry.Amount = 100000000            // Amount of transaction with no decimal. One dollar and eleven cents = 111
 	entry.SetTraceNumber(bh.ODFIIdentification, 1)
-	entry.IndividualName = "Receiver Account Name" // Identifies the receiver of the transaction
+	entry.SetSHRCardExpirationDate("0722")
+	entry.SetSHRDocumentReferenceNumber("12345678910")
+	entry.SetSHRIndividualCardAccountNumber("1234567891123456789")
 	entry.DiscretionaryData = "01"
 
 	addenda02 := ach.NewAddenda02()
@@ -55,7 +57,7 @@ func main() {
 	addenda02.TraceNumber = 121042880000001
 
 	// build the batch
-	batch := ach.NewBatchPOS(bh)
+	batch := ach.NewBatchSHR(bh)
 	batch.AddEntry(entry)
 	batch.GetEntries()[0].AddAddenda(addenda02)
 	if err := batch.Create(); err != nil {

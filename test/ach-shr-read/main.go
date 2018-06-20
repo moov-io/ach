@@ -9,7 +9,7 @@ import (
 
 func main() {
 	// open a file for reading. Any io.Reader Can be used
-	f, err := os.Open("pos-debit.ach")
+	f, err := os.Open("shr-debit.ach")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -29,6 +29,7 @@ func main() {
 
 	fmt.Printf("Total Amount Debit: %v \n", achFile.Control.TotalDebitEntryDollarAmountInFile)
 	fmt.Printf("SEC Code: %v \n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
-	fmt.Printf("POS Card Transaction Type: %v \n", achFile.Batches[0].GetEntries()[0].DiscretionaryDataField())
-	fmt.Printf("POS Trace Number: %v \n", achFile.Batches[0].GetEntries()[0].TraceNumberField())
+	fmt.Printf("SHR Card Expiration Date: %v \n", achFile.Batches[0].GetEntries()[0].SHRCardExpirationDateField())
+	fmt.Printf("SHR Document Reference Number: %v \n", achFile.Batches[0].GetEntries()[0].SHRDocumentReferenceNumberField())
+	fmt.Printf("SHR Individual Card Account Number: %v \n", achFile.Batches[0].GetEntries()[0].SHRIndividualCardAccountNumberField())
 }

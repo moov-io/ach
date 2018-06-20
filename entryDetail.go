@@ -245,7 +245,7 @@ func (ed *EntryDetail) AddAddenda(addenda Addendumer) []Addendumer {
 
 // SetRDFI takes the 9 digit RDFI account number and separates it for RDFIIdentification and CheckDigit
 func (ed *EntryDetail) SetRDFI(rdfi string) *EntryDetail {
-	s := ed.stringRTNField(rdfi, 9)
+	s := ed.stringField(rdfi, 9)
 	ed.RDFIIdentification = ed.parseStringField(s[:8])
 	ed.CheckDigit = ed.parseStringField(s[8:9])
 	return ed
@@ -253,13 +253,13 @@ func (ed *EntryDetail) SetRDFI(rdfi string) *EntryDetail {
 
 // SetTraceNumber takes first 8 digits of ODFI and concatenates a sequence number onto the TraceNumber
 func (ed *EntryDetail) SetTraceNumber(ODFIIdentification string, seq int) {
-	trace := ed.stringRTNField(ODFIIdentification, 8) + ed.numericField(seq, 7)
+	trace := ed.stringField(ODFIIdentification, 8) + ed.numericField(seq, 7)
 	ed.TraceNumber = ed.parseNumField(trace)
 }
 
 // RDFIIdentificationField get the rdfiIdentification with zero padding
 func (ed *EntryDetail) RDFIIdentificationField() string {
-	return ed.stringRTNField(ed.RDFIIdentification, 8)
+	return ed.stringField(ed.RDFIIdentification, 8)
 }
 
 // DFIAccountNumberField gets the DFIAccountNumber with space padding
@@ -326,6 +326,42 @@ func (ed *EntryDetail) POPTerminalCityField() string {
 func (ed *EntryDetail) POPTerminalStateField() string {
 	//return ed.alphaField(ed.IdentificationNumber, 9)
 	return ed.parseStringField(ed.IdentificationNumber[13:15])
+}
+
+// SetSHRCardExpirationDate format MMYY is used in SHR, characters 1-4 of underlying
+// IdentificationNumber
+func (ed *EntryDetail) SetSHRCardExpirationDate(s string) {
+	ed.IdentificationNumber = ed.alphaField(s, 4)
+}
+
+// SetSHRDocumentReferenceNumber format int is used in SHR, characters 5-15 of underlying
+// IdentificationNumber
+func (ed *EntryDetail) SetSHRDocumentReferenceNumber(s string) {
+	ed.IdentificationNumber = ed.IdentificationNumber + ed.stringField(s, 11)
+}
+
+// SetSHRIndividualCardAccountNumber format int is used in SHR, underlying
+// IndividualName
+func (ed *EntryDetail) SetSHRIndividualCardAccountNumber(s string) {
+	ed.IndividualName = ed.stringField(s, 22)
+}
+
+// SHRCardExpirationDateField format MMYY is used in SHR, characters 1-4 of underlying
+// IdentificationNumber
+func (ed *EntryDetail) SHRCardExpirationDateField() string {
+	return ed.parseStringField(ed.IdentificationNumber[0:4])
+}
+
+// SHRDocumentReferenceNumberField format int is used in SHR, characters 5-15 of underlying
+// IdentificationNumber
+func (ed *EntryDetail) SHRDocumentReferenceNumberField() string {
+	return ed.stringField(ed.IdentificationNumber[4:15], 11)
+}
+
+// SHRIndividualCardAccountNumberField format int is used in SHR, underlying
+// IndividualName
+func (ed *EntryDetail) SHRIndividualCardAccountNumberField() string {
+	return ed.stringField(ed.IndividualName, 22)
 }
 
 // IndividualNameField returns a space padded string of IndividualName
