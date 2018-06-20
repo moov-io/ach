@@ -27,7 +27,7 @@ func mockARCEntryDetail() *EntryDetail {
 	entry.Amount = 25000
 	entry.SetCheckSerialNumber("123456789")
 	entry.SetReceivingCompany("ABC Company")
-	entry.SetTraceNumber(mockBatchARCHeader().ODFIIdentification, 123)
+	entry.SetTraceNumber(mockBatchARCHeader().ODFIIdentification, 1)
 	entry.Category = CategoryForward
 	return entry
 }
@@ -63,7 +63,7 @@ func mockARCEntryDetailCredit() *EntryDetail {
 	entry.Amount = 25000
 	entry.SetCheckSerialNumber("123456789")
 	entry.SetReceivingCompany("ABC Company")
-	entry.SetTraceNumber(mockBatchARCHeader().ODFIIdentification, 123)
+	entry.SetTraceNumber(mockBatchARCHeader().ODFIIdentification, 1)
 	entry.Category = CategoryForward
 	return entry
 }

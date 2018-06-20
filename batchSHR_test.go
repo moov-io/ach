@@ -30,7 +30,7 @@ func mockSHREntryDetail() *EntryDetail {
 	entry.SetSHRCardExpirationDate("0722")
 	entry.SetSHRDocumentReferenceNumber("12345678910")
 	entry.SetSHRIndividualCardAccountNumber("1234567891123456789")
-	entry.SetTraceNumber(mockBatchSHRHeader().ODFIIdentification, 123)
+	entry.SetTraceNumber(mockBatchSHRHeader().ODFIIdentification, 1)
 	entry.DiscretionaryData = "01"
 	entry.Category = CategoryForward
 	return entry
