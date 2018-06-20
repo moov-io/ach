@@ -214,3 +214,37 @@ func BenchmarkBatchWebCreate(b *testing.B) {
 		testBatchWebCreate(b)
 	}
 }
+
+// testBatchWebPaymentTypeR validates that the entry detail
+// payment type / discretionary data is reoccurring
+func testBatchWebPaymentTypeR(t testing.TB) {
+	mockBatch := mockBatchWEB()
+	mockBatch.GetEntries()[0].DiscretionaryData = "R"
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "PaymentType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+	if mockBatch.GetEntries()[0].PaymentTypeField() != "R" {
+		t.Errorf("PaymentTypeField %v was expecting R", mockBatch.GetEntries()[0].PaymentTypeField())
+	}
+}
+
+// TestBatchWebPaymentTypeR tests validating that the entry detail
+// payment type / discretionary data is reoccurring
+func TestBatchWebPaymentTypeR(t *testing.T) {
+	testBatchWebPaymentTypeR(t)
+}
+
+// BenchmarkBatchWebPaymentTypeR benchmarks validating that the entry detail
+// payment type / discretionary data is reoccurring
+func BenchmarkBatchWebPaymentTypeR(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchWebPaymentTypeR(b)
+	}
+}
