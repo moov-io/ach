@@ -60,24 +60,11 @@ func (w *Writer) Write(file *File) error {
 		w.w.WriteString(strings.Repeat("9", 94) + "\n")
 	}
 
-	return nil
+	return w.w.Flush()
 }
 
 // Flush writes any buffered data to the underlying io.Writer.
 // To check if an error occurred during the Flush, call Error.
 func (w *Writer) Flush() {
 	w.w.Flush()
-}
-
-// WriteAll writes multiple ach.files to w using Write and then calls Flush.
-func (w *Writer) WriteAll(files []*File) error {
-	for _, file := range files {
-		err := w.Write(file)
-		// TODO if one of the files errors at a Writer struct flag to decide if
-		// the other files should still be written
-		if err != nil {
-			return err
-		}
-	}
-	return w.w.Flush()
 }

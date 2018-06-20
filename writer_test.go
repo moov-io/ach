@@ -31,9 +31,10 @@ func testPPDWrite(t testing.TB) {
 	b := &bytes.Buffer{}
 	f := NewWriter(b)
 
-	if err := f.WriteAll([]*File{file}); err != nil {
+	if err := f.Write(file); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
+
 	r := NewReader(strings.NewReader(b.String()))
 	_, err := r.Read()
 	if err != nil {
@@ -80,7 +81,7 @@ func testFileWriteErr(t testing.TB) {
 	b := &bytes.Buffer{}
 	f := NewWriter(b)
 
-	if err := f.WriteAll([]*File{file}); err != nil {
+	if err := f.Write(file); err != nil {
 		if e, ok := err.(*FileError); ok {
 			if e.FieldName != "EntryAddendaCount" {
 				t.Errorf("%T: %s", err, err)
