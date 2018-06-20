@@ -39,8 +39,8 @@ ACH is under active development but already in production for multiple companies
 * Additional SEC codes will be added based on library users needs. Please open an issue with a valid test file.
 * Review the project issues for more detailed information
 
-## Usage and examples
-The following is a high level of reading and writing an ach file. Examples exist in projects [example](https://github.com/moov-io/ach/tree/master/example) folder with more details.
+## Usage and tests
+The following is a high level of reading and writing an ach file. Test exist in projects [test](https://github.com/moov-io/ach/tree/master/test) folder with more details.
 
 ### Read a file
 
@@ -76,7 +76,7 @@ if len(achFile.ReturnEntries) > 0 {
 ```	
 
 ### Create a file
-The following is based on [simple file creation](https://github.com/moov-io/ach/tree/master/example/simple-file-creation)
+The following is based on [simple file creation](https://github.com/moov-io/ach/tree/master/test/simple-file-creation)
  
  ```go
 	fh := ach.NewFileHeader()
