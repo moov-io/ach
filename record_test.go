@@ -222,7 +222,7 @@ func testBuildFile(t testing.TB) {
 	// Finally we write the file to an io.Writer
 	var b bytes.Buffer
 	w := NewWriter(&b)
-	if err := w.WriteAll([]*File{file}); err != nil {
+	if err := w.Write(file); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 	w.Flush()

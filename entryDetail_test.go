@@ -606,6 +606,10 @@ func testEDCreditOrDebit(t testing.TB) {
 	if entry.CreditOrDebit() != "D" {
 		t.Errorf("TransactionCode %v expected a Debit(D) got %v", entry.TransactionCode, entry.CreditOrDebit())
 	}
+	entry.TransactionCode = 10
+	if entry.CreditOrDebit() != "" {
+		t.Errorf("TransactionCode %v is invalid", entry.TransactionCode)
+	}
 }
 
 // TestEDCreditOrDebit tests validating debit and credit transaction code
