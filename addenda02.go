@@ -12,7 +12,6 @@ import (
 // Addenda02 is a Addendumer addenda which provides business transaction information for Addenda Type
 // Code 02 in a machine readable format. It is usually formatted according to ANSI, ASC, X12 Standard.
 type Addenda02 struct {
-	//ToDo: Verify which fields should be omitempty
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
 	// RecordType defines the type of record in the block. entryAddenda02 Pos 7
@@ -97,7 +96,6 @@ func (addenda02 *Addenda02) String() string {
 		addenda02.ReferenceInformationTwoField(),
 		addenda02.TerminalIdentificationCodeField(),
 		addenda02.TransactionSerialNumberField(),
-		// ToDo: Follow up on best way to get TransactionDate - should it be treated as an alpha field
 		addenda02.TransactionDateField(),
 		addenda02.AuthorizationCodeOrExpireDateField(),
 		addenda02.TerminalLocationField(),
@@ -121,9 +119,20 @@ func (addenda02 *Addenda02) Validate() error {
 		return &FieldError{FieldName: "TypeCode", Value: addenda02.typeCode, Msg: err.Error()}
 	}
 	// Type Code must be 02
-	// ToDo: Evaluate if Addenda05 and Addenda99 should be modified to validate on 05 and 99
 	if addenda02.typeCode != "02" {
 		return &FieldError{FieldName: "TypeCode", Value: addenda02.typeCode, Msg: msgAddendaTypeCode}
+	}
+	if err := addenda02.isAlphanumeric(addenda02.ReferenceInformationOne); err != nil {
+		return &FieldError{FieldName: "ReferenceInformationOne", Value: addenda02.ReferenceInformationOne, Msg: err.Error()}
+	}
+	if err := addenda02.isAlphanumeric(addenda02.ReferenceInformationTwo); err != nil {
+		return &FieldError{FieldName: "ReferenceInformationTwo", Value: addenda02.ReferenceInformationTwo, Msg: err.Error()}
+	}
+	if err := addenda02.isAlphanumeric(addenda02.TerminalIdentificationCode); err != nil {
+		return &FieldError{FieldName: "TerminalIdentificationCode", Value: addenda02.TerminalIdentificationCode, Msg: err.Error()}
+	}
+	if err := addenda02.isAlphanumeric(addenda02.TransactionSerialNumber); err != nil {
+		return &FieldError{FieldName: "TransactionSerialNumber", Value: addenda02.TransactionSerialNumber, Msg: err.Error()}
 	}
 	// TransactionDate Addenda02 ACH File format is MMDD.  Validate MM is 01-12.
 	if err := addenda02.isMonth(addenda02.parseStringField(addenda02.TransactionDate[0:2])); err != nil {
@@ -134,13 +143,23 @@ func (addenda02 *Addenda02) Validate() error {
 	if err := addenda02.isDay(addenda02.parseStringField(addenda02.TransactionDate[0:2]), addenda02.parseStringField(addenda02.TransactionDate[2:4])); err != nil {
 		return &FieldError{FieldName: "TransactionDate", Value: addenda02.parseStringField(addenda02.TransactionDate[0:2]), Msg: msgValidDay}
 	}
+	if err := addenda02.isAlphanumeric(addenda02.AuthorizationCodeOrExpireDate); err != nil {
+		return &FieldError{FieldName: "AuthorizationCodeOrExpireDate", Value: addenda02.AuthorizationCodeOrExpireDate, Msg: err.Error()}
+	}
+	if err := addenda02.isAlphanumeric(addenda02.TerminalLocation); err != nil {
+		return &FieldError{FieldName: "TerminalLocation", Value: addenda02.TerminalLocation, Msg: err.Error()}
+	}
+	if err := addenda02.isAlphanumeric(addenda02.TerminalCity); err != nil {
+		return &FieldError{FieldName: "TerminalCity", Value: addenda02.TerminalCity, Msg: err.Error()}
+	}
+	if err := addenda02.isAlphanumeric(addenda02.TerminalState); err != nil {
+		return &FieldError{FieldName: "TerminalState", Value: addenda02.TerminalState, Msg: err.Error()}
+	}
 	return nil
 }
 
-// fieldInclusion validate mandatory fields are not default values  and rquired fields are defined. If fields are
+// fieldInclusion validate mandatory fields are not default values  and required fields are defined. If fields are
 // invalid the ACH transfer will be returned.
-
-// ToDo: check if we should do fieldInclusion or validate on required fields
 
 func (addenda02 *Addenda02) fieldInclusion() error {
 	if addenda02.recordType == "" {

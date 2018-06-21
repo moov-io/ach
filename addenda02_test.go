@@ -479,3 +479,211 @@ func BenchmarkAddenda02TransactionDateInvalidDay(b *testing.B) {
 		testAddenda02TransactionDateInvalidDay(b)
 	}
 }
+
+// testReferenceInformationOneAlphaNumeric validates ReferenceInformationOne is alphanumeric
+func testReferenceInformationOneAlphaNumeric(t testing.TB) {
+	addenda02 := mockAddenda02()
+	addenda02.ReferenceInformationOne = "®"
+	if err := addenda02.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "ReferenceInformationOne" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+// TestReferenceInformationOneAlphaNumeric tests validating ReferenceInformationOne is alphanumeric
+func TestReferenceInformationOneAlphaNumeric(t *testing.T) {
+	testReferenceInformationOneAlphaNumeric(t)
+}
+
+// BenchmarkReferenceInformationOneAlphaNumeric benchmarks validating ReferenceInformationOne is alphanumeric
+func BenchmarkReferenceInformationOneAlphaNumeric(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testReferenceInformationOneAlphaNumeric(b)
+	}
+}
+
+// testReferenceInformationTwoAlphaNumeric validates ReferenceInformationTwo is alphanumeric
+func testReferenceInformationTwoAlphaNumeric(t testing.TB) {
+	addenda02 := mockAddenda02()
+	addenda02.ReferenceInformationTwo = "®"
+	if err := addenda02.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "ReferenceInformationTwo" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+// TestReferenceInformationTwoAlphaNumeric tests validating ReferenceInformationTwo is alphanumeric
+func TestReferenceInformationTwoAlphaNumeric(t *testing.T) {
+	testReferenceInformationTwoAlphaNumeric(t)
+}
+
+// BenchmarkReferenceInformationTwoAlphaNumeric benchmarks validating ReferenceInformationTwo is alphanumeric
+func BenchmarkReferenceInformationTwoAlphaNumeric(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testReferenceInformationTwoAlphaNumeric(b)
+	}
+}
+
+// testTerminalIdentificationCodeAlphaNumeric validates TerminalIdentificationCode is alphanumeric
+func testTerminalIdentificationCodeAlphaNumeric(t testing.TB) {
+	addenda02 := mockAddenda02()
+	addenda02.TerminalIdentificationCode = "®"
+	if err := addenda02.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "TerminalIdentificationCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+// TestTerminalIdentificationCodeAlphaNumeric tests validating TerminalIdentificationCode is alphanumeric
+func TestTerminalIdentificationCodeAlphaNumeric(t *testing.T) {
+	testTerminalIdentificationCodeAlphaNumeric(t)
+}
+
+// BenchmarkTerminalIdentificationCodeAlphaNumeric benchmarks validating TerminalIdentificationCode is alphanumeric
+func BenchmarkTerminalIdentificationCodeAlphaNumeric(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testTerminalIdentificationCodeAlphaNumeric(b)
+	}
+}
+
+// testTransactionSerialNumberAlphaNumeric validates TransactionSerialNumber is alphanumeric
+func testTransactionSerialNumberAlphaNumeric(t testing.TB) {
+	addenda02 := mockAddenda02()
+	addenda02.TransactionSerialNumber = "®"
+	if err := addenda02.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "TransactionSerialNumber" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+// TestTransactionSerialNumberAlphaNumeric tests validating TransactionSerialNumber is alphanumeric
+func TestTransactionSerialNumberAlphaNumeric(t *testing.T) {
+	testTransactionSerialNumberAlphaNumeric(t)
+}
+
+// BenchmarkTransactionSerialNumberAlphaNumeric benchmarks validating TransactionSerialNumber is alphanumeric
+func BenchmarkTransactionSerialNumberAlphaNumeric(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testTransactionSerialNumberAlphaNumeric(b)
+	}
+}
+
+// testAuthorizationCodeOrExpireDateAlphaNumeric validates AuthorizationCodeOrExpireDate is alphanumeric
+func testAuthorizationCodeOrExpireDateAlphaNumeric(t testing.TB) {
+	addenda02 := mockAddenda02()
+	addenda02.AuthorizationCodeOrExpireDate = "®"
+	if err := addenda02.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "AuthorizationCodeOrExpireDate" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+// TestAuthorizationCodeOrExpireDateAlphaNumeric tests validating AuthorizationCodeOrExpireDate is alphanumeric
+func TestAuthorizationCodeOrExpireDateAlphaNumeric(t *testing.T) {
+	testAuthorizationCodeOrExpireDateAlphaNumeric(t)
+}
+
+// BenchmarkAuthorizationCodeOrExpireDateAlphaNumeric benchmarks validating AuthorizationCodeOrExpireDate is alphanumeric
+func BenchmarkAuthorizationCodeOrExpireDateAlphaNumeric(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAuthorizationCodeOrExpireDateAlphaNumeric(b)
+	}
+}
+
+// testTerminalLocationAlphaNumeric validates TerminalLocation is alphanumeric
+func testTerminalLocationAlphaNumeric(t testing.TB) {
+	addenda02 := mockAddenda02()
+	addenda02.TerminalLocation = "®"
+	if err := addenda02.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "TerminalLocation" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+// TestTerminalLocationAlphaNumeric tests validating TerminalLocation is alphanumeric
+func TestTerminalLocationAlphaNumeric(t *testing.T) {
+	testTerminalLocationAlphaNumeric(t)
+}
+
+// BenchmarkTerminalLocationAlphaNumeric benchmarks validating TerminalLocation is alphanumeric
+func BenchmarkTerminalLocationAlphaNumeric(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testTerminalLocationAlphaNumeric(b)
+	}
+}
+
+// testTerminalCityAlphaNumeric validates TerminalCity is alphanumeric
+func testTerminalCityAlphaNumeric(t testing.TB) {
+	addenda02 := mockAddenda02()
+	addenda02.TerminalCity = "®"
+	if err := addenda02.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "TerminalCity" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+// TestTerminalCityAlphaNumeric tests validating TerminalCity is alphanumeric
+func TestTerminalCityAlphaNumeric(t *testing.T) {
+	testTerminalCityAlphaNumeric(t)
+}
+
+// BenchmarkTerminalCityAlphaNumeric benchmarks validating TerminalCity is alphanumeric
+func BenchmarkTerminalCityAlphaNumeric(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testTerminalCityAlphaNumeric(b)
+	}
+}
+
+// testTerminalStateAlphaNumeric validates TerminalState is alphanumeric
+func testTerminalStateAlphaNumeric(t testing.TB) {
+	addenda02 := mockAddenda02()
+	addenda02.TerminalState = "®"
+	if err := addenda02.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "TerminalState" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+// TestTerminalStateAlphaNumeric tests validating TerminalState is alphanumeric
+func TestTerminalStateAlphaNumeric(t *testing.T) {
+	testTerminalStateAlphaNumeric(t)
+}
+
+// BenchmarkTerminalStateAlphaNumeric benchmarks validating TerminalState is alphanumeric
+func BenchmarkTerminalStateAlphaNumeric(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testTerminalStateAlphaNumeric(b)
+	}
+}
