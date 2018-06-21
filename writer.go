@@ -35,29 +35,43 @@ func (w *Writer) Write(file *File) error {
 
 	w.lineNum = 0
 	// Iterate over all records in the file
-	w.w.WriteString(file.Header.String() + "\n")
+	if _, err := w.w.WriteString(file.Header.String() + "\n"); err != nil {
+		return err
+	}
 	w.lineNum++
 
 	for _, batch := range file.Batches {
-		w.w.WriteString(batch.GetHeader().String() + "\n")
+		if _, err := w.w.WriteString(batch.GetHeader().String() + "\n"); err != nil {
+			return err
+		}
 		w.lineNum++
 		for _, entry := range batch.GetEntries() {
-			w.w.WriteString(entry.String() + "\n")
+			if _, err := w.w.WriteString(entry.String() + "\n"); err != nil {
+				return err
+			}
 			w.lineNum++
 			for _, addenda := range entry.Addendum {
-				w.w.WriteString(addenda.String() + "\n")
+				if _, err := w.w.WriteString(addenda.String() + "\n"); err != nil {
+					return err
+				}
 				w.lineNum++
 			}
 		}
-		w.w.WriteString(batch.GetControl().String() + "\n")
+		if _, err := w.w.WriteString(batch.GetControl().String() + "\n"); err != nil {
+			return err
+		}
 		w.lineNum++
 	}
-	w.w.WriteString(file.Control.String() + "\n")
+	if _, err := w.w.WriteString(file.Control.String() + "\n"); err != nil {
+		return err
+	}
 	w.lineNum++
 
 	// pad the final block
 	for i := 0; i < (10-(w.lineNum%10)) && w.lineNum%10 != 0; i++ {
-		w.w.WriteString(strings.Repeat("9", 94) + "\n")
+		if _, err := w.w.WriteString(strings.Repeat("9", 94) + "\n"); err != nil {
+			return err
+		}
 	}
 
 	return w.w.Flush()
