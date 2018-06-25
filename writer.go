@@ -13,7 +13,7 @@ import (
 // A Writer writes an ach.file to a NACHA encoded file.
 //
 // As returned by NewWriter, a Writer writes ach.file structs into
-// NACHA formted files.
+// NACHA formatted files.
 //
 type Writer struct {
 	w       *bufio.Writer
@@ -74,30 +74,11 @@ func (w *Writer) Write(file *File) error {
 		}
 	}
 
-	return nil
+	return w.w.Flush()
 }
 
 // Flush writes any buffered data to the underlying io.Writer.
 // To check if an error occurred during the Flush, call Error.
 func (w *Writer) Flush() {
 	w.w.Flush()
-}
-
-// Error reports any error that has occurred during a previous Write or Flush.
-func (w *Writer) Error() error {
-	_, err := w.w.Write(nil)
-	return err
-}
-
-// WriteAll writes multiple ach.files to w using Write and then calls Flush.
-func (w *Writer) WriteAll(files []*File) error {
-	for _, file := range files {
-		err := w.Write(file)
-		// TODO if one of the files errors at a Writer struct flag to decide if
-		// the other files should still be written
-		if err != nil {
-			return err
-		}
-	}
-	return w.w.Flush()
 }
