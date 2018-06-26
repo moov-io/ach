@@ -36,6 +36,8 @@ type Reader struct {
 	line string
 	// currentBatch is the current Batch entries being parsed
 	currentBatch Batcher
+	// IATCurrentBatch is the current IATBatch entries being parsed
+	IATCurrentBatch IATBatcher
 	// line number of the file being parsed
 	lineNum int
 	// recordName holds the current record name being parsed.
@@ -55,6 +57,12 @@ func (r *Reader) error(err error) error {
 // current batch will be added to r.File once parsed.
 func (r *Reader) addCurrentBatch(batch Batcher) {
 	r.currentBatch = batch
+}
+
+// addCurrentBatch creates the current batch type for the file being read. A successful
+// current batch will be added to r.File once parsed.
+func (r *Reader) addIATCurrentBatch(iatBatch IATBatcher) {
+	r.IATCurrentBatch = iatBatch
 }
 
 // NewReader returns a new ACH Reader that reads from r.
@@ -204,9 +212,12 @@ func (r *Reader) parseBatchHeader() error {
 	return nil
 }
 
+// ToDo:  come up with a switch - entryDetailer back to that?
+
 // parseEntryDetail takes the input record string and parses the EntryDetailRecord values
 func (r *Reader) parseEntryDetail() error {
 	r.recordName = "EntryDetail"
+
 	if r.currentBatch == nil {
 		return r.error(&FileError{Msg: msgFileBatchOutside})
 	}
@@ -297,5 +308,47 @@ func (r *Reader) parseFileControl() error {
 	if err := r.File.Control.Validate(); err != nil {
 		return r.error(err)
 	}
+	return nil
+}
+
+// parseIATBatchHeader takes the input record string and parses the FileHeaderRecord values
+func (r *Reader) parseIATBatchHeader() error {
+	r.recordName = "IATBatchHeader"
+	if r.IATCurrentBatch != nil {
+		// batch header inside of current batch
+		return r.error(&FileError{Msg: msgFileBatchInside})
+	}
+
+	// Ensure we have a valid IAT BatchHeader before building a batch.
+	bh := NewIATBatchHeader()
+	bh.Parse(r.line)
+	if err := bh.Validate(); err != nil {
+		return r.error(err)
+	}
+
+	// Passing BatchHeader into NewBatchIAT creates a Batcher of IAT SEC code type.
+	iatBatch, err := IATNewBatch(bh)
+	if err != nil {
+		return r.error(err)
+	}
+
+	r.addIATCurrentBatch(iatBatch)
+
+	return nil
+}
+
+// parseIATEntryDetail takes the input record string and parses the EntryDetailRecord values
+func (r *Reader) parseIATEntryDetail() error {
+	r.recordName = "IATEntryDetail"
+
+	if r.IATCurrentBatch == nil {
+		return r.error(&FileError{Msg: msgFileBatchOutside})
+	}
+	ed := new(IATEntryDetail)
+	ed.Parse(r.line)
+	if err := ed.Validate(); err != nil {
+		return r.error(err)
+	}
+	r.IATCurrentBatch.AddEntry(ed)
 	return nil
 }

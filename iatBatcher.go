@@ -1,0 +1,55 @@
+// Copyright 2018 The ACH Authors
+// Use of this source code is governed by an Apache License
+// license that can be found in the LICENSE file.
+
+package ach
+
+// IATBatcher abstract an IAT ACH batch type
+type IATBatcher interface {
+	GetHeader() *IATBatchHeader
+	SetHeader(*IATBatchHeader)
+	GetControl() *BatchControl
+	SetControl(*BatchControl)
+	GetEntries() []*IATEntryDetail
+	AddEntry(*IATEntryDetail)
+	Create() error
+	Validate() error
+	// Category defines if a Forward or Return
+	Category() string
+}
+
+/*// BatchError is an Error that describes batch validation issues
+type IATBatchError struct {
+	BatchNumber int
+	FieldName   string
+	Msg         string
+}
+
+func (e *BatchError) IATError() string {
+	return fmt.Sprintf("BatchNumber %d %s %s", e.BatchNumber, e.FieldName, e.Msg)
+}*/
+
+// Errors specific to parsing a Batch container
+var (
+// generic messages
+/*	msgBatchHeaderControlEquality     = "header %v is not equal to control %v"
+	msgBatchCalculatedControlEquality = "calculated %v is out-of-balance with control %v"
+	msgBatchAscending                 = "%v is less than last %v. Must be in ascending order"
+	// specific messages for error
+	msgBatchCompanyEntryDescription = "Company entry description %v is not valid for batch type %v"
+	msgBatchOriginatorDNE           = "%v is not “2” for DNE with entry transaction code of 23 or 33"
+	msgBatchTraceNumberNotODFI      = "%v in header does not match entry trace number %v"
+	msgBatchAddendaIndicator        = "is 0 but found addenda record(s)"
+	msgBatchAddendaTraceNumber      = "%v does not match proceeding entry detail trace number %v"
+	msgBatchEntries                 = "must have Entry Record(s) to be built"
+	msgBatchAddendaCount            = "%v addendum found where %v is allowed for batch type %v"
+	msgBatchTransactionCodeCredit   = "%v a credit is not allowed"
+	msgBatchSECType                 = "header SEC type code %v for batch type %v"
+	msgBatchTypeCode                = "%v found in addenda and expecting %v for batch type %v"
+	msgBatchServiceClassCode        = "Service Class Code %v is not valid for batch type %v"
+	msgBatchForwardReturn           = "Forward and Return entries found in the same batch"
+	msgBatchAmount                  = "Amount must be less than %v for SEC code %v"
+	msgBatchCheckSerialNumber       = "Check Serial Number is required for SEC code %v"
+	msgBatchTransactionCode         = "Transaction code %v is not allowed for batch type %v"
+	msgBatchCardTransactionType     = "Card Transaction Type %v is invalid"*/
+)

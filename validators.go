@@ -31,6 +31,9 @@ var (
 	msgValidMonth          = "is an invalid month"
 	msgValidDay            = "is an invalid day"
 	msgValidYear           = "is an invalid year"
+	// IAT
+	msgForeignExchangeIndicator          = "is an invalid Foreign Exchange Indicator"
+	msgForeignExchangeReferenceIndicator = "is an invalid Foreign Exchange Reference Indicator"
 )
 
 // validator is common validation and formatting of golang types to ach type strings
@@ -142,6 +145,28 @@ func (v *validator) isDay(m string, d string) error {
 		}
 	}
 	return errors.New(msgValidDay)
+}
+
+// isForeignExchangeIndicator ensures foreign exchange indicators of an
+// IATBatchHeader is valid
+func (v *validator) isForeignExchangeIndicator(code string) error {
+	switch code {
+	case
+		"FV", "VF", "FF":
+		return nil
+	}
+	return errors.New(msgForeignExchangeIndicator)
+}
+
+// isForeignExchangeReferenceIndicator ensures foreign exchange reference
+// indicator of am IATBatchHeader is valid
+func (v *validator) isForeignExchangeReferenceIndicator(code int) error {
+	switch code {
+	case
+		1, 2, 3:
+		return nil
+	}
+	return errors.New(msgForeignExchangeReferenceIndicator)
 }
 
 // isOriginatorStatusCode ensures status code of a batch is valid
