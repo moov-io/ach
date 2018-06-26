@@ -82,7 +82,7 @@ func (f *File) Create() error {
 		return err
 	}
 	// Requires at least one Batch in the new file.
-	if len(f.Batches) <= 0 && len(f.Batches) <= 0 {
+	if len(f.Batches) <= 0 && len(f.IATBatches) <= 0 {
 		return &FileError{FieldName: "Batches", Value: strconv.Itoa(len(f.Batches)), Msg: "must have []*Batches to be built"}
 	}
 	// add 2 for FileHeader/control and reset if build was called twice do to error
