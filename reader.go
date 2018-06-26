@@ -136,12 +136,26 @@ func (r *Reader) parseLine() error {
 			return err
 		}
 	case batchHeaderPos:
-		if err := r.parseBatchHeader(); err != nil {
-			return err
+		switch r.line[50:53] {
+		case "IAT":
+			if err := r.parseIATBatchHeader(); err != nil {
+				return err
+			}
+		default:
+			if err := r.parseBatchHeader(); err != nil {
+				return err
+			}
 		}
 	case entryDetailPos:
-		if err := r.parseEntryDetail(); err != nil {
-			return err
+		switch r.line[16:29] {
+		case "             ":
+			if err := r.parseIATEntryDetail(); err != nil {
+				return err
+			}
+		default:
+			if err := r.parseEntryDetail(); err != nil {
+				return err
+			}
 		}
 	case entryAddendaPos:
 		if err := r.parseAddenda(); err != nil {
