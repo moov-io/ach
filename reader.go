@@ -212,8 +212,6 @@ func (r *Reader) parseBatchHeader() error {
 	return nil
 }
 
-
-
 // parseEntryDetail takes the input record string and parses the EntryDetailRecord values
 func (r *Reader) parseEntryDetail() error {
 	r.recordName = "EntryDetail"
