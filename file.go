@@ -53,10 +53,11 @@ func (e *FileError) Error() string {
 
 // File contains the structures of a parsed ACH File.
 type File struct {
-	ID      string      `json:"id"`
-	Header  FileHeader  `json:"fileHeader"`
-	Batches []Batcher   `json:"batches"`
-	Control FileControl `json:"fileControl"`
+	ID         string       `json:"id"`
+	Header     FileHeader   `json:"fileHeader"`
+	Batches    []Batcher    `json:"batches"`
+	IATBatches []IATBatcher `json:"IATBatches"`
+	Control    FileControl  `json:"fileControl"`
 
 	// NotificationOfChange (Notification of change) is a slice of references to BatchCOR in file.Batches
 	NotificationOfChange []*BatchCOR
@@ -81,7 +82,7 @@ func (f *File) Create() error {
 		return err
 	}
 	// Requires at least one Batch in the new file.
-	if len(f.Batches) <= 0 {
+	if len(f.Batches) <= 0 && len(f.Batches) <= 0 {
 		return &FileError{FieldName: "Batches", Value: strconv.Itoa(len(f.Batches)), Msg: "must have []*Batches to be built"}
 	}
 	// add 2 for FileHeader/control and reset if build was called twice do to error
@@ -104,6 +105,21 @@ func (f *File) Create() error {
 		fileEntryHashSum = fileEntryHashSum + batch.GetControl().EntryHash
 		totalDebitAmount = totalDebitAmount + batch.GetControl().TotalDebitEntryDollarAmount
 		totalCreditAmount = totalCreditAmount + batch.GetControl().TotalCreditEntryDollarAmount
+
+	}
+	for i, iatBatch := range f.IATBatches {
+		// create ascending batch numbers
+		f.IATBatches[i].GetHeader().BatchNumber = batchSeq
+		f.IATBatches[i].GetControl().BatchNumber = batchSeq
+		batchSeq++
+		// sum file entry and addenda records. Assume batch.Create() batch properly calculated control
+		fileEntryAddendaCount = fileEntryAddendaCount + iatBatch.GetControl().EntryAddendaCount
+		// add 2 for Batch header/control + entry added count
+		totalRecordsInFile = totalRecordsInFile + 2 + iatBatch.GetControl().EntryAddendaCount
+		// sum hash from batch control. Assume Batch.Build properly calculated field.
+		fileEntryHashSum = fileEntryHashSum + iatBatch.GetControl().EntryHash
+		totalDebitAmount = totalDebitAmount + iatBatch.GetControl().TotalDebitEntryDollarAmount
+		totalCreditAmount = totalCreditAmount + iatBatch.GetControl().TotalCreditEntryDollarAmount
 
 	}
 	// create FileControl from calculated values
@@ -135,6 +151,12 @@ func (f *File) AddBatch(batch Batcher) []Batcher {
 	}
 	f.Batches = append(f.Batches, batch)
 	return f.Batches
+}
+
+// AddIATBatch appends a IATBatch to the ach.File
+func (f *File) AddIATBatch(iatBatch IATBatcher) []IATBatcher {
+	f.IATBatches = append(f.IATBatches, iatBatch)
+	return f.IATBatches
 }
 
 // SetHeader allows for header to be built.
