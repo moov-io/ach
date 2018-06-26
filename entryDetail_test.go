@@ -378,7 +378,7 @@ func TestEDSetRDFI(t *testing.T) {
 	testEDSetRDFI(t)
 }
 
-// Benchmark benchmarks validating setting RDFI
+// BenchmarkEDSetRDFI benchmarks validating setting RDFI
 func BenchmarkEDSetRDFI(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {

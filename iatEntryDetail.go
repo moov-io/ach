@@ -16,10 +16,8 @@ import (
 type IATEntryDetail struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
-
 	// RecordType defines the type of record in the block. 6
 	recordType string
-
 	// TransactionCode if the receivers account is:
 	// Credit (deposit) to checking account ‘22’
 	// Prenote for credit to checking account ‘23’
@@ -30,41 +28,30 @@ type IATEntryDetail struct {
 	// Debit to savings account ‘37’
 	// Prenote for debit to savings account ‘38’
 	TransactionCode int `json:"transactionCode"`
-
 	// RDFIIdentification is the RDFI's routing number without the last digit.
 	// Receiving Depository Financial Institution
 	RDFIIdentification string `json:"RDFIIdentification"`
-
 	// CheckDigit the last digit of the RDFI's routing number
 	CheckDigit string `json:"checkDigit"`
-
 	// AddendaRecords is the number of Addenda Records
 	AddendaRecords int `json:"AddendaRecords"`
-
 	// reserved - Leave blank
 	reserved string
-
 	// Amount Number of cents you are debiting/crediting this account
 	Amount int `json:"amount"`
-
 	// DFIAccountNumber is the receiver's bank account number you are crediting/debiting.
 	// It important to note that this is an alphanumeric field, so its space padded, no zero padded
 	DFIAccountNumber string `json:"DFIAccountNumber"`
-
-	// reserved2 - Leave blank
+	// reservedTwo - Leave blank
 	reservedTwo string
-
 	// OFACSreeningIndicator - Leave blank
 	OFACSreeningIndicator string `json:"OFACSreeningIndicator"`
-
 	// SecondaryOFACSreeningIndicator - Leave blank
 	SecondaryOFACSreeningIndicator string `json:"SecondaryOFACSreeningIndicator"`
-
 	// AddendaRecordIndicator indicates the existence of an Addenda Record.
 	// A value of "1" indicates that one ore more addenda records follow,
 	// and "0" means no such record is present.
 	AddendaRecordIndicator int `json:"addendaRecordIndicator,omitempty"`
-
 	// TraceNumber assigned by the ODFI in ascending sequence, is included in each
 	// Entry Detail Record, Corporate Entry Detail Record, and addenda Record.
 	// Trace Numbers uniquely identify each entry within a batch in an ACH input file.
@@ -74,7 +61,6 @@ type IATEntryDetail struct {
 	// in the associated Entry Detail Record, since the Trace Number is associated
 	// with an entry or item rather than a physical record.
 	TraceNumber int `json:"traceNumber,omitempty"`
-
 	// Addendum a list of Addenda for the Entry Detail
 	Addendum []Addendumer `json:"addendum,omitempty"`
 	// Category defines if the entry is a Forward, Return, or NOC
