@@ -307,6 +307,8 @@ func (batch *iatBatch) isTraceNumberODFI() error {
 	return nil
 }
 
+// ToDo:  Adjustments for IAT Addenda
+
 // isAddendaSequence check multiple errors on addenda records in the batch entries
 func (batch *iatBatch) isAddendaSequence() error {
 	for _, entry := range batch.Entries {
