@@ -367,6 +367,8 @@ func (r *Reader) parseBH() error {
 
 // parseEd parses determines whether to parse an IATEntryDetail or EntryDetail
 func (r *Reader) parseED() error {
+	// ToDo: Review if this can be true for domestic files.
+	// IATIndicator field
 	if r.line[16:29] == "             " {
 		if err := r.parseIATEntryDetail(); err != nil {
 			return err
