@@ -136,11 +136,11 @@ func (r *Reader) parseLine() error {
 			return err
 		}
 	case batchHeaderPos:
-		if err := r.parseBatchHeader(); err != nil {
+		if err := r.parseBH(); err != nil {
 			return err
 		}
 	case entryDetailPos:
-		if err := r.parseEntryDetail(); err != nil {
+		if err := r.parseED(); err != nil {
 			return err
 		}
 	case entryAddendaPos:
@@ -348,5 +348,33 @@ func (r *Reader) parseIATEntryDetail() error {
 		return r.error(err)
 	}
 	r.IATCurrentBatch.AddEntry(ed)
+	return nil
+}
+
+// parseBH parses determines whether to parse an IATBatchHeader or BatchHeader
+func (r *Reader) parseBH() error {
+	if r.line[50:53] == "IAT" {
+		if err := r.parseIATBatchHeader(); err != nil {
+			return err
+		}
+	} else {
+		if err := r.parseBatchHeader(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// parseEd parses determines whether to parse an IATEntryDetail or EntryDetail
+func (r *Reader) parseED() error {
+	if r.line[16:29] == "             " {
+		if err := r.parseIATEntryDetail(); err != nil {
+			return err
+		}
+	} else {
+		if err := r.parseEntryDetail(); err != nil {
+			return err
+		}
+	}
 	return nil
 }
