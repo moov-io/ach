@@ -34,7 +34,7 @@ var (
 	// IAT
 	msgForeignExchangeIndicator          = "is an invalid Foreign Exchange Indicator"
 	msgForeignExchangeReferenceIndicator = "is an invalid Foreign Exchange Reference Indicator"
-	msgAddenda10TransactionTypeCode      = "is an invalid Addenda10 Transaction Type Code"
+	msgTransactionTypeCode               = "is an invalid Addenda10 Transaction Type Code"
 )
 
 // validator is common validation and formatting of golang types to ach type strings
@@ -377,7 +377,7 @@ func (v *validator) isTransactionTypeCode(s string) error {
 		"ARC", "BOC", "POP", "RCK":
 		return nil
 	}
-	return errors.New(msgAddenda10TransactionTypeCode)
+	return errors.New(msgTransactionTypeCode)
 }
 
 // isUpperAlphanumeric checks if string only contains ASCII alphanumeric upper case characters
