@@ -107,7 +107,7 @@ func (addenda10 *Addenda10) Validate() error {
 	if err := addenda10.isTransactionTypeCode(addenda10.TransactionTypeCode); err != nil {
 		return &FieldError{FieldName: "TransactionTypeCode", Value: addenda10.TransactionTypeCode, Msg: err.Error()}
 	}
-	// ToDo: Foreign Exchange Amount
+	// ToDo: Foreign Exchange Amount blank ?
 	if err := addenda10.isAlphanumeric(addenda10.ForeignTraceNumber); err != nil {
 		return &FieldError{FieldName: "ForeignTraceNumber", Value: addenda10.ForeignTraceNumber, Msg: err.Error()}
 	}
@@ -135,7 +135,7 @@ func (addenda10 *Addenda10) fieldInclusion() error {
 			Value: strconv.Itoa(addenda10.ForeignPaymentAmount), Msg: msgFieldRequired}
 	}
 	if addenda10.Name == "" {
-		return &FieldError{FieldName: "Name", Value: addenda10.Name, Msg: msgFieldRequired}
+		return &FieldError{FieldName: "Name", Value: addenda10.Name, Msg: msgFieldInclusion}
 	}
 	if addenda10.EntryDetailSequenceNumber == 0 {
 		return &FieldError{FieldName: "EntryDetailSequenceNumber",
@@ -145,8 +145,7 @@ func (addenda10 *Addenda10) fieldInclusion() error {
 }
 
 // ForeignPaymentAmountField returns ForeignPaymentAmount zero padded
-// Payment Amount	For inbound IAT payments this field should contain the USD amount or may be blank.
-// ToDo: Review/Add logic for blank
+// ToDo: Review/Add logic for blank ?
 func (addenda10 *Addenda10) ForeignPaymentAmountField() string {
 	return addenda10.numericField(addenda10.ForeignPaymentAmount, 18)
 }
@@ -156,7 +155,7 @@ func (addenda10 *Addenda10) ForeignTraceNumberField() string {
 	return addenda10.alphaField(addenda10.ForeignTraceNumber, 22)
 }
 
-// NameField gets th name field - Receiving Company Name/Individual Name left padded
+// NameField gets the name field - Receiving Company Name/Individual Name left padded
 func (addenda10 *Addenda10) NameField() string {
 	return addenda10.alphaField(addenda10.Name, 35)
 }

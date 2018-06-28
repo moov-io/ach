@@ -303,7 +303,7 @@ func testAddenda10FieldInclusionName(t testing.TB) {
 	addenda10.Name = ""
 	if err := addenda10.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldRequired {
+			if e.Msg != msgFieldInclusion {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
