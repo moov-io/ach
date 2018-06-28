@@ -34,6 +34,7 @@ var (
 	// IAT
 	msgForeignExchangeIndicator          = "is an invalid Foreign Exchange Indicator"
 	msgForeignExchangeReferenceIndicator = "is an invalid Foreign Exchange Reference Indicator"
+	msgAddenda10TransactionTypeCode      = "is an invalid Addenda10 Transaction Type Code"
 )
 
 // validator is common validation and formatting of golang types to ach type strings
@@ -239,20 +240,20 @@ func (v *validator) isTypeCode(code string) error {
 //
 // The Tran Code is a two-digit code in positions 2 - 3 of the Entry Detail Record (6 Record) within an ACH File.
 // The first digit of the Tran Code indicates the account type to which the entry will post, where the number:
-//	"2"designates a Checking Account.
-//	"3"designates a Savings Account.
-// 	"4"designates a General Ledger Account.
-// 	"5"designates Loan Account.
+//	"2" designates a Checking Account.
+//	"3" designates a Savings Account.
+// 	"4" designates a General Ledger Account.
+// 	"5" designates Loan Account.
 //The second digit of the Tran Code identifies the entry as:
 //	an original forward entry, where the number:
-//		"2"designates a credit. or
-//		"7"designates a debit.
+//		"2" designates a credit. or
+//		"7" designates a debit.
 //	a return or NOC, where the number:
-//		"1"designates the return/NOC of a credit, or
-//		"6"designates a return/NOC of a debit.
+//		"1" designates the return/NOC of a credit, or
+//		"6" designates a return/NOC of a debit.
 //	a pre-note or non-monetary informational transaction, where the number:
-//		"3"designates a credit, or
-//		"8"designates a debit.
+//		"3" designates a credit, or
+//		"8" designates a debit.
 func (v *validator) isTransactionCode(code int) error {
 	switch code {
 	// TransactionCode if the receivers account is:
@@ -362,6 +363,21 @@ func (v *validator) isTransactionCode(code int) error {
 		return nil
 	}
 	return errors.New(msgTransactionCode)
+}
+
+// isTransactionTypeCode verifies Addenda10 TransactionTypeCode is a valid value
+// ANN = Annuity, BUS = Business/Commercial, DEP = Deposit, LOA = Loan, MIS = Miscellaneous, MOR = Mortgage
+// PEN = Pension, RLS = Rent/Lease, REM = Remittance2, SAL = Salary/Payroll, TAX = Tax, TEL = Telephone-Initiated Transaction
+// WEB = Internet-Initiated Transaction, ARC = Accounts Receivable Entry, BOC = Back Office Conversion Entry,
+// POP = Point of Purchase Entry, RCK = Re-presented Check Entry
+func (v *validator) isTransactionTypeCode(s string) error {
+	switch s {
+	case "ANN", "BUS", "DEP", "LOA", "MIS", "MOR",
+		"PEN", "RLS", "REM", "SAL", "TAX", "TEL", "WEB",
+		"ARC", "BOC", "POP", "RCK":
+		return nil
+	}
+	return errors.New(msgAddenda10TransactionTypeCode)
 }
 
 // isUpperAlphanumeric checks if string only contains ASCII alphanumeric upper case characters
