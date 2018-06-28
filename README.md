@@ -31,10 +31,12 @@ ACH is under active development but already in production for multiple companies
 	* Return Entries
 	* Addenda Type Code 02
 	* Addenda Type Code 05
-	* Addenda Type Code 98
-	* Addenda Type Code 99
-
-
+	* Addenda Type Code 10 (IAT)
+	* Addenda Type Code 11 (IAT)
+	* Addenda Type Code 12 (IAT)
+	* Addenda Type Code 98 (NOC)
+	* Addenda Type Code 99 (Return)
+	
 ## Project Roadmap
 * Additional SEC codes will be added based on library users needs. Please open an issue with a valid test file.
 * Review the project issues for more detailed information

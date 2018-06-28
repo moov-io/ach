@@ -11,7 +11,11 @@ import (
 
 // Addenda10 is a Addendumer addenda which provides business transaction information for Addenda Type
 // Code 10 in a machine readable format. It is usually formatted according to ANSI, ASC, X12 Standard.
-// It is mandatory for IAT entries
+//
+// Addenda10 is mandatory for IAT entries
+//
+// The First Addenda Record identifies the Receiver of the transaction and the dollar amount of
+// the payment.
 type Addenda10 struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
