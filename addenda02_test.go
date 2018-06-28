@@ -323,7 +323,7 @@ func BenchmarkAddenda02TerminalState(b *testing.B) {
 	}
 }
 
-// TestAddenda02 String validates that a known parsed file can be return to a string of the same value
+// TestAddenda02String validates that a known parsed Addenda02 record can be return to a string of the same value
 func testAddenda02String(t testing.TB) {
 	addenda02 := NewAddenda02()
 	var line = "702REFONEAREFTERM021000490612123456Target Store 0049          PHILADELPHIA   PA121042880000123"
@@ -336,12 +336,12 @@ func testAddenda02String(t testing.TB) {
 	}
 }
 
-// TestAddenda02String tests validating that a known parsed file can be return to a string of the same value
+// TestAddenda02String tests validating that a known parsed Addenda02 record can be return to a string of the same value
 func TestAddenda02String(t *testing.T) {
 	testAddenda02String(t)
 }
 
-// BenchmarkAddenda02String benchmarks validating that a known parsed file can be return to a string of the same value
+// BenchmarkAddenda02String benchmarks validating that a known parsed Addenda02 record can be return to a string of the same value
 func BenchmarkAddenda02String(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {

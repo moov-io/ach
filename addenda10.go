@@ -66,7 +66,7 @@ func (addenda10 *Addenda10) Parse(record string) {
 	//  25-46 Insert blanks or zeros
 	addenda10.ForeignTraceNumber = addenda10.parseStringField(record[24:46])
 	// 47-81 Receiving Company Name/Individual Name
-	addenda10.Name = record[47:81]
+	addenda10.Name = record[46:81]
 	// 82-87 reserved - Leave blank
 	addenda10.reserved = "      "
 	// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
@@ -149,12 +149,12 @@ func (addenda10 *Addenda10) ForeignPaymentAmountField() string {
 
 // ForeignTraceNumberField gets the Foreign TraceNumber left padded
 func (addenda10 *Addenda10) ForeignTraceNumberField() string {
-	return addenda10.alphaField(addenda10.ForeignTraceNumber, 35)
+	return addenda10.alphaField(addenda10.ForeignTraceNumber, 22)
 }
 
 // NameField gets th name field - Receiving Company Name/Individual Name left padded
 func (addenda10 *Addenda10) NameField() string {
-	return addenda10.alphaField(addenda10.Name, 22)
+	return addenda10.alphaField(addenda10.Name, 35)
 }
 
 // reservedField gets reserved - blank space

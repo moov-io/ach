@@ -4,7 +4,9 @@
 
 package ach
 
-import "testing"
+import (
+	"testing"
+)
 
 func mockAddenda10() *Addenda10 {
 	addenda10 := NewAddenda10()
@@ -157,5 +159,32 @@ func BenchmarkAddenda10FieldInclusionTypeCode(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testAddenda10FieldInclusionTypeCode(b)
+	}
+}
+
+// TestAddenda10String validates that a known parsed Addenda10 record can be return to a string of the same value
+func testAddenda10String(t testing.TB) {
+	addenda10 := NewAddenda10()
+	var line = "710ANN000000000000100000928383-23938           BEK Enterprises                         0000001"
+	addenda10.Parse(line)
+
+	if addenda10.String() != line {
+		t.Errorf("Strings do not match")
+	}
+	if addenda10.TypeCode() != "10" {
+		t.Errorf("TypeCode Expected 10 got: %v", addenda10.TypeCode())
+	}
+}
+
+// TestAddenda10String tests validating that a known parsed Addenda10 record can be return to a string of the same value
+func TestAddenda10String(t *testing.T) {
+	testAddenda10String(t)
+}
+
+// BenchmarkAddenda10String benchmarks validating that a known parsed Addenda10 record can be return to a string of the same value
+func BenchmarkAddenda10String(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda10String(b)
 	}
 }
