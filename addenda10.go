@@ -100,6 +100,10 @@ func (addenda10 *Addenda10) Validate() error {
 	if err := addenda10.isTypeCode(addenda10.typeCode); err != nil {
 		return &FieldError{FieldName: "TypeCode", Value: addenda10.typeCode, Msg: err.Error()}
 	}
+	// Type Code must be 10
+	if addenda10.typeCode != "10" {
+		return &FieldError{FieldName: "TypeCode", Value: addenda10.typeCode, Msg: msgAddendaTypeCode}
+	}
 	if err := addenda10.isTransactionTypeCode(addenda10.TransactionTypeCode); err != nil {
 		return &FieldError{FieldName: "TransactionTypeCode", Value: addenda10.TransactionTypeCode, Msg: err.Error()}
 	}

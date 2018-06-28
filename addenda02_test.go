@@ -8,6 +8,7 @@ import (
 	"testing"
 )
 
+// mockAddenda02 creates a mock Addenda02 record
 func mockAddenda02() *Addenda02 {
 	addenda02 := NewAddenda02()
 	addenda02.ReferenceInformationOne = "REFONEA"

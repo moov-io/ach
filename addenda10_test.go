@@ -8,6 +8,7 @@ import (
 	"testing"
 )
 
+// mockAddenda10() creates a mock Addenda10 record
 func mockAddenda10() *Addenda10 {
 	addenda10 := NewAddenda10()
 	addenda10.TransactionTypeCode = "ANN"
@@ -110,6 +111,86 @@ func BenchmarkAddenda10TypeCode10(b *testing.B) {
 	}
 }
 
+// testAddenda10TransactionTypeCode validates TransactionTypeCode
+func testAddenda10TransactionTypeCode(t testing.TB) {
+	addenda10 := mockAddenda10()
+	addenda10.TransactionTypeCode = "ABC"
+	if err := addenda10.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "TransactionTypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestAddenda10TransactionTypeCode tests validating TransactionTypeCode
+func TestAddenda10TransactionTypeCode(t *testing.T) {
+	testAddenda10TransactionTypeCode(t)
+}
+
+// BenchmarkAddenda10TransactionTypeCode benchmarks validating TransactionTypeCode
+func BenchmarkAddenda10TransactionTypeCode(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda10TransactionTypeCode(b)
+	}
+}
+
+// testForeignTraceNumberAlphaNumeric validates ForeignTraceNumber is alphanumeric
+func testForeignTraceNumberAlphaNumeric(t testing.TB) {
+	addenda10 := mockAddenda10()
+	addenda10.ForeignTraceNumber = "®"
+	if err := addenda10.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "ForeignTraceNumber" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+// TestForeignTraceNumberAlphaNumeric tests validating ForeignTraceNumber is alphanumeric
+func TestForeignTraceNumberAlphaNumeric(t *testing.T) {
+	testForeignTraceNumberAlphaNumeric(t)
+}
+
+// BenchmarkForeignTraceNumberAlphaNumeric benchmarks validating ForeignTraceNumber is alphanumeric
+func BenchmarkForeignTraceNumberAlphaNumeric(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testForeignTraceNumberAlphaNumeric(b)
+	}
+}
+
+// testNameAlphaNumeric validates Name is alphanumeric
+func testNameAlphaNumeric(t testing.TB) {
+	addenda10 := mockAddenda10()
+	addenda10.Name = "Jas®n"
+	if err := addenda10.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "Name" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+// TestNameAlphaNumeric tests validating Name is alphanumeric
+func TestNameAlphaNumeric(t *testing.T) {
+	testNameAlphaNumeric(t)
+}
+
+// BenchmarkNameAlphaNumeric benchmarks validating Name is alphanumeric
+func BenchmarkNameAlphaNumeric(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testNameAlphaNumeric(b)
+	}
+}
+
 // testAddenda10FieldInclusionRecordType validates recordType fieldInclusion
 func testAddenda10FieldInclusionRecordType(t testing.TB) {
 	addenda10 := mockAddenda10()
@@ -159,6 +240,114 @@ func BenchmarkAddenda10FieldInclusionTypeCode(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testAddenda10FieldInclusionTypeCode(b)
+	}
+}
+
+// testAddenda10FieldInclusionTransactionTypeCode validates TransactionTypeCode fieldInclusion
+func testAddenda10FieldInclusionTransactionTypeCode(t testing.TB) {
+	addenda10 := mockAddenda10()
+	addenda10.TransactionTypeCode = ""
+	if err := addenda10.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldRequired {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+// TestAddenda10FieldInclusionTransactionTypeCode tests validating
+// TransactionTypeCode fieldInclusion
+func TestAddenda10FieldInclusionTransactionTypeCode(t *testing.T) {
+	testAddenda10FieldInclusionTransactionTypeCode(t)
+}
+
+// BenchmarkAddenda10FieldInclusionTransactionTypeCode benchmarks validating
+// TransactionTypeCode fieldInclusion
+func BenchmarkAddenda10FieldInclusionTransactionTypeCode(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda10FieldInclusionTransactionTypeCode(b)
+	}
+}
+
+// testAddenda10FieldInclusionForeignPaymentAmount validates ForeignPaymentAmount fieldInclusion
+func testAddenda10FieldInclusionForeignPaymentAmount(t testing.TB) {
+	addenda10 := mockAddenda10()
+	addenda10.ForeignPaymentAmount = 0
+	if err := addenda10.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldRequired {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+// TestAddenda10FieldInclusionForeignPaymentAmount tests validating ForeignPaymentAmount fieldInclusion
+func TestAddenda10FieldInclusionForeignPaymentAmount(t *testing.T) {
+	testAddenda10FieldInclusionForeignPaymentAmount(t)
+}
+
+// BenchmarkAddenda10FieldInclusionForeignPaymentAmount benchmarks validating ForeignPaymentAmount fieldInclusion
+func BenchmarkAddenda10FieldInclusionForeignPaymentAmount(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda10FieldInclusionForeignPaymentAmount(b)
+	}
+}
+
+// testAddenda10FieldInclusionName validates Name fieldInclusion
+func testAddenda10FieldInclusionName(t testing.TB) {
+	addenda10 := mockAddenda10()
+	addenda10.Name = ""
+	if err := addenda10.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldRequired {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+// TestAddenda10FieldInclusionName tests validating Name fieldInclusion
+func TestAddenda10FieldInclusionName(t *testing.T) {
+	testAddenda10FieldInclusionName(t)
+}
+
+// BenchmarkAddenda10FieldInclusionName benchmarks validating Name fieldInclusion
+func BenchmarkAddenda10FieldInclusionName(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda10FieldInclusionName(b)
+	}
+}
+
+// testAddenda10FieldInclusionEntryDetailSequenceNumber validates EntryDetailSequenceNumber fieldInclusion
+func testAddenda10FieldInclusionEntryDetailSequenceNumber(t testing.TB) {
+	addenda10 := mockAddenda10()
+	addenda10.EntryDetailSequenceNumber = 0
+	if err := addenda10.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.Msg != msgFieldInclusion {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+// TestAddenda10FieldInclusionEntryDetailSequenceNumber tests validating
+// EntryDetailSequenceNumber fieldInclusion
+func TestAddenda10FieldInclusionEntryDetailSequenceNumber(t *testing.T) {
+	testAddenda10FieldInclusionEntryDetailSequenceNumber(t)
+}
+
+// BenchmarkAddenda10FieldInclusionEntryDetailSequenceNumber benchmarks validating
+// EntryDetailSequenceNumber fieldInclusion
+func BenchmarkAddenda10FieldInclusionEntryDetailSequenceNumber(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda10FieldInclusionEntryDetailSequenceNumber(b)
 	}
 }
 
