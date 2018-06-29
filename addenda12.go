@@ -60,7 +60,7 @@ func (addenda12 *Addenda12) Parse(record string) {
 	addenda12.typeCode = record[1:3]
 	// 4-38
 	addenda12.OriginatorCityStateProvince = record[3:38]
-	// 38-73
+	// 39-73
 	addenda12.OriginatorCountryPostalCode = record[38:73]
 	// 74-87 reserved - Leave blank
 	addenda12.reserved = "              "
