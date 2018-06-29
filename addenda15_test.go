@@ -267,6 +267,8 @@ func BenchmarkAddenda15FieldInclusionEntryDetailSequenceNumber(b *testing.B) {
 	}
 }
 
+// ToDo  Add Parse test for individual fields
+
 // TestAddenda15String validates that a known parsed Addenda15 record can be return to a string of the same value
 func testAddenda15String(t testing.TB) {
 	addenda15 := NewAddenda15()
