@@ -155,4 +155,3 @@ func (addenda16 *Addenda16) TypeCode() string {
 func (addenda16 *Addenda16) EntryDetailSequenceNumberField() string {
 	return addenda16.numericField(addenda16.EntryDetailSequenceNumber, 7)
 }
-
