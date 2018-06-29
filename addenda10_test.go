@@ -217,7 +217,7 @@ func BenchmarkAddenda10FieldInclusionRecordType(b *testing.B) {
 	}
 }
 
-// testAddenda10FieldInclusionRecordType validates TypeCode fieldInclusion
+// testAddenda10FieldInclusionTypeCode validates TypeCode fieldInclusion
 func testAddenda10FieldInclusionTypeCode(t testing.TB) {
 	addenda10 := mockAddenda10()
 	addenda10.typeCode = ""
@@ -230,12 +230,12 @@ func testAddenda10FieldInclusionTypeCode(t testing.TB) {
 	}
 }
 
-// TestAddenda10FieldInclusionRecordType tests validating TypeCode fieldInclusion
+// TestAddenda10FieldInclusionTypeCode tests validating TypeCode fieldInclusion
 func TestAddenda10FieldInclusionTypeCode(t *testing.T) {
 	testAddenda10FieldInclusionTypeCode(t)
 }
 
-// BenchmarkAddenda10FieldInclusionRecordType benchmarks validating TypeCode fieldInclusion
+// BenchmarkAddenda10FieldInclusionTypeCode benchmarks validating TypeCode fieldInclusion
 func BenchmarkAddenda10FieldInclusionTypeCode(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
