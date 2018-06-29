@@ -122,7 +122,7 @@ func testOriginatorCityStateProvinceAlphaNumeric(t testing.TB) {
 	}
 }
 
-// TestNameOriginatorAlphaNumeric tests validating OriginatorCityStateProvince is alphanumeric
+// TestOriginatorCityStateProvinceAlphaNumeric tests validating OriginatorCityStateProvince is alphanumeric
 func TestOriginatorCityStateProvinceAlphaNumeric(t *testing.T) {
 	testOriginatorCityStateProvinceAlphaNumeric(t)
 }
@@ -148,7 +148,7 @@ func testOriginatorCountryPostalCodeAlphaNumeric(t testing.TB) {
 	}
 }
 
-// TestNameOriginatorAlphaNumeric tests validating OriginatorCountryPostalCode is alphanumeric
+// TestOriginatorCountryPostalCodeAlphaNumeric tests validating OriginatorCountryPostalCode is alphanumeric
 func TestOriginatorCountryPostalCodeAlphaNumeric(t *testing.T) {
 	testOriginatorCountryPostalCodeAlphaNumeric(t)
 }

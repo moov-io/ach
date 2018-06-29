@@ -122,7 +122,7 @@ func testOriginatorNameAlphaNumeric(t testing.TB) {
 	}
 }
 
-// TestNameOriginatorAlphaNumeric tests validating OriginatorName is alphanumeric
+// TestOriginatorNameAlphaNumeric tests validating OriginatorName is alphanumeric
 func TestOriginatorNameAlphaNumeric(t *testing.T) {
 	testOriginatorNameAlphaNumeric(t)
 }
@@ -148,7 +148,7 @@ func testOriginatorStreetAddressAlphaNumeric(t testing.TB) {
 	}
 }
 
-// TestNameOriginatorAlphaNumeric tests validating OriginatorStreetAddress is alphanumeric
+// TestOriginatorStreetAddressAlphaNumeric tests validating OriginatorStreetAddress is alphanumeric
 func TestOriginatorStreetAddressAlphaNumeric(t *testing.T) {
 	testOriginatorStreetAddressAlphaNumeric(t)
 }
