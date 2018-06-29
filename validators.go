@@ -35,6 +35,7 @@ var (
 	msgForeignExchangeIndicator          = "is an invalid Foreign Exchange Indicator"
 	msgForeignExchangeReferenceIndicator = "is an invalid Foreign Exchange Reference Indicator"
 	msgTransactionTypeCode               = "is an invalid Addenda10 Transaction Type Code"
+	msgIDNumberQualifier                 = "is an invalid Identification Number Qualifier"
 )
 
 // validator is common validation and formatting of golang types to ach type strings
@@ -168,6 +169,22 @@ func (v *validator) isForeignExchangeReferenceIndicator(code int) error {
 		return nil
 	}
 	return errors.New(msgForeignExchangeReferenceIndicator)
+}
+
+// isIDNumberQualifier ensures ODFI Identification Number Qualifier is valid
+// For Inbound IATs: The 2-digit code that identifies the numbering scheme used in the
+// Foreign DFI Identification Number field:
+// 01 = National Clearing System
+// 02 = BIC Code
+// 03 = IBAN Code
+// used for both ODFIIDNumberQualifier and RDFIIDNumberQualifier
+func (v *validator) isIDNumberQualifier(s string) error {
+	switch s {
+	case
+		"01", "02", "03":
+		return nil
+	}
+	return errors.New(msgIDNumberQualifier)
 }
 
 // isOriginatorStatusCode ensures status code of a batch is valid
