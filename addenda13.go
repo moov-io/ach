@@ -79,7 +79,7 @@ func (addenda13 *Addenda13) Parse(record string) {
 	// 39-40 ODFIIDNumberQualifier
 	addenda13.ODFIIDNumberQualifier = record[38:40]
 	// 41-74 ODFIIdentification
-	addenda13.ODFIIdentification = record[40:74]
+	addenda13.ODFIIdentification = addenda13.parseStringField(record[40:74])
 	// 75-77
 	addenda13.ODFIBranchCountryCode = record[74:77]
 	// 78-87 reserved - Leave blank

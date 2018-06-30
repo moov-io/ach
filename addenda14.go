@@ -75,7 +75,7 @@ func (addenda14 *Addenda14) Parse(record string) {
 	// 39-40 RDFIIDNumberQualifier
 	addenda14.RDFIIDNumberQualifier = record[38:40]
 	// 41-74 RDFIIdentification
-	addenda14.RDFIIdentification = record[40:74]
+	addenda14.RDFIIdentification = addenda14.parseStringField(record[40:74])
 	// 75-77
 	addenda14.RDFIBranchCountryCode = record[74:77]
 	// 78-87 reserved - Leave blank

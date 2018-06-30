@@ -48,6 +48,8 @@ type FieldError struct {
 	Msg       string // context of the error.
 }
 
+// ToDo:  Add state and country look-up or use a 3rd party look up -verify with Wade
+
 // Error message is constructed
 // FieldName Msg Value
 // Example1: BatchCount $% has none alphanumeric characters

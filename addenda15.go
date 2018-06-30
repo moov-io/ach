@@ -55,7 +55,7 @@ func (addenda15 *Addenda15) Parse(record string) {
 	// 2-3 Always 15
 	addenda15.typeCode = record[1:3]
 	// 4-18
-	addenda15.ReceiverIDNumber = record[3:18]
+	addenda15.ReceiverIDNumber = addenda15.parseStringField(record[3:18])
 	// 19-53
 	addenda15.ReceiverStreetAddress = record[18:53]
 	// 54-87 reserved - Leave blank
