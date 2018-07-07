@@ -8,18 +8,20 @@ import (
 )
 
 type Endpoints struct {
-	CreateFileEndpoint endpoint.Endpoint
-	GetFileEndpoint    endpoint.Endpoint
-	GetFilesEndpoint   endpoint.Endpoint
-	DeleteFileEndpoint endpoint.Endpoint
+	CreateFileEndpoint  endpoint.Endpoint
+	GetFileEndpoint     endpoint.Endpoint
+	GetFilesEndpoint    endpoint.Endpoint
+	DeleteFileEndpoint  endpoint.Endpoint
+	CreateBatchEndpoint endpoint.Endpoint
 }
 
 func MakeServerEndpoints(s Service) Endpoints {
 	return Endpoints{
-		CreateFileEndpoint: MakeCreateFileEndpoint(s),
-		GetFileEndpoint:    MakeGetFileEndpoint(s),
-		GetFilesEndpoint:   MakeGetFilesEndpoint(s),
-		DeleteFileEndpoint: MakeDeleteFileEndpoint(s),
+		CreateFileEndpoint:  MakeCreateFileEndpoint(s),
+		GetFileEndpoint:     MakeGetFileEndpoint(s),
+		GetFilesEndpoint:    MakeGetFilesEndpoint(s),
+		DeleteFileEndpoint:  MakeDeleteFileEndpoint(s),
+		CreateBatchEndpoint: MakeCreateBatchEndpoint(s),
 	}
 }
 
@@ -27,13 +29,13 @@ func MakeServerEndpoints(s Service) Endpoints {
 func MakeCreateFileEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(createFileRequest)
-		id, e := s.CreateFile(req.File)
+		id, e := s.CreateFile(req.FileHeader)
 		return createFileResponse{ID: id, Err: e}, nil
 	}
 }
 
 type createFileRequest struct {
-	File ach.File
+	FileHeader ach.FileHeader
 }
 
 type createFileResponse struct {
@@ -95,3 +97,24 @@ type deleteFileResponse struct {
 }
 
 func (r deleteFileResponse) error() error { return r.Err }
+
+//** Batches ** //
+
+// MakeCreateFileEndpoint returns an endpoint via the passed service.
+func MakeCreateBatchEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		req := request.(createBatchRequest)
+		id, e := s.CreateBatch(req.FileID, req.BatchHeader)
+		return createBatchResponse{ID: id, Err: e}, nil
+	}
+}
+
+type createBatchRequest struct {
+	FileID      string
+	BatchHeader ach.BatchHeader
+}
+
+type createBatchResponse struct {
+	ID  string `json:"id,omitempty"`
+	Err error  `json:"err,omitempty"`
+}

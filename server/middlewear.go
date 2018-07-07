@@ -24,7 +24,7 @@ type loggingMiddleware struct {
 	logger log.Logger
 }
 
-func (mw loggingMiddleware) CreateFile(f ach.File) (id string, err error) {
+func (mw loggingMiddleware) CreateFile(f ach.FileHeader) (id string, err error) {
 	defer func(begin time.Time) {
 		mw.logger.Log("method", "CreateFile", "id", f.ID, "took", time.Since(begin), "err", err)
 	}(time.Now())
@@ -50,4 +50,13 @@ func (mw loggingMiddleware) DeleteFile(id string) (err error) {
 		mw.logger.Log("method", "DeleteFile", "id", id, "took", time.Since(begin))
 	}(time.Now())
 	return mw.next.DeleteFile(id)
+}
+
+//** BATCHES ** //
+
+func (mw loggingMiddleware) CreateBatch(fileID string, bh ach.BatchHeader) (id string, err error) {
+	defer func(begin time.Time) {
+		mw.logger.Log("method", "CreateBatch", "FileID", fileID, "id", bh.ID, "took", time.Since(begin), "err", err)
+	}(time.Now())
+	return mw.next.CreateBatch(fileID, bh)
 }

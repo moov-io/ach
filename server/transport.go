@@ -35,6 +35,8 @@ func MakeHTTPHandler(s Service, logger log.Logger) http.Handler {
 	// GET    /files/                          retrieves a list of all file's
 	// GET    /files/:id                       retrieves the given file by id
 	// DELETE /files/:id					   delete a file based on supplied id
+
+	// POST /files/:id/batches/				   Create a Batch
 	// ***
 	// GET    /files/:id/validate			   validates the supplied file id for nacha compliance
 	// PATCH  /files/:id/build				   build batch and file controls in ach file with supplied values
@@ -64,14 +66,21 @@ func MakeHTTPHandler(s Service, logger log.Logger) http.Handler {
 		encodeResponse,
 		options...,
 	))
+	r.Methods("POST").Path("/files/{fileID}/batches/").Handler(httptransport.NewServer(
+		e.CreateBatchEndpoint,
+		decodeCreateBatchRequest,
+		encodeResponse,
+		options...,
+	))
 	return r
 }
 
+//** FILES ** //
 func decodeCreateFileRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
 	var req createFileRequest
 	// Sets default values
-	req.File = *ach.NewFile()
-	if e := json.NewDecoder(r.Body).Decode(&req.File); e != nil {
+	req.FileHeader = ach.NewFileHeader()
+	if e := json.NewDecoder(r.Body).Decode(&req.FileHeader); e != nil {
 		return nil, e
 	}
 	return req, nil
@@ -108,6 +117,23 @@ func encodeGetFileRequest(ctx context.Context, req *http.Request, request interf
 	fileID := url.QueryEscape(r.ID)
 	req.Method, req.URL.Path = "GET", "/files/"+fileID
 	return encodeRequest(ctx, req, request)
+}
+
+//** BATCHES **//
+
+func decodeCreateBatchRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
+	var req createBatchRequest
+	vars := mux.Vars(r)
+	id, ok := vars["fileID"]
+	if !ok {
+		return nil, ErrBadRouting
+	}
+	req.FileID = id
+	req.BatchHeader = *ach.NewBatchHeader()
+	if e := json.NewDecoder(r.Body).Decode(&req.BatchHeader); e != nil {
+		return nil, e
+	}
+	return req, nil
 }
 
 // errorer is implemented by all concrete response types that may contain

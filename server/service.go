@@ -17,35 +17,48 @@ var (
 // TODO: Add ctx to function parameters to pass the client security token
 type Service interface {
 	// CreateFile creates a new ach file record and returns a resource ID
-	CreateFile(f ach.File) (string, error)
+	CreateFile(f ach.FileHeader) (string, error)
 	// AddFile retrieves a file based on the File id
 	GetFile(id string) (ach.File, error)
 	// GetFiles retrieves all files accessible from the client.
 	GetFiles() []ach.File
-	// DeleteFile takes a file resource ID and deletes it from the repository
+	// DeleteFile takes a file resource ID and deletes it from the store
 	DeleteFile(id string) error
 	// UpdateFile updates the changes properties of a matching File ID
 	// UpdateFile(f ach.File) (string, error)
+
+	// CreateBatch creates a new batch within and ach file and returns its resource ID
+	CreateBatch(fileID string, bh ach.BatchHeader) (string, error)
 }
 
 // service a concrete implementation of the service.
 type service struct {
-	repository Repository
+	store Repository
 }
 
 // NewService creates a new concrete service
 func NewService(r Repository) Service {
 	return &service{
-		repository: r,
+		store: r,
 	}
 }
 
 // CreateFile add a file to storage
-func (s *service) CreateFile(f ach.File) (string, error) {
-	if f.ID == "" {
-		f.ID = NextID()
+func (s *service) CreateFile(fh ach.FileHeader) (string, error) {
+	// create a new file
+	f := ach.NewFile()
+	f.SetHeader(fh)
+	// set resource id's
+	if fh.ID == "" {
+		id := NextID()
+		f.ID = id
+		f.Header.ID = id
+		f.Control.ID = id
+	} else {
+		f.ID = fh.ID
+		f.Control.ID = fh.ID
 	}
-	if err := s.repository.StoreFile(&f); err != nil {
+	if err := s.store.StoreFile(f); err != nil {
 		return "", err
 	}
 	return f.ID, nil
@@ -53,7 +66,7 @@ func (s *service) CreateFile(f ach.File) (string, error) {
 
 // GetFile returns a files based on the supplied id
 func (s *service) GetFile(id string) (ach.File, error) {
-	f, err := s.repository.FindFile(id)
+	f, err := s.store.FindFile(id)
 	if err != nil {
 		return ach.File{}, ErrNotFound
 	}
@@ -62,14 +75,34 @@ func (s *service) GetFile(id string) (ach.File, error) {
 
 func (s *service) GetFiles() []ach.File {
 	var result []ach.File
-	for _, f := range s.repository.FindAllFiles() {
+	for _, f := range s.store.FindAllFiles() {
 		result = append(result, *f)
 	}
 	return result
 }
 
 func (s *service) DeleteFile(id string) error {
-	return s.repository.DeleteFile(id)
+	return s.store.DeleteFile(id)
+}
+
+func (s *service) CreateBatch(fileID string, bh ach.BatchHeader) (string, error) {
+	batch, err := ach.NewBatch(&bh)
+	if err != nil {
+		return bh.ID, err
+	}
+	if bh.ID == "" {
+		id := NextID()
+		batch.ID = id
+		batch.GetHeader().ID = id
+		batch.GetControl().ID = id
+	} else {
+		batch.ID = bh.ID
+		batch.GetControl().ID = bh.ID
+	}
+	if err := s.store.StoreBatch(fileID, batch); err != nil {
+		return "", err
+	}
+	return bh.ID, nil
 }
 
 // Repository concrete implementations
@@ -81,6 +114,7 @@ type Repository interface {
 	FindFile(id string) (*ach.File, error)
 	FindAllFiles() []*ach.File
 	DeleteFile(id string) error
+	StoreBatch(fileID string, batch ach.Batcher) error
 }
 
 // Utility Functions
