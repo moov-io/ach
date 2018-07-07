@@ -91,10 +91,19 @@ func mockBatchHeaderWeb() ach.BatchHeader {
 }
 func TestCreateBatch(t *testing.T) {
 	s := mockServiceInMemory()
+	//b.Header = mockBatchHeaderWeb()
 	id, err := s.CreateBatch("98765", mockBatchHeaderWeb())
 	if id != "54321" {
 		t.Errorf("expected %s received %s w/ error %s", "54321", id, err)
 	}
+}
+
+type Batch struct {
+	// ID is a client defined string used as a reference to this record.
+	ID      string             `json:"id"`
+	Header  *ach.BatchHeader   `json:"batchHeader,omitempty"`
+	Entries []*ach.EntryDetail `json:"entryDetails,omitempty"`
+	Control *ach.BatchControl  `json:"batchControl,omitempty"`
 }
 
 // test adding a batch to a file that doesn't exist
