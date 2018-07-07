@@ -13,7 +13,7 @@ import (
 // Batch holds the Batch Header and Batch Control and all Entry Records
 type batch struct {
 	// ID is a client defined string used as a reference to this record.
-	id      string         `json:"id"`
+	Id      string         `json:"id"`
 	Header  *BatchHeader   `json:"batchHeader,omitempty"`
 	Entries []*EntryDetail `json:"entryDetails,omitempty"`
 	Control *BatchControl  `json:"batchControl,omitempty"`
@@ -213,12 +213,12 @@ func (batch *batch) Category() string {
 
 // ID returns the id of the batch
 func (batch *batch) ID() string {
-	return batch.id
+	return batch.Id
 }
 
 // SetID sets the batch id
 func (batch *batch) SetID(id string) {
-	batch.id = id
+	batch.Id = id
 }
 
 // isFieldInclusion iterates through all the records in the batch and verifies against default fields
