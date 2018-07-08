@@ -36,7 +36,8 @@ func MakeHTTPHandler(s Service, logger log.Logger) http.Handler {
 	// GET    /files/:id                       retrieves the given file by id
 	// DELETE /files/:id					   delete a file based on supplied id
 
-	// POST /files/:id/batches/				   Create a Batch
+	// POST   /files/:id/batches/			   Create a Batch
+	// GET	  /files/:id/batches/:id		   Retrieve the given batch by id
 	// ***
 	// GET    /files/:id/validate			   validates the supplied file id for nacha compliance
 	// PATCH  /files/:id/build				   build batch and file controls in ach file with supplied values
@@ -69,6 +70,12 @@ func MakeHTTPHandler(s Service, logger log.Logger) http.Handler {
 	r.Methods("POST").Path("/files/{fileID}/batches/").Handler(httptransport.NewServer(
 		e.CreateBatchEndpoint,
 		decodeCreateBatchRequest,
+		encodeResponse,
+		options...,
+	))
+	r.Methods("GET").Path("/files/{fileID}/batches/{batchID}").Handler(httptransport.NewServer(
+		e.GetBatchEndpoint,
+		decodeGetBatchRequest,
 		encodeResponse,
 		options...,
 	))
@@ -133,6 +140,23 @@ func decodeCreateBatchRequest(_ context.Context, r *http.Request) (request inter
 	if e := json.NewDecoder(r.Body).Decode(&req.BatchHeader); e != nil {
 		return nil, e
 	}
+	return req, nil
+}
+
+func decodeGetBatchRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
+	var req getBatchRequest
+	vars := mux.Vars(r)
+	fileID, ok := vars["fileID"]
+	if !ok {
+		return nil, ErrBadRouting
+	}
+	batchID, ok := vars["batchID"]
+	if !ok {
+		return nil, ErrBadRouting
+	}
+
+	req.fileID = fileID
+	req.batchID = batchID
 	return req, nil
 }
 

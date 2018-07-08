@@ -13,6 +13,7 @@ type Endpoints struct {
 	GetFilesEndpoint    endpoint.Endpoint
 	DeleteFileEndpoint  endpoint.Endpoint
 	CreateBatchEndpoint endpoint.Endpoint
+	GetBatchEndpoint    endpoint.Endpoint
 }
 
 func MakeServerEndpoints(s Service) Endpoints {
@@ -22,6 +23,7 @@ func MakeServerEndpoints(s Service) Endpoints {
 		GetFilesEndpoint:    MakeGetFilesEndpoint(s),
 		DeleteFileEndpoint:  MakeDeleteFileEndpoint(s),
 		CreateBatchEndpoint: MakeCreateBatchEndpoint(s),
+		GetBatchEndpoint:    MakeGetBatchEndpoint(s),
 	}
 }
 
@@ -117,4 +119,22 @@ type createBatchRequest struct {
 type createBatchResponse struct {
 	ID  string `json:"id,omitempty"`
 	Err error  `json:"err,omitempty"`
+}
+
+func MakeGetBatchEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		req := request.(getBatchRequest)
+		batch, e := s.GetBatch(req.fileID, req.batchID)
+		return getBatchResponse{Batch: batch, Err: e}, nil
+	}
+}
+
+type getBatchRequest struct {
+	fileID  string
+	batchID string
+}
+
+type getBatchResponse struct {
+	Batch ach.Batcher `json:"batch,omitempty"`
+	Err   error       `json:"err,omitempty"`
 }

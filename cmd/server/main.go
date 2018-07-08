@@ -14,7 +14,6 @@ import (
 
 /**
 CreateFile
-curl -d '{"id":"1234"}' -H "Content-Type: application/json" -X POST http://localhost:8080/files/
 curl -d '{"id":"08B751B2","immediateDestination":"9876543210", "immediateDestinationName":"Federal Reserve Bank", "immediateOrigin":"1234567890","immediateOriginName":"My Bank Name"}' -H "Content-Type: application/json" -X POST http://localhost:8080/files/
 
 GetFile
@@ -25,6 +24,16 @@ curl -H "Content-Type: application/json" -X GET http://localhost:8080/files/
 
 DeleteFile
 curl -H "Content-Type: application/json" -X DELETE http://localhost:8080/files/1234
+
+CreateBatch
+curl -d '{"id":"54321","serviceClassCode":"220","standardEntryClassCode":"WEB","companyName":"Your Company inc","companyIdentification":"121042882","companyEntryDescription":"Online Order","ODFIIdentification","12104288"}' -H "Content-Type: application/json" -X POST http://localhost:8080/files/08B751B2/batches/
+
+GetBatch
+curl -H "Content-Type: application/json" -X GET http://localhost:8080/files/08B751B2/batches/54321
+
+GetBatches
+
+DeleteBatch
 **/
 
 func main() {
