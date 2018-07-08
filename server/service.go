@@ -106,18 +106,6 @@ func (s *service) CreateBatch(fileID string, bh ach.BatchHeader) (string, error)
 	return bh.ID, nil
 }
 
-// Repository concrete implementations
-// ********
-
-// Repository is the Service storage mechanism abstraction
-type Repository interface {
-	StoreFile(file *ach.File) error
-	FindFile(id string) (*ach.File, error)
-	FindAllFiles() []*ach.File
-	DeleteFile(id string) error
-	StoreBatch(fileID string, batch ach.Batcher) error
-}
-
 // Utility Functions
 // *****
 

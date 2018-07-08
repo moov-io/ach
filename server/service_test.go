@@ -74,27 +74,71 @@ func TestDeleteFile(t *testing.T) {
 	}
 }
 
-/**
+// Service.CreateBatch tests
+
+// TestCreateBatch tests creating a new batch when file.ID exists and batch.id does not exist
 func TestCreateBatch(t *testing.T) {
 	s := mockServiceInMemory()
-	//b.Header = mockBatchHeaderWeb()
-	id, err := s.CreateBatch("98765", *mockBatchHeaderWeb())
-	if id != "54321" {
-		t.Errorf("expected %s received %s w/ error %s", "54321", id, err)
+	bh := mockBatchHeaderWeb()
+	bh.ID = "11111"
+	id, err := s.CreateBatch("98765", *bh)
+	if id != "11111" {
+		t.Errorf("expected %s received %s w/ error %s", "11111", id, err)
 	}
 }
 
+// TestCreateBatchIDExists Create a new batch with batch.id already present. Should fail.
 func TestCreateBatchIDExists(t *testing.T) {
 	s := mockServiceInMemory()
 	id, err := s.CreateBatch("98765", *mockBatchHeaderWeb())
-	if id != "54321" {
-		t.Errorf("expected %s received %s w/ error %s", "54321", id, err)
+	if err != ErrAlreadyExists {
+		t.Errorf("expected %s received %s w/ error %s", "ErrAlreadyExists", id, err)
 	}
 }
-**/
 
-// test adding a batch to a file that doesn't exist
-// test adding a batch without an ID. Make sure Batch Header, Batch Control, and Batch have the same ID
-// test delete a batch w/ ID
-// test get a batch w/ id
-// test get all batches for a file
+// TestCreateBatchFileIDExits create a batch when the file.id does not exist. Should fail.
+func TestCreateBatchFileIDExits(t *testing.T) {
+	s := mockServiceInMemory()
+	id, err := s.CreateBatch("55555", *mockBatchHeaderWeb())
+	if err != ErrNotFound {
+		t.Errorf("expected %s received %s w/ error %s", "ErrNotFound", id, err)
+	}
+
+}
+
+// TestCreateBatchIDBank create a new batch when the batch.id is nil but file.id is valid. Should generate batch.id and save.
+func TestCreateBatchIDBlank(t *testing.T) {
+	s := mockServiceInMemory()
+	bh := mockBatchHeaderWeb()
+	bh.ID = ""
+	id, err := s.CreateBatch("98765", *bh)
+	if len(id) < 3 {
+		t.Errorf("expected %s received %s w/ error %s", "NextID", id, err)
+	}
+}
+
+// Service.GetBatch
+
+// TestGetBatch return a batch for the existing file.id and batch.id
+func TestGetBatch(t *testing.T) {
+
+}
+
+// TestGetBatchNotFound return a failure if the batch.id is not found
+func TestGetBatchNotFound(t *testing.T) {
+
+}
+
+// Service.GetBatches
+
+// TestGetBatches return a list of batches for the supplied file.id
+func TestGetBatches(t *testing.T) {
+
+}
+
+// Service.DeleteBatch
+
+// TestDeleteBatch removes a batch with existing file and batch id.
+func TestDeleteBatch(t *testing.T) {
+
+}

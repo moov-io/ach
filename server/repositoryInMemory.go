@@ -7,6 +7,14 @@ import (
 	"github.com/moov-io/ach"
 )
 
+// Repository is the Service storage mechanism abstraction
+type Repository interface {
+	StoreFile(file *ach.File) error
+	FindFile(id string) (*ach.File, error)
+	FindAllFiles() []*ach.File
+	DeleteFile(id string) error
+	StoreBatch(fileID string, batch ach.Batcher) error
+}
 type repositoryInMemory struct {
 	mtx   sync.RWMutex
 	files map[string]*ach.File
@@ -60,10 +68,17 @@ func (r *repositoryInMemory) DeleteFile(id string) error {
 func (r *repositoryInMemory) StoreBatch(fileID string, batch ach.Batcher) error {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
+	// Ensure the file does not already exist
 	if _, ok := r.files[fileID]; !ok {
 		return ErrNotFound
 	}
-	// TODO range batches to see if batch already exist and error if it does
+	// ensure the batch does not already exist
+	for _, val := range r.files[fileID].Batches {
+		if val.ID() == batch.ID() {
+			return ErrAlreadyExists
+		}
+	}
+	// Add the batch to the file
 	r.files[fileID].AddBatch(batch)
 	return nil
 }
