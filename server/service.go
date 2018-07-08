@@ -29,6 +29,8 @@ type Service interface {
 
 	// CreateBatch creates a new batch within and ach file and returns its resource ID
 	CreateBatch(fileID string, bh ach.BatchHeader) (string, error)
+	// GetBatch retrieves a batch based oin the file id and batch id
+	GetBatch(fileID string, batchID string) (ach.Batcher, error)
 }
 
 // service a concrete implementation of the service.
@@ -104,6 +106,14 @@ func (s *service) CreateBatch(fileID string, bh ach.BatchHeader) (string, error)
 		return "", err
 	}
 	return bh.ID, nil
+}
+
+func (s *service) GetBatch(fileID string, batchID string) (ach.Batcher, error) {
+	b, err := s.store.FindBatch(fileID, batchID)
+	if err != nil {
+		return nil, ErrNotFound
+	}
+	return *b, nil
 }
 
 // Utility Functions

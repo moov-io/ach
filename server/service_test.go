@@ -121,12 +121,20 @@ func TestCreateBatchIDBlank(t *testing.T) {
 
 // TestGetBatch return a batch for the existing file.id and batch.id
 func TestGetBatch(t *testing.T) {
-
+	s := mockServiceInMemory()
+	b, err := s.GetBatch("98765", "54321")
+	if b.ID() != "54321" {
+		t.Errorf("expected %s received %s w/ error %s", "54321", b.ID(), err)
+	}
 }
 
 // TestGetBatchNotFound return a failure if the batch.id is not found
 func TestGetBatchNotFound(t *testing.T) {
-
+	s := mockServiceInMemory()
+	b, err := s.GetBatch("98765", "55555")
+	if err != ErrNotFound {
+		t.Errorf("expected %s received %s w/ error %s", "ErrNotFound", b.ID(), err)
+	}
 }
 
 // Service.GetBatches

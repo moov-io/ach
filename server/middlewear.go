@@ -60,3 +60,10 @@ func (mw loggingMiddleware) CreateBatch(fileID string, bh ach.BatchHeader) (id s
 	}(time.Now())
 	return mw.next.CreateBatch(fileID, bh)
 }
+
+func (mw loggingMiddleware) GetBatch(fileID string, batchID string) (b ach.Batcher, err error) {
+	defer func(begin time.Time) {
+		mw.logger.Log("method", "GetBatch", "fileID", fileID, "batchID", batchID, "took", time.Since(begin), "err", err)
+	}(time.Now())
+	return mw.next.GetBatch(fileID, batchID)
+}

@@ -14,6 +14,7 @@ type Repository interface {
 	FindAllFiles() []*ach.File
 	DeleteFile(id string) error
 	StoreBatch(fileID string, batch ach.Batcher) error
+	FindBatch(fileID string, batchID string) (*ach.Batcher, error)
 }
 type repositoryInMemory struct {
 	mtx   sync.RWMutex
@@ -81,4 +82,16 @@ func (r *repositoryInMemory) StoreBatch(fileID string, batch ach.Batcher) error 
 	// Add the batch to the file
 	r.files[fileID].AddBatch(batch)
 	return nil
+}
+
+// FindBatch retrieves a ach.Batcher based on the supplied ID
+func (r *repositoryInMemory) FindBatch(fileID string, batchID string) (*ach.Batcher, error) {
+	r.mtx.RLock()
+	defer r.mtx.RUnlock()
+	for _, val := range r.files[fileID].Batches {
+		if val.ID() == batchID {
+			return &val, nil
+		}
+	}
+	return nil, ErrNotFound
 }
