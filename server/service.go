@@ -92,13 +92,14 @@ func (s *service) CreateBatch(fileID string, bh ach.BatchHeader) (string, error)
 	}
 	if bh.ID == "" {
 		id := NextID()
-		batch.ID = id
+		batch.SetID(id)
 		batch.GetHeader().ID = id
 		batch.GetControl().ID = id
 	} else {
-		batch.ID = bh.ID
+		batch.SetID(bh.ID)
 		batch.GetControl().ID = bh.ID
 	}
+
 	if err := s.store.StoreBatch(fileID, batch); err != nil {
 		return "", err
 	}

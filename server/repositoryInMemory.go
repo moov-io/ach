@@ -63,7 +63,7 @@ func (r *repositoryInMemory) StoreBatch(fileID string, batch ach.Batcher) error 
 	if _, ok := r.files[fileID]; !ok {
 		return ErrNotFound
 	}
-	// range batches to see if batch already exist and error if it does
+	// TODO range batches to see if batch already exist and error if it does
 	r.files[fileID].AddBatch(batch)
 	return nil
 }
