@@ -25,6 +25,8 @@ type Batcher interface {
 	AddEntry(*EntryDetail)
 	Create() error
 	Validate() error
+	SetID(string)
+	ID() string
 	// Category defines if a Forward or Return
 	Category() string
 }
