@@ -117,9 +117,9 @@ func (batch *IATBatch) build() error {
 			entryCount = entryCount + 1
 		}
 
-				/*if entry.Addenda18 != nil {
-					entryCount = entryCount + 1
-				}	*/
+		/*if entry.Addenda18 != nil {
+			entryCount = entryCount + 1
+		}	*/
 
 		// Verifies the required addenda* properties for an IAT entry detail are defined
 		if err := batch.addendaFieldInclusion(entry); err != nil {
