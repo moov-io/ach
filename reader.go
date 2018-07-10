@@ -37,7 +37,7 @@ type Reader struct {
 	// currentBatch is the current Batch entries being parsed
 	currentBatch Batcher
 	// IATCurrentBatch is the current IATBatch entries being parsed
-	IATCurrentBatch IATBatcher
+	IATCurrentBatch *IATBatch
 	// line number of the file being parsed
 	lineNum int
 	// recordName holds the current record name being parsed.
@@ -61,7 +61,7 @@ func (r *Reader) addCurrentBatch(batch Batcher) {
 
 // addCurrentBatch creates the current batch type for the file being read. A successful
 // current batch will be added to r.File once parsed.
-func (r *Reader) addIATCurrentBatch(iatBatch IATBatcher) {
+func (r *Reader) addIATCurrentBatch(iatBatch *IATBatch) {
 	r.IATCurrentBatch = iatBatch
 }
 
@@ -325,10 +325,7 @@ func (r *Reader) parseIATBatchHeader() error {
 	}
 
 	// Passing BatchHeader into NewBatchIAT creates a Batcher of IAT SEC code type.
-	iatBatch, err := IATNewBatch(bh)
-	if err != nil {
-		return r.error(err)
-	}
+	iatBatch := IATNewBatch(bh)
 
 	r.addIATCurrentBatch(iatBatch)
 

@@ -62,7 +62,15 @@ type IATEntryDetail struct {
 	// with an entry or item rather than a physical record.
 	TraceNumber int `json:"traceNumber,omitempty"`
 	// Addendum a list of Addenda for the Entry Detail
-	Addendum []Addendumer `json:"addendum,omitempty"`
+	//Addendum []Addendumer `json:"addendum,omitempty"`
+	Addenda10 *Addenda10 `json:"addenda10,omitempty"`
+	Addenda11 *Addenda11 `json:"addenda11,omitempty"`
+	Addenda12 *Addenda12 `json:"addenda12,omitempty"`
+	Addenda13 *Addenda13 `json:"addenda13,omitempty"`
+	Addenda14 *Addenda14 `json:"addenda14,omitempty"`
+	Addenda15 *Addenda15 `json:"addenda15,omitempty"`
+	Addenda16 *Addenda16 `json:"addenda16,omitempty"`
+	Addenda17 *Addenda17 `json:"addenda17,omitempty"`
 	// Category defines if the entry is a Forward, Return, or NOC
 	Category string `json:"category,omitempty"`
 	// validator is composed for data validation

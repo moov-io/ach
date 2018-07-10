@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-// mockAddenda15() creates a mock Addenda15 record
+// mockAddenda15 creates a mock Addenda15 record
 func mockAddenda15() *Addenda15 {
 	addenda15 := NewAddenda15()
 	addenda15.ReceiverIDNumber = "987465493213987"

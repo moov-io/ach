@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-// mockAddenda11() creates a mock Addenda11 record
+// mockAddenda11 creates a mock Addenda11 record
 func mockAddenda11() *Addenda11 {
 	addenda11 := NewAddenda11()
 	addenda11.OriginatorName = "BEK Solutions"

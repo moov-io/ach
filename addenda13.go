@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// Addenda13 is a Addendumer addenda which provides business transaction information for Addenda Type
+// Addenda13 is an addenda which provides business transaction information for Addenda Type
 // Code 13 in a machine readable format. It is usually formatted according to ANSI, ASC, X13 Standard.
 //
 // Addenda13 is mandatory for IAT entries

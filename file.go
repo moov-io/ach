@@ -56,7 +56,7 @@ type File struct {
 	ID         string       `json:"id"`
 	Header     FileHeader   `json:"fileHeader"`
 	Batches    []Batcher    `json:"batches"`
-	IATBatches []IATBatcher `json:"IATBatches"`
+	IATBatches []IATBatch`json:"IATBatches"`
 	Control    FileControl  `json:"fileControl"`
 
 	// NotificationOfChange (Notification of change) is a slice of references to BatchCOR in file.Batches
@@ -154,7 +154,7 @@ func (f *File) AddBatch(batch Batcher) []Batcher {
 }
 
 // AddIATBatch appends a IATBatch to the ach.File
-func (f *File) AddIATBatch(iatBatch IATBatcher) []IATBatcher {
+func (f *File) AddIATBatch(iatBatch IATBatch) []IATBatch {
 	f.IATBatches = append(f.IATBatches, iatBatch)
 	return f.IATBatches
 }

@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// Addenda14 is a Addendumer addenda which provides business transaction information for Addenda Type
+// Addenda14 is an addenda which provides business transaction information for Addenda Type
 // Code 14 in a machine readable format. It is usually formatted according to ANSI, ASC, X14 Standard.
 //
 // Addenda14 is mandatory for IAT entries

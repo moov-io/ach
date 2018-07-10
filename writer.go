@@ -106,12 +106,36 @@ func (w *Writer) writeIATBatch(file *File) error {
 				return err
 			}
 			w.lineNum++
-			for _, addenda := range entry.Addendum {
-				if _, err := w.w.WriteString(addenda.String() + "\n"); err != nil {
-					return err
-				}
-				w.lineNum++
+			if _, err := w.w.WriteString(entry.Addenda10.String() + "\n"); err != nil {
+				return err
 			}
+			w.lineNum++
+			if _, err := w.w.WriteString(entry.Addenda11.String() + "\n"); err != nil {
+				return err
+			}
+			w.lineNum++
+			if _, err := w.w.WriteString(entry.Addenda12.String() + "\n"); err != nil {
+				return err
+			}
+			w.lineNum++
+			if _, err := w.w.WriteString(entry.Addenda13.String() + "\n"); err != nil {
+				return err
+			}
+			w.lineNum++
+			if _, err := w.w.WriteString(entry.Addenda14.String() + "\n"); err != nil {
+				return err
+			}
+			w.lineNum++
+			if _, err := w.w.WriteString(entry.Addenda15.String() + "\n"); err != nil {
+				return err
+			}
+			w.lineNum++
+			if _, err := w.w.WriteString(entry.Addenda16.String() + "\n"); err != nil {
+				return err
+			}
+			w.lineNum++
+
+			// ToDo:  17 and 18
 		}
 		if _, err := w.w.WriteString(iatBatch.GetControl().String() + "\n"); err != nil {
 			return err

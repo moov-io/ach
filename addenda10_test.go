@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-// mockAddenda10() creates a mock Addenda10 record
+// mockAddenda10 creates a mock Addenda10 record
 func mockAddenda10() *Addenda10 {
 	addenda10 := NewAddenda10()
 	addenda10.TransactionTypeCode = "ANN"

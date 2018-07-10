@@ -37,6 +37,10 @@ func NewBatch(bh *BatchHeader) (Batcher, error) {
 		return NewBatchCIE(bh), nil
 	case "COR":
 		return NewBatchCOR(bh), nil
+	case "IAT":
+		//ToDo: Update message to tell user to use iatBatch.go
+		msg := fmt.Sprintf(msgFileNoneSEC, bh.StandardEntryClassCode)
+		return nil, &FileError{FieldName: "StandardEntryClassCode", Msg: msg}
 	case "POP":
 		return NewBatchPOP(bh), nil
 	case "POS":
@@ -86,7 +90,7 @@ func (batch *batch) verify() error {
 	}
 	// batch number header and control must match
 	if batch.Header.BatchNumber != batch.Control.BatchNumber {
-		msg := fmt.Sprintf(msgBatchHeaderControlEquality, batch.Header.ODFIIdentification, batch.Control.ODFIIdentification)
+		msg := fmt.Sprintf(msgBatchHeaderControlEquality, batch.Header.BatchNumber, batch.Control.BatchNumber)
 		return &BatchError{BatchNumber: batchNumber, FieldName: "BatchNumber", Msg: msg}
 	}
 

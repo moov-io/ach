@@ -4,9 +4,11 @@
 
 package ach
 
+// ToDo: Deprecate
+
 // BatchIAT holds the Batch Header and Batch Control and all Entry Records for IAT Entries
 type BatchIAT struct {
-	iatBatch
+	IATBatch
 }
 
 // NewBatchIAT returns a *BatchIAT

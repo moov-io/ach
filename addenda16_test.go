@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-// mockAddenda16() creates a mock Addenda16 record
+// mockAddenda16 creates a mock Addenda16 record
 func mockAddenda16() *Addenda16 {
 	addenda16 := NewAddenda16()
 	addenda16.ReceiverCityStateProvince = "LetterTown*CO\\"

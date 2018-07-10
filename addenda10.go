@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-// Addenda10 is a Addendumer addenda which provides business transaction information for Addenda Type
+// Addenda10 is an addenda which provides business transaction information for Addenda Type
 // Code 10 in a machine readable format. It is usually formatted according to ANSI, ASC, X12 Standard.
 //
 // Addenda10 is mandatory for IAT entries

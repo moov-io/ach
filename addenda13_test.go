@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-// mockAddenda13() creates a mock Addenda13 record
+// mockAddenda13 creates a mock Addenda13 record
 func mockAddenda13() *Addenda13 {
 	addenda13 := NewAddenda13()
 	addenda13.ODFIName = "Wells Fargo"
