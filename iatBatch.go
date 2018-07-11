@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	msgBatchIATAddendaRequired = "is required for an IAT detail entry"
+	msgIATBatchAddendaRequired = "is required for an IAT detail entry"
 )
 
 // IATBatch holds the Batch Header and Batch Control and all Entry Records for an IAT batch
@@ -36,8 +36,8 @@ type IATBatch struct {
 }
 
 // IATNewBatch takes a BatchHeader and returns a matching SEC code batch type that is a batcher. Returns an error if the SEC code is not supported.
-func IATNewBatch(bh *IATBatchHeader) *IATBatch {
-	iatBatch := new(IATBatch)
+func IATNewBatch(bh *IATBatchHeader) IATBatch {
+	iatBatch := IATBatch{}
 	iatBatch.SetControl(NewBatchControl())
 	iatBatch.SetHeader(bh)
 	return iatBatch
@@ -112,10 +112,10 @@ func (batch *IATBatch) build() error {
 	seq := 1
 	for i, entry := range batch.Entries {
 		entryCount = entryCount + 1 + 7
-		//ToDo: Add Addenda17 and Addenda18
-		if entry.Addenda17 != nil {
-			entryCount = entryCount + 1
-		}
+		//ToDo: Add Addenda17 and Addenda18  maximum of 2 addenda17 and 5 addenda18
+		/*		if entry.Addenda17 != nil {
+				entryCount = entryCount + 1
+			}*/
 
 		/*if entry.Addenda18 != nil {
 			entryCount = entryCount + 1
@@ -346,30 +346,13 @@ func (batch *IATBatch) isTraceNumberODFI() error {
 	return nil
 }
 
-// ToDo:  Adjustments for IAT Addenda
-
 // isAddendaSequence check multiple errors on addenda records in the batch entries
 func (batch *IATBatch) isAddendaSequence() error {
 	for _, entry := range batch.Entries {
-
 		// addenda without indicator flag of 1
 		if entry.AddendaRecordIndicator != 1 {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaRecordIndicator", Msg: msgBatchAddendaIndicator}
 		}
-		/*	lastSeq := -1
-			// check if sequence is ascending
-			for _, addenda := range entry.Addendum {
-				// sequences don't exist in NOC or Return addenda
-				if a, ok := addenda.(*Addenda05); ok {
-
-					if a.SequenceNumber < lastSeq {
-						msg := fmt.Sprintf(msgBatchAscending, a.SequenceNumber, lastSeq)
-						return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "SequenceNumber", Msg: msg}
-					}
-					lastSeq = a.SequenceNumber
-				}
-			}*/
-
 		// Verify Addenda* entry detail sequence numbers are valid
 		entryTN := entry.TraceNumberField()[8:]
 
@@ -385,22 +368,18 @@ func (batch *IATBatch) isAddendaSequence() error {
 			msg := fmt.Sprintf(msgBatchAddendaTraceNumber, entry.Addenda12.EntryDetailSequenceNumberField(), entry.TraceNumberField()[8:])
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
 		}
-
 		if entry.Addenda13.EntryDetailSequenceNumberField() != entryTN {
 			msg := fmt.Sprintf(msgBatchAddendaTraceNumber, entry.Addenda13.EntryDetailSequenceNumberField(), entry.TraceNumberField()[8:])
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
 		}
-
 		if entry.Addenda14.EntryDetailSequenceNumberField() != entryTN {
 			msg := fmt.Sprintf(msgBatchAddendaTraceNumber, entry.Addenda14.EntryDetailSequenceNumberField(), entry.TraceNumberField()[8:])
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
 		}
-
 		if entry.Addenda15.EntryDetailSequenceNumberField() != entryTN {
 			msg := fmt.Sprintf(msgBatchAddendaTraceNumber, entry.Addenda15.EntryDetailSequenceNumberField(), entry.TraceNumberField()[8:])
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
 		}
-
 		if entry.Addenda16.EntryDetailSequenceNumberField() != entryTN {
 			msg := fmt.Sprintf(msgBatchAddendaTraceNumber, entry.Addenda16.EntryDetailSequenceNumberField(), entry.TraceNumberField()[8:])
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
@@ -428,32 +407,62 @@ func (batch *IATBatch) isCategory() error {
 
 func (batch *IATBatch) addendaFieldInclusion(entry *IATEntryDetail) error {
 	if entry.Addenda10 == nil {
-		msg := fmt.Sprint(msgBatchIATAddendaRequired)
+		msg := fmt.Sprint(msgIATBatchAddendaRequired)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda10", Msg: msg}
 	}
 	if entry.Addenda11 == nil {
-		msg := fmt.Sprint(msgBatchIATAddendaRequired)
+		msg := fmt.Sprint(msgIATBatchAddendaRequired)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda11", Msg: msg}
 	}
 	if entry.Addenda12 == nil {
-		msg := fmt.Sprint(msgBatchIATAddendaRequired)
+		msg := fmt.Sprint(msgIATBatchAddendaRequired)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda12", Msg: msg}
 	}
 	if entry.Addenda13 == nil {
-		msg := fmt.Sprint(msgBatchIATAddendaRequired)
+		msg := fmt.Sprint(msgIATBatchAddendaRequired)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda13", Msg: msg}
 	}
 	if entry.Addenda14 == nil {
-		msg := fmt.Sprint(msgBatchIATAddendaRequired)
+		msg := fmt.Sprint(msgIATBatchAddendaRequired)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda14", Msg: msg}
 	}
 	if entry.Addenda15 == nil {
-		msg := fmt.Sprint(msgBatchIATAddendaRequired)
+		msg := fmt.Sprint(msgIATBatchAddendaRequired)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda15", Msg: msg}
 	}
 	if entry.Addenda16 == nil {
-		msg := fmt.Sprint(msgBatchIATAddendaRequired)
+		msg := fmt.Sprint(msgIATBatchAddendaRequired)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda16", Msg: msg}
 	}
+	return nil
+}
+
+// Create takes Batch Header and Entries and builds a valid batch
+func (batch *IATBatch) Create() error {
+	// generates sequence numbers and batch control
+	if err := batch.build(); err != nil {
+		return err
+	}
+	// Additional steps specific to batch type
+	// ...
+	return batch.Validate()
+}
+
+// Validate checks valid NACHA batch rules. Assumes properly parsed records.
+func (batch *IATBatch) Validate() error {
+	// basic verification of the batch before we validate specific rules.
+	if err := batch.verify(); err != nil {
+		return err
+	}
+	// Add configuration based validation for this type.
+
+	// IATBatch must have the following mandatory addenda per entry detail:
+	// Addenda10,Addenda11,Addenda12,Addenda13,Addenda14,Addenda15,Addenda16
+
+	// ToDo:  IATBatch can have a maximum of 2 optional Addenda17 records
+	// ToDo:  IAtBatch can have a maximum of 5 optional Addenda18 records
+
+	// Add type specific validation.
+	// ...
 	return nil
 }

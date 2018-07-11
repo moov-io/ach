@@ -10,17 +10,17 @@ import (
 )
 
 // mockIATBatch
-func mockIATBatch() *IATBatch {
-	mockBatch := &IATBatch{}
+func mockIATBatch() IATBatch {
+	mockBatch := IATBatch{}
 	mockBatch.SetHeader(mockIATBatchHeaderFF())
 	mockBatch.AddEntry(mockIATEntryDetail())
-	mockBatch.GetEntries()[0].Addenda10 = mockAddenda10()
-	mockBatch.GetEntries()[0].Addenda11 = mockAddenda11()
-	mockBatch.GetEntries()[0].Addenda12 = mockAddenda12()
-	mockBatch.GetEntries()[0].Addenda13 = mockAddenda13()
-	mockBatch.GetEntries()[0].Addenda14 = mockAddenda14()
-	mockBatch.GetEntries()[0].Addenda15 = mockAddenda15()
-	mockBatch.GetEntries()[0].Addenda16 = mockAddenda16()
+	mockBatch.Entries[0].Addenda10 = mockAddenda10()
+	mockBatch.Entries[0].Addenda11 = mockAddenda11()
+	mockBatch.Entries[0].Addenda12 = mockAddenda12()
+	mockBatch.Entries[0].Addenda13 = mockAddenda13()
+	mockBatch.Entries[0].Addenda14 = mockAddenda14()
+	mockBatch.Entries[0].Addenda15 = mockAddenda15()
+	mockBatch.Entries[0].Addenda16 = mockAddenda16()
 	if err := mockBatch.build(); err != nil {
 		log.Fatal(err)
 	}

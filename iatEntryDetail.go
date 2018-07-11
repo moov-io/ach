@@ -61,17 +61,45 @@ type IATEntryDetail struct {
 	// in the associated Entry Detail Record, since the Trace Number is associated
 	// with an entry or item rather than a physical record.
 	TraceNumber int `json:"traceNumber,omitempty"`
-	// Addendum a list of Addenda for the Entry Detail
-	//Addendum []Addendumer `json:"addendum,omitempty"`
+	// Addenda10 is mandatory for IAT entries
+	//
+	// The Addenda10 Record identifies the Receiver of the transaction and the dollar amount of
+	// the payment.
 	Addenda10 *Addenda10 `json:"addenda10,omitempty"`
+	// Addenda11 is mandatory for IAT entries
+	//
+	// The Addenda11 record identifies key information related to the Originator of
+	// the entry.
 	Addenda11 *Addenda11 `json:"addenda11,omitempty"`
+	// Addenda12 is mandatory for IAT entries
+	//
+	// The Addenda12 record identifies key information related to the Originator of
+	// the entry.
 	Addenda12 *Addenda12 `json:"addenda12,omitempty"`
+	// Addenda13 is mandatory for IAT entries
+	//
+	// The Addenda13 contains information related to the financial institution originating the entry.
+	// For inbound IAT entries, the Fourth Addenda Record must contain information to identify the
+	// foreign financial institution that is providing the funding and payment instruction for
+	// the IAT entry.
 	Addenda13 *Addenda13 `json:"addenda13,omitempty"`
+	// Addenda14 is mandatory for IAT entries
+	//
+	// The Addenda14 identifies the Receiving financial institution holding the Receiver's account.
 	Addenda14 *Addenda14 `json:"addenda14,omitempty"`
+	// Addenda15 is mandatory for IAT entries
+	//
+	// The Addenda15 record identifies key information related to the Receiver.
 	Addenda15 *Addenda15 `json:"addenda15,omitempty"`
+	// Addenda16
 	Addenda16 *Addenda16 `json:"addenda16,omitempty"`
+	// Addenda16 is mandatory for IAT entries
+	//
+	// The Addenda16 record identifies key information related to the Receiver.
 	Addenda17 *Addenda17 `json:"addenda17,omitempty"`
-	// Category defines if the entry is a Forward, Return, or NOC
+	// Addenda17 is optional for IAT entries
+	//
+	// The Addenda17 record identifies payment-related data. A maximum of two of these Addenda Records
 	Category string `json:"category,omitempty"`
 	// validator is composed for data validation
 	validator

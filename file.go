@@ -168,7 +168,7 @@ func (f *File) SetHeader(h FileHeader) *File {
 // Validate NACHA rules on the entire batch before being added to a File
 func (f *File) Validate() error {
 	// The value of the Batch Count Field is equal to the number of Company/Batch/Header Records in the file.
-	if f.Control.BatchCount != len(f.Batches) {
+	if f.Control.BatchCount != (len(f.Batches) + len(f.IATBatches)) {
 		msg := fmt.Sprintf(msgFileCalculatedControlEquality, len(f.Batches), f.Control.BatchCount)
 		return &FileError{FieldName: "BatchCount", Value: strconv.Itoa(len(f.Batches)), Msg: msg}
 	}
@@ -184,13 +184,17 @@ func (f *File) Validate() error {
 	return f.isEntryHash()
 }
 
-// isEntryAddenda is prepared by hashing the RDFI’s 8-digit Routing Number in each entry.
+// isEntryAddendaCount is prepared by hashing the RDFI’s 8-digit Routing Number in each entry.
 //The Entry Hash provides a check against inadvertent alteration of data
 func (f *File) isEntryAddendaCount() error {
 	count := 0
 	// we assume that each batch block has already validated the addenda count is accurate in batch control.
 	for _, batch := range f.Batches {
 		count += batch.GetControl().EntryAddendaCount
+	}
+	// IAT
+	for _, iatBatch := range f.IATBatches {
+		count += iatBatch.GetControl().EntryAddendaCount
 	}
 	if f.Control.EntryAddendaCount != count {
 		msg := fmt.Sprintf(msgFileCalculatedControlEquality, count, f.Control.EntryAddendaCount)
@@ -207,6 +211,11 @@ func (f *File) isFileAmount() error {
 	for _, batch := range f.Batches {
 		debit += batch.GetControl().TotalDebitEntryDollarAmount
 		credit += batch.GetControl().TotalCreditEntryDollarAmount
+	}
+	// IAT
+	for _, iatBatch := range f.IATBatches {
+		debit += iatBatch.GetControl().TotalDebitEntryDollarAmount
+		credit += iatBatch.GetControl().TotalCreditEntryDollarAmount
 	}
 	if f.Control.TotalDebitEntryDollarAmountInFile != debit {
 		msg := fmt.Sprintf(msgFileCalculatedControlEquality, debit, f.Control.TotalDebitEntryDollarAmountInFile)
@@ -235,6 +244,10 @@ func (f *File) calculateEntryHash() string {
 	hash := 0
 	for _, batch := range f.Batches {
 		hash = hash + batch.GetControl().EntryHash
+	}
+	// IAT
+	for _, iatBatch := range f.IATBatches {
+		hash = hash + iatBatch.GetControl().EntryHash
 	}
 	return f.numericField(hash, 10)
 }

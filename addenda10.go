@@ -14,7 +14,7 @@ import (
 //
 // Addenda10 is mandatory for IAT entries
 //
-// The First Addenda Record identifies the Receiver of the transaction and the dollar amount of
+// The Addenda10 Record identifies the Receiver of the transaction and the dollar amount of
 // the payment.
 type Addenda10 struct {
 	// ID is a client defined string used as a reference to this record.

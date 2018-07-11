@@ -37,7 +37,7 @@ type Reader struct {
 	// currentBatch is the current Batch entries being parsed
 	currentBatch Batcher
 	// IATCurrentBatch is the current IATBatch entries being parsed
-	IATCurrentBatch *IATBatch
+	IATCurrentBatch IATBatch
 	// line number of the file being parsed
 	lineNum int
 	// recordName holds the current record name being parsed.
@@ -61,7 +61,7 @@ func (r *Reader) addCurrentBatch(batch Batcher) {
 
 // addCurrentBatch creates the current batch type for the file being read. A successful
 // current batch will be added to r.File once parsed.
-func (r *Reader) addIATCurrentBatch(iatBatch *IATBatch) {
+func (r *Reader) addIATCurrentBatch(iatBatch IATBatch) {
 	r.IATCurrentBatch = iatBatch
 }
 
@@ -144,19 +144,28 @@ func (r *Reader) parseLine() error {
 			return err
 		}
 	case entryAddendaPos:
-		if err := r.parseAddenda(); err != nil {
+		if err := r.parseEDAddenda(); err != nil {
 			return err
 		}
 	case batchControlPos:
 		if err := r.parseBatchControl(); err != nil {
 			return err
 		}
-		if err := r.currentBatch.Validate(); err != nil {
-			r.recordName = "Batches"
-			return r.error(err)
+		if r.currentBatch != nil {
+			if err := r.currentBatch.Validate(); err != nil {
+				r.recordName = "Batches"
+				return r.error(err)
+			}
+			r.File.AddBatch(r.currentBatch)
+			r.currentBatch = nil
+		} else {
+			if err := r.IATCurrentBatch.Validate(); err != nil {
+				r.recordName = "Batches"
+				return r.error(err)
+			}
+			r.File.AddIATBatch(r.IATCurrentBatch)
+			r.IATCurrentBatch = IATBatch{}
 		}
-		r.File.AddBatch(r.currentBatch)
-		r.currentBatch = nil
 	case fileControlPos:
 		if r.line[:2] == "99" {
 			// final blocking padding
@@ -168,6 +177,52 @@ func (r *Reader) parseLine() error {
 	default:
 		msg := fmt.Sprintf(msgUnknownRecordType, r.line[:1])
 		return r.error(&FileError{FieldName: "recordType", Value: r.line[:1], Msg: msg})
+	}
+	return nil
+}
+
+// parseBH parses determines whether to parse an IATBatchHeader or BatchHeader
+func (r *Reader) parseBH() error {
+	if r.line[50:53] == "IAT" {
+		if err := r.parseIATBatchHeader(); err != nil {
+			return err
+		}
+	} else {
+		if err := r.parseBatchHeader(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// parseEd parses determines whether to parse an IATEntryDetail or EntryDetail
+func (r *Reader) parseED() error {
+	// ToDo: Review if this can be true for domestic files.
+	// IATIndicator field
+	if r.line[16:29] == "             " {
+		if err := r.parseIATEntryDetail(); err != nil {
+			return err
+		}
+	} else {
+		if err := r.parseEntryDetail(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// parseEd parses determines whether to parse an IATEntryDetail Addenda or EntryDetail Addenda
+func (r *Reader) parseEDAddenda() error {
+	switch r.line[1:3] {
+	//ToDo;  What to do about 98 and 99 ?
+	case "10", "11", "12", "13", "14", "15", "16", "17", "18":
+		if err := r.parseIATAddenda(); err != nil {
+			return err
+		}
+	default:
+		if err := r.parseAddenda(); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -243,6 +298,7 @@ func (r *Reader) parseAddenda() error {
 	entry := r.currentBatch.GetEntries()[entryIndex]
 
 	if entry.AddendaRecordIndicator == 1 {
+
 		switch r.line[1:3] {
 		case "02":
 			addenda02 := NewAddenda02()
@@ -284,13 +340,22 @@ func (r *Reader) parseAddenda() error {
 // parseBatchControl takes the input record string and parses the BatchControlRecord values
 func (r *Reader) parseBatchControl() error {
 	r.recordName = "BatchControl"
-	if r.currentBatch == nil {
+	if r.currentBatch == nil && r.IATCurrentBatch.GetEntries() == nil {
 		// batch Control without a current batch
 		return r.error(&FileError{Msg: msgFileBatchOutside})
 	}
-	r.currentBatch.GetControl().Parse(r.line)
-	if err := r.currentBatch.GetControl().Validate(); err != nil {
-		return r.error(err)
+
+	if r.currentBatch != nil {
+		r.currentBatch.GetControl().Parse(r.line)
+		if err := r.currentBatch.GetControl().Validate(); err != nil {
+			return r.error(err)
+		}
+	} else {
+		r.IATCurrentBatch.GetControl().Parse(r.line)
+		if err := r.IATCurrentBatch.GetControl().Validate(); err != nil {
+			return r.error(err)
+		}
+
 	}
 	return nil
 }
@@ -309,10 +374,12 @@ func (r *Reader) parseFileControl() error {
 	return nil
 }
 
+// IAT specific reader functions
+
 // parseIATBatchHeader takes the input record string and parses the FileHeaderRecord values
 func (r *Reader) parseIATBatchHeader() error {
-	r.recordName = "IATBatchHeader"
-	if r.IATCurrentBatch != nil {
+	r.recordName = "BatchHeader"
+	if r.IATCurrentBatch.Header != nil {
 		// batch header inside of current batch
 		return r.error(&FileError{Msg: msgFileBatchInside})
 	}
@@ -334,11 +401,12 @@ func (r *Reader) parseIATBatchHeader() error {
 
 // parseIATEntryDetail takes the input record string and parses the EntryDetailRecord values
 func (r *Reader) parseIATEntryDetail() error {
-	r.recordName = "IATEntryDetail"
+	r.recordName = "EntryDetail"
 
-	if r.IATCurrentBatch == nil {
+	if r.IATCurrentBatch.Header == nil {
 		return r.error(&FileError{Msg: msgFileBatchOutside})
 	}
+
 	ed := new(IATEntryDetail)
 	ed.Parse(r.line)
 	if err := ed.Validate(); err != nil {
@@ -348,32 +416,84 @@ func (r *Reader) parseIATEntryDetail() error {
 	return nil
 }
 
-// parseBH parses determines whether to parse an IATBatchHeader or BatchHeader
-func (r *Reader) parseBH() error {
-	if r.line[50:53] == "IAT" {
-		if err := r.parseIATBatchHeader(); err != nil {
-			return err
-		}
-	} else {
-		if err := r.parseBatchHeader(); err != nil {
-			return err
-		}
-	}
-	return nil
-}
+// parseAddendaRecord takes the input record string and create an Addenda Type appended to the last EntryDetail
+func (r *Reader) parseIATAddenda() error {
+	r.recordName = "Addenda"
 
-// parseEd parses determines whether to parse an IATEntryDetail or EntryDetail
-func (r *Reader) parseED() error {
-	// ToDo: Review if this can be true for domestic files.
-	// IATIndicator field
-	if r.line[16:29] == "             " {
-		if err := r.parseIATEntryDetail(); err != nil {
-			return err
+	if r.IATCurrentBatch.GetEntries() == nil {
+		msg := fmt.Sprint(msgFileBatchOutside)
+		return r.error(&FileError{FieldName: "Addenda", Msg: msg})
+	}
+	if len(r.IATCurrentBatch.GetEntries()) == 0 {
+		return r.error(&FileError{FieldName: "Addenda", Msg: msgFileBatchOutside})
+	}
+	entryIndex := len(r.IATCurrentBatch.GetEntries()) - 1
+	entry := r.IATCurrentBatch.GetEntries()[entryIndex]
+
+	if entry.AddendaRecordIndicator == 1 {
+		switch r.line[1:3] {
+		case "10":
+			addenda10 := NewAddenda10()
+			addenda10.Parse(r.line)
+			if err := addenda10.Validate(); err != nil {
+				return r.error(err)
+			}
+			r.IATCurrentBatch.GetEntries()[entryIndex].Addenda10 = addenda10
+		case "11":
+			addenda11 := NewAddenda11()
+			addenda11.Parse(r.line)
+			if err := addenda11.Validate(); err != nil {
+				return r.error(err)
+			}
+			r.IATCurrentBatch.GetEntries()[entryIndex].Addenda11 = addenda11
+		case "12":
+			addenda12 := NewAddenda12()
+			addenda12.Parse(r.line)
+			if err := addenda12.Validate(); err != nil {
+				return r.error(err)
+			}
+			r.IATCurrentBatch.GetEntries()[entryIndex].Addenda12 = addenda12
+		case "13":
+
+			addenda13 := NewAddenda13()
+			addenda13.Parse(r.line)
+			if err := addenda13.Validate(); err != nil {
+				return r.error(err)
+			}
+			r.IATCurrentBatch.GetEntries()[entryIndex].Addenda13 = addenda13
+		case "14":
+			addenda14 := NewAddenda14()
+			addenda14.Parse(r.line)
+			if err := addenda14.Validate(); err != nil {
+				return r.error(err)
+			}
+			r.IATCurrentBatch.GetEntries()[entryIndex].Addenda14 = addenda14
+		case "15":
+			addenda15 := NewAddenda15()
+			addenda15.Parse(r.line)
+			if err := addenda15.Validate(); err != nil {
+				return r.error(err)
+			}
+			r.IATCurrentBatch.GetEntries()[entryIndex].Addenda15 = addenda15
+		case "16":
+			addenda16 := NewAddenda16()
+			addenda16.Parse(r.line)
+			if err := addenda16.Validate(); err != nil {
+				return r.error(err)
+			}
+			r.IATCurrentBatch.GetEntries()[entryIndex].Addenda16 = addenda16
+		case "17":
+			addenda17 := NewAddenda17()
+			addenda17.Parse(r.line)
+			if err := addenda17.Validate(); err != nil {
+				return r.error(err)
+			}
+			r.IATCurrentBatch.GetEntries()[entryIndex].Addenda17 = addenda17
 		}
 	} else {
-		if err := r.parseEntryDetail(); err != nil {
-			return err
-		}
+		msg := fmt.Sprint(msgBatchAddendaIndicator)
+		return r.error(&FileError{FieldName: "AddendaRecordIndicator", Msg: msg})
 	}
+
 	return nil
 }
