@@ -16,7 +16,7 @@ func mockIATEntryDetail() *IATEntryDetail {
 	entry.SetRDFI("121042882")
 	entry.AddendaRecords = 007
 	entry.DFIAccountNumber = "123456789"
-	entry.Amount = 100000		// 1000.00
+	entry.Amount = 100000 // 1000.00
 	entry.SetTraceNumber(mockIATBatchHeaderFF().ODFIIdentification, 1)
 	entry.Category = CategoryForward
 	return entry
