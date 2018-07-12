@@ -6,7 +6,6 @@ package ach
 
 import (
 	"fmt"
-	"strconv"
 )
 
 // Addenda10 is an addenda which provides business transaction information for Addenda Type
@@ -112,7 +111,7 @@ func (addenda10 *Addenda10) Validate() error {
 	if err := addenda10.isTransactionTypeCode(addenda10.TransactionTypeCode); err != nil {
 		return &FieldError{FieldName: "TransactionTypeCode", Value: addenda10.TransactionTypeCode, Msg: err.Error()}
 	}
-	// ToDo: Foreign Exchange Amount blank ?
+	// ToDo: Foreign Payment Amount blank ?
 	if err := addenda10.isAlphanumeric(addenda10.ForeignTraceNumber); err != nil {
 		return &FieldError{FieldName: "ForeignTraceNumber", Value: addenda10.ForeignTraceNumber, Msg: err.Error()}
 	}
@@ -135,10 +134,11 @@ func (addenda10 *Addenda10) fieldInclusion() error {
 		return &FieldError{FieldName: "TransactionTypeCode",
 			Value: addenda10.TransactionTypeCode, Msg: msgFieldRequired}
 	}
-	if addenda10.ForeignPaymentAmount == 0 {
+	// ToDo:  Commented because it appears this value can be all 000 (maybe blank?)
+	/*	if addenda10.ForeignPaymentAmount == 0 {
 		return &FieldError{FieldName: "ForeignPaymentAmount",
 			Value: strconv.Itoa(addenda10.ForeignPaymentAmount), Msg: msgFieldRequired}
-	}
+	}*/
 	if addenda10.Name == "" {
 		return &FieldError{FieldName: "Name", Value: addenda10.Name, Msg: msgFieldInclusion}
 	}

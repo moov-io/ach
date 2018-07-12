@@ -93,27 +93,21 @@ func (batch *batch) verify() error {
 		msg := fmt.Sprintf(msgBatchHeaderControlEquality, batch.Header.BatchNumber, batch.Control.BatchNumber)
 		return &BatchError{BatchNumber: batchNumber, FieldName: "BatchNumber", Msg: msg}
 	}
-
 	if err := batch.isBatchEntryCount(); err != nil {
 		return err
 	}
-
 	if err := batch.isSequenceAscending(); err != nil {
 		return err
 	}
-
 	if err := batch.isBatchAmount(); err != nil {
 		return err
 	}
-
 	if err := batch.isEntryHash(); err != nil {
 		return err
 	}
-
 	if err := batch.isOriginatorDNE(); err != nil {
 		return err
 	}
-
 	if err := batch.isTraceNumberODFI(); err != nil {
 		return err
 	}
@@ -121,7 +115,10 @@ func (batch *batch) verify() error {
 	if err := batch.isAddendaSequence(); err != nil {
 		return err
 	}
-	return batch.isCategory()
+	if err := batch.isCategory(); err != nil {
+		return err
+	}
+	return nil
 }
 
 // Build creates valid batch by building sequence numbers and batch batch control. An error is returned if
@@ -346,7 +343,6 @@ func (batch *batch) isTraceNumberODFI() error {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ODFIIdentificationField", Msg: msg}
 		}
 	}
-
 	return nil
 }
 
@@ -410,9 +406,13 @@ func (batch *batch) isTypeCode(typeCode string) error {
 
 // isCategory verifies that a Forward and Return Category are not in the same batch
 func (batch *batch) isCategory() error {
+	// ToDo:  Add temporarily -  ./test/data/20110805A.ach contains a batch without a detail entry
+	if len(batch.GetEntries()) == 0 {
+		return nil
+	}
 	category := batch.GetEntries()[0].Category
 	if len(batch.Entries) > 1 {
-		for i := 1; i < len(batch.Entries); i++ {
+		for i := 0; i < len(batch.Entries); i++ {
 			if batch.Entries[i].Category == CategoryNOC {
 				continue
 			}

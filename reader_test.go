@@ -998,3 +998,63 @@ func BenchmarkFileFHImmediateOrigin(b *testing.B) {
 		testFileFHImmediateOrigin(b)
 	}
 }
+
+// testACHFileRead validates reading a file with PPD and IAT entries
+func testACHFileRead(t testing.TB) {
+	f, err := os.Open("./test/data/20110805A.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err = r.File.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestACHFileRead tests validating reading a file with PPD and IAT entries
+func TestACHFileRead(t *testing.T) {
+	testACHFileRead(t)
+}
+
+// BenchmarkACHFileRead benchmarks validating reading a file with PPD and IAT entries
+func BenchmarkACHFileRead(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testACHFileRead(b)
+	}
+}
+
+// testACHFileRead2 validates reading a file with PPD and IAT entries
+func testACHFileRead2(t testing.TB) {
+	f, err := os.Open("./test/data/20110729A.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err = r.File.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestACHFileRead2 tests validating reading a file with PPD and IAT entries
+func TestACHFileRead2(t *testing.T) {
+	testACHFileRead2(t)
+}
+
+// BenchmarkACHFileRead2 benchmarks validating reading a file with PPD and IAT entries
+func BenchmarkACHFileRead2(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testACHFileRead2(b)
+	}
+}
