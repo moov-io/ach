@@ -125,6 +125,7 @@ func BenchmarkCreditBatchisBatchAmount(b *testing.B) {
 	}
 
 }
+
 func testSavingsBatchisBatchAmount(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.SetHeader(mockBatchHeader())
@@ -524,6 +525,7 @@ func BenchmarkBatchFieldInclusion(b *testing.B) {
 	}
 }
 
+// testBatchInvalidTraceNumberODFI validates TraceNumberODFI
 func testBatchInvalidTraceNumberODFI(t testing.TB) {
 	mockBatch := mockBatchInvalidTraceNumberODFI()
 	if err := mockBatch.build(); err != nil {
@@ -531,10 +533,12 @@ func testBatchInvalidTraceNumberODFI(t testing.TB) {
 	}
 }
 
+// TestBatchInvalidTraceNumberODFI tests validating TraceNumberODFI
 func TestBatchInvalidTraceNumberODFI(t *testing.T) {
 	testBatchInvalidTraceNumberODFI(t)
 }
 
+// BenchmarkBatchInvalidTraceNumberODFI benchmarks validating TraceNumberODFI
 func BenchmarkBatchInvalidTraceNumberODFI(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -566,6 +570,7 @@ func BenchmarkBatchNoEntry(b *testing.B) {
 	}
 }
 
+// testBatchControl validates BatchControl ODFIIdentification
 func testBatchControl(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.Control.ODFIIdentification = ""
@@ -580,10 +585,12 @@ func testBatchControl(t testing.TB) {
 	}
 }
 
+// TestBatchControl tests validating BatchControl ODFIIdentification
 func TestBatchControl(t *testing.T) {
 	testBatchControl(t)
 }
 
+// BenchmarkBatchControl benchmarks validating BatchControl ODFIIdentification
 func BenchmarkBatchControl(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {

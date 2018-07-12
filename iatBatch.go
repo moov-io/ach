@@ -10,7 +10,8 @@ import (
 )
 
 var (
-	msgIATBatchAddendaRequired = "is required for an IAT detail entry"
+	msgIATBatchAddendaRequired  = "is required for an IAT detail entry"
+	msgIATBatchAddendaIndicator = "is invalid for addenda record(s) found"
 )
 
 // IATBatch holds the Batch Header and Batch Control and all Entry Records for an IAT batch
@@ -349,7 +350,7 @@ func (batch *IATBatch) isAddendaSequence() error {
 	for _, entry := range batch.Entries {
 		// addenda without indicator flag of 1
 		if entry.AddendaRecordIndicator != 1 {
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaRecordIndicator", Msg: msgBatchAddendaIndicator}
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaRecordIndicator", Msg: msgIATBatchAddendaIndicator}
 		}
 		// Verify Addenda* entry detail sequence numbers are valid
 		entryTN := entry.TraceNumberField()[8:]
@@ -389,9 +390,8 @@ func (batch *IATBatch) isAddendaSequence() error {
 
 // isCategory verifies that a Forward and Return Category are not in the same batch
 func (batch *IATBatch) isCategory() error {
-	// ToDo:  Add temporarily -  ./test/data/20110805A.ach contains a batch without a detail entry
-	if len(batch.GetEntries()) == 0 {
-		return nil
+	if len(batch.Entries) <= 0 {
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "entries", Msg: msgBatchEntries}
 	}
 	category := batch.GetEntries()[0].Category
 	if len(batch.Entries) > 1 {

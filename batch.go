@@ -406,9 +406,8 @@ func (batch *batch) isTypeCode(typeCode string) error {
 
 // isCategory verifies that a Forward and Return Category are not in the same batch
 func (batch *batch) isCategory() error {
-	// ToDo:  Add temporarily -  ./test/data/20110805A.ach contains a batch without a detail entry
-	if len(batch.GetEntries()) == 0 {
-		return nil
+	if len(batch.Entries) <= 0 {
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "entries", Msg: msgBatchEntries}
 	}
 	category := batch.GetEntries()[0].Category
 	if len(batch.Entries) > 1 {

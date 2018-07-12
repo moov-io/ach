@@ -518,6 +518,178 @@ func BenchmarkIATServiceClassCodeMismatch(b *testing.B) {
 	}
 }
 
+// testIATBatchCreditIsBatchAmount validates credit isBatchAmount
+func testIATBatchCreditIsBatchAmount(t testing.TB) {
+	mockBatch := mockIATBatch()
+	e1 := mockBatch.GetEntries()[0]
+	e2 := mockIATEntryDetail()
+	e2.TransactionCode = 22
+	e2.Amount = 5000
+	e2.TraceNumber = e1.TraceNumber + 10
+	mockBatch.AddEntry(e2)
+	mockBatch.Entries[1].Addenda10 = mockAddenda10()
+	mockBatch.Entries[1].Addenda11 = mockAddenda11()
+	mockBatch.Entries[1].Addenda12 = mockAddenda12()
+	mockBatch.Entries[1].Addenda13 = mockAddenda13()
+	mockBatch.Entries[1].Addenda14 = mockAddenda14()
+	mockBatch.Entries[1].Addenda15 = mockAddenda15()
+	mockBatch.Entries[1].Addenda16 = mockAddenda16()
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	mockBatch.GetControl().TotalCreditEntryDollarAmount = 1000
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TotalCreditEntryDollarAmount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestIATBatchCreditIsBatchAmount tests validating credit isBatchAmount
+func TestIATBatchCreditIsBatchAmount(t *testing.T) {
+	testIATBatchCreditIsBatchAmount(t)
+}
+
+// BenchmarkIATBatchCreditIsBatchAmount benchmarks validating credit isBatchAmount
+func BenchmarkIATBatchCreditIsBatchAmount(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchCreditIsBatchAmount(b)
+	}
+
+}
+
+// testIATBatchDebitIsBatchAmount validates debit isBatchAmount
+func testIATBatchDebitIsBatchAmount(t testing.TB) {
+	mockBatch := mockIATBatch()
+	e1 := mockBatch.GetEntries()[0]
+	e1.TransactionCode = 27
+	e2 := mockIATEntryDetail()
+	e2.TransactionCode = 27
+	e2.Amount = 5000
+	e2.TraceNumber = e1.TraceNumber + 10
+	mockBatch.AddEntry(e2)
+	mockBatch.Entries[1].Addenda10 = mockAddenda10()
+	mockBatch.Entries[1].Addenda11 = mockAddenda11()
+	mockBatch.Entries[1].Addenda12 = mockAddenda12()
+	mockBatch.Entries[1].Addenda13 = mockAddenda13()
+	mockBatch.Entries[1].Addenda14 = mockAddenda14()
+	mockBatch.Entries[1].Addenda15 = mockAddenda15()
+	mockBatch.Entries[1].Addenda16 = mockAddenda16()
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	mockBatch.GetControl().TotalDebitEntryDollarAmount = 1000
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TotalDebitEntryDollarAmount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestIATBatchDebitIsBatchAmount tests validating debit isBatchAmount
+func TestIATBatchDebitIsBatchAmount(t *testing.T) {
+	testIATBatchDebitIsBatchAmount(t)
+}
+
+// BenchmarkIATBatchDebitIsBatchAmount benchmarks validating debit isBatchAmount
+func BenchmarkIATBatchDebitIsBatchAmount(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchDebitIsBatchAmount(b)
+	}
+
+}
+
+// testIATBatchFieldInclusion validates IATBatch FieldInclusion
+func testIATBatchFieldInclusion(t testing.TB) {
+	mockBatch := mockIATBatch()
+	mockBatch2 := mockIATBatch()
+	mockBatch2.Header.recordType = "4"
+
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+	if err := mockBatch2.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+	if err := mockBatch2.build(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestIATBatchFieldInclusion tests validating IATBatch FieldInclusion
+func TestIATBatchFieldInclusion(t *testing.T) {
+	testIATBatchFieldInclusion(t)
+}
+
+// BenchmarkIATBatchFieldInclusion benchmarks validating IATBatch FieldInclusion
+func BenchmarkIATBatchFieldInclusion(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchFieldInclusion(b)
+	}
+
+}
+
+// testIATBatchBuildError validates IATBatch build error
+func testIATBatchBuild(t testing.TB) {
+	mockBatch := IATBatch{}
+	mockBatch.SetHeader(mockIATBatchHeaderFF())
+
+	if err := mockBatch.build(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "entries" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestIATBatchBuild tests validating IATBatch build error
+func TestIATBatchBuild(t *testing.T) {
+	testIATBatchBuild(t)
+}
+
+// BenchmarkIATBatchBuild benchmarks validating IATBatch build error
+func BenchmarkIATBatchBuild(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchBuild(b)
+	}
+
+}
+
 // testIATODFIIdentificationMismatch validates ODFIIdentification mismatch
 func testIATODFIIdentificationMismatch(t testing.TB) {
 	mockBatch := mockIATBatch()
@@ -546,10 +718,10 @@ func BenchmarkIATODFIIdentificationMismatch(b *testing.B) {
 	}
 }
 
-// testIATAddendaRecordIndicator validates AddendaRecordIndicator FieldInclusion
-func testIATAddendaRecordIndicator(t testing.TB) {
+// testIATBatchAddendaRecordIndicator validates IATEntryDetail AddendaRecordIndicator
+func testIATBatchAddendaRecordIndicator(t testing.TB) {
 	mockBatch := mockIATBatch()
-	mockBatch.GetEntries()[0].AddendaRecordIndicator = 0
+	mockBatch.GetEntries()[0].AddendaRecordIndicator = 2
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "AddendaRecordIndicator" {
@@ -561,15 +733,65 @@ func testIATAddendaRecordIndicator(t testing.TB) {
 	}
 }
 
-// TestIATAddendaRecordIndicator tests validating AddendaRecordIndicator FieldInclusion
-func TestIATAddendaRecordIndicator(t *testing.T) {
-	testIATAddendaRecordIndicator(t)
+// TestIATBatchAddendaRecordIndicator tests validating IATEntryDetail AddendaRecordIndicator
+func TestIATBatchAddendaRecordIndicator(t *testing.T) {
+	testIATBatchAddendaRecordIndicator(t)
 }
 
-// BenchmarkIATAddendaRecordIndicator benchmarks validating AddendaRecordIndicator FieldInclusion
-func BenchmarkIATAddendaRecordIndicator(b *testing.B) {
+// BenchmarkIATBatchAddendaRecordIndicator benchmarks IATEntryDetail AddendaRecordIndicator
+func BenchmarkIATBatchAddendaRecordIndicator(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testIATAddendaRecordIndicator(b)
+		testIATBatchAddendaRecordIndicator(b)
+	}
+}
+
+// testIATBatchInvalidTraceNumberODFI validates TraceNumberODFI
+func testIATBatchInvalidTraceNumberODFI(t testing.TB) {
+	mockBatch := mockIATBatch()
+	mockBatch.GetEntries()[0].SetTraceNumber("9928272", 1)
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestIATBatchInvalidTraceNumberODFI tests validating TraceNumberODFI
+func TestIATBatchInvalidTraceNumberODFI(t *testing.T) {
+	testIATBatchInvalidTraceNumberODFI(t)
+}
+
+// BenchmarkIATBatchInvalidTraceNumberODFI benchmarks validating TraceNumberODFI
+func BenchmarkIATBatchInvalidTraceNumberODFI(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchInvalidTraceNumberODFI(b)
+	}
+}
+
+// testIATBatchControl validates BatchControl ODFIIdentification
+func testIATBatchControl(t testing.TB) {
+	mockBatch := mockIATBatch()
+	mockBatch.Control.ODFIIdentification = ""
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ODFIIdentification" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestIATBatchControl tests validating BatchControl ODFIIdentification
+func TestIATBatchControl(t *testing.T) {
+	testIATBatchControl(t)
+}
+
+// BenchmarkIATBatchControl benchmarks validating BatchControl ODFIIdentification
+func BenchmarkIATBatchControl(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchControl(b)
 	}
 }

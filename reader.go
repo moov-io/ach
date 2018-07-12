@@ -491,7 +491,7 @@ func (r *Reader) parseIATAddenda() error {
 			r.IATCurrentBatch.GetEntries()[entryIndex].Addenda17 = addenda17
 		}
 	} else {
-		msg := fmt.Sprint(msgBatchAddendaIndicator)
+		msg := fmt.Sprint(msgIATBatchAddendaIndicator)
 		return r.error(&FileError{FieldName: "AddendaRecordIndicator", Msg: msg})
 	}
 

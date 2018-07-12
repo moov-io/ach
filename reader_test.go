@@ -1008,10 +1008,23 @@ func testACHFileRead(t testing.TB) {
 	defer f.Close()
 	r := NewReader(f)
 	_, err = r.Read()
-	if err != nil {
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*BatchError); ok {
+			if e.FieldName != "entries" {
+				t.Errorf("%T: %s", e, e)
+			}
+		}
+	} else {
 		t.Errorf("%T: %s", err, err)
 	}
-	if err = r.File.Validate(); err != nil {
+
+	err = r.File.Validate()
+
+	if e, ok := err.(*FileError); ok {
+		if e.FieldName != "BatchCount" {
+			t.Errorf("%T: %s", e, e)
+		}
+	} else {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -1038,10 +1051,23 @@ func testACHFileRead2(t testing.TB) {
 	defer f.Close()
 	r := NewReader(f)
 	_, err = r.Read()
-	if err != nil {
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*BatchError); ok {
+			if e.FieldName != "entries" {
+				t.Errorf("%T: %s", e, e)
+			}
+		}
+	} else {
 		t.Errorf("%T: %s", err, err)
 	}
-	if err = r.File.Validate(); err != nil {
+
+	err = r.File.Validate()
+
+	if e, ok := err.(*FileError); ok {
+		if e.FieldName != "BatchCount" {
+			t.Errorf("%T: %s", e, e)
+		}
+	} else {
 		t.Errorf("%T: %s", err, err)
 	}
 }
