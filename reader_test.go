@@ -1095,8 +1095,7 @@ func BenchmarkACHFileRead2(b *testing.B) {
 	}
 }
 
-// testACHFileRead3 validates reading a file with IAT entries
-// that does not error.
+// testACHFileRead3 validates reading a file with IAT entries only
 func testACHFileRead3(t testing.TB) {
 	f, err := os.Open("./test/data/20180713-IAT.ach")
 	if err != nil {
@@ -1131,14 +1130,12 @@ func testACHFileRead3(t testing.TB) {
 	}
 }
 
-// TestACHFileRead3 tests validating reading a file with IAT entries that
-// does not error.
+// TestACHFileRead3 tests validating reading a file with IAT entries that only
 func TestACHFileRead3(t *testing.T) {
 	testACHFileRead3(t)
 }
 
-// BenchmarkACHFileRead3 benchmarks validating reading a file with IAT entries
-// that does not error.
+// BenchmarkACHFileRead3 benchmarks validating reading a file with IAT entries only
 func BenchmarkACHFileRead3(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
