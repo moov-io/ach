@@ -22,6 +22,19 @@ func mockIATEntryDetail() *IATEntryDetail {
 	return entry
 }
 
+// mockIATEntryDetail2 creates an EntryDetail
+func mockIATEntryDetail2() *IATEntryDetail {
+	entry := NewIATEntryDetail()
+	entry.TransactionCode = 22
+	entry.SetRDFI("121042882")
+	entry.AddendaRecords = 007
+	entry.DFIAccountNumber = "123456789"
+	entry.Amount = 200000 // 2000.00
+	entry.SetTraceNumber(mockIATBatchHeaderFF().ODFIIdentification, 2)
+	entry.Category = CategoryForward
+	return entry
+}
+
 // testMockIATEntryDetail validates an IATEntryDetail record
 func testMockIATEntryDetail(t testing.TB) {
 	entry := mockIATEntryDetail()

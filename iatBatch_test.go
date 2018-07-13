@@ -27,6 +27,32 @@ func mockIATBatch() IATBatch {
 	return mockBatch
 }
 
+// mockIATBatchManyEntries
+func mockIATBatchManyEntries() IATBatch {
+	mockBatch := IATBatch{}
+	mockBatch.SetHeader(mockIATBatchHeaderFF())
+	mockBatch.AddEntry(mockIATEntryDetail())
+	mockBatch.Entries[0].Addenda10 = mockAddenda10()
+	mockBatch.Entries[0].Addenda11 = mockAddenda11()
+	mockBatch.Entries[0].Addenda12 = mockAddenda12()
+	mockBatch.Entries[0].Addenda13 = mockAddenda13()
+	mockBatch.Entries[0].Addenda14 = mockAddenda14()
+	mockBatch.Entries[0].Addenda15 = mockAddenda15()
+	mockBatch.Entries[0].Addenda16 = mockAddenda16()
+	mockBatch.AddEntry(mockIATEntryDetail2())
+	mockBatch.Entries[1].Addenda10 = mockAddenda10()
+	mockBatch.Entries[1].Addenda11 = mockAddenda11()
+	mockBatch.Entries[1].Addenda12 = mockAddenda12()
+	mockBatch.Entries[1].Addenda13 = mockAddenda13()
+	mockBatch.Entries[1].Addenda14 = mockAddenda14()
+	mockBatch.Entries[1].Addenda15 = mockAddenda15()
+	mockBatch.Entries[1].Addenda16 = mockAddenda16()
+	if err := mockBatch.build(); err != nil {
+		log.Fatal(err)
+	}
+	return mockBatch
+}
+
 // TestMockIATBatch validates mockIATBatch
 func TestMockIATBatch(t *testing.T) {
 	iatBatch := mockIATBatch()
@@ -859,5 +885,72 @@ func BenchmarkIATBatchisEntryHash(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testIATBatchisEntryHash(b)
+	}
+}
+
+// testIATBatchIsSequenceAscending validates sequence ascending
+func testIATBatchIsSequenceAscending(t testing.TB) {
+	mockBatch := mockIATBatch()
+	e2 := mockIATEntryDetail()
+	e2.TraceNumber = 1
+	mockBatch.AddEntry(e2)
+	mockBatch.Entries[1].Addenda10 = mockAddenda10()
+	mockBatch.Entries[1].Addenda11 = mockAddenda11()
+	mockBatch.Entries[1].Addenda12 = mockAddenda12()
+	mockBatch.Entries[1].Addenda13 = mockAddenda13()
+	mockBatch.Entries[1].Addenda14 = mockAddenda14()
+	mockBatch.Entries[1].Addenda15 = mockAddenda15()
+	mockBatch.Entries[1].Addenda16 = mockAddenda16()
+	mockBatch.GetControl().EntryAddendaCount = 16
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TraceNumber" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestIATBatchIsSequenceAscending tests validating sequence ascending
+func TestIATBatchIsSequenceAscending(t *testing.T) {
+	testIATBatchIsSequenceAscending(t)
+}
+
+// BenchmarkIATBatchIsSequenceAscending tests validating sequence ascending
+func BenchmarkIATBatchIsSequenceAscending(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchIsSequenceAscending(b)
+	}
+}
+
+// testIATBatchIsCategory validates category
+func testIATBatchIsCategory(t testing.TB) {
+	mockBatch := mockIATBatchManyEntries()
+	mockBatch.GetEntries()[1].Category = CategoryReturn
+
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Category" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestIATBatchIsCategory tests validating category
+func TestIATBatchIsCategory(t *testing.T) {
+	testIATBatchIsCategory(t)
+}
+
+// BenchmarkIATBatchIsCategory tests validating category
+func BenchmarkIATBatchIsCategory(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchIsCategory(b)
 	}
 }
