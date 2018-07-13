@@ -1,6 +1,5 @@
 package server
 
-// TODO: rename to InMemory and move into a repository directory when stable.
 import (
 	"sync"
 
@@ -15,6 +14,8 @@ type Repository interface {
 	DeleteFile(id string) error
 	StoreBatch(fileID string, batch ach.Batcher) error
 	FindBatch(fileID string, batchID string) (*ach.Batcher, error)
+	FindAllBatches(fileID string) []*ach.Batcher
+	DeleteBatch(fileID string, batchID string) error
 }
 type repositoryInMemory struct {
 	mtx   sync.RWMutex
@@ -94,4 +95,29 @@ func (r *repositoryInMemory) FindBatch(fileID string, batchID string) (*ach.Batc
 		}
 	}
 	return nil, ErrNotFound
+}
+
+// FindAllBatches
+func (r *repositoryInMemory) FindAllBatches(fileID string) []*ach.Batcher {
+	r.mtx.RLock()
+	defer r.mtx.RUnlock()
+	batches := make([]*ach.Batcher, 0, len(r.files[fileID].Batches))
+	for _, val := range r.files[fileID].Batches {
+		batches = append(batches, &val)
+	}
+	return batches
+}
+
+func (r *repositoryInMemory) DeleteBatch(fileID string, batchID string) error {
+	r.mtx.RLock()
+	defer r.mtx.RUnlock()
+	for _, val := range r.files[fileID].Batches {
+		if val.ID() == batchID {
+			//append()
+			//delete(val)
+			// TODO delete the bach from the file
+			return ErrNotFound
+		}
+	}
+	return nil
 }

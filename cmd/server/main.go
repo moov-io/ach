@@ -26,14 +26,16 @@ DeleteFile
 curl -H "Content-Type: application/json" -X DELETE http://localhost:8080/files/1234
 
 CreateBatch
-curl -d '{"id":"54321","serviceClassCode":"220","standardEntryClassCode":"WEB","companyName":"Your Company inc","companyIdentification":"121042882","companyEntryDescription":"Online Order","ODFIIdentification","12104288"}' -H "Content-Type: application/json" -X POST http://localhost:8080/files/08B751B2/batches/
+curl -d '{"id":"54321","serviceClassCode":220,"standardEntryClassCode":"WEB","companyName":"Your Company inc","companyIdentification":"121042882","companyEntryDescription":"Online Order","ODFIIdentification":"12104288"}' -H "Content-Type: application/json" -X POST http://localhost:8080/files/08B751B2/batches/
 
 GetBatch
 curl -H "Content-Type: application/json" -X GET http://localhost:8080/files/08B751B2/batches/54321
 
 GetBatches
+curl -H "Content-Type: application/json" -X GET http://localhost:8080/files/08B751B2/batches/
 
 DeleteBatch
+curl -H "Content-Type: application/json" -X DELETE http://localhost:8080/files/08B751B2/batches/54321
 **/
 
 func main() {

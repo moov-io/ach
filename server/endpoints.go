@@ -13,7 +13,9 @@ type Endpoints struct {
 	GetFilesEndpoint    endpoint.Endpoint
 	DeleteFileEndpoint  endpoint.Endpoint
 	CreateBatchEndpoint endpoint.Endpoint
+	GetBatchesEndpoint  endpoint.Endpoint
 	GetBatchEndpoint    endpoint.Endpoint
+	DeleteBatchEndpoint endpoint.Endpoint
 }
 
 func MakeServerEndpoints(s Service) Endpoints {
@@ -23,7 +25,9 @@ func MakeServerEndpoints(s Service) Endpoints {
 		GetFilesEndpoint:    MakeGetFilesEndpoint(s),
 		DeleteFileEndpoint:  MakeDeleteFileEndpoint(s),
 		CreateBatchEndpoint: MakeCreateBatchEndpoint(s),
+		GetBatchesEndpoint:  MakeGetBatchesEndpoint(s),
 		GetBatchEndpoint:    MakeGetBatchEndpoint(s),
+		DeleteBatchEndpoint: MakeDeleteBatchEndpoint(s),
 	}
 }
 
@@ -60,6 +64,8 @@ type getFilesResponse struct {
 	Files []ach.File `json:"files,omitempty"`
 	Err   error      `json:"error,omitempty"`
 }
+
+func (r getFilesResponse) error() error { return r.Err }
 
 // MakeGetFileEndpoint returns an endpoint via the passed service.
 // Primarily useful in a server.
@@ -121,6 +127,26 @@ type createBatchResponse struct {
 	Err error  `json:"err,omitempty"`
 }
 
+func (r createBatchResponse) error() error { return r.Err }
+
+func MakeGetBatchesEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(getBatchesRequest)
+		return getBatchesResponse{Batches: s.GetBatches(req.fileID), Err: nil}, nil
+	}
+}
+
+type getBatchesRequest struct {
+	fileID string
+}
+
+type getBatchesResponse struct {
+	Batches []ach.Batcher `json:"batches,omitempty"`
+	Err     error         `json:"error,omitempty"`
+}
+
+func (r getBatchesResponse) error() error { return r.Err }
+
 func MakeGetBatchEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(getBatchRequest)
@@ -138,3 +164,24 @@ type getBatchResponse struct {
 	Batch ach.Batcher `json:"batch,omitempty"`
 	Err   error       `json:"err,omitempty"`
 }
+
+func (r getBatchResponse) error() error { return r.Err }
+
+func MakeDeleteBatchEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		req := request.(deleteBatchRequest)
+		e := s.DeleteBatch(req.fileID, req.batchID)
+		return deleteBatchResponse{Err: e}, nil
+	}
+}
+
+type deleteBatchRequest struct {
+	fileID  string
+	batchID string
+}
+
+type deleteBatchResponse struct {
+	Err error `json:"err,omitempty"`
+}
+
+func (r deleteBatchResponse) error() error { return r.Err }

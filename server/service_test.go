@@ -141,12 +141,20 @@ func TestGetBatchNotFound(t *testing.T) {
 
 // TestGetBatches return a list of batches for the supplied file.id
 func TestGetBatches(t *testing.T) {
-
+	s := mockServiceInMemory()
+	batches := s.GetBatches("98765")
+	if len(batches) != 1 {
+		t.Errorf("expected %s received %v", "1", len(batches))
+	}
 }
 
 // Service.DeleteBatch
 
 // TestDeleteBatch removes a batch with existing file and batch id.
 func TestDeleteBatch(t *testing.T) {
-
+	s := mockServiceInMemory()
+	err := s.DeleteBatch("98765", "54321")
+	if err != nil {
+		t.Errorf("expected %s received error %s", "nil", err)
+	}
 }

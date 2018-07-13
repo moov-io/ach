@@ -31,6 +31,10 @@ type Service interface {
 	CreateBatch(fileID string, bh ach.BatchHeader) (string, error)
 	// GetBatch retrieves a batch based oin the file id and batch id
 	GetBatch(fileID string, batchID string) (ach.Batcher, error)
+	// GetBatches retrieves all batches associated with the file id.
+	GetBatches(fileID string) []ach.Batcher
+	// DeleteBatch takes a fileID and BatchID and removes the batch from the file
+	DeleteBatch(fileID string, batchID string) error
 }
 
 // service a concrete implementation of the service.
@@ -114,6 +118,18 @@ func (s *service) GetBatch(fileID string, batchID string) (ach.Batcher, error) {
 		return nil, ErrNotFound
 	}
 	return *b, nil
+}
+
+func (s *service) GetBatches(fileID string) []ach.Batcher {
+	var result []ach.Batcher
+	for _, b := range s.store.FindAllBatches(fileID) {
+		result = append(result, *b)
+	}
+	return result
+}
+
+func (s *service) DeleteBatch(fileID string, batchID string) error {
+	return s.store.DeleteBatch(fileID, batchID)
 }
 
 // Utility Functions

@@ -37,7 +37,9 @@ func MakeHTTPHandler(s Service, logger log.Logger) http.Handler {
 	// DELETE /files/:id					   delete a file based on supplied id
 
 	// POST   /files/:id/batches/			   Create a Batch
+	// GET	  /files/:fileID/batches		   Retrieve a list of all batches for the file id.
 	// GET	  /files/:id/batches/:id		   Retrieve the given batch by id
+	// DELETE /files/:fileID/batches/:batchID  delete the batch based on the supplied file and batch id
 	// ***
 	// GET    /files/:id/validate			   validates the supplied file id for nacha compliance
 	// PATCH  /files/:id/build				   build batch and file controls in ach file with supplied values
@@ -73,9 +75,21 @@ func MakeHTTPHandler(s Service, logger log.Logger) http.Handler {
 		encodeResponse,
 		options...,
 	))
+	r.Methods("GET").Path("/files/{fileID}/batches/").Handler(httptransport.NewServer(
+		e.GetBatchesEndpoint,
+		decodeGetBatchesRequest,
+		encodeResponse,
+		options...,
+	))
 	r.Methods("GET").Path("/files/{fileID}/batches/{batchID}").Handler(httptransport.NewServer(
 		e.GetBatchEndpoint,
 		decodeGetBatchRequest,
+		encodeResponse,
+		options...,
+	))
+	r.Methods("DELETE").Path("/files/{fileID}/batches/{batchID}").Handler(httptransport.NewServer(
+		e.DeleteBatchEndpoint,
+		decodeDeleteBatchRequest,
 		encodeResponse,
 		options...,
 	))
@@ -143,8 +157,36 @@ func decodeCreateBatchRequest(_ context.Context, r *http.Request) (request inter
 	return req, nil
 }
 
+func decodeGetBatchesRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
+	var req getBatchesRequest
+	vars := mux.Vars(r)
+	id, ok := vars["fileID"]
+	if !ok {
+		return nil, ErrBadRouting
+	}
+	req.fileID = id
+	return req, nil
+}
+
 func decodeGetBatchRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
 	var req getBatchRequest
+	vars := mux.Vars(r)
+	fileID, ok := vars["fileID"]
+	if !ok {
+		return nil, ErrBadRouting
+	}
+	batchID, ok := vars["batchID"]
+	if !ok {
+		return nil, ErrBadRouting
+	}
+
+	req.fileID = fileID
+	req.batchID = batchID
+	return req, nil
+}
+
+func decodeDeleteBatchRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
+	var req deleteBatchRequest
 	vars := mux.Vars(r)
 	fileID, ok := vars["fileID"]
 	if !ok {

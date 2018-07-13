@@ -67,3 +67,17 @@ func (mw loggingMiddleware) GetBatch(fileID string, batchID string) (b ach.Batch
 	}(time.Now())
 	return mw.next.GetBatch(fileID, batchID)
 }
+
+func (mw loggingMiddleware) GetBatches(fileID string) []ach.Batcher {
+	defer func(begin time.Time) {
+		mw.logger.Log("method", "GetBatches", "fileID", fileID, "took", time.Since(begin))
+	}(time.Now())
+	return mw.next.GetBatches(fileID)
+}
+
+func (mw loggingMiddleware) DeleteBatch(fileID string, batchID string) (err error) {
+	defer func(begin time.Time) {
+		mw.logger.Log("method", "DeleteBatch", "fileID", fileID, "batchID", batchID, "took", time.Since(begin), "err", err)
+	}(time.Now())
+	return mw.next.DeleteBatch(fileID, batchID)
+}
