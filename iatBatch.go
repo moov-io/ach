@@ -48,6 +48,10 @@ func IATNewBatch(bh *IATBatchHeader) IATBatch {
 func (batch *IATBatch) verify() error {
 	batchNumber := batch.Header.BatchNumber
 
+	// No entries in batch
+	if len(batch.Entries) <= 0 {
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "entries", Msg: msgBatchEntries}
+	}
 	// verify field inclusion in all the records of the batch.
 	if err := batch.isFieldInclusion(); err != nil {
 		// convert the field error in to a batch error for a consistent api
@@ -390,9 +394,6 @@ func (batch *IATBatch) isAddendaSequence() error {
 
 // isCategory verifies that a Forward and Return Category are not in the same batch
 func (batch *IATBatch) isCategory() error {
-	if len(batch.Entries) <= 0 {
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "entries", Msg: msgBatchEntries}
-	}
 	category := batch.GetEntries()[0].Category
 	if len(batch.Entries) > 1 {
 		for i := 1; i < len(batch.Entries); i++ {
