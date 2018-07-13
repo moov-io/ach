@@ -12,7 +12,7 @@ import (
 func mockAddenda12() *Addenda12 {
 	addenda12 := NewAddenda12()
 	addenda12.OriginatorCityStateProvince = "JacobsTown*PA\\"
-	addenda12.OriginatorCountryPostalCode = "US19305\\"
+	addenda12.OriginatorCountryPostalCode = "US*19305\\"
 	addenda12.EntryDetailSequenceNumber = 00000001
 	return addenda12
 }
@@ -299,7 +299,7 @@ func testAddenda12String(t testing.TB) {
 	// Backslash logic
 	var line = "712" +
 		"JacobsTown*PA\\                     " +
-		"US19305\\                           " +
+		"US*19305\\                          " +
 		"              " +
 		"0000001"
 

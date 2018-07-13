@@ -11,8 +11,8 @@ import (
 // mockAddenda16 creates a mock Addenda16 record
 func mockAddenda16() *Addenda16 {
 	addenda16 := NewAddenda16()
-	addenda16.ReceiverCityStateProvince = "LetterTown*CO\\"
-	addenda16.ReceiverCountryPostalCode = "US80014\\"
+	addenda16.ReceiverCityStateProvince = "LetterTown*AB\\"
+	addenda16.ReceiverCountryPostalCode = "CA*80014\\"
 	addenda16.EntryDetailSequenceNumber = 00000001
 	return addenda16
 }
@@ -300,8 +300,8 @@ func testAddenda16String(t testing.TB) {
 	addenda16 := NewAddenda16()
 	// Backslash logic
 	var line = "716" +
-		"LetterTown*CO\\                     " +
-		"US80014\\                           " +
+		"LetterTown*AB\\                     " +
+		"CA*80014\\                          " +
 		"              " +
 		"0000001"
 

@@ -750,8 +750,14 @@ func BenchmarkIATBatchAddendaRecordIndicator(b *testing.B) {
 func testIATBatchInvalidTraceNumberODFI(t testing.TB) {
 	mockBatch := mockIATBatch()
 	mockBatch.GetEntries()[0].SetTraceNumber("9928272", 1)
-	if err := mockBatch.build(); err != nil {
-		t.Errorf("%T: %s", err, err)
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ODFIIdentificationField" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
 	}
 }
 
@@ -793,5 +799,65 @@ func BenchmarkIATBatchControl(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testIATBatchControl(b)
+	}
+}
+
+// testIATBatchEntryCountEquality validates IATBatch EntryAddendaCount
+func testIATBatchEntryCountEquality(t testing.TB) {
+	mockBatch := mockIATBatch()
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	mockBatch.GetControl().EntryAddendaCount = 1
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "EntryAddendaCount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestIATBatchEntryCountEquality tests validating IATBatch EntryAddendaCount
+func TestIATBatchEntryCountEquality(t *testing.T) {
+	testIATBatchEntryCountEquality(t)
+}
+
+// BenchmarkIATBatchEntryCountEquality benchmarks validating IATBatch EntryAddendaCount
+func BenchmarkIATBatchEntryCountEquality(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchEntryCountEquality(b)
+	}
+}
+
+// testIATBatchisEntryHash validates IATBatch EntryHash
+func testIATBatchisEntryHash(t testing.TB) {
+	mockBatch := mockIATBatch()
+	mockBatch.GetControl().EntryHash = 1
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "EntryHash" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+//TestIATBatchisEntryHash tests validating IATBatch EntryHash
+func TestIATBatchisEntryHash(t *testing.T) {
+	testIATBatchisEntryHash(t)
+}
+
+//BenchmarkIATBatchisEntryHash benchmarks validating IATBatch EntryHash
+func BenchmarkIATBatchisEntryHash(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchisEntryHash(b)
 	}
 }

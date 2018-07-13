@@ -1008,24 +1008,29 @@ func testACHFileRead(t testing.TB) {
 	defer f.Close()
 	r := NewReader(f)
 	_, err = r.Read()
-	if p, ok := err.(*ParseError); ok {
-		if e, ok := p.Err.(*BatchError); ok {
-			if e.FieldName != "entries" {
-				t.Errorf("%T: %s", e, e)
+
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*BatchError); ok {
+				if e.FieldName != "entries" {
+					t.Errorf("%T: %s", e, e)
+				}
 			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
-	} else {
-		t.Errorf("%T: %s", err, err)
 	}
 
-	err = r.File.Validate()
+	err2 := r.File.Validate()
 
-	if e, ok := err.(*FileError); ok {
-		if e.FieldName != "BatchCount" {
-			t.Errorf("%T: %s", e, e)
+	if err2 != nil {
+		if e, ok := err2.(*FileError); ok {
+			if e.FieldName != "BatchCount" {
+				t.Errorf("%T: %s", e, e)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
-	} else {
-		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1051,24 +1056,29 @@ func testACHFileRead2(t testing.TB) {
 	defer f.Close()
 	r := NewReader(f)
 	_, err = r.Read()
-	if p, ok := err.(*ParseError); ok {
-		if e, ok := p.Err.(*BatchError); ok {
-			if e.FieldName != "entries" {
-				t.Errorf("%T: %s", e, e)
+
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*BatchError); ok {
+				if e.FieldName != "entries" {
+					t.Errorf("%T: %s", e, e)
+				}
 			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
-	} else {
-		t.Errorf("%T: %s", err, err)
 	}
 
-	err = r.File.Validate()
+	err2 := r.File.Validate()
 
-	if e, ok := err.(*FileError); ok {
-		if e.FieldName != "BatchCount" {
-			t.Errorf("%T: %s", e, e)
+	if err2 != nil {
+		if e, ok := err2.(*FileError); ok {
+			if e.FieldName != "BatchCount" {
+				t.Errorf("%T: %s", e, e)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
 		}
-	} else {
-		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1082,5 +1092,56 @@ func BenchmarkACHFileRead2(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testACHFileRead2(b)
+	}
+}
+
+// testACHFileRead3 validates reading a file with IAT entries
+// that does not error.
+func testACHFileRead3(t testing.TB) {
+	f, err := os.Open("./test/data/20180713-IAT.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*BatchError); ok {
+				if e.FieldName != "entries" {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+	err2 := r.File.Validate()
+
+	if err2 != nil {
+		if e, ok := err2.(*FileError); ok {
+			if e.FieldName != "BatchCount" {
+				t.Errorf("%T: %s", e, e)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestACHFileRead3 tests validating reading a file with IAT entries that
+// does not error.
+func TestACHFileRead3(t *testing.T) {
+	testACHFileRead3(t)
+}
+
+// BenchmarkACHFileRead3 benchmarks validating reading a file with IAT entries
+// that does not error.
+func BenchmarkACHFileRead3(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testACHFileRead3(b)
 	}
 }

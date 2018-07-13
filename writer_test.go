@@ -121,18 +121,20 @@ func testIATWrite(t testing.TB) {
 	iatBatch.Create()
 	file.AddIATBatch(iatBatch)
 
-	/*	iatBatch2 := IATBatch{}
-		iatBatch2.SetHeader(mockIATBatchHeaderFF())
-		iatBatch2.AddEntry(mockIATEntryDetail())
-		iatBatch2.Entries[0].Addenda10 = mockAddenda10()
-		iatBatch2.Entries[0].Addenda11 = mockAddenda11()
-		iatBatch2.Entries[0].Addenda12 = mockAddenda12()
-		iatBatch2.Entries[0].Addenda13 = mockAddenda13()
-		iatBatch2.Entries[0].Addenda14 = mockAddenda14()
-		iatBatch2.Entries[0].Addenda15 = mockAddenda15()
-		iatBatch2.Entries[0].Addenda16 = mockAddenda16()
-		iatBatch2.Create()
-		file.AddIATBatch(iatBatch2)*/
+	iatBatch2 := IATBatch{}
+	iatBatch2.SetHeader(mockIATBatchHeaderFF())
+	iatBatch2.AddEntry(mockIATEntryDetail())
+	iatBatch2.GetEntries()[0].TransactionCode = 27
+	iatBatch2.GetEntries()[0].Amount = 2000
+	iatBatch2.Entries[0].Addenda10 = mockAddenda10()
+	iatBatch2.Entries[0].Addenda11 = mockAddenda11()
+	iatBatch2.Entries[0].Addenda12 = mockAddenda12()
+	iatBatch2.Entries[0].Addenda13 = mockAddenda13()
+	iatBatch2.Entries[0].Addenda14 = mockAddenda14()
+	iatBatch2.Entries[0].Addenda15 = mockAddenda15()
+	iatBatch2.Entries[0].Addenda16 = mockAddenda16()
+	iatBatch2.Create()
+	file.AddIATBatch(iatBatch2)
 
 	if err := file.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
