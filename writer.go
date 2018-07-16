@@ -134,8 +134,13 @@ func (w *Writer) writeIATBatch(file *File) error {
 				return err
 			}
 			w.lineNum++
-
-			// ToDo:  17 and 18
+			// IAT Addenda17 and IAT Addenda18 records
+			for _, IATaddenda := range entry.Addendum {
+				if _, err := w.w.WriteString(IATaddenda.String() + "\n"); err != nil {
+					return err
+				}
+				w.lineNum++
+			}
 		}
 		if _, err := w.w.WriteString(iatBatch.GetControl().String() + "\n"); err != nil {
 			return err

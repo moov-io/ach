@@ -1142,3 +1142,51 @@ func BenchmarkACHFileRead3(b *testing.B) {
 		testACHFileRead3(b)
 	}
 }
+
+// testACHIATAddenda17 validates reading a file with IAT and Addenda 17 entries
+func testACHIATAddenda17(t testing.TB) {
+	f, err := os.Open("./test/data/20180716-IAT-A17.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*BatchError); ok {
+				if e.FieldName != "entries" {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+	err2 := r.File.Validate()
+
+	if err2 != nil {
+		if e, ok := err2.(*FileError); ok {
+			if e.FieldName != "BatchCount" {
+				t.Errorf("%T: %s", e, e)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestACHIATAddenda17 tests validating reading a file with IAT and Addenda17 entries that
+func TestACHIATAddenda17(t *testing.T) {
+	testACHIATAddenda17(t)
+}
+
+// BenchmarkACHIATAddenda17  benchmarks validating reading a file with IAT and Addenda17 entries
+func BenchmarkACHIATAddenda17(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testACHIATAddenda17(b)
+	}
+}

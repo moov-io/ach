@@ -92,14 +92,12 @@ type IATEntryDetail struct {
 	// The Addenda15 record identifies key information related to the Receiver.
 	Addenda15 *Addenda15 `json:"addenda15,omitempty"`
 	// Addenda16
+	//
+	// Addenda16 record identifies additional key information related to the Receiver.
 	Addenda16 *Addenda16 `json:"addenda16,omitempty"`
-	// Addenda16 is mandatory for IAT entries
-	//
-	// The Addenda16 record identifies key information related to the Receiver.
-	Addenda17 *Addenda17 `json:"addenda17,omitempty"`
-	// Addenda17 is optional for IAT entries
-	//
-	// The Addenda17 record identifies payment-related data. A maximum of two of these Addenda Records
+	// Addendum a list of Addenda for the Entry Detail
+	Addendum []Addendumer `json:"addendum,omitempty"`
+	// Category defines if the entry is a Forward, Return, or NOC
 	Category string `json:"category,omitempty"`
 	// validator is composed for data validation
 	validator
@@ -288,4 +286,18 @@ func (ed *IATEntryDetail) SecondaryOFACSreeningIndicatorField() string {
 // TraceNumberField returns a zero padded TraceNumber string
 func (ed *IATEntryDetail) TraceNumberField() string {
 	return ed.numericField(ed.TraceNumber, 15)
+}
+
+// AddIATAddenda appends an Addendumer to the IATEntryDetail
+// Currently this is used to add Addenda17 and Addenda18 IAT Addenda records
+func (ed *IATEntryDetail) AddIATAddenda(addenda Addendumer) []Addendumer {
+	ed.AddendaRecordIndicator = 1
+	// checks to make sure that we only have either or, not both
+	switch addenda.(type) {
+	// Addenda17
+	default:
+		ed.Category = CategoryForward
+		ed.Addendum = append(ed.Addendum, addenda)
+		return ed.Addendum
+	}
 }

@@ -417,7 +417,7 @@ func (r *Reader) parseIATEntryDetail() error {
 	return nil
 }
 
-// parseAddendaRecord takes the input record string and create an Addenda Type appended to the last EntryDetail
+// parseIATAddenda takes the input record string and create an Addenda Type appended to the last EntryDetail
 func (r *Reader) parseIATAddenda() error {
 	r.recordName = "Addenda"
 
@@ -489,7 +489,7 @@ func (r *Reader) parseIATAddenda() error {
 			if err := addenda17.Validate(); err != nil {
 				return r.error(err)
 			}
-			r.IATCurrentBatch.GetEntries()[entryIndex].Addenda17 = addenda17
+			r.IATCurrentBatch.GetEntries()[entryIndex].AddIATAddenda(addenda17)
 		}
 	} else {
 		msg := fmt.Sprint(msgIATBatchAddendaIndicator)

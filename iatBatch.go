@@ -114,15 +114,8 @@ func (batch *IATBatch) build() error {
 	entryCount := 0
 	seq := 1
 	for i, entry := range batch.Entries {
-		entryCount = entryCount + 1 + 7
-		//ToDo: Add Addenda17 and Addenda18  maximum of 2 addenda17 and 5 addenda18
-		/*		if entry.Addenda17 != nil {
-				entryCount = entryCount + 1
-			}*/
-
-		/*if entry.Addenda18 != nil {
-			entryCount = entryCount + 1
-		}	*/
+		entryCount = entryCount + 1 + 7 + len(entry.Addendum)
+		//ToDo: Add  Addenda17 and Addenda18  maximum of 2 addenda17 and 5 addenda18
 
 		// Verifies the required addenda* properties for an IAT entry detail are defined
 		if err := batch.addendaFieldInclusion(entry); err != nil {
@@ -153,10 +146,17 @@ func (batch *IATBatch) build() error {
 		entry.Addenda15.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
 		entry.Addenda16.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
 
-		//ToDo:  Add Addenda17 and Addenda 18 logic for SequenceNUmber and EntryDetailSequenceNumber
+		// Addenda17 and Addenda18 SequenceNumber and EntryDetailSequenceNumber
+		seq++
+		addendaSeq := 1
+		for x := range entry.Addendum {
+			if a, ok := batch.Entries[i].Addendum[x].(*Addenda17); ok {
+				a.SequenceNumber = addendaSeq
+				a.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
+			}
+			addendaSeq++
+		}
 
-		/*		entry.Addenda17.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
-				entry.Addenda18.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])*/
 	}
 
 	// build a BatchControl record
@@ -255,13 +255,7 @@ func (batch *IATBatch) isFieldInclusion() error {
 func (batch *IATBatch) isBatchEntryCount() error {
 	entryCount := 0
 	for _, entry := range batch.Entries {
-		entryCount = entryCount + 1 + 7
-
-		//ToDo: Add logic for Addenda17 and Addenda18
-
-		if entry.Addenda17 != nil {
-			entryCount = entryCount + 1
-		}
+		entryCount = entryCount + 1 + 7 + len(entry.Addendum)
 	}
 	if entryCount != batch.Control.EntryAddendaCount {
 		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, entryCount, batch.Control.EntryAddendaCount)

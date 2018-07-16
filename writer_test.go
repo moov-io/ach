@@ -6,6 +6,8 @@ package ach
 
 import (
 	"bytes"
+	"log"
+	"os"
 	"strings"
 	"testing"
 )
@@ -118,6 +120,8 @@ func testIATWrite(t testing.TB) {
 	iatBatch.Entries[0].Addenda14 = mockAddenda14()
 	iatBatch.Entries[0].Addenda15 = mockAddenda15()
 	iatBatch.Entries[0].Addenda16 = mockAddenda16()
+	iatBatch.Entries[0].AddIATAddenda(mockAddenda17())
+	iatBatch.Entries[0].AddIATAddenda(mockAddenda17B())
 	iatBatch.Create()
 	file.AddIATBatch(iatBatch)
 
@@ -133,6 +137,7 @@ func testIATWrite(t testing.TB) {
 	iatBatch2.Entries[0].Addenda14 = mockAddenda14()
 	iatBatch2.Entries[0].Addenda15 = mockAddenda15()
 	iatBatch2.Entries[0].Addenda16 = mockAddenda16()
+	iatBatch2.Entries[0].AddIATAddenda(mockAddenda17())
 	iatBatch2.Create()
 	file.AddIATBatch(iatBatch2)
 
@@ -159,12 +164,12 @@ func testIATWrite(t testing.TB) {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	/*	// Write IAT records to standard output. Anything io.Writer
-		w := NewWriter(os.Stdout)
-		if err := w.Write(file); err != nil {
-			log.Fatalf("Unexpected error: %s\n", err)
-		}
-		w.Flush()*/
+	// Write IAT records to standard output. Anything io.Writer
+	w := NewWriter(os.Stdout)
+	if err := w.Write(file); err != nil {
+		log.Fatalf("Unexpected error: %s\n", err)
+	}
+	w.Flush()
 }
 
 // TestIATWrite tests writing a IAT ACH file
