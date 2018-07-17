@@ -64,7 +64,6 @@ func mockAddenda18E() *Addenda18 {
 	return addenda18
 }
 
-
 // TestMockAddenda18 validates mockAddenda18
 func TestMockAddenda18(t *testing.T) {
 	addenda18 := mockAddenda18()
@@ -240,7 +239,6 @@ func BenchmarkAddenda18ForeignCorrespondentBankBranchCountryCodeAlphaNumeric(b *
 		testAddenda18ForeignCorrespondentBankBranchCountryCodeAlphaNumeric(b)
 	}
 }
-
 
 //testAddenda18ForeignCorrespondentBankIDNumberAlphaNumeric validates ForeignCorrespondentBankIDNumber is alphanumeric
 func testAddenda18ForeignCorrespondentBankIDNumberAlphaNumeric(t testing.TB) {
