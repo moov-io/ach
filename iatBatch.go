@@ -135,11 +135,12 @@ func (batch *IATBatch) build() error {
 			return err
 		}
 
-		// Add a sequenced TraceNumber if one is not already set. Have to keep original trance number Return and NOC entries
+		// Add a sequenced TraceNumber if one is not already set.
 		if currentTraceNumberODFI != batchHeaderODFI {
 			batch.Entries[i].SetTraceNumber(batch.Header.ODFIIdentification, seq)
 		}
 
+		// Set TraceNumber for IATEntryDetail Addenda10-16 Record Properties
 		entry.Addenda10.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
 		entry.Addenda11.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
 		entry.Addenda12.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
@@ -148,7 +149,7 @@ func (batch *IATBatch) build() error {
 		entry.Addenda15.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
 		entry.Addenda16.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
 
-		// Addenda17 and Addenda18 SequenceNumber and EntryDetailSequenceNumber
+		// Set TraceNumber for Addendumer Addenda17 and Addenda18 SequenceNumber and EntryDetailSequenceNumber
 		seq++
 		addenda17Seq := 1
 		addenda18Seq := 1
@@ -158,7 +159,6 @@ func (batch *IATBatch) build() error {
 				a.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
 				addenda17Seq++
 			}
-
 			if a, ok := batch.Entries[i].Addendum[x].(*Addenda18); ok {
 				a.SequenceNumber = addenda18Seq
 				a.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
@@ -166,7 +166,6 @@ func (batch *IATBatch) build() error {
 			}
 		}
 	}
-
 	// build a BatchControl record
 	bc := NewBatchControl()
 	bc.ServiceClassCode = batch.Header.ServiceClassCode
@@ -250,6 +249,12 @@ func (batch *IATBatch) isFieldInclusion() error {
 		}
 		if err := entry.Addenda16.Validate(); err != nil {
 			return err
+		}
+		// Verifies addendumer Addenda17 and Addenda18 records are valid
+		for _, IATAddenda := range entry.Addendum {
+			if err := IATAddenda.Validate(); err != nil {
+				return err
+			}
 		}
 
 	}
@@ -346,7 +351,6 @@ func (batch *IATBatch) isTraceNumberODFI() error {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ODFIIdentificationField", Msg: msg}
 		}
 	}
-
 	return nil
 }
 
@@ -389,11 +393,10 @@ func (batch *IATBatch) isAddendaSequence() error {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
 		}
 
+		// check if sequence is ascending for addendumer - Addenda17 and Addenda18
 		lastAddenda17Seq := -1
 		lastAddenda18Seq := -1
-		// check if sequence is ascending
 		for _, IATAddenda := range entry.Addendum {
-			// sequences don't exist in NOC or Return addenda
 			if a, ok := IATAddenda.(*Addenda17); ok {
 
 				if a.SequenceNumber < lastAddenda17Seq {
