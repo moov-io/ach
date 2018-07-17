@@ -31,6 +31,51 @@ func mockIATBatch() IATBatch {
 func mockIATBatchManyEntries() IATBatch {
 	mockBatch := IATBatch{}
 	mockBatch.SetHeader(mockIATBatchHeaderFF())
+
+	mockBatch.AddEntry(mockIATEntryDetail())
+
+	mockBatch.Entries[0].Addenda10 = mockAddenda10()
+	mockBatch.Entries[0].Addenda11 = mockAddenda11()
+	mockBatch.Entries[0].Addenda12 = mockAddenda12()
+	mockBatch.Entries[0].Addenda13 = mockAddenda13()
+	mockBatch.Entries[0].Addenda14 = mockAddenda14()
+	mockBatch.Entries[0].Addenda15 = mockAddenda15()
+	mockBatch.Entries[0].Addenda16 = mockAddenda16()
+	mockBatch.Entries[0].AddIATAddenda(mockAddenda17())
+	mockBatch.Entries[0].AddIATAddenda(mockAddenda17B())
+	mockBatch.Entries[0].AddIATAddenda(mockAddenda18())
+	mockBatch.Entries[0].AddIATAddenda(mockAddenda18B())
+	mockBatch.Entries[0].AddIATAddenda(mockAddenda18C())
+	mockBatch.Entries[0].AddIATAddenda(mockAddenda18D())
+	mockBatch.Entries[0].AddIATAddenda(mockAddenda18E())
+
+	mockBatch.AddEntry(mockIATEntryDetail2())
+
+	mockBatch.Entries[1].Addenda10 = mockAddenda10()
+	mockBatch.Entries[1].Addenda11 = mockAddenda11()
+	mockBatch.Entries[1].Addenda12 = mockAddenda12()
+	mockBatch.Entries[1].Addenda13 = mockAddenda13()
+	mockBatch.Entries[1].Addenda14 = mockAddenda14()
+	mockBatch.Entries[1].Addenda15 = mockAddenda15()
+	mockBatch.Entries[1].Addenda16 = mockAddenda16()
+	mockBatch.Entries[1].AddIATAddenda(mockAddenda17())
+	mockBatch.Entries[1].AddIATAddenda(mockAddenda17B())
+	mockBatch.Entries[1].AddIATAddenda(mockAddenda18())
+	mockBatch.Entries[1].AddIATAddenda(mockAddenda18B())
+	mockBatch.Entries[1].AddIATAddenda(mockAddenda18C())
+	mockBatch.Entries[1].AddIATAddenda(mockAddenda18D())
+	mockBatch.Entries[1].AddIATAddenda(mockAddenda18E())
+
+	if err := mockBatch.build(); err != nil {
+		log.Fatal(err)
+	}
+	return mockBatch
+}
+
+// mockIATBatch
+func mockInvalidIATBatch() IATBatch {
+	mockBatch := IATBatch{}
+	mockBatch.SetHeader(mockIATBatchHeaderFF())
 	mockBatch.AddEntry(mockIATEntryDetail())
 	mockBatch.Entries[0].Addenda10 = mockAddenda10()
 	mockBatch.Entries[0].Addenda11 = mockAddenda11()
@@ -39,18 +84,21 @@ func mockIATBatchManyEntries() IATBatch {
 	mockBatch.Entries[0].Addenda14 = mockAddenda14()
 	mockBatch.Entries[0].Addenda15 = mockAddenda15()
 	mockBatch.Entries[0].Addenda16 = mockAddenda16()
-	mockBatch.AddEntry(mockIATEntryDetail2())
-	mockBatch.Entries[1].Addenda10 = mockAddenda10()
-	mockBatch.Entries[1].Addenda11 = mockAddenda11()
-	mockBatch.Entries[1].Addenda12 = mockAddenda12()
-	mockBatch.Entries[1].Addenda13 = mockAddenda13()
-	mockBatch.Entries[1].Addenda14 = mockAddenda14()
-	mockBatch.Entries[1].Addenda15 = mockAddenda15()
-	mockBatch.Entries[1].Addenda16 = mockAddenda16()
+	mockBatch.Entries[0].AddIATAddenda(mockInvalidAddenda17())
 	if err := mockBatch.build(); err != nil {
 		log.Fatal(err)
 	}
 	return mockBatch
+}
+
+func mockInvalidAddenda17() *Addenda17 {
+	addenda17 := NewAddenda17()
+	addenda17.PaymentRelatedInformation = "Transfer of money from one country to another"
+	addenda17.typeCode = "02"
+	addenda17.SequenceNumber = 2
+	addenda17.EntryDetailSequenceNumber = 0000002
+
+	return addenda17
 }
 
 // TestMockIATBatch validates mockIATBatch
@@ -952,5 +1000,265 @@ func BenchmarkIATBatchIsCategory(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testIATBatchIsCategory(b)
+	}
+}
+
+// testIATBatchValidateEntry validates EntryDetail
+func testIATBatchValidateEntry(t testing.TB) {
+	mockBatch := mockIATBatch()
+	mockBatch.GetEntries()[0].recordType = "5"
+
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestIATBatchValidateEntry tests validating Entry
+func TestIATBatchValidateEntry(t *testing.T) {
+	testIATBatchValidateEntry(t)
+}
+
+// BenchmarkIATBatchValidateEntry tests validating Entry
+func BenchmarkIATBatchValidateEntry(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchValidateEntry(b)
+	}
+}
+
+// testIATBatchValidateAddenda10 validates Addenda10
+func testIATBatchValidateAddenda10(t testing.TB) {
+	mockBatch := mockIATBatchManyEntries()
+	mockBatch.GetEntries()[1].Addenda10.typeCode = "02"
+
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestIATBatchValidateAddenda10 tests validating Addenda10
+func TestIATBatchValidateAddenda10(t *testing.T) {
+	testIATBatchValidateAddenda10(t)
+}
+
+// BenchmarkIATBatchValidateAddenda10 tests validating Addenda10
+func BenchmarkIATBatchValidateAddenda10(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchValidateAddenda10(b)
+	}
+}
+
+// testIATBatchValidateAddenda11 validates Addenda11
+func testIATBatchValidateAddenda11(t testing.TB) {
+	mockBatch := mockIATBatchManyEntries()
+	mockBatch.GetEntries()[1].Addenda11.typeCode = "02"
+
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestIATBatchValidateAddenda11 tests validating Addenda11
+func TestIATBatchValidateAddenda11(t *testing.T) {
+	testIATBatchValidateAddenda11(t)
+}
+
+// BenchmarkIATBatchValidateAddenda11 tests validating Addenda11
+func BenchmarkIATBatchValidateAddenda11(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchValidateAddenda11(b)
+	}
+}
+
+// testIATBatchValidateAddenda12 validates Addenda12
+func testIATBatchValidateAddenda12(t testing.TB) {
+	mockBatch := mockIATBatchManyEntries()
+	mockBatch.GetEntries()[1].Addenda12.typeCode = "02"
+
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestIATBatchValidateAddenda12 tests validating Addenda12
+func TestIATBatchValidateAddenda12(t *testing.T) {
+	testIATBatchValidateAddenda12(t)
+}
+
+// BenchmarkIATBatchValidateAddenda12 tests validating Addenda12
+func BenchmarkIATBatchValidateAddenda12(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchValidateAddenda12(b)
+	}
+}
+
+// testIATBatchValidateAddenda13 validates Addenda13
+func testIATBatchValidateAddenda13(t testing.TB) {
+	mockBatch := mockIATBatchManyEntries()
+	mockBatch.GetEntries()[1].Addenda13.typeCode = "02"
+
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestIATBatchValidateAddenda13 tests validating Addenda13
+func TestIATBatchValidateAddenda13(t *testing.T) {
+	testIATBatchValidateAddenda13(t)
+}
+
+// BenchmarkIATBatchValidateAddenda13 tests validating Addenda13
+func BenchmarkIATBatchValidateAddenda13(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchValidateAddenda13(b)
+	}
+}
+
+// testIATBatchValidateAddenda14 validates Addenda14
+func testIATBatchValidateAddenda14(t testing.TB) {
+	mockBatch := mockIATBatchManyEntries()
+	mockBatch.GetEntries()[1].Addenda14.typeCode = "02"
+
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestIATBatchValidateAddenda14 tests validating Addenda14
+func TestIATBatchValidateAddenda14(t *testing.T) {
+	testIATBatchValidateAddenda14(t)
+}
+
+// BenchmarkIATBatchValidateAddenda14 tests validating Addenda14
+func BenchmarkIATBatchValidateAddenda14(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchValidateAddenda14(b)
+	}
+}
+
+// testIATBatchValidateAddenda15 validates Addenda15
+func testIATBatchValidateAddenda15(t testing.TB) {
+	mockBatch := mockIATBatchManyEntries()
+	mockBatch.GetEntries()[1].Addenda15.typeCode = "02"
+
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestIATBatchValidateAddenda15 tests validating Addenda15
+func TestIATBatchValidateAddenda15(t *testing.T) {
+	testIATBatchValidateAddenda15(t)
+}
+
+// BenchmarkIATBatchValidateAddenda15 tests validating Addenda15
+func BenchmarkIATBatchValidateAddenda15(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchValidateAddenda15(b)
+	}
+}
+
+// testIATBatchValidateAddenda16 validates Addenda16
+func testIATBatchValidateAddenda16(t testing.TB) {
+	mockBatch := mockIATBatchManyEntries()
+	mockBatch.GetEntries()[1].Addenda16.typeCode = "02"
+
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestIATBatchValidateAddenda16 tests validating Addenda16
+func TestIATBatchValidateAddenda16(t *testing.T) {
+	testIATBatchValidateAddenda16(t)
+}
+
+// BenchmarkIATBatchValidateAddenda16 tests validating Addenda16
+func BenchmarkIATBatchValidateAddenda16(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchValidateAddenda16(b)
+	}
+}
+
+// testIATBatchValidateAddenda17 validates Addenda17
+func testIATBatchValidateAddenda17(t testing.TB) {
+	mockBatch := mockInvalidIATBatch()
+
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestIATBatchValidateAddenda17 tests validating Addenda17
+func TestIATBatchValidateAddenda17(t *testing.T) {
+	testIATBatchValidateAddenda17(t)
+}
+
+// BenchmarkIATBatchValidateAddenda17 tests validating Addenda17
+func BenchmarkIATBatchValidateAddenda17(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchValidateAddenda17(b)
 	}
 }
