@@ -13,9 +13,9 @@ var (
 	msgIATBatchAddendaRequired  = "is required for an IAT detail entry"
 	msgIATBatchAddendaIndicator = "is invalid for addenda record(s) found"
 	// There can be up to 2 optional Addenda17 records and up to 5 optional Addenda18 records
-	msgBatchIATAddendum          = "found and 7 Addendum is the maximum for SEC code IAT"
-	msgBatchIATAddenda17         = "found and 2 Addenda17 is the maximum for SEC code IAT"
-	msgBatchIATAddenda18         = "found and 5 Addenda18 is the maximum for SEC code IAT"
+	msgBatchIATAddendum          = "7 Addendum is the maximum for SEC code IAT"
+	msgBatchIATAddenda17         = "2 Addenda17 is the maximum for SEC code IAT"
+	msgBatchIATAddenda18         = "5 Addenda18 is the maximum for SEC code IAT"
 	msgBatchIATInvalidAddendumer = "invalid Addendumer for SEC Code IAT"
 )
 
@@ -159,6 +159,7 @@ func (batch *IATBatch) build() error {
 				a.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
 				addenda17Seq++
 			}
+
 			if a, ok := batch.Entries[i].Addendum[x].(*Addenda18); ok {
 				a.SequenceNumber = addenda18Seq
 				a.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
@@ -166,6 +167,7 @@ func (batch *IATBatch) build() error {
 			}
 		}
 	}
+
 	// build a BatchControl record
 	bc := NewBatchControl()
 	bc.ServiceClassCode = batch.Header.ServiceClassCode
@@ -256,7 +258,6 @@ func (batch *IATBatch) isFieldInclusion() error {
 				return err
 			}
 		}
-
 	}
 	return batch.Control.Validate()
 }
@@ -351,6 +352,7 @@ func (batch *IATBatch) isTraceNumberODFI() error {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ODFIIdentificationField", Msg: msg}
 		}
 	}
+
 	return nil
 }
 
@@ -396,6 +398,7 @@ func (batch *IATBatch) isAddendaSequence() error {
 		// check if sequence is ascending for addendumer - Addenda17 and Addenda18
 		lastAddenda17Seq := -1
 		lastAddenda18Seq := -1
+
 		for _, IATAddenda := range entry.Addendum {
 			if a, ok := IATAddenda.(*Addenda17); ok {
 

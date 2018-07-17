@@ -1003,6 +1003,32 @@ func BenchmarkIATBatchIsCategory(b *testing.B) {
 	}
 }
 
+//testIATBatchCategory tests IATBatch Category
+func testIATBatchCategory(t testing.TB) {
+	mockBatch := mockIATBatch()
+
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	if mockBatch.Category() != CategoryForward {
+		t.Errorf("No returns and Category is %s", mockBatch.Category())
+	}
+}
+
+// TestIATBatchCategory tests IATBatch Category
+func TestIATBatchCategory(t *testing.T) {
+	testIATBatchCategory(t)
+}
+
+// BenchmarkIATBatchCategory benchmarks IATBatch Category
+func BenchmarkIATBatchCategory(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchCategory(b)
+	}
+}
+
 // testIATBatchValidateEntry validates EntryDetail
 func testIATBatchValidateEntry(t testing.TB) {
 	mockBatch := mockIATBatch()
@@ -1260,5 +1286,114 @@ func BenchmarkIATBatchValidateAddenda17(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testIATBatchValidateAddenda17(b)
+	}
+}
+
+// testIATBatchCreateError validates IATBatch create error
+func testIATBatchCreate(t testing.TB) {
+	file := NewFile().SetHeader(mockFileHeader())
+	mockBatch := mockIATBatch()
+	mockBatch.GetHeader().recordType = "7"
+
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+	file.AddIATBatch(mockBatch)
+}
+
+// TestIATBatchCreate tests validating IATBatch create error
+func TestIATBatchCreate(t *testing.T) {
+	testIATBatchCreate(t)
+}
+
+// BenchmarkIATBatchCreate benchmarks validating IATBatch create error
+func BenchmarkIATBatchCreate(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchCreate(b)
+	}
+
+}
+
+// testIATBatchValidate validates IATBatch validate error
+func testIATBatchValidate(t testing.TB) {
+	file := NewFile().SetHeader(mockFileHeader())
+	mockBatch := mockIATBatch()
+	mockBatch.GetHeader().ServiceClassCode = 225
+
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ServiceClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+	file.AddIATBatch(mockBatch)
+}
+
+// TestIATBatchValidate tests validating IATBatch validate error
+func TestIATBatchValidate(t *testing.T) {
+	testIATBatchValidate(t)
+}
+
+// BenchmarkIATBatchValidate benchmarks validating IATBatch validate error
+func BenchmarkIATBatchValidate(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchValidate(b)
+	}
+
+}
+
+// testIATBatchEntryAddendum validates IATBatch EntryAddendum error
+func testIATBatchEntryAddendum(t testing.TB) {
+	file := NewFile().SetHeader(mockFileHeader())
+	mockBatch := mockIATBatch()
+	mockBatch.Entries[0].AddIATAddenda(mockAddenda17())
+	mockBatch.Entries[0].AddIATAddenda(mockAddenda17B())
+	mockBatch.Entries[0].AddIATAddenda(mockAddenda18())
+	mockBatch.Entries[0].AddIATAddenda(mockAddenda18B())
+	mockBatch.Entries[0].AddIATAddenda(mockAddenda18C())
+	mockBatch.Entries[0].AddIATAddenda(mockAddenda18D())
+	mockBatch.Entries[0].AddIATAddenda(mockAddenda18E())
+	mockBatch.Entries[0].AddIATAddenda(mockAddenda18F())
+
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addendum" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+	file.AddIATBatch(mockBatch)
+}
+
+// TestIATBatchEntryAddendum tests validating IATBatch EntryAddendum error
+func TestIATBatchEntryAddendum(t *testing.T) {
+	testIATBatchEntryAddendum(t)
+}
+
+// BenchmarkIATBatchEntryAddendum benchmarks validating IATBatch EntryAddendum error
+func BenchmarkIATBatchEntryAddendum(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchEntryAddendum(b)
 	}
 }
