@@ -139,7 +139,6 @@ func (batch *IATBatch) build() error {
 		if currentTraceNumberODFI != batchHeaderODFI {
 			batch.Entries[i].SetTraceNumber(batch.Header.ODFIIdentification, seq)
 		}
-		seq++
 
 		entry.Addenda10.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
 		entry.Addenda11.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
@@ -151,17 +150,20 @@ func (batch *IATBatch) build() error {
 
 		// Addenda17 and Addenda18 SequenceNumber and EntryDetailSequenceNumber
 		seq++
-		addendaSeq := 1
+		addenda17Seq := 1
+		addenda18Seq := 1
 		for x := range entry.Addendum {
 			if a, ok := batch.Entries[i].Addendum[x].(*Addenda17); ok {
-				a.SequenceNumber = addendaSeq
+				a.SequenceNumber = addenda17Seq
 				a.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
+				addenda17Seq++
 			}
+
 			if a, ok := batch.Entries[i].Addendum[x].(*Addenda18); ok {
-				a.SequenceNumber = addendaSeq
+				a.SequenceNumber = addenda18Seq
 				a.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
+				addenda18Seq++
 			}
-			addendaSeq++
 		}
 	}
 
@@ -386,7 +388,39 @@ func (batch *IATBatch) isAddendaSequence() error {
 			msg := fmt.Sprintf(msgBatchAddendaTraceNumber, entry.Addenda16.EntryDetailSequenceNumberField(), entry.TraceNumberField()[8:])
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
 		}
-		//ToDo:  Add Addenda17 and Addenda 18 logic for SequenceNUmber and EntryDetailSequenceNumber
+
+		lastAddenda17Seq := -1
+		lastAddenda18Seq := -1
+		// check if sequence is ascending
+		for _, IATAddenda := range entry.Addendum {
+			// sequences don't exist in NOC or Return addenda
+			if a, ok := IATAddenda.(*Addenda17); ok {
+
+				if a.SequenceNumber < lastAddenda17Seq {
+					msg := fmt.Sprintf(msgBatchAscending, a.SequenceNumber, lastAddenda17Seq)
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "SequenceNumber", Msg: msg}
+				}
+				lastAddenda17Seq = a.SequenceNumber
+				// check that we are in the correct Entry Detail
+				if !(a.EntryDetailSequenceNumberField() == entry.TraceNumberField()[8:]) {
+					msg := fmt.Sprintf(msgBatchAddendaTraceNumber, a.EntryDetailSequenceNumberField(), entry.TraceNumberField()[8:])
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
+				}
+			}
+			if a, ok := IATAddenda.(*Addenda18); ok {
+
+				if a.SequenceNumber < lastAddenda18Seq {
+					msg := fmt.Sprintf(msgBatchAscending, a.SequenceNumber, lastAddenda18Seq)
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "SequenceNumber", Msg: msg}
+				}
+				lastAddenda18Seq = a.SequenceNumber
+				// check that we are in the correct Entry Detail
+				if !(a.EntryDetailSequenceNumberField() == entry.TraceNumberField()[8:]) {
+					msg := fmt.Sprintf(msgBatchAddendaTraceNumber, a.EntryDetailSequenceNumberField(), entry.TraceNumberField()[8:])
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
+				}
+			}
+		}
 	}
 	return nil
 }
@@ -476,7 +510,7 @@ func (batch *IATBatch) Validate() error {
 				addenda17Count = addenda17Count + 1
 			}
 			if IATAddenda.TypeCode() == "18" {
-				addenda17Count = addenda18Count + 1
+				addenda18Count = addenda18Count + 1
 			}
 		}
 		if addenda17Count > 2 {
