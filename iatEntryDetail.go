@@ -91,11 +91,13 @@ type IATEntryDetail struct {
 	//
 	// The Addenda15 record identifies key information related to the Receiver.
 	Addenda15 *Addenda15 `json:"addenda15,omitempty"`
-	// Addenda16
+	// Addenda16 is mandatory for IAt entries
 	//
 	// Addenda16 record identifies additional key information related to the Receiver.
 	Addenda16 *Addenda16 `json:"addenda16,omitempty"`
-	// Addendum a list of Addenda for the Entry Detail
+	// Addendum a list of Addenda for the Entry Detail.  For IAT the addendumer is currently being used
+	// for the optional Addenda17 and Addenda18 records.
+	// ToDo: Consider reverting Addenda* explicit properties back to being addendumer
 	Addendum []Addendumer `json:"addendum,omitempty"`
 	// Category defines if the entry is a Forward, Return, or NOC
 	Category string `json:"category,omitempty"`
@@ -188,7 +190,6 @@ func (ed *IATEntryDetail) Validate() error {
 	if err != nil {
 		return &FieldError{FieldName: "CheckDigit", Value: ed.CheckDigit, Msg: err.Error()}
 	}
-
 	if calculated != edCheckDigit {
 		msg := fmt.Sprintf(msgValidCheckDigit, calculated)
 		return &FieldError{FieldName: "RDFIIdentification", Value: ed.CheckDigit, Msg: msg}

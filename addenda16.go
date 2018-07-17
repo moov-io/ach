@@ -57,9 +57,9 @@ func (addenda16 *Addenda16) Parse(record string) {
 	addenda16.recordType = "7"
 	// 2-3 Always 16
 	addenda16.typeCode = record[1:3]
-	// 4-38
+	// 4-38 ReceiverCityStateProvince
 	addenda16.ReceiverCityStateProvince = record[3:38]
-	// 39-73
+	// 39-73 ReceiverCountryPostalCode
 	addenda16.ReceiverCountryPostalCode = record[38:73]
 	// 74-87 reserved - Leave blank
 	addenda16.reserved = "              "

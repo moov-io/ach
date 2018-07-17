@@ -187,7 +187,7 @@ func (addenda13 *Addenda13) ODFIIdentificationField() string {
 
 // ODFIBranchCountryCodeField gets the ODFIBranchCountryCode field left padded
 func (addenda13 *Addenda13) ODFIBranchCountryCodeField() string {
-	return addenda13.alphaField(addenda13.ODFIBranchCountryCode, 2) + " "
+	return addenda13.alphaField(addenda13.ODFIBranchCountryCode, 3)
 }
 
 // reservedField gets reserved - blank space

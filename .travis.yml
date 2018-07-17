@@ -17,7 +17,7 @@ script:
 - test -z $(gofmt -s -l $GO_FILES)
 - go vet $GO_FILES
 - misspell -error -locale US .
-- gocyclo -over 20 $GO_FILES
+- gocyclo -over 19 $GO_FILES
 - golint -set_exit_status $GO_FILES
 after_success:
 - goveralls -repotoken $COVERALLS_TOKEN

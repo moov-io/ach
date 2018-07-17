@@ -67,7 +67,6 @@ func (addenda10 *Addenda10) Parse(record string) {
 	// 07-24 Payment Amount	For inbound IAT payments this field should contain the USD amount or may be blank.
 	addenda10.ForeignPaymentAmount = addenda10.parseNumField(record[06:24])
 	//  25-46 Insert blanks or zeros
-	//addenda10.ForeignTraceNumber = addenda10.parseStringField(record[24:46])
 	addenda10.ForeignTraceNumber = record[24:46]
 	// 47-81 Receiving Company Name/Individual Name
 	addenda10.Name = record[46:81]

@@ -183,7 +183,7 @@ func (addenda14 *Addenda14) RDFIIdentificationField() string {
 
 // RDFIBranchCountryCodeField gets the RDFIBranchCountryCode field left padded
 func (addenda14 *Addenda14) RDFIBranchCountryCodeField() string {
-	return addenda14.alphaField(addenda14.RDFIBranchCountryCode, 2) + " "
+	return addenda14.alphaField(addenda14.RDFIBranchCountryCode, 3)
 }
 
 // reservedField gets reserved - blank space

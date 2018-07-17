@@ -12,6 +12,11 @@ import (
 var (
 	msgIATBatchAddendaRequired  = "is required for an IAT detail entry"
 	msgIATBatchAddendaIndicator = "is invalid for addenda record(s) found"
+	// There can be up to 2 optional Addenda17 records and up to 5 optional Addenda18 records
+	msgBatchIATAddendum          = "found and 7 Addendum is the maximum for SEC code IAT"
+	msgBatchIATAddenda17         = "found and 2 Addenda17 is the maximum for SEC code IAT"
+	msgBatchIATAddenda18         = "found and 5 Addenda18 is the maximum for SEC code IAT"
+	msgBatchIATInvalidAddendumer = "invalid Addendumer for SEC Code IAT"
 )
 
 // IATBatch holds the Batch Header and Batch Control and all Entry Records for an IAT batch
@@ -90,7 +95,6 @@ func (batch *IATBatch) verify() error {
 	if err := batch.isTraceNumberODFI(); err != nil {
 		return err
 	}
-	// TODO this is specific to batch SEC types and should be called by that validator
 	if err := batch.isAddendaSequence(); err != nil {
 		return err
 	}
@@ -115,7 +119,6 @@ func (batch *IATBatch) build() error {
 	seq := 1
 	for i, entry := range batch.Entries {
 		entryCount = entryCount + 1 + 7 + len(entry.Addendum)
-		//ToDo: Add  Addenda17 and Addenda18  maximum of 2 addenda17 and 5 addenda18
 
 		// Verifies the required addenda* properties for an IAT entry detail are defined
 		if err := batch.addendaFieldInclusion(entry); err != nil {
@@ -154,9 +157,12 @@ func (batch *IATBatch) build() error {
 				a.SequenceNumber = addendaSeq
 				a.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
 			}
+			if a, ok := batch.Entries[i].Addendum[x].(*Addenda18); ok {
+				a.SequenceNumber = addendaSeq
+				a.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
+			}
 			addendaSeq++
 		}
-
 	}
 
 	// build a BatchControl record
@@ -204,7 +210,7 @@ func (batch *IATBatch) AddEntry(entry *IATEntryDetail) {
 }
 
 // Category returns IATBatch Category
-// ToDo: Verify this process is the same as a non IAT Batch
+
 func (batch *IATBatch) Category() string {
 	return batch.category
 }
@@ -222,7 +228,6 @@ func (batch *IATBatch) isFieldInclusion() error {
 		if err := batch.addendaFieldInclusion(entry); err != nil {
 			return err
 		}
-
 		// Verifies each Addenda* record is valid
 		if err := entry.Addenda10.Validate(); err != nil {
 			return err
@@ -245,6 +250,7 @@ func (batch *IATBatch) isFieldInclusion() error {
 		if err := entry.Addenda16.Validate(); err != nil {
 			return err
 		}
+
 	}
 	return batch.Control.Validate()
 }
@@ -453,12 +459,34 @@ func (batch *IATBatch) Validate() error {
 	}
 	// Add configuration based validation for this type.
 
-	// IATBatch must have the following mandatory addenda per entry detail:
-	// Addenda10,Addenda11,Addenda12,Addenda13,Addenda14,Addenda15,Addenda16
+	for _, entry := range batch.Entries {
 
-	// ToDo:  IATBatch can have a maximum of 2 optional Addenda17 records
-	// ToDo:  IAtBatch can have a maximum of 5 optional Addenda18 records
+		// Addendum cannot be greater than 7, There can be a maximum of 2 Addenda17 and a maximum of 5 Addenda18
+		if len(entry.Addendum) > 7 {
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchIATAddendum}
+		}
+		addenda17Count := 0
+		addenda18Count := 0
 
+		for _, IATAddenda := range entry.Addendum {
+
+			if (IATAddenda.TypeCode() != "17") && (IATAddenda.TypeCode() != "18") {
+				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchIATInvalidAddendumer}
+			}
+			if IATAddenda.TypeCode() == "17" {
+				addenda17Count = addenda17Count + 1
+			}
+			if IATAddenda.TypeCode() == "18" {
+				addenda17Count = addenda18Count + 1
+			}
+		}
+		if addenda17Count > 2 {
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchIATAddenda17}
+		}
+		if addenda18Count > 5 {
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchIATAddenda18}
+		}
+	}
 	// Add type specific validation.
 	// ...
 	return nil

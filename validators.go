@@ -247,7 +247,7 @@ func (v *validator) isTypeCode(code string) error {
 		// Return, Dishonored Return and Contested Dishonored Return Entries
 		"99",
 		//  IAT forward Entries and IAT Returns
-		"10", "11", "12", "13", "14", "15", "16", "17",
+		"10", "11", "12", "13", "14", "15", "16", "17", "18",
 		// ACK, ATX, CCD, CIE, CTX, DNE, ENR, PPD, TRX and WEB Entries
 		"05":
 		return nil
