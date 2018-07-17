@@ -210,7 +210,6 @@ func (batch *IATBatch) AddEntry(entry *IATEntryDetail) {
 }
 
 // Category returns IATBatch Category
-
 func (batch *IATBatch) Category() string {
 	return batch.category
 }
