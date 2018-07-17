@@ -22,7 +22,7 @@ func mockAddenda17B() *Addenda17 {
 	addenda17 := NewAddenda17()
 	addenda17.PaymentRelatedInformation = "Transfer of money from one country to another"
 	addenda17.SequenceNumber = 2
-	addenda17.EntryDetailSequenceNumber = 0000002
+	addenda17.EntryDetailSequenceNumber = 0000001
 
 	return addenda17
 }

@@ -27,7 +27,7 @@ func mockAddenda18B() *Addenda18 {
 	addenda18.ForeignCorrespondentBankIDNumber = "987987987123123"
 	addenda18.ForeignCorrespondentBankBranchCountryCode = "ES"
 	addenda18.SequenceNumber = 2
-	addenda18.EntryDetailSequenceNumber = 0000002
+	addenda18.EntryDetailSequenceNumber = 0000001
 	return addenda18
 }
 
@@ -38,7 +38,7 @@ func mockAddenda18C() *Addenda18 {
 	addenda18.ForeignCorrespondentBankIDNumber = "456456456987987"
 	addenda18.ForeignCorrespondentBankBranchCountryCode = "FR"
 	addenda18.SequenceNumber = 3
-	addenda18.EntryDetailSequenceNumber = 0000003
+	addenda18.EntryDetailSequenceNumber = 0000001
 	return addenda18
 }
 
@@ -49,7 +49,7 @@ func mockAddenda18D() *Addenda18 {
 	addenda18.ForeignCorrespondentBankIDNumber = "12312345678910"
 	addenda18.ForeignCorrespondentBankBranchCountryCode = "TR"
 	addenda18.SequenceNumber = 4
-	addenda18.EntryDetailSequenceNumber = 0000004
+	addenda18.EntryDetailSequenceNumber = 0000001
 	return addenda18
 }
 
@@ -60,7 +60,7 @@ func mockAddenda18E() *Addenda18 {
 	addenda18.ForeignCorrespondentBankIDNumber = "1234567890123456789012345678901234"
 	addenda18.ForeignCorrespondentBankBranchCountryCode = "GB"
 	addenda18.SequenceNumber = 5
-	addenda18.EntryDetailSequenceNumber = 0000005
+	addenda18.EntryDetailSequenceNumber = 0000001
 	return addenda18
 }
 
@@ -71,7 +71,7 @@ func mockAddenda18F() *Addenda18 {
 	addenda18.ForeignCorrespondentBankIDNumber = "123456789012345678901"
 	addenda18.ForeignCorrespondentBankBranchCountryCode = "AQ"
 	addenda18.SequenceNumber = 6
-	addenda18.EntryDetailSequenceNumber = 0000006
+	addenda18.EntryDetailSequenceNumber = 0000001
 	return addenda18
 }
 
