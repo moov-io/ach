@@ -6,6 +6,7 @@ package ach
 
 import (
 	"fmt"
+	"strings"
 )
 
 // Addenda13 is an addenda which provides business transaction information for Addenda Type
@@ -75,13 +76,13 @@ func (addenda13 *Addenda13) Parse(record string) {
 	// 2-3 Always 13
 	addenda13.typeCode = record[1:3]
 	// 4-38 ODFIName
-	addenda13.ODFIName = record[3:38]
+	addenda13.ODFIName = strings.TrimSpace(record[3:38])
 	// 39-40 ODFIIDNumberQualifier
 	addenda13.ODFIIDNumberQualifier = record[38:40]
 	// 41-74 ODFIIdentification
 	addenda13.ODFIIdentification = addenda13.parseStringField(record[40:74])
 	// 75-77
-	addenda13.ODFIBranchCountryCode = record[74:77]
+	addenda13.ODFIBranchCountryCode = strings.TrimSpace(record[74:77])
 	// 78-87 reserved - Leave blank
 	addenda13.reserved = "          "
 	// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record

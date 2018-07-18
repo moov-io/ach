@@ -27,6 +27,51 @@ func TestMockAddenda10(t *testing.T) {
 	}
 }
 
+// testAddenda10Parse parses Addenda10 record
+func testAddenda10Parse(t testing.TB) {
+	addenda10 := NewAddenda10()
+	line := "710ANN000000000000100000928383-23938          BEK Enterprises                          0000001"
+	addenda10.Parse(line)
+	// walk the Addenda10 struct
+	if addenda10.recordType != "7" {
+		t.Errorf("expected %v got %v", "7", addenda10.recordType)
+	}
+	if addenda10.typeCode != "10" {
+		t.Errorf("expected %v got %v", "10", addenda10.typeCode)
+	}
+	if addenda10.TransactionTypeCode != "ANN" {
+		t.Errorf("expected %v got %v", "ANN", addenda10.TransactionTypeCode)
+	}
+	if addenda10.ForeignPaymentAmount != 100000 {
+		t.Errorf("expected: %v got: %v", 100000, addenda10.ForeignPaymentAmount)
+	}
+	if addenda10.ForeignTraceNumber != "928383-23938" {
+		t.Errorf("expected: %v got: %v", "928383-23938", addenda10.ForeignTraceNumber)
+	}
+	if addenda10.Name != "BEK Enterprises" {
+		t.Errorf("expected: %s got: %s", "BEK Enterprises", addenda10.Name)
+	}
+	if addenda10.reserved != "      " {
+		t.Errorf("expected: %v got: %v", "      ", addenda10.reserved)
+	}
+	if addenda10.EntryDetailSequenceNumber != 0000001 {
+		t.Errorf("expected: %v got: %v", 0000001, addenda10.EntryDetailSequenceNumber)
+	}
+}
+
+// TestAddenda10Parse tests parsing Addenda10 record
+func TestAddenda10Parse(t *testing.T) {
+	testAddenda10Parse(t)
+}
+
+// BenchmarkAddenda10Parse benchmarks parsing Addenda10 record
+func BenchmarkAddenda10Parse(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda10Parse(b)
+	}
+}
+
 // testAddenda10ValidRecordType validates Addenda10 recordType
 func testAddenda10ValidRecordType(t testing.TB) {
 	addenda10 := mockAddenda10()
@@ -351,12 +396,10 @@ func BenchmarkAddenda10FieldInclusionEntryDetailSequenceNumber(b *testing.B) {
 	}
 }
 
-// ToDo  Add Parse test for individual fields
-
 // TestAddenda10String validates that a known parsed Addenda10 record can be return to a string of the same value
 func testAddenda10String(t testing.TB) {
 	addenda10 := NewAddenda10()
-	var line = "710ANN000000000000100000928383-23938           BEK Enterprises                         0000001"
+	var line = "710ANN000000000000100000928383-23938          BEK Enterprises                          0000001"
 	addenda10.Parse(line)
 
 	if addenda10.String() != line {

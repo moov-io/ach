@@ -6,6 +6,7 @@ package ach
 
 import (
 	"fmt"
+	"strings"
 )
 
 // Addenda15 is an addenda which provides business transaction information for Addenda Type
@@ -57,7 +58,7 @@ func (addenda15 *Addenda15) Parse(record string) {
 	// 4-18
 	addenda15.ReceiverIDNumber = addenda15.parseStringField(record[3:18])
 	// 19-53
-	addenda15.ReceiverStreetAddress = record[18:53]
+	addenda15.ReceiverStreetAddress = strings.TrimSpace(record[18:53])
 	// 54-87 reserved - Leave blank
 	addenda15.reserved = "                                  "
 	// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record

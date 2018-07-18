@@ -19,6 +19,51 @@ func mockAddenda13() *Addenda13 {
 	return addenda13
 }
 
+// testAddenda13Parse parses Addenda13 record
+func testAddenda13Parse(t testing.TB) {
+	Addenda13 := NewAddenda13()
+	line := "713Wells Fargo                        01121042882                         US           0000001"
+	Addenda13.Parse(line)
+	// walk the Addenda13 struct
+	if Addenda13.recordType != "7" {
+		t.Errorf("expected %v got %v", "7", Addenda13.recordType)
+	}
+	if Addenda13.typeCode != "13" {
+		t.Errorf("expected %v got %v", "13", Addenda13.typeCode)
+	}
+	if Addenda13.ODFIName != "Wells Fargo" {
+		t.Errorf("expected %v got %v", "Wells Fargo", Addenda13.ODFIName)
+	}
+	if Addenda13.ODFIIDNumberQualifier != "01" {
+		t.Errorf("expected: %v got: %v", "01", Addenda13.ODFIIDNumberQualifier)
+	}
+	if Addenda13.ODFIIdentification != "121042882" {
+		t.Errorf("expected: %v got: %v", "121042882", Addenda13.ODFIIdentification)
+	}
+	if Addenda13.ODFIBranchCountryCode != "US" {
+		t.Errorf("expected: %s got: %s", "US", Addenda13.ODFIBranchCountryCode)
+	}
+	if Addenda13.reserved != "          " {
+		t.Errorf("expected: %v got: %v", "          ", Addenda13.reserved)
+	}
+	if Addenda13.EntryDetailSequenceNumber != 0000001 {
+		t.Errorf("expected: %v got: %v", 0000001, Addenda13.EntryDetailSequenceNumber)
+	}
+}
+
+// TestAddenda13Parse tests parsing Addenda13 record
+func TestAddenda13Parse(t *testing.T) {
+	testAddenda13Parse(t)
+}
+
+// BenchmarkAddenda13Parse benchmarks parsing Addenda13 record
+func BenchmarkAddenda13Parse(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda13Parse(b)
+	}
+}
+
 // TestMockAddenda13 validates mockAddenda13
 func TestMockAddenda13(t *testing.T) {
 	addenda13 := mockAddenda13()
@@ -399,13 +444,10 @@ func BenchmarkAddenda13FieldInclusionEntryDetailSequenceNumber(b *testing.B) {
 	}
 }
 
-// ToDo  Add Parse test for individual fields
-
 // TestAddenda13String validates that a known parsed Addenda13 record can be return to a string of the same value
 func testAddenda13String(t testing.TB) {
 	addenda13 := NewAddenda13()
 	var line = "713Wells Fargo                        121042882                         US             0000001"
-
 	addenda13.Parse(line)
 
 	if addenda13.String() != line {

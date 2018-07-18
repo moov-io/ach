@@ -66,7 +66,7 @@ func mockAddenda18E() *Addenda18 {
 
 func mockAddenda18F() *Addenda18 {
 	addenda18 := NewAddenda18()
-	addenda18.ForeignCorrespondentBankName = "Antarctica"
+	addenda18.ForeignCorrespondentBankName = "Bank of Antarctica"
 	addenda18.ForeignCorrespondentBankIDNumberQualifier = "01"
 	addenda18.ForeignCorrespondentBankIDNumber = "123456789012345678901"
 	addenda18.ForeignCorrespondentBankBranchCountryCode = "AQ"
@@ -98,7 +98,50 @@ func TestMockAddenda18(t *testing.T) {
 	}
 }
 
-// ToDo: Add parse logic
+// testAddenda18Parse parses Addenda18 record
+func testAddenda18Parse(t testing.TB) {
+	Addenda18 := NewAddenda18()
+	line := "718Bank of Germany                    01987987987654654                   DE       00010000001"
+	Addenda18.Parse(line)
+	// walk the Addenda18 struct
+	if Addenda18.recordType != "7" {
+		t.Errorf("expected %v got %v", "7", Addenda18.recordType)
+	}
+	if Addenda18.typeCode != "18" {
+		t.Errorf("expected %v got %v", "18", Addenda18.typeCode)
+	}
+	if Addenda18.ForeignCorrespondentBankName != "Bank of Germany" {
+		t.Errorf("expected %v got %v", "Bank of Germany", Addenda18.ForeignCorrespondentBankName)
+	}
+	if Addenda18.ForeignCorrespondentBankIDNumberQualifier != "01" {
+		t.Errorf("expected: %v got: %v", "01", Addenda18.ForeignCorrespondentBankIDNumberQualifier)
+	}
+	if Addenda18.ForeignCorrespondentBankIDNumber != "987987987654654" {
+		t.Errorf("expected: %v got: %v", "987987987654654", Addenda18.ForeignCorrespondentBankIDNumber)
+	}
+	if Addenda18.ForeignCorrespondentBankBranchCountryCode != "DE" {
+		t.Errorf("expected: %s got: %s", "DE", Addenda18.ForeignCorrespondentBankBranchCountryCode)
+	}
+	if Addenda18.reserved != "      " {
+		t.Errorf("expected: %v got: %v", "      ", Addenda18.reserved)
+	}
+	if Addenda18.EntryDetailSequenceNumber != 0000001 {
+		t.Errorf("expected: %v got: %v", 0000001, Addenda18.EntryDetailSequenceNumber)
+	}
+}
+
+// TestAddenda18Parse tests parsing Addenda18 record
+func TestAddenda18Parse(t *testing.T) {
+	testAddenda18Parse(t)
+}
+
+// BenchmarkAddenda18Parse benchmarks parsing Addenda18 record
+func BenchmarkAddenda18Parse(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda18Parse(b)
+	}
+}
 
 // testAddenda18String validates that a known parsed file can be return to a string of the same value
 func testAddenda18String(t testing.TB) {

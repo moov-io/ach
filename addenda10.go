@@ -6,6 +6,7 @@ package ach
 
 import (
 	"fmt"
+	"strings"
 )
 
 // Addenda10 is an addenda which provides business transaction information for Addenda Type
@@ -67,9 +68,9 @@ func (addenda10 *Addenda10) Parse(record string) {
 	// 07-24 Payment Amount	For inbound IAT payments this field should contain the USD amount or may be blank.
 	addenda10.ForeignPaymentAmount = addenda10.parseNumField(record[06:24])
 	//  25-46 Insert blanks or zeros
-	addenda10.ForeignTraceNumber = record[24:46]
+	addenda10.ForeignTraceNumber = strings.TrimSpace(record[24:46])
 	// 47-81 Receiving Company Name/Individual Name
-	addenda10.Name = record[46:81]
+	addenda10.Name = strings.TrimSpace(record[46:81])
 	// 82-87 reserved - Leave blank
 	addenda10.reserved = "      "
 	// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record

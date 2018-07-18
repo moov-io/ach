@@ -6,6 +6,7 @@ package ach
 
 import (
 	"fmt"
+	"strings"
 )
 
 // Addenda12 is an addenda which provides business transaction information for Addenda Type
@@ -59,9 +60,9 @@ func (addenda12 *Addenda12) Parse(record string) {
 	// 2-3 Always 12
 	addenda12.typeCode = record[1:3]
 	// 4-38
-	addenda12.OriginatorCityStateProvince = record[3:38]
+	addenda12.OriginatorCityStateProvince = strings.TrimSpace(record[3:38])
 	// 39-73
-	addenda12.OriginatorCountryPostalCode = record[38:73]
+	addenda12.OriginatorCountryPostalCode = strings.TrimSpace(record[38:73])
 	// 74-87 reserved - Leave blank
 	addenda12.reserved = "              "
 	// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record

@@ -25,6 +25,45 @@ func TestMockAddenda12(t *testing.T) {
 	}
 }
 
+// testAddenda12Parse parses Addenda12 record
+func testAddenda12Parse(t testing.TB) {
+	Addenda12 := NewAddenda12()
+	line := "712" + "JacobsTown*PA\\                     " + "US*19305\\                                        " + "0000001"
+	Addenda12.Parse(line)
+	// walk the Addenda12 struct
+	if Addenda12.recordType != "7" {
+		t.Errorf("expected %v got %v", "7", Addenda12.recordType)
+	}
+	if Addenda12.typeCode != "12" {
+		t.Errorf("expected %v got %v", "12", Addenda12.typeCode)
+	}
+	if Addenda12.OriginatorCityStateProvince != "JacobsTown*PA\\" {
+		t.Errorf("expected %v got %v", "JacobsTown*PA\\", Addenda12.OriginatorCityStateProvince)
+	}
+	if Addenda12.OriginatorCountryPostalCode != "US*19305\\" {
+		t.Errorf("expected: %v got: %v", "US*19305\\", Addenda12.OriginatorCountryPostalCode)
+	}
+	if Addenda12.reserved != "              " {
+		t.Errorf("expected: %v got: %v", "              ", Addenda12.reserved)
+	}
+	if Addenda12.EntryDetailSequenceNumber != 0000001 {
+		t.Errorf("expected: %v got: %v", 0000001, Addenda12.EntryDetailSequenceNumber)
+	}
+}
+
+// TestAddenda12Parse tests parsing Addenda12 record
+func TestAddenda12Parse(t *testing.T) {
+	testAddenda12Parse(t)
+}
+
+// BenchmarkAddenda12Parse benchmarks parsing Addenda12 record
+func BenchmarkAddenda12Parse(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda12Parse(b)
+	}
+}
+
 // testAddenda12ValidRecordType validates Addenda12 recordType
 func testAddenda12ValidRecordType(t testing.TB) {
 	addenda12 := mockAddenda12()

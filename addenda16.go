@@ -6,6 +6,7 @@ package ach
 
 import (
 	"fmt"
+	"strings"
 )
 
 // Addenda16 is an addenda which provides business transaction information for Addenda Type
@@ -58,9 +59,9 @@ func (addenda16 *Addenda16) Parse(record string) {
 	// 2-3 Always 16
 	addenda16.typeCode = record[1:3]
 	// 4-38 ReceiverCityStateProvince
-	addenda16.ReceiverCityStateProvince = record[3:38]
+	addenda16.ReceiverCityStateProvince = strings.TrimSpace(record[3:38])
 	// 39-73 ReceiverCountryPostalCode
-	addenda16.ReceiverCountryPostalCode = record[38:73]
+	addenda16.ReceiverCountryPostalCode = strings.TrimSpace(record[38:73])
 	// 74-87 reserved - Leave blank
 	addenda16.reserved = "              "
 	// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record

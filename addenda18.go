@@ -6,6 +6,7 @@ package ach
 
 import (
 	"fmt"
+	"strings"
 )
 
 // Addenda18 is an addenda which provides business transaction information for Addenda Type
@@ -72,16 +73,16 @@ func (addenda18 *Addenda18) Parse(record string) {
 	// 2-3 Always 18
 	addenda18.typeCode = record[1:3]
 	// 4-83 Based on the information entered (04-38) 35 alphanumeric
-	addenda18.ForeignCorrespondentBankName = record[3:38]
+	addenda18.ForeignCorrespondentBankName = strings.TrimSpace(record[3:38])
 	// 39-40  Based on the information entered (39-40) 2 alphanumeric
 	// “01” = National Clearing System
 	// “02” = BIC Code
 	// “03” = IBAN Code
 	addenda18.ForeignCorrespondentBankIDNumberQualifier = record[38:40]
 	// 41-74 Based on the information entered (41-74) 34 alphanumeric
-	addenda18.ForeignCorrespondentBankIDNumber = record[40:74]
+	addenda18.ForeignCorrespondentBankIDNumber = strings.TrimSpace(record[40:74])
 	// 75-77 Based on the information entered (75-77) 3 alphanumeric
-	addenda18.ForeignCorrespondentBankBranchCountryCode = record[74:77]
+	addenda18.ForeignCorrespondentBankBranchCountryCode = strings.TrimSpace(record[74:77])
 	// 78-83 - Blank space
 	addenda18.reserved = "      "
 	// 84-87 SequenceNumber is consecutively assigned to each Addenda18 Record following

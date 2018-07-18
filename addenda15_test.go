@@ -25,6 +25,45 @@ func TestMockAddenda15(t *testing.T) {
 	}
 }
 
+// testAddenda15Parse parses Addenda15 record
+func testAddenda15Parse(t testing.TB) {
+	Addenda15 := NewAddenda15()
+	line := "7159874654932139872121 Front Street                                                    0000001"
+	Addenda15.Parse(line)
+	// walk the Addenda15 struct
+	if Addenda15.recordType != "7" {
+		t.Errorf("expected %v got %v", "7", Addenda15.recordType)
+	}
+	if Addenda15.typeCode != "15" {
+		t.Errorf("expected %v got %v", "15", Addenda15.typeCode)
+	}
+	if Addenda15.ReceiverIDNumber != "987465493213987" {
+		t.Errorf("expected %v got %v", "987465493213987", Addenda15.ReceiverIDNumber)
+	}
+	if Addenda15.ReceiverStreetAddress != "2121 Front Street" {
+		t.Errorf("expected: %v got: %v", "2121 Front Street", Addenda15.ReceiverStreetAddress)
+	}
+	if Addenda15.reserved != "                                  " {
+		t.Errorf("expected: %v got: %v", "                                  ", Addenda15.reserved)
+	}
+	if Addenda15.EntryDetailSequenceNumber != 0000001 {
+		t.Errorf("expected: %v got: %v", 0000001, Addenda15.EntryDetailSequenceNumber)
+	}
+}
+
+// TestAddenda15Parse tests parsing Addenda15 record
+func TestAddenda15Parse(t *testing.T) {
+	testAddenda15Parse(t)
+}
+
+// BenchmarkAddenda15Parse benchmarks parsing Addenda15 record
+func BenchmarkAddenda15Parse(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda15Parse(b)
+	}
+}
+
 // testAddenda15ValidRecordType validates Addenda15 recordType
 func testAddenda15ValidRecordType(t testing.TB) {
 	addenda15 := mockAddenda15()
@@ -266,8 +305,6 @@ func BenchmarkAddenda15FieldInclusionEntryDetailSequenceNumber(b *testing.B) {
 		testAddenda15FieldInclusionEntryDetailSequenceNumber(b)
 	}
 }
-
-// ToDo  Add Parse test for individual fields
 
 // TestAddenda15String validates that a known parsed Addenda15 record can be return to a string of the same value
 func testAddenda15String(t testing.TB) {

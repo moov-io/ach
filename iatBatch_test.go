@@ -1784,7 +1784,7 @@ func testIATBatchAddenda18Count(t testing.TB) {
 	mockBatch.Entries[0].AddIATAddenda(mockAddenda18E())
 
 	addenda18F := NewAddenda18()
-	addenda18F.ForeignCorrespondentBankName = "Russian Federation"
+	addenda18F.ForeignCorrespondentBankName = "Russian Federation Bank"
 	addenda18F.ForeignCorrespondentBankIDNumberQualifier = "01"
 	addenda18F.ForeignCorrespondentBankIDNumber = "123123456789943874"
 	addenda18F.ForeignCorrespondentBankBranchCountryCode = "RU"

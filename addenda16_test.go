@@ -25,6 +25,45 @@ func TestMockAddenda16(t *testing.T) {
 	}
 }
 
+// testAddenda16Parse parses Addenda16 record
+func testAddenda16Parse(t testing.TB) {
+	Addenda16 := NewAddenda16()
+	line := "716LetterTown*AB\\                     CA*80014\\                                        0000001"
+	Addenda16.Parse(line)
+	// walk the Addenda16 struct
+	if Addenda16.recordType != "7" {
+		t.Errorf("expected %v got %v", "7", Addenda16.recordType)
+	}
+	if Addenda16.typeCode != "16" {
+		t.Errorf("expected %v got %v", "16", Addenda16.typeCode)
+	}
+	if Addenda16.ReceiverCityStateProvince != "LetterTown*AB\\" {
+		t.Errorf("expected %v got %v", "LetterTown*AB\\", Addenda16.ReceiverCityStateProvince)
+	}
+	if Addenda16.ReceiverCountryPostalCode != "CA*80014\\" {
+		t.Errorf("expected: %v got: %v", "CA*80014\\", Addenda16.ReceiverCountryPostalCode)
+	}
+	if Addenda16.reserved != "              " {
+		t.Errorf("expected: %v got: %v", "              ", Addenda16.reserved)
+	}
+	if Addenda16.EntryDetailSequenceNumber != 0000001 {
+		t.Errorf("expected: %v got: %v", 0000001, Addenda16.EntryDetailSequenceNumber)
+	}
+}
+
+// TestAddenda16Parse tests parsing Addenda16 record
+func TestAddenda16Parse(t *testing.T) {
+	testAddenda16Parse(t)
+}
+
+// BenchmarkAddenda16Parse benchmarks parsing Addenda16 record
+func BenchmarkAddenda16Parse(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda16Parse(b)
+	}
+}
+
 // testAddenda16ValidRecordType validates Addenda16 recordType
 func testAddenda16ValidRecordType(t testing.TB) {
 	addenda16 := mockAddenda16()

@@ -27,6 +27,51 @@ func TestMockAddenda14(t *testing.T) {
 	}
 }
 
+// testAddenda14Parse parses Addenda14 record
+func testAddenda14Parse(t testing.TB) {
+	Addenda14 := NewAddenda14()
+	line := "714Citadel Bank                       01231380104                         US           0000001"
+	Addenda14.Parse(line)
+	// walk the Addenda14 struct
+	if Addenda14.recordType != "7" {
+		t.Errorf("expected %v got %v", "7", Addenda14.recordType)
+	}
+	if Addenda14.typeCode != "14" {
+		t.Errorf("expected %v got %v", "14", Addenda14.typeCode)
+	}
+	if Addenda14.RDFIName != "Citadel Bank" {
+		t.Errorf("expected %v got %v", "Citadel Bank", Addenda14.RDFIName)
+	}
+	if Addenda14.RDFIIDNumberQualifier != "01" {
+		t.Errorf("expected: %v got: %v", "01", Addenda14.RDFIIDNumberQualifier)
+	}
+	if Addenda14.RDFIIdentification != "231380104" {
+		t.Errorf("expected: %v got: %v", "928383-23938", Addenda14.RDFIIdentification)
+	}
+	if Addenda14.RDFIBranchCountryCode != "US" {
+		t.Errorf("expected: %s got: %s", "US", Addenda14.RDFIBranchCountryCode)
+	}
+	if Addenda14.reserved != "          " {
+		t.Errorf("expected: %v got: %v", "          ", Addenda14.reserved)
+	}
+	if Addenda14.EntryDetailSequenceNumber != 0000001 {
+		t.Errorf("expected: %v got: %v", 0000001, Addenda14.EntryDetailSequenceNumber)
+	}
+}
+
+// TestAddenda14Parse tests parsing Addenda14 record
+func TestAddenda14Parse(t *testing.T) {
+	testAddenda14Parse(t)
+}
+
+// BenchmarkAddenda14Parse benchmarks parsing Addenda14 record
+func BenchmarkAddenda14Parse(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda14Parse(b)
+	}
+}
+
 // testAddenda14ValidRecordType validates Addenda14 recordType
 func testAddenda14ValidRecordType(t testing.TB) {
 	addenda14 := mockAddenda14()
@@ -398,8 +443,6 @@ func BenchmarkAddenda14FieldInclusionEntryDetailSequenceNumber(b *testing.B) {
 		testAddenda14FieldInclusionEntryDetailSequenceNumber(b)
 	}
 }
-
-// ToDo  Add Parse test for individual fields
 
 // TestAddenda14String validates that a known parsed Addenda14 record can be return to a string of the same value
 func testAddenda14String(t testing.TB) {

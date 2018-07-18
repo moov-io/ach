@@ -25,6 +25,45 @@ func TestMockAddenda11(t *testing.T) {
 	}
 }
 
+// testAddenda11Parse parses Addenda11 record
+func testAddenda11Parse(t testing.TB) {
+	Addenda11 := NewAddenda11()
+	line := "711BEK Solutions                      15 West Place Street                             0000001"
+	Addenda11.Parse(line)
+	// walk the Addenda11 struct
+	if Addenda11.recordType != "7" {
+		t.Errorf("expected %v got %v", "7", Addenda11.recordType)
+	}
+	if Addenda11.typeCode != "11" {
+		t.Errorf("expected %v got %v", "11", Addenda11.typeCode)
+	}
+	if Addenda11.OriginatorName != "BEK Solutions" {
+		t.Errorf("expected %v got %v", "BEK Solutions", Addenda11.OriginatorName)
+	}
+	if Addenda11.OriginatorStreetAddress != "15 West Place Street" {
+		t.Errorf("expected: %v got: %v", "15 West Place Street", Addenda11.OriginatorStreetAddress)
+	}
+	if Addenda11.reserved != "              " {
+		t.Errorf("expected: %v got: %v", "              ", Addenda11.reserved)
+	}
+	if Addenda11.EntryDetailSequenceNumber != 0000001 {
+		t.Errorf("expected: %v got: %v", 0000001, Addenda11.EntryDetailSequenceNumber)
+	}
+}
+
+// TestAddenda11Parse tests parsing Addenda11 record
+func TestAddenda11Parse(t *testing.T) {
+	testAddenda11Parse(t)
+}
+
+// BenchmarkAddenda11Parse benchmarks parsing Addenda11 record
+func BenchmarkAddenda11Parse(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda11Parse(b)
+	}
+}
+
 // testAddenda11ValidRecordType validates Addenda11 recordType
 func testAddenda11ValidRecordType(t testing.TB) {
 	addenda11 := mockAddenda11()
@@ -292,8 +331,6 @@ func BenchmarkAddenda11FieldInclusionEntryDetailSequenceNumber(b *testing.B) {
 		testAddenda11FieldInclusionEntryDetailSequenceNumber(b)
 	}
 }
-
-// ToDo  Add Parse test for individual fields
 
 // TestAddenda11String validates that a known parsed Addenda11 record can be return to a string of the same value
 func testAddenda11String(t testing.TB) {

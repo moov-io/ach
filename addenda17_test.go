@@ -27,6 +27,42 @@ func mockAddenda17B() *Addenda17 {
 	return addenda17
 }
 
+// testAddenda17Parse parses Addenda17 record
+func testAddenda17Parse(t testing.TB) {
+	Addenda17 := NewAddenda17()
+	line := "717This is an international payment                                                00010000001"
+	Addenda17.Parse(line)
+	// walk the Addenda17 struct
+	if Addenda17.recordType != "7" {
+		t.Errorf("expected %v got %v", "7", Addenda17.recordType)
+	}
+	if Addenda17.typeCode != "17" {
+		t.Errorf("expected %v got %v", "17", Addenda17.typeCode)
+	}
+	if Addenda17.PaymentRelatedInformation != "This is an international payment" {
+		t.Errorf("expected %v got %v", "This is an international payment", Addenda17.PaymentRelatedInformation)
+	}
+	if Addenda17.SequenceNumber != 1 {
+		t.Errorf("expected: %v got: %v", 1, Addenda17.SequenceNumber)
+	}
+	if Addenda17.EntryDetailSequenceNumber != 0000001 {
+		t.Errorf("expected: %v got: %v", 0000001, Addenda17.EntryDetailSequenceNumber)
+	}
+}
+
+// TestAddenda17Parse tests parsing Addenda17 record
+func TestAddenda17Parse(t *testing.T) {
+	testAddenda17Parse(t)
+}
+
+// BenchmarkAddenda17Parse benchmarks parsing Addenda17 record
+func BenchmarkAddenda17Parse(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda17Parse(b)
+	}
+}
+
 // TestMockAddenda17 validates mockAddenda17
 func TestMockAddenda17(t *testing.T) {
 	addenda17 := mockAddenda17()
@@ -37,8 +73,6 @@ func TestMockAddenda17(t *testing.T) {
 		t.Error("EntryDetailSequenceNumber dependent default value has changed")
 	}
 }
-
-// ToDo: Add parse logic
 
 // testAddenda17String validates that a known parsed file can be return to a string of the same value
 func testAddenda17String(t testing.TB) {
