@@ -1397,3 +1397,257 @@ func BenchmarkIATBatchEntryAddendum(b *testing.B) {
 		testIATBatchEntryAddendum(b)
 	}
 }
+
+// testIATBatchAddenda17EDSequenceNumber validates IATBatch Addenda17 Entry Detail Sequence Number error
+func testIATBatchAddenda17EDSequenceNumber(t testing.TB) {
+	mockBatch := IATBatch{}
+	mockBatch.SetHeader(mockIATBatchHeaderFF())
+	mockBatch.AddEntry(mockIATEntryDetail())
+	addenda17 := NewAddenda17()
+	addenda17.PaymentRelatedInformation = "This is an international payment"
+	addenda17.SequenceNumber = 1
+	addenda17.EntryDetailSequenceNumber = 0000001
+	addenda17B := NewAddenda17()
+	addenda17B.PaymentRelatedInformation = "Transfer of money from one country to another"
+	addenda17B.SequenceNumber = 2
+	addenda17B.EntryDetailSequenceNumber = 0000001
+	mockBatch.Entries[0].Addenda10 = mockAddenda10()
+	mockBatch.Entries[0].Addenda11 = mockAddenda11()
+	mockBatch.Entries[0].Addenda12 = mockAddenda12()
+	mockBatch.Entries[0].Addenda13 = mockAddenda13()
+	mockBatch.Entries[0].Addenda14 = mockAddenda14()
+	mockBatch.Entries[0].Addenda15 = mockAddenda15()
+	mockBatch.Entries[0].Addenda16 = mockAddenda16()
+	mockBatch.Entries[0].AddIATAddenda(addenda17)
+	mockBatch.Entries[0].AddIATAddenda(addenda17B)
+
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	addenda17B.SequenceNumber = 1
+	addenda17B.EntryDetailSequenceNumber = 0000002
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TraceNumber" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+}
+
+// TestIATBatchAddenda17EDSequenceNumber tests validating IATBatch Addenda17 Entry Detail Sequence Number error
+func TestIATBatchAddenda17EDSequenceNumber(t *testing.T) {
+	testIATBatchAddenda17EDSequenceNumber(t)
+}
+
+// BenchmarkIATBatchAddenda17EDSequenceNumber benchmarks validating IATBatch Addenda17 Entry Detail Sequence Number error
+func BenchmarkIATBatchAddenda17EDSequenceNumber(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchAddenda17EDSequenceNumber(b)
+	}
+}
+
+// testIATBatchAddenda17Sequence validates IATBatch Addenda17 Sequence Number error
+func testIATBatchAddenda17Sequence(t testing.TB) {
+	mockBatch := IATBatch{}
+	mockBatch.SetHeader(mockIATBatchHeaderFF())
+	mockBatch.AddEntry(mockIATEntryDetail())
+	addenda17 := NewAddenda17()
+	addenda17.PaymentRelatedInformation = "This is an international payment"
+	addenda17.SequenceNumber = 2
+	addenda17.EntryDetailSequenceNumber = 0000001
+	addenda17B := NewAddenda17()
+	addenda17B.PaymentRelatedInformation = "Transfer of money from one country to another"
+	addenda17B.SequenceNumber = 1
+	addenda17B.EntryDetailSequenceNumber = 0000001
+	mockBatch.Entries[0].Addenda10 = mockAddenda10()
+	mockBatch.Entries[0].Addenda11 = mockAddenda11()
+	mockBatch.Entries[0].Addenda12 = mockAddenda12()
+	mockBatch.Entries[0].Addenda13 = mockAddenda13()
+	mockBatch.Entries[0].Addenda14 = mockAddenda14()
+	mockBatch.Entries[0].Addenda15 = mockAddenda15()
+	mockBatch.Entries[0].Addenda16 = mockAddenda16()
+	mockBatch.Entries[0].AddIATAddenda(addenda17)
+	mockBatch.Entries[0].AddIATAddenda(addenda17B)
+
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	addenda17B.SequenceNumber = -1
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "SequenceNumber" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+}
+
+// TestIATBatchAddenda17Sequence tests validating IATBatch Addenda17 Sequence Number error
+func TestIATBatchAddenda17Sequence(t *testing.T) {
+	testIATBatchAddenda17Sequence(t)
+}
+
+// BenchmarkIATBatchAddenda17Sequence benchmarks validating IATBatch Addenda17 Sequence Number error
+func BenchmarkIATBatchAddenda17Sequence(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchAddenda17Sequence(b)
+	}
+}
+
+// testIATBatchAddenda18EDSequenceNumber validates IATBatch Addenda18 Entry Detail Sequence Number error
+func testIATBatchAddenda18EDSequenceNumber(t testing.TB) {
+	mockBatch := IATBatch{}
+	mockBatch.SetHeader(mockIATBatchHeaderFF())
+	mockBatch.AddEntry(mockIATEntryDetail())
+	addenda17 := NewAddenda17()
+	addenda17.PaymentRelatedInformation = "This is an international payment"
+	addenda17.SequenceNumber = 1
+	addenda17.EntryDetailSequenceNumber = 0000001
+
+	addenda17B := NewAddenda17()
+	addenda17B.PaymentRelatedInformation = "Transfer of money from one country to another"
+	addenda17B.SequenceNumber = 2
+	addenda17B.EntryDetailSequenceNumber = 0000001
+
+	addenda18 := NewAddenda18()
+	addenda18.ForeignCorrespondentBankName = "Bank of Turkey"
+	addenda18.ForeignCorrespondentBankIDNumberQualifier = "01"
+	addenda18.ForeignCorrespondentBankIDNumber = "12312345678910"
+	addenda18.ForeignCorrespondentBankBranchCountryCode = "TR"
+	addenda18.SequenceNumber = 1
+	addenda18.EntryDetailSequenceNumber = 0000001
+
+	addenda18B := NewAddenda18()
+	addenda18B.ForeignCorrespondentBankName = "Bank of United Kingdom"
+	addenda18B.ForeignCorrespondentBankIDNumberQualifier = "01"
+	addenda18B.ForeignCorrespondentBankIDNumber = "1234567890123456789012345678901234"
+	addenda18B.ForeignCorrespondentBankBranchCountryCode = "GB"
+	addenda18B.SequenceNumber = 2
+	addenda18B.EntryDetailSequenceNumber = 0000001
+
+	mockBatch.Entries[0].Addenda10 = mockAddenda10()
+	mockBatch.Entries[0].Addenda11 = mockAddenda11()
+	mockBatch.Entries[0].Addenda12 = mockAddenda12()
+	mockBatch.Entries[0].Addenda13 = mockAddenda13()
+	mockBatch.Entries[0].Addenda14 = mockAddenda14()
+	mockBatch.Entries[0].Addenda15 = mockAddenda15()
+	mockBatch.Entries[0].Addenda16 = mockAddenda16()
+	mockBatch.Entries[0].AddIATAddenda(addenda17)
+	mockBatch.Entries[0].AddIATAddenda(addenda17B)
+	mockBatch.Entries[0].AddIATAddenda(addenda18)
+	mockBatch.Entries[0].AddIATAddenda(addenda18B)
+
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	addenda18B.SequenceNumber = 1
+	addenda18B.EntryDetailSequenceNumber = 0000002
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TraceNumber" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+}
+
+// TestIATBatchAddenda18EDSequenceNumber tests validating IATBatch Addenda18 Entry Detail Sequence Number error
+func TestIATBatchAddenda18EDSequenceNumber(t *testing.T) {
+	testIATBatchAddenda18EDSequenceNumber(t)
+}
+
+// BenchmarkIATBatchAddenda18EDSequenceNumber benchmarks validating IATBatch Addenda18 Entry Detail Sequence Number error
+func BenchmarkIATBatchAddenda18EDSequenceNumber(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchAddenda18EDSequenceNumber(b)
+	}
+}
+
+// testIATBatchAddenda18Sequence validates IATBatch Addenda18 Sequence Number error
+func testIATBatchAddenda18Sequence(t testing.TB) {
+	mockBatch := IATBatch{}
+	mockBatch.SetHeader(mockIATBatchHeaderFF())
+	mockBatch.AddEntry(mockIATEntryDetail())
+	addenda17 := NewAddenda17()
+	addenda17.PaymentRelatedInformation = "This is an international payment"
+	addenda17.SequenceNumber = 1
+	addenda17.EntryDetailSequenceNumber = 0000001
+
+	addenda17B := NewAddenda17()
+	addenda17B.PaymentRelatedInformation = "Transfer of money from one country to another"
+	addenda17B.SequenceNumber = 2
+	addenda17B.EntryDetailSequenceNumber = 0000001
+
+	addenda18 := NewAddenda18()
+	addenda18.ForeignCorrespondentBankName = "Bank of Turkey"
+	addenda18.ForeignCorrespondentBankIDNumberQualifier = "01"
+	addenda18.ForeignCorrespondentBankIDNumber = "12312345678910"
+	addenda18.ForeignCorrespondentBankBranchCountryCode = "TR"
+	addenda18.SequenceNumber = 1
+	addenda18.EntryDetailSequenceNumber = 0000001
+
+	addenda18B := NewAddenda18()
+	addenda18B.ForeignCorrespondentBankName = "Bank of United Kingdom"
+	addenda18B.ForeignCorrespondentBankIDNumberQualifier = "01"
+	addenda18B.ForeignCorrespondentBankIDNumber = "1234567890123456789012345678901234"
+	addenda18B.ForeignCorrespondentBankBranchCountryCode = "GB"
+	addenda18B.SequenceNumber = 2
+	addenda18B.EntryDetailSequenceNumber = 0000001
+
+	mockBatch.Entries[0].Addenda10 = mockAddenda10()
+	mockBatch.Entries[0].Addenda11 = mockAddenda11()
+	mockBatch.Entries[0].Addenda12 = mockAddenda12()
+	mockBatch.Entries[0].Addenda13 = mockAddenda13()
+	mockBatch.Entries[0].Addenda14 = mockAddenda14()
+	mockBatch.Entries[0].Addenda15 = mockAddenda15()
+	mockBatch.Entries[0].Addenda16 = mockAddenda16()
+	mockBatch.Entries[0].AddIATAddenda(addenda17)
+	mockBatch.Entries[0].AddIATAddenda(addenda17B)
+	mockBatch.Entries[0].AddIATAddenda(addenda18)
+	mockBatch.Entries[0].AddIATAddenda(addenda18B)
+
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	addenda18B.SequenceNumber = -1
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "SequenceNumber" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+}
+
+// TestIATBatchAddenda18Sequence tests validating IATBatch Addenda18 Sequence Number error
+func TestIATBatchAddenda18Sequence(t *testing.T) {
+	testIATBatchAddenda18Sequence(t)
+}
+
+// BenchmarkIATBatchAddenda18Sequence benchmarks validating IATBatch Addenda18 Sequence Number error
+func BenchmarkIATBatchAddenda18Sequence(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchAddenda18Sequence(b)
+	}
+}
