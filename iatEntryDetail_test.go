@@ -47,7 +47,6 @@ func testMockIATEntryDetail(t testing.TB) {
 	if entry.RDFIIdentification != "12104288" {
 		t.Error("RDFIIdentification dependent default value has changed")
 	}
-	// ToDo: Add checkDigit test
 	if entry.AddendaRecords != 7 {
 		t.Error("AddendaRecords default dependent value has changed")
 	}

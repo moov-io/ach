@@ -74,7 +74,6 @@ func (addenda16 *Addenda16) String() string {
 		addenda16.recordType,
 		addenda16.typeCode,
 		addenda16.ReceiverCityStateProvinceField(),
-		// ToDo: Validator for backslash
 		addenda16.ReceiverCountryPostalCodeField(),
 		addenda16.reservedField(),
 		addenda16.EntryDetailSequenceNumberField())
