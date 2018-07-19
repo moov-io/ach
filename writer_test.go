@@ -193,3 +193,101 @@ func BenchmarkIATWrite(b *testing.B) {
 		testIATWrite(b)
 	}
 }
+
+// testPPDIATWrite writes an ACH file which writing an ACH file which contains PPD and IAT entries
+func testPPDIATWrite(t testing.TB) {
+	file := NewFile().SetHeader(mockFileHeader())
+
+	entry := mockEntryDetail()
+	entry.AddAddenda(mockAddenda05())
+	batch := NewBatchPPD(mockBatchPPDHeader())
+	batch.SetHeader(mockBatchHeader())
+	batch.AddEntry(entry)
+	batch.Create()
+	file.AddBatch(batch)
+
+	iatBatch := IATBatch{}
+	iatBatch.SetHeader(mockIATBatchHeaderFF())
+	iatBatch.AddEntry(mockIATEntryDetail())
+	iatBatch.Entries[0].Addenda10 = mockAddenda10()
+	iatBatch.Entries[0].Addenda11 = mockAddenda11()
+	iatBatch.Entries[0].Addenda12 = mockAddenda12()
+	iatBatch.Entries[0].Addenda13 = mockAddenda13()
+	iatBatch.Entries[0].Addenda14 = mockAddenda14()
+	iatBatch.Entries[0].Addenda15 = mockAddenda15()
+	iatBatch.Entries[0].Addenda16 = mockAddenda16()
+	iatBatch.Entries[0].AddIATAddenda(mockAddenda17())
+	iatBatch.Entries[0].AddIATAddenda(mockAddenda17B())
+	iatBatch.Entries[0].AddIATAddenda(mockAddenda18())
+	iatBatch.Entries[0].AddIATAddenda(mockAddenda18B())
+	iatBatch.Entries[0].AddIATAddenda(mockAddenda18C())
+	iatBatch.Entries[0].AddIATAddenda(mockAddenda18D())
+	iatBatch.Entries[0].AddIATAddenda(mockAddenda18E())
+	iatBatch.Create()
+	file.AddIATBatch(iatBatch)
+
+	iatBatch2 := IATBatch{}
+	iatBatch2.SetHeader(mockIATBatchHeaderFF())
+	iatBatch2.AddEntry(mockIATEntryDetail())
+	iatBatch2.GetEntries()[0].TransactionCode = 27
+	iatBatch2.GetEntries()[0].Amount = 2000
+	iatBatch2.Entries[0].Addenda10 = mockAddenda10()
+	iatBatch2.Entries[0].Addenda11 = mockAddenda11()
+	iatBatch2.Entries[0].Addenda12 = mockAddenda12()
+	iatBatch2.Entries[0].Addenda13 = mockAddenda13()
+	iatBatch2.Entries[0].Addenda14 = mockAddenda14()
+	iatBatch2.Entries[0].Addenda15 = mockAddenda15()
+	iatBatch2.Entries[0].Addenda16 = mockAddenda16()
+	iatBatch2.Entries[0].AddIATAddenda(mockAddenda17())
+	iatBatch2.Entries[0].AddIATAddenda(mockAddenda17B())
+	iatBatch2.Entries[0].AddIATAddenda(mockAddenda18())
+	iatBatch2.Entries[0].AddIATAddenda(mockAddenda18B())
+	iatBatch2.Entries[0].AddIATAddenda(mockAddenda18C())
+	iatBatch2.Entries[0].AddIATAddenda(mockAddenda18D())
+	iatBatch2.Entries[0].AddIATAddenda(mockAddenda18E())
+	iatBatch2.Create()
+	file.AddIATBatch(iatBatch2)
+
+	if err := file.Create(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err := file.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	b := &bytes.Buffer{}
+	f := NewWriter(b)
+
+	if err := f.Write(file); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	r := NewReader(strings.NewReader(b.String()))
+	_, err := r.Read()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err = r.File.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	/*	// Write records to standard output. Anything io.Writer
+		w := NewWriter(os.Stdout)
+		if err := w.Write(file); err != nil {
+			log.Fatalf("Unexpected error: %s\n", err)
+		}
+		w.Flush()*/
+}
+
+// TestPPDIATWrite tests writing a IAT ACH file
+func TestPPDIATWrite(t *testing.T) {
+	testPPDIATWrite(t)
+}
+
+// BenchmarkPPDIATWrite benchmarks validating writing an ACH file which contain PPD and IAT entries
+func BenchmarkPPDIATWrite(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testPPDIATWrite(b)
+	}
+}

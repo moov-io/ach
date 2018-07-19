@@ -36,6 +36,7 @@ ACH is under active development but already in production for multiple companies
 	* Addenda Type Code 12 (IAT)
 	* Addenda Type Code 98 (NOC)
 	* Addenda Type Code 99 (Return)
+	* IAT
 	
 ## Project Roadmap
 * Additional SEC codes will be added based on library users needs. Please open an issue with a valid test file.
@@ -261,6 +262,11 @@ Which will generate a well formed ACH flat file.
 82200000020010200101000000000000000000000799123456789                          234567890000002
 9000002000001000000040020400202000000017500000000000799 
 ```
+
+### Create an IAT file
+
+ 
+
 # Getting Help 
 
  channel | info 
