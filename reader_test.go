@@ -1346,3 +1346,40 @@ func BenchmarkACHFileIATAddenda10(b *testing.B) {
 		testACHFileIATAddenda10(b)
 	}
 }
+
+
+// testACHFileIATBC validates error when reading an invalid IAT Batch Control
+func testACHFileIATBC(t testing.TB) {
+	f, err := os.Open("./test/data/IAT-InvalidBatchControl.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*BatchError); ok {
+				if e.FieldName != "ODFIIdentification" {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestACHFileIATBC tests validating error when reading an invalid IAT Batch Control
+func TestACHFileIATBC(t *testing.T) {
+	testACHFileIATBC(t)
+}
+
+// BenchmarkACHFileIATBC benchmarks validating error when reading an invalid IAT Batch Control
+func BenchmarkACHFileIATBC(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testACHFileIATBC(b)
+	}
+}
