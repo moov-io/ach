@@ -1238,3 +1238,111 @@ func BenchmarkACHIATAddenda1718(b *testing.B) {
 		testACHIATAddenda1718(b)
 	}
 }
+
+// testACHFileIATBatchHeader validates error when reading an invalid IATBatchHeader
+func testACHFileIATBatchHeader(t testing.TB) {
+	f, err := os.Open("./test/data/IAT-InvalidBatchHeader.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*FieldError); ok {
+				if e.FieldName != "ServiceClassCode" {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestACHFileIATBatchHeader tests validating error when reading an invalid IATBatchHeader
+func TestACHFileIATBatchHeader(t *testing.T) {
+	testACHFileIATBatchHeader(t)
+}
+
+// BenchmarkACHFileIATBatchHeader benchmarks validating error when reading an invalid IATBatchHeader
+func BenchmarkACHFileIATBatchHeader(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testACHFileIATBatchHeader(b)
+	}
+}
+
+// testACHFileIATEntryDetail validates error when reading an invalid IATEntryDetail
+func testACHFileIATEntryDetail(t testing.TB) {
+	f, err := os.Open("./test/data/IAT-InvalidEntryDetail.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*FieldError); ok {
+				if e.FieldName != "TransactionCode" {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestACHFileIATEntryDetail tests validating error when reading an invalid IATEntryDetail
+func TestACHFileIATEntryDetail(t *testing.T) {
+	testACHFileIATEntryDetail(t)
+}
+
+// BenchmarkACHFileIATEntryDetail benchmarks validating error when reading an invalid IATEntryDetail
+func BenchmarkACHFileIATEntryDetail(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testACHFileIATEntryDetail(b)
+	}
+}
+
+// testACHFileIATAddenda10 validates error when reading an invalid IATAddenda10
+func testACHFileIATAddenda10(t testing.TB) {
+	f, err := os.Open("./test/data/IAT-InvalidAddenda10.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*FieldError); ok {
+				if e.FieldName != "TransactionTypeCode" {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestACHFileIATAddenda10 tests validating error when reading an invalid IATAddenda10
+func TestACHFileIATAddenda10(t *testing.T) {
+	testACHFileIATAddenda10(t)
+}
+
+// BenchmarkACHFileIATAddenda10 benchmarks validating error when reading an invalid IATAddenda10
+func BenchmarkACHFileIATAddenda10(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testACHFileIATAddenda10(b)
+	}
+}
