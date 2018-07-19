@@ -1347,7 +1347,6 @@ func BenchmarkACHFileIATAddenda10(b *testing.B) {
 	}
 }
 
-
 // testACHFileIATBC validates error when reading an invalid IAT Batch Control
 func testACHFileIATBC(t testing.TB) {
 	f, err := os.Open("./test/data/IAT-InvalidBatchControl.ach")
@@ -1381,5 +1380,41 @@ func BenchmarkACHFileIATBC(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testACHFileIATBC(b)
+	}
+}
+
+// testACHFileIATBH validates error when reading an invalid IAT Batch Header
+func testACHFileIATBH(t testing.TB) {
+	f, err := os.Open("./test/data/IAT-BatchHeaderErr.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*FileError); ok {
+				if e.Msg != msgFileBatchInside {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestACHFileIATBC tests validating error when reading an invalid IAT Batch Header
+func TestACHFileIATBH(t *testing.T) {
+	testACHFileIATBH(t)
+}
+
+// BenchmarkACHFileIATBH benchmarks validating error when reading an invalid IAT Batch Header
+func BenchmarkACHFileIATBH(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testACHFileIATBH(b)
 	}
 }
