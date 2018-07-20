@@ -14,7 +14,6 @@ func mockAddenda17() *Addenda17 {
 	addenda17.PaymentRelatedInformation = "This is an international payment"
 	addenda17.SequenceNumber = 1
 	addenda17.EntryDetailSequenceNumber = 0000001
-
 	return addenda17
 }
 
