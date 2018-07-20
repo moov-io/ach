@@ -1406,7 +1406,7 @@ func testACHFileIATBH(t testing.TB) {
 	}
 }
 
-// TestACHFileIATBC tests validating error when reading an invalid IAT Batch Header
+// TestACHFileIATBH tests validating error when reading an invalid IAT Batch Header
 func TestACHFileIATBH(t *testing.T) {
 	testACHFileIATBH(t)
 }
