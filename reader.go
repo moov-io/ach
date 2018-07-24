@@ -393,7 +393,7 @@ func (r *Reader) parseIATBatchHeader() error {
 	}
 
 	// Passing BatchHeader into NewBatchIAT creates a Batcher of IAT SEC code type.
-	iatBatch := IATNewBatch(bh)
+	iatBatch := NewIATBatch(bh)
 
 	r.addIATCurrentBatch(iatBatch)
 
