@@ -31,6 +31,11 @@ var (
 	msgValidMonth          = "is an invalid month"
 	msgValidDay            = "is an invalid day"
 	msgValidYear           = "is an invalid year"
+	// IAT
+	msgForeignExchangeIndicator          = "is an invalid Foreign Exchange Indicator"
+	msgForeignExchangeReferenceIndicator = "is an invalid Foreign Exchange Reference Indicator"
+	msgTransactionTypeCode               = "is an invalid Addenda10 Transaction Type Code"
+	msgIDNumberQualifier                 = "is an invalid Identification Number Qualifier"
 )
 
 // validator is common validation and formatting of golang types to ach type strings
@@ -42,6 +47,8 @@ type FieldError struct {
 	Value     string // value that cause error
 	Msg       string // context of the error.
 }
+
+// ToDo:  Add state and country look-up or use a 3rd party look up -verify with Wade
 
 // Error message is constructed
 // FieldName Msg Value
@@ -144,6 +151,44 @@ func (v *validator) isDay(m string, d string) error {
 	return errors.New(msgValidDay)
 }
 
+// isForeignExchangeIndicator ensures foreign exchange indicators of an
+// IATBatchHeader is valid
+func (v *validator) isForeignExchangeIndicator(code string) error {
+	switch code {
+	case
+		"FV", "VF", "FF":
+		return nil
+	}
+	return errors.New(msgForeignExchangeIndicator)
+}
+
+// isForeignExchangeReferenceIndicator ensures foreign exchange reference
+// indicator of am IATBatchHeader is valid
+func (v *validator) isForeignExchangeReferenceIndicator(code int) error {
+	switch code {
+	case
+		1, 2, 3:
+		return nil
+	}
+	return errors.New(msgForeignExchangeReferenceIndicator)
+}
+
+// isIDNumberQualifier ensures ODFI Identification Number Qualifier is valid
+// For Inbound IATs: The 2-digit code that identifies the numbering scheme used in the
+// Foreign DFI Identification Number field:
+// 01 = National Clearing System
+// 02 = BIC Code
+// 03 = IBAN Code
+// used for both ODFIIDNumberQualifier and RDFIIDNumberQualifier
+func (v *validator) isIDNumberQualifier(s string) error {
+	switch s {
+	case
+		"01", "02", "03":
+		return nil
+	}
+	return errors.New(msgIDNumberQualifier)
+}
+
 // isOriginatorStatusCode ensures status code of a batch is valid
 func (v *validator) isOriginatorStatusCode(code int) error {
 	switch code {
@@ -202,7 +247,7 @@ func (v *validator) isTypeCode(code string) error {
 		// Return, Dishonored Return and Contested Dishonored Return Entries
 		"99",
 		//  IAT forward Entries and IAT Returns
-		"10", "11", "12", "13", "14", "15", "16", "17",
+		"10", "11", "12", "13", "14", "15", "16", "17", "18",
 		// ACK, ATX, CCD, CIE, CTX, DNE, ENR, PPD, TRX and WEB Entries
 		"05":
 		return nil
@@ -214,20 +259,20 @@ func (v *validator) isTypeCode(code string) error {
 //
 // The Tran Code is a two-digit code in positions 2 - 3 of the Entry Detail Record (6 Record) within an ACH File.
 // The first digit of the Tran Code indicates the account type to which the entry will post, where the number:
-//	"2"designates a Checking Account.
-//	"3"designates a Savings Account.
-// 	"4"designates a General Ledger Account.
-// 	"5"designates Loan Account.
+//	"2" designates a Checking Account.
+//	"3" designates a Savings Account.
+// 	"4" designates a General Ledger Account.
+// 	"5" designates Loan Account.
 //The second digit of the Tran Code identifies the entry as:
 //	an original forward entry, where the number:
-//		"2"designates a credit. or
-//		"7"designates a debit.
+//		"2" designates a credit. or
+//		"7" designates a debit.
 //	a return or NOC, where the number:
-//		"1"designates the return/NOC of a credit, or
-//		"6"designates a return/NOC of a debit.
+//		"1" designates the return/NOC of a credit, or
+//		"6" designates a return/NOC of a debit.
 //	a pre-note or non-monetary informational transaction, where the number:
-//		"3"designates a credit, or
-//		"8"designates a debit.
+//		"3" designates a credit, or
+//		"8" designates a debit.
 func (v *validator) isTransactionCode(code int) error {
 	switch code {
 	// TransactionCode if the receivers account is:
@@ -337,6 +382,21 @@ func (v *validator) isTransactionCode(code int) error {
 		return nil
 	}
 	return errors.New(msgTransactionCode)
+}
+
+// isTransactionTypeCode verifies Addenda10 TransactionTypeCode is a valid value
+// ANN = Annuity, BUS = Business/Commercial, DEP = Deposit, LOA = Loan, MIS = Miscellaneous, MOR = Mortgage
+// PEN = Pension, RLS = Rent/Lease, REM = Remittance2, SAL = Salary/Payroll, TAX = Tax, TEL = Telephone-Initiated Transaction
+// WEB = Internet-Initiated Transaction, ARC = Accounts Receivable Entry, BOC = Back Office Conversion Entry,
+// POP = Point of Purchase Entry, RCK = Re-presented Check Entry
+func (v *validator) isTransactionTypeCode(s string) error {
+	switch s {
+	case "ANN", "BUS", "DEP", "LOA", "MIS", "MOR",
+		"PEN", "RLS", "REM", "SAL", "TAX", "TEL", "WEB",
+		"ARC", "BOC", "POP", "RCK":
+		return nil
+	}
+	return errors.New(msgTransactionTypeCode)
 }
 
 // isUpperAlphanumeric checks if string only contains ASCII alphanumeric upper case characters

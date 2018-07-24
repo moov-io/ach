@@ -29,28 +29,21 @@ type EntryDetail struct {
 	// Debit to savings account ‘37’
 	// Prenote for debit to savings account ‘38’
 	TransactionCode int `json:"transactionCode"`
-
 	// RDFIIdentification is the RDFI's routing number without the last digit.
 	// Receiving Depository Financial Institution
 	RDFIIdentification string `json:"RDFIIdentification"`
-
 	// CheckDigit the last digit of the RDFI's routing number
 	CheckDigit string `json:"checkDigit"`
-
 	// DFIAccountNumber is the receiver's bank account number you are crediting/debiting.
 	// It important to note that this is an alphanumeric field, so its space padded, no zero padded
 	DFIAccountNumber string `json:"DFIAccountNumber"`
-
 	// Amount Number of cents you are debiting/crediting this account
 	Amount int `json:"amount"`
-
 	// IdentificationNumber an internal identification (alphanumeric) that
 	// you use to uniquely identify this Entry Detail Record
 	IdentificationNumber string `json:"identificationNumber,omitempty"`
-
 	// IndividualName The name of the receiver, usually the name on the bank account
 	IndividualName string `json:"individualName"`
-
 	// DiscretionaryData allows ODFIs to include codes, of significance only to them,
 	// to enable specialized handling of the entry. There will be no
 	// standardized interpretation for the value of this field. It can either
@@ -60,12 +53,10 @@ type EntryDetail struct {
 	//
 	// WEB uses the Discretionary Data Field as the Payment Type Code
 	DiscretionaryData string `json:"discretionaryData,omitempty"`
-
 	// AddendaRecordIndicator indicates the existence of an Addenda Record.
 	// A value of "1" indicates that one ore more addenda records follow,
 	// and "0" means no such record is present.
 	AddendaRecordIndicator int `json:"addendaRecordIndicator,omitempty"`
-
 	// TraceNumber assigned by the ODFI in ascending sequence, is included in each
 	// Entry Detail Record, Corporate Entry Detail Record, and addenda Record.
 	// Trace Numbers uniquely identify each entry within a batch in an ACH input file.
@@ -75,7 +66,6 @@ type EntryDetail struct {
 	// in the associated Entry Detail Record, since the Trace Number is associated
 	// with an entry or item rather than a physical record.
 	TraceNumber int `json:"traceNumber,omitempty"`
-
 	// Addendum a list of Addenda for the Entry Detail
 	Addendum []Addendumer `json:"addendum,omitempty"`
 	// Category defines if the entry is a Forward, Return, or NOC
