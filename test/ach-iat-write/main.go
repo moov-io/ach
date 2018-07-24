@@ -95,7 +95,6 @@ func main() {
 	addenda16.EntryDetailSequenceNumber = 00000001
 	entry.Addenda16 = addenda16
 
-
 	// build the batch
 	batch := ach.NewIATBatch(bh)
 	batch.AddEntry(entry)
@@ -118,4 +117,3 @@ func main() {
 	}
 	w.Flush()
 }
-
