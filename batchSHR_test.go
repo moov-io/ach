@@ -380,8 +380,6 @@ func BenchmarkBatchSHRInvalidAddenda(b *testing.B) {
 	}
 }
 
-// ToDo: Using a FieldError may need to add a BatchError and use *BatchError
-
 // testBatchSHRInvalidBuild validates an invalid batch build
 func testBatchSHRInvalidBuild(t testing.TB) {
 	mockBatch := mockBatchSHR()

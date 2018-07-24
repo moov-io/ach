@@ -378,8 +378,6 @@ func BenchmarkBatchPOSInvalidAddenda(b *testing.B) {
 	}
 }
 
-// ToDo: Using a FieldError may need to add a BatchError and use *BatchError
-
 // testBatchPOSInvalidBuild validates an invalid batch build
 func testBatchPOSInvalidBuild(t testing.TB) {
 	mockBatch := mockBatchPOS()

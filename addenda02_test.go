@@ -8,6 +8,7 @@ import (
 	"testing"
 )
 
+// mockAddenda02 creates a mock Addenda02 record
 func mockAddenda02() *Addenda02 {
 	addenda02 := NewAddenda02()
 	addenda02.ReferenceInformationOne = "REFONEA"
@@ -23,6 +24,7 @@ func mockAddenda02() *Addenda02 {
 	return addenda02
 }
 
+// TestMockAddenda02 validates mockAddenda02
 func TestMockAddenda02(t *testing.T) {
 	addenda02 := mockAddenda02()
 	if err := addenda02.Validate(); err != nil {
@@ -30,6 +32,7 @@ func TestMockAddenda02(t *testing.T) {
 	}
 }
 
+// testAddenda02ValidRecordType validates Addenda02 recordType
 func testAddenda02ValidRecordType(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.recordType = "63"
@@ -43,10 +46,13 @@ func testAddenda02ValidRecordType(t testing.TB) {
 		}
 	}
 }
+
+// TestAddenda02ValidRecordType tests validating Addenda02 recordType
 func TestAddenda02ValidRecordType(t *testing.T) {
 	testAddenda02ValidRecordType(t)
 }
 
+// BenchmarkAddenda02ValidRecordType benchmarks validating Addenda02 recordType
 func BenchmarkAddenda02ValidRecordType(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -54,6 +60,7 @@ func BenchmarkAddenda02ValidRecordType(b *testing.B) {
 	}
 }
 
+// testAddenda02ValidTypeCode validates Addenda02 TypeCode
 func testAddenda02ValidTypeCode(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.typeCode = "65"
@@ -67,10 +74,13 @@ func testAddenda02ValidTypeCode(t testing.TB) {
 		}
 	}
 }
+
+// TestAddenda02ValidTypeCode tests validating Addenda02 TypeCode
 func TestAddenda02ValidTypeCode(t *testing.T) {
 	testAddenda02ValidTypeCode(t)
 }
 
+// BenchmarkAddenda02ValidTypeCode benchmarks validating Addenda02 TypeCode
 func BenchmarkAddenda02ValidTypeCode(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -78,6 +88,7 @@ func BenchmarkAddenda02ValidTypeCode(b *testing.B) {
 	}
 }
 
+// testAddenda02TypeCode02 TypeCode is 02 if typeCode is a valid TypeCode
 func testAddenda02TypeCode02(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.typeCode = "05"
@@ -91,10 +102,13 @@ func testAddenda02TypeCode02(t testing.TB) {
 		}
 	}
 }
+
+// TestAddenda02TypeCode02 tests TypeCode is 02 if typeCode is a valid TypeCode
 func TestAddenda02TypeCode02(t *testing.T) {
 	testAddenda02TypeCode02(t)
 }
 
+// BenchmarkAddenda02TypeCode02 benchmarks TypeCode is 02 if typeCode is a valid TypeCode
 func BenchmarkAddenda02TypeCode02(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -102,7 +116,8 @@ func BenchmarkAddenda02TypeCode02(b *testing.B) {
 	}
 }
 
-func testAddenda02RecordType(t testing.TB) {
+// testAddenda02FieldInclusionRecordType validates recordType fieldInclusion
+func testAddenda02FieldInclusionRecordType(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.recordType = ""
 	if err := addenda02.Validate(); err != nil {
@@ -114,18 +129,21 @@ func testAddenda02RecordType(t testing.TB) {
 	}
 }
 
-func TestAddenda02RecordType(t *testing.T) {
-	testAddenda02RecordType(t)
+// TestAddenda02FieldInclusionRecordType tests validating recordType fieldInclusion
+func TestAddenda02FieldInclusionRecordType(t *testing.T) {
+	testAddenda02FieldInclusionRecordType(t)
 }
 
+// BenchmarkAddenda02FieldInclusionRecordType benchmarks validating recordType fieldInclusion
 func BenchmarkAddenda02FieldInclusionRecordType(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testAddenda02RecordType(b)
+		testAddenda02FieldInclusionRecordType(b)
 	}
 }
 
-func testAddenda02TypeCode(t testing.TB) {
+// testAddenda02FieldInclusionTypeCode validates TypeCode fieldInclusion
+func testAddenda02FieldInclusionTypeCode(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.typeCode = ""
 	if err := addenda02.Validate(); err != nil {
@@ -137,17 +155,20 @@ func testAddenda02TypeCode(t testing.TB) {
 	}
 }
 
-func TestAddenda02TypeCode(t *testing.T) {
-	testAddenda02TypeCode(t)
+// TestAddenda02FieldInclusionTypeCode tests validating TypeCode fieldInclusion
+func TestAddenda02FieldInclusionTypeCode(t *testing.T) {
+	testAddenda02FieldInclusionTypeCode(t)
 }
 
-func BenchmarkAddenda02TypeCode(b *testing.B) {
+// BenchmarkAddenda02FieldInclusionTypeCode benchmarks validating TypeCode fieldInclusion
+func BenchmarkAddenda02FieldInclusionTypeCode(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testAddenda02TypeCode(b)
+		testAddenda02FieldInclusionTypeCode(b)
 	}
 }
 
+// testAddenda02TerminalIdentificationCode validates TerminalIdentificationCode is required
 func testAddenda02TerminalIdentificationCode(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TerminalIdentificationCode = ""
@@ -160,10 +181,12 @@ func testAddenda02TerminalIdentificationCode(t testing.TB) {
 	}
 }
 
+// TestAddenda02TerminalIdentificationCode tests validating TerminalIdentificationCode is required
 func TestAddenda02TerminalIdentificationCode(t *testing.T) {
 	testAddenda02TerminalIdentificationCode(t)
 }
 
+// BenchmarkAddenda02TerminalIdentificationCode benchmarks validating TerminalIdentificationCode is required
 func BenchmarkAddenda02TerminalIdentificationCode(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -171,6 +194,7 @@ func BenchmarkAddenda02TerminalIdentificationCode(b *testing.B) {
 	}
 }
 
+// testAddenda02TransactionSerialNumber validates TransactionSerialNumber is required
 func testAddenda02TransactionSerialNumber(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TransactionSerialNumber = ""
@@ -183,10 +207,12 @@ func testAddenda02TransactionSerialNumber(t testing.TB) {
 	}
 }
 
+// TestAddenda02TransactionSerialNumber tests validating TransactionSerialNumber is required
 func TestAddenda02TransactionSerialNumber(t *testing.T) {
 	testAddenda02TransactionSerialNumber(t)
 }
 
+// BenchmarkAddenda02TransactionSerialNumber benchmarks validating TransactionSerialNumber is required
 func BenchmarkAddenda02TransactionSerialNumber(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -194,6 +220,7 @@ func BenchmarkAddenda02TransactionSerialNumber(b *testing.B) {
 	}
 }
 
+// testAddenda02TransactionDate validates TransactionDate is required
 func testAddenda02TransactionDate(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TransactionDate = ""
@@ -206,10 +233,12 @@ func testAddenda02TransactionDate(t testing.TB) {
 	}
 }
 
+// TestAddenda02TransactionDate tests validating TransactionDate is required
 func TestAddenda02TransactionDate(t *testing.T) {
 	testAddenda02TransactionDate(t)
 }
 
+// BenchmarkAddenda02TransactionDate benchmarks validating TransactionDate is required
 func BenchmarkAddenda02TransactionDate(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -217,6 +246,7 @@ func BenchmarkAddenda02TransactionDate(b *testing.B) {
 	}
 }
 
+// testAddenda02TerminalLocation validates TerminalLocation is required
 func testAddenda02TerminalLocation(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TerminalLocation = ""
@@ -229,10 +259,12 @@ func testAddenda02TerminalLocation(t testing.TB) {
 	}
 }
 
+// TestAddenda02TerminalLocation tests validating TerminalLocation is required
 func TestAddenda02TerminalLocation(t *testing.T) {
 	testAddenda02TerminalLocation(t)
 }
 
+// BenchmarkAddenda02TerminalLocation benchmarks validating TerminalLocation is required
 func BenchmarkAddenda02TerminalLocation(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -240,6 +272,7 @@ func BenchmarkAddenda02TerminalLocation(b *testing.B) {
 	}
 }
 
+// testAddenda02TerminalCity validates TerminalCity is required
 func testAddenda02TerminalCity(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TerminalCity = ""
@@ -252,10 +285,12 @@ func testAddenda02TerminalCity(t testing.TB) {
 	}
 }
 
+// TestAddenda02TerminalCity tests validating TerminalCity is required
 func TestAddenda02TerminalCity(t *testing.T) {
 	testAddenda02TerminalCity(t)
 }
 
+// BenchmarkAddenda02TerminalCity benchmarks validating TerminalCity is required
 func BenchmarkAddenda02TerminalCity(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -263,6 +298,7 @@ func BenchmarkAddenda02TerminalCity(b *testing.B) {
 	}
 }
 
+// testAddenda02TerminalState validates TerminalState is required
 func testAddenda02TerminalState(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TerminalState = ""
@@ -275,10 +311,12 @@ func testAddenda02TerminalState(t testing.TB) {
 	}
 }
 
+// TestAddenda02TerminalState tests validating TerminalState is required
 func TestAddenda02TerminalState(t *testing.T) {
 	testAddenda02TerminalState(t)
 }
 
+// BenchmarkAddenda02TerminalState benchmarks validating TerminalState is required
 func BenchmarkAddenda02TerminalState(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -286,7 +324,7 @@ func BenchmarkAddenda02TerminalState(b *testing.B) {
 	}
 }
 
-// TestAddenda02 String validates that a known parsed file can be return to a string of the same value
+// TestAddenda02String validates that a known parsed Addenda02 record can be return to a string of the same value
 func testAddenda02String(t testing.TB) {
 	addenda02 := NewAddenda02()
 	var line = "702REFONEAREFTERM021000490612123456Target Store 0049          PHILADELPHIA   PA121042880000123"
@@ -299,12 +337,12 @@ func testAddenda02String(t testing.TB) {
 	}
 }
 
-// TestAddenda02String tests validating that a known parsed file can be return to a string of the same value
+// TestAddenda02String tests validating that a known parsed Addenda02 record can be return to a string of the same value
 func TestAddenda02String(t *testing.T) {
 	testAddenda02String(t)
 }
 
-// BenchmarkAddenda02String benchmarks validating that a known parsed file can be return to a string of the same value
+// BenchmarkAddenda02String benchmarks validating that a known parsed Addenda02 record can be return to a string of the same value
 func BenchmarkAddenda02String(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -332,7 +370,7 @@ func TestAddenda02TransactionDateMonth(t *testing.T) {
 	testAddenda02TransactionDateMonth(t)
 }
 
-// BenchmarkAddenda02TransactionDateMonth test validating the month is valid for transactionDate
+// BenchmarkAddenda02TransactionDateMonth benchmarks validating the month is valid for transactionDate
 func BenchmarkAddenda02TransactionDateMonth(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -360,7 +398,7 @@ func TestAddenda02TransactionDateDay(t *testing.T) {
 	testAddenda02TransactionDateDay(t)
 }
 
-// BenchmarkAddenda02TransactionDateDay test validating the day is valid for transactionDate
+// BenchmarkAddenda02TransactionDateDay benchmarks validating the day is valid for transactionDate
 func BenchmarkAddenda02TransactionDateDay(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -388,7 +426,7 @@ func TestAddenda02TransactionDateFeb(t *testing.T) {
 	testAddenda02TransactionDateFeb(t)
 }
 
-// BenchmarkAddenda02TransactionDateFeb test validating the day is valid for transactionDate
+// BenchmarkAddenda02TransactionDateFeb benchmarks validating the day is valid for transactionDate
 func BenchmarkAddenda02TransactionDateFeb(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -416,7 +454,7 @@ func TestAddenda02TransactionDate30Day(t *testing.T) {
 	testAddenda02TransactionDate30Day(t)
 }
 
-// BenchmarkAddenda02TransactionDate30Day test validating the day is valid for transactionDate
+// BenchmarkAddenda02TransactionDate30Day benchmarks validating the day is valid for transactionDate
 func BenchmarkAddenda02TransactionDate30Day(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -444,7 +482,7 @@ func TestAddenda02TransactionDate31Day(t *testing.T) {
 	testAddenda02TransactionDate31Day(t)
 }
 
-// BenchmarkAddenda02TransactionDate31Day test validating the day is valid for transactionDate
+// BenchmarkAddenda02TransactionDate31Day benchmarks validating the day is valid for transactionDate
 func BenchmarkAddenda02TransactionDate31Day(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -472,7 +510,7 @@ func TestAddenda02TransactionDateInvalidDay(t *testing.T) {
 	testAddenda02TransactionDateInvalidDay(t)
 }
 
-// BenchmarkAddenda02TransactionDateInvalidDay test validating the day is invalid for transactionDate
+// BenchmarkAddenda02TransactionDateInvalidDay benchmarks validating the day is invalid for transactionDate
 func BenchmarkAddenda02TransactionDateInvalidDay(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
