@@ -1,22 +1,21 @@
 package main
 
 import (
+	"time"
+	"github.com/bkmoovio/ach"
 	"log"
 	"os"
-	"time"
-
-	"github.com/moov-io/ach"
 )
 
 func main() {
-	// Example transfer to write an ACH PPD file to send/credit a external institutions account
+	// Example transfer to write an ACH IAT file to debit a external institutions account
 	// Important: All financial institutions are different and will require registration and exact field values.
 
 	// Set originator bank ODFI and destination Operator for the financial institution
 	// this is the funding/receiving source of the transfer
 	fh := ach.NewFileHeader()
-	fh.ImmediateDestination = "231380104" // Routing Number of the ACH Operator or receiving point to which the file is being sent
-	fh.ImmediateOrigin = "121042882"      // Routing Number of the ACH Operator or sending point that is sending the file
+	fh.ImmediateDestination = "121042882" // Routing Number of the ACH Operator or receiving point to which the file is being sent
+	fh.ImmediateOrigin = "231380104" // Routing Number of the ACH Operator or sending point that is sending the file
 	fh.FileCreationDate = time.Now()      // Today's Date
 	fh.ImmediateDestinationName = "Bank"
 	fh.ImmediateOriginName = "My Bank Name"
@@ -70,7 +69,7 @@ func main() {
 	addenda13 := ach.NewAddenda13()
 	addenda13.ODFIName = "Wells Fargo"
 	addenda13.ODFIIDNumberQualifier = "01"
-	addenda13.ODFIIdentification = "121042882"
+	addenda13.ODFIIdentification = "231380104"
 	addenda13.ODFIBranchCountryCode = "US"
 	addenda13.EntryDetailSequenceNumber = 00000001
 	entry.Addenda13 = addenda13
@@ -78,7 +77,7 @@ func main() {
 	addenda14 := ach.NewAddenda14()
 	addenda14.RDFIName = "Citadel Bank"
 	addenda14.RDFIIDNumberQualifier = "01"
-	addenda14.RDFIIdentification = "231380104"
+	addenda14.RDFIIdentification = "121042882"
 	addenda14.RDFIBranchCountryCode = "CA"
 	addenda14.EntryDetailSequenceNumber = 00000001
 	entry.Addenda14 = addenda14
