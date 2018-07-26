@@ -37,7 +37,7 @@ func main() {
 	// Identifies the receivers account information
 	// can be multiple entry's per batch
 	entry := ach.NewIATEntryDetail()
-	entry.TransactionCode = 22
+	entry.TransactionCode = 27
 	entry.SetRDFI("121042882")
 	entry.AddendaRecords = 007
 	entry.DFIAccountNumber = "123456789"
@@ -79,7 +79,7 @@ func main() {
 	addenda14.RDFIName = "Citadel Bank"
 	addenda14.RDFIIDNumberQualifier = "01"
 	addenda14.RDFIIdentification = "231380104"
-	addenda14.RDFIBranchCountryCode = "US"
+	addenda14.RDFIBranchCountryCode = "CA"
 	addenda14.EntryDetailSequenceNumber = 00000001
 	entry.Addenda14 = addenda14
 
@@ -94,6 +94,21 @@ func main() {
 	addenda16.ReceiverCountryPostalCode = "CA*80014\\"
 	addenda16.EntryDetailSequenceNumber = 00000001
 	entry.Addenda16 = addenda16
+
+	addenda17 := ach.NewAddenda17()
+	addenda17.PaymentRelatedInformation = "This is an international payment"
+	addenda17.SequenceNumber = 1
+	addenda17.EntryDetailSequenceNumber = 0000001
+	entry.AddIATAddenda(addenda17)
+
+	addenda18 := ach.NewAddenda18()
+	addenda18.ForeignCorrespondentBankName = "Bank of France"
+	addenda18.ForeignCorrespondentBankIDNumberQualifier = "01"
+	addenda18.ForeignCorrespondentBankIDNumber = "456456456987987"
+	addenda18.ForeignCorrespondentBankBranchCountryCode = "FR"
+	addenda18.SequenceNumber = 3
+	addenda18.EntryDetailSequenceNumber = 0000001
+	entry.AddIATAddenda(addenda18)
 
 	// build the batch
 	batch := ach.NewIATBatch(bh)
