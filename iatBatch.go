@@ -41,8 +41,8 @@ type IATBatch struct {
 	converters
 }
 
-// IATNewBatch takes a BatchHeader and returns a matching SEC code batch type that is a batcher. Returns an error if the SEC code is not supported.
-func IATNewBatch(bh *IATBatchHeader) IATBatch {
+// NewIATBatch takes a BatchHeader and returns a matching SEC code batch type that is a batcher. Returns an error if the SEC code is not supported.
+func NewIATBatch(bh *IATBatchHeader) IATBatch {
 	iatBatch := IATBatch{}
 	iatBatch.SetControl(NewBatchControl())
 	iatBatch.SetHeader(bh)

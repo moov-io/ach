@@ -78,7 +78,7 @@ func BenchmarkIATMockEntryDetail(b *testing.B) {
 func testParseIATEntryDetail(t testing.TB) {
 	var line = "6221210428820007             000010000012345678901234567890123456789012345    1231380100000001"
 	r := NewReader(strings.NewReader(line))
-	r.addIATCurrentBatch(IATNewBatch(mockIATBatchHeaderFF()))
+	r.addIATCurrentBatch(NewIATBatch(mockIATBatchHeaderFF()))
 	r.IATCurrentBatch.SetHeader(mockIATBatchHeaderFF())
 	r.line = line
 	if err := r.parseIATEntryDetail(); err != nil {
@@ -134,7 +134,7 @@ func BenchmarkParseIATEntryDetail(b *testing.B) {
 func testIATEDString(t testing.TB) {
 	var line = "6221210428820007             000010000012345678901234567890123456789012345    1231380100000001"
 	r := NewReader(strings.NewReader(line))
-	r.addIATCurrentBatch(IATNewBatch(mockIATBatchHeaderFF()))
+	r.addIATCurrentBatch(NewIATBatch(mockIATBatchHeaderFF()))
 	r.IATCurrentBatch.SetHeader(mockIATBatchHeaderFF())
 	r.line = line
 	if err := r.parseIATEntryDetail(); err != nil {
