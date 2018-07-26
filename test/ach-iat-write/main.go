@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 	"time"
-	
+
 	"github.com/moov-io/ach"
 )
 
@@ -111,7 +111,7 @@ func main() {
 	entry.AddIATAddenda(addenda18)
 
 	// build the batch
-	batch := ach.NewIATBatch(bh)
+	batch := ach.IATNewBatch(bh)
 	batch.AddEntry(entry)
 	if err := batch.Create(); err != nil {
 		log.Fatalf("Unexpected error building batch: %s\n", err)
