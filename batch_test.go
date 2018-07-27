@@ -395,6 +395,7 @@ func BenchmarkBatchAddendaTraceNumber(b *testing.B) {
 		testBatchAddendaTraceNumber(b)
 	}
 }
+
 func testNewBatchDefault(t testing.TB) {
 	_, err := NewBatch(mockBatchInvalidSECHeader())
 
@@ -595,5 +596,37 @@ func BenchmarkBatchControl(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchControl(b)
+	}
+}
+
+func testIATBatch(t testing.TB) {
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = 220
+	bh.StandardEntryClassCode = "IAT"
+	bh.CompanyName = "ACME Corporation"
+	bh.CompanyIdentification = "123456789"
+	bh.CompanyEntryDescription = "PAYROLL"
+	bh.EffectiveEntryDate = time.Now()
+	bh.ODFIIdentification = "123456789"
+
+	_, err := NewBatch(bh)
+
+	if e, ok := err.(*FileError); ok {
+		if e.FieldName != "StandardEntryClassCode" {
+			t.Errorf("%T: %s", err, err)
+		}
+	} else {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+func TestIATBatch(t *testing.T) {
+	testIATBatch(t)
+}
+
+func BenchmarkIATBatch(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatch(b)
 	}
 }

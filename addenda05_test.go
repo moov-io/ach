@@ -12,6 +12,7 @@ import (
 func mockAddenda05() *Addenda05 {
 	addenda05 := NewAddenda05()
 	addenda05.SequenceNumber = 1
+	addenda05.PaymentRelatedInformation = "This is an Addenda05"
 	addenda05.EntryDetailSequenceNumber = 0000001
 
 	return addenda05

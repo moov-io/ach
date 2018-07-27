@@ -300,21 +300,18 @@ func (ed *EntryDetail) SetPOPTerminalState(s string) {
 // POPCheckSerialNumberField is used in POP, characters 1-9 of underlying BatchPOP
 // CheckSerialNumber / IdentificationNumber
 func (ed *EntryDetail) POPCheckSerialNumberField() string {
-	//return ed.alphaField(ed.IdentificationNumber, 9)
 	return ed.parseStringField(ed.IdentificationNumber[0:9])
 }
 
 // POPTerminalCityField is used in POP, characters 10-13 of underlying BatchPOP
 // CheckSerialNumber / IdentificationNumber
 func (ed *EntryDetail) POPTerminalCityField() string {
-	//return ed.alphaField(ed.IdentificationNumber, 9)
 	return ed.parseStringField(ed.IdentificationNumber[9:13])
 }
 
 // POPTerminalStateField is used in POP, characters 14-15 of underlying BatchPOP
 // CheckSerialNumber / IdentificationNumber
 func (ed *EntryDetail) POPTerminalStateField() string {
-	//return ed.alphaField(ed.IdentificationNumber, 9)
 	return ed.parseStringField(ed.IdentificationNumber[13:15])
 }
 
@@ -367,6 +364,32 @@ func (ed *EntryDetail) ReceivingCompanyField() string {
 // SetReceivingCompany setter for CCD ReceivingCompany which is underlying IndividualName
 func (ed *EntryDetail) SetReceivingCompany(s string) {
 	ed.IndividualName = s
+}
+
+// SetCTXAddendaRecords setter for CTX AddendaRecords characters 1-4 of underlying IndividualName
+func (ed *EntryDetail) SetCTXAddendaRecords(i int) {
+	ed.IndividualName = ed.numericField(i, 4)
+}
+
+// SetCTXReceivingCompany setter for CTX ReceivingCompany characters 5-20 underlying IndividualName
+// Position 21-22 of underlying Individual Name are reserved blank space for CTX "  "
+func (ed *EntryDetail) SetCTXReceivingCompany(s string) {
+	ed.IndividualName = ed.IndividualName + ed.alphaField(s, 16) + "  "
+}
+
+// CTXAddendaRecordsField is used in CTX files, characters 1-4 of underlying IndividualName field
+func (ed *EntryDetail) CTXAddendaRecordsField() string {
+	return ed.parseStringField(ed.IndividualName[0:4])
+}
+
+// CTXReceivingCompanyField is used in CTX files, characters 5-20 of underlying IndividualName field
+func (ed *EntryDetail) CTXReceivingCompanyField() string {
+	return ed.parseStringField(ed.IndividualName[4:20])
+}
+
+// CTXReservedField is used in CTX files, characters 21-22 of underlying IndividualName field
+func (ed *EntryDetail) CTXReservedField() string {
+	return ed.IndividualName[20:22]
 }
 
 // DiscretionaryDataField returns a space padded string of DiscretionaryData
