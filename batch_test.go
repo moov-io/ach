@@ -396,6 +396,7 @@ func BenchmarkBatchAddendaTraceNumber(b *testing.B) {
 	}
 }
 
+// testNewBatchDefault validates error for NewBatch if invalid SEC Code
 func testNewBatchDefault(t testing.TB) {
 	_, err := NewBatch(mockBatchInvalidSECHeader())
 
@@ -408,10 +409,13 @@ func testNewBatchDefault(t testing.TB) {
 	}
 }
 
+// TestNewBatchDefault test validating error for NewBatch if invalid SEC Code
 func TestNewBatchDefault(t *testing.T) {
 	testNewBatchDefault(t)
 }
 
+// BenchmarkNewBatchDefault benchmarks validating error for NewBatch if
+// invalid SEC Code
 func BenchmarkNewBatchDefault(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -419,6 +423,7 @@ func BenchmarkNewBatchDefault(b *testing.B) {
 	}
 }
 
+// testBatchCategory validates Batch Category
 func testBatchCategory(t testing.TB) {
 	mockBatch := mockBatch()
 	// Add a Addenda Return to the mock batch
@@ -435,10 +440,12 @@ func testBatchCategory(t testing.TB) {
 	}
 }
 
+// TestBatchCategory tests validating Batch Category
 func TestBatchCategory(t *testing.T) {
 	testBatchCategory(t)
 }
 
+// BenchmarkBatchCategory benchmarks validating Batch Category
 func BenchmarkBatchCategory(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -446,6 +453,7 @@ func BenchmarkBatchCategory(b *testing.B) {
 	}
 }
 
+//  testBatchCategoryForwardReturn validates Category based on EntryDetail
 func testBatchCategoryForwardReturn(t testing.TB) {
 	mockBatch := mockBatch()
 	// Add a Addenda Return to the mock batch
@@ -467,9 +475,12 @@ func testBatchCategoryForwardReturn(t testing.TB) {
 	}
 }
 
+// TestBatchCategoryForwardReturn tests validating Category based on EntryDetail
 func TestBatchCategoryForwardReturn(t *testing.T) {
 	testBatchCategoryForwardReturn(t)
 }
+
+//  BenchmarkBatchCategoryForwardReturn benchmarks validating Category based on EntryDetail
 func BenchmarkBatchCategoryForwardReturn(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -547,6 +558,7 @@ func BenchmarkBatchInvalidTraceNumberODFI(b *testing.B) {
 	}
 }
 
+// testBatchNoEntry validates error for a batch with no entries
 func testBatchNoEntry(t testing.TB) {
 	mockBatch := mockBatchNoEntry()
 	if err := mockBatch.build(); err != nil {
@@ -572,10 +584,12 @@ func testBatchNoEntry(t testing.TB) {
 
 }
 
+// TestBatchNoEntry tests validating error for a batch with no entries
 func TestBatchNoEntry(t *testing.T) {
 	testBatchNoEntry(t)
 }
 
+// BenchmarkBatchNoEntry benchmarks validating error for a batch with no entries
 func BenchmarkBatchNoEntry(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
