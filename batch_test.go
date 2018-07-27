@@ -165,7 +165,7 @@ func BenchmarkSavingsBatchisBatchAmount(b *testing.B) {
 	}
 }
 
-func testBatchisEntryHash(t testing.TB) {
+func testBatchIsEntryHash(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.GetControl().EntryHash = 1
 	if err := mockBatch.verify(); err != nil {
@@ -179,14 +179,14 @@ func testBatchisEntryHash(t testing.TB) {
 	}
 }
 
-func TestBatchisEntryHash(t *testing.T) {
-	testBatchisEntryHash(t)
+func TestBatchIsEntryHash(t *testing.T) {
+	testBatchIsEntryHash(t)
 }
 
-func BenchmarkBatchisEntryHash(b *testing.B) {
+func BenchmarkBatchIsEntryHash(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchisEntryHash(b)
+		testBatchIsEntryHash(b)
 	}
 }
 
@@ -558,6 +558,18 @@ func testBatchNoEntry(t testing.TB) {
 			t.Errorf("%T: %s", err, err)
 		}
 	}
+
+	// test verify
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "entries" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
 }
 
 func TestBatchNoEntry(t *testing.T) {
@@ -599,6 +611,7 @@ func BenchmarkBatchControl(b *testing.B) {
 	}
 }
 
+// testIATBatch validates an IAT batch returns an error for batch
 func testIATBatch(t testing.TB) {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = 220
@@ -620,10 +633,12 @@ func testIATBatch(t testing.TB) {
 	}
 }
 
+// TestIATBatch tests validating an IAT batch returns an error for batch
 func TestIATBatch(t *testing.T) {
 	testIATBatch(t)
 }
 
+// BenchmarkIATBatch benchmarks validating an IAT batch returns an error for batch
 func BenchmarkIATBatch(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
