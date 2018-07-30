@@ -57,6 +57,8 @@ func (batch *BatchCTX) Validate() error {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchCTXAddenda}
 		}
 
+		// validate CTXAddendaRecord Field is equal to the actual number of Addenda records
+		// use 0 value if there is no Addenda records
 		addendaRecords, _ := strconv.Atoi(entry.CTXAddendaRecordsField())
 		if len(entry.Addendum) != addendaRecords {
 			msg := fmt.Sprintf(msgBatchCTXAddendaCount, addendaRecords, len(entry.Addendum))
@@ -64,6 +66,16 @@ func (batch *BatchCTX) Validate() error {
 		}
 
 		if len(entry.Addendum) > 0 {
+
+			switch entry.TransactionCode {
+			// Prenote credit  23, 33, 43, 53
+			// Prenote debit 28, 38, 48
+			case 23, 28, 33, 38, 43, 48, 53:
+				msg := fmt.Sprintf(msgBatchTransactionCodeAddenda, entry.TransactionCode, "CTX")
+				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
+			default:
+			}
+
 			for i := range entry.Addendum {
 				addenda05, ok := entry.Addendum[i].(*Addenda05)
 				if !ok {

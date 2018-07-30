@@ -444,3 +444,103 @@ func BenchmarkBatchCTXReserved(b *testing.B) {
 		testBatchCTXReserved(b)
 	}
 }
+
+// testBatchCTXZeroAddendaRecords validates zero addenda records
+func testBatchCTXZeroAddendaRecords(t testing.TB) {
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = 220
+	bh.StandardEntryClassCode = "CTX"
+	bh.CompanyName = "Payee Name"
+	bh.CompanyIdentification = "121042882"
+	bh.CompanyEntryDescription = "ACH CTX"
+	bh.ODFIIdentification = "12104288"
+
+	entry := NewEntryDetail()
+	entry.TransactionCode = 22
+	entry.SetRDFI("231380104")
+	entry.DFIAccountNumber = "744-5678-99"
+	entry.Amount = 25000
+	entry.IdentificationNumber = "45689033"
+	entry.SetCTXAddendaRecords(1)
+	entry.SetCTXReceivingCompany("Receiver Company")
+	entry.SetTraceNumber(mockBatchCTXHeader().ODFIIdentification, 1)
+	entry.DiscretionaryData = "01"
+	entry.Category = CategoryForward
+
+	mockBatch := NewBatchCTX(bh)
+	mockBatch.AddEntry(entry)
+
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addendum" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchCTXZeroAddendaRecords tests validating zero addenda records
+func TestBatchCTXZeroAddendaRecords(t *testing.T) {
+	testBatchCTXZeroAddendaRecords(t)
+}
+
+// BenchmarkBatchZeroAddendaRecords benchmarks validating zero addenda records
+func BenchmarkBatchCTXZeroAddendaRecords(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchCTXZeroAddendaRecords(b)
+	}
+}
+
+// testBatchCTXPrenoteAddendaRecords validates prenote addenda records
+func testBatchCTXPrenoteAddendaRecords(t testing.TB) {
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = 220
+	bh.StandardEntryClassCode = "CTX"
+	bh.CompanyName = "Payee Name"
+	bh.CompanyIdentification = "121042882"
+	bh.CompanyEntryDescription = "ACH CTX"
+	bh.ODFIIdentification = "12104288"
+	bh.OriginatorStatusCode = 2
+
+	entry := NewEntryDetail()
+	entry.TransactionCode = 23
+	entry.SetRDFI("231380104")
+	entry.DFIAccountNumber = "744-5678-99"
+	entry.Amount = 25000
+	entry.IdentificationNumber = "45689033"
+	entry.SetCTXAddendaRecords(1)
+	entry.SetCTXReceivingCompany("Receiver Company")
+	entry.SetTraceNumber(mockBatchCTXHeader().ODFIIdentification, 1)
+	entry.DiscretionaryData = "01"
+	entry.Category = CategoryForward
+
+	mockBatch := NewBatchCTX(bh)
+	mockBatch.AddEntry(entry)
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addendum" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchCTXPrenoteAddendaRecords tests validating prenote addenda records
+func TestBatchCTXPrenoteAddendaRecords(t *testing.T) {
+	testBatchCTXPrenoteAddendaRecords(t)
+}
+
+// BenchmarkBatchPrenoteAddendaRecords benchmarks validating prenote addenda records
+func BenchmarkBatchCTXPrenoteAddendaRecords(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchCTXPrenoteAddendaRecords(b)
+	}
+}

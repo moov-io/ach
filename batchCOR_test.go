@@ -5,6 +5,7 @@
 package ach
 
 import (
+	"log"
 	"testing"
 )
 
@@ -42,7 +43,7 @@ func mockBatchCOR() *BatchCOR {
 	mockBatch.AddEntry(mockCOREntryDetail())
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98())
 	if err := mockBatch.Create(); err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	return mockBatch
 }
