@@ -53,14 +53,30 @@ func (batch *BatchCOR) Validate() error {
 	}
 
 	for _, entry := range batch.Entries {
-		// COR TransactionCode must be a Return or NOC transaction Code
-		// Return/NOC of a credit  21, 31, 41, 51
-		// Return/NOC of a debit 26, 36, 46, 56
-		if entry.TransactionCodeDescription() != ReturnOrNoc {
+		/* COR TransactionCode must be a Return or NOC transaction Code
+			   Return/NOC
+			   Credit:  21, 31, 41, 51
+			   Debit: 26, 36, 46, 56
+
+			   Automated payment/deposit
+			   Credit: 22, 32, 42, 52
+			   Debit: 27, 37, 47, 55 (reversal)
+
+			   Prenote
+			   Credit:  23, 33, 43, 53
+			   Debit: 28, 38, 48
+
+			   Zero dollar amount with remittance data
+			   Credit: 24, 34, 44, 54
+		 	   Debit: 29, 39, 49
+		*/
+		switch entry.TransactionCode {
+		case 22, 27, 32, 37, 42, 47, 52, 55,
+			23, 28, 33, 38, 43, 48, 53,
+			24, 29, 34, 39, 44, 49, 54:
 			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "COR")
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 		}
-
 	}
 
 	return nil
