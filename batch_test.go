@@ -63,6 +63,7 @@ func mockBatchInvalidSECHeader() *BatchHeader {
 }
 
 // Test cases that apply to all batch types
+// testBatchNumberMismatch validates BatchNumber mismatch
 func testBatchNumberMismatch(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.GetControl().BatchNumber = 2
@@ -77,9 +78,12 @@ func testBatchNumberMismatch(t testing.TB) {
 	}
 }
 
+// TestBatchNumberMismatch tests validating BatchNumber mismatch
 func TestBatchNumberMismatch(t *testing.T) {
 	testBatchNumberMismatch(t)
 }
+
+// BenchmarkBatchNumberMismatch benchmarks validating BatchNumber mismatch
 func BenchmarkBatchNumberMismatch(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -87,7 +91,8 @@ func BenchmarkBatchNumberMismatch(b *testing.B) {
 	}
 }
 
-func testCreditBatchisBatchAmount(t testing.TB) {
+// testCreditBatchIsBatchAmount validates Batch TotalCreditEntryDollarAmount
+func testCreditBatchIsBatchAmount(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.SetHeader(mockBatchHeader())
 	e1 := mockBatch.GetEntries()[0]
@@ -114,19 +119,22 @@ func testCreditBatchisBatchAmount(t testing.TB) {
 	}
 }
 
-func TestCreditBatchisBatchAmount(t *testing.T) {
-	testCreditBatchisBatchAmount(t)
+// TestCreditBatchIsBatchAmount test validating Batch TotalCreditEntryDollarAmount
+func TestCreditBatchIsBatchAmount(t *testing.T) {
+	testCreditBatchIsBatchAmount(t)
 }
 
-func BenchmarkCreditBatchisBatchAmount(b *testing.B) {
+// BenchmarkCreditBatchIsBatchAmount benchmarks Batch TotalCreditEntryDollarAmount
+func BenchmarkCreditBatchIsBatchAmount(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testCreditBatchisBatchAmount(b)
+		testCreditBatchIsBatchAmount(b)
 	}
 
 }
 
-func testSavingsBatchisBatchAmount(t testing.TB) {
+// testSavingsBatchIsBatchAmount validates Batch TotalDebitEntryDollarAmount
+func testSavingsBatchIsBatchAmount(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.SetHeader(mockBatchHeader())
 	e1 := mockBatch.GetEntries()[0]
@@ -154,14 +162,16 @@ func testSavingsBatchisBatchAmount(t testing.TB) {
 	}
 }
 
-func TestSavingsBatchisBatchAmount(t *testing.T) {
-	testSavingsBatchisBatchAmount(t)
+// TestSavingsBatchIsBatchAmount tests validating Batch TotalDebitEntryDollarAmount
+func TestSavingsBatchIsBatchAmount(t *testing.T) {
+	testSavingsBatchIsBatchAmount(t)
 }
 
-func BenchmarkSavingsBatchisBatchAmount(b *testing.B) {
+// BenchmarkSavingsBatchIsBatchAmount benchmarks validating Batch TotalDebitEntryDollarAmount
+func BenchmarkSavingsBatchIsBatchAmount(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testSavingsBatchisBatchAmount(b)
+		testSavingsBatchIsBatchAmount(b)
 	}
 }
 
