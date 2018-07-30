@@ -37,7 +37,8 @@ var (
 	msgFileControl       = "none or more than one file control exists"
 	msgFileHeader        = "none or more than one file headers exists"
 	msgUnknownRecordType = "%s is an unknown record type"
-	msgFileNoneSEC       = "%v SEC(standard entry class) is not implemented"
+	msgFileNoneSEC       = "%v Standard Entry Class Code is not implemented"
+	msgFileIATSEC        = "%v Standard Entry Class Code should use iatBatch"
 )
 
 // FileError is an error describing issues validating a file

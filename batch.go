@@ -37,10 +37,11 @@ func NewBatch(bh *BatchHeader) (Batcher, error) {
 		return NewBatchCIE(bh), nil
 	case "COR":
 		return NewBatchCOR(bh), nil
+	case "CTX":
+		return NewBatchCTX(bh), nil
 	case "IAT":
-		//ToDo: Update message to tell user to use iatBatch.go
-		msg := fmt.Sprintf(msgFileNoneSEC, bh.StandardEntryClassCode)
-		return nil, &FileError{FieldName: "StandardEntryClassCode", Msg: msg}
+		msg := fmt.Sprintf(msgFileIATSEC, bh.StandardEntryClassCode)
+		return nil, &FileError{FieldName: "StandardEntryClassCode", Value: bh.StandardEntryClassCode, Msg: msg}
 	case "POP":
 		return NewBatchPOP(bh), nil
 	case "POS":
@@ -58,7 +59,7 @@ func NewBatch(bh *BatchHeader) (Batcher, error) {
 	default:
 	}
 	msg := fmt.Sprintf(msgFileNoneSEC, bh.StandardEntryClassCode)
-	return nil, &FileError{FieldName: "StandardEntryClassCode", Msg: msg}
+	return nil, &FileError{FieldName: "StandardEntryClassCode", Value: bh.StandardEntryClassCode, Msg: msg}
 }
 
 // verify checks basic valid NACHA batch rules. Assumes properly parsed records. This does not mean it is a valid batch as validity is tied to each batch type
@@ -140,6 +141,7 @@ func (batch *batch) build() error {
 	seq := 1
 	for i, entry := range batch.Entries {
 		entryCount = entryCount + 1 + len(entry.Addendum)
+
 		currentTraceNumberODFI, err := strconv.Atoi(entry.TraceNumberField()[:8])
 		if err != nil {
 			return err
