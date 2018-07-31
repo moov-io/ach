@@ -37,7 +37,8 @@ var (
 	msgFileControl       = "none or more than one file control exists"
 	msgFileHeader        = "none or more than one file headers exists"
 	msgUnknownRecordType = "%s is an unknown record type"
-	msgFileNoneSEC       = "%v SEC(standard entry class) is not implemented"
+	msgFileNoneSEC       = "%v Standard Entry Class Code is not implemented"
+	msgFileIATSEC        = "%v Standard Entry Class Code should use iatBatch"
 )
 
 // FileError is an error describing issues validating a file
@@ -53,16 +54,16 @@ func (e *FileError) Error() string {
 
 // File contains the structures of a parsed ACH File.
 type File struct {
-	// ID is a client defined string used as a reference to this record.
-	ID      string      `json:"id"`
-	Header  FileHeader  `json:"fileHeader"`
-	Batches []Batcher   `json:"batches"`
-	Control FileControl `json:"fileControl"`
+	ID         string      `json:"id"`
+	Header     FileHeader  `json:"fileHeader"`
+	Batches    []Batcher   `json:"batches"`
+	IATBatches []IATBatch  `json:"IATBatches"`
+	Control    FileControl `json:"fileControl"`
 
 	// NotificationOfChange (Notification of change) is a slice of references to BatchCOR in file.Batches
-	NotificationOfChange []*BatchCOR `json:"notificationOfChange,omitempty"`
+	NotificationOfChange []*BatchCOR
 	// ReturnEntries is a slice of references to file.Batches that contain return entries
-	ReturnEntries []Batcher `json:"returnEntries,omitempty"`
+	ReturnEntries []Batcher
 
 	converters
 }
@@ -82,7 +83,7 @@ func (f *File) Create() error {
 		return err
 	}
 	// Requires at least one Batch in the new file.
-	if len(f.Batches) <= 0 {
+	if len(f.Batches) <= 0 && len(f.IATBatches) <= 0 {
 		return &FileError{FieldName: "Batches", Value: strconv.Itoa(len(f.Batches)), Msg: "must have []*Batches to be built"}
 	}
 	// add 2 for FileHeader/control and reset if build was called twice do to error
@@ -105,6 +106,21 @@ func (f *File) Create() error {
 		fileEntryHashSum = fileEntryHashSum + batch.GetControl().EntryHash
 		totalDebitAmount = totalDebitAmount + batch.GetControl().TotalDebitEntryDollarAmount
 		totalCreditAmount = totalCreditAmount + batch.GetControl().TotalCreditEntryDollarAmount
+
+	}
+	for i, iatBatch := range f.IATBatches {
+		// create ascending batch numbers
+		f.IATBatches[i].GetHeader().BatchNumber = batchSeq
+		f.IATBatches[i].GetControl().BatchNumber = batchSeq
+		batchSeq++
+		// sum file entry and addenda records. Assume batch.Create() batch properly calculated control
+		fileEntryAddendaCount = fileEntryAddendaCount + iatBatch.GetControl().EntryAddendaCount
+		// add 2 for Batch header/control + entry added count
+		totalRecordsInFile = totalRecordsInFile + 2 + iatBatch.GetControl().EntryAddendaCount
+		// sum hash from batch control. Assume Batch.Build properly calculated field.
+		fileEntryHashSum = fileEntryHashSum + iatBatch.GetControl().EntryHash
+		totalDebitAmount = totalDebitAmount + iatBatch.GetControl().TotalDebitEntryDollarAmount
+		totalCreditAmount = totalCreditAmount + iatBatch.GetControl().TotalCreditEntryDollarAmount
 
 	}
 	// create FileControl from calculated values
@@ -138,6 +154,12 @@ func (f *File) AddBatch(batch Batcher) []Batcher {
 	return f.Batches
 }
 
+// AddIATBatch appends a IATBatch to the ach.File
+func (f *File) AddIATBatch(iatBatch IATBatch) []IATBatch {
+	f.IATBatches = append(f.IATBatches, iatBatch)
+	return f.IATBatches
+}
+
 // SetHeader allows for header to be built.
 func (f *File) SetHeader(h FileHeader) *File {
 	f.Header = h
@@ -147,7 +169,7 @@ func (f *File) SetHeader(h FileHeader) *File {
 // Validate NACHA rules on the entire batch before being added to a File
 func (f *File) Validate() error {
 	// The value of the Batch Count Field is equal to the number of Company/Batch/Header Records in the file.
-	if f.Control.BatchCount != len(f.Batches) {
+	if f.Control.BatchCount != (len(f.Batches) + len(f.IATBatches)) {
 		msg := fmt.Sprintf(msgFileCalculatedControlEquality, len(f.Batches), f.Control.BatchCount)
 		return &FileError{FieldName: "BatchCount", Value: strconv.Itoa(len(f.Batches)), Msg: msg}
 	}
@@ -163,13 +185,17 @@ func (f *File) Validate() error {
 	return f.isEntryHash()
 }
 
-// isEntryAddenda is prepared by hashing the RDFI’s 8-digit Routing Number in each entry.
+// isEntryAddendaCount is prepared by hashing the RDFI’s 8-digit Routing Number in each entry.
 //The Entry Hash provides a check against inadvertent alteration of data
 func (f *File) isEntryAddendaCount() error {
 	count := 0
 	// we assume that each batch block has already validated the addenda count is accurate in batch control.
 	for _, batch := range f.Batches {
 		count += batch.GetControl().EntryAddendaCount
+	}
+	// IAT
+	for _, iatBatch := range f.IATBatches {
+		count += iatBatch.GetControl().EntryAddendaCount
 	}
 	if f.Control.EntryAddendaCount != count {
 		msg := fmt.Sprintf(msgFileCalculatedControlEquality, count, f.Control.EntryAddendaCount)
@@ -186,6 +212,11 @@ func (f *File) isFileAmount() error {
 	for _, batch := range f.Batches {
 		debit += batch.GetControl().TotalDebitEntryDollarAmount
 		credit += batch.GetControl().TotalCreditEntryDollarAmount
+	}
+	// IAT
+	for _, iatBatch := range f.IATBatches {
+		debit += iatBatch.GetControl().TotalDebitEntryDollarAmount
+		credit += iatBatch.GetControl().TotalCreditEntryDollarAmount
 	}
 	if f.Control.TotalDebitEntryDollarAmountInFile != debit {
 		msg := fmt.Sprintf(msgFileCalculatedControlEquality, debit, f.Control.TotalDebitEntryDollarAmountInFile)
@@ -214,6 +245,10 @@ func (f *File) calculateEntryHash() string {
 	hash := 0
 	for _, batch := range f.Batches {
 		hash = hash + batch.GetControl().EntryHash
+	}
+	// IAT
+	for _, iatBatch := range f.IATBatches {
+		hash = hash + iatBatch.GetControl().EntryHash
 	}
 	return f.numericField(hash, 10)
 }
