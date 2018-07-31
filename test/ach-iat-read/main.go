@@ -9,7 +9,7 @@ import (
 
 func main() {
 	// open a file for reading. Any io.Reader Can be used
-	f, err := os.Open("iat-ach.ach")
+	f, err := os.Open("iat-credit.ach")
 	if err != nil {
 		log.Fatal(err)
 	}
