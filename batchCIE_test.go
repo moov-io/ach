@@ -377,8 +377,6 @@ func BenchmarkBatchCIEInvalidAddenda(b *testing.B) {
 	}
 }
 
-// ToDo: Using a FieldError may need to add a BatchError and use *BatchError
-
 // testBatchCIEInvalidBuild validates an invalid batch build
 func testBatchCIEInvalidBuild(t testing.TB) {
 	mockBatch := mockBatchCIE()

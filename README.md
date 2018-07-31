@@ -21,6 +21,7 @@ ACH is under active development but already in production for multiple companies
 	* CCD (Corporate credit or debit)
 	* CIE (Customer-Initiated Entry)
 	* COR (Automated Notification of Change(NOC))
+	* CTX (Corporate Trade Exchange)
 	* POP (Point of Purchase)
 	* POS (Point of Sale)
 	* PPD (Prearranged payment and deposits)
@@ -31,10 +32,13 @@ ACH is under active development but already in production for multiple companies
 	* Return Entries
 	* Addenda Type Code 02
 	* Addenda Type Code 05
-	* Addenda Type Code 98
-	* Addenda Type Code 99
-
-
+	* Addenda Type Code 10 (IAT)
+	* Addenda Type Code 11 (IAT)
+	* Addenda Type Code 12 (IAT)
+	* Addenda Type Code 98 (NOC)
+	* Addenda Type Code 99 (Return)
+	* IAT
+	
 ## Project Roadmap
 * Additional SEC codes will be added based on library users needs. Please open an issue with a valid test file.
 * Review the project issues for more detailed information
@@ -259,6 +263,129 @@ Which will generate a well formed ACH flat file.
 82200000020010200101000000000000000000000799123456789                          234567890000002
 9000002000001000000040020400202000000017500000000000799 
 ```
+
+### Create an IAT file 
+
+```go
+    file := NewFile().SetHeader(mockFileHeader())
+	iatBatch := IATBatch{}
+	iatBatch.SetHeader(mockIATBatchHeaderFF())
+	iatBatch.AddEntry(mockIATEntryDetail())
+	iatBatch.Entries[0].Addenda10 = mockAddenda10()
+	iatBatch.Entries[0].Addenda11 = mockAddenda11()
+	iatBatch.Entries[0].Addenda12 = mockAddenda12()
+	iatBatch.Entries[0].Addenda13 = mockAddenda13()
+	iatBatch.Entries[0].Addenda14 = mockAddenda14()
+	iatBatch.Entries[0].Addenda15 = mockAddenda15()
+	iatBatch.Entries[0].Addenda16 = mockAddenda16()
+	iatBatch.Entries[0].AddIATAddenda(mockAddenda17())
+	iatBatch.Entries[0].AddIATAddenda(mockAddenda17B())
+	iatBatch.Entries[0].AddIATAddenda(mockAddenda18())
+	iatBatch.Entries[0].AddIATAddenda(mockAddenda18B())
+	iatBatch.Entries[0].AddIATAddenda(mockAddenda18C())
+	iatBatch.Entries[0].AddIATAddenda(mockAddenda18D())
+	iatBatch.Entries[0].AddIATAddenda(mockAddenda18E())
+	iatBatch.Create()
+	file.AddIATBatch(iatBatch)
+
+	iatBatch2 := IATBatch{}
+	iatBatch2.SetHeader(mockIATBatchHeaderFF())
+	iatBatch2.AddEntry(mockIATEntryDetail())
+	iatBatch2.GetEntries()[0].TransactionCode = 27
+	iatBatch2.GetEntries()[0].Amount = 2000
+	iatBatch2.Entries[0].Addenda10 = mockAddenda10()
+	iatBatch2.Entries[0].Addenda11 = mockAddenda11()
+	iatBatch2.Entries[0].Addenda12 = mockAddenda12()
+	iatBatch2.Entries[0].Addenda13 = mockAddenda13()
+	iatBatch2.Entries[0].Addenda14 = mockAddenda14()
+	iatBatch2.Entries[0].Addenda15 = mockAddenda15()
+	iatBatch2.Entries[0].Addenda16 = mockAddenda16()
+	iatBatch2.Entries[0].AddIATAddenda(mockAddenda17())
+	iatBatch2.Entries[0].AddIATAddenda(mockAddenda17B())
+	iatBatch2.Entries[0].AddIATAddenda(mockAddenda18())
+	iatBatch2.Entries[0].AddIATAddenda(mockAddenda18B())
+	iatBatch2.Entries[0].AddIATAddenda(mockAddenda18C())
+	iatBatch2.Entries[0].AddIATAddenda(mockAddenda18D())
+	iatBatch2.Entries[0].AddIATAddenda(mockAddenda18E())
+	iatBatch2.Create()
+	file.AddIATBatch(iatBatch2)
+
+	if err := file.Create(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err := file.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	b := &bytes.Buffer{}
+	f := NewWriter(b)
+
+	if err := f.Write(file); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	r := NewReader(strings.NewReader(b.String()))
+	_, err := r.Read()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err = r.File.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	// Write IAT records to standard output. Anything io.Writer
+	w := NewWriter(os.Stdout)
+	if err := w.Write(file); err != nil {
+		log.Fatalf("Unexpected error: %s\n", err)
+	}	
+	w.Flush()
+```
+
+This will generate a well formed flat IAT ACH file
+
+```text
+101 987654321 1234567891807200000A094101Federal Reserve Bank   My Bank Name                   
+5220                FF3               US123456789 IATTRADEPAYMTCADUSD010101   0231380100000001
+6221210428820007             0000100000123456789                              1231380100000001
+710ANN000000000000100000928383-23938          BEK Enterprises                          0000001
+711BEK Solutions                      15 West Place Street                             0000001
+712JacobsTown*PA\                     US*19305\                                        0000001
+713Wells Fargo                        01121042882                         US           0000001
+714Citadel Bank                       01231380104                         US           0000001
+7159874654932139872121 Front Street                                                    0000001
+716LetterTown*AB\                     CA*80014\                                        0000001
+717This is an international payment                                                00010000001
+717Transfer of money from one country to another                                   00020000001
+718Bank of Germany                    01987987987654654                   DE       00010000001
+718Bank of Spain                      01987987987123123                   ES       00020000001
+718Bank of France                     01456456456987987                   FR       00030000001
+718Bank of Turkey                     0112312345678910                    TR       00040000001
+718Bank of United Kingdom             011234567890123456789012345678901234GB       00050000001
+82200000150012104288000000000000000000100000                                   231380100000001
+5220                FF3               US123456789 IATTRADEPAYMTCADUSD010101   0231380100000002
+6271210428820007             0000002000123456789                              1231380100000001
+710ANN000000000000100000928383-23938          BEK Enterprises                          0000001
+711BEK Solutions                      15 West Place Street                             0000001
+712JacobsTown*PA\                     US*19305\                                        0000001
+713Wells Fargo                        01121042882                         US           0000001
+714Citadel Bank                       01231380104                         US           0000001
+7159874654932139872121 Front Street                                                    0000001
+716LetterTown*AB\                     CA*80014\                                        0000001
+717This is an international payment                                                00010000001
+717Transfer of money from one country to another                                   00020000001
+718Bank of Germany                    01987987987654654                   DE       00010000001
+718Bank of Spain                      01987987987123123                   ES       00020000001
+718Bank of France                     01456456456987987                   FR       00030000001
+718Bank of Turkey                     0112312345678910                    TR       00040000001
+718Bank of United Kingdom             011234567890123456789012345678901234GB       00050000001
+82200000150012104288000000002000000000000000                                   231380100000002
+9000002000004000000300024208576000000002000000000100000                                       
+9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+```
+
 # Getting Help 
 
  channel | info 

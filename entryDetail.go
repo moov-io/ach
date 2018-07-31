@@ -29,28 +29,21 @@ type EntryDetail struct {
 	// Debit to savings account ‘37’
 	// Prenote for debit to savings account ‘38’
 	TransactionCode int `json:"transactionCode"`
-
 	// RDFIIdentification is the RDFI's routing number without the last digit.
 	// Receiving Depository Financial Institution
 	RDFIIdentification string `json:"RDFIIdentification"`
-
 	// CheckDigit the last digit of the RDFI's routing number
 	CheckDigit string `json:"checkDigit"`
-
 	// DFIAccountNumber is the receiver's bank account number you are crediting/debiting.
 	// It important to note that this is an alphanumeric field, so its space padded, no zero padded
 	DFIAccountNumber string `json:"DFIAccountNumber"`
-
 	// Amount Number of cents you are debiting/crediting this account
 	Amount int `json:"amount"`
-
 	// IdentificationNumber an internal identification (alphanumeric) that
 	// you use to uniquely identify this Entry Detail Record
 	IdentificationNumber string `json:"identificationNumber,omitempty"`
-
 	// IndividualName The name of the receiver, usually the name on the bank account
 	IndividualName string `json:"individualName"`
-
 	// DiscretionaryData allows ODFIs to include codes, of significance only to them,
 	// to enable specialized handling of the entry. There will be no
 	// standardized interpretation for the value of this field. It can either
@@ -60,12 +53,10 @@ type EntryDetail struct {
 	//
 	// WEB uses the Discretionary Data Field as the Payment Type Code
 	DiscretionaryData string `json:"discretionaryData,omitempty"`
-
 	// AddendaRecordIndicator indicates the existence of an Addenda Record.
 	// A value of "1" indicates that one ore more addenda records follow,
 	// and "0" means no such record is present.
 	AddendaRecordIndicator int `json:"addendaRecordIndicator,omitempty"`
-
 	// TraceNumber assigned by the ODFI in ascending sequence, is included in each
 	// Entry Detail Record, Corporate Entry Detail Record, and addenda Record.
 	// Trace Numbers uniquely identify each entry within a batch in an ACH input file.
@@ -75,7 +66,6 @@ type EntryDetail struct {
 	// in the associated Entry Detail Record, since the Trace Number is associated
 	// with an entry or item rather than a physical record.
 	TraceNumber int `json:"traceNumber,omitempty"`
-
 	// Addendum a list of Addenda for the Entry Detail
 	Addendum []Addendumer `json:"addendum,omitempty"`
 	// Category defines if the entry is a Forward, Return, or NOC
@@ -94,7 +84,6 @@ const (
 	// CategoryNOC defines the entry as being a notification of change of a forward entry to the originating institution
 	CategoryNOC = "NOC"
 	// ReturnOrNoc is the description for the  following TransactionCode: 21, 31, 41, 51, 26, 36, 46, 56
-	ReturnOrNoc = "RN"
 )
 
 // NewEntryDetail returns a new EntryDetail with default values for non exported fields
@@ -310,21 +299,18 @@ func (ed *EntryDetail) SetPOPTerminalState(s string) {
 // POPCheckSerialNumberField is used in POP, characters 1-9 of underlying BatchPOP
 // CheckSerialNumber / IdentificationNumber
 func (ed *EntryDetail) POPCheckSerialNumberField() string {
-	//return ed.alphaField(ed.IdentificationNumber, 9)
 	return ed.parseStringField(ed.IdentificationNumber[0:9])
 }
 
 // POPTerminalCityField is used in POP, characters 10-13 of underlying BatchPOP
 // CheckSerialNumber / IdentificationNumber
 func (ed *EntryDetail) POPTerminalCityField() string {
-	//return ed.alphaField(ed.IdentificationNumber, 9)
 	return ed.parseStringField(ed.IdentificationNumber[9:13])
 }
 
 // POPTerminalStateField is used in POP, characters 14-15 of underlying BatchPOP
 // CheckSerialNumber / IdentificationNumber
 func (ed *EntryDetail) POPTerminalStateField() string {
-	//return ed.alphaField(ed.IdentificationNumber, 9)
 	return ed.parseStringField(ed.IdentificationNumber[13:15])
 }
 
@@ -379,6 +365,32 @@ func (ed *EntryDetail) SetReceivingCompany(s string) {
 	ed.IndividualName = s
 }
 
+// SetCTXAddendaRecords setter for CTX AddendaRecords characters 1-4 of underlying IndividualName
+func (ed *EntryDetail) SetCTXAddendaRecords(i int) {
+	ed.IndividualName = ed.numericField(i, 4)
+}
+
+// SetCTXReceivingCompany setter for CTX ReceivingCompany characters 5-20 underlying IndividualName
+// Position 21-22 of underlying Individual Name are reserved blank space for CTX "  "
+func (ed *EntryDetail) SetCTXReceivingCompany(s string) {
+	ed.IndividualName = ed.IndividualName + ed.alphaField(s, 16) + "  "
+}
+
+// CTXAddendaRecordsField is used in CTX files, characters 1-4 of underlying IndividualName field
+func (ed *EntryDetail) CTXAddendaRecordsField() string {
+	return ed.parseStringField(ed.IndividualName[0:4])
+}
+
+// CTXReceivingCompanyField is used in CTX files, characters 5-20 of underlying IndividualName field
+func (ed *EntryDetail) CTXReceivingCompanyField() string {
+	return ed.parseStringField(ed.IndividualName[4:20])
+}
+
+// CTXReservedField is used in CTX files, characters 21-22 of underlying IndividualName field
+func (ed *EntryDetail) CTXReservedField() string {
+	return ed.IndividualName[20:22]
+}
+
 // DiscretionaryDataField returns a space padded string of DiscretionaryData
 func (ed *EntryDetail) DiscretionaryDataField() string {
 	return ed.alphaField(ed.DiscretionaryData, 2)
@@ -415,20 +427,6 @@ func (ed *EntryDetail) CreditOrDebit() string {
 		return "C"
 	case "5", "6", "7", "8", "9":
 		return "D"
-	default:
-	}
-	return ""
-}
-
-// TransactionCodeDescription determines the transaction code description based on the second number
-// in the TransactionCode
-func (ed *EntryDetail) TransactionCodeDescription() string {
-	tc := strconv.Itoa(ed.TransactionCode)
-	// Take the second number in the TransactionCode
-	switch tc[1:2] {
-	// Return or NOC
-	case "1", "6":
-		return ReturnOrNoc
 	default:
 	}
 	return ""

@@ -998,3 +998,423 @@ func BenchmarkFileFHImmediateOrigin(b *testing.B) {
 		testFileFHImmediateOrigin(b)
 	}
 }
+
+// testACHFileRead validates reading a file with PPD and IAT entries
+func testACHFileRead(t testing.TB) {
+	f, err := os.Open("./test/data/20110805A.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*BatchError); ok {
+				if e.FieldName != "entries" {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+	err2 := r.File.Validate()
+
+	if err2 != nil {
+		if e, ok := err2.(*FileError); ok {
+			if e.FieldName != "BatchCount" {
+				t.Errorf("%T: %s", e, e)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestACHFileRead tests validating reading a file with PPD and IAT entries
+func TestACHFileRead(t *testing.T) {
+	testACHFileRead(t)
+}
+
+// BenchmarkACHFileRead benchmarks validating reading a file with PPD and IAT entries
+func BenchmarkACHFileRead(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testACHFileRead(b)
+	}
+}
+
+// testACHFileRead2 validates reading a file with PPD and IAT entries
+func testACHFileRead2(t testing.TB) {
+	f, err := os.Open("./test/data/20110729A.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*BatchError); ok {
+				if e.FieldName != "entries" {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+	err2 := r.File.Validate()
+
+	if err2 != nil {
+		if e, ok := err2.(*FileError); ok {
+			if e.FieldName != "BatchCount" {
+				t.Errorf("%T: %s", e, e)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestACHFileRead2 tests validating reading a file with PPD and IAT entries
+func TestACHFileRead2(t *testing.T) {
+	testACHFileRead2(t)
+}
+
+// BenchmarkACHFileRead2 benchmarks validating reading a file with PPD and IAT entries
+func BenchmarkACHFileRead2(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testACHFileRead2(b)
+	}
+}
+
+// testACHFileRead3 validates reading a file with IAT entries only
+func testACHFileRead3(t testing.TB) {
+	f, err := os.Open("./test/data/20180713-IAT.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*BatchError); ok {
+				if e.FieldName != "entries" {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+	err2 := r.File.Validate()
+
+	if err2 != nil {
+		if e, ok := err2.(*FileError); ok {
+			if e.FieldName != "BatchCount" {
+				t.Errorf("%T: %s", e, e)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestACHFileRead3 tests validating reading a file with IAT entries that only
+func TestACHFileRead3(t *testing.T) {
+	testACHFileRead3(t)
+}
+
+// BenchmarkACHFileRead3 benchmarks validating reading a file with IAT entries only
+func BenchmarkACHFileRead3(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testACHFileRead3(b)
+	}
+}
+
+// testACHIATAddenda17 validates reading a file with IAT and Addenda17 entries
+func testACHIATAddenda17(t testing.TB) {
+	f, err := os.Open("./test/data/20180716-IAT-A17.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*BatchError); ok {
+				if e.FieldName != "entries" {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+	err2 := r.File.Validate()
+
+	if err2 != nil {
+		if e, ok := err2.(*FileError); ok {
+			if e.FieldName != "BatchCount" {
+				t.Errorf("%T: %s", e, e)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestACHIATAddenda17 tests validating reading a file with IAT and Addenda17 entries that
+func TestACHIATAddenda17(t *testing.T) {
+	testACHIATAddenda17(t)
+}
+
+// BenchmarkACHIATAddenda17  benchmarks validating reading a file with IAT and Addenda17 entries
+func BenchmarkACHIATAddenda17(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testACHIATAddenda17(b)
+	}
+}
+
+// testACHIATAddenda1718 validates reading a file with IAT and Addenda17 and Addenda18 entries
+func testACHIATAddenda1718(t testing.TB) {
+	f, err := os.Open("./test/data/20180716-IAT-A17-A18.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*BatchError); ok {
+				if e.FieldName != "entries" {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+	err2 := r.File.Validate()
+
+	if err2 != nil {
+		if e, ok := err2.(*FileError); ok {
+			if e.FieldName != "BatchCount" {
+				t.Errorf("%T: %s", e, e)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestACHIATAddenda1718 tests validating reading a file with IAT and Addenda17 and Addenda18 entries
+func TestACHIATAddenda1718(t *testing.T) {
+	testACHIATAddenda1718(t)
+}
+
+// BenchmarkACHIATAddenda17  benchmarks validating reading a file with IAT Addenda17 and Addenda18 entries
+func BenchmarkACHIATAddenda1718(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testACHIATAddenda1718(b)
+	}
+}
+
+// testACHFileIATBatchHeader validates error when reading an invalid IATBatchHeader
+func testACHFileIATBatchHeader(t testing.TB) {
+	f, err := os.Open("./test/data/IAT-InvalidBatchHeader.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*FieldError); ok {
+				if e.FieldName != "ServiceClassCode" {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestACHFileIATBatchHeader tests validating error when reading an invalid IATBatchHeader
+func TestACHFileIATBatchHeader(t *testing.T) {
+	testACHFileIATBatchHeader(t)
+}
+
+// BenchmarkACHFileIATBatchHeader benchmarks validating error when reading an invalid IATBatchHeader
+func BenchmarkACHFileIATBatchHeader(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testACHFileIATBatchHeader(b)
+	}
+}
+
+// testACHFileIATEntryDetail validates error when reading an invalid IATEntryDetail
+func testACHFileIATEntryDetail(t testing.TB) {
+	f, err := os.Open("./test/data/IAT-InvalidEntryDetail.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*FieldError); ok {
+				if e.FieldName != "TransactionCode" {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestACHFileIATEntryDetail tests validating error when reading an invalid IATEntryDetail
+func TestACHFileIATEntryDetail(t *testing.T) {
+	testACHFileIATEntryDetail(t)
+}
+
+// BenchmarkACHFileIATEntryDetail benchmarks validating error when reading an invalid IATEntryDetail
+func BenchmarkACHFileIATEntryDetail(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testACHFileIATEntryDetail(b)
+	}
+}
+
+// testACHFileIATAddenda10 validates error when reading an invalid IATAddenda10
+func testACHFileIATAddenda10(t testing.TB) {
+	f, err := os.Open("./test/data/IAT-InvalidAddenda10.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*FieldError); ok {
+				if e.FieldName != "TransactionTypeCode" {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestACHFileIATAddenda10 tests validating error when reading an invalid IATAddenda10
+func TestACHFileIATAddenda10(t *testing.T) {
+	testACHFileIATAddenda10(t)
+}
+
+// BenchmarkACHFileIATAddenda10 benchmarks validating error when reading an invalid IATAddenda10
+func BenchmarkACHFileIATAddenda10(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testACHFileIATAddenda10(b)
+	}
+}
+
+// testACHFileIATBC validates error when reading an invalid IAT Batch Control
+func testACHFileIATBC(t testing.TB) {
+	f, err := os.Open("./test/data/IAT-InvalidBatchControl.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*BatchError); ok {
+				if e.FieldName != "ODFIIdentification" {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestACHFileIATBC tests validating error when reading an invalid IAT Batch Control
+func TestACHFileIATBC(t *testing.T) {
+	testACHFileIATBC(t)
+}
+
+// BenchmarkACHFileIATBC benchmarks validating error when reading an invalid IAT Batch Control
+func BenchmarkACHFileIATBC(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testACHFileIATBC(b)
+	}
+}
+
+// testACHFileIATBH validates error when reading an invalid IAT Batch Header
+func testACHFileIATBH(t testing.TB) {
+	f, err := os.Open("./test/data/IAT-BatchHeaderErr.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if e, ok := p.Err.(*FileError); ok {
+				if e.Msg != msgFileBatchInside {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestACHFileIATBH tests validating error when reading an invalid IAT Batch Header
+func TestACHFileIATBH(t *testing.T) {
+	testACHFileIATBH(t)
+}
+
+// BenchmarkACHFileIATBH benchmarks validating error when reading an invalid IAT Batch Header
+func BenchmarkACHFileIATBH(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testACHFileIATBH(b)
+	}
+}

@@ -63,6 +63,7 @@ func mockBatchInvalidSECHeader() *BatchHeader {
 }
 
 // Test cases that apply to all batch types
+// testBatchNumberMismatch validates BatchNumber mismatch
 func testBatchNumberMismatch(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.GetControl().BatchNumber = 2
@@ -77,9 +78,12 @@ func testBatchNumberMismatch(t testing.TB) {
 	}
 }
 
+// TestBatchNumberMismatch tests validating BatchNumber mismatch
 func TestBatchNumberMismatch(t *testing.T) {
 	testBatchNumberMismatch(t)
 }
+
+// BenchmarkBatchNumberMismatch benchmarks validating BatchNumber mismatch
 func BenchmarkBatchNumberMismatch(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -87,7 +91,8 @@ func BenchmarkBatchNumberMismatch(b *testing.B) {
 	}
 }
 
-func testCreditBatchisBatchAmount(t testing.TB) {
+// testCreditBatchIsBatchAmount validates Batch TotalCreditEntryDollarAmount
+func testCreditBatchIsBatchAmount(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.SetHeader(mockBatchHeader())
 	e1 := mockBatch.GetEntries()[0]
@@ -114,18 +119,22 @@ func testCreditBatchisBatchAmount(t testing.TB) {
 	}
 }
 
-func TestCreditBatchisBatchAmount(t *testing.T) {
-	testCreditBatchisBatchAmount(t)
+// TestCreditBatchIsBatchAmount test validating Batch TotalCreditEntryDollarAmount
+func TestCreditBatchIsBatchAmount(t *testing.T) {
+	testCreditBatchIsBatchAmount(t)
 }
 
-func BenchmarkCreditBatchisBatchAmount(b *testing.B) {
+// BenchmarkCreditBatchIsBatchAmount benchmarks Batch TotalCreditEntryDollarAmount
+func BenchmarkCreditBatchIsBatchAmount(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testCreditBatchisBatchAmount(b)
+		testCreditBatchIsBatchAmount(b)
 	}
 
 }
-func testSavingsBatchisBatchAmount(t testing.TB) {
+
+// testSavingsBatchIsBatchAmount validates Batch TotalDebitEntryDollarAmount
+func testSavingsBatchIsBatchAmount(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.SetHeader(mockBatchHeader())
 	e1 := mockBatch.GetEntries()[0]
@@ -153,18 +162,20 @@ func testSavingsBatchisBatchAmount(t testing.TB) {
 	}
 }
 
-func TestSavingsBatchisBatchAmount(t *testing.T) {
-	testSavingsBatchisBatchAmount(t)
+// TestSavingsBatchIsBatchAmount tests validating Batch TotalDebitEntryDollarAmount
+func TestSavingsBatchIsBatchAmount(t *testing.T) {
+	testSavingsBatchIsBatchAmount(t)
 }
 
-func BenchmarkSavingsBatchisBatchAmount(b *testing.B) {
+// BenchmarkSavingsBatchIsBatchAmount benchmarks validating Batch TotalDebitEntryDollarAmount
+func BenchmarkSavingsBatchIsBatchAmount(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testSavingsBatchisBatchAmount(b)
+		testSavingsBatchIsBatchAmount(b)
 	}
 }
 
-func testBatchisEntryHash(t testing.TB) {
+func testBatchIsEntryHash(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.GetControl().EntryHash = 1
 	if err := mockBatch.verify(); err != nil {
@@ -178,14 +189,14 @@ func testBatchisEntryHash(t testing.TB) {
 	}
 }
 
-func TestBatchisEntryHash(t *testing.T) {
-	testBatchisEntryHash(t)
+func TestBatchIsEntryHash(t *testing.T) {
+	testBatchIsEntryHash(t)
 }
 
-func BenchmarkBatchisEntryHash(b *testing.B) {
+func BenchmarkBatchIsEntryHash(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchisEntryHash(b)
+		testBatchIsEntryHash(b)
 	}
 }
 
@@ -394,6 +405,8 @@ func BenchmarkBatchAddendaTraceNumber(b *testing.B) {
 		testBatchAddendaTraceNumber(b)
 	}
 }
+
+// testNewBatchDefault validates error for NewBatch if invalid SEC Code
 func testNewBatchDefault(t testing.TB) {
 	_, err := NewBatch(mockBatchInvalidSECHeader())
 
@@ -406,10 +419,13 @@ func testNewBatchDefault(t testing.TB) {
 	}
 }
 
+// TestNewBatchDefault test validating error for NewBatch if invalid SEC Code
 func TestNewBatchDefault(t *testing.T) {
 	testNewBatchDefault(t)
 }
 
+// BenchmarkNewBatchDefault benchmarks validating error for NewBatch if
+// invalid SEC Code
 func BenchmarkNewBatchDefault(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -417,6 +433,7 @@ func BenchmarkNewBatchDefault(b *testing.B) {
 	}
 }
 
+// testBatchCategory validates Batch Category
 func testBatchCategory(t testing.TB) {
 	mockBatch := mockBatch()
 	// Add a Addenda Return to the mock batch
@@ -433,10 +450,12 @@ func testBatchCategory(t testing.TB) {
 	}
 }
 
+// TestBatchCategory tests validating Batch Category
 func TestBatchCategory(t *testing.T) {
 	testBatchCategory(t)
 }
 
+// BenchmarkBatchCategory benchmarks validating Batch Category
 func BenchmarkBatchCategory(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -444,6 +463,7 @@ func BenchmarkBatchCategory(b *testing.B) {
 	}
 }
 
+//  testBatchCategoryForwardReturn validates Category based on EntryDetail
 func testBatchCategoryForwardReturn(t testing.TB) {
 	mockBatch := mockBatch()
 	// Add a Addenda Return to the mock batch
@@ -465,9 +485,12 @@ func testBatchCategoryForwardReturn(t testing.TB) {
 	}
 }
 
+// TestBatchCategoryForwardReturn tests validating Category based on EntryDetail
 func TestBatchCategoryForwardReturn(t *testing.T) {
 	testBatchCategoryForwardReturn(t)
 }
+
+//  BenchmarkBatchCategoryForwardReturn benchmarks validating Category based on EntryDetail
 func BenchmarkBatchCategoryForwardReturn(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -524,6 +547,7 @@ func BenchmarkBatchFieldInclusion(b *testing.B) {
 	}
 }
 
+// testBatchInvalidTraceNumberODFI validates TraceNumberODFI
 func testBatchInvalidTraceNumberODFI(t testing.TB) {
 	mockBatch := mockBatchInvalidTraceNumberODFI()
 	if err := mockBatch.build(); err != nil {
@@ -531,10 +555,12 @@ func testBatchInvalidTraceNumberODFI(t testing.TB) {
 	}
 }
 
+// TestBatchInvalidTraceNumberODFI tests validating TraceNumberODFI
 func TestBatchInvalidTraceNumberODFI(t *testing.T) {
 	testBatchInvalidTraceNumberODFI(t)
 }
 
+// BenchmarkBatchInvalidTraceNumberODFI benchmarks validating TraceNumberODFI
 func BenchmarkBatchInvalidTraceNumberODFI(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -542,6 +568,7 @@ func BenchmarkBatchInvalidTraceNumberODFI(b *testing.B) {
 	}
 }
 
+// testBatchNoEntry validates error for a batch with no entries
 func testBatchNoEntry(t testing.TB) {
 	mockBatch := mockBatchNoEntry()
 	if err := mockBatch.build(); err != nil {
@@ -553,12 +580,26 @@ func testBatchNoEntry(t testing.TB) {
 			t.Errorf("%T: %s", err, err)
 		}
 	}
+
+	// test verify
+	if err := mockBatch.verify(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "entries" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
 }
 
+// TestBatchNoEntry tests validating error for a batch with no entries
 func TestBatchNoEntry(t *testing.T) {
 	testBatchNoEntry(t)
 }
 
+// BenchmarkBatchNoEntry benchmarks validating error for a batch with no entries
 func BenchmarkBatchNoEntry(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -566,6 +607,7 @@ func BenchmarkBatchNoEntry(b *testing.B) {
 	}
 }
 
+// testBatchControl validates BatchControl ODFIIdentification
 func testBatchControl(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.Control.ODFIIdentification = ""
@@ -580,13 +622,50 @@ func testBatchControl(t testing.TB) {
 	}
 }
 
+// TestBatchControl tests validating BatchControl ODFIIdentification
 func TestBatchControl(t *testing.T) {
 	testBatchControl(t)
 }
 
+// BenchmarkBatchControl benchmarks validating BatchControl ODFIIdentification
 func BenchmarkBatchControl(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchControl(b)
+	}
+}
+
+// testIATBatch validates an IAT batch returns an error for batch
+func testIATBatch(t testing.TB) {
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = 220
+	bh.StandardEntryClassCode = "IAT"
+	bh.CompanyName = "ACME Corporation"
+	bh.CompanyIdentification = "123456789"
+	bh.CompanyEntryDescription = "PAYROLL"
+	bh.EffectiveEntryDate = time.Now()
+	bh.ODFIIdentification = "123456789"
+
+	_, err := NewBatch(bh)
+
+	if e, ok := err.(*FileError); ok {
+		if e.FieldName != "StandardEntryClassCode" {
+			t.Errorf("%T: %s", err, err)
+		}
+	} else {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestIATBatch tests validating an IAT batch returns an error for batch
+func TestIATBatch(t *testing.T) {
+	testIATBatch(t)
+}
+
+// BenchmarkIATBatch benchmarks validating an IAT batch returns an error for batch
+func BenchmarkIATBatch(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatch(b)
 	}
 }
