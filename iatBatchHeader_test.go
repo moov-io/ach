@@ -25,6 +25,22 @@ func mockIATBatchHeaderFF() *IATBatchHeader {
 	return bh
 }
 
+// mockIATBatchReturnHeaderFF creates a IAT Return BatchHeader that is Fixed-Fixed
+func mockIATReturnBatchHeaderFF() *IATBatchHeader {
+	bh := NewIATBatchHeader()
+	bh.ServiceClassCode = 220
+	bh.ForeignExchangeIndicator = "FF"
+	bh.ForeignExchangeReferenceIndicator = 3
+	bh.ISODestinationCountryCode = "US"
+	bh.OriginatorIdentification = "123456789"
+	bh.StandardEntryClassCode = "IAT"
+	bh.CompanyEntryDescription = "TRADEPAYMT"
+	bh.ISOOriginatingCurrencyCode = "CAD"
+	bh.ISODestinationCurrencyCode = "USD"
+	bh.ODFIIdentification = "12104288"
+	return bh
+}
+
 // testMockIATBatchHeaderFF creates a IAT BatchHeader Fixed-Fixed
 func testMockIATBatchHeaderFF(t testing.TB) {
 	bh := mockIATBatchHeaderFF()

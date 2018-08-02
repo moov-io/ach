@@ -101,6 +101,16 @@ func mockInvalidAddenda17() *Addenda17 {
 	return addenda17
 }
 
+func mockIATAddenda99() *Addenda99 {
+	addenda99 := NewAddenda99()
+	addenda99.ReturnCode = "R07"
+	addenda99.OriginalTrace = 231380100000001
+	addenda99.OriginalDFI = "12104288"
+	addenda99.IATPaymentAmount("0000100000")
+	addenda99.IATAddendaInformation("Authorization Revoked")
+	return addenda99
+}
+
 // TestMockIATBatch validates mockIATBatch
 func TestMockIATBatch(t *testing.T) {
 	iatBatch := mockIATBatch()
@@ -1776,7 +1786,6 @@ func testIATBatchAddenda18Count(t testing.TB) {
 	mockBatch.Entries[0].Addenda15 = mockAddenda15()
 	mockBatch.Entries[0].Addenda16 = mockAddenda16()
 	mockBatch.Entries[0].AddIATAddenda(mockAddenda17())
-	mockBatch.Entries[0].AddIATAddenda(mockAddenda17B())
 	mockBatch.Entries[0].AddIATAddenda(mockAddenda18())
 	mockBatch.Entries[0].AddIATAddenda(mockAddenda18B())
 	mockBatch.Entries[0].AddIATAddenda(mockAddenda18C())
@@ -1881,4 +1890,48 @@ func BenchmarkIATBatchBHODFI(b *testing.B) {
 		testIATBatchBHODFI(b)
 	}
 
+}
+
+// testIATBatchAddenda99Count validates IATBatch Addenda99 Count
+func testIATBatchAddenda99Count(t testing.TB) {
+	mockBatch := IATBatch{}
+	mockBatch.SetHeader(mockIATReturnBatchHeaderFF())
+	mockBatch.AddEntry(mockIATEntryDetail())
+	mockBatch.Entries[0].Addenda10 = mockAddenda10()
+	mockBatch.Entries[0].Addenda11 = mockAddenda11()
+	mockBatch.Entries[0].Addenda12 = mockAddenda12()
+	mockBatch.Entries[0].Addenda13 = mockAddenda13()
+	mockBatch.Entries[0].Addenda14 = mockAddenda14()
+	mockBatch.Entries[0].Addenda15 = mockAddenda15()
+	mockBatch.Entries[0].Addenda16 = mockAddenda16()
+	mockBatch.Entries[0].AddIATAddenda(mockIATAddenda99())
+	mockBatch.category = CategoryReturn
+
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addendum" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+}
+
+// TestIATBatchAddenda99Count tests validating IATBatch Addenda99 Count
+func TestIATBatchAddenda99Count(t *testing.T) {
+	testIATBatchAddenda99Count(t)
+}
+
+// BenchmarkIATBatchAddenda99Count benchmarks validating IATBatch Addenda99 Count
+func BenchmarkIATBatchAddenda99Count(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATBatchAddenda99Count(b)
+	}
 }

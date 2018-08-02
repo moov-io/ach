@@ -214,17 +214,28 @@ func (r *Reader) parseED() error {
 
 // parseEd parses determines whether to parse an IATEntryDetail Addenda or EntryDetail Addenda
 func (r *Reader) parseEDAddenda() error {
-	switch r.line[1:3] {
-	//ToDo;  What to do about 98 and 99 ?
-	case "10", "11", "12", "13", "14", "15", "16", "17", "18":
-		if err := r.parseIATAddenda(); err != nil {
-			return err
-		}
-	default:
+
+	if r.currentBatch != nil {
 		if err := r.parseAddenda(); err != nil {
 			return err
 		}
+	} else {
+		if err := r.parseIATAddenda(); err != nil {
+			return err
+		}
 	}
+
+	/*	switch r.line[1:3] {
+		//ToDo;  What to do about 98 and 99 ?
+		case "10", "11", "12", "13", "14", "15", "16", "17", "18":
+			if err := r.parseIATAddenda(); err != nil {
+				return err
+			}
+		default:
+			if err := r.parseAddenda(); err != nil {
+				return err
+			}
+		}*/
 	return nil
 }
 
@@ -445,6 +456,28 @@ func (r *Reader) parseIATAddenda() error {
 }
 
 func (r *Reader) switchIATAddenda(entryIndex int) error {
+
+	switch r.line[1:3] {
+	// IAT mandatory and optional Addenda
+	case "10", "11", "12", "13", "14", "15", "16", "17", "18":
+		err := r.mandatoryOptionalIATAddenda(entryIndex)
+		if err != nil {
+			return err
+		}
+	// IAT return Addenda
+	case "99":
+		err := r.returnIATAddenda(entryIndex)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// mandatoryOptionalIATAddenda parses and validates mandatory IAT addenda records:
+// Addenda10, Addenda11, Addenda12, Addenda13, Addenda14, Addenda15, Addenda16
+func (r *Reader) mandatoryOptionalIATAddenda(entryIndex int) error {
+
 	switch r.line[1:3] {
 	case "10":
 		addenda10 := NewAddenda10()
@@ -452,64 +485,77 @@ func (r *Reader) switchIATAddenda(entryIndex int) error {
 		if err := addenda10.Validate(); err != nil {
 			return err
 		}
-		r.IATCurrentBatch.GetEntries()[entryIndex].Addenda10 = addenda10
+		r.IATCurrentBatch.Entries[entryIndex].Addenda10 = addenda10
 	case "11":
 		addenda11 := NewAddenda11()
 		addenda11.Parse(r.line)
 		if err := addenda11.Validate(); err != nil {
 			return err
 		}
-		r.IATCurrentBatch.GetEntries()[entryIndex].Addenda11 = addenda11
+		r.IATCurrentBatch.Entries[entryIndex].Addenda11 = addenda11
 	case "12":
 		addenda12 := NewAddenda12()
 		addenda12.Parse(r.line)
 		if err := addenda12.Validate(); err != nil {
 			return err
 		}
-		r.IATCurrentBatch.GetEntries()[entryIndex].Addenda12 = addenda12
+		r.IATCurrentBatch.Entries[entryIndex].Addenda12 = addenda12
 	case "13":
-
 		addenda13 := NewAddenda13()
 		addenda13.Parse(r.line)
 		if err := addenda13.Validate(); err != nil {
 			return err
 		}
-		r.IATCurrentBatch.GetEntries()[entryIndex].Addenda13 = addenda13
+		r.IATCurrentBatch.Entries[entryIndex].Addenda13 = addenda13
 	case "14":
 		addenda14 := NewAddenda14()
 		addenda14.Parse(r.line)
 		if err := addenda14.Validate(); err != nil {
 			return err
 		}
-		r.IATCurrentBatch.GetEntries()[entryIndex].Addenda14 = addenda14
+		r.IATCurrentBatch.Entries[entryIndex].Addenda14 = addenda14
 	case "15":
 		addenda15 := NewAddenda15()
 		addenda15.Parse(r.line)
 		if err := addenda15.Validate(); err != nil {
 			return err
 		}
-		r.IATCurrentBatch.GetEntries()[entryIndex].Addenda15 = addenda15
+		r.IATCurrentBatch.Entries[entryIndex].Addenda15 = addenda15
 	case "16":
 		addenda16 := NewAddenda16()
 		addenda16.Parse(r.line)
 		if err := addenda16.Validate(); err != nil {
 			return err
 		}
-		r.IATCurrentBatch.GetEntries()[entryIndex].Addenda16 = addenda16
+		r.IATCurrentBatch.Entries[entryIndex].Addenda16 = addenda16
 	case "17":
 		addenda17 := NewAddenda17()
 		addenda17.Parse(r.line)
 		if err := addenda17.Validate(); err != nil {
 			return err
 		}
-		r.IATCurrentBatch.GetEntries()[entryIndex].AddIATAddenda(addenda17)
+		r.IATCurrentBatch.Entries[entryIndex].AddIATAddenda(addenda17)
 	case "18":
 		addenda18 := NewAddenda18()
 		addenda18.Parse(r.line)
 		if err := addenda18.Validate(); err != nil {
 			return err
 		}
-		r.IATCurrentBatch.GetEntries()[entryIndex].AddIATAddenda(addenda18)
+		r.IATCurrentBatch.Entries[entryIndex].AddIATAddenda(addenda18)
 	}
+
+	return nil
+}
+
+// returnIATAddenda parses and validates IAT return record Addenda99
+func (r *Reader) returnIATAddenda(entryIndex int) error {
+
+	addenda99 := NewAddenda99()
+	addenda99.Parse(r.line)
+	if err := addenda99.Validate(); err != nil {
+		return err
+	}
+	r.IATCurrentBatch.Entries[entryIndex].AddIATAddenda(addenda99)
+
 	return nil
 }
