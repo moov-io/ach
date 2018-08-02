@@ -474,8 +474,8 @@ func (r *Reader) switchIATAddenda(entryIndex int) error {
 	return nil
 }
 
-// mandatoryOptionalIATAddenda parses and validates mandatory IAT addenda records:
-// Addenda10, Addenda11, Addenda12, Addenda13, Addenda14, Addenda15, Addenda16
+// mandatoryOptionalIATAddenda parses and validates mandatory IAT addenda records: Addenda10,
+// Addenda11, Addenda12, Addenda13, Addenda14, Addenda15, Addenda16, Addenda17, Addenda18
 func (r *Reader) mandatoryOptionalIATAddenda(entryIndex int) error {
 
 	switch r.line[1:3] {
