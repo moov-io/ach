@@ -295,7 +295,10 @@ func (ed *IATEntryDetail) AddIATAddenda(addenda Addendumer) []Addendumer {
 	ed.AddendaRecordIndicator = 1
 	// checks to make sure that we only have either or, not both
 	switch addenda.(type) {
-	// Addenda17
+	case *Addenda99:
+		ed.Category = CategoryReturn
+		ed.Addendum = append(ed.Addendum, addenda)
+		return ed.Addendum
 	default:
 		ed.Category = CategoryForward
 		ed.Addendum = append(ed.Addendum, addenda)

@@ -157,6 +157,29 @@ func (Addenda99 *Addenda99) AddendaInformationField() string {
 	return Addenda99.alphaField(Addenda99.AddendaInformation, 44)
 }
 
+//IATPaymentAmount sets original forward entry payment amount characters 1-10 of underlying AddendaInformation
+func (Addenda99 *Addenda99) IATPaymentAmount(s string) {
+	Addenda99.AddendaInformation = Addenda99.stringField(s, 10)
+}
+
+//IATAddendaInformation sets Addenda Information for IAT return items, characters 10-44 of
+// underlying AddendaInformation
+func (Addenda99 *Addenda99) IATAddendaInformation(s string) {
+	Addenda99.AddendaInformation = Addenda99.AddendaInformation + Addenda99.alphaField(s, 34)
+}
+
+//IATPaymentAmountField returns original forward entry payment amount int, characters 1-10 of
+// underlying AddendaInformation
+func (Addenda99 *Addenda99) IATPaymentAmountField() int {
+	return Addenda99.parseNumField(Addenda99.AddendaInformation[0:10])
+}
+
+//IATAddendaInformationField returns a space padded AddendaInformation string, characters 10-44 of
+// underlying AddendaInformation
+func (Addenda99 *Addenda99) IATAddendaInformationField() string {
+	return Addenda99.alphaField(Addenda99.AddendaInformation[9:44], 34)
+}
+
 // TraceNumberField returns a zero padded traceNumber string
 func (Addenda99 *Addenda99) TraceNumberField() string {
 	return Addenda99.numericField(Addenda99.TraceNumber, 15)
