@@ -111,13 +111,13 @@ func (r *repositoryInMemory) FindAllBatches(fileID string) []*ach.Batcher {
 func (r *repositoryInMemory) DeleteBatch(fileID string, batchID string) error {
 	r.mtx.RLock()
 	defer r.mtx.RUnlock()
-	for _, val := range r.files[fileID].Batches {
-		if val.ID() == batchID {
-			//append()
-			//delete(val)
-			// TODO delete the bach from the file
-			return ErrNotFound
+
+	for i := len(r.files[fileID].Batches) - 1; i >= 0; i-- {
+		if r.files[fileID].Batches[i].ID() == batchID {
+			r.files[fileID].Batches = append(r.files[fileID].Batches[:i], r.files[fileID].Batches[i+1:]...)
+			//fmt.Println(r.files[fileID].Batches)
+			return nil
 		}
 	}
-	return nil
+	return ErrNotFound
 }
