@@ -109,19 +109,20 @@ func NewBatchControl() *BatchControl {
 
 // String writes the BatchControl struct to a 94 character string.
 func (bc *BatchControl) String() string {
-	return fmt.Sprintf("%v%v%v%v%v%v%v%v%v%v%v",
-		bc.recordType,
-		bc.ServiceClassCode,
-		bc.EntryAddendaCountField(),
-		bc.EntryHashField(),
-		bc.TotalDebitEntryDollarAmountField(),
-		bc.TotalCreditEntryDollarAmountField(),
-		bc.CompanyIdentificationField(),
-		bc.MessageAuthenticationCodeField(),
-		"      ",
-		bc.ODFIIdentificationField(),
-		bc.BatchNumberField(),
-	)
+	var buf strings.Builder
+	buf.Grow(94)
+	buf.WriteString(bc.recordType)
+	buf.WriteString(string(bc.ServiceClassCode))
+	buf.WriteString(bc.EntryAddendaCountField())
+	buf.WriteString(bc.EntryHashField())
+	buf.WriteString(bc.TotalDebitEntryDollarAmountField())
+	buf.WriteString(bc.TotalCreditEntryDollarAmountField())
+	buf.WriteString(bc.CompanyIdentificationField())
+	buf.WriteString(bc.MessageAuthenticationCodeField())
+	buf.WriteString("      ")
+	buf.WriteString(bc.ODFIIdentificationField())
+	buf.WriteString(bc.BatchNumberField())
+	return buf.String()
 }
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated

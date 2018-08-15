@@ -86,17 +86,18 @@ func (addenda98 *Addenda98) Parse(record string) {
 
 // String writes the Addenda98 struct to a 94 character string
 func (addenda98 *Addenda98) String() string {
-	return fmt.Sprintf("%v%v%v%v%v%v%v%v%v",
-		addenda98.recordType,
-		addenda98.TypeCode(),
-		addenda98.ChangeCode,
-		addenda98.OriginalTraceField(),
-		"      ", //6 char reserved field
-		addenda98.OriginalDFIField(),
-		addenda98.CorrectedDataField(),
-		"               ", // 15 char reserved field
-		addenda98.TraceNumberField(),
-	)
+	var buf strings.Builder
+	buf.Grow(94)
+	buf.WriteString(addenda98.recordType)
+	buf.WriteString(addenda98.TypeCode())
+	buf.WriteString(addenda98.ChangeCode)
+	buf.WriteString(addenda98.OriginalTraceField())
+	buf.WriteString("      ") // 6 char reserved field
+	buf.WriteString(addenda98.OriginalDFIField())
+	buf.WriteString(addenda98.CorrectedDataField())
+	buf.WriteString("               ") // 15 char reserved field
+	buf.WriteString(addenda98.TraceNumberField())
+	return buf.String()
 }
 
 // Validate verifies NACHA rules for Addenda98

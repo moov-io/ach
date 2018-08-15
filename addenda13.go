@@ -91,15 +91,17 @@ func (addenda13 *Addenda13) Parse(record string) {
 
 // String writes the Addenda13 struct to a 94 character string.
 func (addenda13 *Addenda13) String() string {
-	return fmt.Sprintf("%v%v%v%v%v%v%v%v",
-		addenda13.recordType,
-		addenda13.typeCode,
-		addenda13.ODFINameField(),
-		addenda13.ODFIIDNumberQualifierField(),
-		addenda13.ODFIIdentificationField(),
-		addenda13.ODFIBranchCountryCodeField(),
-		addenda13.reservedField(),
-		addenda13.EntryDetailSequenceNumberField())
+	var buf strings.Builder
+	buf.Grow(94)
+	buf.WriteString(addenda13.recordType)
+	buf.WriteString(addenda13.typeCode)
+	buf.WriteString(addenda13.ODFINameField())
+	buf.WriteString(addenda13.ODFIIDNumberQualifierField())
+	buf.WriteString(addenda13.ODFIIdentificationField())
+	buf.WriteString(addenda13.ODFIBranchCountryCodeField())
+	buf.WriteString(addenda13.reservedField())
+	buf.WriteString(addenda13.EntryDetailSequenceNumberField())
+	return buf.String()
 }
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated

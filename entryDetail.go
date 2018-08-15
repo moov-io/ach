@@ -126,18 +126,20 @@ func (ed *EntryDetail) Parse(record string) {
 
 // String writes the EntryDetail struct to a 94 character string.
 func (ed *EntryDetail) String() string {
-	return fmt.Sprintf("%v%v%v%v%v%v%v%v%v%v%v",
-		ed.recordType,
-		ed.TransactionCode,
-		ed.RDFIIdentificationField(),
-		ed.CheckDigit,
-		ed.DFIAccountNumberField(),
-		ed.AmountField(),
-		ed.IdentificationNumberField(),
-		ed.IndividualNameField(),
-		ed.DiscretionaryDataField(),
-		ed.AddendaRecordIndicator,
-		ed.TraceNumberField())
+	var buf strings.Builder
+	buf.Grow(94)
+	buf.WriteString(ed.recordType)
+	buf.WriteString(string(ed.TransactionCode))
+	buf.WriteString(ed.RDFIIdentificationField())
+	buf.WriteString(ed.CheckDigit)
+	buf.WriteString(ed.DFIAccountNumberField())
+	buf.WriteString(ed.AmountField())
+	buf.WriteString(ed.IdentificationNumberField())
+	buf.WriteString(ed.IndividualNameField())
+	buf.WriteString(ed.DiscretionaryDataField())
+	buf.WriteString(string(ed.AddendaRecordIndicator))
+	buf.WriteString(ed.TraceNumberField())
+	return buf.String()
 }
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
@@ -224,7 +226,7 @@ func (ed *EntryDetail) AddAddenda(addenda Addendumer) []Addendumer {
 		ed.Addendum = nil
 		ed.Addendum = append(ed.Addendum, addenda)
 		return ed.Addendum
-	// default is current *Addenda05
+		// default is current *Addenda05
 	default:
 		ed.Category = CategoryForward
 		ed.Addendum = append(ed.Addendum, addenda)
