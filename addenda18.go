@@ -94,16 +94,18 @@ func (addenda18 *Addenda18) Parse(record string) {
 
 // String writes the Addenda18 struct to a 94 character string.
 func (addenda18 *Addenda18) String() string {
-	return fmt.Sprintf("%v%v%v%v%v%v%v%v%v",
-		addenda18.recordType,
-		addenda18.typeCode,
-		addenda18.ForeignCorrespondentBankNameField(),
-		addenda18.ForeignCorrespondentBankIDNumberQualifierField(),
-		addenda18.ForeignCorrespondentBankIDNumberField(),
-		addenda18.ForeignCorrespondentBankBranchCountryCodeField(),
-		addenda18.reservedField(),
-		addenda18.SequenceNumberField(),
-		addenda18.EntryDetailSequenceNumberField())
+	var buf strings.Builder
+	buf.Grow(94)
+	buf.WriteString(addenda18.recordType)
+	buf.WriteString(addenda18.typeCode)
+	buf.WriteString(addenda18.ForeignCorrespondentBankNameField())
+	buf.WriteString(addenda18.ForeignCorrespondentBankIDNumberQualifierField())
+	buf.WriteString(addenda18.ForeignCorrespondentBankIDNumberField())
+	buf.WriteString(addenda18.ForeignCorrespondentBankBranchCountryCodeField())
+	buf.WriteString(addenda18.reservedField())
+	buf.WriteString(addenda18.SequenceNumberField())
+	buf.WriteString(addenda18.EntryDetailSequenceNumberField())
+	return buf.String()
 }
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated

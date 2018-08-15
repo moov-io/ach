@@ -4,7 +4,10 @@
 
 package ach
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // FileControl record contains entry counts, dollar totals and hash
 // totals accumulated from each batch control record in the file.
@@ -71,16 +74,17 @@ func NewFileControl() FileControl {
 
 // String writes the FileControl struct to a 94 character string.
 func (fc *FileControl) String() string {
-	return fmt.Sprintf("%v%v%v%v%v%v%v%v",
-		fc.recordType,
-		fc.BatchCountField(),
-		fc.BlockCountField(),
-		fc.EntryAddendaCountField(),
-		fc.EntryHashField(),
-		fc.TotalDebitEntryDollarAmountInFileField(),
-		fc.TotalCreditEntryDollarAmountInFileField(),
-		fc.reserved,
-	)
+	var buf strings.Builder
+	buf.Grow(94)
+	buf.WriteString(fc.recordType)
+	buf.WriteString(fc.BatchCountField())
+	buf.WriteString(fc.BlockCountField())
+	buf.WriteString(fc.EntryAddendaCountField())
+	buf.WriteString(fc.EntryHashField())
+	buf.WriteString(fc.TotalDebitEntryDollarAmountInFileField())
+	buf.WriteString(fc.TotalCreditEntryDollarAmountInFileField())
+	buf.WriteString(fc.reserved)
+	return buf.String()
 }
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated

@@ -138,28 +138,27 @@ func (fh *FileHeader) Parse(record string) {
 
 // String writes the FileHeader struct to a 94 character string.
 func (fh *FileHeader) String() string {
-	return fmt.Sprintf("%v%v%v%v%v%v%v%v%v%v%v%v%v",
-		fh.recordType,
-		fh.priorityCode,
-		fh.ImmediateDestinationField(),
-		fh.ImmediateOriginField(),
-		fh.FileCreationDateField(),
-		fh.FileCreationTimeField(),
-		fh.FileIDModifier,
-		fh.recordSize,
-		fh.blockingFactor,
-		fh.formatCode,
-		fh.ImmediateDestinationNameField(),
-		fh.ImmediateOriginNameField(),
-		fh.ReferenceCodeField(),
-	)
-
+	var buf strings.Builder
+	buf.Grow(94)
+	buf.WriteString(fh.recordType)
+	buf.WriteString(fh.priorityCode)
+	buf.WriteString(fh.ImmediateDestinationField())
+	buf.WriteString(fh.ImmediateOriginField())
+	buf.WriteString(fh.FileCreationDateField())
+	buf.WriteString(fh.FileCreationTimeField())
+	buf.WriteString(fh.FileIDModifier)
+	buf.WriteString(fh.recordSize)
+	buf.WriteString(fh.blockingFactor)
+	buf.WriteString(fh.formatCode)
+	buf.WriteString(fh.ImmediateDestinationNameField())
+	buf.WriteString(fh.ImmediateOriginNameField())
+	buf.WriteString(fh.ReferenceCodeField())
+	return buf.String()
 }
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops the parsing.
 func (fh *FileHeader) Validate() error {
-
 	if err := fh.fieldInclusion(); err != nil {
 		return err
 	}

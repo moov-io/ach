@@ -222,25 +222,26 @@ func (iatBh *IATBatchHeader) Parse(record string) {
 
 // String writes the BatchHeader struct to a 94 character string.
 func (iatBh *IATBatchHeader) String() string {
-	return fmt.Sprintf("%v%v%v%v%v%v%v%v%v%v%v%v%v%v%v%v%v",
-		iatBh.recordType,
-		iatBh.ServiceClassCode,
-		iatBh.IATIndicatorField(),
-		iatBh.ForeignExchangeIndicatorField(),
-		iatBh.ForeignExchangeReferenceIndicatorField(),
-		iatBh.ForeignExchangeReferenceField(),
-		iatBh.ISODestinationCountryCodeField(),
-		iatBh.OriginatorIdentificationField(),
-		iatBh.StandardEntryClassCode,
-		iatBh.CompanyEntryDescriptionField(),
-		iatBh.ISOOriginatingCurrencyCodeField(),
-		iatBh.ISODestinationCurrencyCodeField(),
-		iatBh.EffectiveEntryDateField(),
-		iatBh.settlementDateField(),
-		iatBh.OriginatorStatusCode,
-		iatBh.ODFIIdentificationField(),
-		iatBh.BatchNumberField(),
-	)
+	var buf strings.Builder
+	buf.Grow(94)
+	buf.WriteString(iatBh.recordType)
+	buf.WriteString(string(iatBh.ServiceClassCode))
+	buf.WriteString(iatBh.IATIndicatorField())
+	buf.WriteString(iatBh.ForeignExchangeIndicatorField())
+	buf.WriteString(iatBh.ForeignExchangeReferenceIndicatorField())
+	buf.WriteString(iatBh.ForeignExchangeReferenceField())
+	buf.WriteString(iatBh.ISODestinationCountryCodeField())
+	buf.WriteString(iatBh.OriginatorIdentificationField())
+	buf.WriteString(iatBh.StandardEntryClassCode)
+	buf.WriteString(iatBh.CompanyEntryDescriptionField())
+	buf.WriteString(iatBh.ISOOriginatingCurrencyCodeField())
+	buf.WriteString(iatBh.ISODestinationCurrencyCodeField())
+	buf.WriteString(iatBh.EffectiveEntryDateField())
+	buf.WriteString(iatBh.settlementDateField())
+	buf.WriteString(string(iatBh.OriginatorStatusCode))
+	buf.WriteString(iatBh.ODFIIdentificationField())
+	buf.WriteString(iatBh.BatchNumberField())
+	return buf.String()
 }
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated

@@ -89,20 +89,21 @@ func (addenda02 *Addenda02) Parse(record string) {
 
 // String writes the Addenda02 struct to a 94 character string.
 func (addenda02 *Addenda02) String() string {
-	return fmt.Sprintf("%v%v%v%v%v%v%v%v%v%v%v%v",
-		addenda02.recordType,
-		addenda02.typeCode,
-		addenda02.ReferenceInformationOneField(),
-		addenda02.ReferenceInformationTwoField(),
-		addenda02.TerminalIdentificationCodeField(),
-		addenda02.TransactionSerialNumberField(),
-		addenda02.TransactionDateField(),
-		addenda02.AuthorizationCodeOrExpireDateField(),
-		addenda02.TerminalLocationField(),
-		addenda02.TerminalCityField(),
-		addenda02.TerminalStateField(),
-		addenda02.TraceNumberField(),
-	)
+	var buf strings.Builder
+	buf.Grow(94)
+	buf.WriteString(addenda02.recordType)
+	buf.WriteString(addenda02.typeCode)
+	buf.WriteString(addenda02.ReferenceInformationOneField())
+	buf.WriteString(addenda02.ReferenceInformationTwoField())
+	buf.WriteString(addenda02.TerminalIdentificationCodeField())
+	buf.WriteString(addenda02.TransactionSerialNumberField())
+	buf.WriteString(addenda02.TransactionDateField())
+	buf.WriteString(addenda02.AuthorizationCodeOrExpireDateField())
+	buf.WriteString(addenda02.TerminalLocationField())
+	buf.WriteString(addenda02.TerminalCityField())
+	buf.WriteString(addenda02.TerminalStateField())
+	buf.WriteString(addenda02.TraceNumberField())
+	return buf.String()
 }
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
