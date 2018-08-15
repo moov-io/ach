@@ -225,7 +225,7 @@ func (iatBh *IATBatchHeader) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
 	buf.WriteString(iatBh.recordType)
-	buf.WriteString(string(iatBh.ServiceClassCode))
+	buf.WriteString(fmt.Sprintf("%v", iatBh.ServiceClassCode))
 	buf.WriteString(iatBh.IATIndicatorField())
 	buf.WriteString(iatBh.ForeignExchangeIndicatorField())
 	buf.WriteString(iatBh.ForeignExchangeReferenceIndicatorField())
@@ -238,7 +238,7 @@ func (iatBh *IATBatchHeader) String() string {
 	buf.WriteString(iatBh.ISODestinationCurrencyCodeField())
 	buf.WriteString(iatBh.EffectiveEntryDateField())
 	buf.WriteString(iatBh.settlementDateField())
-	buf.WriteString(string(iatBh.OriginatorStatusCode))
+	buf.WriteString(fmt.Sprintf("%v", iatBh.OriginatorStatusCode))
 	buf.WriteString(iatBh.ODFIIdentificationField())
 	buf.WriteString(iatBh.BatchNumberField())
 	return buf.String()
