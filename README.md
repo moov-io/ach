@@ -386,7 +386,7 @@ This will generate a well formed flat IAT ACH file
 9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
 ```
 
-# Getting Help
+## Getting Help
 
  channel | info
  ------- | -------
@@ -394,6 +394,13 @@ This will generate a well formed flat IAT ACH file
 Twitter [@moov_io](https://twitter.com/moov_io)	| You can follow Moov.IO's Twitter feed to get updates on our project(s). You can also tweet us questions or just share blogs or stories.
 [GitHub Issue](https://github.com/moov-io) | If you are able to reproduce an problem please open a GitHub Issue under the specific project that caused the error.
 [moov-io slack](http://moov-io.slack.com/) | Join our slack channel to have an interactive discussion about the development of the project.
+
+## Supported and Tested Platforms
+
+- 64-bit Linux (Ubuntu, Debian), macOS, and Windows
+- Rasberry Pi
+
+Note: 32-bit platforms have known issues and is not supported.
 
 ## Contributing
 
