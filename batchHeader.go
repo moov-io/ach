@@ -159,7 +159,7 @@ func (bh *BatchHeader) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
 	buf.WriteString(bh.recordType)
-	buf.WriteString(string(bh.ServiceClassCode))
+	buf.WriteString(fmt.Sprintf("%v", bh.ServiceClassCode))
 	buf.WriteString(bh.CompanyNameField())
 	buf.WriteString(bh.CompanyDiscretionaryDataField())
 	buf.WriteString(bh.CompanyIdentificationField())
@@ -168,7 +168,7 @@ func (bh *BatchHeader) String() string {
 	buf.WriteString(bh.CompanyDescriptiveDateField())
 	buf.WriteString(bh.EffectiveEntryDateField())
 	buf.WriteString(bh.settlementDateField())
-	buf.WriteString(string(bh.OriginatorStatusCode))
+	buf.WriteString(fmt.Sprintf("%v", bh.OriginatorStatusCode))
 	buf.WriteString(bh.ODFIIdentificationField())
 	buf.WriteString(bh.BatchNumberField())
 	return buf.String()

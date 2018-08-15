@@ -112,7 +112,7 @@ func (bc *BatchControl) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
 	buf.WriteString(bc.recordType)
-	buf.WriteString(string(bc.ServiceClassCode))
+	buf.WriteString(fmt.Sprintf("%v", bc.ServiceClassCode))
 	buf.WriteString(bc.EntryAddendaCountField())
 	buf.WriteString(bc.EntryHashField())
 	buf.WriteString(bc.TotalDebitEntryDollarAmountField())

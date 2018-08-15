@@ -129,7 +129,7 @@ func (ed *EntryDetail) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
 	buf.WriteString(ed.recordType)
-	buf.WriteString(string(ed.TransactionCode))
+	buf.WriteString(fmt.Sprintf("%v", ed.TransactionCode))
 	buf.WriteString(ed.RDFIIdentificationField())
 	buf.WriteString(ed.CheckDigit)
 	buf.WriteString(ed.DFIAccountNumberField())
@@ -137,7 +137,7 @@ func (ed *EntryDetail) String() string {
 	buf.WriteString(ed.IdentificationNumberField())
 	buf.WriteString(ed.IndividualNameField())
 	buf.WriteString(ed.DiscretionaryDataField())
-	buf.WriteString(string(ed.AddendaRecordIndicator))
+	buf.WriteString(fmt.Sprintf("%v", ed.AddendaRecordIndicator))
 	buf.WriteString(ed.TraceNumberField())
 	return buf.String()
 }

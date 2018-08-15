@@ -155,7 +155,7 @@ func (ed *IATEntryDetail) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
 	buf.WriteString(ed.recordType)
-	buf.WriteString(string(ed.TransactionCode))
+	buf.WriteString(fmt.Sprintf("%v", ed.TransactionCode))
 	buf.WriteString(ed.RDFIIdentificationField())
 	buf.WriteString(ed.CheckDigit)
 	buf.WriteString(ed.AddendaRecordsField())
@@ -165,7 +165,7 @@ func (ed *IATEntryDetail) String() string {
 	buf.WriteString(ed.reservedTwoField())
 	buf.WriteString(ed.OFACSreeningIndicatorField())
 	buf.WriteString(ed.SecondaryOFACSreeningIndicatorField())
-	buf.WriteString(string(ed.AddendaRecordIndicator))
+	buf.WriteString(fmt.Sprintf("%v", ed.AddendaRecordIndicator))
 	buf.WriteString(ed.TraceNumberField())
 	return buf.String()
 }
