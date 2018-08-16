@@ -291,3 +291,64 @@ func BenchmarkPPDIATWrite(b *testing.B) {
 		testPPDIATWrite(b)
 	}
 }
+
+// testIATReturn writes a IAT ACH Return file
+func testIATReturn(t testing.TB) {
+	file := NewFile().SetHeader(mockFileHeader())
+	iatBatch := IATBatch{}
+	iatBatch.SetHeader(mockIATBatchHeaderFF())
+	iatBatch.AddEntry(mockIATEntryDetail())
+	iatBatch.Entries[0].Addenda10 = mockAddenda10()
+	iatBatch.Entries[0].Addenda11 = mockAddenda11()
+	iatBatch.Entries[0].Addenda12 = mockAddenda12()
+	iatBatch.Entries[0].Addenda13 = mockAddenda13()
+	iatBatch.Entries[0].Addenda14 = mockAddenda14()
+	iatBatch.Entries[0].Addenda15 = mockAddenda15()
+	iatBatch.Entries[0].Addenda16 = mockAddenda16()
+	iatBatch.Entries[0].AddIATAddenda(mockIATAddenda99())
+	iatBatch.Create()
+	file.AddIATBatch(iatBatch)
+
+	if err := file.Create(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err := file.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	b := &bytes.Buffer{}
+	f := NewWriter(b)
+
+	if err := f.Write(file); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	r := NewReader(strings.NewReader(b.String()))
+	_, err := r.Read()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err = r.File.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	/*		// Write IAT records to standard output. Anything io.Writer
+			w := NewWriter(os.Stdout)
+			if err := w.Write(file); err != nil {
+				log.Fatalf("Unexpected error: %s\n", err)
+			}
+			w.Flush()*/
+}
+
+// TestIATReturn tests writing a IAT ACH Return file
+func TestIATReturn(t *testing.T) {
+	testIATReturn(t)
+}
+
+// BenchmarkIATReturn benchmarks validating writing a IAT ACH Return file
+func BenchmarkIATReturn(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testIATReturn(b)
+	}
+}

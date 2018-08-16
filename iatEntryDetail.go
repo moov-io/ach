@@ -7,6 +7,7 @@ package ach
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 // IATEntryDetail contains the actual transaction data for an individual entry.
@@ -151,20 +152,22 @@ func (ed *IATEntryDetail) Parse(record string) {
 
 // String writes the EntryDetail struct to a 94 character string.
 func (ed *IATEntryDetail) String() string {
-	return fmt.Sprintf("%v%v%v%v%v%v%v%v%v%v%v%v%v",
-		ed.recordType,
-		ed.TransactionCode,
-		ed.RDFIIdentificationField(),
-		ed.CheckDigit,
-		ed.AddendaRecordsField(),
-		ed.reservedField(),
-		ed.AmountField(),
-		ed.DFIAccountNumberField(),
-		ed.reservedTwoField(),
-		ed.OFACSreeningIndicatorField(),
-		ed.SecondaryOFACSreeningIndicatorField(),
-		ed.AddendaRecordIndicator,
-		ed.TraceNumberField())
+	var buf strings.Builder
+	buf.Grow(94)
+	buf.WriteString(ed.recordType)
+	buf.WriteString(fmt.Sprintf("%v", ed.TransactionCode))
+	buf.WriteString(ed.RDFIIdentificationField())
+	buf.WriteString(ed.CheckDigit)
+	buf.WriteString(ed.AddendaRecordsField())
+	buf.WriteString(ed.reservedField())
+	buf.WriteString(ed.AmountField())
+	buf.WriteString(ed.DFIAccountNumberField())
+	buf.WriteString(ed.reservedTwoField())
+	buf.WriteString(ed.OFACSreeningIndicatorField())
+	buf.WriteString(ed.SecondaryOFACSreeningIndicatorField())
+	buf.WriteString(fmt.Sprintf("%v", ed.AddendaRecordIndicator))
+	buf.WriteString(ed.TraceNumberField())
+	return buf.String()
 }
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
@@ -295,7 +298,10 @@ func (ed *IATEntryDetail) AddIATAddenda(addenda Addendumer) []Addendumer {
 	ed.AddendaRecordIndicator = 1
 	// checks to make sure that we only have either or, not both
 	switch addenda.(type) {
-	// Addenda17
+	case *Addenda99:
+		ed.Category = CategoryReturn
+		ed.Addendum = append(ed.Addendum, addenda)
+		return ed.Addendum
 	default:
 		ed.Category = CategoryForward
 		ed.Addendum = append(ed.Addendum, addenda)

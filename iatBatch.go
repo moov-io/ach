@@ -14,8 +14,7 @@ var (
 	msgIATBatchAddendaIndicator = "is invalid for addenda record(s) found"
 	// There can be up to 2 optional Addenda17 records and up to 5 optional Addenda18 records
 	msgBatchIATAddendum          = "7 Addendum is the maximum for SEC code IAT"
-	msgBatchIATAddenda17         = "2 Addenda17 is the maximum for SEC code IAT"
-	msgBatchIATAddenda18         = "5 Addenda18 is the maximum for SEC code IAT"
+	msgBatchIATAddendumCount     = "%v Addenda %v for SEC Code IAT"
 	msgBatchIATInvalidAddendumer = "invalid Addendumer for SEC Code IAT"
 )
 
@@ -505,26 +504,38 @@ func (batch *IATBatch) Validate() error {
 		if len(entry.Addendum) > 7 {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchIATAddendum}
 		}
+
+		// Counter for addendumer for 17, 18,, and 99
+		// ToDo: Come up with a better way?
+
 		addenda17Count := 0
 		addenda18Count := 0
+		addenda99Count := 0
 
 		for _, IATAddenda := range entry.Addendum {
 
-			if (IATAddenda.TypeCode() != "17") && (IATAddenda.TypeCode() != "18") {
+			switch IATAddenda.TypeCode() {
+			case "17":
+				addenda17Count = addenda17Count + 1
+				if addenda17Count > 2 {
+					msg := fmt.Sprintf(msgBatchIATAddendumCount, addenda17Count, "17")
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
+				}
+			case "18":
+				addenda18Count = addenda18Count + 1
+				if addenda18Count > 5 {
+					msg := fmt.Sprintf(msgBatchIATAddendumCount, addenda18Count, "18")
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
+				}
+			case "99":
+				addenda99Count = addenda99Count + 1
+				if addenda99Count > 1 {
+					msg := fmt.Sprintf(msgBatchIATAddendumCount, addenda99Count, "99")
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
+				}
+			default:
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchIATInvalidAddendumer}
 			}
-			if IATAddenda.TypeCode() == "17" {
-				addenda17Count = addenda17Count + 1
-			}
-			if IATAddenda.TypeCode() == "18" {
-				addenda18Count = addenda18Count + 1
-			}
-		}
-		if addenda17Count > 2 {
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchIATAddenda17}
-		}
-		if addenda18Count > 5 {
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchIATAddenda18}
 		}
 	}
 	// Add type specific validation.

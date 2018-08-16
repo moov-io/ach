@@ -7,15 +7,15 @@ moov-io/ach
 [![Apache 2 licensed](https://img.shields.io/badge/license-Apache2-blue.svg)](https://raw.githubusercontent.com/moov-io/ach/master/LICENSE)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmoov-io%2Fach.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmoov-io%2Fach?ref=badge_shield)
 
+Package `github.com/moov-io/ach` implements a file reader and writer for parsing [ACH](https://en.wikipedia.org/wiki/Automated_Clearing_House) Automated Clearing House files. ACH is the primary method of electronic money movement throughout the United States.
 
-Package 'moov-io/ach' implements a file reader and writer for parsing [ACH](https://en.wikipedia.org/wiki/Automated_Clearing_House
-) Automated Clearing House files. ACH is the primary method of electronic money movement throughout the United States.
+Docs: [docs.moov.io](http://docs.moov.io/en/latest/)
 
 ## Project Status
 
 ACH is under active development but already in production for multiple companies. Please star the project if you are interested in its progress.
 
-* Library currently supports the reading and writing 
+* Library currently supports the reading and writing
 	* ARC (Accounts Receivable Entry)
 	* BOC (Back Office Conversion)
 	* CCD (Corporate credit or debit)
@@ -38,7 +38,7 @@ ACH is under active development but already in production for multiple companies
 	* Addenda Type Code 98 (NOC)
 	* Addenda Type Code 99 (Return)
 	* IAT
-	
+
 ## Project Roadmap
 * Additional SEC codes will be added based on library users needs. Please open an issue with a valid test file.
 * Review the project issues for more detailed information
@@ -63,25 +63,25 @@ if err != nil {
 if achFile.Validate(); err != nil {
 	fmt.Printf("Could not validate entire read file: %v", err)
 }
-// Check if any Notifications Of Change exist in the file 
+// Check if any Notifications Of Change exist in the file
 if len(achFile.NotificationOfChange) > 0 {
 	for _, batch := range achFile.NotificationOfChange {
 		a98 := batch.GetEntries()[0].Addendum[0].(*Addenda98)
 		println(a98.CorrectedData)
-	} 
-} 
-// Check if any Return Entries exist in the file 
+	}
+}
+// Check if any Return Entries exist in the file
 if len(achFile.ReturnEntries) > 0 {
 	for _, batch := range achFile.ReturnEntries {
 		aReturn := batch.GetEntries()[0].Addendum[0].(*Addenda99)
 		println(aReturn.ReturnCode)
-	} 
+	}
 }
-```	
+```
 
 ### Create a file
 The following is based on [simple file creation](https://github.com/moov-io/ach/tree/master/test/simple-file-creation)
- 
+
  ```go
 	fh := ach.NewFileHeader()
 	fh.ImmediateDestination = "9876543210" // A blank space followed by your ODFI's transit/routing number
@@ -94,7 +94,7 @@ The following is based on [simple file creation](https://github.com/moov-io/ach/
 	file.SetHeader(fh)
 ```
 
-Explicitly create a PPD batch file. 
+Explicitly create a PPD batch file.
 
 Errors only if payment type is not supported
 
@@ -153,7 +153,7 @@ To add one or more optional addenda records for an entry
 addenda := NewAddenda05()
 addenda.PaymentRelatedInformation = "Bonus pay for amazing work on #OSS"
 ```
-Add the addenda record to the detail entry 
+Add the addenda record to the detail entry
 
  ```go
 entry.AddAddenda(addenda)
@@ -249,7 +249,7 @@ w.Flush()
 }
 ```
 
-Which will generate a well formed ACH flat file. 
+Which will generate a well formed ACH flat file.
 
 ```text
 101 210000890 1234567891708290000A094101Your Bank              Your Company           #00000A1
@@ -261,10 +261,10 @@ Which will generate a well formed ACH flat file.
 6221020010175343121          0000000799#123456        Wade Arnold           R 1234567890000001
 705Monthly Membership Subscription                                                 00010000001
 82200000020010200101000000000000000000000799123456789                          234567890000002
-9000002000001000000040020400202000000017500000000000799 
+9000002000001000000040020400202000000017500000000000799
 ```
 
-### Create an IAT file 
+### Create an IAT file
 
 ```go
     file := NewFile().SetHeader(mockFileHeader())
@@ -337,14 +337,14 @@ Which will generate a well formed ACH flat file.
 	w := NewWriter(os.Stdout)
 	if err := w.Write(file); err != nil {
 		log.Fatalf("Unexpected error: %s\n", err)
-	}	
+	}
 	w.Flush()
 ```
 
 This will generate a well formed flat IAT ACH file
 
 ```text
-101 987654321 1234567891807200000A094101Federal Reserve Bank   My Bank Name                   
+101 987654321 1234567891807200000A094101Federal Reserve Bank   My Bank Name
 5220                FF3               US123456789 IATTRADEPAYMTCADUSD010101   0231380100000001
 6221210428820007             0000100000123456789                              1231380100000001
 710ANN000000000000100000928383-23938          BEK Enterprises                          0000001
@@ -379,25 +379,35 @@ This will generate a well formed flat IAT ACH file
 718Bank of Turkey                     0112312345678910                    TR       00040000001
 718Bank of United Kingdom             011234567890123456789012345678901234GB       00050000001
 82200000150012104288000000002000000000000000                                   231380100000002
-9000002000004000000300024208576000000002000000000100000                                       
+9000002000004000000300024208576000000002000000000100000
 9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
 9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
 9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
 9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
 ```
 
-# Getting Help 
+## Getting Help
 
- channel | info 
+ channel | info
  ------- | -------
+ [Project Documentation](http://docs.moov.io/en/latest/) | Our project documentation available online.
  Google Group [moov-users](https://groups.google.com/forum/#!forum/moov-users)| The Moov users Google group is for contributors other people contributing to the Moov project. You can join them without a google account by sending an email to [moov-users+subscribe@googlegroups.com](mailto:moov-users+subscribe@googlegroups.com). After receiving the join-request message, you can simply reply to that to confirm the subscription.
 Twitter [@moov_io](https://twitter.com/moov_io)	| You can follow Moov.IO's Twitter feed to get updates on our project(s). You can also tweet us questions or just share blogs or stories.
-[GitHub Issue](https://github.com/moov-io) | If you are able to reproduce an problem please open a GitHub Issue under the specific project that caused the error. 
-[moov-io slack](http://moov-io.slack.com/) | Join our slack channel to have an interactive discussion about the development of the project. 
+[GitHub Issue](https://github.com/moov-io) | If you are able to reproduce an problem please open a GitHub Issue under the specific project that caused the error.
+[moov-io slack](http://moov-io.slack.com/) | Join our slack channel to have an interactive discussion about the development of the project.
 
-## Contributing 
+## Supported and Tested Platforms
 
-Yes please! Please review our [Contributing guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) to get started! 
+- 64-bit Linux (Ubuntu, Debian), macOS, and Windows
+- Rasberry Pi
+
+Note: 32-bit platforms have known issues and is not supported.
+
+## Contributing
+
+Yes please! Please review our [Contributing guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) to get started!
+
+Note: This project requires Go 1.10 or higher to compile.
 
 ## License
 

@@ -156,21 +156,22 @@ func (bh *BatchHeader) Parse(record string) {
 
 // String writes the BatchHeader struct to a 94 character string.
 func (bh *BatchHeader) String() string {
-	return fmt.Sprintf("%v%v%v%v%v%v%v%v%v%v%v%v%v",
-		bh.recordType,
-		bh.ServiceClassCode,
-		bh.CompanyNameField(),
-		bh.CompanyDiscretionaryDataField(),
-		bh.CompanyIdentificationField(),
-		bh.StandardEntryClassCode,
-		bh.CompanyEntryDescriptionField(),
-		bh.CompanyDescriptiveDateField(),
-		bh.EffectiveEntryDateField(),
-		bh.settlementDateField(),
-		bh.OriginatorStatusCode,
-		bh.ODFIIdentificationField(),
-		bh.BatchNumberField(),
-	)
+	var buf strings.Builder
+	buf.Grow(94)
+	buf.WriteString(bh.recordType)
+	buf.WriteString(fmt.Sprintf("%v", bh.ServiceClassCode))
+	buf.WriteString(bh.CompanyNameField())
+	buf.WriteString(bh.CompanyDiscretionaryDataField())
+	buf.WriteString(bh.CompanyIdentificationField())
+	buf.WriteString(bh.StandardEntryClassCode)
+	buf.WriteString(bh.CompanyEntryDescriptionField())
+	buf.WriteString(bh.CompanyDescriptiveDateField())
+	buf.WriteString(bh.EffectiveEntryDateField())
+	buf.WriteString(bh.settlementDateField())
+	buf.WriteString(fmt.Sprintf("%v", bh.OriginatorStatusCode))
+	buf.WriteString(bh.ODFIIdentificationField())
+	buf.WriteString(bh.BatchNumberField())
+	return buf.String()
 }
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated

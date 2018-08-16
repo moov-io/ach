@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/bkmoovio/ach"
+	"github.com/moov-io/ach"
 	"log"
 	"os"
 	"time"
