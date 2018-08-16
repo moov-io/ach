@@ -22,7 +22,7 @@ ACH is under active development but already in production for multiple companies
 	* CIE (Customer-Initiated Entry)
 	* COR (Automated Notification of Change(NOC))
 	* CTX (Corporate Trade Exchange)
-	* IAT
+	* IAT (International ACH Transactions)
 	* POP (Point of Purchase)
 	* POS (Point of Sale)
 	* PPD (Prearranged payment and deposits)
