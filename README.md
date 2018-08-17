@@ -22,6 +22,7 @@ ACH is under active development but already in production for multiple companies
 	* CIE (Customer-Initiated Entry)
 	* COR (Automated Notification of Change(NOC))
 	* CTX (Corporate Trade Exchange)
+	* IAT (International ACH Transactions)
 	* POP (Point of Purchase)
 	* POS (Point of Sale)
 	* PPD (Prearranged payment and deposits)
@@ -35,9 +36,14 @@ ACH is under active development but already in production for multiple companies
 	* Addenda Type Code 10 (IAT)
 	* Addenda Type Code 11 (IAT)
 	* Addenda Type Code 12 (IAT)
+	* Addenda Type Code 13 (IAT)
+	* Addenda Type Code 14 (IAT)
+	* Addenda Type Code 15 (IAT)
+	* Addenda Type Code 16 (IAT)
+	* Addenda Type Code 17 (IAT Optional)
+	* Addenda Type Code 18 (IAT Optional)
 	* Addenda Type Code 98 (NOC)
 	* Addenda Type Code 99 (Return)
-	* IAT
 
 ## Project Roadmap
 * Additional SEC codes will be added based on library users needs. Please open an issue with a valid test file.
