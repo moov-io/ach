@@ -113,12 +113,16 @@ func (Addenda99 *Addenda99) String() string {
 
 // Validate verifies NACHA rules for Addenda99
 func (Addenda99 *Addenda99) Validate() error {
-
 	if Addenda99.recordType != "7" {
 		msg := fmt.Sprintf(msgRecordType, 7)
 		return &FieldError{FieldName: "recordType", Value: Addenda99.recordType, Msg: msg}
 	}
-	// @TODO Type Code should be 99.
+	if Addenda99.typeCode == "" {
+		return &FieldError{FieldName: "TypeCode", Value: Addenda99.typeCode, Msg: msgFieldInclusion}
+	}
+	if Addenda99.typeCode != "99" {
+		return &FieldError{FieldName: "TypeCode", Value: Addenda99.typeCode, Msg: msgAddendaTypeCode}
+	}
 
 	_, ok := returnCodeDict[Addenda99.ReturnCode]
 	if !ok {
