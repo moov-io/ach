@@ -83,6 +83,10 @@ func (addenda05 *Addenda05) Validate() error {
 	if err := addenda05.isTypeCode(addenda05.typeCode); err != nil {
 		return &FieldError{FieldName: "TypeCode", Value: addenda05.typeCode, Msg: err.Error()}
 	}
+	// Type Code must be 05
+	if addenda05.typeCode != "05" {
+		return &FieldError{FieldName: "TypeCode", Value: addenda05.typeCode, Msg: msgAddendaTypeCode}
+	}
 	if err := addenda05.isAlphanumeric(addenda05.PaymentRelatedInformation); err != nil {
 		return &FieldError{FieldName: "PaymentRelatedInformation", Value: addenda05.PaymentRelatedInformation, Msg: err.Error()}
 	}
