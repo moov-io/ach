@@ -186,3 +186,31 @@ func BenchmarkAddenda05TypeCodeNil(b *testing.B) {
 		testAddenda05TypeCodeNil(b)
 	}
 }
+
+// testAddenda05TypeCode05 TypeCode is 05
+func testAddenda05TypeCode05(t testing.TB) {
+	addenda05 := mockAddenda05()
+	addenda05.typeCode = "99"
+	if err := addenda05.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestAddenda05TypeCode05 tests TypeCode is 05
+func TestAddenda05TypeCode05(t *testing.T) {
+	testAddenda05TypeCode05(t)
+}
+
+// BenchmarkAddenda05TypeCode05 benchmarks TypeCode is 05
+func BenchmarkAddenda05TypeCode05(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda05TypeCode05(b)
+	}
+}

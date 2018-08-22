@@ -278,3 +278,31 @@ func BenchmarkAddenda98TraceNumberField(b *testing.B) {
 		testAddenda98TraceNumberField(b)
 	}
 }
+
+// testAddenda98TypeCodeNil validates TypeCode is ""
+func testAddenda98TypeCodeNil(t testing.TB) {
+	addenda98 := mockAddenda98()
+	addenda98.typeCode = ""
+	if err := addenda98.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestAddenda98TypeCodeES tests TypeCode is ""
+func TestAddenda98TypeCodeNil(t *testing.T) {
+	testAddenda98TypeCodeNil(t)
+}
+
+// BenchmarkAddenda98TypeCodeNil benchmarks TypeCode is ""
+func BenchmarkAddenda98TypeCodeNil(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda98TypeCodeNil(b)
+	}
+}
