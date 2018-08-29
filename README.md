@@ -22,6 +22,7 @@ ACH is under active development but already in production for multiple companies
 	* CIE (Customer-Initiated Entry)
 	* COR (Automated Notification of Change(NOC))
 	* CTX (Corporate Trade Exchange)
+	* IAT (International ACH Transactions)
 	* POP (Point of Purchase)
 	* POS (Point of Sale)
 	* PPD (Prearranged payment and deposits)
@@ -35,9 +36,14 @@ ACH is under active development but already in production for multiple companies
 	* Addenda Type Code 10 (IAT)
 	* Addenda Type Code 11 (IAT)
 	* Addenda Type Code 12 (IAT)
+	* Addenda Type Code 13 (IAT)
+	* Addenda Type Code 14 (IAT)
+	* Addenda Type Code 15 (IAT)
+	* Addenda Type Code 16 (IAT)
+	* Addenda Type Code 17 (IAT Optional)
+	* Addenda Type Code 18 (IAT Optional)
 	* Addenda Type Code 98 (NOC)
 	* Addenda Type Code 99 (Return)
-	* IAT
 
 ## Project Roadmap
 * Additional SEC codes will be added based on library users needs. Please open an issue with a valid test file.
@@ -394,7 +400,7 @@ This will generate a well formed flat IAT ACH file
  Google Group [moov-users](https://groups.google.com/forum/#!forum/moov-users)| The Moov users Google group is for contributors other people contributing to the Moov project. You can join them without a google account by sending an email to [moov-users+subscribe@googlegroups.com](mailto:moov-users+subscribe@googlegroups.com). After receiving the join-request message, you can simply reply to that to confirm the subscription.
 Twitter [@moov_io](https://twitter.com/moov_io)	| You can follow Moov.IO's Twitter feed to get updates on our project(s). You can also tweet us questions or just share blogs or stories.
 [GitHub Issue](https://github.com/moov-io) | If you are able to reproduce an problem please open a GitHub Issue under the specific project that caused the error.
-[moov-io slack](http://moov-io.slack.com/) | Join our slack channel to have an interactive discussion about the development of the project.
+[moov-io slack](http://moov-io.slack.com/) | Join our slack channel to have an interactive discussion about the development of the project. [Request and invote to the slack channel](https://join.slack.com/t/moov-io/shared_invite/enQtNDE5NzIwNTYxODEwLTRkYTcyZDI5ZTlkZWRjMzlhMWVhMGZlOTZiOTk4MmM3MmRhZDY4OTJiMDVjOTE2MGEyNWYzYzY1MGMyMThiZjg)
 
 ## Supported and Tested Platforms
 

@@ -106,6 +106,9 @@ func (addenda98 *Addenda98) Validate() error {
 		msg := fmt.Sprintf(msgRecordType, 7)
 		return &FieldError{FieldName: "recordType", Value: addenda98.recordType, Msg: msg}
 	}
+	if addenda98.typeCode == "" {
+		return &FieldError{FieldName: "TypeCode", Value: addenda98.typeCode, Msg: msgFieldInclusion}
+	}
 	// Type Code must be 98
 	if addenda98.typeCode != "98" {
 		return &FieldError{FieldName: "TypeCode", Value: addenda98.typeCode, Msg: msgAddendaTypeCode}
