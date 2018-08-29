@@ -220,11 +220,42 @@ func BenchmarkTwoFileControls(b *testing.B) {
 	}
 }
 
-// testFileLineShort validates file line is short
-func testFileLineShort(t testing.TB) {
-	var line = "1 line is only 70 characters ........................................!"
+// testFileLineEmpty verifies empty files fail to parse
+func testFileLineEmpty(t testing.TB) {
+	line := ""
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
+
+	if p, ok := err.(*ParseError); ok {
+		if e, ok := p.Err.(*FileError); ok {
+			if e.Msg != "none or more than one file headers exists" { // from msgFileHeader
+				t.Errorf("%#v", e)
+			}
+		} else {
+			t.Errorf("%T: %s", e, e)
+		}
+	}
+}
+
+// TestFileLineEmpty tests validating file line is short
+func TestFileLineEmpty(t *testing.T) {
+	testFileLineEmpty(t)
+}
+
+// BenchmarkFileLineEmpty benchmarks validating file line is short
+func BenchmarkFileLineEmpty(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFileLineEmpty(b)
+	}
+}
+
+// testFileLineShort validates file line is short
+func testFileLineShort(t testing.TB) {
+	line := "1 line is only 70 characters ........................................!"
+	r := NewReader(strings.NewReader(line))
+	_, err := r.Read()
+
 	if p, ok := err.(*ParseError); ok {
 		if e, ok := p.Err.(*FileError); ok {
 			if e.FieldName != "RecordLength" {
