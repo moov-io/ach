@@ -100,12 +100,12 @@ func (r *Reader) Read() (File, error) {
 		}
 	}
 	if (FileHeader{}) == r.File.Header {
-		// Their must be at least one File Header
+		// There must be at least one File Header
 		r.recordName = "FileHeader"
 		return r.File, r.error(&FileError{Msg: msgFileHeader})
 	}
 	if (FileControl{}) == r.File.Control {
-		// Their must be at least one File Control
+		// There must be at least one File Control
 		r.recordName = "FileControl"
 		return r.File, r.error(&FileError{Msg: msgFileControl})
 	}
@@ -243,7 +243,7 @@ func (r *Reader) parseEDAddenda() error {
 func (r *Reader) parseFileHeader() error {
 	r.recordName = "FileHeader"
 	if (FileHeader{}) != r.File.Header {
-		// Their can only be one File Header per File exit
+		// There can only be one File Header per File exit
 		r.error(&FileError{Msg: msgFileHeader})
 	}
 	r.File.Header.Parse(r.line)
