@@ -3,13 +3,14 @@ package server
 import (
 	"net/url"
 	"testing"
+	"unicode/utf8"
 
 	"github.com/moov-io/ach"
 )
 
 func testNextID(tb testing.TB) string {
 	id := NextID()
-	if len(id) != 16 {
+	if utf8.RuneCountInString(id) != 16 {
 		tb.Errorf("got other length %d for ID %s", len(id), id)
 	}
 	return id
