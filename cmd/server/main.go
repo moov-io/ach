@@ -8,8 +8,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/wadearnold/ach/server"
-	"github.com/wadearnold/kit/log"
+	"github.com/moov-io/ach/server"
+	"github.com/moov-io/kit/log"
 )
 
 /**
