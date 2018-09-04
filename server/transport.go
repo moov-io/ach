@@ -21,6 +21,8 @@ var (
 	// ErrBadRouting is returned when an expected path variable is missing.
 	// It always indicates programmer error.
 	ErrBadRouting = errors.New("inconsistent mapping between route and handler (programmer error)")
+
+	ErrFoundABug = errors.New("Snuck into encodeError with err == nil, please report this as a bug -- https://github.com/moov-io/ach/issues/new")
 )
 
 func MakeHTTPHandler(s Service, logger log.Logger) http.Handler {
@@ -31,26 +33,23 @@ func MakeHTTPHandler(s Service, logger log.Logger) http.Handler {
 		httptransport.ServerErrorEncoder(encodeError),
 	}
 
-	// POST   /files/                          Creates a file
-	// GET    /files/                          retrieves a list of all file's
-	// GET    /files/:id                       retrieves the given file by id
-	// DELETE /files/:id					   delete a file based on supplied id
+	// GET    /files/:id/validate	validates the supplied file id for nacha compliance
+	// PATCH  /files/:id/build	build batch and file controls in ach file with supplied values
 
-	// POST   /files/:id/batches/			   Create a Batch
-	// GET	  /files/:fileID/batches		   Retrieve a list of all batches for the file id.
-	// GET	  /files/:id/batches/:id		   Retrieve the given batch by id
-	// DELETE /files/:fileID/batches/:batchID  delete the batch based on the supplied file and batch id
-	// ***
-	// GET    /files/:id/validate			   validates the supplied file id for nacha compliance
-	// PATCH  /files/:id/build				   build batch and file controls in ach file with supplied values
-	// PATCH  /files/upload/				   upload a ach file
+	// TODO(adam): wanted?
+	// should be PUT (total replace file)
+	// how do we prevent malicious (or not) collision? (namespace per-ip)
+	//
+	// PATCH	/files/upload			 Upload a ach file
 
+	// HTTP Methods
 	r.Methods("POST").Path("/files/").Handler(httptransport.NewServer(
 		e.CreateFileEndpoint,
 		decodeCreateFileRequest,
 		encodeResponse,
 		options...,
 	))
+
 	r.Methods("GET").Path("/files/").Handler(httptransport.NewServer(
 		e.GetFilesEndpoint,
 		decodeGetFilesRequest,
@@ -203,9 +202,9 @@ func decodeDeleteBatchRequest(_ context.Context, r *http.Request) (request inter
 }
 
 // errorer is implemented by all concrete response types that may contain
-// errors. It allows us to change the HTTP response code without needing to
-// trigger an endpoint (transport-level) error. For more information, read the
-// big comment in endpoints.go.
+// errors. There are a few well-known values which are used to change the
+// HTTP response code without needing to trigger an endpoint (transport-level)
+// error.
 type errorer interface {
 	error() error
 }
@@ -238,9 +237,10 @@ func encodeRequest(_ context.Context, req *http.Request, request interface{}) er
 	return nil
 }
 
+// encodeError JSON encodes the supplied error
 func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	if err == nil {
-		panic("encodeError with nil error")
+		err = ErrFoundABug
 	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(codeFrom(err))
@@ -250,12 +250,15 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 }
 
 func codeFrom(err error) int {
+	if err == nil {
+		return http.StatusOK
+	}
+
 	switch err {
 	case ErrNotFound:
 		return http.StatusNotFound
 	case ErrAlreadyExists:
 		return http.StatusBadRequest
-	default:
-		return http.StatusInternalServerError
 	}
+	return http.StatusInternalServerError
 }
