@@ -33,14 +33,14 @@ func MakeHTTPHandler(s Service, logger log.Logger) http.Handler {
 		httptransport.ServerErrorEncoder(encodeError),
 	}
 
+	// TODO(Adam): endpoints still needed
+
 	// GET    /files/:id/validate	validates the supplied file id for nacha compliance
+
+	// MUTATES FILE
 	// PATCH  /files/:id/build	build batch and file controls in ach file with supplied values
 
-	// TODO(adam): wanted?
-	// should be PUT (total replace file)
-	// how do we prevent malicious (or not) collision? (namespace per-ip)
-	//
-	// PATCH	/files/upload			 Upload a ach file
+	// POST	  /files/upload	        Parse body as an ACH File and add to repository, replaces any existing file by ID
 
 	// HTTP Methods
 	r.Methods("POST").Path("/files/").Handler(httptransport.NewServer(
