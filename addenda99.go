@@ -98,26 +98,31 @@ func (Addenda99 *Addenda99) Parse(record string) {
 
 // String writes the Addenda99 struct to a 94 character string
 func (Addenda99 *Addenda99) String() string {
-	return fmt.Sprintf("%v%v%v%v%v%v%v%v",
-		Addenda99.recordType,
-		Addenda99.TypeCode(),
-		Addenda99.ReturnCode,
-		Addenda99.OriginalTraceField(),
-		Addenda99.DateOfDeathField(),
-		Addenda99.OriginalDFIField(),
-		Addenda99.AddendaInformationField(),
-		Addenda99.TraceNumberField(),
-	)
+	var buf strings.Builder
+	buf.Grow(94)
+	buf.WriteString(Addenda99.recordType)
+	buf.WriteString(Addenda99.TypeCode())
+	buf.WriteString(Addenda99.ReturnCode)
+	buf.WriteString(Addenda99.OriginalTraceField())
+	buf.WriteString(Addenda99.DateOfDeathField())
+	buf.WriteString(Addenda99.OriginalDFIField())
+	buf.WriteString(Addenda99.AddendaInformationField())
+	buf.WriteString(Addenda99.TraceNumberField())
+	return buf.String()
 }
 
 // Validate verifies NACHA rules for Addenda99
 func (Addenda99 *Addenda99) Validate() error {
-
 	if Addenda99.recordType != "7" {
 		msg := fmt.Sprintf(msgRecordType, 7)
 		return &FieldError{FieldName: "recordType", Value: Addenda99.recordType, Msg: msg}
 	}
-	// @TODO Type Code should be 99.
+	if Addenda99.typeCode == "" {
+		return &FieldError{FieldName: "TypeCode", Value: Addenda99.typeCode, Msg: msgFieldInclusion}
+	}
+	if Addenda99.typeCode != "99" {
+		return &FieldError{FieldName: "TypeCode", Value: Addenda99.typeCode, Msg: msgAddendaTypeCode}
+	}
 
 	_, ok := returnCodeDict[Addenda99.ReturnCode]
 	if !ok {

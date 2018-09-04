@@ -281,3 +281,59 @@ func BenchmarkAddenda99ValidRecordType(b *testing.B) {
 		testAddenda99ValidRecordType(b)
 	}
 }
+
+// testAddenda99TypeCode99 TypeCode is 99
+func testAddenda99TypeCode99(t testing.TB) {
+	addenda99 := mockAddenda99()
+	addenda99.typeCode = "05"
+	if err := addenda99.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestAddenda99TypeCode99 tests TypeCode is 99
+func TestAddenda99TypeCode99(t *testing.T) {
+	testAddenda99TypeCode99(t)
+}
+
+// BenchmarkAddenda99TypeCode99 benchmarks TypeCode is 99
+func BenchmarkAddenda99TypeCode99(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda99TypeCode99(b)
+	}
+}
+
+// testAddenda99TypeCodeNil validates TypeCode is ""
+func testAddenda99TypeCodeNil(t testing.TB) {
+	addenda99 := mockAddenda99()
+	addenda99.typeCode = ""
+	if err := addenda99.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestAddenda99TypeCodeES tests TypeCode is ""
+func TestAddenda99TypeCodeNil(t *testing.T) {
+	testAddenda99TypeCodeNil(t)
+}
+
+// BenchmarkAddenda99TypeCodeNil benchmarks TypeCode is ""
+func BenchmarkAddenda99TypeCodeNil(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testAddenda99TypeCodeNil(b)
+	}
+}

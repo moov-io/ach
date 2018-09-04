@@ -100,12 +100,12 @@ func (r *Reader) Read() (File, error) {
 		}
 	}
 	if (FileHeader{}) == r.File.Header {
-		// Their must be at least one File Header
+		// There must be at least one File Header
 		r.recordName = "FileHeader"
 		return r.File, r.error(&FileError{Msg: msgFileHeader})
 	}
 	if (FileControl{}) == r.File.Control {
-		// Their must be at least one File Control
+		// There must be at least one File Control
 		r.recordName = "FileControl"
 		return r.File, r.error(&FileError{Msg: msgFileControl})
 	}
@@ -214,7 +214,6 @@ func (r *Reader) parseED() error {
 
 // parseEd parses determines whether to parse an IATEntryDetail Addenda or EntryDetail Addenda
 func (r *Reader) parseEDAddenda() error {
-
 	if r.currentBatch != nil {
 		if err := r.parseAddenda(); err != nil {
 			return err
@@ -224,18 +223,6 @@ func (r *Reader) parseEDAddenda() error {
 			return err
 		}
 	}
-
-	/*	switch r.line[1:3] {
-		//ToDo;  What to do about 98 and 99 ?
-		case "10", "11", "12", "13", "14", "15", "16", "17", "18":
-			if err := r.parseIATAddenda(); err != nil {
-				return err
-			}
-		default:
-			if err := r.parseAddenda(); err != nil {
-				return err
-			}
-		}*/
 	return nil
 }
 
@@ -243,7 +230,7 @@ func (r *Reader) parseEDAddenda() error {
 func (r *Reader) parseFileHeader() error {
 	r.recordName = "FileHeader"
 	if (FileHeader{}) != r.File.Header {
-		// Their can only be one File Header per File exit
+		// There can only be one File Header per File exit
 		r.error(&FileError{Msg: msgFileHeader})
 	}
 	r.File.Header.Parse(r.line)
@@ -345,7 +332,6 @@ func (r *Reader) parseAddenda() error {
 		msg := fmt.Sprint(msgBatchAddendaIndicator)
 		return r.error(&FileError{FieldName: "AddendaRecordIndicator", Msg: msg})
 	}
-
 	return nil
 }
 
@@ -405,7 +391,6 @@ func (r *Reader) parseIATBatchHeader() error {
 
 	// Passing BatchHeader into NewBatchIAT creates a Batcher of IAT SEC code type.
 	iatBatch := NewIATBatch(bh)
-
 	r.addIATCurrentBatch(iatBatch)
 
 	return nil
@@ -451,7 +436,6 @@ func (r *Reader) parseIATAddenda() error {
 		msg := fmt.Sprint(msgIATBatchAddendaIndicator)
 		return r.error(&FileError{FieldName: "AddendaRecordIndicator", Msg: msg})
 	}
-
 	return nil
 }
 
@@ -543,7 +527,6 @@ func (r *Reader) mandatoryOptionalIATAddenda(entryIndex int) error {
 		}
 		r.IATCurrentBatch.Entries[entryIndex].AddIATAddenda(addenda18)
 	}
-
 	return nil
 }
 
@@ -556,6 +539,5 @@ func (r *Reader) returnIATAddenda(entryIndex int) error {
 		return err
 	}
 	r.IATCurrentBatch.Entries[entryIndex].AddIATAddenda(addenda99)
-
 	return nil
 }
