@@ -1,10 +1,35 @@
 package server
 
 import (
+	"net/url"
 	"testing"
 
 	"github.com/moov-io/ach"
 )
+
+func testNextID(tb testing.TB) string {
+	id := NextID()
+	if len(id) != 16 {
+		tb.Errorf("got other length %d for ID %s", len(id), id)
+	}
+	return id
+}
+
+func TestNextID(t *testing.T) {
+	id := testNextID(t)
+
+	_, err := url.Parse("https://moov.io/" + id)
+	if err != nil {
+		t.Fatalf("failed to parse url with id of %q: %v", id, err)
+	}
+}
+
+func BenchmarkNextID(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testNextID(b)
+	}
+}
 
 // test mocks are in mock_test.go
 

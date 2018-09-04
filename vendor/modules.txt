@@ -6,8 +6,6 @@ github.com/go-kit/kit/transport/http
 github.com/go-logfmt/logfmt
 # github.com/go-stack/stack v1.8.0
 github.com/go-stack/stack
-# github.com/gofrs/uuid/v3 v3.1.1
-github.com/gofrs/uuid/v3
 # github.com/gorilla/context v1.1.1
 github.com/gorilla/context
 # github.com/gorilla/mux v1.6.2

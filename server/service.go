@@ -1,12 +1,12 @@
 package server
 
 import (
+	"crypto/rand"
+	"crypto/sha1"
+	"encoding/hex"
 	"errors"
-	"strings"
 
 	"github.com/moov-io/ach"
-
-	uuid "github.com/gofrs/uuid/v3"
 )
 
 var (
@@ -133,12 +133,16 @@ func (s *service) DeleteBatch(fileID string, batchID string) error {
 	return s.store.DeleteBatch(fileID, batchID)
 }
 
-// Utility Functions
-
-// NextID generates a new resource ID
+// NextID generates a new resource ID.
+// Do not assume anything about the data structure.
+//
+// Multiple calls to NextID() have no concern about producing
+// lexicographically ordered output.
 func NextID() string {
-	id, _ := uuid.NewV4()
-	//return id.String()
-	// make it shorter for testing URL
-	return string(strings.Split(strings.ToUpper(id.String()), "-")[0])
+	bs := make([]byte, 20)
+	rand.Reader.Read(bs)
+
+	h := sha1.New()
+	h.Write(bs)
+	return hex.EncodeToString(h.Sum(nil))[:16]
 }
