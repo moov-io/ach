@@ -225,10 +225,9 @@ func testFileLineEmpty(t testing.TB) {
 	line := ""
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
-
 	if p, ok := err.(*ParseError); ok {
 		if e, ok := p.Err.(*FileError); ok {
-			if e.Msg != "none or more than one file headers exists" { // from msgFileHeader
+			if e.Msg != msgFileHeader {
 				t.Errorf("%#v", e)
 			}
 		} else {
@@ -237,12 +236,12 @@ func testFileLineEmpty(t testing.TB) {
 	}
 }
 
-// TestFileLineEmpty tests validating file line is short
+// TestFileLineEmpty tests validating empty file fails to parse
 func TestFileLineEmpty(t *testing.T) {
 	testFileLineEmpty(t)
 }
 
-// BenchmarkFileLineEmpty benchmarks validating file line is short
+// BenchmarkFileLineEmpty benchmarks validating empty file fails to parse
 func BenchmarkFileLineEmpty(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
