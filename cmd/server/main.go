@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/go-kit/kit/log"
+
 	"github.com/moov-io/ach/server"
 )
 
@@ -38,29 +39,28 @@ DeleteBatch
 curl -H "Content-Type: application/json" -X DELETE http://localhost:8080/files/08B751B2/batches/54321
 **/
 
+var (
+	httpAddr = flag.String("http.addr", ":8080", "HTTP listen address")
+	logger log.Logger
+
+	svc server.Service
+	handler http.Handler
+)
+
 func main() {
-	var (
-		httpAddr = flag.String("http.addr", ":8080", "HTTP listen address")
-	)
 	flag.Parse()
 
-	var logger log.Logger
-	{
-		logger = log.NewLogfmtLogger(os.Stderr)
-		logger = log.With(logger, "ts", log.DefaultTimestampUTC)
-		logger = log.With(logger, "caller", log.DefaultCaller)
-	}
+	// Setup logging, default to stdout
+	logger = log.NewLogfmtLogger(os.Stderr)
+	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
+	logger = log.With(logger, "caller", log.DefaultCaller)
 
-	var s server.Service
-	{
-		s = server.NewService(server.NewRepositoryInMemory())
-		s = server.LoggingMiddleware(logger)(s)
-	}
+	// Setup underlying ach service
+	svc = server.NewService(server.NewRepositoryInMemory())
+	svc = server.LoggingMiddleware(logger)(svc)
 
-	var h http.Handler
-	{
-		h = server.MakeHTTPHandler(s, log.With(logger, "component", "HTTP"))
-	}
+	// Create HTTP server
+	handler = server.MakeHTTPHandler(svc, log.With(logger, "component", "HTTP"))
 
 	// Listen for application termination.
 	errs := make(chan error)
@@ -72,7 +72,7 @@ func main() {
 
 	go func() {
 		logger.Log("transport", "HTTP", "addr", *httpAddr)
-		errs <- http.ListenAndServe(*httpAddr, h)
+		errs <- http.ListenAndServe(*httpAddr, handler)
 	}()
 
 	logger.Log("exit", <-errs)
