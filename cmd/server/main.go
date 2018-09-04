@@ -41,9 +41,9 @@ curl -H "Content-Type: application/json" -X DELETE http://localhost:8080/files/0
 
 var (
 	httpAddr = flag.String("http.addr", ":8080", "HTTP listen address")
-	logger log.Logger
+	logger   log.Logger
 
-	svc server.Service
+	svc     server.Service
 	handler http.Handler
 )
 
