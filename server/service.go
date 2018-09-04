@@ -5,7 +5,8 @@ import (
 	"strings"
 
 	"github.com/moov-io/ach"
-	uuid "github.com/satori/go.uuid"
+
+	uuid "github.com/gofrs/uuid/v3"
 )
 
 var (
@@ -133,7 +134,6 @@ func (s *service) DeleteBatch(fileID string, batchID string) error {
 }
 
 // Utility Functions
-// *****
 
 // NextID generates a new resource ID
 func NextID() string {

@@ -9,7 +9,7 @@ import (
 	"syscall"
 
 	"github.com/moov-io/ach/server"
-	"github.com/moov-io/kit/log"
+	"github.com/go-kit/kit/log"
 )
 
 /**
