@@ -52,17 +52,18 @@ func (t *timer) String() string {
 
 // Middleware endpoints
 
-func (mw loggingMiddleware) CreateFile(f ach.FileHeader) (id string, err error) {
+func (mw loggingMiddleware) CreateFile(f *ach.FileHeader) (id string, err error) {
 	t := startTimer()
 	defer func() {
 		// f.ID can be empty here if the request does not specify it, do we care?
-		// service's CreateFile generates and assigns one just fine
+		// The ID is properly generated and stored, so there's no "issue", just flakey logs.
+		// TODO(adam): figure out if we care to fix this
 		mw.logger.Log("method", "CreateFile", "id", f.ID, "took", t, "err", err)
 	}()
 	return mw.next.CreateFile(f)
 }
 
-func (mw loggingMiddleware) GetFile(id string) (f ach.File, err error) {
+func (mw loggingMiddleware) GetFile(id string) (f *ach.File, err error) {
 	t := startTimer()
 	defer func() {
 		mw.logger.Log("method", "GetFile", "id", id, "took", t, "err", err)
@@ -70,7 +71,7 @@ func (mw loggingMiddleware) GetFile(id string) (f ach.File, err error) {
 	return mw.next.GetFile(id)
 }
 
-func (mw loggingMiddleware) GetFiles() []ach.File {
+func (mw loggingMiddleware) GetFiles() []*ach.File {
 	t := startTimer()
 	defer func() {
 		mw.logger.Log("method", "GetFiles", "took", t)
@@ -88,7 +89,7 @@ func (mw loggingMiddleware) DeleteFile(id string) (err error) {
 
 //** BATCHES ** //
 
-func (mw loggingMiddleware) CreateBatch(fileID string, bh ach.BatchHeader) (id string, err error) {
+func (mw loggingMiddleware) CreateBatch(fileID string, bh *ach.BatchHeader) (id string, err error) {
 	t := startTimer()
 	defer func() {
 		mw.logger.Log("method", "CreateBatch", "FileID", fileID, "batchID", bh.ID, "took", t, "err", err)

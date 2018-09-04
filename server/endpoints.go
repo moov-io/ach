@@ -35,7 +35,7 @@ func MakeServerEndpoints(s Service) Endpoints {
 func MakeCreateFileEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(createFileRequest)
-		id, e := s.CreateFile(req.FileHeader)
+		id, e := s.CreateFile(&req.FileHeader)
 		return createFileResponse{ID: id, Err: e}, nil
 	}
 }
@@ -61,7 +61,7 @@ func MakeGetFilesEndpoint(s Service) endpoint.Endpoint {
 type getFilesRequest struct{}
 
 type getFilesResponse struct {
-	Files []ach.File `json:"files,omitempty"`
+	Files []*ach.File `json:"files,omitempty"`
 	Err   error      `json:"error,omitempty"`
 }
 
@@ -82,7 +82,7 @@ type getFileRequest struct {
 }
 
 type getFileResponse struct {
-	File ach.File `json:"file,omitempty"`
+	File *ach.File `json:"file,omitempty"`
 	Err  error    `json:"err,omitempty"`
 }
 
@@ -112,7 +112,7 @@ func (r deleteFileResponse) error() error { return r.Err }
 func MakeCreateBatchEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(createBatchRequest)
-		id, e := s.CreateBatch(req.FileID, req.BatchHeader)
+		id, e := s.CreateBatch(req.FileID, &req.BatchHeader)
 		return createBatchResponse{ID: id, Err: e}, nil
 	}
 }

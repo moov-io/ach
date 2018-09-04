@@ -13,10 +13,11 @@ type Repository interface {
 	FindAllFiles() []*ach.File
 	DeleteFile(id string) error
 	StoreBatch(fileID string, batch ach.Batcher) error
-	FindBatch(fileID string, batchID string) (*ach.Batcher, error)
-	FindAllBatches(fileID string) []*ach.Batcher
+	FindBatch(fileID string, batchID string) (ach.Batcher, error)
+	FindAllBatches(fileID string) []ach.Batcher
 	DeleteBatch(fileID string, batchID string) error
 }
+
 type repositoryInMemory struct {
 	mtx   sync.RWMutex
 	files map[string]*ach.File
@@ -67,6 +68,7 @@ func (r *repositoryInMemory) DeleteFile(id string) error {
 	return nil
 }
 
+// TODO(adam): was copying this causing issues?
 func (r *repositoryInMemory) StoreBatch(fileID string, batch ach.Batcher) error {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
@@ -86,24 +88,24 @@ func (r *repositoryInMemory) StoreBatch(fileID string, batch ach.Batcher) error 
 }
 
 // FindBatch retrieves a ach.Batcher based on the supplied ID
-func (r *repositoryInMemory) FindBatch(fileID string, batchID string) (*ach.Batcher, error) {
+func (r *repositoryInMemory) FindBatch(fileID string, batchID string) (ach.Batcher, error) {
 	r.mtx.RLock()
 	defer r.mtx.RUnlock()
 	for _, val := range r.files[fileID].Batches {
 		if val.ID() == batchID {
-			return &val, nil
+			return val, nil
 		}
 	}
 	return nil, ErrNotFound
 }
 
 // FindAllBatches
-func (r *repositoryInMemory) FindAllBatches(fileID string) []*ach.Batcher {
+func (r *repositoryInMemory) FindAllBatches(fileID string) []ach.Batcher {
 	r.mtx.RLock()
 	defer r.mtx.RUnlock()
-	batches := make([]*ach.Batcher, 0, len(r.files[fileID].Batches))
+	batches := make([]ach.Batcher, 0, len(r.files[fileID].Batches))
 	for _, val := range r.files[fileID].Batches {
-		batches = append(batches, &val)
+		batches = append(batches, val)
 	}
 	return batches
 }

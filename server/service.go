@@ -18,18 +18,18 @@ var (
 // TODO: Add ctx to function parameters to pass the client security token
 type Service interface {
 	// CreateFile creates a new ach file record and returns a resource ID
-	CreateFile(f ach.FileHeader) (string, error)
+	CreateFile(f *ach.FileHeader) (string, error)
 	// AddFile retrieves a file based on the File id
-	GetFile(id string) (ach.File, error)
+	GetFile(id string) (*ach.File, error)
 	// GetFiles retrieves all files accessible from the client.
-	GetFiles() []ach.File
+	GetFiles() []*ach.File
 	// DeleteFile takes a file resource ID and deletes it from the store
 	DeleteFile(id string) error
 	// UpdateFile updates the changes properties of a matching File ID
 	// UpdateFile(f ach.File) (string, error)
 
 	// CreateBatch creates a new batch within and ach file and returns its resource ID
-	CreateBatch(fileID string, bh ach.BatchHeader) (string, error)
+	CreateBatch(fileID string, bh *ach.BatchHeader) (string, error)
 	// GetBatch retrieves a batch based oin the file id and batch id
 	GetBatch(fileID string, batchID string) (ach.Batcher, error)
 	// GetBatches retrieves all batches associated with the file id.
@@ -51,10 +51,11 @@ func NewService(r Repository) Service {
 }
 
 // CreateFile add a file to storage
-func (s *service) CreateFile(fh ach.FileHeader) (string, error) {
+// TODO(adam): the HTTP endpoint accepts malformed bodies (and missing data)
+func (s *service) CreateFile(fh *ach.FileHeader) (string, error) {
 	// create a new file
 	f := ach.NewFile()
-	f.SetHeader(fh)
+	f.SetHeader(*fh)
 	// set resource id's
 	if fh.ID == "" {
 		id := NextID()
@@ -72,28 +73,24 @@ func (s *service) CreateFile(fh ach.FileHeader) (string, error) {
 }
 
 // GetFile returns a files based on the supplied id
-func (s *service) GetFile(id string) (ach.File, error) {
+func (s *service) GetFile(id string) (*ach.File, error) {
 	f, err := s.store.FindFile(id)
 	if err != nil {
-		return ach.File{}, ErrNotFound
+		return nil, ErrNotFound
 	}
-	return *f, nil
+	return f, nil
 }
 
-func (s *service) GetFiles() []ach.File {
-	var result []ach.File
-	for _, f := range s.store.FindAllFiles() {
-		result = append(result, *f)
-	}
-	return result
+func (s *service) GetFiles() []*ach.File {
+	return s.store.FindAllFiles()
 }
 
 func (s *service) DeleteFile(id string) error {
 	return s.store.DeleteFile(id)
 }
 
-func (s *service) CreateBatch(fileID string, bh ach.BatchHeader) (string, error) {
-	batch, err := ach.NewBatch(&bh)
+func (s *service) CreateBatch(fileID string, bh *ach.BatchHeader) (string, error) {
+	batch, err := ach.NewBatch(bh)
 	if err != nil {
 		return bh.ID, err
 	}
@@ -118,15 +115,11 @@ func (s *service) GetBatch(fileID string, batchID string) (ach.Batcher, error) {
 	if err != nil {
 		return nil, ErrNotFound
 	}
-	return *b, nil
+	return b, nil
 }
 
 func (s *service) GetBatches(fileID string) []ach.Batcher {
-	var result []ach.Batcher
-	for _, b := range s.store.FindAllBatches(fileID) {
-		result = append(result, *b)
-	}
-	return result
+	return s.store.FindAllBatches(fileID)
 }
 
 func (s *service) DeleteBatch(fileID string, batchID string) error {

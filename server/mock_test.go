@@ -13,7 +13,7 @@ func mockServiceInMemory() Service {
 	return NewService(repository)
 }
 
-func mockFileHeader() ach.FileHeader {
+func mockFileHeader() *ach.FileHeader {
 	fh := ach.NewFileHeader()
 	fh.ID = "12345"
 	fh.ImmediateDestination = "9876543210"
@@ -21,7 +21,7 @@ func mockFileHeader() ach.FileHeader {
 	fh.FileCreationDate = time.Now()
 	fh.ImmediateDestinationName = "Federal Reserve Bank"
 	fh.ImmediateOriginName = "My Bank Name"
-	return fh
+	return &fh
 }
 
 func mockBatchHeaderWeb() *ach.BatchHeader {
