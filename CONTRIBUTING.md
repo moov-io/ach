@@ -27,6 +27,28 @@ We use GitHub to manage reviews of pull requests.
   Environments](http://peter.bourgon.org/go-in-production/#formatting-and-style).
 
 * When in doubt follow the [Go Proverbs](https://go-proverbs.github.io/)
+
+## Getting the code
+
+We recommend using additional git remote's for pushing/pulling code. Go cares about where the `ach` project lives relative to `GOPATH`.
+
+To pull our source code run:
+
+```
+$ go get github.com/moov-io/ach
+```
+
+Then, add your (or another user's) fork.
+
+```
+$ cd $GOPATH/src/github.com/moov-io/ach
+
+$ git remote add $user git@github.com:$user/ach.git
+
+$ git fetch $user
+```
+
+Now, feel free to branch and push (`git push $user $branch`) to your remote and send us Pull Requests!
   
 ## Pull Requests
 
