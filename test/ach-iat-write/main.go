@@ -1,10 +1,10 @@
 package main
 
 import (
-	"time"
 	"github.com/moov-io/ach"
 	"log"
 	"os"
+	"time"
 )
 
 func main() {
@@ -15,7 +15,7 @@ func main() {
 	// this is the funding/receiving source of the transfer
 	fh := ach.NewFileHeader()
 	fh.ImmediateDestination = "121042882" // Routing Number of the ACH Operator or receiving point to which the file is being sent
-	fh.ImmediateOrigin = "231380104" // Routing Number of the ACH Operator or sending point that is sending the file
+	fh.ImmediateOrigin = "231380104"      // Routing Number of the ACH Operator or sending point that is sending the file
 	fh.FileCreationDate = time.Now()      // Today's Date
 	fh.ImmediateDestinationName = "Bank"
 	fh.ImmediateOriginName = "My Bank Name"
