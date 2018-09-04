@@ -12,7 +12,7 @@ environment:
   GOARCH: amd64
   DEBUG: true
 
-stack: go 1.10
+stack: go 1.11
 
 before_test:
   - go vet ./...
