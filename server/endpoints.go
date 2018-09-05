@@ -62,7 +62,7 @@ type getFilesRequest struct{}
 
 type getFilesResponse struct {
 	Files []*ach.File `json:"files,omitempty"`
-	Err   error      `json:"error,omitempty"`
+	Err   error       `json:"error,omitempty"`
 }
 
 func (r getFilesResponse) error() error { return r.Err }
@@ -83,7 +83,7 @@ type getFileRequest struct {
 
 type getFileResponse struct {
 	File *ach.File `json:"file,omitempty"`
-	Err  error    `json:"err,omitempty"`
+	Err  error     `json:"err,omitempty"`
 }
 
 func (r getFileResponse) error() error { return r.Err }
