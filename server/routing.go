@@ -25,7 +25,7 @@ var (
 
 	ErrFoundABug = errors.New("Snuck into encodeError with err == nil, please report this as a bug -- https://github.com/moov-io/ach/issues/new")
 
-	MaxContentLength = 1*1024*1024 // bytes
+	MaxContentLength = 1 * 1024 * 1024 // bytes
 )
 
 func MakeHTTPHandler(s Service, repo Repository, logger log.Logger) http.Handler {
@@ -42,16 +42,15 @@ func MakeHTTPHandler(s Service, repo Repository, logger log.Logger) http.Handler
 	// PATCH  /files/:id/build	build batch and file controls in ach file with supplied values
 
 	// HTTP Methods
-	r.Methods("POST").Path("/files/").Handler(httptransport.NewServer(
-		e.CreateFileEndpoint,
-		decodeCreateFileRequest,
-		encodeResponse,
-		options...,
-	))
-
 	r.Methods("GET").Path("/files/").Handler(httptransport.NewServer(
 		e.GetFilesEndpoint,
 		decodeGetFilesRequest,
+		encodeResponse,
+		options...,
+	))
+	r.Methods("POST").Path("/files/create").Handler(httptransport.NewServer(
+		e.CreateFileEndpoint,
+		decodeCreateFileRequest,
 		encodeResponse,
 		options...,
 	))

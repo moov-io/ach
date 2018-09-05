@@ -39,6 +39,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Files'
+  /files/create:
     post:
       tags:
       - Files
