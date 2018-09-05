@@ -108,6 +108,60 @@ func TestDeleteFile(t *testing.T) {
 	}
 }
 
+// Service.ValidateFile tests
+
+func TestValidateFile(t *testing.T) {
+	s := mockServiceInMemory()
+	id, err := s.CreateFile(mockFileHeader())
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	f, err := s.GetFile(id)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	if err := f.Validate(); err != nil {
+		t.Fatal(err.Error())
+	}
+}
+
+func TestValidateFileMissing(t *testing.T) {
+	s := mockServiceInMemory()
+	err := s.ValidateFile("missing")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestValidateFileBad(t *testing.T) {
+	s := mockServiceInMemory()
+
+	fId, _ := s.CreateFile(mockFileHeader())
+
+	// setup batch
+	bh := mockBatchHeaderWeb()
+	bh.ID = "11111"
+	bId, e1 := s.CreateBatch(fId, bh)
+	batch, e2 := s.GetBatch(fId, bId)
+	if batch == nil {
+		t.Fatalf("couldn't get batch, e1=%v, e2=%v", e1, e2)
+	}
+
+	// setup file, add batch
+	f, err := s.GetFile(fId)
+	if f == nil {
+		t.Fatalf("couldn't get file: %v", err)
+	}
+	if len(f.AddBatch(batch)) == 0 {
+		t.Fatal("problem adding batch to file")
+	}
+
+	// validate
+	if err := f.Validate(); err == nil {
+		t.Fatal("expected error")
+	}
+}
+
 // Service.CreateBatch tests
 
 // TestCreateBatch tests creating a new batch when file.ID exists and batch.id does not exist

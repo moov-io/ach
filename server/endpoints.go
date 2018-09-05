@@ -8,32 +8,34 @@ import (
 )
 
 type Endpoints struct {
-	CreateFileEndpoint  endpoint.Endpoint
-	GetFileEndpoint     endpoint.Endpoint
-	GetFilesEndpoint    endpoint.Endpoint
-	DeleteFileEndpoint  endpoint.Endpoint
-	CreateBatchEndpoint endpoint.Endpoint
-	GetBatchesEndpoint  endpoint.Endpoint
-	GetBatchEndpoint    endpoint.Endpoint
-	DeleteBatchEndpoint endpoint.Endpoint
+	CreateFileEndpoint   endpoint.Endpoint
+	GetFileEndpoint      endpoint.Endpoint
+	GetFilesEndpoint     endpoint.Endpoint
+	DeleteFileEndpoint   endpoint.Endpoint
+	ValidateFileEndpoint endpoint.Endpoint
+	CreateBatchEndpoint  endpoint.Endpoint
+	GetBatchesEndpoint   endpoint.Endpoint
+	GetBatchEndpoint     endpoint.Endpoint
+	DeleteBatchEndpoint  endpoint.Endpoint
 }
 
 func MakeServerEndpoints(s Service) Endpoints {
 	return Endpoints{
-		CreateFileEndpoint:  MakeCreateFileEndpoint(s),
-		GetFileEndpoint:     MakeGetFileEndpoint(s),
-		GetFilesEndpoint:    MakeGetFilesEndpoint(s),
-		DeleteFileEndpoint:  MakeDeleteFileEndpoint(s),
-		CreateBatchEndpoint: MakeCreateBatchEndpoint(s),
-		GetBatchesEndpoint:  MakeGetBatchesEndpoint(s),
-		GetBatchEndpoint:    MakeGetBatchEndpoint(s),
-		DeleteBatchEndpoint: MakeDeleteBatchEndpoint(s),
+		CreateFileEndpoint:   MakeCreateFileEndpoint(s),
+		GetFileEndpoint:      MakeGetFileEndpoint(s),
+		GetFilesEndpoint:     MakeGetFilesEndpoint(s),
+		DeleteFileEndpoint:   MakeDeleteFileEndpoint(s),
+		ValidateFileEndpoint: MakeValidateFileEndpoint(s),
+		CreateBatchEndpoint:  MakeCreateBatchEndpoint(s),
+		GetBatchesEndpoint:   MakeGetBatchesEndpoint(s),
+		GetBatchEndpoint:     MakeGetBatchEndpoint(s),
+		DeleteBatchEndpoint:  MakeDeleteBatchEndpoint(s),
 	}
 }
 
 // MakeCreateFileEndpoint returns an endpoint via the passed service.
 func MakeCreateFileEndpoint(s Service) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(createFileRequest)
 		id, e := s.CreateFile(&req.FileHeader)
 		return createFileResponse{ID: id, Err: e}, nil
@@ -52,9 +54,11 @@ type createFileResponse struct {
 func (r createFileResponse) error() error { return r.Err }
 
 func MakeGetFilesEndpoint(s Service) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		_ = request.(getFilesRequest)
-		return getFilesResponse{Files: s.GetFiles(), Err: nil}, nil
+	return func(_ context.Context, _ interface{}) (interface{}, error) {
+		return getFilesResponse{
+			Files: s.GetFiles(),
+			Err:   nil,
+		}, nil
 	}
 }
 
@@ -70,10 +74,13 @@ func (r getFilesResponse) error() error { return r.Err }
 // MakeGetFileEndpoint returns an endpoint via the passed service.
 // Primarily useful in a server.
 func MakeGetFileEndpoint(s Service) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(getFileRequest)
 		f, e := s.GetFile(req.ID)
-		return getFileResponse{File: f, Err: e}, nil
+		return getFileResponse{
+			File: f,
+			Err:  e,
+		}, nil
 	}
 }
 
@@ -89,15 +96,16 @@ type getFileResponse struct {
 func (r getFileResponse) error() error { return r.Err }
 
 func MakeDeleteFileEndpoint(s Service) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(deleteFileRequest)
-		e := s.DeleteFile(req.ID)
-		return deleteFileResponse{Err: e}, nil
+		return deleteFileResponse{
+			Err: s.DeleteFile(req.ID),
+		}, nil
 	}
 }
 
 type deleteFileRequest struct {
-	ID string `json:"id,omitempty"`
+	ID string `json:"id,omitempty"` // TODO(adam): why omitempty
 }
 
 type deleteFileResponse struct {
@@ -106,14 +114,36 @@ type deleteFileResponse struct {
 
 func (r deleteFileResponse) error() error { return r.Err }
 
+func MakeValidateFileEndpoint(s Service) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(validateFileRequest)
+		return validateFileResponse{
+			Err: s.ValidateFile(req.ID),
+		}, nil
+	}
+}
+
+type validateFileRequest struct {
+	ID string `json:"id,omitempty"` // TODO(adam): why omitempty
+}
+
+type validateFileResponse struct {
+	Err error `json:"err,omitempty"` // TODO(adam): omitempty?
+}
+
+func (v validateFileResponse) error() error { return v.Err }
+
 //** Batches ** //
 
 // MakeCreateFileEndpoint returns an endpoint via the passed service.
 func MakeCreateBatchEndpoint(s Service) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(createBatchRequest)
 		id, e := s.CreateBatch(req.FileID, &req.BatchHeader)
-		return createBatchResponse{ID: id, Err: e}, nil
+		return createBatchResponse{
+			ID:  id,
+			Err: e,
+		}, nil
 	}
 }
 
@@ -130,9 +160,12 @@ type createBatchResponse struct {
 func (r createBatchResponse) error() error { return r.Err }
 
 func MakeGetBatchesEndpoint(s Service) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(getBatchesRequest)
-		return getBatchesResponse{Batches: s.GetBatches(req.fileID), Err: nil}, nil
+		return getBatchesResponse{
+			Batches: s.GetBatches(req.fileID),
+			Err:     nil,
+		}, nil
 	}
 }
 
@@ -148,10 +181,13 @@ type getBatchesResponse struct {
 func (r getBatchesResponse) error() error { return r.Err }
 
 func MakeGetBatchEndpoint(s Service) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(getBatchRequest)
 		batch, e := s.GetBatch(req.fileID, req.batchID)
-		return getBatchResponse{Batch: batch, Err: e}, nil
+		return getBatchResponse{
+			Batch: batch,
+			Err:   e,
+		}, nil
 	}
 }
 
@@ -168,10 +204,11 @@ type getBatchResponse struct {
 func (r getBatchResponse) error() error { return r.Err }
 
 func MakeDeleteBatchEndpoint(s Service) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(deleteBatchRequest)
-		e := s.DeleteBatch(req.fileID, req.batchID)
-		return deleteBatchResponse{Err: e}, nil
+		return deleteBatchResponse{
+			Err: s.DeleteBatch(req.fileID, req.batchID),
+		}, nil
 	}
 }
 

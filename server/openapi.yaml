@@ -1,6 +1,6 @@
 openapi: "3.0.0"
 info:
-  description: Moov ACH is a RESTful enpoint of an ACH file creator to enable developers of all languages and read, write, and validate NACHA files. 
+  description: Moov ACH is a RESTful enpoint of an ACH file creator to enable developers of all languages and read, write, and validate NACHA files.
   version: "0.0.1"
   title: "Moov ACH"
   contact:
@@ -8,36 +8,36 @@ info:
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-servers: 
+servers:
 - url: https://api.moov.io/v1/
   description: Production server
 - url: https://sandbox.moov.io/v1/
-  description: Development server. 
-tags: 
+  description: Development server.
+tags:
   - name: Files
     description: File contains the structures of a ACH File. It contains one and only one File Header and File Control with at least one Batches.
   - name: Batches
-    description: Batch objects hold the Batch Header and Batch Control and all Entry Records and Addenda records for the Batch.    
+    description: Batch objects hold the Batch Header and Batch Control and all Entry Records and Addenda records for the Batch.
 
 paths:
 #FILES
   /files:
-    get: 
-      tags: 
+    get:
+      tags:
       - Files
       summary: Gets a list of Files
       operationId: getFiles
-      responses: 
-        '200': 
+      responses:
+        '200':
           description: A list of File objects
-          headers: 
-            X-Total-Count: 
+          headers:
+            X-Total-Count:
               description: The total number of Originators
-              schema: 
+              schema:
                 type: integer
-          content: 
+          content:
             application/json:
-              schema: 
+              schema:
                 $ref: '#/components/schemas/Files'
     post:
       tags:
@@ -46,13 +46,13 @@ paths:
       operationId: addFile
       requestBody:
         $ref: '#/components/requestBodies/File'
-      responses: 
+      responses:
         '201':
           description: A JSON object containing a new File
-          headers: 
-            Location: 
+          headers:
+            Location:
               description: The location of the new resource
-              schema: 
+              schema:
                 type: string
                 format: uri
           content:
@@ -61,18 +61,18 @@ paths:
                 $ref: '#/components/schemas/File'
         '400':
           description: "Invalid File Header Object"
-          content: 
+          content:
             application/json:
-              schema: 
+              schema:
                 $ref: '#/components/schemas/Error'
   /files/{file_id}:
-    get: 
+    get:
       tags:
       - Files
       summary: Retrieves the details of an existing File. You need only supply the unique File identifier that was returned upon creation.
       operationId: getFileByID
       parameters:
-        - $ref: '#/components/parameters/requestID' 
+        - $ref: '#/components/parameters/requestID'
         - name: file_id
           in: path
           description: File ID
@@ -81,16 +81,16 @@ paths:
             type: string
             format: uuid
             example: 3f2d23ee-68d9-494e-a23e-cd0a9ce09281
-      responses: 
+      responses:
         '200':
           description: A File object for the supplied ID
-          content: 
+          content:
             application/json:
-              schema: 
+              schema:
                 $ref: '#/components/schemas/File'
         '404':
           description: A resource with the specified ID was not found
-    post: 
+    post:
       tags:
       - Files
       summary: Updates the specified File Header by setting the values of the parameters passed. Any parameters not provided will be left unchanged.
@@ -106,13 +106,13 @@ paths:
             example: 3f2d23ee-68d9-494e-a23e-cd0a9ce09281
       requestBody:
         $ref: '#/components/requestBodies/File'
-      responses: 
+      responses:
         '201':
           description: A JSON object containing a new File
-          headers: 
-            Location: 
+          headers:
+            Location:
               description: The location of the new resource
-              schema: 
+              schema:
                 type: string
                 format: uri
           content:
@@ -121,15 +121,15 @@ paths:
                 $ref: '#/components/schemas/File'
         '400':
           description: "Invalid File Header Object"
-          content: 
+          content:
             application/json:
-              schema: 
+              schema:
                 $ref: '#/components/schemas/Error'
     delete:
       tags:
       - Files
       summary: Permanently deletes a File and associated Batches. It cannot be undone.
-      parameters: 
+      parameters:
         - name: file_id
           in: path
           description: File ID
@@ -137,10 +137,10 @@ paths:
           schema:
             type: string
             format: uuid
-      responses: 
+      responses:
           '200':
-            description: Permanently deleted File. 
-            content: 
+            description: Permanently deleted File.
+            content:
                 application/json:
                   schema:
                     type: string
@@ -148,7 +148,34 @@ paths:
                     example: 3f2d23ee-68d9-494e-a23e-cd0a9ce09281
           '404':
             description: A File with the specified ID was not found.
-# COMPONENTS to be re-used           
+  /files/{file_id}/validate:
+    get:
+      tags:
+        - Files
+      summary: Validates the existing file. You need only supply the unique File identifier that was returned upon creation.
+      operationId: validateFile
+      parameters:
+        - $ref: '#/components/parameters/requestID'
+        - name: file_id
+          in: path
+          description: File ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 3f2d23ee-68d9-494e-a23e-cd0a9ce09281
+      responses:
+        '200':
+          description: File validated successfully without errors.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+        '500':
+          # TODO(adam): should be a 4xx error
+          description: Validation failed. Check response for errors
+
+# COMPONENTS to be re-used
 components:
   schemas:
     File:
@@ -158,19 +185,19 @@ components:
           format: uuid
           description: File ID
           example: 724b6abe-e39d-4727-bf66-b499faf06938
-        FileHeader: 
+        FileHeader:
           $ref: '#/components/schemas/FileHeader'
     Files:
       type: array
-      items: 
+      items:
         $ref: '#/components/schemas/File'
     FileHeader:
-      required: 
+      required:
         - immediateOrigin
         - immediateOriginName
         - immediateDestination
         - immediateDestinationName
-      properties: 
+      properties:
         id:
           type: string
           format: uuid
@@ -178,16 +205,16 @@ components:
           example: 724b6abe-e39d-4727-bf66-b499faf06938
         immediateOrigin:
           type: string
-          description: contains the Routing Number of the ACH Operator or sending point that is sending the file. 
+          description: contains the Routing Number of the ACH Operator or sending point that is sending the file.
           minLength: 9
           maxLength: 10
-          example: "99991234" 
+          example: "99991234"
         immediateOriginName:
           type: string
           description: The name of the ACH operator or sending point that is sending the file.
           maxLength: 23
           example: My Bank Name
-        immediateDestination: 
+        immediateDestination:
           type: string
           maxLength: 10
           minLength: 9
@@ -195,78 +222,78 @@ components:
           description: contains the Routing Number of the ACH Operator or receiving point to which the file is being sent
         immediateDestinationName:
           type: string
-          description: The name of the ACH or receiving point for which that file is destined. 
+          description: The name of the ACH or receiving point for which that file is destined.
           maxLength: 23
           example: Federal Reserve Bank
-        fileCreationDate: 
+        fileCreationDate:
           type: string
           description: expressed in a "YYMMDD" format. The File Creation Date is the date on which the file is prepared by an ODFI
           example: "102318"
           minLength: 6
           maxLength: 6
-        fileCreationTime: 
+        fileCreationTime:
           type: string
           description: Expressed in "HHMM" (24 hour clock) format.
           example: "1601"
           minLength: 4
           maxLength: 4
     FileControl:
-      properties: 
-        id: 
+      properties:
+        id:
           type: string
           format: uuid
           description: File Control ID (same as File)
-          
-        
+
+
     Error:
-      required: 
+      required:
         - code
         - message
-      properties: 
+      properties:
         code:
           type: string
           description: A detailed error code
           example: ValidationError
-        message: 
+        message:
           type: string
           description: A human readable description of the problem
-          example: Validation error(s) present.  
-  requestBodies: 
-    File: 
+          example: Validation error(s) present.
+  requestBodies:
+    File:
       description: A JSON object containing a new File
       required: true
-      content: 
+      content:
         application/json:
-          schema: 
+          schema:
             $ref: '#/components/schemas/FileHeader'
-  parameters: 
-    offsetParam: 
+  parameters:
+    offsetParam:
       in: query
       name: offset
       required: false
       description: The number of items to skip before starting to collect the result set
-      schema: 
+      schema:
         type: integer
         minimum: 1
         default: 0
-    limitParam: 
+    limitParam:
       in: query
       name: limit
       description: The number of items to return
       required: false
-      schema: 
+      schema:
         type: integer
         minimum: 0
         maximum: 100
         default: 25
         example: 10
-    idempotencyKey: 
+    idempotencyKey:
       in: header
       name: Idempotency-Key
-      description: Idempotent key in the header which expires after 24/hrs 
+      description: Idempotent key in the header which expires after 24/hrs
       example: a4f88150-9f5d-4f75-a1b1-0344f268506e
       required: false
-      schema: 
+      schema:
         type: string
         format: uuid
     requestID:
@@ -274,21 +301,21 @@ components:
       name: Request_Id
       description: Optional Request ID allows application developer to tracce requests through the systems logs
       example: r4f99150-8f5d-5f75-z1b1-9344f268506f
-      schema: 
+      schema:
         type: string
         format: uuid
     startDate:
       in: query
       name: startDate
       description: Filter objects created after this date. ISO-8601 format YYYY-MM-DD. Can optionally be used with endDate to specify a date range.
-      schema: 
+      schema:
         type: string
         format: date-time
-    endDate: 
+    endDate:
       in: query
       name: endDate
       description: Filter objects created before this date. ISO-8601 format YYYY-MM-DD. Can optionally be used with startDate to specify a date range.
-      schema: 
+      schema:
         type: string
         format: date-time
     expand:
@@ -297,5 +324,5 @@ components:
       required: false
       description: Return nested objects rather than ID's in the response body.
       example: depository
-      schema: 
+      schema:
         type: string

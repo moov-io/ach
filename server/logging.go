@@ -87,6 +87,14 @@ func (mw loggingMiddleware) DeleteFile(id string) (err error) {
 	return mw.next.DeleteFile(id)
 }
 
+func (mw loggingMiddleware) ValidateFile(id string) error {
+	t := startTimer()
+	defer func() {
+		mw.logger.Log("method", "ValidateFile", "id", id, "took", t)
+	}()
+	return mw.next.ValidateFile(id)
+}
+
 //** BATCHES ** //
 
 func (mw loggingMiddleware) CreateBatch(fileID string, bh *ach.BatchHeader) (id string, err error) {

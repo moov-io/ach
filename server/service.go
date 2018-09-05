@@ -5,6 +5,7 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"errors"
+	"fmt"
 
 	"github.com/moov-io/ach"
 )
@@ -27,6 +28,7 @@ type Service interface {
 	DeleteFile(id string) error
 	// UpdateFile updates the changes properties of a matching File ID
 	// UpdateFile(f ach.File) (string, error)
+	ValidateFile(id string) error
 
 	// CreateBatch creates a new batch within and ach file and returns its resource ID
 	CreateBatch(fileID string, bh *ach.BatchHeader) (string, error)
@@ -87,6 +89,14 @@ func (s *service) GetFiles() []*ach.File {
 
 func (s *service) DeleteFile(id string) error {
 	return s.store.DeleteFile(id)
+}
+
+func (s *service) ValidateFile(id string) error {
+	f, err := s.GetFile(id)
+	if err != nil {
+		return fmt.Errorf("problem reading file %s: %v", id, err)
+	}
+	return f.Validate()
 }
 
 func (s *service) CreateBatch(fileID string, bh *ach.BatchHeader) (string, error) {

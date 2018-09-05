@@ -35,8 +35,6 @@ func MakeHTTPHandler(s Service, logger log.Logger) http.Handler {
 
 	// TODO(Adam): endpoints still needed
 
-	// GET    /files/:id/validate	validates the supplied file id for nacha compliance
-
 	// MUTATES FILE
 	// PATCH  /files/:id/build	build batch and file controls in ach file with supplied values
 
@@ -59,6 +57,14 @@ func MakeHTTPHandler(s Service, logger log.Logger) http.Handler {
 	r.Methods("GET").Path("/files/{id}").Handler(httptransport.NewServer(
 		e.GetFileEndpoint,
 		decodeGetFileRequest,
+		encodeResponse,
+		options...,
+	))
+	// TODO(adam): api docs
+	// GET    /files/:id/validate	validates the supplied file id for nacha compliance
+	r.Methods("GET").Path("/files/{id}/validate").Handler(httptransport.NewServer(
+		e.ValidateFileEndpoint,
+		decodeValidateFileRequest,
 		encodeResponse,
 		options...,
 	))
@@ -137,6 +143,15 @@ func encodeGetFileRequest(ctx context.Context, req *http.Request, request interf
 	fileID := url.QueryEscape(r.ID)
 	req.Method, req.URL.Path = "GET", "/files/"+fileID
 	return encodeRequest(ctx, req, request)
+}
+
+func decodeValidateFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	id, ok := vars["id"]
+	if !ok {
+		return nil, ErrBadRouting
+	}
+	return validateFileRequest{ID: id}, nil
 }
 
 //** BATCHES **//
@@ -260,5 +275,7 @@ func codeFrom(err error) int {
 	case ErrAlreadyExists:
 		return http.StatusBadRequest
 	}
+	// TODO(adam): this should really probably be a 4xx error
+	// TODO(adam): on GET /files/:id/validate a "bad" file returns 500
 	return http.StatusInternalServerError
 }
