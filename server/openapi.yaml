@@ -45,7 +45,16 @@ paths:
       summary: Create a new File object
       operationId: addFile
       requestBody:
-        $ref: '#/components/requestBodies/File'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requestBodies/File'
+          text/plain:
+            schema:
+              description: A plaintext ACH file
+              type: string
+              example: 101 222380104 1210428821805100000A094101Citadel                Bank Name
       responses:
         '201':
           description: A JSON object containing a new File

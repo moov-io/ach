@@ -5,16 +5,17 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"io"
 	"io/ioutil"
-
 	"net/http"
 	"net/url"
+	"strconv"
+
+	"github.com/moov-io/ach"
 
 	"github.com/go-kit/kit/log"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
-
-	"github.com/moov-io/ach"
 )
 
 var (
@@ -23,11 +24,13 @@ var (
 	ErrBadRouting = errors.New("inconsistent mapping between route and handler (programmer error)")
 
 	ErrFoundABug = errors.New("Snuck into encodeError with err == nil, please report this as a bug -- https://github.com/moov-io/ach/issues/new")
+
+	MaxContentLength = 1*1024*1024 // bytes
 )
 
-func MakeHTTPHandler(s Service, logger log.Logger) http.Handler {
+func MakeHTTPHandler(s Service, repo Repository, logger log.Logger) http.Handler {
 	r := mux.NewRouter()
-	e := MakeServerEndpoints(s)
+	e := MakeServerEndpoints(s, repo)
 	options := []httptransport.ServerOption{
 		httptransport.ServerErrorLogger(logger),
 		httptransport.ServerErrorEncoder(encodeError),
@@ -37,8 +40,6 @@ func MakeHTTPHandler(s Service, logger log.Logger) http.Handler {
 
 	// MUTATES FILE
 	// PATCH  /files/:id/build	build batch and file controls in ach file with supplied values
-
-	// POST	  /files/upload	        Parse body as an ACH File and add to repository, replaces any existing file by ID
 
 	// HTTP Methods
 	r.Methods("POST").Path("/files/").Handler(httptransport.NewServer(
@@ -60,8 +61,6 @@ func MakeHTTPHandler(s Service, logger log.Logger) http.Handler {
 		encodeResponse,
 		options...,
 	))
-	// TODO(adam): api docs
-	// GET    /files/:id/validate	validates the supplied file id for nacha compliance
 	r.Methods("GET").Path("/files/{id}/validate").Handler(httptransport.NewServer(
 		e.ValidateFileEndpoint,
 		decodeValidateFileRequest,
@@ -102,17 +101,42 @@ func MakeHTTPHandler(s Service, logger log.Logger) http.Handler {
 }
 
 //** FILES ** //
-func decodeCreateFileRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
-	var req createFileRequest
-	// Sets default values
-	req.FileHeader = ach.NewFileHeader()
-	if e := json.NewDecoder(r.Body).Decode(&req.FileHeader); e != nil {
-		return nil, e
+func decodeCreateFileRequest(_ context.Context, request *http.Request) (interface{}, error) {
+	// Make sure content-length is small enough
+	if !acceptableContentLength(request.Header) {
+		return nil, errors.New("request body is too large")
 	}
+
+	var r io.Reader
+	var req createFileRequest
+
+	// Sets default values
+	req.File = ach.File{
+		Header: ach.NewFileHeader(),
+	}
+
+	bs, err := ioutil.ReadAll(request.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	// Attempt to read file as json
+	r = bytes.NewReader(bs)
+	if err := json.NewDecoder(r).Decode(&req.File.Header); err == nil {
+		return req, nil
+	}
+
+	// Attempt parsing body as an ACH File
+	r = bytes.NewReader(bs)
+	f, err := ach.NewReader(r).Read()
+	if err != nil {
+		return nil, err
+	}
+	req.File = f
 	return req, nil
 }
 
-func decodeGetFileRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
+func decodeGetFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	vars := mux.Vars(r)
 	id, ok := vars["id"]
 	if !ok {
@@ -121,7 +145,7 @@ func decodeGetFileRequest(_ context.Context, r *http.Request) (request interface
 	return getFileRequest{ID: id}, nil
 }
 
-func decodeDeleteFileRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
+func decodeDeleteFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	vars := mux.Vars(r)
 	id, ok := vars["id"]
 	if !ok {
@@ -134,7 +158,7 @@ func encodeCreateFileRequest(ctx context.Context, req *http.Request, request int
 	req.Method, req.URL.Path = "POST", "/files/"
 	return encodeRequest(ctx, req, request)
 }
-func decodeGetFilesRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
+func decodeGetFilesRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	return getFilesRequest{}, nil
 }
 
@@ -156,7 +180,7 @@ func decodeValidateFileRequest(_ context.Context, r *http.Request) (interface{},
 
 //** BATCHES **//
 
-func decodeCreateBatchRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
+func decodeCreateBatchRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req createBatchRequest
 	vars := mux.Vars(r)
 	id, ok := vars["fileID"]
@@ -171,7 +195,7 @@ func decodeCreateBatchRequest(_ context.Context, r *http.Request) (request inter
 	return req, nil
 }
 
-func decodeGetBatchesRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
+func decodeGetBatchesRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req getBatchesRequest
 	vars := mux.Vars(r)
 	id, ok := vars["fileID"]
@@ -182,7 +206,7 @@ func decodeGetBatchesRequest(_ context.Context, r *http.Request) (request interf
 	return req, nil
 }
 
-func decodeGetBatchRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
+func decodeGetBatchRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req getBatchRequest
 	vars := mux.Vars(r)
 	fileID, ok := vars["fileID"]
@@ -199,7 +223,7 @@ func decodeGetBatchRequest(_ context.Context, r *http.Request) (request interfac
 	return req, nil
 }
 
-func decodeDeleteBatchRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
+func decodeDeleteBatchRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req deleteBatchRequest
 	vars := mux.Vars(r)
 	fileID, ok := vars["fileID"]
@@ -278,4 +302,12 @@ func codeFrom(err error) int {
 	// TODO(adam): this should really probably be a 4xx error
 	// TODO(adam): on GET /files/:id/validate a "bad" file returns 500
 	return http.StatusInternalServerError
+}
+
+func acceptableContentLength(headers http.Header) bool {
+	h := headers.Get("Content-Length")
+	if v, err := strconv.Atoi(h); err == nil {
+		return v <= MaxContentLength
+	}
+	return false
 }

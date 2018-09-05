@@ -19,9 +19,9 @@ type Endpoints struct {
 	DeleteBatchEndpoint  endpoint.Endpoint
 }
 
-func MakeServerEndpoints(s Service) Endpoints {
+func MakeServerEndpoints(s Service, r Repository) Endpoints {
 	return Endpoints{
-		CreateFileEndpoint:   MakeCreateFileEndpoint(s),
+		CreateFileEndpoint:   MakeCreateFileEndpoint(s, r),
 		GetFileEndpoint:      MakeGetFileEndpoint(s),
 		GetFilesEndpoint:     MakeGetFilesEndpoint(s),
 		DeleteFileEndpoint:   MakeDeleteFileEndpoint(s),
@@ -34,16 +34,28 @@ func MakeServerEndpoints(s Service) Endpoints {
 }
 
 // MakeCreateFileEndpoint returns an endpoint via the passed service.
-func MakeCreateFileEndpoint(s Service) endpoint.Endpoint {
+func MakeCreateFileEndpoint(s Service, r Repository) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(createFileRequest)
-		id, e := s.CreateFile(&req.FileHeader)
-		return createFileResponse{ID: id, Err: e}, nil
+
+		if req.File.ID == "" {
+			// No File ID, so create the file
+			id, e := s.CreateFile(&req.File.Header)
+			return createFileResponse{
+				ID:  id,
+				Err: e,
+			}, nil
+		} else {
+			return createFileResponse{
+				ID:  req.File.ID,
+				Err: r.StoreFile(&req.File),
+			}, nil
+		}
 	}
 }
 
 type createFileRequest struct {
-	FileHeader ach.FileHeader
+	File ach.File
 }
 
 type createFileResponse struct {

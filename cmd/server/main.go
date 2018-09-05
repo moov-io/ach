@@ -56,11 +56,12 @@ func main() {
 	logger = log.With(logger, "caller", log.DefaultCaller)
 
 	// Setup underlying ach service
-	svc = server.NewService(server.NewRepositoryInMemory())
+	r := server.NewRepositoryInMemory()
+	svc = server.NewService(r)
 	svc = server.LoggingMiddleware(logger)(svc)
 
 	// Create HTTP server
-	handler = server.MakeHTTPHandler(svc, log.With(logger, "component", "HTTP"))
+	handler = server.MakeHTTPHandler(svc, r, log.With(logger, "component", "HTTP"))
 
 	// Listen for application termination.
 	errs := make(chan error)
