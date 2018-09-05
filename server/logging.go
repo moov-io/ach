@@ -87,6 +87,14 @@ func (mw loggingMiddleware) DeleteFile(id string) (err error) {
 	return mw.next.DeleteFile(id)
 }
 
+func (mw loggingMiddleware) BuildFile(id string) error {
+	t := startTimer()
+	defer func() {
+		mw.logger.Log("method", "BuildFile", "id", id, "took", t)
+	}()
+	return mw.next.BuildFile(id)
+}
+
 func (mw loggingMiddleware) ValidateFile(id string) error {
 	t := startTimer()
 	defer func() {

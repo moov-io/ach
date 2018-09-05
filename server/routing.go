@@ -36,11 +36,6 @@ func MakeHTTPHandler(s Service, repo Repository, logger log.Logger) http.Handler
 		httptransport.ServerErrorEncoder(encodeError),
 	}
 
-	// TODO(Adam): endpoints still needed
-
-	// MUTATES FILE
-	// PATCH  /files/:id/build	build batch and file controls in ach file with supplied values
-
 	// HTTP Methods
 	r.Methods("GET").Path("/files/").Handler(httptransport.NewServer(
 		e.GetFilesEndpoint,
@@ -63,6 +58,12 @@ func MakeHTTPHandler(s Service, repo Repository, logger log.Logger) http.Handler
 	r.Methods("GET").Path("/files/{id}/validate").Handler(httptransport.NewServer(
 		e.ValidateFileEndpoint,
 		decodeValidateFileRequest,
+		encodeResponse,
+		options...,
+	))
+	r.Methods("PATCH").Path("/files/{id}/build").Handler(httptransport.NewServer(
+		e.BuildFileEndpoint,
+		decodeBuildFileRequest,
 		encodeResponse,
 		options...,
 	))
@@ -166,6 +167,15 @@ func encodeGetFileRequest(ctx context.Context, req *http.Request, request interf
 	fileID := url.QueryEscape(r.ID)
 	req.Method, req.URL.Path = "GET", "/files/"+fileID
 	return encodeRequest(ctx, req, request)
+}
+
+func decodeBuildFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	id, ok := vars["id"]
+	if !ok {
+		return nil, ErrBadRouting
+	}
+	return buildFileRequest{ID: id}, nil
 }
 
 func decodeValidateFileRequest(_ context.Context, r *http.Request) (interface{}, error) {

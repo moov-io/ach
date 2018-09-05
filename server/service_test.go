@@ -108,15 +108,30 @@ func TestDeleteFile(t *testing.T) {
 	}
 }
 
-// Service.ValidateFile tests
-
-func TestValidateFile(t *testing.T) {
+// Service.BuildFile tests
+func TestBuildFile(t *testing.T) {
 	s := mockServiceInMemory()
 	id, err := s.CreateFile(mockFileHeader())
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	f, err := s.GetFile(id)
+
+	// make the file valid
+	bh := mockBatchHeaderWeb()
+	bh.ID = "11111"
+	s.CreateBatch(id, bh)
+
+	// build file
+	if err := s.BuildFile(id); err != nil {
+		t.Fatal(err.Error())
+	}
+}
+
+// Service.ValidateFile tests
+
+func TestValidateFile(t *testing.T) {
+	s := mockServiceInMemory()
+	id, err := s.CreateFile(mockFileHeader())
 	if err != nil {
 		t.Fatal(err.Error())
 	}

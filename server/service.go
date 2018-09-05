@@ -26,8 +26,9 @@ type Service interface {
 	GetFiles() []*ach.File
 	// DeleteFile takes a file resource ID and deletes it from the store
 	DeleteFile(id string) error
-	// UpdateFile updates the changes properties of a matching File ID
-	// UpdateFile(f ach.File) (string, error)
+	// BuildFile creates a valid file assuming it has a FileHeader and at least one Batch record.
+	BuildFile(id string) error
+	// ValidateFile
 	ValidateFile(id string) error
 
 	// CreateBatch creates a new batch within and ach file and returns its resource ID
@@ -89,6 +90,14 @@ func (s *service) GetFiles() []*ach.File {
 
 func (s *service) DeleteFile(id string) error {
 	return s.store.DeleteFile(id)
+}
+
+func (s *service) BuildFile(id string) error {
+	f, err := s.GetFile(id)
+	if err != nil {
+		return fmt.Errorf("problem reading file %s: %v", id, err)
+	}
+	return f.Create()
 }
 
 func (s *service) ValidateFile(id string) error {
