@@ -15,7 +15,7 @@ import (
 
 /**
 CreateFile
-curl -d '{"id":"08B751B2","immediateDestination":"9876543210", "immediateDestinationName":"Federal Reserve Bank", "immediateOrigin":"1234567890","immediateOriginName":"My Bank Name"}' -H "Content-Type: application/json" -X POST http://localhost:8080/files/
+curl -d '{"id":"1234","immediateDestination":"9876543210", "immediateDestinationName":"Federal Reserve Bank", "immediateOrigin":"1234567890","immediateOriginName":"My Bank Name"}' -H "Content-Type: application/json" -X POST http://localhost:8080/files/create
 
 GetFile
 curl -H "Content-Type: application/json" -X GET http://localhost:8080/files/1234
