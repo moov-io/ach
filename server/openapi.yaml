@@ -1,6 +1,6 @@
 openapi: "3.0.0"
 info:
-  description: Moov ACH is a RESTful enpoint of an ACH file creator to enable developers of all languages and read, write, and validate NACHA files.
+  description: Moov ACH is a RESTful endpoint of an ACH file creator to enable developers of all languages and read, write, and validate NACHA files.
   version: "0.0.1"
   title: "Moov ACH"
   contact:
@@ -79,8 +79,7 @@ paths:
           required: true
           schema:
             type: string
-            format: uuid
-            example: 3f2d23ee-68d9-494e-a23e-cd0a9ce09281
+            example: 3f2d23ee214
       responses:
         '200':
           description: A File object for the supplied ID
@@ -102,8 +101,7 @@ paths:
           required: true
           schema:
             type: string
-            format: uuid
-            example: 3f2d23ee-68d9-494e-a23e-cd0a9ce09281
+            example: 3f2d23ee214
       requestBody:
         $ref: '#/components/requestBodies/File'
       responses:
@@ -136,16 +134,10 @@ paths:
           required: true
           schema:
             type: string
-            format: uuid
+            example: 3f2d23ee214
       responses:
           '200':
             description: Permanently deleted File.
-            content:
-                application/json:
-                  schema:
-                    type: string
-                    format: uuid
-                    example: 3f2d23ee-68d9-494e-a23e-cd0a9ce09281
           '404':
             description: A File with the specified ID was not found.
   /files/{file_id}/validate:
@@ -162,8 +154,7 @@ paths:
           required: true
           schema:
             type: string
-            format: uuid
-            example: 3f2d23ee-68d9-494e-a23e-cd0a9ce09281
+            example: 3f2d23ee214
       responses:
         '200':
           description: File validated successfully without errors.
@@ -182,9 +173,8 @@ components:
       properties:
         id:
           type: string
-          format: uuid
           description: File ID
-          example: 724b6abe-e39d-4727-bf66-b499faf06938
+          example: 3f2d23ee214
         FileHeader:
           $ref: '#/components/schemas/FileHeader'
     Files:
@@ -199,10 +189,9 @@ components:
         - immediateDestinationName
       properties:
         id:
-          type: string
-          format: uuid
           description: File Header ID (same as File)
-          example: 724b6abe-e39d-4727-bf66-b499faf06938
+          type: string
+          example: 3f2d23ee214
         immediateOrigin:
           type: string
           description: contains the Routing Number of the ACH Operator or sending point that is sending the file.
@@ -240,11 +229,9 @@ components:
     FileControl:
       properties:
         id:
-          type: string
-          format: uuid
           description: File Control ID (same as File)
-
-
+          type: string
+          example: 3f2d23ee214
     Error:
       required:
         - code
@@ -291,19 +278,17 @@ components:
       in: header
       name: Idempotency-Key
       description: Idempotent key in the header which expires after 24/hrs
-      example: a4f88150-9f5d-4f75-a1b1-0344f268506e
+      example: a4f881509f5d4f75a1b10344f268506e
       required: false
       schema:
         type: string
-        format: uuid
     requestID:
       in: header
       name: Request_Id
-      description: Optional Request ID allows application developer to tracce requests through the systems logs
-      example: r4f99150-8f5d-5f75-z1b1-9344f268506f
+      description: Optional Request ID allows application developer to trace requests through the systems logs
+      example: r4f99158f5d5f75z1b19344f268506f0
       schema:
         type: string
-        format: uuid
     startDate:
       in: query
       name: startDate
