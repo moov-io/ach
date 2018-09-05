@@ -135,7 +135,7 @@ func TestValidateFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	if err := f.Validate(); err != nil {
+	if err := s.ValidateFile(id); err != nil {
 		t.Fatal(err.Error())
 	}
 }
@@ -172,7 +172,7 @@ func TestValidateFileBad(t *testing.T) {
 	}
 
 	// validate
-	if err := f.Validate(); err == nil {
+	if err := s.ValidateFile(fId); err == nil {
 		t.Fatal("expected error")
 	}
 }
