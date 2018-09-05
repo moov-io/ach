@@ -30,11 +30,13 @@ type loggingMiddleware struct {
 type timer struct {
 	start, end time.Time
 }
+
 func startTimer() *timer {
 	return &timer{
 		start: time.Now(),
 	}
 }
+
 // stop returns the number of milliseconds for the given timer
 // and stops the timer.
 func (t *timer) stop() int64 {
@@ -42,7 +44,7 @@ func (t *timer) stop() int64 {
 	if t.end.IsZero() {
 		t.end = when
 	}
-	return t.end.Sub(t.start).Nanoseconds()/1e6
+	return t.end.Sub(t.start).Nanoseconds() / 1e6
 }
 func (t *timer) String() string {
 	return fmt.Sprintf("%dms", t.stop())
