@@ -6,18 +6,26 @@ import (
 	"github.com/moov-io/ach"
 	"log"
 	"os"
+	"path/filepath"
 	"runtime/pprof"
 	"time"
+)
+
+var (
+	fPath      = flag.String("fPath", "", "File Path")
+	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 )
 
 // main creates an ACH File with 4 batches of SEC Code PPD.
 // Each batch contains an EntryAddendaCount of 2500.
 func main() {
-
-	var fPath = flag.String("fPath", "", "File Path")
-	var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
-
 	flag.Parse()
+
+	path := filepath.Join(*fPath, time.Now().UTC().Format("200601021504")+".ach")
+	write(path)
+}
+
+func write(path string) {
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
 		if err != nil {
@@ -27,9 +35,7 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	path := *fPath
-
-	f, err := os.Create(path + time.Now().UTC().Format("200601021504") + ".ach")
+	f, err := os.Create(path)
 	if err != nil {
 		fmt.Printf("%T: %s", err, err)
 	}
@@ -103,6 +109,10 @@ func main() {
 	if err := w.Write(file); err != nil {
 		fmt.Printf("%T: %s", err, err)
 	}
-	w.Flush()
-	f.Close()
+	if err := w.Flush(); err != nil {
+		fmt.Println(err.Error())
+	}
+	if err := f.Close(); err != nil {
+		fmt.Println(err.Error())
+	}
 }
