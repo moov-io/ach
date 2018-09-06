@@ -109,9 +109,7 @@ func write(path string) {
 	if err := w.Write(file); err != nil {
 		fmt.Printf("%T: %s", err, err)
 	}
-	if err := w.Flush(); err != nil {
-		fmt.Println(err.Error())
-	}
+	w.Flush()
 	if err := f.Close(); err != nil {
 		fmt.Println(err.Error())
 	}
