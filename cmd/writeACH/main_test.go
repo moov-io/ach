@@ -1,6 +1,8 @@
 package main
 
 import (
+	"io/ioutil"
+	"os"
 	"testing"
 )
 
@@ -19,5 +21,19 @@ func BenchmarkTestFileWrite(b *testing.B) {
 
 // FileCreate creates an ACH File
 func testFileWrite(t testing.TB) {
-	main()
+	tmp, err := ioutil.TempFile("", "ach-writeACH-test")
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	defer os.Remove(tmp.Name())
+
+	write(tmp.Name())
+
+	s, err := os.Stat(tmp.Name())
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	if s.Size() <= 0 {
+		t.Fatal("expected non-empty file")
+	}
 }
