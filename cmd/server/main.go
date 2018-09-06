@@ -1,16 +1,18 @@
 package main
 
 import (
+	"crypto/tls"
 	"flag"
 	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
-
-	"github.com/go-kit/kit/log"
+	"time"
 
 	"github.com/moov-io/ach/server"
+
+	"github.com/go-kit/kit/log"
 )
 
 /**
@@ -71,10 +73,37 @@ func main() {
 		errs <- fmt.Errorf("%s", <-c)
 	}()
 
+	readTimeout, _ := time.ParseDuration("30s")
+	writTimeout, _ := time.ParseDuration("30s")
+	idleTimeout, _ := time.ParseDuration("60s")
+
+	serve := &http.Server{
+		Addr:    *httpAddr,
+		Handler: handler,
+		TLSConfig: &tls.Config{
+			InsecureSkipVerify:       false,
+			PreferServerCipherSuites: true,
+			MinVersion:               tls.VersionTLS12,
+		},
+		ReadTimeout:  readTimeout,
+		WriteTimeout: writTimeout,
+		IdleTimeout:  idleTimeout,
+	}
+	shutdownServer := func() {
+		if err := serve.Shutdown(nil); err != nil {
+			logger.Log("shutdown", err)
+		}
+	}
+
 	go func() {
 		logger.Log("transport", "HTTP", "addr", *httpAddr)
-		errs <- http.ListenAndServe(*httpAddr, handler)
+		errs <- serve.ListenAndServe()
+		// TODO(adam): support TLS
+		// func (srv *Server) ListenAndServeTLS(certFile, keyFile string) error
 	}()
 
-	logger.Log("exit", <-errs)
+	if err := <-errs; err != nil {
+		shutdownServer()
+		logger.Log("exit", err)
+	}
 }
