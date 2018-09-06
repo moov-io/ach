@@ -413,7 +413,7 @@ Note: 32-bit platforms have known issues and is not supported.
 
 Yes please! Please review our [Contributing guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) to get started!
 
-Note: This project requires Go 1.10 or higher to compile.
+Note: This project uses Go Modules, which requires Go 1.11 or higher, but we ship the vendor directory in our repository.
 
 ## License
 
