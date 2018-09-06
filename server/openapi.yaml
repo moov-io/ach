@@ -150,12 +150,12 @@ paths:
             description: Permanently deleted File.
           '404':
             description: A File with the specified ID was not found.
-  /files/{file_id}/build:
-    patch:
+  /files/{file_id}/contents:
+    get:
       tags:
         - Files
-      summary: Assembles the existing file (batches and controls) records, computes sequence numbers and totals. Required to get the plain text contents.
-      operationId: buildFile
+      summary: Assembles the existing file (batches and controls) records, computes sequence numbers and totals. Returns plaintext file.
+      operationId: getFileContents
       parameters:
         - $ref: '#/components/parameters/requestID'
         - name: file_id
@@ -168,6 +168,9 @@ paths:
       responses:
         '200':
           description: File built successfully without errors.
+          content:
+            type: string
+            example: 101 222380104 1210428821805100000A094101Citadel                Bank Name
   /files/{file_id}/validate:
     get:
       tags:

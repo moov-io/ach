@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 
 	"github.com/moov-io/ach"
 
@@ -55,15 +56,15 @@ func MakeHTTPHandler(s Service, repo Repository, logger log.Logger) http.Handler
 		encodeResponse,
 		options...,
 	))
+	r.Methods("GET").Path("/files/{id}/contents").Handler(httptransport.NewServer(
+		e.GetFileContentsEndpoint,
+		decodeGetFileContentsRequest,
+		encodeTextResponse,
+		options...,
+	))
 	r.Methods("GET").Path("/files/{id}/validate").Handler(httptransport.NewServer(
 		e.ValidateFileEndpoint,
 		decodeValidateFileRequest,
-		encodeResponse,
-		options...,
-	))
-	r.Methods("PATCH").Path("/files/{id}/build").Handler(httptransport.NewServer(
-		e.BuildFileEndpoint,
-		decodeBuildFileRequest,
 		encodeResponse,
 		options...,
 	))
@@ -120,19 +121,22 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 		return nil, err
 	}
 
-	// Attempt to read file as json
-	r = bytes.NewReader(bs)
-	if err := json.NewDecoder(r).Decode(&req.File.Header); err == nil {
-		return req, nil
+	h := request.Header.Get("Content-Type")
+	if strings.Contains(h, "application/json") {
+		// Attempt to read file as json
+		r = bytes.NewReader(bs)
+		if err := json.NewDecoder(r).Decode(&req.File.Header); err == nil {
+			return req, nil
+		}
+	} else {
+		// Attempt parsing body as an ACH File
+		r = bytes.NewReader(bs)
+		f, err := ach.NewReader(r).Read()
+		if err != nil {
+			return nil, err
+		}
+		req.File = f
 	}
-
-	// Attempt parsing body as an ACH File
-	r = bytes.NewReader(bs)
-	f, err := ach.NewReader(r).Read()
-	if err != nil {
-		return nil, err
-	}
-	req.File = f
 	return req, nil
 }
 
@@ -169,13 +173,13 @@ func encodeGetFileRequest(ctx context.Context, req *http.Request, request interf
 	return encodeRequest(ctx, req, request)
 }
 
-func decodeBuildFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func decodeGetFileContentsRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	vars := mux.Vars(r)
 	id, ok := vars["id"]
 	if !ok {
 		return nil, ErrBadRouting
 	}
-	return buildFileRequest{ID: id}, nil
+	return getFileContentsRequest{ID: id}, nil
 }
 
 func decodeValidateFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
@@ -270,6 +274,15 @@ func encodeResponse(ctx context.Context, w http.ResponseWriter, response interfa
 	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	return json.NewEncoder(w).Encode(response)
+}
+
+func encodeTextResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
+	if r, ok := response.(io.Reader); ok {
+		w.Header().Set("Content-Type", "text/plain")
+		_, err := io.Copy(w, r)
+		return err
+	}
+	return encodeResponse(ctx, w, response)
 }
 
 // encodeRequest likewise JSON-encodes the request to the HTTP request body.

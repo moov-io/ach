@@ -1,6 +1,7 @@
 package server
 
 import (
+	"io/ioutil"
 	"net/url"
 	"testing"
 	"unicode/utf8"
@@ -108,8 +109,9 @@ func TestDeleteFile(t *testing.T) {
 	}
 }
 
-// Service.BuildFile tests
-func TestBuildFile(t *testing.T) {
+// Service.GetFileContents tests
+
+func TestGetFileContents(t *testing.T) {
 	s := mockServiceInMemory()
 	id, err := s.CreateFile(mockFileHeader())
 	if err != nil {
@@ -122,8 +124,16 @@ func TestBuildFile(t *testing.T) {
 	s.CreateBatch(id, bh)
 
 	// build file
-	if err := s.BuildFile(id); err != nil {
+	r, err := s.GetFileContents(id)
+	if err != nil {
 		t.Fatal(err.Error())
+	}
+	bs, err := ioutil.ReadAll(r)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	if len(bs) == 0 {
+		t.Fatal("expected to read fil")
 	}
 }
 

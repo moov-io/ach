@@ -8,30 +8,30 @@ import (
 )
 
 type Endpoints struct {
-	CreateFileEndpoint   endpoint.Endpoint
-	GetFileEndpoint      endpoint.Endpoint
-	GetFilesEndpoint     endpoint.Endpoint
-	DeleteFileEndpoint   endpoint.Endpoint
-	BuildFileEndpoint    endpoint.Endpoint
-	ValidateFileEndpoint endpoint.Endpoint
-	CreateBatchEndpoint  endpoint.Endpoint
-	GetBatchesEndpoint   endpoint.Endpoint
-	GetBatchEndpoint     endpoint.Endpoint
-	DeleteBatchEndpoint  endpoint.Endpoint
+	CreateFileEndpoint      endpoint.Endpoint
+	GetFileEndpoint         endpoint.Endpoint
+	GetFilesEndpoint        endpoint.Endpoint
+	DeleteFileEndpoint      endpoint.Endpoint
+	GetFileContentsEndpoint endpoint.Endpoint
+	ValidateFileEndpoint    endpoint.Endpoint
+	CreateBatchEndpoint     endpoint.Endpoint
+	GetBatchesEndpoint      endpoint.Endpoint
+	GetBatchEndpoint        endpoint.Endpoint
+	DeleteBatchEndpoint     endpoint.Endpoint
 }
 
 func MakeServerEndpoints(s Service, r Repository) Endpoints {
 	return Endpoints{
-		CreateFileEndpoint:   MakeCreateFileEndpoint(s, r),
-		GetFileEndpoint:      MakeGetFileEndpoint(s),
-		GetFilesEndpoint:     MakeGetFilesEndpoint(s),
-		DeleteFileEndpoint:   MakeDeleteFileEndpoint(s),
-		BuildFileEndpoint:    MakeBuildFileEndpoint(s),
-		ValidateFileEndpoint: MakeValidateFileEndpoint(s),
-		CreateBatchEndpoint:  MakeCreateBatchEndpoint(s),
-		GetBatchesEndpoint:   MakeGetBatchesEndpoint(s),
-		GetBatchEndpoint:     MakeGetBatchEndpoint(s),
-		DeleteBatchEndpoint:  MakeDeleteBatchEndpoint(s),
+		CreateFileEndpoint:      MakeCreateFileEndpoint(s, r),
+		GetFileEndpoint:         MakeGetFileEndpoint(s),
+		GetFilesEndpoint:        MakeGetFilesEndpoint(s),
+		DeleteFileEndpoint:      MakeDeleteFileEndpoint(s),
+		GetFileContentsEndpoint: MakeGetFileContentsEndpoint(s),
+		ValidateFileEndpoint:    MakeValidateFileEndpoint(s),
+		CreateBatchEndpoint:     MakeCreateBatchEndpoint(s),
+		GetBatchesEndpoint:      MakeGetBatchesEndpoint(s),
+		GetBatchEndpoint:        MakeGetBatchEndpoint(s),
+		DeleteBatchEndpoint:     MakeDeleteBatchEndpoint(s),
 	}
 }
 
@@ -128,24 +128,26 @@ type deleteFileResponse struct {
 
 func (r deleteFileResponse) error() error { return r.Err }
 
-func MakeBuildFileEndpoint(s Service) endpoint.Endpoint {
+func MakeGetFileContentsEndpoint(s Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(buildFileRequest)
-		return buildFileResponse{
-			Err: s.BuildFile(req.ID),
-		}, nil
+		req := request.(getFileContentsRequest)
+		r, err := s.GetFileContents(req.ID)
+		if err != nil {
+			return getFileContentsResponse{Err: err}, nil
+		}
+		return &r, nil
 	}
 }
 
-type buildFileRequest struct {
+type getFileContentsRequest struct {
 	ID string `json:"id,omitempty"` // TODO(adam): why omitempty
 }
 
-type buildFileResponse struct {
+type getFileContentsResponse struct {
 	Err error `json:"err,omitempty"` // TODO(adam): omitempty?
 }
 
-func (v buildFileResponse) error() error { return v.Err }
+func (v getFileContentsResponse) error() error { return v.Err }
 
 func MakeValidateFileEndpoint(s Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {

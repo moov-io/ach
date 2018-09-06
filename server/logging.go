@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/go-kit/kit/log"
@@ -87,12 +88,12 @@ func (mw loggingMiddleware) DeleteFile(id string) (err error) {
 	return mw.next.DeleteFile(id)
 }
 
-func (mw loggingMiddleware) BuildFile(id string) error {
+func (mw loggingMiddleware) GetFileContents(id string) (io.Reader, error) {
 	t := startTimer()
 	defer func() {
-		mw.logger.Log("method", "BuildFile", "id", id, "took", t)
+		mw.logger.Log("method", "GetFileContents", "id", id, "took", t)
 	}()
-	return mw.next.BuildFile(id)
+	return mw.next.GetFileContents(id)
 }
 
 func (mw loggingMiddleware) ValidateFile(id string) error {

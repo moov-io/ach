@@ -1,11 +1,13 @@
 package server
 
 import (
+	"bytes"
 	"crypto/rand"
 	"crypto/sha1"
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"io"
 
 	"github.com/moov-io/ach"
 )
@@ -26,8 +28,8 @@ type Service interface {
 	GetFiles() []*ach.File
 	// DeleteFile takes a file resource ID and deletes it from the store
 	DeleteFile(id string) error
-	// BuildFile creates a valid file assuming it has a FileHeader and at least one Batch record.
-	BuildFile(id string) error
+	// GetFileContents creates a valid plaintext file in memory assuming it has a FileHeader and at least one Batch record.
+	GetFileContents(id string) (io.Reader, error)
 	// ValidateFile
 	ValidateFile(id string) error
 
@@ -92,12 +94,21 @@ func (s *service) DeleteFile(id string) error {
 	return s.store.DeleteFile(id)
 }
 
-func (s *service) BuildFile(id string) error {
+func (s *service) GetFileContents(id string) (io.Reader, error) {
 	f, err := s.GetFile(id)
 	if err != nil {
-		return fmt.Errorf("problem reading file %s: %v", id, err)
+		return nil, fmt.Errorf("problem reading file %s: %v", id, err)
 	}
-	return f.Create()
+	if err := f.Create(); err != nil {
+		return nil, fmt.Errorf("problem creating file %s: %v", id, err)
+	}
+
+	var buf bytes.Buffer
+	w := ach.NewWriter(&buf)
+	if err := w.Write(f); err != nil {
+		return nil, fmt.Errorf("problem writing plaintext file %s: %v", id, err)
+	}
+	return &buf, nil
 }
 
 func (s *service) ValidateFile(id string) error {
