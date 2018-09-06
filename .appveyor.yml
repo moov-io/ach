@@ -15,7 +15,6 @@ environment:
 stack: go 1.11
 
 before_test:
-  - go vet ./...
   - go fmt ./...
 
 test_script:

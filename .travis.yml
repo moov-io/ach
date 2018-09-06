@@ -15,12 +15,12 @@ before_install:
 - go get -u golang.org/x/lint/golint
 - go get github.com/fzipp/gocyclo
 before_script:
-- GO_FILES=$(find . -iname '*.go' -type f | grep -v /test/ | grep -v /cmd/)
+- GOFILES=$(find . -type f -name '*.go' | grep -v vendor)
 script:
-- test -z $(gofmt -s -l $GO_FILES)
-- go vet $GO_FILES
-- misspell -error -locale US .
-- gocyclo -over 19 $GO_FILES
-- golint -set_exit_status $GO_FILES
+- test -z $(gofmt -s -l $GOFILES)
+- go test ./...
+- misspell -error -locale US $GOFILES
+- gocyclo -over 19 $GOFILES
+- golint -set_exit_status $GOFILES
 after_success:
 - goveralls -repotoken $COVERALLS_TOKEN
