@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"sync"
 
 	"github.com/moov-io/ach"
@@ -31,6 +32,10 @@ func NewRepositoryInMemory() Repository {
 	}
 }
 func (r *repositoryInMemory) StoreFile(f *ach.File) error {
+	if f == nil {
+		return errors.New("nil ACH file provided")
+	}
+
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 	if _, ok := r.files[f.ID]; ok {
@@ -68,7 +73,7 @@ func (r *repositoryInMemory) DeleteFile(id string) error {
 	return nil
 }
 
-// TODO(adam): was copying this causing issues?
+// TODO(adam): was copying ach.Batcher causing issues?
 func (r *repositoryInMemory) StoreBatch(fileID string, batch ach.Batcher) error {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
