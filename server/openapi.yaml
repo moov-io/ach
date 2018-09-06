@@ -169,8 +169,9 @@ paths:
         '200':
           description: File built successfully without errors.
           content:
-            type: string
-            example: 101 222380104 1210428821805100000A094101Citadel                Bank Name
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/RawFile'
   /files/{file_id}/validate:
     get:
       tags:
@@ -208,6 +209,9 @@ components:
           example: 3f2d23ee214
         FileHeader:
           $ref: '#/components/schemas/FileHeader'
+    RawFile:
+      type: string
+      example: 101 222380104 1210428821805100000A094101Citadel                Bank Name
     Files:
       type: array
       items:
