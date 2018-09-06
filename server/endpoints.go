@@ -61,8 +61,8 @@ type createFileRequest struct {
 }
 
 type createFileResponse struct {
-	ID  string `json:"id,omitempty"`
-	Err error  `json:"err,omitempty"`
+	ID  string `json:"id"`
+	Err error  `json:"error"`
 }
 
 func (r createFileResponse) error() error { return r.Err }
@@ -79,8 +79,8 @@ func MakeGetFilesEndpoint(s Service) endpoint.Endpoint {
 type getFilesRequest struct{}
 
 type getFilesResponse struct {
-	Files []*ach.File `json:"files,omitempty"`
-	Err   error       `json:"error,omitempty"`
+	Files []*ach.File `json:"files"`
+	Err   error       `json:"error"`
 }
 
 func (r getFilesResponse) error() error { return r.Err }
@@ -99,12 +99,12 @@ func MakeGetFileEndpoint(s Service) endpoint.Endpoint {
 }
 
 type getFileRequest struct {
-	ID string `json:"id,omitempty"`
+	ID string
 }
 
 type getFileResponse struct {
-	File *ach.File `json:"file,omitempty"`
-	Err  error     `json:"err,omitempty"`
+	File *ach.File `json:"file"`
+	Err  error     `json:"error"`
 }
 
 func (r getFileResponse) error() error { return r.Err }
@@ -119,11 +119,11 @@ func MakeDeleteFileEndpoint(s Service) endpoint.Endpoint {
 }
 
 type deleteFileRequest struct {
-	ID string `json:"id,omitempty"` // TODO(adam): why omitempty
+	ID string
 }
 
 type deleteFileResponse struct {
-	Err error `json:"err,omitempty"`
+	Err error `json:"err"`
 }
 
 func (r deleteFileResponse) error() error { return r.Err }
@@ -140,11 +140,11 @@ func MakeGetFileContentsEndpoint(s Service) endpoint.Endpoint {
 }
 
 type getFileContentsRequest struct {
-	ID string `json:"id,omitempty"` // TODO(adam): why omitempty
+	ID string
 }
 
 type getFileContentsResponse struct {
-	Err error `json:"err,omitempty"` // TODO(adam): omitempty?
+	Err error `json:"error"`
 }
 
 func (v getFileContentsResponse) error() error { return v.Err }
@@ -159,11 +159,11 @@ func MakeValidateFileEndpoint(s Service) endpoint.Endpoint {
 }
 
 type validateFileRequest struct {
-	ID string `json:"id,omitempty"` // TODO(adam): why omitempty
+	ID string
 }
 
 type validateFileResponse struct {
-	Err error `json:"err,omitempty"` // TODO(adam): omitempty?
+	Err error `json:"error"`
 }
 
 func (v validateFileResponse) error() error { return v.Err }
@@ -188,8 +188,8 @@ type createBatchRequest struct {
 }
 
 type createBatchResponse struct {
-	ID  string `json:"id,omitempty"`
-	Err error  `json:"err,omitempty"`
+	ID  string `json:"id"`
+	Err error  `json:"error"`
 }
 
 func (r createBatchResponse) error() error { return r.Err }
@@ -209,8 +209,8 @@ type getBatchesRequest struct {
 }
 
 type getBatchesResponse struct {
-	Batches []ach.Batcher `json:"batches,omitempty"`
-	Err     error         `json:"error,omitempty"`
+	Batches []ach.Batcher `json:"batches"`
+	Err     error         `json:"error"`
 }
 
 func (r getBatchesResponse) error() error { return r.Err }
@@ -232,8 +232,8 @@ type getBatchRequest struct {
 }
 
 type getBatchResponse struct {
-	Batch ach.Batcher `json:"batch,omitempty"`
-	Err   error       `json:"err,omitempty"`
+	Batch ach.Batcher `json:"batch"`
+	Err   error       `json:"error"`
 }
 
 func (r getBatchResponse) error() error { return r.Err }
@@ -253,7 +253,7 @@ type deleteBatchRequest struct {
 }
 
 type deleteBatchResponse struct {
-	Err error `json:"err,omitempty"`
+	Err error `json:"error"`
 }
 
 func (r deleteBatchResponse) error() error { return r.Err }

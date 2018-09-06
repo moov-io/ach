@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -20,11 +21,11 @@ import (
 )
 
 var (
-	// ErrBadRouting is returned when an expected path variable is missing.
-	// It always indicates programmer error.
-	ErrBadRouting = errors.New("inconsistent mapping between route and handler (programmer error)")
+	bugReportHelp = "please report this as a bug -- https://github.com/moov-io/ach/issues/new"
 
-	ErrFoundABug = errors.New("Snuck into encodeError with err == nil, please report this as a bug -- https://github.com/moov-io/ach/issues/new")
+	// ErrBadRouting is returned when an expected path variable is missing, which is always programmer error.
+	ErrBadRouting = fmt.Errorf("inconsistent mapping between route and handler, %s", bugReportHelp)
+	ErrFoundABug  = fmt.Errorf("Snuck into encodeError with err == nil, %s", bugReportHelp)
 
 	MaxContentLength = 1 * 1024 * 1024 // bytes
 )

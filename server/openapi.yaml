@@ -265,16 +265,11 @@ components:
           example: 3f2d23ee214
     Error:
       required:
-        - code
-        - message
+        - error
       properties:
-        code:
+        error:
           type: string
-          description: A detailed error code
-          example: ValidationError
-        message:
-          type: string
-          description: A human readable description of the problem
+          description: An error message describing the problem intended for humans.
           example: Validation error(s) present.
   requestBodies:
     File:
