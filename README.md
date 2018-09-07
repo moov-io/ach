@@ -418,5 +418,3 @@ Note: This project uses Go Modules, which requires Go 1.11 or higher, but we shi
 ## License
 
 Apache License 2.0 See [LICENSE](LICENSE) for details.
-
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmoov-io%2Fach.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmoov-io%2Fach?ref=badge_large)
