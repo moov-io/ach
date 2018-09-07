@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/moov-io/ach"
 	"github.com/moov-io/ach/server"
 
 	"github.com/go-kit/kit/log"
@@ -56,6 +57,7 @@ func main() {
 	logger = log.NewLogfmtLogger(os.Stderr)
 	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 	logger = log.With(logger, "caller", log.DefaultCaller)
+	logger.Log("startup", fmt.Sprintf("Starting ach server version %s", ach.Version))
 
 	// Setup underlying ach service
 	r := server.NewRepositoryInMemory()
