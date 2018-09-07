@@ -207,6 +207,10 @@ func (ed *EntryDetail) fieldInclusion() error {
 }
 
 // AddAddenda appends an Addendumer to the EntryDetail
+//
+// Note: The order of records here is determined by their insertion order.
+// No inspection of SequenceNumbers in Addendas (i.e 05, 17, 18) is done
+// to re-order addenda records.
 func (ed *EntryDetail) AddAddenda(addenda Addendumer) []Addendumer {
 	ed.AddendaRecordIndicator = 1
 	// checks to make sure that we only have either or, not both
