@@ -12,6 +12,7 @@ import (
 
 	"github.com/moov-io/ach"
 	"github.com/moov-io/ach/server"
+	"github.com/moov-io/ach/server/admin"
 
 	"github.com/go-kit/kit/log"
 )
@@ -97,6 +98,14 @@ func main() {
 		}
 	}
 
+	adminService := admin.SetupServer()
+	go func() {
+		logger.Log("admin", "Starting admin service..")
+		if err := adminService.Listen(); err != nil {
+			logger.Log("admin[shutdown]", err)
+		}
+	}()
+
 	go func() {
 		logger.Log("transport", "HTTP", "addr", *httpAddr)
 		errs <- serve.ListenAndServe()
@@ -105,6 +114,7 @@ func main() {
 	}()
 
 	if err := <-errs; err != nil {
+		adminService.Shutdown()
 		shutdownServer()
 		logger.Log("exit", err)
 	}
