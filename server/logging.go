@@ -5,8 +5,18 @@ import (
 	"io"
 	"time"
 
-	"github.com/go-kit/kit/log"
 	"github.com/moov-io/ach"
+
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/metrics/prometheus"
+	stdprometheus "github.com/prometheus/client_golang/prometheus"
+)
+
+var (
+	filesCreated = prometheus.NewCounterFrom(stdprometheus.CounterOpts{
+		Name: "ach_files_created",
+		Help: "The number of ACH files created",
+	}, []string{"destination", "origin"})
 )
 
 // Middleware describes a service (as opposed to endpoint) middleware.
@@ -61,6 +71,7 @@ func (mw loggingMiddleware) CreateFile(f *ach.FileHeader) (id string, err error)
 		// TODO(adam): figure out if we care to fix this
 		mw.logger.Log("method", "CreateFile", "id", f.ID, "took", t, "err", err)
 	}()
+	filesCreated.With("destination", f.ImmediateDestination, "origin", f.ImmediateOrigin).Add(1)
 	return mw.next.CreateFile(f)
 }
 
