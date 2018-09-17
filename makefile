@@ -20,8 +20,8 @@ clean:
 	@rm -rf tmp/
 
 docker: clean
-	docker build -t moov.io/ach:$(VERSION) -f Dockerfile .
-	docker tag moov.io/ach:$(VERSION) moov.io/ach:latest
+	docker build -t moov/ach:$(VERSION) -f Dockerfile .
+	docker tag moov/ach:$(VERSION) moov/ach:latest
 
 release: docker
 	$(shell go test ./...)
@@ -29,3 +29,4 @@ release: docker
 
 release-push:
 	git push origin $(VERSION)
+	docker push moov/ach:$(VERSION)
