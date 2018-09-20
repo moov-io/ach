@@ -6,7 +6,7 @@ import (
 )
 
 func TestAcceptableContentLength(t *testing.T) {
-	h := make(http.Header, 0)
+	h := make(http.Header)
 
 	if acceptableContentLength(h) { // reject if missing header
 		t.Error("wanted unacceptable")

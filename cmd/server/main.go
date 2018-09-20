@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"flag"
 	"fmt"
@@ -71,7 +72,7 @@ func main() {
 	// Listen for application termination.
 	errs := make(chan error)
 	go func() {
-		c := make(chan os.Signal)
+		c := make(chan os.Signal, 1)
 		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
 		errs <- fmt.Errorf("%s", <-c)
 	}()
@@ -93,7 +94,7 @@ func main() {
 		IdleTimeout:  idleTimeout,
 	}
 	shutdownServer := func() {
-		if err := serve.Shutdown(nil); err != nil {
+		if err := serve.Shutdown(context.TODO()); err != nil {
 			logger.Log("shutdown", err)
 		}
 	}

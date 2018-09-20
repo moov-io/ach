@@ -9,7 +9,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"strconv"
 	"strings"
 
@@ -159,19 +158,8 @@ func decodeDeleteFileRequest(_ context.Context, r *http.Request) (interface{}, e
 	return deleteFileRequest{ID: id}, nil
 }
 
-func encodeCreateFileRequest(ctx context.Context, req *http.Request, request interface{}) error {
-	req.Method, req.URL.Path = "POST", "/files/"
-	return encodeRequest(ctx, req, request)
-}
 func decodeGetFilesRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	return getFilesRequest{}, nil
-}
-
-func encodeGetFileRequest(ctx context.Context, req *http.Request, request interface{}) error {
-	r := request.(getFileRequest)
-	fileID := url.QueryEscape(r.ID)
-	req.Method, req.URL.Path = "GET", "/files/"+fileID
-	return encodeRequest(ctx, req, request)
 }
 
 func decodeGetFileContentsRequest(_ context.Context, r *http.Request) (interface{}, error) {
@@ -284,19 +272,6 @@ func encodeTextResponse(ctx context.Context, w http.ResponseWriter, response int
 		return err
 	}
 	return encodeResponse(ctx, w, response)
-}
-
-// encodeRequest likewise JSON-encodes the request to the HTTP request body.
-// Don't use it directly as a transport/http.Client EncodeRequestFunc:
-// Service endpoints require mutating the HTTP method and request path.
-func encodeRequest(_ context.Context, req *http.Request, request interface{}) error {
-	var buf bytes.Buffer
-	err := json.NewEncoder(&buf).Encode(request)
-	if err != nil {
-		return err
-	}
-	req.Body = ioutil.NopCloser(&buf)
-	return nil
 }
 
 // encodeError JSON encodes the supplied error

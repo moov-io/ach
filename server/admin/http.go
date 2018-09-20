@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"context"
 	"net/http"
 	"time"
 
@@ -34,7 +35,7 @@ func (s *Server) Listen() error {
 
 // Shutdown unbinds the HTTP server.
 func (s *Server) Shutdown() {
-	s.svc.Shutdown(nil)
+	s.svc.Shutdown(context.TODO())
 }
 
 func handler() http.Handler {
