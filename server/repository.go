@@ -109,9 +109,7 @@ func (r *repositoryInMemory) FindAllBatches(fileID string) []ach.Batcher {
 	r.mtx.RLock()
 	defer r.mtx.RUnlock()
 	batches := make([]ach.Batcher, 0, len(r.files[fileID].Batches))
-	for _, val := range r.files[fileID].Batches {
-		batches = append(batches, val)
-	}
+	batches = append(batches, r.files[fileID].Batches...)
 	return batches
 }
 
