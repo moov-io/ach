@@ -38,6 +38,10 @@ func MakeHTTPHandler(s Service, repo Repository, logger log.Logger) http.Handler
 	}
 
 	// HTTP Methods
+	r.Methods("GET").Path("/ping").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		w.Write([]byte("PONG"))
+	})
 	r.Methods("GET").Path("/files/").Handler(httptransport.NewServer(
 		e.GetFilesEndpoint,
 		decodeGetFilesRequest,
