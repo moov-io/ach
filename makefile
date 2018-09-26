@@ -24,8 +24,8 @@ docker: clean
 	docker tag moov/ach:$(VERSION) moov/ach:latest
 
 release: docker
-	$(shell go test ./...)
-	$(shell git tag $(VERSION))
+	go test ./...
+	git tag -f $(VERSION)
 
 release-push:
 	git push origin $(VERSION)
