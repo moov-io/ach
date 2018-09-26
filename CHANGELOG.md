@@ -1,4 +1,4 @@
-## v0.3.0 (Unreleased)
+## v0.3.0 (Released 2018-09-26)
 
 FEATURES
 
@@ -10,4 +10,9 @@ FEATURES
 
 IMPROVEMENTS
 
-- Fixing parsing, validation,
+- Added admin HTTP service.
+- Added `GET /ping` route (unauthed)
+
+BUG FIXES
+
+- Fixes to parsing and validation.
