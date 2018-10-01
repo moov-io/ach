@@ -23,10 +23,17 @@ docker: clean
 	docker build -t moov/ach:$(VERSION) -f Dockerfile .
 	docker tag moov/ach:$(VERSION) moov/ach:latest
 
-release: docker
+release: docker AUTHORS
 	go test ./...
 	git tag -f $(VERSION)
 
 release-push:
 	git push origin $(VERSION)
 	docker push moov/ach:$(VERSION)
+
+# From https://github.com/genuinetools/img
+.PHONY: AUTHORS
+AUTHORS:
+	@$(file >$@,# This file lists all individuals having contributed content to the repository.)
+	@$(file >>$@,# For how it is generated, see `make AUTHORS`.)
+	@echo "$(shell git log --format='\n%aN <%aE>' | LC_ALL=C.UTF-8 sort -uf)" >> $@
