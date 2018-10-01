@@ -42,7 +42,7 @@ func MakeHTTPHandler(s Service, repo Repository, logger log.Logger) http.Handler
 		w.Header().Set("Content-Type", "text/plain")
 		w.Write([]byte("PONG"))
 	})
-	r.Methods("GET").Path("/files/").Handler(httptransport.NewServer(
+	r.Methods("GET").Path("/files").Handler(httptransport.NewServer(
 		e.GetFilesEndpoint,
 		decodeGetFilesRequest,
 		encodeResponse,
