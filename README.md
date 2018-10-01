@@ -6,7 +6,7 @@ moov-io/ach
 [![Go Report Card](https://goreportcard.com/badge/github.com/moov-io/ach)](https://goreportcard.com/report/github.com/moov-io/ach)
 [![Apache 2 licensed](https://img.shields.io/badge/license-Apache2-blue.svg)](https://raw.githubusercontent.com/moov-io/ach/master/LICENSE)
 
-Package `github.com/moov-io/ach` implements a file reader and writer for parsing [ACH](https://en.wikipedia.org/wiki/Automated_Clearing_House) Automated Clearing House files. ACH is the primary method of electronic money movement throughout the United States.
+Package `github.com/moov-io/ach` implements a file reader and writer for parsing Automated Clearing House ([ACH](https://en.wikipedia.org/wiki/Automated_Clearing_House)) files. ACH is the primary method of electronic money movement throughout the United States.
 
 Docs: [docs.moov.io](https://docs.moov.io/en/latest/) | [api docs](https://editor.swagger.io/?url=https://raw.githubusercontent.com/moov-io/ach/master/server/openapi.yaml)
 
