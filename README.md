@@ -8,7 +8,7 @@ moov-io/ach
 
 Package `github.com/moov-io/ach` implements a file reader and writer for parsing Automated Clearing House ([ACH](https://en.wikipedia.org/wiki/Automated_Clearing_House)) files. ACH is the primary method of electronic money movement throughout the United States.
 
-Docs: [docs.moov.io](https://docs.moov.io/en/latest/) | [api docs](https://editor.swagger.io/?url=https://raw.githubusercontent.com/moov-io/ach/master/server/openapi.yaml)
+Docs: [docs.moov.io](https://docs.moov.io/en/latest/) | [api docs](https://api.moov.io)
 
 ## Project Status
 
