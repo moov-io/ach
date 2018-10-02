@@ -6,16 +6,6 @@ build:
 	go fmt ./...
 	CGO_ENABLED=0 go build -o bin/ach ./cmd/server
 
-client:
-# Download
-	if [ ! -d "$(shell pwd)/tmp/swagger-codegen" ]; then \
-		git clone https://github.com/swagger-api/swagger-codegen tmp/swagger-codegen; \
-	fi
-	cd tmp/swagger-codegen && \
-	mvn clean package && \
-	java -jar tmp/swagger-codegen/modules/swagger-codegen-cli/target/swagger-codegen-cli.jar \
-	  generate -i server/openapi.yaml -l go -o client/
-
 clean:
 	@rm -rf tmp/
 
