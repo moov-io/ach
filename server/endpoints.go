@@ -83,6 +83,8 @@ type getFilesResponse struct {
 	Err   error       `json:"error"`
 }
 
+func (r getFilesResponse) count() int { return len(r.Files) }
+
 func (r getFilesResponse) error() error { return r.Err }
 
 // MakeGetFileEndpoint returns an endpoint via the passed service.
