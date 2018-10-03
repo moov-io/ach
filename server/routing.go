@@ -254,6 +254,12 @@ type errorer interface {
 	error() error
 }
 
+// counter is implemented by any concrete response types that may contain
+// some arbitrary count information.
+type counter interface {
+	count() int
+}
+
 // encodeResponse is the common method to encode all response types to the
 // client. I chose to do it this way because, since we're using JSON, there's no
 // reason to provide anything more specific. It's certainly possible to
@@ -264,6 +270,9 @@ func encodeResponse(ctx context.Context, w http.ResponseWriter, response interfa
 		// Provide those as HTTP errors.
 		encodeError(ctx, e.error(), w)
 		return nil
+	}
+	if e, ok := response.(counter); ok {
+		w.Header().Set("X-Total-Count", strconv.Itoa(e.count()))
 	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	return json.NewEncoder(w).Encode(response)
