@@ -271,13 +271,23 @@ func encodeResponse(ctx context.Context, w http.ResponseWriter, response interfa
 		encodeError(ctx, e.error(), w)
 		return nil
 	}
+
+	// Used for pagination
 	if e, ok := response.(counter); ok {
 		w.Header().Set("X-Total-Count", strconv.Itoa(e.count()))
 	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
+	// Don't overwrite a header (i.e. called from encodeTextResponse)
+	if v := w.Header().Get("Content-Type"); v == "" {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	}
+
 	return json.NewEncoder(w).Encode(response)
 }
 
+// encodeTextResponse will marshal response into the HTTP Response
+// This method is designed text/plain content-types and expects response
+// to be an io.Reader.
 func encodeTextResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
 	if r, ok := response.(io.Reader); ok {
 		w.Header().Set("Content-Type", "text/plain")
