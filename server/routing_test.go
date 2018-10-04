@@ -44,3 +44,47 @@ func TestXTotalCountHeader(t *testing.T) {
 		t.Errorf("should be 1, got %v", actual[0])
 	}
 }
+
+func TestRouting__proxyCORSHeaders(t *testing.T) {
+	r := httptest.NewRequest("GET", "/ping", nil)
+	r.Header.Set("Access-Control-Allow-Origin", "origin")
+	r.Header.Set("Access-Control-Allow-Methods", "methods")
+	r.Header.Set("Access-Control-Allow-Headers", "headers")
+	r.Header.Set("Access-Control-Allow-Credentials", "credentials")
+
+	ctx := context.TODO()
+	ctx = saveCORSHeadersIntoContext()(ctx, r)
+
+	check := func(ctx context.Context, key contextKey, expected string) {
+		v, ok := ctx.Value(key).(string)
+		if !ok {
+			t.Errorf("key=%v, v=%s, ok=%v", key, v, ok)
+		}
+		if v != expected {
+			t.Errorf("got %s, expected %s", v, expected)
+		}
+	}
+
+	check(ctx, accessControlAllowOrigin, "origin")
+	check(ctx, accessControlAllowMethods, "methods")
+	check(ctx, accessControlAllowHeaders, "headers")
+	check(ctx, accessControlAllowCredentials, "credentials")
+
+	// now make sure ctx writes these headers to an http.ResponseWriter
+	w := httptest.NewRecorder()
+	respondWithSavedCORSHeaders()(ctx, w)
+	w.Flush()
+
+	if v := r.Header.Get("Access-Control-Allow-Origin"); v != "origin" {
+		t.Errorf("got %s", v)
+	}
+	if v := r.Header.Get("Access-Control-Allow-Methods"); v != "methods" {
+		t.Errorf("got %s", v)
+	}
+	if v := r.Header.Get("Access-Control-Allow-Headers"); v != "headers" {
+		t.Errorf("got %s", v)
+	}
+	if v := r.Header.Get("Access-Control-Allow-Credentials"); v != "credentials" {
+		t.Errorf("got %s", v)
+	}
+}
