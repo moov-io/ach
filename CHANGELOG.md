@@ -1,3 +1,9 @@
+## v0.3.2 (Released 2018-10-05)
+
+ADDITIONS
+
+- Handle pre-flight requests and proxy back CORS headers
+
 ## v0.3.1 (Released 2018-10-05)
 
 ADDITIONS
