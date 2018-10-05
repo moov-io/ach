@@ -4,4 +4,4 @@
 
 package ach
 
-const Version = "v0.3.1-M2"
+const Version = "v0.3.1"

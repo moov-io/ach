@@ -1,3 +1,15 @@
+## v0.3.1 (Released 2018-10-05)
+
+ADDITIONS
+
+- Add `X-Total-Count` on GET responses
+- Proxy back CORS headers if sent on the request
+
+BUG FIXES
+
+- Drop requirement for /-suffix on GET /files
+- Don't trample content-type in encodeResponse
+
 ## v0.3.0 (Released 2018-09-26)
 
 FEATURES
