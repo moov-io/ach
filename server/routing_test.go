@@ -9,6 +9,8 @@ import (
 	"testing"
 
 	"github.com/moov-io/ach"
+
+	httptransport "github.com/go-kit/kit/transport/http"
 )
 
 func TestEncodeResponse(t *testing.T) {
@@ -124,6 +126,43 @@ func TestRouting__proxyCORSHeaders(t *testing.T) {
 		t.Errorf("got %s", v)
 	}
 	if v := r.Header.Get("Access-Control-Allow-Credentials"); v != "credentials" {
+		t.Errorf("got %s", v)
+	}
+}
+
+func TestPreflightHandler(t *testing.T) {
+	options := []httptransport.ServerOption{
+		httptransport.ServerBefore(saveCORSHeadersIntoContext()),
+		httptransport.ServerAfter(respondWithSavedCORSHeaders()),
+	}
+
+	handler := preflightHandler(options)
+
+	// Make our pre-flight request
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest("OPTIONS", "/files/create", nil)
+
+	// Add CORS headers (i.e. like they're coming from auth)
+	r.Header.Set("Access-Control-Allow-Origin", "origin")
+	r.Header.Set("Access-Control-Allow-Methods", "methods")
+	r.Header.Set("Access-Control-Allow-Headers", "headers")
+	r.Header.Set("Access-Control-Allow-Credentials", "credentials")
+
+	// Make the request
+	handler.ServeHTTP(w, r)
+	w.Flush()
+
+	// Check response
+	if v := w.Header().Get("Access-Control-Allow-Origin"); v != "origin" {
+		t.Errorf("got %s", v)
+	}
+	if v := w.Header().Get("Access-Control-Allow-Methods"); v != "methods" {
+		t.Errorf("got %s", v)
+	}
+	if v := w.Header().Get("Access-Control-Allow-Headers"); v != "headers" {
+		t.Errorf("got %s", v)
+	}
+	if v := w.Header().Get("Access-Control-Allow-Credentials"); v != "credentials" {
 		t.Errorf("got %s", v)
 	}
 }
