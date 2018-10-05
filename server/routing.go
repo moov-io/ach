@@ -14,6 +14,7 @@ import (
 
 	"github.com/moov-io/ach"
 
+	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/log"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
@@ -85,6 +86,22 @@ func respondWithSavedCORSHeaders() httptransport.ServerResponseFunc {
 	}
 }
 
+// preflightHandler captures Corss Origin Resource Sharing (CORS) requests
+// by looking at all OPTIONS requests for the Origin header, parsing that
+// and responding back with the other Access-Control-Allow-* headers.
+//
+// Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+func preflightHandler(options []httptransport.ServerOption) http.Handler {
+	return httptransport.NewServer(
+		endpoint.Nop,
+		httptransport.NopRequestDecoder,
+		func(_ context.Context, _ http.ResponseWriter, _ interface{}) error {
+			return nil
+		},
+		options...,
+	)
+}
+
 func MakeHTTPHandler(s Service, repo Repository, logger log.Logger) http.Handler {
 	r := mux.NewRouter()
 	e := MakeServerEndpoints(s, repo)
@@ -96,6 +113,7 @@ func MakeHTTPHandler(s Service, repo Repository, logger log.Logger) http.Handler
 	}
 
 	// HTTP Methods
+	r.Methods("OPTIONS").Handler(preflightHandler(options)) // CORS pre-flight handler
 	r.Methods("GET").Path("/ping").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain")
 		w.Write([]byte("PONG"))
