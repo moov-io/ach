@@ -99,6 +99,11 @@ func write(path string) {
 		file.AddBatch(batch)
 	}
 
+	// ensure we have a validated file structure
+	if file.Validate(); err != nil {
+		fmt.Printf("Could not validate entire file: %v", err)
+	}
+
 	// Create the file
 	if err := file.Create(); err != nil {
 		fmt.Printf("%T: %s", err, err)
