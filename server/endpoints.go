@@ -50,14 +50,14 @@ func MakeCreateFileEndpoint(s Service, r Repository) endpoint.Endpoint {
 		} else {
 			return createFileResponse{
 				ID:  req.File.ID,
-				Err: r.StoreFile(&req.File),
+				Err: r.StoreFile(req.File),
 			}, nil
 		}
 	}
 }
 
 type createFileRequest struct {
-	File ach.File
+	File *ach.File
 }
 
 type createFileResponse struct {

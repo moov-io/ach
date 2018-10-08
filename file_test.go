@@ -5,6 +5,8 @@
 package ach
 
 import (
+	"io/ioutil"
+	"path/filepath"
 	"testing"
 )
 
@@ -361,5 +363,22 @@ func BenchmarkFileReturnEntries(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testFileReturnEntries(b)
+	}
+}
+
+func TestFile__readFromJson(t *testing.T) {
+	path := filepath.Join("test", "testdata", "ppd-valid.json")
+	bs, err := ioutil.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	file, err := FileFromJson(bs)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(file.Batches) != 1 {
+		t.Errorf("got %d batches: %v", len(file.Batches), file.Batches)
 	}
 }
