@@ -356,9 +356,10 @@ func encodeResponse(ctx context.Context, w http.ResponseWriter, response interfa
 	// Don't overwrite a header (i.e. called from encodeTextResponse)
 	if v := w.Header().Get("Content-Type"); v == "" {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		// Only write json body if we're setting response as json
+		return json.NewEncoder(w).Encode(response)
 	}
-
-	return json.NewEncoder(w).Encode(response)
+	return nil
 }
 
 // encodeTextResponse will marshal response into the HTTP Response
@@ -367,10 +368,11 @@ func encodeResponse(ctx context.Context, w http.ResponseWriter, response interfa
 func encodeTextResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
 	if r, ok := response.(io.Reader); ok {
 		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusOK)
 		_, err := io.Copy(w, r)
 		return err
 	}
-	return encodeResponse(ctx, w, response)
+	return nil
 }
 
 // encodeError JSON encodes the supplied error

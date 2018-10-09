@@ -137,7 +137,7 @@ func MakeGetFileContentsEndpoint(s Service) endpoint.Endpoint {
 		if err != nil {
 			return getFileContentsResponse{Err: err}, nil
 		}
-		return &r, nil
+		return r, nil
 	}
 }
 
