@@ -192,7 +192,7 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 	var req createFileRequest
 
 	// Sets default values
-	req.File = ach.File{
+	req.File = &ach.File{
 		Header: ach.NewFileHeader(),
 	}
 
@@ -203,11 +203,12 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 
 	h := request.Header.Get("Content-Type")
 	if strings.Contains(h, "application/json") {
-		// Attempt to read file as json
-		r = bytes.NewReader(bs)
-		if err := json.NewDecoder(r).Decode(&req.File.Header); err == nil {
-			return req, nil
+		// Read body as ACH file in JSON
+		f, err := ach.FileFromJson(bs)
+		if err != nil {
+			return nil, err
 		}
+		req.File = f
 	} else {
 		// Attempt parsing body as an ACH File
 		r = bytes.NewReader(bs)
@@ -215,7 +216,7 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 		if err != nil {
 			return nil, err
 		}
-		req.File = f
+		req.File = &f
 	}
 	return req, nil
 }

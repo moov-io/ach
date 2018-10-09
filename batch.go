@@ -5,6 +5,7 @@
 package ach
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -60,6 +61,14 @@ func NewBatch(bh *BatchHeader) (Batcher, error) {
 	}
 	msg := fmt.Sprintf(msgFileNoneSEC, bh.StandardEntryClassCode)
 	return nil, &FileError{FieldName: "StandardEntryClassCode", Value: bh.StandardEntryClassCode, Msg: msg}
+}
+
+func (batch *batch) Create() error {
+	return errors.New("use an implementation of batch or NewBatch")
+}
+
+func (batch *batch) Validate() error {
+	return errors.New("use an implementation of batch or NewBatch")
 }
 
 // verify checks basic valid NACHA batch rules. Assumes properly parsed records. This does not mean it is a valid batch as validity is tied to each batch type

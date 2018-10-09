@@ -5,6 +5,9 @@
 package ach
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 )
@@ -70,6 +73,57 @@ func NewFile() *File {
 		Header:  NewFileHeader(),
 		Control: NewFileControl(),
 	}
+}
+
+// FileFromJson attempts to return a *File object assuming the input is valid JSON.
+//
+// Callers should always check for a nil-error before using the returned file.
+func FileFromJson(bs []byte) (*File, error) {
+	// Copy bs for the second read
+	backup := make([]byte, len(bs))
+	n := copy(backup, bs)
+	if n == 0 {
+		return nil, errors.New("no json data provided")
+	}
+
+	file := File{Header: NewFileHeader()}
+
+	// Read what we can and then custom read batches
+	json.NewDecoder(bytes.NewReader(bs)).Decode(&file)
+	if err := file.setBatchesFromJson(backup); err != nil {
+		return nil, err
+	}
+
+	return &file, nil
+}
+
+type batchesJSON struct {
+	Batches []*batch `json:"batches"`
+}
+
+// setBatchesFromJson takes bs as JSON and attempts to read out all the Batches within.
+//
+// We have to break this out as Batcher is an interface (and can't be read by Go's
+// json struct tag decoding).
+func (f *File) setBatchesFromJson(bs []byte) error {
+	var batches batchesJSON
+	if err := json.Unmarshal(bs, &batches); err != nil {
+		return err
+	}
+	// Clear out any nil batchs
+	for i := range f.Batches {
+		if f.Batches[i] == nil {
+			f.Batches = append(f.Batches[:i], f.Batches[i+1:]...)
+		}
+	}
+	// Add new batches to file
+	for i := range batches.Batches {
+		if batches.Batches[i] == nil {
+			continue
+		}
+		f.Batches = append(f.Batches, batches.Batches[i])
+	}
+	return nil
 }
 
 // Create creates a valid file and requires that the FileHeader and at least one Batch
