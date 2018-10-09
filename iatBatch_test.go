@@ -94,7 +94,7 @@ func mockInvalidIATBatch() IATBatch {
 func mockInvalidAddenda17() *Addenda17 {
 	addenda17 := NewAddenda17()
 	addenda17.PaymentRelatedInformation = "Transfer of money from one country to another"
-	addenda17.typeCode = "02"
+	addenda17.TypeCode = "02"
 	addenda17.SequenceNumber = 2
 	addenda17.EntryDetailSequenceNumber = 0000002
 
@@ -1071,7 +1071,7 @@ func BenchmarkIATBatchValidateEntry(b *testing.B) {
 // testIATBatchValidateAddenda10 validates Addenda10
 func testIATBatchValidateAddenda10(t testing.TB) {
 	mockBatch := mockIATBatchManyEntries()
-	mockBatch.GetEntries()[1].Addenda10.typeCode = "02"
+	mockBatch.GetEntries()[1].Addenda10.TypeCode = "02"
 
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -1100,7 +1100,7 @@ func BenchmarkIATBatchValidateAddenda10(b *testing.B) {
 // testIATBatchValidateAddenda11 validates Addenda11
 func testIATBatchValidateAddenda11(t testing.TB) {
 	mockBatch := mockIATBatchManyEntries()
-	mockBatch.GetEntries()[1].Addenda11.typeCode = "02"
+	mockBatch.GetEntries()[1].Addenda11.TypeCode = "02"
 
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -1129,7 +1129,7 @@ func BenchmarkIATBatchValidateAddenda11(b *testing.B) {
 // testIATBatchValidateAddenda12 validates Addenda12
 func testIATBatchValidateAddenda12(t testing.TB) {
 	mockBatch := mockIATBatchManyEntries()
-	mockBatch.GetEntries()[1].Addenda12.typeCode = "02"
+	mockBatch.GetEntries()[1].Addenda12.TypeCode = "02"
 
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -1158,7 +1158,7 @@ func BenchmarkIATBatchValidateAddenda12(b *testing.B) {
 // testIATBatchValidateAddenda13 validates Addenda13
 func testIATBatchValidateAddenda13(t testing.TB) {
 	mockBatch := mockIATBatchManyEntries()
-	mockBatch.GetEntries()[1].Addenda13.typeCode = "02"
+	mockBatch.GetEntries()[1].Addenda13.TypeCode = "02"
 
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -1187,7 +1187,7 @@ func BenchmarkIATBatchValidateAddenda13(b *testing.B) {
 // testIATBatchValidateAddenda14 validates Addenda14
 func testIATBatchValidateAddenda14(t testing.TB) {
 	mockBatch := mockIATBatchManyEntries()
-	mockBatch.GetEntries()[1].Addenda14.typeCode = "02"
+	mockBatch.GetEntries()[1].Addenda14.TypeCode = "02"
 
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -1216,7 +1216,7 @@ func BenchmarkIATBatchValidateAddenda14(b *testing.B) {
 // testIATBatchValidateAddenda15 validates Addenda15
 func testIATBatchValidateAddenda15(t testing.TB) {
 	mockBatch := mockIATBatchManyEntries()
-	mockBatch.GetEntries()[1].Addenda15.typeCode = "02"
+	mockBatch.GetEntries()[1].Addenda15.TypeCode = "02"
 
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -1245,7 +1245,7 @@ func BenchmarkIATBatchValidateAddenda15(b *testing.B) {
 // testIATBatchValidateAddenda16 validates Addenda16
 func testIATBatchValidateAddenda16(t testing.TB) {
 	mockBatch := mockIATBatchManyEntries()
-	mockBatch.GetEntries()[1].Addenda16.typeCode = "02"
+	mockBatch.GetEntries()[1].Addenda16.TypeCode = "02"
 
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {

@@ -23,7 +23,7 @@ type Addenda13 struct {
 	// RecordType defines the type of record in the block.
 	recordType string
 	// TypeCode Addenda13 types code '13'
-	typeCode string
+	TypeCode string `json:"typeCode"`
 	// Originating DFI Name
 	// For Outbound IAT Entries, this field must contain the name of the U.S. ODFI.
 	// For Inbound IATs: Name of the foreign bank providing funding for the payment transaction
@@ -65,7 +65,7 @@ type Addenda13 struct {
 func NewAddenda13() *Addenda13 {
 	addenda13 := new(Addenda13)
 	addenda13.recordType = "7"
-	addenda13.typeCode = "13"
+	addenda13.TypeCode = "13"
 	return addenda13
 }
 
@@ -74,7 +74,7 @@ func (addenda13 *Addenda13) Parse(record string) {
 	// 1-1 Always "7"
 	addenda13.recordType = "7"
 	// 2-3 Always 13
-	addenda13.typeCode = record[1:3]
+	addenda13.TypeCode = record[1:3]
 	// 4-38 ODFIName
 	addenda13.ODFIName = strings.TrimSpace(record[3:38])
 	// 39-40 ODFIIDNumberQualifier
@@ -94,7 +94,7 @@ func (addenda13 *Addenda13) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
 	buf.WriteString(addenda13.recordType)
-	buf.WriteString(addenda13.typeCode)
+	buf.WriteString(addenda13.TypeCode)
 	buf.WriteString(addenda13.ODFINameField())
 	buf.WriteString(addenda13.ODFIIDNumberQualifierField())
 	buf.WriteString(addenda13.ODFIIdentificationField())
@@ -114,12 +114,12 @@ func (addenda13 *Addenda13) Validate() error {
 		msg := fmt.Sprintf(msgRecordType, 7)
 		return &FieldError{FieldName: "recordType", Value: addenda13.recordType, Msg: msg}
 	}
-	if err := addenda13.isTypeCode(addenda13.typeCode); err != nil {
-		return &FieldError{FieldName: "TypeCode", Value: addenda13.typeCode, Msg: err.Error()}
+	if err := addenda13.isTypeCode(addenda13.TypeCode); err != nil {
+		return &FieldError{FieldName: "TypeCode", Value: addenda13.TypeCode, Msg: err.Error()}
 	}
 	// Type Code must be 13
-	if addenda13.typeCode != "13" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda13.typeCode, Msg: msgAddendaTypeCode}
+	if addenda13.TypeCode != "13" {
+		return &FieldError{FieldName: "TypeCode", Value: addenda13.TypeCode, Msg: msgAddendaTypeCode}
 	}
 	if err := addenda13.isAlphanumeric(addenda13.ODFIName); err != nil {
 		return &FieldError{FieldName: "ODFIName",
@@ -147,8 +147,8 @@ func (addenda13 *Addenda13) fieldInclusion() error {
 	if addenda13.recordType == "" {
 		return &FieldError{FieldName: "recordType", Value: addenda13.recordType, Msg: msgFieldInclusion}
 	}
-	if addenda13.typeCode == "" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda13.typeCode, Msg: msgFieldInclusion}
+	if addenda13.TypeCode == "" {
+		return &FieldError{FieldName: "TypeCode", Value: addenda13.TypeCode, Msg: msgFieldInclusion}
 	}
 	if addenda13.ODFIName == "" {
 		return &FieldError{FieldName: "ODFIName",
@@ -199,8 +199,8 @@ func (addenda13 *Addenda13) reservedField() string {
 }
 
 // TypeCode Defines the specific explanation and format for the addenda13 information left padded
-func (addenda13 *Addenda13) TypeCode() string {
-	return addenda13.typeCode
+func (addenda13 *Addenda13) typeCode() string {
+	return addenda13.TypeCode
 }
 
 // EntryDetailSequenceNumberField returns a zero padded EntryDetailSequenceNumber string

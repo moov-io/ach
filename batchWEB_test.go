@@ -102,7 +102,7 @@ func BenchmarkBatchWebIndividualNameRequired(b *testing.B) {
 // testBatchWEBAddendaTypeCod validates addenda type code is 05
 func testBatchWEBAddendaTypeCode(t testing.TB) {
 	mockBatch := mockBatchWEB()
-	mockBatch.GetEntries()[0].Addendum[0].(*Addenda05).typeCode = "07"
+	mockBatch.GetEntries()[0].Addendum[0].(*Addenda05).TypeCode = "07"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {

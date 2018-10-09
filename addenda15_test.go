@@ -34,8 +34,8 @@ func testAddenda15Parse(t testing.TB) {
 	if Addenda15.recordType != "7" {
 		t.Errorf("expected %v got %v", "7", Addenda15.recordType)
 	}
-	if Addenda15.typeCode != "15" {
-		t.Errorf("expected %v got %v", "15", Addenda15.typeCode)
+	if Addenda15.TypeCode != "15" {
+		t.Errorf("expected %v got %v", "15", Addenda15.TypeCode)
 	}
 	if Addenda15.ReceiverIDNumber != "987465493213987" {
 		t.Errorf("expected %v got %v", "987465493213987", Addenda15.ReceiverIDNumber)
@@ -95,7 +95,7 @@ func BenchmarkAddenda15ValidRecordType(b *testing.B) {
 // testAddenda15ValidTypeCode validates Addenda15 TypeCode
 func testAddenda15ValidTypeCode(t testing.TB) {
 	addenda15 := mockAddenda15()
-	addenda15.typeCode = "65"
+	addenda15.TypeCode = "65"
 	if err := addenda15.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -120,10 +120,10 @@ func BenchmarkAddenda15ValidTypeCode(b *testing.B) {
 	}
 }
 
-// testAddenda15TypeCode15 TypeCode is 15 if typeCode is a valid TypeCode
+// testAddenda15TypeCode15 TypeCode is 15 if TypeCode is a valid TypeCode
 func testAddenda15TypeCode15(t testing.TB) {
 	addenda15 := mockAddenda15()
-	addenda15.typeCode = "05"
+	addenda15.TypeCode = "05"
 	if err := addenda15.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -135,12 +135,12 @@ func testAddenda15TypeCode15(t testing.TB) {
 	}
 }
 
-// TestAddenda15TypeCode15 tests TypeCode is 15 if typeCode is a valid TypeCode
+// TestAddenda15TypeCode15 tests TypeCode is 15 if TypeCode is a valid TypeCode
 func TestAddenda15TypeCode15(t *testing.T) {
 	testAddenda15TypeCode15(t)
 }
 
-// BenchmarkAddenda15TypeCode15 benchmarks TypeCode is 15 if typeCode is a valid TypeCode
+// BenchmarkAddenda15TypeCode15 benchmarks TypeCode is 15 if TypeCode is a valid TypeCode
 func BenchmarkAddenda15TypeCode15(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -229,7 +229,7 @@ func BenchmarkAddenda15FieldInclusionRecordType(b *testing.B) {
 // testAddenda15FieldInclusionTypeCode validates TypeCode fieldInclusion
 func testAddenda15FieldInclusionTypeCode(t testing.TB) {
 	addenda15 := mockAddenda15()
-	addenda15.typeCode = ""
+	addenda15.TypeCode = ""
 	if err := addenda15.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.Msg != msgFieldInclusion {
@@ -315,8 +315,8 @@ func testAddenda15String(t testing.TB) {
 	if addenda15.String() != line {
 		t.Errorf("Strings do not match")
 	}
-	if addenda15.TypeCode() != "15" {
-		t.Errorf("TypeCode Expected 15 got: %v", addenda15.TypeCode())
+	if addenda15.TypeCode != "15" {
+		t.Errorf("TypeCode Expected 15 got: %v", addenda15.TypeCode)
 	}
 }
 

@@ -53,8 +53,8 @@ func testParseAddenda05(t testing.TB) {
 	if record.recordType != "7" {
 		t.Errorf("RecordType Expected '7' got: %v", record.recordType)
 	}
-	if record.TypeCode() != "05" {
-		t.Errorf("TypeCode Expected 05 got: %v", record.TypeCode())
+	if record.TypeCode != "05" {
+		t.Errorf("TypeCode Expected 05 got: %v", record.TypeCode)
 	}
 	if record.PaymentRelatedInformationField() != "PPD                                        DIEGO MAY                            " {
 		t.Errorf("PaymentRelatedInformation Expected 'PPD                                        DIEGO MAY                            ' got: %v", record.PaymentRelatedInformationField())
@@ -118,7 +118,7 @@ func TestValidateAddenda05RecordType(t *testing.T) {
 
 func TestValidateAddenda05TypeCode(t *testing.T) {
 	addenda05 := mockAddenda05()
-	addenda05.typeCode = "23"
+	addenda05.TypeCode = "23"
 	if err := addenda05.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -166,7 +166,7 @@ func TestAddenda05PaymentRelatedInformationAlphaNumeric(t *testing.T) {
 
 func testAddenda05TypeCodeNil(t testing.TB) {
 	addenda05 := mockAddenda05()
-	addenda05.typeCode = ""
+	addenda05.TypeCode = ""
 	if err := addenda05.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -190,7 +190,7 @@ func BenchmarkAddenda05TypeCodeNil(b *testing.B) {
 // testAddenda05TypeCode05 TypeCode is 05
 func testAddenda05TypeCode05(t testing.TB) {
 	addenda05 := mockAddenda05()
-	addenda05.typeCode = "99"
+	addenda05.TypeCode = "99"
 	if err := addenda05.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {

@@ -401,8 +401,8 @@ func (batch *batch) isAddendaCount(count int) error {
 func (batch *batch) isTypeCode(typeCode string) error {
 	for _, entry := range batch.Entries {
 		for _, addenda := range entry.Addendum {
-			if addenda.TypeCode() != typeCode {
-				msg := fmt.Sprintf(msgBatchTypeCode, addenda.TypeCode(), typeCode, batch.Header.StandardEntryClassCode)
+			if addenda.typeCode() != typeCode {
+				msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), typeCode, batch.Header.StandardEntryClassCode)
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
 			}
 		}
