@@ -1,3 +1,21 @@
+## v0.3.3 (Released 2018-10-08)
+
+ADDITIONS
+
+- Expose `TypeCode` on Addenda records
+
+IMPROVEMENTS
+
+- Run as unprivileged user in Docker image
+- `cmd/readACH`: add -json to print `File` as JSON
+- `cmd/writeACH`: validate file before writing
+- `cmd/writeACH`: add -json to output `File` as JSON
+
+BUG FIXES
+
+- Fix reading batches out from JSON endpoint
+- Fix plaintext ACH file rendering endpoint
+
 ## v0.3.2 (Released 2018-10-05)
 
 ADDITIONS
