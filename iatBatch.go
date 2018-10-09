@@ -514,7 +514,7 @@ func (batch *IATBatch) Validate() error {
 
 		for _, IATAddenda := range entry.Addendum {
 
-			switch IATAddenda.TypeCode() {
+			switch IATAddenda.typeCode() {
 			case "17":
 				addenda17Count = addenda17Count + 1
 				if addenda17Count > 2 {

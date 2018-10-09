@@ -63,7 +63,7 @@ func BenchmarkAddenda02ValidRecordType(b *testing.B) {
 // testAddenda02ValidTypeCode validates Addenda02 TypeCode
 func testAddenda02ValidTypeCode(t testing.TB) {
 	addenda02 := mockAddenda02()
-	addenda02.typeCode = "65"
+	addenda02.TypeCode = "65"
 	if err := addenda02.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -88,10 +88,10 @@ func BenchmarkAddenda02ValidTypeCode(b *testing.B) {
 	}
 }
 
-// testAddenda02TypeCode02 TypeCode is 02 if typeCode is a valid TypeCode
+// testAddenda02TypeCode02 TypeCode is 02 if TypeCode is a valid TypeCode
 func testAddenda02TypeCode02(t testing.TB) {
 	addenda02 := mockAddenda02()
-	addenda02.typeCode = "05"
+	addenda02.TypeCode = "05"
 	if err := addenda02.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -103,12 +103,12 @@ func testAddenda02TypeCode02(t testing.TB) {
 	}
 }
 
-// TestAddenda02TypeCode02 tests TypeCode is 02 if typeCode is a valid TypeCode
+// TestAddenda02TypeCode02 tests TypeCode is 02 if TypeCode is a valid TypeCode
 func TestAddenda02TypeCode02(t *testing.T) {
 	testAddenda02TypeCode02(t)
 }
 
-// BenchmarkAddenda02TypeCode02 benchmarks TypeCode is 02 if typeCode is a valid TypeCode
+// BenchmarkAddenda02TypeCode02 benchmarks TypeCode is 02 if TypeCode is a valid TypeCode
 func BenchmarkAddenda02TypeCode02(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -145,7 +145,7 @@ func BenchmarkAddenda02FieldInclusionRecordType(b *testing.B) {
 // testAddenda02FieldInclusionTypeCode validates TypeCode fieldInclusion
 func testAddenda02FieldInclusionTypeCode(t testing.TB) {
 	addenda02 := mockAddenda02()
-	addenda02.typeCode = ""
+	addenda02.TypeCode = ""
 	if err := addenda02.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.Msg != msgFieldInclusion {
@@ -332,8 +332,8 @@ func testAddenda02String(t testing.TB) {
 	if addenda02.String() != line {
 		t.Errorf("Strings do not match")
 	}
-	if addenda02.TypeCode() != "02" {
-		t.Errorf("TypeCode Expected 02 got: %v", addenda02.TypeCode())
+	if addenda02.TypeCode != "02" {
+		t.Errorf("TypeCode Expected 02 got: %v", addenda02.TypeCode)
 	}
 }
 

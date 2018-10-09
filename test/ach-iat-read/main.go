@@ -32,6 +32,7 @@ func main() {
 	fmt.Printf("Entry: %v \n", achFile.IATBatches[0].GetEntries()[0])
 	fmt.Printf("Addenda Record Indicator: %v \n", achFile.IATBatches[0].GetEntries()[0].AddendaRecordIndicator)
 	fmt.Printf("Addenda10: %v \n", achFile.IATBatches[0].GetEntries()[0].Addenda10)
+	fmt.Printf("Addenda10: %v \n", achFile.IATBatches[0].GetEntries()[0].Addenda10.TypeCode)
 	fmt.Printf("Addenda11: %v \n", achFile.IATBatches[0].GetEntries()[0].Addenda11)
 	fmt.Printf("Addenda12: %v \n", achFile.IATBatches[0].GetEntries()[0].Addenda12)
 	fmt.Printf("Addenda13: %v \n", achFile.IATBatches[0].GetEntries()[0].Addenda13)

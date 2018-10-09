@@ -8,7 +8,7 @@ package ach
 type Addendumer interface {
 	Parse(string)
 	//TypeCode Defines the specific explanation and format for the addenda information
-	TypeCode() string
+	typeCode() string
 	String() string
 	Validate() error
 }

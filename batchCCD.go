@@ -34,9 +34,10 @@ func (batch *BatchCCD) Validate() error {
 	if err := batch.isAddendaCount(1); err != nil {
 		return err
 	}
-	if err := batch.isTypeCode("05"); err != nil {
+
+	/*	if err := batch.isTypeCode("05"); err != nil {
 		return err
-	}
+	}*/
 
 	// Add type specific validation.
 	if batch.Header.StandardEntryClassCode != "CCD" {

@@ -22,7 +22,7 @@ type Addenda17 struct {
 	// RecordType defines the type of record in the block. entryAddenda17 Pos 7
 	recordType string
 	// TypeCode Addenda17 types code '17'
-	typeCode string
+	TypeCode string `json:"typeCode"`
 	// PaymentRelatedInformation
 	PaymentRelatedInformation string `json:"paymentRelatedInformation"`
 	// SequenceNumber is consecutively assigned to each Addenda17 Record following
@@ -44,7 +44,7 @@ type Addenda17 struct {
 func NewAddenda17() *Addenda17 {
 	addenda17 := new(Addenda17)
 	addenda17.recordType = "7"
-	addenda17.typeCode = "17"
+	addenda17.TypeCode = "17"
 	return addenda17
 }
 
@@ -53,7 +53,7 @@ func (addenda17 *Addenda17) Parse(record string) {
 	// 1-1 Always "7"
 	addenda17.recordType = "7"
 	// 2-3 Always 17
-	addenda17.typeCode = record[1:3]
+	addenda17.TypeCode = record[1:3]
 	// 4-83 Based on the information entered (04-83) 80 alphanumeric
 	addenda17.PaymentRelatedInformation = strings.TrimSpace(record[3:83])
 	// 84-87 SequenceNumber is consecutively assigned to each Addenda17 Record following
@@ -68,7 +68,7 @@ func (addenda17 *Addenda17) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
 	buf.WriteString(addenda17.recordType)
-	buf.WriteString(addenda17.typeCode)
+	buf.WriteString(addenda17.TypeCode)
 	buf.WriteString(addenda17.PaymentRelatedInformationField())
 	buf.WriteString(addenda17.SequenceNumberField())
 	buf.WriteString(addenda17.EntryDetailSequenceNumberField())
@@ -85,12 +85,12 @@ func (addenda17 *Addenda17) Validate() error {
 		msg := fmt.Sprintf(msgRecordType, 7)
 		return &FieldError{FieldName: "recordType", Value: addenda17.recordType, Msg: msg}
 	}
-	if err := addenda17.isTypeCode(addenda17.typeCode); err != nil {
-		return &FieldError{FieldName: "TypeCode", Value: addenda17.typeCode, Msg: err.Error()}
+	if err := addenda17.isTypeCode(addenda17.TypeCode); err != nil {
+		return &FieldError{FieldName: "TypeCode", Value: addenda17.TypeCode, Msg: err.Error()}
 	}
 	// Type Code must be 17
-	if addenda17.typeCode != "17" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda17.typeCode, Msg: msgAddendaTypeCode}
+	if addenda17.TypeCode != "17" {
+		return &FieldError{FieldName: "TypeCode", Value: addenda17.TypeCode, Msg: msgAddendaTypeCode}
 	}
 	if err := addenda17.isAlphanumeric(addenda17.PaymentRelatedInformation); err != nil {
 		return &FieldError{FieldName: "PaymentRelatedInformation", Value: addenda17.PaymentRelatedInformation, Msg: err.Error()}
@@ -105,8 +105,8 @@ func (addenda17 *Addenda17) fieldInclusion() error {
 	if addenda17.recordType == "" {
 		return &FieldError{FieldName: "recordType", Value: addenda17.recordType, Msg: msgFieldInclusion}
 	}
-	if addenda17.typeCode == "" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda17.typeCode, Msg: msgFieldInclusion}
+	if addenda17.TypeCode == "" {
+		return &FieldError{FieldName: "TypeCode", Value: addenda17.TypeCode, Msg: msgFieldInclusion}
 	}
 	if addenda17.SequenceNumber == 0 {
 		return &FieldError{FieldName: "SequenceNumber", Value: addenda17.SequenceNumberField(), Msg: msgFieldInclusion}
@@ -133,6 +133,6 @@ func (addenda17 *Addenda17) EntryDetailSequenceNumberField() string {
 }
 
 // TypeCode Defines the specific explanation and format for the addenda17 information
-func (addenda17 *Addenda17) TypeCode() string {
-	return addenda17.typeCode
+func (addenda17 *Addenda17) typeCode() string {
+	return addenda17.TypeCode
 }

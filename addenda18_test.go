@@ -107,8 +107,8 @@ func testAddenda18Parse(t testing.TB) {
 	if Addenda18.recordType != "7" {
 		t.Errorf("expected %v got %v", "7", Addenda18.recordType)
 	}
-	if Addenda18.typeCode != "18" {
-		t.Errorf("expected %v got %v", "18", Addenda18.typeCode)
+	if Addenda18.TypeCode != "18" {
+		t.Errorf("expected %v got %v", "18", Addenda18.TypeCode)
 	}
 	if Addenda18.ForeignCorrespondentBankName != "Bank of Germany" {
 		t.Errorf("expected %v got %v", "Bank of Germany", Addenda18.ForeignCorrespondentBankName)
@@ -181,7 +181,7 @@ func TestValidateAddenda18RecordType(t *testing.T) {
 
 func TestAddenda18TypeCodeFieldInclusion(t *testing.T) {
 	addenda18 := mockAddenda18()
-	addenda18.typeCode = ""
+	addenda18.TypeCode = ""
 	if err := addenda18.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -323,7 +323,7 @@ func BenchmarkAddendaForeignCorrespondentBankIDNumberAlphaNumeric(b *testing.B) 
 // testAddenda18ValidTypeCode validates Addenda18 TypeCode
 func testAddenda18ValidTypeCode(t testing.TB) {
 	addenda18 := mockAddenda18()
-	addenda18.typeCode = "65"
+	addenda18.TypeCode = "65"
 	if err := addenda18.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -348,10 +348,10 @@ func BenchmarkAddenda18ValidTypeCode(b *testing.B) {
 	}
 }
 
-// testAddenda18TypeCode18 TypeCode is 18 if typeCode is a valid TypeCode
+// testAddenda18TypeCode18 TypeCode is 18 if TypeCode is a valid TypeCode
 func testAddenda18TypeCode18(t testing.TB) {
 	addenda18 := mockAddenda18()
-	addenda18.typeCode = "05"
+	addenda18.TypeCode = "05"
 	if err := addenda18.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -363,12 +363,12 @@ func testAddenda18TypeCode18(t testing.TB) {
 	}
 }
 
-// TestAddenda18TypeCode18 tests TypeCode is 18 if typeCode is a valid TypeCode
+// TestAddenda18TypeCode18 tests TypeCode is 18 if TypeCode is a valid TypeCode
 func TestAddenda18TypeCode18(t *testing.T) {
 	testAddenda18TypeCode18(t)
 }
 
-// BenchmarkAddenda18TypeCode18 benchmarks TypeCode is 18 if typeCode is a valid TypeCode
+// BenchmarkAddenda18TypeCode18 benchmarks TypeCode is 18 if TypeCode is a valid TypeCode
 func BenchmarkAddenda18TypeCode18(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {

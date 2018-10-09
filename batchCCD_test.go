@@ -128,7 +128,7 @@ func BenchmarkBatchCCDReceivingCompanyName(b *testing.B) {
 // testBatchCCDAddendaTypeCode validates addenda type code is 05
 func testBatchCCDAddendaTypeCode(t testing.TB) {
 	mockBatch := mockBatchCCD()
-	mockBatch.GetEntries()[0].Addendum[0].(*Addenda05).typeCode = "07"
+	mockBatch.GetEntries()[0].Addendum[0].(*Addenda05).TypeCode = "07"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {

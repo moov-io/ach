@@ -21,7 +21,7 @@ type Addenda15 struct {
 	// RecordType defines the type of record in the block.
 	recordType string
 	// TypeCode Addenda15 types code '15'
-	typeCode string
+	TypeCode string `json:"typeCode"`
 	// Receiver Identification Number contains the accounting number by which the Originator is known to
 	// the Receiver for descriptive purposes. NACHA Rules recommend but do not require the RDFI to print
 	// the contents of this field on the receiver's statement.
@@ -45,7 +45,7 @@ type Addenda15 struct {
 func NewAddenda15() *Addenda15 {
 	addenda15 := new(Addenda15)
 	addenda15.recordType = "7"
-	addenda15.typeCode = "15"
+	addenda15.TypeCode = "15"
 	return addenda15
 }
 
@@ -54,7 +54,7 @@ func (addenda15 *Addenda15) Parse(record string) {
 	// 1-1 Always "7"
 	addenda15.recordType = "7"
 	// 2-3 Always 15
-	addenda15.typeCode = record[1:3]
+	addenda15.TypeCode = record[1:3]
 	// 4-18
 	addenda15.ReceiverIDNumber = addenda15.parseStringField(record[3:18])
 	// 19-53
@@ -70,7 +70,7 @@ func (addenda15 *Addenda15) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
 	buf.WriteString(addenda15.recordType)
-	buf.WriteString(addenda15.typeCode)
+	buf.WriteString(addenda15.TypeCode)
 	buf.WriteString(addenda15.ReceiverIDNumberField())
 	buf.WriteString(addenda15.ReceiverStreetAddressField())
 	buf.WriteString(addenda15.reservedField())
@@ -88,12 +88,12 @@ func (addenda15 *Addenda15) Validate() error {
 		msg := fmt.Sprintf(msgRecordType, 7)
 		return &FieldError{FieldName: "recordType", Value: addenda15.recordType, Msg: msg}
 	}
-	if err := addenda15.isTypeCode(addenda15.typeCode); err != nil {
-		return &FieldError{FieldName: "TypeCode", Value: addenda15.typeCode, Msg: err.Error()}
+	if err := addenda15.isTypeCode(addenda15.TypeCode); err != nil {
+		return &FieldError{FieldName: "TypeCode", Value: addenda15.TypeCode, Msg: err.Error()}
 	}
 	// Type Code must be 15
-	if addenda15.typeCode != "15" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda15.typeCode, Msg: msgAddendaTypeCode}
+	if addenda15.TypeCode != "15" {
+		return &FieldError{FieldName: "TypeCode", Value: addenda15.TypeCode, Msg: msgAddendaTypeCode}
 	}
 	if err := addenda15.isAlphanumeric(addenda15.ReceiverIDNumber); err != nil {
 		return &FieldError{FieldName: "ReceiverIDNumber", Value: addenda15.ReceiverIDNumber, Msg: err.Error()}
@@ -110,8 +110,8 @@ func (addenda15 *Addenda15) fieldInclusion() error {
 	if addenda15.recordType == "" {
 		return &FieldError{FieldName: "recordType", Value: addenda15.recordType, Msg: msgFieldInclusion}
 	}
-	if addenda15.typeCode == "" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda15.typeCode, Msg: msgFieldInclusion}
+	if addenda15.TypeCode == "" {
+		return &FieldError{FieldName: "TypeCode", Value: addenda15.TypeCode, Msg: msgFieldInclusion}
 	}
 	if addenda15.ReceiverStreetAddress == "" {
 		return &FieldError{FieldName: "ReceiverStreetAddress",
@@ -140,8 +140,8 @@ func (addenda15 *Addenda15) reservedField() string {
 }
 
 // TypeCode Defines the specific explanation and format for the addenda15 information left padded
-func (addenda15 *Addenda15) TypeCode() string {
-	return addenda15.typeCode
+func (addenda15 *Addenda15) typeCode() string {
+	return addenda15.TypeCode
 }
 
 // EntryDetailSequenceNumberField returns a zero padded EntryDetailSequenceNumber string
