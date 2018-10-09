@@ -108,6 +108,9 @@ func (s *service) GetFileContents(id string) (io.Reader, error) {
 	if err := w.Write(f); err != nil {
 		return nil, fmt.Errorf("problem writing plaintext file %s: %v", id, err)
 	}
+	if err := w.Flush(); err != nil {
+		return nil, err
+	}
 	return &buf, nil
 }
 
