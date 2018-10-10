@@ -154,13 +154,13 @@ func MakeHTTPHandler(s Service, repo Repository, logger log.Logger) http.Handler
 		encodeResponse,
 		options...,
 	))
-	r.Methods("POST").Path("/files/{fileID}/batches/").Handler(httptransport.NewServer(
+	r.Methods("POST").Path("/files/{fileID}/batches").Handler(httptransport.NewServer(
 		e.CreateBatchEndpoint,
 		decodeCreateBatchRequest,
 		encodeResponse,
 		options...,
 	))
-	r.Methods("GET").Path("/files/{fileID}/batches/").Handler(httptransport.NewServer(
+	r.Methods("GET").Path("/files/{fileID}/batches").Handler(httptransport.NewServer(
 		e.GetBatchesEndpoint,
 		decodeGetBatchesRequest,
 		encodeResponse,
