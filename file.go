@@ -224,6 +224,13 @@ func (f *File) Validate() error {
 		return &FileError{FieldName: "BatchCount", Value: strconv.Itoa(len(f.Batches)), Msg: msg}
 	}
 
+	if err := f.Header.Validate(); err != nil {
+		return err
+	}
+	if err := f.Control.Validate(); err != nil {
+		return err
+	}
+
 	if err := f.isEntryAddendaCount(); err != nil {
 		return err
 	}

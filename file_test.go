@@ -7,6 +7,7 @@ package ach
 import (
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -40,6 +41,19 @@ func BenchmarkFileError(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testFileError(b)
+	}
+}
+
+func TestFileEmptyError(t *testing.T) {
+	file := &File{}
+	if err := file.Create(); err == nil {
+		t.Error("expected error")
+	}
+
+	err := file.Validate()
+	msg := err.Error()
+	if !strings.HasPrefix(msg, "recordType") || !strings.Contains(msg, "is a mandatory field") {
+		t.Errorf("got %q", err)
 	}
 }
 
