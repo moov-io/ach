@@ -211,6 +211,8 @@ type getBatchesRequest struct {
 }
 
 type getBatchesResponse struct {
+	// TODO(adam): change this to JSON encode without wrapper {"batches": [..]}
+	// We don't wrap json objects in other responses, so why here?
 	Batches []ach.Batcher `json:"batches"`
 	Err     error         `json:"error"`
 }
