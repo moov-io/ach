@@ -107,7 +107,11 @@ func (addenda98 *Addenda98) Validate() error {
 		return &FieldError{FieldName: "recordType", Value: addenda98.recordType, Msg: msg}
 	}
 	if addenda98.TypeCode == "" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda98.TypeCode, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "TypeCode",
+			Value:     addenda98.TypeCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda98()?",
+		}
 	}
 	// Type Code must be 98
 	if addenda98.TypeCode != "98" {

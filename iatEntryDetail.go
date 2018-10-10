@@ -204,32 +204,53 @@ func (ed *IATEntryDetail) Validate() error {
 // invalid the ACH transfer will be returned.
 func (ed *IATEntryDetail) fieldInclusion() error {
 	if ed.recordType == "" {
-		return &FieldError{FieldName: "recordType",
-			Value: ed.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     ed.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewIATEntryDetail()?",
+		}
 	}
 	if ed.TransactionCode == 0 {
-		return &FieldError{FieldName: "TransactionCode",
-			Value: strconv.Itoa(ed.TransactionCode), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "TransactionCode",
+			Value:     strconv.Itoa(ed.TransactionCode),
+			Msg:       msgFieldInclusion + ", did you use NewIATEntryDetail()?",
+		}
 	}
 	if ed.RDFIIdentification == "" {
-		return &FieldError{FieldName: "RDFIIdentification",
-			Value: ed.RDFIIdentificationField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "RDFIIdentification",
+			Value:     ed.RDFIIdentificationField(),
+			Msg:       msgFieldInclusion + ", did you use NewIATEntryDetail()?",
+		}
 	}
 	if ed.AddendaRecords == 0 {
-		return &FieldError{FieldName: "AddendaRecords",
-			Value: strconv.Itoa(ed.AddendaRecords), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "AddendaRecords",
+			Value:     strconv.Itoa(ed.AddendaRecords),
+			Msg:       msgFieldInclusion + ", did you use NewIATEntryDetail()?",
+		}
 	}
 	if ed.DFIAccountNumber == "" {
-		return &FieldError{FieldName: "DFIAccountNumber",
-			Value: ed.DFIAccountNumber, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "DFIAccountNumber",
+			Value:     ed.DFIAccountNumber,
+			Msg:       msgFieldInclusion + ", did you use NewIATEntryDetail()?",
+		}
 	}
 	if ed.AddendaRecordIndicator == 0 {
-		return &FieldError{FieldName: "AddendaRecordIndicator",
-			Value: strconv.Itoa(ed.AddendaRecordIndicator), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "AddendaRecordIndicator",
+			Value:     strconv.Itoa(ed.AddendaRecordIndicator),
+			Msg:       msgFieldInclusion + ", did you use NewIATEntryDetail()?",
+		}
 	}
 	if ed.TraceNumber == 0 {
-		return &FieldError{FieldName: "TraceNumber",
-			Value: ed.TraceNumberField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "TraceNumber",
+			Value:     ed.TraceNumberField(),
+			Msg:       msgFieldInclusion + ", did you use NewIATEntryDetail()?",
+		}
 	}
 	return nil
 }

@@ -319,7 +319,7 @@ func testFileFileHeaderErr(t testing.TB) {
 	_, err := r.Read()
 	if p, ok := err.(*ParseError); ok {
 		if e, ok := p.Err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", e, e)
 			}
 		}
@@ -350,7 +350,7 @@ func testFileBatchHeaderErr(t testing.TB) {
 	_, err := r.Read()
 	if p, ok := err.(*ParseError); ok {
 		if e, ok := p.Err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", e, e)
 			}
 		}
@@ -383,7 +383,7 @@ func testFileBatchHeaderDuplicate(t testing.TB) {
 	_, err := r.Read()
 	if p, ok := err.(*ParseError); ok {
 		if e, ok := p.Err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", e, e)
 			}
 		}
@@ -445,7 +445,7 @@ func testFileEntryDetail(t testing.TB) {
 	_, err := r.Read()
 	if p, ok := err.(*ParseError); ok {
 		if e, ok := p.Err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", e, e)
 			}
 		}
@@ -480,7 +480,7 @@ func testFileAddenda05(t testing.TB) {
 	if err != nil {
 		if p, ok := err.(*ParseError); ok {
 			if e, ok := p.Err.(*FieldError); ok {
-				if e.Msg != msgFieldInclusion {
+				if !strings.Contains(e.Msg, msgFieldInclusion) {
 					t.Errorf("%T: %s", e, e)
 				}
 			}
@@ -627,7 +627,7 @@ func testFileAddenda98(t testing.TB) {
 	if err != nil {
 		if p, ok := err.(*ParseError); ok {
 			if e, ok := p.Err.(*FieldError); ok {
-				if e.Msg != msgFieldInclusion {
+				if !strings.Contains(e.Msg, msgFieldInclusion) {
 					t.Errorf("%T: %s", e, e)
 				}
 			}
@@ -701,7 +701,7 @@ func testFileAddenda99(t testing.TB) {
 	if err != nil {
 		if p, ok := err.(*ParseError); ok {
 			if e, ok := p.Err.(*FieldError); ok {
-				if e.Msg != msgFieldInclusion {
+				if !strings.Contains(e.Msg, msgFieldInclusion) {
 					t.Errorf("%T: %s", e, e)
 				}
 			}
@@ -795,7 +795,7 @@ func testFileFileControlErr(t testing.TB) {
 	_, err := r.Read()
 	if p, ok := err.(*ParseError); ok {
 		if e, ok := p.Err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", e, e)
 			}
 		}
@@ -946,7 +946,7 @@ func testFileLongErr(t testing.TB) {
 	_, err := r.Read()
 	if e, ok := err.(*ParseError); ok {
 		if e, ok := e.Err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -1007,7 +1007,7 @@ func testFileFHImmediateOrigin(t testing.TB) {
 	_, err := r.Read()
 	if p, ok := err.(*ParseError); ok {
 		if e, ok := p.Err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", e, e)
 			}
 		}

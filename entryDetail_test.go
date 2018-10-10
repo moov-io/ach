@@ -211,7 +211,7 @@ func testEDFieldInclusion(t testing.TB) {
 	ed.Amount = 0
 	if err := ed.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -392,7 +392,7 @@ func testEDFieldInclusionRecordType(t testing.TB) {
 	entry.recordType = ""
 	if err := entry.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -418,7 +418,7 @@ func testEDFieldInclusionTransactionCode(t testing.TB) {
 	entry.TransactionCode = 0
 	if err := entry.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -444,7 +444,7 @@ func testEDFieldInclusionRDFIIdentification(t testing.TB) {
 	entry.RDFIIdentification = ""
 	if err := entry.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -470,7 +470,7 @@ func testEDFieldInclusionDFIAccountNumber(t testing.TB) {
 	entry.DFIAccountNumber = ""
 	if err := entry.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -496,7 +496,7 @@ func testEDFieldInclusionIndividualName(t testing.TB) {
 	entry.IndividualName = ""
 	if err := entry.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -522,7 +522,7 @@ func testEDFieldInclusionTraceNumber(t testing.TB) {
 	entry.TraceNumber = 0
 	if err := entry.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}

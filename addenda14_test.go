@@ -5,6 +5,7 @@
 package ach
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -266,7 +267,7 @@ func testAddenda14FieldInclusionRecordType(t testing.TB) {
 	addenda14.recordType = ""
 	if err := addenda14.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -292,7 +293,7 @@ func testAddenda14FieldInclusionTypeCode(t testing.TB) {
 	addenda14.TypeCode = ""
 	if err := addenda14.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -318,7 +319,7 @@ func testAddenda14FieldInclusionRDFIName(t testing.TB) {
 	addenda14.RDFIName = ""
 	if err := addenda14.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -344,7 +345,7 @@ func testAddenda14FieldInclusionRDFIIDNumberQualifier(t testing.TB) {
 	addenda14.RDFIIDNumberQualifier = ""
 	if err := addenda14.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -370,7 +371,7 @@ func testAddenda14FieldInclusionRDFIIdentification(t testing.TB) {
 	addenda14.RDFIIdentification = ""
 	if err := addenda14.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -396,7 +397,7 @@ func testAddenda14FieldInclusionRDFIBranchCountryCode(t testing.TB) {
 	addenda14.RDFIBranchCountryCode = ""
 	if err := addenda14.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -422,7 +423,7 @@ func testAddenda14FieldInclusionEntryDetailSequenceNumber(t testing.TB) {
 	addenda14.EntryDetailSequenceNumber = 0
 	if err := addenda14.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}

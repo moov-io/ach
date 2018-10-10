@@ -115,22 +115,39 @@ func (addenda12 *Addenda12) Validate() error {
 // invalid the ACH transfer will be returned.
 func (addenda12 *Addenda12) fieldInclusion() error {
 	if addenda12.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: addenda12.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     addenda12.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda12()?",
+		}
 	}
 	if addenda12.TypeCode == "" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda12.TypeCode, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "TypeCode",
+			Value:     addenda12.TypeCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda12()?",
+		}
 	}
 	if addenda12.OriginatorCityStateProvince == "" {
-		return &FieldError{FieldName: "OriginatorCityStateProvince",
-			Value: addenda12.OriginatorCityStateProvince, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "OriginatorCityStateProvince",
+			Value:     addenda12.OriginatorCityStateProvince,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda12()?",
+		}
 	}
 	if addenda12.OriginatorCountryPostalCode == "" {
-		return &FieldError{FieldName: "OriginatorCountryPostalCode",
-			Value: addenda12.OriginatorCountryPostalCode, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "OriginatorCountryPostalCode",
+			Value:     addenda12.OriginatorCountryPostalCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda12()?",
+		}
 	}
 	if addenda12.EntryDetailSequenceNumber == 0 {
-		return &FieldError{FieldName: "EntryDetailSequenceNumber",
-			Value: addenda12.EntryDetailSequenceNumberField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "EntryDetailSequenceNumber",
+			Value:     addenda12.EntryDetailSequenceNumberField(),
+			Msg:       msgFieldInclusion + ", did you use NewAddenda12()?",
+		}
 	}
 	return nil
 }

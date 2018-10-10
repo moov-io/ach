@@ -7,6 +7,7 @@ package ach
 import (
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -242,7 +243,7 @@ func testFileBuildBadFileHeader(t testing.TB) {
 	file := NewFile().SetHeader(FileHeader{})
 	if err := file.Create(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {

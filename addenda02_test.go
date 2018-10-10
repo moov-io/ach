@@ -5,6 +5,7 @@
 package ach
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -122,7 +123,7 @@ func testAddenda02FieldInclusionRecordType(t testing.TB) {
 	addenda02.recordType = ""
 	if err := addenda02.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -148,7 +149,7 @@ func testAddenda02FieldInclusionTypeCode(t testing.TB) {
 	addenda02.TypeCode = ""
 	if err := addenda02.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}

@@ -144,28 +144,60 @@ func (addenda18 *Addenda18) Validate() error {
 // invalid the ACH transfer will be returned.
 func (addenda18 *Addenda18) fieldInclusion() error {
 	if addenda18.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: addenda18.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     addenda18.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda18()?",
+		}
 	}
 	if addenda18.TypeCode == "" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda18.TypeCode, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "TypeCode",
+			Value:     addenda18.TypeCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda18()?",
+		}
 	}
 	if addenda18.ForeignCorrespondentBankName == "" {
-		return &FieldError{FieldName: "ForeignCorrespondentBankName", Value: addenda18.ForeignCorrespondentBankName, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "ForeignCorrespondentBankName",
+			Value:     addenda18.ForeignCorrespondentBankName,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda18()?",
+		}
 	}
 	if addenda18.ForeignCorrespondentBankIDNumberQualifier == "" {
-		return &FieldError{FieldName: "ForeignCorrespondentBankIDNumberQualifier", Value: addenda18.ForeignCorrespondentBankIDNumberQualifier, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "ForeignCorrespondentBankIDNumberQualifier",
+			Value:     addenda18.ForeignCorrespondentBankIDNumberQualifier,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda18()?",
+		}
 	}
 	if addenda18.ForeignCorrespondentBankIDNumber == "" {
-		return &FieldError{FieldName: "ForeignCorrespondentBankIDNumber", Value: addenda18.ForeignCorrespondentBankIDNumber, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "ForeignCorrespondentBankIDNumber",
+			Value:     addenda18.ForeignCorrespondentBankIDNumber,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda18()?",
+		}
 	}
 	if addenda18.ForeignCorrespondentBankBranchCountryCode == "" {
-		return &FieldError{FieldName: "ForeignCorrespondentBankBranchCountryCode", Value: addenda18.ForeignCorrespondentBankBranchCountryCode, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "ForeignCorrespondentBankBranchCountryCode",
+			Value:     addenda18.ForeignCorrespondentBankBranchCountryCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda18()?",
+		}
 	}
 	if addenda18.SequenceNumber == 0 {
-		return &FieldError{FieldName: "SequenceNumber", Value: addenda18.SequenceNumberField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "SequenceNumber",
+			Value:     addenda18.SequenceNumberField(),
+			Msg:       msgFieldInclusion + ", did you use NewAddenda18()?",
+		}
 	}
 	if addenda18.EntryDetailSequenceNumber == 0 {
-		return &FieldError{FieldName: "EntryDetailSequenceNumber", Value: addenda18.EntryDetailSequenceNumberField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "EntryDetailSequenceNumber",
+			Value:     addenda18.EntryDetailSequenceNumberField(),
+			Msg:       msgFieldInclusion + ", did you use NewAddenda18()?",
+		}
 	}
 	return nil
 }

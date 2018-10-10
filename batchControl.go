@@ -154,13 +154,24 @@ func (bc *BatchControl) Validate() error {
 // invalid the ACH transfer will be returned.
 func (bc *BatchControl) fieldInclusion() error {
 	if bc.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: bc.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     bc.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewBatchControl()?"}
 	}
 	if bc.ServiceClassCode == 0 {
-		return &FieldError{FieldName: "ServiceClassCode", Value: strconv.Itoa(bc.ServiceClassCode), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "ServiceClassCode",
+			Value:     strconv.Itoa(bc.ServiceClassCode),
+			Msg:       msgFieldInclusion + ", did you use NewBatchControl()?",
+		}
 	}
 	if bc.ODFIIdentification == "000000000" {
-		return &FieldError{FieldName: "ODFIIdentification", Value: bc.ODFIIdentificationField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "ODFIIdentification",
+			Value:     bc.ODFIIdentificationField(),
+			Msg:       msgFieldInclusion + ", did you use NewBatchControl()?",
+		}
 	}
 	return nil
 }
