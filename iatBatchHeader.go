@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/moov-io/ach/internal/iso3166"
 )
 
 // msgServiceClass
@@ -265,6 +267,10 @@ func (iatBh *IATBatchHeader) Validate() error {
 	if err := iatBh.isForeignExchangeReferenceIndicator(iatBh.ForeignExchangeReferenceIndicator); err != nil {
 		return &FieldError{FieldName: "ForeignExchangeReferenceIndicator",
 			Value: strconv.Itoa(iatBh.ForeignExchangeReferenceIndicator), Msg: err.Error()}
+	}
+	if !iso3166.Valid(iatBh.ISODestinationCountryCode) {
+		return &FieldError{FieldName: "ISODestinationCountryCode",
+			Value: iatBh.ISODestinationCountryCode, Msg: "invalid ISO 3166-1-alpha-2 code"}
 	}
 	if err := iatBh.isAlphanumeric(iatBh.ISODestinationCountryCode); err != nil {
 		return &FieldError{FieldName: "ISODestinationCountryCode",
