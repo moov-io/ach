@@ -16,7 +16,7 @@ docker: clean
 	docker build -t moov/ach:$(VERSION) -f Dockerfile .
 	docker tag moov/ach:$(VERSION) moov/ach:latest
 
-release: docker AUTHORS
+release: docker generate AUTHORS
 	go test ./...
 	git tag -f $(VERSION)
 
