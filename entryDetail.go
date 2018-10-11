@@ -426,7 +426,11 @@ func (ed *EntryDetail) TraceNumberField() string {
 
 // CreditOrDebit returns a "C" for credit or "D" for debit based on the entry TransactionCode
 func (ed *EntryDetail) CreditOrDebit() string {
+	if ed.TransactionCode < 10 || ed.TransactionCode > 99 {
+		return ""
+	}
 	tc := strconv.Itoa(ed.TransactionCode)
+
 	// take the second number in the TransactionCode
 	switch tc[1:2] {
 	case "1", "2", "3", "4":

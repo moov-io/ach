@@ -597,18 +597,33 @@ func BenchmarkEDAddAddenda99Twice(b *testing.B) {
 
 // testEDCreditOrDebit validates debit and credit transaction code
 func testEDCreditOrDebit(t testing.TB) {
-	// TODO add more credit and debit transaction code's to this test
 	entry := mockEntryDetail()
-	if entry.CreditOrDebit() != "C" {
+	if entry.CreditOrDebit() != "C" { // our mock's default
 		t.Errorf("TransactionCode %v expected a Credit(C) got %v", entry.TransactionCode, entry.CreditOrDebit())
 	}
-	entry.TransactionCode = 27
-	if entry.CreditOrDebit() != "D" {
-		t.Errorf("TransactionCode %v expected a Debit(D) got %v", entry.TransactionCode, entry.CreditOrDebit())
+
+	// TransactionCode -> C or D
+	var cases = map[int]string{
+		// invalid
+		-1:  "",
+		00:  "", // invalid
+		1:   "",
+		108: "",
+		// valid
+		22: "C",
+		23: "C",
+		27: "D",
+		28: "D",
+		32: "C",
+		33: "C",
+		37: "D",
+		38: "D",
 	}
-	entry.TransactionCode = 10
-	if entry.CreditOrDebit() != "" {
-		t.Errorf("TransactionCode %v is invalid", entry.TransactionCode)
+	for code, expected := range cases {
+		entry.TransactionCode = code
+		if v := entry.CreditOrDebit(); v != expected {
+			t.Errorf("TransactionCode %d expected %s, got %s", code, expected, v)
+		}
 	}
 }
 
