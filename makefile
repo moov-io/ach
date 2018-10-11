@@ -7,7 +7,8 @@ build:
 	CGO_ENABLED=0 go build -o bin/ach ./cmd/server
 
 generate: clean
-	go run internal/iso3166/iso3166_gen.go
+	@go run internal/iso3166/iso3166_gen.go
+	@go run internal/iso4217/iso4217_gen.go
 
 clean:
 	@rm -rf tmp/
