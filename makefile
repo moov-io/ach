@@ -1,10 +1,13 @@
 VERSION := $(shell grep -Eo '(v[0-9]+[\.][0-9]+[\.][0-9]+([-a-zA-Z0-9]*)?)' version.go)
 
-.PHONY: build docker release
+.PHONY: build generate docker release
 
 build:
 	go fmt ./...
 	CGO_ENABLED=0 go build -o bin/ach ./cmd/server
+
+generate: clean
+	go run internal/iso3166/iso3166_gen.go
 
 clean:
 	@rm -rf tmp/
@@ -13,7 +16,7 @@ docker: clean
 	docker build -t moov/ach:$(VERSION) -f Dockerfile .
 	docker tag moov/ach:$(VERSION) moov/ach:latest
 
-release: docker AUTHORS
+release: docker generate AUTHORS
 	go test ./...
 	git tag -f $(VERSION)
 
