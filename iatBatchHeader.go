@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/moov-io/ach/internal/iso3166"
+	"github.com/moov-io/ach/internal/iso4217"
 )
 
 // msgServiceClass
@@ -288,15 +289,25 @@ func (iatBh *IATBatchHeader) Validate() error {
 		return &FieldError{FieldName: "CompanyEntryDescription",
 			Value: iatBh.CompanyEntryDescription, Msg: err.Error()}
 	}
+
+	if !iso4217.Valid(iatBh.ISOOriginatingCurrencyCode) {
+		return &FieldError{FieldName: "ISOOriginatingCurrencyCode",
+			Value: iatBh.ISOOriginatingCurrencyCode, Msg: "invalid ISO 4217 code"}
+	}
 	if err := iatBh.isAlphanumeric(iatBh.ISOOriginatingCurrencyCode); err != nil {
 		return &FieldError{FieldName: "ISOOriginatingCurrencyCode",
 			Value: iatBh.ISOOriginatingCurrencyCode, Msg: err.Error()}
 	}
 
+	if !iso4217.Valid(iatBh.ISODestinationCurrencyCode) {
+		return &FieldError{FieldName: "ISODestinationCurrencyCode",
+			Value: iatBh.ISODestinationCurrencyCode, Msg: "invalid ISO 4217 code"}
+	}
 	if err := iatBh.isAlphanumeric(iatBh.ISODestinationCurrencyCode); err != nil {
 		return &FieldError{FieldName: "ISODestinationCurrencyCode",
 			Value: iatBh.ISODestinationCurrencyCode, Msg: err.Error()}
 	}
+
 	if err := iatBh.isOriginatorStatusCode(iatBh.OriginatorStatusCode); err != nil {
 		return &FieldError{FieldName: "OriginatorStatusCode",
 			Value: strconv.Itoa(iatBh.OriginatorStatusCode), Msg: err.Error()}
