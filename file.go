@@ -97,6 +97,10 @@ func FileFromJson(bs []byte) (*File, error) {
 	return &file, nil
 }
 
+func (f *File) UnmarshalJSON(p []byte) error {
+	return errors.New("json struct tag unmarshal is deprecated, use ach.FileFromJSON instead.")
+}
+
 type batchesJSON struct {
 	Batches []*batch `json:"batches"`
 }
