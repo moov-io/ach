@@ -6,6 +6,7 @@ package ach
 
 import (
 	"fmt"
+	"unicode/utf8"
 )
 
 // BatchSHR holds the BatchHeader and BatchControl and all EntryDetail for SHR Entries.
@@ -70,8 +71,21 @@ func (batch *BatchSHR) Validate() error {
 			return &FieldError{FieldName: "CardExpirationDate", Value: entry.parseStringField(entry.SHRCardExpirationDateField()[0:2]), Msg: msgValidMonth}
 		}
 
-		if err := entry.isYear(entry.parseStringField(entry.SHRCardExpirationDateField()[2:4])); err != nil {
-			return &FieldError{FieldName: "CardExpirationDate", Value: entry.parseStringField(entry.SHRCardExpirationDateField()[2:4]), Msg: msgValidYear}
+		if v := entry.SHRCardExpirationDateField(); utf8.RuneCountInString(v) == 4 {
+			exp := entry.parseStringField(v[2:4])
+			if err := entry.isYear(exp); err != nil {
+				return &FieldError{
+					FieldName: "CardExpirationDate",
+					Value: v,
+					Msg: msgValidYear,
+				}
+			}
+		} else {
+			return &FieldError{
+				FieldName: "CardExpirationDate",
+				Value: v,
+				Msg: msgFieldInclusion,
+			}
 		}
 
 		// Addenda validations - SHR Addenda must be Addenda02
