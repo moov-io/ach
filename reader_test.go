@@ -5,11 +5,11 @@
 package ach
 
 import (
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
-	"io/ioutil"
-	"path/filepath"
 )
 
 func TestReader__crashers(t *testing.T) {

@@ -149,15 +149,15 @@ func (addenda02 *Addenda02) Validate() error {
 		if err != nil {
 			return &FieldError{
 				FieldName: "TransactionDate",
-				Value: addenda02.parseStringField(mm),
-				Msg: msgValidDay,
+				Value:     addenda02.parseStringField(mm),
+				Msg:       msgValidDay,
 			}
 		}
 	} else {
 		return &FieldError{
 			FieldName: "TransactionDate",
-			Value: addenda02.TransactionDate,
-			Msg: msgFieldInclusion,
+			Value:     addenda02.TransactionDate,
+			Msg:       msgFieldInclusion,
 		}
 	}
 

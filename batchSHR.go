@@ -76,15 +76,15 @@ func (batch *BatchSHR) Validate() error {
 			if err := entry.isYear(exp); err != nil {
 				return &FieldError{
 					FieldName: "CardExpirationDate",
-					Value: v,
-					Msg: msgValidYear,
+					Value:     v,
+					Msg:       msgValidYear,
 				}
 			}
 		} else {
 			return &FieldError{
 				FieldName: "CardExpirationDate",
-				Value: v,
-				Msg: msgFieldInclusion,
+				Value:     v,
+				Msg:       msgFieldInclusion,
 			}
 		}
 
