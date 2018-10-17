@@ -7,6 +7,7 @@ package ach
 import (
 	"fmt"
 	"strings"
+	"unicode/utf8"
 )
 
 // Addenda02 is a Addendumer addenda which provides business transaction information for Addenda Type
@@ -141,9 +142,25 @@ func (addenda02 *Addenda02) Validate() error {
 	}
 	// TransactionDate Addenda02 ACH File format is MMDD.  If the month is valid, validate the day for the
 	// month 01-31 depending on month.
-	if err := addenda02.isDay(addenda02.parseStringField(addenda02.TransactionDate[0:2]), addenda02.parseStringField(addenda02.TransactionDate[2:4])); err != nil {
-		return &FieldError{FieldName: "TransactionDate", Value: addenda02.parseStringField(addenda02.TransactionDate[0:2]), Msg: msgValidDay}
+	if utf8.RuneCountInString(addenda02.TransactionDate) == 4 {
+		mm := addenda02.TransactionDate[0:2]
+		dd := addenda02.TransactionDate[2:4]
+		err := addenda02.isDay(addenda02.parseStringField(mm), addenda02.parseStringField(dd))
+		if err != nil {
+			return &FieldError{
+				FieldName: "TransactionDate",
+				Value: addenda02.parseStringField(mm),
+				Msg: msgValidDay,
+			}
+		}
+	} else {
+		return &FieldError{
+			FieldName: "TransactionDate",
+			Value: addenda02.TransactionDate,
+			Msg: msgFieldInclusion,
+		}
 	}
+
 	if err := addenda02.isAlphanumeric(addenda02.AuthorizationCodeOrExpireDate); err != nil {
 		return &FieldError{FieldName: "AuthorizationCodeOrExpireDate", Value: addenda02.AuthorizationCodeOrExpireDate, Msg: err.Error()}
 	}
