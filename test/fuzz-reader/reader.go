@@ -29,6 +29,32 @@ func Fuzz(data []byte) int {
 	}
 
 	// FileHeader
+	if n := checkFileHeader(&f); n > 0 {
+		return n
+	}
+
+	// Batches
+	if n := checkFileBatches(&f); n > 0 {
+		return n
+	}
+
+	// FileControl
+	if n := checkFileControl(&f); n > 0 {
+		return n
+	}
+
+	// Changes / Returns
+	if len(f.NotificationOfChange) > 0 {
+		return 1
+	}
+	if len(f.ReturnEntries) > 0 {
+		return 1
+	}
+
+	return 1 // increase priority of input
+}
+
+func checkFileHeader(f *ach.File) int {
 	if f.Header.ID != "" {
 		return 1
 	}
@@ -47,16 +73,17 @@ func Fuzz(data []byte) int {
 	if f.Header.ReferenceCode != "" {
 		return 1
 	}
+	return -2
+}
 
-	// Batches
-	if len(f.Batches) > 0 {
+func checkFileBatches(f *ach.File) int {
+	if len(f.Batches) > 0 || len(f.IATBatches) > 0 {
 		return 1
 	}
-	if len(f.IATBatches) > 0 {
-		return 1
-	}
+	return -2
+}
 
-	// FileControl
+func checkFileControl(f *ach.File) int {
 	if f.Control.ID != "" {
 		return 1
 	}
@@ -72,14 +99,5 @@ func Fuzz(data []byte) int {
 	if f.Control.TotalCreditEntryDollarAmountInFile > 0 {
 		return 1
 	}
-
-	// Changes / Returns
-	if len(f.NotificationOfChange) > 0 {
-		return 1
-	}
-	if len(f.ReturnEntries) > 0 {
-		return 1
-	}
-
-	return 1 // increase priority of input
+	return -2
 }
