@@ -341,7 +341,7 @@ func (ed *EntryDetail) SetSHRIndividualCardAccountNumber(s string) {
 // SHRCardExpirationDateField format MMYY is used in SHR, characters 1-4 of underlying
 // IdentificationNumber
 func (ed *EntryDetail) SHRCardExpirationDateField() string {
-	return ed.parseStringField(ed.IdentificationNumber[0:4])
+	return ed.alphaField(ed.parseStringField(ed.IdentificationNumber[0:4]), 4)
 }
 
 // SHRDocumentReferenceNumberField format int is used in SHR, characters 5-15 of underlying

@@ -7,7 +7,6 @@ package ach
 import (
 	"fmt"
 	"strings"
-	"unicode/utf8"
 )
 
 // Addenda02 is a Addendumer addenda which provides business transaction information for Addenda Type
@@ -139,29 +138,20 @@ func (addenda02 *Addenda02) Validate() error {
 
 	// TransactionDate Addenda02 ACH File format is MMDD. Validate MM is 01-12 and day for the
 	// month 01-31 depending on month.
-	if utf8.RuneCountInString(addenda02.TransactionDate) == 4 {
-		mm := addenda02.parseStringField(addenda02.TransactionDate[0:2])
-		dd := addenda02.parseStringField(addenda02.TransactionDate[2:4])
-
-		if err := addenda02.isMonth(mm); err != nil {
-			return &FieldError{
-				FieldName: "TransactionDate",
-				Value: mm,
-				Msg: msgValidMonth,
-			}
-		}
-		if err := addenda02.isDay(mm, dd); err != nil {
-			return &FieldError{
-				FieldName: "TransactionDate",
-				Value:     dd,
-				Msg:       msgValidDay,
-			}
-		}
-	} else {
+	mm := addenda02.parseStringField(addenda02.TransactionDateField()[0:2])
+	dd := addenda02.parseStringField(addenda02.TransactionDateField()[2:4])
+	if err := addenda02.isMonth(mm); err != nil {
 		return &FieldError{
 			FieldName: "TransactionDate",
-			Value:     addenda02.TransactionDate,
-			Msg:       msgFieldInclusion,
+			Value: mm,
+			Msg: msgValidMonth,
+		}
+	}
+	if err := addenda02.isDay(mm, dd); err != nil {
+		return &FieldError{
+			FieldName: "TransactionDate",
+			Value:     dd,
+			Msg:       msgValidDay,
 		}
 	}
 
@@ -239,7 +229,7 @@ func (addenda02 *Addenda02) TransactionSerialNumberField() string {
 
 // TransactionDateField returns TransactionDate MMDD string
 func (addenda02 *Addenda02) TransactionDateField() string {
-	return addenda02.TransactionDate
+	return addenda02.alphaField(addenda02.TransactionDate, 4)
 }
 
 // AuthorizationCodeOrExpireDateField returns a space padded AuthorizationCodeOrExpireDate string

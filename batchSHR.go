@@ -6,7 +6,6 @@ package ach
 
 import (
 	"fmt"
-	"unicode/utf8"
 )
 
 // BatchSHR holds the BatchHeader and BatchControl and all EntryDetail for SHR Entries.
@@ -67,22 +66,13 @@ func (batch *BatchSHR) Validate() error {
 		}
 
 		// CardExpirationDate BatchSHR ACH File format is MMYY.  Validate MM is 01-12.
-		if v := entry.SHRCardExpirationDateField(); utf8.RuneCountInString(v) == 4 {
-			month := entry.parseStringField(v[0:2])
-			year := entry.parseStringField(v[2:4])
-
-			if err := entry.isMonth(month); err != nil {
-				return &FieldError{FieldName: "CardExpirationDate", Value: month, Msg: msgValidMonth}
-			}
-			if err := entry.isYear(year); err != nil {
-				return &FieldError{FieldName: "CardExpirationDate", Value: v, Msg: msgValidYear}
-			}
-		} else {
-			return &FieldError{
-				FieldName: "CardExpirationDate",
-				Value:     v,
-				Msg:       msgFieldInclusion,
-			}
+		month := entry.parseStringField(entry.SHRCardExpirationDateField()[0:2])
+		year := entry.parseStringField(entry.SHRCardExpirationDateField()[2:4])
+		if err := entry.isMonth(month); err != nil {
+			return &FieldError{FieldName: "CardExpirationDate", Value: month, Msg: msgValidMonth}
+		}
+		if err := entry.isYear(year); err != nil {
+			return &FieldError{FieldName: "CardExpirationDate", Value: year, Msg: msgValidYear}
 		}
 
 		// Addenda validations - SHR Addenda must be Addenda02
