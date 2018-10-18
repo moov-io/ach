@@ -191,22 +191,46 @@ func (ed *EntryDetail) Validate() error {
 // invalid the ACH transfer will be returned.
 func (ed *EntryDetail) fieldInclusion() error {
 	if ed.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: ed.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     ed.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewEntryDetail()?",
+		}
 	}
 	if ed.TransactionCode == 0 {
-		return &FieldError{FieldName: "TransactionCode", Value: strconv.Itoa(ed.TransactionCode), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "TransactionCode",
+			Value:     strconv.Itoa(ed.TransactionCode),
+			Msg:       msgFieldInclusion + ", did you use NewEntryDetail()?",
+		}
 	}
 	if ed.RDFIIdentification == "" {
-		return &FieldError{FieldName: "RDFIIdentification", Value: ed.RDFIIdentificationField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "RDFIIdentification",
+			Value:     ed.RDFIIdentificationField(),
+			Msg:       msgFieldInclusion + ", did you use NewEntryDetail()?",
+		}
 	}
 	if ed.DFIAccountNumber == "" {
-		return &FieldError{FieldName: "DFIAccountNumber", Value: ed.DFIAccountNumber, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "DFIAccountNumber",
+			Value:     ed.DFIAccountNumber,
+			Msg:       msgFieldInclusion + ", did you use NewEntryDetail()?",
+		}
 	}
 	if ed.IndividualName == "" {
-		return &FieldError{FieldName: "IndividualName", Value: ed.IndividualName, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "IndividualName",
+			Value:     ed.IndividualName,
+			Msg:       msgFieldInclusion + ", did you use NewEntryDetail()?",
+		}
 	}
 	if ed.TraceNumber == 0 {
-		return &FieldError{FieldName: "TraceNumber", Value: ed.TraceNumberField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "TraceNumber",
+			Value:     ed.TraceNumberField(),
+			Msg:       msgFieldInclusion + ", did you use NewEntryDetail()?",
+		}
 	}
 	return nil
 }

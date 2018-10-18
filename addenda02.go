@@ -175,10 +175,17 @@ func (addenda02 *Addenda02) Validate() error {
 
 func (addenda02 *Addenda02) fieldInclusion() error {
 	if addenda02.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: addenda02.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     addenda02.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda02()?",
+		}
 	}
 	if addenda02.TypeCode == "" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda02.TypeCode, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "TypeCode",
+			Value:     addenda02.TypeCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda02()?"}
 	}
 	// Required Fields
 	if addenda02.TerminalIdentificationCode == "" {

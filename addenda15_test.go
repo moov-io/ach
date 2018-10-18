@@ -5,6 +5,7 @@
 package ach
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -206,7 +207,7 @@ func testAddenda15FieldInclusionRecordType(t testing.TB) {
 	addenda15.recordType = ""
 	if err := addenda15.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -232,7 +233,7 @@ func testAddenda15FieldInclusionTypeCode(t testing.TB) {
 	addenda15.TypeCode = ""
 	if err := addenda15.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -258,7 +259,7 @@ func testAddenda15FieldInclusionReceiverStreetAddress(t testing.TB) {
 	addenda15.ReceiverStreetAddress = ""
 	if err := addenda15.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -284,7 +285,7 @@ func testAddenda15FieldInclusionEntryDetailSequenceNumber(t testing.TB) {
 	addenda15.EntryDetailSequenceNumber = 0
 	if err := addenda15.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}

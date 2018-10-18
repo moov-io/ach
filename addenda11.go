@@ -107,22 +107,39 @@ func (addenda11 *Addenda11) Validate() error {
 // invalid the ACH transfer will be returned.
 func (addenda11 *Addenda11) fieldInclusion() error {
 	if addenda11.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: addenda11.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     addenda11.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda11()?",
+		}
 	}
 	if addenda11.TypeCode == "" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda11.TypeCode, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "TypeCode",
+			Value:     addenda11.TypeCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda11()?",
+		}
 	}
 	if addenda11.OriginatorName == "" {
-		return &FieldError{FieldName: "OriginatorName",
-			Value: addenda11.OriginatorName, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "OriginatorName",
+			Value:     addenda11.OriginatorName,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda11()?",
+		}
 	}
 	if addenda11.OriginatorStreetAddress == "" {
-		return &FieldError{FieldName: "OriginatorStreetAddress",
-			Value: addenda11.OriginatorStreetAddress, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "OriginatorStreetAddress",
+			Value:     addenda11.OriginatorStreetAddress,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda11()?",
+		}
 	}
 	if addenda11.EntryDetailSequenceNumber == 0 {
-		return &FieldError{FieldName: "EntryDetailSequenceNumber",
-			Value: addenda11.EntryDetailSequenceNumberField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "EntryDetailSequenceNumber",
+			Value:     addenda11.EntryDetailSequenceNumberField(),
+			Msg:       msgFieldInclusion + ", did you use NewAddenda11()?",
+		}
 	}
 	return nil
 }

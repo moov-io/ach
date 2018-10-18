@@ -217,25 +217,53 @@ func (bh *BatchHeader) Validate() error {
 // invalid the ACH transfer will be returned.
 func (bh *BatchHeader) fieldInclusion() error {
 	if bh.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: bh.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     bh.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewBatchHeader()?",
+		}
 	}
 	if bh.ServiceClassCode == 0 {
-		return &FieldError{FieldName: "ServiceClassCode", Value: strconv.Itoa(bh.ServiceClassCode), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "ServiceClassCode",
+			Value:     strconv.Itoa(bh.ServiceClassCode),
+			Msg:       msgFieldInclusion + ", did you use NewBatchHeader()?",
+		}
 	}
 	if bh.CompanyName == "" {
-		return &FieldError{FieldName: "CompanyName", Value: bh.CompanyName, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "CompanyName",
+			Value:     bh.CompanyName,
+			Msg:       msgFieldInclusion + ", did you use NewBatchHeader()?",
+		}
 	}
 	if bh.CompanyIdentification == "" {
-		return &FieldError{FieldName: "CompanyIdentification", Value: bh.CompanyIdentification, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "CompanyIdentification",
+			Value:     bh.CompanyIdentification,
+			Msg:       msgFieldInclusion + ", did you use NewBatchHeader()?",
+		}
 	}
 	if bh.StandardEntryClassCode == "" {
-		return &FieldError{FieldName: "StandardEntryClassCode", Value: bh.StandardEntryClassCode, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "StandardEntryClassCode",
+			Value:     bh.StandardEntryClassCode,
+			Msg:       msgFieldInclusion + ", did you use NewBatchHeader()?",
+		}
 	}
 	if bh.CompanyEntryDescription == "" {
-		return &FieldError{FieldName: "CompanyEntryDescription", Value: bh.CompanyEntryDescription, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "CompanyEntryDescription",
+			Value:     bh.CompanyEntryDescription,
+			Msg:       msgFieldInclusion + ", did you use NewBatchHeader()?",
+		}
 	}
 	if bh.ODFIIdentification == "" {
-		return &FieldError{FieldName: "ODFIIdentification", Value: bh.ODFIIdentificationField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "ODFIIdentification",
+			Value:     bh.ODFIIdentificationField(),
+			Msg:       msgFieldInclusion + ", did you use NewBatchHeader()?",
+		}
 	}
 	return nil
 }

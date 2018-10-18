@@ -141,30 +141,53 @@ func (addenda14 *Addenda14) Validate() error {
 // invalid the ACH transfer will be returned.
 func (addenda14 *Addenda14) fieldInclusion() error {
 	if addenda14.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: addenda14.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     addenda14.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda14()?",
+		}
 	}
 	if addenda14.TypeCode == "" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda14.TypeCode, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "TypeCode",
+			Value:     addenda14.TypeCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda14()?",
+		}
 	}
 	if addenda14.RDFIName == "" {
-		return &FieldError{FieldName: "RDFIName",
-			Value: addenda14.RDFIName, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "RDFIName",
+			Value:     addenda14.RDFIName,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda14()?",
+		}
 	}
 	if addenda14.RDFIIDNumberQualifier == "" {
-		return &FieldError{FieldName: "RDFIIDNumberQualifier",
-			Value: addenda14.RDFIIDNumberQualifier, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "RDFIIDNumberQualifier",
+			Value:     addenda14.RDFIIDNumberQualifier,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda14()?",
+		}
 	}
 	if addenda14.RDFIIdentification == "" {
-		return &FieldError{FieldName: "RDFIIdentification",
-			Value: addenda14.RDFIIdentification, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "RDFIIdentification",
+			Value:     addenda14.RDFIIdentification,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda14()?",
+		}
 	}
 	if addenda14.RDFIBranchCountryCode == "" {
-		return &FieldError{FieldName: "RDFIBranchCountryCode",
-			Value: addenda14.RDFIBranchCountryCode, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "RDFIBranchCountryCode",
+			Value:     addenda14.RDFIBranchCountryCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda14()?",
+		}
 	}
 	if addenda14.EntryDetailSequenceNumber == 0 {
-		return &FieldError{FieldName: "EntryDetailSequenceNumber",
-			Value: addenda14.EntryDetailSequenceNumberField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "EntryDetailSequenceNumber",
+			Value:     addenda14.EntryDetailSequenceNumberField(),
+			Msg:       msgFieldInclusion + ", did you use NewAddenda14()?",
+		}
 	}
 	return nil
 }

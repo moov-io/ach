@@ -103,16 +103,32 @@ func (addenda17 *Addenda17) Validate() error {
 // invalid the ACH transfer will be returned.
 func (addenda17 *Addenda17) fieldInclusion() error {
 	if addenda17.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: addenda17.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     addenda17.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda17()?",
+		}
 	}
 	if addenda17.TypeCode == "" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda17.TypeCode, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "TypeCode",
+			Value:     addenda17.TypeCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda17()?",
+		}
 	}
 	if addenda17.SequenceNumber == 0 {
-		return &FieldError{FieldName: "SequenceNumber", Value: addenda17.SequenceNumberField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "SequenceNumber",
+			Value:     addenda17.SequenceNumberField(),
+			Msg:       msgFieldInclusion + ", did you use NewAddenda17()?",
+		}
 	}
 	if addenda17.EntryDetailSequenceNumber == 0 {
-		return &FieldError{FieldName: "EntryDetailSequenceNumber", Value: addenda17.EntryDetailSequenceNumberField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "EntryDetailSequenceNumber",
+			Value:     addenda17.EntryDetailSequenceNumberField(),
+			Msg:       msgFieldInclusion + ", did you use NewAddenda17()?",
+		}
 	}
 	return nil
 }

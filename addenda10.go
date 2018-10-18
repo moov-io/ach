@@ -127,14 +127,25 @@ func (addenda10 *Addenda10) Validate() error {
 // invalid the ACH transfer will be returned.
 func (addenda10 *Addenda10) fieldInclusion() error {
 	if addenda10.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: addenda10.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     addenda10.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda10()?",
+		}
 	}
 	if addenda10.TypeCode == "" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda10.TypeCode, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "TypeCode",
+			Value:     addenda10.TypeCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda10()?",
+		}
 	}
 	if addenda10.TransactionTypeCode == "" {
-		return &FieldError{FieldName: "TransactionTypeCode",
-			Value: addenda10.TransactionTypeCode, Msg: msgFieldRequired}
+		return &FieldError{
+			FieldName: "TransactionTypeCode",
+			Value:     addenda10.TransactionTypeCode,
+			Msg:       msgFieldRequired,
+		}
 	}
 	// ToDo:  Commented because it appears this value can be all 000 (maybe blank?)
 	/*	if addenda10.ForeignPaymentAmount == 0 {
@@ -142,11 +153,18 @@ func (addenda10 *Addenda10) fieldInclusion() error {
 			Value: strconv.Itoa(addenda10.ForeignPaymentAmount), Msg: msgFieldRequired}
 	}*/
 	if addenda10.Name == "" {
-		return &FieldError{FieldName: "Name", Value: addenda10.Name, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "Name",
+			Value:     addenda10.Name,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda10()?",
+		}
 	}
 	if addenda10.EntryDetailSequenceNumber == 0 {
-		return &FieldError{FieldName: "EntryDetailSequenceNumber",
-			Value: addenda10.EntryDetailSequenceNumberField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "EntryDetailSequenceNumber",
+			Value:     addenda10.EntryDetailSequenceNumberField(),
+			Msg:       msgFieldInclusion + ", did you use NewAddenda10()?",
+		}
 	}
 	return nil
 }

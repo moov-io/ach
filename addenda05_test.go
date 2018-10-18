@@ -145,7 +145,7 @@ func TestAddenda05FieldInclusionRecordType(t *testing.T) {
 	addenda05.recordType = ""
 	if err := addenda05.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}

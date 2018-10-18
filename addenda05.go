@@ -98,16 +98,32 @@ func (addenda05 *Addenda05) Validate() error {
 // invalid the ACH transfer will be returned.
 func (addenda05 *Addenda05) fieldInclusion() error {
 	if addenda05.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: addenda05.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     addenda05.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda05()?",
+		}
 	}
 	if addenda05.TypeCode == "" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda05.TypeCode, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "TypeCode",
+			Value:     addenda05.TypeCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda05()?",
+		}
 	}
 	if addenda05.SequenceNumber == 0 {
-		return &FieldError{FieldName: "SequenceNumber", Value: addenda05.SequenceNumberField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "SequenceNumber",
+			Value:     addenda05.SequenceNumberField(),
+			Msg:       msgFieldInclusion + ", did you use NewAddenda05()?",
+		}
 	}
 	if addenda05.EntryDetailSequenceNumber == 0 {
-		return &FieldError{FieldName: "EntryDetailSequenceNumber", Value: addenda05.EntryDetailSequenceNumberField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "EntryDetailSequenceNumber",
+			Value:     addenda05.EntryDetailSequenceNumberField(),
+			Msg:       msgFieldInclusion + ", did you use NewAddenda05()?",
+		}
 	}
 	return nil
 }
