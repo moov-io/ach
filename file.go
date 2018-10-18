@@ -47,7 +47,7 @@ type FileError struct {
 	Msg       string
 }
 
-func (e *FileError) Error() string {
+func (e FileError) Error() string {
 	return fmt.Sprintf("%s %s", e.FieldName, e.Msg)
 }
 
