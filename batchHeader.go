@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 // msgServiceClass
@@ -118,6 +119,10 @@ func NewBatchHeader() *BatchHeader {
 
 // Parse takes the input record string and parses the BatchHeader values
 func (bh *BatchHeader) Parse(record string) {
+	if utf8.RuneCountInString(record) != 94 {
+		return
+	}
+
 	// 1-1 Always "5"
 	bh.recordType = "5"
 	// 2-4 If the entries are credits, always "220". If the entries are debits, always "225"

@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/moov-io/ach/internal/iso3166"
 	"github.com/moov-io/ach/internal/iso4217"
@@ -171,6 +172,10 @@ func NewIATBatchHeader() *IATBatchHeader {
 
 // Parse takes the input record string and parses the BatchHeader values
 func (iatBh *IATBatchHeader) Parse(record string) {
+	if utf8.RuneCountInString(record) != 94 {
+		return
+	}
+
 	// 1-1 Always "5"
 	iatBh.recordType = "5"
 	// 2-4 If the entries are credits, always "220". If the entries are debits, always "225"

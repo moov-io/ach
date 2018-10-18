@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 // Errors specific to a File Header Record
@@ -107,6 +108,10 @@ func NewFileHeader() FileHeader {
 
 // Parse takes the input record string and parses the FileHeader values
 func (fh *FileHeader) Parse(record string) {
+	if utf8.RuneCountInString(record) != 94 {
+		return
+	}
+
 	// (character position 1-1) Always "1"
 	fh.recordType = "1"
 	// (2-3) Always "01"
