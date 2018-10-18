@@ -7,6 +7,7 @@ package ach
 import (
 	"fmt"
 	"strings"
+	"unicode/utf8"
 )
 
 // FileControl record contains entry counts, dollar totals and hash
@@ -45,6 +46,10 @@ type FileControl struct {
 
 // Parse takes the input record string and parses the FileControl values
 func (fc *FileControl) Parse(record string) {
+	if utf8.RuneCountInString(record) < 55 {
+		return
+	}
+
 	// 1-1 Always "9"
 	fc.recordType = "9"
 	// 2-7 The total number of Batch Header Record in the file. For example: "000003

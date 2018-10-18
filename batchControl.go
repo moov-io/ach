@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 // BatchControl contains entry counts, dollar total and has totals for all
@@ -72,6 +73,10 @@ type BatchControl struct {
 
 // Parse takes the input record string and parses the EntryDetail values
 func (bc *BatchControl) Parse(record string) {
+	if utf8.RuneCountInString(record) != 94 {
+		return
+	}
+
 	// 1-1 Always "8"
 	bc.recordType = "8"
 	// 2-4 This is the same as the "Service code" field in previous Batch Header Record

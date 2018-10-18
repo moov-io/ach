@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 // IATEntryDetail contains the actual transaction data for an individual entry.
@@ -120,6 +121,10 @@ func NewIATEntryDetail() *IATEntryDetail {
 
 // Parse takes the input record string and parses the EntryDetail values
 func (ed *IATEntryDetail) Parse(record string) {
+	if utf8.RuneCountInString(record) != 94 {
+		return
+	}
+
 	// 1-1 Always "6"
 	ed.recordType = "6"
 	// 2-3 is checking credit 22 debit 27 savings credit 32 debit 37
