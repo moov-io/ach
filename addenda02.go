@@ -143,8 +143,8 @@ func (addenda02 *Addenda02) Validate() error {
 	if err := addenda02.isMonth(mm); err != nil {
 		return &FieldError{
 			FieldName: "TransactionDate",
-			Value: mm,
-			Msg: msgValidMonth,
+			Value:     mm,
+			Msg:       msgValidMonth,
 		}
 	}
 	if err := addenda02.isDay(mm, dd); err != nil {
