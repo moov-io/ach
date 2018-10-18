@@ -5,10 +5,42 @@
 package ach
 
 import (
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
+
+func TestReader__crashers(t *testing.T) {
+	dir := filepath.Join("test", "testdata", "crashes")
+	fds, err := ioutil.ReadDir(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var currentFile string
+
+	// log current file when we panic
+	defer func() {
+		if v := recover(); v != nil {
+			if _, ok := v.(error); ok {
+				t.Errorf("panic from parsing %s", filepath.Join(dir, currentFile))
+				panic(v) // throw original panic so testing package emits trace
+			}
+		}
+	}()
+
+	for i := range fds {
+		currentFile = fds[i].Name()
+
+		f, err := os.Open(filepath.Join(dir, fds[i].Name()))
+		if err != nil {
+			t.Fatal(err)
+		}
+		NewReader(f).Read() // making sure we don't panic
+	}
+}
 
 // testParseError validates a a parsing error
 func testParseError(t testing.TB) {
