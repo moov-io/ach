@@ -67,18 +67,15 @@ func (batch *BatchSHR) Validate() error {
 		}
 
 		// CardExpirationDate BatchSHR ACH File format is MMYY.  Validate MM is 01-12.
-		if err := entry.isMonth(entry.parseStringField(entry.SHRCardExpirationDateField()[0:2])); err != nil {
-			return &FieldError{FieldName: "CardExpirationDate", Value: entry.parseStringField(entry.SHRCardExpirationDateField()[0:2]), Msg: msgValidMonth}
-		}
-
 		if v := entry.SHRCardExpirationDateField(); utf8.RuneCountInString(v) == 4 {
-			exp := entry.parseStringField(v[2:4])
-			if err := entry.isYear(exp); err != nil {
-				return &FieldError{
-					FieldName: "CardExpirationDate",
-					Value:     v,
-					Msg:       msgValidYear,
-				}
+			month := entry.parseStringField(v[0:2])
+			year := entry.parseStringField(v[2:4])
+
+			if err := entry.isMonth(month); err != nil {
+				return &FieldError{FieldName: "CardExpirationDate", Value: month, Msg: msgValidMonth}
+			}
+			if err := entry.isYear(year); err != nil {
+				return &FieldError{FieldName: "CardExpirationDate", Value: v, Msg: msgValidYear}
 			}
 		} else {
 			return &FieldError{

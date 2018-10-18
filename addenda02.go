@@ -136,20 +136,24 @@ func (addenda02 *Addenda02) Validate() error {
 	if err := addenda02.isAlphanumeric(addenda02.TransactionSerialNumber); err != nil {
 		return &FieldError{FieldName: "TransactionSerialNumber", Value: addenda02.TransactionSerialNumber, Msg: err.Error()}
 	}
-	// TransactionDate Addenda02 ACH File format is MMDD.  Validate MM is 01-12.
-	if err := addenda02.isMonth(addenda02.parseStringField(addenda02.TransactionDate[0:2])); err != nil {
-		return &FieldError{FieldName: "TransactionDate", Value: addenda02.parseStringField(addenda02.TransactionDate[0:2]), Msg: msgValidMonth}
-	}
-	// TransactionDate Addenda02 ACH File format is MMDD.  If the month is valid, validate the day for the
+
+	// TransactionDate Addenda02 ACH File format is MMDD. Validate MM is 01-12 and day for the
 	// month 01-31 depending on month.
 	if utf8.RuneCountInString(addenda02.TransactionDate) == 4 {
-		mm := addenda02.TransactionDate[0:2]
-		dd := addenda02.TransactionDate[2:4]
-		err := addenda02.isDay(addenda02.parseStringField(mm), addenda02.parseStringField(dd))
-		if err != nil {
+		mm := addenda02.parseStringField(addenda02.TransactionDate[0:2])
+		dd := addenda02.parseStringField(addenda02.TransactionDate[2:4])
+
+		if err := addenda02.isMonth(mm); err != nil {
 			return &FieldError{
 				FieldName: "TransactionDate",
-				Value:     addenda02.parseStringField(mm),
+				Value: mm,
+				Msg: msgValidMonth,
+			}
+		}
+		if err := addenda02.isDay(mm, dd); err != nil {
+			return &FieldError{
+				FieldName: "TransactionDate",
+				Value:     dd,
 				Msg:       msgValidDay,
 			}
 		}
