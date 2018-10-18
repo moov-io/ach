@@ -5,6 +5,7 @@
 package ach
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
@@ -381,5 +382,12 @@ func TestFile__readFromJson(t *testing.T) {
 
 	if len(file.Batches) != 1 {
 		t.Errorf("got %d batches: %v", len(file.Batches), file.Batches)
+	}
+
+	// ensure we error on struct tag unmarshal
+	var f File
+	err = json.Unmarshal(bs, &f)
+	if !strings.Contains(err.Error(), "use ach.FileFromJSON instead") {
+		t.Error("expected error, see FileFromJson definition")
 	}
 }

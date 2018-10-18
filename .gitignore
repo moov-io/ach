@@ -40,5 +40,11 @@ _testmain.go
 coverage.html
 cover.out
 
+
 bin/
 tmp/
+
+# fuzzing
+test/fuzz-reader/crashes
+test/fuzz-reader/suppressions
+test/fuzz-reader/*.zip

@@ -1,0 +1,7 @@
+FROM golang:1.10-alpine as builder
+RUN apk add -U git make
+WORKDIR /go/src/github.com/moov-io/ach
+COPY . .
+WORKDIR /go/src/github.com/moov-io/ach/test/fuzz-reader
+RUN make install
+ENTRYPOINT ["make"]
