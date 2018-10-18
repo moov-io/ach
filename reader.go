@@ -6,6 +6,8 @@ package ach
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"strconv"
@@ -19,33 +21,104 @@ type ParseError struct {
 	Err    error  // The actual error
 }
 
-func (e *ParseError) Error() string {
+func (e ParseError) Error() string {
 	if e.Record == "" {
 		return fmt.Sprintf("line:%d %T %s", e.Line, e.Err, e.Err)
 	}
 	return fmt.Sprintf("line:%d record:%s %T %s", e.Line, e.Record, e.Err, e.Err)
 }
 
-// Reader reads records from a ACH-encoded file.
-type Reader struct {
-	// r handles the IO.Reader sent to be parser.
-	scanner *bufio.Scanner
-	// file is ach.file model being built as r is parsed.
-	File File
-	// line is the current line being parsed from the input r
-	line string
-	// currentBatch is the current Batch entries being parsed
-	currentBatch Batcher
-	// IATCurrentBatch is the current IATBatch entries being parsed
-	IATCurrentBatch IATBatch
-	// line number of the file being parsed
-	lineNum int
-	// recordName holds the current record name being parsed.
-	recordName string
+// ErrorList represents an array of errors which is also an error itself.
+type ErrorList []error
+
+// Add appends err onto the ErrorList. Errors are kept in order.
+func (e *ErrorList) Add(err error) {
+	*e = append(*e, err)
 }
 
-// error creates a new ParseError based on err.
-func (r *Reader) error(err error) error {
+// Err returns the first error (or nil).
+func (e ErrorList) Err() error {
+	if e == nil || len(e) == 0 {
+		return nil
+	}
+	return e[0]
+}
+
+// Error implements the error interface
+func (e ErrorList) Error() string {
+	if len(e) == 0 {
+		return "<nil>"
+	}
+	var buf bytes.Buffer
+	e.Print(&buf)
+	return buf.String()
+}
+
+// Print formats the ErrorList into a string written to w.
+// If ErrorList contains multiple errors those after the first
+// are indented.
+func (e ErrorList) Print(w io.Writer) {
+	if w == nil || len(e) == 0 {
+		fmt.Fprintf(w, "<nil>")
+		return
+	}
+
+	fmt.Fprintf(w, "%s", e[0])
+	if len(e) > 1 {
+		fmt.Fprintf(w, "\n")
+	}
+
+	for i := 1; i < len(e); i++ {
+		fmt.Fprintf(w, "  %s", e[i])
+		if i < len(e)-1 { // don't add \n to last error
+			fmt.Fprintf(w, "\n")
+		}
+	}
+}
+
+func (e ErrorList) Empty() bool {
+	return e == nil || len(e) == 0
+}
+
+func (e ErrorList) MarshalJSON() ([]byte, error) {
+	return json.Marshal(e.Error())
+}
+
+// Reader reads records from a ACH-encoded file.
+type Reader struct {
+	// file is ach.file model being built as r is parsed.
+	File File
+
+	// IATCurrentBatch is the current IATBatch entries being parsed
+	IATCurrentBatch IATBatch
+
+	// r handles the IO.Reader sent to be parser.
+	scanner *bufio.Scanner
+
+	// line is the current line being parsed from the input r
+	line string
+
+	// currentBatch is the current Batch entries being parsed
+	currentBatch Batcher
+
+	// line number of the file being parsed
+	lineNum int
+
+	// recordName holds the current record name being parsed.
+	recordName string
+
+	// errors holds each error encountered when attempting to parse the file
+	errors ErrorList
+}
+
+// error returns a new ParseError based on err
+func (r *Reader) parseError(err error) error {
+	if err == nil {
+		return nil
+	}
+	if _, ok := err.(*ParseError); ok {
+		return err
+	}
 	return &ParseError{
 		Line:   r.lineNum,
 		Record: r.recordName,
@@ -86,31 +159,35 @@ func (r *Reader) Read() (File, error) {
 		switch {
 		case r.lineNum == 1 && lineLength > RecordLength && lineLength%RecordLength == 0:
 			if err := r.processFixedWidthFile(&line); err != nil {
-				return r.File, err
+				r.errors.Add(err)
 			}
 		case lineLength != RecordLength:
 			msg := fmt.Sprintf(msgRecordLength, lineLength)
 			err := &FileError{FieldName: "RecordLength", Value: strconv.Itoa(lineLength), Msg: msg}
-			return r.File, r.error(err)
+			r.errors.Add(r.parseError(err))
 		default:
 			r.line = line
 			if err := r.parseLine(); err != nil {
-				return r.File, err
+				r.errors.Add(err)
 			}
 		}
 	}
 	if (FileHeader{}) == r.File.Header {
 		// There must be at least one File Header
 		r.recordName = "FileHeader"
-		return r.File, r.error(&FileError{Msg: msgFileHeader})
+		r.errors.Add(r.parseError(&FileError{Msg: msgFileHeader}))
 	}
 	if (FileControl{}) == r.File.Control {
 		// There must be at least one File Control
 		r.recordName = "FileControl"
-		return r.File, r.error(&FileError{Msg: msgFileControl})
+		r.errors.Add(r.parseError(&FileError{Msg: msgFileControl}))
 	}
 
-	return r.File, nil
+	if r.errors.Empty() {
+		return r.File, nil
+	} else {
+		return r.File, r.errors
+	}
 }
 
 func (r *Reader) processFixedWidthFile(line *string) error {
@@ -154,14 +231,14 @@ func (r *Reader) parseLine() error {
 		if r.currentBatch != nil {
 			if err := r.currentBatch.Validate(); err != nil {
 				r.recordName = "Batches"
-				return r.error(err)
+				return r.parseError(err)
 			}
 			r.File.AddBatch(r.currentBatch)
 			r.currentBatch = nil
 		} else {
 			if err := r.IATCurrentBatch.Validate(); err != nil {
 				r.recordName = "Batches"
-				return r.error(err)
+				return r.parseError(err)
 			}
 			r.File.AddIATBatch(r.IATCurrentBatch)
 			r.IATCurrentBatch = IATBatch{}
@@ -176,7 +253,11 @@ func (r *Reader) parseLine() error {
 		}
 	default:
 		msg := fmt.Sprintf(msgUnknownRecordType, r.line[:1])
-		return r.error(&FileError{FieldName: "recordType", Value: r.line[:1], Msg: msg})
+		return r.parseError(&FileError{
+			FieldName: "recordType",
+			Value:     r.line[:1],
+			Msg:       msg,
+		})
 	}
 	return nil
 }
@@ -231,12 +312,12 @@ func (r *Reader) parseFileHeader() error {
 	r.recordName = "FileHeader"
 	if (FileHeader{}) != r.File.Header {
 		// There can only be one File Header per File exit
-		r.error(&FileError{Msg: msgFileHeader})
+		return r.parseError(&FileError{Msg: msgFileHeader})
 	}
 	r.File.Header.Parse(r.line)
 
 	if err := r.File.Header.Validate(); err != nil {
-		return r.error(err)
+		return r.parseError(err)
 	}
 	return nil
 }
@@ -246,20 +327,20 @@ func (r *Reader) parseBatchHeader() error {
 	r.recordName = "BatchHeader"
 	if r.currentBatch != nil {
 		// batch header inside of current batch
-		return r.error(&FileError{Msg: msgFileBatchInside})
+		return r.parseError(&FileError{Msg: msgFileBatchInside})
 	}
 
 	// Ensure we have a valid batch header before building a batch.
 	bh := NewBatchHeader()
 	bh.Parse(r.line)
 	if err := bh.Validate(); err != nil {
-		return r.error(err)
+		return r.parseError(err)
 	}
 
 	// Passing BatchHeader into NewBatch creates a Batcher of SEC code type.
 	batch, err := NewBatch(bh)
 	if err != nil {
-		return r.error(err)
+		return r.parseError(err)
 	}
 
 	r.addCurrentBatch(batch)
@@ -271,12 +352,12 @@ func (r *Reader) parseEntryDetail() error {
 	r.recordName = "EntryDetail"
 
 	if r.currentBatch == nil {
-		return r.error(&FileError{Msg: msgFileBatchOutside})
+		return r.parseError(&FileError{Msg: msgFileBatchOutside})
 	}
 	ed := new(EntryDetail)
 	ed.Parse(r.line)
 	if err := ed.Validate(); err != nil {
-		return r.error(err)
+		return r.parseError(err)
 	}
 	r.currentBatch.AddEntry(ed)
 	return nil
@@ -288,10 +369,10 @@ func (r *Reader) parseAddenda() error {
 
 	if r.currentBatch == nil {
 		msg := fmt.Sprint(msgFileBatchOutside)
-		return r.error(&FileError{FieldName: "Addenda", Msg: msg})
+		return r.parseError(&FileError{FieldName: "Addenda", Msg: msg})
 	}
 	if len(r.currentBatch.GetEntries()) == 0 {
-		return r.error(&FileError{FieldName: "Addenda", Msg: msgFileBatchOutside})
+		return r.parseError(&FileError{FieldName: "Addenda", Msg: msgFileBatchOutside})
 	}
 	entryIndex := len(r.currentBatch.GetEntries()) - 1
 	entry := r.currentBatch.GetEntries()[entryIndex]
@@ -303,34 +384,36 @@ func (r *Reader) parseAddenda() error {
 			addenda02 := NewAddenda02()
 			addenda02.Parse(r.line)
 			if err := addenda02.Validate(); err != nil {
-				return r.error(err)
+				return r.parseError(err)
 			}
 			r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda02)
 		case "05":
 			addenda05 := NewAddenda05()
 			addenda05.Parse(r.line)
 			if err := addenda05.Validate(); err != nil {
-				return r.error(err)
+				return r.parseError(err)
 			}
 			r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda05)
 		case "98":
 			addenda98 := NewAddenda98()
 			addenda98.Parse(r.line)
 			if err := addenda98.Validate(); err != nil {
-				return r.error(err)
+				return r.parseError(err)
 			}
 			r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda98)
 		case "99":
 			addenda99 := NewAddenda99()
 			addenda99.Parse(r.line)
 			if err := addenda99.Validate(); err != nil {
-				return r.error(err)
+				return r.parseError(err)
 			}
 			r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda99)
 		}
 	} else {
-		msg := fmt.Sprint(msgBatchAddendaIndicator)
-		return r.error(&FileError{FieldName: "AddendaRecordIndicator", Msg: msg})
+		return r.parseError(&FileError{
+			FieldName: "AddendaRecordIndicator",
+			Msg:       fmt.Sprint(msgBatchAddendaIndicator),
+		})
 	}
 	return nil
 }
@@ -340,18 +423,18 @@ func (r *Reader) parseBatchControl() error {
 	r.recordName = "BatchControl"
 	if r.currentBatch == nil && r.IATCurrentBatch.GetEntries() == nil {
 		// batch Control without a current batch
-		return r.error(&FileError{Msg: msgFileBatchOutside})
+		return r.parseError(&FileError{Msg: msgFileBatchOutside})
 	}
 
 	if r.currentBatch != nil {
 		r.currentBatch.GetControl().Parse(r.line)
 		if err := r.currentBatch.GetControl().Validate(); err != nil {
-			return r.error(err)
+			return r.parseError(err)
 		}
 	} else {
 		r.IATCurrentBatch.GetControl().Parse(r.line)
 		if err := r.IATCurrentBatch.GetControl().Validate(); err != nil {
-			return r.error(err)
+			return r.parseError(err)
 		}
 
 	}
@@ -363,11 +446,11 @@ func (r *Reader) parseFileControl() error {
 	r.recordName = "FileControl"
 	if (FileControl{}) != r.File.Control {
 		// Can be only one file control per file
-		return r.error(&FileError{Msg: msgFileControl})
+		return r.parseError(&FileError{Msg: msgFileControl})
 	}
 	r.File.Control.Parse(r.line)
 	if err := r.File.Control.Validate(); err != nil {
-		return r.error(err)
+		return r.parseError(err)
 	}
 	return nil
 }
@@ -379,14 +462,14 @@ func (r *Reader) parseIATBatchHeader() error {
 	r.recordName = "BatchHeader"
 	if r.IATCurrentBatch.Header != nil {
 		// batch header inside of current batch
-		return r.error(&FileError{Msg: msgFileBatchInside})
+		return r.parseError(&FileError{Msg: msgFileBatchInside})
 	}
 
 	// Ensure we have a valid IAT BatchHeader before building a batch.
 	bh := NewIATBatchHeader()
 	bh.Parse(r.line)
 	if err := bh.Validate(); err != nil {
-		return r.error(err)
+		return r.parseError(err)
 	}
 
 	// Passing BatchHeader into NewBatchIAT creates a Batcher of IAT SEC code type.
@@ -401,13 +484,13 @@ func (r *Reader) parseIATEntryDetail() error {
 	r.recordName = "EntryDetail"
 
 	if r.IATCurrentBatch.Header == nil {
-		return r.error(&FileError{Msg: msgFileBatchOutside})
+		return r.parseError(&FileError{Msg: msgFileBatchOutside})
 	}
 
 	ed := new(IATEntryDetail)
 	ed.Parse(r.line)
 	if err := ed.Validate(); err != nil {
-		return r.error(err)
+		return r.parseError(err)
 	}
 	r.IATCurrentBatch.AddEntry(ed)
 	return nil
@@ -419,10 +502,10 @@ func (r *Reader) parseIATAddenda() error {
 
 	if r.IATCurrentBatch.GetEntries() == nil {
 		msg := fmt.Sprint(msgFileBatchOutside)
-		return r.error(&FileError{FieldName: "Addenda", Msg: msg})
+		return r.parseError(&FileError{FieldName: "Addenda", Msg: msg})
 	}
 	if len(r.IATCurrentBatch.GetEntries()) == 0 {
-		return r.error(&FileError{FieldName: "Addenda", Msg: msgFileBatchOutside})
+		return r.parseError(&FileError{FieldName: "Addenda", Msg: msgFileBatchOutside})
 	}
 	entryIndex := len(r.IATCurrentBatch.GetEntries()) - 1
 	entry := r.IATCurrentBatch.GetEntries()[entryIndex]
@@ -430,17 +513,16 @@ func (r *Reader) parseIATAddenda() error {
 	if entry.AddendaRecordIndicator == 1 {
 		err := r.switchIATAddenda(entryIndex)
 		if err != nil {
-			return r.error(err)
+			return r.parseError(err)
 		}
 	} else {
 		msg := fmt.Sprint(msgIATBatchAddendaIndicator)
-		return r.error(&FileError{FieldName: "AddendaRecordIndicator", Msg: msg})
+		return r.parseError(&FileError{FieldName: "AddendaRecordIndicator", Msg: msg})
 	}
 	return nil
 }
 
 func (r *Reader) switchIATAddenda(entryIndex int) error {
-
 	switch r.line[1:3] {
 	// IAT mandatory and optional Addenda
 	case "10", "11", "12", "13", "14", "15", "16", "17", "18":
@@ -461,7 +543,6 @@ func (r *Reader) switchIATAddenda(entryIndex int) error {
 // mandatoryOptionalIATAddenda parses and validates mandatory IAT addenda records: Addenda10,
 // Addenda11, Addenda12, Addenda13, Addenda14, Addenda15, Addenda16, Addenda17, Addenda18
 func (r *Reader) mandatoryOptionalIATAddenda(entryIndex int) error {
-
 	switch r.line[1:3] {
 	case "10":
 		addenda10 := NewAddenda10()
@@ -532,7 +613,6 @@ func (r *Reader) mandatoryOptionalIATAddenda(entryIndex int) error {
 
 // returnIATAddenda parses and validates IAT return record Addenda99
 func (r *Reader) returnIATAddenda(entryIndex int) error {
-
 	addenda99 := NewAddenda99()
 	addenda99.Parse(r.line)
 	if err := addenda99.Validate(); err != nil {
