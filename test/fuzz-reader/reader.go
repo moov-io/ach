@@ -20,7 +20,7 @@ func Fuzz(data []byte) int {
 		// if f != nil {
 		// 	panic(fmt.Sprintf("f != nil on err != nil: %v", f))
 		// }
-		return -1
+		return 0
 	}
 
 	// Check f (as ach.File)
@@ -51,7 +51,7 @@ func Fuzz(data []byte) int {
 		return 1
 	}
 
-	return 1 // increase priority of input
+	return 0 // increase priority of input
 }
 
 func checkFileHeader(f *ach.File) int {
