@@ -131,12 +131,15 @@ func TestGetFileContents(t *testing.T) {
 			t.Fatal(err.Error())
 		}
 	}
-	bs, err := ioutil.ReadAll(r)
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-	if len(bs) == 0 {
-		t.Fatal("expected to read fil")
+	if r != nil {
+		bs, err := ioutil.ReadAll(r)
+		if err != nil {
+			t.Fatal(err.Error())
+		}
+
+		if len(bs) == 0 {
+			t.Fatal("expected to read fil")
+		}
 	}
 }
 

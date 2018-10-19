@@ -45,6 +45,19 @@ func BenchmarkFileError(b *testing.B) {
 	}
 }
 
+// TestFileEmptyError tests an empty file error
+func TestFileEmptyError(t *testing.T) {
+	file := &File{}
+	if err := file.Create(); err == nil {
+		t.Error("expected error")
+	}
+	err := file.Validate()
+	msg := err.Error()
+	if !strings.HasPrefix(msg, "recordType") || !strings.Contains(msg, "is a mandatory field") {
+		t.Errorf("got %q", err)
+	}
+}
+
 // testFileBatchCount validates if calculated count is different from control
 func testFileBatchCount(t testing.TB) {
 	file := mockFilePPD()
