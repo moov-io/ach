@@ -3,6 +3,7 @@ package server
 import (
 	"io/ioutil"
 	"net/url"
+	"strings"
 	"testing"
 	"unicode/utf8"
 
@@ -126,7 +127,9 @@ func TestGetFileContents(t *testing.T) {
 	// build file
 	r, err := s.GetFileContents(id)
 	if err != nil {
-		t.Fatal(err.Error())
+		if !strings.Contains(err.Error(), "mandatory ") {
+			t.Fatal(err.Error())
+		}
 	}
 	bs, err := ioutil.ReadAll(r)
 	if err != nil {
@@ -146,7 +149,9 @@ func TestValidateFile(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 	if err := s.ValidateFile(id); err != nil {
-		t.Fatal(err.Error())
+		if !strings.Contains(err.Error(), "mandatory ") {
+			t.Fatal(err.Error())
+		}
 	}
 }
 
