@@ -3,7 +3,7 @@ sudo: false
 os:
 - linux
 - osx
-#- windows
+- windows
 go:
 - 1.11
 osx_image: xcode9.1
