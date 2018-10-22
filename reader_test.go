@@ -1635,3 +1635,21 @@ func BenchmarkACHFileIATBH(b *testing.B) {
 		testACHFileIATBH(b)
 	}
 }
+
+// TestReturnACHFile test loading WEB return file
+func TestReturnACHFile(t *testing.T) {
+	f, err := os.Open("./test/testdata/return-WEB.ach")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+
+	r := NewReader(f)
+	data, err := r.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := data.Validate(); err != nil {
+		t.Fatal(err)
+	}
+}
