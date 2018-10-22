@@ -10,6 +10,7 @@ import (
 	"math"
 	"regexp"
 	"strconv"
+	"unicode/utf8"
 )
 
 var (
@@ -422,6 +423,10 @@ func (v *validator) isAlphanumeric(s string) error {
 // Subtract the sum from the next highest multiple of 10.
 // The result is the Check Digit
 func (v *validator) CalculateCheckDigit(routingNumber string) int {
+	if n := utf8.RuneCountInString(routingNumber); n != 8 && n != 9 {
+		return -1
+	}
+
 	var routeIndex [8]string
 	for i := 0; i < 8; i++ {
 		routeIndex[i] = string(routingNumber[i])
