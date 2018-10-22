@@ -11,8 +11,11 @@ import (
 func TestValidators__checkDigit(t *testing.T) {
 	cases := map[string]int{
 		// invalid
-		"":       -1,
-		"123456": -1,
+		"":         -1,
+		"123456":   -1,
+		"1a8ab":    -1,
+		"0730002a": -1,
+		"0730A002": -1,
 		// valid
 		"07300022": 8, // Wells Fargo - Iowa
 		"10200007": 6, // Wells Fargo - Colorado

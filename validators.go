@@ -429,6 +429,9 @@ func (v *validator) CalculateCheckDigit(routingNumber string) int {
 
 	var routeIndex [8]string
 	for i := 0; i < 8; i++ {
+		if routingNumber[i] < '0' || routingNumber[i] > '9' {
+			return -1 // only digits are allowed
+		}
 		routeIndex[i] = string(routingNumber[i])
 	}
 	n, _ := strconv.Atoi(routeIndex[0])
