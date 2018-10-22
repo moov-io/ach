@@ -34,8 +34,13 @@ func (batch *BatchWEB) Validate() error {
 	if err := batch.isAddendaCount(1); err != nil {
 		return err
 	}
-	if err := batch.isTypeCode("05"); err != nil {
-		return err
+	for _, entry := range batch.Entries {
+		for _, addenda := range entry.Addendum {
+			if (addenda.typeCode() != "05") && (addenda.typeCode() != "99") {
+				msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), addenda.typeCode(), batch.Header.StandardEntryClassCode)
+				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+			}
+		}
 	}
 
 	// Add type specific validation.
