@@ -39,11 +39,7 @@ func (batch *BatchPPD) Validate() error {
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
 			}
 		}
-		return nil
 	}
-
-	// Add type specific validation.
-	// ...
 	return nil
 }
 

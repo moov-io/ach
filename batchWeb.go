@@ -41,7 +41,6 @@ func (batch *BatchWEB) Validate() error {
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
 			}
 		}
-		return nil
 	}
 
 	// Add type specific validation.

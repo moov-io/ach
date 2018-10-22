@@ -40,14 +40,12 @@ func (batch *BatchCCD) Validate() error {
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
 			}
 		}
-		return nil
 	}
 	// Add type specific validation.
 	if batch.Header.StandardEntryClassCode != "CCD" {
 		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "CCD")
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
-
 	return nil
 }
 

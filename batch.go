@@ -406,19 +406,6 @@ func (batch *batch) isAddendaCount(count int) error {
 	return nil
 }
 
-// isTypeCode takes a TypeCode string and verifies Addenda records match
-func (batch *batch) isTypeCode(typeCode string) error {
-	for _, entry := range batch.Entries {
-		for _, addenda := range entry.Addendum {
-			if addenda.typeCode() != typeCode {
-				msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), typeCode, batch.Header.StandardEntryClassCode)
-				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
-			}
-		}
-	}
-	return nil
-}
-
 // isCategory verifies that a Forward and Return Category are not in the same batch
 func (batch *batch) isCategory() error {
 	category := batch.GetEntries()[0].Category
