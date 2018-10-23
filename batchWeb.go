@@ -29,27 +29,30 @@ func (batch *BatchWEB) Validate() error {
 	if err := batch.verify(); err != nil {
 		return err
 	}
-	// Add configuration based validation for this type.
-	// Web can have up to one addenda per entry record
-	if err := batch.isAddendaCount(1); err != nil {
-		return err
-	}
-	for _, entry := range batch.Entries {
-		for _, addenda := range entry.Addendum {
-			if (addenda.typeCode() != "05") && (addenda.typeCode() != "99") {
-				msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), addenda.typeCode(), batch.Header.StandardEntryClassCode)
-				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
-			}
-		}
-	}
-
-	// Add type specific validation.
+	// Add configuration and type specific validation for this type.
 	if batch.Header.StandardEntryClassCode != "WEB" {
 		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "WEB")
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
-	return batch.isPaymentTypeCode()
+	for _, entry := range batch.Entries {
+		// Web can have up to one addenda per entry record
+		if len(entry.Addendum) > 1 {
+			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+		}
+		for _, addenda := range entry.Addendum {
+			switch addenda.typeCode() {
+			// Addenda TypeCode valid
+			case "05", "98", "99":
+			//Return error
+			default:
+				msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), addenda.typeCode(), batch.Header.StandardEntryClassCode)
+				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+			}
+		}
+	}
+	return nil
 }
 
 // Create builds the batch sequence numbers and batch control. Additional creation

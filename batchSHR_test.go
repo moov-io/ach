@@ -298,7 +298,7 @@ func testBatchSHRAddendaCountZero(t testing.TB) {
 	mockBatch.AddEntry(mockSHREntryDetail())
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
+			if e.FieldName != "AddendaCount" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -320,6 +320,16 @@ func BenchmarkBatchSHRAddendaCountZero(b *testing.B) {
 	}
 }
 
+// TestBatchSHRAddendum99 validates Addenda99 returns an error
+func TestBatchSHRAddendum99(t *testing.T) {
+	mockBatch := NewBatchSHR(mockBatchSHRHeader())
+	mockBatch.AddEntry(mockSHREntryDetail())
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda99())
+	if err := mockBatch.Create(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
 // testBatchSHRInvalidAddendum validates Addendum must be Addenda02
 func testBatchSHRInvalidAddendum(t testing.TB) {
 	mockBatch := NewBatchSHR(mockBatchSHRHeader())
@@ -327,7 +337,7 @@ func testBatchSHRInvalidAddendum(t testing.TB) {
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
+			if e.FieldName != "TypeCode" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {

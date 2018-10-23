@@ -99,10 +99,20 @@ func BenchmarkBatchWebIndividualNameRequired(b *testing.B) {
 	}
 }
 
-// testBatchWEBAddendaTypeCod validates addenda type code is 05
+// TestBatchWEBAddendum98 validates Addenda98 returns an error
+func TestBatchWEBAddendum98(t *testing.T) {
+	mockBatch := NewBatchWEB(mockBatchWEBHeader())
+	mockBatch.AddEntry(mockWEBEntryDetail())
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98())
+	if err := mockBatch.Create(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// testBatchWEBAddendaTypeCode validates addenda type code is 05
 func testBatchWEBAddendaTypeCode(t testing.TB) {
 	mockBatch := mockBatchWEB()
-	mockBatch.GetEntries()[0].Addendum[0].(*Addenda05).TypeCode = "07"
+	mockBatch.GetEntries()[0].Addendum[0].(*Addenda05).TypeCode = "98"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
