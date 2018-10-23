@@ -66,7 +66,7 @@ func (batch *BatchPOS) Validate() error {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "CardTransactionType", Msg: msg}
 		}
 
-		// Addendum must be equal to 1
+		// POS must have one Addenda Record TypeCode = 02, or there can be a NOC (98) or Return (99)
 		if len(entry.Addendum) != 1 {
 			msg := fmt.Sprintf(msgBatchRequiredAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}

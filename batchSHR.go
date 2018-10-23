@@ -70,7 +70,7 @@ func (batch *BatchSHR) Validate() error {
 			return &FieldError{FieldName: "CardExpirationDate", Value: year, Msg: msgValidYear}
 		}
 
-		// Addendum must be equal to 1
+		// SHR must have one Addenda record TypeCode = 02, or there can be a NOC (98) or Return (99)
 		if len(entry.Addendum) != 1 {
 			msg := fmt.Sprintf(msgBatchRequiredAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
@@ -83,7 +83,7 @@ func (batch *BatchSHR) Validate() error {
 			case "02", "98", "99":
 			// Return Error
 			default:
-				msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), addenda.typeCode(), batch.Header.StandardEntryClassCode)
+				msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "02", batch.Header.StandardEntryClassCode)
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
 			}
 		}

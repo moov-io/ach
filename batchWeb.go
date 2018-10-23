@@ -36,18 +36,19 @@ func (batch *BatchWEB) Validate() error {
 	}
 
 	for _, entry := range batch.Entries {
-		// Web can have up to one addenda per entry record
+		// Web can have up to one Record TypeCode = 05, or there can be a NOC (98) or Return (99)
 		if len(entry.Addendum) > 1 {
 			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 		}
+
 		for _, addenda := range entry.Addendum {
 			switch addenda.typeCode() {
 			// Addenda TypeCode valid
 			case "05", "98", "99":
 			//Return error
 			default:
-				msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), addenda.typeCode(), batch.Header.StandardEntryClassCode)
+				msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "05", batch.Header.StandardEntryClassCode)
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
 			}
 		}

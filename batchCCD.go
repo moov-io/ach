@@ -29,23 +29,31 @@ func (batch *BatchCCD) Validate() error {
 	if err := batch.verify(); err != nil {
 		return err
 	}
-	// Add configuration based validation for this type.
-	if err := batch.isAddendaCount(1); err != nil {
-		return err
-	}
-	for _, entry := range batch.Entries {
-		for _, addenda := range entry.Addendum {
-			if (addenda.typeCode() != "05") && (addenda.typeCode() != "99") {
-				msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), addenda.typeCode(), batch.Header.StandardEntryClassCode)
-				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
-			}
-		}
-	}
-	// Add type specific validation.
+
+	// Add configuration and type specific validation.
 	if batch.Header.StandardEntryClassCode != "CCD" {
 		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "CCD")
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
+
+	for _, entry := range batch.Entries {
+		// CCD can have up to one Record TypeCode = 05, or there can be a NOC (98) or Return (99)
+		if len(entry.Addendum) > 1 {
+			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+		}
+		for _, addenda := range entry.Addendum {
+			switch addenda.typeCode() {
+			// Addenda TypeCode valid
+			case "05", "98", "99":
+				//Return error
+			default:
+				msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "05", batch.Header.StandardEntryClassCode)
+				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+			}
+		}
+	}
+
 	return nil
 }
 
