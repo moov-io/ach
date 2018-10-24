@@ -47,12 +47,10 @@ func (batch *BatchWEB) Validate() error {
 				if err := batch.categoryNOCAddenda98(entry, addenda); err != nil {
 					return err
 				}
-				// Do not need a length check on entry.Addendum as addAddenda.EntryDetail only allows one Addenda98
 			case CategoryReturn:
 				if err := batch.categoryReturnAddenda99(entry, addenda); err != nil {
 					return err
 				}
-				// Do not need a length check on entry.Addendum as addAddenda.EntryDetail only allows one Addenda99
 			}
 		}
 	}

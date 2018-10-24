@@ -47,17 +47,13 @@ func (batch *BatchTEL) Validate() error {
 					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 				}
 			case CategoryNOC:
-				if addenda.typeCode() != "98" {
-					msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "98", entry.Category, batch.Header.StandardEntryClassCode)
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+				if err := batch.categoryNOCAddenda98(entry, addenda); err != nil {
+					return err
 				}
-				// Do not need a length check on entry.Addendum as addAddenda.EntryDetail only allows one Addenda98
 			case CategoryReturn:
-				if addenda.typeCode() != "99" {
-					msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "99", entry.Category, batch.Header.StandardEntryClassCode)
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+				if err := batch.categoryReturnAddenda99(entry, addenda); err != nil {
+					return err
 				}
-				// Do not need a length check on entry.Addendum as addAddenda.EntryDetail only allows one Addenda99
 			}
 		}
 	}

@@ -407,10 +407,10 @@ func (batch *batch) isCategory() error {
 	return nil
 }
 
-/*// categoryForwardAddenda02 verifies CategoryForward Addenda02 TypeCode is 02
+// categoryForwardAddenda02 verifies CategoryForward Addenda02 TypeCode is 02
 func (batch *batch) categoryForwardAddenda02(entry *EntryDetail, addenda Addendumer) error {
 	return nil
-}*/
+}
 
 // categoryForwardAddenda05 verifies CategoryForward Addenda05 TypeCode is 05
 func (batch *batch) categoryForwardAddenda05(entry *EntryDetail, addenda Addendumer) error {

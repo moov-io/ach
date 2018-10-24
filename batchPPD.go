@@ -37,26 +37,21 @@ func (batch *BatchPPD) Validate() error {
 		for _, addenda := range entry.Addendum {
 			switch entry.Category {
 			case CategoryForward:
-				if addenda.typeCode() != "05" {
-					msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "05", entry.Category, batch.Header.StandardEntryClassCode)
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+				if err := batch.categoryForwardAddenda05(entry, addenda); err != nil {
+					return err
 				}
 				if len(entry.Addendum) > 1 {
 					msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 0, batch.Header.StandardEntryClassCode)
 					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 				}
 			case CategoryNOC:
-				if addenda.typeCode() != "98" {
-					msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "98", entry.Category, batch.Header.StandardEntryClassCode)
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+				if err := batch.categoryNOCAddenda98(entry, addenda); err != nil {
+					return err
 				}
-				// Do not need a length check on entry.Addendum as addAddenda.EntryDetail only allows one Addenda98
 			case CategoryReturn:
-				if addenda.typeCode() != "99" {
-					msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "99", entry.Category, batch.Header.StandardEntryClassCode)
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+				if err := batch.categoryReturnAddenda99(entry, addenda); err != nil {
+					return err
 				}
-				// Do not need a length check on entry.Addendum as addAddenda.EntryDetail only allows one Addenda99
 			}
 		}
 	}
