@@ -11,10 +11,6 @@ type BatchWEB struct {
 	batch
 }
 
-var (
-	msgBatchWebPaymentType = "%v is not a valid payment type S (single entry) or R (recurring)"
-)
-
 // NewBatchWEB returns a *BatchWEB
 func NewBatchWEB(bh *BatchHeader) *BatchWEB {
 	batch := new(BatchWEB)
