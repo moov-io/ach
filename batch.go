@@ -406,3 +406,35 @@ func (batch *batch) isCategory() error {
 	}
 	return nil
 }
+
+/*// categoryForwardAddenda02 verifies CategoryForward Addenda02 TypeCode is 02
+func (batch *batch) categoryForwardAddenda02(entry *EntryDetail, addenda Addendumer) error {
+	return nil
+}*/
+
+// categoryForwardAddenda05 verifies CategoryForward Addenda05 TypeCode is 05
+func (batch *batch) categoryForwardAddenda05(entry *EntryDetail, addenda Addendumer) error {
+	if addenda.typeCode() != "05" {
+		msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "05", entry.Category, batch.Header.StandardEntryClassCode)
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+	}
+	return nil
+}
+
+// categoryNOCAddenda98 verifies CategoryNOC Addenda98 TypeCode is 98
+func (batch *batch) categoryNOCAddenda98(entry *EntryDetail, addenda Addendumer) error {
+	if addenda.typeCode() != "98" {
+		msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "98", entry.Category, batch.Header.StandardEntryClassCode)
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+	}
+	return nil
+}
+
+// categoryReturnAddenda99 verifies CategoryReturn Addenda99 TypeCode is 99
+func (batch *batch) categoryReturnAddenda99(entry *EntryDetail, addenda Addendumer) error {
+	if addenda.typeCode() != "99" {
+		msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "99", entry.Category, batch.Header.StandardEntryClassCode)
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+	}
+	return nil
+}
