@@ -20,9 +20,7 @@ type BatchCTX struct {
 }
 
 var (
-	msgBatchCTXAddenda      = "9999 is the maximum addenda records for SEC code CTX"
 	msgBatchCTXAddendaCount = "%v entry detail addenda records not equal to addendum %v"
-	msgBatchCTXAddendaType  = "%T found where Addenda05 is required for SEC code CTX"
 )
 
 // NewBatchCTX returns a *BatchCTX
@@ -39,23 +37,14 @@ func (batch *BatchCTX) Validate() error {
 	if err := batch.verify(); err != nil {
 		return err
 	}
-	// Add configuration based validation for this type.
 
-	// Add type specific validation.
-
+	// Add configuration and type specific validation for this type.
 	if batch.Header.StandardEntryClassCode != "CTX" {
 		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "CTX")
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
 	for _, entry := range batch.Entries {
-
-		// Addenda validations - CTX Addenda must be Addenda05
-
-		// A maximum of 9999 addenda records for CTX entry details
-		if len(entry.Addendum) > 9999 {
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchCTXAddenda}
-		}
 
 		// validate CTXAddendaRecord Field is equal to the actual number of Addenda records
 		// use 0 value if there is no Addenda records
@@ -76,16 +65,24 @@ func (batch *BatchCTX) Validate() error {
 			default:
 			}
 
-			for i := range entry.Addendum {
-				addenda05, ok := entry.Addendum[i].(*Addenda05)
-				if !ok {
-					msg := fmt.Sprintf(msgBatchCTXAddendaType, entry.Addendum[i])
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
-				}
-				if err := addenda05.Validate(); err != nil {
-					// convert the field error in to a batch error for a consistent api
-					if e, ok := err.(*FieldError); ok {
-						return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: e.FieldName, Msg: e.Msg}
+			// CTX can have up to one Addenda Record TypeCode = 05, or there can be a NOC (98) or Return (99)
+			for _, addenda := range entry.Addendum {
+				switch entry.Category {
+				case CategoryForward:
+					if err := batch.categoryForwardAddenda05(entry, addenda); err != nil {
+						return err
+					}
+					if len(entry.Addendum) > 9999 {
+						msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
+						return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+					}
+				case CategoryNOC:
+					if err := batch.categoryNOCAddenda98(entry, addenda); err != nil {
+						return err
+					}
+				case CategoryReturn:
+					if err := batch.categoryReturnAddenda99(entry, addenda); err != nil {
+						return err
 					}
 				}
 			}

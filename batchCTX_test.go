@@ -212,7 +212,7 @@ func testBatchCTXInvalidAddendum(t testing.TB) {
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda02())
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
+			if e.FieldName != "TypeCode" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -542,5 +542,41 @@ func BenchmarkBatchCTXPrenoteAddendaRecords(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchCTXPrenoteAddendaRecords(b)
+	}
+}
+
+// TestBatchCTXAddendum98 validates Addenda98 returns an error
+func TestBatchCTXAddendum98(t *testing.T) {
+	mockBatch := NewBatchCTX(mockBatchCTXHeader())
+	mockBatch.AddEntry(mockCTXEntryDetail())
+	mockAddenda98 := mockAddenda98()
+	mockAddenda98.TypeCode = "05"
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98)
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchCTXAddendum99 validates Addenda99 returns an error
+func TestBatchCTXAddendum99(t *testing.T) {
+	mockBatch := NewBatchCTX(mockBatchCTXHeader())
+	mockBatch.AddEntry(mockCTXEntryDetail())
+	mockAddenda99 := mockAddenda99()
+	mockAddenda99.TypeCode = "05"
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda99)
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
 	}
 }
