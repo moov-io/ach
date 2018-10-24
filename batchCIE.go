@@ -21,9 +21,6 @@ type BatchCIE struct {
 	batch
 }
 
-var msgBatchCIEAddenda = "found and 1 Addenda05 is the maximum for SEC code CIE"
-var msgBatchCIEAddendaType = "%T found where Addenda05 is required for SEC code CIE"
-
 // NewBatchCIE returns a *BatchCIE
 func NewBatchCIE(bh *BatchHeader) *BatchCIE {
 	batch := new(BatchCIE)
@@ -59,6 +56,12 @@ func (batch *BatchCIE) Validate() error {
 		if entry.CreditOrDebit() != "C" {
 			msg := fmt.Sprintf(msgBatchTransactionCodeCredit, entry.TransactionCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
+		}
+
+		// CIE must have one Addenda05 record
+		if len(entry.Addendum) != 1 {
+			msg := fmt.Sprintf(msgBatchRequiredAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 		}
 
 		// CIE can have up to one Record TypeCode = 05, or there can be a NOC (98) or Return (99)

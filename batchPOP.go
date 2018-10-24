@@ -39,14 +39,8 @@ func (batch *BatchPOP) Validate() error {
 	if err := batch.verify(); err != nil {
 		return err
 	}
-	// Add configuration based validation for this type.
 
-	// Batch POP cannot have an addenda record
-	if err := batch.isAddendaCount(0); err != nil {
-		return err
-	}
-
-	// Add type specific validation.
+	// Add configuration and type specific validation for this type.
 	if batch.Header.StandardEntryClassCode != "POP" {
 		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "POP")
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
@@ -78,6 +72,28 @@ func (batch *BatchPOP) Validate() error {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "CheckSerialNumber", Msg: msg}
 		}
 
+		// POP cannot have Addenda02 or Addenda05.  There can be a NOC (98) or Return (99)
+		for _, addenda := range entry.Addendum {
+			switch entry.Category {
+			case CategoryForward:
+				if len(entry.Addendum) > 0 {
+					msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+				}
+			case CategoryNOC:
+				if addenda.typeCode() != "98" {
+					msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "98", entry.Category, batch.Header.StandardEntryClassCode)
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+				}
+				// Do not need a length check on entry.Addendum as addAddenda.EntryDetail only allows one Addenda98
+			case CategoryReturn:
+				if addenda.typeCode() != "99" {
+					msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "99", entry.Category, batch.Header.StandardEntryClassCode)
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+				}
+				// Do not need a length check on entry.Addendum as addAddenda.EntryDetail only allows one Addenda99
+			}
+		}
 	}
 	return nil
 }

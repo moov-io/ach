@@ -295,7 +295,7 @@ func testBatchCIEAddendaCountZero(t testing.TB) {
 	mockBatch.AddEntry(mockCIEEntryDetail())
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
+			if e.FieldName != "AddendaCount" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {

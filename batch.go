@@ -391,20 +391,6 @@ func (batch *batch) isAddendaSequence() error {
 	return nil
 }
 
-// isAddendaCount iterates through each entry detail and checks the number of addendum is greater than the count parameter otherwise it returns an error.
-// Following SEC codes allow for none or one Addendum
-// "PPD", "WEB", "CCD", "CIE", "DNE", "MTE", "POS", "SHR"
-func (batch *batch) isAddendaCount(count int) error {
-	for _, entry := range batch.Entries {
-		if len(entry.Addendum) > count {
-			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), count, batch.Header.StandardEntryClassCode)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
-		}
-
-	}
-	return nil
-}
-
 // isCategory verifies that a Forward and Return Category are not in the same batch
 func (batch *batch) isCategory() error {
 	category := batch.GetEntries()[0].Category
