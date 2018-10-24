@@ -468,3 +468,19 @@ func TestBatchCIEAddendum99(t *testing.T) {
 		}
 	}
 }
+
+// TestBatchCIEAddenda validates no more than 1 addenda record per entry detail record can exist
+func TestBatchCIEAddenda(t *testing.T) {
+	mockBatch := mockBatchCIE()
+	// mock batch already has one addenda. Creating two addenda should error
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "AddendaCount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}

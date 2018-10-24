@@ -74,7 +74,7 @@ func (batch *BatchARC) Validate() error {
 			switch entry.Category {
 			case CategoryForward:
 				if len(entry.Addendum) > 0 {
-					msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
+					msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 0, batch.Header.StandardEntryClassCode)
 					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 				}
 			case CategoryNOC:

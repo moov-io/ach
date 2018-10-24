@@ -73,7 +73,7 @@ func (batch *BatchCTX) Validate() error {
 						return err
 					}
 					if len(entry.Addendum) > 9999 {
-						msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
+						msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 9999, batch.Header.StandardEntryClassCode)
 						return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 					}
 				case CategoryNOC:
