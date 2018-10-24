@@ -27,13 +27,7 @@ func (batch *BatchTEL) Validate() error {
 	if err := batch.verify(); err != nil {
 		return err
 	}
-	// Add configuration based validation for this type.
-	// TEL can not have an addenda
-	if err := batch.isAddendaCount(0); err != nil {
-		return err
-	}
-
-	// Add type specific validation.
+	// Add configuration and type specific based validation for this type.
 	if batch.Header.StandardEntryClassCode != "TEL" {
 		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "TEL")
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
@@ -44,9 +38,30 @@ func (batch *BatchTEL) Validate() error {
 			msg := fmt.Sprintf(msgBatchTransactionCodeCredit, entry.IndividualName)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 		}
+		// TEL cannot have Addenda02 or Addenda05.  There can be a NOC (98) or Return (99)
+		for _, addenda := range entry.Addendum {
+			switch entry.Category {
+			case CategoryForward:
+				if len(entry.Addendum) > 0 {
+					msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+				}
+			case CategoryNOC:
+				if addenda.typeCode() != "98" {
+					msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "98", entry.Category, batch.Header.StandardEntryClassCode)
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+				}
+				// Do not need a length check on entry.Addendum as addAddenda.EntryDetail only allows one Addenda98
+			case CategoryReturn:
+				if addenda.typeCode() != "99" {
+					msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "99", entry.Category, batch.Header.StandardEntryClassCode)
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+				}
+				// Do not need a length check on entry.Addendum as addAddenda.EntryDetail only allows one Addenda99
+			}
+		}
 	}
-
-	return batch.isPaymentTypeCode()
+	return nil
 }
 
 // Create builds the batch sequence numbers and batch control. Additional creation

@@ -103,9 +103,35 @@ func BenchmarkBatchWebIndividualNameRequired(b *testing.B) {
 func TestBatchWEBAddendum98(t *testing.T) {
 	mockBatch := NewBatchWEB(mockBatchWEBHeader())
 	mockBatch.AddEntry(mockWEBEntryDetail())
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98())
+	mockAddenda98 := mockAddenda98()
+	mockAddenda98.TypeCode = "05"
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98)
 	if err := mockBatch.Create(); err != nil {
-		t.Errorf("%T: %s", err, err)
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchWEBAddendum99 validates Addenda99 returns an error
+func TestBatchWEBAddendum99(t *testing.T) {
+	mockBatch := NewBatchWEB(mockBatchWEBHeader())
+	mockBatch.AddEntry(mockWEBEntryDetail())
+	mockAddenda99 := mockAddenda99()
+	mockAddenda99.TypeCode = "05"
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda99)
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
 	}
 }
 

@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"strings"
 )
 
 // Batch holds the Batch Header and Batch Control and all Entry Records
@@ -417,20 +416,6 @@ func (batch *batch) isCategory() error {
 			if batch.Entries[i].Category != category {
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Category", Msg: msgBatchForwardReturn}
 			}
-		}
-	}
-	return nil
-}
-
-// isPaymentTypeCode checks that the Entry detail records have either:
-// "R" For a recurring WEB Entry
-// "S" For a Single-Entry WEB Entry
-func (batch *batch) isPaymentTypeCode() error {
-	for _, entry := range batch.Entries {
-		if !strings.Contains(strings.ToUpper(entry.PaymentTypeField()), "S") && !strings.Contains(strings.ToUpper(entry.PaymentTypeField()), "R") {
-			// TODO dead code because PaymentTypeField always returns S regardless of Discretionary Data value
-			msg := fmt.Sprintf(msgBatchWebPaymentType, entry.PaymentTypeField())
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "PaymentType", Msg: msg}
 		}
 	}
 	return nil
