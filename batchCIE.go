@@ -61,27 +61,30 @@ func (batch *BatchCIE) Validate() error {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 		}
 
-		// Addenda validations - CIE Addenda must be Addenda05
-
-		// Addendum must be equal to 1
-		if len(entry.Addendum) > 1 {
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchCIEAddenda}
-		}
-
-		if len(entry.Addendum) > 0 {
-			// Addenda type assertion must be Addenda05
-			addenda05, ok := entry.Addendum[0].(*Addenda05)
-			if !ok {
-				msg := fmt.Sprintf(msgBatchCIEAddendaType, entry.Addendum[0])
-				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
-			}
-
-			// Addenda05 must be Validated
-			if err := addenda05.Validate(); err != nil {
-				// convert the field error in to a batch error for a consistent api
-				if e, ok := err.(*FieldError); ok {
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: e.FieldName, Msg: e.Msg}
+		// CIE can have up to one Record TypeCode = 05, or there can be a NOC (98) or Return (99)
+		for _, addenda := range entry.Addendum {
+			switch entry.Category {
+			case CategoryForward:
+				if addenda.typeCode() != "05" {
+					msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "05", entry.Category, batch.Header.StandardEntryClassCode)
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
 				}
+				if len(entry.Addendum) > 1 {
+					msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 0, batch.Header.StandardEntryClassCode)
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+				}
+			case CategoryNOC:
+				if addenda.typeCode() != "98" {
+					msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "98", entry.Category, batch.Header.StandardEntryClassCode)
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+				}
+				// Do not need a length check on entry.Addendum as addAddenda.EntryDetail only allows one Addenda98
+			case CategoryReturn:
+				if addenda.typeCode() != "99" {
+					msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "99", entry.Category, batch.Header.StandardEntryClassCode)
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+				}
+				// Do not need a length check on entry.Addendum as addAddenda.EntryDetail only allows one Addenda99
 			}
 		}
 	}
