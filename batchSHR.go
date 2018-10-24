@@ -71,20 +71,26 @@ func (batch *BatchSHR) Validate() error {
 		}
 
 		// SHR must have one Addenda record TypeCode = 02, or there can be a NOC (98) or Return (99)
-		if len(entry.Addendum) != 1 {
-			msg := fmt.Sprintf(msgBatchRequiredAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
-		}
-
-		// Range through Addenda
 		for _, addenda := range entry.Addendum {
-			switch addenda.typeCode() {
-			// Addenda TypeCode valid
-			case "02", "98", "99":
-			// Return Error
-			default:
-				msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "02", batch.Header.StandardEntryClassCode)
-				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+			switch entry.Category {
+			case CategoryForward:
+				if addenda.typeCode() != "02" {
+					msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "02", entry.Category, batch.Header.StandardEntryClassCode)
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+				}
+				// Do not need a length check on entry.Addendum as addAddenda.EntryDetail only allows one Addenda02
+			case CategoryNOC:
+				if addenda.typeCode() != "98" {
+					msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "98", entry.Category, batch.Header.StandardEntryClassCode)
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+				}
+				// Do not need a length check on entry.Addendum as addAddenda.EntryDetail only allows one Addenda98
+			case CategoryReturn:
+				if addenda.typeCode() != "99" {
+					msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "99", entry.Category, batch.Header.StandardEntryClassCode)
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+				}
+				// Do not need a length check on entry.Addendum as addAddenda.EntryDetail only allows one Addenda99
 			}
 		}
 	}

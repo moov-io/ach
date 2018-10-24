@@ -54,16 +54,6 @@ func testBatchPOSHeader(t testing.TB) {
 	}
 }
 
-// TestBatchPOSAddendum98 validates Addenda98 returns an error
-func TestBatchPOSAddendum98(t *testing.T) {
-	mockBatch := NewBatchPOS(mockBatchPOSHeader())
-	mockBatch.AddEntry(mockPOSEntryDetail())
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda99())
-	if err := mockBatch.Create(); err != nil {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
 // TestBatchPOSHeader tests validating BatchPOS BatchHeader
 func TestBatchPOSHeader(t *testing.T) {
 	testBatchPOSHeader(t)
@@ -354,6 +344,42 @@ func BenchmarkBatchPOSInvalidAddendum(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchPOSInvalidAddendum(b)
+	}
+}
+
+// TestBatchPOSAddendum98 validates Addenda98 returns an error
+func TestBatchPOSAddendum98(t *testing.T) {
+	mockBatch := NewBatchPOS(mockBatchPOSHeader())
+	mockBatch.AddEntry(mockPOSEntryDetail())
+	mockAddenda98 := mockAddenda98()
+	mockAddenda98.TypeCode = "05"
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98)
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchPOSAddendum99 validates Addenda99 returns an error
+func TestBatchPOSAddendum99(t *testing.T) {
+	mockBatch := NewBatchPOS(mockBatchPOSHeader())
+	mockBatch.AddEntry(mockPOSEntryDetail())
+	mockAddenda99 := mockAddenda99()
+	mockAddenda99.TypeCode = "05"
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda99)
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
 	}
 }
 
