@@ -409,6 +409,10 @@ func (batch *batch) isCategory() error {
 
 // categoryForwardAddenda02 verifies CategoryForward Addenda02 TypeCode is 02
 func (batch *batch) categoryForwardAddenda02(entry *EntryDetail, addenda Addendumer) error {
+	if addenda.typeCode() != "02" {
+		msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "02", entry.Category, batch.Header.StandardEntryClassCode)
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+	}
 	return nil
 }
 
