@@ -21,9 +21,6 @@ type BatchSHR struct {
 	batch
 }
 
-var msgBatchSHRAddenda = "found and 1 Addenda02 is required for SEC code SHR"
-var msgBatchSHRAddendaType = "%T found where Addenda02 is required for SEC code SHR"
-
 // NewBatchSHR returns a *BatchSHR
 func NewBatchSHR(bh *BatchHeader) *BatchSHR {
 	batch := new(BatchSHR)
@@ -38,10 +35,8 @@ func (batch *BatchSHR) Validate() error {
 	if err := batch.verify(); err != nil {
 		return err
 	}
-	// Add configuration based validation for this type.
 
-	// Add type specific validation.
-
+	// Add configuration and type specific validation for this type.
 	if batch.Header.StandardEntryClassCode != "SHR" {
 		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "SHR")
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
@@ -75,25 +70,26 @@ func (batch *BatchSHR) Validate() error {
 			return &FieldError{FieldName: "CardExpirationDate", Value: year, Msg: msgValidYear}
 		}
 
-		// Addenda validations - SHR Addenda must be Addenda02
-
-		// Addendum must be equal to 1
+		// SHR must have one Addenda02 record
 		if len(entry.Addendum) != 1 {
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchSHRAddenda}
+			msg := fmt.Sprintf(msgBatchRequiredAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 		}
-
-		// Addenda type assertion must be Addenda02
-		addenda02, ok := entry.Addendum[0].(*Addenda02)
-		if !ok {
-			msg := fmt.Sprintf(msgBatchSHRAddendaType, entry.Addendum[0])
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
-		}
-
-		// Addenda02 must be Validated
-		if err := addenda02.Validate(); err != nil {
-			// convert the field error in to a batch error for a consistent api
-			if e, ok := err.(*FieldError); ok {
-				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: e.FieldName, Msg: e.Msg}
+		// SHR must have one Addenda02 but cannot have Addenda05, or there can be a NOC (98) or Return (99)
+		for _, addenda := range entry.Addendum {
+			switch entry.Category {
+			case CategoryForward:
+				if err := batch.categoryForwardAddenda02(entry, addenda); err != nil {
+					return err
+				}
+			case CategoryNOC:
+				if err := batch.categoryNOCAddenda98(entry, addenda); err != nil {
+					return err
+				}
+			case CategoryReturn:
+				if err := batch.categoryReturnAddenda99(entry, addenda); err != nil {
+					return err
+				}
 			}
 		}
 	}

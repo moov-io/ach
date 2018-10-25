@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"strings"
 )
 
 // Batch holds the Batch Header and Batch Control and all Entry Records
@@ -392,20 +391,6 @@ func (batch *batch) isAddendaSequence() error {
 	return nil
 }
 
-// isAddendaCount iterates through each entry detail and checks the number of addendum is greater than the count parameter otherwise it returns an error.
-// Following SEC codes allow for none or one Addendum
-// "PPD", "WEB", "CCD", "CIE", "DNE", "MTE", "POS", "SHR"
-func (batch *batch) isAddendaCount(count int) error {
-	for _, entry := range batch.Entries {
-		if len(entry.Addendum) > count {
-			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), count, batch.Header.StandardEntryClassCode)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
-		}
-
-	}
-	return nil
-}
-
 // isCategory verifies that a Forward and Return Category are not in the same batch
 func (batch *batch) isCategory() error {
 	category := batch.GetEntries()[0].Category
@@ -422,16 +407,38 @@ func (batch *batch) isCategory() error {
 	return nil
 }
 
-// isPaymentTypeCode checks that the Entry detail records have either:
-// "R" For a recurring WEB Entry
-// "S" For a Single-Entry WEB Entry
-func (batch *batch) isPaymentTypeCode() error {
-	for _, entry := range batch.Entries {
-		if !strings.Contains(strings.ToUpper(entry.PaymentTypeField()), "S") && !strings.Contains(strings.ToUpper(entry.PaymentTypeField()), "R") {
-			// TODO dead code because PaymentTypeField always returns S regardless of Discretionary Data value
-			msg := fmt.Sprintf(msgBatchWebPaymentType, entry.PaymentTypeField())
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "PaymentType", Msg: msg}
-		}
+// categoryForwardAddenda02 verifies CategoryForward Addenda02 TypeCode is 02
+func (batch *batch) categoryForwardAddenda02(entry *EntryDetail, addenda Addendumer) error {
+	if addenda.typeCode() != "02" {
+		msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "02", entry.Category, batch.Header.StandardEntryClassCode)
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+	}
+	return nil
+}
+
+// categoryForwardAddenda05 verifies CategoryForward Addenda05 TypeCode is 05
+func (batch *batch) categoryForwardAddenda05(entry *EntryDetail, addenda Addendumer) error {
+	if addenda.typeCode() != "05" {
+		msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "05", entry.Category, batch.Header.StandardEntryClassCode)
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+	}
+	return nil
+}
+
+// categoryNOCAddenda98 verifies CategoryNOC Addenda98 TypeCode is 98
+func (batch *batch) categoryNOCAddenda98(entry *EntryDetail, addenda Addendumer) error {
+	if addenda.typeCode() != "98" {
+		msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "98", entry.Category, batch.Header.StandardEntryClassCode)
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
+	}
+	return nil
+}
+
+// categoryReturnAddenda99 verifies CategoryReturn Addenda99 TypeCode is 99
+func (batch *batch) categoryReturnAddenda99(entry *EntryDetail, addenda Addendumer) error {
+	if addenda.typeCode() != "99" {
+		msg := fmt.Sprintf(msgBatchTypeCode, addenda.typeCode(), "99", entry.Category, batch.Header.StandardEntryClassCode)
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TypeCode", Msg: msg}
 	}
 	return nil
 }

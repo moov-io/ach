@@ -485,3 +485,39 @@ func BenchmarkBatchPOPInvalidBuild(b *testing.B) {
 		testBatchPOPInvalidBuild(b)
 	}
 }
+
+// TestBatchPOPAddendum98 validates Addenda98 returns an error
+func TestBatchPOPAddendum98(t *testing.T) {
+	mockBatch := NewBatchPOP(mockBatchPOPHeader())
+	mockBatch.AddEntry(mockPOPEntryDetail())
+	mockAddenda98 := mockAddenda98()
+	mockAddenda98.TypeCode = "05"
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98)
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchPOPAddendum99 validates Addenda99 returns an error
+func TestBatchPOPAddendum99(t *testing.T) {
+	mockBatch := NewBatchPOP(mockBatchPOPHeader())
+	mockBatch.AddEntry(mockPOPEntryDetail())
+	mockAddenda99 := mockAddenda99()
+	mockAddenda99.TypeCode = "05"
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda99)
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}

@@ -462,3 +462,39 @@ func BenchmarkRCKBatchInvalidBuild(b *testing.B) {
 		testBatchRCKInvalidBuild(b)
 	}
 }
+
+// TestBatchRCKAddendum98 validates Addenda98 returns an error
+func TestBatchRCKAddendum98(t *testing.T) {
+	mockBatch := NewBatchRCK(mockBatchRCKHeader())
+	mockBatch.AddEntry(mockRCKEntryDetail())
+	mockAddenda98 := mockAddenda98()
+	mockAddenda98.TypeCode = "05"
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98)
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchRCKAddendum99 validates Addenda99 returns an error
+func TestBatchRCKAddendum99(t *testing.T) {
+	mockBatch := NewBatchRCK(mockBatchRCKHeader())
+	mockBatch.AddEntry(mockRCKEntryDetail())
+	mockAddenda99 := mockAddenda99()
+	mockAddenda99.TypeCode = "05"
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda99)
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
