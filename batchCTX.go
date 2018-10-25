@@ -46,6 +46,12 @@ func (batch *BatchCTX) Validate() error {
 
 	for _, entry := range batch.Entries {
 
+		// Trapping this error, as entry.CTXAddendaRecordsField() can not be greater than 9999
+		if len(entry.Addendum) > 9999 {
+			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 9999, batch.Header.StandardEntryClassCode)
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+		}
+
 		// validate CTXAddendaRecord Field is equal to the actual number of Addenda records
 		// use 0 value if there is no Addenda records
 		addendaRecords, _ := strconv.Atoi(entry.CTXAddendaRecordsField())
@@ -71,10 +77,6 @@ func (batch *BatchCTX) Validate() error {
 				case CategoryForward:
 					if err := batch.categoryForwardAddenda05(entry, addenda); err != nil {
 						return err
-					}
-					if len(entry.Addendum) > 9999 {
-						msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 9999, batch.Header.StandardEntryClassCode)
-						return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 					}
 				case CategoryNOC:
 					if err := batch.categoryNOCAddenda98(entry, addenda); err != nil {
