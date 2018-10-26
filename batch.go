@@ -29,26 +29,18 @@ func NewBatch(bh *BatchHeader) (Batcher, error) {
 	switch bh.StandardEntryClassCode {
 	case "ACK":
 		return NewBatchACK(bh), nil
-	case "ATX":
-		return NewBatchATX(bh), nil
 	case "ARC":
 		return NewBatchARC(bh), nil
+	case "ATX":
+		return NewBatchATX(bh), nil
 	case "BOC":
 		return NewBatchBOC(bh), nil
-	/*	case "CCD", "ACK":
-			return NewBatchCCD(bh), nil
-		ToDo: Should we do it this way and slash up batchCCD?
-	*/
 	case "CCD":
 		return NewBatchCCD(bh), nil
 	case "CIE":
 		return NewBatchCIE(bh), nil
 	case "COR":
 		return NewBatchCOR(bh), nil
-		/*	case "CTX", ATX:
-			return NewBatchCTX(bh), nil
-			ToDo: Should we do it this way and slash up batchCTX
-		*/
 	case "CTX":
 		return NewBatchCTX(bh), nil
 	case "IAT":

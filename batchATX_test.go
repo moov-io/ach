@@ -15,9 +15,9 @@ func mockBatchATXHeader() *BatchHeader {
 	bh.ServiceClassCode = 220
 	bh.StandardEntryClassCode = "ATX"
 	bh.CompanyName = "Payee Name"
-	bh.CompanyIdentification = "121042882"
+	bh.CompanyIdentification = "231380104"
 	bh.CompanyEntryDescription = "ACH ATX"
-	bh.ODFIIdentification = "12104288"
+	bh.ODFIIdentification = "23138010"
 	return bh
 }
 
@@ -25,10 +25,10 @@ func mockBatchATXHeader() *BatchHeader {
 func mockATXEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
 	entry.TransactionCode = 24
-	entry.SetRDFI("231380104")
+	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
-	entry.IdentificationNumber = "45689033"
+	entry.SetOriginalTraceNumber(121042880000001)
 	entry.SetCATXAddendaRecords(1)
 	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(mockBatchATXHeader().ODFIIdentification, 1)
@@ -300,16 +300,16 @@ func testBatchATXAddenda10000(t testing.TB) {
 	bh.ServiceClassCode = 220
 	bh.StandardEntryClassCode = "ATX"
 	bh.CompanyName = "Payee Name"
-	bh.CompanyIdentification = "121042882"
+	bh.CompanyIdentification = "231380104"
 	bh.CompanyEntryDescription = "ACH ATX"
-	bh.ODFIIdentification = "12104288"
+	bh.ODFIIdentification = "23138010"
 
 	entry := NewEntryDetail()
 	entry.TransactionCode = 24
-	entry.SetRDFI("231380104")
+	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
-	entry.IdentificationNumber = "45689033"
+	entry.SetOriginalTraceNumber(121042880000001)
 	entry.SetCATXAddendaRecords(9999)
 	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(mockBatchATXHeader().ODFIIdentification, 1)
@@ -353,16 +353,16 @@ func testBatchATXAddendaRecords(t testing.TB) {
 	bh.ServiceClassCode = 220
 	bh.StandardEntryClassCode = "ATX"
 	bh.CompanyName = "Payee Name"
-	bh.CompanyIdentification = "121042882"
+	bh.CompanyIdentification = "231380104"
 	bh.CompanyEntryDescription = "ACH ATX"
-	bh.ODFIIdentification = "12104288"
+	bh.ODFIIdentification = "23138010"
 
 	entry := NewEntryDetail()
 	entry.TransactionCode = 24
-	entry.SetRDFI("231380104")
+	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
-	entry.IdentificationNumber = "45689033"
+	entry.SetOriginalTraceNumber(121042880000001)
 	entry.SetCATXAddendaRecords(500)
 	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(mockBatchATXHeader().ODFIIdentification, 1)
@@ -451,16 +451,16 @@ func testBatchATXZeroAddendaRecords(t testing.TB) {
 	bh.ServiceClassCode = 220
 	bh.StandardEntryClassCode = "ATX"
 	bh.CompanyName = "Payee Name"
-	bh.CompanyIdentification = "121042882"
+	bh.CompanyIdentification = "231380104"
 	bh.CompanyEntryDescription = "ACH ATX"
-	bh.ODFIIdentification = "12104288"
+	bh.ODFIIdentification = "23138010"
 
 	entry := NewEntryDetail()
 	entry.TransactionCode = 24
-	entry.SetRDFI("231380104")
+	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
-	entry.IdentificationNumber = "45689033"
+	entry.SetOriginalTraceNumber(121042880000001)
 	entry.SetCATXAddendaRecords(1)
 	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(mockBatchATXHeader().ODFIIdentification, 1)
@@ -500,17 +500,17 @@ func testBatchATXTransactionCode(t testing.TB) {
 	bh.ServiceClassCode = 220
 	bh.StandardEntryClassCode = "ATX"
 	bh.CompanyName = "Payee Name"
-	bh.CompanyIdentification = "121042882"
+	bh.CompanyIdentification = "231380104"
 	bh.CompanyEntryDescription = "ACH ATX"
-	bh.ODFIIdentification = "12104288"
+	bh.ODFIIdentification = "23138010"
 	bh.OriginatorStatusCode = 2
 
 	entry := NewEntryDetail()
 	entry.TransactionCode = 23
-	entry.SetRDFI("231380104")
+	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
-	entry.IdentificationNumber = "45689033"
+	entry.SetOriginalTraceNumber(121042880000001)
 	entry.SetCATXAddendaRecords(1)
 	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(mockBatchATXHeader().ODFIIdentification, 1)
@@ -551,17 +551,17 @@ func TestBatchATXAmount(t *testing.T) {
 	bh.ServiceClassCode = 220
 	bh.StandardEntryClassCode = "ATX"
 	bh.CompanyName = "Payee Name"
-	bh.CompanyIdentification = "121042882"
+	bh.CompanyIdentification = "231380104"
 	bh.CompanyEntryDescription = "ACH ATX"
-	bh.ODFIIdentification = "12104288"
+	bh.ODFIIdentification = "23138010"
 	bh.OriginatorStatusCode = 2
 
 	entry := NewEntryDetail()
 	entry.TransactionCode = 23
-	entry.SetRDFI("231380104")
+	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
-	entry.IdentificationNumber = "45689033"
+	entry.SetOriginalTraceNumber(121042880000001)
 	entry.SetCATXAddendaRecords(1)
 	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(mockBatchATXHeader().ODFIIdentification, 1)

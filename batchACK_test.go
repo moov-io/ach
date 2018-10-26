@@ -15,9 +15,9 @@ func mockBatchACKHeader() *BatchHeader {
 	bh.ServiceClassCode = 220
 	bh.StandardEntryClassCode = "ACK"
 	bh.CompanyName = "Your Company, inc"
-	bh.CompanyIdentification = "121042882"
+	bh.CompanyIdentification = "231380104"
 	bh.CompanyEntryDescription = "Vndr Pay"
-	bh.ODFIIdentification = "231380104"
+	bh.ODFIIdentification = "23138010"
 	return bh
 }
 
@@ -28,8 +28,7 @@ func mockACKEntryDetail() *EntryDetail {
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
-	// ToDo: In EntryDetail Change To Proper Name
-	entry.IdentificationNumber = "121042880000001"
+	entry.SetOriginalTraceNumber(121042880000001)
 	entry.SetReceivingCompany("Best Co. #23")
 	entry.SetTraceNumber(mockBatchACKHeader().ODFIIdentification, 1)
 	entry.DiscretionaryData = "S"

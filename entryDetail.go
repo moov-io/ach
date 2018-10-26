@@ -400,35 +400,16 @@ func (ed *EntryDetail) SetReceivingCompany(s string) {
 	ed.IndividualName = s
 }
 
-// ToDo:  Deprecate
-// SetCTXAddendaRecords setter for CTX AddendaRecords characters 1-4 of underlying IndividualName
-func (ed *EntryDetail) SetCTXAddendaRecords(i int) {
-	ed.IndividualName = ed.numericField(i, 4)
+// OriginalTraceNumberField is used in ACK and ATX files but returns the underlying IdentificationNumber field
+func (ed *EntryDetail) OriginalTraceNumberField() string {
+	return ed.IdentificationNumberField()
 }
 
-// ToDo:  Deprecate
-// SetCTXReceivingCompany setter for CTX ReceivingCompany characters 5-20 underlying IndividualName
-// Position 21-22 of underlying Individual Name are reserved blank space for ATX "  "
-func (ed *EntryDetail) SetCTXReceivingCompany(s string) {
-	ed.IndividualName = ed.IndividualName + ed.alphaField(s, 16) + "  "
-}
-
-// ToDo:  Deprecate
-// CTXAddendaRecordsField is used in CTX files, characters 1-4 of underlying IndividualName field
-func (ed *EntryDetail) CTXAddendaRecordsField() string {
-	return ed.parseStringField(ed.IndividualName[0:4])
-}
-
-// ToDo:  Deprecate
-// CTXReceivingCompanyField is used in CTX files, characters 5-20 of underlying IndividualName field
-func (ed *EntryDetail) CTXReceivingCompanyField() string {
-	return ed.parseStringField(ed.IndividualName[4:20])
-}
-
-// ToDo:  Deprecate
-// CTXReservedField is used in CTX files, characters 21-22 of underlying IndividualName field
-func (ed *EntryDetail) CTXReservedField() string {
-	return ed.IndividualName[20:22]
+// SetOriginalTraceNumber setter for ACK and ATX OriginalTraceNumber which is underlying IdentificationNumber
+func (ed *EntryDetail) SetOriginalTraceNumber(i int) {
+	s := strconv.Itoa(i)
+	//ed.IdentificationNumber = ed.numericField(i, 15)
+	ed.IdentificationNumber = s
 }
 
 // SetCATXAddendaRecords setter for CTX and ATX AddendaRecords characters 1-4 of underlying IndividualName
