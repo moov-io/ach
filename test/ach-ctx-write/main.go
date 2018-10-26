@@ -39,8 +39,8 @@ func main() {
 	entry.DFIAccountNumber = "12345678" // Receivers bank account number
 	entry.Amount = 100000000            // Amount of transaction with no decimal. One dollar and eleven cents = 111
 	entry.IdentificationNumber = "45689033"
-	entry.SetCTXAddendaRecords(2)
-	entry.SetCTXReceivingCompany("Receiver Company")
+	entry.SetCATXAddendaRecords(2)
+	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(bh.ODFIIdentification, 1)
 	entry.DiscretionaryData = "01"
 

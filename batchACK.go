@@ -15,11 +15,6 @@ type BatchACK struct {
 	batch
 }
 
-var (
-	msgBatchTransactionCodeACK = "%v transaction code not equal to 24 or 34 for SEC code %v"
-	msgBatchAmountACK          = "%v amount must be zero for SEC code %v"
-)
-
 // NewBatchACK returns a *BatchACK
 func NewBatchACK(bh *BatchHeader) *BatchACK {
 	batch := new(BatchACK)
@@ -43,15 +38,15 @@ func (batch *BatchACK) Validate() error {
 	for _, entry := range batch.Entries {
 		// Amount must be zero for Acknowledgement Entries
 		if entry.Amount > 0 {
-			msg := fmt.Sprintf(msgBatchAmountACK, entry.Amount, "ACK")
+			msg := fmt.Sprintf(msgBatchAmountZero, entry.Amount, "ACK")
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
 		}
 		// TransactionCode must be either 24 or 34 for Acknowledgement Entries
 		switch entry.TransactionCode {
 		case 24, 34:
 		default:
-			msg := fmt.Sprintf(msgBatchTransactionCodeACK, entry.TransactionCode, "ACK")
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Transaction Code", Msg: msg}
+			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "ACK")
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 		}
 
 		// ACK can have up to one Record TypeCode = 05, or there can be a NOC (98) or Return (99)

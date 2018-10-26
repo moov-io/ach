@@ -248,8 +248,8 @@ func BenchmarkBatchACKAddendaCount(b *testing.B) {
 	}
 }
 
-// testBatchACKCreate creates a batch ACK
-func testBatchACKCreate(t testing.TB) {
+// testBatchACKServiceClassCode validates ServiceClassCode
+func testBatchACKServiceClassCode(t testing.TB) {
 	mockBatch := mockBatchACK()
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetHeader().ServiceClassCode = 0
@@ -265,16 +265,16 @@ func testBatchACKCreate(t testing.TB) {
 	}
 }
 
-// TestBatchACKCreate Test creating a batch ACK
-func TestBatchACKCreate(t *testing.T) {
-	testBatchACKCreate(t)
+// TestBatchACKServiceClassCode tests validating ServiceClassCode
+func TestBatchACKServiceClassCode(t *testing.T) {
+	testBatchACKServiceClassCode(t)
 }
 
-// BenchmarkBatchACKCreate benchmark creating a batch ACK
-func BenchmarkBatchACKCreate(b *testing.B) {
+// BenchmarkBatchACKServiceClassCode benchmarks validating ServiceClassCode
+func BenchmarkBatchACKServiceClassCode(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchACKCreate(b)
+		testBatchACKServiceClassCode(b)
 	}
 }
 
@@ -300,5 +300,39 @@ func BenchmarkBatchACKReceivingCompanyField(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchACKReceivingCompanyField(b)
+	}
+}
+
+// TestBatchACKAmount validates Amount
+func TestBatchACKAmount(t *testing.T) {
+	mockBatch := mockBatchACK()
+	// Batch Header information is required to Create a batch.
+	mockBatch.GetEntries()[0].Amount = 25000
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Amount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchACKTransactionCode validates Amount
+func TestBatchACKTransactionCode(t *testing.T) {
+	mockBatch := mockBatchACK()
+	// Batch Header information is required to Create a batch.
+	mockBatch.GetEntries()[0].TransactionCode = 22
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TransactionCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
 	}
 }
