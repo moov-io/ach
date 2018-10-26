@@ -28,7 +28,7 @@ func mockACKEntryDetail() *EntryDetail {
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
-	entry.SetOriginalTraceNumber(121042880000001)
+	entry.SetOriginalTraceNumber("121042880000001")
 	entry.SetReceivingCompany("Best Co. #23")
 	entry.SetTraceNumber(mockBatchACKHeader().ODFIIdentification, 1)
 	entry.DiscretionaryData = "S"

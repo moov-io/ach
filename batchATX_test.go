@@ -28,7 +28,7 @@ func mockATXEntryDetail() *EntryDetail {
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
-	entry.SetOriginalTraceNumber(121042880000001)
+	entry.SetOriginalTraceNumber("121042880000001")
 	entry.SetCATXAddendaRecords(1)
 	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(mockBatchATXHeader().ODFIIdentification, 1)
@@ -309,7 +309,7 @@ func testBatchATXAddenda10000(t testing.TB) {
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
-	entry.SetOriginalTraceNumber(121042880000001)
+	entry.SetOriginalTraceNumber("121042880000001")
 	entry.SetCATXAddendaRecords(9999)
 	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(mockBatchATXHeader().ODFIIdentification, 1)
@@ -362,7 +362,7 @@ func testBatchATXAddendaRecords(t testing.TB) {
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
-	entry.SetOriginalTraceNumber(121042880000001)
+	entry.SetOriginalTraceNumber("121042880000001")
 	entry.SetCATXAddendaRecords(500)
 	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(mockBatchATXHeader().ODFIIdentification, 1)
@@ -460,7 +460,7 @@ func testBatchATXZeroAddendaRecords(t testing.TB) {
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
-	entry.SetOriginalTraceNumber(121042880000001)
+	entry.SetOriginalTraceNumber("121042880000001")
 	entry.SetCATXAddendaRecords(1)
 	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(mockBatchATXHeader().ODFIIdentification, 1)
@@ -510,7 +510,7 @@ func testBatchATXTransactionCode(t testing.TB) {
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
-	entry.SetOriginalTraceNumber(121042880000001)
+	entry.SetOriginalTraceNumber("121042880000001")
 	entry.SetCATXAddendaRecords(1)
 	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(mockBatchATXHeader().ODFIIdentification, 1)
@@ -561,7 +561,7 @@ func TestBatchATXAmount(t *testing.T) {
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
-	entry.SetOriginalTraceNumber(121042880000001)
+	entry.SetOriginalTraceNumber("121042880000001")
 	entry.SetCATXAddendaRecords(1)
 	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(mockBatchATXHeader().ODFIIdentification, 1)

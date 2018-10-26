@@ -406,9 +406,7 @@ func (ed *EntryDetail) OriginalTraceNumberField() string {
 }
 
 // SetOriginalTraceNumber setter for ACK and ATX OriginalTraceNumber which is underlying IdentificationNumber
-func (ed *EntryDetail) SetOriginalTraceNumber(i int) {
-	s := strconv.Itoa(i)
-	//ed.IdentificationNumber = ed.numericField(i, 15)
+func (ed *EntryDetail) SetOriginalTraceNumber(s string) {
 	ed.IdentificationNumber = s
 }
 
