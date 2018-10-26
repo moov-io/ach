@@ -27,10 +27,16 @@ type batch struct {
 // NewBatch takes a BatchHeader and returns a matching SEC code batch type that is a batcher. Returns an error if the SEC code is not supported.
 func NewBatch(bh *BatchHeader) (Batcher, error) {
 	switch bh.StandardEntryClassCode {
+	case "ACK":
+		return NewBatchACK(bh), nil
 	case "ARC":
 		return NewBatchARC(bh), nil
 	case "BOC":
 		return NewBatchBOC(bh), nil
+	/*	case "CCD", "ATX":
+			return NewBatchCCD(bh), nil
+		ToDo: Should we do it this way and slash up batchCCD?
+	*/
 	case "CCD":
 		return NewBatchCCD(bh), nil
 	case "CIE":
