@@ -15,7 +15,9 @@ Docs: [docs.moov.io](https://docs.moov.io/en/latest/) | [api docs](https://api.m
 ACH is under active development but already in production for multiple companies. Please star the project if you are interested in its progress.
 
 * Library currently supports the reading and writing
+	* ACK (Acknowledgment Entry for CCD)
 	* ARC (Accounts Receivable Entry)
+	* ATX (Acknowledgment Entry for CTX)
 	* BOC (Back Office Conversion)
 	* CCD (Corporate credit or debit)
 	* CIE (Customer-Initiated Entry)
