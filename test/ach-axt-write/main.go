@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	// Example transfer to write an ACH ACK file acknowledging a credit
+	// Example transfer to write an ACH AXT file acknowledging a CTX credit
 	// Important: All financial institutions are different and will require registration and exact field values.
 
 	// Set originator bank ODFI and destination Operator for the financial institution
@@ -26,7 +26,7 @@ func main() {
 	bh.ServiceClassCode = 220          // ACH credit pushes money out, 225 debits/pulls money in.
 	bh.CompanyName = "Name on Account" // The name of the company/person that has relationship with receiver
 	bh.CompanyIdentification = fh.ImmediateOrigin
-	bh.StandardEntryClassCode = "ACK"       // Consumer destination vs Company CCD
+	bh.StandardEntryClassCode = "ATX"       // Consumer destination vs Company CCD
 	bh.CompanyEntryDescription = "Vndr Pay" // will be on receiving accounts statement
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
 	bh.ODFIIdentification = "23138010" // Originating Routing Number
@@ -40,8 +40,10 @@ func main() {
 	entry.DFIAccountNumber = "744-5678-99" // Receivers bank account number
 	entry.Amount = 0                       // Amount of transaction with no decimal. One dollar and eleven cents = 111
 	entry.SetOriginalTraceNumber("031300010000001")
-	entry.SetReceivingCompany("Best. #1")
+	entry.SetCATXAddendaRecords(2)
+	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(bh.ODFIIdentification, 1)
+	entry.DiscretionaryData = "01"
 
 	entryOne := ach.NewEntryDetail()          // Fee Entry
 	entryOne.TransactionCode = 24             // Demand Credit
@@ -49,13 +51,39 @@ func main() {
 	entryOne.DFIAccountNumber = "744-5678-99" // Receivers bank account number
 	entryOne.Amount = 0                       // Amount of transaction with no decimal. One dollar and eleven cents = 111
 	entryOne.SetOriginalTraceNumber("031300010000002")
-	entryOne.SetReceivingCompany("Best. #1")
+	entryOne.SetCATXAddendaRecords(2)
+	entryOne.SetCATXReceivingCompany("Receiver Company")
 	entryOne.SetTraceNumber(bh.ODFIIdentification, 2)
+	entryOne.DiscretionaryData = "01"
+
+	entryAd1 := ach.NewAddenda05()
+	entryAd1.PaymentRelatedInformation = "Credit account 1 for service"
+	entryAd1.SequenceNumber = 1
+	entryAd1.EntryDetailSequenceNumber = 0000001
+
+	entryAd2 := ach.NewAddenda05()
+	entryAd2.PaymentRelatedInformation = "Credit account 2 for service"
+	entryAd2.SequenceNumber = 2
+	entryAd2.EntryDetailSequenceNumber = 0000001
+
+	entryOneAd1 := ach.NewAddenda05()
+	entryOneAd1.PaymentRelatedInformation = "Credit account 1 for leadership"
+	entryOneAd1.SequenceNumber = 1
+	entryOneAd1.EntryDetailSequenceNumber = 0000002
+
+	entryOneAd2 := ach.NewAddenda05()
+	entryOneAd2.PaymentRelatedInformation = "Credit account 2 for leadership"
+	entryOneAd2.SequenceNumber = 2
+	entryOneAd2.EntryDetailSequenceNumber = 0000002
 
 	// build the batch
-	batch := ach.NewBatchACK(bh)
+	batch := ach.NewBatchATX(bh)
 	batch.AddEntry(entry)
+	batch.GetEntries()[0].AddAddenda(entryAd1)
+	batch.GetEntries()[0].AddAddenda(entryAd2)
 	batch.AddEntry(entryOne)
+	batch.GetEntries()[1].AddAddenda(entryOneAd1)
+	batch.GetEntries()[1].AddAddenda(entryOneAd2)
 	if err := batch.Create(); err != nil {
 		log.Fatalf("Unexpected error building batch: %s\n", err)
 	}
