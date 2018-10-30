@@ -5,6 +5,7 @@
 package ach
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -1969,6 +1970,70 @@ func TestIATBatchAddenda98Count(t *testing.T) {
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Addendum" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestMockISODestinationCountryCode validates mockIATBatch
+func TestMockISODestinationCountryCode(t *testing.T) {
+	iatBatch := mockIATBatch(t)
+	iatBatch.Header.ISODestinationCountryCode = "®©"
+	if err := iatBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ISODestinationCountryCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+}
+
+// TestMockISOOriginatingCurrencyCode validates mockIATBatch
+func TestMockISOOriginatingCurrencyCode(t *testing.T) {
+	iatBatch := mockIATBatch(t)
+	iatBatch.Header.ISOOriginatingCurrencyCode = "®©"
+	if err := iatBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ISOOriginatingCurrencyCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+}
+
+// TestMockISODestinationCurrencyCode validates mockIATBatch
+func TestMockISODestinationCurrencyCode(t *testing.T) {
+	iatBatch := mockIATBatch(t)
+	iatBatch.Header.ISODestinationCurrencyCode = "®©"
+	if err := iatBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ISODestinationCurrencyCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+}
+
+// TestParseRuneCountIATBatchHeader tests parsing an invalid RuneCount in IATBatchHeader
+func TestParseRuneCountIATBatchHeader(t *testing.T) {
+	line := "5220                FF3               US123456789 IATTRADEPAYMTCADUSD010101"
+	r := NewReader(strings.NewReader(line))
+	r.line = line
+	if err := r.parseIATBatchHeader(); err != nil {
+		if e, ok := err.(*ParseError); ok {
+			if e.Record != "BatchHeader" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
