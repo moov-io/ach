@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -26,8 +25,6 @@ var (
 	// ErrBadRouting is returned when an expected path variable is missing, which is always programmer error.
 	ErrBadRouting = fmt.Errorf("inconsistent mapping between route and handler, %s", bugReportHelp)
 	ErrFoundABug  = fmt.Errorf("Snuck into encodeError with err == nil, %s", bugReportHelp)
-
-	MaxContentLength = 1 * 1024 * 1024 // bytes
 )
 
 // contextKey is a unique (and compariable) type we use
@@ -183,11 +180,6 @@ func MakeHTTPHandler(s Service, repo Repository, logger log.Logger) http.Handler
 
 //** FILES ** //
 func decodeCreateFileRequest(_ context.Context, request *http.Request) (interface{}, error) {
-	// Make sure content-length is small enough
-	if !acceptableContentLength(request.Header) {
-		return nil, errors.New("request body is too large")
-	}
-
 	var r io.Reader
 	var req createFileRequest
 
@@ -402,12 +394,4 @@ func codeFrom(err error) int {
 	// TODO(adam): this should really probably be a 4xx error
 	// TODO(adam): on GET /files/:id/validate a "bad" file returns 500
 	return http.StatusInternalServerError
-}
-
-func acceptableContentLength(headers http.Header) bool {
-	h := headers.Get("Content-Length")
-	if v, err := strconv.Atoi(h); err == nil {
-		return v <= MaxContentLength
-	}
-	return false
 }
