@@ -400,10 +400,24 @@ func (ed *EntryDetail) SetReceivingCompany(s string) {
 	ed.IndividualName = s
 }
 
+// OriginalTraceNumberField is used in ACK and ATX files but returns the underlying IdentificationNumber field
+func (ed *EntryDetail) OriginalTraceNumberField() string {
+	return ed.IdentificationNumberField()
+}
+
+// SetOriginalTraceNumber setter for ACK and ATX OriginalTraceNumber which is underlying IdentificationNumber
+func (ed *EntryDetail) SetOriginalTraceNumber(s string) {
+	ed.IdentificationNumber = s
+}
+
+// ToDo: Deprecate and use SetCATXAddendaRecords
+
 // SetCTXAddendaRecords setter for CTX AddendaRecords characters 1-4 of underlying IndividualName
 func (ed *EntryDetail) SetCTXAddendaRecords(i int) {
 	ed.IndividualName = ed.numericField(i, 4)
 }
+
+// ToDo: Deprecate and use SetCATXReceivingCompany
 
 // SetCTXReceivingCompany setter for CTX ReceivingCompany characters 5-20 underlying IndividualName
 // Position 21-22 of underlying Individual Name are reserved blank space for CTX "  "
@@ -411,18 +425,50 @@ func (ed *EntryDetail) SetCTXReceivingCompany(s string) {
 	ed.IndividualName = ed.IndividualName + ed.alphaField(s, 16) + "  "
 }
 
+// ToDo: Deprecate and use CATXAddendaRecordsField
+
 // CTXAddendaRecordsField is used in CTX files, characters 1-4 of underlying IndividualName field
 func (ed *EntryDetail) CTXAddendaRecordsField() string {
 	return ed.parseStringField(ed.IndividualName[0:4])
 }
+
+// ToDo: Deprecate and use CATXReceivingCompanyField
 
 // CTXReceivingCompanyField is used in CTX files, characters 5-20 of underlying IndividualName field
 func (ed *EntryDetail) CTXReceivingCompanyField() string {
 	return ed.parseStringField(ed.IndividualName[4:20])
 }
 
+// ToDo: Deprecate and use CATXReservedField
+
 // CTXReservedField is used in CTX files, characters 21-22 of underlying IndividualName field
 func (ed *EntryDetail) CTXReservedField() string {
+	return ed.IndividualName[20:22]
+}
+
+// SetCATXAddendaRecords setter for CTX and ATX AddendaRecords characters 1-4 of underlying IndividualName
+func (ed *EntryDetail) SetCATXAddendaRecords(i int) {
+	ed.IndividualName = ed.numericField(i, 4)
+}
+
+// SetCATXReceivingCompany setter for CTX and ATX ReceivingCompany characters 5-20 underlying IndividualName
+// Position 21-22 of underlying Individual Name are reserved blank space for CTX "  "
+func (ed *EntryDetail) SetCATXReceivingCompany(s string) {
+	ed.IndividualName = ed.IndividualName + ed.alphaField(s, 16) + "  "
+}
+
+// CATXAddendaRecordsField is used in CTX and ATX files, characters 1-4 of underlying IndividualName field
+func (ed *EntryDetail) CATXAddendaRecordsField() string {
+	return ed.parseStringField(ed.IndividualName[0:4])
+}
+
+// CATXReceivingCompanyField is used in CTX and ATX files, characters 5-20 of underlying IndividualName field
+func (ed *EntryDetail) CATXReceivingCompanyField() string {
+	return ed.parseStringField(ed.IndividualName[4:20])
+}
+
+// CATXReservedField is used in CTX and ATX files, characters 21-22 of underlying IndividualName field
+func (ed *EntryDetail) CATXReservedField() string {
 	return ed.IndividualName[20:22]
 }
 

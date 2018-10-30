@@ -9,69 +9,74 @@ import (
 	"strconv"
 )
 
-// BatchCTX holds the BatchHeader and BatchControl and all EntryDetail for CTX Entries.
+// BatchATX holds the BatchHeader and BatchControl and all EntryDetail for ATX (Acknowledgment)
+// Entries.
 //
-// The Corporate Trade Exchange (CTX) application provides the ability to collect and disburse
-// funds and information between companies. Generally it is used by businesses paying one another
-// for goods or services. These payments replace checks with an electronic process of debiting and
-// crediting invoices between the financial institutions of participating companies.
-type BatchCTX struct {
+// The ATX entry is an acknowledgement by the Receiving Depository Financial Institution (RDFI) that a
+// Corporate Credit (CTX) has been received.
+type BatchATX struct {
 	batch
 }
 
 var (
-	msgBatchCTXAddendaCount = "%v entry detail addenda records not equal to addendum %v"
+	msgBatchATXAddendaCount = "%v entry detail addenda records not equal to addendum %v"
 )
 
-// NewBatchCTX returns a *BatchCTX
-func NewBatchCTX(bh *BatchHeader) *BatchCTX {
-	batch := new(BatchCTX)
+// NewBatchATX returns a *BatchATX
+func NewBatchATX(bh *BatchHeader) *BatchATX {
+	batch := new(BatchATX)
 	batch.SetControl(NewBatchControl())
 	batch.SetHeader(bh)
 	return batch
 }
 
 // Validate checks valid NACHA batch rules. Assumes properly parsed records.
-func (batch *BatchCTX) Validate() error {
+func (batch *BatchATX) Validate() error {
 	// basic verification of the batch before we validate specific rules.
 	if err := batch.verify(); err != nil {
 		return err
 	}
 
 	// Add configuration and type specific validation for this type.
-	if batch.Header.StandardEntryClassCode != "CTX" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "CTX")
+	if batch.Header.StandardEntryClassCode != "ATX" {
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "ATX")
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
 	for _, entry := range batch.Entries {
+		// Amount must be zero for Acknowledgement Entries
+		if entry.Amount > 0 {
+			msg := fmt.Sprintf(msgBatchAmountZero, entry.Amount, "ATX")
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
+		}
 
-		// Trapping this error, as entry.CTXAddendaRecordsField() can not be greater than 9999
+		// TransactionCode must be either 24 or 34 for Acknowledgement Entries
+		switch entry.TransactionCode {
+		// Prenote credit  23, 33, 43, 53
+		// Prenote debit 28, 38, 48
+		case 24, 34:
+		default:
+			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "ATX")
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
+		}
+
+		// Trapping this error, as entry.ATXAddendaRecordsField() can not be greater than 9999
 		if len(entry.Addendum) > 9999 {
 			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 9999, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 		}
 
-		// validate CTXAddendaRecord Field is equal to the actual number of Addenda records
+		// validate ATXAddendaRecord Field is equal to the actual number of Addenda records
 		// use 0 value if there is no Addenda records
 		addendaRecords, _ := strconv.Atoi(entry.CATXAddendaRecordsField())
 		if len(entry.Addendum) != addendaRecords {
-			msg := fmt.Sprintf(msgBatchCTXAddendaCount, addendaRecords, len(entry.Addendum))
+			msg := fmt.Sprintf(msgBatchATXAddendaCount, addendaRecords, len(entry.Addendum))
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
 		}
 
 		if len(entry.Addendum) > 0 {
 
-			switch entry.TransactionCode {
-			// Prenote credit  23, 33, 43, 53
-			// Prenote debit 28, 38, 48
-			case 23, 28, 33, 38, 43, 48, 53:
-				msg := fmt.Sprintf(msgBatchTransactionCodeAddenda, entry.TransactionCode, "CTX")
-				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
-			default:
-			}
-
-			// CTX can have up to 9999 Addenda Record TypeCode = 05, or there can be a NOC (98) or Return (99)
+			// ATX can have up to 9999 Addenda Record TypeCode = 05, or there can be a NOC (98) or Return (99)
 			for _, addenda := range entry.Addendum {
 				switch entry.Category {
 				case CategoryForward:
@@ -94,7 +99,7 @@ func (batch *BatchCTX) Validate() error {
 }
 
 // Create takes Batch Header and Entries and builds a valid batch
-func (batch *BatchCTX) Create() error {
+func (batch *BatchATX) Create() error {
 	// generates sequence numbers and batch control
 	if err := batch.build(); err != nil {
 		return err
