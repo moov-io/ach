@@ -1,21 +1,22 @@
 package main
 
 import (
-	"github.com/moov-io/ach"
 	"log"
 	"os"
 	"time"
+
+	"github.com/moov-io/ach"
 )
 
 func main() {
-	// Example transfer to write an ACH CTX file to send/credit a external institutions account
+	// Example transfer to write an ACH ACK file acknowledging a credit
 	// Important: All financial institutions are different and will require registration and exact field values.
 
 	// Set originator bank ODFI and destination Operator for the financial institution
 	// this is the funding/receiving source of the transfer
 	fh := ach.NewFileHeader()
-	fh.ImmediateDestination = "231380104" // Routing Number of the ACH Operator or receiving point to which the file is being sent
-	fh.ImmediateOrigin = "121042882"      // Routing Number of the ACH Operator or sending point that is sending the file
+	fh.ImmediateDestination = "031300012" // Routing Number of the ACH Operator or receiving point to which the file is being sent
+	fh.ImmediateOrigin = "231380104"      // Routing Number of the ACH Operator or sending point that is sending the file
 	fh.FileCreationDate = time.Now()      // Today's Date
 	fh.ImmediateDestinationName = "Federal Reserve Bank"
 	fh.ImmediateOriginName = "My Bank Name"
@@ -25,40 +26,36 @@ func main() {
 	bh.ServiceClassCode = 220          // ACH credit pushes money out, 225 debits/pulls money in.
 	bh.CompanyName = "Name on Account" // The name of the company/person that has relationship with receiver
 	bh.CompanyIdentification = fh.ImmediateOrigin
-	bh.StandardEntryClassCode = "CTX"      // Consumer destination vs Company CCD
-	bh.CompanyEntryDescription = "ACH CTX" // will be on receiving accounts statement
+	bh.StandardEntryClassCode = "ACK"       // Consumer destination vs Company CCD
+	bh.CompanyEntryDescription = "Vndr Pay" // will be on receiving accounts statement
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
-	bh.ODFIIdentification = "121042882" // Originating Routing Number
+	bh.ODFIIdentification = "23138010" // Originating Routing Number
 
 	// Identifies the receivers account information
 	// can be multiple entry's per batch
 	entry := ach.NewEntryDetail()
 	// Identifies the entry as a debit and credit entry AND to what type of account (Savings, DDA, Loan, GL)
-	entry.TransactionCode = 27          // Code 27: Debit checking account
-	entry.SetRDFI("231380104")          // Receivers bank transit routing number
-	entry.DFIAccountNumber = "12345678" // Receivers bank account number
-	entry.Amount = 100000000            // Amount of transaction with no decimal. One dollar and eleven cents = 111
-	entry.IdentificationNumber = "45689033"
-	entry.SetCATXAddendaRecords(2)
-	entry.SetCATXReceivingCompany("Receiver Company")
+	entry.TransactionCode = 24             // Code 22: Demand Debit(deposit) to checking account
+	entry.SetRDFI("031300012")             // Receivers bank transit routing number
+	entry.DFIAccountNumber = "744-5678-99" // Receivers bank account number
+	entry.Amount = 0                       // Amount of transaction with no decimal. One dollar and eleven cents = 111
+	entry.SetOriginalTraceNumber("031300010000001")
+	entry.SetReceivingCompany("Best. #1")
 	entry.SetTraceNumber(bh.ODFIIdentification, 1)
-	entry.DiscretionaryData = "01"
 
-	addenda1 := ach.NewAddenda05()
-	addenda1.PaymentRelatedInformation = "Debit First Account"
-	addenda1.SequenceNumber = 1
-	addenda1.EntryDetailSequenceNumber = 0000001
-
-	addenda2 := ach.NewAddenda05()
-	addenda2.PaymentRelatedInformation = "Debit Second Account"
-	addenda2.SequenceNumber = 2
-	addenda2.EntryDetailSequenceNumber = 0000001
+	entryOne := ach.NewEntryDetail()          // Fee Entry
+	entryOne.TransactionCode = 24             // Demand Credit
+	entryOne.SetRDFI("031300012")             // Receivers bank transit routing number
+	entryOne.DFIAccountNumber = "744-5678-99" // Receivers bank account number
+	entryOne.Amount = 0                       // Amount of transaction with no decimal. One dollar and eleven cents = 111
+	entryOne.SetOriginalTraceNumber("031300010000002")
+	entryOne.SetReceivingCompany("Best. #1")
+	entryOne.SetTraceNumber(bh.ODFIIdentification, 2)
 
 	// build the batch
-	batch := ach.NewBatchCTX(bh)
+	batch := ach.NewBatchACK(bh)
 	batch.AddEntry(entry)
-	batch.GetEntries()[0].AddAddenda(addenda1)
-	batch.GetEntries()[0].AddAddenda(addenda2)
+	batch.AddEntry(entryOne)
 	if err := batch.Create(); err != nil {
 		log.Fatalf("Unexpected error building batch: %s\n", err)
 	}
