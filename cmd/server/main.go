@@ -13,7 +13,8 @@ import (
 
 	"github.com/moov-io/ach"
 	"github.com/moov-io/ach/server"
-	"github.com/moov-io/ach/server/admin"
+	"github.com/moov-io/base/admin"
+	"github.com/moov-io/base/http/bind"
 
 	"github.com/go-kit/kit/log"
 )
@@ -45,8 +46,10 @@ curl -H "Content-Type: application/json" -X DELETE http://localhost:8080/files/0
 **/
 
 var (
-	httpAddr = flag.String("http.addr", ":8080", "HTTP listen address")
-	logger   log.Logger
+	httpAddr  = flag.String("http.addr", bind.HTTP("ach"), "HTTP listen address")
+	adminAddr = flag.String("admin.addr", bind.Admin("ach"), "Admin HTTP listen address")
+
+	logger log.Logger
 
 	svc     server.Service
 	handler http.Handler
@@ -99,13 +102,17 @@ func main() {
 		}
 	}
 
-	adminService := admin.SetupServer()
+	// Admin server (metrics and debugging)
+	adminServer := admin.NewServer(*adminAddr)
 	go func() {
-		logger.Log("admin", "Starting admin service..")
-		if err := adminService.Listen(); err != nil {
-			logger.Log("admin[shutdown]", err)
+		logger.Log("admin", fmt.Sprintf("listening on %s", adminServer.BindAddr()))
+		if err := adminServer.Listen(); err != nil {
+			err = fmt.Errorf("problem starting admin http: %v", err)
+			logger.Log("admin", err)
+			errs <- err
 		}
 	}()
+	defer adminServer.Shutdown()
 
 	go func() {
 		logger.Log("transport", "HTTP", "addr", *httpAddr)
@@ -115,7 +122,6 @@ func main() {
 	}()
 
 	if err := <-errs; err != nil {
-		adminService.Shutdown()
 		shutdownServer()
 		logger.Log("exit", err)
 	}
