@@ -75,6 +75,14 @@ func NewFile() *File {
 	}
 }
 
+type fileHeader struct {
+	Header FileHeader `json:"fileHeader"`
+}
+
+type fileControl struct {
+	Control FileControl `json:"fileControl"`
+}
+
 // FileFromJson attempts to return a *File object assuming the input is valid JSON.
 //
 // Callers should always check for a nil-error before using the returned file.
@@ -86,15 +94,30 @@ func FileFromJson(bs []byte) (*File, error) {
 		return nil, errors.New("no json data provided")
 	}
 
-	file := File{Header: NewFileHeader()}
+	// Read FileHeader
+	header := fileHeader{
+		Header: NewFileHeader(),
+	}
+	if err := json.NewDecoder(bytes.NewReader(bs)).Decode(&header); err != nil {
+		return nil, fmt.Errorf("problem reading FileHeader: %v", err)
+	}
 
-	// Read what we can and then custom read batches
-	json.NewDecoder(bytes.NewReader(bs)).Decode(&file)
+	// Read FileControl
+	control := fileControl{
+		Control: NewFileControl(),
+	}
+	if err := json.NewDecoder(bytes.NewReader(bs)).Decode(&control); err != nil {
+		return nil, fmt.Errorf("problem reading FileControl: %v", err)
+	}
+
+	// Build resulting file
+	file := NewFile()
 	if err := file.setBatchesFromJson(backup); err != nil {
 		return nil, err
 	}
-
-	return &file, nil
+	file.Header = header.Header
+	file.Control = control.Control
+	return file, nil
 }
 
 func (f *File) UnmarshalJSON(p []byte) error {

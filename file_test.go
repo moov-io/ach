@@ -393,8 +393,28 @@ func TestFile__readFromJson(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// Header
+	if file.Header.ImmediateOrigin != "121042882" || file.Header.ImmediateOriginName != "Wells Fargo" {
+		t.Errorf("origin=%s name=%s", file.Header.ImmediateOrigin, file.Header.ImmediateOriginName)
+	}
+	if file.Header.ImmediateDestination != "231380104" || file.Header.ImmediateDestinationName != "Citadel" {
+		t.Errorf("destination=%s name=%s", file.Header.ImmediateDestination, file.Header.ImmediateDestinationName)
+	}
+	if file.Header.FileCreationTime.IsZero() || file.Header.FileCreationDate.IsZero() {
+		t.Errorf("time=%v date=%v", file.Header.FileCreationTime, file.Header.FileCreationDate)
+	}
+
+	// Batches
 	if len(file.Batches) != 1 {
 		t.Errorf("got %d batches: %v", len(file.Batches), file.Batches)
+	}
+
+	// Control
+	if file.Control.BatchCount != 1 {
+		t.Errorf("BatchCount: %d", file.Control.BatchCount)
+	}
+	if file.Control.TotalDebitEntryDollarAmountInFile != 0 || file.Control.TotalCreditEntryDollarAmountInFile != 100000 {
+		t.Errorf("debit=%d credit=%d", file.Control.TotalDebitEntryDollarAmountInFile, file.Control.TotalCreditEntryDollarAmountInFile)
 	}
 
 	// ensure we error on struct tag unmarshal
