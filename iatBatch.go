@@ -435,10 +435,9 @@ func (batch *IATBatch) isCategory() error {
 	category := batch.GetEntries()[0].Category
 	if len(batch.Entries) > 1 {
 		for i := 1; i < len(batch.Entries); i++ {
-			// ToDo: Need to research requirements for Notice of change fo IAT
-			/*if batch.Entries[i].Category == CategoryNOC {
+			if batch.Entries[i].Category == CategoryNOC {
 				continue
-			}*/
+			}
 			if batch.Entries[i].Category != category {
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Category", Msg: msgBatchForwardReturn}
 			}
@@ -505,11 +504,9 @@ func (batch *IATBatch) Validate() error {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchIATAddendum}
 		}
 
-		// Counter for addendumer for 17, 18,, and 99
-		// ToDo: Come up with a better way?
-
 		addenda17Count := 0
 		addenda18Count := 0
+		addenda98Count := 0
 		addenda99Count := 0
 
 		for _, IATAddenda := range entry.Addendum {
@@ -525,6 +522,12 @@ func (batch *IATBatch) Validate() error {
 				addenda18Count = addenda18Count + 1
 				if addenda18Count > 5 {
 					msg := fmt.Sprintf(msgBatchIATAddendumCount, addenda18Count, "18")
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
+				}
+			case "98":
+				addenda98Count = addenda98Count + 1
+				if addenda98Count > 1 {
+					msg := fmt.Sprintf(msgBatchIATAddendumCount, addenda99Count, "98")
 					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
 				}
 			case "99":

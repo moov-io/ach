@@ -322,8 +322,11 @@ func (ed *IATEntryDetail) TraceNumberField() string {
 // Currently this is used to add Addenda17 and Addenda18 IAT Addenda records
 func (ed *IATEntryDetail) AddIATAddenda(addenda Addendumer) []Addendumer {
 	ed.AddendaRecordIndicator = 1
-	// checks to make sure that we only have either or, not both
 	switch addenda.(type) {
+	case *Addenda98:
+		ed.Category = CategoryNOC
+		ed.Addendum = append(ed.Addendum, addenda)
+		return ed.Addendum
 	case *Addenda99:
 		ed.Category = CategoryReturn
 		ed.Addendum = append(ed.Addendum, addenda)
