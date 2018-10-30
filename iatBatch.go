@@ -511,7 +511,6 @@ func (batch *IATBatch) Validate() error {
 	for _, entry := range batch.Entries {
 
 		switch entry.Category {
-
 		case CategoryForward:
 			if len(entry.Addendum) > 7 {
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchIATAddendum}
@@ -538,6 +537,7 @@ func (batch *IATBatch) Validate() error {
 					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
 				}
 			case "98":
+				// Only one Addenda98 can be added in EntryDetail.AddIATAddenda
 				if batch.GetHeader().IATIndicator != "IATCOR" {
 					msg := fmt.Sprintf(msgBatchIATNOC, batch.GetHeader().IATIndicator, "IATCOR")
 					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "IATIndicator", Msg: msg}
