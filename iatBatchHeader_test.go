@@ -41,6 +41,23 @@ func mockIATReturnBatchHeaderFF() *IATBatchHeader {
 	return bh
 }
 
+// mockIATNOCBatchHeaderFF creates a IAT Return BatchHeader that is Fixed-Fixed
+func mockIATNOCBatchHeaderFF() *IATBatchHeader {
+	bh := NewIATBatchHeader()
+	bh.ServiceClassCode = 220
+	bh.IATIndicator = "IATCOR"
+	bh.ForeignExchangeIndicator = "FF"
+	bh.ForeignExchangeReferenceIndicator = 3
+	bh.ISODestinationCountryCode = "US"
+	bh.OriginatorIdentification = "123456789"
+	bh.StandardEntryClassCode = "COR"
+	bh.CompanyEntryDescription = "TRADEPAYMT"
+	bh.ISOOriginatingCurrencyCode = "CAD"
+	bh.ISODestinationCurrencyCode = "USD"
+	bh.ODFIIdentification = "12104288"
+	return bh
+}
+
 // testMockIATBatchHeaderFF creates a IAT BatchHeader Fixed-Fixed
 func testMockIATBatchHeaderFF(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
@@ -108,8 +125,8 @@ func testParseIATBatchHeader(t testing.TB) {
 	if record.ServiceClassCode != 220 {
 		t.Errorf("ServiceClassCode Expected '225' got: %v", record.ServiceClassCode)
 	}
-	if record.IATIndicator != "                " {
-		t.Errorf("IATIndicator Expected '                ' got: %v", record.IATIndicator)
+	if record.IATIndicator != "" {
+		t.Errorf("IATIndicator Expected '' got: %v", record.IATIndicator)
 	}
 	if record.ForeignExchangeIndicator != "FF" {
 		t.Errorf("ForeignExchangeIndicator Expected '                ' got: %v",
