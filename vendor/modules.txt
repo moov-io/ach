@@ -21,6 +21,9 @@ github.com/gorilla/mux
 github.com/kr/logfmt
 # github.com/matttproud/golang_protobuf_extensions v1.0.1
 github.com/matttproud/golang_protobuf_extensions/pbutil
+# github.com/moov-io/base v0.0.0-20181030202447-dedcf5cc8055
+github.com/moov-io/base/admin
+github.com/moov-io/base/http/bind
 # github.com/prometheus/client_golang v0.8.0
 github.com/prometheus/client_golang/prometheus
 github.com/prometheus/client_golang/prometheus/promhttp
