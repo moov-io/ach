@@ -17,7 +17,6 @@ var (
 	msgBatchIATAddendumCount     = "%v Addenda %v for SEC Code IAT"
 	msgBatchIATInvalidAddendumer = "invalid Addendumer for SEC Code IAT"
 	msgBatchIATNOC               = "%v invalid for IAT NOC, should be %v"
-	msgBatchIATInvalidAddenda    = "%v is only valid for %v entry"
 )
 
 // IATBatch holds the Batch Header and Batch Control and all Entry Records for an IAT batch
