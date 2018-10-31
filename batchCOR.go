@@ -96,13 +96,13 @@ func (batch *BatchCOR) Create() error {
 func (batch *BatchCOR) isAddenda98() error {
 	for _, entry := range batch.Entries {
 		// Addenda type must be equal to 1
-		if len(entry.Addendum) != 1 {
+		if len(entry.addendas) != 1 {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchCORAddenda}
 		}
 		// Addenda type assertion must be Addenda98
-		addenda98, ok := entry.Addendum[0].(*Addenda98)
+		addenda98, ok := entry.addendas[0].(*Addenda98)
 		if !ok {
-			msg := fmt.Sprintf(msgBatchCORAddendaType, entry.Addendum[0])
+			msg := fmt.Sprintf(msgBatchCORAddendaType, entry.addendas[0])
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
 		}
 		// Addenda98 must be Validated

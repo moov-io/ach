@@ -36,7 +36,16 @@
                     "discretionaryData": "  ",
                     "addendaRecordIndicator": 1,
                     "traceNumber": 121042880000001,
-                    "category": "Forward"
+                    "category": "Forward",
+                    "addendum": [
+                        {
+                            "typeCode": "05",
+                            "entryDetailSequenceNumber": 1,
+                            "sequenceNumber": 1,
+                            "paymentRelatedInformation": "PAY-GATE Payment",
+                            "id": "adam-01"
+                        }
+                    ]
                 }
             ],
             "batchControl": {

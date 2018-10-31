@@ -67,8 +67,8 @@ type EntryDetail struct {
 	// in the associated Entry Detail Record, since the Trace Number is associated
 	// with an entry or item rather than a physical record.
 	TraceNumber int `json:"traceNumber,omitempty"`
-	// Addendum a list of Addenda for the Entry Detail
-	Addendum []Addendumer `json:"addendum,omitempty"`
+	// addendas a list of Addenda for the Entry Detail
+	addendas []Addendumer
 	// Category defines if the entry is a Forward, Return, or NOC
 	Category string `json:"category,omitempty"`
 	// validator is composed for data validation
@@ -94,6 +94,10 @@ func NewEntryDetail() *EntryDetail {
 		Category:   CategoryForward,
 	}
 	return entry
+}
+
+func (ed *EntryDetail) Addendas() []Addendumer {
+	return ed.addendas
 }
 
 // Parse takes the input record string and parses the EntryDetail values
@@ -246,24 +250,24 @@ func (ed *EntryDetail) AddAddenda(addenda Addendumer) []Addendumer {
 	switch addenda.(type) {
 	case *Addenda99:
 		ed.Category = CategoryReturn
-		ed.Addendum = nil
-		ed.Addendum = append(ed.Addendum, addenda)
-		return ed.Addendum
+		ed.addendas = nil
+		ed.addendas = append(ed.addendas, addenda)
+		return ed.addendas
 	case *Addenda98:
 		ed.Category = CategoryNOC
-		ed.Addendum = nil
-		ed.Addendum = append(ed.Addendum, addenda)
-		return ed.Addendum
+		ed.addendas = nil
+		ed.addendas = append(ed.addendas, addenda)
+		return ed.addendas
 	case *Addenda02:
 		ed.Category = CategoryForward
-		ed.Addendum = nil
-		ed.Addendum = append(ed.Addendum, addenda)
-		return ed.Addendum
+		ed.addendas = nil
+		ed.addendas = append(ed.addendas, addenda)
+		return ed.addendas
 		// default is current *Addenda05
 	default:
 		ed.Category = CategoryForward
-		ed.Addendum = append(ed.Addendum, addenda)
-		return ed.Addendum
+		ed.addendas = append(ed.addendas, addenda)
+		return ed.addendas
 	}
 }
 

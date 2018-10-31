@@ -138,7 +138,7 @@ func TestBatchWEBAddendum99(t *testing.T) {
 // testBatchWEBAddendaTypeCode validates addenda type code is valid
 func testBatchWEBAddendaTypeCode(t testing.TB) {
 	mockBatch := mockBatchWEB()
-	mockBatch.GetEntries()[0].Addendum[0].(*Addenda05).TypeCode = "02"
+	mockBatch.GetEntries()[0].addendas[0].(*Addenda05).TypeCode = "02"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {

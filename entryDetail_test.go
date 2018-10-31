@@ -577,7 +577,7 @@ func testEDAddAddenda99Twice(t testing.TB) {
 		t.Error("Addenda99 added and Category is not CategoryReturn")
 	}
 
-	if len(entry.Addendum) != 1 {
+	if len(entry.addendas) != 1 {
 		t.Error("Addenda99 added and isReturn is false")
 	}
 }

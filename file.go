@@ -115,6 +115,9 @@ func FileFromJson(bs []byte) (*File, error) {
 	if err := file.setBatchesFromJson(backup); err != nil {
 		return nil, err
 	}
+	if err := file.addAddendasFromJSON(backup); err != nil {
+		return nil, err
+	}
 	file.Header = header.Header
 	file.Control = control.Control
 	return file, nil

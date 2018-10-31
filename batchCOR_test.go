@@ -188,7 +188,7 @@ func BenchmarkBatchCORAddendaType(b *testing.B) {
 // testBatchCORAddendaTypeCode validates TypeCode
 func testBatchCORAddendaTypeCode(t testing.TB) {
 	mockBatch := mockBatchCOR()
-	mockBatch.GetEntries()[0].Addendum[0].(*Addenda98).TypeCode = "07"
+	mockBatch.GetEntries()[0].addendas[0].(*Addenda98).TypeCode = "07"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {

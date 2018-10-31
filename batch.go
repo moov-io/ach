@@ -152,7 +152,7 @@ func (batch *batch) build() error {
 	entryCount := 0
 	seq := 1
 	for i, entry := range batch.Entries {
-		entryCount = entryCount + 1 + len(entry.Addendum)
+		entryCount = entryCount + 1 + len(entry.addendas)
 
 		currentTraceNumberODFI, err := strconv.Atoi(entry.TraceNumberField()[:8])
 		if err != nil {
@@ -170,9 +170,9 @@ func (batch *batch) build() error {
 		}
 		seq++
 		addendaSeq := 1
-		for x := range entry.Addendum {
+		for x := range entry.addendas {
 			// sequences don't exist in NOC or Return addenda
-			if a, ok := batch.Entries[i].Addendum[x].(*Addenda05); ok {
+			if a, ok := batch.Entries[i].addendas[x].(*Addenda05); ok {
 				a.SequenceNumber = addendaSeq
 				a.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
 			}
@@ -249,7 +249,7 @@ func (batch *batch) isFieldInclusion() error {
 		if err := entry.Validate(); err != nil {
 			return err
 		}
-		for _, addenda := range entry.Addendum {
+		for _, addenda := range entry.addendas {
 			if err := addenda.Validate(); err != nil {
 				return nil
 			}
@@ -264,7 +264,7 @@ func (batch *batch) isFieldInclusion() error {
 func (batch *batch) isBatchEntryCount() error {
 	entryCount := 0
 	for _, entry := range batch.Entries {
-		entryCount = entryCount + 1 + len(entry.Addendum)
+		entryCount = entryCount + 1 + len(entry.addendas)
 	}
 	if entryCount != batch.Control.EntryAddendaCount {
 		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, entryCount, batch.Control.EntryAddendaCount)
@@ -367,14 +367,14 @@ func (batch *batch) isTraceNumberODFI() error {
 // isAddendaSequence check multiple errors on addenda records in the batch entries
 func (batch *batch) isAddendaSequence() error {
 	for _, entry := range batch.Entries {
-		if len(entry.Addendum) > 0 {
+		if len(entry.addendas) > 0 {
 			// addenda without indicator flag of 1
 			if entry.AddendaRecordIndicator != 1 {
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaRecordIndicator", Msg: msgBatchAddendaIndicator}
 			}
 			lastSeq := -1
 			// check if sequence is ascending
-			for _, addenda := range entry.Addendum {
+			for _, addenda := range entry.addendas {
 				// sequences don't exist in NOC or Return addenda
 				if a, ok := addenda.(*Addenda05); ok {
 

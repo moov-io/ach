@@ -71,12 +71,12 @@ func (batch *BatchSHR) Validate() error {
 		}
 
 		// SHR must have one Addenda02 record
-		if len(entry.Addendum) != 1 {
-			msg := fmt.Sprintf(msgBatchRequiredAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
+		if len(entry.addendas) != 1 {
+			msg := fmt.Sprintf(msgBatchRequiredAddendaCount, len(entry.addendas), 1, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 		}
 		// SHR must have one Addenda02 but cannot have Addenda05, or there can be a NOC (98) or Return (99)
-		for _, addenda := range entry.Addendum {
+		for _, addenda := range entry.addendas {
 			switch entry.Category {
 			case CategoryForward:
 				if err := batch.categoryForwardAddenda02(entry, addenda); err != nil {

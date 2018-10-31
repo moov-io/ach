@@ -59,13 +59,13 @@ func (batch *BatchCIE) Validate() error {
 		}
 
 		// CIE must have one Addenda05 record
-		if len(entry.Addendum) != 1 {
-			msg := fmt.Sprintf(msgBatchRequiredAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
+		if len(entry.addendas) != 1 {
+			msg := fmt.Sprintf(msgBatchRequiredAddendaCount, len(entry.addendas), 1, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 		}
 
 		// CIE can have up to one Record TypeCode = 05, or there can be a NOC (98) or Return (99)
-		for _, addenda := range entry.Addendum {
+		for _, addenda := range entry.addendas {
 			switch entry.Category {
 			case CategoryForward:
 				if err := batch.categoryForwardAddenda05(entry, addenda); err != nil {

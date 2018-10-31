@@ -582,9 +582,46 @@ func testFileAddenda05(t testing.TB) {
 	bh := mockBatchHeader()
 	ed := mockEntryDetail()
 	addenda := mockAddenda05()
-	addenda.SequenceNumber = 0
+	addenda.SequenceNumber = 1
 	ed.AddAddenda(addenda)
-	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.addendas[0].String()
+	r := NewReader(strings.NewReader(line))
+	_, err := r.Read()
+	if err != nil {
+		if el, ok := err.(ErrorList); ok {
+			if p, ok := el.Err().(*ParseError); ok {
+				if e, ok := p.Err.(*FieldError); ok {
+					if e.FieldName != "TransactionDate" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
+// TestFileAddenda02invalid tests validating error for an invalid addenda02
+func TestFileAddenda02invalid(t *testing.T) {
+	testFileAddenda02invalid(t)
+}
+
+// BenchmarkFileAddenda02invalid benchmarks validating error for an invalid addenda02
+func BenchmarkFileAddenda02invalid(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFileAddenda02invalid(b)
+	}
+}
+
+// testFileAddenda02 validates a valid addenda02
+func testFileAddenda02(t testing.TB) {
+	bh := mockBatchPOSHeader()
+	ed := mockPOSEntryDetail()
+	addenda := mockAddenda02()
+	ed.AddAddenda(addenda)
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.addendas[0].String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
 	if err != nil {
@@ -622,44 +659,7 @@ func testFileAddenda02invalid(t testing.TB) {
 	addenda := mockAddenda02()
 	addenda.TransactionDate = "0000"
 	ed.AddAddenda(addenda)
-	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
-	r := NewReader(strings.NewReader(line))
-	_, err := r.Read()
-	if err != nil {
-		if el, ok := err.(ErrorList); ok {
-			if p, ok := el.Err().(*ParseError); ok {
-				if e, ok := p.Err.(*FieldError); ok {
-					if e.FieldName != "TransactionDate" {
-						t.Errorf("%T: %s", e, e)
-					}
-				}
-			} else {
-				t.Errorf("%T: %s", el, el)
-			}
-		}
-	}
-}
-
-// TestFileAddenda02invalid tests validating error for an invalid addenda02
-func TestFileAddenda02invalid(t *testing.T) {
-	testFileAddenda02invalid(t)
-}
-
-// BenchmarkFileAddenda02invalid benchmarks validating error for an invalid addenda02
-func BenchmarkFileAddenda02invalid(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testFileAddenda02invalid(b)
-	}
-}
-
-// testFileAddenda02 validates a valid addenda02
-func testFileAddenda02(t testing.TB) {
-	bh := mockBatchPOSHeader()
-	ed := mockPOSEntryDetail()
-	addenda := mockAddenda02()
-	ed.AddAddenda(addenda)
-	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.addendas[0].String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
 	if err != nil {
@@ -699,7 +699,7 @@ func testFileAddenda98invalid(t testing.TB) {
 	addenda.ChangeCode = "C50"
 	addenda.CorrectedData = "ACME One Corporation"
 	ed.AddAddenda(addenda)
-	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.addendas[0].String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
 	if err != nil {
@@ -739,7 +739,7 @@ func testFileAddenda98(t testing.TB) {
 	addenda.ChangeCode = "C10"
 	addenda.CorrectedData = "ACME One Corporation"
 	ed.AddAddenda(addenda)
-	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.addendas[0].String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
 	if err != nil {
@@ -778,7 +778,7 @@ func testFileAddenda99invalid(t testing.TB) {
 	addenda.TraceNumber = 0000001
 	addenda.ReturnCode = "100"
 	ed.AddAddenda(addenda)
-	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.addendas[0].String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
 	if err != nil {
@@ -817,7 +817,7 @@ func testFileAddenda99(t testing.TB) {
 	addenda.TraceNumber = 0000001
 	addenda.ReturnCode = "R02"
 	ed.AddAddenda(addenda)
-	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.addendas[0].String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
 	if err != nil {
