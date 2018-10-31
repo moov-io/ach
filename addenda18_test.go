@@ -5,7 +5,6 @@
 package ach
 
 import (
-	"strings"
 	"testing"
 )
 
@@ -180,7 +179,7 @@ func TestValidateAddenda18RecordType(t *testing.T) {
 	}
 }
 
-func TestAddenda18TypeCodeFieldInclusion(t *testing.T) {
+func TestAddenda18FieldInclusionTypeCode(t *testing.T) {
 	addenda18 := mockAddenda18()
 	addenda18.TypeCode = ""
 	if err := addenda18.Validate(); err != nil {
@@ -204,12 +203,72 @@ func TestAddenda18FieldInclusion(t *testing.T) {
 	}
 }
 
+func TestAddenda18FieldInclusionSequenceNumber(t *testing.T) {
+	addenda18 := mockAddenda18()
+	addenda18.SequenceNumber = 0
+	if err := addenda18.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "SequenceNumber" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
 func TestAddenda18FieldInclusionRecordType(t *testing.T) {
 	addenda18 := mockAddenda18()
 	addenda18.recordType = ""
 	if err := addenda18.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+func TestAddenda18FieldInclusionFCBankName(t *testing.T) {
+	addenda18 := mockAddenda18()
+	addenda18.ForeignCorrespondentBankName = ""
+	if err := addenda18.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "ForeignCorrespondentBankName" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+func TestAddenda18FieldInclusionFCBankIDNumberQualifier(t *testing.T) {
+	addenda18 := mockAddenda18()
+	addenda18.ForeignCorrespondentBankIDNumberQualifier = ""
+	if err := addenda18.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "ForeignCorrespondentBankIDNumberQualifier" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+func TestAddenda18FieldInclusionFCBankIDNumber(t *testing.T) {
+	addenda18 := mockAddenda18()
+	addenda18.ForeignCorrespondentBankIDNumber = ""
+	if err := addenda18.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "ForeignCorrespondentBankIDNumber" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+func TestAddenda18FieldInclusionFCBankBranchCountryCode(t *testing.T) {
+	addenda18 := mockAddenda18()
+	addenda18.ForeignCorrespondentBankBranchCountryCode = ""
+	if err := addenda18.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "ForeignCorrespondentBankBranchCountryCode" {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
