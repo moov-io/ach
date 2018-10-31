@@ -6,6 +6,7 @@ package ach
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
@@ -15,11 +16,21 @@ import (
 // mockFilePPD creates an ACH file with PPD batch and entry
 func mockFilePPD() *File {
 	mockFile := NewFile()
+	mockFile.ID = "fileId"
 	mockFile.SetHeader(mockFileHeader())
+	mockFile.Header.ID = mockFile.ID
+	mockFile.Control = mockFileControl()
+	mockFile.Control.ID = mockFile.ID
 	mockBatch := mockBatchPPD()
 	mockFile.AddBatch(mockBatch)
 	if err := mockFile.Create(); err != nil {
 		panic(err)
+	}
+	if mockFile.ID != mockFile.Header.ID {
+		panic(fmt.Sprintf("mockFile.ID=%s mockFile.Header.ID=%s", mockFile.ID, mockFile.Header.ID))
+	}
+	if mockFile.ID != mockFile.Control.ID {
+		panic(fmt.Sprintf("mockFile.ID=%s mockFile.Control.ID=%s", mockFile.ID, mockFile.Control.ID))
 	}
 	return mockFile
 }

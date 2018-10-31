@@ -5,6 +5,7 @@
 package ach
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -98,6 +99,18 @@ func NewEntryDetail() *EntryDetail {
 
 func (ed *EntryDetail) Addendas() []Addendumer {
 	return ed.addendas
+}
+
+func (ed *EntryDetail) MarshalJSON() ([]byte, error) {
+	// Trick from http://choly.ca/post/go-json-marshalling/
+	type Alias EntryDetail
+	return json.Marshal(&struct {
+		Addendum []Addendumer `json:"addendum"`
+		*Alias
+	}{
+		Addendum: ed.Addendas,
+		Alias:    (*Alias)(ed),
+	})
 }
 
 // Parse takes the input record string and parses the EntryDetail values
