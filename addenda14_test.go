@@ -37,7 +37,7 @@ func testAddenda14Parse(t testing.TB) {
 	if Addenda14.recordType != "7" {
 		t.Errorf("expected %v got %v", "7", Addenda14.recordType)
 	}
-	if Addenda14.TypeCode != "14" {
+	if Addenda14.typeCode() != "14" {
 		t.Errorf("expected %v got %v", "14", Addenda14.TypeCode)
 	}
 	if Addenda14.RDFIName != "Citadel Bank" {

@@ -35,7 +35,7 @@ func testAddenda15Parse(t testing.TB) {
 	if Addenda15.recordType != "7" {
 		t.Errorf("expected %v got %v", "7", Addenda15.recordType)
 	}
-	if Addenda15.TypeCode != "15" {
+	if Addenda15.typeCode() != "15" {
 		t.Errorf("expected %v got %v", "15", Addenda15.TypeCode)
 	}
 	if Addenda15.ReceiverIDNumber != "987465493213987" {

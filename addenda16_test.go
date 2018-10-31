@@ -35,7 +35,7 @@ func testAddenda16Parse(t testing.TB) {
 	if Addenda16.recordType != "7" {
 		t.Errorf("expected %v got %v", "7", Addenda16.recordType)
 	}
-	if Addenda16.TypeCode != "16" {
+	if Addenda16.typeCode() != "16" {
 		t.Errorf("expected %v got %v", "16", Addenda16.TypeCode)
 	}
 	if Addenda16.ReceiverCityStateProvince != "LetterTown*AB\\" {

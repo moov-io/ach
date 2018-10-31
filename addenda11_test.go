@@ -35,7 +35,7 @@ func testAddenda11Parse(t testing.TB) {
 	if Addenda11.recordType != "7" {
 		t.Errorf("expected %v got %v", "7", Addenda11.recordType)
 	}
-	if Addenda11.TypeCode != "11" {
+	if Addenda11.typeCode() != "11" {
 		t.Errorf("expected %v got %v", "11", Addenda11.TypeCode)
 	}
 	if Addenda11.OriginatorName != "BEK Solutions" {
