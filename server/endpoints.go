@@ -217,6 +217,8 @@ type getBatchesResponse struct {
 	Err     error         `json:"error"`
 }
 
+func (r getBatchesResponse) count() int { return len(r.Batches) }
+
 func (r getBatchesResponse) error() error { return r.Err }
 
 func MakeGetBatchEndpoint(s Service) endpoint.Endpoint {

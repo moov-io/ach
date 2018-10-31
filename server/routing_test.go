@@ -3,11 +3,10 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"github.com/moov-io/ach"
 	"net/http/httptest"
 	"strings"
 	"testing"
-
-	"github.com/moov-io/ach"
 
 	httptransport "github.com/go-kit/kit/transport/http"
 )
@@ -49,10 +48,37 @@ func TestEncodeTextResponse(t *testing.T) {
 	}
 }
 
-func TestXTotalCountHeader(t *testing.T) {
+func TestFilesXTotalCountHeader(t *testing.T) {
 	counter := getFilesResponse{
 		Files: []*ach.File{ach.NewFile()},
 		Err:   nil,
+	}
+
+	w := httptest.NewRecorder()
+	encodeResponse(context.Background(), w, counter)
+
+	actual, ok := w.Result().Header["X-Total-Count"]
+	if !ok {
+		t.Fatal("should have count")
+	}
+	if actual[0] != "1" {
+		t.Errorf("should be 1, got %v", actual[0])
+	}
+}
+
+func TestBatchesXTotalCountHeader(t *testing.T) {
+	bh := mockBatchHeaderWeb()
+	entry := mockWEBEntryDetail()
+	addenda := mockAddenda05()
+	entry.AddAddenda(addenda)
+	// build the batch
+	batch := ach.NewBatchWEB(bh)
+	batch.SetID(batch.Header.ID)
+	batch.AddEntry(entry)
+
+	counter := getBatchesResponse{
+		Batches: []ach.Batcher{batch},
+		Err:     nil,
 	}
 
 	w := httptest.NewRecorder()
