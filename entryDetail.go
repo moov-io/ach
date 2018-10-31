@@ -108,7 +108,7 @@ func (ed *EntryDetail) MarshalJSON() ([]byte, error) {
 		Addendum []Addendumer `json:"addendum"`
 		*Alias
 	}{
-		Addendum: ed.Addendas,
+		Addendum: ed.addendas,
 		Alias:    (*Alias)(ed),
 	})
 }
