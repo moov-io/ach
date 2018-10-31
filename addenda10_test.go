@@ -37,7 +37,7 @@ func testAddenda10Parse(t testing.TB) {
 	if addenda10.recordType != "7" {
 		t.Errorf("expected %v got %v", "7", addenda10.recordType)
 	}
-	if addenda10.typeCode() != "10" {
+	if addenda10.TypeCode != "10" {
 		t.Errorf("expected %v got %v", "10", addenda10.TypeCode)
 	}
 	if addenda10.TransactionTypeCode != "ANN" {

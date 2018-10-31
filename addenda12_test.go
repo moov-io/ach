@@ -35,7 +35,7 @@ func testAddenda12Parse(t testing.TB) {
 	if Addenda12.recordType != "7" {
 		t.Errorf("expected %v got %v", "7", Addenda12.recordType)
 	}
-	if Addenda12.typeCode() != "12" {
+	if Addenda12.TypeCode != "12" {
 		t.Errorf("expected %v got %v", "12", Addenda12.TypeCode)
 	}
 	if Addenda12.OriginatorCityStateProvince != "JacobsTown*PA\\" {

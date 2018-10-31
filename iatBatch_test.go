@@ -1694,7 +1694,7 @@ func BenchmarkIATNoEntry(b *testing.B) {
 // testIATBatchAddendumTypeCode validates IATBatch Addendum TypeCode
 func testIATBatchAddendumTypeCode(t testing.TB) {
 	mockBatch := mockIATBatch(t)
-	mockBatch.GetEntries()[0].AddIATAddenda(mockAddenda12())
+	mockBatch.GetEntries()[0].AddIATAddenda(mockAddenda17())
 
 	if err := mockBatch.build(); err != nil {
 		t.Errorf("%T: %s", err, err)
