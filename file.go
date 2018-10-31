@@ -120,6 +120,7 @@ func FileFromJson(bs []byte) (*File, error) {
 	}
 	file.Header = header.Header
 	file.Control = control.Control
+	file.Control.BatchCount = len(file.Batches)
 	return file, nil
 }
 
@@ -205,6 +206,7 @@ func (f *File) Create() error {
 	}
 	// create FileControl from calculated values
 	fc := NewFileControl()
+	fc.ID = f.ID
 	fc.BatchCount = batchSeq - 1
 	// blocking factor of 10 is static default value in f.Header.blockingFactor.
 	if (totalRecordsInFile % 10) != 0 {
