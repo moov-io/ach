@@ -367,12 +367,13 @@ func (batch *IATBatch) isAddendaSequence() error {
 		if entry.AddendaRecordIndicator != 1 {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaRecordIndicator", Msg: msgIATBatchAddendaIndicator}
 		}
-		// Verify Addenda* entry detail sequence numbers are valid
-		entryTN := entry.TraceNumberField()[8:]
 
 		if entry.Category == CategoryNOC {
 			return nil
 		}
+
+		// Verify Addenda* entry detail sequence numbers are valid
+		entryTN := entry.TraceNumberField()[8:]
 		if entry.Addenda10.EntryDetailSequenceNumberField() != entryTN {
 			msg := fmt.Sprintf(msgBatchAddendaTraceNumber, entry.Addenda10.EntryDetailSequenceNumberField(), entry.TraceNumberField()[8:])
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
