@@ -60,8 +60,8 @@ func (r *repositoryInMemory) FindAllFiles() []*ach.File {
 	r.mtx.RLock()
 	defer r.mtx.RUnlock()
 	files := make([]*ach.File, 0, len(r.files))
-	for _, val := range r.files {
-		files = append(files, val)
+	for i := range r.files {
+		files = append(files, r.files[i])
 	}
 	return files
 }
