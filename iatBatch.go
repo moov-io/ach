@@ -455,36 +455,38 @@ func (batch *IATBatch) isCategory() error {
 
 func (batch *IATBatch) addendaFieldInclusion(entry *IATEntryDetail) error {
 
-	if entry.Category != CategoryNOC {
-		if entry.Addenda10 == nil {
-			msg := fmt.Sprint(msgIATBatchAddendaRequired)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda10", Msg: msg}
-		}
-		if entry.Addenda11 == nil {
-			msg := fmt.Sprint(msgIATBatchAddendaRequired)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda11", Msg: msg}
-		}
-		if entry.Addenda12 == nil {
-			msg := fmt.Sprint(msgIATBatchAddendaRequired)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda12", Msg: msg}
-		}
-		if entry.Addenda13 == nil {
-			msg := fmt.Sprint(msgIATBatchAddendaRequired)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda13", Msg: msg}
-		}
-		if entry.Addenda14 == nil {
-			msg := fmt.Sprint(msgIATBatchAddendaRequired)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda14", Msg: msg}
-		}
-		if entry.Addenda15 == nil {
-			msg := fmt.Sprint(msgIATBatchAddendaRequired)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda15", Msg: msg}
-		}
-		if entry.Addenda16 == nil {
-			msg := fmt.Sprint(msgIATBatchAddendaRequired)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda16", Msg: msg}
-		}
+	if entry.Category == CategoryNOC {
+		return nil
 	}
+	if entry.Addenda10 == nil {
+		msg := fmt.Sprint(msgIATBatchAddendaRequired)
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda10", Msg: msg}
+	}
+	if entry.Addenda11 == nil {
+		msg := fmt.Sprint(msgIATBatchAddendaRequired)
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda11", Msg: msg}
+	}
+	if entry.Addenda12 == nil {
+		msg := fmt.Sprint(msgIATBatchAddendaRequired)
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda12", Msg: msg}
+	}
+	if entry.Addenda13 == nil {
+		msg := fmt.Sprint(msgIATBatchAddendaRequired)
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda13", Msg: msg}
+	}
+	if entry.Addenda14 == nil {
+		msg := fmt.Sprint(msgIATBatchAddendaRequired)
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda14", Msg: msg}
+	}
+	if entry.Addenda15 == nil {
+		msg := fmt.Sprint(msgIATBatchAddendaRequired)
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda15", Msg: msg}
+	}
+	if entry.Addenda16 == nil {
+		msg := fmt.Sprint(msgIATBatchAddendaRequired)
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda16", Msg: msg}
+	}
+
 	return nil
 }
 
