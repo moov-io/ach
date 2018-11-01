@@ -21,7 +21,7 @@ type addenda struct {
 	Addenda Addendumer
 }
 
-// UnmarshalJSON attempts to parse data as each AddendaXX record.
+// UnmarshalJSON attempts to parse data as each (non-IAT) AddendaXX record.
 func (a *addenda) UnmarshalJSON(data []byte) error {
 	addenda02 := NewAddenda02()
 	if json.Unmarshal(data, &addenda02) == nil && addenda02.Validate() == nil {
@@ -32,42 +32,6 @@ func (a *addenda) UnmarshalJSON(data []byte) error {
 	addenda05 := NewAddenda05()
 	if json.Unmarshal(data, &addenda05) == nil && addenda05.Validate() == nil {
 		a.Addenda = addenda05
-		return nil
-	}
-
-	addenda10 := NewAddenda10()
-	if json.Unmarshal(data, &addenda10) == nil && addenda10.Validate() == nil {
-		a.Addenda = addenda10
-		return nil
-	}
-
-	addenda12 := NewAddenda12()
-	if json.Unmarshal(data, &addenda12) == nil && addenda12.Validate() == nil {
-		a.Addenda = addenda12
-		return nil
-	}
-
-	addenda13 := NewAddenda13()
-	if json.Unmarshal(data, &addenda13) == nil && addenda13.Validate() == nil {
-		a.Addenda = addenda13
-		return nil
-	}
-
-	addenda14 := NewAddenda14()
-	if json.Unmarshal(data, &addenda14) == nil && addenda14.Validate() == nil {
-		a.Addenda = addenda14
-		return nil
-	}
-
-	addenda15 := NewAddenda15()
-	if json.Unmarshal(data, &addenda15) == nil && addenda15.Validate() == nil {
-		a.Addenda = addenda15
-		return nil
-	}
-
-	addenda16 := NewAddenda16()
-	if json.Unmarshal(data, &addenda16) == nil && addenda16.Validate() == nil {
-		a.Addenda = addenda16
 		return nil
 	}
 
