@@ -404,6 +404,10 @@ func TestFile__readFromJson(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	if file.ID != "adam-01" {
+		t.Errorf("file.ID: %s", file.ID)
+	}
+
 	// Header
 	if file.Header.ImmediateOrigin != "121042882" || file.Header.ImmediateOriginName != "Wells Fargo" {
 		t.Errorf("origin=%s name=%s", file.Header.ImmediateOrigin, file.Header.ImmediateOriginName)
@@ -444,5 +448,9 @@ func TestFile__readFromJson(t *testing.T) {
 	err = json.Unmarshal(bs, &f)
 	if !strings.Contains(err.Error(), "use ach.FileFromJSON instead") {
 		t.Error("expected error, see FileFromJson definition")
+	}
+
+	if err := file.Validate(); err != nil {
+		t.Error(err)
 	}
 }

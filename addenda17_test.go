@@ -36,7 +36,7 @@ func testAddenda17Parse(t testing.TB) {
 	if Addenda17.recordType != "7" {
 		t.Errorf("expected %v got %v", "7", Addenda17.recordType)
 	}
-	if Addenda17.TypeCode != "17" {
+	if Addenda17.typeCode() != "17" {
 		t.Errorf("expected %v got %v", "17", Addenda17.TypeCode)
 	}
 	if Addenda17.PaymentRelatedInformation != "This is an international payment" {
@@ -110,7 +110,7 @@ func TestValidateAddenda17RecordType(t *testing.T) {
 	}
 }
 
-func TestAddenda17TypeCodeFieldInclusion(t *testing.T) {
+func TestAddenda17FieldInclusionTypeCode(t *testing.T) {
 	addenda17 := mockAddenda17()
 	addenda17.TypeCode = ""
 	if err := addenda17.Validate(); err != nil {
@@ -128,6 +128,18 @@ func TestAddenda17FieldInclusion(t *testing.T) {
 	if err := addenda17.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "EntryDetailSequenceNumber" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+func TestAddenda17FieldInclusionSequenceNumber(t *testing.T) {
+	addenda17 := mockAddenda17()
+	addenda17.SequenceNumber = 0
+	if err := addenda17.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "SequenceNumber" {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
