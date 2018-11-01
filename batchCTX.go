@@ -47,20 +47,20 @@ func (batch *BatchCTX) Validate() error {
 	for _, entry := range batch.Entries {
 
 		// Trapping this error, as entry.CTXAddendaRecordsField() can not be greater than 9999
-		if len(entry.addendas) > 9999 {
-			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.addendas), 9999, batch.Header.StandardEntryClassCode)
+		if len(entry.Addendum) > 9999 {
+			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 9999, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 		}
 
 		// validate CTXAddendaRecord Field is equal to the actual number of Addenda records
 		// use 0 value if there is no Addenda records
 		addendaRecords, _ := strconv.Atoi(entry.CATXAddendaRecordsField())
-		if len(entry.addendas) != addendaRecords {
-			msg := fmt.Sprintf(msgBatchCTXAddendaCount, addendaRecords, len(entry.addendas))
+		if len(entry.Addendum) != addendaRecords {
+			msg := fmt.Sprintf(msgBatchCTXAddendaCount, addendaRecords, len(entry.Addendum))
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
 		}
 
-		if len(entry.addendas) > 0 {
+		if len(entry.Addendum) > 0 {
 
 			switch entry.TransactionCode {
 			// Prenote credit  23, 33, 43, 53
@@ -72,7 +72,7 @@ func (batch *BatchCTX) Validate() error {
 			}
 
 			// CTX can have up to 9999 Addenda Record TypeCode = 05, or there can be a NOC (98) or Return (99)
-			for _, addenda := range entry.addendas {
+			for _, addenda := range entry.Addendum {
 				switch entry.Category {
 				case CategoryForward:
 					if err := batch.categoryForwardAddenda05(entry, addenda); err != nil {

@@ -325,8 +325,8 @@ func testBatchIsAddendaSeqAscending(t testing.TB) {
 	ed.AddAddenda(mockAddenda05())
 	mockBatch.build()
 
-	mockBatch.GetEntries()[0].addendas[0].(*Addenda05).SequenceNumber = 2
-	mockBatch.GetEntries()[0].addendas[1].(*Addenda05).SequenceNumber = 1
+	mockBatch.GetEntries()[0].Addendum[0].(*Addenda05).SequenceNumber = 2
+	mockBatch.GetEntries()[0].Addendum[1].(*Addenda05).SequenceNumber = 1
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "SequenceNumber" {
@@ -383,7 +383,7 @@ func testBatchAddendaTraceNumber(t testing.TB) {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	mockBatch.GetEntries()[0].addendas[0].(*Addenda05).EntryDetailSequenceNumber = 99
+	mockBatch.GetEntries()[0].Addendum[0].(*Addenda05).EntryDetailSequenceNumber = 99
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TraceNumber" {

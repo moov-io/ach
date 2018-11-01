@@ -5,6 +5,9 @@
 package ach
 
 import (
+	"encoding/json"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -577,7 +580,7 @@ func testEDAddAddenda99Twice(t testing.TB) {
 		t.Error("Addenda99 added and Category is not CategoryReturn")
 	}
 
-	if len(entry.addendas) != 1 {
+	if len(entry.Addendum) != 1 {
 		t.Error("Addenda99 added and isReturn is false")
 	}
 }
@@ -663,5 +666,85 @@ func BenchmarkValidateEDCheckDigit(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testValidateEDCheckDigit(b)
+	}
+}
+
+func TestEntryDetail__json(t *testing.T) {
+	f, err := os.Open(filepath.Join("test", "testdata", "entrydetail-valid.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+
+	var ed EntryDetail
+	if err := json.NewDecoder(f).Decode(&ed); err != nil {
+		t.Fatal(err)
+	}
+
+	if ed.ID != "test" {
+		t.Error(ed.ID)
+	}
+	if ed.TransactionCode != 27 {
+		t.Error(ed)
+	}
+	if ed.RDFIIdentification != "RDFI" {
+		t.Error(ed.RDFIIdentification)
+	}
+	if ed.CheckDigit != "0" {
+		t.Error(ed.CheckDigit)
+	}
+	if ed.DFIAccountNumber != "132" {
+		t.Error(ed.DFIAccountNumber)
+	}
+	if ed.Amount != 10000 {
+		t.Error(ed.Amount)
+	}
+	if ed.IndividualName != "jane doe" {
+		t.Error(ed.IndividualName)
+	}
+	if len(ed.Addendum) != 2 {
+		t.Errorf("got %d addenda records", len(ed.Addendum))
+	}
+
+	// addenda record order matters
+	rec05, ok := ed.Addendum[0].(*Addenda05)
+	if !ok || rec05 == nil {
+		t.Fatalf("%#v", rec05)
+	}
+	if rec05.ID != "test-05" {
+		t.Error(rec05.ID)
+	}
+	if rec05.TypeCode != "05" {
+		t.Error(rec05.TypeCode)
+	}
+	if rec05.PaymentRelatedInformation != "lottery winnings" {
+		t.Error(rec05.PaymentRelatedInformation)
+	}
+	if rec05.SequenceNumber != 1 {
+		t.Errorf("got %d", rec05.SequenceNumber)
+	}
+
+	// second addenda record
+	rec98, ok := ed.Addendum[1].(*Addenda98)
+	if !ok || rec98 == nil {
+		t.Fatalf("%#v", rec98)
+	}
+	if rec98.TypeCode != "98" {
+		t.Error(rec98.TypeCode)
+	}
+	if rec98.ChangeCode != "C01" {
+		t.Error(rec98.ChangeCode)
+	}
+	if rec98.OriginalTrace != 18571 {
+		t.Error(rec98.OriginalTrace)
+	}
+	if rec98.OriginalDFI != "123456789" {
+		t.Error(rec98.OriginalDFI)
+	}
+	if rec98.CorrectedData != "fix me" {
+		t.Error(rec98.CorrectedData)
+	}
+	if rec98.TraceNumber != 87198212121 {
+		t.Errorf("traceNumber: %d", rec98.TraceNumber)
 	}
 }

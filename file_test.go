@@ -419,7 +419,7 @@ func TestFile__readFromJson(t *testing.T) {
 	if len(file.Batches) != 1 {
 		t.Errorf("got %d batches: %v", len(file.Batches), file.Batches)
 	}
-	if add := file.Batches[0].GetEntries()[0].addendas; len(add) != 1 {
+	if add := file.Batches[0].GetEntries()[0].Addendum; len(add) != 1 {
 		t.Errorf("got %d addenda: %v", len(add), add)
 	} else {
 		if addenda05, ok := add[0].(*Addenda05); !ok {

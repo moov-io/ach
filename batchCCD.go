@@ -38,14 +38,14 @@ func (batch *BatchCCD) Validate() error {
 
 	for _, entry := range batch.Entries {
 		// CCD can have up to one Record TypeCode = 05, or there can be a NOC (98) or Return (99)
-		for _, addenda := range entry.addendas {
+		for _, addenda := range entry.Addendum {
 			switch entry.Category {
 			case CategoryForward:
 				if err := batch.categoryForwardAddenda05(entry, addenda); err != nil {
 					return err
 				}
-				if len(entry.addendas) > 1 {
-					msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.addendas), 1, batch.Header.StandardEntryClassCode)
+				if len(entry.Addendum) > 1 {
+					msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
 					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 				}
 			case CategoryNOC:

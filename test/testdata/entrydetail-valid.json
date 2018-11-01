@@ -1,0 +1,27 @@
+{
+  "id": "test",
+  "transactionCode": 27,
+  "RDFIIdentification": "RDFI",
+  "checkDigit": "0",
+  "DFIAccountNumber": "132",
+  "amount": 10000,
+  "individualName": "jane doe",
+  "addendum": [
+    {
+      "id": "test-05",
+      "typeCode": "05",
+      "paymentRelatedInformation": "lottery winnings",
+      "sequenceNumber": 1,
+      "entryDetailSequenceNumber": 1
+    },
+    {
+      "id": "test-98",
+      "typeCode": "98",
+      "changeCode": "C01",
+      "originalTrace": 18571,
+      "originalDFI": "123456789",
+      "correctedData": "fix me",
+      "traceNumber": 87198212121
+    }
+  ]
+}

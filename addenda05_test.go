@@ -48,7 +48,7 @@ func testParseAddenda05(t testing.TB) {
 	// add the PPD entry detail to the batch
 	r.currentBatch.AddEntry(entryDetail)
 
-	record := r.currentBatch.GetEntries()[0].addendas[0].(*Addenda05)
+	record := r.currentBatch.GetEntries()[0].Addendum[0].(*Addenda05)
 
 	if record.recordType != "7" {
 		t.Errorf("RecordType Expected '7' got: %v", record.recordType)

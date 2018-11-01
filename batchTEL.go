@@ -39,11 +39,11 @@ func (batch *BatchTEL) Validate() error {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 		}
 		// TEL cannot have Addenda02 or Addenda05.  There can be a NOC (98) or Return (99)
-		for _, addenda := range entry.addendas {
+		for _, addenda := range entry.Addendum {
 			switch entry.Category {
 			case CategoryForward:
-				if len(entry.addendas) > 0 {
-					msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.addendas), 0, batch.Header.StandardEntryClassCode)
+				if len(entry.Addendum) > 0 {
+					msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 0, batch.Header.StandardEntryClassCode)
 					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 				}
 			case CategoryNOC:
