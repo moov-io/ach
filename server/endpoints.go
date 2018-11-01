@@ -172,7 +172,7 @@ func (v validateFileResponse) error() error { return v.Err }
 
 //** Batches ** //
 
-// MakeCreateFileEndpoint returns an endpoint via the passed service.
+// MakeCreateBatchEndpoint returns an endpoint via the passed service.
 func MakeCreateBatchEndpoint(s Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(createBatchRequest)

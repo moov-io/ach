@@ -60,15 +60,15 @@ func (r *repositoryInMemory) FindAllFiles() []*ach.File {
 	r.mtx.RLock()
 	defer r.mtx.RUnlock()
 	files := make([]*ach.File, 0, len(r.files))
-	for _, val := range r.files {
-		files = append(files, val)
+	for i := range r.files {
+		files = append(files, r.files[i])
 	}
 	return files
 }
 
 func (r *repositoryInMemory) DeleteFile(id string) error {
-	r.mtx.RLock()
-	defer r.mtx.RUnlock()
+	r.mtx.Lock()
+	defer r.mtx.Unlock()
 	delete(r.files, id)
 	return nil
 }
@@ -114,8 +114,8 @@ func (r *repositoryInMemory) FindAllBatches(fileID string) []ach.Batcher {
 }
 
 func (r *repositoryInMemory) DeleteBatch(fileID string, batchID string) error {
-	r.mtx.RLock()
-	defer r.mtx.RUnlock()
+	r.mtx.Lock()
+	defer r.mtx.Unlock()
 
 	for i := len(r.files[fileID].Batches) - 1; i >= 0; i-- {
 		if r.files[fileID].Batches[i].ID() == batchID {
