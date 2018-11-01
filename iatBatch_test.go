@@ -5,12 +5,12 @@
 package ach
 
 import (
-	"log"
+	"strings"
 	"testing"
 )
 
 // mockIATBatch
-func mockIATBatch() IATBatch {
+func mockIATBatch(t testing.TB) IATBatch {
 	mockBatch := IATBatch{}
 	mockBatch.SetHeader(mockIATBatchHeaderFF())
 	mockBatch.AddEntry(mockIATEntryDetail())
@@ -22,13 +22,13 @@ func mockIATBatch() IATBatch {
 	mockBatch.Entries[0].Addenda15 = mockAddenda15()
 	mockBatch.Entries[0].Addenda16 = mockAddenda16()
 	if err := mockBatch.build(); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	return mockBatch
 }
 
 // mockIATBatchManyEntries
-func mockIATBatchManyEntries() IATBatch {
+func mockIATBatchManyEntries(t testing.TB) IATBatch {
 	mockBatch := IATBatch{}
 	mockBatch.SetHeader(mockIATBatchHeaderFF())
 
@@ -67,13 +67,13 @@ func mockIATBatchManyEntries() IATBatch {
 	mockBatch.Entries[1].AddIATAddenda(mockAddenda18E())
 
 	if err := mockBatch.build(); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	return mockBatch
 }
 
 // mockIATBatch
-func mockInvalidIATBatch() IATBatch {
+func mockInvalidIATBatch(t testing.TB) IATBatch {
 	mockBatch := IATBatch{}
 	mockBatch.SetHeader(mockIATBatchHeaderFF())
 	mockBatch.AddEntry(mockIATEntryDetail())
@@ -86,7 +86,7 @@ func mockInvalidIATBatch() IATBatch {
 	mockBatch.Entries[0].Addenda16 = mockAddenda16()
 	mockBatch.Entries[0].AddIATAddenda(mockInvalidAddenda17())
 	if err := mockBatch.build(); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	return mockBatch
 }
@@ -97,7 +97,6 @@ func mockInvalidAddenda17() *Addenda17 {
 	addenda17.TypeCode = "02"
 	addenda17.SequenceNumber = 2
 	addenda17.EntryDetailSequenceNumber = 0000002
-
 	return addenda17
 }
 
@@ -111,9 +110,19 @@ func mockIATAddenda99() *Addenda99 {
 	return addenda99
 }
 
+func mockIATAddenda98() *Addenda98 {
+	addenda98 := NewAddenda98()
+	addenda98.ChangeCode = "C01"
+	addenda98.OriginalTrace = 231380100000001
+	addenda98.OriginalDFI = "12104288"
+	addenda98.CorrectedData = "89722-C3"
+	addenda98.TraceNumber = 121042880000001
+	return addenda98
+}
+
 // TestMockIATBatch validates mockIATBatch
 func TestMockIATBatch(t *testing.T) {
-	iatBatch := mockIATBatch()
+	iatBatch := mockIATBatch(t)
 	if err := iatBatch.verify(); err != nil {
 		t.Error("mockIATBatch does not validate and will break other tests")
 	}
@@ -121,7 +130,7 @@ func TestMockIATBatch(t *testing.T) {
 
 // testIATBatchAddenda10Error validates IATBatch returns an error if Addenda10 is not included
 func testIATBatchAddenda10Error(t testing.TB) {
-	iatBatch := mockIATBatch()
+	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda10 = nil
 	if err := iatBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -151,7 +160,7 @@ func BenchmarkIATBatchAddenda10Error(b *testing.B) {
 
 // testIATBatchAddenda11Error validates IATBatch returns an error if Addenda11 is not included
 func testIATBatchAddenda11Error(t testing.TB) {
-	iatBatch := mockIATBatch()
+	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda11 = nil
 	if err := iatBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -181,7 +190,7 @@ func BenchmarkIATBatchAddenda11Error(b *testing.B) {
 
 // testIATBatchAddenda12Error validates IATBatch returns an error if Addenda12 is not included
 func testIATBatchAddenda12Error(t testing.TB) {
-	iatBatch := mockIATBatch()
+	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda12 = nil
 	if err := iatBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -211,7 +220,7 @@ func BenchmarkIATBatchAddenda12Error(b *testing.B) {
 
 // testIATBatchAddenda13Error validates IATBatch returns an error if Addenda13 is not included
 func testIATBatchAddenda13Error(t testing.TB) {
-	iatBatch := mockIATBatch()
+	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda13 = nil
 	if err := iatBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -241,7 +250,7 @@ func BenchmarkIATBatchAddenda13Error(b *testing.B) {
 
 // testIATBatchAddenda14Error validates IATBatch returns an error if Addenda14 is not included
 func testIATBatchAddenda14Error(t testing.TB) {
-	iatBatch := mockIATBatch()
+	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda14 = nil
 	if err := iatBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -271,7 +280,7 @@ func BenchmarkIATBatchAddenda14Error(b *testing.B) {
 
 // testIATBatchAddenda15Error validates IATBatch returns an error if Addenda15 is not included
 func testIATBatchAddenda15Error(t testing.TB) {
-	iatBatch := mockIATBatch()
+	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda15 = nil
 	if err := iatBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -301,7 +310,7 @@ func BenchmarkIATBatchAddenda15Error(b *testing.B) {
 
 // testIATBatchAddenda16Error validates IATBatch returns an error if Addenda16 is not included
 func testIATBatchAddenda16Error(t testing.TB) {
-	iatBatch := mockIATBatch()
+	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda16 = nil
 	if err := iatBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -332,7 +341,7 @@ func BenchmarkIATBatchAddenda16Error(b *testing.B) {
 // testAddenda10EntryDetailSequenceNumber validates IATBatch returns an error if
 // EntryDetailSequenceNumber is not valid
 func testAddenda10EntryDetailSequenceNumber(t testing.TB) {
-	iatBatch := mockIATBatch()
+	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda10.EntryDetailSequenceNumber = 00000005
 	if err := iatBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -363,7 +372,7 @@ func BenchmarkAddenda10EntryDetailSequenceNumber(b *testing.B) {
 // testAddenda11EntryDetailSequenceNumber validates IATBatch returns an error if EntryDetailSequenceNumber
 // is not valid
 func testAddenda11EntryDetailSequenceNumber(t testing.TB) {
-	iatBatch := mockIATBatch()
+	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda11.EntryDetailSequenceNumber = 00000005
 	if err := iatBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -394,7 +403,7 @@ func BenchmarkAddenda11EntryDetailSequenceNumber(b *testing.B) {
 // testAddenda12EntryDetailSequenceNumber validates IATBatch returns an error if
 // EntryDetailSequenceNumber is not valid
 func testAddenda12EntryDetailSequenceNumber(t testing.TB) {
-	iatBatch := mockIATBatch()
+	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda12.EntryDetailSequenceNumber = 00000005
 	if err := iatBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -425,7 +434,7 @@ func BenchmarkAddenda12EntryDetailSequenceNumber(b *testing.B) {
 // testAddenda13EntryDetailSequenceNumber validates IATBatch returns an error if
 // EntryDetailSequenceNumber is not valid
 func testAddenda13EntryDetailSequenceNumber(t testing.TB) {
-	iatBatch := mockIATBatch()
+	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda13.EntryDetailSequenceNumber = 00000005
 	if err := iatBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -456,7 +465,7 @@ func BenchmarkAddenda13EntryDetailSequenceNumber(b *testing.B) {
 // testAddenda14EntryDetailSequenceNumber validates IATBatch returns an error if
 // EntryDetailSequenceNumber is not valid
 func testAddenda14EntryDetailSequenceNumber(t testing.TB) {
-	iatBatch := mockIATBatch()
+	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda14.EntryDetailSequenceNumber = 00000005
 	if err := iatBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -487,7 +496,7 @@ func BenchmarkAddenda14EntryDetailSequenceNumber(b *testing.B) {
 // testAddenda15EntryDetailSequenceNumber validates IATBatch returns an error if
 // EntryDetailSequenceNumber is not valid
 func testAddenda15EntryDetailSequenceNumber(t testing.TB) {
-	iatBatch := mockIATBatch()
+	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda15.EntryDetailSequenceNumber = 00000005
 	if err := iatBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -518,7 +527,7 @@ func BenchmarkAddenda15EntryDetailSequenceNumber(b *testing.B) {
 // testAddenda16EntryDetailSequenceNumber validates IATBatch returns an error if
 // EntryDetailSequenceNumber is not valid
 func testAddenda16EntryDetailSequenceNumber(t testing.TB) {
-	iatBatch := mockIATBatch()
+	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda16.EntryDetailSequenceNumber = 00000005
 	if err := iatBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -548,7 +557,7 @@ func BenchmarkAddenda16EntryDetailSequenceNumber(b *testing.B) {
 
 // testIATBatchNumberMismatch validates BatchNumber mismatch
 func testIATBatchNumberMismatch(t testing.TB) {
-	mockBatch := mockIATBatch()
+	mockBatch := mockIATBatch(t)
 	mockBatch.GetControl().BatchNumber = 2
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -576,7 +585,7 @@ func BenchmarkIATBatchNumberMismatch(b *testing.B) {
 
 // testIATServiceClassCodeMismatch validates ServiceClassCode mismatch
 func testIATServiceClassCodeMismatch(t testing.TB) {
-	mockBatch := mockIATBatch()
+	mockBatch := mockIATBatch(t)
 	mockBatch.GetControl().ServiceClassCode = 225
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -604,7 +613,7 @@ func BenchmarkIATServiceClassCodeMismatch(b *testing.B) {
 
 // testIATBatchCreditIsBatchAmount validates credit isBatchAmount
 func testIATBatchCreditIsBatchAmount(t testing.TB) {
-	mockBatch := mockIATBatch()
+	mockBatch := mockIATBatch(t)
 	e1 := mockBatch.GetEntries()[0]
 	e2 := mockIATEntryDetail()
 	e2.TransactionCode = 22
@@ -650,7 +659,7 @@ func BenchmarkIATBatchCreditIsBatchAmount(b *testing.B) {
 
 // testIATBatchDebitIsBatchAmount validates debit isBatchAmount
 func testIATBatchDebitIsBatchAmount(t testing.TB) {
-	mockBatch := mockIATBatch()
+	mockBatch := mockIATBatch(t)
 	e1 := mockBatch.GetEntries()[0]
 	e1.TransactionCode = 27
 	e2 := mockIATEntryDetail()
@@ -697,8 +706,8 @@ func BenchmarkIATBatchDebitIsBatchAmount(b *testing.B) {
 
 // testIATBatchFieldInclusion validates IATBatch FieldInclusion
 func testIATBatchFieldInclusion(t testing.TB) {
-	mockBatch := mockIATBatch()
-	mockBatch2 := mockIATBatch()
+	mockBatch := mockIATBatch(t)
+	mockBatch2 := mockIATBatch(t)
 	mockBatch2.Header.recordType = "4"
 
 	if err := mockBatch.verify(); err != nil {
@@ -776,7 +785,7 @@ func BenchmarkIATBatchBuild(b *testing.B) {
 
 // testIATODFIIdentificationMismatch validates ODFIIdentification mismatch
 func testIATODFIIdentificationMismatch(t testing.TB) {
-	mockBatch := mockIATBatch()
+	mockBatch := mockIATBatch(t)
 	mockBatch.GetControl().ODFIIdentification = "53158020"
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -804,7 +813,7 @@ func BenchmarkIATODFIIdentificationMismatch(b *testing.B) {
 
 // testIATBatchAddendaRecordIndicator validates IATEntryDetail AddendaRecordIndicator
 func testIATBatchAddendaRecordIndicator(t testing.TB) {
-	mockBatch := mockIATBatch()
+	mockBatch := mockIATBatch(t)
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 2
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -832,7 +841,7 @@ func BenchmarkIATBatchAddendaRecordIndicator(b *testing.B) {
 
 // testIATBatchInvalidTraceNumberODFI validates TraceNumberODFI
 func testIATBatchInvalidTraceNumberODFI(t testing.TB) {
-	mockBatch := mockIATBatch()
+	mockBatch := mockIATBatch(t)
 	mockBatch.GetEntries()[0].SetTraceNumber("9928272", 1)
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -860,7 +869,7 @@ func BenchmarkIATBatchInvalidTraceNumberODFI(b *testing.B) {
 
 // testIATBatchControl validates BatchControl ODFIIdentification
 func testIATBatchControl(t testing.TB) {
-	mockBatch := mockIATBatch()
+	mockBatch := mockIATBatch(t)
 	mockBatch.Control.ODFIIdentification = ""
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -888,7 +897,7 @@ func BenchmarkIATBatchControl(b *testing.B) {
 
 // testIATBatchEntryCountEquality validates IATBatch EntryAddendaCount
 func testIATBatchEntryCountEquality(t testing.TB) {
-	mockBatch := mockIATBatch()
+	mockBatch := mockIATBatch(t)
 	if err := mockBatch.build(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -920,7 +929,7 @@ func BenchmarkIATBatchEntryCountEquality(b *testing.B) {
 
 // testIATBatchisEntryHash validates IATBatch EntryHash
 func testIATBatchisEntryHash(t testing.TB) {
-	mockBatch := mockIATBatch()
+	mockBatch := mockIATBatch(t)
 	mockBatch.GetControl().EntryHash = 1
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -948,7 +957,7 @@ func BenchmarkIATBatchisEntryHash(b *testing.B) {
 
 // testIATBatchIsSequenceAscending validates sequence ascending
 func testIATBatchIsSequenceAscending(t testing.TB) {
-	mockBatch := mockIATBatch()
+	mockBatch := mockIATBatch(t)
 	e2 := mockIATEntryDetail()
 	e2.TraceNumber = 1
 	mockBatch.AddEntry(e2)
@@ -986,7 +995,7 @@ func BenchmarkIATBatchIsSequenceAscending(b *testing.B) {
 
 // testIATBatchIsCategory validates category
 func testIATBatchIsCategory(t testing.TB) {
-	mockBatch := mockIATBatchManyEntries()
+	mockBatch := mockIATBatchManyEntries(t)
 	mockBatch.GetEntries()[1].Category = CategoryReturn
 
 	if err := mockBatch.verify(); err != nil {
@@ -1015,7 +1024,7 @@ func BenchmarkIATBatchIsCategory(b *testing.B) {
 
 //testIATBatchCategory tests IATBatch Category
 func testIATBatchCategory(t testing.TB) {
-	mockBatch := mockIATBatch()
+	mockBatch := mockIATBatch(t)
 
 	if err := mockBatch.build(); err != nil {
 		t.Errorf("%T: %s", err, err)
@@ -1041,7 +1050,7 @@ func BenchmarkIATBatchCategory(b *testing.B) {
 
 // testIATBatchValidateEntry validates EntryDetail
 func testIATBatchValidateEntry(t testing.TB) {
-	mockBatch := mockIATBatch()
+	mockBatch := mockIATBatch(t)
 	mockBatch.GetEntries()[0].recordType = "5"
 
 	if err := mockBatch.verify(); err != nil {
@@ -1070,7 +1079,7 @@ func BenchmarkIATBatchValidateEntry(b *testing.B) {
 
 // testIATBatchValidateAddenda10 validates Addenda10
 func testIATBatchValidateAddenda10(t testing.TB) {
-	mockBatch := mockIATBatchManyEntries()
+	mockBatch := mockIATBatchManyEntries(t)
 	mockBatch.GetEntries()[1].Addenda10.TypeCode = "02"
 
 	if err := mockBatch.verify(); err != nil {
@@ -1099,7 +1108,7 @@ func BenchmarkIATBatchValidateAddenda10(b *testing.B) {
 
 // testIATBatchValidateAddenda11 validates Addenda11
 func testIATBatchValidateAddenda11(t testing.TB) {
-	mockBatch := mockIATBatchManyEntries()
+	mockBatch := mockIATBatchManyEntries(t)
 	mockBatch.GetEntries()[1].Addenda11.TypeCode = "02"
 
 	if err := mockBatch.verify(); err != nil {
@@ -1128,7 +1137,7 @@ func BenchmarkIATBatchValidateAddenda11(b *testing.B) {
 
 // testIATBatchValidateAddenda12 validates Addenda12
 func testIATBatchValidateAddenda12(t testing.TB) {
-	mockBatch := mockIATBatchManyEntries()
+	mockBatch := mockIATBatchManyEntries(t)
 	mockBatch.GetEntries()[1].Addenda12.TypeCode = "02"
 
 	if err := mockBatch.verify(); err != nil {
@@ -1157,7 +1166,7 @@ func BenchmarkIATBatchValidateAddenda12(b *testing.B) {
 
 // testIATBatchValidateAddenda13 validates Addenda13
 func testIATBatchValidateAddenda13(t testing.TB) {
-	mockBatch := mockIATBatchManyEntries()
+	mockBatch := mockIATBatchManyEntries(t)
 	mockBatch.GetEntries()[1].Addenda13.TypeCode = "02"
 
 	if err := mockBatch.verify(); err != nil {
@@ -1186,7 +1195,7 @@ func BenchmarkIATBatchValidateAddenda13(b *testing.B) {
 
 // testIATBatchValidateAddenda14 validates Addenda14
 func testIATBatchValidateAddenda14(t testing.TB) {
-	mockBatch := mockIATBatchManyEntries()
+	mockBatch := mockIATBatchManyEntries(t)
 	mockBatch.GetEntries()[1].Addenda14.TypeCode = "02"
 
 	if err := mockBatch.verify(); err != nil {
@@ -1215,7 +1224,7 @@ func BenchmarkIATBatchValidateAddenda14(b *testing.B) {
 
 // testIATBatchValidateAddenda15 validates Addenda15
 func testIATBatchValidateAddenda15(t testing.TB) {
-	mockBatch := mockIATBatchManyEntries()
+	mockBatch := mockIATBatchManyEntries(t)
 	mockBatch.GetEntries()[1].Addenda15.TypeCode = "02"
 
 	if err := mockBatch.verify(); err != nil {
@@ -1244,7 +1253,7 @@ func BenchmarkIATBatchValidateAddenda15(b *testing.B) {
 
 // testIATBatchValidateAddenda16 validates Addenda16
 func testIATBatchValidateAddenda16(t testing.TB) {
-	mockBatch := mockIATBatchManyEntries()
+	mockBatch := mockIATBatchManyEntries(t)
 	mockBatch.GetEntries()[1].Addenda16.TypeCode = "02"
 
 	if err := mockBatch.verify(); err != nil {
@@ -1273,7 +1282,7 @@ func BenchmarkIATBatchValidateAddenda16(b *testing.B) {
 
 // testIATBatchValidateAddenda17 validates Addenda17
 func testIATBatchValidateAddenda17(t testing.TB) {
-	mockBatch := mockInvalidIATBatch()
+	mockBatch := mockInvalidIATBatch(t)
 
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -1302,7 +1311,7 @@ func BenchmarkIATBatchValidateAddenda17(b *testing.B) {
 // testIATBatchCreateError validates IATBatch create error
 func testIATBatchCreate(t testing.TB) {
 	file := NewFile().SetHeader(mockFileHeader())
-	mockBatch := mockIATBatch()
+	mockBatch := mockIATBatch(t)
 	mockBatch.GetHeader().recordType = "7"
 
 	if err := mockBatch.Create(); err != nil {
@@ -1335,7 +1344,7 @@ func BenchmarkIATBatchCreate(b *testing.B) {
 // testIATBatchValidate validates IATBatch validate error
 func testIATBatchValidate(t testing.TB) {
 	file := NewFile().SetHeader(mockFileHeader())
-	mockBatch := mockIATBatch()
+	mockBatch := mockIATBatch(t)
 	mockBatch.GetHeader().ServiceClassCode = 225
 
 	if err := mockBatch.Validate(); err != nil {
@@ -1368,7 +1377,7 @@ func BenchmarkIATBatchValidate(b *testing.B) {
 // testIATBatchEntryAddendum validates IATBatch EntryAddendum error
 func testIATBatchEntryAddendum(t testing.TB) {
 	file := NewFile().SetHeader(mockFileHeader())
-	mockBatch := mockIATBatch()
+	mockBatch := mockIATBatch(t)
 	mockBatch.Entries[0].AddIATAddenda(mockAddenda17())
 	mockBatch.Entries[0].AddIATAddenda(mockAddenda17B())
 	mockBatch.Entries[0].AddIATAddenda(mockAddenda18())
@@ -1684,8 +1693,8 @@ func BenchmarkIATNoEntry(b *testing.B) {
 
 // testIATBatchAddendumTypeCode validates IATBatch Addendum TypeCode
 func testIATBatchAddendumTypeCode(t testing.TB) {
-	mockBatch := mockIATBatch()
-	mockBatch.GetEntries()[0].AddIATAddenda(mockAddenda12())
+	mockBatch := mockIATBatch(t)
+	mockBatch.GetEntries()[0].AddIATAddenda(mockAddenda17())
 
 	if err := mockBatch.build(); err != nil {
 		t.Errorf("%T: %s", err, err)
@@ -1864,7 +1873,7 @@ func BenchmarkIATBatchBuildAddendaError(b *testing.B) {
 
 // testIATBatchBHODFI validates IATBatchHeader ODFI error
 func testIATBatchBHODFI(t testing.TB) {
-	mockBatch := mockIATBatch()
+	mockBatch := mockIATBatch(t)
 	mockBatch.GetEntries()[0].SetTraceNumber("39387337", 1)
 
 	if err := mockBatch.build(); err != nil {
@@ -1897,6 +1906,7 @@ func testIATBatchAddenda99Count(t testing.TB) {
 	mockBatch := IATBatch{}
 	mockBatch.SetHeader(mockIATReturnBatchHeaderFF())
 	mockBatch.AddEntry(mockIATEntryDetail())
+	mockBatch.GetEntries()[0].Category = CategoryReturn
 	mockBatch.Entries[0].Addenda10 = mockAddenda10()
 	mockBatch.Entries[0].Addenda11 = mockAddenda11()
 	mockBatch.Entries[0].Addenda12 = mockAddenda12()
@@ -1904,7 +1914,9 @@ func testIATBatchAddenda99Count(t testing.TB) {
 	mockBatch.Entries[0].Addenda14 = mockAddenda14()
 	mockBatch.Entries[0].Addenda15 = mockAddenda15()
 	mockBatch.Entries[0].Addenda16 = mockAddenda16()
+	mockBatch.Entries[0].AddIATAddenda(mockAddenda17())
 	mockBatch.Entries[0].AddIATAddenda(mockIATAddenda99())
+	//mockBatch.Entries[0].AddIATAddenda(mockIATAddenda99())
 	mockBatch.category = CategoryReturn
 
 	if err := mockBatch.build(); err != nil {
@@ -1933,5 +1945,171 @@ func BenchmarkIATBatchAddenda99Count(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testIATBatchAddenda99Count(b)
+	}
+}
+
+// TestIATBatchAddenda98TotalCount validates IATBatch Addenda98 TotalCount
+func TestIATBatchAddenda98TotalCount(t *testing.T) {
+	mockBatch := IATBatch{}
+	mockBatch.SetHeader(mockIATNOCBatchHeaderFF())
+	mockBatch.AddEntry(mockIATEntryDetail())
+	mockBatch.GetEntries()[0].TransactionCode = 21
+	mockBatch.GetEntries()[0].AddendaRecords = 2
+	mockBatch.GetEntries()[0].Category = CategoryNOC
+	mockBatch.Entries[0].AddIATAddenda(mockIATAddenda98())
+	mockBatch.category = CategoryNOC
+
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addendum" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestIATBatchAddenda98TransactionCode validates IATBatch Transaction Code Count
+func TestIATBatchAddenda98TransactionCode(t *testing.T) {
+	mockBatch := IATBatch{}
+	mockBatch.SetHeader(mockIATNOCBatchHeaderFF())
+	mockBatch.AddEntry(mockIATEntryDetail())
+	mockBatch.GetEntries()[0].TransactionCode = 22
+	mockBatch.GetEntries()[0].Category = CategoryNOC
+	mockBatch.Entries[0].AddIATAddenda(mockIATAddenda98())
+	mockBatch.category = CategoryNOC
+
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TransactionCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestIATBatchAddenda98IATIndicator validates IATBatch Transaction Code Count
+func TestIATBatchAddenda98IATIndicator(t *testing.T) {
+	mockBatch := IATBatch{}
+	mockBatch.SetHeader(mockIATNOCBatchHeaderFF())
+	mockBatch.GetHeader().IATIndicator = "B"
+	mockBatch.AddEntry(mockIATEntryDetail())
+	mockBatch.GetEntries()[0].TransactionCode = 22
+	mockBatch.GetEntries()[0].Category = CategoryNOC
+	mockBatch.Entries[0].AddIATAddenda(mockIATAddenda98())
+	mockBatch.category = CategoryNOC
+
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "IATIndicator" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+func TestIATBatchAddenda98SECCode(t *testing.T) {
+	mockBatch := IATBatch{}
+	mockBatch.SetHeader(mockIATNOCBatchHeaderFF())
+	mockBatch.GetHeader().StandardEntryClassCode = "IAT"
+	mockBatch.AddEntry(mockIATEntryDetail())
+	mockBatch.GetEntries()[0].TransactionCode = 22
+	mockBatch.GetEntries()[0].Category = CategoryNOC
+	mockBatch.Entries[0].AddIATAddenda(mockIATAddenda98())
+	mockBatch.category = CategoryNOC
+
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "StandardEntryClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestMockISODestinationCountryCode validates mockIATBatch
+func TestMockISODestinationCountryCode(t *testing.T) {
+	iatBatch := mockIATBatch(t)
+	iatBatch.Header.ISODestinationCountryCode = "®©"
+	if err := iatBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ISODestinationCountryCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+}
+
+// TestMockISOOriginatingCurrencyCode validates mockIATBatch
+func TestMockISOOriginatingCurrencyCode(t *testing.T) {
+	iatBatch := mockIATBatch(t)
+	iatBatch.Header.ISOOriginatingCurrencyCode = "®©"
+	if err := iatBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ISOOriginatingCurrencyCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+}
+
+// TestMockISODestinationCurrencyCode validates mockIATBatch
+func TestMockISODestinationCurrencyCode(t *testing.T) {
+	iatBatch := mockIATBatch(t)
+	iatBatch.Header.ISODestinationCurrencyCode = "®©"
+	if err := iatBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ISODestinationCurrencyCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+}
+
+// TestParseRuneCountIATBatchHeader tests parsing an invalid RuneCount in IATBatchHeader
+func TestParseRuneCountIATBatchHeader(t *testing.T) {
+	line := "5220                FF3               US123456789 IATTRADEPAYMTCADUSD010101"
+	r := NewReader(strings.NewReader(line))
+	r.line = line
+	if err := r.parseIATBatchHeader(); err != nil {
+		if e, ok := err.(*ParseError); ok {
+			if e.Record != "BatchHeader" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
 	}
 }

@@ -221,11 +221,6 @@ func (addenda13 *Addenda13) reservedField() string {
 	return addenda13.alphaField(addenda13.reserved, 10)
 }
 
-// TypeCode Defines the specific explanation and format for the addenda13 information left padded
-func (addenda13 *Addenda13) typeCode() string {
-	return addenda13.TypeCode
-}
-
 // EntryDetailSequenceNumberField returns a zero padded EntryDetailSequenceNumber string
 func (addenda13 *Addenda13) EntryDetailSequenceNumberField() string {
 	return addenda13.numericField(addenda13.EntryDetailSequenceNumber, 7)
