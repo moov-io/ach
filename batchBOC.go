@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -42,14 +42,8 @@ func (batch *BatchBOC) Validate() error {
 	if err := batch.verify(); err != nil {
 		return err
 	}
-	// Add configuration based validation for this type.
+	// Add configuration and type specific validation for this type.
 
-	// Batch BOC cannot have an addenda record
-	if err := batch.isAddendaCount(0); err != nil {
-		return err
-	}
-
-	// Add type specific validation.
 	if batch.Header.StandardEntryClassCode != "BOC" {
 		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "BOC")
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
@@ -79,6 +73,24 @@ func (batch *BatchBOC) Validate() error {
 		if entry.IdentificationNumber == "" {
 			msg := fmt.Sprintf(msgBatchCheckSerialNumber, "BOC")
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "CheckSerialNumber", Msg: msg}
+		}
+		// BOC cannot have Addenda02 or Addenda05.  There can be a NOC (98) or Return (99)
+		for _, addenda := range entry.Addendum {
+			switch entry.Category {
+			case CategoryForward:
+				if len(entry.Addendum) > 0 {
+					msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 0, batch.Header.StandardEntryClassCode)
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+				}
+			case CategoryNOC:
+				if err := batch.categoryNOCAddenda98(entry, addenda); err != nil {
+					return err
+				}
+			case CategoryReturn:
+				if err := batch.categoryReturnAddenda99(entry, addenda); err != nil {
+					return err
+				}
+			}
 		}
 	}
 	return nil

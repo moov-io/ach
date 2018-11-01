@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -10,6 +10,7 @@ import (
 	"math"
 	"regexp"
 	"strconv"
+	"unicode/utf8"
 )
 
 var (
@@ -47,8 +48,6 @@ type FieldError struct {
 	Value     string // value that cause error
 	Msg       string // context of the error.
 }
-
-// ToDo:  Add state and country look-up or use a 3rd party look up -verify with Wade
 
 // Error message is constructed
 // FieldName Msg Value
@@ -424,8 +423,15 @@ func (v *validator) isAlphanumeric(s string) error {
 // Subtract the sum from the next highest multiple of 10.
 // The result is the Check Digit
 func (v *validator) CalculateCheckDigit(routingNumber string) int {
+	if n := utf8.RuneCountInString(routingNumber); n != 8 && n != 9 {
+		return -1
+	}
+
 	var routeIndex [8]string
 	for i := 0; i < 8; i++ {
+		if routingNumber[i] < '0' || routingNumber[i] > '9' {
+			return -1 // only digits are allowed
+		}
 		routeIndex[i] = string(routingNumber[i])
 	}
 	n, _ := strconv.Atoi(routeIndex[0])

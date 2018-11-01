@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -298,7 +298,7 @@ func testBatchSHRAddendaCountZero(t testing.TB) {
 	mockBatch.AddEntry(mockSHREntryDetail())
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
+			if e.FieldName != "AddendaCount" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -320,6 +320,42 @@ func BenchmarkBatchSHRAddendaCountZero(b *testing.B) {
 	}
 }
 
+// TestBatchSHRAddendum98 validates Addenda98 returns an error
+func TestBatchSHRAddendum98(t *testing.T) {
+	mockBatch := NewBatchSHR(mockBatchSHRHeader())
+	mockBatch.AddEntry(mockSHREntryDetail())
+	mockAddenda98 := mockAddenda98()
+	mockAddenda98.TypeCode = "05"
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98)
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchSHRAddendum99 validates Addenda99 returns an error
+func TestBatchSHRAddendum99(t *testing.T) {
+	mockBatch := NewBatchSHR(mockBatchSHRHeader())
+	mockBatch.AddEntry(mockSHREntryDetail())
+	mockAddenda99 := mockAddenda99()
+	mockAddenda99.TypeCode = "05"
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda99)
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
 // testBatchSHRInvalidAddendum validates Addendum must be Addenda02
 func testBatchSHRInvalidAddendum(t testing.TB) {
 	mockBatch := NewBatchSHR(mockBatchSHRHeader())
@@ -327,7 +363,7 @@ func testBatchSHRInvalidAddendum(t testing.TB) {
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
+			if e.FieldName != "TypeCode" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {

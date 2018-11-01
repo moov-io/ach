@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -27,13 +27,7 @@ func (batch *BatchTEL) Validate() error {
 	if err := batch.verify(); err != nil {
 		return err
 	}
-	// Add configuration based validation for this type.
-	// TEL can not have an addenda
-	if err := batch.isAddendaCount(0); err != nil {
-		return err
-	}
-
-	// Add type specific validation.
+	// Add configuration and type specific based validation for this type.
 	if batch.Header.StandardEntryClassCode != "TEL" {
 		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "TEL")
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
@@ -44,9 +38,26 @@ func (batch *BatchTEL) Validate() error {
 			msg := fmt.Sprintf(msgBatchTransactionCodeCredit, entry.IndividualName)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 		}
+		// TEL cannot have Addenda02 or Addenda05.  There can be a NOC (98) or Return (99)
+		for _, addenda := range entry.Addendum {
+			switch entry.Category {
+			case CategoryForward:
+				if len(entry.Addendum) > 0 {
+					msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 0, batch.Header.StandardEntryClassCode)
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+				}
+			case CategoryNOC:
+				if err := batch.categoryNOCAddenda98(entry, addenda); err != nil {
+					return err
+				}
+			case CategoryReturn:
+				if err := batch.categoryReturnAddenda99(entry, addenda); err != nil {
+					return err
+				}
+			}
+		}
 	}
-
-	return batch.isPaymentTypeCode()
+	return nil
 }
 
 // Create builds the batch sequence numbers and batch control. Additional creation

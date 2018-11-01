@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -107,8 +107,8 @@ func testAddenda18Parse(t testing.TB) {
 	if Addenda18.recordType != "7" {
 		t.Errorf("expected %v got %v", "7", Addenda18.recordType)
 	}
-	if Addenda18.typeCode != "18" {
-		t.Errorf("expected %v got %v", "18", Addenda18.typeCode)
+	if Addenda18.typeCode() != "18" {
+		t.Errorf("expected %v got %v", "18", Addenda18.TypeCode)
 	}
 	if Addenda18.ForeignCorrespondentBankName != "Bank of Germany" {
 		t.Errorf("expected %v got %v", "Bank of Germany", Addenda18.ForeignCorrespondentBankName)
@@ -179,9 +179,9 @@ func TestValidateAddenda18RecordType(t *testing.T) {
 	}
 }
 
-func TestAddenda18TypeCodeFieldInclusion(t *testing.T) {
+func TestAddenda18FieldInclusionTypeCode(t *testing.T) {
 	addenda18 := mockAddenda18()
-	addenda18.typeCode = ""
+	addenda18.TypeCode = ""
 	if err := addenda18.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -203,12 +203,72 @@ func TestAddenda18FieldInclusion(t *testing.T) {
 	}
 }
 
+func TestAddenda18FieldInclusionSequenceNumber(t *testing.T) {
+	addenda18 := mockAddenda18()
+	addenda18.SequenceNumber = 0
+	if err := addenda18.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "SequenceNumber" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
 func TestAddenda18FieldInclusionRecordType(t *testing.T) {
 	addenda18 := mockAddenda18()
 	addenda18.recordType = ""
 	if err := addenda18.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+func TestAddenda18FieldInclusionFCBankName(t *testing.T) {
+	addenda18 := mockAddenda18()
+	addenda18.ForeignCorrespondentBankName = ""
+	if err := addenda18.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "ForeignCorrespondentBankName" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+func TestAddenda18FieldInclusionFCBankIDNumberQualifier(t *testing.T) {
+	addenda18 := mockAddenda18()
+	addenda18.ForeignCorrespondentBankIDNumberQualifier = ""
+	if err := addenda18.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "ForeignCorrespondentBankIDNumberQualifier" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+func TestAddenda18FieldInclusionFCBankIDNumber(t *testing.T) {
+	addenda18 := mockAddenda18()
+	addenda18.ForeignCorrespondentBankIDNumber = ""
+	if err := addenda18.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "ForeignCorrespondentBankIDNumber" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
+func TestAddenda18FieldInclusionFCBankBranchCountryCode(t *testing.T) {
+	addenda18 := mockAddenda18()
+	addenda18.ForeignCorrespondentBankBranchCountryCode = ""
+	if err := addenda18.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "ForeignCorrespondentBankBranchCountryCode" {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -323,7 +383,7 @@ func BenchmarkAddendaForeignCorrespondentBankIDNumberAlphaNumeric(b *testing.B) 
 // testAddenda18ValidTypeCode validates Addenda18 TypeCode
 func testAddenda18ValidTypeCode(t testing.TB) {
 	addenda18 := mockAddenda18()
-	addenda18.typeCode = "65"
+	addenda18.TypeCode = "65"
 	if err := addenda18.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -348,10 +408,10 @@ func BenchmarkAddenda18ValidTypeCode(b *testing.B) {
 	}
 }
 
-// testAddenda18TypeCode18 TypeCode is 18 if typeCode is a valid TypeCode
+// testAddenda18TypeCode18 TypeCode is 18 if TypeCode is a valid TypeCode
 func testAddenda18TypeCode18(t testing.TB) {
 	addenda18 := mockAddenda18()
-	addenda18.typeCode = "05"
+	addenda18.TypeCode = "05"
 	if err := addenda18.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -363,12 +423,12 @@ func testAddenda18TypeCode18(t testing.TB) {
 	}
 }
 
-// TestAddenda18TypeCode18 tests TypeCode is 18 if typeCode is a valid TypeCode
+// TestAddenda18TypeCode18 tests TypeCode is 18 if TypeCode is a valid TypeCode
 func TestAddenda18TypeCode18(t *testing.T) {
 	testAddenda18TypeCode18(t)
 }
 
-// BenchmarkAddenda18TypeCode18 benchmarks TypeCode is 18 if typeCode is a valid TypeCode
+// BenchmarkAddenda18TypeCode18 benchmarks TypeCode is 18 if TypeCode is a valid TypeCode
 func BenchmarkAddenda18TypeCode18(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {

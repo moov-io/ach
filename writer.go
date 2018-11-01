@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -64,9 +64,8 @@ func (w *Writer) Write(file *File) error {
 }
 
 // Flush writes any buffered data to the underlying io.Writer.
-// To check if an error occurred during the Flush, call Error.
-func (w *Writer) Flush() {
-	w.w.Flush()
+func (w *Writer) Flush() error {
+	return w.w.Flush()
 }
 
 func (w *Writer) writeBatch(file *File) error {

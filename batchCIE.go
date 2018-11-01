@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -20,9 +20,6 @@ import (
 type BatchCIE struct {
 	batch
 }
-
-var msgBatchCIEAddenda = "found and 1 Addenda05 is the maximum for SEC code CIE"
-var msgBatchCIEAddendaType = "%T found where Addenda05 is required for SEC code CIE"
 
 // NewBatchCIE returns a *BatchCIE
 func NewBatchCIE(bh *BatchHeader) *BatchCIE {
@@ -61,26 +58,26 @@ func (batch *BatchCIE) Validate() error {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 		}
 
-		// Addenda validations - CIE Addenda must be Addenda05
-
-		// Addendum must be equal to 1
-		if len(entry.Addendum) > 1 {
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchCIEAddenda}
+		// CIE must have one Addenda05 record
+		if len(entry.Addendum) != 1 {
+			msg := fmt.Sprintf(msgBatchRequiredAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 		}
 
-		if len(entry.Addendum) > 0 {
-			// Addenda type assertion must be Addenda05
-			addenda05, ok := entry.Addendum[0].(*Addenda05)
-			if !ok {
-				msg := fmt.Sprintf(msgBatchCIEAddendaType, entry.Addendum[0])
-				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
-			}
-
-			// Addenda05 must be Validated
-			if err := addenda05.Validate(); err != nil {
-				// convert the field error in to a batch error for a consistent api
-				if e, ok := err.(*FieldError); ok {
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: e.FieldName, Msg: e.Msg}
+		// CIE can have up to one Record TypeCode = 05, or there can be a NOC (98) or Return (99)
+		for _, addenda := range entry.Addendum {
+			switch entry.Category {
+			case CategoryForward:
+				if err := batch.categoryForwardAddenda05(entry, addenda); err != nil {
+					return err
+				}
+			case CategoryNOC:
+				if err := batch.categoryNOCAddenda98(entry, addenda); err != nil {
+					return err
+				}
+			case CategoryReturn:
+				if err := batch.categoryReturnAddenda99(entry, addenda); err != nil {
+					return err
 				}
 			}
 		}

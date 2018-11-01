@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -27,8 +27,8 @@ func testAddenda99Parse(t testing.TB) {
 	if addenda99.recordType != "7" {
 		t.Errorf("expected %v got %v", "7", addenda99.recordType)
 	}
-	if addenda99.typeCode != "99" {
-		t.Errorf("expected %v got %v", "99", addenda99.typeCode)
+	if addenda99.TypeCode != "99" {
+		t.Errorf("expected %v got %v", "99", addenda99.TypeCode)
 	}
 	if addenda99.ReturnCode != "R07" {
 		t.Errorf("expected %v got %v", "R07", addenda99.ReturnCode)
@@ -285,7 +285,7 @@ func BenchmarkAddenda99ValidRecordType(b *testing.B) {
 // testAddenda99TypeCode99 TypeCode is 99
 func testAddenda99TypeCode99(t testing.TB) {
 	addenda99 := mockAddenda99()
-	addenda99.typeCode = "05"
+	addenda99.TypeCode = "05"
 	if err := addenda99.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -313,7 +313,7 @@ func BenchmarkAddenda99TypeCode99(b *testing.B) {
 // testAddenda99TypeCodeNil validates TypeCode is ""
 func testAddenda99TypeCodeNil(t testing.TB) {
 	addenda99 := mockAddenda99()
-	addenda99.typeCode = ""
+	addenda99.TypeCode = ""
 	if err := addenda99.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {

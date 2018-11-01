@@ -1,10 +1,11 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
 package ach
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -34,8 +35,8 @@ func testAddenda11Parse(t testing.TB) {
 	if Addenda11.recordType != "7" {
 		t.Errorf("expected %v got %v", "7", Addenda11.recordType)
 	}
-	if Addenda11.typeCode != "11" {
-		t.Errorf("expected %v got %v", "11", Addenda11.typeCode)
+	if Addenda11.TypeCode != "11" {
+		t.Errorf("expected %v got %v", "11", Addenda11.TypeCode)
 	}
 	if Addenda11.OriginatorName != "BEK Solutions" {
 		t.Errorf("expected %v got %v", "BEK Solutions", Addenda11.OriginatorName)
@@ -95,7 +96,7 @@ func BenchmarkAddenda11ValidRecordType(b *testing.B) {
 // testAddenda11ValidTypeCode validates Addenda11 TypeCode
 func testAddenda11ValidTypeCode(t testing.TB) {
 	addenda11 := mockAddenda11()
-	addenda11.typeCode = "65"
+	addenda11.TypeCode = "65"
 	if err := addenda11.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -120,10 +121,10 @@ func BenchmarkAddenda11ValidTypeCode(b *testing.B) {
 	}
 }
 
-// testAddenda11TypeCode11 TypeCode is 11 if typeCode is a valid TypeCode
+// testAddenda11TypeCode11 TypeCode is 11 if TypeCode is a valid TypeCode
 func testAddenda11TypeCode11(t testing.TB) {
 	addenda11 := mockAddenda11()
-	addenda11.typeCode = "05"
+	addenda11.TypeCode = "05"
 	if err := addenda11.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -135,12 +136,12 @@ func testAddenda11TypeCode11(t testing.TB) {
 	}
 }
 
-// TestAddenda11TypeCode11 tests TypeCode is 11 if typeCode is a valid TypeCode
+// TestAddenda11TypeCode11 tests TypeCode is 11 if TypeCode is a valid TypeCode
 func TestAddenda11TypeCode11(t *testing.T) {
 	testAddenda11TypeCode11(t)
 }
 
-// BenchmarkAddenda11TypeCode11 benchmarks TypeCode is 11 if typeCode is a valid TypeCode
+// BenchmarkAddenda11TypeCode11 benchmarks TypeCode is 11 if TypeCode is a valid TypeCode
 func BenchmarkAddenda11TypeCode11(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -206,7 +207,7 @@ func testAddenda11FieldInclusionRecordType(t testing.TB) {
 	addenda11.recordType = ""
 	if err := addenda11.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -229,10 +230,10 @@ func BenchmarkAddenda11FieldInclusionRecordType(b *testing.B) {
 // testAddenda11FieldInclusionTypeCode validates TypeCode fieldInclusion
 func testAddenda11FieldInclusionTypeCode(t testing.TB) {
 	addenda11 := mockAddenda11()
-	addenda11.typeCode = ""
+	addenda11.TypeCode = ""
 	if err := addenda11.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -258,7 +259,7 @@ func testAddenda11FieldInclusionOriginatorName(t testing.TB) {
 	addenda11.OriginatorName = ""
 	if err := addenda11.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -284,7 +285,7 @@ func testAddenda11FieldInclusionOriginatorStreetAddress(t testing.TB) {
 	addenda11.OriginatorStreetAddress = ""
 	if err := addenda11.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -310,7 +311,7 @@ func testAddenda11FieldInclusionEntryDetailSequenceNumber(t testing.TB) {
 	addenda11.EntryDetailSequenceNumber = 0
 	if err := addenda11.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -341,8 +342,8 @@ func testAddenda11String(t testing.TB) {
 	if addenda11.String() != line {
 		t.Errorf("Strings do not match")
 	}
-	if addenda11.TypeCode() != "11" {
-		t.Errorf("TypeCode Expected 11 got: %v", addenda11.TypeCode())
+	if addenda11.TypeCode != "11" {
+		t.Errorf("TypeCode Expected 11 got: %v", addenda11.TypeCode)
 	}
 }
 

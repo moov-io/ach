@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 // IATEntryDetail contains the actual transaction data for an individual entry.
@@ -120,6 +121,10 @@ func NewIATEntryDetail() *IATEntryDetail {
 
 // Parse takes the input record string and parses the EntryDetail values
 func (ed *IATEntryDetail) Parse(record string) {
+	if utf8.RuneCountInString(record) != 94 {
+		return
+	}
+
 	// 1-1 Always "6"
 	ed.recordType = "6"
 	// 2-3 is checking credit 22 debit 27 savings credit 32 debit 37
@@ -204,32 +209,53 @@ func (ed *IATEntryDetail) Validate() error {
 // invalid the ACH transfer will be returned.
 func (ed *IATEntryDetail) fieldInclusion() error {
 	if ed.recordType == "" {
-		return &FieldError{FieldName: "recordType",
-			Value: ed.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     ed.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewIATEntryDetail()?",
+		}
 	}
 	if ed.TransactionCode == 0 {
-		return &FieldError{FieldName: "TransactionCode",
-			Value: strconv.Itoa(ed.TransactionCode), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "TransactionCode",
+			Value:     strconv.Itoa(ed.TransactionCode),
+			Msg:       msgFieldInclusion + ", did you use NewIATEntryDetail()?",
+		}
 	}
 	if ed.RDFIIdentification == "" {
-		return &FieldError{FieldName: "RDFIIdentification",
-			Value: ed.RDFIIdentificationField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "RDFIIdentification",
+			Value:     ed.RDFIIdentificationField(),
+			Msg:       msgFieldInclusion + ", did you use NewIATEntryDetail()?",
+		}
 	}
 	if ed.AddendaRecords == 0 {
-		return &FieldError{FieldName: "AddendaRecords",
-			Value: strconv.Itoa(ed.AddendaRecords), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "AddendaRecords",
+			Value:     strconv.Itoa(ed.AddendaRecords),
+			Msg:       msgFieldInclusion + ", did you use NewIATEntryDetail()?",
+		}
 	}
 	if ed.DFIAccountNumber == "" {
-		return &FieldError{FieldName: "DFIAccountNumber",
-			Value: ed.DFIAccountNumber, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "DFIAccountNumber",
+			Value:     ed.DFIAccountNumber,
+			Msg:       msgFieldInclusion + ", did you use NewIATEntryDetail()?",
+		}
 	}
 	if ed.AddendaRecordIndicator == 0 {
-		return &FieldError{FieldName: "AddendaRecordIndicator",
-			Value: strconv.Itoa(ed.AddendaRecordIndicator), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "AddendaRecordIndicator",
+			Value:     strconv.Itoa(ed.AddendaRecordIndicator),
+			Msg:       msgFieldInclusion + ", did you use NewIATEntryDetail()?",
+		}
 	}
 	if ed.TraceNumber == 0 {
-		return &FieldError{FieldName: "TraceNumber",
-			Value: ed.TraceNumberField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "TraceNumber",
+			Value:     ed.TraceNumberField(),
+			Msg:       msgFieldInclusion + ", did you use NewIATEntryDetail()?",
+		}
 	}
 	return nil
 }
@@ -293,13 +319,18 @@ func (ed *IATEntryDetail) TraceNumberField() string {
 }
 
 // AddIATAddenda appends an Addendumer to the IATEntryDetail
-// Currently this is used to add Addenda17 and Addenda18 IAT Addenda records
+// Currently this is used to add Addenda17, Addenda18, Addenda98 and Addenda99 IAT Addenda records
 func (ed *IATEntryDetail) AddIATAddenda(addenda Addendumer) []Addendumer {
 	ed.AddendaRecordIndicator = 1
-	// checks to make sure that we only have either or, not both
 	switch addenda.(type) {
+	case *Addenda98:
+		ed.Category = CategoryNOC
+		ed.Addendum = nil
+		ed.Addendum = append(ed.Addendum, addenda)
+		return ed.Addendum
 	case *Addenda99:
 		ed.Category = CategoryReturn
+		ed.Addendum = nil
 		ed.Addendum = append(ed.Addendum, addenda)
 		return ed.Addendum
 	default:

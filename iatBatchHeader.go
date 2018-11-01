@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -9,6 +9,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
+
+	"github.com/moov-io/ach/internal/iso3166"
+	"github.com/moov-io/ach/internal/iso4217"
 )
 
 // msgServiceClass
@@ -69,7 +73,6 @@ type IATBatchHeader struct {
 	// ForeignExchangeReference  Contains either the foreign exchange rate used to execute
 	// the foreign exchange conversion of a cross-border entry or another reference to the foreign
 	// exchange transaction.
-	// ToDo: potentially write a validator
 	ForeignExchangeReference string `json:"foreignExchangeReference"`
 
 	// ISODestinationCountryCode is the two-character code, as approved by the International
@@ -168,12 +171,16 @@ func NewIATBatchHeader() *IATBatchHeader {
 
 // Parse takes the input record string and parses the BatchHeader values
 func (iatBh *IATBatchHeader) Parse(record string) {
+	if utf8.RuneCountInString(record) != 94 {
+		return
+	}
+
 	// 1-1 Always "5"
 	iatBh.recordType = "5"
 	// 2-4 If the entries are credits, always "220". If the entries are debits, always "225"
 	iatBh.ServiceClassCode = iatBh.parseNumField(record[1:4])
-	// 05-20  Leave Blank  - It is only used for corrected IAT entries
-	iatBh.IATIndicator = "                "
+	// 05-20  Blank except for corrected IAT entries
+	iatBh.IATIndicator = iatBh.parseStringField(record[4:20])
 	// 21-22 A code indicating currency conversion
 	// “FV” Fixed-to-Variable
 	// “VF” Variable-to-Fixed
@@ -266,13 +273,9 @@ func (iatBh *IATBatchHeader) Validate() error {
 		return &FieldError{FieldName: "ForeignExchangeReferenceIndicator",
 			Value: strconv.Itoa(iatBh.ForeignExchangeReferenceIndicator), Msg: err.Error()}
 	}
-	if err := iatBh.isAlphanumeric(iatBh.ISODestinationCountryCode); err != nil {
+	if !iso3166.Valid(iatBh.ISODestinationCountryCode) {
 		return &FieldError{FieldName: "ISODestinationCountryCode",
-			Value: iatBh.ISODestinationCountryCode, Msg: err.Error()}
-	}
-	if err := iatBh.isAlphanumeric(iatBh.OriginatorIdentification); err != nil {
-		return &FieldError{FieldName: "OriginatorIdentification",
-			Value: iatBh.OriginatorIdentification, Msg: err.Error()}
+			Value: iatBh.ISODestinationCountryCode, Msg: "invalid ISO 3166-1-alpha-2 code"}
 	}
 	if err := iatBh.isSECCode(iatBh.StandardEntryClassCode); err != nil {
 		return &FieldError{FieldName: "StandardEntryClassCode",
@@ -282,14 +285,13 @@ func (iatBh *IATBatchHeader) Validate() error {
 		return &FieldError{FieldName: "CompanyEntryDescription",
 			Value: iatBh.CompanyEntryDescription, Msg: err.Error()}
 	}
-	if err := iatBh.isAlphanumeric(iatBh.ISOOriginatingCurrencyCode); err != nil {
+	if !iso4217.Valid(iatBh.ISOOriginatingCurrencyCode) {
 		return &FieldError{FieldName: "ISOOriginatingCurrencyCode",
-			Value: iatBh.ISOOriginatingCurrencyCode, Msg: err.Error()}
+			Value: iatBh.ISOOriginatingCurrencyCode, Msg: "invalid ISO 4217 code"}
 	}
-
-	if err := iatBh.isAlphanumeric(iatBh.ISODestinationCurrencyCode); err != nil {
+	if !iso4217.Valid(iatBh.ISODestinationCurrencyCode) {
 		return &FieldError{FieldName: "ISODestinationCurrencyCode",
-			Value: iatBh.ISODestinationCurrencyCode, Msg: err.Error()}
+			Value: iatBh.ISODestinationCurrencyCode, Msg: "invalid ISO 4217 code"}
 	}
 	if err := iatBh.isOriginatorStatusCode(iatBh.OriginatorStatusCode); err != nil {
 		return &FieldError{FieldName: "OriginatorStatusCode",

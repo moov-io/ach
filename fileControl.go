@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -7,6 +7,7 @@ package ach
 import (
 	"fmt"
 	"strings"
+	"unicode/utf8"
 )
 
 // FileControl record contains entry counts, dollar totals and hash
@@ -45,6 +46,10 @@ type FileControl struct {
 
 // Parse takes the input record string and parses the FileControl values
 func (fc *FileControl) Parse(record string) {
+	if utf8.RuneCountInString(record) < 55 {
+		return
+	}
+
 	// 1-1 Always "9"
 	fc.recordType = "9"
 	// 2-7 The total number of Batch Header Record in the file. For example: "000003
@@ -104,19 +109,39 @@ func (fc *FileControl) Validate() error {
 // invalid the ACH transfer will be returned.
 func (fc *FileControl) fieldInclusion() error {
 	if fc.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: fc.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     fc.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewFileControl()?",
+		}
 	}
 	if fc.BatchCount == 0 {
-		return &FieldError{FieldName: "BatchCount", Value: fc.BatchCountField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "BatchCount",
+			Value:     fc.BatchCountField(),
+			Msg:       msgFieldInclusion + ", did you use NewFileControl()?",
+		}
 	}
 	if fc.BlockCount == 0 {
-		return &FieldError{FieldName: "BlockCount", Value: fc.BlockCountField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "BlockCount",
+			Value:     fc.BlockCountField(),
+			Msg:       msgFieldInclusion + ", did you use NewFileControl()?",
+		}
 	}
 	if fc.EntryAddendaCount == 0 {
-		return &FieldError{FieldName: "EntryAddendaCount", Value: fc.EntryAddendaCountField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "EntryAddendaCount",
+			Value:     fc.EntryAddendaCountField(),
+			Msg:       msgFieldInclusion + ", did you use NewFileControl()?",
+		}
 	}
 	if fc.EntryHash == 0 {
-		return &FieldError{FieldName: "EntryAddendaCount", Value: fc.EntryAddendaCountField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "EntryAddendaCount",
+			Value:     fc.EntryAddendaCountField(),
+			Msg:       msgFieldInclusion + ", did you use NewFileControl()?",
+		}
 	}
 	return nil
 }

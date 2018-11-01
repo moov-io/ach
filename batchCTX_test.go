@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -29,8 +29,8 @@ func mockCTXEntryDetail() *EntryDetail {
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
 	entry.IdentificationNumber = "45689033"
-	entry.SetCTXAddendaRecords(1)
-	entry.SetCTXReceivingCompany("Receiver Company")
+	entry.SetCATXAddendaRecords(1)
+	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(mockBatchCTXHeader().ODFIIdentification, 1)
 	entry.DiscretionaryData = "01"
 	entry.Category = CategoryForward
@@ -212,7 +212,7 @@ func testBatchCTXInvalidAddendum(t testing.TB) {
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda02())
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
+			if e.FieldName != "TypeCode" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -310,8 +310,8 @@ func testBatchCTXAddenda10000(t testing.TB) {
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
 	entry.IdentificationNumber = "45689033"
-	entry.SetCTXAddendaRecords(9999)
-	entry.SetCTXReceivingCompany("Receiver Company")
+	entry.SetCATXAddendaRecords(9999)
+	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(mockBatchCTXHeader().ODFIIdentification, 1)
 	entry.DiscretionaryData = "01"
 	entry.Category = CategoryForward
@@ -325,7 +325,7 @@ func testBatchCTXAddenda10000(t testing.TB) {
 
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
+			if e.FieldName != "AddendaCount" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -363,8 +363,8 @@ func testBatchCTXAddendaRecords(t testing.TB) {
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
 	entry.IdentificationNumber = "45689033"
-	entry.SetCTXAddendaRecords(500)
-	entry.SetCTXReceivingCompany("Receiver Company")
+	entry.SetCATXAddendaRecords(500)
+	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(mockBatchCTXHeader().ODFIIdentification, 1)
 	entry.DiscretionaryData = "01"
 	entry.Category = CategoryForward
@@ -403,10 +403,10 @@ func BenchmarkBatchCTXAddendaRecords(b *testing.B) {
 // testBatchCTXReceivingCompany validates CTXReceivingCompany
 func testBatchCTXReceivingCompany(t testing.TB) {
 	mockBatch := mockBatchCTX()
-	//mockBatch.GetEntries()[0].SetCTXReceivingCompany("Receiver")
+	//mockBatch.GetEntries()[0].SetCATXReceivingCompany("Receiver")
 
-	if mockBatch.GetEntries()[0].CTXReceivingCompanyField() != "Receiver Company" {
-		t.Errorf("expected %v got %v", "Receiver Company", mockBatch.GetEntries()[0].CTXReceivingCompanyField())
+	if mockBatch.GetEntries()[0].CATXReceivingCompanyField() != "Receiver Company" {
+		t.Errorf("expected %v got %v", "Receiver Company", mockBatch.GetEntries()[0].CATXReceivingCompanyField())
 	}
 }
 
@@ -427,8 +427,8 @@ func BenchmarkBatchCTXReceivingCompany(b *testing.B) {
 func testBatchCTXReserved(t testing.TB) {
 	mockBatch := mockBatchCTX()
 
-	if mockBatch.GetEntries()[0].CTXReservedField() != "  " {
-		t.Errorf("expected %v got %v", "  ", mockBatch.GetEntries()[0].CTXReservedField())
+	if mockBatch.GetEntries()[0].CATXReservedField() != "  " {
+		t.Errorf("expected %v got %v", "  ", mockBatch.GetEntries()[0].CATXReservedField())
 	}
 }
 
@@ -461,8 +461,8 @@ func testBatchCTXZeroAddendaRecords(t testing.TB) {
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
 	entry.IdentificationNumber = "45689033"
-	entry.SetCTXAddendaRecords(1)
-	entry.SetCTXReceivingCompany("Receiver Company")
+	entry.SetCATXAddendaRecords(1)
+	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(mockBatchCTXHeader().ODFIIdentification, 1)
 	entry.DiscretionaryData = "01"
 	entry.Category = CategoryForward
@@ -511,8 +511,8 @@ func testBatchCTXPrenoteAddendaRecords(t testing.TB) {
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
 	entry.IdentificationNumber = "45689033"
-	entry.SetCTXAddendaRecords(1)
-	entry.SetCTXReceivingCompany("Receiver Company")
+	entry.SetCATXAddendaRecords(1)
+	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(mockBatchCTXHeader().ODFIIdentification, 1)
 	entry.DiscretionaryData = "01"
 	entry.Category = CategoryForward
@@ -542,5 +542,41 @@ func BenchmarkBatchCTXPrenoteAddendaRecords(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchCTXPrenoteAddendaRecords(b)
+	}
+}
+
+// TestBatchCTXAddendum98 validates Addenda98 returns an error
+func TestBatchCTXAddendum98(t *testing.T) {
+	mockBatch := NewBatchCTX(mockBatchCTXHeader())
+	mockBatch.AddEntry(mockCTXEntryDetail())
+	mockAddenda98 := mockAddenda98()
+	mockAddenda98.TypeCode = "05"
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98)
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchCTXAddendum99 validates Addenda99 returns an error
+func TestBatchCTXAddendum99(t *testing.T) {
+	mockBatch := NewBatchCTX(mockBatchCTXHeader())
+	mockBatch.AddEntry(mockCTXEntryDetail())
+	mockAddenda99 := mockAddenda99()
+	mockAddenda99.TypeCode = "05"
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda99)
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
 	}
 }

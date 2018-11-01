@@ -1,10 +1,14 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
 package ach
 
 import (
+	"encoding/json"
+	"io/ioutil"
+	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -38,6 +42,19 @@ func BenchmarkFileError(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testFileError(b)
+	}
+}
+
+// TestFileEmptyError tests an empty file error
+func TestFileEmptyError(t *testing.T) {
+	file := &File{}
+	if err := file.Create(); err == nil {
+		t.Error("expected error")
+	}
+	err := file.Validate()
+	msg := err.Error()
+	if !strings.HasPrefix(msg, "recordType") || !strings.Contains(msg, "is a mandatory field") {
+		t.Errorf("got %q", err)
 	}
 }
 
@@ -240,7 +257,7 @@ func testFileBuildBadFileHeader(t testing.TB) {
 	file := NewFile().SetHeader(FileHeader{})
 	if err := file.Create(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -361,5 +378,49 @@ func BenchmarkFileReturnEntries(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testFileReturnEntries(b)
+	}
+}
+
+func TestFile__readFromJson(t *testing.T) {
+	path := filepath.Join("test", "testdata", "ppd-valid.json")
+	bs, err := ioutil.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	file, err := FileFromJson(bs)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Header
+	if file.Header.ImmediateOrigin != "121042882" || file.Header.ImmediateOriginName != "Wells Fargo" {
+		t.Errorf("origin=%s name=%s", file.Header.ImmediateOrigin, file.Header.ImmediateOriginName)
+	}
+	if file.Header.ImmediateDestination != "231380104" || file.Header.ImmediateDestinationName != "Citadel" {
+		t.Errorf("destination=%s name=%s", file.Header.ImmediateDestination, file.Header.ImmediateDestinationName)
+	}
+	if file.Header.FileCreationTime.IsZero() || file.Header.FileCreationDate.IsZero() {
+		t.Errorf("time=%v date=%v", file.Header.FileCreationTime, file.Header.FileCreationDate)
+	}
+
+	// Batches
+	if len(file.Batches) != 1 {
+		t.Errorf("got %d batches: %v", len(file.Batches), file.Batches)
+	}
+
+	// Control
+	if file.Control.BatchCount != 1 {
+		t.Errorf("BatchCount: %d", file.Control.BatchCount)
+	}
+	if file.Control.TotalDebitEntryDollarAmountInFile != 0 || file.Control.TotalCreditEntryDollarAmountInFile != 100000 {
+		t.Errorf("debit=%d credit=%d", file.Control.TotalDebitEntryDollarAmountInFile, file.Control.TotalCreditEntryDollarAmountInFile)
+	}
+
+	// ensure we error on struct tag unmarshal
+	var f File
+	err = json.Unmarshal(bs, &f)
+	if !strings.Contains(err.Error(), "use ach.FileFromJSON instead") {
+		t.Error("expected error, see FileFromJson definition")
 	}
 }

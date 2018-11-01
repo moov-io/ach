@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -56,14 +56,16 @@ var (
 	msgBatchAddendaTraceNumber      = "%v does not match proceeding entry detail trace number %v"
 	msgBatchEntries                 = "must have Entry Record(s) to be built"
 	msgBatchAddendaCount            = "%v addendum found where %v is allowed for batch type %v"
+	msgBatchRequiredAddendaCount    = "%v addendum found where %v is required for batch type %v"
 	msgBatchTransactionCodeCredit   = "%v a credit is not allowed"
 	msgBatchSECType                 = "header SEC type code %v for batch type %v"
-	msgBatchTypeCode                = "%v found in addenda and expecting %v for batch type %v"
+	msgBatchTypeCode                = "%v found in addenda and expecting %v for %v, batch type %v"
 	msgBatchServiceClassCode        = "Service Class Code %v is not valid for batch type %v"
 	msgBatchForwardReturn           = "Forward and Return entries found in the same batch"
 	msgBatchAmount                  = "Amount must be less than %v for SEC code %v"
 	msgBatchCheckSerialNumber       = "Check Serial Number is required for SEC code %v"
-	msgBatchTransactionCode         = "Transaction code %v is not allowed for batch type %v"
+	msgBatchTransactionCode         = "%v is not allowed for batch type %v"
 	msgBatchCardTransactionType     = "Card Transaction Type %v is invalid"
 	msgBatchTransactionCodeAddenda  = "Addenda not allowed for transaction code %v for batch type %v"
+	msgBatchAmountZero              = "%v must be zero for SEC code %v"
 )

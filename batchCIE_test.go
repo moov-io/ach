@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -267,7 +267,7 @@ func testBatchCIEAddendaCount(t testing.TB) {
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
+			if e.FieldName != "AddendaCount" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -295,7 +295,7 @@ func testBatchCIEAddendaCountZero(t testing.TB) {
 	mockBatch.AddEntry(mockCIEEntryDetail())
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
+			if e.FieldName != "AddendaCount" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -324,7 +324,7 @@ func testBatchCIEInvalidAddendum(t testing.TB) {
 	mockBatch.GetEntries()[0].AddAddenda(mockAddenda02())
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
+			if e.FieldName != "TypeCode" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -430,5 +430,57 @@ func BenchmarkBatchCIECardTransactionType(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchCIECardTransactionType(b)
+	}
+}
+
+// TestBatchCIEAddendum98 validates Addenda98 returns an error
+func TestBatchCIEAddendum98(t *testing.T) {
+	mockBatch := NewBatchCIE(mockBatchCIEHeader())
+	mockBatch.AddEntry(mockCIEEntryDetail())
+	mockAddenda98 := mockAddenda98()
+	mockAddenda98.TypeCode = "05"
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98)
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchCIEAddendum99 validates Addenda99 returns an error
+func TestBatchCIEAddendum99(t *testing.T) {
+	mockBatch := NewBatchCIE(mockBatchCIEHeader())
+	mockBatch.AddEntry(mockCIEEntryDetail())
+	mockAddenda99 := mockAddenda99()
+	mockAddenda99.TypeCode = "05"
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda99)
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchCIEAddenda validates no more than 1 addenda record per entry detail record can exist
+func TestBatchCIEAddenda(t *testing.T) {
+	mockBatch := mockBatchCIE()
+	// mock batch already has one addenda. Creating two addenda should error
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "AddendaCount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
 	}
 }

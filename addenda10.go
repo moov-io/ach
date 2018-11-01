@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -22,7 +22,7 @@ type Addenda10 struct {
 	// RecordType defines the type of record in the block.
 	recordType string
 	// TypeCode Addenda10 types code '10'
-	typeCode string
+	TypeCode string `json:"typeCode"`
 	// Transaction Type Code Describes the type of payment:
 	// ANN = Annuity, BUS = Business/Commercial, DEP = Deposit, LOA = Loan, MIS = Miscellaneous, MOR = Mortgage
 	// PEN = Pension, RLS = Rent/Lease, REM = Remittance2, SAL = Salary/Payroll, TAX = Tax, TEL = Telephone-Initiated Transaction
@@ -53,7 +53,7 @@ type Addenda10 struct {
 func NewAddenda10() *Addenda10 {
 	addenda10 := new(Addenda10)
 	addenda10.recordType = "7"
-	addenda10.typeCode = "10"
+	addenda10.TypeCode = "10"
 	return addenda10
 }
 
@@ -62,7 +62,7 @@ func (addenda10 *Addenda10) Parse(record string) {
 	// 1-1 Always "7"
 	addenda10.recordType = "7"
 	// 2-3 Always 10
-	addenda10.typeCode = record[1:3]
+	addenda10.TypeCode = record[1:3]
 	// 04-06 Describes the type of payment
 	addenda10.TransactionTypeCode = record[3:6]
 	// 07-24 Payment Amount	For inbound IAT payments this field should contain the USD amount or may be blank.
@@ -82,7 +82,7 @@ func (addenda10 *Addenda10) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
 	buf.WriteString(addenda10.recordType)
-	buf.WriteString(addenda10.typeCode)
+	buf.WriteString(addenda10.TypeCode)
 	// TransactionTypeCode Validator
 	buf.WriteString(addenda10.TransactionTypeCode)
 	buf.WriteString(addenda10.ForeignPaymentAmountField())
@@ -103,12 +103,12 @@ func (addenda10 *Addenda10) Validate() error {
 		msg := fmt.Sprintf(msgRecordType, 7)
 		return &FieldError{FieldName: "recordType", Value: addenda10.recordType, Msg: msg}
 	}
-	if err := addenda10.isTypeCode(addenda10.typeCode); err != nil {
-		return &FieldError{FieldName: "TypeCode", Value: addenda10.typeCode, Msg: err.Error()}
+	if err := addenda10.isTypeCode(addenda10.TypeCode); err != nil {
+		return &FieldError{FieldName: "TypeCode", Value: addenda10.TypeCode, Msg: err.Error()}
 	}
 	// Type Code must be 10
-	if addenda10.typeCode != "10" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda10.typeCode, Msg: msgAddendaTypeCode}
+	if addenda10.TypeCode != "10" {
+		return &FieldError{FieldName: "TypeCode", Value: addenda10.TypeCode, Msg: msgAddendaTypeCode}
 	}
 	if err := addenda10.isTransactionTypeCode(addenda10.TransactionTypeCode); err != nil {
 		return &FieldError{FieldName: "TransactionTypeCode", Value: addenda10.TransactionTypeCode, Msg: err.Error()}
@@ -127,14 +127,25 @@ func (addenda10 *Addenda10) Validate() error {
 // invalid the ACH transfer will be returned.
 func (addenda10 *Addenda10) fieldInclusion() error {
 	if addenda10.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: addenda10.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     addenda10.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda10()?",
+		}
 	}
-	if addenda10.typeCode == "" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda10.typeCode, Msg: msgFieldInclusion}
+	if addenda10.TypeCode == "" {
+		return &FieldError{
+			FieldName: "TypeCode",
+			Value:     addenda10.TypeCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda10()?",
+		}
 	}
 	if addenda10.TransactionTypeCode == "" {
-		return &FieldError{FieldName: "TransactionTypeCode",
-			Value: addenda10.TransactionTypeCode, Msg: msgFieldRequired}
+		return &FieldError{
+			FieldName: "TransactionTypeCode",
+			Value:     addenda10.TransactionTypeCode,
+			Msg:       msgFieldRequired,
+		}
 	}
 	// ToDo:  Commented because it appears this value can be all 000 (maybe blank?)
 	/*	if addenda10.ForeignPaymentAmount == 0 {
@@ -142,11 +153,18 @@ func (addenda10 *Addenda10) fieldInclusion() error {
 			Value: strconv.Itoa(addenda10.ForeignPaymentAmount), Msg: msgFieldRequired}
 	}*/
 	if addenda10.Name == "" {
-		return &FieldError{FieldName: "Name", Value: addenda10.Name, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "Name",
+			Value:     addenda10.Name,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda10()?",
+		}
 	}
 	if addenda10.EntryDetailSequenceNumber == 0 {
-		return &FieldError{FieldName: "EntryDetailSequenceNumber",
-			Value: addenda10.EntryDetailSequenceNumberField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "EntryDetailSequenceNumber",
+			Value:     addenda10.EntryDetailSequenceNumberField(),
+			Msg:       msgFieldInclusion + ", did you use NewAddenda10()?",
+		}
 	}
 	return nil
 }
@@ -170,11 +188,6 @@ func (addenda10 *Addenda10) NameField() string {
 // reservedField gets reserved - blank space
 func (addenda10 *Addenda10) reservedField() string {
 	return addenda10.alphaField(addenda10.reserved, 6)
-}
-
-// TypeCode Defines the specific explanation and format for the addenda10 information left padded
-func (addenda10 *Addenda10) TypeCode() string {
-	return addenda10.typeCode
 }
 
 // EntryDetailSequenceNumberField returns a zero padded EntryDetailSequenceNumber string

@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -26,9 +26,6 @@ type BatchPOS struct {
 	batch
 }
 
-var msgBatchPOSAddenda = "found and 1 Addenda02 is required for SEC code POS"
-var msgBatchPOSAddendaType = "%T found where Addenda02 is required for SEC code POS"
-
 // NewBatchPOS returns a *BatchPOS
 func NewBatchPOS(bh *BatchHeader) *BatchPOS {
 	batch := new(BatchPOS)
@@ -43,9 +40,8 @@ func (batch *BatchPOS) Validate() error {
 	if err := batch.verify(); err != nil {
 		return err
 	}
-	// Add configuration based validation for this type.
 
-	// Add type specific validation.
+	// Add configuration and type specific validation for this type.
 
 	if batch.Header.StandardEntryClassCode != "POS" {
 		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "POS")
@@ -70,25 +66,26 @@ func (batch *BatchPOS) Validate() error {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "CardTransactionType", Msg: msg}
 		}
 
-		// Addenda validations - POS Addenda must be Addenda02
-
-		// Addendum must be equal to 1
+		// POS must have one Addenda02 record
 		if len(entry.Addendum) != 1 {
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchPOSAddenda}
+			msg := fmt.Sprintf(msgBatchRequiredAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 		}
-
-		// Addenda type assertion must be Addenda02
-		addenda02, ok := entry.Addendum[0].(*Addenda02)
-		if !ok {
-			msg := fmt.Sprintf(msgBatchPOSAddendaType, entry.Addendum[0])
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
-		}
-
-		// Addenda02 must be Validated
-		if err := addenda02.Validate(); err != nil {
-			// convert the field error in to a batch error for a consistent api
-			if e, ok := err.(*FieldError); ok {
-				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: e.FieldName, Msg: e.Msg}
+		// POS must have one Addenda02 but cannot have Addenda05, or there can be a NOC (98) or Return (99)
+		for _, addenda := range entry.Addendum {
+			switch entry.Category {
+			case CategoryForward:
+				if err := batch.categoryForwardAddenda02(entry, addenda); err != nil {
+					return err
+				}
+			case CategoryNOC:
+				if err := batch.categoryNOCAddenda98(entry, addenda); err != nil {
+					return err
+				}
+			case CategoryReturn:
+				if err := batch.categoryReturnAddenda99(entry, addenda); err != nil {
+					return err
+				}
 			}
 		}
 	}

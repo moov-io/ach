@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 // Errors specific to a File Header Record
@@ -107,6 +108,10 @@ func NewFileHeader() FileHeader {
 
 // Parse takes the input record string and parses the FileHeader values
 func (fh *FileHeader) Parse(record string) {
+	if utf8.RuneCountInString(record) != 94 {
+		return
+	}
+
 	// (character position 1-1) Always "1"
 	fh.recordType = "1"
 	// (2-3) Always "01"
@@ -186,10 +191,18 @@ func (fh *FileHeader) Validate() error {
 		return &FieldError{FieldName: "ImmediateDestinationName", Value: fh.ImmediateDestinationName, Msg: err.Error()}
 	}
 	if fh.ImmediateOrigin == "000000000" {
-		return &FieldError{FieldName: "ImmediateOrigin", Value: fh.ImmediateOrigin, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "ImmediateOrigin",
+			Value:     fh.ImmediateOrigin,
+			Msg:       msgFieldInclusion + ", did you use NewFileHeader()?",
+		}
 	}
 	if fh.ImmediateDestination == "000000000" {
-		return &FieldError{FieldName: "ImmediateDestination", Value: fh.ImmediateDestination, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "ImmediateDestination",
+			Value:     fh.ImmediateDestination,
+			Msg:       msgFieldInclusion + ", did you use NewFileHeader()?",
+		}
 	}
 	if err := fh.isAlphanumeric(fh.ImmediateOriginName); err != nil {
 		return &FieldError{FieldName: "ImmediateOriginName", Value: fh.ImmediateOriginName, Msg: err.Error()}
@@ -211,28 +224,60 @@ func (fh *FileHeader) Validate() error {
 // invalid the ACH transfer will be returned.
 func (fh *FileHeader) fieldInclusion() error {
 	if fh.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: fh.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     fh.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewFileHeader()?",
+		}
 	}
 	if fh.ImmediateDestination == "" {
-		return &FieldError{FieldName: "ImmediateDestination", Value: fh.ImmediateDestinationField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "ImmediateDestination",
+			Value:     fh.ImmediateDestinationField(),
+			Msg:       msgFieldInclusion + ", did you use NewFileHeader()?",
+		}
 	}
 	if fh.ImmediateOrigin == "" {
-		return &FieldError{FieldName: "ImmediateOrigin", Value: fh.ImmediateOriginField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "ImmediateOrigin",
+			Value:     fh.ImmediateOriginField(),
+			Msg:       msgFieldInclusion + ", did you use NewFileHeader()?",
+		}
 	}
 	if fh.FileCreationDate.IsZero() {
-		return &FieldError{FieldName: "FileCreationDate", Value: fh.FileCreationDate.String(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "FileCreationDate",
+			Value:     fh.FileCreationDate.String(),
+			Msg:       msgFieldInclusion + ", did you use NewFileHeader()?",
+		}
 	}
 	if fh.FileIDModifier == "" {
-		return &FieldError{FieldName: "FileIDModifier", Value: fh.FileIDModifier, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "FileIDModifier",
+			Value:     fh.FileIDModifier,
+			Msg:       msgFieldInclusion + ", did you use NewFileHeader()?",
+		}
 	}
 	if fh.recordSize == "" {
-		return &FieldError{FieldName: "recordSize", Value: fh.recordSize, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordSize",
+			Value:     fh.recordSize,
+			Msg:       msgFieldInclusion + ", did you use NewFileHeader()?",
+		}
 	}
 	if fh.blockingFactor == "" {
-		return &FieldError{FieldName: "blockingFactor", Value: fh.blockingFactor, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "blockingFactor",
+			Value:     fh.blockingFactor,
+			Msg:       msgFieldInclusion + ", did you use NewFileHeader()?",
+		}
 	}
 	if fh.formatCode == "" {
-		return &FieldError{FieldName: "formatCode", Value: fh.formatCode, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "formatCode",
+			Value:     fh.formatCode,
+			Msg:       msgFieldInclusion + ", did you use NewFileHeader()?",
+		}
 	}
 	return nil
 }

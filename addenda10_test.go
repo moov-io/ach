@@ -1,10 +1,11 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
 package ach
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -36,8 +37,8 @@ func testAddenda10Parse(t testing.TB) {
 	if addenda10.recordType != "7" {
 		t.Errorf("expected %v got %v", "7", addenda10.recordType)
 	}
-	if addenda10.typeCode != "10" {
-		t.Errorf("expected %v got %v", "10", addenda10.typeCode)
+	if addenda10.TypeCode != "10" {
+		t.Errorf("expected %v got %v", "10", addenda10.TypeCode)
 	}
 	if addenda10.TransactionTypeCode != "ANN" {
 		t.Errorf("expected %v got %v", "ANN", addenda10.TransactionTypeCode)
@@ -103,7 +104,7 @@ func BenchmarkAddenda10ValidRecordType(b *testing.B) {
 // testAddenda10ValidTypeCode validates Addenda10 TypeCode
 func testAddenda10ValidTypeCode(t testing.TB) {
 	addenda10 := mockAddenda10()
-	addenda10.typeCode = "65"
+	addenda10.TypeCode = "65"
 	if err := addenda10.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -128,10 +129,10 @@ func BenchmarkAddenda10ValidTypeCode(b *testing.B) {
 	}
 }
 
-// testAddenda10TypeCode10 TypeCode is 10 if typeCode is a valid TypeCode
+// testAddenda10TypeCode10 TypeCode is 10 if TypeCode is a valid TypeCode
 func testAddenda10TypeCode10(t testing.TB) {
 	addenda10 := mockAddenda10()
-	addenda10.typeCode = "05"
+	addenda10.TypeCode = "05"
 	if err := addenda10.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -143,12 +144,12 @@ func testAddenda10TypeCode10(t testing.TB) {
 	}
 }
 
-// TestAddenda10TypeCode10 tests TypeCode is 10 if typeCode is a valid TypeCode
+// TestAddenda10TypeCode10 tests TypeCode is 10 if TypeCode is a valid TypeCode
 func TestAddenda10TypeCode10(t *testing.T) {
 	testAddenda10TypeCode10(t)
 }
 
-// BenchmarkAddenda10TypeCode10 benchmarks TypeCode is 10 if typeCode is a valid TypeCode
+// BenchmarkAddenda10TypeCode10 benchmarks TypeCode is 10 if TypeCode is a valid TypeCode
 func BenchmarkAddenda10TypeCode10(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -242,7 +243,7 @@ func testAddenda10FieldInclusionRecordType(t testing.TB) {
 	addenda10.recordType = ""
 	if err := addenda10.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -265,10 +266,10 @@ func BenchmarkAddenda10FieldInclusionRecordType(b *testing.B) {
 // testAddenda10FieldInclusionTypeCode validates TypeCode fieldInclusion
 func testAddenda10FieldInclusionTypeCode(t testing.TB) {
 	addenda10 := mockAddenda10()
-	addenda10.typeCode = ""
+	addenda10.TypeCode = ""
 	if err := addenda10.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -348,7 +349,7 @@ func testAddenda10FieldInclusionName(t testing.TB) {
 	addenda10.Name = ""
 	if err := addenda10.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -374,7 +375,7 @@ func testAddenda10FieldInclusionEntryDetailSequenceNumber(t testing.TB) {
 	addenda10.EntryDetailSequenceNumber = 0
 	if err := addenda10.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -405,8 +406,8 @@ func testAddenda10String(t testing.TB) {
 	if addenda10.String() != line {
 		t.Errorf("Strings do not match")
 	}
-	if addenda10.TypeCode() != "10" {
-		t.Errorf("TypeCode Expected 10 got: %v", addenda10.TypeCode())
+	if addenda10.TypeCode != "10" {
+		t.Errorf("TypeCode Expected 10 got: %v", addenda10.TypeCode)
 	}
 }
 

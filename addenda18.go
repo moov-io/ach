@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -23,7 +23,7 @@ type Addenda18 struct {
 	// RecordType defines the type of record in the block. entryAddenda18 Pos 7
 	recordType string
 	// TypeCode Addenda18 types code '18'
-	typeCode string
+	TypeCode string `json:"typeCode"`
 	// ForeignCorrespondentBankName contains the name of the Foreign Correspondent Bank
 	ForeignCorrespondentBankName string `json:"foreignCorrespondentBankName"`
 	// Foreign Correspondent Bank Identification Number Qualifier contains a 2-digit code that
@@ -62,7 +62,7 @@ type Addenda18 struct {
 func NewAddenda18() *Addenda18 {
 	addenda18 := new(Addenda18)
 	addenda18.recordType = "7"
-	addenda18.typeCode = "18"
+	addenda18.TypeCode = "18"
 	return addenda18
 }
 
@@ -71,7 +71,7 @@ func (addenda18 *Addenda18) Parse(record string) {
 	// 1-1 Always "7"
 	addenda18.recordType = "7"
 	// 2-3 Always 18
-	addenda18.typeCode = record[1:3]
+	addenda18.TypeCode = record[1:3]
 	// 4-83 Based on the information entered (04-38) 35 alphanumeric
 	addenda18.ForeignCorrespondentBankName = strings.TrimSpace(record[3:38])
 	// 39-40  Based on the information entered (39-40) 2 alphanumeric
@@ -97,7 +97,7 @@ func (addenda18 *Addenda18) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
 	buf.WriteString(addenda18.recordType)
-	buf.WriteString(addenda18.typeCode)
+	buf.WriteString(addenda18.TypeCode)
 	buf.WriteString(addenda18.ForeignCorrespondentBankNameField())
 	buf.WriteString(addenda18.ForeignCorrespondentBankIDNumberQualifierField())
 	buf.WriteString(addenda18.ForeignCorrespondentBankIDNumberField())
@@ -118,12 +118,12 @@ func (addenda18 *Addenda18) Validate() error {
 		msg := fmt.Sprintf(msgRecordType, 7)
 		return &FieldError{FieldName: "recordType", Value: addenda18.recordType, Msg: msg}
 	}
-	if err := addenda18.isTypeCode(addenda18.typeCode); err != nil {
-		return &FieldError{FieldName: "TypeCode", Value: addenda18.typeCode, Msg: err.Error()}
+	if err := addenda18.isTypeCode(addenda18.TypeCode); err != nil {
+		return &FieldError{FieldName: "TypeCode", Value: addenda18.TypeCode, Msg: err.Error()}
 	}
 	// Type Code must be 18
-	if addenda18.typeCode != "18" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda18.typeCode, Msg: msgAddendaTypeCode}
+	if addenda18.TypeCode != "18" {
+		return &FieldError{FieldName: "TypeCode", Value: addenda18.TypeCode, Msg: msgAddendaTypeCode}
 	}
 	if err := addenda18.isAlphanumeric(addenda18.ForeignCorrespondentBankName); err != nil {
 		return &FieldError{FieldName: "ForeignCorrespondentBankName", Value: addenda18.ForeignCorrespondentBankName, Msg: err.Error()}
@@ -144,28 +144,60 @@ func (addenda18 *Addenda18) Validate() error {
 // invalid the ACH transfer will be returned.
 func (addenda18 *Addenda18) fieldInclusion() error {
 	if addenda18.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: addenda18.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     addenda18.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda18()?",
+		}
 	}
-	if addenda18.typeCode == "" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda18.typeCode, Msg: msgFieldInclusion}
+	if addenda18.TypeCode == "" {
+		return &FieldError{
+			FieldName: "TypeCode",
+			Value:     addenda18.TypeCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda18()?",
+		}
 	}
 	if addenda18.ForeignCorrespondentBankName == "" {
-		return &FieldError{FieldName: "ForeignCorrespondentBankName", Value: addenda18.ForeignCorrespondentBankName, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "ForeignCorrespondentBankName",
+			Value:     addenda18.ForeignCorrespondentBankName,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda18()?",
+		}
 	}
 	if addenda18.ForeignCorrespondentBankIDNumberQualifier == "" {
-		return &FieldError{FieldName: "ForeignCorrespondentBankIDNumberQualifier", Value: addenda18.ForeignCorrespondentBankIDNumberQualifier, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "ForeignCorrespondentBankIDNumberQualifier",
+			Value:     addenda18.ForeignCorrespondentBankIDNumberQualifier,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda18()?",
+		}
 	}
 	if addenda18.ForeignCorrespondentBankIDNumber == "" {
-		return &FieldError{FieldName: "ForeignCorrespondentBankIDNumber", Value: addenda18.ForeignCorrespondentBankIDNumber, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "ForeignCorrespondentBankIDNumber",
+			Value:     addenda18.ForeignCorrespondentBankIDNumber,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda18()?",
+		}
 	}
 	if addenda18.ForeignCorrespondentBankBranchCountryCode == "" {
-		return &FieldError{FieldName: "ForeignCorrespondentBankBranchCountryCode", Value: addenda18.ForeignCorrespondentBankBranchCountryCode, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "ForeignCorrespondentBankBranchCountryCode",
+			Value:     addenda18.ForeignCorrespondentBankBranchCountryCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda18()?",
+		}
 	}
 	if addenda18.SequenceNumber == 0 {
-		return &FieldError{FieldName: "SequenceNumber", Value: addenda18.SequenceNumberField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "SequenceNumber",
+			Value:     addenda18.SequenceNumberField(),
+			Msg:       msgFieldInclusion + ", did you use NewAddenda18()?",
+		}
 	}
 	if addenda18.EntryDetailSequenceNumber == 0 {
-		return &FieldError{FieldName: "EntryDetailSequenceNumber", Value: addenda18.EntryDetailSequenceNumberField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "EntryDetailSequenceNumber",
+			Value:     addenda18.EntryDetailSequenceNumberField(),
+			Msg:       msgFieldInclusion + ", did you use NewAddenda18()?",
+		}
 	}
 	return nil
 }
@@ -206,6 +238,6 @@ func (addenda18 *Addenda18) EntryDetailSequenceNumberField() string {
 }
 
 // TypeCode Defines the specific explanation and format for the addenda18 information
-func (addenda18 *Addenda18) TypeCode() string {
-	return addenda18.typeCode
+func (addenda18 *Addenda18) typeCode() string {
+	return addenda18.TypeCode
 }

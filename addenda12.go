@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -22,7 +22,7 @@ type Addenda12 struct {
 	// RecordType defines the type of record in the block.
 	recordType string
 	// TypeCode Addenda12 types code '12'
-	typeCode string
+	TypeCode string `json:"typeCode"`
 	// Originator City & State / Province
 	// Data elements City and State / Province  should be separated with an asterisk (*) as a delimiter
 	// and the field should end with a backslash (\).
@@ -49,7 +49,7 @@ type Addenda12 struct {
 func NewAddenda12() *Addenda12 {
 	addenda12 := new(Addenda12)
 	addenda12.recordType = "7"
-	addenda12.typeCode = "12"
+	addenda12.TypeCode = "12"
 	return addenda12
 }
 
@@ -58,7 +58,7 @@ func (addenda12 *Addenda12) Parse(record string) {
 	// 1-1 Always "7"
 	addenda12.recordType = "7"
 	// 2-3 Always 12
-	addenda12.typeCode = record[1:3]
+	addenda12.TypeCode = record[1:3]
 	// 4-38
 	addenda12.OriginatorCityStateProvince = strings.TrimSpace(record[3:38])
 	// 39-73
@@ -74,7 +74,7 @@ func (addenda12 *Addenda12) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
 	buf.WriteString(addenda12.recordType)
-	buf.WriteString(addenda12.typeCode)
+	buf.WriteString(addenda12.TypeCode)
 	buf.WriteString(addenda12.OriginatorCityStateProvinceField())
 	// ToDo Validator for backslash
 	buf.WriteString(addenda12.OriginatorCountryPostalCodeField())
@@ -93,12 +93,12 @@ func (addenda12 *Addenda12) Validate() error {
 		msg := fmt.Sprintf(msgRecordType, 7)
 		return &FieldError{FieldName: "recordType", Value: addenda12.recordType, Msg: msg}
 	}
-	if err := addenda12.isTypeCode(addenda12.typeCode); err != nil {
-		return &FieldError{FieldName: "TypeCode", Value: addenda12.typeCode, Msg: err.Error()}
+	if err := addenda12.isTypeCode(addenda12.TypeCode); err != nil {
+		return &FieldError{FieldName: "TypeCode", Value: addenda12.TypeCode, Msg: err.Error()}
 	}
 	// Type Code must be 12
-	if addenda12.typeCode != "12" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda12.typeCode, Msg: msgAddendaTypeCode}
+	if addenda12.TypeCode != "12" {
+		return &FieldError{FieldName: "TypeCode", Value: addenda12.TypeCode, Msg: msgAddendaTypeCode}
 	}
 	if err := addenda12.isAlphanumeric(addenda12.OriginatorCityStateProvince); err != nil {
 		return &FieldError{FieldName: "OriginatorCityStateProvince",
@@ -115,22 +115,39 @@ func (addenda12 *Addenda12) Validate() error {
 // invalid the ACH transfer will be returned.
 func (addenda12 *Addenda12) fieldInclusion() error {
 	if addenda12.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: addenda12.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     addenda12.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda12()?",
+		}
 	}
-	if addenda12.typeCode == "" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda12.typeCode, Msg: msgFieldInclusion}
+	if addenda12.TypeCode == "" {
+		return &FieldError{
+			FieldName: "TypeCode",
+			Value:     addenda12.TypeCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda12()?",
+		}
 	}
 	if addenda12.OriginatorCityStateProvince == "" {
-		return &FieldError{FieldName: "OriginatorCityStateProvince",
-			Value: addenda12.OriginatorCityStateProvince, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "OriginatorCityStateProvince",
+			Value:     addenda12.OriginatorCityStateProvince,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda12()?",
+		}
 	}
 	if addenda12.OriginatorCountryPostalCode == "" {
-		return &FieldError{FieldName: "OriginatorCountryPostalCode",
-			Value: addenda12.OriginatorCountryPostalCode, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "OriginatorCountryPostalCode",
+			Value:     addenda12.OriginatorCountryPostalCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda12()?",
+		}
 	}
 	if addenda12.EntryDetailSequenceNumber == 0 {
-		return &FieldError{FieldName: "EntryDetailSequenceNumber",
-			Value: addenda12.EntryDetailSequenceNumberField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "EntryDetailSequenceNumber",
+			Value:     addenda12.EntryDetailSequenceNumberField(),
+			Msg:       msgFieldInclusion + ", did you use NewAddenda12()?",
+		}
 	}
 	return nil
 }
@@ -148,11 +165,6 @@ func (addenda12 *Addenda12) OriginatorCountryPostalCodeField() string {
 // reservedField gets reserved - blank space
 func (addenda12 *Addenda12) reservedField() string {
 	return addenda12.alphaField(addenda12.reserved, 14)
-}
-
-// TypeCode Defines the specific explanation and format for the addenda12 information left padded
-func (addenda12 *Addenda12) TypeCode() string {
-	return addenda12.typeCode
 }
 
 // EntryDetailSequenceNumberField returns a zero padded EntryDetailSequenceNumber string

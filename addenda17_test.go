@@ -1,10 +1,11 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
 package ach
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -35,8 +36,8 @@ func testAddenda17Parse(t testing.TB) {
 	if Addenda17.recordType != "7" {
 		t.Errorf("expected %v got %v", "7", Addenda17.recordType)
 	}
-	if Addenda17.typeCode != "17" {
-		t.Errorf("expected %v got %v", "17", Addenda17.typeCode)
+	if Addenda17.typeCode() != "17" {
+		t.Errorf("expected %v got %v", "17", Addenda17.TypeCode)
 	}
 	if Addenda17.PaymentRelatedInformation != "This is an international payment" {
 		t.Errorf("expected %v got %v", "This is an international payment", Addenda17.PaymentRelatedInformation)
@@ -109,9 +110,9 @@ func TestValidateAddenda17RecordType(t *testing.T) {
 	}
 }
 
-func TestAddenda17TypeCodeFieldInclusion(t *testing.T) {
+func TestAddenda17FieldInclusionTypeCode(t *testing.T) {
 	addenda17 := mockAddenda17()
-	addenda17.typeCode = ""
+	addenda17.TypeCode = ""
 	if err := addenda17.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -133,12 +134,24 @@ func TestAddenda17FieldInclusion(t *testing.T) {
 	}
 }
 
+func TestAddenda17FieldInclusionSequenceNumber(t *testing.T) {
+	addenda17 := mockAddenda17()
+	addenda17.SequenceNumber = 0
+	if err := addenda17.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "SequenceNumber" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
 func TestAddenda17FieldInclusionRecordType(t *testing.T) {
 	addenda17 := mockAddenda17()
 	addenda17.recordType = ""
 	if err := addenda17.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -175,7 +188,7 @@ func BenchmarkAddenda17PaymentRelatedInformationAlphaNumeric(b *testing.B) {
 // testAddenda17ValidTypeCode validates Addenda17 TypeCode
 func testAddenda17ValidTypeCode(t testing.TB) {
 	addenda17 := mockAddenda17()
-	addenda17.typeCode = "65"
+	addenda17.TypeCode = "65"
 	if err := addenda17.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -200,10 +213,10 @@ func BenchmarkAddenda17ValidTypeCode(b *testing.B) {
 	}
 }
 
-// testAddenda17TypeCode17 TypeCode is 17 if typeCode is a valid TypeCode
+// testAddenda17TypeCode17 TypeCode is 17 if TypeCode is a valid TypeCode
 func testAddenda17TypeCode17(t testing.TB) {
 	addenda17 := mockAddenda17()
-	addenda17.typeCode = "05"
+	addenda17.TypeCode = "05"
 	if err := addenda17.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -215,12 +228,12 @@ func testAddenda17TypeCode17(t testing.TB) {
 	}
 }
 
-// TestAddenda17TypeCode17 tests TypeCode is 17 if typeCode is a valid TypeCode
+// TestAddenda17TypeCode17 tests TypeCode is 17 if TypeCode is a valid TypeCode
 func TestAddenda17TypeCode17(t *testing.T) {
 	testAddenda17TypeCode17(t)
 }
 
-// BenchmarkAddenda17TypeCode17 benchmarks TypeCode is 17 if typeCode is a valid TypeCode
+// BenchmarkAddenda17TypeCode17 benchmarks TypeCode is 17 if TypeCode is a valid TypeCode
 func BenchmarkAddenda17TypeCode17(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {

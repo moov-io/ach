@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -17,7 +17,7 @@ type Addenda02 struct {
 	// RecordType defines the type of record in the block. entryAddenda02 Pos 7
 	recordType string
 	// TypeCode Addenda02 type code '02'
-	typeCode string
+	TypeCode string `json:"typeCode"`
 	// ReferenceInformationOne may be used for additional reference numbers, identification numbers,
 	// or codes that the merchant needs to identify the particular transaction or customer.
 	ReferenceInformationOne string `json:"referenceInformationOne,omitempty"`
@@ -55,7 +55,7 @@ type Addenda02 struct {
 func NewAddenda02() *Addenda02 {
 	addenda02 := new(Addenda02)
 	addenda02.recordType = "7"
-	addenda02.typeCode = "02"
+	addenda02.TypeCode = "02"
 	return addenda02
 }
 
@@ -64,7 +64,7 @@ func (addenda02 *Addenda02) Parse(record string) {
 	// 1-1 Always "7"
 	addenda02.recordType = "7"
 	// 2-3 Always 02
-	addenda02.typeCode = record[1:3]
+	addenda02.TypeCode = record[1:3]
 	// 4-10 Based on the information entered (04-10) 7 alphanumeric
 	addenda02.ReferenceInformationOne = strings.TrimSpace(record[3:10])
 	// 11-13 Based on the information entered (11-13) 3 alphanumeric
@@ -92,7 +92,7 @@ func (addenda02 *Addenda02) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
 	buf.WriteString(addenda02.recordType)
-	buf.WriteString(addenda02.typeCode)
+	buf.WriteString(addenda02.TypeCode)
 	buf.WriteString(addenda02.ReferenceInformationOneField())
 	buf.WriteString(addenda02.ReferenceInformationTwoField())
 	buf.WriteString(addenda02.TerminalIdentificationCodeField())
@@ -116,12 +116,12 @@ func (addenda02 *Addenda02) Validate() error {
 		msg := fmt.Sprintf(msgRecordType, 7)
 		return &FieldError{FieldName: "recordType", Value: addenda02.recordType, Msg: msg}
 	}
-	if err := addenda02.isTypeCode(addenda02.typeCode); err != nil {
-		return &FieldError{FieldName: "TypeCode", Value: addenda02.typeCode, Msg: err.Error()}
+	if err := addenda02.isTypeCode(addenda02.TypeCode); err != nil {
+		return &FieldError{FieldName: "TypeCode", Value: addenda02.TypeCode, Msg: err.Error()}
 	}
 	// Type Code must be 02
-	if addenda02.typeCode != "02" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda02.typeCode, Msg: msgAddendaTypeCode}
+	if addenda02.TypeCode != "02" {
+		return &FieldError{FieldName: "TypeCode", Value: addenda02.TypeCode, Msg: msgAddendaTypeCode}
 	}
 	if err := addenda02.isAlphanumeric(addenda02.ReferenceInformationOne); err != nil {
 		return &FieldError{FieldName: "ReferenceInformationOne", Value: addenda02.ReferenceInformationOne, Msg: err.Error()}
@@ -135,15 +135,26 @@ func (addenda02 *Addenda02) Validate() error {
 	if err := addenda02.isAlphanumeric(addenda02.TransactionSerialNumber); err != nil {
 		return &FieldError{FieldName: "TransactionSerialNumber", Value: addenda02.TransactionSerialNumber, Msg: err.Error()}
 	}
-	// TransactionDate Addenda02 ACH File format is MMDD.  Validate MM is 01-12.
-	if err := addenda02.isMonth(addenda02.parseStringField(addenda02.TransactionDate[0:2])); err != nil {
-		return &FieldError{FieldName: "TransactionDate", Value: addenda02.parseStringField(addenda02.TransactionDate[0:2]), Msg: msgValidMonth}
-	}
-	// TransactionDate Addenda02 ACH File format is MMDD.  If the month is valid, validate the day for the
+
+	// TransactionDate Addenda02 ACH File format is MMDD. Validate MM is 01-12 and day for the
 	// month 01-31 depending on month.
-	if err := addenda02.isDay(addenda02.parseStringField(addenda02.TransactionDate[0:2]), addenda02.parseStringField(addenda02.TransactionDate[2:4])); err != nil {
-		return &FieldError{FieldName: "TransactionDate", Value: addenda02.parseStringField(addenda02.TransactionDate[0:2]), Msg: msgValidDay}
+	mm := addenda02.parseStringField(addenda02.TransactionDateField()[0:2])
+	dd := addenda02.parseStringField(addenda02.TransactionDateField()[2:4])
+	if err := addenda02.isMonth(mm); err != nil {
+		return &FieldError{
+			FieldName: "TransactionDate",
+			Value:     mm,
+			Msg:       msgValidMonth,
+		}
 	}
+	if err := addenda02.isDay(mm, dd); err != nil {
+		return &FieldError{
+			FieldName: "TransactionDate",
+			Value:     dd,
+			Msg:       msgValidDay,
+		}
+	}
+
 	if err := addenda02.isAlphanumeric(addenda02.AuthorizationCodeOrExpireDate); err != nil {
 		return &FieldError{FieldName: "AuthorizationCodeOrExpireDate", Value: addenda02.AuthorizationCodeOrExpireDate, Msg: err.Error()}
 	}
@@ -164,10 +175,17 @@ func (addenda02 *Addenda02) Validate() error {
 
 func (addenda02 *Addenda02) fieldInclusion() error {
 	if addenda02.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: addenda02.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     addenda02.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda02()?",
+		}
 	}
-	if addenda02.typeCode == "" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda02.typeCode, Msg: msgFieldInclusion}
+	if addenda02.TypeCode == "" {
+		return &FieldError{
+			FieldName: "TypeCode",
+			Value:     addenda02.TypeCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda02()?"}
 	}
 	// Required Fields
 	if addenda02.TerminalIdentificationCode == "" {
@@ -192,8 +210,8 @@ func (addenda02 *Addenda02) fieldInclusion() error {
 }
 
 // TypeCode Defines the specific explanation and format for the addenda02 information
-func (addenda02 *Addenda02) TypeCode() string {
-	return addenda02.typeCode
+func (addenda02 *Addenda02) typeCode() string {
+	return addenda02.TypeCode
 }
 
 // ReferenceInformationOneField returns a space padded ReferenceInformationOne string
@@ -218,7 +236,7 @@ func (addenda02 *Addenda02) TransactionSerialNumberField() string {
 
 // TransactionDateField returns TransactionDate MMDD string
 func (addenda02 *Addenda02) TransactionDateField() string {
-	return addenda02.TransactionDate
+	return addenda02.alphaField(addenda02.TransactionDate, 4)
 }
 
 // AuthorizationCodeOrExpireDateField returns a space padded AuthorizationCodeOrExpireDate string

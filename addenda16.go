@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -21,7 +21,7 @@ type Addenda16 struct {
 	// RecordType defines the type of record in the block.
 	recordType string
 	// TypeCode Addenda16 types code '16'
-	typeCode string
+	TypeCode string `json:"typeCode"`
 	// Receiver City & State / Province
 	// Data elements City and State / Province  should be separated with an asterisk (*) as a delimiter
 	// and the field should end with a backslash (\).
@@ -48,7 +48,7 @@ type Addenda16 struct {
 func NewAddenda16() *Addenda16 {
 	addenda16 := new(Addenda16)
 	addenda16.recordType = "7"
-	addenda16.typeCode = "16"
+	addenda16.TypeCode = "16"
 	return addenda16
 }
 
@@ -57,7 +57,7 @@ func (addenda16 *Addenda16) Parse(record string) {
 	// 1-1 Always "7"
 	addenda16.recordType = "7"
 	// 2-3 Always 16
-	addenda16.typeCode = record[1:3]
+	addenda16.TypeCode = record[1:3]
 	// 4-38 ReceiverCityStateProvince
 	addenda16.ReceiverCityStateProvince = strings.TrimSpace(record[3:38])
 	// 39-73 ReceiverCountryPostalCode
@@ -73,7 +73,7 @@ func (addenda16 *Addenda16) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
 	buf.WriteString(addenda16.recordType)
-	buf.WriteString(addenda16.typeCode)
+	buf.WriteString(addenda16.TypeCode)
 	buf.WriteString(addenda16.ReceiverCityStateProvinceField())
 	buf.WriteString(addenda16.ReceiverCountryPostalCodeField())
 	buf.WriteString(addenda16.reservedField())
@@ -91,12 +91,12 @@ func (addenda16 *Addenda16) Validate() error {
 		msg := fmt.Sprintf(msgRecordType, 7)
 		return &FieldError{FieldName: "recordType", Value: addenda16.recordType, Msg: msg}
 	}
-	if err := addenda16.isTypeCode(addenda16.typeCode); err != nil {
-		return &FieldError{FieldName: "TypeCode", Value: addenda16.typeCode, Msg: err.Error()}
+	if err := addenda16.isTypeCode(addenda16.TypeCode); err != nil {
+		return &FieldError{FieldName: "TypeCode", Value: addenda16.TypeCode, Msg: err.Error()}
 	}
 	// Type Code must be 16
-	if addenda16.typeCode != "16" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda16.typeCode, Msg: msgAddendaTypeCode}
+	if addenda16.TypeCode != "16" {
+		return &FieldError{FieldName: "TypeCode", Value: addenda16.TypeCode, Msg: msgAddendaTypeCode}
 	}
 	if err := addenda16.isAlphanumeric(addenda16.ReceiverCityStateProvince); err != nil {
 		return &FieldError{FieldName: "ReceiverCityStateProvince",
@@ -113,22 +113,39 @@ func (addenda16 *Addenda16) Validate() error {
 // invalid the ACH transfer will be returned.
 func (addenda16 *Addenda16) fieldInclusion() error {
 	if addenda16.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: addenda16.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     addenda16.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda16()?",
+		}
 	}
-	if addenda16.typeCode == "" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda16.typeCode, Msg: msgFieldInclusion}
+	if addenda16.TypeCode == "" {
+		return &FieldError{
+			FieldName: "TypeCode",
+			Value:     addenda16.TypeCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda16()?",
+		}
 	}
 	if addenda16.ReceiverCityStateProvince == "" {
-		return &FieldError{FieldName: "ReceiverCityStateProvince",
-			Value: addenda16.ReceiverCityStateProvince, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "ReceiverCityStateProvince",
+			Value:     addenda16.ReceiverCityStateProvince,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda16()?",
+		}
 	}
 	if addenda16.ReceiverCountryPostalCode == "" {
-		return &FieldError{FieldName: "ReceiverCountryPostalCode",
-			Value: addenda16.ReceiverCountryPostalCode, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "ReceiverCountryPostalCode",
+			Value:     addenda16.ReceiverCountryPostalCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda16()?",
+		}
 	}
 	if addenda16.EntryDetailSequenceNumber == 0 {
-		return &FieldError{FieldName: "EntryDetailSequenceNumber",
-			Value: addenda16.EntryDetailSequenceNumberField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "EntryDetailSequenceNumber",
+			Value:     addenda16.EntryDetailSequenceNumberField(),
+			Msg:       msgFieldInclusion + ", did you use NewAddenda16()?",
+		}
 	}
 	return nil
 }
@@ -146,11 +163,6 @@ func (addenda16 *Addenda16) ReceiverCountryPostalCodeField() string {
 // reservedField gets reserved - blank space
 func (addenda16 *Addenda16) reservedField() string {
 	return addenda16.alphaField(addenda16.reserved, 14)
-}
-
-// TypeCode Defines the specific explanation and format for the addenda16 information left padded
-func (addenda16 *Addenda16) TypeCode() string {
-	return addenda16.typeCode
 }
 
 // EntryDetailSequenceNumberField returns a zero padded EntryDetailSequenceNumber string

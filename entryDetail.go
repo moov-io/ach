@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 // EntryDetail contains the actual transaction data for an individual entry.
@@ -97,6 +98,10 @@ func NewEntryDetail() *EntryDetail {
 
 // Parse takes the input record string and parses the EntryDetail values
 func (ed *EntryDetail) Parse(record string) {
+	if utf8.RuneCountInString(record) != 94 {
+		return
+	}
+
 	// 1-1 Always "6"
 	ed.recordType = "6"
 	// 2-3 is checking credit 22 debit 27 savings credit 32 debit 37
@@ -186,27 +191,55 @@ func (ed *EntryDetail) Validate() error {
 // invalid the ACH transfer will be returned.
 func (ed *EntryDetail) fieldInclusion() error {
 	if ed.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: ed.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     ed.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewEntryDetail()?",
+		}
 	}
 	if ed.TransactionCode == 0 {
-		return &FieldError{FieldName: "TransactionCode", Value: strconv.Itoa(ed.TransactionCode), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "TransactionCode",
+			Value:     strconv.Itoa(ed.TransactionCode),
+			Msg:       msgFieldInclusion + ", did you use NewEntryDetail()?",
+		}
 	}
 	if ed.RDFIIdentification == "" {
-		return &FieldError{FieldName: "RDFIIdentification", Value: ed.RDFIIdentificationField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "RDFIIdentification",
+			Value:     ed.RDFIIdentificationField(),
+			Msg:       msgFieldInclusion + ", did you use NewEntryDetail()?",
+		}
 	}
 	if ed.DFIAccountNumber == "" {
-		return &FieldError{FieldName: "DFIAccountNumber", Value: ed.DFIAccountNumber, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "DFIAccountNumber",
+			Value:     ed.DFIAccountNumber,
+			Msg:       msgFieldInclusion + ", did you use NewEntryDetail()?",
+		}
 	}
 	if ed.IndividualName == "" {
-		return &FieldError{FieldName: "IndividualName", Value: ed.IndividualName, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "IndividualName",
+			Value:     ed.IndividualName,
+			Msg:       msgFieldInclusion + ", did you use NewEntryDetail()?",
+		}
 	}
 	if ed.TraceNumber == 0 {
-		return &FieldError{FieldName: "TraceNumber", Value: ed.TraceNumberField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "TraceNumber",
+			Value:     ed.TraceNumberField(),
+			Msg:       msgFieldInclusion + ", did you use NewEntryDetail()?",
+		}
 	}
 	return nil
 }
 
 // AddAddenda appends an Addendumer to the EntryDetail
+//
+// Note: The order of records here is determined by their insertion order.
+// No inspection of SequenceNumbers in Addendas (i.e 05, 17, 18) is done
+// to re-order addenda records.
 func (ed *EntryDetail) AddAddenda(addenda Addendumer) []Addendumer {
 	ed.AddendaRecordIndicator = 1
 	// checks to make sure that we only have either or, not both
@@ -337,7 +370,7 @@ func (ed *EntryDetail) SetSHRIndividualCardAccountNumber(s string) {
 // SHRCardExpirationDateField format MMYY is used in SHR, characters 1-4 of underlying
 // IdentificationNumber
 func (ed *EntryDetail) SHRCardExpirationDateField() string {
-	return ed.parseStringField(ed.IdentificationNumber[0:4])
+	return ed.alphaField(ed.parseStringField(ed.IdentificationNumber[0:4]), 4)
 }
 
 // SHRDocumentReferenceNumberField format int is used in SHR, characters 5-15 of underlying
@@ -367,10 +400,24 @@ func (ed *EntryDetail) SetReceivingCompany(s string) {
 	ed.IndividualName = s
 }
 
+// OriginalTraceNumberField is used in ACK and ATX files but returns the underlying IdentificationNumber field
+func (ed *EntryDetail) OriginalTraceNumberField() string {
+	return ed.IdentificationNumberField()
+}
+
+// SetOriginalTraceNumber setter for ACK and ATX OriginalTraceNumber which is underlying IdentificationNumber
+func (ed *EntryDetail) SetOriginalTraceNumber(s string) {
+	ed.IdentificationNumber = s
+}
+
+// ToDo: Deprecate and use SetCATXAddendaRecords
+
 // SetCTXAddendaRecords setter for CTX AddendaRecords characters 1-4 of underlying IndividualName
 func (ed *EntryDetail) SetCTXAddendaRecords(i int) {
 	ed.IndividualName = ed.numericField(i, 4)
 }
+
+// ToDo: Deprecate and use SetCATXReceivingCompany
 
 // SetCTXReceivingCompany setter for CTX ReceivingCompany characters 5-20 underlying IndividualName
 // Position 21-22 of underlying Individual Name are reserved blank space for CTX "  "
@@ -378,18 +425,50 @@ func (ed *EntryDetail) SetCTXReceivingCompany(s string) {
 	ed.IndividualName = ed.IndividualName + ed.alphaField(s, 16) + "  "
 }
 
+// ToDo: Deprecate and use CATXAddendaRecordsField
+
 // CTXAddendaRecordsField is used in CTX files, characters 1-4 of underlying IndividualName field
 func (ed *EntryDetail) CTXAddendaRecordsField() string {
 	return ed.parseStringField(ed.IndividualName[0:4])
 }
+
+// ToDo: Deprecate and use CATXReceivingCompanyField
 
 // CTXReceivingCompanyField is used in CTX files, characters 5-20 of underlying IndividualName field
 func (ed *EntryDetail) CTXReceivingCompanyField() string {
 	return ed.parseStringField(ed.IndividualName[4:20])
 }
 
+// ToDo: Deprecate and use CATXReservedField
+
 // CTXReservedField is used in CTX files, characters 21-22 of underlying IndividualName field
 func (ed *EntryDetail) CTXReservedField() string {
+	return ed.IndividualName[20:22]
+}
+
+// SetCATXAddendaRecords setter for CTX and ATX AddendaRecords characters 1-4 of underlying IndividualName
+func (ed *EntryDetail) SetCATXAddendaRecords(i int) {
+	ed.IndividualName = ed.numericField(i, 4)
+}
+
+// SetCATXReceivingCompany setter for CTX and ATX ReceivingCompany characters 5-20 underlying IndividualName
+// Position 21-22 of underlying Individual Name are reserved blank space for CTX "  "
+func (ed *EntryDetail) SetCATXReceivingCompany(s string) {
+	ed.IndividualName = ed.IndividualName + ed.alphaField(s, 16) + "  "
+}
+
+// CATXAddendaRecordsField is used in CTX and ATX files, characters 1-4 of underlying IndividualName field
+func (ed *EntryDetail) CATXAddendaRecordsField() string {
+	return ed.parseStringField(ed.IndividualName[0:4])
+}
+
+// CATXReceivingCompanyField is used in CTX and ATX files, characters 5-20 of underlying IndividualName field
+func (ed *EntryDetail) CATXReceivingCompanyField() string {
+	return ed.parseStringField(ed.IndividualName[4:20])
+}
+
+// CATXReservedField is used in CTX and ATX files, characters 21-22 of underlying IndividualName field
+func (ed *EntryDetail) CATXReservedField() string {
 	return ed.IndividualName[20:22]
 }
 
@@ -422,7 +501,11 @@ func (ed *EntryDetail) TraceNumberField() string {
 
 // CreditOrDebit returns a "C" for credit or "D" for debit based on the entry TransactionCode
 func (ed *EntryDetail) CreditOrDebit() string {
+	if ed.TransactionCode < 10 || ed.TransactionCode > 99 {
+		return ""
+	}
 	tc := strconv.Itoa(ed.TransactionCode)
+
 	// take the second number in the TransactionCode
 	switch tc[1:2] {
 	case "1", "2", "3", "4":

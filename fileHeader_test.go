@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE File.
 
@@ -285,7 +285,7 @@ func testFHFieldInclusion(t testing.TB) {
 	fh.ImmediateOrigin = ""
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -430,7 +430,7 @@ func testFHFieldInclusionRecordType(t testing.TB) {
 	fh.recordType = ""
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -456,7 +456,7 @@ func testFHFieldInclusionImmediateDestination(t testing.TB) {
 	fh.ImmediateDestination = ""
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -482,7 +482,7 @@ func testFHFieldInclusionFileIDModifier(t testing.TB) {
 	fh.FileIDModifier = ""
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -508,7 +508,7 @@ func testFHFieldInclusionRecordSize(t testing.TB) {
 	fh.recordSize = ""
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -534,7 +534,7 @@ func testFHFieldInclusionBlockingFactor(t testing.TB) {
 	fh.blockingFactor = ""
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -561,7 +561,7 @@ func testFHFieldInclusionFormatCode(t testing.TB) {
 	fh.formatCode = ""
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -587,7 +587,7 @@ func testFHFieldInclusionCreationDate(t testing.TB) {
 	fh.FileCreationDate = time.Time{}
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}

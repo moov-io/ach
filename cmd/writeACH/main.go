@@ -1,23 +1,42 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/moov-io/ach"
 	"log"
 	"os"
+	"path/filepath"
 	"runtime/pprof"
 	"time"
+)
+
+var (
+	fPath      = flag.String("fPath", "", "File Path")
+	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
+
+	// output formats
+	flagJson = flag.Bool("json", false, "Output file in json")
 )
 
 // main creates an ACH File with 4 batches of SEC Code PPD.
 // Each batch contains an EntryAddendaCount of 2500.
 func main() {
-
-	var fPath = flag.String("fPath", "", "File Path")
-	var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
-
 	flag.Parse()
+
+	filename := time.Now().UTC().Format("200601021504")
+	if *flagJson {
+		filename += ".json"
+	} else {
+		filename += ".ach"
+	}
+
+	path := filepath.Join(*fPath, filename)
+	write(path)
+}
+
+func write(path string) {
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
 		if err != nil {
@@ -27,9 +46,7 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	path := *fPath
-
-	f, err := os.Create(path + time.Now().UTC().Format("200601021504") + ".ach")
+	f, err := os.Create(path)
 	if err != nil {
 		fmt.Printf("%T: %s", err, err)
 	}
@@ -93,16 +110,34 @@ func main() {
 		file.AddBatch(batch)
 	}
 
+	// ensure we have a validated file structure
+	if file.Validate(); err != nil {
+		fmt.Printf("Could not validate entire file: %v", err)
+	}
+
 	// Create the file
 	if err := file.Create(); err != nil {
 		fmt.Printf("%T: %s", err, err)
 	}
 
 	// Write to a file
-	w := ach.NewWriter(f)
-	if err := w.Write(file); err != nil {
-		fmt.Printf("%T: %s", err, err)
+	if *flagJson {
+		// Write in JSON format
+		if err := json.NewEncoder(f).Encode(file); err != nil {
+			fmt.Printf("%T: %s", err, err)
+		}
+	} else {
+		// Write in ACH plain text format
+		w := ach.NewWriter(f)
+		if err := w.Write(file); err != nil {
+			fmt.Printf("%T: %s", err, err)
+		}
+		w.Flush()
 	}
-	w.Flush()
-	f.Close()
+
+	if err := f.Close(); err != nil {
+		fmt.Println(err.Error())
+	}
+
+	fmt.Printf("Wrote %s\n", path)
 }

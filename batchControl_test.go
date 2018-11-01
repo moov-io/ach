@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -282,7 +282,7 @@ func testBCFieldInclusionRecordType(t testing.TB) {
 	bc.recordType = ""
 	if err := bc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -308,7 +308,7 @@ func testBCFieldInclusionServiceClassCode(t testing.TB) {
 	bc.ServiceClassCode = 0
 	if err := bc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -334,7 +334,7 @@ func testBCFieldInclusionODFIIdentification(t testing.TB) {
 	bc.ODFIIdentification = "000000000"
 	if err := bc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}

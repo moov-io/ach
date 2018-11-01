@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 // BatchControl contains entry counts, dollar total and has totals for all
@@ -72,6 +73,10 @@ type BatchControl struct {
 
 // Parse takes the input record string and parses the EntryDetail values
 func (bc *BatchControl) Parse(record string) {
+	if utf8.RuneCountInString(record) != 94 {
+		return
+	}
+
 	// 1-1 Always "8"
 	bc.recordType = "8"
 	// 2-4 This is the same as the "Service code" field in previous Batch Header Record
@@ -154,13 +159,24 @@ func (bc *BatchControl) Validate() error {
 // invalid the ACH transfer will be returned.
 func (bc *BatchControl) fieldInclusion() error {
 	if bc.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: bc.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     bc.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewBatchControl()?"}
 	}
 	if bc.ServiceClassCode == 0 {
-		return &FieldError{FieldName: "ServiceClassCode", Value: strconv.Itoa(bc.ServiceClassCode), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "ServiceClassCode",
+			Value:     strconv.Itoa(bc.ServiceClassCode),
+			Msg:       msgFieldInclusion + ", did you use NewBatchControl()?",
+		}
 	}
 	if bc.ODFIIdentification == "000000000" {
-		return &FieldError{FieldName: "ODFIIdentification", Value: bc.ODFIIdentificationField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "ODFIIdentification",
+			Value:     bc.ODFIIdentificationField(),
+			Msg:       msgFieldInclusion + ", did you use NewBatchControl()?",
+		}
 	}
 	return nil
 }

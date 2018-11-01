@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -163,7 +163,7 @@ func testFCFieldInclusion(t testing.TB) {
 	fc.BatchCount = 0
 	if err := fc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -189,7 +189,7 @@ func testFCFieldInclusionRecordType(t testing.TB) {
 	fc.recordType = ""
 	if err := fc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -215,7 +215,7 @@ func testFCFieldInclusionBlockCount(t testing.TB) {
 	fc.BlockCount = 0
 	if err := fc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -241,7 +241,7 @@ func testFCFieldInclusionEntryAddendaCount(t testing.TB) {
 	fc.EntryAddendaCount = 0
 	if err := fc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -267,7 +267,7 @@ func testFCFieldInclusionEntryHash(t testing.TB) {
 	fc.EntryHash = 0
 	if err := fc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}

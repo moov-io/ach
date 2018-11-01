@@ -1,14 +1,13 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
-// Package ach reads and writes (ACH) Automated Clearing House files. ACH is the
-// primary method of electronic money movement through the United States.
-//
-// https://en.wikipedia.org/wiki/Automated_Clearing_House
 package ach
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 )
@@ -48,7 +47,7 @@ type FileError struct {
 	Msg       string
 }
 
-func (e *FileError) Error() string {
+func (e FileError) Error() string {
 	return fmt.Sprintf("%s %s", e.FieldName, e.Msg)
 }
 
@@ -74,6 +73,84 @@ func NewFile() *File {
 		Header:  NewFileHeader(),
 		Control: NewFileControl(),
 	}
+}
+
+type fileHeader struct {
+	Header FileHeader `json:"fileHeader"`
+}
+
+type fileControl struct {
+	Control FileControl `json:"fileControl"`
+}
+
+// FileFromJson attempts to return a *File object assuming the input is valid JSON.
+//
+// Callers should always check for a nil-error before using the returned file.
+func FileFromJson(bs []byte) (*File, error) {
+	// Copy bs for the second read
+	backup := make([]byte, len(bs))
+	n := copy(backup, bs)
+	if n == 0 {
+		return nil, errors.New("no json data provided")
+	}
+
+	// Read FileHeader
+	header := fileHeader{
+		Header: NewFileHeader(),
+	}
+	if err := json.NewDecoder(bytes.NewReader(bs)).Decode(&header); err != nil {
+		return nil, fmt.Errorf("problem reading FileHeader: %v", err)
+	}
+
+	// Read FileControl
+	control := fileControl{
+		Control: NewFileControl(),
+	}
+	if err := json.NewDecoder(bytes.NewReader(bs)).Decode(&control); err != nil {
+		return nil, fmt.Errorf("problem reading FileControl: %v", err)
+	}
+
+	// Build resulting file
+	file := NewFile()
+	if err := file.setBatchesFromJson(backup); err != nil {
+		return nil, err
+	}
+	file.Header = header.Header
+	file.Control = control.Control
+	return file, nil
+}
+
+func (f *File) UnmarshalJSON(p []byte) error {
+	return errors.New("json struct tag unmarshal is deprecated, use ach.FileFromJSON instead.")
+}
+
+type batchesJSON struct {
+	Batches []*batch `json:"batches"`
+}
+
+// setBatchesFromJson takes bs as JSON and attempts to read out all the Batches within.
+//
+// We have to break this out as Batcher is an interface (and can't be read by Go's
+// json struct tag decoding).
+func (f *File) setBatchesFromJson(bs []byte) error {
+	var batches batchesJSON
+	if err := json.Unmarshal(bs, &batches); err != nil {
+		return err
+	}
+	// Clear out any nil batchs
+	for i := range f.Batches {
+		if f.Batches[i] == nil {
+			f.Batches = append(f.Batches[:i], f.Batches[i+1:]...)
+		}
+	}
+	// Add new batches to file
+	for i := range batches.Batches {
+		if batches.Batches[i] == nil {
+			continue
+		}
+		f.Batches = append(f.Batches, batches.Batches[i])
+	}
+	return nil
 }
 
 // Create creates a valid file and requires that the FileHeader and at least one Batch
@@ -173,15 +250,18 @@ func (f *File) Validate() error {
 		msg := fmt.Sprintf(msgFileCalculatedControlEquality, len(f.Batches), f.Control.BatchCount)
 		return &FileError{FieldName: "BatchCount", Value: strconv.Itoa(len(f.Batches)), Msg: msg}
 	}
-
+	if err := f.Header.Validate(); err != nil {
+		return err
+	}
+	if err := f.Control.Validate(); err != nil {
+		return err
+	}
 	if err := f.isEntryAddendaCount(); err != nil {
 		return err
 	}
-
 	if err := f.isFileAmount(); err != nil {
 		return err
 	}
-
 	return f.isEntryHash()
 }
 

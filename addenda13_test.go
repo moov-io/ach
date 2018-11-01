@@ -1,10 +1,11 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
 package ach
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -28,8 +29,8 @@ func testAddenda13Parse(t testing.TB) {
 	if Addenda13.recordType != "7" {
 		t.Errorf("expected %v got %v", "7", Addenda13.recordType)
 	}
-	if Addenda13.typeCode != "13" {
-		t.Errorf("expected %v got %v", "13", Addenda13.typeCode)
+	if Addenda13.TypeCode != "13" {
+		t.Errorf("expected %v got %v", "13", Addenda13.TypeCode)
 	}
 	if Addenda13.ODFIName != "Wells Fargo" {
 		t.Errorf("expected %v got %v", "Wells Fargo", Addenda13.ODFIName)
@@ -103,7 +104,7 @@ func BenchmarkAddenda13ValidRecordType(b *testing.B) {
 // testAddenda13ValidTypeCode validates Addenda13 TypeCode
 func testAddenda13ValidTypeCode(t testing.TB) {
 	addenda13 := mockAddenda13()
-	addenda13.typeCode = "65"
+	addenda13.TypeCode = "65"
 	if err := addenda13.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -128,10 +129,10 @@ func BenchmarkAddenda13ValidTypeCode(b *testing.B) {
 	}
 }
 
-// testAddenda13TypeCode13 TypeCode is 13 if typeCode is a valid TypeCode
+// testAddenda13TypeCode13 TypeCode is 13 if TypeCode is a valid TypeCode
 func testAddenda13TypeCode13(t testing.TB) {
 	addenda13 := mockAddenda13()
-	addenda13.typeCode = "05"
+	addenda13.TypeCode = "05"
 	if err := addenda13.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TypeCode" {
@@ -143,12 +144,12 @@ func testAddenda13TypeCode13(t testing.TB) {
 	}
 }
 
-// TestAddenda13TypeCode13 tests TypeCode is 13 if typeCode is a valid TypeCode
+// TestAddenda13TypeCode13 tests TypeCode is 13 if TypeCode is a valid TypeCode
 func TestAddenda13TypeCode13(t *testing.T) {
 	testAddenda13TypeCode13(t)
 }
 
-// BenchmarkAddenda13TypeCode13 benchmarks TypeCode is 13 if typeCode is a valid TypeCode
+// BenchmarkAddenda13TypeCode13 benchmarks TypeCode is 13 if TypeCode is a valid TypeCode
 func BenchmarkAddenda13TypeCode13(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -266,7 +267,7 @@ func testAddenda13FieldInclusionRecordType(t testing.TB) {
 	addenda13.recordType = ""
 	if err := addenda13.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -289,10 +290,10 @@ func BenchmarkAddenda13FieldInclusionRecordType(b *testing.B) {
 // testAddenda13FieldInclusionTypeCode validates TypeCode fieldInclusion
 func testAddenda13FieldInclusionTypeCode(t testing.TB) {
 	addenda13 := mockAddenda13()
-	addenda13.typeCode = ""
+	addenda13.TypeCode = ""
 	if err := addenda13.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -318,7 +319,7 @@ func testAddenda13FieldInclusionODFIName(t testing.TB) {
 	addenda13.ODFIName = ""
 	if err := addenda13.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -344,7 +345,7 @@ func testAddenda13FieldInclusionODFIIDNumberQualifier(t testing.TB) {
 	addenda13.ODFIIDNumberQualifier = ""
 	if err := addenda13.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -370,7 +371,7 @@ func testAddenda13FieldInclusionODFIIdentification(t testing.TB) {
 	addenda13.ODFIIdentification = ""
 	if err := addenda13.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -396,7 +397,7 @@ func testAddenda13FieldInclusionODFIBranchCountryCode(t testing.TB) {
 	addenda13.ODFIBranchCountryCode = ""
 	if err := addenda13.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -422,7 +423,7 @@ func testAddenda13FieldInclusionEntryDetailSequenceNumber(t testing.TB) {
 	addenda13.EntryDetailSequenceNumber = 0
 	if err := addenda13.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldInclusion {
+			if !strings.Contains(e.Msg, msgFieldInclusion) {
 				t.Errorf("%T: %s", err, err)
 			}
 		}
@@ -453,8 +454,8 @@ func testAddenda13String(t testing.TB) {
 	if addenda13.String() != line {
 		t.Errorf("Strings do not match")
 	}
-	if addenda13.TypeCode() != "13" {
-		t.Errorf("TypeCode Expected 13 got: %v", addenda13.TypeCode())
+	if addenda13.TypeCode != "13" {
+		t.Errorf("TypeCode Expected 13 got: %v", addenda13.TypeCode)
 	}
 }
 

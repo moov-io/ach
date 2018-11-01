@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -21,7 +21,7 @@ type Addenda14 struct {
 	// RecordType defines the type of record in the block.
 	recordType string
 	// TypeCode Addenda14 types code '14'
-	typeCode string
+	TypeCode string `json:"typeCode"`
 	// Receiving DFI Name
 	// Name of the Receiver's bank
 	RDFIName string `json:"RDFIName"`
@@ -61,7 +61,7 @@ type Addenda14 struct {
 func NewAddenda14() *Addenda14 {
 	addenda14 := new(Addenda14)
 	addenda14.recordType = "7"
-	addenda14.typeCode = "14"
+	addenda14.TypeCode = "14"
 	return addenda14
 }
 
@@ -70,7 +70,7 @@ func (addenda14 *Addenda14) Parse(record string) {
 	// 1-1 Always "7"
 	addenda14.recordType = "7"
 	// 2-3 Always 14
-	addenda14.typeCode = record[1:3]
+	addenda14.TypeCode = record[1:3]
 	// 4-38 RDFIName
 	addenda14.RDFIName = strings.TrimSpace(record[3:38])
 	// 39-40 RDFIIDNumberQualifier
@@ -90,7 +90,7 @@ func (addenda14 *Addenda14) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
 	buf.WriteString(addenda14.recordType)
-	buf.WriteString(addenda14.typeCode)
+	buf.WriteString(addenda14.TypeCode)
 	buf.WriteString(addenda14.RDFINameField())
 	buf.WriteString(addenda14.RDFIIDNumberQualifierField())
 	buf.WriteString(addenda14.RDFIIdentificationField())
@@ -110,12 +110,12 @@ func (addenda14 *Addenda14) Validate() error {
 		msg := fmt.Sprintf(msgRecordType, 7)
 		return &FieldError{FieldName: "recordType", Value: addenda14.recordType, Msg: msg}
 	}
-	if err := addenda14.isTypeCode(addenda14.typeCode); err != nil {
-		return &FieldError{FieldName: "TypeCode", Value: addenda14.typeCode, Msg: err.Error()}
+	if err := addenda14.isTypeCode(addenda14.TypeCode); err != nil {
+		return &FieldError{FieldName: "TypeCode", Value: addenda14.TypeCode, Msg: err.Error()}
 	}
 	// Type Code must be 14
-	if addenda14.typeCode != "14" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda14.typeCode, Msg: msgAddendaTypeCode}
+	if addenda14.TypeCode != "14" {
+		return &FieldError{FieldName: "TypeCode", Value: addenda14.TypeCode, Msg: msgAddendaTypeCode}
 	}
 	if err := addenda14.isAlphanumeric(addenda14.RDFIName); err != nil {
 		return &FieldError{FieldName: "RDFIName",
@@ -141,30 +141,53 @@ func (addenda14 *Addenda14) Validate() error {
 // invalid the ACH transfer will be returned.
 func (addenda14 *Addenda14) fieldInclusion() error {
 	if addenda14.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: addenda14.recordType, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "recordType",
+			Value:     addenda14.recordType,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda14()?",
+		}
 	}
-	if addenda14.typeCode == "" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda14.typeCode, Msg: msgFieldInclusion}
+	if addenda14.TypeCode == "" {
+		return &FieldError{
+			FieldName: "TypeCode",
+			Value:     addenda14.TypeCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda14()?",
+		}
 	}
 	if addenda14.RDFIName == "" {
-		return &FieldError{FieldName: "RDFIName",
-			Value: addenda14.RDFIName, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "RDFIName",
+			Value:     addenda14.RDFIName,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda14()?",
+		}
 	}
 	if addenda14.RDFIIDNumberQualifier == "" {
-		return &FieldError{FieldName: "RDFIIDNumberQualifier",
-			Value: addenda14.RDFIIDNumberQualifier, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "RDFIIDNumberQualifier",
+			Value:     addenda14.RDFIIDNumberQualifier,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda14()?",
+		}
 	}
 	if addenda14.RDFIIdentification == "" {
-		return &FieldError{FieldName: "RDFIIdentification",
-			Value: addenda14.RDFIIdentification, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "RDFIIdentification",
+			Value:     addenda14.RDFIIdentification,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda14()?",
+		}
 	}
 	if addenda14.RDFIBranchCountryCode == "" {
-		return &FieldError{FieldName: "RDFIBranchCountryCode",
-			Value: addenda14.RDFIBranchCountryCode, Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "RDFIBranchCountryCode",
+			Value:     addenda14.RDFIBranchCountryCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda14()?",
+		}
 	}
 	if addenda14.EntryDetailSequenceNumber == 0 {
-		return &FieldError{FieldName: "EntryDetailSequenceNumber",
-			Value: addenda14.EntryDetailSequenceNumberField(), Msg: msgFieldInclusion}
+		return &FieldError{
+			FieldName: "EntryDetailSequenceNumber",
+			Value:     addenda14.EntryDetailSequenceNumberField(),
+			Msg:       msgFieldInclusion + ", did you use NewAddenda14()?",
+		}
 	}
 	return nil
 }
@@ -192,11 +215,6 @@ func (addenda14 *Addenda14) RDFIBranchCountryCodeField() string {
 // reservedField gets reserved - blank space
 func (addenda14 *Addenda14) reservedField() string {
 	return addenda14.alphaField(addenda14.reserved, 10)
-}
-
-// TypeCode Defines the specific explanation and format for the addenda14 information left padded
-func (addenda14 *Addenda14) TypeCode() string {
-	return addenda14.typeCode
 }
 
 // EntryDetailSequenceNumberField returns a zero padded EntryDetailSequenceNumber string

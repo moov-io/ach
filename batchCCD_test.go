@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -96,6 +96,42 @@ func BenchmarkBatchCCDAddendumCount(b *testing.B) {
 	}
 }
 
+// TestBatchCCDAddendum98 validates Addenda98 returns an error
+func TestBatchCCDAddendum98(t *testing.T) {
+	mockBatch := NewBatchCCD(mockBatchCCDHeader())
+	mockBatch.AddEntry(mockCCDEntryDetail())
+	mockAddenda98 := mockAddenda98()
+	mockAddenda98.TypeCode = "05"
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98)
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchCCDAddendum99 validates Addenda99 returns an error
+func TestBatchCCDAddendum99(t *testing.T) {
+	mockBatch := NewBatchCCD(mockBatchCCDHeader())
+	mockBatch.AddEntry(mockCCDEntryDetail())
+	mockAddenda99 := mockAddenda99()
+	mockAddenda99.TypeCode = "05"
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda99)
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
 // testBatchCCDReceivingCompanyName validates Receiving company / Individual name is a mandatory field
 func testBatchCCDReceivingCompanyName(t testing.TB) {
 	mockBatch := mockBatchCCD()
@@ -128,7 +164,7 @@ func BenchmarkBatchCCDReceivingCompanyName(b *testing.B) {
 // testBatchCCDAddendaTypeCode validates addenda type code is 05
 func testBatchCCDAddendaTypeCode(t testing.TB) {
 	mockBatch := mockBatchCCD()
-	mockBatch.GetEntries()[0].Addendum[0].(*Addenda05).typeCode = "07"
+	mockBatch.GetEntries()[0].Addendum[0].(*Addenda05).TypeCode = "07"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {

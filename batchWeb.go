@@ -11,10 +11,6 @@ type BatchWEB struct {
 	batch
 }
 
-var (
-	msgBatchWebPaymentType = "%v is not a valid payment type S (single entry) or R (recurring)"
-)
-
 // NewBatchWEB returns a *BatchWEB
 func NewBatchWEB(bh *BatchHeader) *BatchWEB {
 	batch := new(BatchWEB)
@@ -29,22 +25,36 @@ func (batch *BatchWEB) Validate() error {
 	if err := batch.verify(); err != nil {
 		return err
 	}
-	// Add configuration based validation for this type.
-	// Web can have up to one addenda per entry record
-	if err := batch.isAddendaCount(1); err != nil {
-		return err
-	}
-	if err := batch.isTypeCode("05"); err != nil {
-		return err
-	}
-
-	// Add type specific validation.
+	// Add configuration and type specific validation for this type.
 	if batch.Header.StandardEntryClassCode != "WEB" {
 		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "WEB")
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
-	return batch.isPaymentTypeCode()
+	for _, entry := range batch.Entries {
+		// WEB can have up to one Addenda Record TypeCode = 05, or there can be a NOC (98) or Return (99)
+		for _, addenda := range entry.Addendum {
+			switch entry.Category {
+			case CategoryForward:
+				if err := batch.categoryForwardAddenda05(entry, addenda); err != nil {
+					return err
+				}
+				if len(entry.Addendum) > 1 {
+					msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+				}
+			case CategoryNOC:
+				if err := batch.categoryNOCAddenda98(entry, addenda); err != nil {
+					return err
+				}
+			case CategoryReturn:
+				if err := batch.categoryReturnAddenda99(entry, addenda); err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
 }
 
 // Create builds the batch sequence numbers and batch control. Additional creation

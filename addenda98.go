@@ -1,4 +1,4 @@
-// Copyright 2018 The ACH Authors
+// Copyright 2018 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -17,7 +17,7 @@ type Addenda98 struct {
 	// RecordType defines the type of record in the block. entryAddendaPos 7
 	recordType string
 	// TypeCode Addenda types code '98'
-	typeCode string
+	TypeCode string `json:"typeCode"`
 	// ChangeCode field contains a standard code used by an ACH Operator or RDFI to describe the reason for a change Entry.
 	// Must exist in changeCodeDict
 	ChangeCode string `json:"changeCode"`
@@ -61,7 +61,7 @@ type changeCode struct {
 func NewAddenda98() *Addenda98 {
 	addenda98 := &Addenda98{
 		recordType: "7",
-		typeCode:   "98",
+		TypeCode:   "98",
 	}
 	return addenda98
 }
@@ -71,7 +71,7 @@ func (addenda98 *Addenda98) Parse(record string) {
 	// 1-1 Always "7"
 	addenda98.recordType = "7"
 	// 2-3 Always "98"
-	addenda98.typeCode = record[1:3]
+	addenda98.TypeCode = record[1:3]
 	// 4-6
 	addenda98.ChangeCode = record[3:6]
 	// 7-21
@@ -89,7 +89,7 @@ func (addenda98 *Addenda98) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
 	buf.WriteString(addenda98.recordType)
-	buf.WriteString(addenda98.TypeCode())
+	buf.WriteString(addenda98.typeCode())
 	buf.WriteString(addenda98.ChangeCode)
 	buf.WriteString(addenda98.OriginalTraceField())
 	buf.WriteString("      ") // 6 char reserved field
@@ -106,12 +106,16 @@ func (addenda98 *Addenda98) Validate() error {
 		msg := fmt.Sprintf(msgRecordType, 7)
 		return &FieldError{FieldName: "recordType", Value: addenda98.recordType, Msg: msg}
 	}
-	if addenda98.typeCode == "" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda98.typeCode, Msg: msgFieldInclusion}
+	if addenda98.TypeCode == "" {
+		return &FieldError{
+			FieldName: "TypeCode",
+			Value:     addenda98.TypeCode,
+			Msg:       msgFieldInclusion + ", did you use NewAddenda98()?",
+		}
 	}
 	// Type Code must be 98
-	if addenda98.typeCode != "98" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda98.typeCode, Msg: msgAddendaTypeCode}
+	if addenda98.TypeCode != "98" {
+		return &FieldError{FieldName: "TypeCode", Value: addenda98.TypeCode, Msg: msgAddendaTypeCode}
 	}
 
 	// Addenda98 requires a valid ChangeCode
@@ -129,8 +133,8 @@ func (addenda98 *Addenda98) Validate() error {
 }
 
 // TypeCode defines the format of the underlying addenda record
-func (addenda98 *Addenda98) TypeCode() string {
-	return addenda98.typeCode
+func (addenda98 *Addenda98) typeCode() string {
+	return addenda98.TypeCode
 }
 
 // OriginalTraceField returns a zero padded OriginalTrace string
