@@ -138,7 +138,7 @@ func (fc *FileControl) fieldInclusion() error {
 	}
 	if fc.EntryHash == 0 {
 		return &FieldError{
-			FieldName: "EntryAddendaCount",
+			FieldName: "EntryHash",
 			Value:     fc.EntryAddendaCountField(),
 			Msg:       msgFieldInclusion + ", did you use NewFileControl()?",
 		}
