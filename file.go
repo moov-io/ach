@@ -75,6 +75,14 @@ func NewFile() *File {
 	}
 }
 
+type file struct {
+	ID string `json:"id"`
+
+	// TODO(adam): support other JSON attributes
+	// NotificationOfChange []*BatchCOR
+	// ReturnEntries []Batcher
+}
+
 type fileHeader struct {
 	Header FileHeader `json:"fileHeader"`
 }
@@ -87,12 +95,17 @@ type fileControl struct {
 //
 // Callers should always check for a nil-error before using the returned file.
 func FileFromJson(bs []byte) (*File, error) {
-	// Copy bs for the second read
-	backup := make([]byte, len(bs))
-	n := copy(backup, bs)
-	if n == 0 {
-		return nil, errors.New("no json data provided")
+	if len(bs) == 0 {
+		return nil, errors.New("no JSON data provided")
 	}
+
+	// read file root level
+	var f file
+	file := NewFile()
+	if err := json.NewDecoder(bytes.NewReader(bs)).Decode(&f); err != nil {
+		return nil, fmt.Errorf("problem reading File: %v", err)
+	}
+	file.ID = f.ID
 
 	// Read FileHeader
 	header := fileHeader{
@@ -111,8 +124,7 @@ func FileFromJson(bs []byte) (*File, error) {
 	}
 
 	// Build resulting file
-	file := NewFile()
-	if err := file.setBatchesFromJson(backup); err != nil {
+	if err := file.setBatchesFromJson(bs); err != nil {
 		return nil, err
 	}
 	file.Header = header.Header
