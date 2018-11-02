@@ -45,6 +45,8 @@ func NewBatch(bh *BatchHeader) (Batcher, error) {
 		return NewBatchCTX(bh), nil
 	case "DNE":
 		return NewBatchDNE(bh), nil
+	case "ENR":
+		return NewBatchENR(bh), nil
 	case "IAT":
 		msg := fmt.Sprintf(msgFileIATSEC, bh.StandardEntryClassCode)
 		return nil, &FileError{FieldName: "StandardEntryClassCode", Value: bh.StandardEntryClassCode, Msg: msg}

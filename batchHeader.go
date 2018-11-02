@@ -295,7 +295,12 @@ func (bh *BatchHeader) CompanyDescriptiveDateField() string {
 
 // EffectiveEntryDateField get the EffectiveEntryDate in YYMMDD format
 func (bh *BatchHeader) EffectiveEntryDateField() string {
-	return bh.formatSimpleDate(bh.EffectiveEntryDate)
+	// ENR records require EffectiveEntryDate to be space filled. NACHA Page OR108
+	if bh.CompanyEntryDescription == "AUTOENROLL" {
+		return bh.alphaField("", 6) // YYMMDD
+	} else {
+		return bh.formatSimpleDate(bh.EffectiveEntryDate)
+	}
 }
 
 // ODFIIdentificationField get the odfi number zero padded
