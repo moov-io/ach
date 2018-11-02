@@ -1,0 +1,296 @@
+// Copyright 2018 The Moov Authors
+// Use of this source code is governed by an Apache License
+// license that can be found in the LICENSE file.
+
+package ach
+
+import (
+	"log"
+	"testing"
+	"time"
+)
+
+// mockBatchDNEHeader creates a DNE batch header
+func mockBatchDNEHeader() *BatchHeader {
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = 220
+	bh.CompanyName = "Name on Account"
+	bh.CompanyIdentification = "231380104"
+	bh.StandardEntryClassCode = "DNE"
+	bh.CompanyEntryDescription = "Death"
+	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
+	bh.ODFIIdentification = "23138010"
+	bh.OriginatorStatusCode = 2
+	return bh
+}
+
+// mockDNEEntryDetail creates a DNE entry detail
+func mockDNEEntryDetail() *EntryDetail {
+	entry := NewEntryDetail()
+	entry.TransactionCode = 21
+	entry.SetRDFI("031300012")
+	entry.DFIAccountNumber = "744-5678-99"
+	entry.Amount = 0
+	entry.SetOriginalTraceNumber("031300010000001")
+	entry.SetReceivingCompany("Best. #1")
+	entry.SetTraceNumber("23138010", 1)
+
+	addenda := NewAddenda05()
+	addenda.PaymentRelatedInformation = `21*12200004*3*123987654321*777777777*DOE*JOHN*0\`
+	entry.AddAddenda(addenda)
+
+	return entry
+}
+
+// mockBatchDNE creates a DNE batch
+func mockBatchDNE() *BatchDNE {
+	batch := NewBatchDNE(mockBatchDNEHeader())
+	batch.AddEntry(mockDNEEntryDetail())
+	if err := batch.Create(); err != nil {
+		log.Fatalf("Unexpected error building batch: %s\n", err)
+	}
+	return batch
+}
+
+// testBatchDNEHeader creates a DNE batch header
+func testBatchDNEHeader(t testing.TB) {
+	batch, _ := NewBatch(mockBatchDNEHeader())
+	_, ok := batch.(*BatchDNE)
+	if !ok {
+		t.Error("Expecting BatchDNE")
+	}
+}
+
+// TestBatchDNEHeader tests creating a DNE batch header
+func TestBatchDNEHeader(t *testing.T) {
+	testBatchDNEHeader(t)
+}
+
+// BenchmarkBatchDNEHeader benchmark creating a DNE batch header
+func BenchmarkBatchDNEHeader(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchDNEHeader(b)
+	}
+}
+
+// testBatchDNEAddendumCount batch control DNE can only have one addendum per entry detail
+func testBatchDNEAddendumCount(t testing.TB) {
+	mockBatch := mockBatchDNE()
+	// Adding a second addenda to the mock entry
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "EntryAddendaCount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchDNEAddendumCount tests batch control DNE can only have one addendum per entry detail
+func TestBatchDNEAddendumCount(t *testing.T) {
+	testBatchDNEAddendumCount(t)
+}
+
+// BenchmarkBatchDNEAddendumCount benchmarks batch control DNE can only have one addendum per entry detail
+func BenchmarkBatchDNEAddendumCount(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchDNEAddendumCount(b)
+	}
+}
+
+// TestBatchDNEAddendum98 validates Addenda05 returns an error
+func TestBatchDNEAddendum98(t *testing.T) {
+	mockBatch := NewBatchDNE(mockBatchDNEHeader())
+	mockBatch.AddEntry(mockDNEEntryDetail())
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// testBatchDNEReceivingCompanyName validates Receiving company / Individual name is a mandatory field
+func testBatchDNEReceivingCompanyName(t testing.TB) {
+	mockBatch := mockBatchDNE()
+	// modify the Individual name / receiving company to nothing
+	mockBatch.GetEntries()[0].SetReceivingCompany("")
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "IndividualName" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchDNEReceivingCompanyName tests validating receiving company / Individual name is a mandatory field
+func TestBatchDNEReceivingCompanyName(t *testing.T) {
+	testBatchDNEReceivingCompanyName(t)
+}
+
+// BenchmarkBatchDNEReceivingCompanyName benchmarks validating receiving company / Individual name is a mandatory field
+func BenchmarkBatchDNEReceivingCompanyName(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchDNEReceivingCompanyName(b)
+	}
+}
+
+// testBatchDNEAddendaTypeCode validates addenda type code is 05
+func testBatchDNEAddendaTypeCode(t testing.TB) {
+	mockBatch := mockBatchDNE()
+	mockBatch.GetEntries()[0].Addendum[0].(*Addenda05).TypeCode = "05"
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TypeCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchDNEAddendaTypeCode tests validating addenda type code is 05
+func TestBatchDNEAddendaTypeCode(t *testing.T) {
+	testBatchDNEAddendaTypeCode(t)
+}
+
+// BenchmarkBatchDNEAddendaTypeCod benchmarks validating addenda type code is 05
+func BenchmarkBatchDNEAddendaTypeCode(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchDNEAddendaTypeCode(b)
+	}
+}
+
+// testBatchDNESEC validates that the standard entry class code is DNE for batchDNE
+func testBatchDNESEC(t testing.TB) {
+	mockBatch := mockBatchDNE()
+	mockBatch.Header.StandardEntryClassCode = "ACK"
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "StandardEntryClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchDNESEC tests validating that the standard entry class code is DNE for batchDNE
+func TestBatchDNESEC(t *testing.T) {
+	testBatchDNESEC(t)
+}
+
+// BenchmarkBatchDNESEC benchmarks validating that the standard entry class code is DNE for batch DNE
+func BenchmarkBatchDNESEC(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchDNESEC(b)
+	}
+}
+
+// testBatchDNEAddendaCount validates batch DNE addenda count
+func testBatchDNEAddendaCount(t testing.TB) {
+	mockBatch := mockBatchDNE()
+	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "AddendaCount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchDNEAddendaCount tests validating batch DNE addenda count
+func TestBatchDNEAddendaCount(t *testing.T) {
+	testBatchDNEAddendaCount(t)
+}
+
+// BenchmarkBatchDNEAddendaCount benchmarks validating batch DNE addenda count
+func BenchmarkBatchDNEAddendaCount(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchDNEAddendaCount(b)
+	}
+}
+
+// testBatchDNEServiceClassCode validates ServiceClassCode
+func testBatchDNEServiceClassCode(t testing.TB) {
+	mockBatch := mockBatchDNE()
+	// Batch Header information is required to Create a batch.
+	mockBatch.GetHeader().ServiceClassCode = 0
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ServiceClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchDNEServiceClassCode tests validating ServiceClassCode
+func TestBatchDNEServiceClassCode(t *testing.T) {
+	testBatchDNEServiceClassCode(t)
+}
+
+// BenchmarkBatchDNEServiceClassCode benchmarks validating ServiceClassCode
+func BenchmarkBatchDNEServiceClassCode(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchDNEServiceClassCode(b)
+	}
+}
+
+// TestBatchDNEAmount validates Amount
+func TestBatchDNEAmount(t *testing.T) {
+	mockBatch := mockBatchDNE()
+	// Batch Header information is required to Create a batch.
+	mockBatch.GetEntries()[0].Amount = 25000
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Amount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchDNETransactionCode validates TransactionCode
+func TestBatchDNETransactionCode(t *testing.T) {
+	mockBatch := mockBatchDNE()
+	mockBatch.GetEntries()[0].TransactionCode = 21
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TransactionCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
