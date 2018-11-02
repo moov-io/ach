@@ -23,6 +23,7 @@ ACH is under active development but already in production for multiple companies
 	* CIE (Customer-Initiated Entry)
 	* COR (Automated Notification of Change(NOC))
 	* CTX (Corporate Trade Exchange)
+    * DNE (Death Notification Entry)
 	* IAT (International ACH Transactions)
 	* POP (Point of Purchase)
 	* POS (Point of Sale)
