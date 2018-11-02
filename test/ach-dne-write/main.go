@@ -45,9 +45,9 @@ func main() {
 	entry.SetTraceNumber(bh.ODFIIdentification, 1)
 
 	addenda := ach.NewAddenda05()
-	addenda.PaymentRelatedInformation = `22*12200004*3*123987654321*777777777*DOE*JOHN*0\` // From NACHA 2013 Official Rules
-	entry.AddendaRecordIndicator = 1
+	addenda.PaymentRelatedInformation = `    DATE OF DEATH*010218*CUSTOMERSSN*#########*AMOUNT*$$$$.cc\` // From NACHA 2013 Official Rules
 	entry.AddAddenda05(addenda)
+	entry.AddendaRecordIndicator = 1
 
 	// build the batch
 	batch := ach.NewBatchDNE(bh)

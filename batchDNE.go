@@ -6,6 +6,7 @@ package ach
 
 import (
 	"fmt"
+	"strings"
 )
 
 // BatchDNE is a batch file that handles SEC code Death Notification Entry (DNE)
@@ -59,6 +60,10 @@ func (batch *BatchDNE) Validate() error {
 			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addenda05), 1, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 		}
+		// Verify Addenda* FieldInclusion based on entry.Category and batchHeader.StandardEntryClassCode
+		if err := batch.addendaFieldInclusion(entry); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -70,4 +75,33 @@ func (batch *BatchDNE) Create() error {
 		return err
 	}
 	return batch.Validate()
+}
+
+// details returns the Date of Death (YYMMDD), Customer SSN (9 digits), and Amount ($$$$.cc)
+// from the Addenda05 record. This method assumes the addenda05 PaymentRelatedInformation is valid.
+func (batch *BatchDNE) details() (string, string, string) {
+	addendas := batch.Entries[0].Addenda05
+	if len(addendas) != 1 {
+		return "", "", ""
+	}
+	line := addendas[0].PaymentRelatedInformation
+	return line[18:24], line[37:46], strings.TrimSuffix(line[54:], `\`)
+}
+
+// DateOfDeath returns the YYMMDD string from Addenda05's PaymentRelatedInformation
+func (batch *BatchDNE) DateOfDeath() string {
+	date, _, _ := batch.details()
+	return date
+}
+
+// CustomerSSN returns the SSN string from Addenda05's PaymentRelatedInformation
+func (batch *BatchDNE) CustomerSSN() string {
+	_, ssn, _ := batch.details()
+	return ssn
+}
+
+// Amount returns the amount to be dispursed to the named beneficiary from Addenda05's PaymentRelatedInformation.
+func (batch *BatchDNE) Amount() string {
+	_, _, amount := batch.details()
+	return amount
 }
