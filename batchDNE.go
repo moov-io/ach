@@ -8,11 +8,6 @@ import (
 	"fmt"
 )
 
-var (
-	msgBatchDNEAddenda     = "found and 1 Addenda05 is required for SEC Type DNE"
-	msgBatchDNEAddendaType = "%T found where Addenda05 is required for SEC type DNE"
-)
-
 // BatchDNE is a batch file that handles SEC code Death Notification Entry (DNE)
 // United States Federal agencies (e.g. Social Security) use this to notify depository
 // financial institutions that the recipient of government benefit paymetns has died.

@@ -444,3 +444,22 @@ func TestBatchARCAddendum99(t *testing.T) {
 		}
 	}
 }
+
+// TestBatchARCAddendum99Category validates Addenda99 returns an error
+func TestBatchARCAddendum99Category(t *testing.T) {
+	mockBatch := NewBatchARC(mockBatchARCHeader())
+	mockBatch.AddEntry(mockARCEntryDetail())
+	mockAddenda99 := mockAddenda99()
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
+	mockBatch.GetEntries()[0].Category = CategoryForward
+	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addenda99" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}

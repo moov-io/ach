@@ -339,3 +339,21 @@ func TestBatchACKTransactionCode(t *testing.T) {
 		}
 	}
 }
+
+// TestBatchACKAddendum99Category validates Addenda99 returns an error
+func TestBatchACKAddendum99Category(t *testing.T) {
+	mockBatch := NewBatchACK(mockBatchACKHeader())
+	mockBatch.AddEntry(mockACKEntryDetail())
+	mockAddenda99 := mockAddenda99()
+	mockBatch.GetEntries()[0].Category = CategoryForward
+	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addenda99" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
