@@ -142,8 +142,3 @@ func (addenda05 *Addenda05) SequenceNumberField() string {
 func (addenda05 *Addenda05) EntryDetailSequenceNumberField() string {
 	return addenda05.numericField(addenda05.EntryDetailSequenceNumber, 7)
 }
-
-// TypeCode Defines the specific explanation and format for the addenda05 information
-func (addenda05 *Addenda05) typeCode() string {
-	return addenda05.TypeCode
-}

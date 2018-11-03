@@ -210,11 +210,6 @@ func (addenda02 *Addenda02) fieldInclusion() error {
 	return nil
 }
 
-// TypeCode Defines the specific explanation and format for the addenda02 information
-func (addenda02 *Addenda02) typeCode() string {
-	return addenda02.TypeCode
-}
-
 // ReferenceInformationOneField returns a space padded ReferenceInformationOne string
 func (addenda02 *Addenda02) ReferenceInformationOneField() string {
 	return addenda02.alphaField(addenda02.ReferenceInformationOne, 7)
