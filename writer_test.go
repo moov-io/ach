@@ -14,7 +14,8 @@ import (
 func testPPDWrite(t testing.TB) {
 	file := NewFile().SetHeader(mockFileHeader())
 	entry := mockEntryDetail()
-	entry.AddAddenda(mockAddenda05())
+	entry.AddendaRecordIndicator = 1
+	entry.AddAddenda05(mockAddenda05())
 	batch := NewBatchPPD(mockBatchPPDHeader())
 	batch.SetHeader(mockBatchHeader())
 	batch.AddEntry(entry)
@@ -62,7 +63,8 @@ func BenchmarkPPDWrite(b *testing.B) {
 func testFileWriteErr(t testing.TB) {
 	file := NewFile().SetHeader(mockFileHeader())
 	entry := mockEntryDetail()
-	entry.AddAddenda(mockAddenda05())
+	entry.AddendaRecordIndicator = 1
+	entry.AddAddenda05(mockAddenda05())
 	batch := NewBatchPPD(mockBatchPPDHeader())
 	batch.SetHeader(mockBatchHeader())
 	batch.AddEntry(entry)
@@ -199,7 +201,8 @@ func testPPDIATWrite(t testing.TB) {
 	file := NewFile().SetHeader(mockFileHeader())
 
 	entry := mockEntryDetail()
-	entry.AddAddenda(mockAddenda05())
+	entry.AddendaRecordIndicator = 1
+	entry.AddAddenda05(mockAddenda05())
 	batch := NewBatchPPD(mockBatchPPDHeader())
 	batch.SetHeader(mockBatchHeader())
 	batch.AddEntry(entry)
@@ -306,6 +309,7 @@ func testIATReturn(t testing.TB) {
 	iatBatch.Entries[0].Addenda15 = mockAddenda15()
 	iatBatch.Entries[0].Addenda16 = mockAddenda16()
 	iatBatch.Entries[0].AddIATAddenda(mockIATAddenda99())
+	iatBatch.Entries[0].Category = CategoryReturn
 	iatBatch.Create()
 	file.AddIATBatch(iatBatch)
 

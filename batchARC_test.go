@@ -353,11 +353,12 @@ func BenchmarkBatchARCTransactionCode(b *testing.B) {
 // testBatchARCAddendaCount validates BatchARC Addenda count
 func testBatchARCAddendaCount(t testing.TB) {
 	mockBatch := mockBatchARC()
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaCount" {
+			if e.FieldName != "Addenda05" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -413,7 +414,8 @@ func TestBatchARCAddendum98(t *testing.T) {
 	mockBatch.AddEntry(mockARCEntryDetail())
 	mockAddenda98 := mockAddenda98()
 	mockAddenda98.TypeCode = "05"
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98)
+	mockBatch.GetEntries()[0].Category = CategoryNOC
+	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
@@ -431,7 +433,7 @@ func TestBatchARCAddendum99(t *testing.T) {
 	mockBatch.AddEntry(mockARCEntryDetail())
 	mockAddenda99 := mockAddenda99()
 	mockAddenda99.TypeCode = "05"
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda99)
+	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {

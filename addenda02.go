@@ -11,6 +11,7 @@ import (
 
 // Addenda02 is a Addendumer addenda which provides business transaction information for Addenda Type
 // Code 02 in a machine readable format. It is usually formatted according to ANSI, ASC, X12 Standard.
+// SEC Codes MTE, POS, and SHR allow Addenda02
 type Addenda02 struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`

@@ -27,7 +27,6 @@ func mockPOSEntryDetail() *EntryDetail {
 	entry.Amount = 25000
 	entry.IdentificationNumber = "45689033"
 	entry.IndividualName = "Wade Arnold"
-	//entry.SetReceivingCompany("ABC Company")
 	entry.SetTraceNumber(mockBatchPOSHeader().ODFIIdentification, 1)
 	entry.DiscretionaryData = "01"
 	entry.Category = CategoryForward
@@ -38,7 +37,8 @@ func mockPOSEntryDetail() *EntryDetail {
 func mockBatchPOS() *BatchPOS {
 	mockBatch := NewBatchPOS(mockBatchPOSHeader())
 	mockBatch.AddEntry(mockPOSEntryDetail())
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda02())
+	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
 		panic(err)
 	}
@@ -264,7 +264,7 @@ func BenchmarkBatchPOSTransactionCode(b *testing.B) {
 // testBatchPOSAddendaCount validates BatchPOS Addendum count of 2
 func testBatchPOSAddendaCount(t testing.TB) {
 	mockBatch := mockBatchPOS()
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda02())
+	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -322,7 +322,8 @@ func BenchmarkBatchPOSAddendaCountZero(b *testing.B) {
 func testBatchPOSInvalidAddendum(t testing.TB) {
 	mockBatch := NewBatchPOS(mockBatchPOSHeader())
 	mockBatch.AddEntry(mockPOSEntryDetail())
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
@@ -353,7 +354,8 @@ func TestBatchPOSAddendum98(t *testing.T) {
 	mockBatch.AddEntry(mockPOSEntryDetail())
 	mockAddenda98 := mockAddenda98()
 	mockAddenda98.TypeCode = "05"
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98)
+	mockBatch.GetEntries()[0].Category = CategoryNOC
+	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
@@ -371,7 +373,8 @@ func TestBatchPOSAddendum99(t *testing.T) {
 	mockBatch.AddEntry(mockPOSEntryDetail())
 	mockAddenda99 := mockAddenda99()
 	mockAddenda99.TypeCode = "05"
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda99)
+	mockBatch.GetEntries()[0].Category = CategoryReturn
+	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
@@ -389,7 +392,8 @@ func testBatchPOSInvalidAddenda(t testing.TB) {
 	mockBatch.AddEntry(mockPOSEntryDetail())
 	addenda02 := mockAddenda02()
 	addenda02.recordType = "63"
-	mockBatch.GetEntries()[0].AddAddenda(addenda02)
+	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "recordType" {

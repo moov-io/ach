@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/moov-io/ach"
 	"log"
 	"os"
-
-	"github.com/moov-io/ach"
 )
 
 func main() {
@@ -33,10 +32,10 @@ func main() {
 	fmt.Printf("SEC Code: %v \n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
 	fmt.Printf("Total Amount: %v \n", achFile.Batches[0].GetEntries()[0].Amount)
 	fmt.Printf("Original Trace Number: %v \n", achFile.Batches[0].GetEntries()[0].OriginalTraceNumberField())
-	fmt.Printf("Addenda1: %v \n", achFile.Batches[0].GetEntries()[0].Addendum[0].String())
-	fmt.Printf("Addenda2: %v \n", achFile.Batches[0].GetEntries()[0].Addendum[1].String())
+	fmt.Printf("Addenda1: %v \n", achFile.Batches[0].GetEntries()[0].Addenda05[0].String())
+	fmt.Printf("Addenda2: %v \n", achFile.Batches[0].GetEntries()[0].Addenda05[1].String())
 	fmt.Printf("Total Amount: %v \n", achFile.Batches[0].GetEntries()[1].Amount)
 	fmt.Printf("Original Trace Number: %v \n", achFile.Batches[0].GetEntries()[1].OriginalTraceNumberField())
-	fmt.Printf("Addenda1: %v \n", achFile.Batches[0].GetEntries()[1].Addendum[0].String())
-	fmt.Printf("Addenda2: %v \n", achFile.Batches[0].GetEntries()[1].Addendum[1].String())
+	fmt.Printf("Addenda1: %v \n", achFile.Batches[0].GetEntries()[1].Addenda05[0].String())
+	fmt.Printf("Addenda2: %v \n", achFile.Batches[0].GetEntries()[1].Addenda05[1].String())
 }

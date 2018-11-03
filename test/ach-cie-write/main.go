@@ -42,6 +42,8 @@ func main() {
 	entry.SetTraceNumber(bh.ODFIIdentification, 1)
 	entry.IndividualName = "Receiver Account Name" // Identifies the receiver of the transaction
 	entry.DiscretionaryData = "01"
+	entry.AddendaRecordIndicator = 1
+	entry.AddendaRecordIndicator = 1
 
 	addenda05 := ach.NewAddenda05()
 	addenda05.PaymentRelatedInformation = "Credit Store Account"
@@ -51,7 +53,7 @@ func main() {
 	// build the batch
 	batch := ach.NewBatchCIE(bh)
 	batch.AddEntry(entry)
-	batch.GetEntries()[0].AddAddenda(addenda05)
+	batch.GetEntries()[0].AddAddenda05(addenda05)
 	if err := batch.Create(); err != nil {
 		log.Fatalf("Unexpected error building batch: %s\n", err)
 	}

@@ -41,11 +41,12 @@ func main() {
 	entry.IdentificationNumber = "#789654"
 	entry.DiscretionaryData = "S"
 	entry.Category = ach.CategoryForward
+	entry.AddendaRecordIndicator = 1
 
 	// To add one or more optional addenda records for an entry
 	addenda1 := ach.NewAddenda05()
 	addenda1.PaymentRelatedInformation = "PAY-GATE payment"
-	entry.AddAddenda(addenda1)
+	entry.AddAddenda05(addenda1)
 
 	entry2 := ach.NewEntryDetail()
 	entry2.TransactionCode = 22
@@ -57,11 +58,12 @@ func main() {
 	entry2.IdentificationNumber = "#123456"
 	entry2.DiscretionaryData = "R"
 	entry2.Category = ach.CategoryForward
+	entry2.AddendaRecordIndicator = 1
 
 	// To add one or more optional addenda records for an entry
 	addenda2 := ach.NewAddenda05()
 	addenda2.PaymentRelatedInformation = "Monthly Membership Subscription"
-	entry2.AddAddenda(addenda2)
+	entry2.AddAddenda05(addenda2)
 
 	// build the batch
 	batch := ach.NewBatchWEB(bh)

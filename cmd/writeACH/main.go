@@ -94,7 +94,7 @@ func write(path string) {
 			// Add addenda record for an entry
 			addendaEntrySeq := ach.NewAddenda05()
 			addendaEntrySeq.PaymentRelatedInformation = "bonus pay for amazing work on #OSS"
-			entryEntrySeq.AddAddenda(addendaEntrySeq)
+			entryEntrySeq.AddAddenda05(addendaEntrySeq)
 
 			// Add entries
 			batch.AddEntry(entryEntrySeq)

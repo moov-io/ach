@@ -40,7 +40,8 @@ func mockSHREntryDetail() *EntryDetail {
 func mockBatchSHR() *BatchSHR {
 	mockBatch := NewBatchSHR(mockBatchSHRHeader())
 	mockBatch.AddEntry(mockSHREntryDetail())
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda02())
+	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
 		panic(err)
 	}
@@ -266,7 +267,7 @@ func BenchmarkBatchSHRTransactionCode(b *testing.B) {
 // testBatchSHRAddendaCount validates BatchSHR Addendum count of 2
 func testBatchSHRAddendaCount(t testing.TB) {
 	mockBatch := mockBatchSHR()
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda02())
+	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -326,7 +327,8 @@ func TestBatchSHRAddendum98(t *testing.T) {
 	mockBatch.AddEntry(mockSHREntryDetail())
 	mockAddenda98 := mockAddenda98()
 	mockAddenda98.TypeCode = "05"
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98)
+	mockBatch.GetEntries()[0].Category = CategoryNOC
+	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
@@ -344,7 +346,8 @@ func TestBatchSHRAddendum99(t *testing.T) {
 	mockBatch.AddEntry(mockSHREntryDetail())
 	mockAddenda99 := mockAddenda99()
 	mockAddenda99.TypeCode = "05"
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda99)
+	mockBatch.GetEntries()[0].Category = CategoryReturn
+	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
@@ -360,10 +363,11 @@ func TestBatchSHRAddendum99(t *testing.T) {
 func testBatchSHRInvalidAddendum(t testing.TB) {
 	mockBatch := NewBatchSHR(mockBatchSHRHeader())
 	mockBatch.AddEntry(mockSHREntryDetail())
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
+			if e.FieldName != "AddendaCount" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -391,7 +395,8 @@ func testBatchSHRInvalidAddenda(t testing.TB) {
 	mockBatch.AddEntry(mockSHREntryDetail())
 	addenda02 := mockAddenda02()
 	addenda02.recordType = "63"
-	mockBatch.GetEntries()[0].AddAddenda(addenda02)
+	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "recordType" {

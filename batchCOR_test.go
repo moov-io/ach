@@ -9,8 +9,6 @@ import (
 	"testing"
 )
 
-// TODO make all the mock values cor fields
-
 // mockBatchCORHeader creates a COR BatchHeader
 func mockBatchCORHeader() *BatchHeader {
 	bh := NewBatchHeader()
@@ -41,7 +39,8 @@ func mockCOREntryDetail() *EntryDetail {
 func mockBatchCOR() *BatchCOR {
 	mockBatch := NewBatchCOR(mockBatchCORHeader())
 	mockBatch.AddEntry(mockCOREntryDetail())
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98())
+	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98()
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
 		log.Fatal(err)
 	}
@@ -74,6 +73,7 @@ func BenchmarkBatchCORHeader(b *testing.B) {
 // testBatchCORSEC validates BatchCOR SEC code
 func testBatchCORSEC(t testing.TB) {
 	mockBatch := mockBatchCOR()
+	mockBatch.GetEntries()[0].Category = CategoryNOC
 	mockBatch.Header.StandardEntryClassCode = "WEB"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -103,7 +103,7 @@ func BenchmarkBatchCORSEC(b *testing.B) {
 func testBatchCORAddendumCountTwo(t testing.TB) {
 	mockBatch := mockBatchCOR()
 	// Adding a second addenda to the mock entry
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98())
+	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98()
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Addendum" {
@@ -160,7 +160,8 @@ func BenchmarkBatchCORAddendaCountZero(b *testing.B) {
 func testBatchCORAddendaType(t testing.TB) {
 	mockBatch := NewBatchCOR(mockBatchCORHeader())
 	mockBatch.AddEntry(mockCOREntryDetail())
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Addendum" {
@@ -188,7 +189,7 @@ func BenchmarkBatchCORAddendaType(b *testing.B) {
 // testBatchCORAddendaTypeCode validates TypeCode
 func testBatchCORAddendaTypeCode(t testing.TB) {
 	mockBatch := mockBatchCOR()
-	mockBatch.GetEntries()[0].Addendum[0].(*Addenda98).TypeCode = "07"
+	mockBatch.GetEntries()[0].Addenda98.TypeCode = "07"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {

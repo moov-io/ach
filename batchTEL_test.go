@@ -95,12 +95,13 @@ func BenchmarkBatchTELCreate(b *testing.B) {
 // testBatchTELAddendaCount validates addenda count for batch TEL
 func testBatchTELAddendaCount(t testing.TB) {
 	mockBatch := mockBatchTEL()
-	// TEL can not have an addendum
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	// TEL can not have an addenda02
+	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaCount" {
+			if e.FieldName != "Addenda02" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -216,7 +217,8 @@ func TestBatchTELAddendum98(t *testing.T) {
 	mockBatch.AddEntry(mockTELEntryDetail())
 	mockAddenda98 := mockAddenda98()
 	mockAddenda98.TypeCode = "05"
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98)
+	mockBatch.GetEntries()[0].Category = CategoryNOC
+	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
@@ -234,7 +236,8 @@ func TestBatchTELAddendum99(t *testing.T) {
 	mockBatch.AddEntry(mockTELEntryDetail())
 	mockAddenda99 := mockAddenda99()
 	mockAddenda99.TypeCode = "05"
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda99)
+	mockBatch.GetEntries()[0].Category = CategoryReturn
+	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {

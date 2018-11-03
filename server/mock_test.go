@@ -47,6 +47,7 @@ func mockWEBEntryDetail() *ach.EntryDetail {
 	entry.IndividualName = "Wade Arnold"
 	entry.SetTraceNumber(mockBatchHeaderWeb().ODFIIdentification, 1)
 	entry.SetPaymentType("S")
+	entry.AddAddenda05(mockAddenda05())
 	return entry
 }
 
@@ -55,7 +56,7 @@ func mockBatchWEB() *ach.BatchWEB {
 	mockBatch := ach.NewBatchWEB(mockBatchHeaderWeb())
 	mockBatch.SetID(mockBatch.Header.ID)
 	mockBatch.AddEntry(mockWEBEntryDetail())
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
 		panic(err)
 	}

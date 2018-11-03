@@ -41,6 +41,10 @@ func (batch *BatchACK) Validate() error {
 			msg := fmt.Sprintf(msgBatchAmountZero, entry.Amount, "ACK")
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
 		}
+		if len(entry.Addenda05) > 1 {
+			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addenda05), 1, batch.Header.StandardEntryClassCode)
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+		}
 		// TransactionCode must be either 24 or 34 for Acknowledgement Entries
 		switch entry.TransactionCode {
 		case 24, 34:
@@ -49,28 +53,12 @@ func (batch *BatchACK) Validate() error {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 		}
 
-		// ACK can have up to one Record TypeCode = 05, or there can be a NOC (98) or Return (99)
-		for _, addenda := range entry.Addendum {
-			switch entry.Category {
-			case CategoryForward:
-				if err := batch.categoryForwardAddenda05(entry, addenda); err != nil {
-					return err
-				}
-				if len(entry.Addendum) > 1 {
-					msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
-				}
-			case CategoryNOC:
-				if err := batch.categoryNOCAddenda98(entry, addenda); err != nil {
-					return err
-				}
-			case CategoryReturn:
-				if err := batch.categoryReturnAddenda99(entry, addenda); err != nil {
-					return err
-				}
-			}
+		// Verify Addenda* FieldInclusion based on entry.Category and batchHeader.StandardEntryClassCode
+		if err := batch.addendaFieldInclusion(entry); err != nil {
+			return err
 		}
 	}
+
 	return nil
 }
 

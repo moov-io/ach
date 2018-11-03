@@ -59,7 +59,6 @@ var (
 	msgBatchRequiredAddendaCount    = "%v addendum found where %v is required for batch type %v"
 	msgBatchTransactionCodeCredit   = "%v a credit is not allowed"
 	msgBatchSECType                 = "header SEC type code %v for batch type %v"
-	msgBatchTypeCode                = "%v found in addenda and expecting %v for %v, batch type %v"
 	msgBatchServiceClassCode        = "Service Class Code %v is not valid for batch type %v"
 	msgBatchForwardReturn           = "Forward and Return entries found in the same batch"
 	msgBatchAmount                  = "Amount must be less than %v for SEC code %v"
@@ -68,4 +67,5 @@ var (
 	msgBatchCardTransactionType     = "Card Transaction Type %v is invalid"
 	msgBatchTransactionCodeAddenda  = "Addenda not allowed for transaction code %v for batch type %v"
 	msgBatchAmountZero              = "%v must be zero for SEC code %v"
+	msgBatchAddenda                 = "%v not allowed for category %v for batch type %v"
 )

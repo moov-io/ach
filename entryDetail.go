@@ -52,7 +52,7 @@ type EntryDetail struct {
 	// according to the needs of the ODFI and/or Originator involved. This
 	// field must be returned intact for any returned entry.
 	//
-	// WEB uses the Discretionary Data Field as the Payment Type Code
+	// WEB and TEL batches use the Discretionary Data Field as the Payment Type Code
 	DiscretionaryData string `json:"discretionaryData,omitempty"`
 	// AddendaRecordIndicator indicates the existence of an Addenda Record.
 	// A value of "1" indicates that one ore more addenda records follow,
@@ -67,8 +67,14 @@ type EntryDetail struct {
 	// in the associated Entry Detail Record, since the Trace Number is associated
 	// with an entry or item rather than a physical record.
 	TraceNumber int `json:"traceNumber,omitempty"`
-	// Addendum a list of Addenda for the Entry Detail
-	Addendum []Addendumer `json:"addendum,omitempty"`
+	// Addenda02 for use with StandardEntryClass Code POS, and SHR
+	Addenda02 *Addenda02 `json:"addenda02,omitempty"`
+	// Addenda05
+	Addenda05 []*Addenda05 `json:"addenda05,omitempty"`
+	// Addenda98
+	Addenda98 *Addenda98 `json:"addenda98,omitempty"`
+	// Addenda99
+	Addenda99 *Addenda99 `json:"addenda99,omitempty"`
 	// Category defines if the entry is a Forward, Return, or NOC
 	Category string `json:"category,omitempty"`
 	// validator is composed for data validation
@@ -118,9 +124,9 @@ func (ed *EntryDetail) Parse(record string) {
 	ed.IdentificationNumber = record[39:54]
 	// 55-76 The name of the receiver, usually the name on the bank account
 	ed.IndividualName = record[54:76]
-	// 77-78 allows ODFIs to include codes of significance only to them
-	// For WEB transaction this field is the PaymentType which is either R(reoccurring) or S(single)
-	// normally blank
+	// 77-78 allows ODFIs to include codes of significance only to them, normally blank
+	//
+	// For WEB and TEL batches this field is the PaymentType which is either R(reoccurring) or S(single)
 	ed.DiscretionaryData = record[76:78]
 	// 79-79 1 if addenda exists 0 if it does not
 	ed.AddendaRecordIndicator = ed.parseNumField(record[78:79])
@@ -233,38 +239,6 @@ func (ed *EntryDetail) fieldInclusion() error {
 		}
 	}
 	return nil
-}
-
-// AddAddenda appends an Addendumer to the EntryDetail
-//
-// Note: The order of records here is determined by their insertion order.
-// No inspection of SequenceNumbers in Addendas (i.e 05, 17, 18) is done
-// to re-order addenda records.
-func (ed *EntryDetail) AddAddenda(addenda Addendumer) []Addendumer {
-	ed.AddendaRecordIndicator = 1
-	// checks to make sure that we only have either or, not both
-	switch addenda.(type) {
-	case *Addenda99:
-		ed.Category = CategoryReturn
-		ed.Addendum = nil
-		ed.Addendum = append(ed.Addendum, addenda)
-		return ed.Addendum
-	case *Addenda98:
-		ed.Category = CategoryNOC
-		ed.Addendum = nil
-		ed.Addendum = append(ed.Addendum, addenda)
-		return ed.Addendum
-	case *Addenda02:
-		ed.Category = CategoryForward
-		ed.Addendum = nil
-		ed.Addendum = append(ed.Addendum, addenda)
-		return ed.Addendum
-		// default is current *Addenda05
-	default:
-		ed.Category = CategoryForward
-		ed.Addendum = append(ed.Addendum, addenda)
-		return ed.Addendum
-	}
 }
 
 // SetRDFI takes the 9 digit RDFI account number and separates it for RDFIIdentification and CheckDigit
@@ -477,14 +451,14 @@ func (ed *EntryDetail) DiscretionaryDataField() string {
 	return ed.alphaField(ed.DiscretionaryData, 2)
 }
 
-// PaymentTypeField returns the DiscretionaryData field used in WEB batch files
+// PaymentTypeField returns the DiscretionaryData field used in WEB and TEL batch files
 func (ed *EntryDetail) PaymentTypeField() string {
 	// because DiscretionaryData can be changed outside of PaymentType we reset the value for safety
 	ed.SetPaymentType(ed.DiscretionaryData)
 	return ed.DiscretionaryData
 }
 
-// SetPaymentType as R (Recurring) all other values will result in S (single)
+// SetPaymentType as R (Recurring) all other values will result in S (single).  This is used for WEB and TEL batch files
 func (ed *EntryDetail) SetPaymentType(t string) {
 	t = strings.ToUpper(strings.TrimSpace(t))
 	if t == "R" {
@@ -515,4 +489,14 @@ func (ed *EntryDetail) CreditOrDebit() string {
 	default:
 	}
 	return ""
+}
+
+// GetAddenda05 returns a slice of Addenda05 for the batch
+func (ed *EntryDetail) GetAddenda05() []*Addenda05 {
+	return ed.Addenda05
+}
+
+// AddAddenda05 appends an Addenda05 to the EntryDetail
+func (ed *EntryDetail) AddAddenda05(addenda05 *Addenda05) {
+	ed.Addenda05 = append(ed.Addenda05, addenda05)
 }

@@ -1916,7 +1916,6 @@ func testIATBatchAddenda99Count(t testing.TB) {
 	mockBatch.Entries[0].Addenda16 = mockAddenda16()
 	mockBatch.Entries[0].AddIATAddenda(mockAddenda17())
 	mockBatch.Entries[0].AddIATAddenda(mockIATAddenda99())
-	//mockBatch.Entries[0].AddIATAddenda(mockIATAddenda99())
 	mockBatch.category = CategoryReturn
 
 	if err := mockBatch.build(); err != nil {

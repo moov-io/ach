@@ -47,47 +47,31 @@ func (batch *BatchCTX) Validate() error {
 	for _, entry := range batch.Entries {
 
 		// Trapping this error, as entry.CTXAddendaRecordsField() can not be greater than 9999
-		if len(entry.Addendum) > 9999 {
-			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 9999, batch.Header.StandardEntryClassCode)
+		if len(entry.Addenda05) > 9999 {
+			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addenda05), 9999, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 		}
 
 		// validate CTXAddendaRecord Field is equal to the actual number of Addenda records
 		// use 0 value if there is no Addenda records
 		addendaRecords, _ := strconv.Atoi(entry.CATXAddendaRecordsField())
-		if len(entry.Addendum) != addendaRecords {
-			msg := fmt.Sprintf(msgBatchCTXAddendaCount, addendaRecords, len(entry.Addendum))
+		if len(entry.Addenda05) != addendaRecords {
+			msg := fmt.Sprintf(msgBatchCTXAddendaCount, addendaRecords, len(entry.Addenda05))
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
 		}
 
-		if len(entry.Addendum) > 0 {
+		switch entry.TransactionCode {
+		// Prenote credit  23, 33, 43, 53
+		// Prenote debit 28, 38, 48
+		case 23, 28, 33, 38, 43, 48, 53:
+			msg := fmt.Sprintf(msgBatchTransactionCodeAddenda, entry.TransactionCode, "CTX")
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
+		default:
+		}
 
-			switch entry.TransactionCode {
-			// Prenote credit  23, 33, 43, 53
-			// Prenote debit 28, 38, 48
-			case 23, 28, 33, 38, 43, 48, 53:
-				msg := fmt.Sprintf(msgBatchTransactionCodeAddenda, entry.TransactionCode, "CTX")
-				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
-			default:
-			}
-
-			// CTX can have up to 9999 Addenda Record TypeCode = 05, or there can be a NOC (98) or Return (99)
-			for _, addenda := range entry.Addendum {
-				switch entry.Category {
-				case CategoryForward:
-					if err := batch.categoryForwardAddenda05(entry, addenda); err != nil {
-						return err
-					}
-				case CategoryNOC:
-					if err := batch.categoryNOCAddenda98(entry, addenda); err != nil {
-						return err
-					}
-				case CategoryReturn:
-					if err := batch.categoryReturnAddenda99(entry, addenda); err != nil {
-						return err
-					}
-				}
-			}
+		// Verify Addenda* FieldInclusion based on entry.Category and batchHeader.StandardEntryClassCode
+		if err := batch.addendaFieldInclusion(entry); err != nil {
+			return err
 		}
 	}
 	return nil

@@ -17,7 +17,6 @@ type BatchCOR struct {
 
 var msgBatchCORAmount = "debit:%v credit:%v entry detail amount fields must be zero for SEC type COR"
 var msgBatchCORAddenda = "found and 1 Addenda98 is required for SEC Type COR"
-var msgBatchCORAddendaType = "%T found where Addenda98 is required for SEC type NOC"
 
 // NewBatchCOR returns a *BatchCOR
 func NewBatchCOR(bh *BatchHeader) *BatchCOR {
@@ -77,6 +76,11 @@ func (batch *BatchCOR) Validate() error {
 			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "COR")
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 		}
+
+		// Verify Addenda* FieldInclusion based on entry.Category and batchHeader.StandardEntryClassCode
+		if err := batch.addendaFieldInclusion(entry); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -95,18 +99,12 @@ func (batch *BatchCOR) Create() error {
 // isAddenda98 verifies that a Addenda98 exists for each EntryDetail and is Validated
 func (batch *BatchCOR) isAddenda98() error {
 	for _, entry := range batch.Entries {
-		// Addenda type must be equal to 1
-		if len(entry.Addendum) != 1 {
+		// ToDo: May be able to get rid of the first check
+		if entry.Addenda98 == nil {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchCORAddenda}
 		}
-		// Addenda type assertion must be Addenda98
-		addenda98, ok := entry.Addendum[0].(*Addenda98)
-		if !ok {
-			msg := fmt.Sprintf(msgBatchCORAddendaType, entry.Addendum[0])
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
-		}
 		// Addenda98 must be Validated
-		if err := addenda98.Validate(); err != nil {
+		if err := entry.Addenda98.Validate(); err != nil {
 			// convert the field error in to a batch error for a consistent api
 			if e, ok := err.(*FieldError); ok {
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: e.FieldName, Msg: e.Msg}
