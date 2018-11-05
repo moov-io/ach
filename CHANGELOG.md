@@ -1,5 +1,9 @@
 ## v0.4.0 (Unreleased)
 
+BREAKING CHANGES
+
+- `EntryDetail.Addendum` has been broken out into `Addenda02`, `Addenda05`, `Addenda98`, and `Addenda99` fields on `EntryDetail`.
+
 ADDITIONS
 
 - Support ACK, ATX, DNE, ENR StandardEntryClassCode (SEC types)
