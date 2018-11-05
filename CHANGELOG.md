@@ -1,3 +1,26 @@
+## v0.4.0 (Unreleased)
+
+ADDITIONS
+
+- Support ACK, ATX, DNE, ENR StandardEntryClassCode (SEC types)
+  - Support NOC for IAT Entries
+- Add `FileFromJson` for reading `File` objects as JSON.
+- Add `X-Total-Count` response headers on `GET /files/:id/batches`
+
+IMPROVEMENTS
+
+- Multiple parsing errors are returned in `Reader.Read() error`'s error message.
+- IAT: Validate ISODestinationCountryCode according to ISO 3166
+- IAT: Validate ISOOriginatingCurrencyCode and ISODestinationCurrencyCode according to ISO 4217
+- build: Run CI tests against Windows
+- Verify record lengths in [IAT] BatchHeader, [IAT] BatchControl, FileControl, FileHeader, and [IAT] EntryDetail.
+
+BUG FIXES
+- `cmd/server`: don't expect trailing slash on endpoints
+- `cmd/server`: Grab write lock on delete requests
+- Several panics are fixed from fuzzing
+- Reject invalid ABA routing numbers
+
 ## v0.3.3 (Released 2018-10-08)
 
 ADDITIONS
