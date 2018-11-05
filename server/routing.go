@@ -1,17 +1,12 @@
 package server
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strconv"
-	"strings"
-
-	"github.com/moov-io/ach"
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/log"
@@ -101,7 +96,6 @@ func preflightHandler(options []httptransport.ServerOption) http.Handler {
 
 func MakeHTTPHandler(s Service, repo Repository, logger log.Logger) http.Handler {
 	r := mux.NewRouter()
-	e := MakeServerEndpoints(s, repo)
 	options := []httptransport.ServerOption{
 		httptransport.ServerErrorLogger(logger),
 		httptransport.ServerErrorEncoder(encodeError),
@@ -116,203 +110,66 @@ func MakeHTTPHandler(s Service, repo Repository, logger log.Logger) http.Handler
 		w.Write([]byte("PONG"))
 	})
 	r.Methods("GET").Path("/files").Handler(httptransport.NewServer(
-		e.GetFilesEndpoint,
+		getFilesEndpoint(s),
 		decodeGetFilesRequest,
 		encodeResponse,
 		options...,
 	))
 	r.Methods("POST").Path("/files/create").Handler(httptransport.NewServer(
-		e.CreateFileEndpoint,
+		createFileEndpoint(s, repo),
 		decodeCreateFileRequest,
 		encodeResponse,
 		options...,
 	))
 	r.Methods("GET").Path("/files/{id}").Handler(httptransport.NewServer(
-		e.GetFileEndpoint,
+		getFileEndpoint(s),
 		decodeGetFileRequest,
 		encodeResponse,
 		options...,
 	))
 	r.Methods("GET").Path("/files/{id}/contents").Handler(httptransport.NewServer(
-		e.GetFileContentsEndpoint,
+		getFileContentsEndpoint(s),
 		decodeGetFileContentsRequest,
 		encodeTextResponse,
 		options...,
 	))
 	r.Methods("GET").Path("/files/{id}/validate").Handler(httptransport.NewServer(
-		e.ValidateFileEndpoint,
+		validateFileEndpoint(s),
 		decodeValidateFileRequest,
 		encodeResponse,
 		options...,
 	))
 	r.Methods("DELETE").Path("/files/{id}").Handler(httptransport.NewServer(
-		e.DeleteFileEndpoint,
+		deleteFileEndpoint(s),
 		decodeDeleteFileRequest,
 		encodeResponse,
 		options...,
 	))
 	r.Methods("POST").Path("/files/{fileID}/batches").Handler(httptransport.NewServer(
-		e.CreateBatchEndpoint,
+		createBatchEndpoint(s),
 		decodeCreateBatchRequest,
 		encodeResponse,
 		options...,
 	))
 	r.Methods("GET").Path("/files/{fileID}/batches").Handler(httptransport.NewServer(
-		e.GetBatchesEndpoint,
+		getBatchesEndpoint(s),
 		decodeGetBatchesRequest,
 		encodeResponse,
 		options...,
 	))
 	r.Methods("GET").Path("/files/{fileID}/batches/{batchID}").Handler(httptransport.NewServer(
-		e.GetBatchEndpoint,
+		getBatchEndpoint(s),
 		decodeGetBatchRequest,
 		encodeResponse,
 		options...,
 	))
 	r.Methods("DELETE").Path("/files/{fileID}/batches/{batchID}").Handler(httptransport.NewServer(
-		e.DeleteBatchEndpoint,
+		deleteBatchEndpoint(s),
 		decodeDeleteBatchRequest,
 		encodeResponse,
 		options...,
 	))
 	return r
-}
-
-//** FILES ** //
-func decodeCreateFileRequest(_ context.Context, request *http.Request) (interface{}, error) {
-	var r io.Reader
-	var req createFileRequest
-
-	// Sets default values
-	req.File = &ach.File{
-		Header: ach.NewFileHeader(),
-	}
-
-	bs, err := ioutil.ReadAll(request.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	h := request.Header.Get("Content-Type")
-	if strings.Contains(h, "application/json") {
-		// Read body as ACH file in JSON
-		f, err := ach.FileFromJson(bs)
-		if err != nil {
-			return nil, err
-		}
-		req.File = f
-	} else {
-		// Attempt parsing body as an ACH File
-		r = bytes.NewReader(bs)
-		f, err := ach.NewReader(r).Read()
-		if err != nil {
-			return nil, err
-		}
-		req.File = &f
-	}
-	return req, nil
-}
-
-func decodeGetFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	vars := mux.Vars(r)
-	id, ok := vars["id"]
-	if !ok {
-		return nil, ErrBadRouting
-	}
-	return getFileRequest{ID: id}, nil
-}
-
-func decodeDeleteFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	vars := mux.Vars(r)
-	id, ok := vars["id"]
-	if !ok {
-		return nil, ErrBadRouting
-	}
-	return deleteFileRequest{ID: id}, nil
-}
-
-func decodeGetFilesRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	return getFilesRequest{}, nil
-}
-
-func decodeGetFileContentsRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	vars := mux.Vars(r)
-	id, ok := vars["id"]
-	if !ok {
-		return nil, ErrBadRouting
-	}
-	return getFileContentsRequest{ID: id}, nil
-}
-
-func decodeValidateFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	vars := mux.Vars(r)
-	id, ok := vars["id"]
-	if !ok {
-		return nil, ErrBadRouting
-	}
-	return validateFileRequest{ID: id}, nil
-}
-
-//** BATCHES **//
-
-func decodeCreateBatchRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var req createBatchRequest
-	vars := mux.Vars(r)
-	id, ok := vars["fileID"]
-	if !ok {
-		return nil, ErrBadRouting
-	}
-	req.FileID = id
-	req.BatchHeader = *ach.NewBatchHeader()
-	if e := json.NewDecoder(r.Body).Decode(&req.BatchHeader); e != nil {
-		return nil, e
-	}
-	return req, nil
-}
-
-func decodeGetBatchesRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var req getBatchesRequest
-	vars := mux.Vars(r)
-	id, ok := vars["fileID"]
-	if !ok {
-		return nil, ErrBadRouting
-	}
-	req.fileID = id
-	return req, nil
-}
-
-func decodeGetBatchRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var req getBatchRequest
-	vars := mux.Vars(r)
-	fileID, ok := vars["fileID"]
-	if !ok {
-		return nil, ErrBadRouting
-	}
-	batchID, ok := vars["batchID"]
-	if !ok {
-		return nil, ErrBadRouting
-	}
-
-	req.fileID = fileID
-	req.batchID = batchID
-	return req, nil
-}
-
-func decodeDeleteBatchRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var req deleteBatchRequest
-	vars := mux.Vars(r)
-	fileID, ok := vars["fileID"]
-	if !ok {
-		return nil, ErrBadRouting
-	}
-	batchID, ok := vars["batchID"]
-	if !ok {
-		return nil, ErrBadRouting
-	}
-
-	req.fileID = fileID
-	req.batchID = batchID
-	return req, nil
 }
 
 // errorer is implemented by all concrete response types that may contain
