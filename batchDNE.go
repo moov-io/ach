@@ -20,6 +20,7 @@ type BatchDNE struct {
 	batch
 }
 
+// NewBatchDNE returns a *BatchDNE
 func NewBatchDNE(bh *BatchHeader) *BatchDNE {
 	batch := new(BatchDNE)
 	batch.SetControl(NewBatchControl())

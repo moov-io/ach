@@ -69,6 +69,9 @@ func testFileWriteErr(t testing.TB) {
 	batch.SetHeader(mockBatchHeader())
 	batch.AddEntry(entry)
 	batch.Create()
+	if err := batch.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
 	file.AddBatch(batch)
 
 	if err := file.Create(); err != nil {

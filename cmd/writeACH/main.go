@@ -90,6 +90,7 @@ func write(path string) {
 			//entryEntrySeq.IdentificationNumber = "#" + randomdata.RandStringRunes(13) + "#"
 			entryEntrySeq.IdentificationNumber = "#83738AB#"
 			entryEntrySeq.Category = ach.CategoryForward
+			entryEntrySeq.AddendaRecordIndicator = 1
 
 			// Add addenda record for an entry
 			addendaEntrySeq := ach.NewAddenda05()
