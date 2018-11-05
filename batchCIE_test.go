@@ -37,7 +37,8 @@ func mockCIEEntryDetail() *EntryDetail {
 func mockBatchCIE() *BatchCIE {
 	mockBatch := NewBatchCIE(mockBatchCIEHeader())
 	mockBatch.AddEntry(mockCIEEntryDetail())
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
 		panic(err)
 	}
@@ -263,7 +264,7 @@ func BenchmarkBatchCIETransactionCode(b *testing.B) {
 // testBatchCIEAddendaCount validates BatchCIE Addendum count of 2
 func testBatchCIEAddendaCount(t testing.TB) {
 	mockBatch := mockBatchCIE()
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -321,10 +322,11 @@ func BenchmarkBatchCIEAddendaCountZero(b *testing.B) {
 func testBatchCIEInvalidAddendum(t testing.TB) {
 	mockBatch := NewBatchCIE(mockBatchCIEHeader())
 	mockBatch.AddEntry(mockCIEEntryDetail())
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda02())
+	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
+			if e.FieldName != "AddendaCount" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -352,7 +354,8 @@ func testBatchCIEInvalidAddenda(t testing.TB) {
 	mockBatch.AddEntry(mockCIEEntryDetail())
 	addenda05 := mockAddenda05()
 	addenda05.recordType = "63"
-	mockBatch.GetEntries()[0].AddAddenda(addenda05)
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "recordType" {
@@ -439,7 +442,8 @@ func TestBatchCIEAddendum98(t *testing.T) {
 	mockBatch.AddEntry(mockCIEEntryDetail())
 	mockAddenda98 := mockAddenda98()
 	mockAddenda98.TypeCode = "05"
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98)
+	mockBatch.GetEntries()[0].Category = CategoryNOC
+	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
@@ -457,7 +461,8 @@ func TestBatchCIEAddendum99(t *testing.T) {
 	mockBatch.AddEntry(mockCIEEntryDetail())
 	mockAddenda99 := mockAddenda99()
 	mockAddenda99.TypeCode = "05"
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda99)
+	mockBatch.GetEntries()[0].Category = CategoryReturn
+	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
@@ -473,7 +478,7 @@ func TestBatchCIEAddendum99(t *testing.T) {
 func TestBatchCIEAddenda(t *testing.T) {
 	mockBatch := mockBatchCIE()
 	// mock batch already has one addenda. Creating two addenda should error
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "AddendaCount" {

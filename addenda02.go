@@ -11,6 +11,7 @@ import (
 
 // Addenda02 is a Addendumer addenda which provides business transaction information for Addenda Type
 // Code 02 in a machine readable format. It is usually formatted according to ANSI, ASC, X12 Standard.
+// It is used for following StandardEntryClassCode: MTE, POS, and SHR.
 type Addenda02 struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
@@ -207,11 +208,6 @@ func (addenda02 *Addenda02) fieldInclusion() error {
 		return &FieldError{FieldName: "TerminalState", Value: addenda02.TerminalState, Msg: msgFieldRequired}
 	}
 	return nil
-}
-
-// TypeCode Defines the specific explanation and format for the addenda02 information
-func (addenda02 *Addenda02) typeCode() string {
-	return addenda02.TypeCode
 }
 
 // ReferenceInformationOneField returns a space padded ReferenceInformationOne string

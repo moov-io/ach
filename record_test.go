@@ -172,13 +172,14 @@ func testBuildFile(t testing.TB) {
 
 	// To create an entry
 	entry := mockPPDEntryDetail()
+	entry.AddendaRecordIndicator = 1
 
 	// To add one or more optional addenda records for an entry
 	addendaPPD := NewAddenda05()
 	addendaPPD.PaymentRelatedInformation = "Currently string needs ASC X12 Interchange Control Structures"
 
 	// Add the addenda record to the detail entry
-	entry.AddAddenda(addendaPPD)
+	entry.AddAddenda05(addendaPPD)
 
 	// Entries are added to batches like so:
 
@@ -202,12 +203,13 @@ func testBuildFile(t testing.TB) {
 	// The following is a reoccuring payment for $7.99
 
 	entry = mockWEBEntryDetail()
+	entry.AddendaRecordIndicator = 1
 
 	addendaWEB := NewAddenda05()
 	addendaWEB.PaymentRelatedInformation = "Monthly Membership Subscription"
 
 	// Add the addenda record to the detail entry
-	entry.AddAddenda(addendaWEB)
+	entry.AddAddenda05(addendaWEB)
 
 	// add the second batch to the file
 

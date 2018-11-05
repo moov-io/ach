@@ -545,7 +545,9 @@ func BenchmarkEDFieldInclusionTraceNumber(b *testing.B) {
 // testEDAddAddenda99 validates adding Addenda99 to an entry detail
 func testEDAddAddenda99(t testing.TB) {
 	entry := mockEntryDetail()
-	entry.AddAddenda(mockAddenda99())
+	entry.Addenda99 = mockAddenda99()
+	entry.Category = CategoryReturn
+	entry.AddendaRecordIndicator = 1
 	if entry.Category != CategoryReturn {
 		t.Error("Addenda99 added and isReturn is false")
 	}
@@ -571,14 +573,11 @@ func BenchmarkEDAddAddenda99(b *testing.B) {
 // testEDAddAddenda99Twice validates only one Addenda99 is added to an entry detail
 func testEDAddAddenda99Twice(t testing.TB) {
 	entry := mockEntryDetail()
-	entry.AddAddenda(mockAddenda99())
-	entry.AddAddenda(mockAddenda99())
+	entry.Addenda99 = mockAddenda99()
+	entry.Addenda99 = mockAddenda99()
+	entry.Category = CategoryReturn
 	if entry.Category != CategoryReturn {
 		t.Error("Addenda99 added and Category is not CategoryReturn")
-	}
-
-	if len(entry.Addendum) != 1 {
-		t.Error("Addenda99 added and isReturn is false")
 	}
 }
 

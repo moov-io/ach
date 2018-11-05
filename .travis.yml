@@ -28,7 +28,7 @@ script:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then test -z $(gofmt -s -l $GOFILES); fi
 - go test ./...
 - misspell -error -locale US $GOFILES
-- gocyclo -over 19 $GOFILES
+- gocyclo -over 25 $GOFILES
 - golint -set_exit_status $GOFILES
 - megacheck ./...
 after_success:

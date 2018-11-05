@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/moov-io/ach"
 	"log"
 	"os"
-
-	"github.com/moov-io/ach"
 )
 
 func main() {
@@ -31,6 +30,6 @@ func main() {
 	fmt.Printf("Total Amount Debit: %v \n", achFile.Control.TotalDebitEntryDollarAmountInFile)
 	fmt.Printf("Total Amount Credit: %v \n", achFile.Control.TotalCreditEntryDollarAmountInFile)
 	fmt.Printf("SEC Code: %v \n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
-	fmt.Printf("Addenda1: %v \n", achFile.Batches[0].GetEntries()[0].Addendum[0].String())
-	fmt.Printf("Addenda2: %v \n", achFile.Batches[0].GetEntries()[0].Addendum[1].String())
+	fmt.Printf("Addenda1: %v \n", achFile.Batches[0].GetEntries()[0].Addenda05[0].String())
+	fmt.Printf("Addenda2: %v \n", achFile.Batches[0].GetEntries()[0].Addenda05[1].String())
 }

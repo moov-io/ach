@@ -581,10 +581,10 @@ func BenchmarkFileEntryDetail(b *testing.B) {
 func testFileAddenda05(t testing.TB) {
 	bh := mockBatchHeader()
 	ed := mockEntryDetail()
-	addenda := mockAddenda05()
-	addenda.SequenceNumber = 0
-	ed.AddAddenda(addenda)
-	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
+	addenda05 := mockAddenda05()
+	addenda05.SequenceNumber = 0
+	ed.AddAddenda05(addenda05)
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addenda05[0].String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
 	if err != nil {
@@ -619,10 +619,10 @@ func BenchmarkFileAddenda05(b *testing.B) {
 func testFileAddenda02invalid(t testing.TB) {
 	bh := mockBatchPOSHeader()
 	ed := mockPOSEntryDetail()
-	addenda := mockAddenda02()
-	addenda.TransactionDate = "0000"
-	ed.AddAddenda(addenda)
-	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
+	addenda02 := mockAddenda02()
+	addenda02.TransactionDate = "0000"
+	ed.Addenda02 = addenda02
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addenda02.String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
 	if err != nil {
@@ -657,9 +657,9 @@ func BenchmarkFileAddenda02invalid(b *testing.B) {
 func testFileAddenda02(t testing.TB) {
 	bh := mockBatchPOSHeader()
 	ed := mockPOSEntryDetail()
-	addenda := mockAddenda02()
-	ed.AddAddenda(addenda)
-	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
+	addenda02 := mockAddenda02()
+	ed.Addenda02 = addenda02
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addenda02.String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
 	if err != nil {
@@ -694,12 +694,13 @@ func BenchmarkFileAddenda02(b *testing.B) {
 func testFileAddenda98invalid(t testing.TB) {
 	bh := mockBatchPPDHeader()
 	ed := mockPPDEntryDetail()
-	addenda := mockAddenda98()
-	addenda.TraceNumber = 0000001
-	addenda.ChangeCode = "C50"
-	addenda.CorrectedData = "ACME One Corporation"
-	ed.AddAddenda(addenda)
-	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
+	addenda98 := mockAddenda98()
+	addenda98.TraceNumber = 0000001
+	addenda98.ChangeCode = "C50"
+	addenda98.CorrectedData = "ACME One Corporation"
+	ed.Category = CategoryNOC
+	ed.Addenda98 = addenda98
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addenda98.String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
 	if err != nil {
@@ -734,12 +735,13 @@ func BenchmarkFileAddenda98invalid(b *testing.B) {
 func testFileAddenda98(t testing.TB) {
 	bh := mockBatchHeader()
 	ed := mockEntryDetail()
-	addenda := mockAddenda98()
-	addenda.TraceNumber = 0000001
-	addenda.ChangeCode = "C10"
-	addenda.CorrectedData = "ACME One Corporation"
-	ed.AddAddenda(addenda)
-	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
+	addenda98 := mockAddenda98()
+	addenda98.TraceNumber = 0000001
+	addenda98.ChangeCode = "C10"
+	addenda98.CorrectedData = "ACME One Corporation"
+	ed.Category = CategoryNOC
+	ed.Addenda98 = addenda98
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addenda98.String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
 	if err != nil {
@@ -774,11 +776,12 @@ func BenchmarkFileAddenda98(b *testing.B) {
 func testFileAddenda99invalid(t testing.TB) {
 	bh := mockBatchPPDHeader()
 	ed := mockPPDEntryDetail()
-	addenda := mockAddenda99()
-	addenda.TraceNumber = 0000001
-	addenda.ReturnCode = "100"
-	ed.AddAddenda(addenda)
-	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
+	addenda99 := mockAddenda99()
+	addenda99.TraceNumber = 0000001
+	addenda99.ReturnCode = "100"
+	ed.Category = CategoryReturn
+	ed.Addenda99 = addenda99
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addenda99.String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
 	if err != nil {
@@ -813,11 +816,12 @@ func BenchmarkFileAddenda99invalid(b *testing.B) {
 func testFileAddenda99(t testing.TB) {
 	bh := mockBatchHeader()
 	ed := mockEntryDetail()
-	addenda := mockAddenda99()
-	addenda.TraceNumber = 0000001
-	addenda.ReturnCode = "R02"
-	ed.AddAddenda(addenda)
-	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addendum[0].String()
+	addenda99 := mockAddenda99()
+	addenda99.TraceNumber = 0000001
+	addenda99.ReturnCode = "R02"
+	ed.Category = CategoryReturn
+	ed.Addenda99 = addenda99
+	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addenda99.String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
 	if err != nil {

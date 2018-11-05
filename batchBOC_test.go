@@ -349,14 +349,15 @@ func BenchmarkBatchBOCTransactionCode(b *testing.B) {
 	}
 }
 
-// testBatchBOCAddendaCount validates BatchBOC Addenda count
-func testBatchBOCAddendaCount(t testing.TB) {
+// testBatchBOCAddenda05 validates BatchBOC Addenda count
+func testBatchBOCAddenda05(t testing.TB) {
 	mockBatch := mockBatchBOC()
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaCount" {
+			if e.FieldName != "Addenda05" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -365,16 +366,16 @@ func testBatchBOCAddendaCount(t testing.TB) {
 	}
 }
 
-// TestBatchBOCAddendaCount tests validating BatchBOC Addenda count
-func TestBatchBOCAddendaCount(t *testing.T) {
-	testBatchBOCAddendaCount(t)
+// TestBatchBOCAddenda05 tests validating BatchBOC Addenda count
+func TestBatchBOCAddenda05(t *testing.T) {
+	testBatchBOCAddenda05(t)
 }
 
-// BenchmarkBatchBOCAddendaCount benchmarks validating BatchBOC Addenda count
-func BenchmarkBatchBOCAddendaCount(b *testing.B) {
+// BenchmarkBatchBOCAddenda05 benchmarks validating BatchBOC Addenda count
+func BenchmarkBatchBOCAddenda05(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchBOCAddendaCount(b)
+		testBatchBOCAddenda05(b)
 	}
 }
 
@@ -412,7 +413,8 @@ func TestBatchBOCAddendum98(t *testing.T) {
 	mockBatch.AddEntry(mockBOCEntryDetail())
 	mockAddenda98 := mockAddenda98()
 	mockAddenda98.TypeCode = "05"
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98)
+	mockBatch.GetEntries()[0].Category = CategoryNOC
+	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
@@ -430,7 +432,8 @@ func TestBatchBOCAddendum99(t *testing.T) {
 	mockBatch.AddEntry(mockBOCEntryDetail())
 	mockAddenda99 := mockAddenda99()
 	mockAddenda99.TypeCode = "05"
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda99)
+	mockBatch.GetEntries()[0].Category = CategoryReturn
+	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {

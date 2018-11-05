@@ -386,28 +386,31 @@ func (r *Reader) parseAddenda() error {
 			if err := addenda02.Validate(); err != nil {
 				return r.parseError(err)
 			}
-			r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda02)
+			//r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda02)
+			r.currentBatch.GetEntries()[entryIndex].Addenda02 = addenda02
 		case "05":
+			// ToDo: Validate this increments
+
 			addenda05 := NewAddenda05()
 			addenda05.Parse(r.line)
 			if err := addenda05.Validate(); err != nil {
 				return r.parseError(err)
 			}
-			r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda05)
+			r.currentBatch.GetEntries()[entryIndex].AddAddenda05(addenda05)
 		case "98":
 			addenda98 := NewAddenda98()
 			addenda98.Parse(r.line)
 			if err := addenda98.Validate(); err != nil {
 				return r.parseError(err)
 			}
-			r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda98)
+			r.currentBatch.GetEntries()[entryIndex].Addenda98 = addenda98
 		case "99":
 			addenda99 := NewAddenda99()
 			addenda99.Parse(r.line)
 			if err := addenda99.Validate(); err != nil {
 				return r.parseError(err)
 			}
-			r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda99)
+			r.currentBatch.GetEntries()[entryIndex].Addenda99 = addenda99
 		}
 	} else {
 		return r.parseError(&FileError{

@@ -69,8 +69,6 @@ func TestFilesXTotalCountHeader(t *testing.T) {
 func TestBatchesXTotalCountHeader(t *testing.T) {
 	bh := mockBatchHeaderWeb()
 	entry := mockWEBEntryDetail()
-	addenda := mockAddenda05()
-	entry.AddAddenda(addenda)
 	// build the batch
 	batch := ach.NewBatchWEB(bh)
 	batch.SetID(batch.Header.ID)

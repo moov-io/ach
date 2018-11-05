@@ -34,10 +34,11 @@ func mockDNEEntryDetail() *EntryDetail {
 	entry.SetOriginalTraceNumber("031300010000001")
 	entry.SetReceivingCompany("Best. #1")
 	entry.SetTraceNumber("23138010", 1)
+	entry.AddendaRecordIndicator = 1
 
 	addenda := NewAddenda05()
 	addenda.PaymentRelatedInformation = `21*12200004*3*123987654321*777777777*DOE*JOHN*0\`
-	entry.AddAddenda(addenda)
+	entry.AddAddenda05(addenda)
 
 	return entry
 }
@@ -78,7 +79,7 @@ func BenchmarkBatchDNEHeader(b *testing.B) {
 func testBatchDNEAddendumCount(t testing.TB) {
 	mockBatch := mockBatchDNE()
 	// Adding a second addenda to the mock entry
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "EntryAddendaCount" {
@@ -150,7 +151,7 @@ func BenchmarkBatchDNEReceivingCompanyName(b *testing.B) {
 // testBatchDNEAddendaTypeCode validates addenda type code is 05
 func testBatchDNEAddendaTypeCode(t testing.TB) {
 	mockBatch := mockBatchDNE()
-	mockBatch.GetEntries()[0].Addendum[0].(*Addenda05).TypeCode = "05"
+	mockBatch.GetEntries()[0].Addenda05[0].TypeCode = "05"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
@@ -206,7 +207,7 @@ func BenchmarkBatchDNESEC(b *testing.B) {
 // testBatchDNEAddendaCount validates batch DNE addenda count
 func testBatchDNEAddendaCount(t testing.TB) {
 	mockBatch := mockBatchDNE()
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -282,7 +283,7 @@ func TestBatchDNEAmount(t *testing.T) {
 // TestBatchDNETransactionCode validates TransactionCode
 func TestBatchDNETransactionCode(t *testing.T) {
 	mockBatch := mockBatchDNE()
-	mockBatch.GetEntries()[0].TransactionCode = 21
+	mockBatch.GetEntries()[0].TransactionCode = 22
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

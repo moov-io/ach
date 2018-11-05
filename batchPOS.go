@@ -66,27 +66,9 @@ func (batch *BatchPOS) Validate() error {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "CardTransactionType", Msg: msg}
 		}
 
-		// POS must have one Addenda02 record
-		if len(entry.Addendum) != 1 {
-			msg := fmt.Sprintf(msgBatchRequiredAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
-		}
-		// POS must have one Addenda02 but cannot have Addenda05, or there can be a NOC (98) or Return (99)
-		for _, addenda := range entry.Addendum {
-			switch entry.Category {
-			case CategoryForward:
-				if err := batch.categoryForwardAddenda02(entry, addenda); err != nil {
-					return err
-				}
-			case CategoryNOC:
-				if err := batch.categoryNOCAddenda98(entry, addenda); err != nil {
-					return err
-				}
-			case CategoryReturn:
-				if err := batch.categoryReturnAddenda99(entry, addenda); err != nil {
-					return err
-				}
-			}
+		// Verify Addenda* FieldInclusion based on entry.Category and batchHeader.StandardEntryClassCode
+		if err := batch.addendaFieldInclusion(entry); err != nil {
+			return err
 		}
 	}
 	return nil

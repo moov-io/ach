@@ -57,8 +57,9 @@ func main() {
 	// build the batch
 	batch := ach.NewBatchCTX(bh)
 	batch.AddEntry(entry)
-	batch.GetEntries()[0].AddAddenda(addenda1)
-	batch.GetEntries()[0].AddAddenda(addenda2)
+	batch.Entries[0].AddendaRecordIndicator = 1
+	batch.GetEntries()[0].AddAddenda05(addenda1)
+	batch.GetEntries()[0].AddAddenda05(addenda2)
 	if err := batch.Create(); err != nil {
 		log.Fatalf("Unexpected error building batch: %s\n", err)
 	}

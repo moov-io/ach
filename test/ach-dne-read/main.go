@@ -30,11 +30,5 @@ func main() {
 
 	fmt.Printf("Total Amount: %v \n", achFile.Batches[0].GetEntries()[0].Amount)
 	fmt.Printf("SEC Code: %v \n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
-
-	a := achFile.Batches[0].GetEntries()[0].Addendum[0]
-	if add, ok := a.(*ach.Addenda05); !ok {
-		log.Fatalf("%T %#v", a, a)
-	} else {
-		fmt.Printf("Payment Related Information: %v \n", add.PaymentRelatedInformation)
-	}
+	fmt.Printf("Payment Related Information: %v \n", achFile.Batches[0].GetEntries()[0].Addenda05[0].PaymentRelatedInformation)
 }

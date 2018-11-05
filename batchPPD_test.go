@@ -158,7 +158,7 @@ func testBatchPPDTypeCode(t testing.TB) {
 	// change an addendum to an invalid type code
 	a := mockAddenda05()
 	a.TypeCode = "63"
-	mockBatch.GetEntries()[0].AddAddenda(a)
+	mockBatch.GetEntries()[0].AddAddenda05(a)
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -245,7 +245,8 @@ func testBatchBuild(t testing.TB) {
 	mockBatch := NewBatchPPD(mockBatchPPDHeader2())
 	entry := mockPPDEntryDetail2()
 	addenda05 := NewAddenda05()
-	entry.AddAddenda(addenda05)
+	entry.AddendaRecordIndicator = 1
+	entry.AddAddenda05(addenda05)
 	mockBatch.AddEntry(entry)
 	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
@@ -268,8 +269,9 @@ func BenchmarkBatchBuild(b *testing.B) {
 // testBatchPPDAddendaCount validates BatchPPD Addendum count of 2
 func testBatchPPDAddendaCount(t testing.TB) {
 	mockBatch := mockBatchPPD()
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -301,7 +303,8 @@ func TestBatchPPDAddendum98(t *testing.T) {
 	mockBatch.AddEntry(mockPPDEntryDetail())
 	mockAddenda98 := mockAddenda98()
 	mockAddenda98.TypeCode = "05"
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98)
+	mockBatch.GetEntries()[0].Category = CategoryNOC
+	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
@@ -319,7 +322,8 @@ func TestBatchPPDAddendum99(t *testing.T) {
 	mockBatch.AddEntry(mockPPDEntryDetail())
 	mockAddenda99 := mockAddenda99()
 	mockAddenda99.TypeCode = "05"
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda99)
+	mockBatch.GetEntries()[0].Category = CategoryReturn
+	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {

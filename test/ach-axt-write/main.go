@@ -44,6 +44,7 @@ func main() {
 	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(bh.ODFIIdentification, 1)
 	entry.DiscretionaryData = "01"
+	entry.AddendaRecordIndicator = 1
 
 	entryOne := ach.NewEntryDetail()          // Fee Entry
 	entryOne.TransactionCode = 24             // Demand Credit
@@ -55,6 +56,7 @@ func main() {
 	entryOne.SetCATXReceivingCompany("Receiver Company")
 	entryOne.SetTraceNumber(bh.ODFIIdentification, 2)
 	entryOne.DiscretionaryData = "01"
+	entryOne.AddendaRecordIndicator = 1
 
 	entryAd1 := ach.NewAddenda05()
 	entryAd1.PaymentRelatedInformation = "Credit account 1 for service"
@@ -79,11 +81,11 @@ func main() {
 	// build the batch
 	batch := ach.NewBatchATX(bh)
 	batch.AddEntry(entry)
-	batch.GetEntries()[0].AddAddenda(entryAd1)
-	batch.GetEntries()[0].AddAddenda(entryAd2)
+	batch.GetEntries()[0].AddAddenda05(entryAd1)
+	batch.GetEntries()[0].AddAddenda05(entryAd2)
 	batch.AddEntry(entryOne)
-	batch.GetEntries()[1].AddAddenda(entryOneAd1)
-	batch.GetEntries()[1].AddAddenda(entryOneAd2)
+	batch.GetEntries()[1].AddAddenda05(entryOneAd1)
+	batch.GetEntries()[1].AddAddenda05(entryOneAd2)
 	if err := batch.Create(); err != nil {
 		log.Fatalf("Unexpected error building batch: %s\n", err)
 	}

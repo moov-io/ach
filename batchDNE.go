@@ -8,11 +8,6 @@ import (
 	"fmt"
 )
 
-var (
-	msgBatchDNEAddenda     = "found and 1 Addenda05 is required for SEC Type DNE"
-	msgBatchDNEAddendaType = "%T found where Addenda05 is required for SEC type DNE"
-)
-
 // BatchDNE is a batch file that handles SEC code Death Notification Entry (DNE)
 // United States Federal agencies (e.g. Social Security) use this to notify depository
 // financial institutions that the recipient of government benefit paymetns has died.
@@ -25,6 +20,7 @@ type BatchDNE struct {
 	batch
 }
 
+// NewBatchDNE returns a *BatchDNE
 func NewBatchDNE(bh *BatchHeader) *BatchDNE {
 	batch := new(BatchDNE)
 	batch.SetControl(NewBatchControl())
@@ -59,14 +55,12 @@ func (batch *BatchDNE) Validate() error {
 		}
 
 		// DNE must have one Addenda05
-		if len(entry.Addendum) != 1 {
-			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
+		if len(entry.Addenda05) != 1 {
+			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addenda05), 1, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 		}
 	}
-
-	// Check Addenda05
-	return batch.isAddenda05()
+	return nil
 }
 
 // Create builds the batch sequence numbers and batch control. Additional creation
@@ -76,32 +70,4 @@ func (batch *BatchDNE) Create() error {
 		return err
 	}
 	return batch.Validate()
-}
-
-// isAddenda05 verifies that a Addenda04 exists for each EntryDetail and is Validated
-func (batch *BatchDNE) isAddenda05() error {
-	if len(batch.Entries) != 1 {
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "entries", Msg: msgBatchEntries}
-	}
-
-	for _, entry := range batch.Entries {
-		// Addenda type must be equal to 1
-		if len(entry.Addendum) != 1 {
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchDNEAddenda}
-		}
-		// Addenda type assertion must be Addenda05
-		addenda05, ok := entry.Addendum[0].(*Addenda05)
-		if !ok {
-			msg := fmt.Sprintf(msgBatchDNEAddendaType, entry.Addendum[0])
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
-		}
-		// Addenda05 must be Validated
-		if err := addenda05.Validate(); err != nil {
-			// convert the field error in to a batch error for a consistent api
-			if e, ok := err.(*FieldError); ok {
-				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: e.FieldName, Msg: e.Msg}
-			}
-		}
-	}
-	return nil
 }

@@ -33,6 +33,8 @@ func mockATXEntryDetail() *EntryDetail {
 	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(mockBatchATXHeader().ODFIIdentification, 1)
 	entry.DiscretionaryData = "01"
+	entry.AddendaRecordIndicator = 1
+	entry.AddAddenda05(mockAddenda05())
 	entry.Category = CategoryForward
 	return entry
 }
@@ -41,7 +43,6 @@ func mockATXEntryDetail() *EntryDetail {
 func mockBatchATX() *BatchATX {
 	mockBatch := NewBatchATX(mockBatchATXHeader())
 	mockBatch.AddEntry(mockATXEntryDetail())
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
 	if err := mockBatch.Create(); err != nil {
 		log.Fatal(err)
 	}
@@ -148,14 +149,15 @@ func BenchmarkBatchATXServiceClassCodeEquality(b *testing.B) {
 	}
 }
 
-// testBatchATXAddendaCount validates BatchATX Addendum count of 2
+// testBatchATXAddendaCount validates BatchATX Addenda05 count of 2
 func testBatchATXAddendaCount(t testing.TB) {
 	mockBatch := mockBatchATX()
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
+			if e.FieldName != "AddendaCount" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -164,7 +166,7 @@ func testBatchATXAddendaCount(t testing.TB) {
 	}
 }
 
-// TestBatchATXAddendaCount tests validating BatchATX Addendum count of 2
+// TestBatchATXAddendaCount tests validating BatchATX Addenda05 count of 2
 func TestBatchATXAddendaCount(t *testing.T) {
 	testBatchATXAddendaCount(t)
 }
@@ -181,6 +183,7 @@ func BenchmarkBatchATXAddendaCount(b *testing.B) {
 func testBatchATXAddendaCountZero(t testing.TB) {
 	mockBatch := NewBatchATX(mockBatchATXHeader())
 	mockBatch.AddEntry(mockATXEntryDetail())
+	//mockBatch.GetEntries()[0].Addenda05[0].
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Addendum" {
@@ -205,32 +208,20 @@ func BenchmarkBatchATXAddendaCountZero(b *testing.B) {
 	}
 }
 
-// testBatchATXInvalidAddendum validates Addendum must be Addenda05
-func testBatchATXInvalidAddendum(t testing.TB) {
+// TestBatchATXInvalidAddenda02 validates Addenda must be Addenda05
+func TestBatchATXInvalidAddend02(t *testing.T) {
 	mockBatch := NewBatchATX(mockBatchATXHeader())
-	mockBatch.AddEntry(mockATXEntryDetail())
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda02())
+	entry := mockATXEntryDetail()
+	entry.Addenda02 = mockAddenda02()
+	mockBatch.AddEntry(entry)
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
+			if e.FieldName != "Addenda02" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
 			t.Errorf("%T: %s", err, err)
 		}
-	}
-}
-
-// TestBatchATXInvalidAddendum tests validating Addendum must be Addenda05
-func TestBatchATXInvalidAddendum(t *testing.T) {
-	testBatchATXInvalidAddendum(t)
-}
-
-// BenchmarkBatchATXInvalidAddendum benchmarks validating Addendum must be Addenda05
-func BenchmarkBatchATXInvalidAddendum(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testBatchATXInvalidAddendum(b)
 	}
 }
 
@@ -240,7 +231,7 @@ func testBatchATXInvalidAddenda(t testing.TB) {
 	mockBatch.AddEntry(mockATXEntryDetail())
 	addenda05 := mockAddenda05()
 	addenda05.recordType = "63"
-	mockBatch.GetEntries()[0].AddAddenda(addenda05)
+	mockBatch.GetEntries()[0].AddAddenda05(addenda05)
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "recordType" {
@@ -318,9 +309,11 @@ func testBatchATXAddenda10000(t testing.TB) {
 
 	mockBatch := NewBatchATX(bh)
 	mockBatch.AddEntry(entry)
+	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
 
 	for i := 0; i < 10000; i++ {
-		mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+		mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
+
 	}
 
 	if err := mockBatch.Create(); err != nil {
@@ -363,17 +356,18 @@ func testBatchATXAddendaRecords(t testing.TB) {
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
 	entry.SetOriginalTraceNumber("121042880000001")
-	entry.SetCATXAddendaRecords(500)
+	entry.SetCATXAddendaRecords(565)
 	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(mockBatchATXHeader().ODFIIdentification, 1)
 	entry.DiscretionaryData = "01"
 	entry.Category = CategoryForward
+	entry.AddendaRecordIndicator = 1
 
 	mockBatch := NewBatchATX(bh)
 	mockBatch.AddEntry(entry)
 
 	for i := 0; i < 565; i++ {
-		mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+		mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	}
 
 	if err := mockBatch.Create(); err != nil {
@@ -465,6 +459,8 @@ func testBatchATXZeroAddendaRecords(t testing.TB) {
 	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(mockBatchATXHeader().ODFIIdentification, 1)
 	entry.DiscretionaryData = "01"
+	entry.AddAddenda05(mockAddenda05())
+	entry.AddendaRecordIndicator = 1
 	entry.Category = CategoryForward
 
 	mockBatch := NewBatchATX(bh)
@@ -519,7 +515,8 @@ func testBatchATXTransactionCode(t testing.TB) {
 
 	mockBatch := NewBatchATX(bh)
 	mockBatch.AddEntry(entry)
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -570,7 +567,8 @@ func TestBatchATXAmount(t *testing.T) {
 
 	mockBatch := NewBatchATX(bh)
 	mockBatch.AddEntry(entry)
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -589,7 +587,8 @@ func TestBatchATXAddendum98(t *testing.T) {
 	mockBatch.AddEntry(mockATXEntryDetail())
 	mockAddenda98 := mockAddenda98()
 	mockAddenda98.TypeCode = "05"
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98)
+	mockBatch.GetEntries()[0].Category = CategoryNOC
+	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
@@ -607,7 +606,8 @@ func TestBatchATXAddendum99(t *testing.T) {
 	mockBatch.AddEntry(mockATXEntryDetail())
 	mockAddenda99 := mockAddenda99()
 	mockAddenda99.TypeCode = "05"
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda99)
+	mockBatch.GetEntries()[0].Category = CategoryReturn
+	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {

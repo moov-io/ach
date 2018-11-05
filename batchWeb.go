@@ -32,26 +32,15 @@ func (batch *BatchWEB) Validate() error {
 	}
 
 	for _, entry := range batch.Entries {
-		// WEB can have up to one Addenda Record TypeCode = 05, or there can be a NOC (98) or Return (99)
-		for _, addenda := range entry.Addendum {
-			switch entry.Category {
-			case CategoryForward:
-				if err := batch.categoryForwardAddenda05(entry, addenda); err != nil {
-					return err
-				}
-				if len(entry.Addendum) > 1 {
-					msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), 1, batch.Header.StandardEntryClassCode)
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
-				}
-			case CategoryNOC:
-				if err := batch.categoryNOCAddenda98(entry, addenda); err != nil {
-					return err
-				}
-			case CategoryReturn:
-				if err := batch.categoryReturnAddenda99(entry, addenda); err != nil {
-					return err
-				}
-			}
+		// WEB can have up to one Addenda05 record
+		if len(entry.Addenda05) > 1 {
+			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addenda05), 1, batch.Header.StandardEntryClassCode)
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+		}
+
+		// Verify Addenda* FieldInclusion based on entry.Category and batchHeader.StandardEntryClassCode
+		if err := batch.addendaFieldInclusion(entry); err != nil {
+			return err
 		}
 	}
 	return nil

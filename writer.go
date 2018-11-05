@@ -79,8 +79,27 @@ func (w *Writer) writeBatch(file *File) error {
 				return err
 			}
 			w.lineNum++
-			for _, addenda := range entry.Addendum {
-				if _, err := w.w.WriteString(addenda.String() + "\n"); err != nil {
+
+			if entry.Addenda02 != nil {
+				if _, err := w.w.WriteString(entry.Addenda02.String() + "\n"); err != nil {
+					return err
+				}
+				w.lineNum++
+			}
+			for _, addenda05 := range entry.Addenda05 {
+				if _, err := w.w.WriteString(addenda05.String() + "\n"); err != nil {
+					return err
+				}
+				w.lineNum++
+			}
+			if entry.Addenda98 != nil {
+				if _, err := w.w.WriteString(entry.Addenda98.String() + "\n"); err != nil {
+					return err
+				}
+				w.lineNum++
+			}
+			if entry.Addenda99 != nil {
+				if _, err := w.w.WriteString(entry.Addenda99.String() + "\n"); err != nil {
 					return err
 				}
 				w.lineNum++

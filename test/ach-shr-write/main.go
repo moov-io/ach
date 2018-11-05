@@ -43,6 +43,7 @@ func main() {
 	entry.SetSHRDocumentReferenceNumber("12345678910")
 	entry.SetSHRIndividualCardAccountNumber("1234567891123456789")
 	entry.DiscretionaryData = "01"
+	entry.AddendaRecordIndicator = 1
 
 	addenda02 := ach.NewAddenda02()
 	addenda02.ReferenceInformationOne = "REFONEA"
@@ -59,7 +60,7 @@ func main() {
 	// build the batch
 	batch := ach.NewBatchSHR(bh)
 	batch.AddEntry(entry)
-	batch.GetEntries()[0].AddAddenda(addenda02)
+	batch.GetEntries()[0].Addenda02 = addenda02
 	if err := batch.Create(); err != nil {
 		log.Fatalf("Unexpected error building batch: %s\n", err)
 	}

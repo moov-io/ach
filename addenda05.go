@@ -11,6 +11,7 @@ import (
 
 // Addenda05 is a Addendumer addenda which provides business transaction information for Addenda Type
 // Code 05 in a machine readable format. It is usually formatted according to ANSI, ASC, X12 Standard.
+// It is used for the following StandardEntryClassCode: ACK, ATX, CCD, CIE, CTX, DNE, ENR WEB, PPD, TRX.
 type Addenda05 struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
@@ -141,9 +142,4 @@ func (addenda05 *Addenda05) SequenceNumberField() string {
 // EntryDetailSequenceNumberField returns a zero padded EntryDetailSequenceNumber string
 func (addenda05 *Addenda05) EntryDetailSequenceNumberField() string {
 	return addenda05.numericField(addenda05.EntryDetailSequenceNumber, 7)
-}
-
-// TypeCode Defines the specific explanation and format for the addenda05 information
-func (addenda05 *Addenda05) typeCode() string {
-	return addenda05.TypeCode
 }

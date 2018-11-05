@@ -14,7 +14,6 @@ func mockAddenda05() *Addenda05 {
 	addenda05.SequenceNumber = 1
 	addenda05.PaymentRelatedInformation = "This is an Addenda05"
 	addenda05.EntryDetailSequenceNumber = 0000001
-
 	return addenda05
 }
 
@@ -43,12 +42,12 @@ func testParseAddenda05(t testing.TB) {
 	entryDetail := mockPPDEntryDetail()
 
 	//Add an addenda to the PPD EntryDetail
-	entryDetail.AddAddenda(addendaPPD)
+	entryDetail.AddAddenda05(addendaPPD)
 
 	// add the PPD entry detail to the batch
 	r.currentBatch.AddEntry(entryDetail)
 
-	record := r.currentBatch.GetEntries()[0].Addendum[0].(*Addenda05)
+	record := r.currentBatch.GetEntries()[0].Addenda05[0]
 
 	if record.recordType != "7" {
 		t.Errorf("RecordType Expected '7' got: %v", record.recordType)

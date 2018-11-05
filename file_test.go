@@ -351,7 +351,8 @@ func testFileReturnEntries(t testing.TB) {
 	// create or copy the entry to be returned record
 	entry := mockEntryDetail()
 	// Add the addenda return with appropriate ReturnCode and addenda information
-	entry.AddAddenda(mockAddenda99())
+	entry.Addenda99 = mockAddenda99()
+	entry.Category = CategoryReturn
 	// create or copy the previous batch header of the item being returned
 	batchHeader := mockBatchHeader()
 	// create or copy the batch to be returned
@@ -372,10 +373,6 @@ func testFileReturnEntries(t testing.TB) {
 	// Create the return file
 	if err := file.Create(); err != nil {
 		t.Error(err.Error())
-	}
-
-	if len(file.ReturnEntries) != 1 {
-		t.Errorf("1 file.ReturnEntries added and %v exist", len(file.ReturnEntries))
 	}
 }
 

@@ -46,7 +46,8 @@ func main() {
 
 	addenda := ach.NewAddenda05()
 	addenda.PaymentRelatedInformation = `22*12200004*3*123987654321*777777777*DOE*JOHN*0\` // From NACHA 2013 Official Rules
-	entry.AddAddenda(addenda)
+	entry.AddendaRecordIndicator = 1
+	entry.AddAddenda05(addenda)
 
 	// build the batch
 	batch := ach.NewBatchDNE(bh)

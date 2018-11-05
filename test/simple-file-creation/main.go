@@ -43,12 +43,13 @@ func main() {
 	entry.SetTraceNumber(bh.ODFIIdentification, 1)
 	entry.IdentificationNumber = "ABC##jvkdjfuiwn"
 	entry.Category = ach.CategoryForward
+	entry.AddendaRecordIndicator = 1
 
 	// To add one or more optional addenda records for an entry
 
 	addenda := ach.NewAddenda05()
 	addenda.PaymentRelatedInformation = "bonus pay for amazing work on #OSS"
-	entry.AddAddenda(addenda)
+	entry.AddAddenda05(addenda)
 
 	// Entries are added to batches like so:
 
@@ -90,11 +91,12 @@ func main() {
 	entry2.IdentificationNumber = "#123456"
 	entry2.DiscretionaryData = "R"
 	entry2.Category = ach.CategoryForward
+	entry2.AddendaRecordIndicator = 1
 
 	// To add one or more optional addenda records for an entry
 	addenda2 := ach.NewAddenda05()
 	addenda2.PaymentRelatedInformation = "Monthly Membership Subscription"
-	entry2.AddAddenda(addenda2)
+	entry2.AddAddenda05(addenda2)
 
 	// add the entry to the batch
 	batch2.AddEntry(entry2)

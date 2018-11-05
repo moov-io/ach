@@ -1,6 +1,8 @@
 package ach
 
-import "testing"
+import (
+	"testing"
+)
 
 // mockBatchWEBHeader creates a WEB batch header
 func mockBatchWEBHeader() *BatchHeader {
@@ -31,7 +33,8 @@ func mockWEBEntryDetail() *EntryDetail {
 func mockBatchWEB() *BatchWEB {
 	mockBatch := NewBatchWEB(mockBatchWEBHeader())
 	mockBatch.AddEntry(mockWEBEntryDetail())
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	if err := mockBatch.Create(); err != nil {
 		panic(err)
 	}
@@ -43,7 +46,7 @@ func mockBatchWEB() *BatchWEB {
 func testBatchWebAddenda(t testing.TB) {
 	mockBatch := mockBatchWEB()
 	// mock batch already has one addenda. Creating two addenda should error
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "AddendaCount" {
@@ -105,7 +108,8 @@ func TestBatchWEBAddendum98(t *testing.T) {
 	mockBatch.AddEntry(mockWEBEntryDetail())
 	mockAddenda98 := mockAddenda98()
 	mockAddenda98.TypeCode = "05"
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda98)
+	mockBatch.GetEntries()[0].Category = CategoryNOC
+	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
@@ -123,7 +127,8 @@ func TestBatchWEBAddendum99(t *testing.T) {
 	mockBatch.AddEntry(mockWEBEntryDetail())
 	mockAddenda99 := mockAddenda99()
 	mockAddenda99.TypeCode = "05"
-	mockBatch.GetEntries()[0].AddAddenda(mockAddenda99)
+	mockBatch.GetEntries()[0].Category = CategoryReturn
+	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
@@ -138,7 +143,8 @@ func TestBatchWEBAddendum99(t *testing.T) {
 // testBatchWEBAddendaTypeCode validates addenda type code is valid
 func testBatchWEBAddendaTypeCode(t testing.TB) {
 	mockBatch := mockBatchWEB()
-	mockBatch.GetEntries()[0].Addendum[0].(*Addenda05).TypeCode = "02"
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
+	mockBatch.GetEntries()[0].Addenda05[0].TypeCode = "02"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
@@ -282,5 +288,24 @@ func BenchmarkBatchWebPaymentTypeR(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchWebPaymentTypeR(b)
+	}
+}
+
+// TestBatchWEBAddendum99Category validates Addenda99 returns an error
+func TestBatchWEBAddendum99Category(t *testing.T) {
+	mockBatch := NewBatchWEB(mockBatchWEBHeader())
+	mockBatch.AddEntry(mockWEBEntryDetail())
+	mockAddenda99 := mockAddenda99()
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
+	mockBatch.Entries[0].Category = CategoryForward
+	mockBatch.Entries[0].Addenda99 = mockAddenda99
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addenda99" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
 	}
 }
