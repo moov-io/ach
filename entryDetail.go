@@ -491,11 +491,6 @@ func (ed *EntryDetail) CreditOrDebit() string {
 	return ""
 }
 
-// GetAddenda05 returns a slice of Addenda05 for the batch
-func (ed *EntryDetail) GetAddenda05() []*Addenda05 {
-	return ed.Addenda05
-}
-
 // AddAddenda05 appends an Addenda05 to the EntryDetail
 func (ed *EntryDetail) AddAddenda05(addenda05 *Addenda05) {
 	ed.Addenda05 = append(ed.Addenda05, addenda05)
