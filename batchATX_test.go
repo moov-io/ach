@@ -152,11 +152,12 @@ func BenchmarkBatchATXServiceClassCodeEquality(b *testing.B) {
 // testBatchATXAddendaCount validates BatchATX Addenda05 count of 2
 func testBatchATXAddendaCount(t testing.TB) {
 	mockBatch := mockBatchATX()
-	//mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda05" {
+			if e.FieldName != "AddendaCount" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -230,7 +231,7 @@ func testBatchATXInvalidAddenda(t testing.TB) {
 	mockBatch.AddEntry(mockATXEntryDetail())
 	addenda05 := mockAddenda05()
 	addenda05.recordType = "63"
-	//mockBatch.GetEntries()[0].AddAddenda(addenda05)
+	mockBatch.GetEntries()[0].AddAddenda05(addenda05)
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "recordType" {
@@ -308,9 +309,11 @@ func testBatchATXAddenda10000(t testing.TB) {
 
 	mockBatch := NewBatchATX(bh)
 	mockBatch.AddEntry(entry)
+	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
 
 	for i := 0; i < 10000; i++ {
-		//mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+		mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
+
 	}
 
 	if err := mockBatch.Create(); err != nil {
@@ -512,7 +515,8 @@ func testBatchATXTransactionCode(t testing.TB) {
 
 	mockBatch := NewBatchATX(bh)
 	mockBatch.AddEntry(entry)
-	//mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -563,7 +567,8 @@ func TestBatchATXAmount(t *testing.T) {
 
 	mockBatch := NewBatchATX(bh)
 	mockBatch.AddEntry(entry)
-	//mockBatch.GetEntries()[0].AddAddenda(mockAddenda05())
+	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
