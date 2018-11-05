@@ -290,3 +290,22 @@ func BenchmarkBatchWebPaymentTypeR(b *testing.B) {
 		testBatchWebPaymentTypeR(b)
 	}
 }
+
+// TestBatchWEBAddendum99Category validates Addenda99 returns an error
+func TestBatchWEBAddendum99Category(t *testing.T) {
+	mockBatch := NewBatchWEB(mockBatchWEBHeader())
+	mockBatch.AddEntry(mockWEBEntryDetail())
+	mockAddenda99 := mockAddenda99()
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
+	mockBatch.Entries[0].Category = CategoryForward
+	mockBatch.Entries[0].Addenda99 = mockAddenda99
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addenda99" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}

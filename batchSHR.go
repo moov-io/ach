@@ -70,12 +70,6 @@ func (batch *BatchSHR) Validate() error {
 			return &FieldError{FieldName: "CardExpirationDate", Value: year, Msg: msgValidYear}
 		}
 
-		// SHR must have one Addenda02 record
-		if entry.Addenda02 == nil {
-			msg := fmt.Sprintf(msgBatchRequiredAddendaCount, 0, 1, batch.Header.StandardEntryClassCode)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
-		}
-
 		// Verify Addenda* FieldInclusion based on entry.Category and batchHeader.StandardEntryClassCode
 		if err := batch.addendaFieldInclusion(entry); err != nil {
 			return err

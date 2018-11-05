@@ -496,7 +496,6 @@ func (batch *batch) addendaFieldInclusion(entry *EntryDetail) error {
 		if err := batch.addendaFieldInclusionReturn(entry); err != nil {
 			return err
 		}
-	default:
 	}
 	return nil
 }

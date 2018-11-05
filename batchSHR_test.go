@@ -367,7 +367,7 @@ func testBatchSHRInvalidAddendum(t testing.TB) {
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaCount" {
+			if e.FieldName != "Addenda05" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -605,5 +605,24 @@ func BenchmarkSHRCardExpirationDateYear(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testSHRCardExpirationDateYear(b)
+	}
+}
+
+// TestBatchSHRAddendum99Category validates Addenda99 returns an error
+func TestBatchSHRAddendum99Category(t *testing.T) {
+	mockBatch := NewBatchSHR(mockBatchSHRHeader())
+	mockBatch.AddEntry(mockSHREntryDetail())
+	mockAddenda99 := mockAddenda99()
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
+	mockBatch.Entries[0].Category = CategoryNOC
+	mockBatch.Entries[0].Addenda99 = mockAddenda99
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addenda99" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
 	}
 }
