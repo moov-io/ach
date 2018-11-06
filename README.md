@@ -28,6 +28,7 @@ ACH is under active development but already in production for multiple companies
 | COR      | Automated Notification of Change(NOC) | [Link](test/ach-cor-read/main.go) | [Link](test/ach-cor-write/main.go) |
 | CTX      | Corporate Trade Exchange              | [Link](test/ach-ctx-read/main.go) | [Link](test/ach-ctx-write/main.go) |
 | DNE      | Death Notification Entry              | [Link](test/ach-dne-read/main.go) | [Link](test/ach-dne-write/main.go) |
+| ENR      | Automatic Enrollment Entry            | [Link](test/ach-enr-read/main.go) | [Link](test/ach-enr-write/main.go) |
 | IAT      | International ACH Transactions        | [Link](test/ach-iat-read/main.go) | [Link](test/ach-iat-write/main.go) |
 | POP      | Point of Purchase                     | [Link](test/ach-pop-read/main.go) | [Link](test/ach-pop-write/main.go) |
 | POS      | Point of Sale                         | [Link](test/ach-pos-read/main.go) | [Link](test/ach-pos-write/main.go) |
