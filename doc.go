@@ -6,6 +6,7 @@
 // primary method of electronic money movement through the United States.
 //
 // https://en.wikipedia.org/wiki/Automated_Clearing_House
+//
 // https://github.com/moov-io/ach/tree/master/documentation
 //
 // Read an ACH File
