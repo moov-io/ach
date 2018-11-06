@@ -89,7 +89,7 @@ func (addenda98 *Addenda98) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
 	buf.WriteString(addenda98.recordType)
-	buf.WriteString(addenda98.typeCode())
+	buf.WriteString(addenda98.TypeCode)
 	buf.WriteString(addenda98.ChangeCode)
 	buf.WriteString(addenda98.OriginalTraceField())
 	buf.WriteString("      ") // 6 char reserved field
@@ -130,11 +130,6 @@ func (addenda98 *Addenda98) Validate() error {
 	}
 
 	return nil
-}
-
-// TypeCode defines the format of the underlying addenda record
-func (addenda98 *Addenda98) typeCode() string {
-	return addenda98.TypeCode
 }
 
 // OriginalTraceField returns a zero padded OriginalTrace string

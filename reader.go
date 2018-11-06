@@ -533,6 +533,12 @@ func (r *Reader) switchIATAddenda(entryIndex int) error {
 		if err != nil {
 			return err
 		}
+	// IATNOC
+	case "98":
+		err := r.nocIATAddenda(entryIndex)
+		if err != nil {
+			return err
+		}
 	// IAT return Addenda
 	case "99":
 		err := r.returnIATAddenda(entryIndex)
@@ -602,15 +608,26 @@ func (r *Reader) mandatoryOptionalIATAddenda(entryIndex int) error {
 		if err := addenda17.Validate(); err != nil {
 			return err
 		}
-		r.IATCurrentBatch.Entries[entryIndex].AddIATAddenda(addenda17)
+		r.IATCurrentBatch.Entries[entryIndex].AddAddenda17(addenda17)
 	case "18":
 		addenda18 := NewAddenda18()
 		addenda18.Parse(r.line)
 		if err := addenda18.Validate(); err != nil {
 			return err
 		}
-		r.IATCurrentBatch.Entries[entryIndex].AddIATAddenda(addenda18)
+		r.IATCurrentBatch.Entries[entryIndex].AddAddenda18(addenda18)
 	}
+	return nil
+}
+
+// nocIATAddenda parses and validates IAT NOC record Addenda98
+func (r *Reader) nocIATAddenda(entryIndex int) error {
+	addenda98 := NewAddenda98()
+	addenda98.Parse(r.line)
+	if err := addenda98.Validate(); err != nil {
+		return err
+	}
+	r.IATCurrentBatch.Entries[entryIndex].Addenda98 = addenda98
 	return nil
 }
 
@@ -621,6 +638,6 @@ func (r *Reader) returnIATAddenda(entryIndex int) error {
 	if err := addenda99.Validate(); err != nil {
 		return err
 	}
-	r.IATCurrentBatch.Entries[entryIndex].AddIATAddenda(addenda99)
+	r.IATCurrentBatch.Entries[entryIndex].Addenda99 = addenda99
 	return nil
 }

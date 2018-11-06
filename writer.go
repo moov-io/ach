@@ -152,9 +152,28 @@ func (w *Writer) writeIATBatch(file *File) error {
 				return err
 			}
 			w.lineNum++
-			// IAT Addenda17 and IAT Addenda18 records
-			for _, IATaddenda := range entry.Addendum {
-				if _, err := w.w.WriteString(IATaddenda.String() + "\n"); err != nil {
+			// IAT Addenda17
+			for _, addenda17 := range entry.Addenda17 {
+				if _, err := w.w.WriteString(addenda17.String() + "\n"); err != nil {
+					return err
+				}
+				w.lineNum++
+			}
+			// IAT Addenda18
+			for _, addenda18 := range entry.Addenda18 {
+				if _, err := w.w.WriteString(addenda18.String() + "\n"); err != nil {
+					return err
+				}
+				w.lineNum++
+			}
+			if entry.Addenda98 != nil {
+				if _, err := w.w.WriteString(entry.Addenda98.String() + "\n"); err != nil {
+					return err
+				}
+				w.lineNum++
+			}
+			if entry.Addenda99 != nil {
+				if _, err := w.w.WriteString(entry.Addenda99.String() + "\n"); err != nil {
 					return err
 				}
 				w.lineNum++
