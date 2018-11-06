@@ -28,7 +28,7 @@ func main() {
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = "MTE"
 	bh.CompanyEntryDescription = "CASH WITHDRAW" // will be on receiving accounts statement // TODO
-	bh.EffectiveEntryDate = time.Now()           // Date phyiscal money was received
+	bh.EffectiveEntryDate = time.Now()           // Date physical money was received
 	bh.ODFIIdentification = "23138010"           // Originating Routing Number
 
 	// Identifies the receivers account information
