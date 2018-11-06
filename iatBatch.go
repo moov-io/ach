@@ -10,13 +10,9 @@ import (
 )
 
 var (
-	msgIATBatchAddendaRequired  = "is required for an IAT detail entry"
 	msgIATBatchAddendaIndicator = "is invalid for addenda record(s) found"
-	// There can be up to 2 optional Addenda17 records and up to 5 optional Addenda18 records
-	msgBatchIATAddendum          = "7 Addendum is the maximum for SEC code IAT"
-	msgBatchIATAddendumCount     = "%v Addenda %v for SEC Code IAT"
-	msgBatchIATInvalidAddendumer = "invalid Addendumer for SEC Code IAT"
-	msgBatchIATNOC               = "%v invalid for IAT NOC, should be %v"
+	msgBatchIATAddendumCount    = "%v Addenda %v for SEC Code IAT"
+	msgBatchIATNOC              = "%v invalid for IAT NOC, should be %v"
 )
 
 // IATBatch holds the Batch Header and Batch Control and all Entry Records for an IAT batch
@@ -118,7 +114,14 @@ func (batch *IATBatch) build() error {
 	entryCount := 0
 	seq := 1
 	for i, entry := range batch.Entries {
-		entryCount = entryCount + 1 + 7 + len(entry.Addenda17) + len(entry.Addenda18) + len(entry.Addendum)
+		entryCount = entryCount + 1 + 7 + len(entry.Addenda17) + len(entry.Addenda18)
+
+		if entry.Addenda98 != nil {
+			entryCount = entryCount + 1
+		}
+		if entry.Addenda99 != nil {
+			entryCount = entryCount + 1
+		}
 
 		// Verifies the required addenda* properties for an IAT entry detail are defined
 		if err := batch.addendaFieldInclusion(entry); err != nil {
@@ -230,7 +233,6 @@ func (batch *IATBatch) isFieldInclusion() error {
 		if err := batch.addendaFieldInclusion(entry); err != nil {
 			return err
 		}
-
 		if entry.Category != CategoryNOC {
 			// Verifies each Addenda* record is valid
 			if err := entry.Addenda10.Validate(); err != nil {
@@ -254,10 +256,31 @@ func (batch *IATBatch) isFieldInclusion() error {
 			if err := entry.Addenda16.Validate(); err != nil {
 				return err
 			}
+			for _, Addenda17 := range entry.Addenda17 {
+				if err := Addenda17.Validate(); err != nil {
+					return err
+				}
+			}
+			for _, Addenda18 := range entry.Addenda18 {
+				if err := Addenda18.Validate(); err != nil {
+					return err
+				}
+			}
 		}
-		// Verifies addendumer Addenda17 and Addenda18 records are valid
-		for _, IATAddenda := range entry.Addendum {
-			if err := IATAddenda.Validate(); err != nil {
+		if entry.Category == CategoryNOC {
+			if entry.Addenda98 == nil {
+				return &FieldError{FieldName: "Addenda98", Msg: msgFieldInclusion}
+			}
+			if err := entry.Addenda98.Validate(); err != nil {
+				return err
+			}
+		}
+		if entry.Category == CategoryReturn {
+			if entry.Addenda99 == nil {
+				return &FieldError{FieldName: "Addenda99", Msg: msgFieldInclusion}
+			}
+
+			if err := entry.Addenda99.Validate(); err != nil {
 				return err
 			}
 		}
@@ -271,7 +294,14 @@ func (batch *IATBatch) isFieldInclusion() error {
 func (batch *IATBatch) isBatchEntryCount() error {
 	entryCount := 0
 	for _, entry := range batch.Entries {
-		entryCount = entryCount + 1 + 7 + len(entry.Addenda17) + len(entry.Addenda18) + len(entry.Addendum)
+		entryCount = entryCount + 1 + 7 + len(entry.Addenda17) + len(entry.Addenda18)
+
+		if entry.Addenda98 != nil {
+			entryCount = entryCount + 1
+		}
+		if entry.Addenda99 != nil {
+			entryCount = entryCount + 1
+		}
 	}
 	if entryCount != batch.Control.EntryAddendaCount {
 		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, entryCount, batch.Control.EntryAddendaCount)
@@ -452,39 +482,30 @@ func (batch *IATBatch) isCategory() error {
 }
 
 func (batch *IATBatch) addendaFieldInclusion(entry *IATEntryDetail) error {
-
 	if entry.Category == CategoryNOC {
 		return nil
 	}
 	if entry.Addenda10 == nil {
-		msg := fmt.Sprint(msgIATBatchAddendaRequired)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda10", Msg: msg}
+		return &FieldError{FieldName: "Addenda10", Msg: msgFieldInclusion}
 	}
 	if entry.Addenda11 == nil {
-		msg := fmt.Sprint(msgIATBatchAddendaRequired)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda11", Msg: msg}
+		return &FieldError{FieldName: "Addenda11", Msg: msgFieldInclusion}
 	}
 	if entry.Addenda12 == nil {
-		msg := fmt.Sprint(msgIATBatchAddendaRequired)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda12", Msg: msg}
+		return &FieldError{FieldName: "Addenda12", Msg: msgFieldInclusion}
 	}
 	if entry.Addenda13 == nil {
-		msg := fmt.Sprint(msgIATBatchAddendaRequired)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda13", Msg: msg}
+		return &FieldError{FieldName: "Addenda13", Msg: msgFieldInclusion}
 	}
 	if entry.Addenda14 == nil {
-		msg := fmt.Sprint(msgIATBatchAddendaRequired)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda14", Msg: msg}
+		return &FieldError{FieldName: "Addenda14", Msg: msgFieldInclusion}
 	}
 	if entry.Addenda15 == nil {
-		msg := fmt.Sprint(msgIATBatchAddendaRequired)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda15", Msg: msg}
+		return &FieldError{FieldName: "Addenda15", Msg: msgFieldInclusion}
 	}
 	if entry.Addenda16 == nil {
-		msg := fmt.Sprint(msgIATBatchAddendaRequired)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda16", Msg: msg}
+		return &FieldError{FieldName: "Addenda16", Msg: msgFieldInclusion}
 	}
-
 	return nil
 }
 
@@ -509,55 +530,37 @@ func (batch *IATBatch) Validate() error {
 
 	for _, entry := range batch.Entries {
 
-		switch entry.Category {
-		case CategoryForward:
-			if len(entry.Addendum) > 7 {
-				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchIATAddendum}
-			}
-		default:
-		}
-
 		addenda17Count := 0
 		addenda18Count := 0
 
-		for _, IATAddenda := range entry.Addendum {
+		if len(entry.Addenda17) > 2 {
+			msg := fmt.Sprintf(msgBatchIATAddendumCount, addenda17Count, "17")
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda17", Msg: msg}
+		}
 
-			switch IATAddenda.typeCode() {
-			case "17":
-				addenda17Count = addenda17Count + 1
-				if addenda17Count > 2 {
-					msg := fmt.Sprintf(msgBatchIATAddendumCount, addenda17Count, "17")
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
-				}
-			case "18":
-				addenda18Count = addenda18Count + 1
-				if addenda18Count > 5 {
-					msg := fmt.Sprintf(msgBatchIATAddendumCount, addenda18Count, "18")
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
-				}
-			case "98":
-				// Only one Addenda98 can be added in EntryDetail.AddIATAddenda
-				if batch.GetHeader().IATIndicator != "IATCOR" {
-					msg := fmt.Sprintf(msgBatchIATNOC, batch.GetHeader().IATIndicator, "IATCOR")
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "IATIndicator", Msg: msg}
-				}
-				if batch.GetHeader().StandardEntryClassCode != "COR" {
-					msg := fmt.Sprintf(msgBatchIATNOC, batch.GetHeader().StandardEntryClassCode, "COR")
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
-				}
-				switch entry.TransactionCode {
-				case 22, 27, 32, 37, 42, 47, 52, 55,
-					23, 28, 33, 38, 43, 48, 53,
-					24, 29, 34, 39, 44, 49, 54:
-					msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "IATCOR")
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
-				}
-			case "99":
-				// Only one Addenda99 can be added in EntryDetail.AddIATAddenda
-			default:
-				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msgBatchIATInvalidAddendumer}
+		if len(entry.Addenda18) > 5 {
+			msg := fmt.Sprintf(msgBatchIATAddendumCount, addenda18Count, "18")
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda18", Msg: msg}
+		}
+
+		if entry.Category == CategoryNOC {
+			if batch.GetHeader().IATIndicator != "IATCOR" {
+				msg := fmt.Sprintf(msgBatchIATNOC, batch.GetHeader().IATIndicator, "IATCOR")
+				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "IATIndicator", Msg: msg}
+			}
+			if batch.GetHeader().StandardEntryClassCode != "COR" {
+				msg := fmt.Sprintf(msgBatchIATNOC, batch.GetHeader().StandardEntryClassCode, "COR")
+				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
+			}
+			switch entry.TransactionCode {
+			case 22, 27, 32, 37, 42, 47, 52, 55,
+				23, 28, 33, 38, 43, 48, 53,
+				24, 29, 34, 39, 44, 49, 54:
+				msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "IATCOR")
+				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 			}
 		}
+
 	}
 	return nil
 }

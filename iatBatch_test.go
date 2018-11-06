@@ -134,7 +134,7 @@ func testIATBatchAddenda10Error(t testing.TB) {
 	iatBatch.GetEntries()[0].Addenda10 = nil
 	if err := iatBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "FieldError" {
+			if e.FieldName != "Addenda10" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -164,7 +164,7 @@ func testIATBatchAddenda11Error(t testing.TB) {
 	iatBatch.GetEntries()[0].Addenda11 = nil
 	if err := iatBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "FieldError" {
+			if e.FieldName != "Addenda11" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -194,7 +194,7 @@ func testIATBatchAddenda12Error(t testing.TB) {
 	iatBatch.GetEntries()[0].Addenda12 = nil
 	if err := iatBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "FieldError" {
+			if e.FieldName != "Addenda12" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -224,7 +224,7 @@ func testIATBatchAddenda13Error(t testing.TB) {
 	iatBatch.GetEntries()[0].Addenda13 = nil
 	if err := iatBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "FieldError" {
+			if e.FieldName != "Addenda13" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -254,7 +254,7 @@ func testIATBatchAddenda14Error(t testing.TB) {
 	iatBatch.GetEntries()[0].Addenda14 = nil
 	if err := iatBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "FieldError" {
+			if e.FieldName != "Addenda14" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -284,7 +284,7 @@ func testIATBatchAddenda15Error(t testing.TB) {
 	iatBatch.GetEntries()[0].Addenda15 = nil
 	if err := iatBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "FieldError" {
+			if e.FieldName != "Addenda15" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -314,7 +314,7 @@ func testIATBatchAddenda16Error(t testing.TB) {
 	iatBatch.GetEntries()[0].Addenda16 = nil
 	if err := iatBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "FieldError" {
+			if e.FieldName != "Addenda16" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -1000,7 +1000,7 @@ func testIATBatchIsCategory(t testing.TB) {
 
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Category" {
+			if e.FieldName != "Addenda99" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -1393,7 +1393,7 @@ func testIATBatchEntryAddendum(t testing.TB) {
 
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
+			if e.FieldName != "Addenda18" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -1759,7 +1759,7 @@ func testIATBatchAddenda17Count(t testing.TB) {
 
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
+			if e.FieldName != "Addenda17" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -1817,7 +1817,7 @@ func testIATBatchAddenda18Count(t testing.TB) {
 
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
+			if e.FieldName != "Addenda18" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -1847,7 +1847,7 @@ func testIATBatchBuildAddendaError(t testing.TB) {
 	mockBatch.AddEntry(mockIATEntryDetail())
 
 	if err := mockBatch.build(); err != nil {
-		if e, ok := err.(*BatchError); ok {
+		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "Addenda10" {
 				t.Errorf("%T: %s", err, err)
 			}
@@ -1915,7 +1915,7 @@ func testIATBatchAddenda99Count(t testing.TB) {
 	mockBatch.Entries[0].Addenda15 = mockAddenda15()
 	mockBatch.Entries[0].Addenda16 = mockAddenda16()
 	mockBatch.Entries[0].AddAddenda17(mockAddenda17())
-	mockBatch.Entries[0].AddIATAddenda(mockIATAddenda99())
+	mockBatch.Entries[0].Addenda99 = mockIATAddenda99()
 	mockBatch.category = CategoryReturn
 
 	if err := mockBatch.build(); err != nil {
@@ -1955,7 +1955,7 @@ func TestIATBatchAddenda98TotalCount(t *testing.T) {
 	mockBatch.GetEntries()[0].TransactionCode = 21
 	mockBatch.GetEntries()[0].AddendaRecords = 2
 	mockBatch.GetEntries()[0].Category = CategoryNOC
-	mockBatch.Entries[0].AddIATAddenda(mockIATAddenda98())
+	mockBatch.Entries[0].Addenda98 = mockIATAddenda98()
 	mockBatch.category = CategoryNOC
 
 	if err := mockBatch.build(); err != nil {
@@ -1980,7 +1980,7 @@ func TestIATBatchAddenda98TransactionCode(t *testing.T) {
 	mockBatch.AddEntry(mockIATEntryDetail())
 	mockBatch.GetEntries()[0].TransactionCode = 22
 	mockBatch.GetEntries()[0].Category = CategoryNOC
-	mockBatch.Entries[0].AddIATAddenda(mockIATAddenda98())
+	mockBatch.Entries[0].Addenda98 = mockIATAddenda98()
 	mockBatch.category = CategoryNOC
 
 	if err := mockBatch.build(); err != nil {
@@ -2006,7 +2006,7 @@ func TestIATBatchAddenda98IATIndicator(t *testing.T) {
 	mockBatch.AddEntry(mockIATEntryDetail())
 	mockBatch.GetEntries()[0].TransactionCode = 22
 	mockBatch.GetEntries()[0].Category = CategoryNOC
-	mockBatch.Entries[0].AddIATAddenda(mockIATAddenda98())
+	mockBatch.Entries[0].Addenda98 = mockIATAddenda98()
 	mockBatch.category = CategoryNOC
 
 	if err := mockBatch.build(); err != nil {
@@ -2031,7 +2031,7 @@ func TestIATBatchAddenda98SECCode(t *testing.T) {
 	mockBatch.AddEntry(mockIATEntryDetail())
 	mockBatch.GetEntries()[0].TransactionCode = 22
 	mockBatch.GetEntries()[0].Category = CategoryNOC
-	mockBatch.Entries[0].AddIATAddenda(mockIATAddenda98())
+	mockBatch.Entries[0].Addenda98 = mockIATAddenda98()
 	mockBatch.category = CategoryNOC
 
 	if err := mockBatch.build(); err != nil {

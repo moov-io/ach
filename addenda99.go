@@ -101,7 +101,7 @@ func (Addenda99 *Addenda99) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
 	buf.WriteString(Addenda99.recordType)
-	buf.WriteString(Addenda99.typeCode())
+	buf.WriteString(Addenda99.TypeCode)
 	buf.WriteString(Addenda99.ReturnCode)
 	buf.WriteString(Addenda99.OriginalTraceField())
 	buf.WriteString(Addenda99.DateOfDeathField())
@@ -134,11 +134,6 @@ func (Addenda99 *Addenda99) Validate() error {
 		return &FieldError{FieldName: "ReturnCode", Value: Addenda99.ReturnCode, Msg: msgAddenda99ReturnCode}
 	}
 	return nil
-}
-
-// TypeCode defines the format of the underlying addenda record
-func (Addenda99 *Addenda99) typeCode() string {
-	return Addenda99.TypeCode
 }
 
 // OriginalTraceField returns a zero padded OriginalTrace string

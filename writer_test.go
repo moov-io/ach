@@ -311,7 +311,7 @@ func testIATReturn(t testing.TB) {
 	iatBatch.Entries[0].Addenda14 = mockAddenda14()
 	iatBatch.Entries[0].Addenda15 = mockAddenda15()
 	iatBatch.Entries[0].Addenda16 = mockAddenda16()
-	iatBatch.Entries[0].AddIATAddenda(mockIATAddenda99())
+	iatBatch.Entries[0].Addenda99 = mockIATAddenda99()
 	iatBatch.Entries[0].Category = CategoryReturn
 	iatBatch.Create()
 	file.AddIATBatch(iatBatch)

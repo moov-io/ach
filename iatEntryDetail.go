@@ -108,13 +108,10 @@ type IATEntryDetail struct {
 	// processing of the IAT entry. If no Foreign Correspondent Bank is involved,the record should not be included.
 	// A maximum of five Addenda18 records may be included with each IAT entry.
 	Addenda18 []*Addenda18 `json:"addenda18,omitempty"`
-	// Addendum
-	Addendum []Addendumer `json:"addendum,omitempty"`
-
 	// Addenda98 for user with NOC
-	//Addenda98 *Addenda98 `json:"addenda98,omitempty"`
+	Addenda98 *Addenda98 `json:"addenda98,omitempty"`
 	// Addenda99 for use with Returns
-	//Addenda99 *Addenda99 `json:"addenda99,omitempty"`
+	Addenda99 *Addenda99 `json:"addenda99,omitempty"`
 	// Category defines if the entry is a Forward, Return, or NOC
 	Category string `json:"category,omitempty"`
 	// validator is composed for data validation
@@ -330,26 +327,6 @@ func (ed *IATEntryDetail) SecondaryOFACSreeningIndicatorField() string {
 // TraceNumberField returns a zero padded TraceNumber string
 func (ed *IATEntryDetail) TraceNumberField() string {
 	return ed.numericField(ed.TraceNumber, 15)
-}
-
-// AddIATAddenda appends an Addendumer to the IATEntryDetail
-// Currently this is used to add Addenda98 and Addenda99 IAT Addenda records
-func (ed *IATEntryDetail) AddIATAddenda(addenda Addendumer) []Addendumer {
-	ed.AddendaRecordIndicator = 1
-	switch addenda.(type) {
-	case *Addenda98:
-		ed.Category = CategoryNOC
-		ed.Addendum = nil
-		ed.Addendum = append(ed.Addendum, addenda)
-		return ed.Addendum
-	case *Addenda99:
-		ed.Category = CategoryReturn
-		ed.Addendum = nil
-		ed.Addendum = append(ed.Addendum, addenda)
-		return ed.Addendum
-	default:
-		return ed.Addendum
-	}
 }
 
 // AddAddenda17 appends an Addenda17 to the IATEntryDetail
