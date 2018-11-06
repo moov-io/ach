@@ -29,6 +29,8 @@ func NewBatch(bh *BatchHeader) (Batcher, error) {
 	switch bh.StandardEntryClassCode {
 	case "ACK":
 		return NewBatchACK(bh), nil
+	case "ADV":
+		return NewBatchADV(bh), nil
 	case "ARC":
 		return NewBatchARC(bh), nil
 	case "ATX":
