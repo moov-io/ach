@@ -164,7 +164,7 @@ addenda.PaymentRelatedInformation = "Bonus pay for amazing work on #OSS"
 Add the addenda record to the detail entry
 
  ```go
-entry.AddAddenda(addenda)
+entry.AddAddenda05(addenda)
 ```
 
 Entries are added to batches like so:
@@ -225,7 +225,7 @@ addenda2.PaymentRelatedInformation = "Monthly Membership Subscription"
 
 Add the entry to the batch
 ```go
-entry2.AddAddenda(addenda2)
+entry2.AddAddenda05(addenda2)
 ```
 
 Create and add the second batch

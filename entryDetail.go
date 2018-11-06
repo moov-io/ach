@@ -67,13 +67,13 @@ type EntryDetail struct {
 	// in the associated Entry Detail Record, since the Trace Number is associated
 	// with an entry or item rather than a physical record.
 	TraceNumber int `json:"traceNumber,omitempty"`
-	// Addenda02 for use with StandardEntryClass Code POS, and SHR
+	// Addenda02 for use with StandardEntryClassCode MTE, POS, and SHR
 	Addenda02 *Addenda02 `json:"addenda02,omitempty"`
-	// Addenda05
+	// Addenda05 for use with StandardEntryClassCode: ACK, ATX, CCD, CIE, CTX, DNE, ENR, WEB, PPD, TRX.
 	Addenda05 []*Addenda05 `json:"addenda05,omitempty"`
-	// Addenda98
+	// Addenda98 for user with NOC
 	Addenda98 *Addenda98 `json:"addenda98,omitempty"`
-	// Addenda99
+	// Addenda99 for use with Returns
 	Addenda99 *Addenda99 `json:"addenda99,omitempty"`
 	// Category defines if the entry is a Forward, Return, or NOC
 	Category string `json:"category,omitempty"`
