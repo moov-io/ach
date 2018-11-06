@@ -25,23 +25,6 @@ func NewBatchMTE(bh *BatchHeader) *BatchMTE {
 	return batch
 }
 
-// Company Name - Identifies owner of terminal where transaction was initiated (merchant where ATM physically is) // TODO(Adam): what field?
-//
-// Individual Identification: required (non-blank, non-zero)
-//  - Field 8 is used? (Instead of field 7)
-//
-// CompanyDescriptiveDate: actual date of transfer (YYMMDD)
-
-// IAT Addenta (if first is MTE and TransactionCode == MTE (or POS/SHR))
-// TERMINAL IDENTIFICATION CODE * TERMINAL LOCATION * TERMINAL CITY * TERMINAL STATE / FOREIGN COUNTRY
-//  (max 6 chars)                   (max 27 chars)     (max 15 chars)       (max 2 chars)
-//
-// Example: 200509*321 East Market Street*Anytown*VA\
-//          367802*10TH & VINE STREETS*LONDON*UK\
-//
-// TODO(adam): "Starting at position 4" ...  (spaces?)
-// TODO(adam): needs to be all caps?
-
 // Validate checks valid NACHA batch rules. Assumes properly parsed records.
 func (batch *BatchMTE) Validate() error {
 	// basic verification of the batch before we validate specific rules.
