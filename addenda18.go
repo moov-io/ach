@@ -236,8 +236,3 @@ func (addenda18 *Addenda18) reservedField() string {
 func (addenda18 *Addenda18) EntryDetailSequenceNumberField() string {
 	return addenda18.numericField(addenda18.EntryDetailSequenceNumber, 7)
 }
-
-// TypeCode Defines the specific explanation and format for the addenda18 information
-func (addenda18 *Addenda18) typeCode() string {
-	return addenda18.TypeCode
-}

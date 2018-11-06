@@ -602,14 +602,14 @@ func (r *Reader) mandatoryOptionalIATAddenda(entryIndex int) error {
 		if err := addenda17.Validate(); err != nil {
 			return err
 		}
-		r.IATCurrentBatch.Entries[entryIndex].AddIATAddenda(addenda17)
+		r.IATCurrentBatch.Entries[entryIndex].AddAddenda17(addenda17)
 	case "18":
 		addenda18 := NewAddenda18()
 		addenda18.Parse(r.line)
 		if err := addenda18.Validate(); err != nil {
 			return err
 		}
-		r.IATCurrentBatch.Entries[entryIndex].AddIATAddenda(addenda18)
+		r.IATCurrentBatch.Entries[entryIndex].AddAddenda18(addenda18)
 	}
 	return nil
 }

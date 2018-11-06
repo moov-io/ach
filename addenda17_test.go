@@ -36,7 +36,7 @@ func testAddenda17Parse(t testing.TB) {
 	if Addenda17.recordType != "7" {
 		t.Errorf("expected %v got %v", "7", Addenda17.recordType)
 	}
-	if Addenda17.typeCode() != "17" {
+	if Addenda17.TypeCode != "17" {
 		t.Errorf("expected %v got %v", "17", Addenda17.TypeCode)
 	}
 	if Addenda17.PaymentRelatedInformation != "This is an international payment" {

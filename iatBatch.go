@@ -118,7 +118,7 @@ func (batch *IATBatch) build() error {
 	entryCount := 0
 	seq := 1
 	for i, entry := range batch.Entries {
-		entryCount = entryCount + 1 + 7 + len(entry.Addendum)
+		entryCount = entryCount + 1 + 7 + len(entry.Addenda17) + len(entry.Addenda18) + len(entry.Addendum)
 
 		// Verifies the required addenda* properties for an IAT entry detail are defined
 		if err := batch.addendaFieldInclusion(entry); err != nil {
@@ -154,18 +154,17 @@ func (batch *IATBatch) build() error {
 		seq++
 		addenda17Seq := 1
 		addenda18Seq := 1
-		for x := range entry.Addendum {
-			if a, ok := batch.Entries[i].Addendum[x].(*Addenda17); ok {
-				a.SequenceNumber = addenda17Seq
-				a.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
-				addenda17Seq++
-			}
 
-			if a, ok := batch.Entries[i].Addendum[x].(*Addenda18); ok {
-				a.SequenceNumber = addenda18Seq
-				a.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
-				addenda18Seq++
-			}
+		for _, addenda17 := range entry.Addenda17 {
+			addenda17.SequenceNumber = addenda17Seq
+			addenda17.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
+			addenda17Seq++
+		}
+
+		for _, addenda18 := range entry.Addenda18 {
+			addenda18.SequenceNumber = addenda18Seq
+			addenda18.EntryDetailSequenceNumber = batch.parseNumField(batch.Entries[i].TraceNumberField()[8:])
+			addenda18Seq++
 		}
 	}
 
@@ -272,7 +271,7 @@ func (batch *IATBatch) isFieldInclusion() error {
 func (batch *IATBatch) isBatchEntryCount() error {
 	entryCount := 0
 	for _, entry := range batch.Entries {
-		entryCount = entryCount + 1 + 7 + len(entry.Addendum)
+		entryCount = entryCount + 1 + 7 + len(entry.Addenda17) + len(entry.Addenda18) + len(entry.Addendum)
 	}
 	if entryCount != batch.Control.EntryAddendaCount {
 		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, entryCount, batch.Control.EntryAddendaCount)
@@ -407,32 +406,29 @@ func (batch *IATBatch) isAddendaSequence() error {
 		lastAddenda17Seq := -1
 		lastAddenda18Seq := -1
 
-		for _, IATAddenda := range entry.Addendum {
-			if a, ok := IATAddenda.(*Addenda17); ok {
-
-				if a.SequenceNumber < lastAddenda17Seq {
-					msg := fmt.Sprintf(msgBatchAscending, a.SequenceNumber, lastAddenda17Seq)
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "SequenceNumber", Msg: msg}
-				}
-				lastAddenda17Seq = a.SequenceNumber
-				// check that we are in the correct Entry Detail
-				if !(a.EntryDetailSequenceNumberField() == entry.TraceNumberField()[8:]) {
-					msg := fmt.Sprintf(msgBatchAddendaTraceNumber, a.EntryDetailSequenceNumberField(), entry.TraceNumberField()[8:])
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
-				}
+		for _, addenda17 := range entry.Addenda17 {
+			if addenda17.SequenceNumber < lastAddenda17Seq {
+				msg := fmt.Sprintf(msgBatchAscending, addenda17.SequenceNumber, lastAddenda17Seq)
+				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "SequenceNumber", Msg: msg}
 			}
-			if a, ok := IATAddenda.(*Addenda18); ok {
+			lastAddenda17Seq = addenda17.SequenceNumber
+			// check that we are in the correct Entry Detail
+			if !(addenda17.EntryDetailSequenceNumberField() == entry.TraceNumberField()[8:]) {
+				msg := fmt.Sprintf(msgBatchAddendaTraceNumber, addenda17.EntryDetailSequenceNumberField(), entry.TraceNumberField()[8:])
+				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
+			}
+		}
 
-				if a.SequenceNumber < lastAddenda18Seq {
-					msg := fmt.Sprintf(msgBatchAscending, a.SequenceNumber, lastAddenda18Seq)
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "SequenceNumber", Msg: msg}
-				}
-				lastAddenda18Seq = a.SequenceNumber
-				// check that we are in the correct Entry Detail
-				if !(a.EntryDetailSequenceNumberField() == entry.TraceNumberField()[8:]) {
-					msg := fmt.Sprintf(msgBatchAddendaTraceNumber, a.EntryDetailSequenceNumberField(), entry.TraceNumberField()[8:])
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
-				}
+		for _, addenda18 := range entry.Addenda18 {
+			if addenda18.SequenceNumber < lastAddenda18Seq {
+				msg := fmt.Sprintf(msgBatchAscending, addenda18.SequenceNumber, lastAddenda18Seq)
+				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "SequenceNumber", Msg: msg}
+			}
+			lastAddenda18Seq = addenda18.SequenceNumber
+			// check that we are in the correct Entry Detail
+			if !(addenda18.EntryDetailSequenceNumberField() == entry.TraceNumberField()[8:]) {
+				msg := fmt.Sprintf(msgBatchAddendaTraceNumber, addenda18.EntryDetailSequenceNumberField(), entry.TraceNumberField()[8:])
+				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TraceNumber", Msg: msg}
 			}
 		}
 	}

@@ -97,10 +97,24 @@ type IATEntryDetail struct {
 	//
 	// Addenda16 record identifies additional key information related to the Receiver.
 	Addenda16 *Addenda16 `json:"addenda16,omitempty"`
-	// Addendum a list of Addenda for the Entry Detail.  For IAT the addendumer is currently being used
-	// for the optional Addenda17 and Addenda18 records.
-	// ToDo: Consider reverting Addenda* explicit properties back to being addendumer
+	// Addenda17 is optional for IAT entries
+	//
+	// This is an optional Addenda Record used to provide payment-related data. There i a maximum of up to two of these
+	// Addenda Records with each IAT entry.
+	Addenda17 []*Addenda17 `json:"addenda17,omitempty"`
+	// Addenda18 is optional for IAT entries
+	//
+	// This optional addenda record is used to provide information on each Foreign Correspondent Bank involved in the
+	// processing of the IAT entry. If no Foreign Correspondent Bank is involved,the record should not be included.
+	// A maximum of five Addenda18 records may be included with each IAT entry.
+	Addenda18 []*Addenda18 `json:"addenda18,omitempty"`
+	// Addendum
 	Addendum []Addendumer `json:"addendum,omitempty"`
+
+	// Addenda98 for user with NOC
+	//Addenda98 *Addenda98 `json:"addenda98,omitempty"`
+	// Addenda99 for use with Returns
+	//Addenda99 *Addenda99 `json:"addenda99,omitempty"`
 	// Category defines if the entry is a Forward, Return, or NOC
 	Category string `json:"category,omitempty"`
 	// validator is composed for data validation
@@ -319,7 +333,7 @@ func (ed *IATEntryDetail) TraceNumberField() string {
 }
 
 // AddIATAddenda appends an Addendumer to the IATEntryDetail
-// Currently this is used to add Addenda17, Addenda18, Addenda98 and Addenda99 IAT Addenda records
+// Currently this is used to add Addenda98 and Addenda99 IAT Addenda records
 func (ed *IATEntryDetail) AddIATAddenda(addenda Addendumer) []Addendumer {
 	ed.AddendaRecordIndicator = 1
 	switch addenda.(type) {
@@ -334,8 +348,16 @@ func (ed *IATEntryDetail) AddIATAddenda(addenda Addendumer) []Addendumer {
 		ed.Addendum = append(ed.Addendum, addenda)
 		return ed.Addendum
 	default:
-		ed.Category = CategoryForward
-		ed.Addendum = append(ed.Addendum, addenda)
 		return ed.Addendum
 	}
+}
+
+// AddAddenda17 appends an Addenda17 to the IATEntryDetail
+func (ed *IATEntryDetail) AddAddenda17(addenda17 *Addenda17) {
+	ed.Addenda17 = append(ed.Addenda17, addenda17)
+}
+
+// AddAddenda18 appends an Addenda18 to the IATEntryDetail
+func (ed *IATEntryDetail) AddAddenda18(addenda18 *Addenda18) {
+	ed.Addenda18 = append(ed.Addenda18, addenda18)
 }

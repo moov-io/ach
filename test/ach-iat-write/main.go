@@ -98,7 +98,7 @@ func main() {
 	addenda17.PaymentRelatedInformation = "This is an international payment"
 	addenda17.SequenceNumber = 1
 	addenda17.EntryDetailSequenceNumber = 0000001
-	entry.AddIATAddenda(addenda17)
+	entry.AddAddenda17(addenda17)
 
 	addenda18 := ach.NewAddenda18()
 	addenda18.ForeignCorrespondentBankName = "Bank of France"
@@ -107,7 +107,7 @@ func main() {
 	addenda18.ForeignCorrespondentBankBranchCountryCode = "FR"
 	addenda18.SequenceNumber = 3
 	addenda18.EntryDetailSequenceNumber = 0000001
-	entry.AddIATAddenda(addenda18)
+	entry.AddAddenda18(addenda18)
 
 	// build the batch
 	batch := ach.NewIATBatch(bh)

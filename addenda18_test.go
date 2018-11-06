@@ -107,7 +107,7 @@ func testAddenda18Parse(t testing.TB) {
 	if Addenda18.recordType != "7" {
 		t.Errorf("expected %v got %v", "7", Addenda18.recordType)
 	}
-	if Addenda18.typeCode() != "18" {
+	if Addenda18.TypeCode != "18" {
 		t.Errorf("expected %v got %v", "18", Addenda18.TypeCode)
 	}
 	if Addenda18.ForeignCorrespondentBankName != "Bank of Germany" {
