@@ -1973,6 +1973,105 @@ func TestIATBatchAddenda98TotalCount(t *testing.T) {
 	}
 }
 
+// TestIATBatchAddenda98Nil validates IATBatch Addenda98 is not nil
+func TestIATBatchAddenda98Nil(t *testing.T) {
+	mockBatch := IATBatch{}
+	mockBatch.SetHeader(mockIATNOCBatchHeaderFF())
+	mockBatch.AddEntry(mockIATEntryDetail())
+	mockBatch.GetEntries()[0].TransactionCode = 21
+	mockBatch.GetEntries()[0].AddendaRecords = 2
+	mockBatch.GetEntries()[0].Category = CategoryNOC
+
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addenda98" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestIATBatchAddenda98RecordType validates IATBatch Addenda98 RecordType is valid
+func TestIATBatchAddenda98RecordType(t *testing.T) {
+	mockBatch := IATBatch{}
+	mockBatch.SetHeader(mockIATNOCBatchHeaderFF())
+	mockBatch.AddEntry(mockIATEntryDetail())
+	mockBatch.GetEntries()[0].TransactionCode = 21
+	mockBatch.GetEntries()[0].AddendaRecords = 2
+	addenda98 := mockAddenda98()
+	addenda98.recordType = "00"
+	mockBatch.GetEntries()[0].Addenda98 = addenda98
+	mockBatch.GetEntries()[0].Category = CategoryNOC
+
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestIATBatchAddenda99RecordType validates IATBatch Addenda99 RecordType is valid
+func TestIATBatchAddenda99RecordType(t *testing.T) {
+	mockBatch := mockIATBatch(t)
+	mockBatch.SetHeader(mockIATReturnBatchHeaderFF())
+	mockBatch.GetEntries()[0].AddendaRecords = 1
+	addenda99 := mockAddenda99()
+	addenda99.recordType = "00"
+	mockBatch.GetEntries()[0].Addenda99 = addenda99
+	mockBatch.GetEntries()[0].Category = CategoryReturn
+
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestIATBatchAddenda18RecordType validates IATBatch Addenda18 RecordType is valid
+func TestIATBatchAddenda18RecordType(t *testing.T) {
+	mockBatch := mockIATBatch(t)
+	mockBatch.SetHeader(mockIATReturnBatchHeaderFF())
+	addenda18 := mockAddenda18()
+	addenda18.recordType = "00"
+	mockBatch.GetEntries()[0].AddAddenda18(addenda18)
+
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
 // TestIATBatchAddenda98TransactionCode validates IATBatch Transaction Code Count
 func TestIATBatchAddenda98TransactionCode(t *testing.T) {
 	mockBatch := IATBatch{}
