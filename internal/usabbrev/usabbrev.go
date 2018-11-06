@@ -13,7 +13,7 @@ var (
 	// two-letter abbreviations.
 	// Source: https://www.hud.gov/sites/documents/22211X2CHCH.PDF
 	usStateAndTerritoryAbbreviations = map[string]bool{
-		"AK": true, // Alaska MS Mississippi
+		"AK": true, // Alaska
 		"AL": true, // Alabama
 		"AR": true, // Arkansas
 		"AS": true, // American Samoa
@@ -42,6 +42,7 @@ var (
 		"MN": true, // Minnesota
 		"MO": true, // Missouri
 		"MP": true, // Northern Marianas Islands
+		"MS": true, // Mississippi
 		"MT": true, // Montana
 		"NC": true, // North Carolina
 		"ND": true, // North Dakota
