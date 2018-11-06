@@ -37,7 +37,7 @@ func mockDNEEntryDetail() *EntryDetail {
 	entry.AddendaRecordIndicator = 1
 
 	addenda := NewAddenda05()
-	addenda.PaymentRelatedInformation = `21*12200004*3*123987654321*777777777*DOE*JOHN*0\`
+	addenda.PaymentRelatedInformation = `    DATE OF DEATH*010218*CUSTOMERSSN*#########*AMOUNT*$$$$.cc\`
 	entry.AddAddenda05(addenda)
 
 	return entry
@@ -293,5 +293,30 @@ func TestBatchDNETransactionCode(t *testing.T) {
 		} else {
 			t.Errorf("%T: %s", err, err)
 		}
+	}
+}
+
+func TestBatchDNE__Details(t *testing.T) {
+	mockBatch := mockBatchDNE()
+	date, ssn, amount := mockBatch.details()
+	if date != "010218" {
+		t.Errorf("Got %s", date)
+	}
+	if ssn != "#########" {
+		t.Errorf("Got %s", ssn)
+	}
+	if amount != "$$$$.cc" {
+		t.Errorf("Got %s", amount)
+	}
+
+	// Check the helper methods too
+	if v := mockBatch.DateOfDeath(); v != date {
+		t.Errorf("got %s expected %s", v, date)
+	}
+	if v := mockBatch.CustomerSSN(); v != ssn {
+		t.Errorf("got %s expected %s", v, ssn)
+	}
+	if v := mockBatch.Amount(); v != amount {
+		t.Errorf("got %s expected %s", v, amount)
 	}
 }
