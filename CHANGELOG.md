@@ -1,4 +1,6 @@
-## v0.4.0 (Unreleased)
+## v0.4.1 (Unreleased)
+
+## v0.4.0 (Released 2018-11-06)
 
 BREAKING CHANGES
 
