@@ -21,6 +21,8 @@ type Batcher interface {
 	SetHeader(*BatchHeader)
 	GetControl() *BatchControl
 	SetControl(*BatchControl)
+	GetADVControl() *BatchADVControl
+	SetADVControl(*BatchADVControl)
 	GetEntries() []*EntryDetail
 	AddEntry(*EntryDetail)
 	Create() error

@@ -105,8 +105,16 @@ func (w *Writer) writeBatch(file *File) error {
 				w.lineNum++
 			}
 		}
-		if _, err := w.w.WriteString(batch.GetControl().String() + "\n"); err != nil {
-			return err
+
+		if batch.GetHeader().StandardEntryClassCode == "ADV" {
+			if _, err := w.w.WriteString(batch.GetADVControl().String() + "\n"); err != nil {
+				return err
+			}
+		} else {
+
+			if _, err := w.w.WriteString(batch.GetControl().String() + "\n"); err != nil {
+				return err
+			}
 		}
 		w.lineNum++
 	}

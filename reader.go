@@ -76,10 +76,12 @@ func (e ErrorList) Print(w io.Writer) {
 	}
 }
 
+// Empty is an Empty ErrorList
 func (e ErrorList) Empty() bool {
 	return e == nil || len(e) == 0
 }
 
+// MarshalJson marshals errors
 func (e ErrorList) MarshalJSON() ([]byte, error) {
 	return json.Marshal(e.Error())
 }
@@ -185,9 +187,9 @@ func (r *Reader) Read() (File, error) {
 
 	if r.errors.Empty() {
 		return r.File, nil
-	} else {
-		return r.File, r.errors
 	}
+	return r.File, r.errors
+
 }
 
 func (r *Reader) processFixedWidthFile(line *string) error {
@@ -278,9 +280,7 @@ func (r *Reader) parseBH() error {
 
 // parseEd parses determines whether to parse an IATEntryDetail or EntryDetail
 func (r *Reader) parseED() error {
-	// ToDo: Review if this can be true for domestic files.  Also this field may be
-	// ToDo:  used for IAT Corrections so consider using another field
-	// IATIndicator field
+	// IAT Indicator field
 	if r.line[16:29] == "             " {
 		if err := r.parseIATEntryDetail(); err != nil {
 			return err
@@ -389,8 +389,6 @@ func (r *Reader) parseAddenda() error {
 			//r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda02)
 			r.currentBatch.GetEntries()[entryIndex].Addenda02 = addenda02
 		case "05":
-			// ToDo: Validate this increments
-
 			addenda05 := NewAddenda05()
 			addenda05.Parse(r.line)
 			if err := addenda05.Validate(); err != nil {
@@ -428,11 +426,17 @@ func (r *Reader) parseBatchControl() error {
 		// batch Control without a current batch
 		return r.parseError(&FileError{Msg: msgFileBatchOutside})
 	}
-
 	if r.currentBatch != nil {
-		r.currentBatch.GetControl().Parse(r.line)
-		if err := r.currentBatch.GetControl().Validate(); err != nil {
-			return r.parseError(err)
+		if r.currentBatch.GetHeader().StandardEntryClassCode == "ADV" {
+			r.currentBatch.GetADVControl().Parse(r.line)
+			if err := r.currentBatch.GetADVControl().Validate(); err != nil {
+				return r.parseError(err)
+			}
+		} else {
+			r.currentBatch.GetControl().Parse(r.line)
+			if err := r.currentBatch.GetControl().Validate(); err != nil {
+				return r.parseError(err)
+			}
 		}
 	} else {
 		r.IATCurrentBatch.GetControl().Parse(r.line)

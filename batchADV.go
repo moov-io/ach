@@ -4,7 +4,9 @@
 
 package ach
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // BatchADV holds the Batch Header and Batch Control and all Entry Records for ADV Entries
 type BatchADV struct {
@@ -14,24 +16,23 @@ type BatchADV struct {
 // NewBatchADV returns a *BatchADV
 func NewBatchADV(bh *BatchHeader) *BatchADV {
 	batch := new(BatchADV)
-	batch.SetControl(NewBatchControl())
+	batch.SetADVControl(NewBatchADVControl())
 	batch.SetHeader(bh)
 	return batch
 }
 
 // Validate checks valid NACHA batch rules. Assumes properly parsed records.
 func (batch *BatchADV) Validate() error {
-	// basic verification of the batch before we validate specific rules.
-	if err := batch.verify(); err != nil {
-		return err
-	}
-	// Add configuration and type specific validation for this type.
 
 	if batch.Header.StandardEntryClassCode != "ADV" {
 		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "ADV")
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
-
+	// basic verification of the batch before we validate specific rules.
+	if err := batch.verify(); err != nil {
+		return err
+	}
+	// Add configuration and type specific validation for this type.
 	for _, entry := range batch.Entries {
 		// Verify Addenda* FieldInclusion based on entry.Category and batchHeader.StandardEntryClassCode
 		if err := batch.addendaFieldInclusion(entry); err != nil {
@@ -49,6 +50,5 @@ func (batch *BatchADV) Create() error {
 	}
 	// Additional steps specific to batch type
 	// ...
-
 	return batch.Validate()
 }
