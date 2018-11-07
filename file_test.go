@@ -420,10 +420,18 @@ func TestFile__readFromJson(t *testing.T) {
 	if len(file.Batches) != 1 {
 		t.Errorf("got %d batches: %v", len(file.Batches), file.Batches)
 	}
+	batch := file.Batches[0]
+	batchControl := batch.GetControl()
+	if batchControl.EntryAddendaCount != 2 {
+		t.Errorf("EntryAddendaCount: %d", batchControl.EntryAddendaCount)
+	}
 
 	// Control
 	if file.Control.BatchCount != 1 {
 		t.Errorf("BatchCount: %d", file.Control.BatchCount)
+	}
+	if file.Control.EntryAddendaCount != 2 {
+		t.Errorf("File Control EntryAddendaCount: %d", file.Control.EntryAddendaCount)
 	}
 	if file.Control.TotalDebitEntryDollarAmountInFile != 0 || file.Control.TotalCreditEntryDollarAmountInFile != 100000 {
 		t.Errorf("debit=%d credit=%d", file.Control.TotalDebitEntryDollarAmountInFile, file.Control.TotalCreditEntryDollarAmountInFile)
