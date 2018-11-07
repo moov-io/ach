@@ -518,7 +518,7 @@ func (batch *batch) addendaFieldInclusionForward(entry *EntryDetail) error {
 			msg := fmt.Sprintf(msgBatchAddenda, "Addenda02", entry.Category, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda02", Msg: msg}
 		}
-	case "ARC", "BOC", "COR", "POP", "RCK", "TEL", "TRC", "XCK":
+	case "ADV", "ARC", "BOC", "COR", "POP", "RCK", "TEL", "TRC", "XCK":
 		if entry.Addenda02 != nil {
 			msg := fmt.Sprintf(msgBatchAddenda, "Addenda02", entry.Category, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda02", Msg: msg}

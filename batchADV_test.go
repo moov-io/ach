@@ -5,7 +5,6 @@
 package ach
 
 import (
-	"log"
 	"testing"
 )
 
@@ -33,7 +32,6 @@ func mockADVEntryDetail() *EntryDetail {
 	entry.SetTraceNumber(mockBatchADVHeader().ODFIIdentification, 1)
 	entry.DiscretionaryData = "S"
 	entry.AddendaRecordIndicator = 1
-	entry.AddAddenda05(mockAddenda05())
 	return entry
 }
 
@@ -42,7 +40,7 @@ func mockBatchADV() *BatchADV {
 	mockBatch := NewBatchADV(mockBatchADVHeader())
 	mockBatch.AddEntry(mockADVEntryDetail())
 	if err := mockBatch.Create(); err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	return mockBatch
 }
@@ -76,7 +74,7 @@ func testBatchADVAddendumCount(t testing.TB) {
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaCount" {
+			if e.FieldName != "Addenda05" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -165,34 +163,6 @@ func BenchmarkBatchADVReceivingCompanyName(b *testing.B) {
 	}
 }
 
-// testBatchADVAddendaTypeCode validates addenda type code is 05
-func testBatchADVAddendaTypeCode(t testing.TB) {
-	mockBatch := mockBatchADV()
-	mockBatch.GetEntries()[0].Addenda05[0].TypeCode = "07"
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
-	}
-}
-
-// TestBatchADVAddendaTypeCode tests validating addenda type code is 05
-func TestBatchADVAddendaTypeCode(t *testing.T) {
-	testBatchADVAddendaTypeCode(t)
-}
-
-// BenchmarkBatchADVAddendaTypeCod benchmarks validating addenda type code is 05
-func BenchmarkBatchADVAddendaTypeCode(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testBatchADVAddendaTypeCode(b)
-	}
-}
-
 // testBatchADVSEC validates that the standard entry class code is ADV for batchADV
 func testBatchADVSEC(t testing.TB) {
 	mockBatch := mockBatchADV()
@@ -218,36 +188,6 @@ func BenchmarkBatchADVSEC(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchADVSEC(b)
-	}
-}
-
-// testBatchADVAddendaCount validates batch ADV addenda count
-func testBatchADVAddendaCount(t testing.TB) {
-	mockBatch := mockBatchADV()
-	addenda05 := mockAddenda05()
-	mockBatch.GetEntries()[0].AddAddenda05(addenda05)
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
-	}
-}
-
-// TestBatchADVAddendaCount tests validating batch ADV addenda count
-func TestBatchADVAddendaCount(t *testing.T) {
-	testBatchADVAddendaCount(t)
-}
-
-// BenchmarkBatchADVAddendaCount benchmarks validating batch ADV addenda count
-func BenchmarkBatchADVAddendaCount(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testBatchADVAddendaCount(b)
 	}
 }
 
