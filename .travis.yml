@@ -14,11 +14,11 @@ env:
   global:
     secure: QPkcX77j8QEqTwOYyLGItqvxYwE6Na5WaSZWjmhp48OlxYatWRHxJBwcFYSn1OWD5FMn+3oW39fHknReIxtrnhXMaNvI7x3/0gy4zujD/xZ2xAg7NsQ+l5buvEFO8/LEwwo0fp4knItFcBv8xH/ziJBJyXvgfMtj7Is4Q/pB1p6pWDdVy1vtAj3zH02bcqh1yXXS3HvcD8UhTszfU017gVNXDN1ow0rp1L3ainr3btrVK9izUxZfKvb7PlWJO1ogah7xNr/dIOJLsx2SfKgzKp+3H28L2WegtbzON74Op4jXvRywCwqjmUt/nwJ/Y9anunMNHT136h+ye4ziG1i/VdbWq0Q4PopQ8yYqinujG7SjfQio+wNCV2cwc2r/WjNBjbH0N9/Pflogq3RHvgy/9VtPif1tY+RrZCSntohoEZbYpVcFQFE1xDyf6xq/uLxVeEcCU33gqq7cKEfpcUgyCITa+yCPfBdtgkLBJ8h7Sew1j08D1kTKUW6g3D1epmwlCh/Z16oHG5VwSnCLGDjJy8wm/hQk1i/g7qeP7g24CfNzffzlFBCy88HhjzmrhUpcaTyfVVDf4h8wK6Zu/J3dHjHXQYwfiQRqpMa+2DYyjGgZhniccuh4GWolGZauDQdmO9SD4Ugyt9PEMk02i32ax3A4XE/Q6VNOam+qszviX3Q=
 before_install:
-- go get github.com/mattn/goveralls
 - go get -u github.com/client9/misspell/cmd/misspell
 - go get -u golang.org/x/lint/golint
-- go get -u honnef.co/go/tools/cmd/megacheck
 - go get github.com/fzipp/gocyclo
+- go get -u honnef.co/go/tools/cmd/megacheck
+- go get golang.org/x/tools/cmd/cover
 # Install gcc, from https://travis-ci.community/t/go-cant-find-gcc-with-go1-11-1-on-windows/293/5
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then choco install -y mingw; export PATH=/c/tools/mingw64/bin:"$PATH"; fi
 before_script:
@@ -26,10 +26,11 @@ before_script:
 script:
 # Just check gofmt on linux, it's the fastest builder
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then test -z $(gofmt -s -l $GOFILES); fi
-- go test ./...
+- go test ./... -race -coverprofile=coverage.txt -covermode=atomic
 - misspell -error -locale US $GOFILES
 - gocyclo -over 25 $GOFILES
 - golint -set_exit_status $GOFILES
 - megacheck ./...
 after_success:
-- goveralls -repotoken $COVERALLS_TOKEN
+  - bash <(curl -s https://codecov.io/bash)
+  - make docker
