@@ -217,7 +217,7 @@ func BenchmarkFCADVFieldInclusionRecordType(b *testing.B) {
 
 // testFCADVFieldInclusionBlockCount validates file control block count field inclusion
 func testFCADVFieldInclusionBlockCount(t testing.TB) {
-	fc := mockFileControl()
+	fc := mockFileADVControl()
 	fc.BlockCount = 0
 	if err := fc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
@@ -243,7 +243,7 @@ func BenchmarkFCADVFieldInclusionBlockCount(b *testing.B) {
 
 // testFCADVFieldInclusionEntryAddendaCount validates file control addenda count field inclusion
 func testFCADVFieldInclusionEntryAddendaCount(t testing.TB) {
-	fc := mockFileControl()
+	fc := mockFileADVControl()
 	fc.EntryAddendaCount = 0
 	if err := fc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
@@ -269,7 +269,7 @@ func BenchmarkFCADVFieldInclusionEntryAddendaCount(b *testing.B) {
 
 // testFCADVFieldInclusionEntryHash validates file control entry hash field inclusion
 func testFCADVFieldInclusionEntryHash(t testing.TB) {
-	fc := mockFileControl()
+	fc := mockFileADVControl()
 	fc.EntryHash = 0
 	if err := fc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
