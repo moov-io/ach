@@ -1,8 +1,11 @@
-## v0.4.0 (Unreleased)
+## v0.4.1 (Unreleased)
+
+## v0.4.0 (Released 2018-11-06)
 
 BREAKING CHANGES
 
 - `EntryDetail.Addendum` has been broken out into `Addenda02`, `Addenda05`, `Addenda98`, and `Addenda99` fields on `EntryDetail`.
+- IAT `EntryDetail.Addendum` has been broken out into Addenda 10-18, 98 and 99.
 
 ADDITIONS
 
