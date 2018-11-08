@@ -52,6 +52,8 @@ func NewBatch(bh *BatchHeader) (Batcher, error) {
 	case "IAT":
 		msg := fmt.Sprintf(msgFileIATSEC, bh.StandardEntryClassCode)
 		return nil, &FileError{FieldName: "StandardEntryClassCode", Value: bh.StandardEntryClassCode, Msg: msg}
+	case "MTE":
+		return NewBatchMTE(bh), nil
 	case "POP":
 		return NewBatchPOP(bh), nil
 	case "POS":
@@ -582,7 +584,7 @@ func (batch *batch) addendaFieldInclusionForward(entry *EntryDetail) error {
 			msg := fmt.Sprintf(msgBatchAddenda, "Addenda05", entry.Category, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda05", Msg: msg}
 		}
-		// ACK, ATX, CCD, CIE, CTX, DNE, ENR WEB, PPD, TRX can only have Addenda05
+	// ACK, ATX, CCD, CIE, CTX, DNE, ENR WEB, PPD, TRX can only have Addenda05
 	case "ACK", "ATX", "CCD", "CIE", "CTX", "DNE", "ENR", "WEB", "PPD", "TRX":
 		if entry.Addenda02 != nil {
 			msg := fmt.Sprintf(msgBatchAddenda, "Addenda02", entry.Category, batch.Header.StandardEntryClassCode)

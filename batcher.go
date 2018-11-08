@@ -69,5 +69,6 @@ var (
 	msgBatchCardTransactionType     = "Card Transaction Type %v is invalid"
 	msgBatchTransactionCodeAddenda  = "Addenda not allowed for transaction code %v for batch type %v"
 	msgBatchAmountZero              = "%v must be zero for SEC code %v"
+	msgBatchAmountNonZero           = "%v must be non-zero for SEC code %s"
 	msgBatchAddenda                 = "%v not allowed for category %v for batch type %v"
 )
