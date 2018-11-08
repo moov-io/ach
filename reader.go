@@ -81,7 +81,7 @@ func (e ErrorList) Empty() bool {
 	return e == nil || len(e) == 0
 }
 
-// MarshalJson marshals errors
+// MarshalJSON marshals errors
 func (e ErrorList) MarshalJSON() ([]byte, error) {
 	return json.Marshal(e.Error())
 }
@@ -179,12 +179,20 @@ func (r *Reader) Read() (File, error) {
 		r.recordName = "FileHeader"
 		r.errors.Add(r.parseError(&FileError{Msg: msgFileHeader}))
 	}
-	if (FileControl{}) == r.File.Control {
-		// There must be at least one File Control
-		r.recordName = "FileControl"
-		r.errors.Add(r.parseError(&FileError{Msg: msgFileControl}))
-	}
 
+	if !r.File.isADV() {
+		if (FileControl{}) == r.File.Control {
+			// There must be at least one File Control
+			r.recordName = "FileControl"
+			r.errors.Add(r.parseError(&FileError{Msg: msgFileControl}))
+		}
+	} else {
+		if (FileADVControl{}) == r.File.ADVControl {
+			// There must be at least one File Control
+			r.recordName = "FileControl"
+			r.errors.Add(r.parseError(&FileError{Msg: msgFileControl}))
+		}
+	}
 	if r.errors.Empty() {
 		return r.File, nil
 	}
@@ -451,13 +459,25 @@ func (r *Reader) parseBatchControl() error {
 // parseFileControl takes the input record string and parses the FileControlRecord values
 func (r *Reader) parseFileControl() error {
 	r.recordName = "FileControl"
-	if (FileControl{}) != r.File.Control {
-		// Can be only one file control per file
-		return r.parseError(&FileError{Msg: msgFileControl})
-	}
-	r.File.Control.Parse(r.line)
-	if err := r.File.Control.Validate(); err != nil {
-		return r.parseError(err)
+
+	if !r.File.isADV() {
+		if (FileControl{}) != r.File.Control {
+			// Can be only one file control per file
+			return r.parseError(&FileError{Msg: msgFileControl})
+		}
+		r.File.Control.Parse(r.line)
+		if err := r.File.Control.Validate(); err != nil {
+			return r.parseError(err)
+		}
+	} else {
+		if (FileADVControl{}) != r.File.ADVControl {
+			// Can be only one file control per file
+			return r.parseError(&FileError{Msg: msgFileControl})
+		}
+		r.File.ADVControl.Parse(r.line)
+		if err := r.File.ADVControl.Validate(); err != nil {
+			return r.parseError(err)
+		}
 	}
 	return nil
 }
