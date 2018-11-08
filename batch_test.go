@@ -10,8 +10,8 @@ import (
 )
 
 // batch should never be used directly.
-func mockBatch() *batch {
-	mockBatch := &batch{}
+func mockBatch() *Batch {
+	mockBatch := &Batch{}
 	mockBatch.SetHeader(mockBatchHeader())
 	mockBatch.AddEntry(mockEntryDetail())
 	if err := mockBatch.build(); err != nil {
@@ -21,8 +21,8 @@ func mockBatch() *batch {
 }
 
 // Batch with mismatched TraceNumber ODFI
-func mockBatchInvalidTraceNumberODFI() *batch {
-	mockBatch := &batch{}
+func mockBatchInvalidTraceNumberODFI() *Batch {
+	mockBatch := &Batch{}
 	mockBatch.SetHeader(mockBatchHeader())
 	mockBatch.AddEntry(mockEntryDetailInvalidTraceNumberODFI())
 	return mockBatch
@@ -43,8 +43,8 @@ func mockEntryDetailInvalidTraceNumberODFI() *EntryDetail {
 }
 
 // Batch with no entries
-func mockBatchNoEntry() *batch {
-	mockBatch := &batch{}
+func mockBatchNoEntry() *Batch {
+	mockBatch := &Batch{}
 	mockBatch.SetHeader(mockBatchHeader())
 	return mockBatch
 }

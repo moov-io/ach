@@ -20,7 +20,7 @@ import "fmt"
 //
 // The difference between ARC and POP is that ARC can result from a check mailed in whereas POP is in-person.
 type BatchARC struct {
-	batch
+	Batch
 }
 
 // NewBatchARC returns a *BatchARC

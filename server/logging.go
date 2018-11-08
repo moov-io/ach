@@ -107,12 +107,12 @@ func (mw loggingMiddleware) ValidateFile(id string) error {
 
 //** BATCHES ** //
 
-func (mw loggingMiddleware) CreateBatch(fileID string, bh *ach.BatchHeader) (id string, err error) {
+func (mw loggingMiddleware) CreateBatch(fileID string, batch ach.Batcher) (id string, err error) {
 	t := startTimer()
 	defer func() {
-		mw.logger.Log("method", "CreateBatch", "FileID", fileID, "batchID", bh.ID, "took", t, "err", err)
+		mw.logger.Log("method", "CreateBatch", "FileID", fileID, "batchID", batch.ID, "took", t, "err", err)
 	}()
-	return mw.next.CreateBatch(fileID, bh)
+	return mw.next.CreateBatch(fileID, batch)
 }
 
 func (mw loggingMiddleware) GetBatch(fileID string, batchID string) (b ach.Batcher, err error) {

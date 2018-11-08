@@ -34,7 +34,7 @@ type Service interface {
 	ValidateFile(id string) error
 
 	// CreateBatch creates a new batch within and ach file and returns its resource ID
-	CreateBatch(fileID string, bh *ach.BatchHeader) (string, error)
+	CreateBatch(fileID string, bh ach.Batcher) (string, error)
 	// GetBatch retrieves a batch based oin the file id and batch id
 	GetBatch(fileID string, batchID string) (ach.Batcher, error)
 	// GetBatches retrieves all batches associated with the file id.
@@ -122,25 +122,23 @@ func (s *service) ValidateFile(id string) error {
 	return f.Validate()
 }
 
-func (s *service) CreateBatch(fileID string, bh *ach.BatchHeader) (string, error) {
-	batch, err := ach.NewBatch(bh)
-	if err != nil {
-		return bh.ID, err
+func (s *service) CreateBatch(fileID string, batch ach.Batcher) (string, error) {
+	if batch == nil {
+		return "", errors.New("no batch provided")
 	}
-	if bh.ID == "" {
+	if batch.GetHeader().ID == "" {
 		id := NextID()
 		batch.SetID(id)
 		batch.GetHeader().ID = id
 		batch.GetControl().ID = id
 	} else {
-		batch.SetID(bh.ID)
-		batch.GetControl().ID = bh.ID
+		batch.SetID(batch.GetHeader().ID)
+		batch.GetControl().ID = batch.GetHeader().ID
 	}
-
 	if err := s.store.StoreBatch(fileID, batch); err != nil {
 		return "", err
 	}
-	return bh.ID, nil
+	return batch.ID(), nil
 }
 
 func (s *service) GetBatch(fileID string, batchID string) (ach.Batcher, error) {

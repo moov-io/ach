@@ -15,7 +15,7 @@ import (
 // The ATX entry is an acknowledgement by the Receiving Depository Financial Institution (RDFI) that a
 // Corporate Credit (CTX) has been received.
 type BatchATX struct {
-	batch
+	Batch
 }
 
 var (

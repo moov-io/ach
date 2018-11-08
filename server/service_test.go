@@ -122,7 +122,8 @@ func TestGetFileContents(t *testing.T) {
 	// make the file valid
 	bh := mockBatchHeaderWeb()
 	bh.ID = "11111"
-	s.CreateBatch(id, bh)
+	batch, _ := ach.NewBatch(bh)
+	s.CreateBatch(id, batch)
 
 	// build file
 	r, err := s.GetFileContents(id)
@@ -174,7 +175,8 @@ func TestValidateFileBad(t *testing.T) {
 	// setup batch
 	bh := mockBatchHeaderWeb()
 	bh.ID = "11111"
-	bId, e1 := s.CreateBatch(fId, bh)
+	b, _ := ach.NewBatch(bh)
+	bId, e1 := s.CreateBatch(fId, b)
 	batch, e2 := s.GetBatch(fId, bId)
 	if batch == nil {
 		t.Fatalf("couldn't get batch, e1=%v, e2=%v", e1, e2)
@@ -202,30 +204,33 @@ func TestCreateBatch(t *testing.T) {
 	s := mockServiceInMemory()
 	bh := mockBatchHeaderWeb()
 	bh.ID = "11111"
-	id, err := s.CreateBatch("98765", bh)
+	b, _ := ach.NewBatch(bh)
+	id, err := s.CreateBatch("98765", b)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
 	if id != "11111" {
-		t.Errorf("expected %s received %s w/ error %s", "11111", id, err)
+		t.Errorf("expected %s received %s w/ error %v", "11111", id, err)
 	}
 }
 
 // TestCreateBatchIDExists Create a new batch with batch.id already present. Should fail.
 func TestCreateBatchIDExists(t *testing.T) {
 	s := mockServiceInMemory()
-	id, err := s.CreateBatch("98765", mockBatchHeaderWeb())
+	b, _ := ach.NewBatch(mockBatchHeaderWeb())
+	id, err := s.CreateBatch("98765", b)
 	if err != ErrAlreadyExists {
-		t.Errorf("expected %s received %s w/ error %s", "ErrAlreadyExists", id, err)
+		t.Errorf("expected %s received %s w/ error %v", "ErrAlreadyExists", id, err)
 	}
 }
 
 // TestCreateBatchFileIDExits create a batch when the file.id does not exist. Should fail.
 func TestCreateBatchFileIDExits(t *testing.T) {
 	s := mockServiceInMemory()
-	id, err := s.CreateBatch("55555", mockBatchHeaderWeb())
+	b, _ := ach.NewBatch(mockBatchHeaderWeb())
+	id, err := s.CreateBatch("55555", b)
 	if err != ErrNotFound {
-		t.Errorf("expected %s received %s w/ error %s", "ErrNotFound", id, err)
+		t.Errorf("expected %s received %s w/ error %v", "ErrNotFound", id, err)
 	}
 }
 
@@ -234,9 +239,10 @@ func TestCreateBatchIDBlank(t *testing.T) {
 	s := mockServiceInMemory()
 	bh := mockBatchHeaderWeb()
 	bh.ID = ""
-	id, err := s.CreateBatch("98765", bh)
+	b, _ := ach.NewBatch(bh)
+	id, err := s.CreateBatch("98765", b)
 	if len(id) < 3 {
-		t.Errorf("expected %s received %s w/ error %s", "NextID", id, err)
+		t.Errorf("expected %s received %s w/ error %v", "NextID", id, err)
 	}
 	if err != nil {
 		t.Fatal(err.Error())
@@ -253,7 +259,7 @@ func TestGetBatch(t *testing.T) {
 		t.Errorf("problem getting batch: %v", err)
 	}
 	if b.ID() != "54321" {
-		t.Errorf("expected %s received %s w/ error %s", "54321", b.ID(), err)
+		t.Errorf("expected %s received %s w/ error %v", "54321", b.ID(), err)
 	}
 }
 
@@ -284,6 +290,6 @@ func TestDeleteBatch(t *testing.T) {
 	s := mockServiceInMemory()
 	err := s.DeleteBatch("98765", "54321")
 	if err != nil {
-		t.Errorf("expected %s received error %s", "nil", err)
+		t.Errorf("expected %s received error %v", "nil", err)
 	}
 }

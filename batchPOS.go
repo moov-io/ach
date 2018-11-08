@@ -23,7 +23,7 @@ import (
 // Settlement of the transaction moves from the card network to the ACH Network through
 // the creation of a POS entry by the card issuer to debit the Receiver’s account.
 type BatchPOS struct {
-	batch
+	Batch
 }
 
 // NewBatchPOS returns a *BatchPOS
