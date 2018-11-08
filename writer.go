@@ -48,8 +48,14 @@ func (w *Writer) Write(file *File) error {
 		return err
 	}
 
-	if _, err := w.w.WriteString(file.Control.String() + "\n"); err != nil {
-		return err
+	if !file.isADV() {
+		if _, err := w.w.WriteString(file.Control.String() + "\n"); err != nil {
+			return err
+		}
+	} else {
+		if _, err := w.w.WriteString(file.ADVControl.String() + "\n"); err != nil {
+			return err
+		}
 	}
 	w.lineNum++
 
