@@ -65,8 +65,6 @@ type EntryDetailADV struct {
 	JulianDateDay int `json:"julianDateDay"`
 	// SequenceNumber
 	SequenceNumber int `json:"sequenceNumber,omitEmpty"`
-
-	//ToDo: Check on NOC and Return
 	// Addenda98 for user with NOC
 	Addenda98 *Addenda98 `json:"addenda98,omitempty"`
 	// Addenda99 for use with Returns
@@ -138,9 +136,15 @@ func (ed *EntryDetailADV) String() string {
 	buf.WriteString(ed.CheckDigit)
 	buf.WriteString(ed.DFIAccountNumberField())
 	buf.WriteString(ed.AmountField())
+	buf.WriteString(ed.AdviceRoutingNumberField())
+	buf.WriteString(ed.FileIdentificationField())
+	buf.WriteString(ed.ACHOperatorDataField())
 	buf.WriteString(ed.IndividualNameField())
 	buf.WriteString(ed.DiscretionaryDataField())
 	buf.WriteString(fmt.Sprintf("%v", ed.AddendaRecordIndicator))
+	buf.WriteString(ed.ACHOperatorRoutingNumberField())
+	buf.WriteString(ed.JulianDateDayField())
+	buf.WriteString(ed.SequenceNumberField())
 	return buf.String()
 }
 
@@ -160,14 +164,18 @@ func (ed *EntryDetailADV) Validate() error {
 	if err := ed.isAlphanumeric(ed.DFIAccountNumber); err != nil {
 		return &FieldError{FieldName: "DFIAccountNumber", Value: ed.DFIAccountNumber, Msg: err.Error()}
 	}
-
+	if err := ed.isAlphanumeric(ed.AdviceRoutingNumber); err != nil {
+		return &FieldError{FieldName: "AdviceRoutingNumber", Value: ed.AdviceRoutingNumber, Msg: err.Error()}
+	}
 	if err := ed.isAlphanumeric(ed.IndividualName); err != nil {
 		return &FieldError{FieldName: "IndividualName", Value: ed.IndividualName, Msg: err.Error()}
 	}
 	if err := ed.isAlphanumeric(ed.DiscretionaryData); err != nil {
 		return &FieldError{FieldName: "DiscretionaryData", Value: ed.DiscretionaryData, Msg: err.Error()}
 	}
-
+	if err := ed.isAlphanumeric(ed.ACHOperatorRoutingNumber); err != nil {
+		return &FieldError{FieldName: "ACHOperatorRoutingNumber", Value: ed.ACHOperatorRoutingNumber, Msg: err.Error()}
+	}
 	calculated := ed.CalculateCheckDigit(ed.RDFIIdentificationField())
 
 	edCheckDigit, err := strconv.Atoi(ed.CheckDigit)
@@ -213,15 +221,36 @@ func (ed *EntryDetailADV) fieldInclusion() error {
 			Msg:       msgFieldInclusion + ", did you use NewEntryDetailADV()?",
 		}
 	}
+	if ed.AdviceRoutingNumber == "" {
+		return &FieldError{
+			FieldName: "AdviceRoutingNumber",
+			Value:     ed.AdviceRoutingNumber,
+			Msg:       msgFieldInclusion + ", did you use NewEntryDetailADV()?",
+		}
+	}
 	if ed.IndividualName == "" {
 		return &FieldError{
 			FieldName: "IndividualName",
 			Value:     ed.IndividualName,
-			Msg:       msgFieldInclusion + ", did you use NewEntryDetailADV()?",
+			Msg:       msgFieldRequired + ", did you use NewEntryDetailADV()?",
 		}
 	}
-
+	if ed.ACHOperatorRoutingNumber == "" {
+		return &FieldError{
+			FieldName: "ACHOperatorRoutingNumber",
+			Value:     ed.ACHOperatorRoutingNumber,
+			Msg:       msgFieldRequired + ", did you use NewEntryDetailADV()?",
+		}
+	}
 	return nil
+}
+
+// SetRDFI takes the 9 digit RDFI account number and separates it for RDFIIdentification and CheckDigit
+func (ed *EntryDetailADV) SetRDFI(rdfi string) *EntryDetailADV {
+	s := ed.stringField(rdfi, 9)
+	ed.RDFIIdentification = ed.parseStringField(s[:8])
+	ed.CheckDigit = ed.parseStringField(s[8:9])
+	return ed
 }
 
 // RDFIIdentificationField get the rdfiIdentification with zero padding
@@ -239,24 +268,44 @@ func (ed *EntryDetailADV) AmountField() string {
 	return ed.numericField(ed.Amount, 10)
 }
 
+// AdviceRoutingNumberField gets the AdviceRoutingNumber with zero padding
+func (ed *EntryDetailADV) AdviceRoutingNumberField() string {
+	return ed.stringField(ed.AdviceRoutingNumber, 9)
+}
+
+// FileIdentificationField returns a space padded string of FileIdentification
+func (ed *EntryDetailADV) FileIdentificationField() string {
+	return ed.alphaField(ed.FileIdentification, 5)
+}
+
+// ACHOperatorDataField returns a space padded string of ACHOperatorData
+func (ed *EntryDetailADV) ACHOperatorDataField() string {
+	return ed.alphaField(ed.ACHOperatorData, 1)
+}
+
 // IndividualNameField returns a space padded string of IndividualName
 func (ed *EntryDetailADV) IndividualNameField() string {
 	return ed.alphaField(ed.IndividualName, 22)
 }
 
-// ReceivingCompanyField is used in CCD files but returns the underlying IndividualName field
-func (ed *EntryDetailADV) ReceivingCompanyField() string {
-	return ed.IndividualNameField()
-}
-
-// SetReceivingCompany setter for CCD ReceivingCompany which is underlying IndividualName
-func (ed *EntryDetailADV) SetReceivingCompany(s string) {
-	ed.IndividualName = s
-}
-
 // DiscretionaryDataField returns a space padded string of DiscretionaryData
 func (ed *EntryDetailADV) DiscretionaryDataField() string {
 	return ed.alphaField(ed.DiscretionaryData, 2)
+}
+
+// ACHOperatorRoutingNumberField returns a space padded string of ACHOperatorRoutingNumber
+func (ed *EntryDetailADV) ACHOperatorRoutingNumberField() string {
+	return ed.alphaField(ed.ACHOperatorRoutingNumber, 8)
+}
+
+// JulianDateDayField returns a zero padded string of JulianDateDay
+func (ed *EntryDetailADV) JulianDateDayField() string {
+	return ed.numericField(ed.JulianDateDay, 3)
+}
+
+// SequenceNumberField returns a zero padded string of SequenceNumber
+func (ed *EntryDetailADV) SequenceNumberField() string {
+	return ed.numericField(ed.SequenceNumber, 4)
 }
 
 // CreditOrDebit returns a "C" for credit or "D" for debit based on the entry TransactionCode
@@ -268,9 +317,9 @@ func (ed *EntryDetailADV) CreditOrDebit() string {
 
 	// take the second number in the TransactionCode
 	switch tc[1:2] {
-	case "1", "2", "3", "4":
+	case "1", "3", "5", "7":
 		return "C"
-	case "5", "6", "7", "8", "9":
+	case "2", "4", "6", "8":
 		return "D"
 	default:
 	}

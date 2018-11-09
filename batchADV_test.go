@@ -20,23 +20,10 @@ func mockBatchADVHeader() *BatchHeader {
 	return bh
 }
 
-// mockADVEntryDetail creates a ADV entry detail
-func mockADVEntryDetail() *EntryDetailADV {
-	entry := NewEntryDetailADV()
-	entry.TransactionCode = 81
-	entry.DFIAccountNumber = "744-5678-99"
-	entry.Amount = 0
-	entry.SetReceivingCompany("Best Co. #23")
-
-	entry.DiscretionaryData = "S"
-	entry.AddendaRecordIndicator = 1
-	return entry
-}
-
 // mockBatchADV creates a ADV batch
 func mockBatchADV() *BatchADV {
 	mockBatch := NewBatchADV(mockBatchADVHeader())
-	mockBatch.AddADVEntry(mockADVEntryDetail())
+	mockBatch.AddADVEntry(mockEntryDetailADV())
 	if err := mockBatch.Create(); err != nil {
 		panic(err)
 	}
@@ -68,7 +55,7 @@ func BenchmarkBatchADVHeader(b *testing.B) {
 // TestBatchADVAddendum98 validates Addenda98 returns an error
 func TestBatchADVAddendum98(t *testing.T) {
 	mockBatch := NewBatchADV(mockBatchADVHeader())
-	mockBatch.AddADVEntry(mockADVEntryDetail())
+	mockBatch.AddADVEntry(mockEntryDetailADV())
 	mockAddenda98 := mockAddenda98()
 	mockAddenda98.TypeCode = "05"
 	mockBatch.GetADVEntries()[0].Category = CategoryNOC
@@ -87,7 +74,7 @@ func TestBatchADVAddendum98(t *testing.T) {
 // TestBatchADVAddendum99 validates Addenda99 returns an error
 func TestBatchADVAddendum99(t *testing.T) {
 	mockBatch := NewBatchADV(mockBatchADVHeader())
-	mockBatch.AddADVEntry(mockADVEntryDetail())
+	mockBatch.AddADVEntry(mockEntryDetailADV())
 	mockAddenda99 := mockAddenda99()
 	mockAddenda99.TypeCode = "05"
 	mockBatch.GetADVEntries()[0].Category = CategoryReturn
@@ -161,26 +148,10 @@ func BenchmarkBatchADVServiceClassCode(b *testing.B) {
 	}
 }
 
-// TestBatchADVTransactionCode validates Transaction Code
-func TestBatchADVTransactionCode(t *testing.T) {
-	mockBatch := mockBatchADV()
-	// Batch Header information is required to Create a batch.
-	mockBatch.GetADVEntries()[0].TransactionCode = 22
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
-	}
-}
-
 // TestBatchADVAddendum99Category validates Addenda99 returns an error
 func TestBatchADVAddendum99Category(t *testing.T) {
 	mockBatch := NewBatchADV(mockBatchADVHeader())
-	mockBatch.AddADVEntry(mockADVEntryDetail())
+	mockBatch.AddADVEntry(mockEntryDetailADV())
 	mockAddenda99 := mockAddenda99()
 	mockBatch.GetADVEntries()[0].Category = CategoryForward
 	mockBatch.GetADVEntries()[0].Addenda99 = mockAddenda99

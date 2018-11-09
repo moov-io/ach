@@ -39,13 +39,14 @@ func (batch *BatchADV) Validate() error {
 	// Add configuration and type specific validation for this type.
 	for _, entry := range batch.ADVEntries {
 
-		switch entry.TransactionCode {
-		case 81, 82, 83, 84, 85, 86, 87, 88:
-		default:
-			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "ADV")
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
+		if entry.Category == CategoryForward {
+			switch entry.TransactionCode {
+			case 81, 82, 83, 84, 85, 86, 87, 88:
+			default:
+				msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "ADV")
+				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
+			}
 		}
-
 		// ToDo:  If NOC and Returns for ADV check Addenda98 and Addenda99
 	}
 	return nil

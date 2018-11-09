@@ -333,20 +333,41 @@ func (batch *batch) isFieldInclusion() error {
 	if err := batch.Header.Validate(); err != nil {
 		return err
 	}
-	for _, entry := range batch.Entries {
+
+	if !batch.IsADV() {
+		for _, entry := range batch.Entries {
+			if err := entry.Validate(); err != nil {
+				return err
+			}
+
+			if entry.Addenda02 != nil {
+				if err := entry.Addenda02.Validate(); err != nil {
+					return err
+				}
+			}
+			for _, addenda05 := range entry.Addenda05 {
+				if err := addenda05.Validate(); err != nil {
+					return err
+				}
+			}
+			if entry.Addenda98 != nil {
+				if err := entry.Addenda98.Validate(); err != nil {
+					return err
+				}
+			}
+			if entry.Addenda99 != nil {
+				if err := entry.Addenda99.Validate(); err != nil {
+					return err
+				}
+			}
+
+		}
+		return batch.Control.Validate()
+	}
+	// ADV File/Batch
+	for _, entry := range batch.ADVEntries {
 		if err := entry.Validate(); err != nil {
 			return err
-		}
-
-		if entry.Addenda02 != nil {
-			if err := entry.Addenda02.Validate(); err != nil {
-				return err
-			}
-		}
-		for _, addenda05 := range entry.Addenda05 {
-			if err := addenda05.Validate(); err != nil {
-				return err
-			}
 		}
 		if entry.Addenda98 != nil {
 			if err := entry.Addenda98.Validate(); err != nil {
@@ -359,10 +380,7 @@ func (batch *batch) isFieldInclusion() error {
 			}
 		}
 	}
-	if batch.Header.StandardEntryClassCode == "ADV" {
-		return batch.ADVControl.Validate()
-	}
-	return batch.Control.Validate()
+	return batch.ADVControl.Validate()
 }
 
 // isBatchEntryCount validate Entry count is accurate
