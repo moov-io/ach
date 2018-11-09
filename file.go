@@ -201,13 +201,6 @@ func (f *File) Create() error {
 		return &FileError{FieldName: "Batches", Value: strconv.Itoa(len(f.Batches)), Msg: "must have []*Batches to be built"}
 	}
 
-	// Check to see if processing an ADV file.  If so the FileControl is different, so call createFileADV
-	if f.isADV() {
-		if err := f.createFileADV(); err != nil {
-			return err
-		}
-		return nil
-	}
 	if !f.isADV() {
 		// add 2 for FileHeader/control and reset if build was called twice do to error
 		totalRecordsInFile := 2

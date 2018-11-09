@@ -20,15 +20,15 @@ type EntryDetailADV struct {
 	ID string `json:"id"`
 	// RecordType defines the type of record in the block. 6
 	recordType string
-	// TransactionCode if the receivers account is:
-	// Credit (deposit) to checking account ‘22’
-	// Prenote for credit to checking account ‘23’
-	// Debit (withdrawal) to checking account ‘27’
-	// Prenote for debit to checking account ‘28’
-	// Credit to savings account ‘32’
-	// Prenote for credit to savings account ‘33’
-	// Debit to savings account ‘37’
-	// Prenote for debit to savings account ‘38’
+	// TransactionCode representing Accounting Entries
+	// Credit for ACH debits originated - 81
+	// Debit for ACH credits originated - 82
+	// Credit for ACH credits received 83
+	// Debit for ACH debits received 84
+	// Credit for ACH credits in rejected batches 85
+	// Debit for ACH debits in rejected batches - 86
+	// Summary credit for respondent ACH activity - 87
+	// Summary debit for respondent ACH activity - 88
 	TransactionCode int `json:"transactionCode"`
 	// RDFIIdentification is the RDFI's routing number without the last digit.
 	// Receiving Depository Financial Institution
@@ -104,18 +104,28 @@ func (ed *EntryDetailADV) Parse(record string) {
 	ed.RDFIIdentification = ed.parseStringField(record[3:11])
 	// 12-12 The last digit of the RDFI's routing number
 	ed.CheckDigit = ed.parseStringField(record[11:12])
-	// 13-29 The receiver's bank account number you are crediting/debiting
-	ed.DFIAccountNumber = record[12:29]
-	// 30-39 Number of cents you are debiting/crediting this account
-	ed.Amount = ed.parseNumField(record[29:39])
-	// 55-76 The name of the receiver, usually the name on the bank account
+	// 13-27 The receiver's bank account number you are crediting/debiting
+	ed.DFIAccountNumber = record[12:27]
+	// 28-39 Number of cents you are debiting/crediting this account
+	ed.Amount = ed.parseNumField(record[27:39])
+	// 40-48 Advice Routing Number
+	ed.AdviceRoutingNumber = ed.parseStringField(record[39:48])
+	// 49-53 File Identification
+	ed.FileIdentification = ed.parseStringField(record[48:53])
+	// 54-54 ACH Operator Data
+	ed.ACHOperatorData = ed.parseStringField(record[53:54])
+	// 55-76 Individual Name
 	ed.IndividualName = record[54:76]
 	// 77-78 allows ODFIs to include codes of significance only to them, normally blank
-	//
-	// For WEB and TEL batches this field is the PaymentType which is either R(reoccurring) or S(single)
 	ed.DiscretionaryData = record[76:78]
 	// 79-79 1 if addenda exists 0 if it does not
 	ed.AddendaRecordIndicator = ed.parseNumField(record[78:79])
+	// 80-87
+	ed.ACHOperatorRoutingNumber = ed.parseStringField(record[79:87])
+	// 88-90
+	ed.JulianDateDay = ed.parseNumField(record[87:90])
+	// 91-94
+	ed.SequenceNumber = ed.parseNumField(record[90:94])
 }
 
 // String writes the EntryDetailADV struct to a 94 character string.
