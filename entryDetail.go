@@ -66,7 +66,7 @@ type EntryDetail struct {
 	// For addenda Records, the Trace Number will be identical to the Trace Number
 	// in the associated Entry Detail Record, since the Trace Number is associated
 	// with an entry or item rather than a physical record.
-	TraceNumber int `json:"traceNumber,omitempty"`
+	TraceNumber string `json:"traceNumber,omitempty"`
 	// Addenda02 for use with StandardEntryClassCode MTE, POS, and SHR
 	Addenda02 *Addenda02 `json:"addenda02,omitempty"`
 	// Addenda05 for use with StandardEntryClassCode: ACK, ATX, CCD, CIE, CTX, DNE, ENR, WEB, PPD, TRX.
@@ -134,7 +134,7 @@ func (ed *EntryDetail) Parse(record string) {
 	ed.AddendaRecordIndicator = ed.parseNumField(record[78:79])
 	// 80-94 An internal identification (alphanumeric) that you use to uniquely identify
 	// this Entry Detail Record This number should be unique to the transaction and will help identify the transaction in case of an inquiry
-	ed.TraceNumber = ed.parseNumField(record[79:94])
+	ed.TraceNumber = strings.TrimSpace(record[79:94])
 }
 
 // String writes the EntryDetail struct to a 94 character string.
@@ -233,7 +233,7 @@ func (ed *EntryDetail) fieldInclusion() error {
 			Msg:       msgFieldInclusion + ", did you use NewEntryDetail()?",
 		}
 	}
-	if ed.TraceNumber == 0 {
+	if ed.TraceNumber == "" {
 		return &FieldError{
 			FieldName: "TraceNumber",
 			Value:     ed.TraceNumberField(),
@@ -253,8 +253,7 @@ func (ed *EntryDetail) SetRDFI(rdfi string) *EntryDetail {
 
 // SetTraceNumber takes first 8 digits of ODFI and concatenates a sequence number onto the TraceNumber
 func (ed *EntryDetail) SetTraceNumber(ODFIIdentification string, seq int) {
-	trace := ed.stringField(ODFIIdentification, 8) + ed.numericField(seq, 7)
-	ed.TraceNumber = ed.parseNumField(trace)
+	ed.TraceNumber = ed.stringField(ODFIIdentification, 8) + ed.numericField(seq, 7)
 }
 
 // RDFIIdentificationField get the rdfiIdentification with zero padding
@@ -502,7 +501,7 @@ func (ed *EntryDetail) ItemTypeIndicator() string {
 
 // TraceNumberField returns a zero padded TraceNumber string
 func (ed *EntryDetail) TraceNumberField() string {
-	return ed.numericField(ed.TraceNumber, 15)
+	return ed.stringField(ed.TraceNumber, 15)
 }
 
 // CreditOrDebit returns a "C" for credit or "D" for debit based on the entry TransactionCode

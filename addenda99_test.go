@@ -45,8 +45,8 @@ func testAddenda99Parse(t testing.TB) {
 	if addenda99.AddendaInformation != "Authorization revoked" {
 		t.Errorf("expected: %v got: %v", "Authorization revoked", addenda99.AddendaInformation)
 	}
-	if addenda99.TraceNumber != 91012980000066 {
-		t.Errorf("expected: %v got: %v", 91012980000066, addenda99.TraceNumber)
+	if addenda99.TraceNumber != "091012980000066" {
+		t.Errorf("expected: %v got: %v", "091012980000066", addenda99.TraceNumber)
 	}
 }
 
@@ -240,7 +240,7 @@ func BenchmarkAddenda99AddendaInformationField(b *testing.B) {
 
 func testAddenda99TraceNumberField(t testing.TB) {
 	addenda99 := mockAddenda99()
-	addenda99.TraceNumber = 91012980000066
+	addenda99.TraceNumber = "91012980000066"
 	exp := "091012980000066"
 	if addenda99.TraceNumberField() != exp {
 		t.Errorf("expected %v received %v", exp, addenda99.TraceNumberField())

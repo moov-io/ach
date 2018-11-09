@@ -41,7 +41,7 @@ func testMockEntryDetail(t testing.TB) {
 	if entry.IndividualName != "Wade Arnold" {
 		t.Error("IndividualName dependent default value has changed")
 	}
-	if entry.TraceNumber != 121042880000001 {
+	if entry.TraceNumber != "121042880000001" {
 		t.Errorf("TraceNumber dependent default value has changed %v", entry.TraceNumber)
 	}
 }
@@ -519,7 +519,7 @@ func BenchmarkEDFieldInclusionIndividualName(b *testing.B) {
 // testEDFieldInclusionTraceNumber validates trace number field inclusion
 func testEDFieldInclusionTraceNumber(t testing.TB) {
 	entry := mockEntryDetail()
-	entry.TraceNumber = 0
+	entry.TraceNumber = "0"
 	if err := entry.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if !strings.Contains(e.Msg, msgFieldInclusion) {

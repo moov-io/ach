@@ -30,7 +30,7 @@ type Addenda98 struct {
 	// CorrectedData
 	CorrectedData string `json:"correctedData"`
 	// TraceNumber matches the Entry Detail Trace Number of the entry being returned.
-	TraceNumber int `json:"traceNumber,omitempty"`
+	TraceNumber string `json:"traceNumber,omitempty"`
 
 	// validator is composed for data validation
 	validator
@@ -83,7 +83,7 @@ func (addenda98 *Addenda98) Parse(record string) {
 	// 36-64
 	addenda98.CorrectedData = strings.TrimSpace(record[35:64])
 	// 80-94
-	addenda98.TraceNumber = addenda98.parseNumField(record[79:94])
+	addenda98.TraceNumber = strings.TrimSpace(record[79:94])
 }
 
 // String writes the Addenda98 struct to a 94 character string
@@ -151,7 +151,7 @@ func (addenda98 *Addenda98) CorrectedDataField() string {
 
 // TraceNumberField returns a zero padded traceNumber string
 func (addenda98 *Addenda98) TraceNumberField() string {
-	return addenda98.numericField(addenda98.TraceNumber, 15)
+	return addenda98.stringField(addenda98.TraceNumber, 15)
 }
 
 func makeChangeCodeDict() map[string]*changeCode {

@@ -695,7 +695,7 @@ func testFileAddenda98invalid(t testing.TB) {
 	bh := mockBatchPPDHeader()
 	ed := mockPPDEntryDetail()
 	addenda98 := mockAddenda98()
-	addenda98.TraceNumber = 0000001
+	addenda98.TraceNumber = "0000001"
 	addenda98.ChangeCode = "C50"
 	addenda98.CorrectedData = "ACME One Corporation"
 	ed.Category = CategoryNOC
@@ -736,7 +736,7 @@ func testFileAddenda98(t testing.TB) {
 	bh := mockBatchHeader()
 	ed := mockEntryDetail()
 	addenda98 := mockAddenda98()
-	addenda98.TraceNumber = 0000001
+	addenda98.TraceNumber = "0000001"
 	addenda98.ChangeCode = "C10"
 	addenda98.CorrectedData = "ACME One Corporation"
 	ed.Category = CategoryNOC
@@ -777,7 +777,7 @@ func testFileAddenda99invalid(t testing.TB) {
 	bh := mockBatchPPDHeader()
 	ed := mockPPDEntryDetail()
 	addenda99 := mockAddenda99()
-	addenda99.TraceNumber = 0000001
+	addenda99.TraceNumber = "0000001"
 	addenda99.ReturnCode = "100"
 	ed.Category = CategoryReturn
 	ed.Addenda99 = addenda99
@@ -817,7 +817,7 @@ func testFileAddenda99(t testing.TB) {
 	bh := mockBatchHeader()
 	ed := mockEntryDetail()
 	addenda99 := mockAddenda99()
-	addenda99.TraceNumber = 0000001
+	addenda99.TraceNumber = "0000001"
 	addenda99.ReturnCode = "R02"
 	ed.Category = CategoryReturn
 	ed.Addenda99 = addenda99

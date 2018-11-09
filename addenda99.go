@@ -52,7 +52,7 @@ type Addenda99 struct {
 	// AddendaInformation
 	AddendaInformation string `json:"addendaInformation,omitempty"`
 	// TraceNumber matches the Entry Detail Trace Number of the entry being returned.
-	TraceNumber int `json:"traceNumber,omitempty"`
+	TraceNumber string `json:"traceNumber,omitempty"`
 
 	// validator is composed for data validation
 	validator
@@ -95,7 +95,7 @@ func (Addenda99 *Addenda99) Parse(record string) {
 	// 36-79
 	Addenda99.AddendaInformation = strings.TrimSpace(record[35:79])
 	// 80-94
-	Addenda99.TraceNumber = Addenda99.parseNumField(record[79:94])
+	Addenda99.TraceNumber = strings.TrimSpace(record[79:94])
 }
 
 // String writes the Addenda99 struct to a 94 character string
@@ -186,9 +186,9 @@ func (Addenda99 *Addenda99) IATAddendaInformationField() string {
 	return Addenda99.alphaField(Addenda99.AddendaInformation[9:44], 34)
 }
 
-// TraceNumberField returns a zero padded traceNumber string
+// TraceNumberField returns a zero padded TraceNumber string
 func (Addenda99 *Addenda99) TraceNumberField() string {
-	return Addenda99.numericField(Addenda99.TraceNumber, 15)
+	return Addenda99.stringField(Addenda99.TraceNumber, 15)
 }
 
 func makeReturnCodeDict() map[string]*returnCode {
