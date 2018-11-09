@@ -255,7 +255,7 @@ func (batch *batch) build() error {
 		bcADV.BatchNumber = batch.Header.BatchNumber
 		bcADV.EntryAddendaCount = entryCount
 		bcADV.EntryHash = batch.parseNumField(batch.calculateEntryHash())
-		bcADV.TotalCreditEntryDollarAmount, bcADV.TotalDebitEntryDollarAmount = batch.calculateBatchAmounts()
+		bcADV.TotalCreditEntryDollarAmount, bcADV.TotalDebitEntryDollarAmount = batch.calculateADVBatchAmounts()
 		batch.ADVControl = bcADV
 	}
 	return nil
@@ -415,8 +415,11 @@ func (batch *batch) isBatchEntryCount() error {
 // The Total Debit and Credit Entry Dollar Amount fields contain accumulated
 // Entry Detail debit and credit totals within a given batch
 func (batch *batch) isBatchAmount() error {
+	credit := 0
+	debit := 0
+
 	if !batch.IsADV() {
-		credit, debit := batch.calculateBatchAmounts()
+		credit, debit = batch.calculateBatchAmounts()
 		if debit != batch.Control.TotalDebitEntryDollarAmount {
 			msg := fmt.Sprintf(msgBatchCalculatedControlEquality, debit, batch.Control.TotalDebitEntryDollarAmount)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TotalDebitEntryDollarAmount", Msg: msg}
@@ -426,7 +429,7 @@ func (batch *batch) isBatchAmount() error {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TotalCreditEntryDollarAmount", Msg: msg}
 		}
 	} else {
-		credit, debit := batch.calculateADVBatchAmounts()
+		credit, debit = batch.calculateADVBatchAmounts()
 		if debit != batch.ADVControl.TotalDebitEntryDollarAmount {
 			msg := fmt.Sprintf(msgBatchCalculatedControlEquality, debit, batch.ADVControl.TotalDebitEntryDollarAmount)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TotalDebitEntryDollarAmount", Msg: msg}
@@ -669,7 +672,7 @@ func (batch *batch) addendaFieldInclusionForward(entry *EntryDetail) error {
 			msg := fmt.Sprintf(msgBatchAddenda, "Addenda02", entry.Category, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda02", Msg: msg}
 		}
-	case "ADV", "ARC", "BOC", "COR", "POP", "RCK", "TEL", "TRC", "XCK":
+	case "ARC", "BOC", "COR", "POP", "RCK", "TEL", "TRC", "XCK":
 		if entry.Addenda02 != nil {
 			msg := fmt.Sprintf(msgBatchAddenda, "Addenda02", entry.Category, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda02", Msg: msg}

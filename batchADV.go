@@ -37,11 +37,16 @@ func (batch *BatchADV) Validate() error {
 		return err
 	}
 	// Add configuration and type specific validation for this type.
-	for _, entry := range batch.Entries {
-		// Verify Addenda* FieldInclusion based on entry.Category and batchHeader.StandardEntryClassCode
-		if err := batch.addendaFieldInclusion(entry); err != nil {
-			return err
+	for _, entry := range batch.ADVEntries {
+
+		switch entry.TransactionCode {
+		case 81, 82, 83, 84, 85, 86, 87, 88:
+		default:
+			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "ADV")
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 		}
+
+		// ToDo:  If NOC and Returns for ADV check Addenda98 and Addenda99
 	}
 	return nil
 }

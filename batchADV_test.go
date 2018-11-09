@@ -23,7 +23,7 @@ func mockBatchADVHeader() *BatchHeader {
 // mockADVEntryDetail creates a ADV entry detail
 func mockADVEntryDetail() *EntryDetailADV {
 	entry := NewEntryDetailADV()
-	entry.TransactionCode = 24
+	entry.TransactionCode = 81
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
 	entry.SetReceivingCompany("Best Co. #23")
@@ -161,54 +161,11 @@ func BenchmarkBatchADVServiceClassCode(b *testing.B) {
 	}
 }
 
-// testBatchADVReceivingCompanyField validates ADVReceivingCompanyField
-// underlying IndividualName
-func testBatchADVReceivingCompanyField(t testing.TB) {
-	mockBatch := mockBatchADV()
-	ts := mockBatch.ADVEntries[0].ReceivingCompanyField()
-	if ts != "Best Co. #23          " {
-		t.Error("Receiving Company Field is invalid")
-	}
-}
-
-// TestBatchADVReceivingCompanyField tests validating ADVReceivingCompanyField
-// underlying IndividualName
-func TestBatchADVReceivingCompanyFieldField(t *testing.T) {
-	testBatchADVReceivingCompanyField(t)
-}
-
-// BenchmarkBatchADVReceivingCompanyField benchmarks validating ADVReceivingCompanyField
-// underlying IndividualName
-func BenchmarkBatchADVReceivingCompanyField(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testBatchADVReceivingCompanyField(b)
-	}
-}
-
-// TestBatchADVAmount validates Amount
-func TestBatchADVAmount(t *testing.T) {
-	mockBatch := mockBatchADV()
-	// Batch Header information is required to Create a batch.
-	mockBatch.GetADVEntries()[0].Amount = 25000
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Amount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
-	}
-}
-
-// TestBatchADVTransactionCode validates Amount
+// TestBatchADVTransactionCode validates Transaction Code
 func TestBatchADVTransactionCode(t *testing.T) {
 	mockBatch := mockBatchADV()
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetADVEntries()[0].TransactionCode = 22
-	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TransactionCode" {
