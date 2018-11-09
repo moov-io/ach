@@ -12,7 +12,7 @@ import (
 // Corporate credit or debit. Identifies an Entry initiated by an Organization to transfer funds to or from an account of that Organization or another Organization.
 // For commercial accounts only.
 type BatchCCD struct {
-	batch
+	Batch
 }
 
 // NewBatchCCD returns a *BatchCCD

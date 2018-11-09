@@ -162,7 +162,7 @@ func (f *File) UnmarshalJSON(p []byte) error {
 }
 
 type batchesJSON struct {
-	Batches []*batch `json:"batches"`
+	Batches []*Batch `json:"batches"`
 }
 
 // setBatchesFromJson takes bs as JSON and attempts to read out all the Batches within.

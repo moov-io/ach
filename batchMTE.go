@@ -15,7 +15,7 @@ import (
 // A MTE transaction is created when a consumer uses their debit card at an Automated Teller Machine (ATM) to withdraw cash.
 // MTE transactions cannot be aggregated together under a single Entry.
 type BatchMTE struct {
-	batch
+	Batch
 }
 
 func NewBatchMTE(bh *BatchHeader) *BatchMTE {

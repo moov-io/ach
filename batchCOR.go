@@ -12,7 +12,7 @@ import (
 // This Standard Entry Class Code is used by an RDFI or ODFI when originating a Notification of Change or Refused Notification of Change in automated format.
 // A Notification of Change may be created by an RDFI to notify the ODFI that a posted Entry or Prenotification Entry contains invalid or erroneous information and should be changed.
 type BatchCOR struct {
-	batch
+	Batch
 }
 
 var msgBatchCORAmount = "debit:%v credit:%v entry detail amount fields must be zero for SEC type COR"

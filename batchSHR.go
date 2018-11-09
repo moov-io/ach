@@ -18,7 +18,7 @@ import (
 // where the ODFI and RDFI have an agreement in addition to these Rules to process such
 // Entries.
 type BatchSHR struct {
-	batch
+	Batch
 }
 
 // NewBatchSHR returns a *BatchSHR

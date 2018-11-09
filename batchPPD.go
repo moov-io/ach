@@ -8,7 +8,7 @@ import "fmt"
 
 // BatchPPD holds the Batch Header and Batch Control and all Entry Records for PPD Entries
 type BatchPPD struct {
-	batch
+	Batch
 }
 
 // NewBatchPPD returns a *BatchPPD

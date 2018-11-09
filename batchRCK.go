@@ -11,7 +11,7 @@ import "fmt"
 // Represented Check Entries (RCK). A physical check that was presented but returned because of
 // insufficient funds may be represented as an ACH entry.
 type BatchRCK struct {
-	batch
+	Batch
 }
 
 // NewBatchRCK returns a *BatchRCK

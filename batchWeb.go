@@ -8,7 +8,7 @@ import (
 // Entry submitted pursuant to an authorization obtained solely via the Internet or a wireless network
 // For consumer accounts only.
 type BatchWEB struct {
-	batch
+	Batch
 }
 
 // NewBatchWEB returns a *BatchWEB

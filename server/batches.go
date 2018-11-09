@@ -7,6 +7,7 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/moov-io/ach"
@@ -16,8 +17,8 @@ import (
 )
 
 type createBatchRequest struct {
-	FileID      string
-	BatchHeader ach.BatchHeader
+	FileID string
+	Batch  *ach.Batch
 }
 
 type createBatchResponse struct {
@@ -30,7 +31,7 @@ func (r createBatchResponse) error() error { return r.Err }
 func createBatchEndpoint(s Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(createBatchRequest)
-		id, e := s.CreateBatch(req.FileID, &req.BatchHeader)
+		id, e := s.CreateBatch(req.FileID, req.Batch)
 		return createBatchResponse{
 			ID:  id,
 			Err: e,
@@ -46,9 +47,11 @@ func decodeCreateBatchRequest(_ context.Context, r *http.Request) (interface{}, 
 		return nil, ErrBadRouting
 	}
 	req.FileID = id
-	req.BatchHeader = *ach.NewBatchHeader()
-	if e := json.NewDecoder(r.Body).Decode(&req.BatchHeader); e != nil {
-		return nil, e
+	if err := json.NewDecoder(r.Body).Decode(req.Batch); err != nil {
+		return nil, err
+	}
+	if req.Batch == nil {
+		return nil, errors.New("no Batch provided")
 	}
 	return req, nil
 }
