@@ -29,9 +29,6 @@ func testMockEntryDetailADV(t testing.TB) {
 	if entry.TransactionCode != 81 {
 		t.Error("TransactionCode dependent default value has changed")
 	}
-	if entry.RDFIIdentification != "231380104" {
-		t.Error("RDFIIdentification dependent default value has changed")
-	}
 	if entry.AdviceRoutingNumber != "121042882" {
 		t.Error("AdviceRoutingNumber dependent default value has changed")
 	}
