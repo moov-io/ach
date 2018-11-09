@@ -25,7 +25,7 @@ import "fmt"
 // Unlike ARC entries, BOC conversions require the customer to be present and a notice that
 // checks may be converted to BOC ACH entries be posted.
 type BatchBOC struct {
-	batch
+	Batch
 }
 
 // NewBatchBOC returns a *BatchBOC

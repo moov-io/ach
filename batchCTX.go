@@ -16,7 +16,7 @@ import (
 // for goods or services. These payments replace checks with an electronic process of debiting and
 // crediting invoices between the financial institutions of participating companies.
 type BatchCTX struct {
-	batch
+	Batch
 }
 
 var (

@@ -15,7 +15,7 @@ import (
 //
 // Allowed TransactionCode values: 22 Demand Credit, 27 Demand Debit, 32 Savings Credit, 37 Savings Debit
 type BatchENR struct {
-	batch
+	Batch
 }
 
 func NewBatchENR(bh *BatchHeader) *BatchENR {

@@ -18,7 +18,7 @@ import (
 // are “pushed” to the biller in the form of an ACH credit, as opposed to the biller’s use of
 // a debit application (e.g., PPD, WEB) to “pull” the funds from a customer’s account.
 type BatchCIE struct {
-	batch
+	Batch
 }
 
 // NewBatchCIE returns a *BatchCIE

@@ -12,7 +12,7 @@ import (
 // Acknowledgement of a Corporate credit by the Receiving Depository Financial Institution (RDFI).
 // For commercial accounts only.
 type BatchACK struct {
-	batch
+	Batch
 }
 
 // NewBatchACK returns a *BatchACK

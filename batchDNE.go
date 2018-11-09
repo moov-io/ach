@@ -18,7 +18,7 @@ import (
 //  - SSN (positions 38-46) are zero if no SSN
 //  - Beneficiary payment starts at position 55
 type BatchDNE struct {
-	batch
+	Batch
 }
 
 // NewBatchDNE returns a *BatchDNE
