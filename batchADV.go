@@ -10,7 +10,7 @@ import (
 
 // BatchADV holds the Batch Header and Batch Control and all Entry Records for ADV Entries
 type BatchADV struct {
-	batch
+	Batch
 }
 
 // NewBatchADV returns a *BatchADV
