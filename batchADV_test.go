@@ -11,7 +11,7 @@ import (
 // mockBatchADVHeader creates a ADV batch header
 func mockBatchADVHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = 280
 	bh.StandardEntryClassCode = "ADV"
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "231380104"
@@ -21,15 +21,13 @@ func mockBatchADVHeader() *BatchHeader {
 }
 
 // mockADVEntryDetail creates a ADV entry detail
-func mockADVEntryDetail() *EntryDetail {
-	entry := NewEntryDetail()
+func mockADVEntryDetail() *EntryDetailADV {
+	entry := NewEntryDetailADV()
 	entry.TransactionCode = 24
-	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
-	entry.SetOriginalTraceNumber("121042880000001")
 	entry.SetReceivingCompany("Best Co. #23")
-	entry.SetTraceNumber(mockBatchADVHeader().ODFIIdentification, 1)
+
 	entry.DiscretionaryData = "S"
 	entry.AddendaRecordIndicator = 1
 	return entry
@@ -38,7 +36,7 @@ func mockADVEntryDetail() *EntryDetail {
 // mockBatchADV creates a ADV batch
 func mockBatchADV() *BatchADV {
 	mockBatch := NewBatchADV(mockBatchADVHeader())
-	mockBatch.AddEntry(mockADVEntryDetail())
+	mockBatch.AddADVEntry(mockADVEntryDetail())
 	if err := mockBatch.Create(); err != nil {
 		panic(err)
 	}
@@ -67,43 +65,14 @@ func BenchmarkBatchADVHeader(b *testing.B) {
 	}
 }
 
-// testBatchADVAddendumCount batch control ADV can only have one addendum per entry detail
-func testBatchADVAddendumCount(t testing.TB) {
-	mockBatch := mockBatchADV()
-	// Adding a second addenda to the mock entry
-	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda05" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
-	}
-}
-
-// TestBatchADVAddendumCount tests batch control ADV can only have one addendum per entry detail
-func TestBatchADVAddendumCount(t *testing.T) {
-	testBatchADVAddendumCount(t)
-}
-
-// BenchmarkBatchADVAddendumCount benchmarks batch control ADV can only have one addendum per entry detail
-func BenchmarkBatchADVAddendumCount(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testBatchADVAddendumCount(b)
-	}
-}
-
 // TestBatchADVAddendum98 validates Addenda98 returns an error
 func TestBatchADVAddendum98(t *testing.T) {
 	mockBatch := NewBatchADV(mockBatchADVHeader())
-	mockBatch.AddEntry(mockADVEntryDetail())
+	mockBatch.AddADVEntry(mockADVEntryDetail())
 	mockAddenda98 := mockAddenda98()
 	mockAddenda98.TypeCode = "05"
-	mockBatch.GetEntries()[0].Category = CategoryNOC
-	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
+	mockBatch.GetADVEntries()[0].Category = CategoryNOC
+	mockBatch.GetADVEntries()[0].Addenda98 = mockAddenda98
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
@@ -118,11 +87,11 @@ func TestBatchADVAddendum98(t *testing.T) {
 // TestBatchADVAddendum99 validates Addenda99 returns an error
 func TestBatchADVAddendum99(t *testing.T) {
 	mockBatch := NewBatchADV(mockBatchADVHeader())
-	mockBatch.AddEntry(mockADVEntryDetail())
+	mockBatch.AddADVEntry(mockADVEntryDetail())
 	mockAddenda99 := mockAddenda99()
 	mockAddenda99.TypeCode = "05"
-	mockBatch.GetEntries()[0].Category = CategoryReturn
-	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
+	mockBatch.GetADVEntries()[0].Category = CategoryReturn
+	mockBatch.GetADVEntries()[0].Addenda99 = mockAddenda99
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
@@ -131,35 +100,6 @@ func TestBatchADVAddendum99(t *testing.T) {
 		} else {
 			t.Errorf("%T: %s", err, err)
 		}
-	}
-}
-
-// testBatchADVReceivingCompanyName validates Receiving company / Individual name is a mandatory field
-func testBatchADVReceivingCompanyName(t testing.TB) {
-	mockBatch := mockBatchADV()
-	// modify the Individual name / receiving company to nothing
-	mockBatch.GetEntries()[0].SetReceivingCompany("")
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "IndividualName" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
-	}
-}
-
-// TestBatchADVReceivingCompanyName tests validating receiving company / Individual name is a mandatory field
-func TestBatchADVReceivingCompanyName(t *testing.T) {
-	testBatchADVReceivingCompanyName(t)
-}
-
-// BenchmarkBatchADVReceivingCompanyName benchmarks validating receiving company / Individual name is a mandatory field
-func BenchmarkBatchADVReceivingCompanyName(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testBatchADVReceivingCompanyName(b)
 	}
 }
 
@@ -225,7 +165,7 @@ func BenchmarkBatchADVServiceClassCode(b *testing.B) {
 // underlying IndividualName
 func testBatchADVReceivingCompanyField(t testing.TB) {
 	mockBatch := mockBatchADV()
-	ts := mockBatch.Entries[0].ReceivingCompanyField()
+	ts := mockBatch.ADVEntries[0].ReceivingCompanyField()
 	if ts != "Best Co. #23          " {
 		t.Error("Receiving Company Field is invalid")
 	}
@@ -250,7 +190,7 @@ func BenchmarkBatchADVReceivingCompanyField(b *testing.B) {
 func TestBatchADVAmount(t *testing.T) {
 	mockBatch := mockBatchADV()
 	// Batch Header information is required to Create a batch.
-	mockBatch.GetEntries()[0].Amount = 25000
+	mockBatch.GetADVEntries()[0].Amount = 25000
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -267,7 +207,7 @@ func TestBatchADVAmount(t *testing.T) {
 func TestBatchADVTransactionCode(t *testing.T) {
 	mockBatch := mockBatchADV()
 	// Batch Header information is required to Create a batch.
-	mockBatch.GetEntries()[0].TransactionCode = 22
+	mockBatch.GetADVEntries()[0].TransactionCode = 22
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -283,10 +223,10 @@ func TestBatchADVTransactionCode(t *testing.T) {
 // TestBatchADVAddendum99Category validates Addenda99 returns an error
 func TestBatchADVAddendum99Category(t *testing.T) {
 	mockBatch := NewBatchADV(mockBatchADVHeader())
-	mockBatch.AddEntry(mockADVEntryDetail())
+	mockBatch.AddADVEntry(mockADVEntryDetail())
 	mockAddenda99 := mockAddenda99()
-	mockBatch.GetEntries()[0].Category = CategoryForward
-	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
+	mockBatch.GetADVEntries()[0].Category = CategoryForward
+	mockBatch.GetADVEntries()[0].Addenda99 = mockAddenda99
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Addenda99" {

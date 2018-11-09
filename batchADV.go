@@ -28,6 +28,10 @@ func (batch *BatchADV) Validate() error {
 		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "ADV")
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
+	if batch.Header.ServiceClassCode != 280 {
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.ServiceClassCode, "ADV")
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
+	}
 	// basic verification of the batch before we validate specific rules.
 	if err := batch.verify(); err != nil {
 		return err

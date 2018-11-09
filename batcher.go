@@ -25,6 +25,8 @@ type Batcher interface {
 	SetADVControl(*BatchADVControl)
 	GetEntries() []*EntryDetail
 	AddEntry(*EntryDetail)
+	GetADVEntries() []*EntryDetailADV
+	AddADVEntry(*EntryDetailADV)
 	Create() error
 	Validate() error
 	SetID(string)
