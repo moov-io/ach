@@ -440,30 +440,28 @@ func (batch *batch) isBatchAmount() error {
 }
 
 func (batch *batch) calculateBatchAmounts() (credit int, debit int) {
-		for _, entry := range batch.Entries {
-			if entry.TransactionCode == 21 || entry.TransactionCode == 22 || entry.TransactionCode == 23 || entry.TransactionCode == 32 || entry.TransactionCode == 33 {
-				credit = credit + entry.Amount
-			}
-			if entry.TransactionCode == 26 || entry.TransactionCode == 27 || entry.TransactionCode == 28 || entry.TransactionCode == 36 || entry.TransactionCode == 37 || entry.TransactionCode == 38 {
-				debit = debit + entry.Amount
-			}
+	for _, entry := range batch.Entries {
+		if entry.TransactionCode == 21 || entry.TransactionCode == 22 || entry.TransactionCode == 23 || entry.TransactionCode == 32 || entry.TransactionCode == 33 {
+			credit = credit + entry.Amount
 		}
+		if entry.TransactionCode == 26 || entry.TransactionCode == 27 || entry.TransactionCode == 28 || entry.TransactionCode == 36 || entry.TransactionCode == 37 || entry.TransactionCode == 38 {
+			debit = debit + entry.Amount
+		}
+	}
 	return credit, debit
 }
-
 
 func (batch *batch) calculateADVBatchAmounts() (credit int, debit int) {
-		for _, entry := range batch.ADVEntries {
-			if entry.TransactionCode == 21 || entry.TransactionCode == 22 || entry.TransactionCode == 23 || entry.TransactionCode == 32 || entry.TransactionCode == 33 {
-				credit = credit + entry.Amount
-			}
-			if entry.TransactionCode == 26 || entry.TransactionCode == 27 || entry.TransactionCode == 28 || entry.TransactionCode == 36 || entry.TransactionCode == 37 || entry.TransactionCode == 38 {
-				debit = debit + entry.Amount
-			}
+	for _, entry := range batch.ADVEntries {
+		if entry.TransactionCode == 21 || entry.TransactionCode == 22 || entry.TransactionCode == 23 || entry.TransactionCode == 32 || entry.TransactionCode == 33 {
+			credit = credit + entry.Amount
 		}
+		if entry.TransactionCode == 26 || entry.TransactionCode == 27 || entry.TransactionCode == 28 || entry.TransactionCode == 36 || entry.TransactionCode == 37 || entry.TransactionCode == 38 {
+			debit = debit + entry.Amount
+		}
+	}
 	return credit, debit
 }
-
 
 // isSequenceAscending Individual Entry Detail Records within individual batches must
 // be in ascending Trace Number order (although Trace Numbers need not necessarily be consecutive).
