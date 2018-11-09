@@ -44,7 +44,7 @@ type Addenda99 struct {
 	// OriginalTrace This field contains the Trace Number as originally included on the forward Entry or Prenotification.
 	// The RDFI must include the Original Entry Trace Number in the Addenda Record of an Entry being returned to an ODFI,
 	// in the Addenda Record of an 98, within an Acknowledgment Entry, or with an RDFI request for a copy of an authorization.
-	OriginalTrace int `json:"originalTrace"`
+	OriginalTrace string `json:"originalTrace"`
 	// DateOfDeath The field date of death is to be supplied on Entries being returned for reason of death (return reason codes R14 and R15).
 	DateOfDeath time.Time `json:"dateOfDeath"`
 	// OriginalDFI field contains the Receiving DFI Identification (addenda.RDFIIdentification) as originally included on the forward Entry or Prenotification that the RDFI is returning or correcting.
@@ -87,7 +87,7 @@ func (Addenda99 *Addenda99) Parse(record string) {
 	// 4-6
 	Addenda99.ReturnCode = record[3:6]
 	// 7-21
-	Addenda99.OriginalTrace = Addenda99.parseNumField(record[6:21])
+	Addenda99.OriginalTrace = strings.TrimSpace(record[6:21])
 	// 22-27, might be a date or blank
 	Addenda99.DateOfDeath = Addenda99.parseSimpleDate(record[21:27])
 	// 28-35
@@ -140,7 +140,7 @@ func (Addenda99 *Addenda99) Validate() error {
 
 // OriginalTraceField returns a zero padded OriginalTrace string
 func (Addenda99 *Addenda99) OriginalTraceField() string {
-	return Addenda99.numericField(Addenda99.OriginalTrace, 15)
+	return Addenda99.stringField(Addenda99.OriginalTrace, 15)
 }
 
 // DateOfDeathField returns a space padded DateOfDeath string

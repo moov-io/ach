@@ -4,6 +4,7 @@ BREAKING CHANGES
 
 - `TraceNumber` has been changed from `int` to a `string`. (See [#366](https://github.com/moov-io/ach/issues/366))
    - Previously zero-prefixed ABA routing numbers would have their leading zero truncated.
+- `OriginalTrace` has been changed from `int` to a `string`. (See [#366](https://github.com/moov-io/ach/issues/366))
 
 ## v0.4.1 (Unreleased)
 
