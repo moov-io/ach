@@ -11,7 +11,7 @@ import (
 	"unicode/utf8"
 )
 
-// BatchADVControl contains entry counts, dollar total and has totals for all
+// ADVBatchControl contains entry counts, dollar total and has totals for all
 // entries contained in the preceding batch
 type ADVBatchControl struct {
 	// ID is a client defined string used as a reference to this record.
