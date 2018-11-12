@@ -54,12 +54,12 @@ func testParseBatchADVControl(t testing.TB) {
 	r.line = line
 	bh := BatchHeader{BatchNumber: 1,
 		StandardEntryClassCode: "ADV",
-		ServiceClassCode:       225,
+		ServiceClassCode:       280,
 		CompanyIdentification:  "origid",
-		ODFIIdentification:     "7640125"}
+		ODFIIdentification:     "12104288"}
 	r.addCurrentBatch(NewBatchADV(&bh))
 
-	r.currentBatch.AddEntry(&EntryDetail{TransactionCode: 27, Amount: 10500, RDFIIdentification: "5320001", TraceNumber: 76401255655291})
+	r.currentBatch.AddADVEntry(mockEntryDetailADV())
 	if err := r.parseBatchControl(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -114,12 +114,12 @@ func testADVBCString(t testing.TB) {
 	r.line = line
 	bh := BatchHeader{BatchNumber: 1,
 		StandardEntryClassCode: "ADV",
-		ServiceClassCode:       225,
+		ServiceClassCode:       280,
 		CompanyIdentification:  "origid",
-		ODFIIdentification:     "7640125"}
+		ODFIIdentification:     "12104288"}
 	r.addCurrentBatch(NewBatchADV(&bh))
 
-	r.currentBatch.AddEntry(&EntryDetail{TransactionCode: 27, Amount: 10500, RDFIIdentification: "5320001", TraceNumber: 76401255655291})
+	r.currentBatch.AddADVEntry(mockEntryDetailADV())
 	if err := r.parseBatchControl(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}

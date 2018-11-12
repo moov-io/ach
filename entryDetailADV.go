@@ -260,12 +260,12 @@ func (ed *EntryDetailADV) RDFIIdentificationField() string {
 
 // DFIAccountNumberField gets the DFIAccountNumber with space padding
 func (ed *EntryDetailADV) DFIAccountNumberField() string {
-	return ed.alphaField(ed.DFIAccountNumber, 17)
+	return ed.alphaField(ed.DFIAccountNumber, 15)
 }
 
 // AmountField returns a zero padded string of amount
 func (ed *EntryDetailADV) AmountField() string {
-	return ed.numericField(ed.Amount, 10)
+	return ed.numericField(ed.Amount, 12)
 }
 
 // AdviceRoutingNumberField gets the AdviceRoutingNumber with zero padding

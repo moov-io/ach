@@ -4,19 +4,28 @@
 
 package ach
 
-import "testing"
+import (
+	"fmt"
+	"strings"
+	"testing"
+)
 
 // mockEntryDetailADV creates a ADV entry detail
 func mockEntryDetailADV() *EntryDetailADV {
 	entry := NewEntryDetailADV()
 	entry.TransactionCode = 81
 	entry.SetRDFI("231380104")
-	entry.AdviceRoutingNumber = "121042882"
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 50000
+	entry.AdviceRoutingNumber = "121042882"
+	entry.FileIdentification = "FILE1"
+	entry.ACHOperatorData = ""
 	entry.IndividualName = "Name"
-	entry.ACHOperatorRoutingNumber = "01100001"
 	entry.DiscretionaryData = ""
+	entry.AddendaRecordIndicator = 0
+	entry.ACHOperatorRoutingNumber = "01100001"
+	entry.JulianDateDay = 50
+	entry.SequenceNumber = 1
 	return entry
 }
 
@@ -29,7 +38,9 @@ func testMockEntryDetailADV(t testing.TB) {
 	if entry.TransactionCode != 81 {
 		t.Error("TransactionCode dependent default value has changed")
 	}
-	// ToDo: Add RDFI
+	if entry.RDFIIdentification != "23138010" {
+		t.Error("RDFIIdentification dependent default value has changed")
+	}
 	if entry.AdviceRoutingNumber != "121042882" {
 		t.Error("AdviceRoutingNumber dependent default value has changed")
 	}
@@ -60,5 +71,47 @@ func BenchmarkMockEntryDetailADV(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testMockEntryDetailADV(b)
+	}
+}
+
+// testEDAVString validates that a known parsed entry
+// detail can be returned to a string of the same value
+func testEDADVString(t testing.TB) {
+	var line = "681231380104744-5678-99    000000050000121042882FILE1 Name                    0011000010500001"
+	r := NewReader(strings.NewReader(line))
+	r.line = line
+	bh := BatchHeader{BatchNumber: 1,
+		StandardEntryClassCode: "ADV",
+		ServiceClassCode:       280,
+		CompanyIdentification:  "origid",
+		ODFIIdentification:     "121042882"}
+	r.addCurrentBatch(NewBatchADV(&bh))
+
+	r.currentBatch.AddADVEntry(mockEntryDetailADV())
+	if err := r.parseEntryDetail(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	record := r.currentBatch.GetADVEntries()[0]
+
+	fmt.Printf("line: %v \n", line)
+	fmt.Printf("stri: %v \n", record.String())
+
+	if record.String() != line {
+		t.Errorf("Strings do not match")
+	}
+}
+
+// TestEDADVString tests validating that a known parsed entry
+// detail can be returned to a string of the same value
+func TestEDADVString(t *testing.T) {
+	testEDADVString(t)
+}
+
+// BenchmarkEDADVString benchmarks validating that a known parsed entry
+// detail can be returned to a string of the same value
+func BenchmarkEDADVString(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testEDADVString(b)
 	}
 }
