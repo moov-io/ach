@@ -184,19 +184,19 @@ func (batch *Batch) build() error {
 
 	if !batch.IsADV() {
 		for i, entry := range batch.Entries {
-			entryCount = entryCount + 1
+			entryCount++
 
 			// Add in Addenda Count
 			if entry.Addenda02 != nil {
-				entryCount = entryCount + 1
+				entryCount++
 			}
 			entryCount = entryCount + len(entry.Addenda05)
 			if entry.Addenda98 != nil {
-				entryCount = entryCount + 1
+				entryCount++
 			}
 
 			if entry.Addenda99 != nil {
-				entryCount = entryCount + 1
+				entryCount++
 			}
 
 			currentTraceNumberODFI, err := strconv.Atoi(entry.TraceNumberField()[:8])
@@ -235,14 +235,14 @@ func (batch *Batch) build() error {
 		batch.Control = bc
 	} else {
 		for i, entry := range batch.ADVEntries {
-			entryCount = entryCount + 1
+			entryCount++
 
 			if entry.Addenda98 != nil {
-				entryCount = entryCount + 1
+				entryCount++
 			}
 
 			if entry.Addenda99 != nil {
-				entryCount = entryCount + 1
+				entryCount++
 			}
 			// Set Sequence Number
 			batch.ADVEntries[i].SequenceNumber = seq
@@ -393,19 +393,18 @@ func (batch *Batch) isBatchEntryCount() error {
 
 	if !batch.IsADV() {
 		for _, entry := range batch.Entries {
-			entryCount = entryCount + 1
+			entryCount++
 
 			// Add in Addenda Count
 			if entry.Addenda02 != nil {
-				entryCount = entryCount + 1
+				entryCount++
 			}
 			entryCount = entryCount + len(entry.Addenda05)
 			if entry.Addenda98 != nil {
-				entryCount = entryCount + 1
+				entryCount++
 			}
-
 			if entry.Addenda99 != nil {
-				entryCount = entryCount + 1
+				entryCount++
 			}
 		}
 		if entryCount != batch.Control.EntryAddendaCount {
@@ -414,13 +413,12 @@ func (batch *Batch) isBatchEntryCount() error {
 		}
 	} else {
 		for _, entry := range batch.ADVEntries {
-			entryCount = entryCount + 1
+			entryCount++
 			if entry.Addenda98 != nil {
-				entryCount = entryCount + 1
+				entryCount++
 			}
-
 			if entry.Addenda99 != nil {
-				entryCount = entryCount + 1
+				entryCount++
 			}
 		}
 		if entryCount != batch.ADVControl.EntryAddendaCount {
