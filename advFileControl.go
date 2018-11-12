@@ -10,9 +10,9 @@ import (
 	"unicode/utf8"
 )
 
-// FileADVControl record contains entry counts, dollar totals and hash
+// ADVFileControl record contains entry counts, dollar totals and hash
 // totals accumulated from each batchADV control record in the file.
-type FileADVControl struct {
+type ADVFileControl struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
 	// RecordType defines the type of record in the block. fileControlPos 9
@@ -45,7 +45,7 @@ type FileADVControl struct {
 }
 
 // Parse takes the input record string and parses the FileControl values
-func (fc *FileADVControl) Parse(record string) {
+func (fc *ADVFileControl) Parse(record string) {
 	if utf8.RuneCountInString(record) < 55 {
 		return
 	}
@@ -69,16 +69,16 @@ func (fc *FileADVControl) Parse(record string) {
 	fc.reserved = "                       "
 }
 
-// NewFileADVControl returns a new FileADVControl with default values for none exported fields
-func NewFileADVControl() FileADVControl {
-	return FileADVControl{
+// NewADVFileControl returns a new ADVFileControl with default values for none exported fields
+func NewADVFileControl() ADVFileControl {
+	return ADVFileControl{
 		recordType: "9",
 		reserved:   "                       ",
 	}
 }
 
-// String writes the FileADVControl struct to a 94 character string.
-func (fc *FileADVControl) String() string {
+// String writes the ADVFileControl struct to a 94 character string.
+func (fc *ADVFileControl) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
 	buf.WriteString(fc.recordType)
@@ -94,7 +94,7 @@ func (fc *FileADVControl) String() string {
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops that parsing.
-func (fc *FileADVControl) Validate() error {
+func (fc *ADVFileControl) Validate() error {
 	if err := fc.fieldInclusion(); err != nil {
 		return err
 	}
@@ -107,7 +107,7 @@ func (fc *FileADVControl) Validate() error {
 
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
-func (fc *FileADVControl) fieldInclusion() error {
+func (fc *ADVFileControl) fieldInclusion() error {
 	if fc.recordType == "" {
 		return &FieldError{
 			FieldName: "recordType",
@@ -147,31 +147,31 @@ func (fc *FileADVControl) fieldInclusion() error {
 }
 
 // BatchCountField gets a string of the batch count zero padded
-func (fc *FileADVControl) BatchCountField() string {
+func (fc *ADVFileControl) BatchCountField() string {
 	return fc.numericField(fc.BatchCount, 6)
 }
 
 // BlockCountField gets a string of the block count zero padded
-func (fc *FileADVControl) BlockCountField() string {
+func (fc *ADVFileControl) BlockCountField() string {
 	return fc.numericField(fc.BlockCount, 6)
 }
 
 // EntryAddendaCountField gets a string of entry addenda batch count zero padded
-func (fc *FileADVControl) EntryAddendaCountField() string {
+func (fc *ADVFileControl) EntryAddendaCountField() string {
 	return fc.numericField(fc.EntryAddendaCount, 8)
 }
 
 // EntryHashField gets a string of entry hash zero padded
-func (fc *FileADVControl) EntryHashField() string {
+func (fc *ADVFileControl) EntryHashField() string {
 	return fc.numericField(fc.EntryHash, 10)
 }
 
 // TotalDebitEntryDollarAmountInFileField get a zero padded Total debit Entry Amount
-func (fc *FileADVControl) TotalDebitEntryDollarAmountInFileField() string {
+func (fc *ADVFileControl) TotalDebitEntryDollarAmountInFileField() string {
 	return fc.numericField(fc.TotalDebitEntryDollarAmountInFile, 20)
 }
 
 // TotalCreditEntryDollarAmountInFileField get a zero padded Total credit Entry Amount
-func (fc *FileADVControl) TotalCreditEntryDollarAmountInFileField() string {
+func (fc *ADVFileControl) TotalCreditEntryDollarAmountInFileField() string {
 	return fc.numericField(fc.TotalCreditEntryDollarAmountInFile, 20)
 }

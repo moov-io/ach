@@ -187,7 +187,7 @@ func (r *Reader) Read() (File, error) {
 			r.errors.Add(r.parseError(&FileError{Msg: msgFileControl}))
 		}
 	} else {
-		if (FileADVControl{}) == r.File.ADVControl {
+		if (ADVFileControl{}) == r.File.ADVControl {
 			// There must be at least one File Control
 			r.recordName = "FileControl"
 			r.errors.Add(r.parseError(&FileError{Msg: msgFileControl}))
@@ -470,7 +470,7 @@ func (r *Reader) parseFileControl() error {
 			return r.parseError(err)
 		}
 	} else {
-		if (FileADVControl{}) != r.File.ADVControl {
+		if (ADVFileControl{}) != r.File.ADVControl {
 			// Can be only one file control per file
 			return r.parseError(&FileError{Msg: msgFileControl})
 		}

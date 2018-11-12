@@ -59,7 +59,7 @@ type File struct {
 	Batches    []Batcher      `json:"batches"`
 	IATBatches []IATBatch     `json:"IATBatches"`
 	Control    FileControl    `json:"fileControl"`
-	ADVControl FileADVControl `json:"fileADVControl"`
+	ADVControl ADVFileControl `json:"fileADVControl"`
 
 	// NotificationOfChange (Notification of change) is a slice of references to BatchCOR in file.Batches
 	NotificationOfChange []*BatchCOR
@@ -94,7 +94,7 @@ type fileControl struct {
 }
 
 type fileADVControl struct {
-	ControlADV FileADVControl `json:"fileADVControl"`
+	ControlADV ADVFileControl `json:"fileADVControl"`
 }
 
 // FileFromJson attempts to return a *File object assuming the input is valid JSON.
@@ -133,7 +133,7 @@ func FileFromJson(bs []byte) (*File, error) {
 	} else {
 		// Read ADVFileControl
 		controlADV := fileADVControl{
-			ControlADV: NewFileADVControl(),
+			ControlADV: NewADVFileControl(),
 		}
 		if err := json.NewDecoder(bytes.NewReader(bs)).Decode(&controlADV); err != nil {
 			return nil, fmt.Errorf("problem reading FileADVControl: %v", err)
@@ -502,7 +502,7 @@ func (f *File) createFileADV() error {
 		totalCreditAmount = totalCreditAmount + batch.GetADVControl().TotalCreditEntryDollarAmount
 	}
 
-	fc := NewFileADVControl()
+	fc := NewADVFileControl()
 	fc.ID = f.ID
 	fc.BatchCount = batchSeq - 1
 	// blocking factor of 10 is static default value in f.Header.blockingFactor.
