@@ -6,8 +6,6 @@ package ach
 
 import (
 	"bytes"
-	"log"
-	"os"
 	"strings"
 	"testing"
 )
@@ -395,12 +393,4 @@ func TestADVWrite(t *testing.T) {
 	if err = r.File.Validate(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
-
-	// Write ADV records to standard output. Anything io.Writer
-	w := NewWriter(os.Stdout)
-	if err := w.Write(file); err != nil {
-		log.Fatalf("Unexpected error: %s\n", err)
-	}
-	w.Flush()
-
 }

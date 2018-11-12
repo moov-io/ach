@@ -239,7 +239,22 @@ func (ed *ADVEntryDetail) fieldInclusion() error {
 		return &FieldError{
 			FieldName: "ACHOperatorRoutingNumber",
 			Value:     ed.ACHOperatorRoutingNumber,
-			Msg:       msgFieldRequired + ", did you use NewADVEntryDetail()?",
+			Msg:       msgFieldInclusion + ", did you use NewADVEntryDetail()?",
+		}
+	}
+	if ed.JulianDateDay == 0 {
+		return &FieldError{
+			FieldName: "JulianDateDay",
+			Value:     strconv.Itoa(ed.JulianDateDay),
+			Msg:       msgFieldInclusion + ", did you use NewADVEntryDetail()?",
+		}
+	}
+
+	if ed.SequenceNumber == 0 {
+		return &FieldError{
+			FieldName: "SequenceNumber",
+			Value:     strconv.Itoa(ed.SequenceNumber),
+			Msg:       msgFieldInclusion + ", did you use NewADVEntryDetail()?",
 		}
 	}
 	return nil
@@ -306,22 +321,4 @@ func (ed *ADVEntryDetail) JulianDateDayField() string {
 // SequenceNumberField returns a zero padded string of SequenceNumber
 func (ed *ADVEntryDetail) SequenceNumberField() string {
 	return ed.numericField(ed.SequenceNumber, 4)
-}
-
-// CreditOrDebit returns a "C" for credit or "D" for debit based on the entry TransactionCode
-func (ed *ADVEntryDetail) CreditOrDebit() string {
-	if ed.TransactionCode < 10 || ed.TransactionCode > 99 {
-		return ""
-	}
-	tc := strconv.Itoa(ed.TransactionCode)
-
-	// take the second number in the TransactionCode
-	switch tc[1:2] {
-	case "1", "3", "5", "7":
-		return "C"
-	case "2", "4", "6", "8":
-		return "D"
-	default:
-	}
-	return ""
 }

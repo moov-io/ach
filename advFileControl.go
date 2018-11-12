@@ -46,7 +46,7 @@ type ADVFileControl struct {
 
 // Parse takes the input record string and parses the FileControl values
 func (fc *ADVFileControl) Parse(record string) {
-	if utf8.RuneCountInString(record) < 55 {
+	if utf8.RuneCountInString(record) < 71 {
 		return
 	}
 
