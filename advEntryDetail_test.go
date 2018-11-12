@@ -5,14 +5,13 @@
 package ach
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 )
 
-// mockEntryDetailADV creates a ADV entry detail
-func mockEntryDetailADV() *EntryDetailADV {
-	entry := NewEntryDetailADV()
+// mockADVEntryDetail creates a ADV entry detail
+func mockADVEntryDetail() *ADVEntryDetail {
+	entry := NewADVEntryDetail()
 	entry.TransactionCode = 81
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
@@ -29,11 +28,11 @@ func mockEntryDetailADV() *EntryDetailADV {
 	return entry
 }
 
-// testMockEntryDetailADV validates an ADV entry detail record
-func testMockEntryDetailADV(t testing.TB) {
-	entry := mockEntryDetailADV()
+// testMockADVEntryDetail validates an ADV entry detail record
+func testMockADVEntryDetail(t testing.TB) {
+	entry := mockADVEntryDetail()
 	if err := entry.Validate(); err != nil {
-		t.Error("mockEntryDetailADV does not validate and will break other tests")
+		t.Error("mockADVEntryDetail does not validate and will break other tests")
 	}
 	if entry.TransactionCode != 81 {
 		t.Error("TransactionCode dependent default value has changed")
@@ -61,16 +60,16 @@ func testMockEntryDetailADV(t testing.TB) {
 	}
 }
 
-// TestMockEntryDetailADV tests validating an entry detail record
-func TestMockEntryDetailADV(t *testing.T) {
-	testMockEntryDetailADV(t)
+// TestMockADVEntryDetail tests validating an entry detail record
+func TestMockADVEntryDetail(t *testing.T) {
+	testMockADVEntryDetail(t)
 }
 
 // BenchmarkMockEntryDetail benchmarks validating an entry detail record
-func BenchmarkMockEntryDetailADV(b *testing.B) {
+func BenchmarkMockADVEntryDetail(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testMockEntryDetailADV(b)
+		testMockADVEntryDetail(b)
 	}
 }
 
@@ -87,14 +86,11 @@ func testEDADVString(t testing.TB) {
 		ODFIIdentification:     "121042882"}
 	r.addCurrentBatch(NewBatchADV(&bh))
 
-	r.currentBatch.AddADVEntry(mockEntryDetailADV())
+	r.currentBatch.AddADVEntry(mockADVEntryDetail())
 	if err := r.parseEntryDetail(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 	record := r.currentBatch.GetADVEntries()[0]
-
-	fmt.Printf("line: %v \n", line)
-	fmt.Printf("stri: %v \n", record.String())
 
 	if record.String() != line {
 		t.Errorf("Strings do not match")

@@ -23,7 +23,7 @@ func mockBatchADVHeader() *BatchHeader {
 // mockBatchADV creates a ADV batch
 func mockBatchADV() *BatchADV {
 	mockBatch := NewBatchADV(mockBatchADVHeader())
-	mockBatch.AddADVEntry(mockEntryDetailADV())
+	mockBatch.AddADVEntry(mockADVEntryDetail())
 	if err := mockBatch.Create(); err != nil {
 		panic(err)
 	}
@@ -55,7 +55,7 @@ func BenchmarkBatchADVHeader(b *testing.B) {
 // TestBatchADVAddendum98 validates Addenda98 returns an error
 func TestBatchADVAddendum98(t *testing.T) {
 	mockBatch := NewBatchADV(mockBatchADVHeader())
-	mockBatch.AddADVEntry(mockEntryDetailADV())
+	mockBatch.AddADVEntry(mockADVEntryDetail())
 	mockAddenda98 := mockAddenda98()
 	mockAddenda98.TypeCode = "05"
 	mockBatch.GetADVEntries()[0].Category = CategoryNOC
@@ -74,7 +74,7 @@ func TestBatchADVAddendum98(t *testing.T) {
 // TestBatchADVAddendum99 validates Addenda99 returns an error
 func TestBatchADVAddendum99(t *testing.T) {
 	mockBatch := NewBatchADV(mockBatchADVHeader())
-	mockBatch.AddADVEntry(mockEntryDetailADV())
+	mockBatch.AddADVEntry(mockADVEntryDetail())
 	mockAddenda99 := mockAddenda99()
 	mockAddenda99.TypeCode = "05"
 	mockBatch.GetADVEntries()[0].Category = CategoryReturn
@@ -151,7 +151,7 @@ func BenchmarkBatchADVServiceClassCode(b *testing.B) {
 // TestBatchADVAddendum99Category validates Addenda99 returns an error
 func TestBatchADVAddendum99Category(t *testing.T) {
 	mockBatch := NewBatchADV(mockBatchADVHeader())
-	mockBatch.AddADVEntry(mockEntryDetailADV())
+	mockBatch.AddADVEntry(mockADVEntryDetail())
 	mockAddenda99 := mockAddenda99()
 	mockBatch.GetADVEntries()[0].Category = CategoryForward
 	mockBatch.GetADVEntries()[0].Addenda99 = mockAddenda99

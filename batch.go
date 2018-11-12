@@ -17,7 +17,7 @@ type Batch struct {
 	Header     *BatchHeader      `json:"batchHeader,omitempty"`
 	Entries    []*EntryDetail    `json:"entryDetails,omitempty"`
 	Control    *BatchControl     `json:"batchControl,omitempty"`
-	ADVEntries []*EntryDetailADV `json:"advEntryDetails,omitempty"`
+	ADVEntries []*ADVEntryDetail `json:"advEntryDetails,omitempty"`
 	ADVControl *BatchADVControl  `json:"advBatchControl,omitempty"`
 	// category defines if the entry is a Forward, Return, or NOC
 	category string
@@ -75,10 +75,12 @@ func NewBatch(bh *BatchHeader) (Batcher, error) {
 	return nil, &FileError{FieldName: "StandardEntryClassCode", Value: bh.StandardEntryClassCode, Msg: msg}
 }
 
+// Create creates a batch
 func (batch *Batch) Create() error {
 	return errors.New("use an implementation of batch or NewBatch")
 }
 
+// Validate validates a batch
 func (batch *Batch) Validate() error {
 	return errors.New("use an implementation of batch or NewBatch")
 }
@@ -303,17 +305,17 @@ func (batch *Batch) AddEntry(entry *EntryDetail) {
 }
 
 // GetADVEntries returns a slice of ADV entry details for the batch
-func (batch *Batch) GetADVEntries() []*EntryDetailADV {
+func (batch *Batch) GetADVEntries() []*ADVEntryDetail {
 	return batch.ADVEntries
 }
 
 // AddADVEntry appends an EntryDetailADV to the Batch
-func (batch *Batch) AddADVEntry(entry *EntryDetailADV) {
+func (batch *Batch) AddADVEntry(entry *ADVEntryDetail) {
 	batch.category = entry.Category
 	batch.ADVEntries = append(batch.ADVEntries, entry)
 }
 
-// IsReturn is true if the batch contains an Entry Return
+// Category returns batch category
 func (batch *Batch) Category() string {
 	return batch.category
 }
@@ -759,6 +761,7 @@ func (batch *Batch) addendaFieldInclusionReturn(entry *EntryDetail) error {
 	return nil
 }
 
+// IsADV determines if a batch is batch type ADV - BatchADV
 func (batch *Batch) IsADV() bool {
 	ok := batch.GetHeader().StandardEntryClassCode == "ADV"
 	return ok

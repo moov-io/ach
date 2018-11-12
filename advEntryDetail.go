@@ -11,11 +11,11 @@ import (
 	"unicode/utf8"
 )
 
-// EntryDetailADV contains the actual transaction data for an individual entry.
+// ADVEntryDetail contains the actual transaction data for an individual entry.
 // Fields include those designating the entry as a deposit (credit) or
 // withdrawal (debit), the transit routing number for the entry recipient’s financial
 // institution, the account number (left justify,no zero fill), name, and dollar amount.
-type EntryDetailADV struct {
+type ADVEntryDetail struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
 	// RecordType defines the type of record in the block. 6
@@ -77,9 +77,9 @@ type EntryDetailADV struct {
 	converters
 }
 
-// NewEntryDetailADV returns a new EntryDetailADV with default values for non exported fields
-func NewEntryDetailADV() *EntryDetailADV {
-	entry := &EntryDetailADV{
+// NewADVEntryDetail returns a new ADVEntryDetail with default values for non exported fields
+func NewADVEntryDetail() *ADVEntryDetail {
+	entry := &ADVEntryDetail{
 		recordType: "6",
 		Category:   CategoryForward,
 	}
@@ -88,8 +88,8 @@ func NewEntryDetailADV() *EntryDetailADV {
 
 //ToDo: ADV Specific Properties
 
-// Parse takes the input record string and parses the EntryDetailADV values
-func (ed *EntryDetailADV) Parse(record string) {
+// Parse takes the input record string and parses the ADVEntryDetail values
+func (ed *ADVEntryDetail) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
@@ -126,8 +126,8 @@ func (ed *EntryDetailADV) Parse(record string) {
 	ed.SequenceNumber = ed.parseNumField(record[90:94])
 }
 
-// String writes the EntryDetailADV struct to a 94 character string.
-func (ed *EntryDetailADV) String() string {
+// String writes the ADVEntryDetail struct to a 94 character string.
+func (ed *ADVEntryDetail) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
 	buf.WriteString(ed.recordType)
@@ -150,7 +150,7 @@ func (ed *EntryDetailADV) String() string {
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops that parsing.
-func (ed *EntryDetailADV) Validate() error {
+func (ed *ADVEntryDetail) Validate() error {
 	if err := ed.fieldInclusion(); err != nil {
 		return err
 	}
@@ -192,61 +192,61 @@ func (ed *EntryDetailADV) Validate() error {
 
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
-func (ed *EntryDetailADV) fieldInclusion() error {
+func (ed *ADVEntryDetail) fieldInclusion() error {
 	if ed.recordType == "" {
 		return &FieldError{
 			FieldName: "recordType",
 			Value:     ed.recordType,
-			Msg:       msgFieldInclusion + ", did you use NewEntryDetailADV()?",
+			Msg:       msgFieldInclusion + ", did you use NewADVEntryDetail()?",
 		}
 	}
 	if ed.TransactionCode == 0 {
 		return &FieldError{
 			FieldName: "TransactionCode",
 			Value:     strconv.Itoa(ed.TransactionCode),
-			Msg:       msgFieldInclusion + ", did you use NewEntryDetailADV()?",
+			Msg:       msgFieldInclusion + ", did you use NewADVEntryDetail()?",
 		}
 	}
 	if ed.RDFIIdentification == "" {
 		return &FieldError{
 			FieldName: "RDFIIdentification",
 			Value:     ed.RDFIIdentificationField(),
-			Msg:       msgFieldInclusion + ", did you use NewEntryDetailADV()?",
+			Msg:       msgFieldInclusion + ", did you use NewADVEntryDetail()?",
 		}
 	}
 	if ed.DFIAccountNumber == "" {
 		return &FieldError{
 			FieldName: "DFIAccountNumber",
 			Value:     ed.DFIAccountNumber,
-			Msg:       msgFieldInclusion + ", did you use NewEntryDetailADV()?",
+			Msg:       msgFieldInclusion + ", did you use NewADVEntryDetail()?",
 		}
 	}
 	if ed.AdviceRoutingNumber == "" {
 		return &FieldError{
 			FieldName: "AdviceRoutingNumber",
 			Value:     ed.AdviceRoutingNumber,
-			Msg:       msgFieldInclusion + ", did you use NewEntryDetailADV()?",
+			Msg:       msgFieldInclusion + ", did you use NewADVEntryDetail()?",
 		}
 	}
 	if ed.IndividualName == "" {
 		return &FieldError{
 			FieldName: "IndividualName",
 			Value:     ed.IndividualName,
-			Msg:       msgFieldRequired + ", did you use NewEntryDetailADV()?",
+			Msg:       msgFieldRequired + ", did you use NewADVEntryDetail()?",
 		}
 	}
 	if ed.ACHOperatorRoutingNumber == "" {
 		return &FieldError{
 			FieldName: "ACHOperatorRoutingNumber",
 			Value:     ed.ACHOperatorRoutingNumber,
-			Msg:       msgFieldRequired + ", did you use NewEntryDetailADV()?",
+			Msg:       msgFieldRequired + ", did you use NewADVEntryDetail()?",
 		}
 	}
 	return nil
 }
 
 // SetRDFI takes the 9 digit RDFI account number and separates it for RDFIIdentification and CheckDigit
-func (ed *EntryDetailADV) SetRDFI(rdfi string) *EntryDetailADV {
+func (ed *ADVEntryDetail) SetRDFI(rdfi string) *ADVEntryDetail {
 	s := ed.stringField(rdfi, 9)
 	ed.RDFIIdentification = ed.parseStringField(s[:8])
 	ed.CheckDigit = ed.parseStringField(s[8:9])
@@ -254,62 +254,62 @@ func (ed *EntryDetailADV) SetRDFI(rdfi string) *EntryDetailADV {
 }
 
 // RDFIIdentificationField get the rdfiIdentification with zero padding
-func (ed *EntryDetailADV) RDFIIdentificationField() string {
+func (ed *ADVEntryDetail) RDFIIdentificationField() string {
 	return ed.stringField(ed.RDFIIdentification, 8)
 }
 
 // DFIAccountNumberField gets the DFIAccountNumber with space padding
-func (ed *EntryDetailADV) DFIAccountNumberField() string {
+func (ed *ADVEntryDetail) DFIAccountNumberField() string {
 	return ed.alphaField(ed.DFIAccountNumber, 15)
 }
 
 // AmountField returns a zero padded string of amount
-func (ed *EntryDetailADV) AmountField() string {
+func (ed *ADVEntryDetail) AmountField() string {
 	return ed.numericField(ed.Amount, 12)
 }
 
 // AdviceRoutingNumberField gets the AdviceRoutingNumber with zero padding
-func (ed *EntryDetailADV) AdviceRoutingNumberField() string {
+func (ed *ADVEntryDetail) AdviceRoutingNumberField() string {
 	return ed.stringField(ed.AdviceRoutingNumber, 9)
 }
 
 // FileIdentificationField returns a space padded string of FileIdentification
-func (ed *EntryDetailADV) FileIdentificationField() string {
+func (ed *ADVEntryDetail) FileIdentificationField() string {
 	return ed.alphaField(ed.FileIdentification, 5)
 }
 
 // ACHOperatorDataField returns a space padded string of ACHOperatorData
-func (ed *EntryDetailADV) ACHOperatorDataField() string {
+func (ed *ADVEntryDetail) ACHOperatorDataField() string {
 	return ed.alphaField(ed.ACHOperatorData, 1)
 }
 
 // IndividualNameField returns a space padded string of IndividualName
-func (ed *EntryDetailADV) IndividualNameField() string {
+func (ed *ADVEntryDetail) IndividualNameField() string {
 	return ed.alphaField(ed.IndividualName, 22)
 }
 
 // DiscretionaryDataField returns a space padded string of DiscretionaryData
-func (ed *EntryDetailADV) DiscretionaryDataField() string {
+func (ed *ADVEntryDetail) DiscretionaryDataField() string {
 	return ed.alphaField(ed.DiscretionaryData, 2)
 }
 
 // ACHOperatorRoutingNumberField returns a space padded string of ACHOperatorRoutingNumber
-func (ed *EntryDetailADV) ACHOperatorRoutingNumberField() string {
+func (ed *ADVEntryDetail) ACHOperatorRoutingNumberField() string {
 	return ed.alphaField(ed.ACHOperatorRoutingNumber, 8)
 }
 
 // JulianDateDayField returns a zero padded string of JulianDateDay
-func (ed *EntryDetailADV) JulianDateDayField() string {
+func (ed *ADVEntryDetail) JulianDateDayField() string {
 	return ed.numericField(ed.JulianDateDay, 3)
 }
 
 // SequenceNumberField returns a zero padded string of SequenceNumber
-func (ed *EntryDetailADV) SequenceNumberField() string {
+func (ed *ADVEntryDetail) SequenceNumberField() string {
 	return ed.numericField(ed.SequenceNumber, 4)
 }
 
 // CreditOrDebit returns a "C" for credit or "D" for debit based on the entry TransactionCode
-func (ed *EntryDetailADV) CreditOrDebit() string {
+func (ed *ADVEntryDetail) CreditOrDebit() string {
 	if ed.TransactionCode < 10 || ed.TransactionCode > 99 {
 		return ""
 	}

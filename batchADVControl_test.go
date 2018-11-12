@@ -59,7 +59,7 @@ func testParseBatchADVControl(t testing.TB) {
 		ODFIIdentification:     "12104288"}
 	r.addCurrentBatch(NewBatchADV(&bh))
 
-	r.currentBatch.AddADVEntry(mockEntryDetailADV())
+	r.currentBatch.AddADVEntry(mockADVEntryDetail())
 	if err := r.parseBatchControl(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -119,7 +119,7 @@ func testADVBCString(t testing.TB) {
 		ODFIIdentification:     "12104288"}
 	r.addCurrentBatch(NewBatchADV(&bh))
 
-	r.currentBatch.AddADVEntry(mockEntryDetailADV())
+	r.currentBatch.AddADVEntry(mockADVEntryDetail())
 	if err := r.parseBatchControl(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
