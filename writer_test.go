@@ -6,6 +6,8 @@ package ach
 
 import (
 	"bytes"
+	"log"
+	"os"
 	"strings"
 	"testing"
 )
@@ -358,4 +360,47 @@ func BenchmarkIATReturn(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		testIATReturn(b)
 	}
+}
+
+// TestADVWrite writes a ADV ACH file
+func TestADVWrite(t *testing.T) {
+	file := NewFile().SetHeader(mockFileHeader())
+	entry := mockADVEntryDetail()
+	entry.AddendaRecordIndicator = 0
+	batch := NewBatchADV(mockBatchADVHeader())
+	batch.SetHeader(mockBatchADVHeader())
+	batch.AddADVEntry(entry)
+	batch.Create()
+	file.AddBatch(batch)
+
+	if err := file.Create(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err := file.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	b := &bytes.Buffer{}
+	f := NewWriter(b)
+
+	if err := f.Write(file); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	r := NewReader(strings.NewReader(b.String()))
+	_, err := r.Read()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err = r.File.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	// Write ADV records to standard output. Anything io.Writer
+	w := NewWriter(os.Stdout)
+	if err := w.Write(file); err != nil {
+		log.Fatalf("Unexpected error: %s\n", err)
+	}
+	w.Flush()
+
 }

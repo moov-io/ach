@@ -534,12 +534,23 @@ func (batch *Batch) isEntryHash() error {
 // The Entry Hash provides a check against inadvertent alteration of data
 func (batch *Batch) calculateEntryHash() string {
 	hash := 0
-	for _, entry := range batch.Entries {
 
-		entryRDFI, _ := strconv.Atoi(entry.RDFIIdentification)
+	if !batch.IsADV() {
+		for _, entry := range batch.Entries {
 
-		hash = hash + entryRDFI
+			entryRDFI, _ := strconv.Atoi(entry.RDFIIdentification)
+
+			hash = hash + entryRDFI
+		}
+	} else {
+		for _, entry := range batch.ADVEntries {
+
+			entryRDFI, _ := strconv.Atoi(entry.RDFIIdentification)
+
+			hash = hash + entryRDFI
+		}
 	}
+
 	return batch.numericField(hash, 10)
 }
 

@@ -121,7 +121,7 @@ func FileFromJson(bs []byte) (*File, error) {
 		return nil, fmt.Errorf("problem reading FileHeader: %v", err)
 	}
 
-	if !file.isADV() {
+	if !file.IsADV() {
 		// Read FileControl
 		control := fileControl{
 			Control: NewFileControl(),
@@ -146,7 +146,7 @@ func FileFromJson(bs []byte) (*File, error) {
 		return nil, err
 	}
 	file.Header = header.Header
-	if !file.isADV() {
+	if !file.IsADV() {
 		file.Control.BatchCount = len(file.Batches)
 	} else {
 
@@ -201,7 +201,7 @@ func (f *File) Create() error {
 		return &FileError{FieldName: "Batches", Value: strconv.Itoa(len(f.Batches)), Msg: "must have []*Batches to be built"}
 	}
 
-	if !f.isADV() {
+	if !f.IsADV() {
 		// add 2 for FileHeader/control and reset if build was called twice do to error
 		totalRecordsInFile := 2
 		batchSeq := 1
@@ -295,7 +295,7 @@ func (f *File) Validate() error {
 		return err
 	}
 
-	if !f.isADV() {
+	if !f.IsADV() {
 		// The value of the Batch Count Field is equal to the number of Company/Batch/Header Records in the file.
 		if f.Control.BatchCount != (len(f.Batches) + len(f.IATBatches)) {
 			msg := fmt.Sprintf(msgFileCalculatedControlEquality, len(f.Batches), f.Control.BatchCount)
@@ -334,8 +334,8 @@ func (f *File) Validate() error {
 
 // isEntryAddendaCount is prepared by hashing the RDFI’s 8-digit Routing Number in each entry.
 // The Entry Hash provides a check against inadvertent alteration of data
-func (f *File) isEntryAddendaCount(isADV bool) error {
-	// isADV
+func (f *File) isEntryAddendaCount(IsADV bool) error {
+	// IsADV
 	// true: the file contains ADV batches
 	// false: the file contains other batch types
 
@@ -343,7 +343,7 @@ func (f *File) isEntryAddendaCount(isADV bool) error {
 
 	// we assume that each batch block has already validated the addenda count is accurate in batch control.
 
-	if !isADV {
+	if !IsADV {
 		for _, batch := range f.Batches {
 			count += batch.GetControl().EntryAddendaCount
 		}
@@ -368,15 +368,15 @@ func (f *File) isEntryAddendaCount(isADV bool) error {
 
 // isFileAmount The Total Debit and Credit Entry Dollar Amounts Fields contain accumulated
 // Entry Detail debit and credit totals within the file
-func (f *File) isFileAmount(isADV bool) error {
-	// isADV
+func (f *File) isFileAmount(IsADV bool) error {
+	// IsADV
 	// true: the file contains ADV batches
 	// false: the file contains other batch types
 
 	debit := 0
 	credit := 0
 
-	if !isADV {
+	if !IsADV {
 		for _, batch := range f.Batches {
 			debit += batch.GetControl().TotalDebitEntryDollarAmount
 			credit += batch.GetControl().TotalCreditEntryDollarAmount
@@ -414,14 +414,14 @@ func (f *File) isFileAmount(isADV bool) error {
 }
 
 // isEntryHash validates the hash by recalculating the result
-func (f *File) isEntryHash(isADV bool) error {
-	// isADV
+func (f *File) isEntryHash(IsADV bool) error {
+	// IsADV
 	// true: the file contains ADV batches
 	// false: the file contains other batch types but not ADV
 
-	hashField := f.calculateEntryHash(isADV)
+	hashField := f.calculateEntryHash(IsADV)
 
-	if !isADV {
+	if !IsADV {
 		if hashField != f.Control.EntryHashField() {
 			msg := fmt.Sprintf(msgFileCalculatedControlEquality, hashField, f.Control.EntryHashField())
 			return &FileError{FieldName: "EntryHash", Value: f.Control.EntryHashField(), Msg: msg}
@@ -437,14 +437,14 @@ func (f *File) isEntryHash(isADV bool) error {
 
 // calculateEntryHash This field is prepared by hashing the 8-digit Routing Number in each batch.
 // The Entry Hash provides a check against inadvertent alteration of data
-func (f *File) calculateEntryHash(isADV bool) string {
-	// isADV
+func (f *File) calculateEntryHash(IsADV bool) string {
+	// IsADV
 	// true: the file contains ADV batches
 	// false: the file contains other batch types but not ADV
 
 	hash := 0
 
-	if !isADV {
+	if !IsADV {
 		for _, batch := range f.Batches {
 			hash = hash + batch.GetControl().EntryHash
 		}
@@ -460,7 +460,8 @@ func (f *File) calculateEntryHash(isADV bool) string {
 	return f.numericField(hash, 10)
 }
 
-func (f *File) isADV() bool {
+// IsADV determines if the File is an File containing ADV batches
+func (f *File) IsADV() bool {
 	ok := false
 	for _, batch := range f.Batches {
 		ok = batch.GetHeader().StandardEntryClassCode == "ADV"
@@ -495,7 +496,7 @@ func (f *File) createFileADV() error {
 		// sum file entry and addenda records. Assume batch.Create() batch properly calculated control
 		fileEntryAddendaCount = fileEntryAddendaCount + batch.GetADVControl().EntryAddendaCount
 		// add 2 for Batch header/control + entry added count
-		totalRecordsInFile = totalRecordsInFile + 2 + batch.GetControl().EntryAddendaCount
+		totalRecordsInFile = totalRecordsInFile + 2 + batch.GetADVControl().EntryAddendaCount
 		// sum hash from batch control. Assume Batch.Build properly calculated field.
 		fileEntryHashSum = fileEntryHashSum + batch.GetADVControl().EntryHash
 		totalDebitAmount = totalDebitAmount + batch.GetADVControl().TotalDebitEntryDollarAmount

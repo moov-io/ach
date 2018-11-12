@@ -83,7 +83,7 @@ func (bc *ADVBatchControl) Parse(record string) {
 func NewADVBatchControl() *ADVBatchControl {
 	return &ADVBatchControl{
 		recordType:       "8",
-		ServiceClassCode: 200,
+		ServiceClassCode: 280,
 		EntryHash:        1,
 		BatchNumber:      1,
 	}

@@ -14,9 +14,9 @@ func mockBatchADVHeader() *BatchHeader {
 	bh.ServiceClassCode = 280
 	bh.StandardEntryClassCode = "ADV"
 	bh.CompanyName = "Your Company, inc"
-	bh.CompanyIdentification = "231380104"
-	bh.CompanyEntryDescription = "Vndr Pay"
-	bh.ODFIIdentification = "23138010"
+	bh.CompanyIdentification = "121042882"
+	bh.CompanyEntryDescription = "Accounting"
+	bh.ODFIIdentification = "12104288"
 	return bh
 }
 

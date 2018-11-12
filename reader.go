@@ -180,7 +180,7 @@ func (r *Reader) Read() (File, error) {
 		r.errors.Add(r.parseError(&FileError{Msg: msgFileHeader}))
 	}
 
-	if !r.File.isADV() {
+	if !r.File.IsADV() {
 		if (FileControl{}) == r.File.Control {
 			// There must be at least one File Control
 			r.recordName = "FileControl"
@@ -362,12 +362,21 @@ func (r *Reader) parseEntryDetail() error {
 	if r.currentBatch == nil {
 		return r.parseError(&FileError{Msg: msgFileBatchOutside})
 	}
-	ed := new(EntryDetail)
-	ed.Parse(r.line)
-	if err := ed.Validate(); err != nil {
-		return r.parseError(err)
+	if r.currentBatch.GetHeader().StandardEntryClassCode != "ADV" {
+		ed := new(EntryDetail)
+		ed.Parse(r.line)
+		if err := ed.Validate(); err != nil {
+			return r.parseError(err)
+		}
+		r.currentBatch.AddEntry(ed)
+	} else {
+		ed := new(ADVEntryDetail)
+		ed.Parse(r.line)
+		if err := ed.Validate(); err != nil {
+			return r.parseError(err)
+		}
+		r.currentBatch.AddADVEntry(ed)
 	}
-	r.currentBatch.AddEntry(ed)
 	return nil
 }
 
@@ -460,7 +469,7 @@ func (r *Reader) parseBatchControl() error {
 func (r *Reader) parseFileControl() error {
 	r.recordName = "FileControl"
 
-	if !r.File.isADV() {
+	if !r.File.IsADV() {
 		if (FileControl{}) != r.File.Control {
 			// Can be only one file control per file
 			return r.parseError(&FileError{Msg: msgFileControl})
