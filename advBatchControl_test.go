@@ -9,19 +9,19 @@ import (
 	"testing"
 )
 
-func mockBatchADVControl() *BatchADVControl {
-	bc := NewBatchADVControl()
+func mockADVBatchControl() *ADVBatchControl {
+	bc := NewADVBatchControl()
 	bc.ServiceClassCode = 220
 	bc.ACHOperatorData = "T-BANK"
 	bc.ODFIIdentification = "12104288"
 	return bc
 }
 
-// testMockBatchADVControl tests mock batch control
-func testMockBatchADVControl(t testing.TB) {
-	bc := mockBatchADVControl()
+// testMockADVBatchControl tests mock batch control
+func testMockADVBatchControl(t testing.TB) {
+	bc := mockADVBatchControl()
 	if err := bc.Validate(); err != nil {
-		t.Error("mockBatchADVControl does not validate and will break other tests")
+		t.Error("mockADVBatchControl does not validate and will break other tests")
 	}
 	if bc.ServiceClassCode != 220 {
 		t.Error("ServiceClassCode depedendent default value has changed")
@@ -34,21 +34,21 @@ func testMockBatchADVControl(t testing.TB) {
 	}
 }
 
-// TestMockBatchADVControl test mock batch control
-func TestMockBatchADVControl(t *testing.T) {
-	testMockBatchADVControl(t)
+// TestMockADVBatchControl test mock batch control
+func TestMockADVBatchControl(t *testing.T) {
+	testMockADVBatchControl(t)
 }
 
-// BenchmarkMockBatchADVControl benchmarks mock batch control
-func BenchmarkMockBatchADVControl(b *testing.B) {
+// BenchmarkMockADVBatchControl benchmarks mock batch control
+func BenchmarkMockADVBatchControl(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testMockBatchADVControl(b)
+		testMockADVBatchControl(b)
 	}
 }
 
-// TestParseBatchADVControl parses a known Batch ControlRecord string.
-func testParseBatchADVControl(t testing.TB) {
+// TestParseADVBatchControl parses a known Batch ControlRecord string.
+func testParseADVBatchControl(t testing.TB) {
 	var line = "822500000100053200010000000000000001050000000000000000000000T-BANK             076401250000001"
 	r := NewReader(strings.NewReader(line))
 	r.line = line
@@ -94,16 +94,16 @@ func testParseBatchADVControl(t testing.TB) {
 	}
 }
 
-// TestParseBatchADVControl tests parsing a known Batch ControlRecord string.
-func TestParseBatchADVControl(t *testing.T) {
-	testParseBatchADVControl(t)
+// TestParseADVBatchControl tests parsing a known Batch ControlRecord string.
+func TestParseADVBatchControl(t *testing.T) {
+	testParseADVBatchControl(t)
 }
 
-// BenchmarkParseBatchADVControl benchmarks parsing a known Batch ControlRecord string.
-func BenchmarkParseBatchADVControl(b *testing.B) {
+// BenchmarkParseADVBatchControl benchmarks parsing a known Batch ControlRecord string.
+func BenchmarkParseADVBatchControl(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testParseBatchADVControl(b)
+		testParseADVBatchControl(b)
 	}
 }
 
@@ -145,7 +145,7 @@ func BenchmarkADVBCString(b *testing.B) {
 
 // testValidateADVBCRecordType ensure error if recordType is not 8
 func testValidateADVBCRecordType(t testing.TB) {
-	bc := mockBatchADVControl()
+	bc := mockADVBatchControl()
 	bc.recordType = "2"
 	if err := bc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
@@ -171,7 +171,7 @@ func BenchmarkValidateADVBCRecordType(b *testing.B) {
 
 // testADVisServiceClassErr verifies service class code
 func testADVBCisServiceClassErr(t testing.TB) {
-	bc := mockBatchADVControl()
+	bc := mockADVBatchControl()
 	bc.ServiceClassCode = 123
 	if err := bc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
@@ -196,7 +196,7 @@ func BenchmarkADVBCisServiceClassErr(b *testing.B) {
 
 // testADVBCBatchNumber verifies batch number
 func testADVBCBatchNumber(t testing.TB) {
-	bc := mockBatchADVControl()
+	bc := mockADVBatchControl()
 	bc.BatchNumber = 0
 	if err := bc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
@@ -222,7 +222,7 @@ func BenchmarkADVBCBatchNumber(b *testing.B) {
 
 // testADVBCACHOperatorDataAlphaNumeric verifies Company Identification is AlphaNumeric
 func testADVBCACHOperatorDataAlphaNumeric(t testing.TB) {
-	bc := mockBatchADVControl()
+	bc := mockADVBatchControl()
 	bc.ACHOperatorData = "®"
 	if err := bc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
@@ -248,7 +248,7 @@ func BenchmarkADVACHOperatorDataAlphaNumeric(b *testing.B) {
 
 // testADVBCFieldInclusionRecordType verifies Record Type is included
 func testADVBCFieldInclusionRecordType(t testing.TB) {
-	bc := mockBatchADVControl()
+	bc := mockADVBatchControl()
 	bc.recordType = ""
 	if err := bc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
@@ -274,7 +274,7 @@ func BenchmarkADVBCFieldInclusionRecordType(b *testing.B) {
 
 // testADVBCFieldInclusionServiceClassCode verifies Service Class Code is included
 func testADVBCFieldInclusionServiceClassCode(t testing.TB) {
-	bc := mockBatchADVControl()
+	bc := mockADVBatchControl()
 	bc.ServiceClassCode = 0
 	if err := bc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
@@ -300,7 +300,7 @@ func BenchmarkADVBCFieldInclusionServiceClassCode(b *testing.B) {
 
 // testADVBCFieldInclusionODFIIdentification verifies batch control ODFIIdentification
 func testADVBCFieldInclusionODFIIdentification(t testing.TB) {
-	bc := mockBatchADVControl()
+	bc := mockADVBatchControl()
 	bc.ODFIIdentification = "000000000"
 	if err := bc.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
@@ -324,24 +324,24 @@ func BenchmarkADVBCFieldInclusionODFIIdentification(b *testing.B) {
 	}
 }
 
-// testBatchADVControlLength verifies batch control length
-func testBatchADVControlLength(t testing.TB) {
-	bc := NewBatchADVControl()
+// testADVBatchControlLength verifies batch control length
+func testADVBatchControlLength(t testing.TB) {
+	bc := NewADVBatchControl()
 	recordLength := len(bc.String())
 	if recordLength != 94 {
 		t.Errorf("Instantiated length of Batch Control string is not 94 but %v", recordLength)
 	}
 }
 
-// TestBatchADVControlLength tests verifying batch control length
-func TestBatchADVControlLength(t *testing.T) {
-	testBatchADVControlLength(t)
+// TestADVBatchControlLength tests verifying batch control length
+func TestADVBatchControlLength(t *testing.T) {
+	testADVBatchControlLength(t)
 }
 
-// BenchmarkBatchADVControlLength benchmarks verifying batch control length
-func BenchmarkBatchADVControlLength(b *testing.B) {
+// BenchmarkADVBatchControlLength benchmarks verifying batch control length
+func BenchmarkADVBatchControlLength(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchADVControlLength(b)
+		testADVBatchControlLength(b)
 	}
 }

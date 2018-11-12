@@ -18,7 +18,7 @@ type Batch struct {
 	Entries    []*EntryDetail    `json:"entryDetails,omitempty"`
 	Control    *BatchControl     `json:"batchControl,omitempty"`
 	ADVEntries []*ADVEntryDetail `json:"advEntryDetails,omitempty"`
-	ADVControl *BatchADVControl  `json:"advBatchControl,omitempty"`
+	ADVControl *ADVBatchControl  `json:"advBatchControl,omitempty"`
 	// category defines if the entry is a Forward, Return, or NOC
 	category string
 	// Converters is composed for ACH to GoLang Converters
@@ -250,7 +250,7 @@ func (batch *Batch) build() error {
 			seq++
 		}
 		// build a BatchADVControl record
-		bcADV := NewBatchADVControl()
+		bcADV := NewADVBatchControl()
 		bcADV.ServiceClassCode = batch.Header.ServiceClassCode
 		bcADV.ACHOperatorData = batch.Header.CompanyName
 		bcADV.ODFIIdentification = batch.Header.ODFIIdentification
@@ -284,12 +284,12 @@ func (batch *Batch) GetControl() *BatchControl {
 }
 
 // SetADVControl appends an BatchADVControl to the Batch
-func (batch *Batch) SetADVControl(batchADVControl *BatchADVControl) {
+func (batch *Batch) SetADVControl(batchADVControl *ADVBatchControl) {
 	batch.ADVControl = batchADVControl
 }
 
 // GetADVControl returns the current Batch ADVControl
-func (batch *Batch) GetADVControl() *BatchADVControl {
+func (batch *Batch) GetADVControl() *ADVBatchControl {
 	return batch.ADVControl
 }
 

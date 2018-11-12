@@ -13,7 +13,7 @@ import (
 
 // BatchADVControl contains entry counts, dollar total and has totals for all
 // entries contained in the preceding batch
-type BatchADVControl struct {
+type ADVBatchControl struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
 	// RecordType defines the type of record in the block.
@@ -53,7 +53,7 @@ type BatchADVControl struct {
 }
 
 // Parse takes the input record string and parses the EntryDetail values
-func (bc *BatchADVControl) Parse(record string) {
+func (bc *ADVBatchControl) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
@@ -79,9 +79,9 @@ func (bc *BatchADVControl) Parse(record string) {
 	bc.BatchNumber = bc.parseNumField(record[87:94])
 }
 
-// NewBatchADVControl returns a new BatchADVControl with default values for none exported fields
-func NewBatchADVControl() *BatchADVControl {
-	return &BatchADVControl{
+// NewADVBatchControl returns a new ADVBatchControl with default values for none exported fields
+func NewADVBatchControl() *ADVBatchControl {
+	return &ADVBatchControl{
 		recordType:       "8",
 		ServiceClassCode: 200,
 		EntryHash:        1,
@@ -89,8 +89,8 @@ func NewBatchADVControl() *BatchADVControl {
 	}
 }
 
-// String writes the BatchADVControl struct to a 94 character string.
-func (bc *BatchADVControl) String() string {
+// String writes the ADVBatchControl struct to a 94 character string.
+func (bc *ADVBatchControl) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
 	buf.WriteString(bc.recordType)
@@ -107,7 +107,7 @@ func (bc *BatchADVControl) String() string {
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops that parsing.
-func (bc *BatchADVControl) Validate() error {
+func (bc *ADVBatchControl) Validate() error {
 	if err := bc.fieldInclusion(); err != nil {
 		return err
 	}
@@ -127,61 +127,61 @@ func (bc *BatchADVControl) Validate() error {
 
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
-func (bc *BatchADVControl) fieldInclusion() error {
+func (bc *ADVBatchControl) fieldInclusion() error {
 	if bc.recordType == "" {
 		return &FieldError{
 			FieldName: "recordType",
 			Value:     bc.recordType,
-			Msg:       msgFieldInclusion + ", did you use NewBatchADVControl()?"}
+			Msg:       msgFieldInclusion + ", did you use NewADVBatchControl()?"}
 	}
 	if bc.ServiceClassCode == 0 {
 		return &FieldError{
 			FieldName: "ServiceClassCode",
 			Value:     strconv.Itoa(bc.ServiceClassCode),
-			Msg:       msgFieldInclusion + ", did you use NewBatchADVControl()?",
+			Msg:       msgFieldInclusion + ", did you use NewADVBatchControl()?",
 		}
 	}
 	if bc.ODFIIdentification == "000000000" {
 		return &FieldError{
 			FieldName: "ODFIIdentification",
 			Value:     bc.ODFIIdentificationField(),
-			Msg:       msgFieldInclusion + ", did you use NewBatchADVControl()?",
+			Msg:       msgFieldInclusion + ", did you use NewADVBatchControl()?",
 		}
 	}
 	return nil
 }
 
 // EntryAddendaCountField gets a string of the addenda count zero padded
-func (bc *BatchADVControl) EntryAddendaCountField() string {
+func (bc *ADVBatchControl) EntryAddendaCountField() string {
 	return bc.numericField(bc.EntryAddendaCount, 6)
 }
 
 // EntryHashField get a zero padded EntryHash
-func (bc *BatchADVControl) EntryHashField() string {
+func (bc *ADVBatchControl) EntryHashField() string {
 	return bc.numericField(bc.EntryHash, 10)
 }
 
 //TotalDebitEntryDollarAmountField get a zero padded Debit Entry Amount
-func (bc *BatchADVControl) TotalDebitEntryDollarAmountField() string {
+func (bc *ADVBatchControl) TotalDebitEntryDollarAmountField() string {
 	return bc.numericField(bc.TotalDebitEntryDollarAmount, 20)
 }
 
 // TotalCreditEntryDollarAmountField get a zero padded Credit Entry Amount
-func (bc *BatchADVControl) TotalCreditEntryDollarAmountField() string {
+func (bc *ADVBatchControl) TotalCreditEntryDollarAmountField() string {
 	return bc.numericField(bc.TotalCreditEntryDollarAmount, 20)
 }
 
 // ACHOperatorDataField get the ACHOperatorData right padded
-func (bc *BatchADVControl) ACHOperatorDataField() string {
+func (bc *ADVBatchControl) ACHOperatorDataField() string {
 	return bc.alphaField(bc.ACHOperatorData, 19)
 }
 
 // ODFIIdentificationField get the odfi number zero padded
-func (bc *BatchADVControl) ODFIIdentificationField() string {
+func (bc *ADVBatchControl) ODFIIdentificationField() string {
 	return bc.stringField(bc.ODFIIdentification, 8)
 }
 
 // BatchNumberField gets a string of the batch number zero padded
-func (bc *BatchADVControl) BatchNumberField() string {
+func (bc *ADVBatchControl) BatchNumberField() string {
 	return bc.numericField(bc.BatchNumber, 7)
 }

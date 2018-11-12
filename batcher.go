@@ -21,8 +21,8 @@ type Batcher interface {
 	SetHeader(*BatchHeader)
 	GetControl() *BatchControl
 	SetControl(*BatchControl)
-	GetADVControl() *BatchADVControl
-	SetADVControl(*BatchADVControl)
+	GetADVControl() *ADVBatchControl
+	SetADVControl(*ADVBatchControl)
 	GetEntries() []*EntryDetail
 	AddEntry(*EntryDetail)
 	GetADVEntries() []*ADVEntryDetail

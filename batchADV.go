@@ -16,7 +16,7 @@ type BatchADV struct {
 // NewBatchADV returns a *BatchADV
 func NewBatchADV(bh *BatchHeader) *BatchADV {
 	batch := new(BatchADV)
-	batch.SetADVControl(NewBatchADVControl())
+	batch.SetADVControl(NewADVBatchControl())
 	batch.SetHeader(bh)
 	return batch
 }
