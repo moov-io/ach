@@ -107,6 +107,8 @@ func NewFileHeader() FileHeader {
 }
 
 // Parse takes the input record string and parses the FileHeader values
+//
+// Parse provides no guarantee about all fields being filled in. Callers should make a Validate() call to confirm successful parsing and data validity.
 func (fh *FileHeader) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return

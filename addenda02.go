@@ -61,6 +61,8 @@ func NewAddenda02() *Addenda02 {
 }
 
 // Parse takes the input record string and parses the Addenda02 values
+//
+// Parse provides no guarantee about all fields being filled in. Callers should make a Validate() call to confirm successful parsing and data validity.
 func (addenda02 *Addenda02) Parse(record string) {
 	// 1-1 Always "7"
 	addenda02.recordType = "7"
