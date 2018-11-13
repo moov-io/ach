@@ -170,6 +170,8 @@ func NewIATBatchHeader() *IATBatchHeader {
 }
 
 // Parse takes the input record string and parses the BatchHeader values
+//
+// Parse provides no guarantee about all fields being filled in. Callers should make a Validate() call to confirm successful parsing and data validity.
 func (iatBh *IATBatchHeader) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return

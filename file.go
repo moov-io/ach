@@ -94,6 +94,9 @@ type fileControl struct {
 // FileFromJson attempts to return a *File object assuming the input is valid JSON.
 //
 // Callers should always check for a nil-error before using the returned file.
+//
+// The File returned may not be valid and callers should confirm with Validate(). Invalid files may
+// be rejected by other Financial Institutions or ACH tools.
 func FileFromJson(bs []byte) (*File, error) {
 	if len(bs) == 0 {
 		return nil, errors.New("no JSON data provided")
