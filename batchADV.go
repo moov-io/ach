@@ -47,7 +47,6 @@ func (batch *BatchADV) Validate() error {
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 			}
 		}
-		// ToDo:  If NOC and Returns for ADV check Addenda98 and Addenda99
 	}
 	return nil
 }

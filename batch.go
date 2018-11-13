@@ -237,10 +237,6 @@ func (batch *Batch) build() error {
 		for i, entry := range batch.ADVEntries {
 			entryCount++
 
-			if entry.Addenda98 != nil {
-				entryCount++
-			}
-
 			if entry.Addenda99 != nil {
 				entryCount++
 			}
@@ -371,11 +367,6 @@ func (batch *Batch) isFieldInclusion() error {
 		if err := entry.Validate(); err != nil {
 			return err
 		}
-		if entry.Addenda98 != nil {
-			if err := entry.Addenda98.Validate(); err != nil {
-				return err
-			}
-		}
 		if entry.Addenda99 != nil {
 			if err := entry.Addenda99.Validate(); err != nil {
 				return err
@@ -414,9 +405,6 @@ func (batch *Batch) isBatchEntryCount() error {
 	} else {
 		for _, entry := range batch.ADVEntries {
 			entryCount++
-			if entry.Addenda98 != nil {
-				entryCount++
-			}
 			if entry.Addenda99 != nil {
 				entryCount++
 			}
@@ -491,7 +479,6 @@ func (batch *Batch) isSequenceAscending() error {
 	lastSeq := -1
 
 	if !batch.IsADV() {
-		lastSeq := -1
 		for _, entry := range batch.Entries {
 			if entry.TraceNumber <= lastSeq {
 				msg := fmt.Sprintf(msgBatchAscending, entry.TraceNumber, lastSeq)
@@ -499,15 +486,6 @@ func (batch *Batch) isSequenceAscending() error {
 			}
 			lastSeq = entry.TraceNumber
 		}
-	} else {
-		for _, entry := range batch.ADVEntries {
-			if entry.SequenceNumber <= lastSeq {
-				msg := fmt.Sprintf(msgBatchAscending, entry.SequenceNumber, lastSeq)
-				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "SequenceNumber", Msg: msg}
-			}
-			lastSeq = entry.SequenceNumber
-		}
-
 	}
 	return nil
 }
@@ -523,7 +501,7 @@ func (batch *Batch) isEntryHash() error {
 		}
 	} else {
 		if hashField != batch.ADVControl.EntryHashField() {
-			msg := fmt.Sprintf(msgBatchCalculatedControlEquality, hashField, batch.Control.EntryHashField())
+			msg := fmt.Sprintf(msgBatchCalculatedControlEquality, hashField, batch.ADVControl.EntryHashField())
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "EntryHash", Msg: msg}
 		}
 	}
@@ -643,9 +621,6 @@ func (batch *Batch) isCategory() error {
 		category := batch.GetADVEntries()[0].Category
 		if len(batch.ADVEntries) > 1 {
 			for i := 0; i < len(batch.ADVEntries); i++ {
-				if batch.ADVEntries[i].Category == CategoryNOC {
-					continue
-				}
 				if batch.ADVEntries[i].Category != category {
 					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Category", Msg: msgBatchForwardReturn}
 				}

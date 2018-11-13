@@ -52,25 +52,6 @@ func BenchmarkBatchADVHeader(b *testing.B) {
 	}
 }
 
-// TestBatchADVAddendum98 validates Addenda98 returns an error
-func TestBatchADVAddendum98(t *testing.T) {
-	mockBatch := NewBatchADV(mockBatchADVHeader())
-	mockBatch.AddADVEntry(mockADVEntryDetail())
-	mockAddenda98 := mockAddenda98()
-	mockAddenda98.TypeCode = "05"
-	mockBatch.GetADVEntries()[0].Category = CategoryNOC
-	mockBatch.GetADVEntries()[0].Addenda98 = mockAddenda98
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
-	}
-}
-
 // TestBatchADVAddendum99 validates Addenda99 returns an error
 func TestBatchADVAddendum99(t *testing.T) {
 	mockBatch := NewBatchADV(mockBatchADVHeader())

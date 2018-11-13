@@ -65,8 +65,6 @@ type ADVEntryDetail struct {
 	JulianDateDay int `json:"julianDateDay"`
 	// SequenceNumber
 	SequenceNumber int `json:"sequenceNumber,omitEmpty"`
-	// Addenda98 for user with NOC
-	Addenda98 *Addenda98 `json:"addenda98,omitempty"`
 	// Addenda99 for use with Returns
 	Addenda99 *Addenda99 `json:"addenda99,omitempty"`
 	// Category defines if the entry is a Forward, Return, or NOC
