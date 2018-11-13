@@ -244,6 +244,11 @@ func (batch *Batch) build() error {
 			batch.ADVEntries[i].SequenceNumber = seq
 
 			seq++
+
+			if seq > 9999 {
+				msg := fmt.Sprintf(msgBatchADVCount, 9999)
+				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "SequenceNumber", Msg: msg}
+			}
 		}
 		// build a BatchADVControl record
 		bcADV := NewADVBatchControl()

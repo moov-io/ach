@@ -163,3 +163,24 @@ func TestBatchADVInvalidTransactionCode(t *testing.T) {
 		}
 	}
 }
+
+// TestADVMaximumEntries validates maximum entries for an ADV ACH file
+func TestADVMaximumEntries(t *testing.T) {
+	entry := mockADVEntryDetail()
+	entry.AddendaRecordIndicator = 0
+	batch := NewBatchADV(mockBatchADVHeader())
+	batch.SetHeader(mockBatchADVHeader())
+
+	for i := 0; i < 10000; i++ {
+		batch.AddADVEntry(entry)
+	}
+	if err := batch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "SequenceNumber" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
