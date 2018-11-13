@@ -37,7 +37,7 @@ func main() {
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 50000
 	entry.AdviceRoutingNumber = "121042882"
-	entry.FileIdentification = "FILE1"
+	entry.FileIdentification = "11131"
 	entry.ACHOperatorData = ""
 	entry.IndividualName = "Name"
 	entry.DiscretionaryData = ""
@@ -53,7 +53,7 @@ func main() {
 	entryOne.DFIAccountNumber = "744-5678-99"
 	entryOne.Amount = 250000
 	entryOne.AdviceRoutingNumber = "121042882"
-	entryOne.FileIdentification = "FILE9"
+	entryOne.FileIdentification = "11139"
 	entryOne.ACHOperatorData = ""
 	entryOne.IndividualName = "Name"
 	entryOne.DiscretionaryData = ""

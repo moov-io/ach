@@ -17,7 +17,7 @@ func mockADVEntryDetail() *ADVEntryDetail {
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 50000
 	entry.AdviceRoutingNumber = "121042882"
-	entry.FileIdentification = "FILE1"
+	entry.FileIdentification = "11131"
 	entry.ACHOperatorData = ""
 	entry.IndividualName = "Name"
 	entry.DiscretionaryData = ""
@@ -46,6 +46,9 @@ func testMockADVEntryDetail(t testing.TB) {
 	if entry.DFIAccountNumber != "744-5678-99" {
 		t.Error("DFIAccountNumber dependent default value has changed")
 	}
+	if entry.FileIdentification != "11131" {
+		t.Error("FileIdentification dependent default value has changed")
+	}
 	if entry.Amount != 50000 {
 		t.Error("Amount dependent default value has changed")
 	}
@@ -58,6 +61,13 @@ func testMockADVEntryDetail(t testing.TB) {
 	if entry.DiscretionaryData != "" {
 		t.Error("DiscretionaryData dependent default value has changed")
 	}
+	if entry.JulianDateDay != 50 {
+		t.Error("JulianDateDay dependent default value has changed")
+	}
+	if entry.SequenceNumber != 1 {
+		t.Error("SequenceNumber dependent default value has changed")
+	}
+
 }
 
 // TestMockADVEntryDetail tests validating an entry detail record
@@ -76,7 +86,7 @@ func BenchmarkMockADVEntryDetail(b *testing.B) {
 // testADVEDString validates that a known parsed ADV entry
 // detail can be returned to a string of the same value
 func testADVEDString(t testing.TB) {
-	var line = "681231380104744-5678-99    000000050000121042882FILE1 Name                    0011000010500001"
+	var line = "681231380104744-5678-99    00000005000012104288211131 Name                    0011000010500001"
 	r := NewReader(strings.NewReader(line))
 	r.line = line
 	bh := BatchHeader{BatchNumber: 1,

@@ -353,12 +353,12 @@ func TestBatchPOSAddendum98(t *testing.T) {
 	mockBatch := NewBatchPOS(mockBatchPOSHeader())
 	mockBatch.AddEntry(mockPOSEntryDetail())
 	mockAddenda98 := mockAddenda98()
-	mockAddenda98.TypeCode = "05"
+	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
+			if e.FieldName != "Addenda98" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -482,6 +482,61 @@ func TestBatchPOSAddendum99Category(t *testing.T) {
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.Entries[0].Category = CategoryNOC
 	mockBatch.Entries[0].Addenda99 = mockAddenda99
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addenda99" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchPOSAddendum98Category validates Addenda99 returns an error
+func TestBatchPOSAddendum9Category(t *testing.T) {
+	mockBatch := NewBatchPOS(mockBatchPOSHeader())
+	mockBatch.AddEntry(mockPOSEntryDetail())
+	mockAddenda98 := mockAddenda98()
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
+	mockBatch.Entries[0].Category = CategoryForward
+	mockBatch.Entries[0].Addenda98 = mockAddenda98
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addenda98" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchPOSCategoryReturn validates CategoryReturn returns an error
+func TestBatchPOSCategoryReturn(t *testing.T) {
+	mockBatch := NewBatchPOS(mockBatchPOSHeader())
+	mockBatch.AddEntry(mockPOSEntryDetail())
+	mockAddenda02 := mockAddenda02()
+	mockBatch.GetEntries()[0].Category = CategoryReturn
+	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
+	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addenda02" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchPOSCategoryReturnAddenda99 validates CategoryReturn returns an error
+func TestBatchPOSCategoryReturnAddenda99(t *testing.T) {
+	mockBatch := NewBatchPOS(mockBatchPOSHeader())
+	mockBatch.AddEntry(mockPOSEntryDetail())
+	mockBatch.GetEntries()[0].Category = CategoryReturn
+	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Addenda99" {
