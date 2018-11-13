@@ -388,45 +388,75 @@ func (r *Reader) parseAddenda() error {
 		msg := fmt.Sprint(msgFileBatchOutside)
 		return r.parseError(&FileError{FieldName: "Addenda", Msg: msg})
 	}
-	if len(r.currentBatch.GetEntries()) == 0 {
+
+	if r.currentBatch.GetHeader().StandardEntryClassCode != "ADV" {
+		if len(r.currentBatch.GetEntries()) == 0 {
+			return r.parseError(&FileError{FieldName: "Addenda", Msg: msgFileBatchOutside})
+		}
+		entryIndex := len(r.currentBatch.GetEntries()) - 1
+		entry := r.currentBatch.GetEntries()[entryIndex]
+
+		if entry.AddendaRecordIndicator == 1 {
+			switch r.line[1:3] {
+			case "02":
+				addenda02 := NewAddenda02()
+				addenda02.Parse(r.line)
+				if err := addenda02.Validate(); err != nil {
+					return r.parseError(err)
+				}
+				//r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda02)
+				r.currentBatch.GetEntries()[entryIndex].Addenda02 = addenda02
+			case "05":
+				addenda05 := NewAddenda05()
+				addenda05.Parse(r.line)
+				if err := addenda05.Validate(); err != nil {
+					return r.parseError(err)
+				}
+				r.currentBatch.GetEntries()[entryIndex].AddAddenda05(addenda05)
+			case "98":
+				addenda98 := NewAddenda98()
+				addenda98.Parse(r.line)
+				if err := addenda98.Validate(); err != nil {
+					return r.parseError(err)
+				}
+				r.currentBatch.GetEntries()[entryIndex].Addenda98 = addenda98
+			case "99":
+				addenda99 := NewAddenda99()
+				addenda99.Parse(r.line)
+				if err := addenda99.Validate(); err != nil {
+					return r.parseError(err)
+				}
+				r.currentBatch.GetEntries()[entryIndex].Addenda99 = addenda99
+			}
+		} else {
+			return r.parseError(&FileError{
+				FieldName: "AddendaRecordIndicator",
+				Msg:       fmt.Sprint(msgBatchAddendaIndicator),
+			})
+		}
+	} else {
+		if err := r.parseADVAddenda(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// parseADVAddenda takes the input record string and create an Addenda99 appended to the last ADVEntryDetail
+func (r *Reader) parseADVAddenda() error {
+	if len(r.currentBatch.GetADVEntries()) == 0 {
 		return r.parseError(&FileError{FieldName: "Addenda", Msg: msgFileBatchOutside})
 	}
-	entryIndex := len(r.currentBatch.GetEntries()) - 1
-	entry := r.currentBatch.GetEntries()[entryIndex]
+	entryIndex := len(r.currentBatch.GetADVEntries()) - 1
+	entry := r.currentBatch.GetADVEntries()[entryIndex]
 
 	if entry.AddendaRecordIndicator == 1 {
-
-		switch r.line[1:3] {
-		case "02":
-			addenda02 := NewAddenda02()
-			addenda02.Parse(r.line)
-			if err := addenda02.Validate(); err != nil {
-				return r.parseError(err)
-			}
-			//r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda02)
-			r.currentBatch.GetEntries()[entryIndex].Addenda02 = addenda02
-		case "05":
-			addenda05 := NewAddenda05()
-			addenda05.Parse(r.line)
-			if err := addenda05.Validate(); err != nil {
-				return r.parseError(err)
-			}
-			r.currentBatch.GetEntries()[entryIndex].AddAddenda05(addenda05)
-		case "98":
-			addenda98 := NewAddenda98()
-			addenda98.Parse(r.line)
-			if err := addenda98.Validate(); err != nil {
-				return r.parseError(err)
-			}
-			r.currentBatch.GetEntries()[entryIndex].Addenda98 = addenda98
-		case "99":
-			addenda99 := NewAddenda99()
-			addenda99.Parse(r.line)
-			if err := addenda99.Validate(); err != nil {
-				return r.parseError(err)
-			}
-			r.currentBatch.GetEntries()[entryIndex].Addenda99 = addenda99
+		addenda99 := NewAddenda99()
+		addenda99.Parse(r.line)
+		if err := addenda99.Validate(); err != nil {
+			return r.parseError(err)
 		}
+		r.currentBatch.GetADVEntries()[entryIndex].Addenda99 = addenda99
 	} else {
 		return r.parseError(&FileError{
 			FieldName: "AddendaRecordIndicator",
