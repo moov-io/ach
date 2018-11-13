@@ -512,7 +512,7 @@ func TestBatchPOSAddendum9Category(t *testing.T) {
 	}
 }
 
-// TestBatchPOSCategoryReturn validates CategoryReturn returns an error
+// TestBatchPOSCategoryReturn validates CategoryReturn returns an error if valid Addenda02 is defined
 func TestBatchPOSCategoryReturn(t *testing.T) {
 	mockBatch := NewBatchPOS(mockBatchPOSHeader())
 	mockBatch.AddEntry(mockPOSEntryDetail())
@@ -531,10 +531,28 @@ func TestBatchPOSCategoryReturn(t *testing.T) {
 	}
 }
 
-// TestBatchPOSCategoryReturnAddenda99 validates CategoryReturn returns an error
+// TestBatchPOSCategoryReturnAddenda99 validates CategoryReturn returns an error if Addenda99 is not defined
 func TestBatchPOSCategoryReturnAddenda99(t *testing.T) {
 	mockBatch := NewBatchPOS(mockBatchPOSHeader())
 	mockBatch.AddEntry(mockPOSEntryDetail())
+	mockBatch.GetEntries()[0].Category = CategoryReturn
+	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addenda99" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchPOSCategoryReturnValid validates CategoryReturn does not return an error if Addenda99 is not defined
+func TestBatchPOSCategoryReturnValid(t *testing.T) {
+	mockBatch := NewBatchPOS(mockBatchPOSHeader())
+	mockBatch.AddEntry(mockPOSEntryDetail())
+	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99()
 	mockBatch.GetEntries()[0].Category = CategoryReturn
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
