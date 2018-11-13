@@ -5,8 +5,14 @@
 package ach
 
 import (
+	"bytes"
+	"crypto/rand"
+	"io"
 	"log"
+	"math/big"
+	"sync"
 	"testing"
+	"unsafe"
 )
 
 // mockBatchENRHeader creates a ENR batch header
@@ -319,4 +325,38 @@ func TestBatchENR__PaymentInformation(t *testing.T) {
 	if v := info.EnrolleeClassificationCode; v != 1 {
 		t.Errorf("EnrolleeClassificationCode: %d", v)
 	}
+}
+
+func TestBatchENR__FuzzPaymentInformation(t *testing.T) {
+	batch := mockBatchENR()
+	if err := batch.Validate(); err != nil {
+		t.Fatal(err)
+	}
+	addenda05 := batch.GetEntries()[0].Addenda05[0]
+
+	// read up to 100 characters in a string, ACH has a max 94 character length limit
+	max := big.NewInt(int64(100 * unsafe.Sizeof("a")))
+	maxint := int(max.Int64())
+
+	iterations := int(5 * 1e4)
+	var wg sync.WaitGroup
+	wg.Add(iterations)
+
+	for i := 0; i < iterations; i++ {
+		go func(i int) {
+			defer wg.Done()
+
+			buf := bytes.Buffer{}
+			buf.Grow(maxint)
+
+			// read a random string
+			n, _ := rand.Int(rand.Reader, max)
+			io.Copy(&buf, io.LimitReader(rand.Reader, n.Int64()))
+
+			// fuzz
+			addenda05.PaymentRelatedInformation = buf.String()
+			batch.ParsePaymentInformation(addenda05)
+		}(i)
+	}
+	wg.Wait()
 }
