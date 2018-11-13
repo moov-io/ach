@@ -105,8 +105,8 @@ func BenchmarkParseADVFileControl(b *testing.B) {
 	}
 }
 
-// testFCADVString validates that a known parsed file can be return to a string of the same value
-func testFCADVString(t testing.TB) {
+// testADVFCString validates that a known parsed file can be return to a string of the same value
+func testADVFCString(t testing.TB) {
 	var line = "90000010000010000000100053200010000000000000001050000000000000000000000                       "
 	r := NewReader(strings.NewReader(line))
 	r.line = line
@@ -123,21 +123,21 @@ func testFCADVString(t testing.TB) {
 	}
 }
 
-// TestFCADVString tests validating that a known parsed file can be return to a string of the same value
-func TestFCADVString(t *testing.T) {
-	testFCADVString(t)
+// TestADVFCString tests validating that a known parsed file can be return to a string of the same value
+func TestADVFCString(t *testing.T) {
+	testADVFCString(t)
 }
 
-// BenchmarkFCADVString benchmarks validating that a known parsed file can be return to a string of the same value
-func BenchmarkFCADVString(b *testing.B) {
+// BenchmarkADVFCString benchmarks validating that a known parsed file can be return to a string of the same value
+func BenchmarkADVFCString(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testFCADVString(b)
+		testADVFCString(b)
 	}
 }
 
-// testValidateFCADVRecordType validates error if recordType is not 9
-func testValidateFCADVRecordType(t testing.TB) {
+// testValidateADVFCRecordType validates error if recordType is not 9
+func testValidateADVFCRecordType(t testing.TB) {
 	fc := mockADVFileControl()
 	fc.recordType = "2"
 
@@ -150,21 +150,21 @@ func testValidateFCADVRecordType(t testing.TB) {
 	}
 }
 
-// TestValidateFCADVRecordType tests validating error if recordType is not 9
-func TestValidateFCADVRecordType(t *testing.T) {
-	testValidateFCADVRecordType(t)
+// TestValidateADVFCRecordType tests validating error if recordType is not 9
+func TestValidateADVFCRecordType(t *testing.T) {
+	testValidateADVFCRecordType(t)
 }
 
-// BenchmarkValidateFCADVRecordType benchmarks validating error if recordType is not 9
-func BenchmarkValidateFCADVRecordType(b *testing.B) {
+// BenchmarkValidateADVFCRecordType benchmarks validating error if recordType is not 9
+func BenchmarkValidateADVFCRecordType(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testValidateFCADVRecordType(b)
+		testValidateADVFCRecordType(b)
 	}
 }
 
-// testFCADVFieldInclusion validates file control field inclusion
-func testFCADVFieldInclusion(t testing.TB) {
+// testADVFCFieldInclusion validates file control field inclusion
+func testADVFCFieldInclusion(t testing.TB) {
 	fc := mockADVFileControl()
 	fc.BatchCount = 0
 	if err := fc.Validate(); err != nil {
@@ -176,21 +176,21 @@ func testFCADVFieldInclusion(t testing.TB) {
 	}
 }
 
-// TestFCADVFieldInclusion tests validating file control field inclusion
-func TestFCADVFieldInclusion(t *testing.T) {
-	testFCADVFieldInclusion(t)
+// TestADVFCFieldInclusion tests validating file control field inclusion
+func TestADVFCFieldInclusion(t *testing.T) {
+	testADVFCFieldInclusion(t)
 }
 
-// BenchmarkFCADVFieldInclusion benchmarks validating file control field inclusion
-func BenchmarkFCADVFieldInclusion(b *testing.B) {
+// BenchmarkADVFCFieldInclusion benchmarks validating file control field inclusion
+func BenchmarkADVFCFieldInclusion(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testFCADVFieldInclusion(b)
+		testADVFCFieldInclusion(b)
 	}
 }
 
-// testFCADVFieldInclusionRecordType validates file control record type field inclusion
-func testFCADVFieldInclusionRecordType(t testing.TB) {
+// testADVFCFieldInclusionRecordType validates file control record type field inclusion
+func testADVFCFieldInclusionRecordType(t testing.TB) {
 	fc := mockADVFileControl()
 	fc.recordType = ""
 	if err := fc.Validate(); err != nil {
@@ -202,21 +202,21 @@ func testFCADVFieldInclusionRecordType(t testing.TB) {
 	}
 }
 
-// TestFCADVFieldInclusionRecordType tests validating file control record type field inclusion
-func TestFCADVFieldInclusionRecordType(t *testing.T) {
-	testFCADVFieldInclusionRecordType(t)
+// TestADVFCFieldInclusionRecordType tests validating file control record type field inclusion
+func TestADVFCFieldInclusionRecordType(t *testing.T) {
+	testADVFCFieldInclusionRecordType(t)
 }
 
-// BenchmarkFCADVFieldInclusionRecordType benchmarks tests validating file control record type field inclusion
-func BenchmarkFCADVFieldInclusionRecordType(b *testing.B) {
+// BenchmarkADVFCFieldInclusionRecordType benchmarks tests validating file control record type field inclusion
+func BenchmarkADVFCFieldInclusionRecordType(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testFCADVFieldInclusionRecordType(b)
+		testADVFCFieldInclusionRecordType(b)
 	}
 }
 
-// testFCADVFieldInclusionBlockCount validates file control block count field inclusion
-func testFCADVFieldInclusionBlockCount(t testing.TB) {
+// testADVFCFieldInclusionBlockCount validates file control block count field inclusion
+func testADVFCFieldInclusionBlockCount(t testing.TB) {
 	fc := mockADVFileControl()
 	fc.BlockCount = 0
 	if err := fc.Validate(); err != nil {
@@ -228,21 +228,21 @@ func testFCADVFieldInclusionBlockCount(t testing.TB) {
 	}
 }
 
-// TestFCADVFieldInclusionBlockCount tests validating file control block count field inclusion
-func TestFCADVFieldInclusionBlockCount(t *testing.T) {
-	testFCADVFieldInclusionBlockCount(t)
+// TestADVFCFieldInclusionBlockCount tests validating file control block count field inclusion
+func TestADVFCFieldInclusionBlockCount(t *testing.T) {
+	testADVFCFieldInclusionBlockCount(t)
 }
 
-// BenchmarkFCADVFieldInclusionBlockCount benchmarks validating file control block count field inclusion
-func BenchmarkFCADVFieldInclusionBlockCount(b *testing.B) {
+// BenchmarkADVFCFieldInclusionBlockCount benchmarks validating file control block count field inclusion
+func BenchmarkADVFCFieldInclusionBlockCount(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testFCADVFieldInclusionBlockCount(b)
+		testADVFCFieldInclusionBlockCount(b)
 	}
 }
 
-// testFCADVFieldInclusionEntryAddendaCount validates file control addenda count field inclusion
-func testFCADVFieldInclusionEntryAddendaCount(t testing.TB) {
+// testADVFCFieldInclusionEntryAddendaCount validates file control addenda count field inclusion
+func testADVFCFieldInclusionEntryAddendaCount(t testing.TB) {
 	fc := mockADVFileControl()
 	fc.EntryAddendaCount = 0
 	if err := fc.Validate(); err != nil {
@@ -254,21 +254,21 @@ func testFCADVFieldInclusionEntryAddendaCount(t testing.TB) {
 	}
 }
 
-// TestFCADVFieldInclusionEntryAddendaCount tests validating file control addenda count field inclusion
-func TestFCADVFieldInclusionEntryAddendaCount(t *testing.T) {
-	testFCADVFieldInclusionEntryAddendaCount(t)
+// TestADVFCFieldInclusionEntryAddendaCount tests validating file control addenda count field inclusion
+func TestADVFCFieldInclusionEntryAddendaCount(t *testing.T) {
+	testADVFCFieldInclusionEntryAddendaCount(t)
 }
 
-// BenchmarkFCADVFieldInclusionEntryAddendaCount benchmarks validating file control addenda count field inclusion
-func BenchmarkFCADVFieldInclusionEntryAddendaCount(b *testing.B) {
+// BenchmarkADVFCFieldInclusionEntryAddendaCount benchmarks validating file control addenda count field inclusion
+func BenchmarkADVFCFieldInclusionEntryAddendaCount(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testFCADVFieldInclusionEntryAddendaCount(b)
+		testADVFCFieldInclusionEntryAddendaCount(b)
 	}
 }
 
-// testFCADVFieldInclusionEntryHash validates file control entry hash field inclusion
-func testFCADVFieldInclusionEntryHash(t testing.TB) {
+// testADVFCFieldInclusionEntryHash validates file control entry hash field inclusion
+func testADVFCFieldInclusionEntryHash(t testing.TB) {
 	fc := mockADVFileControl()
 	fc.EntryHash = 0
 	if err := fc.Validate(); err != nil {
@@ -280,15 +280,34 @@ func testFCADVFieldInclusionEntryHash(t testing.TB) {
 	}
 }
 
-// TestFCADVFieldInclusionEntryHash tests validating file control entry hash field inclusion
-func TestFCADVFieldInclusionEntryHash(t *testing.T) {
-	testFCADVFieldInclusionEntryHash(t)
+// TestADVFCFieldInclusionEntryHash tests validating file control entry hash field inclusion
+func TestADVFCFieldInclusionEntryHash(t *testing.T) {
+	testADVFCFieldInclusionEntryHash(t)
 }
 
-// BenchmarkFCADVFieldInclusionEntryHash benchmarks validating file control entry hash field inclusion
-func BenchmarkFCADVFieldInclusionEntryHash(b *testing.B) {
+// BenchmarkADVFCFieldInclusionEntryHash benchmarks validating file control entry hash field inclusion
+func BenchmarkADVFCFieldInclusionEntryHash(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testFCADVFieldInclusionEntryHash(b)
+		testADVFCFieldInclusionEntryHash(b)
+	}
+}
+
+// TestInvalidADVFCParse returns an error when parsing an ADV File Control
+func TestInvalidADVFCParse(t *testing.T) {
+	var line = "9000001000001000000010005320001000000000000000105"
+	r := NewReader(strings.NewReader(line))
+	r.line = line
+	batchADV := mockBatchADV()
+	r.File.AddBatch(batchADV)
+
+	if err := r.parseFileControl(); err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if p.Record != "FileControl" {
+				t.Errorf("%T: %s", p, p)
+			}
+		} else {
+			t.Errorf("%T: %s", p.Err, p.Err)
+		}
 	}
 }

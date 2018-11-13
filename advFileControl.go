@@ -112,35 +112,35 @@ func (fc *ADVFileControl) fieldInclusion() error {
 		return &FieldError{
 			FieldName: "recordType",
 			Value:     fc.recordType,
-			Msg:       msgFieldInclusion + ", did you use NewFileControl()?",
+			Msg:       msgFieldInclusion + ", did you use NewADVFileControl()?",
 		}
 	}
 	if fc.BatchCount == 0 {
 		return &FieldError{
 			FieldName: "BatchCount",
 			Value:     fc.BatchCountField(),
-			Msg:       msgFieldInclusion + ", did you use NewFileControl()?",
+			Msg:       msgFieldInclusion + ", did you use NewADVFileControl()?",
 		}
 	}
 	if fc.BlockCount == 0 {
 		return &FieldError{
 			FieldName: "BlockCount",
 			Value:     fc.BlockCountField(),
-			Msg:       msgFieldInclusion + ", did you use NewFileControl()?",
+			Msg:       msgFieldInclusion + ", did you use NewADVFileControl()?",
 		}
 	}
 	if fc.EntryAddendaCount == 0 {
 		return &FieldError{
 			FieldName: "EntryAddendaCount",
 			Value:     fc.EntryAddendaCountField(),
-			Msg:       msgFieldInclusion + ", did you use NewFileControl()?",
+			Msg:       msgFieldInclusion + ", did you use NewADVFileControl()?",
 		}
 	}
 	if fc.EntryHash == 0 {
 		return &FieldError{
 			FieldName: "EntryHash",
 			Value:     fc.EntryAddendaCountField(),
-			Msg:       msgFieldInclusion + ", did you use NewFileControl()?",
+			Msg:       msgFieldInclusion + ", did you use NewADVFileControl()?",
 		}
 	}
 	return nil

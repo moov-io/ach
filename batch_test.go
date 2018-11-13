@@ -672,3 +672,54 @@ func BenchmarkIATBatch(b *testing.B) {
 		testIATBatch(b)
 	}
 }
+
+// TestBatchADVInvalidServiceClassCode validates ServiceClassCode
+func TestBatchADVInvalidServiceClassCode(t *testing.T) {
+	mockBatch := mockBatchADV()
+	// Batch Header information is required to Create a batch.
+	mockBatch.Create()
+	mockBatch.ADVControl.ServiceClassCode = 220
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ServiceClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchADVInvalidODFIIdentification validates ODFIIdentification
+func TestBatchADVInvalidODFIIdentification(t *testing.T) {
+	mockBatch := mockBatchADV()
+	// Batch Header information is required to Create a batch.
+	mockBatch.Create()
+	mockBatch.ADVControl.ODFIIdentification = "231380104"
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ODFIIdentification" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchADVInvalidBatchNumber validates BatchNumber
+func TestBatchADVInvalidBatchNumber(t *testing.T) {
+	mockBatch := mockBatchADV()
+	// Batch Header information is required to Create a batch.
+	mockBatch.Create()
+	mockBatch.ADVControl.BatchNumber = 2
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "BatchNumber" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}

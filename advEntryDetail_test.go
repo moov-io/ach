@@ -73,7 +73,7 @@ func BenchmarkMockADVEntryDetail(b *testing.B) {
 	}
 }
 
-// testAVDEDString validates that a known parsed entry
+// testADVEDString validates that a known parsed ADV entry
 // detail can be returned to a string of the same value
 func testADVEDString(t testing.TB) {
 	var line = "681231380104744-5678-99    000000050000121042882FILE1 Name                    0011000010500001"
@@ -139,7 +139,7 @@ func TestValidateADVEDTransactionCode(t *testing.T) {
 }
 
 // TestADVEDDFIAccountNumberAlphaNumeric validates DFI account number is alpha numeric
-func TestEDAVDDFIAccountNumberAlphaNumeric(t *testing.T) {
+func TestADVEDDFIAccountNumberAlphaNumeric(t *testing.T) {
 	ed := mockADVEntryDetail()
 	ed.DFIAccountNumber = "®"
 	if err := ed.Validate(); err != nil {
@@ -342,6 +342,29 @@ func TestBadTransactionCode(t *testing.T) {
 			if e.FieldName != "TransactionCode" {
 				t.Errorf("%T: %s", err, err)
 			}
+		}
+	}
+}
+
+// TestInvalidADVEDParse returns an error when parsing an ADV Entry Detail
+func TestInvalidADVEDParse(t *testing.T) {
+	var line = "681231380104744-5678-99    000000050000121042882FILE1 Name"
+	r := NewReader(strings.NewReader(line))
+	r.line = line
+	bh := BatchHeader{BatchNumber: 1,
+		StandardEntryClassCode: "ADV",
+		ServiceClassCode:       280,
+		CompanyIdentification:  "origid",
+		ODFIIdentification:     "121042882"}
+	r.addCurrentBatch(NewBatchADV(&bh))
+
+	if err := r.parseEntryDetail(); err != nil {
+		if p, ok := err.(*ParseError); ok {
+			if p.Record != "EntryDetail" {
+				t.Errorf("%T: %s", p, p)
+			}
+		} else {
+			t.Errorf("%T: %s", p.Err, p.Err)
 		}
 	}
 }

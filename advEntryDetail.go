@@ -178,10 +178,7 @@ func (ed *ADVEntryDetail) Validate() error {
 	}
 	calculated := ed.CalculateCheckDigit(ed.RDFIIdentificationField())
 
-	edCheckDigit, err := strconv.Atoi(ed.CheckDigit)
-	if err != nil {
-		return &FieldError{FieldName: "CheckDigit", Value: ed.CheckDigit, Msg: err.Error()}
-	}
+	edCheckDigit, _ := strconv.Atoi(ed.CheckDigit)
 
 	if calculated != edCheckDigit {
 		msg := fmt.Sprintf(msgValidCheckDigit, calculated)

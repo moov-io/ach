@@ -165,3 +165,20 @@ func TestBatchADVAddendum99Category(t *testing.T) {
 		}
 	}
 }
+
+// TestBatchADVInvalidTransactionCode validates TransactionCode
+func TestBatchADVInvalidTransactionCode(t *testing.T) {
+	mockBatch := mockBatchADV()
+	// Batch Header information is required to Create a batch.
+	mockBatch.GetADVEntries()[0].TransactionCode = 22
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TransactionCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
