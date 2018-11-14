@@ -48,7 +48,7 @@ func (batch *BatchPOP) Validate() error {
 
 	// POP detail entries can only be a debit, ServiceClassCode must allow debits
 	switch batch.Header.ServiceClassCode {
-	case 200, 220, 280:
+	case 200, 220:
 		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, "POP")
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
 	}
