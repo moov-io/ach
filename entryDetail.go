@@ -470,6 +470,36 @@ func (ed *EntryDetail) SetPaymentType(t string) {
 	}
 }
 
+// SetProcessControlField setter for TRC Process Control Field characters 1-6 of underlying IndividualName
+func (ed *EntryDetail) SetProcessControlField(s string) {
+	ed.IndividualName = ed.alphaField(s, 6)
+}
+
+// SetItemResearchNumber setter for TRC Item Research Number characters 7-22 of underlying IndividualName
+func (ed *EntryDetail) SetItemResearchNumber(s string) {
+	ed.IndividualName = ed.IndividualName + ed.alphaField(s, 16)
+}
+
+// SetItemTypeIndicator setter for TRC Item Type Indicator which is underlying Discretionary Data
+func (ed *EntryDetail) SetItemTypeIndicator(s string) {
+	ed.DiscretionaryData = ed.alphaField(s, 2)
+}
+
+// ProcessControlField getter for TRC Process Control Field characters 1-6 of underlying IndividualName
+func (ed *EntryDetail) ProcessControlField() string {
+	return ed.parseStringField(ed.IndividualName[0:6])
+}
+
+// ItemResearchNumber getter for TRC Item Research Number characters 7-22 of underlying IndividualName
+func (ed *EntryDetail) ItemResearchNumber() string {
+	return ed.parseStringField(ed.IndividualName[6:22])
+}
+
+// ItemTypeIndicator getter for TRC Item Type Indicator which is underlying Discretionary Data
+func (ed *EntryDetail) ItemTypeIndicator() string {
+	return ed.DiscretionaryData
+}
+
 // TraceNumberField returns a zero padded TraceNumber string
 func (ed *EntryDetail) TraceNumberField() string {
 	return ed.numericField(ed.TraceNumber, 15)

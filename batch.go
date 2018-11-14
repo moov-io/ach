@@ -64,6 +64,8 @@ func NewBatch(bh *BatchHeader) (Batcher, error) {
 		return NewBatchSHR(bh), nil
 	case "TEL":
 		return NewBatchTEL(bh), nil
+	case "TRC":
+		return NewBatchTRC(bh), nil
 	case "WEB":
 		return NewBatchWEB(bh), nil
 	default:
