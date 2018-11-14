@@ -43,7 +43,7 @@ func main() {
 	entry.DiscretionaryData = ""
 	entry.AddendaRecordIndicator = 0
 	entry.ACHOperatorRoutingNumber = "01100001"
-	entry.JulianDateDay = 50
+	entry.JulianDay = 50
 	entry.SequenceNumber = 1
 
 	entryOne := ach.NewADVEntryDetail()
@@ -59,7 +59,7 @@ func main() {
 	entryOne.DiscretionaryData = ""
 	entryOne.AddendaRecordIndicator = 0
 	entryOne.ACHOperatorRoutingNumber = "01100001"
-	entryOne.JulianDateDay = 50
+	entryOne.JulianDay = 50
 	entryOne.SequenceNumber = 2
 
 	// build the batch

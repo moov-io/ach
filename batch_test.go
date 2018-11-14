@@ -832,7 +832,7 @@ func TestBatchADVCategory(t *testing.T) {
 	entryOne.DiscretionaryData = ""
 	entryOne.AddendaRecordIndicator = 0
 	entryOne.ACHOperatorRoutingNumber = "01100001"
-	entryOne.JulianDateDay = 50
+	entryOne.JulianDay = 50
 	entryOne.SequenceNumber = 1
 	entryOne.Category = CategoryReturn
 

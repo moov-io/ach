@@ -23,7 +23,7 @@ func mockADVEntryDetail() *ADVEntryDetail {
 	entry.DiscretionaryData = ""
 	entry.AddendaRecordIndicator = 0
 	entry.ACHOperatorRoutingNumber = "01100001"
-	entry.JulianDateDay = 50
+	entry.JulianDay = 50
 	entry.SequenceNumber = 1
 	return entry
 }
@@ -61,8 +61,8 @@ func testMockADVEntryDetail(t testing.TB) {
 	if entry.DiscretionaryData != "" {
 		t.Error("DiscretionaryData dependent default value has changed")
 	}
-	if entry.JulianDateDay != 50 {
-		t.Error("JulianDateDay dependent default value has changed")
+	if entry.JulianDay != 50 {
+		t.Error("JulianDay dependent default value has changed")
 	}
 	if entry.SequenceNumber != 1 {
 		t.Error("SequenceNumber dependent default value has changed")
@@ -317,10 +317,10 @@ func TestADVEDFieldInclusionACHOperatorRoutingNumber(t *testing.T) {
 	}
 }
 
-// TestADVEDFieldInclusionJulianDateDay validates JulianDateDay field inclusion
+// TestADVEDFieldInclusionJulianDateDay validates JulianDay field inclusion
 func TestADVEDFieldInclusionJulianDateDay(t *testing.T) {
 	entry := mockADVEntryDetail()
-	entry.JulianDateDay = 0
+	entry.JulianDay = 0
 	if err := entry.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if !strings.Contains(e.Msg, msgFieldInclusion) {

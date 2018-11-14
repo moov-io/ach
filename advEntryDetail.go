@@ -61,8 +61,8 @@ type ADVEntryDetail struct {
 	AddendaRecordIndicator int `json:"addendaRecordIndicator,omitempty"`
 	// ACHOperatorRoutingNumber
 	ACHOperatorRoutingNumber string `json:"achOperatorRoutingNumber"`
-	// JulianDateDay
-	JulianDateDay int `json:"julianDateDay"`
+	// JulianDay
+	JulianDay int `json:"julianDay"`
 	// SequenceNumber
 	SequenceNumber int `json:"sequenceNumber,omitEmpty"`
 	// Addenda99 for use with Returns
@@ -120,7 +120,7 @@ func (ed *ADVEntryDetail) Parse(record string) {
 	// 80-87
 	ed.ACHOperatorRoutingNumber = ed.parseStringField(record[79:87])
 	// 88-90
-	ed.JulianDateDay = ed.parseNumField(record[87:90])
+	ed.JulianDay = ed.parseNumField(record[87:90])
 	// 91-94
 	ed.SequenceNumber = ed.parseNumField(record[90:94])
 }
@@ -238,10 +238,10 @@ func (ed *ADVEntryDetail) fieldInclusion() error {
 			Msg:       msgFieldInclusion + ", did you use NewADVEntryDetail()?",
 		}
 	}
-	if ed.JulianDateDay <= 0 {
+	if ed.JulianDay <= 0 {
 		return &FieldError{
-			FieldName: "JulianDateDay",
-			Value:     strconv.Itoa(ed.JulianDateDay),
+			FieldName: "JulianDay",
+			Value:     strconv.Itoa(ed.JulianDay),
 			Msg:       msgFieldInclusion + ", did you use NewADVEntryDetail()?",
 		}
 	}
@@ -309,9 +309,9 @@ func (ed *ADVEntryDetail) ACHOperatorRoutingNumberField() string {
 	return ed.alphaField(ed.ACHOperatorRoutingNumber, 8)
 }
 
-// JulianDateDayField returns a zero padded string of JulianDateDay
+// JulianDateDayField returns a zero padded string of JulianDay
 func (ed *ADVEntryDetail) JulianDateDayField() string {
-	return ed.numericField(ed.JulianDateDay, 3)
+	return ed.numericField(ed.JulianDay, 3)
 }
 
 // SequenceNumberField returns a zero padded string of SequenceNumber
