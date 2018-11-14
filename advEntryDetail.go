@@ -238,7 +238,7 @@ func (ed *ADVEntryDetail) fieldInclusion() error {
 			Msg:       msgFieldInclusion + ", did you use NewADVEntryDetail()?",
 		}
 	}
-	if ed.JulianDateDay == 0 {
+	if ed.JulianDateDay <= 0 {
 		return &FieldError{
 			FieldName: "JulianDateDay",
 			Value:     strconv.Itoa(ed.JulianDateDay),

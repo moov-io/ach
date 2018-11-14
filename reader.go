@@ -404,7 +404,6 @@ func (r *Reader) parseAddenda() error {
 				if err := addenda02.Validate(); err != nil {
 					return r.parseError(err)
 				}
-				//r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda02)
 				r.currentBatch.GetEntries()[entryIndex].Addenda02 = addenda02
 			case "05":
 				addenda05 := NewAddenda05()
