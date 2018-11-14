@@ -450,19 +450,18 @@ func (r *Reader) parseADVAddenda() error {
 	entryIndex := len(r.currentBatch.GetADVEntries()) - 1
 	entry := r.currentBatch.GetADVEntries()[entryIndex]
 
-	if entry.AddendaRecordIndicator == 1 {
-		addenda99 := NewAddenda99()
-		addenda99.Parse(r.line)
-		if err := addenda99.Validate(); err != nil {
-			return r.parseError(err)
-		}
-		r.currentBatch.GetADVEntries()[entryIndex].Addenda99 = addenda99
-	} else {
+	if entry.AddendaRecordIndicator != 1 {
 		return r.parseError(&FileError{
 			FieldName: "AddendaRecordIndicator",
 			Msg:       fmt.Sprint(msgBatchAddendaIndicator),
 		})
 	}
+	addenda99 := NewAddenda99()
+	addenda99.Parse(r.line)
+	if err := addenda99.Validate(); err != nil {
+		return r.parseError(err)
+	}
+	r.currentBatch.GetADVEntries()[entryIndex].Addenda99 = addenda99
 	return nil
 }
 
