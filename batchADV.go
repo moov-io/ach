@@ -9,6 +9,10 @@ import (
 )
 
 // BatchADV holds the Batch Header and Batch Control and all Entry Records for ADV Entries
+//
+// The ADV entry identifies a Non-Monetary Entry that is used by an ACH Operator to provide accounting information
+// regarding an entry to participating DFI's.  It's an optional service provided by ACH operators and must be requested
+// by a DFI wanting the service.
 type BatchADV struct {
 	Batch
 }
