@@ -1657,3 +1657,47 @@ func TestReturnACHFile(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+// TestADVReturnError returns a Parse Error
+func TestADVReturnError(t *testing.T) {
+	file := NewFile().SetHeader(mockFileHeader())
+	entry := mockADVEntryDetail()
+	entry.Addenda99 = mockAddenda99()
+	entry.Category = CategoryReturn
+	advHeader := mockBatchADVHeader()
+	batch := NewBatchADV(advHeader)
+	batch.SetHeader(advHeader)
+	batch.AddADVEntry(entry)
+	batch.Create()
+	file.AddBatch(batch)
+
+	if err := file.Create(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err := file.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	b := &bytes.Buffer{}
+	f := NewWriter(b)
+
+	if err := f.Write(file); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	r := NewReader(strings.NewReader(b.String()))
+	_, err := r.Read()
+	if err != nil {
+		if err != nil {
+			if el, ok := err.(ErrorList); ok {
+				if p, ok := el.Err().(*ParseError); ok {
+					if p.Record != "Addenda" {
+						t.Errorf("%T: %s", p, p)
+					}
+				} else {
+					t.Errorf("%T: %s", el, el)
+				}
+			}
+		}
+	}
+}
