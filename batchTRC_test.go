@@ -455,7 +455,7 @@ func TestBatchTRCProcessControlField(t *testing.T) {
 }
 
 // TestBatchTRCItemResearchNumber returns an error if ItemResearchNumber is not defined.
-func TestBatchItemResearchNumber(t *testing.T) {
+func TestBatchTRCItemResearchNumber(t *testing.T) {
 	mockBatch := NewBatchTRC(mockBatchTRCHeader())
 	mockBatch.AddEntry(mockTRCEntryDetail())
 	mockBatch.GetEntries()[0].IndividualName = ""
