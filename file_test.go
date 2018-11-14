@@ -396,7 +396,7 @@ func TestFile__readFromJson(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	file, err := FileFromJson(bs)
+	file, err := FileFromJSON(bs)
 	if err != nil {
 		t.Fatal(err)
 	}

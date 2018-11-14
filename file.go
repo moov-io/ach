@@ -91,13 +91,13 @@ type fileControl struct {
 	Control FileControl `json:"fileControl"`
 }
 
-// FileFromJson attempts to return a *File object assuming the input is valid JSON.
+// FileFromJSON attempts to return a *File object assuming the input is valid JSON.
 //
 // Callers should always check for a nil-error before using the returned file.
 //
 // The File returned may not be valid and callers should confirm with Validate(). Invalid files may
 // be rejected by other Financial Institutions or ACH tools.
-func FileFromJson(bs []byte) (*File, error) {
+func FileFromJSON(bs []byte) (*File, error) {
 	if len(bs) == 0 {
 		return nil, errors.New("no JSON data provided")
 	}
@@ -127,7 +127,7 @@ func FileFromJson(bs []byte) (*File, error) {
 	}
 
 	// Build resulting file
-	if err := file.setBatchesFromJson(bs); err != nil {
+	if err := file.setBatchesFromJSON(bs); err != nil {
 		return nil, err
 	}
 	file.Header = header.Header
@@ -136,8 +136,9 @@ func FileFromJson(bs []byte) (*File, error) {
 	return file, nil
 }
 
+// UnmarshalJSON returns error json struct tag unmarshal is deprecated, use ach.FileFromJSON instead
 func (f *File) UnmarshalJSON(p []byte) error {
-	return errors.New("json struct tag unmarshal is deprecated, use ach.FileFromJSON instead.")
+	return errors.New("json struct tag unmarshal is deprecated, use ach.FileFromJSON instead")
 }
 
 type batchesJSON struct {
@@ -148,7 +149,7 @@ type batchesJSON struct {
 //
 // We have to break this out as Batcher is an interface (and can't be read by Go's
 // json struct tag decoding).
-func (f *File) setBatchesFromJson(bs []byte) error {
+func (f *File) setBatchesFromJSON(bs []byte) error {
 	var batches batchesJSON
 	if err := json.Unmarshal(bs, &batches); err != nil {
 		return err
