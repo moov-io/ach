@@ -78,6 +78,7 @@ func (batch *BatchENR) Create() error {
 	return batch.Validate()
 }
 
+// ENRPaymentInformation structure
 type ENRPaymentInformation struct {
 	// TransactionCode is the Transaction Code of the holder's account
 	// Values: 22 (Demand  Credit), 27 (Demand Debit), 32 (Savings Credit), 37 (Savings Debit)

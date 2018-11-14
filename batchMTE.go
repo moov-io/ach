@@ -18,6 +18,7 @@ type BatchMTE struct {
 	Batch
 }
 
+// NewBatchMTE returns a *BatchMTE
 func NewBatchMTE(bh *BatchHeader) *BatchMTE {
 	batch := new(BatchMTE)
 	batch.SetControl(NewBatchControl())
