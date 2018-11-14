@@ -21,8 +21,12 @@ type Batcher interface {
 	SetHeader(*BatchHeader)
 	GetControl() *BatchControl
 	SetControl(*BatchControl)
+	GetADVControl() *ADVBatchControl
+	SetADVControl(*ADVBatchControl)
 	GetEntries() []*EntryDetail
 	AddEntry(*EntryDetail)
+	GetADVEntries() []*ADVEntryDetail
+	AddADVEntry(*ADVEntryDetail)
 	Create() error
 	Validate() error
 	SetID(string)
@@ -69,4 +73,5 @@ var (
 	msgBatchAmountZero              = "%v must be zero for SEC code %v"
 	msgBatchAmountNonZero           = "%v must be non-zero for SEC code %s"
 	msgBatchAddenda                 = "%v not allowed for category %v for batch type %v"
+	msgBatchADVCount                = "There can be a maximum of %v ADV Sequence Numbers (ADV Entry Detail Records)"
 )

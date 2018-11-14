@@ -309,3 +309,41 @@ func TestBatchWEBAddendum99Category(t *testing.T) {
 		}
 	}
 }
+
+// TestBatchWEBCategoryReturn validates CategoryReturn returns an error
+func TestBatchWEBCategoryReturn(t *testing.T) {
+	mockBatch := NewBatchWEB(mockBatchWEBHeader())
+	mockBatch.AddEntry(mockWEBEntryDetail())
+	mockAddenda05 := mockAddenda05()
+	mockBatch.GetEntries()[0].Category = CategoryReturn
+	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05)
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addenda05" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchWEBCategoryReturnAddenda98 validates CategoryReturn returns an error
+func TestBatchWEBCategoryReturnAddenda98(t *testing.T) {
+	mockBatch := NewBatchWEB(mockBatchWEBHeader())
+	mockBatch.AddEntry(mockWEBEntryDetail())
+	mockAddenda98 := mockAddenda98()
+	mockBatch.GetEntries()[0].Category = CategoryReturn
+	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
+	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addenda98" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}

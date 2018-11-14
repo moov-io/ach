@@ -4,4 +4,5 @@
 
 package ach
 
+// Version of ACH library
 const Version = "v0.4.1-dev"
