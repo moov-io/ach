@@ -141,7 +141,7 @@ func (bc *ADVBatchControl) fieldInclusion() error {
 			Msg:       msgFieldInclusion + ", did you use NewADVBatchControl()?",
 		}
 	}
-	if bc.ODFIIdentification == "000000000" {
+	if bc.ODFIIdentification == "000000000" || bc.ODFIIdentification == "" {
 		return &FieldError{
 			FieldName: "ODFIIdentification",
 			Value:     bc.ODFIIdentificationField(),
