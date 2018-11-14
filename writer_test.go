@@ -359,3 +359,189 @@ func BenchmarkIATReturn(b *testing.B) {
 		testIATReturn(b)
 	}
 }
+
+// TestADVWrite writes a ADV ACH file
+func TestADVWrite(t *testing.T) {
+	file := NewFile().SetHeader(mockFileHeader())
+	entry := mockADVEntryDetail()
+	entry.AddendaRecordIndicator = 0
+	batch := NewBatchADV(mockBatchADVHeader())
+	batch.SetHeader(mockBatchADVHeader())
+	batch.AddADVEntry(entry)
+	batch.Create()
+	file.AddBatch(batch)
+
+	if err := file.Create(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err := file.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	b := &bytes.Buffer{}
+	f := NewWriter(b)
+
+	if err := f.Write(file); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	r := NewReader(strings.NewReader(b.String()))
+	_, err := r.Read()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err = r.File.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestPOSWrite writes a POS ACH file
+func TestPOSWrite(t *testing.T) {
+	file := NewFile().SetHeader(mockFileHeader())
+	entry := mockPOSEntryDetail()
+	entry.AddendaRecordIndicator = 1
+	entry.Addenda02 = mockAddenda02()
+	posHeader := mockBatchPOSHeader()
+	batch := NewBatchPOS(posHeader)
+	batch.SetHeader(posHeader)
+	batch.AddEntry(entry)
+	batch.Create()
+	file.AddBatch(batch)
+
+	if err := file.Create(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err := file.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	b := &bytes.Buffer{}
+	f := NewWriter(b)
+
+	if err := f.Write(file); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	r := NewReader(strings.NewReader(b.String()))
+	_, err := r.Read()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err = r.File.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestPOSReturnWrite writes a POS Return ACH file
+func TestPOSReturnWrite(t *testing.T) {
+	file := NewFile().SetHeader(mockFileHeader())
+	entry := mockPOSEntryDetail()
+	entry.AddendaRecordIndicator = 1
+	entry.Addenda99 = mockAddenda99()
+	entry.Category = CategoryReturn
+	posHeader := mockBatchPOSHeader()
+	batch := NewBatchPOS(posHeader)
+	batch.SetHeader(posHeader)
+	batch.AddEntry(entry)
+	batch.Create()
+	file.AddBatch(batch)
+
+	if err := file.Create(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err := file.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	b := &bytes.Buffer{}
+	f := NewWriter(b)
+
+	if err := f.Write(file); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	r := NewReader(strings.NewReader(b.String()))
+	_, err := r.Read()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err = r.File.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestNOCWrite writes a COR NOC ACH file
+func TestNOCWrite(t *testing.T) {
+	file := NewFile().SetHeader(mockFileHeader())
+	entry := mockCOREntryDetail()
+	entry.AddendaRecordIndicator = 1
+	entry.Addenda98 = mockAddenda98()
+	entry.Category = CategoryNOC
+	corHeader := mockBatchCORHeader()
+	batch := NewBatchCOR(corHeader)
+	batch.SetHeader(corHeader)
+	batch.AddEntry(entry)
+	batch.Create()
+	file.AddBatch(batch)
+
+	if err := file.Create(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err := file.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	b := &bytes.Buffer{}
+	f := NewWriter(b)
+
+	if err := f.Write(file); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	r := NewReader(strings.NewReader(b.String()))
+	_, err := r.Read()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err = r.File.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestADVReturnWrite writes a ADV Return Return ACH file
+func TestADVReturnWrite(t *testing.T) {
+	file := NewFile().SetHeader(mockFileHeader())
+	entry := mockADVEntryDetail()
+	entry.AddendaRecordIndicator = 1
+	entry.Addenda99 = mockAddenda99()
+	entry.Category = CategoryReturn
+	advHeader := mockBatchADVHeader()
+	batch := NewBatchADV(advHeader)
+	batch.SetHeader(advHeader)
+	batch.AddADVEntry(entry)
+	batch.Create()
+	file.AddBatch(batch)
+
+	if err := file.Create(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err := file.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	b := &bytes.Buffer{}
+	f := NewWriter(b)
+
+	if err := f.Write(file); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	r := NewReader(strings.NewReader(b.String()))
+	_, err := r.Read()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err = r.File.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}

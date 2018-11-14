@@ -134,7 +134,7 @@ func testBatchCORAddendaCountZero(t testing.TB) {
 	mockBatch.AddEntry(mockCOREntryDetail())
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
+			if e.FieldName != "Addenda98" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -164,7 +164,7 @@ func testBatchCORAddendaType(t testing.TB) {
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
+			if e.FieldName != "Addenda98" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
@@ -353,5 +353,61 @@ func BenchmarkBatchCORServiceClassCodeEquality(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchCORServiceClassCodeEquality(b)
+	}
+}
+
+// TestBatchCORCategoryNOCAddenda05 validates that an error is returned if valid Addenda05 is defined for CategoryNOC
+func TestBatchCORCategoryNOCAddenda05(t *testing.T) {
+	mockBatch := NewBatchCOR(mockBatchCORHeader())
+	mockBatch.AddEntry(mockCOREntryDetail())
+	mockBatch.GetEntries()[0].Category = CategoryNOC
+	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98()
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addenda05" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchCORCategoryNOCAddenda02 validates that an error is returned if valid Addenda02 is defined for CategoryNOC
+func TestBatchCORCategoryNOCAddenda02(t *testing.T) {
+	mockBatch := NewBatchCOR(mockBatchCORHeader())
+	mockBatch.AddEntry(mockCOREntryDetail())
+	mockBatch.GetEntries()[0].Category = CategoryNOC
+	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98()
+	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addenda02" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchCORCategoryNOCAddenda98 validates that no error is returned if Addenda098 is defined for CategoryNOC
+func TestBatchCORCategoryNOCAddenda98(t *testing.T) {
+	mockBatch := NewBatchCOR(mockBatchCORHeader())
+	mockBatch.AddEntry(mockCOREntryDetail())
+	mockBatch.GetEntries()[0].Category = CategoryNOC
+	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98()
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addenda98" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
 	}
 }

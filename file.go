@@ -38,6 +38,7 @@ var (
 	msgUnknownRecordType = "%s is an unknown record type"
 	msgFileNoneSEC       = "%v Standard Entry Class Code is not implemented"
 	msgFileIATSEC        = "%v Standard Entry Class Code should use iatBatch"
+	msgFileADV           = "file can only have ADV Batches"
 )
 
 // FileError is an error describing issues validating a file
@@ -53,11 +54,12 @@ func (e FileError) Error() string {
 
 // File contains the structures of a parsed ACH File.
 type File struct {
-	ID         string      `json:"id"`
-	Header     FileHeader  `json:"fileHeader"`
-	Batches    []Batcher   `json:"batches"`
-	IATBatches []IATBatch  `json:"IATBatches"`
-	Control    FileControl `json:"fileControl"`
+	ID         string         `json:"id"`
+	Header     FileHeader     `json:"fileHeader"`
+	Batches    []Batcher      `json:"batches"`
+	IATBatches []IATBatch     `json:"IATBatches"`
+	Control    FileControl    `json:"fileControl"`
+	ADVControl ADVFileControl `json:"fileADVControl"`
 
 	// NotificationOfChange (Notification of change) is a slice of references to BatchCOR in file.Batches
 	NotificationOfChange []*BatchCOR
@@ -118,12 +120,24 @@ func FileFromJSON(bs []byte) (*File, error) {
 		return nil, fmt.Errorf("problem reading FileHeader: %v", err)
 	}
 
-	// Read FileControl
-	control := fileControl{
-		Control: NewFileControl(),
-	}
-	if err := json.NewDecoder(bytes.NewReader(bs)).Decode(&control); err != nil {
-		return nil, fmt.Errorf("problem reading FileControl: %v", err)
+	if !file.IsADV() {
+		// Read FileControl
+		control := fileControl{
+			Control: NewFileControl(),
+		}
+		if err := json.NewDecoder(bytes.NewReader(bs)).Decode(&control); err != nil {
+			return nil, fmt.Errorf("problem reading FileControl: %v", err)
+		}
+		file.Control = control.Control
+	} else {
+		// Read ADVFileControl
+		controlADV := fileADVControl{
+			ControlADV: NewADVFileControl(),
+		}
+		if err := json.NewDecoder(bytes.NewReader(bs)).Decode(&controlADV); err != nil {
+			return nil, fmt.Errorf("problem reading FileADVControl: %v", err)
+		}
+		file.ADVControl = controlADV.ControlADV
 	}
 
 	// Build resulting file
@@ -131,8 +145,13 @@ func FileFromJSON(bs []byte) (*File, error) {
 		return nil, err
 	}
 	file.Header = header.Header
-	file.Control = control.Control
-	file.Control.BatchCount = len(file.Batches)
+	if !file.IsADV() {
+		file.Control.BatchCount = len(file.Batches)
+	} else {
+
+		file.ADVControl.BatchCount = len(file.Batches)
+	}
+
 	return file, nil
 }
 
@@ -180,59 +199,66 @@ func (f *File) Create() error {
 	if len(f.Batches) <= 0 && len(f.IATBatches) <= 0 {
 		return &FileError{FieldName: "Batches", Value: strconv.Itoa(len(f.Batches)), Msg: "must have []*Batches to be built"}
 	}
-	// add 2 for FileHeader/control and reset if build was called twice do to error
-	totalRecordsInFile := 2
-	batchSeq := 1
-	fileEntryAddendaCount := 0
-	fileEntryHashSum := 0
-	totalDebitAmount := 0
-	totalCreditAmount := 0
-	for i, batch := range f.Batches {
-		// create ascending batch numbers
-		f.Batches[i].GetHeader().BatchNumber = batchSeq
-		f.Batches[i].GetControl().BatchNumber = batchSeq
-		batchSeq++
-		// sum file entry and addenda records. Assume batch.Create() batch properly calculated control
-		fileEntryAddendaCount = fileEntryAddendaCount + batch.GetControl().EntryAddendaCount
-		// add 2 for Batch header/control + entry added count
-		totalRecordsInFile = totalRecordsInFile + 2 + batch.GetControl().EntryAddendaCount
-		// sum hash from batch control. Assume Batch.Build properly calculated field.
-		fileEntryHashSum = fileEntryHashSum + batch.GetControl().EntryHash
-		totalDebitAmount = totalDebitAmount + batch.GetControl().TotalDebitEntryDollarAmount
-		totalCreditAmount = totalCreditAmount + batch.GetControl().TotalCreditEntryDollarAmount
 
-	}
-	for i, iatBatch := range f.IATBatches {
-		// create ascending batch numbers
-		f.IATBatches[i].GetHeader().BatchNumber = batchSeq
-		f.IATBatches[i].GetControl().BatchNumber = batchSeq
-		batchSeq++
-		// sum file entry and addenda records. Assume batch.Create() batch properly calculated control
-		fileEntryAddendaCount = fileEntryAddendaCount + iatBatch.GetControl().EntryAddendaCount
-		// add 2 for Batch header/control + entry added count
-		totalRecordsInFile = totalRecordsInFile + 2 + iatBatch.GetControl().EntryAddendaCount
-		// sum hash from batch control. Assume Batch.Build properly calculated field.
-		fileEntryHashSum = fileEntryHashSum + iatBatch.GetControl().EntryHash
-		totalDebitAmount = totalDebitAmount + iatBatch.GetControl().TotalDebitEntryDollarAmount
-		totalCreditAmount = totalCreditAmount + iatBatch.GetControl().TotalCreditEntryDollarAmount
+	if !f.IsADV() {
+		// add 2 for FileHeader/control and reset if build was called twice do to error
+		totalRecordsInFile := 2
+		batchSeq := 1
+		fileEntryAddendaCount := 0
+		fileEntryHashSum := 0
+		totalDebitAmount := 0
+		totalCreditAmount := 0
 
-	}
-	// create FileControl from calculated values
-	fc := NewFileControl()
-	fc.ID = f.ID
-	fc.BatchCount = batchSeq - 1
-	// blocking factor of 10 is static default value in f.Header.blockingFactor.
-	if (totalRecordsInFile % 10) != 0 {
-		fc.BlockCount = totalRecordsInFile/10 + 1
+		for i, batch := range f.Batches {
+
+			// create ascending batch numbers
+			f.Batches[i].GetHeader().BatchNumber = batchSeq
+			f.Batches[i].GetControl().BatchNumber = batchSeq
+			batchSeq++
+			// sum file entry and addenda records. Assume batch.Create() batch properly calculated control
+			fileEntryAddendaCount = fileEntryAddendaCount + batch.GetControl().EntryAddendaCount
+			// add 2 for Batch header/control + entry added count
+			totalRecordsInFile = totalRecordsInFile + 2 + batch.GetControl().EntryAddendaCount
+			// sum hash from batch control. Assume Batch.Build properly calculated field.
+			fileEntryHashSum = fileEntryHashSum + batch.GetControl().EntryHash
+			totalDebitAmount = totalDebitAmount + batch.GetControl().TotalDebitEntryDollarAmount
+			totalCreditAmount = totalCreditAmount + batch.GetControl().TotalCreditEntryDollarAmount
+		}
+		for i, iatBatch := range f.IATBatches {
+			// create ascending batch numbers
+			f.IATBatches[i].GetHeader().BatchNumber = batchSeq
+			f.IATBatches[i].GetControl().BatchNumber = batchSeq
+			batchSeq++
+			// sum file entry and addenda records. Assume batch.Create() batch properly calculated control
+			fileEntryAddendaCount = fileEntryAddendaCount + iatBatch.GetControl().EntryAddendaCount
+			// add 2 for Batch header/control + entry added count
+			totalRecordsInFile = totalRecordsInFile + 2 + iatBatch.GetControl().EntryAddendaCount
+			// sum hash from batch control. Assume Batch.Build properly calculated field.
+			fileEntryHashSum = fileEntryHashSum + iatBatch.GetControl().EntryHash
+			totalDebitAmount = totalDebitAmount + iatBatch.GetControl().TotalDebitEntryDollarAmount
+			totalCreditAmount = totalCreditAmount + iatBatch.GetControl().TotalCreditEntryDollarAmount
+		}
+
+		// create FileControl from calculated values
+		fc := NewFileControl()
+		fc.ID = f.ID
+		fc.BatchCount = batchSeq - 1
+		// blocking factor of 10 is static default value in f.Header.blockingFactor.
+		if (totalRecordsInFile % 10) != 0 {
+			fc.BlockCount = totalRecordsInFile/10 + 1
+		} else {
+			fc.BlockCount = totalRecordsInFile / 10
+		}
+		fc.EntryAddendaCount = fileEntryAddendaCount
+		fc.EntryHash = fileEntryHashSum
+		fc.TotalDebitEntryDollarAmountInFile = totalDebitAmount
+		fc.TotalCreditEntryDollarAmountInFile = totalCreditAmount
+		f.Control = fc
 	} else {
-		fc.BlockCount = totalRecordsInFile / 10
+		if err := f.createFileADV(); err != nil {
+			return err
+		}
 	}
-	fc.EntryAddendaCount = fileEntryAddendaCount
-	fc.EntryHash = fileEntryHashSum
-	fc.TotalDebitEntryDollarAmountInFile = totalDebitAmount
-	fc.TotalCreditEntryDollarAmountInFile = totalCreditAmount
-	f.Control = fc
-
 	return nil
 }
 
@@ -263,90 +289,233 @@ func (f *File) SetHeader(h FileHeader) *File {
 
 // Validate NACHA rules on the entire batch before being added to a File
 func (f *File) Validate() error {
-	// The value of the Batch Count Field is equal to the number of Company/Batch/Header Records in the file.
-	if f.Control.BatchCount != (len(f.Batches) + len(f.IATBatches)) {
-		msg := fmt.Sprintf(msgFileCalculatedControlEquality, len(f.Batches), f.Control.BatchCount)
-		return &FileError{FieldName: "BatchCount", Value: strconv.Itoa(len(f.Batches)), Msg: msg}
-	}
+
 	if err := f.Header.Validate(); err != nil {
 		return err
 	}
-	if err := f.Control.Validate(); err != nil {
+
+	if !f.IsADV() {
+		// The value of the Batch Count Field is equal to the number of Company/Batch/Header Records in the file.
+		if f.Control.BatchCount != (len(f.Batches) + len(f.IATBatches)) {
+			msg := fmt.Sprintf(msgFileCalculatedControlEquality, len(f.Batches), f.Control.BatchCount)
+			return &FileError{FieldName: "BatchCount", Value: strconv.Itoa(len(f.Batches)), Msg: msg}
+		}
+		if err := f.Control.Validate(); err != nil {
+			return err
+		}
+		if err := f.isEntryAddendaCount(false); err != nil {
+			return err
+		}
+		if err := f.isFileAmount(false); err != nil {
+			return err
+		}
+		return f.isEntryHash(false)
+	}
+
+	//File contains ADV batches BatchADV
+
+	// The value of the Batch Count Field is equal to the number of Company/Batch/Header Records in the file.
+	if f.ADVControl.BatchCount != len(f.Batches) {
+		msg := fmt.Sprintf(msgFileCalculatedControlEquality, len(f.Batches), f.ADVControl.BatchCount)
+		return &FileError{FieldName: "BatchCount", Value: strconv.Itoa(len(f.Batches)), Msg: msg}
+	}
+	if err := f.ADVControl.Validate(); err != nil {
 		return err
 	}
-	if err := f.isEntryAddendaCount(); err != nil {
+	if err := f.isEntryAddendaCount(true); err != nil {
 		return err
 	}
-	if err := f.isFileAmount(); err != nil {
+	if err := f.isFileAmount(true); err != nil {
 		return err
 	}
-	return f.isEntryHash()
+	return f.isEntryHash(true)
 }
 
 // isEntryAddendaCount is prepared by hashing the RDFI’s 8-digit Routing Number in each entry.
-//The Entry Hash provides a check against inadvertent alteration of data
-func (f *File) isEntryAddendaCount() error {
+// The Entry Hash provides a check against inadvertent alteration of data
+func (f *File) isEntryAddendaCount(IsADV bool) error {
+	// IsADV
+	// true: the file contains ADV batches
+	// false: the file contains other batch types
+
 	count := 0
+
 	// we assume that each batch block has already validated the addenda count is accurate in batch control.
-	for _, batch := range f.Batches {
-		count += batch.GetControl().EntryAddendaCount
-	}
-	// IAT
-	for _, iatBatch := range f.IATBatches {
-		count += iatBatch.GetControl().EntryAddendaCount
-	}
-	if f.Control.EntryAddendaCount != count {
-		msg := fmt.Sprintf(msgFileCalculatedControlEquality, count, f.Control.EntryAddendaCount)
-		return &FileError{FieldName: "EntryAddendaCount", Value: f.Control.EntryAddendaCountField(), Msg: msg}
+
+	if !IsADV {
+		for _, batch := range f.Batches {
+			count += batch.GetControl().EntryAddendaCount
+		}
+		for _, iatBatch := range f.IATBatches {
+			count += iatBatch.GetControl().EntryAddendaCount
+		}
+		if f.Control.EntryAddendaCount != count {
+			msg := fmt.Sprintf(msgFileCalculatedControlEquality, count, f.Control.EntryAddendaCount)
+			return &FileError{FieldName: "EntryAddendaCount", Value: f.Control.EntryAddendaCountField(), Msg: msg}
+		}
+	} else {
+		for _, batch := range f.Batches {
+			count += batch.GetADVControl().EntryAddendaCount
+		}
+		if f.ADVControl.EntryAddendaCount != count {
+			msg := fmt.Sprintf(msgFileCalculatedControlEquality, count, f.ADVControl.EntryAddendaCount)
+			return &FileError{FieldName: "EntryAddendaCount", Value: f.ADVControl.EntryAddendaCountField(), Msg: msg}
+		}
 	}
 	return nil
 }
 
-// isFileAmount tThe Total Debit and Credit Entry Dollar Amounts Fields contain accumulated
+// isFileAmount The Total Debit and Credit Entry Dollar Amounts Fields contain accumulated
 // Entry Detail debit and credit totals within the file
-func (f *File) isFileAmount() error {
+func (f *File) isFileAmount(IsADV bool) error {
+	// IsADV
+	// true: the file contains ADV batches
+	// false: the file contains other batch types
+
 	debit := 0
 	credit := 0
-	for _, batch := range f.Batches {
-		debit += batch.GetControl().TotalDebitEntryDollarAmount
-		credit += batch.GetControl().TotalCreditEntryDollarAmount
-	}
-	// IAT
-	for _, iatBatch := range f.IATBatches {
-		debit += iatBatch.GetControl().TotalDebitEntryDollarAmount
-		credit += iatBatch.GetControl().TotalCreditEntryDollarAmount
-	}
-	if f.Control.TotalDebitEntryDollarAmountInFile != debit {
-		msg := fmt.Sprintf(msgFileCalculatedControlEquality, debit, f.Control.TotalDebitEntryDollarAmountInFile)
-		return &FileError{FieldName: "TotalDebitEntryDollarAmountInFile", Value: f.Control.TotalDebitEntryDollarAmountInFileField(), Msg: msg}
-	}
-	if f.Control.TotalCreditEntryDollarAmountInFile != credit {
-		msg := fmt.Sprintf(msgFileCalculatedControlEquality, credit, f.Control.TotalCreditEntryDollarAmountInFile)
-		return &FileError{FieldName: "TotalCreditEntryDollarAmountInFile", Value: f.Control.TotalCreditEntryDollarAmountInFileField(), Msg: msg}
+
+	if !IsADV {
+		for _, batch := range f.Batches {
+			debit += batch.GetControl().TotalDebitEntryDollarAmount
+			credit += batch.GetControl().TotalCreditEntryDollarAmount
+		}
+		// IAT
+		for _, iatBatch := range f.IATBatches {
+			debit += iatBatch.GetControl().TotalDebitEntryDollarAmount
+			credit += iatBatch.GetControl().TotalCreditEntryDollarAmount
+		}
+
+		if f.Control.TotalDebitEntryDollarAmountInFile != debit {
+			msg := fmt.Sprintf(msgFileCalculatedControlEquality, debit, f.Control.TotalDebitEntryDollarAmountInFile)
+			return &FileError{FieldName: "TotalDebitEntryDollarAmountInFile", Value: f.Control.TotalDebitEntryDollarAmountInFileField(), Msg: msg}
+		}
+		if f.Control.TotalCreditEntryDollarAmountInFile != credit {
+			msg := fmt.Sprintf(msgFileCalculatedControlEquality, credit, f.Control.TotalCreditEntryDollarAmountInFile)
+			return &FileError{FieldName: "TotalCreditEntryDollarAmountInFile", Value: f.Control.TotalCreditEntryDollarAmountInFileField(), Msg: msg}
+		}
+	} else {
+		for _, batch := range f.Batches {
+			debit += batch.GetADVControl().TotalDebitEntryDollarAmount
+			credit += batch.GetADVControl().TotalCreditEntryDollarAmount
+		}
+
+		if f.ADVControl.TotalDebitEntryDollarAmountInFile != debit {
+			msg := fmt.Sprintf(msgFileCalculatedControlEquality, debit, f.ADVControl.TotalDebitEntryDollarAmountInFile)
+			return &FileError{FieldName: "TotalDebitEntryDollarAmountInFile", Value: f.ADVControl.TotalDebitEntryDollarAmountInFileField(), Msg: msg}
+		}
+		if f.ADVControl.TotalCreditEntryDollarAmountInFile != credit {
+			msg := fmt.Sprintf(msgFileCalculatedControlEquality, credit, f.ADVControl.TotalCreditEntryDollarAmountInFile)
+			return &FileError{FieldName: "TotalCreditEntryDollarAmountInFile", Value: f.ADVControl.TotalCreditEntryDollarAmountInFileField(), Msg: msg}
+		}
 	}
 	return nil
 }
 
 // isEntryHash validates the hash by recalculating the result
-func (f *File) isEntryHash() error {
-	hashField := f.calculateEntryHash()
-	if hashField != f.Control.EntryHashField() {
-		msg := fmt.Sprintf(msgFileCalculatedControlEquality, hashField, f.Control.EntryHashField())
-		return &FileError{FieldName: "EntryHash", Value: f.Control.EntryHashField(), Msg: msg}
+func (f *File) isEntryHash(IsADV bool) error {
+	// IsADV
+	// true: the file contains ADV batches
+	// false: the file contains other batch types but not ADV
+
+	hashField := f.calculateEntryHash(IsADV)
+
+	if !IsADV {
+		if hashField != f.Control.EntryHashField() {
+			msg := fmt.Sprintf(msgFileCalculatedControlEquality, hashField, f.Control.EntryHashField())
+			return &FileError{FieldName: "EntryHash", Value: f.Control.EntryHashField(), Msg: msg}
+		}
+	} else {
+		if hashField != f.ADVControl.EntryHashField() {
+			msg := fmt.Sprintf(msgFileCalculatedControlEquality, hashField, f.ADVControl.EntryHashField())
+			return &FileError{FieldName: "EntryHash", Value: f.ADVControl.EntryHashField(), Msg: msg}
+		}
 	}
 	return nil
 }
 
 // calculateEntryHash This field is prepared by hashing the 8-digit Routing Number in each batch.
 // The Entry Hash provides a check against inadvertent alteration of data
-func (f *File) calculateEntryHash() string {
+func (f *File) calculateEntryHash(IsADV bool) string {
+	// IsADV
+	// true: the file contains ADV batches
+	// false: the file contains other batch types but not ADV
+
 	hash := 0
-	for _, batch := range f.Batches {
-		hash = hash + batch.GetControl().EntryHash
-	}
-	// IAT
-	for _, iatBatch := range f.IATBatches {
-		hash = hash + iatBatch.GetControl().EntryHash
+
+	if !IsADV {
+		for _, batch := range f.Batches {
+			hash = hash + batch.GetControl().EntryHash
+		}
+		// IAT
+		for _, iatBatch := range f.IATBatches {
+			hash = hash + iatBatch.GetControl().EntryHash
+		}
+	} else {
+		for _, batch := range f.Batches {
+			hash = hash + batch.GetADVControl().EntryHash
+		}
 	}
 	return f.numericField(hash, 10)
+}
+
+// IsADV determines if the File is an File containing ADV batches
+func (f *File) IsADV() bool {
+	ok := false
+	for _, batch := range f.Batches {
+		ok = batch.GetHeader().StandardEntryClassCode == "ADV"
+		if ok {
+			break
+		}
+	}
+	return ok
+}
+
+func (f *File) createFileADV() error {
+
+	// add 2 for FileHeader/control and reset if build was called twice do to error
+	totalRecordsInFile := 2
+	batchSeq := 1
+	fileEntryAddendaCount := 0
+	fileEntryHashSum := 0
+	totalDebitAmount := 0
+	totalCreditAmount := 0
+
+	for i, batch := range f.Batches {
+		// create ascending batch numbers
+
+		if batch.GetHeader().StandardEntryClassCode != "ADV" {
+			return &FileError{FieldName: "EntryAddendaCount", Value: batch.GetHeader().StandardEntryClassCode,
+				Msg: msgFileADV}
+		}
+
+		f.Batches[i].GetHeader().BatchNumber = batchSeq
+		f.Batches[i].GetADVControl().BatchNumber = batchSeq
+		batchSeq++
+		// sum file entry and addenda records. Assume batch.Create() batch properly calculated control
+		fileEntryAddendaCount = fileEntryAddendaCount + batch.GetADVControl().EntryAddendaCount
+		// add 2 for Batch header/control + entry added count
+		totalRecordsInFile = totalRecordsInFile + 2 + batch.GetADVControl().EntryAddendaCount
+		// sum hash from batch control. Assume Batch.Build properly calculated field.
+		fileEntryHashSum = fileEntryHashSum + batch.GetADVControl().EntryHash
+		totalDebitAmount = totalDebitAmount + batch.GetADVControl().TotalDebitEntryDollarAmount
+		totalCreditAmount = totalCreditAmount + batch.GetADVControl().TotalCreditEntryDollarAmount
+	}
+
+	fc := NewADVFileControl()
+	fc.ID = f.ID
+	fc.BatchCount = batchSeq - 1
+	// blocking factor of 10 is static default value in f.Header.blockingFactor.
+	if (totalRecordsInFile % 10) != 0 {
+		fc.BlockCount = totalRecordsInFile/10 + 1
+	} else {
+		fc.BlockCount = totalRecordsInFile / 10
+	}
+	fc.EntryAddendaCount = fileEntryAddendaCount
+	fc.EntryHash = fileEntryHashSum
+	fc.TotalDebitEntryDollarAmountInFile = totalDebitAmount
+	fc.TotalCreditEntryDollarAmountInFile = totalCreditAmount
+	f.ADVControl = fc
+
+	return nil
 }

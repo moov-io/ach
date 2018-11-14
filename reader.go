@@ -182,12 +182,20 @@ func (r *Reader) Read() (File, error) {
 		r.recordName = "FileHeader"
 		r.errors.Add(r.parseError(&FileError{Msg: msgFileHeader}))
 	}
-	if (FileControl{}) == r.File.Control {
-		// There must be at least one File Control
-		r.recordName = "FileControl"
-		r.errors.Add(r.parseError(&FileError{Msg: msgFileControl}))
-	}
 
+	if !r.File.IsADV() {
+		if (FileControl{}) == r.File.Control {
+			// There must be at least one File Control
+			r.recordName = "FileControl"
+			r.errors.Add(r.parseError(&FileError{Msg: msgFileControl}))
+		}
+	} else {
+		if (ADVFileControl{}) == r.File.ADVControl {
+			// There must be at least one File Control
+			r.recordName = "FileControl"
+			r.errors.Add(r.parseError(&FileError{Msg: msgFileControl}))
+		}
+	}
 	if r.errors.Empty() {
 		return r.File, nil
 	}
@@ -282,9 +290,7 @@ func (r *Reader) parseBH() error {
 
 // parseEd parses determines whether to parse an IATEntryDetail or EntryDetail
 func (r *Reader) parseED() error {
-	// ToDo: Review if this can be true for domestic files.  Also this field may be
-	// ToDo:  used for IAT Corrections so consider using another field
-	// IATIndicator field
+	// IAT Indicator field
 	if r.line[16:29] == "             " {
 		if err := r.parseIATEntryDetail(); err != nil {
 			return err
@@ -358,12 +364,21 @@ func (r *Reader) parseEntryDetail() error {
 	if r.currentBatch == nil {
 		return r.parseError(&FileError{Msg: msgFileBatchOutside})
 	}
-	ed := new(EntryDetail)
-	ed.Parse(r.line)
-	if err := ed.Validate(); err != nil {
-		return r.parseError(err)
+	if r.currentBatch.GetHeader().StandardEntryClassCode != "ADV" {
+		ed := new(EntryDetail)
+		ed.Parse(r.line)
+		if err := ed.Validate(); err != nil {
+			return r.parseError(err)
+		}
+		r.currentBatch.AddEntry(ed)
+	} else {
+		ed := new(ADVEntryDetail)
+		ed.Parse(r.line)
+		if err := ed.Validate(); err != nil {
+			return r.parseError(err)
+		}
+		r.currentBatch.AddADVEntry(ed)
 	}
-	r.currentBatch.AddEntry(ed)
 	return nil
 }
 
@@ -375,53 +390,79 @@ func (r *Reader) parseAddenda() error {
 		msg := fmt.Sprint(msgFileBatchOutside)
 		return r.parseError(&FileError{FieldName: "Addenda", Msg: msg})
 	}
-	if len(r.currentBatch.GetEntries()) == 0 {
-		return r.parseError(&FileError{FieldName: "Addenda", Msg: msgFileBatchOutside})
-	}
-	entryIndex := len(r.currentBatch.GetEntries()) - 1
-	entry := r.currentBatch.GetEntries()[entryIndex]
 
-	if entry.AddendaRecordIndicator == 1 {
+	if r.currentBatch.GetHeader().StandardEntryClassCode != "ADV" {
+		if len(r.currentBatch.GetEntries()) == 0 {
+			return r.parseError(&FileError{FieldName: "Addenda", Msg: msgFileBatchOutside})
+		}
+		entryIndex := len(r.currentBatch.GetEntries()) - 1
+		entry := r.currentBatch.GetEntries()[entryIndex]
 
-		switch r.line[1:3] {
-		case "02":
-			addenda02 := NewAddenda02()
-			addenda02.Parse(r.line)
-			if err := addenda02.Validate(); err != nil {
-				return r.parseError(err)
+		if entry.AddendaRecordIndicator == 1 {
+			switch r.line[1:3] {
+			case "02":
+				addenda02 := NewAddenda02()
+				addenda02.Parse(r.line)
+				if err := addenda02.Validate(); err != nil {
+					return r.parseError(err)
+				}
+				r.currentBatch.GetEntries()[entryIndex].Addenda02 = addenda02
+			case "05":
+				addenda05 := NewAddenda05()
+				addenda05.Parse(r.line)
+				if err := addenda05.Validate(); err != nil {
+					return r.parseError(err)
+				}
+				r.currentBatch.GetEntries()[entryIndex].AddAddenda05(addenda05)
+			case "98":
+				addenda98 := NewAddenda98()
+				addenda98.Parse(r.line)
+				if err := addenda98.Validate(); err != nil {
+					return r.parseError(err)
+				}
+				r.currentBatch.GetEntries()[entryIndex].Addenda98 = addenda98
+			case "99":
+				addenda99 := NewAddenda99()
+				addenda99.Parse(r.line)
+				if err := addenda99.Validate(); err != nil {
+					return r.parseError(err)
+				}
+				r.currentBatch.GetEntries()[entryIndex].Addenda99 = addenda99
 			}
-			//r.currentBatch.GetEntries()[entryIndex].AddAddenda(addenda02)
-			r.currentBatch.GetEntries()[entryIndex].Addenda02 = addenda02
-		case "05":
-			// ToDo: Validate this increments
-
-			addenda05 := NewAddenda05()
-			addenda05.Parse(r.line)
-			if err := addenda05.Validate(); err != nil {
-				return r.parseError(err)
-			}
-			r.currentBatch.GetEntries()[entryIndex].AddAddenda05(addenda05)
-		case "98":
-			addenda98 := NewAddenda98()
-			addenda98.Parse(r.line)
-			if err := addenda98.Validate(); err != nil {
-				return r.parseError(err)
-			}
-			r.currentBatch.GetEntries()[entryIndex].Addenda98 = addenda98
-		case "99":
-			addenda99 := NewAddenda99()
-			addenda99.Parse(r.line)
-			if err := addenda99.Validate(); err != nil {
-				return r.parseError(err)
-			}
-			r.currentBatch.GetEntries()[entryIndex].Addenda99 = addenda99
+		} else {
+			return r.parseError(&FileError{
+				FieldName: "AddendaRecordIndicator",
+				Msg:       fmt.Sprint(msgBatchAddendaIndicator),
+			})
 		}
 	} else {
+		if err := r.parseADVAddenda(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// parseADVAddenda takes the input record string and create an Addenda99 appended to the last ADVEntryDetail
+func (r *Reader) parseADVAddenda() error {
+	if len(r.currentBatch.GetADVEntries()) == 0 {
+		return r.parseError(&FileError{FieldName: "Addenda", Msg: msgFileBatchOutside})
+	}
+	entryIndex := len(r.currentBatch.GetADVEntries()) - 1
+	entry := r.currentBatch.GetADVEntries()[entryIndex]
+
+	if entry.AddendaRecordIndicator != 1 {
 		return r.parseError(&FileError{
 			FieldName: "AddendaRecordIndicator",
 			Msg:       fmt.Sprint(msgBatchAddendaIndicator),
 		})
 	}
+	addenda99 := NewAddenda99()
+	addenda99.Parse(r.line)
+	if err := addenda99.Validate(); err != nil {
+		return r.parseError(err)
+	}
+	r.currentBatch.GetADVEntries()[entryIndex].Addenda99 = addenda99
 	return nil
 }
 
@@ -432,11 +473,17 @@ func (r *Reader) parseBatchControl() error {
 		// batch Control without a current batch
 		return r.parseError(&FileError{Msg: msgFileBatchOutside})
 	}
-
 	if r.currentBatch != nil {
-		r.currentBatch.GetControl().Parse(r.line)
-		if err := r.currentBatch.GetControl().Validate(); err != nil {
-			return r.parseError(err)
+		if r.currentBatch.GetHeader().StandardEntryClassCode == "ADV" {
+			r.currentBatch.GetADVControl().Parse(r.line)
+			if err := r.currentBatch.GetADVControl().Validate(); err != nil {
+				return r.parseError(err)
+			}
+		} else {
+			r.currentBatch.GetControl().Parse(r.line)
+			if err := r.currentBatch.GetControl().Validate(); err != nil {
+				return r.parseError(err)
+			}
 		}
 	} else {
 		r.IATCurrentBatch.GetControl().Parse(r.line)
@@ -451,13 +498,25 @@ func (r *Reader) parseBatchControl() error {
 // parseFileControl takes the input record string and parses the FileControlRecord values
 func (r *Reader) parseFileControl() error {
 	r.recordName = "FileControl"
-	if (FileControl{}) != r.File.Control {
-		// Can be only one file control per file
-		return r.parseError(&FileError{Msg: msgFileControl})
-	}
-	r.File.Control.Parse(r.line)
-	if err := r.File.Control.Validate(); err != nil {
-		return r.parseError(err)
+
+	if !r.File.IsADV() {
+		if (FileControl{}) != r.File.Control {
+			// Can be only one file control per file
+			return r.parseError(&FileError{Msg: msgFileControl})
+		}
+		r.File.Control.Parse(r.line)
+		if err := r.File.Control.Validate(); err != nil {
+			return r.parseError(err)
+		}
+	} else {
+		if (ADVFileControl{}) != r.File.ADVControl {
+			// Can be only one file control per file
+			return r.parseError(&FileError{Msg: msgFileControl})
+		}
+		r.File.ADVControl.Parse(r.line)
+		if err := r.File.ADVControl.Validate(); err != nil {
+			return r.parseError(err)
+		}
 	}
 	return nil
 }

@@ -48,8 +48,14 @@ func (w *Writer) Write(file *File) error {
 		return err
 	}
 
-	if _, err := w.w.WriteString(file.Control.String() + "\n"); err != nil {
-		return err
+	if !file.IsADV() {
+		if _, err := w.w.WriteString(file.Control.String() + "\n"); err != nil {
+			return err
+		}
+	} else {
+		if _, err := w.w.WriteString(file.ADVControl.String() + "\n"); err != nil {
+			return err
+		}
 	}
 	w.lineNum++
 
@@ -74,39 +80,61 @@ func (w *Writer) writeBatch(file *File) error {
 			return err
 		}
 		w.lineNum++
-		for _, entry := range batch.GetEntries() {
-			if _, err := w.w.WriteString(entry.String() + "\n"); err != nil {
-				return err
-			}
-			w.lineNum++
+		if !file.IsADV() {
+			for _, entry := range batch.GetEntries() {
+				if _, err := w.w.WriteString(entry.String() + "\n"); err != nil {
+					return err
+				}
+				w.lineNum++
 
-			if entry.Addenda02 != nil {
-				if _, err := w.w.WriteString(entry.Addenda02.String() + "\n"); err != nil {
-					return err
+				if entry.Addenda02 != nil {
+					if _, err := w.w.WriteString(entry.Addenda02.String() + "\n"); err != nil {
+						return err
+					}
+					w.lineNum++
 				}
-				w.lineNum++
+				for _, addenda05 := range entry.Addenda05 {
+					if _, err := w.w.WriteString(addenda05.String() + "\n"); err != nil {
+						return err
+					}
+					w.lineNum++
+				}
+				if entry.Addenda98 != nil {
+					if _, err := w.w.WriteString(entry.Addenda98.String() + "\n"); err != nil {
+						return err
+					}
+					w.lineNum++
+				}
+				if entry.Addenda99 != nil {
+					if _, err := w.w.WriteString(entry.Addenda99.String() + "\n"); err != nil {
+						return err
+					}
+					w.lineNum++
+				}
 			}
-			for _, addenda05 := range entry.Addenda05 {
-				if _, err := w.w.WriteString(addenda05.String() + "\n"); err != nil {
+		} else {
+			for _, entry := range batch.GetADVEntries() {
+				if _, err := w.w.WriteString(entry.String() + "\n"); err != nil {
 					return err
 				}
 				w.lineNum++
-			}
-			if entry.Addenda98 != nil {
-				if _, err := w.w.WriteString(entry.Addenda98.String() + "\n"); err != nil {
-					return err
+				if entry.Addenda99 != nil {
+					if _, err := w.w.WriteString(entry.Addenda99.String() + "\n"); err != nil {
+						return err
+					}
+					w.lineNum++
 				}
-				w.lineNum++
-			}
-			if entry.Addenda99 != nil {
-				if _, err := w.w.WriteString(entry.Addenda99.String() + "\n"); err != nil {
-					return err
-				}
-				w.lineNum++
 			}
 		}
-		if _, err := w.w.WriteString(batch.GetControl().String() + "\n"); err != nil {
-			return err
+
+		if batch.GetHeader().StandardEntryClassCode != "ADV" {
+			if _, err := w.w.WriteString(batch.GetControl().String() + "\n"); err != nil {
+				return err
+			}
+		} else {
+			if _, err := w.w.WriteString(batch.GetADVControl().String() + "\n"); err != nil {
+				return err
+			}
 		}
 		w.lineNum++
 	}

@@ -13,8 +13,8 @@ import (
 // mockFileHeader build a validate File Header for tests
 func mockFileHeader() FileHeader {
 	fh := NewFileHeader()
-	fh.ImmediateDestination = "9876543210"
-	fh.ImmediateOrigin = "1234567890"
+	fh.ImmediateDestination = "231380104"
+	fh.ImmediateOrigin = "121042882"
 	fh.FileCreationDate = time.Now()
 	fh.ImmediateDestinationName = "Federal Reserve Bank"
 	fh.ImmediateOriginName = "My Bank Name"
@@ -27,10 +27,10 @@ func testMockFileHeader(t testing.TB) {
 	if err := fh.Validate(); err != nil {
 		t.Error("mockFileHeader does not validate and will break other tests")
 	}
-	if fh.ImmediateDestination != "9876543210" {
+	if fh.ImmediateDestination != "231380104" {
 		t.Error("ImmediateDestination dependent default value has changed")
 	}
-	if fh.ImmediateOrigin != "1234567890" {
+	if fh.ImmediateOrigin != "121042882" {
 		t.Error("ImmediateOrigin dependent default value has changed")
 	}
 	if fh.ImmediateDestinationName != "Federal Reserve Bank" {

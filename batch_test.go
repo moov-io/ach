@@ -672,3 +672,178 @@ func BenchmarkIATBatch(b *testing.B) {
 		testIATBatch(b)
 	}
 }
+
+// TestBatchADVInvalidServiceClassCode validates ServiceClassCode
+func TestBatchADVInvalidServiceClassCode(t *testing.T) {
+	mockBatch := mockBatchADV()
+	mockBatch.Create()
+	mockBatch.ADVControl.ServiceClassCode = 220
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ServiceClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchADVInvalidODFIIdentification validates ODFIIdentification
+func TestBatchADVInvalidODFIIdentification(t *testing.T) {
+	mockBatch := mockBatchADV()
+	mockBatch.Create()
+	mockBatch.ADVControl.ODFIIdentification = "231380104"
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ODFIIdentification" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchADVInvalidBatchNumber validates BatchNumber
+func TestBatchADVInvalidBatchNumber(t *testing.T) {
+	mockBatch := mockBatchADV()
+	mockBatch.Create()
+	mockBatch.ADVControl.BatchNumber = 2
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "BatchNumber" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchADVEntryAddendaCount validates EntryAddendaCount
+func TestBatchADVInvalidEntryAddendaCount(t *testing.T) {
+	mockBatch := mockBatchADV()
+	mockBatch.Create()
+	mockBatch.ADVControl.EntryAddendaCount = 22
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "EntryAddendaCount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchADVTotalDebitEntryDollarAmount validates TotalDebitEntryDollarAmount
+func TestBatchADVInvalidTotalDebitEntryDollarAmount(t *testing.T) {
+	mockBatch := mockBatchADV()
+	mockBatch.GetADVEntries()[0].TransactionCode = 82
+	mockBatch.Create()
+	mockBatch.ADVControl.TotalDebitEntryDollarAmount = 2200
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TotalDebitEntryDollarAmount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchADVTotalCreditEntryDollarAmount validates TotalCreditEntryDollarAmount
+func TestBatchADVInvalidTotalCreditEntryDollarAmount(t *testing.T) {
+	mockBatch := mockBatchADV()
+	mockBatch.Create()
+	mockBatch.ADVControl.TotalCreditEntryDollarAmount = 2200
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TotalCreditEntryDollarAmount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchADVEntryHash validates EntryHash
+func TestBatchADVInvalidEntryHash(t *testing.T) {
+	mockBatch := mockBatchADV()
+	mockBatch.Create()
+	mockBatch.ADVControl.EntryHash = 2200233
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "EntryHash" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchAddenda98InvalidAddendaRecordIndicator validates AddendaRecordIndicator
+func TestBatchAddenda98InvalidAddendaRecordIndicator(t *testing.T) {
+	mockBatch := mockBatchCOR()
+	mockBatch.GetEntries()[0].AddendaRecordIndicator = 0
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "AddendaRecordIndicator" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchAddenda02InvalidAddendaRecordIndicator validates AddendaRecordIndicator
+func TestBatchAddenda02InvalidAddendaRecordIndicator(t *testing.T) {
+	mockBatch := mockBatchPOS()
+	mockBatch.GetEntries()[0].AddendaRecordIndicator = 0
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "AddendaRecordIndicator" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchADVCategory validates Category
+func TestBatchADVCategory(t *testing.T) {
+	mockBatch := mockBatchADV()
+
+	entryOne := NewADVEntryDetail()
+	entryOne.TransactionCode = 81
+	entryOne.SetRDFI("231380104")
+	entryOne.DFIAccountNumber = "744-5678-99"
+	entryOne.Amount = 50000
+	entryOne.AdviceRoutingNumber = "121042882"
+	entryOne.FileIdentification = "FILE1"
+	entryOne.ACHOperatorData = ""
+	entryOne.IndividualName = "Name"
+	entryOne.DiscretionaryData = ""
+	entryOne.AddendaRecordIndicator = 0
+	entryOne.ACHOperatorRoutingNumber = "01100001"
+	entryOne.JulianDay = 50
+	entryOne.SequenceNumber = 1
+	entryOne.Category = CategoryReturn
+
+	mockBatch.AddADVEntry(entryOne)
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Category" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
