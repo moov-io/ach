@@ -307,6 +307,17 @@ func (batch *Batch) AddEntry(entry *EntryDetail) {
 	batch.Entries = append(batch.Entries, entry)
 }
 
+// AddADVEntry appends an ADV EntryDetail to the Batch
+func (batch *Batch) AddADVEntry(entry *ADVEntryDetail) {
+	batch.category = entry.Category
+	batch.ADVEntries = append(batch.ADVEntries, entry)
+}
+
+// GetADVEntries returns a slice of entry details for the batch
+func (batch *Batch) GetADVEntries() []*ADVEntryDetail {
+	return batch.ADVEntries
+}
+
 // Category returns batch category
 func (batch *Batch) Category() string {
 	return batch.category

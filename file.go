@@ -93,6 +93,10 @@ type fileControl struct {
 	Control FileControl `json:"fileControl"`
 }
 
+type advFileControl struct {
+	ADVControl ADVFileControl `json:"advFileControl"`
+}
+
 // FileFromJSON attempts to return a *File object assuming the input is valid JSON.
 //
 // Callers should always check for a nil-error before using the returned file.
@@ -131,13 +135,13 @@ func FileFromJSON(bs []byte) (*File, error) {
 		file.Control = control.Control
 	} else {
 		// Read ADVFileControl
-		controlADV := fileADVControl{
-			ControlADV: NewADVFileControl(),
+		advControl := advFileControl{
+			ADVControl: NewADVFileControl(),
 		}
-		if err := json.NewDecoder(bytes.NewReader(bs)).Decode(&controlADV); err != nil {
-			return nil, fmt.Errorf("problem reading FileADVControl: %v", err)
+		if err := json.NewDecoder(bytes.NewReader(bs)).Decode(&advControl); err != nil {
+			return nil, fmt.Errorf("problem reading ADVFileControl: %v", err)
 		}
-		file.ADVControl = controlADV.ControlADV
+		file.ADVControl = advControl.ADVControl
 	}
 
 	// Build resulting file
