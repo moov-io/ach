@@ -76,10 +76,12 @@ func (e ErrorList) Print(w io.Writer) {
 	}
 }
 
+// Empty no errors to return
 func (e ErrorList) Empty() bool {
 	return e == nil || len(e) == 0
 }
 
+// MarshalJSON marshals error list
 func (e ErrorList) MarshalJSON() ([]byte, error) {
 	return json.Marshal(e.Error())
 }
@@ -188,9 +190,8 @@ func (r *Reader) Read() (File, error) {
 
 	if r.errors.Empty() {
 		return r.File, nil
-	} else {
-		return r.File, r.errors
 	}
+	return r.File, r.errors
 }
 
 func (r *Reader) processFixedWidthFile(line *string) error {
