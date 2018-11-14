@@ -74,10 +74,12 @@ func NewBatch(bh *BatchHeader) (Batcher, error) {
 	return nil, &FileError{FieldName: "StandardEntryClassCode", Value: bh.StandardEntryClassCode, Msg: msg}
 }
 
+// Create returns error for using an implementation of batch or NewBatch"
 func (batch *Batch) Create() error {
 	return errors.New("use an implementation of batch or NewBatch")
 }
 
+// Validate returns an error for using an use an implementation of batch or NewBatch
 func (batch *Batch) Validate() error {
 	return errors.New("use an implementation of batch or NewBatch")
 }
@@ -245,7 +247,7 @@ func (batch *Batch) AddEntry(entry *EntryDetail) {
 	batch.Entries = append(batch.Entries, entry)
 }
 
-// IsReturn is true if the batch contains an Entry Return
+// Category returns batch category
 func (batch *Batch) Category() string {
 	return batch.category
 }

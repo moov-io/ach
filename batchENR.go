@@ -18,6 +18,7 @@ type BatchENR struct {
 	Batch
 }
 
+// NewBatchENR returns a *BatchENR
 func NewBatchENR(bh *BatchHeader) *BatchENR {
 	batch := new(BatchENR)
 	batch.SetControl(NewBatchControl())
