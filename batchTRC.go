@@ -8,7 +8,7 @@ import "fmt"
 
 // BatchTRC holds the BatchHeader and BatchControl and all EntryDetail for TRC Entries.
 //
-//Truncated Entry is used to identify a debit entry of a truncated check.
+// Check Truncation Entry (Truncated Entry) is used to identify a debit entry of a truncated check.
 type BatchTRC struct {
 	Batch
 }

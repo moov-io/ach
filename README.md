@@ -37,8 +37,11 @@ ACH is under active development but already in production for multiple companies
 | PPD      | Prearranged payment and deposits      | [Link](test/ach-ppd-read/main.go) | [Link](test/ach-ppd-write/main.go) |
 | RCK      | Represented Check Entries             | [Link](test/ach-rck-read/main.go) | [Link](test/ach-rck-write/main.go) |
 | SHR      | Shared Network Entry                  | [Link](test/ach-shr-read/main.go) | [Link](test/ach-shr-write/main.go) |
+| TRC      | Check Truncation Entry                | [Link](test/ach-trc-read/main.go) | [Link](test/ach-trc-write/main.go) |
+| TRX      | Check Truncation Entries Exchange     | [Link](test/ach-trx-read/main.go) | [Link](test/ach-trx-write/main.go) |
 | TEL      | Telephone-Initiated Entry             | [Link](test/ach-tel-read/main.go) | [Link](test/ach-tel-write/main.go) |
 | WEB      | Internet-initiated Entries            | [Link](test/ach-web-read/main.go) | [Link](test/ach-web-write/main.go) |
+| XCK      | Destroyed Check Entry                 | [Link](test/ach-xck-read/main.go) | [Link](test/ach-xck-write/main.go) |
 
 </details>
 
