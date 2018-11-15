@@ -88,6 +88,7 @@ func NewADVEntryDetail() *ADVEntryDetail {
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate() call to confirm
 // successful parsing and data validity.
 
+// Parse ADVEntryDetail
 func (ed *ADVEntryDetail) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return

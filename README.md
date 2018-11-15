@@ -38,6 +38,7 @@ ACH is under active development but already in production for multiple companies
 | RCK      | Represented Check Entries             | [Link](test/ach-rck-read/main.go) | [Link](test/ach-rck-write/main.go) |
 | SHR      | Shared Network Entry                  | [Link](test/ach-shr-read/main.go) | [Link](test/ach-shr-write/main.go) |
 | TEL      | Telephone-Initiated Entry             | [Link](test/ach-tel-read/main.go) | [Link](test/ach-tel-write/main.go) |
+| TRC      | Truncated Check Entry                 | [Link](test/ach-trc-read/main.go) | [Link](test/ach-trc-write/main.go) |
 | WEB      | Internet-initiated Entries            | [Link](test/ach-web-read/main.go) | [Link](test/ach-web-write/main.go) |
 
 </details>
