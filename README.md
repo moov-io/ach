@@ -40,6 +40,7 @@ ACH is under active development but already in production for multiple companies
 | TEL      | Telephone-Initiated Entry             | [Link](test/ach-tel-read/main.go) | [Link](test/ach-tel-write/main.go) |
 | TRC      | Truncated Check Entry                 | [Link](test/ach-trc-read/main.go) | [Link](test/ach-trc-write/main.go) |
 | WEB      | Internet-initiated Entries            | [Link](test/ach-web-read/main.go) | [Link](test/ach-web-write/main.go) |
+| XCK      | Destroyed Check Entry                 | [Link](test/ach-xck-read/main.go) | [Link](test/ach-xck-write/main.go) |
 
 </details>
 

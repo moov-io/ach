@@ -1,5 +1,9 @@
 ## v0.4.1 (Unreleased)
 
+ADDITIONS
+
+- Support ADV, TRC, TRX, XCK StandardEntryClassCode (SEC types)
+
 ## v0.4.0 (Released 2018-11-06)
 
 BREAKING CHANGES

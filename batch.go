@@ -71,6 +71,8 @@ func NewBatch(bh *BatchHeader) (Batcher, error) {
 		return NewBatchTRC(bh), nil
 	case "WEB":
 		return NewBatchWEB(bh), nil
+	case "XCK":
+		return NewBatchXCK(bh), nil
 	default:
 	}
 	msg := fmt.Sprintf(msgFileNoneSEC, bh.StandardEntryClassCode)
