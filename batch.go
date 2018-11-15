@@ -81,12 +81,12 @@ func NewBatch(bh *BatchHeader) (Batcher, error) {
 	return nil, &FileError{FieldName: "StandardEntryClassCode", Value: bh.StandardEntryClassCode, Msg: msg}
 }
 
-// Create creates a batch
+// Create returns error for using an implementation of batch or NewBatch"
 func (batch *Batch) Create() error {
 	return errors.New("use an implementation of batch or NewBatch")
 }
 
-// Validate validates a batch
+// Validate returns an error for using an use an implementation of batch or NewBatch
 func (batch *Batch) Validate() error {
 	return errors.New("use an implementation of batch or NewBatch")
 }
@@ -311,15 +311,15 @@ func (batch *Batch) AddEntry(entry *EntryDetail) {
 	batch.Entries = append(batch.Entries, entry)
 }
 
-// GetADVEntries returns a slice of ADV entry details for the batch
-func (batch *Batch) GetADVEntries() []*ADVEntryDetail {
-	return batch.ADVEntries
-}
-
-// AddADVEntry appends an EntryDetailADV to the Batch
+// AddADVEntry appends an ADV EntryDetail to the Batch
 func (batch *Batch) AddADVEntry(entry *ADVEntryDetail) {
 	batch.category = entry.Category
 	batch.ADVEntries = append(batch.ADVEntries, entry)
+}
+
+// GetADVEntries returns a slice of entry details for the batch
+func (batch *Batch) GetADVEntries() []*ADVEntryDetail {
+	return batch.ADVEntries
 }
 
 // Category returns batch category
