@@ -42,7 +42,7 @@ func main() {
 	entry.SetCATXAddendaRecords(2)
 	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(bh.ODFIIdentification, 1)
-	entry.DiscretionaryData = "01"
+	entry.SetItemTypeIndicator("01")
 
 	addenda1 := ach.NewAddenda05()
 	addenda1.PaymentRelatedInformation = "Debit First Account"

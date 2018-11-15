@@ -32,7 +32,7 @@ func mockTRXEntryDetail() *EntryDetail {
 	entry.SetCATXAddendaRecords(1)
 	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(mockBatchTRXHeader().ODFIIdentification, 1)
-	entry.DiscretionaryData = "01"
+	entry.SetItemTypeIndicator("01")
 	entry.Category = CategoryForward
 	return entry
 }
@@ -350,7 +350,7 @@ func testBatchTRXAddenda10000(t testing.TB) {
 	entry.SetCATXAddendaRecords(9999)
 	entry.SetCATXReceivingCompany("Receiver Company")
 	entry.SetTraceNumber(mockBatchTRXHeader().ODFIIdentification, 1)
-	entry.DiscretionaryData = "01"
+	entry.SetItemTypeIndicator("01")
 	entry.Category = CategoryForward
 
 	mockBatch := NewBatchTRX(bh)
