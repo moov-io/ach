@@ -39,6 +39,7 @@ ACH is under active development but already in production for multiple companies
 | SHR      | Shared Network Entry                  | [Link](test/ach-shr-read/main.go) | [Link](test/ach-shr-write/main.go) |
 | TEL      | Telephone-Initiated Entry             | [Link](test/ach-tel-read/main.go) | [Link](test/ach-tel-write/main.go) |
 | WEB      | Internet-initiated Entries            | [Link](test/ach-web-read/main.go) | [Link](test/ach-web-write/main.go) |
+| XCK      | Destroyed Check Entry                 | [Link](test/ach-xck-read/main.go) | [Link](test/ach-xck-write/main.go) |
 
 </details>
 
