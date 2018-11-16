@@ -63,6 +63,7 @@ var (
 	msgBatchRequiredAddendaCount    = "%v addendum found where %v is required for batch type %v"
 	msgBatchTransactionCodeCredit   = "%v a credit is not allowed"
 	msgBatchSECType                 = "header SEC type code %v for batch type %v"
+	msgBatchServiceClassTranCode    = "%v is not valid for %v"
 	msgBatchServiceClassCode        = "Service Class Code %v is not valid for batch type %v"
 	msgBatchForwardReturn           = "Forward and Return entries found in the same batch"
 	msgBatchAmount                  = "Amount must be less than %v for SEC code %v"
