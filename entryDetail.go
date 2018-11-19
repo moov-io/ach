@@ -66,6 +66,8 @@ type EntryDetail struct {
 	// For addenda Records, the Trace Number will be identical to the Trace Number
 	// in the associated Entry Detail Record, since the Trace Number is associated
 	// with an entry or item rather than a physical record.
+	//
+	// Use TraceNumberField() for a properly formatted string representation.
 	TraceNumber string `json:"traceNumber,omitempty"`
 	// Addenda02 for use with StandardEntryClassCode MTE, POS, and SHR
 	Addenda02 *Addenda02 `json:"addenda02,omitempty"`

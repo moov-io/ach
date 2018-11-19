@@ -52,6 +52,8 @@ type Addenda99 struct {
 	// AddendaInformation
 	AddendaInformation string `json:"addendaInformation,omitempty"`
 	// TraceNumber matches the Entry Detail Trace Number of the entry being returned.
+	//
+	// Use TraceNumberField() for a properly formatted string representation.
 	TraceNumber string `json:"traceNumber,omitempty"`
 
 	// validator is composed for data validation
