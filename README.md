@@ -12,10 +12,10 @@ Docs: [docs.moov.io](https://docs.moov.io/en/latest/) | [api docs](https://api.m
 
 ## Project Status
 
-ACH is under active development but already in production for multiple companies. Please star the project if you are interested in its progress.
+ACH is under active development but already in production for multiple companies. Please star the project if you are interested in its progress. Right now we are building towards 100% support for the NACHA standards. NACHA issues specifications for Standard Entry Class (SEC) codes, which are designed for various business usecases.
 
 <details>
-<summary>Examples</summary>
+<summary>Supported Standard Entry Class (SEC) codes</summary>
 
 | SEC Code | Name                                  | Read Example                      | Write Example                      |
 |----------|---------------------------------------|-----------------------------------|------------------------------------|
@@ -50,9 +50,7 @@ ACH is under active development but already in production for multiple companies
 
 The `ach` project also offers an HTTP and JSON API for creating and editing files. If you're using Go the `ach.File` type can be used, otherwise just send properly formatted JSON. We have an [example JSON file](test/testdata/ppd-valid.json), but each SEC type will generate differnet JSON.
 
-Example: [Go](test/server-example/main.go) | [Ruby](https://github.com/moov-io/ruby-ach-demo)
-
-### Examples
+Examples: [Go](test/server-example/main.go) | [Ruby](https://github.com/moov-io/ruby-ach-demo)
 
 - [Submit plaintext ACH file for validation](#) (...) # TODO(adam)
 - [Create an ACH file for a payment and get the raw file](https://github.com/moov-io/ruby-ach-demo)
