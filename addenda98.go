@@ -30,6 +30,8 @@ type Addenda98 struct {
 	// CorrectedData
 	CorrectedData string `json:"correctedData"`
 	// TraceNumber matches the Entry Detail Trace Number of the entry being returned.
+	//
+	// Use TraceNumberField() for a properly formatted string representation.
 	TraceNumber int `json:"traceNumber,omitempty"`
 
 	// validator is composed for data validation

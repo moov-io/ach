@@ -45,6 +45,8 @@ type Addenda02 struct {
 	// TerminalState Identifies the state in which the electronic terminal is located
 	TerminalState string `json:"terminalState"`
 	// TraceNumber Standard Entry Detail Trace Number
+	//
+	// Use TraceNumberField() for a properly formatted string representation.
 	TraceNumber int `json:"traceNumber,omitempty"`
 	// validator is composed for data validation
 	validator
