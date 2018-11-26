@@ -542,7 +542,10 @@ func (batch *IATBatch) Validate() error {
 			msg := fmt.Sprintf(msgBatchIATAddendumCount, addenda18Count, "18")
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda18", Msg: msg}
 		}
-
+		if batch.Header.ServiceClassCode == 280 {
+			msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, "IAT")
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
+		}
 		if entry.Category == CategoryNOC {
 			if batch.GetHeader().IATIndicator != "IATCOR" {
 				msg := fmt.Sprintf(msgBatchIATNOC, batch.GetHeader().IATIndicator, "IATCOR")

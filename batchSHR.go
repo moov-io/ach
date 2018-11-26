@@ -44,7 +44,7 @@ func (batch *BatchSHR) Validate() error {
 
 	// SHR detail entries can only be a debit, ServiceClassCode must allow debits
 	switch batch.Header.ServiceClassCode {
-	case 200, 220, 280:
+	case 200, 220:
 		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, "SHR")
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
 	}
@@ -69,7 +69,10 @@ func (batch *BatchSHR) Validate() error {
 		if err := entry.isYear(year); err != nil {
 			return &FieldError{FieldName: "CardExpirationDate", Value: year, Msg: msgValidYear}
 		}
-
+		// Verify the TransactionCode is valid for a ServiceClassCode
+		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {
+			return err
+		}
 		// Verify Addenda* FieldInclusion based on entry.Category and batchHeader.StandardEntryClassCode
 		if err := batch.addendaFieldInclusion(entry); err != nil {
 			return err

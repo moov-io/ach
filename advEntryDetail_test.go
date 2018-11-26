@@ -346,7 +346,7 @@ func TestADVEDFieldInclusionSequenceNumber(t *testing.T) {
 // TestADVEDBadTransactionCode validates TransactionCode field inclusion
 func TestBadTransactionCode(t *testing.T) {
 	entry := mockADVEntryDetail()
-	entry.TransactionCode = 1
+	entry.TransactionCode = 27
 	if err := entry.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TransactionCode" {

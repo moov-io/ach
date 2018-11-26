@@ -11,7 +11,7 @@ import (
 // mockBatchCCDHeader creates a CCD batch header
 func mockBatchCCDHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = 225
 	bh.StandardEntryClassCode = "CCD"
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "121042882"

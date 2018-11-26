@@ -13,7 +13,7 @@ import (
 // mockBatchMTEHeader creates a MTE batch header
 func mockBatchMTEHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = 225
 	bh.CompanyName = "Merchant with ATM"
 	bh.CompanyIdentification = "231380104"
 	bh.StandardEntryClassCode = "MTE"
