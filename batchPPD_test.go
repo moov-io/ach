@@ -350,10 +350,9 @@ func TestBatchPPDSEC(t *testing.T) {
 	}
 }
 
-// TestBatchPPDValidTranCodeForServiceClassCode validates A transactionCode based on ServiceClassCode
+// TestBatchPPDValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
 func TestBatchPPDValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchPPD()
-	// Adding a second addenda to the mock entry
 	mockBatch.GetHeader().ServiceClassCode = 225
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
