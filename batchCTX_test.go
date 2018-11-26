@@ -585,3 +585,35 @@ func TestBatchCTXAddendum99(t *testing.T) {
 		}
 	}
 }
+
+// TestBatchCTXValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
+func TestBatchCTXValidTranCodeForServiceClassCode(t *testing.T) {
+	mockBatch := mockBatchCTX()
+	mockBatch.GetHeader().ServiceClassCode = 225
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TransactionCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchCTXAddenda02 validates BatchCTX cannot have Addenda02
+func TestBatchCTXAddenda02(t *testing.T) {
+	mockBatch := mockBatchCTX()
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
+	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addenda02" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}

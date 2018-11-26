@@ -318,3 +318,35 @@ func TestBatchMTEIdentificationNumber(t *testing.T) {
 		}
 	}
 }
+
+// TestBatchMTEValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
+func TestBatchMTEValidTranCodeForServiceClassCode(t *testing.T) {
+	mockBatch := mockBatchMTE()
+	mockBatch.GetHeader().ServiceClassCode = 220
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TransactionCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchMTEAddenda05 validates BatchMTE cannot have Addenda05
+func TestBatchMTEAddenda05(t *testing.T) {
+	mockBatch := mockBatchMTE()
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addenda05" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}

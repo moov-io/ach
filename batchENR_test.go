@@ -320,3 +320,35 @@ func TestBatchENR__PaymentInformation(t *testing.T) {
 		t.Errorf("EnrolleeClassificationCode: %d", v)
 	}
 }
+
+// TestBatchENRValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
+func TestBatchENRValidTranCodeForServiceClassCode(t *testing.T) {
+	mockBatch := mockBatchENR()
+	mockBatch.GetHeader().ServiceClassCode = 225
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TransactionCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchENRAddenda02 validates BatchENR cannot have Addenda02
+func TestBatchENRAddenda02(t *testing.T) {
+	mockBatch := mockBatchENR()
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
+	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addenda02" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
