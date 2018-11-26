@@ -347,3 +347,19 @@ func TestBatchWEBCategoryReturnAddenda98(t *testing.T) {
 		}
 	}
 }
+
+// TestBatchWEBValidTranCodeForServiceClassCode validates A transactionCode based on ServiceClassCode
+func TestBatchWEBValidTranCodeForServiceClassCode(t *testing.T) {
+	mockBatch := mockBatchWEB()
+	// Adding a second addenda to the mock entry
+	mockBatch.GetHeader().ServiceClassCode = 225
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TransactionCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}

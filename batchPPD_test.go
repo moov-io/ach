@@ -349,3 +349,36 @@ func TestBatchPPDSEC(t *testing.T) {
 		}
 	}
 }
+
+// TestBatchPPDValidTranCodeForServiceClassCode validates A transactionCode based on ServiceClassCode
+func TestBatchPPDValidTranCodeForServiceClassCode(t *testing.T) {
+	mockBatch := mockBatchPPD()
+	// Adding a second addenda to the mock entry
+	mockBatch.GetHeader().ServiceClassCode = 225
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TransactionCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchPPDAddenda02 validates BatchPPD cannot have Addenda02
+func TestBatchPPDAddenda02(t *testing.T) {
+	mockBatch := mockBatchPPD()
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
+	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addenda02" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
