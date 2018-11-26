@@ -105,13 +105,6 @@ func (batch *BatchCOR) isAddenda98() error {
 		if entry.Addenda98 == nil {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda98", Msg: msgBatchCORAddenda}
 		}
-		// Addenda98 must be Validated
-		if err := entry.Addenda98.Validate(); err != nil {
-			// convert the field error in to a batch error for a consistent api
-			if e, ok := err.(*FieldError); ok {
-				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: e.FieldName, Msg: e.Msg}
-			}
-		}
 	}
 	return nil
 }
