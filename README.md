@@ -12,10 +12,10 @@ Docs: [docs.moov.io](https://docs.moov.io/en/latest/) | [api docs](https://api.m
 
 ## Project Status
 
-ACH is under active development but already in production for multiple companies. Please star the project if you are interested in its progress.
+ACH is under active development but already in production for multiple companies. Please star the project if you are interested in its progress. Right now we are building towards 100% support for the NACHA standards. NACHA issues specifications for Standard Entry Class (SEC) codes, which are designed for various business usecases.
 
 <details>
-<summary>Examples</summary>
+<summary>Supported Standard Entry Class (SEC) codes</summary>
 
 | SEC Code | Name                                  | Read Example                      | Write Example                      |
 |----------|---------------------------------------|-----------------------------------|------------------------------------|
@@ -46,28 +46,27 @@ ACH is under active development but already in production for multiple companies
 
 </details>
 
-<!-- TODO(adam):
-	* Return Entries
-	* Addenda Type Code 02
-	* Addenda Type Code 05
-	* Addenda Type Code 10 (IAT)
-	* Addenda Type Code 11 (IAT)
-	* Addenda Type Code 12 (IAT)
-	* Addenda Type Code 13 (IAT)
-	* Addenda Type Code 14 (IAT)
-	* Addenda Type Code 15 (IAT)
-	* Addenda Type Code 16 (IAT)
-	* Addenda Type Code 17 (IAT Optional)
-	* Addenda Type Code 18 (IAT Optional)
-	* Addenda Type Code 98 (NOC)
-	* Addenda Type Code 99 (Return)
--->
-
 ## HTTP API
 
 The `ach` project also offers an HTTP and JSON API for creating and editing files. If you're using Go the `ach.File` type can be used, otherwise just send properly formatted JSON. We have an [example JSON file](test/testdata/ppd-valid.json), but each SEC type will generate differnet JSON.
 
-Example: [Go](test/server-example/main.go)
+Examples: [Go](test/server-example/main.go) | [Ruby](https://github.com/moov-io/ruby-ach-demo)
+
+- [Submit plaintext ACH file for validation](#) (...) # TODO(adam)
+- [Create an ACH file for a payment and get the raw file](https://github.com/moov-io/ruby-ach-demo)
+
+## Getting Started
+
+This project uses [Go Modules](https://github.com/golang/go/wiki/Modules) and thus requires Go 1.11+. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/ach/releases) as well. We highly recommend you use a tagged release for production.
+
+```
+$ git@github.com:moov-io/ach.git
+
+# Just pull down into the Go Module's cache
+$ go get -u github.com/moov-io/ach
+
+$ go doc github.com/moov-io/ach BatchHeader
+```
 
 ## Getting Help
 
@@ -84,7 +83,7 @@ Twitter [@moov_io](https://twitter.com/moov_io)	| You can follow Moov.IO's Twitt
 - 64-bit Linux (Ubuntu, Debian), macOS, and Windows
 - Rasberry Pi
 
-Note: 32-bit platforms have known issues and is not supported.
+Note: 32-bit platforms have known issues and are not supported.
 
 ## Contributing
 

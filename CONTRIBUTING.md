@@ -49,7 +49,7 @@ $ git fetch $user
 ```
 
 Now, feel free to branch and push (`git push $user $branch`) to your remote and send us Pull Requests!
-  
+
 ## Pull Requests
 
 A good quality PR will have the following characteristics:
@@ -67,24 +67,23 @@ A good PR should be able to flow through a peer review system easily and quickly
 Our Build pipeline utilizes [Travis-CI](https://travis-ci.org/moov-io/ach) to enforce many tools that you should add to your editor before issuing a pull request. Learn more about these tools on our [Go Report card](https://goreportcard.com/report/github.com/moov-io/ach)
 
 
-## Additional SEC (Standard Entry Class) code batch types. 
+## Additional SEC (Standard Entry Class) code batch types.
 
 SEC type's in the Batch Header record define the payment type of the following Entry Details and Addenda. The format of the records in the batch is the same between all payment types but NACHA defines different rules for the values that are held in each record field. To add support for an additional SEC type you will need to implement NACHA rules for that type. The vast majority of rules are implemented in ach.batch and then composed into Batch(SEC) for reuse. All Batch(SEC) types must be a ach.Batcher.
 
-1. Create a milestone for the new SEC type that you want supported. 
-2. Add issues to that milestone to meet the NACHA rules for the batch type. 
-3. Create a new struct of the batch type. In the following example we will use MTE(Machine Transfer Entry) as our example. 
+2. Create an issue with the NACHA rules and record layout for the batch type.
+3. Create a new struct of the batch type. In the following example we will use MTE (Machine Transfer Entry) as our example.
 4. The following code would be place in a new file batchMTE.go next to the existing batch types.
-5. The code is stub code and the MTE type is not implemented. For concrete examples review the existing batch types in the source.  
+5. The code is stub code and the MTE type is not implemented. For concrete examples review the existing batch types in the source.
 
-Create a new struct and compose ach.batch 
+Create a new struct and compose ach.batch
 
 ```go
 type BatchMTE struct {
 	batch
 }
 ```
-Add the ability for the new type to be created. 
+Add the ability for the new type to be created.
 
 ```go
 func NewBatchMTE(bh *BatchHeader) *BatchMTE {
@@ -95,11 +94,12 @@ func NewBatchMTE(bh *BatchHeader) *BatchMTE {
 }
 ```
 
-To support the Batcher interface you must add the following functions that are not implemented in ach.batch. 
-* Validate() error
-* Create() error 
+To support the Batcher interface you must add the following functions that are not implemented in `ach.Batch`.
 
-Validate is designed to enforce the NACHA rules for the MTE payment type. Validate is run after a batch of this type is read from a file. If you are creating a batch from code call validate afterwards. 
+- `Validate() error`
+- `Create() error`
+
+Validate is designed to enforce the NACHA rules for the MTE payment type. Validate is run after a batch of this type is read from a file. If you are creating a batch from code call validate afterwards.
 
 ```go
 // Validate checks valid NACHA batch rules. Assumes properly parsed records.
@@ -115,7 +115,7 @@ func (batch *BatchMTE) Validate() error {
 	return nil
 }
 ```
-Create takes the Batch Header and Entry details and creates the proper sequence number and batch control. If additional logic specific to the SEC type is required it building a batch file it should be added here. 
+Create takes the Batch Header and Entry details and creates the proper sequence number and batch control. If additional logic specific to the SEC type is required it building a batch file it should be added here.
 
 ```go
 // Create takes Batch Header and Entries and builds a valid batch
@@ -134,7 +134,7 @@ func (batch *BatchMTE) Create() error {
 }
 ```
 
-Finally add the batch type to the NewBatch factory in batch.go. 
+Finally add the batch type to the NewBatch factory in batch.go.
 
 ```go
 //...
@@ -143,52 +143,47 @@ case "MTE":
 //...
 ```
 
-Pull request require a batchMTE_test.go file that covers the logic of the type. 
+In order for the code to be merged with a Pull requests we require a `batchMTE_test.go` test file that covers the logic of the type. Refer to the [Go blog post on code coverage metrics](https://blog.golang.org/cover).
 
-## Benchmarks and Profiling 
+## Command Line tools
 
-**Write:**
+We have written two command line tools ([`readACH`](github.com/moov-io/ach/cmd/readACH) and [`writeACH`](github.com/moov-io/ach/cmd/writeACH)) that work with ACH files.
 
-github.com/moov-io/ach/cmd/writeACH
+#### readACH
 
-main.go will create an ACH file with 4 batches each containing 1250 detail and addenda records 
+`readACH` will output the details of an ACH file to the terminal, but `readACH` can also emit a JSON representation of the file following our `ach.File` type.
 
-A custom path can be used by defining fPath ( e.g. -fPath=github.com/moov-io/_directory_ )
+```
+$ readACH -help
+Usage of readACH:
+  -fPath string
+    	File Path (default "201805101354.ach")
+  -json
+    	Output ACH File in JSON to stdout
 
-Benchmark 
-
-
-```bash
-github.com/moov-io/ach/cmd/writeACH>go test -bench=BenchmarkTestFileWrite  -count=5 > old
+$ readACH -fPath test/testdata/ppd-debit.ach -json  | jq .
+{"id":"","fileHeader":{"id":"","immediateDestination":"076401251","immediateOrigin":"076401251", ...
 ```
 
-Profiling
+#### writeACH
+
+`writeACH` creates an ACH file with 4 batches each containing 1250 detail and addenda records. A custom output filepath can be specified with `-fPath`.
 
 
-```bash
-github.com/moov-io/ach/cmd/writeACH>main -cpuprofile=writeACH.pprof
+## Benchmarks
+
+Running benchmarks can be ran with `go test`. Typically machines running benchmarks are idle except for the benchmarked code. Please report all machine hardware specs and OS/Go versions when reporting benchmarks. Please refer to Dave Cheny's [benchmarking buide](https://dave.cheney.net/2013/06/30/how-to-write-benchmarks-in-go).
+
+Example:
+
+```
+$ cd ach/ # This project
+
+$ go test -bench=BenchmarkWEBDebitRead  -count=10000 > BenchmarkWEBDebitRead.txt
+$ go test ./cmd/readACH -bench=BenchmarkTestFileRead -count=10000 > BenchmarkTestFileRead.txt
 ```
 
-**Read:**
-
-```bash
-github.com/moov-io/ach/cmd/readACH
-```
-
-Use fPath to define the file to be read ( e.g. -fPath=github.com/moov-io/ach/cmd/readACH/_filename_ )
-
-Benchmark 
-
-```bash
-github.com/moov-io/ach/cmd/readACH>go test -bench=BenchmarkTestFileRead -count=5 > old
-```
-Profiling
-
-```bash
-github.com/moov-io/ach/cmd/readACH>main -fPath=_filename_ -cpuprofile=ReadACH.pprof
-```
-
-## References 
+## References
 
 * [Wikipeda: Automated Clearing House](http://en.wikipedia.org/wiki/Automated_Clearing_House)
 * [Nacha ACH Network: How it Works](https://www.nacha.org/ach-network)
@@ -203,7 +198,7 @@ github.com/moov-io/ach/cmd/readACH>main -fPath=_filename_ -cpuprofile=ReadACH.pp
 
 ![ACH File Layout](https://github.com/moov-io/ach/blob/master/documentation/ach_file_structure_shg.gif)
 
-## Inspiration 
+## Inspiration
 
 * [ACH:Builder - Tools for Building ACH](http://search.cpan.org/~tkeefer/ACH-Builder-0.03/lib/ACH/Builder.pm)
 * [mosscode / ach](https://github.com/mosscode/ach)
