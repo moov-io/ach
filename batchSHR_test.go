@@ -297,6 +297,9 @@ func BenchmarkBatchSHRAddendaCount(b *testing.B) {
 func testBatchSHRAddendaCountZero(t testing.TB) {
 	mockBatch := NewBatchSHR(mockBatchSHRHeader())
 	mockBatch.AddEntry(mockSHREntryDetail())
+	mockAddenda02 := mockAddenda02()
+	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "AddendaCount" {
@@ -619,6 +622,25 @@ func TestBatchSHRAddendum99Category(t *testing.T) {
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Addenda99" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchSHRTerminalState validates TerminalState returns an error if invalid from usabbrev
+func TestBatchSHRTerminalState(t *testing.T) {
+	mockBatch := NewBatchSHR(mockBatchSHRHeader())
+	mockBatch.AddEntry(mockSHREntryDetail())
+	mockAddenda02 := mockAddenda02()
+	mockAddenda02.TerminalState = "YY"
+	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TerminalState" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
