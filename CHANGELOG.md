@@ -3,6 +3,8 @@
 ADDITIONS
 
 - Support ADV, TRC, TRX, XCK StandardEntryClassCode (SEC types)
+- Transaction Codes match Service Class Codes
+- Add Addenda02.TerminalState validation for BatchPOS and BatchSHR (POS and SEC Standard Entry Class Codes)
 
 ## v0.4.0 (Released 2018-11-06)
 

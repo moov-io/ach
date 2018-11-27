@@ -6,7 +6,6 @@ package ach
 
 import (
 	"fmt"
-
 	"github.com/moov-io/ach/internal/usabbrev"
 )
 
@@ -43,11 +42,6 @@ func (batch *BatchMTE) Validate() error {
 			msg := fmt.Sprintf(msgBatchAmountNonZero, entry.Amount, "MTE")
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
 		}
-
-		if !usabbrev.Valid(entry.Addenda02.TerminalState) {
-			msg := fmt.Sprintf("%q is not a valid US state or territory", entry.Addenda02.TerminalState)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TerminalState", Msg: msg}
-		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {
 			return err
@@ -55,6 +49,12 @@ func (batch *BatchMTE) Validate() error {
 		// Verify Addenda* FieldInclusion based on entry.Category and batchHeader.StandardEntryClassCode
 		if err := batch.addendaFieldInclusion(entry); err != nil {
 			return err
+		}
+		if entry.Category == CategoryForward {
+			if !usabbrev.Valid(entry.Addenda02.TerminalState) {
+				msg := fmt.Sprintf("%q is not a valid US state or territory", entry.Addenda02.TerminalState)
+				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TerminalState", Msg: msg}
+			}
 		}
 	}
 	return nil
