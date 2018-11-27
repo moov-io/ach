@@ -294,6 +294,9 @@ func BenchmarkBatchPOSAddendaCount(b *testing.B) {
 func testBatchPOSAddendaCountZero(t testing.TB) {
 	mockBatch := NewBatchPOS(mockBatchPOSHeader())
 	mockBatch.AddEntry(mockPOSEntryDetail())
+	mockAddenda02 := mockAddenda02()
+	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "AddendaCount" {
@@ -548,16 +551,17 @@ func TestBatchPOSCategoryReturnAddenda99(t *testing.T) {
 	}
 }
 
-// TestBatchPOSCategoryReturnValid validates CategoryReturn does not return an error if Addenda99 is not defined
-func TestBatchPOSCategoryReturnValid(t *testing.T) {
+// TestBatchPOSTerminalState validates TerminalState returns an error if invalid from usabbrev
+func TestBatchPOSTerminalState(t *testing.T) {
 	mockBatch := NewBatchPOS(mockBatchPOSHeader())
 	mockBatch.AddEntry(mockPOSEntryDetail())
-	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99()
-	mockBatch.GetEntries()[0].Category = CategoryReturn
-	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
+	mockAddenda02 := mockAddenda02()
+	mockAddenda02.TerminalState = "YY"
+	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda99" {
+			if e.FieldName != "TerminalState" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {
