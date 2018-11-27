@@ -366,6 +366,7 @@ func TestBatchSHRAddendum99(t *testing.T) {
 func testBatchSHRInvalidAddendum(t testing.TB) {
 	mockBatch := NewBatchSHR(mockBatchSHRHeader())
 	mockBatch.AddEntry(mockSHREntryDetail())
+	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
