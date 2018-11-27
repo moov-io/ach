@@ -411,3 +411,39 @@ func TestBatchCORCategoryNOCAddenda98(t *testing.T) {
 		}
 	}
 }
+
+// TestBatchCORValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
+func TestBatchCORValidTranCodeForServiceClassCode(t *testing.T) {
+	mockBatch := mockBatchCOR()
+	mockBatch.GetHeader().ServiceClassCode = 280
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "ServiceClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchCORInvalidAddenda98 validates that an error is returned if Addenda98 is invalid
+func TestBatchCORTestBatchCORInvalidAddenda98(t *testing.T) {
+	mockBatch := NewBatchCOR(mockBatchCORHeader())
+	mockBatch.AddEntry(mockCOREntryDetail())
+	mockBatch.GetEntries()[0].Category = CategoryNOC
+	addenda98 := mockAddenda98()
+	addenda98.recordType = "03"
+	mockBatch.GetEntries()[0].Addenda98 = addenda98
+
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}

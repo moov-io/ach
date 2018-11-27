@@ -248,3 +248,18 @@ func TestBatchTELAddendum99(t *testing.T) {
 		}
 	}
 }
+
+// TestBatchTELValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
+func TestBatchTELValidTranCodeForServiceClassCode(t *testing.T) {
+	mockBatch := mockBatchTEL()
+	mockBatch.GetHeader().ServiceClassCode = 220
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TransactionCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}

@@ -357,3 +357,18 @@ func TestBatchACKAddendum99Category(t *testing.T) {
 		}
 	}
 }
+
+// TestBatchACKValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
+func TestBatchACKValidTranCodeForServiceClassCode(t *testing.T) {
+	mockBatch := mockBatchACK()
+	mockBatch.GetHeader().ServiceClassCode = 225
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TransactionCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}

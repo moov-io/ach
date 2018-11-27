@@ -757,3 +757,32 @@ func (batch *Batch) IsADV() bool {
 	ok := batch.GetHeader().StandardEntryClassCode == "ADV"
 	return ok
 }
+
+// ValidTranCodeForServiceClassCode validates a TransactionCode is valid for a ServiceClassCode
+func (batch *Batch) ValidTranCodeForServiceClassCode(entry *EntryDetail) error {
+	// ADV should use ADVEntryDetail
+	// ADV Transaction Codes are 81, 82, 83, 84, 85, 86, 87, 88
+	switch entry.TransactionCode {
+	case 81, 82, 83, 84, 85, 86, 87, 88:
+		msg := fmt.Sprintf(msgBatchServiceClassTranCode, entry.TransactionCode, batch.Header.StandardEntryClassCode)
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
+	}
+
+	switch batch.Header.ServiceClassCode {
+	case 280:
+		msg := fmt.Sprintf(msgBatchServiceClassTranCode, batch.Header.ServiceClassCode, batch.Header.StandardEntryClassCode)
+		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
+	case 200:
+	case 220:
+		if entry.CreditOrDebit() == "D" {
+			msg := fmt.Sprintf(msgBatchServiceClassTranCode, entry.TransactionCode, batch.Header.ServiceClassCode)
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
+		}
+	case 225:
+		if entry.CreditOrDebit() == "C" {
+			msg := fmt.Sprintf(msgBatchServiceClassTranCode, entry.TransactionCode, batch.Header.ServiceClassCode)
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
+		}
+	}
+	return nil
+}

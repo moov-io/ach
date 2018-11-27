@@ -618,3 +618,18 @@ func TestBatchATXAddendum99(t *testing.T) {
 		}
 	}
 }
+
+// TestBatchATXValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
+func TestBatchATXValidTranCodeForServiceClassCode(t *testing.T) {
+	mockBatch := mockBatchATX()
+	mockBatch.GetHeader().ServiceClassCode = 225
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TransactionCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}

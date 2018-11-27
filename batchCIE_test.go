@@ -489,3 +489,20 @@ func TestBatchCIEAddenda(t *testing.T) {
 		}
 	}
 }
+
+// TestBatchCIEAddenda02 validates BatchCIE cannot have Addenda02
+func TestBatchCIEAddenda02(t *testing.T) {
+	mockBatch := mockBatchCIE()
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
+	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addenda02" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}

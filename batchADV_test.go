@@ -17,6 +17,7 @@ func mockBatchADVHeader() *BatchHeader {
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "Accounting"
 	bh.ODFIIdentification = "12104288"
+	bh.OriginatorStatusCode = 0
 	return bh
 }
 

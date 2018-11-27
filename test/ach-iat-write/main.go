@@ -22,7 +22,7 @@ func main() {
 
 	// BatchHeader identifies the originating entity and the type of transactions contained in the batch
 	bh := ach.NewIATBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = 225
 	bh.ForeignExchangeIndicator = "FF"
 	bh.ForeignExchangeReferenceIndicator = 3
 	bh.ISODestinationCountryCode = "US"
@@ -36,7 +36,7 @@ func main() {
 	// Identifies the receivers account information
 	// can be multiple entry's per batch
 	entry := ach.NewIATEntryDetail()
-	entry.TransactionCode = 27
+	entry.TransactionCode = 22
 	entry.SetRDFI("121042882")
 	entry.AddendaRecords = 007
 	entry.DFIAccountNumber = "123456789"

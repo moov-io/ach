@@ -11,7 +11,7 @@ import (
 // mockBatchCCDHeader creates a CCD batch header
 func mockBatchCCDHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = 225
 	bh.StandardEntryClassCode = "CCD"
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "121042882"
@@ -301,5 +301,37 @@ func BenchmarkBatchCCDReceivingCompanyField(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchCCDReceivingCompanyField(b)
+	}
+}
+
+// TestBatchCCDValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
+func TestBatchCCDValidTranCodeForServiceClassCode(t *testing.T) {
+	mockBatch := mockBatchCCD()
+	mockBatch.GetHeader().ServiceClassCode = 220
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TransactionCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchCCDAddenda02 validates BatchCCD cannot have Addenda02
+func TestBatchCCDAddenda02(t *testing.T) {
+	mockBatch := mockBatchCCD()
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
+	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Addenda02" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
 	}
 }
