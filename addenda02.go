@@ -45,7 +45,9 @@ type Addenda02 struct {
 	// TerminalState Identifies the state in which the electronic terminal is located
 	TerminalState string `json:"terminalState"`
 	// TraceNumber Standard Entry Detail Trace Number
-	TraceNumber int `json:"traceNumber,omitempty"`
+	//
+	// Use TraceNumberField() for a properly formatted string representation.
+	TraceNumber string `json:"traceNumber,omitempty"`
 	// validator is composed for data validation
 	validator
 	// converters is composed for ACH to GoLang Converters
@@ -87,7 +89,7 @@ func (addenda02 *Addenda02) Parse(record string) {
 	// 78-79
 	addenda02.TerminalState = strings.TrimSpace(record[77:79])
 	// 80-94
-	addenda02.TraceNumber = addenda02.parseNumField(record[79:94])
+	addenda02.TraceNumber = strings.TrimSpace(record[79:94])
 }
 
 // String writes the Addenda02 struct to a 94 character string.
@@ -257,7 +259,7 @@ func (addenda02 *Addenda02) TerminalStateField() string {
 	return addenda02.alphaField(addenda02.TerminalState, 2)
 }
 
-// TraceNumberField returns a space padded traceNumber string
+// TraceNumberField returns a space padded TraceNumber string
 func (addenda02 *Addenda02) TraceNumberField() string {
-	return addenda02.numericField(addenda02.TraceNumber, 15)
+	return addenda02.stringField(addenda02.TraceNumber, 15)
 }

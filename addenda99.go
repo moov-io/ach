@@ -44,7 +44,7 @@ type Addenda99 struct {
 	// OriginalTrace This field contains the Trace Number as originally included on the forward Entry or Prenotification.
 	// The RDFI must include the Original Entry Trace Number in the Addenda Record of an Entry being returned to an ODFI,
 	// in the Addenda Record of an 98, within an Acknowledgment Entry, or with an RDFI request for a copy of an authorization.
-	OriginalTrace int `json:"originalTrace"`
+	OriginalTrace string `json:"originalTrace"`
 	// DateOfDeath The field date of death is to be supplied on Entries being returned for reason of death (return reason codes R14 and R15).
 	DateOfDeath time.Time `json:"dateOfDeath"`
 	// OriginalDFI field contains the Receiving DFI Identification (addenda.RDFIIdentification) as originally included on the forward Entry or Prenotification that the RDFI is returning or correcting.
@@ -52,7 +52,9 @@ type Addenda99 struct {
 	// AddendaInformation
 	AddendaInformation string `json:"addendaInformation,omitempty"`
 	// TraceNumber matches the Entry Detail Trace Number of the entry being returned.
-	TraceNumber int `json:"traceNumber,omitempty"`
+	//
+	// Use TraceNumberField() for a properly formatted string representation.
+	TraceNumber string `json:"traceNumber,omitempty"`
 
 	// validator is composed for data validation
 	validator
@@ -87,7 +89,7 @@ func (Addenda99 *Addenda99) Parse(record string) {
 	// 4-6
 	Addenda99.ReturnCode = record[3:6]
 	// 7-21
-	Addenda99.OriginalTrace = Addenda99.parseNumField(record[6:21])
+	Addenda99.OriginalTrace = strings.TrimSpace(record[6:21])
 	// 22-27, might be a date or blank
 	Addenda99.DateOfDeath = Addenda99.parseSimpleDate(record[21:27])
 	// 28-35
@@ -95,7 +97,7 @@ func (Addenda99 *Addenda99) Parse(record string) {
 	// 36-79
 	Addenda99.AddendaInformation = strings.TrimSpace(record[35:79])
 	// 80-94
-	Addenda99.TraceNumber = Addenda99.parseNumField(record[79:94])
+	Addenda99.TraceNumber = strings.TrimSpace(record[79:94])
 }
 
 // String writes the Addenda99 struct to a 94 character string
@@ -140,7 +142,7 @@ func (Addenda99 *Addenda99) Validate() error {
 
 // OriginalTraceField returns a zero padded OriginalTrace string
 func (Addenda99 *Addenda99) OriginalTraceField() string {
-	return Addenda99.numericField(Addenda99.OriginalTrace, 15)
+	return Addenda99.stringField(Addenda99.OriginalTrace, 15)
 }
 
 // DateOfDeathField returns a space padded DateOfDeath string
@@ -186,9 +188,9 @@ func (Addenda99 *Addenda99) IATAddendaInformationField() string {
 	return Addenda99.alphaField(Addenda99.AddendaInformation[9:44], 34)
 }
 
-// TraceNumberField returns a zero padded traceNumber string
+// TraceNumberField returns a zero padded TraceNumber string
 func (Addenda99 *Addenda99) TraceNumberField() string {
-	return Addenda99.numericField(Addenda99.TraceNumber, 15)
+	return Addenda99.stringField(Addenda99.TraceNumber, 15)
 }
 
 func makeReturnCodeDict() map[string]*returnCode {

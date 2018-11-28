@@ -103,7 +103,7 @@ func mockInvalidAddenda17() *Addenda17 {
 func mockIATAddenda99() *Addenda99 {
 	addenda99 := NewAddenda99()
 	addenda99.ReturnCode = "R07"
-	addenda99.OriginalTrace = 231380100000001
+	addenda99.OriginalTrace = "231380100000001"
 	addenda99.OriginalDFI = "12104288"
 	addenda99.IATPaymentAmount("0000100000")
 	addenda99.IATAddendaInformation("Authorization Revoked")
@@ -113,10 +113,10 @@ func mockIATAddenda99() *Addenda99 {
 func mockIATAddenda98() *Addenda98 {
 	addenda98 := NewAddenda98()
 	addenda98.ChangeCode = "C01"
-	addenda98.OriginalTrace = 231380100000001
+	addenda98.OriginalTrace = "231380100000001"
 	addenda98.OriginalDFI = "12104288"
 	addenda98.CorrectedData = "89722-C3"
-	addenda98.TraceNumber = 121042880000001
+	addenda98.TraceNumber = "121042880000001"
 	return addenda98
 }
 
@@ -618,7 +618,8 @@ func testIATBatchCreditIsBatchAmount(t testing.TB) {
 	e2 := mockIATEntryDetail()
 	e2.TransactionCode = 22
 	e2.Amount = 5000
-	e2.TraceNumber = e1.TraceNumber + 10
+	// replace last 2 of TraceNumber
+	e2.TraceNumber = e1.TraceNumber[:13] + "10"
 	mockBatch.AddEntry(e2)
 	mockBatch.Entries[1].Addenda10 = mockAddenda10()
 	mockBatch.Entries[1].Addenda11 = mockAddenda11()
@@ -665,7 +666,8 @@ func testIATBatchDebitIsBatchAmount(t testing.TB) {
 	e2 := mockIATEntryDetail()
 	e2.TransactionCode = 27
 	e2.Amount = 5000
-	e2.TraceNumber = e1.TraceNumber + 10
+	// replace last 2 of TraceNumber
+	e2.TraceNumber = e1.TraceNumber[:13] + "10"
 	mockBatch.AddEntry(e2)
 	mockBatch.Entries[1].Addenda10 = mockAddenda10()
 	mockBatch.Entries[1].Addenda11 = mockAddenda11()
@@ -959,7 +961,7 @@ func BenchmarkIATBatchisEntryHash(b *testing.B) {
 func testIATBatchIsSequenceAscending(t testing.TB) {
 	mockBatch := mockIATBatch(t)
 	e2 := mockIATEntryDetail()
-	e2.TraceNumber = 1
+	e2.TraceNumber = "1"
 	mockBatch.AddEntry(e2)
 	mockBatch.Entries[1].Addenda10 = mockAddenda10()
 	mockBatch.Entries[1].Addenda11 = mockAddenda11()

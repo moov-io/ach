@@ -101,7 +101,8 @@ func testCreditBatchIsBatchAmount(t testing.TB) {
 	e2 := mockEntryDetail()
 	e2.TransactionCode = 22
 	e2.Amount = 100
-	e2.TraceNumber = e1.TraceNumber + 10
+	// replace last 2 of TraceNumber
+	e2.TraceNumber = e1.TraceNumber[:13] + "10"
 	mockBatch.AddEntry(e2)
 	if err := mockBatch.build(); err != nil {
 		t.Errorf("%T: %s", err, err)
@@ -143,7 +144,8 @@ func testSavingsBatchIsBatchAmount(t testing.TB) {
 	e2 := mockEntryDetail()
 	e2.TransactionCode = 37
 	e2.Amount = 100
-	e2.TraceNumber = e1.TraceNumber + 10
+	// replace last 2 of TraceNumber
+	e2.TraceNumber = e1.TraceNumber[:13] + "10"
 
 	mockBatch.AddEntry(e2)
 	if err := mockBatch.build(); err != nil {
@@ -351,7 +353,7 @@ func BenchmarkBatchIsAddendaSeqAscending(b *testing.B) {
 func testBatchIsSequenceAscending(t testing.TB) {
 	mockBatch := mockBatch()
 	e3 := mockEntryDetail()
-	e3.TraceNumber = 1
+	e3.TraceNumber = "1"
 	mockBatch.AddEntry(e3)
 	mockBatch.GetControl().EntryAddendaCount = 2
 	if err := mockBatch.verify(); err != nil {
@@ -471,7 +473,8 @@ func testBatchCategoryForwardReturn(t testing.TB) {
 	entry := mockEntryDetail()
 	entry.Addenda99 = mockAddenda99()
 	entry.Category = CategoryReturn
-	entry.TraceNumber = entry.TraceNumber + 10
+	// replace last 2 of TraceNumber
+	entry.TraceNumber = entry.TraceNumber[:13] + "10"
 	entry.AddendaRecordIndicator = 1
 	mockBatch.AddEntry(entry)
 	if err := mockBatch.build(); err != nil {

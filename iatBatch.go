@@ -342,7 +342,7 @@ func (batch *IATBatch) calculateBatchAmounts() (credit int, debit int) {
 // isSequenceAscending Individual Entry Detail Records within individual batches must
 // be in ascending Trace Number order (although Trace Numbers need not necessarily be consecutive).
 func (batch *IATBatch) isSequenceAscending() error {
-	lastSeq := -1
+	lastSeq := "-1"
 	for _, entry := range batch.Entries {
 		if entry.TraceNumber <= lastSeq {
 			msg := fmt.Sprintf(msgBatchAscending, entry.TraceNumber, lastSeq)

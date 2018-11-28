@@ -24,13 +24,15 @@ type Addenda98 struct {
 	// OriginalTrace This field contains the Trace Number as originally included on the forward Entry or Prenotification.
 	// The RDFI must include the Original Entry Trace Number in the Addenda Record of an Entry being returned to an ODFI,
 	// in the Addenda Record of an 98, within an Acknowledgment Entry, or with an RDFI request for a copy of an authorization.
-	OriginalTrace int `json:"originalTrace"`
+	OriginalTrace string `json:"originalTrace"`
 	// OriginalDFI field contains the Receiving DFI Identification (addenda.RDFIIdentification) as originally included on the forward Entry or Prenotification that the RDFI is returning or correcting.
 	OriginalDFI string `json:"originalDFI"`
 	// CorrectedData
 	CorrectedData string `json:"correctedData"`
 	// TraceNumber matches the Entry Detail Trace Number of the entry being returned.
-	TraceNumber int `json:"traceNumber,omitempty"`
+	//
+	// Use TraceNumberField() for a properly formatted string representation.
+	TraceNumber string `json:"traceNumber,omitempty"`
 
 	// validator is composed for data validation
 	validator
@@ -77,13 +79,13 @@ func (addenda98 *Addenda98) Parse(record string) {
 	// 4-6
 	addenda98.ChangeCode = record[3:6]
 	// 7-21
-	addenda98.OriginalTrace = addenda98.parseNumField(record[6:21])
+	addenda98.OriginalTrace = strings.TrimSpace(record[6:21])
 	// 28-35
 	addenda98.OriginalDFI = addenda98.parseStringField(record[27:35])
 	// 36-64
 	addenda98.CorrectedData = strings.TrimSpace(record[35:64])
 	// 80-94
-	addenda98.TraceNumber = addenda98.parseNumField(record[79:94])
+	addenda98.TraceNumber = strings.TrimSpace(record[79:94])
 }
 
 // String writes the Addenda98 struct to a 94 character string
@@ -136,7 +138,7 @@ func (addenda98 *Addenda98) Validate() error {
 
 // OriginalTraceField returns a zero padded OriginalTrace string
 func (addenda98 *Addenda98) OriginalTraceField() string {
-	return addenda98.numericField(addenda98.OriginalTrace, 15)
+	return addenda98.stringField(addenda98.OriginalTrace, 15)
 }
 
 // OriginalDFIField returns a zero padded OriginalDFI string
@@ -151,7 +153,7 @@ func (addenda98 *Addenda98) CorrectedDataField() string {
 
 // TraceNumberField returns a zero padded traceNumber string
 func (addenda98 *Addenda98) TraceNumberField() string {
-	return addenda98.numericField(addenda98.TraceNumber, 15)
+	return addenda98.stringField(addenda98.TraceNumber, 15)
 }
 
 func makeChangeCodeDict() map[string]*changeCode {
