@@ -850,3 +850,63 @@ func TestBatchADVCategory(t *testing.T) {
 		}
 	}
 }
+
+// TestBatchDishonoredReturnsCategory validates Category for Returns
+func TestBatchDishonoredReturnsCategory(t *testing.T) {
+	entry := NewEntryDetail()
+	entry.TransactionCode = 27
+	entry.SetRDFI("121042882")
+	entry.DFIAccountNumber = "744-5678-99"
+	entry.Amount = 25000
+	entry.IdentificationNumber = "45689033"
+	entry.IndividualName = "Wade Arnold"
+	entry.SetTraceNumber(mockBatchPOSHeader().ODFIIdentification, 1)
+	entry.DiscretionaryData = "01"
+	entry.AddendaRecordIndicator = 1
+	entry.Category = CategoryDishonoredReturn
+
+	addenda99 := mockAddenda99()
+	addenda99.ReturnCode = "R68"
+	addenda99.AddendaInformation = "Untimely Return"
+	entry.Addenda99 = addenda99
+
+	entryOne := NewEntryDetail()
+	entryOne.TransactionCode = 27
+	entryOne.SetRDFI("121042882")
+	entryOne.DFIAccountNumber = "744-5678-99"
+	entryOne.Amount = 23000
+	entryOne.IdentificationNumber = "45689033"
+	entryOne.IndividualName = "Adam Decaf"
+	entryOne.SetTraceNumber(mockBatchPOSHeader().ODFIIdentification, 1)
+	entryOne.DiscretionaryData = "01"
+	entryOne.AddendaRecordIndicator = 1
+	entryOne.Category = CategoryReturn
+
+	addenda99One := mockAddenda99()
+	addenda99One.ReturnCode = "R68"
+	addenda99One.AddendaInformation = "Untimely Return"
+	entryOne.Addenda99 = addenda99One
+
+	posHeader := NewBatchHeader()
+	posHeader.ServiceClassCode = 225
+	posHeader.StandardEntryClassCode = "POS"
+	posHeader.CompanyName = "Payee Name"
+	posHeader.CompanyIdentification = "231380104"
+	posHeader.CompanyEntryDescription = "ACH POS"
+	posHeader.ODFIIdentification = "23138010"
+
+	batch := NewBatchPOS(posHeader)
+	batch.SetHeader(posHeader)
+	batch.AddEntry(entry)
+	batch.AddEntry(entryOne)
+
+	if err := batch.Create(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "Category" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}

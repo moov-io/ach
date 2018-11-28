@@ -470,6 +470,64 @@ func TestPOSReturnWrite(t *testing.T) {
 	}
 }
 
+// TestPOSDishonoredReturnWrite writes a POS Return ACH file
+func TestPOSDishonoredReturnWrite(t *testing.T) {
+	file := NewFile().SetHeader(mockFileHeader())
+	entry := NewEntryDetail()
+	entry.TransactionCode = 27
+	entry.SetRDFI("121042882")
+	entry.DFIAccountNumber = "744-5678-99"
+	entry.Amount = 25000
+	entry.IdentificationNumber = "45689033"
+	entry.IndividualName = "Wade Arnold"
+	entry.SetTraceNumber(mockBatchPOSHeader().ODFIIdentification, 1)
+	entry.DiscretionaryData = "01"
+	entry.AddendaRecordIndicator = 1
+	entry.Category = CategoryDishonoredReturn
+
+	addenda99 := mockAddenda99()
+	addenda99.ReturnCode = "R68"
+	addenda99.AddendaInformation = "Untimely Return"
+	entry.Addenda99 = addenda99
+
+	posHeader := NewBatchHeader()
+	posHeader.ServiceClassCode = 225
+	posHeader.StandardEntryClassCode = "POS"
+	posHeader.CompanyName = "Payee Name"
+	posHeader.CompanyIdentification = "231380104"
+	posHeader.CompanyEntryDescription = "ACH POS"
+	posHeader.ODFIIdentification = "23138010"
+
+	batch := NewBatchPOS(posHeader)
+	batch.SetHeader(posHeader)
+	batch.AddEntry(entry)
+	batch.Create()
+	file.AddBatch(batch)
+
+	if err := file.Create(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err := file.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	b := &bytes.Buffer{}
+	f := NewWriter(b)
+
+	if err := f.Write(file); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	r := NewReader(strings.NewReader(b.String()))
+	_, err := r.Read()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err = r.File.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
 // TestNOCWrite writes a COR NOC ACH file
 func TestNOCWrite(t *testing.T) {
 	file := NewFile().SetHeader(mockFileHeader())

@@ -622,7 +622,8 @@ func (batch *Batch) isCategory() error {
 					continue
 				}
 				if batch.Entries[i].Category != category {
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Category", Msg: msgBatchForwardReturn}
+					msg := fmt.Sprintf(msgBatchCategory, batch.Entries[i].Category, category)
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Category", Msg: msg}
 				}
 			}
 		}
@@ -631,7 +632,8 @@ func (batch *Batch) isCategory() error {
 		if len(batch.ADVEntries) > 1 {
 			for i := 0; i < len(batch.ADVEntries); i++ {
 				if batch.ADVEntries[i].Category != category {
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Category", Msg: msgBatchForwardReturn}
+					msg := fmt.Sprintf(msgBatchCategory, batch.ADVEntries[i].Category, category)
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Category", Msg: msg}
 				}
 			}
 		}
@@ -651,8 +653,6 @@ func (batch *Batch) isCategory() error {
 // Return:
 // Addenda99
 //
-// ToDo: Implement Batch for TRX, TRC, XCK
-//
 func (batch *Batch) addendaFieldInclusion(entry *EntryDetail) error {
 	switch entry.Category {
 	case CategoryForward:
@@ -663,7 +663,7 @@ func (batch *Batch) addendaFieldInclusion(entry *EntryDetail) error {
 		if err := batch.addendaFieldInclusionNOC(entry); err != nil {
 			return err
 		}
-	case CategoryReturn:
+	case CategoryReturn, CategoryDishonoredReturn, CategoryDishonoredReturnContested:
 		if err := batch.addendaFieldInclusionReturn(entry); err != nil {
 			return err
 		}
@@ -675,6 +675,10 @@ func (batch *Batch) addendaFieldInclusion(entry *EntryDetail) error {
 func (batch *Batch) addendaFieldInclusionForward(entry *EntryDetail) error {
 	switch batch.Header.StandardEntryClassCode {
 	case "MTE", "POS", "SHR":
+		if entry.Addenda02 == nil {
+			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda02", Msg: msgFieldInclusion}
+
+		}
 		if entry.Addenda05 != nil {
 			msg := fmt.Sprintf(msgBatchAddenda, "Addenda05", entry.Category, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda05", Msg: msg}

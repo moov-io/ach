@@ -92,7 +92,12 @@ const (
 	CategoryReturn = "Return"
 	// CategoryNOC defines the entry as being a notification of change of a forward entry to the originating institution
 	CategoryNOC = "NOC"
-	// ReturnOrNoc is the description for the  following TransactionCode: 21, 31, 41, 51, 26, 36, 46, 56
+	// CategoryDishonoredReturn defines the entry as being a dishonored return initiated by the ODFI to the RDFI that
+	// submitted the return entry
+	CategoryDishonoredReturn = "DishonoredReturn"
+	// CategoryDishonoredReturnContested defines the entry as a contested dishonored return initiated by the RDFI to
+	// the ODFI that submitted the dishonored return
+	CategoryDishonoredReturnContested = "DishonoredReturnContested"
 )
 
 // NewEntryDetail returns a new EntryDetail with default values for non exported fields

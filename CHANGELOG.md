@@ -8,9 +8,13 @@ BREAKING CHANGES
 
 ADDITIONS
 
-- Support ADV, TRC, TRX, XCK StandardEntryClassCode (SEC types)
-- Transaction Codes match Service Class Codes
-- Add Addenda02.TerminalState validation for BatchPOS and BatchSHR (POS and SEC Standard Entry Class Codes)
+- Support StandardEntryClassCode (SEC types):
+    - ADV (See [#340](https://github.com/moov-io/ach/issues/340))
+    - TRC (See [#346](https://github.com/moov-io/ach/issues/346))
+    - TRX (See [#372](https://github.com/moov-io/ach/issues/372))
+    - XCK (See [#347](https://github.com/moov-io/ach/issues/347))
+- Transaction Codes match Service Class Codes (See [#56](https://github.com/moov-io/ach/issues/56))
+- Add Addenda02.TerminalState validation for BatchPOS and BatchSHR (See [#375](https://github.com/moov-io/ach/issues/375))
 
 ## v0.4.0 (Released 2018-11-06)
 
