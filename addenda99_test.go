@@ -12,7 +12,7 @@ import (
 func mockAddenda99() *Addenda99 {
 	addenda99 := NewAddenda99()
 	addenda99.ReturnCode = "R07"
-	addenda99.OriginalTrace = 99912340000015
+	addenda99.OriginalTrace = "99912340000015"
 	addenda99.AddendaInformation = "Authorization Revoked"
 	addenda99.OriginalDFI = "9101298"
 
@@ -33,8 +33,8 @@ func testAddenda99Parse(t testing.TB) {
 	if addenda99.ReturnCode != "R07" {
 		t.Errorf("expected %v got %v", "R07", addenda99.ReturnCode)
 	}
-	if addenda99.OriginalTrace != 99912340000015 {
-		t.Errorf("expected: %v got: %v", 99912340000015, addenda99.OriginalTrace)
+	if addenda99.OriginalTrace != "099912340000015" {
+		t.Errorf("expected: %v got: %v", "099912340000015", addenda99.OriginalTrace)
 	}
 	if !addenda99.DateOfDeath.IsZero() {
 		t.Errorf("expected: %v got: %v", time.Time{}, addenda99.DateOfDeath)
@@ -45,8 +45,8 @@ func testAddenda99Parse(t testing.TB) {
 	if addenda99.AddendaInformation != "Authorization revoked" {
 		t.Errorf("expected: %v got: %v", "Authorization revoked", addenda99.AddendaInformation)
 	}
-	if addenda99.TraceNumber != 91012980000066 {
-		t.Errorf("expected: %v got: %v", 91012980000066, addenda99.TraceNumber)
+	if addenda99.TraceNumber != "091012980000066" {
+		t.Errorf("expected: %v got: %v", "091012980000066", addenda99.TraceNumber)
 	}
 }
 
@@ -160,7 +160,7 @@ func BenchmarkAddenda99ValidateReturnCodeFalse(b *testing.B) {
 
 func testAddenda99OriginalTraceField(t testing.TB) {
 	addenda99 := mockAddenda99()
-	addenda99.OriginalTrace = 12345
+	addenda99.OriginalTrace = "12345"
 	if addenda99.OriginalTraceField() != "000000000012345" {
 		t.Errorf("expected %v received %v", "000000000012345", addenda99.OriginalTraceField())
 	}
@@ -240,7 +240,7 @@ func BenchmarkAddenda99AddendaInformationField(b *testing.B) {
 
 func testAddenda99TraceNumberField(t testing.TB) {
 	addenda99 := mockAddenda99()
-	addenda99.TraceNumber = 91012980000066
+	addenda99.TraceNumber = "91012980000066"
 	exp := "091012980000066"
 	if addenda99.TraceNumberField() != exp {
 		t.Errorf("expected %v received %v", exp, addenda99.TraceNumberField())

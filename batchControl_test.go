@@ -58,7 +58,7 @@ func testParseBatchControl(t testing.TB) {
 		ODFIIdentification:    "7640125"}
 	r.addCurrentBatch(NewBatchPPD(&bh))
 
-	r.currentBatch.AddEntry(&EntryDetail{TransactionCode: 27, Amount: 10500, RDFIIdentification: "5320001", TraceNumber: 76401255655291})
+	r.currentBatch.AddEntry(&EntryDetail{TransactionCode: 27, Amount: 10500, RDFIIdentification: "5320001", TraceNumber: "76401255655291"})
 	if err := r.parseBatchControl(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -123,7 +123,7 @@ func testBCString(t testing.TB) {
 		ODFIIdentification:    "7640125"}
 	r.addCurrentBatch(NewBatchPPD(&bh))
 
-	r.currentBatch.AddEntry(&EntryDetail{TransactionCode: 27, Amount: 10500, RDFIIdentification: "5320001", TraceNumber: 76401255655291})
+	r.currentBatch.AddEntry(&EntryDetail{TransactionCode: 27, Amount: 10500, RDFIIdentification: "5320001", TraceNumber: "76401255655291"})
 	if err := r.parseBatchControl(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}

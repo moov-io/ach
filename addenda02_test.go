@@ -21,7 +21,7 @@ func mockAddenda02() *Addenda02 {
 	addenda02.TerminalLocation = "Target Store 0049"
 	addenda02.TerminalCity = "PHILADELPHIA"
 	addenda02.TerminalState = "PA"
-	addenda02.TraceNumber = 121042880000123
+	addenda02.TraceNumber = "121042880000123"
 	return addenda02
 }
 

@@ -56,7 +56,7 @@ func testMockIATEntryDetail(t testing.TB) {
 	if entry.Amount != 100000 {
 		t.Error("Amount dependent default value has changed")
 	}
-	if entry.TraceNumber != 231380100000001 {
+	if entry.TraceNumber != "231380100000001" {
 		t.Errorf("TraceNumber dependent default value has changed %v", entry.TraceNumber)
 	}
 }
@@ -452,7 +452,7 @@ func BenchmarkIATEDDFIAccountNumber(b *testing.B) {
 // testIATEDTraceNumber validates IATEntryDetail TraceNumber fieldInclusion
 func testIATEDTraceNumber(t testing.TB) {
 	iatEd := mockIATEntryDetail()
-	iatEd.TraceNumber = 0
+	iatEd.TraceNumber = "0"
 	if err := iatEd.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TraceNumber" {
