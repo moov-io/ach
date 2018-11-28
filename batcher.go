@@ -65,7 +65,7 @@ var (
 	msgBatchSECType                 = "header SEC type code %v for batch type %v"
 	msgBatchServiceClassTranCode    = "%v is not valid for %v"
 	msgBatchServiceClassCode        = "Service Class Code %v is not valid for batch type %v"
-	msgBatchForwardReturn           = "Forward and Return entries found in the same batch"
+	msgBatchCategory                = "%v category found in batch with category %v"
 	msgBatchAmount                  = "Amount must be less than %v for SEC code %v"
 	msgBatchCheckSerialNumber       = "Check Serial Number is required for SEC code %v"
 	msgBatchTransactionCode         = "%v is not allowed for batch type %v"

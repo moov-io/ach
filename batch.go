@@ -624,7 +624,8 @@ func (batch *Batch) isCategory() error {
 					continue
 				}
 				if batch.Entries[i].Category != category {
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Category", Msg: msgBatchForwardReturn}
+					msg := fmt.Sprintf(msgBatchCategory, batch.Entries[i].Category, category)
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Category", Msg: msg}
 				}
 			}
 		}
@@ -633,7 +634,8 @@ func (batch *Batch) isCategory() error {
 		if len(batch.ADVEntries) > 1 {
 			for i := 0; i < len(batch.ADVEntries); i++ {
 				if batch.ADVEntries[i].Category != category {
-					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Category", Msg: msgBatchForwardReturn}
+					msg := fmt.Sprintf(msgBatchCategory, batch.ADVEntries[i].Category, category)
+					return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Category", Msg: msg}
 				}
 			}
 		}

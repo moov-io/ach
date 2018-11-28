@@ -474,7 +474,8 @@ func (batch *IATBatch) isCategory() error {
 				continue
 			}
 			if batch.Entries[i].Category != category {
-				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Category", Msg: msgBatchForwardReturn}
+				msg := fmt.Sprintf(msgBatchCategory, batch.Entries[i].Category, category)
+				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Category", Msg: msg}
 			}
 		}
 	}
