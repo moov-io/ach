@@ -15,7 +15,8 @@ ADDITIONS
     - XCK (See [#347](https://github.com/moov-io/ach/issues/347))
 - Transaction Codes match Service Class Codes (See [#56](https://github.com/moov-io/ach/issues/56))
 - Add Addenda02.TerminalState validation for BatchPOS and BatchSHR (See [#375](https://github.com/moov-io/ach/issues/375))
-
+- Remove deprecated functions from EntryDetail (See [#385](https://github.com/moov-io/ach/issues/385))
+ 
 ## v0.4.0 (Released 2018-11-06)
 
 BREAKING CHANGES
