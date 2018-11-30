@@ -1,4 +1,4 @@
-## v0.5.0 (Unreleased)
+## v0.5.0 (Released 2018-11-29)
 
 BREAKING CHANGES
 
@@ -19,7 +19,7 @@ ADDITIONS
 REMOVALS
 
 - Remove deprecated functions from `EntryDetail` (See [#385](https://github.com/moov-io/ach/issues/385))
- 
+
 ## v0.4.0 (Released 2018-11-06)
 
 BREAKING CHANGES
