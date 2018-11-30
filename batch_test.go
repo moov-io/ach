@@ -743,7 +743,7 @@ func TestBatchADVInvalidEntryAddendaCount(t *testing.T) {
 // TestBatchADVTotalDebitEntryDollarAmount validates TotalDebitEntryDollarAmount
 func TestBatchADVInvalidTotalDebitEntryDollarAmount(t *testing.T) {
 	mockBatch := mockBatchADV()
-	mockBatch.GetADVEntries()[0].TransactionCode = 82
+	mockBatch.GetADVEntries()[0].TransactionCode = DebitForCreditsOriginated
 	mockBatch.Create()
 	mockBatch.ADVControl.TotalDebitEntryDollarAmount = 2200
 	if err := mockBatch.Validate(); err != nil {
@@ -824,7 +824,7 @@ func TestBatchADVCategory(t *testing.T) {
 	mockBatch := mockBatchADV()
 
 	entryOne := NewADVEntryDetail()
-	entryOne.TransactionCode = 81
+	entryOne.TransactionCode = CreditForDebitsOriginated
 	entryOne.SetRDFI("231380104")
 	entryOne.DFIAccountNumber = "744-5678-99"
 	entryOne.Amount = 50000

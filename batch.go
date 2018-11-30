@@ -473,10 +473,10 @@ func (batch *Batch) calculateBatchAmounts() (credit int, debit int) {
 
 func (batch *Batch) calculateADVBatchAmounts() (credit int, debit int) {
 	for _, entry := range batch.ADVEntries {
-		if entry.TransactionCode == 81 || entry.TransactionCode == 83 || entry.TransactionCode == 85 || entry.TransactionCode == 87 {
+		if entry.TransactionCode == CreditForDebitsOriginated || entry.TransactionCode == CreditForCreditsReceived || entry.TransactionCode == CreditForCreditsRejected || entry.TransactionCode == CreditSummary {
 			credit = credit + entry.Amount
 		}
-		if entry.TransactionCode == 82 || entry.TransactionCode == 84 || entry.TransactionCode == 86 || entry.TransactionCode == 88 {
+		if entry.TransactionCode == DebitForCreditsOriginated || entry.TransactionCode == DebitForDebitsReceived || entry.TransactionCode == DebitForDebitsRejectedBatches || entry.TransactionCode == DebitSummary {
 			debit = debit + entry.Amount
 		}
 	}
