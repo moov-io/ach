@@ -8,17 +8,17 @@ BREAKING CHANGES
 
 ADDITIONS
 
-- Support StandardEntryClassCode (SEC types):
+- Support `StandardEntryClassCode` (Batch types):
     - ADV (See [#340](https://github.com/moov-io/ach/issues/340))
     - TRC (See [#346](https://github.com/moov-io/ach/issues/346))
     - TRX (See [#372](https://github.com/moov-io/ach/issues/372))
     - XCK (See [#347](https://github.com/moov-io/ach/issues/347))
-- Transaction Codes match Service Class Codes (See [#56](https://github.com/moov-io/ach/issues/56))
-- Add Addenda02.TerminalState validation for BatchPOS and BatchSHR (See [#375](https://github.com/moov-io/ach/issues/375))
+- `TransactionCode` match `ServiceClassCode` (See [#56](https://github.com/moov-io/ach/issues/56))
+- `Addenda02.TerminalState` validation for BatchPOS and BatchSHR (See [#375](https://github.com/moov-io/ach/issues/375))
 
 REMOVALS
 
-- Remove deprecated functions from EntryDetail (See [#385](https://github.com/moov-io/ach/issues/385))
+- Remove deprecated functions from `EntryDetail` (See [#385](https://github.com/moov-io/ach/issues/385))
  
 ## v0.4.0 (Released 2018-11-06)
 
@@ -29,10 +29,14 @@ BREAKING CHANGES
 
 ADDITIONS
 
-- Support ACK, ATX, DNE, ENR StandardEntryClassCode (SEC types)
-  - Support NOC for IAT Entries
+- Support `StandardEntryClassCode` (Batch types):
+  - ACK (See [#327](https://github.com/moov-io/ach/issues/327))
+  - ATX (See [#327](https://github.com/moov-io/ach/issues/327))
+  - DNE (See [#342](https://github.com/moov-io/ach/issues/342))
+  - ENR (See [#343](https://github.com/moov-io/ach/issues/343))
+- Support NOC for IAT Entries (See [#328](https://github.com/moov-io/ach/issues/328))
 - Add `FileFromJson` for reading `File` objects as JSON.
-- Add `X-Total-Count` response headers on `GET /files/:id/batches`
+- Add `X-Total-Count` response headers on `GET /files/:id/batches` (See [#280](https://github.com/moov-io/ach/issues/280))
 
 IMPROVEMENTS
 
