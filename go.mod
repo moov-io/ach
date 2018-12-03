@@ -9,9 +9,10 @@ require (
 	github.com/golang/protobuf v1.2.0 // indirect
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/mux v1.6.2
+	github.com/hashicorp/golang-lru v0.5.0 // indirect
 	github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
-	github.com/moov-io/base v0.0.0-20181030202447-dedcf5cc8055
+	github.com/moov-io/base v0.0.0-20181203201558-b27bcdd66705
 	github.com/prometheus/client_golang v0.8.0
 	github.com/prometheus/client_model v0.0.0-20180712105110-5c3871d89910 // indirect
 	github.com/prometheus/common v0.0.0-20180801064454-c7de2306084e // indirect

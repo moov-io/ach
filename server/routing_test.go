@@ -91,47 +91,36 @@ func TestBatchesXTotalCountHeader(t *testing.T) {
 	}
 }
 
-func TestRouting__proxyCORSHeaders(t *testing.T) {
-	r := httptest.NewRequest("GET", "/ping", nil)
-	r.Header.Set("Access-Control-Allow-Origin", "origin")
-	r.Header.Set("Access-Control-Allow-Methods", "methods")
-	r.Header.Set("Access-Control-Allow-Headers", "headers")
-	r.Header.Set("Access-Control-Allow-Credentials", "credentials")
-
+func TestRouting__CORSHeaders(t *testing.T) {
 	ctx := context.TODO()
-	ctx = saveCORSHeadersIntoContext()(ctx, r)
+	req := httptest.NewRequest("GET", "/files/create", nil)
+	req.Header.Set("Access-Control-Allow-Origin", "https://api.moov.io")
 
-	check := func(ctx context.Context, key contextKey, expected string) {
-		v, ok := ctx.Value(key).(string)
-		if !ok {
-			t.Errorf("key=%v, v=%s, ok=%v", key, v, ok)
-		}
-		if v != expected {
-			t.Errorf("got %s, expected %s", v, expected)
-		}
-	}
+	ctx = saveCORSHeadersIntoContext()(ctx, req)
 
-	check(ctx, accessControlAllowOrigin, "origin")
-	check(ctx, accessControlAllowMethods, "methods")
-	check(ctx, accessControlAllowHeaders, "headers")
-	check(ctx, accessControlAllowCredentials, "credentials")
-
-	// now make sure ctx writes these headers to an http.ResponseWriter
 	w := httptest.NewRecorder()
 	respondWithSavedCORSHeaders()(ctx, w)
 	w.Flush()
 
-	if v := r.Header.Get("Access-Control-Allow-Origin"); v != "origin" {
+	if w.Code != 0 {
+		t.Errorf("expected no status code, but got %d", w.Code)
+	}
+	if v := w.Header().Get("Content-Type"); v != "" {
+		t.Errorf("expected no Content-Type, but got %q", v)
+	}
+
+	// check CORS headers
+	if v := w.Header().Get("Access-Control-Allow-Origin"); v != "https://api.moov.io" {
 		t.Errorf("got %s", v)
 	}
-	if v := r.Header.Get("Access-Control-Allow-Methods"); v != "methods" {
-		t.Errorf("got %s", v)
+	if v := w.Header().Get("Access-Control-Allow-Methods"); v == "" {
+		t.Error("missing Access-Control-Allow-Methods")
 	}
-	if v := r.Header.Get("Access-Control-Allow-Headers"); v != "headers" {
-		t.Errorf("got %s", v)
+	if v := w.Header().Get("Access-Control-Allow-Headers"); v == "" {
+		t.Error("missing Access-Control-Allow-Headers")
 	}
-	if v := r.Header.Get("Access-Control-Allow-Credentials"); v != "credentials" {
-		t.Errorf("got %s", v)
+	if v := w.Header().Get("Access-Control-Allow-Credentials"); v == "" {
+		t.Error("missing Access-Control-Allow-Credentials")
 	}
 }
 

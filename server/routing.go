@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strconv"
 
+	moovhttp "github.com/moov-io/base/http"
+
 	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/log"
 	httptransport "github.com/go-kit/kit/transport/http"
@@ -25,33 +27,15 @@ var (
 // contextKey is a unique (and compariable) type we use
 // to store and retrieve additional information in the
 // go-kit context.
-type contextKey int
-
-const (
-	accessControlAllowOrigin contextKey = iota
-	accessControlAllowMethods
-	accessControlAllowHeaders
-	accessControlAllowCredentials
-)
+var contextKey struct{}
 
 // saveCORSHeadersIntoContext saves CORS headers into the go-kit context.
 //
 // This is designed to be added as a ServerOption in our main http handler.
 func saveCORSHeadersIntoContext() httptransport.RequestFunc {
 	return func(ctx context.Context, r *http.Request) context.Context {
-		if v := r.Header.Get("Access-Control-Allow-Origin"); v != "" {
-			ctx = context.WithValue(ctx, accessControlAllowOrigin, v)
-
-			v = r.Header.Get("Access-Control-Allow-Methods")
-			ctx = context.WithValue(ctx, accessControlAllowMethods, v)
-
-			v = r.Header.Get("Access-Control-Allow-Headers")
-			ctx = context.WithValue(ctx, accessControlAllowHeaders, v)
-
-			v = r.Header.Get("Access-Control-Allow-Credentials")
-			ctx = context.WithValue(ctx, accessControlAllowCredentials, v)
-		}
-		return ctx
+		origin := r.Header.Get("Origin")
+		return context.WithValue(ctx, contextKey, origin)
 	}
 }
 
@@ -62,17 +46,9 @@ func saveCORSHeadersIntoContext() httptransport.RequestFunc {
 // This is designed to be added as a ServerOption in our main http handler.
 func respondWithSavedCORSHeaders() httptransport.ServerResponseFunc {
 	return func(ctx context.Context, w http.ResponseWriter) context.Context {
-		if v, ok := ctx.Value(accessControlAllowOrigin).(string); ok && v != "" {
-			w.Header().Set("Access-Control-Allow-Origin", v)
-		}
-		if v, ok := ctx.Value(accessControlAllowMethods).(string); ok && v != "" {
-			w.Header().Set("Access-Control-Allow-Methods", v)
-		}
-		if v, ok := ctx.Value(accessControlAllowHeaders).(string); ok && v != "" {
-			w.Header().Set("Access-Control-Allow-Headers", v)
-		}
-		if v, ok := ctx.Value(accessControlAllowCredentials).(string); ok && v != "" {
-			w.Header().Set("Access-Control-Allow-Credentials", v)
+		v, ok := ctx.Value(contextKey).(string)
+		if ok && v != "" {
+			moovhttp.SetAccessControlAllowHeaders(w, v) // set CORS headers
 		}
 		return ctx
 	}
@@ -87,7 +63,10 @@ func preflightHandler(options []httptransport.ServerOption) http.Handler {
 	return httptransport.NewServer(
 		endpoint.Nop,
 		httptransport.NopRequestDecoder,
-		func(_ context.Context, _ http.ResponseWriter, _ interface{}) error {
+		func(_ context.Context, w http.ResponseWriter, _ interface{}) error {
+			if v := w.Header().Get("Content-Type"); v == "" {
+				w.Header().Set("Content-Type", "text/plain")
+			}
 			return nil
 		},
 		options...,
