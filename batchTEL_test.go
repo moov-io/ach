@@ -19,7 +19,7 @@ func mockBatchTELHeader() *BatchHeader {
 // mockTELEntryDetail creates a TEL entry detail
 func mockTELEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 27
+	entry.TransactionCode = CheckingDebit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 5000000

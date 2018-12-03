@@ -236,7 +236,7 @@ func BenchmarkBatchCIEServiceClass280(b *testing.B) {
 // testBatchCIETransactionCode validates BatchCIE TransactionCode is not a debit
 func testBatchCIETransactionCode(t testing.TB) {
 	mockBatch := mockBatchCIE()
-	mockBatch.GetEntries()[0].TransactionCode = 27
+	mockBatch.GetEntries()[0].TransactionCode = CheckingDebit
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TransactionCode" {

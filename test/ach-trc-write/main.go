@@ -32,10 +32,10 @@ func main() {
 	// can be multiple entry's per batch
 	entry := ach.NewEntryDetail()
 	// Identifies the entry as a debit and credit entry AND to what type of account (Savings, DDA, Loan, GL)
-	entry.TransactionCode = 27          // Code 27: Debit (withdrawal) from checking account
-	entry.SetRDFI("231380104")          // Receivers bank transit routing number
-	entry.DFIAccountNumber = "12345678" // Receivers bank account number
-	entry.Amount = 250000               // Amount of transaction with no decimal. One dollar and eleven cents = 111
+	entry.TransactionCode = ach.CheckingDebit // Code 27: Debit (withdrawal) from checking account
+	entry.SetRDFI("231380104")                // Receivers bank transit routing number
+	entry.DFIAccountNumber = "12345678"       // Receivers bank account number
+	entry.Amount = 250000                     // Amount of transaction with no decimal. One dollar and eleven cents = 111
 	entry.SetCheckSerialNumber("123879654")
 	entry.SetProcessControlField("CHECK1")
 	entry.SetItemResearchNumber("182726")

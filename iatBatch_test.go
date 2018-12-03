@@ -662,9 +662,9 @@ func BenchmarkIATBatchCreditIsBatchAmount(b *testing.B) {
 func testIATBatchDebitIsBatchAmount(t testing.TB) {
 	mockBatch := mockIATBatch(t)
 	e1 := mockBatch.GetEntries()[0]
-	e1.TransactionCode = 27
+	e1.TransactionCode = CheckingDebit
 	e2 := mockIATEntryDetail()
-	e2.TransactionCode = 27
+	e2.TransactionCode = CheckingDebit
 	e2.Amount = 5000
 	// replace last 2 of TraceNumber
 	e2.TraceNumber = e1.TraceNumber[:13] + "10"

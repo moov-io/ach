@@ -74,7 +74,7 @@ func testParseEntryDetail(t testing.TB) {
 	if record.recordType != "6" {
 		t.Errorf("RecordType Expected '6' got: %v", record.recordType)
 	}
-	if record.TransactionCode != 27 {
+	if record.TransactionCode != CheckingDebit {
 		t.Errorf("TransactionCode Expected '27' got: %v", record.TransactionCode)
 	}
 	if record.RDFIIdentificationField() != "05320001" {

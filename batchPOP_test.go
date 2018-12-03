@@ -21,7 +21,7 @@ func mockBatchPOPHeader() *BatchHeader {
 // mockPOPEntryDetail creates a BatchPOP EntryDetail
 func mockPOPEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 27
+	entry.TransactionCode = CheckingDebit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000

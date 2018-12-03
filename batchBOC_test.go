@@ -21,7 +21,7 @@ func mockBatchBOCHeader() *BatchHeader {
 // mockBOCEntryDetail creates a BatchBOC EntryDetail
 func mockBOCEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 27
+	entry.TransactionCode = CheckingDebit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000

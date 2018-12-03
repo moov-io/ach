@@ -35,20 +35,20 @@ func main() {
 	// can be multiple entry's per batch
 	entry := ach.NewEntryDetail()
 	// Identifies the entry as a debit and credit entry AND to what type of account (Savings, DDA, Loan, GL)
-	entry.TransactionCode = 27             // Code 22: Demand Debit(deposit) to checking account
-	entry.SetRDFI("231380104")             // Receivers bank transit routing number
-	entry.DFIAccountNumber = "744-5678-99" // Receivers bank account number
-	entry.Amount = 500000                  // Amount of transaction with no decimal. One dollar and eleven cents = 111
+	entry.TransactionCode = ach.CheckingDebit // Code 22: Demand Debit(deposit) to checking account
+	entry.SetRDFI("231380104")                // Receivers bank transit routing number
+	entry.DFIAccountNumber = "744-5678-99"    // Receivers bank account number
+	entry.Amount = 500000                     // Amount of transaction with no decimal. One dollar and eleven cents = 111
 	entry.IdentificationNumber = "location #1"
 	entry.SetReceivingCompany("Best Co. #1")
 	entry.SetTraceNumber(bh.ODFIIdentification, 1)
 	entry.DiscretionaryData = "S"
 
-	entryOne := ach.NewEntryDetail()          // Fee Entry
-	entryOne.TransactionCode = 27             // Code 22: Demand Debit(deposit) to checking account
-	entryOne.SetRDFI("231380104")             // Receivers bank transit routing number
-	entryOne.DFIAccountNumber = "744-5678-99" // Receivers bank account number
-	entryOne.Amount = 125                     // Amount of transaction with no decimal. One dollar and eleven cents = 111
+	entryOne := ach.NewEntryDetail()             // Fee Entry
+	entryOne.TransactionCode = ach.CheckingDebit // Code 22: Demand Debit(deposit) to checking account
+	entryOne.SetRDFI("231380104")                // Receivers bank transit routing number
+	entryOne.DFIAccountNumber = "744-5678-99"    // Receivers bank account number
+	entryOne.Amount = 125                        // Amount of transaction with no decimal. One dollar and eleven cents = 111
 	entryOne.IdentificationNumber = "Fee #1"
 	entryOne.SetReceivingCompany("Best Co. #1")
 	entryOne.SetTraceNumber(bh.ODFIIdentification, 2)

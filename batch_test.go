@@ -854,7 +854,7 @@ func TestBatchADVCategory(t *testing.T) {
 // TestBatchDishonoredReturnsCategory validates Category for Returns
 func TestBatchDishonoredReturnsCategory(t *testing.T) {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 27
+	entry.TransactionCode = CheckingDebit
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
@@ -871,7 +871,7 @@ func TestBatchDishonoredReturnsCategory(t *testing.T) {
 	entry.Addenda99 = addenda99
 
 	entryOne := NewEntryDetail()
-	entryOne.TransactionCode = 27
+	entryOne.TransactionCode = CheckingDebit
 	entryOne.SetRDFI("121042882")
 	entryOne.DFIAccountNumber = "744-5678-99"
 	entryOne.Amount = 23000

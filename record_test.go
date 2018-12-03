@@ -66,7 +66,7 @@ func BenchmarkBatchRecord(b *testing.B) {
 func testEntryDetail(t testing.TB) {
 	entry := mockEntryDetail()
 	//override mockEntryDetail
-	entry.TransactionCode = 27
+	entry.TransactionCode = CheckingDebit
 
 	if err := entry.Validate(); err != nil {
 		t.Errorf("%T: %s", err, err)
@@ -90,7 +90,7 @@ func BenchmarkEntryDetail(b *testing.B) {
 func testEntryDetailPaymentType(t testing.TB) {
 	entry := mockEntryDetail()
 	//override mockEntryDetail
-	entry.TransactionCode = 27
+	entry.TransactionCode = CheckingDebit
 	entry.DiscretionaryData = "R"
 	if err := entry.Validate(); err != nil {
 		t.Errorf("%T: %s", err, err)
@@ -114,7 +114,7 @@ func BenchmarkEntryDetailPaymentType(b *testing.B) {
 func testEntryDetailReceivingCompany(t testing.TB) {
 	entry := mockEntryDetail()
 	//override mockEntryDetail
-	entry.TransactionCode = 27
+	entry.TransactionCode = CheckingDebit
 	entry.IdentificationNumber = "location #23"
 	entry.IndividualName = "Best Co. #23"
 

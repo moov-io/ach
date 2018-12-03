@@ -245,7 +245,7 @@ func BenchmarkBatchCORAmount(b *testing.B) {
 // testBatchCORTransactionCode27 validates BatchCOR TransactionCode 27 returns an error
 func testBatchCORTransactionCode27(t testing.TB) {
 	mockBatch := mockBatchCOR()
-	mockBatch.GetEntries()[0].TransactionCode = 27
+	mockBatch.GetEntries()[0].TransactionCode = CheckingDebit
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TransactionCode" {
