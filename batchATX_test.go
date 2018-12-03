@@ -502,7 +502,7 @@ func testBatchATXTransactionCode(t testing.TB) {
 	bh.OriginatorStatusCode = 2
 
 	entry := NewEntryDetail()
-	entry.TransactionCode = 23
+	entry.TransactionCode = CheckingPrenoteCredit
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
@@ -554,7 +554,7 @@ func TestBatchATXAmount(t *testing.T) {
 	bh.OriginatorStatusCode = 2
 
 	entry := NewEntryDetail()
-	entry.TransactionCode = 23
+	entry.TransactionCode = CheckingPrenoteCredit
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000

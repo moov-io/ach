@@ -509,7 +509,7 @@ func testBatchCTXPrenoteAddendaRecords(t testing.TB) {
 	bh.OriginatorStatusCode = 2
 
 	entry := NewEntryDetail()
-	entry.TransactionCode = 23
+	entry.TransactionCode = CheckingPrenoteCredit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000

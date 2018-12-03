@@ -211,7 +211,7 @@ func testBatchDNEMismatch(t testing.TB) {
 	mockBatch.build()
 
 	mockBatch.GetHeader().OriginatorStatusCode = 1
-	mockBatch.GetEntries()[0].TransactionCode = 23
+	mockBatch.GetEntries()[0].TransactionCode = CheckingPrenoteCredit
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "OriginatorStatusCode" {

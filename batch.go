@@ -559,7 +559,7 @@ func (batch *Batch) calculateEntryHash() string {
 func (batch *Batch) isOriginatorDNE() error {
 	if batch.Header.OriginatorStatusCode != 2 {
 		for _, entry := range batch.Entries {
-			if entry.TransactionCode == 23 || entry.TransactionCode == 33 {
+			if entry.TransactionCode == CheckingPrenoteCredit || entry.TransactionCode == 33 {
 				msg := fmt.Sprintf(msgBatchOriginatorDNE, batch.Header.OriginatorStatusCode)
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "OriginatorStatusCode", Msg: msg}
 			}
