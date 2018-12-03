@@ -27,7 +27,7 @@ func mockBatchDNEHeader() *BatchHeader {
 // mockDNEEntryDetail creates a DNE entry detail
 func mockDNEEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 21
+	entry.TransactionCode = CheckingReturnNOCCredit
 	entry.SetRDFI("031300012")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0

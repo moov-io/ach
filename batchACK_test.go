@@ -24,7 +24,7 @@ func mockBatchACKHeader() *BatchHeader {
 // mockACKEntryDetail creates a ACK entry detail
 func mockACKEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 24
+	entry.TransactionCode = CheckingZeroDollarRemittanceCredit
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0

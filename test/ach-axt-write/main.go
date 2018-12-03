@@ -46,8 +46,8 @@ func main() {
 	entry.DiscretionaryData = "01"
 	entry.AddendaRecordIndicator = 1
 
-	entryOne := ach.NewEntryDetail()          // Fee Entry
-	entryOne.TransactionCode = 24             // Demand Credit
+	entryOne := ach.NewEntryDetail() // Fee Entry
+	entryOne.TransactionCode = ach.CheckingZeroDollarRemittanceCredit
 	entryOne.SetRDFI("031300012")             // Receivers bank transit routing number
 	entryOne.DFIAccountNumber = "744-5678-99" // Receivers bank account number
 	entryOne.Amount = 0                       // Amount of transaction with no decimal. One dollar and eleven cents = 111

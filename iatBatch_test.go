@@ -1954,7 +1954,7 @@ func TestIATBatchAddenda98TotalCount(t *testing.T) {
 	mockBatch := IATBatch{}
 	mockBatch.SetHeader(mockIATNOCBatchHeaderFF())
 	mockBatch.AddEntry(mockIATEntryDetail())
-	mockBatch.GetEntries()[0].TransactionCode = 21
+	mockBatch.GetEntries()[0].TransactionCode = CheckingReturnNOCCredit
 	mockBatch.GetEntries()[0].AddendaRecords = 2
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 	mockBatch.Entries[0].Addenda98 = mockIATAddenda98()
@@ -1980,7 +1980,7 @@ func TestIATBatchAddenda98Nil(t *testing.T) {
 	mockBatch := IATBatch{}
 	mockBatch.SetHeader(mockIATNOCBatchHeaderFF())
 	mockBatch.AddEntry(mockIATEntryDetail())
-	mockBatch.GetEntries()[0].TransactionCode = 21
+	mockBatch.GetEntries()[0].TransactionCode = CheckingReturnNOCCredit
 	mockBatch.GetEntries()[0].AddendaRecords = 2
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 
@@ -2004,7 +2004,7 @@ func TestIATBatchAddenda98RecordType(t *testing.T) {
 	mockBatch := IATBatch{}
 	mockBatch.SetHeader(mockIATNOCBatchHeaderFF())
 	mockBatch.AddEntry(mockIATEntryDetail())
-	mockBatch.GetEntries()[0].TransactionCode = 21
+	mockBatch.GetEntries()[0].TransactionCode = CheckingReturnNOCCredit
 	mockBatch.GetEntries()[0].AddendaRecords = 2
 	addenda98 := mockAddenda98()
 	addenda98.recordType = "00"
@@ -2079,7 +2079,7 @@ func TestIATBatchAddenda98TransactionCode(t *testing.T) {
 	mockBatch := IATBatch{}
 	mockBatch.SetHeader(mockIATNOCBatchHeaderFF())
 	mockBatch.AddEntry(mockIATEntryDetail())
-	mockBatch.GetEntries()[0].TransactionCode = 21
+	mockBatch.GetEntries()[0].TransactionCode = CheckingReturnNOCCredit
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 	mockBatch.Entries[0].Addenda98 = mockIATAddenda98()
 	mockBatch.category = CategoryNOC
@@ -2105,7 +2105,7 @@ func TestIATBatchAddenda98IATIndicator(t *testing.T) {
 	mockBatch.SetHeader(mockIATNOCBatchHeaderFF())
 	mockBatch.GetHeader().IATIndicator = "B"
 	mockBatch.AddEntry(mockIATEntryDetail())
-	mockBatch.GetEntries()[0].TransactionCode = 21
+	mockBatch.GetEntries()[0].TransactionCode = CheckingReturnNOCCredit
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 	mockBatch.Entries[0].Addenda98 = mockIATAddenda98()
 	mockBatch.category = CategoryNOC
@@ -2130,7 +2130,7 @@ func TestIATBatchAddenda98SECCode(t *testing.T) {
 	mockBatch.SetHeader(mockIATNOCBatchHeaderFF())
 	mockBatch.GetHeader().StandardEntryClassCode = "IAT"
 	mockBatch.AddEntry(mockIATEntryDetail())
-	mockBatch.GetEntries()[0].TransactionCode = 21
+	mockBatch.GetEntries()[0].TransactionCode = CheckingReturnNOCCredit
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 	mockBatch.Entries[0].Addenda98 = mockIATAddenda98()
 	mockBatch.category = CategoryNOC

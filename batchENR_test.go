@@ -274,7 +274,7 @@ func TestBatchENRAmount(t *testing.T) {
 // TestBatchENRTransactionCode validates TransactionCode
 func TestBatchENRTransactionCode(t *testing.T) {
 	mockBatch := mockBatchENR()
-	mockBatch.GetEntries()[0].TransactionCode = 21
+	mockBatch.GetEntries()[0].TransactionCode = CheckingReturnNOCCredit
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -298,7 +298,7 @@ func TestBatchENR__PaymentInformation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if v := info.TransactionCode; v != 21 {
+	if v := info.TransactionCode; v != CheckingReturnNOCCredit {
 		t.Errorf("TransactionCode: %d", v)
 	}
 	if v := info.RDFIIdentification; v != "12200004" {

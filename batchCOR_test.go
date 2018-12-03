@@ -24,7 +24,7 @@ func mockBatchCORHeader() *BatchHeader {
 // mockCOREntryDetail creates a COR EntryDetail
 func mockCOREntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 21
+	entry.TransactionCode = CheckingReturnNOCCredit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
@@ -274,7 +274,7 @@ func BenchmarkBatchCORTransactionCode27(b *testing.B) {
 // testBatchCORTransactionCode21 validates BatchCOR TransactionCode 21
 func testBatchCORTransactionCode21(t testing.TB) {
 	mockBatch := mockBatchCOR()
-	mockBatch.GetEntries()[0].TransactionCode = 21
+	mockBatch.GetEntries()[0].TransactionCode = CheckingReturnNOCCredit
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TransactionCode" {
