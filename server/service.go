@@ -111,6 +111,11 @@ func (s *service) GetFileContents(id string) (io.Reader, error) {
 	if err := w.Flush(); err != nil {
 		return nil, err
 	}
+
+	if buf.Len() == 0 {
+		return nil, errors.New("empty ACH file contents")
+	}
+
 	return &buf, nil
 }
 
