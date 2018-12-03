@@ -32,7 +32,7 @@ func main() {
 	bh.ODFIIdentification = "121042882" // Originating Routing Number
 
 	entry := ach.NewEntryDetail()
-	entry.TransactionCode = 22
+	entry.TransactionCode = ach.CheckingCredit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "12345678"
 	entry.Amount = 10000 //  100.00
@@ -49,7 +49,7 @@ func main() {
 	entry.AddAddenda05(addenda1)
 
 	entry2 := ach.NewEntryDetail()
-	entry2.TransactionCode = 22
+	entry2.TransactionCode = ach.CheckingCredit
 	entry2.SetRDFI("231380104")
 	entry2.DFIAccountNumber = "81967038518"
 	entry2.Amount = 799 // 7.99

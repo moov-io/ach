@@ -283,7 +283,7 @@ func TestBatchDNEAmount(t *testing.T) {
 // TestBatchDNETransactionCode validates TransactionCode
 func TestBatchDNETransactionCode(t *testing.T) {
 	mockBatch := mockBatchDNE()
-	mockBatch.GetEntries()[0].TransactionCode = 22
+	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

@@ -239,7 +239,7 @@ func BenchmarkBatchSHRServiceClass280(b *testing.B) {
 // testBatchSHRTransactionCode validates BatchSHR TransactionCode is not a credit
 func testBatchSHRTransactionCode(t testing.TB) {
 	mockBatch := mockBatchSHR()
-	mockBatch.GetEntries()[0].TransactionCode = 22
+	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TransactionCode" {

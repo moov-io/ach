@@ -31,7 +31,7 @@ func mockBatchInvalidTraceNumberODFI() *Batch {
 // EntryDetail with mismatched TraceNumber ODFI
 func mockEntryDetailInvalidTraceNumberODFI() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 22
+	entry.TransactionCode = CheckingCredit
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "123456789"
 	entry.Amount = 100000000
@@ -96,10 +96,10 @@ func testCreditBatchIsBatchAmount(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.SetHeader(mockBatchHeader())
 	e1 := mockBatch.GetEntries()[0]
-	e1.TransactionCode = 22
+	e1.TransactionCode = CheckingCredit
 	e1.Amount = 100
 	e2 := mockEntryDetail()
-	e2.TransactionCode = 22
+	e2.TransactionCode = CheckingCredit
 	e2.Amount = 100
 	// replace last 2 of TraceNumber
 	e2.TraceNumber = e1.TraceNumber[:13] + "10"
@@ -728,7 +728,7 @@ func TestBatchADVInvalidBatchNumber(t *testing.T) {
 func TestBatchADVInvalidEntryAddendaCount(t *testing.T) {
 	mockBatch := mockBatchADV()
 	mockBatch.Create()
-	mockBatch.ADVControl.EntryAddendaCount = 22
+	mockBatch.ADVControl.EntryAddendaCount = CheckingCredit
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "EntryAddendaCount" {

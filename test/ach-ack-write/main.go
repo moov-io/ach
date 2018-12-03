@@ -23,7 +23,7 @@ func main() {
 
 	// BatchHeader identifies the originating entity and the type of transactions contained in the batch
 	bh := ach.NewBatchHeader()
-	bh.ServiceClassCode = 220          // ACH credit pushes money out, 225 debits/pulls money in.
+	bh.ServiceClassCode = 220          //
 	bh.CompanyName = "Name on Account" // The name of the company/person that has relationship with receiver
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = "ACK"       // Consumer destination vs Company CCD
@@ -35,19 +35,19 @@ func main() {
 	// can be multiple entry's per batch
 	entry := ach.NewEntryDetail()
 	// Identifies the entry as a debit and credit entry AND to what type of account (Savings, DDA, Loan, GL)
-	entry.TransactionCode = 24             // Code 22: Demand Debit(deposit) to checking account
+	entry.TransactionCode = ach.CheckingZeroDollarRemittanceCredit
 	entry.SetRDFI("031300012")             // Receivers bank transit routing number
 	entry.DFIAccountNumber = "744-5678-99" // Receivers bank account number
-	entry.Amount = 0                       // Amount of transaction with no decimal. One dollar and eleven cents = 111
+	entry.Amount = 0                       // Amount of transaction with no decimal. Zero Dollar Amount
 	entry.SetOriginalTraceNumber("031300010000001")
 	entry.SetReceivingCompany("Best. #1")
 	entry.SetTraceNumber(bh.ODFIIdentification, 1)
 
-	entryOne := ach.NewEntryDetail()          // Fee Entry
-	entryOne.TransactionCode = 24             // Demand Credit
+	entryOne := ach.NewEntryDetail() // Fee Entry
+	entryOne.TransactionCode = ach.CheckingZeroDollarRemittanceCredit
 	entryOne.SetRDFI("031300012")             // Receivers bank transit routing number
 	entryOne.DFIAccountNumber = "744-5678-99" // Receivers bank account number
-	entryOne.Amount = 0                       // Amount of transaction with no decimal. One dollar and eleven cents = 111
+	entryOne.Amount = 0                       // Amount of transaction with no decimal.  Zero Dollar Amount
 	entryOne.SetOriginalTraceNumber("031300010000002")
 	entryOne.SetReceivingCompany("Best. #1")
 	entryOne.SetTraceNumber(bh.ODFIIdentification, 2)

@@ -154,7 +154,7 @@ func BenchmarkBatchTELSEC(b *testing.B) {
 // testBatchTELDebit validates Transaction code for TEL entry detail
 func testBatchTELDebit(t testing.TB) {
 	mockBatch := mockBatchTEL()
-	mockBatch.GetEntries()[0].TransactionCode = 22
+	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TransactionCode" {

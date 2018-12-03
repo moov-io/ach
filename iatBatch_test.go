@@ -616,7 +616,7 @@ func testIATBatchCreditIsBatchAmount(t testing.TB) {
 	mockBatch := mockIATBatch(t)
 	e1 := mockBatch.GetEntries()[0]
 	e2 := mockIATEntryDetail()
-	e2.TransactionCode = 22
+	e2.TransactionCode = CheckingCredit
 	e2.Amount = 5000
 	// replace last 2 of TraceNumber
 	e2.TraceNumber = e1.TraceNumber[:13] + "10"
@@ -2079,7 +2079,7 @@ func TestIATBatchAddenda98TransactionCode(t *testing.T) {
 	mockBatch := IATBatch{}
 	mockBatch.SetHeader(mockIATNOCBatchHeaderFF())
 	mockBatch.AddEntry(mockIATEntryDetail())
-	mockBatch.GetEntries()[0].TransactionCode = 22
+	mockBatch.GetEntries()[0].TransactionCode = 21
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 	mockBatch.Entries[0].Addenda98 = mockIATAddenda98()
 	mockBatch.category = CategoryNOC
@@ -2105,7 +2105,7 @@ func TestIATBatchAddenda98IATIndicator(t *testing.T) {
 	mockBatch.SetHeader(mockIATNOCBatchHeaderFF())
 	mockBatch.GetHeader().IATIndicator = "B"
 	mockBatch.AddEntry(mockIATEntryDetail())
-	mockBatch.GetEntries()[0].TransactionCode = 22
+	mockBatch.GetEntries()[0].TransactionCode = 21
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 	mockBatch.Entries[0].Addenda98 = mockIATAddenda98()
 	mockBatch.category = CategoryNOC
@@ -2130,7 +2130,7 @@ func TestIATBatchAddenda98SECCode(t *testing.T) {
 	mockBatch.SetHeader(mockIATNOCBatchHeaderFF())
 	mockBatch.GetHeader().StandardEntryClassCode = "IAT"
 	mockBatch.AddEntry(mockIATEntryDetail())
-	mockBatch.GetEntries()[0].TransactionCode = 22
+	mockBatch.GetEntries()[0].TransactionCode = 21
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 	mockBatch.Entries[0].Addenda98 = mockIATAddenda98()
 	mockBatch.category = CategoryNOC

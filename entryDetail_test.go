@@ -12,7 +12,7 @@ import (
 // mockEntryDetail creates an entry detail
 func mockEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 22
+	entry.TransactionCode = CheckingCredit
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "123456789"
 	entry.Amount = 100000000
@@ -29,7 +29,7 @@ func testMockEntryDetail(t testing.TB) {
 	if err := entry.Validate(); err != nil {
 		t.Error("mockEntryDetail does not validate and will break other tests")
 	}
-	if entry.TransactionCode != 22 {
+	if entry.TransactionCode != CheckingCredit {
 		t.Error("TransactionCode dependent default value has changed")
 	}
 	if entry.DFIAccountNumber != "123456789" {

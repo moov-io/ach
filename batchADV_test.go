@@ -152,7 +152,7 @@ func TestBatchADVAddendum99Category(t *testing.T) {
 func TestBatchADVInvalidTransactionCode(t *testing.T) {
 	mockBatch := mockBatchADV()
 	// Batch Header information is required to Create a batch.
-	mockBatch.GetADVEntries()[0].TransactionCode = 22
+	mockBatch.GetADVEntries()[0].TransactionCode = CheckingCredit
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

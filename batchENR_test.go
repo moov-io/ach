@@ -24,7 +24,7 @@ func mockBatchENRHeader() *BatchHeader {
 // mockENREntryDetail creates a ENR entry detail
 func mockENREntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 22
+	entry.TransactionCode = CheckingCredit
 	entry.SetRDFI("031300012")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0

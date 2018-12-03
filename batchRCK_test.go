@@ -57,7 +57,7 @@ func mockBatchRCKHeaderCredit() *BatchHeader {
 // mockRCKEntryDetailCredit creates a BatchRCK EntryDetail with a credit entry
 func mockRCKEntryDetailCredit() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 22
+	entry.TransactionCode = CheckingCredit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 2400

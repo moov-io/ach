@@ -461,10 +461,24 @@ func (batch *Batch) isBatchAmount() error {
 
 func (batch *Batch) calculateBatchAmounts() (credit int, debit int) {
 	for _, entry := range batch.Entries {
-		if entry.TransactionCode == 21 || entry.TransactionCode == 22 || entry.TransactionCode == 23 || entry.TransactionCode == 32 || entry.TransactionCode == 33 {
+		if entry.TransactionCode == CheckingCredit ||
+			entry.TransactionCode == CheckingReturnNOCCredit ||
+			entry.TransactionCode == CheckingPrenoteCredit ||
+			entry.TransactionCode == CheckingZeroDollarRemittanceCredit ||
+			entry.TransactionCode == SavingsCredit ||
+			entry.TransactionCode == SavingsReturnNOCCredit ||
+			entry.TransactionCode == SavingsPrenoteCredit ||
+			entry.TransactionCode == SavingsZeroDollarRemittanceCredit {
 			credit = credit + entry.Amount
 		}
-		if entry.TransactionCode == 26 || entry.TransactionCode == 27 || entry.TransactionCode == 28 || entry.TransactionCode == 36 || entry.TransactionCode == 37 || entry.TransactionCode == 38 {
+		if entry.TransactionCode == CheckingDebit ||
+			entry.TransactionCode == CheckingReturnNOCDebit ||
+			entry.TransactionCode == CheckingPrenoteDebit ||
+			entry.TransactionCode == CheckingZeroDollarRemittanceDebit ||
+			entry.TransactionCode == SavingsDebit ||
+			entry.TransactionCode == SavingsReturnNOCDebit ||
+			entry.TransactionCode == SavingsPrenoteDebit ||
+			entry.TransactionCode == SavingsZeroDollarRemittanceDebit {
 			debit = debit + entry.Amount
 		}
 	}

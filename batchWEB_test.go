@@ -19,7 +19,7 @@ func mockBatchWEBHeader() *BatchHeader {
 // mockWEBEntryDetail creates a WEB entry detail
 func mockWEBEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 22
+	entry.TransactionCode = CheckingCredit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "123456789"
 	entry.Amount = 100000000

@@ -327,7 +327,7 @@ func TestBatchACKAmount(t *testing.T) {
 func TestBatchACKTransactionCode(t *testing.T) {
 	mockBatch := mockBatchACK()
 	// Batch Header information is required to Create a batch.
-	mockBatch.GetEntries()[0].TransactionCode = 22
+	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
