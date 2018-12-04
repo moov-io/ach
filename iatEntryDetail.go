@@ -46,10 +46,10 @@ type IATEntryDetail struct {
 	DFIAccountNumber string `json:"DFIAccountNumber"`
 	// reservedTwo - Leave blank
 	reservedTwo string
-	// OFACSreeningIndicator - Leave blank
-	OFACSreeningIndicator string `json:"OFACSreeningIndicator"`
-	// SecondaryOFACSreeningIndicator - Leave blank
-	SecondaryOFACSreeningIndicator string `json:"SecondaryOFACSreeningIndicator"`
+	// OFACScreeningIndicator - Leave blank
+	OFACScreeningIndicator string `json:"OFACScreeningIndicator"`
+	// SecondaryOFACScreeningIndicator - Leave blank
+	SecondaryOFACScreeningIndicator string `json:"SecondaryOFACScreeningIndicator"`
 	// AddendaRecordIndicator indicates the existence of an Addenda Record.
 	// A value of "1" indicates that one or more addenda records follow,
 	// and "0" means no such record is present.
@@ -159,9 +159,9 @@ func (ed *IATEntryDetail) Parse(record string) {
 	// 75-76 reserved2 Leave blank
 	ed.reservedTwo = "  "
 	// 77 OFACScreeningIndicator
-	ed.OFACSreeningIndicator = " "
-	// 78-78 Secondary SecondaryOFACSreeningIndicator
-	ed.SecondaryOFACSreeningIndicator = " "
+	ed.OFACScreeningIndicator = " "
+	// 78-78 Secondary SecondaryOFACScreeningIndicator
+	ed.SecondaryOFACScreeningIndicator = " "
 	// 79-79 1 if addenda exists 0 if it does not
 	//ed.AddendaRecordIndicator = 1
 	ed.AddendaRecordIndicator = ed.parseNumField(record[78:79])
@@ -183,8 +183,8 @@ func (ed *IATEntryDetail) String() string {
 	buf.WriteString(ed.AmountField())
 	buf.WriteString(ed.DFIAccountNumberField())
 	buf.WriteString(ed.reservedTwoField())
-	buf.WriteString(ed.OFACSreeningIndicatorField())
-	buf.WriteString(ed.SecondaryOFACSreeningIndicatorField())
+	buf.WriteString(ed.OFACScreeningIndicatorField())
+	buf.WriteString(ed.SecondaryOFACScreeningIndicatorField())
 	buf.WriteString(fmt.Sprintf("%v", ed.AddendaRecordIndicator))
 	buf.WriteString(ed.TraceNumberField())
 	return buf.String()
@@ -317,14 +317,14 @@ func (ed *IATEntryDetail) reservedTwoField() string {
 	return ed.alphaField(ed.reservedTwo, 2)
 }
 
-// OFACSreeningIndicatorField gets the OFACSreeningIndicator
-func (ed *IATEntryDetail) OFACSreeningIndicatorField() string {
-	return ed.alphaField(ed.OFACSreeningIndicator, 1)
+// OFACScreeningIndicatorField gets the OFACScreeningIndicator
+func (ed *IATEntryDetail) OFACScreeningIndicatorField() string {
+	return ed.alphaField(ed.OFACScreeningIndicator, 1)
 }
 
-// SecondaryOFACSreeningIndicatorField gets the SecondaryOFACSreeningIndicator
-func (ed *IATEntryDetail) SecondaryOFACSreeningIndicatorField() string {
-	return ed.alphaField(ed.SecondaryOFACSreeningIndicator, 1)
+// SecondaryOFACScreeningIndicatorField gets the SecondaryOFACScreeningIndicator
+func (ed *IATEntryDetail) SecondaryOFACScreeningIndicatorField() string {
+	return ed.alphaField(ed.SecondaryOFACScreeningIndicator, 1)
 }
 
 // TraceNumberField returns a zero padded TraceNumber string
