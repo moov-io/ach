@@ -50,7 +50,7 @@ ACH is under active development but already in production for multiple companies
 
 The `ach` project also offers an HTTP and JSON API for creating and editing files. If you're using Go the `ach.File` type can be used, otherwise just send properly formatted JSON. We have an [example JSON file](test/testdata/ppd-valid.json), but each SEC type will generate differnet JSON.
 
-Examples: [Go](test/server-example/main.go) | [Ruby](https://github.com/moov-io/ruby-ach-demo)
+Examples: [Go](examples/http/main.go) | [Ruby](https://github.com/moov-io/ruby-ach-demo)
 
 - [Submit plaintext ACH file for validation](#) (...) # TODO(adam)
 - [Create an ACH file for a payment and get the raw file](https://github.com/moov-io/ruby-ach-demo)
