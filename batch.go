@@ -435,6 +435,13 @@ func (batch *Batch) isBatchAmount() error {
 	credit := 0
 	debit := 0
 
+	//ToDo: Consider going back to one function for calculating BatchAmounts, but I'm not sure I want to have
+	// calculateBatchAmounts with ADV TransactionCodes.  In addition the smaller functions help keep the -over for
+	// gocyclo lower, although since we are currently at 25 (originally it was 18 or 19) it probably won't matter now
+	// in this case.  Based on what I see in other github go code, I'm not sure 25 is a high enough number either.
+	// Balancing easy to understand functions without having to create functions just for the purpose of meeting the
+	// -over number convinces me that it should be higher than 25.
+
 	if !batch.IsADV() {
 		credit, debit = batch.calculateBatchAmounts()
 		if debit != batch.Control.TotalDebitEntryDollarAmount {
@@ -487,10 +494,16 @@ func (batch *Batch) calculateBatchAmounts() (credit int, debit int) {
 
 func (batch *Batch) calculateADVBatchAmounts() (credit int, debit int) {
 	for _, entry := range batch.ADVEntries {
-		if entry.TransactionCode == CreditForDebitsOriginated || entry.TransactionCode == CreditForCreditsReceived || entry.TransactionCode == CreditForCreditsRejected || entry.TransactionCode == CreditSummary {
+		if entry.TransactionCode == CreditForDebitsOriginated ||
+			entry.TransactionCode == CreditForCreditsReceived ||
+			entry.TransactionCode == CreditForCreditsRejected ||
+			entry.TransactionCode == CreditSummary {
 			credit = credit + entry.Amount
 		}
-		if entry.TransactionCode == DebitForCreditsOriginated || entry.TransactionCode == DebitForDebitsReceived || entry.TransactionCode == DebitForDebitsRejectedBatches || entry.TransactionCode == DebitSummary {
+		if entry.TransactionCode == DebitForCreditsOriginated ||
+			entry.TransactionCode == DebitForDebitsReceived ||
+			entry.TransactionCode == DebitForDebitsRejectedBatches ||
+			entry.TransactionCode == DebitSummary {
 			debit = debit + entry.Amount
 		}
 	}
