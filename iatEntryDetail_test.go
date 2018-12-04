@@ -12,7 +12,7 @@ import (
 // mockIATEntryDetail creates an IAT EntryDetail
 func mockIATEntryDetail() *IATEntryDetail {
 	entry := NewIATEntryDetail()
-	entry.TransactionCode = 22
+	entry.TransactionCode = CheckingCredit
 	entry.SetRDFI("121042882")
 	entry.AddendaRecords = 007
 	entry.DFIAccountNumber = "123456789"
@@ -25,7 +25,7 @@ func mockIATEntryDetail() *IATEntryDetail {
 // mockIATEntryDetail2 creates an EntryDetail
 func mockIATEntryDetail2() *IATEntryDetail {
 	entry := NewIATEntryDetail()
-	entry.TransactionCode = 22
+	entry.TransactionCode = CheckingCredit
 	entry.SetRDFI("121042882")
 	entry.AddendaRecords = 007
 	entry.DFIAccountNumber = "123456789"
@@ -41,7 +41,7 @@ func testMockIATEntryDetail(t testing.TB) {
 	if err := entry.Validate(); err != nil {
 		t.Error("mockEntryDetail does not validate and will break other tests")
 	}
-	if entry.TransactionCode != 22 {
+	if entry.TransactionCode != CheckingCredit {
 		t.Error("TransactionCode dependent default value has changed")
 	}
 	if entry.RDFIIdentification != "12104288" {
@@ -89,7 +89,7 @@ func testParseIATEntryDetail(t testing.TB) {
 	if record.recordType != "6" {
 		t.Errorf("RecordType Expected '6' got: %v", record.recordType)
 	}
-	if record.TransactionCode != 22 {
+	if record.TransactionCode != CheckingCredit {
 		t.Errorf("TransactionCode Expected '22' got: %v", record.TransactionCode)
 	}
 	if record.RDFIIdentificationField() != "12104288" {

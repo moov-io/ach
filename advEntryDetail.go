@@ -75,6 +75,29 @@ type ADVEntryDetail struct {
 	converters
 }
 
+const (
+	// ADV Transaction Code Values
+	// These transaction codes represent accounting entries
+
+	// CreditForDebitsOriginated is an accounting entry credit for ACH debits originated
+	CreditForDebitsOriginated = 81
+	// CreditForCreditsReceived is an accounting entry credits for ACH credits received
+	CreditForCreditsReceived = 83
+	// CreditForCreditsRejected is an accounting entry credit for ACH credits in rejected batches
+	CreditForCreditsRejected = 85
+	// CreditSummary is an accounting entry for summary credit for respondent ACH activity
+	CreditSummary = 87
+
+	// DebitForCreditsOriginated is an accounting entry debit for ACH credits originated
+	DebitForCreditsOriginated = 82
+	// DebitForDebitsReceived is an accounting entry debit for for ACH debits received
+	DebitForDebitsReceived = 84
+	// DebitForDebitsRejectedBatches is an accounting entry debit for ACH debits in rejected batches
+	DebitForDebitsRejectedBatches = 86
+	// DebitSummary is an accounting entry for summary debit for respondent ACH activity
+	DebitSummary = 88
+)
+
 // NewADVEntryDetail returns a new ADVEntryDetail with default values for non exported fields
 func NewADVEntryDetail() *ADVEntryDetail {
 	entry := &ADVEntryDetail{

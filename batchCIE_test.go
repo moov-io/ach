@@ -21,7 +21,7 @@ func mockBatchCIEHeader() *BatchHeader {
 // mockCIEEntryDetail creates a BatchCIE EntryDetail
 func mockCIEEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 22
+	entry.TransactionCode = CheckingCredit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
@@ -236,7 +236,7 @@ func BenchmarkBatchCIEServiceClass280(b *testing.B) {
 // testBatchCIETransactionCode validates BatchCIE TransactionCode is not a debit
 func testBatchCIETransactionCode(t testing.TB) {
 	mockBatch := mockBatchCIE()
-	mockBatch.GetEntries()[0].TransactionCode = 27
+	mockBatch.GetEntries()[0].TransactionCode = CheckingDebit
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TransactionCode" {

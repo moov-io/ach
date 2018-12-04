@@ -36,7 +36,7 @@ func main() {
 	// Identifies the receivers account information
 	// can be multiple entry's per batch
 	entry := ach.NewIATEntryDetail()
-	entry.TransactionCode = 22
+	entry.TransactionCode = ach.CheckingCredit
 	entry.SetRDFI("121042882")
 	entry.AddendaRecords = 007
 	entry.DFIAccountNumber = "123456789"

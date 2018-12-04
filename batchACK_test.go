@@ -24,7 +24,7 @@ func mockBatchACKHeader() *BatchHeader {
 // mockACKEntryDetail creates a ACK entry detail
 func mockACKEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 24
+	entry.TransactionCode = CheckingZeroDollarRemittanceCredit
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
@@ -327,7 +327,7 @@ func TestBatchACKAmount(t *testing.T) {
 func TestBatchACKTransactionCode(t *testing.T) {
 	mockBatch := mockBatchACK()
 	// Batch Header information is required to Create a batch.
-	mockBatch.GetEntries()[0].TransactionCode = 22
+	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

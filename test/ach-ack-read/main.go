@@ -29,6 +29,7 @@ func main() {
 	}
 
 	fmt.Printf("Credit Total Amount: %v \n", achFile.Control.TotalCreditEntryDollarAmountInFile)
+	fmt.Printf("Batch Credit Total Amount: %v \n", achFile.Batches[0].GetControl().TotalCreditEntryDollarAmount)
 	fmt.Printf("Total Amount: %v \n", achFile.Batches[0].GetEntries()[0].Amount)
 	fmt.Printf("SEC Code: %v \n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
 	fmt.Printf("Original Trace Number: %v \n", achFile.Batches[0].GetEntries()[0].OriginalTraceNumberField())

@@ -34,10 +34,10 @@ func main() {
 	// can be multiple entry's per batch
 	entry := ach.NewEntryDetail()
 	// Identifies the entry as a debit and credit entry AND to what type of account (Savings, DDA, Loan, GL)
-	entry.TransactionCode = 27          // Code 27: Debit checking account
-	entry.SetRDFI("231380104")          // Receivers bank transit routing number
-	entry.DFIAccountNumber = "12345678" // Receivers bank account number
-	entry.Amount = 100000000            // Amount of transaction with no decimal. One dollar and eleven cents = 111
+	entry.TransactionCode = ach.CheckingDebit // Code 27: Debit checking account
+	entry.SetRDFI("231380104")                // Receivers bank transit routing number
+	entry.DFIAccountNumber = "12345678"       // Receivers bank account number
+	entry.Amount = 100000000                  // Amount of transaction with no decimal. One dollar and eleven cents = 111
 	entry.IdentificationNumber = "45689033"
 	entry.SetCATXAddendaRecords(2)
 	entry.SetCATXReceivingCompany("Receiver Company")

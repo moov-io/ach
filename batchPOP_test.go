@@ -21,7 +21,7 @@ func mockBatchPOPHeader() *BatchHeader {
 // mockPOPEntryDetail creates a BatchPOP EntryDetail
 func mockPOPEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 27
+	entry.TransactionCode = CheckingDebit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
@@ -59,7 +59,7 @@ func mockBatchPOPHeaderCredit() *BatchHeader {
 // mockPOPEntryDetailCredit creates a POP EntryDetail with a credit entry
 func mockPOPEntryDetailCredit() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 22
+	entry.TransactionCode = CheckingCredit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000

@@ -12,7 +12,7 @@ import (
 // mockADVEntryDetail creates a ADV entry detail
 func mockADVEntryDetail() *ADVEntryDetail {
 	entry := NewADVEntryDetail()
-	entry.TransactionCode = 81
+	entry.TransactionCode = CreditForDebitsOriginated
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 50000
@@ -34,7 +34,7 @@ func testMockADVEntryDetail(t testing.TB) {
 	if err := entry.Validate(); err != nil {
 		t.Error("mockADVEntryDetail does not validate and will break other tests")
 	}
-	if entry.TransactionCode != 81 {
+	if entry.TransactionCode != CreditForDebitsOriginated {
 		t.Error("TransactionCode dependent default value has changed")
 	}
 	if entry.RDFIIdentification != "23138010" {
@@ -346,7 +346,7 @@ func TestADVEDFieldInclusionSequenceNumber(t *testing.T) {
 // TestADVEDBadTransactionCode validates TransactionCode field inclusion
 func TestBadTransactionCode(t *testing.T) {
 	entry := mockADVEntryDetail()
-	entry.TransactionCode = 27
+	entry.TransactionCode = CheckingDebit
 	if err := entry.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "TransactionCode" {

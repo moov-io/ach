@@ -17,23 +17,18 @@ type FileControl struct {
 	ID string `json:"id"`
 	// RecordType defines the type of record in the block. fileControlPos 9
 	recordType string
-
 	// BatchCount total number of batches (i.e., ‘5’ records) in the file
 	BatchCount int `json:"batchCount"`
-
 	// BlockCount total number of records in the file (include all headers and trailer) divided
 	// by 10 (This number must be evenly divisible by 10. If not, additional records consisting of all 9’s are added to the file after the initial ‘9’ record to fill out the block 10.)
 	BlockCount int `json:"blockCount,omitempty"`
-
-	// EntryAddendaCount total detail and addenda records in the file
+	// EntryAddendaCount is a tally of each Entry Detail Record and each Addenda
+	// Record processed, within either the batch or file as appropriate.
 	EntryAddendaCount int `json:"entryAddendaCount"`
-
 	// EntryHash calculated in the same manner as the batch has total but includes total from entire file
 	EntryHash int `json:"entryHash"`
-
 	// TotalDebitEntryDollarAmountInFile contains accumulated Batch debit totals within the file.
 	TotalDebitEntryDollarAmountInFile int `json:"totalDebit"`
-
 	// TotalCreditEntryDollarAmountInFile contains accumulated Batch credit totals within the file.
 	TotalCreditEntryDollarAmountInFile int `json:"totalCredit"`
 	// Reserved should be blank.

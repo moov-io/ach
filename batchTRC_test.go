@@ -21,7 +21,7 @@ func mockBatchTRCHeader() *BatchHeader {
 // mockTRCEntryDetail creates a BatchTRC EntryDetail
 func mockTRCEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 27
+	entry.TransactionCode = CheckingDebit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
@@ -59,7 +59,7 @@ func mockBatchTRCHeaderCredit() *BatchHeader {
 // mockTRCEntryDetailCredit creates a TRC EntryDetail with a credit entry
 func mockTRCEntryDetailCredit() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 22
+	entry.TransactionCode = CheckingCredit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000

@@ -31,7 +31,7 @@ func mockBatchInvalidTraceNumberODFI() *Batch {
 // EntryDetail with mismatched TraceNumber ODFI
 func mockEntryDetailInvalidTraceNumberODFI() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 22
+	entry.TransactionCode = CheckingCredit
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "123456789"
 	entry.Amount = 100000000
@@ -96,10 +96,10 @@ func testCreditBatchIsBatchAmount(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.SetHeader(mockBatchHeader())
 	e1 := mockBatch.GetEntries()[0]
-	e1.TransactionCode = 22
+	e1.TransactionCode = CheckingCredit
 	e1.Amount = 100
 	e2 := mockEntryDetail()
-	e2.TransactionCode = 22
+	e2.TransactionCode = CheckingCredit
 	e2.Amount = 100
 	// replace last 2 of TraceNumber
 	e2.TraceNumber = e1.TraceNumber[:13] + "10"
@@ -139,10 +139,10 @@ func testSavingsBatchIsBatchAmount(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.SetHeader(mockBatchHeader())
 	e1 := mockBatch.GetEntries()[0]
-	e1.TransactionCode = 32
+	e1.TransactionCode = SavingsCredit
 	e1.Amount = 100
 	e2 := mockEntryDetail()
-	e2.TransactionCode = 37
+	e2.TransactionCode = SavingsDebit
 	e2.Amount = 100
 	// replace last 2 of TraceNumber
 	e2.TraceNumber = e1.TraceNumber[:13] + "10"
@@ -211,7 +211,7 @@ func testBatchDNEMismatch(t testing.TB) {
 	mockBatch.build()
 
 	mockBatch.GetHeader().OriginatorStatusCode = 1
-	mockBatch.GetEntries()[0].TransactionCode = 23
+	mockBatch.GetEntries()[0].TransactionCode = CheckingPrenoteCredit
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "OriginatorStatusCode" {
@@ -728,7 +728,7 @@ func TestBatchADVInvalidBatchNumber(t *testing.T) {
 func TestBatchADVInvalidEntryAddendaCount(t *testing.T) {
 	mockBatch := mockBatchADV()
 	mockBatch.Create()
-	mockBatch.ADVControl.EntryAddendaCount = 22
+	mockBatch.ADVControl.EntryAddendaCount = CheckingCredit
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "EntryAddendaCount" {
@@ -743,7 +743,7 @@ func TestBatchADVInvalidEntryAddendaCount(t *testing.T) {
 // TestBatchADVTotalDebitEntryDollarAmount validates TotalDebitEntryDollarAmount
 func TestBatchADVInvalidTotalDebitEntryDollarAmount(t *testing.T) {
 	mockBatch := mockBatchADV()
-	mockBatch.GetADVEntries()[0].TransactionCode = 82
+	mockBatch.GetADVEntries()[0].TransactionCode = DebitForCreditsOriginated
 	mockBatch.Create()
 	mockBatch.ADVControl.TotalDebitEntryDollarAmount = 2200
 	if err := mockBatch.Validate(); err != nil {
@@ -824,7 +824,7 @@ func TestBatchADVCategory(t *testing.T) {
 	mockBatch := mockBatchADV()
 
 	entryOne := NewADVEntryDetail()
-	entryOne.TransactionCode = 81
+	entryOne.TransactionCode = CreditForDebitsOriginated
 	entryOne.SetRDFI("231380104")
 	entryOne.DFIAccountNumber = "744-5678-99"
 	entryOne.Amount = 50000
@@ -854,7 +854,7 @@ func TestBatchADVCategory(t *testing.T) {
 // TestBatchDishonoredReturnsCategory validates Category for Returns
 func TestBatchDishonoredReturnsCategory(t *testing.T) {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 27
+	entry.TransactionCode = CheckingDebit
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
@@ -871,7 +871,7 @@ func TestBatchDishonoredReturnsCategory(t *testing.T) {
 	entry.Addenda99 = addenda99
 
 	entryOne := NewEntryDetail()
-	entryOne.TransactionCode = 27
+	entryOne.TransactionCode = CheckingDebit
 	entryOne.SetRDFI("121042882")
 	entryOne.DFIAccountNumber = "744-5678-99"
 	entryOne.Amount = 23000

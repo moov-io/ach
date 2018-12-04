@@ -21,7 +21,7 @@ func mockBatchPOSHeader() *BatchHeader {
 // mockPOSEntryDetail creates a BatchPOS EntryDetail
 func mockPOSEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 27
+	entry.TransactionCode = CheckingDebit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
@@ -236,7 +236,7 @@ func BenchmarkBatchPOSServiceClass280(b *testing.B) {
 // testBatchPOSTransactionCode validates BatchPOS TransactionCode is not a credit
 func testBatchPOSTransactionCode(t testing.TB) {
 	mockBatch := mockBatchPOS()
-	mockBatch.GetEntries()[0].TransactionCode = 22
+	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TransactionCode" {

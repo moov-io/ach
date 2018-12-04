@@ -25,7 +25,7 @@ func mockBatchPPDHeader() *BatchHeader {
 // mockPPDEntryDetail creates a PPD Entry Detail
 func mockPPDEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 22
+	entry.TransactionCode = CheckingCredit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "123456789"
 	entry.Amount = 100000000
@@ -52,7 +52,7 @@ func mockBatchPPDHeader2() *BatchHeader {
 // mockPPDEntryDetail2 creates a 2nd PPD entry detail
 func mockPPDEntryDetail2() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 22 // ACH Credit
+	entry.TransactionCode = CheckingCredit // ACH Credit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "62292250"         // account number
 	entry.Amount = 100000                       // 1k dollars

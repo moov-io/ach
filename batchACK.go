@@ -45,9 +45,8 @@ func (batch *BatchACK) Validate() error {
 			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addenda05), 1, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
 		}
-		// TransactionCode must be either 24 or 34 for Acknowledgement Entries
 		switch entry.TransactionCode {
-		case 24, 34:
+		case CheckingZeroDollarRemittanceCredit, SavingsZeroDollarRemittanceCredit:
 		default:
 			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "ACK")
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}

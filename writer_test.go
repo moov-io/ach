@@ -136,7 +136,7 @@ func testIATWrite(t testing.TB) {
 	iatBatch2 := IATBatch{}
 	iatBatch2.SetHeader(mockIATBatchHeaderFF())
 	iatBatch2.AddEntry(mockIATEntryDetail())
-	iatBatch2.GetEntries()[0].TransactionCode = 27
+	iatBatch2.GetEntries()[0].TransactionCode = CheckingDebit
 	iatBatch2.GetEntries()[0].Amount = 2000
 	iatBatch2.Entries[0].Addenda10 = mockAddenda10()
 	iatBatch2.Entries[0].Addenda11 = mockAddenda11()
@@ -235,7 +235,7 @@ func testPPDIATWrite(t testing.TB) {
 	iatBatch2 := IATBatch{}
 	iatBatch2.SetHeader(mockIATBatchHeaderFF())
 	iatBatch2.AddEntry(mockIATEntryDetail())
-	iatBatch2.GetEntries()[0].TransactionCode = 27
+	iatBatch2.GetEntries()[0].TransactionCode = CheckingDebit
 	iatBatch2.GetEntries()[0].Amount = 2000
 	iatBatch2.Entries[0].Addenda10 = mockAddenda10()
 	iatBatch2.Entries[0].Addenda11 = mockAddenda11()
@@ -474,7 +474,7 @@ func TestPOSReturnWrite(t *testing.T) {
 func TestPOSDishonoredReturnWrite(t *testing.T) {
 	file := NewFile().SetHeader(mockFileHeader())
 	entry := NewEntryDetail()
-	entry.TransactionCode = 27
+	entry.TransactionCode = CheckingDebit
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000

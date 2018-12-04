@@ -435,6 +435,13 @@ func (batch *Batch) isBatchAmount() error {
 	credit := 0
 	debit := 0
 
+	//ToDo: Consider going back to one function for calculating BatchAmounts, but I'm not sure I want to have
+	// calculateBatchAmounts with ADV TransactionCodes.  In addition the smaller functions help keep the -over for
+	// gocyclo lower, although since we are currently at 25 (originally it was 18 or 19) it probably won't matter now
+	// in this case.  Based on what I see in other github go code, I'm not sure 25 is a high enough number either.
+	// Balancing easy to understand functions without having to create functions just for the purpose of meeting the
+	// -over number convinces me that it should be higher than 25.
+
 	if !batch.IsADV() {
 		credit, debit = batch.calculateBatchAmounts()
 		if debit != batch.Control.TotalDebitEntryDollarAmount {
@@ -461,10 +468,15 @@ func (batch *Batch) isBatchAmount() error {
 
 func (batch *Batch) calculateBatchAmounts() (credit int, debit int) {
 	for _, entry := range batch.Entries {
-		if entry.TransactionCode == 21 || entry.TransactionCode == 22 || entry.TransactionCode == 23 || entry.TransactionCode == 32 || entry.TransactionCode == 33 {
+		switch entry.TransactionCode {
+		case CheckingCredit, CheckingReturnNOCCredit, CheckingPrenoteCredit, CheckingZeroDollarRemittanceCredit,
+			SavingsCredit, SavingsReturnNOCCredit, SavingsPrenoteCredit, SavingsZeroDollarRemittanceCredit, GLCredit,
+			GLReturnNOCCredit, GLPrenoteCredit, GLZeroDollarRemittanceCredit, LoanCredit, LoanReturnNOCCredit,
+			LoanPrenoteCredit, LoanZeroDollarRemittanceCredit:
 			credit = credit + entry.Amount
-		}
-		if entry.TransactionCode == 26 || entry.TransactionCode == 27 || entry.TransactionCode == 28 || entry.TransactionCode == 36 || entry.TransactionCode == 37 || entry.TransactionCode == 38 {
+		case CheckingDebit, CheckingReturnNOCDebit, CheckingPrenoteDebit, CheckingZeroDollarRemittanceDebit,
+			SavingsDebit, SavingsReturnNOCDebit, SavingsPrenoteDebit, SavingsZeroDollarRemittanceDebit, GLDebit,
+			GLReturnNOCDebit, GLPrenoteDebit, GLZeroDollarRemittanceDebit, LoanDebit, LoanReturnNOCDebit:
 			debit = debit + entry.Amount
 		}
 	}
@@ -473,10 +485,16 @@ func (batch *Batch) calculateBatchAmounts() (credit int, debit int) {
 
 func (batch *Batch) calculateADVBatchAmounts() (credit int, debit int) {
 	for _, entry := range batch.ADVEntries {
-		if entry.TransactionCode == 81 || entry.TransactionCode == 83 || entry.TransactionCode == 85 || entry.TransactionCode == 87 {
+		if entry.TransactionCode == CreditForDebitsOriginated ||
+			entry.TransactionCode == CreditForCreditsReceived ||
+			entry.TransactionCode == CreditForCreditsRejected ||
+			entry.TransactionCode == CreditSummary {
 			credit = credit + entry.Amount
 		}
-		if entry.TransactionCode == 82 || entry.TransactionCode == 84 || entry.TransactionCode == 86 || entry.TransactionCode == 88 {
+		if entry.TransactionCode == DebitForCreditsOriginated ||
+			entry.TransactionCode == DebitForDebitsReceived ||
+			entry.TransactionCode == DebitForDebitsRejectedBatches ||
+			entry.TransactionCode == DebitSummary {
 			debit = debit + entry.Amount
 		}
 	}
@@ -545,7 +563,7 @@ func (batch *Batch) calculateEntryHash() string {
 func (batch *Batch) isOriginatorDNE() error {
 	if batch.Header.OriginatorStatusCode != 2 {
 		for _, entry := range batch.Entries {
-			if entry.TransactionCode == 23 || entry.TransactionCode == 33 {
+			if entry.TransactionCode == CheckingPrenoteCredit || entry.TransactionCode == SavingsPrenoteCredit {
 				msg := fmt.Sprintf(msgBatchOriginatorDNE, batch.Header.OriginatorStatusCode)
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "OriginatorStatusCode", Msg: msg}
 			}
@@ -763,9 +781,9 @@ func (batch *Batch) IsADV() bool {
 // ValidTranCodeForServiceClassCode validates a TransactionCode is valid for a ServiceClassCode
 func (batch *Batch) ValidTranCodeForServiceClassCode(entry *EntryDetail) error {
 	// ADV should use ADVEntryDetail
-	// ADV Transaction Codes are 81, 82, 83, 84, 85, 86, 87, 88
 	switch entry.TransactionCode {
-	case 81, 82, 83, 84, 85, 86, 87, 88:
+	case CreditForDebitsOriginated, CreditForCreditsReceived, CreditForCreditsRejected, CreditSummary,
+		DebitForCreditsOriginated, DebitForDebitsReceived, DebitForDebitsRejectedBatches, DebitSummary:
 		msg := fmt.Sprintf(msgBatchServiceClassTranCode, entry.TransactionCode, batch.Header.StandardEntryClassCode)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 	}

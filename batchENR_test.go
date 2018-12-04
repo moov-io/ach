@@ -24,7 +24,7 @@ func mockBatchENRHeader() *BatchHeader {
 // mockENREntryDetail creates a ENR entry detail
 func mockENREntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 22
+	entry.TransactionCode = CheckingCredit
 	entry.SetRDFI("031300012")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
@@ -274,7 +274,7 @@ func TestBatchENRAmount(t *testing.T) {
 // TestBatchENRTransactionCode validates TransactionCode
 func TestBatchENRTransactionCode(t *testing.T) {
 	mockBatch := mockBatchENR()
-	mockBatch.GetEntries()[0].TransactionCode = 21
+	mockBatch.GetEntries()[0].TransactionCode = CheckingReturnNOCCredit
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -298,7 +298,7 @@ func TestBatchENR__PaymentInformation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if v := info.TransactionCode; v != 21 {
+	if v := info.TransactionCode; v != CheckingReturnNOCCredit {
 		t.Errorf("TransactionCode: %d", v)
 	}
 	if v := info.RDFIIdentification; v != "12200004" {

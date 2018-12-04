@@ -45,7 +45,8 @@ func (batch *BatchADV) Validate() error {
 
 		if entry.Category == CategoryForward {
 			switch entry.TransactionCode {
-			case 81, 82, 83, 84, 85, 86, 87, 88:
+			case CreditForDebitsOriginated, CreditForCreditsReceived, CreditForCreditsRejected, CreditSummary,
+				DebitForCreditsOriginated, DebitForDebitsReceived, DebitForDebitsRejectedBatches, DebitSummary:
 			default:
 				msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "ADV")
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}

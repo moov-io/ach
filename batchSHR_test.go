@@ -23,7 +23,7 @@ func mockBatchSHRHeader() *BatchHeader {
 // mockSHREntryDetail creates a BatchSHR EntryDetail
 func mockSHREntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 27
+	entry.TransactionCode = CheckingDebit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
@@ -239,7 +239,7 @@ func BenchmarkBatchSHRServiceClass280(b *testing.B) {
 // testBatchSHRTransactionCode validates BatchSHR TransactionCode is not a credit
 func testBatchSHRTransactionCode(t testing.TB) {
 	mockBatch := mockBatchSHR()
-	mockBatch.GetEntries()[0].TransactionCode = 22
+	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TransactionCode" {

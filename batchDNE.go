@@ -49,7 +49,7 @@ func (batch *BatchDNE) Validate() error {
 		}
 
 		switch entry.TransactionCode {
-		case 21, 23, 31, 33:
+		case CheckingReturnNOCCredit, CheckingPrenoteCredit, SavingsReturnNOCCredit, SavingsPrenoteCredit:
 		default:
 			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "DNE")
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}

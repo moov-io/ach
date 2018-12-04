@@ -80,14 +80,12 @@ func write(path string) {
 			entrySeq = entrySeq + 1
 
 			entryEntrySeq := ach.NewEntryDetail()
-			entryEntrySeq.TransactionCode = 22
+			entryEntrySeq.TransactionCode = ach.CheckingCredit
 			entryEntrySeq.SetRDFI("231380104")
 			entryEntrySeq.DFIAccountNumber = "81967038518"
 			entryEntrySeq.Amount = 100000
-			//entryEntrySeq.IndividualName = randomdata.FullName(randomdata.RandomGender)
 			entryEntrySeq.IndividualName = "Steven Tander"
 			entryEntrySeq.SetTraceNumber(bh.ODFIIdentification, entrySeq)
-			//entryEntrySeq.IdentificationNumber = "#" + randomdata.RandStringRunes(13) + "#"
 			entryEntrySeq.IdentificationNumber = "#83738AB#"
 			entryEntrySeq.Category = ach.CategoryForward
 			entryEntrySeq.AddendaRecordIndicator = 1

@@ -26,7 +26,7 @@ func mockBatchMTEHeader() *BatchHeader {
 // mockMTEEntryDetail creates a MTE entry detail
 func mockMTEEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 27
+	entry.TransactionCode = CheckingDebit
 	entry.SetRDFI("031300012")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 10000

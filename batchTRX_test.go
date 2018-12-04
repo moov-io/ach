@@ -24,7 +24,7 @@ func mockBatchTRXHeader() *BatchHeader {
 // mockTRXEntryDetail creates a BatchTRX EntryDetail
 func mockTRXEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 27
+	entry.TransactionCode = CheckingDebit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
@@ -64,7 +64,7 @@ func mockBatchTRXHeaderCredit() *BatchHeader {
 // mockTRXEntryDetailCredit creates a TRX EntryDetail with a credit entry
 func mockTRXEntryDetailCredit() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 22
+	entry.TransactionCode = CheckingCredit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
@@ -342,7 +342,7 @@ func testBatchTRXAddenda10000(t testing.TB) {
 	bh.ODFIIdentification = "12104288"
 
 	entry := NewEntryDetail()
-	entry.TransactionCode = 27
+	entry.TransactionCode = CheckingDebit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
@@ -395,7 +395,7 @@ func testBatchTRXAddendaRecords(t testing.TB) {
 	bh.ODFIIdentification = "12104288"
 
 	entry := NewEntryDetail()
-	entry.TransactionCode = 27
+	entry.TransactionCode = CheckingDebit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
@@ -493,7 +493,7 @@ func testBatchTRXZeroAddendaRecords(t testing.TB) {
 	bh.ODFIIdentification = "12104288"
 
 	entry := NewEntryDetail()
-	entry.TransactionCode = 27
+	entry.TransactionCode = CheckingDebit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000

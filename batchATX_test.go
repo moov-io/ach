@@ -24,7 +24,7 @@ func mockBatchATXHeader() *BatchHeader {
 // mockATXEntryDetail creates a BatchATX EntryDetail
 func mockATXEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 24
+	entry.TransactionCode = CheckingZeroDollarRemittanceCredit
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
@@ -296,7 +296,7 @@ func testBatchATXAddenda10000(t testing.TB) {
 	bh.ODFIIdentification = "23138010"
 
 	entry := NewEntryDetail()
-	entry.TransactionCode = 24
+	entry.TransactionCode = CheckingZeroDollarRemittanceCredit
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
@@ -351,7 +351,7 @@ func testBatchATXAddendaRecords(t testing.TB) {
 	bh.ODFIIdentification = "23138010"
 
 	entry := NewEntryDetail()
-	entry.TransactionCode = 24
+	entry.TransactionCode = CheckingZeroDollarRemittanceCredit
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
@@ -450,7 +450,7 @@ func testBatchATXZeroAddendaRecords(t testing.TB) {
 	bh.ODFIIdentification = "23138010"
 
 	entry := NewEntryDetail()
-	entry.TransactionCode = 24
+	entry.TransactionCode = CheckingZeroDollarRemittanceCredit
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
@@ -502,7 +502,7 @@ func testBatchATXTransactionCode(t testing.TB) {
 	bh.OriginatorStatusCode = 2
 
 	entry := NewEntryDetail()
-	entry.TransactionCode = 23
+	entry.TransactionCode = CheckingPrenoteCredit
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
@@ -554,7 +554,7 @@ func TestBatchATXAmount(t *testing.T) {
 	bh.OriginatorStatusCode = 2
 
 	entry := NewEntryDetail()
-	entry.TransactionCode = 23
+	entry.TransactionCode = CheckingPrenoteCredit
 	entry.SetRDFI("121042882")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000

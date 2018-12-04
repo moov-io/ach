@@ -24,7 +24,7 @@ func mockBatchCTXHeader() *BatchHeader {
 // mockCTXEntryDetail creates a BatchCTX EntryDetail
 func mockCTXEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = 22
+	entry.TransactionCode = CheckingCredit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
@@ -308,7 +308,7 @@ func testBatchCTXAddenda10000(t testing.TB) {
 	bh.ODFIIdentification = "12104288"
 
 	entry := NewEntryDetail()
-	entry.TransactionCode = 22
+	entry.TransactionCode = CheckingCredit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
@@ -361,7 +361,7 @@ func testBatchCTXAddendaRecords(t testing.TB) {
 	bh.ODFIIdentification = "12104288"
 
 	entry := NewEntryDetail()
-	entry.TransactionCode = 22
+	entry.TransactionCode = CheckingCredit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
@@ -459,7 +459,7 @@ func testBatchCTXZeroAddendaRecords(t testing.TB) {
 	bh.ODFIIdentification = "12104288"
 
 	entry := NewEntryDetail()
-	entry.TransactionCode = 22
+	entry.TransactionCode = CheckingCredit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
@@ -509,7 +509,7 @@ func testBatchCTXPrenoteAddendaRecords(t testing.TB) {
 	bh.OriginatorStatusCode = 2
 
 	entry := NewEntryDetail()
-	entry.TransactionCode = 23
+	entry.TransactionCode = CheckingPrenoteCredit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000

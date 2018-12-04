@@ -35,7 +35,7 @@ func main() {
 
 	// To create an entry
 	entry := ach.NewEntryDetail()
-	entry.TransactionCode = 22
+	entry.TransactionCode = ach.CheckingCredit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "81967038518"
 	entry.Amount = 1000000
@@ -82,7 +82,7 @@ func main() {
 	// The following is a recurring payment for $7.99
 
 	entry2 := ach.NewEntryDetail()
-	entry2.TransactionCode = 22
+	entry2.TransactionCode = ach.CheckingCredit
 	entry2.SetRDFI("231380104")
 	entry2.DFIAccountNumber = "81967038518"
 	entry2.Amount = 799

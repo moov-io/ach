@@ -20,15 +20,7 @@ type EntryDetail struct {
 	ID string `json:"id"`
 	// RecordType defines the type of record in the block. 6
 	recordType string
-	// TransactionCode if the receivers account is:
-	// Credit (deposit) to checking account ‘22’
-	// Prenote for credit to checking account ‘23’
-	// Debit (withdrawal) to checking account ‘27’
-	// Prenote for debit to checking account ‘28’
-	// Credit to savings account ‘32’
-	// Prenote for credit to savings account ‘33’
-	// Debit to savings account ‘37’
-	// Prenote for debit to savings account ‘38’
+	// TransactionCode if the receivers account is checking, savings, general ledger (GL) or loan.
 	TransactionCode int `json:"transactionCode"`
 	// RDFIIdentification is the RDFI's routing number without the last digit.
 	// Receiving Depository Financial Institution
@@ -98,6 +90,80 @@ const (
 	// CategoryDishonoredReturnContested defines the entry as a contested dishonored return initiated by the RDFI to
 	// the ODFI that submitted the dishonored return
 	CategoryDishonoredReturnContested = "DishonoredReturnContested"
+
+	// TransactionCode Values
+
+	// CheckingCredit is a credit to the receiver's checking account
+	CheckingCredit = 22
+	// CheckingReturnNOCCredit is a return that credits the receiver's checking account
+	CheckingReturnNOCCredit = 21
+	// CheckingPrenoteCredit is a pre-notification of a credit to the receiver's checking account
+	CheckingPrenoteCredit = 23
+	// CheckingZeroDollarRemittanceCredit is a zero dollar remittance data credit to a checking account for CCD, CTX,
+	// ACK, and ATX entries
+	CheckingZeroDollarRemittanceCredit = 24
+	// CheckingDebit is a debit to the receivers checking account
+	CheckingDebit = 27
+	// CheckingReturnNOCDebit is a return that debits the receiver's checking account
+	CheckingReturnNOCDebit = 26
+	// CheckingPrenoteDebit is a pre-notification of a debit to the receiver's checking account
+	CheckingPrenoteDebit = 28
+	// CheckingZeroDollarRemittanceDebit is a zero dollar remittance data debit to a checking account for CCD, CTX,
+	// ACK, and ATX entries
+	CheckingZeroDollarRemittanceDebit = 29
+
+	// SavingsCredit is a credit to the receiver's savings account
+	SavingsCredit = 32
+	// SavingsReturnNOCCredit is a return that credits the receiver's savings account
+	SavingsReturnNOCCredit = 31
+	// SavingsPrenoteCredit is a pre-notification of a credit to the receiver's savings account
+	SavingsPrenoteCredit = 33
+	// SavingsZeroDollarRemittanceCredit is a zero dollar remittance data credit to a savings account for CCD
+	// and CTX entries
+	SavingsZeroDollarRemittanceCredit = 34
+	// SavingsDebit is a debit to the receivers savings account
+	SavingsDebit = 37
+	// SavingsReturnNOCDebit is a return that debits the receiver's savings account
+	SavingsReturnNOCDebit = 36
+	// SavingsPrenoteDebit is a pre-notification of a debit to the receiver's savings account
+	SavingsPrenoteDebit = 38
+	// SavingsZeroDollarRemittanceDebit is a zero dollar remittance data debit to a savings account for CCD
+	// and CTX entries
+	SavingsZeroDollarRemittanceDebit = 39
+
+	// GLCredit is a credit to the receiver's general ledger (GL) account
+	GLCredit = 42
+	// GLReturnNOCCredit is a return that credits the receiver's general ledger (GL) account
+	GLReturnNOCCredit = 41
+	// GLPrenoteCredit is a pre-notification of a credit to the receiver's general ledger (GL) account
+	GLPrenoteCredit = 43
+	// GLZeroDollarRemittanceCredit is a zero dollar remittance data credit to the receiver's general ledger (GL) account
+	GLZeroDollarRemittanceCredit = 44
+	// GLDebit is a debit to the receiver's general ledger (GL) account
+	GLDebit = 47
+	// GLReturnNOCDebit is a return that debits the receiver's general ledger (GL) account
+	GLReturnNOCDebit = 46
+	// GLPrenoteDebit is a pre-notification of a debit to the receiver's general ledger (GL) account
+	GLPrenoteDebit = 48
+	// GLZeroDollarRemittanceDebit is a zero dollar remittance data debit to the receiver's general ledger (GL) account
+	GLZeroDollarRemittanceDebit = 49
+
+	// LoanCredit is a credit to the receiver's loan account
+	LoanCredit = 52
+	// LoanReturnNOCCredit is a return that credits the receiver's loan account
+	LoanReturnNOCCredit = 51
+	// LoanPrenoteCredit is a pre-notification of a credit to the receiver's loan account
+	LoanPrenoteCredit = 53
+	// LoanZeroDollarRemittanceCredit is a zero dollar remittance data credit to the receiver's loan account
+	LoanZeroDollarRemittanceCredit = 54
+	// LoanDebit is a debit (Reversal's Only) to the receiver's loan account
+	LoanDebit = 55
+	// LoanReturnNOCDebit is a return that debits the receiver's loan account
+	LoanReturnNOCDebit = 56
+	// LoanPrenoteDebit is N/A
+	// LoanZeroDollarRemittanceDebit is N/A
+
+	// End of TransactionCode Values
 )
 
 // NewEntryDetail returns a new EntryDetail with default values for non exported fields
