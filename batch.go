@@ -468,24 +468,49 @@ func (batch *Batch) isBatchAmount() error {
 
 func (batch *Batch) calculateBatchAmounts() (credit int, debit int) {
 	for _, entry := range batch.Entries {
-		if entry.TransactionCode == CheckingCredit ||
-			entry.TransactionCode == CheckingReturnNOCCredit ||
-			entry.TransactionCode == CheckingPrenoteCredit ||
-			entry.TransactionCode == CheckingZeroDollarRemittanceCredit ||
-			entry.TransactionCode == SavingsCredit ||
-			entry.TransactionCode == SavingsReturnNOCCredit ||
-			entry.TransactionCode == SavingsPrenoteCredit ||
-			entry.TransactionCode == SavingsZeroDollarRemittanceCredit {
+		/*		if entry.TransactionCode == CheckingCredit ||
+					entry.TransactionCode == CheckingReturnNOCCredit ||
+					entry.TransactionCode == CheckingPrenoteCredit ||
+					entry.TransactionCode == CheckingZeroDollarRemittanceCredit ||
+					entry.TransactionCode == SavingsCredit ||
+					entry.TransactionCode == SavingsReturnNOCCredit ||
+					entry.TransactionCode == SavingsPrenoteCredit ||
+					entry.TransactionCode == SavingsZeroDollarRemittanceCredit ||
+					entry.TransactionCode == GLCredit ||
+					entry.TransactionCode == GLReturnNOCCredit ||
+					entry.TransactionCode == GLPrenoteCredit ||
+					entry.TransactionCode == GLZeroDollarRemittanceCredit ||
+					entry.TransactionCode == LoanCredit ||
+					entry.TransactionCode == LoanReturnNOCCredit ||
+					entry.TransactionCode == LoanPrenoteCredit ||
+					entry.TransactionCode == LoanZeroDollarRemittanceCredit {
+					credit = credit + entry.Amount
+				}
+				if entry.TransactionCode == CheckingDebit ||
+					entry.TransactionCode == CheckingReturnNOCDebit ||
+					entry.TransactionCode == CheckingPrenoteDebit ||
+					entry.TransactionCode == CheckingZeroDollarRemittanceDebit ||
+					entry.TransactionCode == SavingsDebit ||
+					entry.TransactionCode == SavingsReturnNOCDebit ||
+					entry.TransactionCode == SavingsPrenoteDebit ||
+					entry.TransactionCode == SavingsZeroDollarRemittanceDebit ||
+					entry.TransactionCode == GLDebit ||
+					entry.TransactionCode == GLReturnNOCDebit ||
+					entry.TransactionCode == GLPrenoteDebit ||
+					entry.TransactionCode == GLZeroDollarRemittanceDebit ||
+					entry.TransactionCode == LoanDebit ||
+					entry.TransactionCode == LoanReturnNOCDebit {
+					debit = debit + entry.Amount
+				}*/
+		switch entry.TransactionCode {
+		case CheckingCredit, CheckingReturnNOCCredit, CheckingPrenoteCredit, CheckingZeroDollarRemittanceCredit,
+			SavingsCredit, SavingsReturnNOCCredit, SavingsPrenoteCredit, SavingsZeroDollarRemittanceCredit, GLCredit,
+			GLReturnNOCCredit, GLPrenoteCredit, GLZeroDollarRemittanceCredit, LoanCredit, LoanReturnNOCCredit,
+			LoanPrenoteCredit, LoanZeroDollarRemittanceCredit:
 			credit = credit + entry.Amount
-		}
-		if entry.TransactionCode == CheckingDebit ||
-			entry.TransactionCode == CheckingReturnNOCDebit ||
-			entry.TransactionCode == CheckingPrenoteDebit ||
-			entry.TransactionCode == CheckingZeroDollarRemittanceDebit ||
-			entry.TransactionCode == SavingsDebit ||
-			entry.TransactionCode == SavingsReturnNOCDebit ||
-			entry.TransactionCode == SavingsPrenoteDebit ||
-			entry.TransactionCode == SavingsZeroDollarRemittanceDebit {
+		case CheckingDebit, CheckingReturnNOCDebit, CheckingPrenoteDebit, CheckingZeroDollarRemittanceDebit,
+			SavingsDebit, SavingsReturnNOCDebit, SavingsPrenoteDebit, SavingsZeroDollarRemittanceDebit, GLDebit,
+			GLReturnNOCDebit, GLPrenoteDebit, GLZeroDollarRemittanceDebit, LoanDebit, LoanReturnNOCDebit:
 			debit = debit + entry.Amount
 		}
 	}
@@ -572,7 +597,7 @@ func (batch *Batch) calculateEntryHash() string {
 func (batch *Batch) isOriginatorDNE() error {
 	if batch.Header.OriginatorStatusCode != 2 {
 		for _, entry := range batch.Entries {
-			if entry.TransactionCode == CheckingPrenoteCredit || entry.TransactionCode == 33 {
+			if entry.TransactionCode == CheckingPrenoteCredit || entry.TransactionCode == SavingsPrenoteCredit {
 				msg := fmt.Sprintf(msgBatchOriginatorDNE, batch.Header.OriginatorStatusCode)
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "OriginatorStatusCode", Msg: msg}
 			}

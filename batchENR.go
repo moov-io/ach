@@ -54,7 +54,7 @@ func (batch *BatchENR) Validate() error {
 		}
 
 		switch entry.TransactionCode {
-		case 22, 27, 32, 37:
+		case CheckingCredit, CheckingDebit, SavingsCredit, SavingsDebit:
 		default:
 			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "ENR")
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}

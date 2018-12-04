@@ -49,12 +49,8 @@ func (batch *BatchATX) Validate() error {
 			msg := fmt.Sprintf(msgBatchAmountZero, entry.Amount, "ATX")
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
 		}
-
-		// TransactionCode must be either 24 or 34 for Acknowledgement Entries
 		switch entry.TransactionCode {
-		// Prenote credit  23, 33, 43, 53
-		// Prenote debit 28, 38, 48
-		case 24, 34:
+		case CheckingZeroDollarRemittanceCredit, SavingsZeroDollarRemittanceCredit:
 		default:
 			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "ATX")
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
