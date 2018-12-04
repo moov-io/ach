@@ -139,10 +139,10 @@ func testSavingsBatchIsBatchAmount(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.SetHeader(mockBatchHeader())
 	e1 := mockBatch.GetEntries()[0]
-	e1.TransactionCode = 32
+	e1.TransactionCode = SavingsCredit
 	e1.Amount = 100
 	e2 := mockEntryDetail()
-	e2.TransactionCode = 37
+	e2.TransactionCode = SavingsDebit
 	e2.Amount = 100
 	// replace last 2 of TraceNumber
 	e2.TraceNumber = e1.TraceNumber[:13] + "10"
