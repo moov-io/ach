@@ -401,6 +401,14 @@ func TestFile__readFromJson(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// Ensure the file is valid
+	if err := file.Create(); err != nil {
+		t.Error(err)
+	}
+	if err := file.Validate(); err != nil {
+		t.Error(err)
+	}
+
 	if file.ID != "adam-01" {
 		t.Errorf("file.ID: %s", file.ID)
 	}
@@ -422,7 +430,7 @@ func TestFile__readFromJson(t *testing.T) {
 	}
 	batch := file.Batches[0]
 	batchControl := batch.GetControl()
-	if batchControl.EntryAddendaCount != 2 {
+	if batchControl.EntryAddendaCount != 1 {
 		t.Errorf("EntryAddendaCount: %d", batchControl.EntryAddendaCount)
 	}
 
@@ -430,7 +438,7 @@ func TestFile__readFromJson(t *testing.T) {
 	if file.Control.BatchCount != 1 {
 		t.Errorf("BatchCount: %d", file.Control.BatchCount)
 	}
-	if file.Control.EntryAddendaCount != 2 {
+	if file.Control.EntryAddendaCount != 1 {
 		t.Errorf("File Control EntryAddendaCount: %d", file.Control.EntryAddendaCount)
 	}
 	if file.Control.TotalDebitEntryDollarAmountInFile != 0 || file.Control.TotalCreditEntryDollarAmountInFile != 100000 {
@@ -446,5 +454,31 @@ func TestFile__readFromJson(t *testing.T) {
 
 	if err := file.Validate(); err != nil {
 		t.Error(err)
+	}
+}
+
+// TestFile__jsonFileNoControlBlobs will read an ach.File from its JSON form, but the JSON has no
+// batchControl or fileControl sub-objects.
+func TestFile__jsonFileNoControlBlobs(t *testing.T) {
+	path := filepath.Join("test", "testdata", "ppd-no-control-blobs-valid.json")
+	bs, err := ioutil.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	file, err := FileFromJSON(bs)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := file.Create(); err != nil {
+		t.Fatal(err)
+	}
+	if err := file.Validate(); err != nil {
+		t.Fatal(err)
+	}
+
+	if file.ID != "adam-01" {
+		t.Errorf("file.ID: %s", file.ID)
 	}
 }

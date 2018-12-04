@@ -497,3 +497,22 @@ func (ed *EntryDetail) CreditOrDebit() string {
 func (ed *EntryDetail) AddAddenda05(addenda05 *Addenda05) {
 	ed.Addenda05 = append(ed.Addenda05, addenda05)
 }
+
+// addendaCount returns the count of Addenda records added onto this EntryDetail
+func (ed *EntryDetail) addendaCount() (n int) {
+	if ed.Addenda02 != nil {
+		n += 1
+	}
+	for i := range ed.Addenda05 {
+		if ed.Addenda05[i] != nil {
+			n += 1
+		}
+	}
+	if ed.Addenda98 != nil {
+		n += 1
+	}
+	if ed.Addenda99 != nil {
+		n += 1
+	}
+	return n
+}

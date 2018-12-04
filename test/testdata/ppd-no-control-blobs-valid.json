@@ -34,34 +34,23 @@
                     "identificationNumber": "#83738AB#      ",
                     "individualName": "Steven Tander         ",
                     "discretionaryData": "  ",
-                    "addendaRecordIndicator": 0,
+                    "addendaRecordIndicator": 1,
                     "traceNumber": "121042880000001",
-                    "category": "Forward"
+                    "category": "Forward",
+                    "addenda05": [
+                      {
+                        "entryDetailSequenceNumber": 1,
+                        "sequenceNumber": 1,
+                        "paymentRelatedInformation": "Bonus for working on #OSS!",
+                        "typeCode": "",
+                        "id": "gvluehibyuuqdoajiqfn"
+                      }
+                    ]
                 }
-            ],
-            "batchControl": {
-                "id": "adam-01",
-                "serviceClassCode": 200,
-                "entryAddendaÇount": 0,
-                "entryHash": 23138010,
-                "totalDebit": 0,
-                "totalCredit": 100000,
-                "companyIdentification": "121042882",
-                "ODFIIdentification": "12104288",
-                "batchNumber": 1
-            }
+            ]
         }
     ],
     "IATBatches": null,
-    "fileControl": {
-        "id": "adam-01",
-        "batchCount": 1,
-        "blockCount": 1,
-        "entryAddendaCount": 0,
-        "entryHash": 23138010,
-        "totalDebit": 0,
-        "totalCredit": 100000
-    },
     "NotificationOfChange": null,
     "ReturnEntries": null
 }

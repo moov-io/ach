@@ -5,6 +5,7 @@
 package ach
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
@@ -23,6 +24,23 @@ type Batch struct {
 	category string
 	// Converters is composed for ACH to GoLang Converters
 	converters
+}
+
+func (b *Batch) UnmarshalJSON(p []byte) error {
+	b.Header = NewBatchHeader()
+	b.Control = NewBatchControl()
+	b.ADVControl = NewADVBatchControl()
+
+	type Alias Batch
+	aux := struct {
+		*Alias
+	}{
+		(*Alias)(b),
+	}
+	if err := json.Unmarshal(p, &aux); err != nil {
+		return err
+	}
+	return nil
 }
 
 // NewBatch takes a BatchHeader and returns a matching SEC code batch type that is a batcher. Returns an error if the SEC code is not supported.
@@ -190,20 +208,7 @@ func (batch *Batch) build() error {
 
 	if !batch.IsADV() {
 		for i, entry := range batch.Entries {
-			entryCount++
-
-			// Add in Addenda Count
-			if entry.Addenda02 != nil {
-				entryCount++
-			}
-			entryCount = entryCount + len(entry.Addenda05)
-			if entry.Addenda98 != nil {
-				entryCount++
-			}
-
-			if entry.Addenda99 != nil {
-				entryCount++
-			}
+			entryCount += 1 + entry.addendaCount()
 
 			currentTraceNumberODFI, err := strconv.Atoi(entry.TraceNumberField()[:8])
 			if err != nil {
@@ -217,7 +222,7 @@ func (batch *Batch) build() error {
 
 			// Add a sequenced TraceNumber if one is not already set. Have to keep original trance number Return and NOC entries
 			if currentTraceNumberODFI != batchHeaderODFI {
-				batch.Entries[i].SetTraceNumber(batch.Header.ODFIIdentification, seq)
+				entry.SetTraceNumber(batch.Header.ODFIIdentification, seq)
 			}
 			seq++
 			addendaSeq := 1
@@ -307,6 +312,10 @@ func (batch *Batch) GetEntries() []*EntryDetail {
 
 // AddEntry appends an EntryDetail to the Batch
 func (batch *Batch) AddEntry(entry *EntryDetail) {
+	if entry == nil {
+		return
+	}
+
 	batch.category = entry.Category
 	batch.Entries = append(batch.Entries, entry)
 }
@@ -395,19 +404,7 @@ func (batch *Batch) isBatchEntryCount() error {
 
 	if !batch.IsADV() {
 		for _, entry := range batch.Entries {
-			entryCount++
-
-			// Add in Addenda Count
-			if entry.Addenda02 != nil {
-				entryCount++
-			}
-			entryCount = entryCount + len(entry.Addenda05)
-			if entry.Addenda98 != nil {
-				entryCount++
-			}
-			if entry.Addenda99 != nil {
-				entryCount++
-			}
+			entryCount += 1 + entry.addendaCount()
 		}
 		if entryCount != batch.Control.EntryAddendaCount {
 			msg := fmt.Sprintf(msgBatchCalculatedControlEquality, entryCount, batch.Control.EntryAddendaCount)

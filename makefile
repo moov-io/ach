@@ -5,6 +5,7 @@ VERSION := $(shell grep -Eo '(v[0-9]+[\.][0-9]+[\.][0-9]+([-a-zA-Z0-9]*)?)' vers
 build:
 	go fmt ./...
 	@mkdir -p ./bin/
+	go build github.com/moov-io/ach
 	CGO_ENABLED=0 go build -o ./bin/server github.com/moov-io/ach/cmd/server
 
 generate: clean
