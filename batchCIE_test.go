@@ -9,7 +9,7 @@ import "testing"
 // mockBatchCIEHeader creates a BatchCIE BatchHeader
 func mockBatchCIEHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.StandardEntryClassCode = "CIE"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -178,7 +178,7 @@ func BenchmarkBatchCIEServiceClass200(b *testing.B) {
 // testBatchCIEServiceClass225 validates BatchCIE create for an invalid ServiceClassCode 225
 func testBatchCIEServiceClass225(t testing.TB) {
 	mockBatch := mockBatchCIE()
-	mockBatch.Header.ServiceClassCode = 225
+	mockBatch.Header.ServiceClassCode = DebitsOnly
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

@@ -9,7 +9,7 @@ import "testing"
 // mockBatchPOSHeader creates a BatchPOS BatchHeader
 func mockBatchPOSHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "POS"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -178,7 +178,7 @@ func BenchmarkBatchPOSServiceClass200(b *testing.B) {
 // testBatchPOSServiceClass220 validates BatchPOS create for an invalid ServiceClassCode 220
 func testBatchPOSServiceClass220(t testing.TB) {
 	mockBatch := mockBatchPOS()
-	mockBatch.Header.ServiceClassCode = 220
+	mockBatch.Header.ServiceClassCode = CreditsOnly
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

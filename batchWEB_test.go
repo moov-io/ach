@@ -7,7 +7,7 @@ import (
 // mockBatchWEBHeader creates a WEB batch header
 func mockBatchWEBHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.StandardEntryClassCode = "WEB"
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "121042882"
@@ -351,7 +351,7 @@ func TestBatchWEBCategoryReturnAddenda98(t *testing.T) {
 // TestBatchWEBValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
 func TestBatchWEBValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchWEB()
-	mockBatch.GetHeader().ServiceClassCode = 225
+	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TransactionCode" {

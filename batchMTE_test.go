@@ -13,7 +13,7 @@ import (
 // mockBatchMTEHeader creates a MTE batch header
 func mockBatchMTEHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.CompanyName = "Merchant with ATM"
 	bh.CompanyIdentification = "231380104"
 	bh.StandardEntryClassCode = "MTE"
@@ -322,7 +322,7 @@ func TestBatchMTEIdentificationNumber(t *testing.T) {
 // TestBatchMTEValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
 func TestBatchMTEValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchMTE()
-	mockBatch.GetHeader().ServiceClassCode = 220
+	mockBatch.GetHeader().ServiceClassCode = CreditsOnly
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TransactionCode" {

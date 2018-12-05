@@ -9,7 +9,7 @@ import "testing"
 // mockBatchRCKHeader creates a BatchRCK BatchHeader
 func mockBatchRCKHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "RCK"
 	bh.CompanyName = "Company Name"
 	bh.CompanyIdentification = "121042882"
@@ -45,7 +45,7 @@ func mockBatchRCK() *BatchRCK {
 // mockBatchRCKHeaderCredit creates a BatchRCK BatchHeader
 func mockBatchRCKHeaderCredit() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "RCK"
 	bh.CompanyName = "Company Name"
 	bh.CompanyIdentification = "121042882"
@@ -208,7 +208,7 @@ func BenchmarkBatchRCKServiceClass200(b *testing.B) {
 // testBatchRCKServiceClass220 validates BatchRCK create for an invalid ServiceClassCode 220
 func testBatchRCKServiceClass220(t testing.TB) {
 	mockBatch := mockBatchRCK()
-	mockBatch.Header.ServiceClassCode = 220
+	mockBatch.Header.ServiceClassCode = CreditsOnly
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

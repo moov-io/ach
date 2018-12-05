@@ -586,7 +586,7 @@ func BenchmarkIATBatchNumberMismatch(b *testing.B) {
 // testIATServiceClassCodeMismatch validates ServiceClassCode mismatch
 func testIATServiceClassCodeMismatch(t testing.TB) {
 	mockBatch := mockIATBatch(t)
-	mockBatch.GetControl().ServiceClassCode = 225
+	mockBatch.GetControl().ServiceClassCode = DebitsOnly
 	if err := mockBatch.verify(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
@@ -1347,7 +1347,7 @@ func BenchmarkIATBatchCreate(b *testing.B) {
 func testIATBatchValidate(t testing.TB) {
 	file := NewFile().SetHeader(mockFileHeader())
 	mockBatch := mockIATBatch(t)
-	mockBatch.GetHeader().ServiceClassCode = 225
+	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
 
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

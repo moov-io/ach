@@ -11,7 +11,7 @@ import (
 // mockBatchSHRHeader creates a BatchSHR BatchHeader
 func mockBatchSHRHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "SHR"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -181,7 +181,7 @@ func BenchmarkBatchSHRServiceClass200(b *testing.B) {
 // testBatchSHRServiceClass220 validates BatchSHR create for an invalid ServiceClassCode 220
 func testBatchSHRServiceClass220(t testing.TB) {
 	mockBatch := mockBatchSHR()
-	mockBatch.Header.ServiceClassCode = 220
+	mockBatch.Header.ServiceClassCode = CreditsOnly
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

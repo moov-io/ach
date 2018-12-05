@@ -52,7 +52,7 @@ func mockBatchNoEntry() *Batch {
 // Invalid SEC CODE BatchHeader
 func mockBatchInvalidSECHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.StandardEntryClassCode = "NIL"
 	bh.CompanyName = "ACME Corporation"
 	bh.CompanyIdentification = "123456789"
@@ -644,7 +644,7 @@ func BenchmarkBatchControl(b *testing.B) {
 // testIATBatch validates an IAT batch returns an error for batch
 func testIATBatch(t testing.TB) {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.StandardEntryClassCode = "IAT"
 	bh.CompanyName = "ACME Corporation"
 	bh.CompanyIdentification = "123456789"
@@ -680,7 +680,7 @@ func BenchmarkIATBatch(b *testing.B) {
 func TestBatchADVInvalidServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchADV()
 	mockBatch.Create()
-	mockBatch.ADVControl.ServiceClassCode = 220
+	mockBatch.ADVControl.ServiceClassCode = CreditsOnly
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
@@ -888,7 +888,7 @@ func TestBatchDishonoredReturnsCategory(t *testing.T) {
 	entryOne.Addenda99 = addenda99One
 
 	posHeader := NewBatchHeader()
-	posHeader.ServiceClassCode = 225
+	posHeader.ServiceClassCode = DebitsOnly
 	posHeader.StandardEntryClassCode = "POS"
 	posHeader.CompanyName = "Payee Name"
 	posHeader.CompanyIdentification = "231380104"

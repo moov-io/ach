@@ -324,7 +324,7 @@ func TestBatchENR__PaymentInformation(t *testing.T) {
 // TestBatchENRValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
 func TestBatchENRValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchENR()
-	mockBatch.GetHeader().ServiceClassCode = 225
+	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TransactionCode" {

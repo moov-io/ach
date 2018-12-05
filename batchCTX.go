@@ -61,8 +61,6 @@ func (batch *BatchCTX) Validate() error {
 		}
 
 		switch entry.TransactionCode {
-		// Prenote credit  23, 33, 43, 53
-		// Prenote debit 28, 38, 48
 		case CheckingPrenoteCredit, CheckingPrenoteDebit, SavingsPrenoteCredit, SavingsReturnNOCDebit, GLPrenoteCredit,
 			GLPrenoteDebit, LoanPrenoteCredit:
 			msg := fmt.Sprintf(msgBatchTransactionCodeAddenda, entry.TransactionCode, "CTX")

@@ -107,6 +107,19 @@ type BatchHeader struct {
 	converters
 }
 
+const (
+	// BatchHeader.ServiceClassCode and BatchControl.ServiceClassCode
+
+	// MixedDebitsAndCredits indicates a batch can have debit and credit ACH entries
+	MixedDebitsAndCredits = 200
+	// CreditsOnly indicates a batch can only have credit ACH entries
+	CreditsOnly = 220
+	// DebitsOnly indicates a batch can only have debit ACH entries
+	DebitsOnly = 225
+	// AutomatedAccountingAdvices indicates a batch can only have Automated Accounting Advices (debit and credit)
+	AutomatedAccountingAdvices = 280
+)
+
 // NewBatchHeader returns a new BatchHeader with default values for non exported fields
 func NewBatchHeader() *BatchHeader {
 	bh := &BatchHeader{

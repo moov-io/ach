@@ -12,7 +12,7 @@ import (
 // mockBatchTRXHeader creates a BatchTRX BatchHeader
 func mockBatchTRXHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "TRX"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -52,7 +52,7 @@ func mockBatchTRX() *BatchTRX {
 // mockBatchTRXHeaderCredit creates a BatchTRX BatchHeader
 func mockBatchTRXHeaderCredit() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "TRX"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -334,7 +334,7 @@ func BenchmarkBatchTRXInvalidBuild(b *testing.B) {
 func testBatchTRXAddenda10000(t testing.TB) {
 
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "TRX"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -387,7 +387,7 @@ func BenchmarkBatchTRXAddenda10000(b *testing.B) {
 // testBatchTRXAddendaRecords validates error for AddendaRecords not equal to addendum
 func testBatchTRXAddendaRecords(t testing.TB) {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "TRX"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -485,7 +485,7 @@ func BenchmarkBatchTRXReserved(b *testing.B) {
 // testBatchTRXZeroAddendaRecords validates zero addenda records
 func testBatchTRXZeroAddendaRecords(t testing.TB) {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "TRX"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -599,7 +599,7 @@ func TestBatchTRXAddendum99(t *testing.T) {
 // testBatchTRXServiceClass220 validates BatchTRX create for an invalid ServiceClassCode 220
 func testBatchTRXServiceClass220(t testing.TB) {
 	mockBatch := mockBatchTRX()
-	mockBatch.Header.ServiceClassCode = 220
+	mockBatch.Header.ServiceClassCode = CreditsOnly
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

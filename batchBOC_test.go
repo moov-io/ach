@@ -9,7 +9,7 @@ import "testing"
 // mockBatchBOCHeader creates a BatchBOC BatchHeader
 func mockBatchBOCHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "BOC"
 	bh.CompanyName = "Company Name"
 	bh.CompanyIdentification = "121042882"
@@ -45,7 +45,7 @@ func mockBatchBOC() *BatchBOC {
 // mockBatchBOCHeaderCredit creates a BatchBOC BatchHeader
 func mockBatchBOCHeaderCredit() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "BOC"
 	bh.CompanyName = "Company Name"
 	bh.CompanyIdentification = "121042882"
@@ -208,7 +208,7 @@ func BenchmarkBatchBOCServiceClass200(b *testing.B) {
 // testBatchBOCServiceClass220 validates BatchBOC create for an invalid ServiceClassCode 220
 func testBatchBOCServiceClass220(t testing.TB) {
 	mockBatch := mockBatchBOC()
-	mockBatch.Header.ServiceClassCode = 220
+	mockBatch.Header.ServiceClassCode = CreditsOnly
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

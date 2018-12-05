@@ -9,7 +9,7 @@ import "testing"
 // mockBatchTRCHeader creates a BatchTRC BatchHeader
 func mockBatchTRCHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "TRC"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -47,7 +47,7 @@ func mockBatchTRC() *BatchTRC {
 // mockBatchTRCHeaderCredit creates a BatchTRC BatchHeader
 func mockBatchTRCHeaderCredit() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "TRC"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -211,7 +211,7 @@ func BenchmarkBatchTRCServiceClass200(b *testing.B) {
 // testBatchTRCServiceClass220 validates BatchTRC create for an invalid ServiceClassCode 220
 func testBatchTRCServiceClass220(t testing.TB) {
 	mockBatch := mockBatchTRC()
-	mockBatch.Header.ServiceClassCode = 220
+	mockBatch.Header.ServiceClassCode = CreditsOnly
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

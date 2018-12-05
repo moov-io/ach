@@ -9,7 +9,7 @@ import "testing"
 // mockBatchXCKHeader creates a BatchXCK BatchHeader
 func mockBatchXCKHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "XCK"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -47,7 +47,7 @@ func mockBatchXCK() *BatchXCK {
 // mockBatchXCKHeaderCredit creates a BatchXCK BatchHeader
 func mockBatchXCKHeaderCredit() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "XCK"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -211,7 +211,7 @@ func BenchmarkBatchXCKServiceClass200(b *testing.B) {
 // testBatchXCKServiceClass220 validates BatchXCK create for an invalid ServiceClassCode 220
 func testBatchXCKServiceClass220(t testing.TB) {
 	mockBatch := mockBatchXCK()
-	mockBatch.Header.ServiceClassCode = 220
+	mockBatch.Header.ServiceClassCode = CreditsOnly
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

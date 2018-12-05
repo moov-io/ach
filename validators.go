@@ -218,14 +218,14 @@ func (v *validator) isSECCode(code string) error {
 func (v *validator) isServiceClass(code int) error {
 	switch code {
 	case
-		// ACH Mixed Debits and Credits
-		200,
-		// ACH Credits Only
-		220,
-		// ACH Debits Only
-		225,
-		// ACH Automated Accounting Advices
-		280:
+		// Mixed Debits and Credits
+		MixedDebitsAndCredits,
+		// Credits Only
+		CreditsOnly,
+		// Debits Only
+		DebitsOnly,
+		// Automated Accounting Advices
+		AutomatedAccountingAdvices:
 		return nil
 	}
 	return errors.New(msgServiceClass)

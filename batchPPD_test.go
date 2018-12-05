@@ -12,7 +12,7 @@ import (
 // mockBatchPPDHeader creates a PPD batch header
 func mockBatchPPDHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.StandardEntryClassCode = "PPD"
 	bh.CompanyName = "ACME Corporation"
 	bh.CompanyIdentification = "121042882"
@@ -97,7 +97,7 @@ func BenchmarkBatchError(b *testing.B) {
 // testBatchServiceClassCodeEquality validates service class code equality
 func testBatchServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchPPD()
-	mockBatch.GetControl().ServiceClassCode = 225
+	mockBatch.GetControl().ServiceClassCode = DebitsOnly
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
@@ -353,7 +353,7 @@ func TestBatchPPDSEC(t *testing.T) {
 // TestBatchPPDValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
 func TestBatchPPDValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchPPD()
-	mockBatch.GetHeader().ServiceClassCode = 225
+	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TransactionCode" {

@@ -9,7 +9,7 @@ import "testing"
 // mockBatchPOPHeader creates a BatchPOP BatchHeader
 func mockBatchPOPHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "POP"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -47,7 +47,7 @@ func mockBatchPOP() *BatchPOP {
 // mockBatchPOPHeaderCredit creates a BatchPOP BatchHeader
 func mockBatchPOPHeaderCredit() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "POP"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -212,7 +212,7 @@ func BenchmarkBatchPOPServiceClass200(b *testing.B) {
 // testBatchPOPServiceClass220 validates BatchPOP create for an invalid ServiceClassCode 220
 func testBatchPOPServiceClass220(t testing.TB) {
 	mockBatch := mockBatchPOP()
-	mockBatch.Header.ServiceClassCode = 220
+	mockBatch.Header.ServiceClassCode = CreditsOnly
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
