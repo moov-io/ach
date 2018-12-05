@@ -2,6 +2,12 @@
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
+// Package main is an example for creating an Automated Clearing House (ACH) file with Moov's HTTP service.
+// To run this example first start the ach service locally:
+//   $ go run ./cmd/server // from this project's root directory
+//
+// Then, in a second terminal you can run this example:
+//   $ go run ./examples/http // from project root
 package main
 
 import (
@@ -16,8 +22,7 @@ import (
 )
 
 var (
-	// achAddress refers to the local host and port for the ACH service
-	// running locally.
+	// achAddress refers to the local host and port for the ACH service running locally
 	achAddress = "http://localhost:8080"
 )
 
