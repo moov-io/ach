@@ -68,10 +68,7 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 	var req createFileRequest
 
 	// Sets default values
-	req.File = &ach.File{
-		Header: ach.NewFileHeader(),
-	}
-
+	req.File = ach.NewFile()
 	bs, err := ioutil.ReadAll(request.Body)
 	if err != nil {
 		return nil, err
@@ -195,6 +192,7 @@ func getFileContentsEndpoint(s Service) endpoint.Endpoint {
 		req := request.(getFileContentsRequest)
 		r, err := s.GetFileContents(req.ID)
 		if err != nil {
+			// TODO(adam): log? if requestId != ""
 			return getFileContentsResponse{Err: err}, nil
 		}
 		return r, nil
