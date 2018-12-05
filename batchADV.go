@@ -32,7 +32,7 @@ func (batch *BatchADV) Validate() error {
 		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "ADV")
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
-	if batch.Header.ServiceClassCode != 280 {
+	if batch.Header.ServiceClassCode != AutomatedAccountingAdvices {
 		msg := fmt.Sprintf(msgBatchSECType, batch.Header.ServiceClassCode, "ADV")
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
 	}

@@ -237,7 +237,7 @@ func BenchmarkBatchARCServiceClass220(b *testing.B) {
 // testBatchARCServiceClass280 validates BatchARC create for an invalid ServiceClassCode 280
 func testBatchARCServiceClass280(t testing.TB) {
 	mockBatch := mockBatchARC()
-	mockBatch.Header.ServiceClassCode = 280
+	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

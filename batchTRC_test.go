@@ -240,7 +240,7 @@ func BenchmarkBatchTRCServiceClass220(b *testing.B) {
 // testBatchTRCServiceClass280 validates BatchTRC create for an invalid ServiceClassCode 280
 func testBatchTRCServiceClass280(t testing.TB) {
 	mockBatch := mockBatchTRC()
-	mockBatch.Header.ServiceClassCode = 280
+	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

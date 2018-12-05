@@ -207,7 +207,7 @@ func BenchmarkBatchCIEServiceClass225(b *testing.B) {
 // testBatchCIEServiceClass280 validates BatchCIE create for an invalid ServiceClassCode 280
 func testBatchCIEServiceClass280(t testing.TB) {
 	mockBatch := mockBatchCIE()
-	mockBatch.Header.ServiceClassCode = 280
+	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

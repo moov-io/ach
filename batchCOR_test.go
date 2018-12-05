@@ -415,7 +415,7 @@ func TestBatchCORCategoryNOCAddenda98(t *testing.T) {
 // TestBatchCORValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
 func TestBatchCORValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchCOR()
-	mockBatch.GetHeader().ServiceClassCode = 280
+	mockBatch.GetHeader().ServiceClassCode = AutomatedAccountingAdvices
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {

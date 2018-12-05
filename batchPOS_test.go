@@ -207,7 +207,7 @@ func BenchmarkBatchPOSServiceClass220(b *testing.B) {
 // testBatchPOSServiceClass280 validates BatchPOS create for an invalid ServiceClassCode 280
 func testBatchPOSServiceClass280(t testing.TB) {
 	mockBatch := mockBatchPOS()
-	mockBatch.Header.ServiceClassCode = 280
+	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

@@ -54,7 +54,7 @@ func testParseADVBatchControl(t testing.TB) {
 	r.line = line
 	bh := BatchHeader{BatchNumber: 1,
 		StandardEntryClassCode: "ADV",
-		ServiceClassCode:       280,
+		ServiceClassCode:       AutomatedAccountingAdvices,
 		CompanyIdentification:  "origid",
 		ODFIIdentification:     "12104288"}
 	r.addCurrentBatch(NewBatchADV(&bh))
@@ -68,7 +68,7 @@ func testParseADVBatchControl(t testing.TB) {
 	if record.recordType != "8" {
 		t.Errorf("RecordType Expected '8' got: %v", record.recordType)
 	}
-	if record.ServiceClassCode != 280 {
+	if record.ServiceClassCode != AutomatedAccountingAdvices {
 		t.Errorf("ServiceClassCode Expected '280' got: %v", record.ServiceClassCode)
 	}
 	if record.EntryAddendaCountField() != "000001" {
@@ -114,7 +114,7 @@ func testADVBCString(t testing.TB) {
 	r.line = line
 	bh := BatchHeader{BatchNumber: 1,
 		StandardEntryClassCode: "ADV",
-		ServiceClassCode:       280,
+		ServiceClassCode:       AutomatedAccountingAdvices,
 		CompanyIdentification:  "origid",
 		ODFIIdentification:     "12104288"}
 	r.addCurrentBatch(NewBatchADV(&bh))

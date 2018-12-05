@@ -26,16 +26,16 @@ type Batch struct {
 	converters
 }
 
-func (b *Batch) UnmarshalJSON(p []byte) error {
-	b.Header = NewBatchHeader()
-	b.Control = NewBatchControl()
-	b.ADVControl = NewADVBatchControl()
+func (batch *Batch) UnmarshalJSON(p []byte) error {
+	batch.Header = NewBatchHeader()
+	batch.Control = NewBatchControl()
+	batch.ADVControl = NewADVBatchControl()
 
 	type Alias Batch
 	aux := struct {
 		*Alias
 	}{
-		(*Alias)(b),
+		(*Alias)(batch),
 	}
 	if err := json.Unmarshal(p, &aux); err != nil {
 		return err
@@ -786,17 +786,17 @@ func (batch *Batch) ValidTranCodeForServiceClassCode(entry *EntryDetail) error {
 	}
 
 	switch batch.Header.ServiceClassCode {
-	case 280:
+	case AutomatedAccountingAdvices:
 		msg := fmt.Sprintf(msgBatchServiceClassTranCode, batch.Header.ServiceClassCode, batch.Header.StandardEntryClassCode)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
-	case 200:
-	case 220:
-		if entry.CreditOrDebit() == "D" {
+	case MixedDebitsAndCredits:
+	case CreditsOnly:
+		if entry.CreditOrDebit() != "C" {
 			msg := fmt.Sprintf(msgBatchServiceClassTranCode, entry.TransactionCode, batch.Header.ServiceClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 		}
-	case 225:
-		if entry.CreditOrDebit() == "C" {
+	case DebitsOnly:
+		if entry.CreditOrDebit() != "D" {
 			msg := fmt.Sprintf(msgBatchServiceClassTranCode, entry.TransactionCode, batch.Header.ServiceClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 		}

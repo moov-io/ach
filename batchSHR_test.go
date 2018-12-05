@@ -210,7 +210,7 @@ func BenchmarkBatchSHRServiceClass220(b *testing.B) {
 // testBatchSHRServiceClass280 validates BatchSHR create for an invalid ServiceClassCode 280
 func testBatchSHRServiceClass280(t testing.TB) {
 	mockBatch := mockBatchSHR()
-	mockBatch.Header.ServiceClassCode = 280
+	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
