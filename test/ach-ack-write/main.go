@@ -23,7 +23,7 @@ func main() {
 
 	// BatchHeader identifies the originating entity and the type of transactions contained in the batch
 	bh := ach.NewBatchHeader()
-	bh.ServiceClassCode = 220          //
+	bh.ServiceClassCode = ach.CreditsOnly
 	bh.CompanyName = "Name on Account" // The name of the company/person that has relationship with receiver
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = "ACK"       // Consumer destination vs Company CCD

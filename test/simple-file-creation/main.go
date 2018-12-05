@@ -68,7 +68,7 @@ func main() {
 	// Now add a new batch for accepting payments on the web
 
 	bh2 := ach.NewBatchHeader()
-	bh2.ServiceClassCode = 220
+	bh2.ServiceClassCode = ach.CreditsOnly
 	bh2.CompanyName = "Your Company"
 	bh2.CompanyIdentification = file.Header.ImmediateOrigin
 	bh2.StandardEntryClassCode = "WEB"

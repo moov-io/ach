@@ -12,7 +12,7 @@ import (
 // mockBatchENRHeader creates a ENR batch header
 func mockBatchENRHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.CompanyName = "Name on Account"
 	bh.CompanyIdentification = "231380104"
 	bh.StandardEntryClassCode = "ENR"
