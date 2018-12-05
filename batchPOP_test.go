@@ -180,8 +180,8 @@ func BenchmarkBatchPOPServiceClassCodeEquality(b *testing.B) {
 	}
 }
 
-// testBatchPOPServiceClass200 validates BatchPOP create for an invalid ServiceClassCode 200
-func testBatchPOPServiceClass200(t testing.TB) {
+// testBatchPOPMixedCreditsAndDebits validates BatchPOP create for an invalid MixedCreditsAndDebits
+func testBatchPOPMixedCreditsAndDebits(t testing.TB) {
 	mockBatch := mockBatchPOP()
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	mockBatch.Create()
@@ -196,21 +196,21 @@ func testBatchPOPServiceClass200(t testing.TB) {
 	}
 }
 
-// TestBatchPOPServiceClass200 tests validating BatchPOP create for an invalid ServiceClassCode 200
-func TestBatchPOPServiceClass200(t *testing.T) {
-	testBatchPOPServiceClass200(t)
+// TestBatchPOPMixedCreditsAndDebits tests validating BatchPOP create for an invalid MixedCreditsAndDebits
+func TestBatchPOPMixedCreditsAndDebits(t *testing.T) {
+	testBatchPOPMixedCreditsAndDebits(t)
 }
 
-// BenchmarkBatchPOPServiceClass200 benchmarks validating BatchPOP create for an invalid ServiceClassCode 200
-func BenchmarkBatchPOPServiceClass200(b *testing.B) {
+// BenchmarkBatchPOPMixedCreditsAndDebits benchmarks validating BatchPOP create for an invalid MixedCreditsAndDebits
+func BenchmarkBatchPOPMixedCreditsAndDebits(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchPOPServiceClass200(b)
+		testBatchPOPMixedCreditsAndDebits(b)
 	}
 }
 
-// testBatchPOPServiceClass220 validates BatchPOP create for an invalid ServiceClassCode 220
-func testBatchPOPServiceClass220(t testing.TB) {
+// testBatchPOPCreditsOnly validates BatchPOP create for an invalid CreditsOnly
+func testBatchPOPCreditsOnly(t testing.TB) {
 	mockBatch := mockBatchPOP()
 	mockBatch.Header.ServiceClassCode = CreditsOnly
 	mockBatch.Create()
@@ -225,21 +225,21 @@ func testBatchPOPServiceClass220(t testing.TB) {
 	}
 }
 
-// TestBatchPOPServiceClass220 tests validating BatchPOP create for an invalid ServiceClassCode 220
-func TestBatchPOPServiceClass220(t *testing.T) {
-	testBatchPOPServiceClass220(t)
+// TestBatchPOPCreditsOnly tests validating BatchPOP create for an invalid CreditsOnly
+func TestBatchPOPCreditsOnly(t *testing.T) {
+	testBatchPOPCreditsOnly(t)
 }
 
-// BenchmarkBatchPOPServiceClass220 benchmarks validating BatchPOP create for an invalid ServiceClassCode 220
-func BenchmarkBatchPOPServiceClass220(b *testing.B) {
+// BenchmarkBatchPOPCreditsOnly benchmarks validating BatchPOP create for an invalid CreditsOnly
+func BenchmarkBatchPOPCreditsOnly(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchPOPServiceClass220(b)
+		testBatchPOPCreditsOnly(b)
 	}
 }
 
-// testBatchPOPServiceClass280 validates BatchPOP create for an invalid ServiceClassCode 280
-func testBatchPOPServiceClass280(t testing.TB) {
+// testBatchPOPAutomatedAccountingAdvices validates BatchPOP create for an invalid AutomatedAccountingAdvices
+func testBatchPOPAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchPOP()
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	mockBatch.Create()
@@ -254,16 +254,16 @@ func testBatchPOPServiceClass280(t testing.TB) {
 	}
 }
 
-// TestBatchPOPServiceClass280 tests validating BatchPOP create for an invalid ServiceClassCode 280
-func TestBatchPOPServiceClass280(t *testing.T) {
-	testBatchPOPServiceClass280(t)
+// TestBatchPOPAutomatedAccountingAdvices tests validating BatchPOP create for an invalid AutomatedAccountingAdvices
+func TestBatchPOPAutomatedAccountingAdvices(t *testing.T) {
+	testBatchPOPAutomatedAccountingAdvices(t)
 }
 
-// BenchmarkBatchPOPServiceClass280 benchmarks validating BatchPOP create for an invalid ServiceClassCode 280
-func BenchmarkBatchPOPServiceClass280(b *testing.B) {
+// BenchmarkBatchPOPAutomatedAccountingAdvices benchmarks validating BatchPOP create for an invalid AutomatedAccountingAdvices
+func BenchmarkBatchPOPAutomatedAccountingAdvices(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchPOPServiceClass280(b)
+		testBatchPOPAutomatedAccountingAdvices(b)
 	}
 }
 

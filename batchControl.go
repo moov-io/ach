@@ -108,7 +108,7 @@ func (bc *BatchControl) Parse(record string) {
 func NewBatchControl() *BatchControl {
 	return &BatchControl{
 		recordType:       "8",
-		ServiceClassCode: 200,
+		ServiceClassCode: MixedDebitsAndCredits,
 		EntryHash:        1,
 		BatchNumber:      1,
 	}

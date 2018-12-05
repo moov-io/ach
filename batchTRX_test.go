@@ -596,8 +596,8 @@ func TestBatchTRXAddendum99(t *testing.T) {
 	}
 }
 
-// testBatchTRXServiceClass220 validates BatchTRX create for an invalid ServiceClassCode 220
-func testBatchTRXServiceClass220(t testing.TB) {
+// testBatchTRXCreditsOnly validates BatchTRX create for an invalid CreditsOnly
+func testBatchTRXCreditsOnly(t testing.TB) {
 	mockBatch := mockBatchTRX()
 	mockBatch.Header.ServiceClassCode = CreditsOnly
 	mockBatch.Create()
@@ -612,21 +612,21 @@ func testBatchTRXServiceClass220(t testing.TB) {
 	}
 }
 
-// TestBatchTRXServiceClass220 tests validating BatchTRX create for an invalid ServiceClassCode 220
-func TestBatchTRXServiceClass220(t *testing.T) {
-	testBatchTRXServiceClass220(t)
+// TestBatchTRXCreditsOnly tests validating BatchTRX create for an invalid CreditsOnly
+func TestBatchTRXCreditsOnly(t *testing.T) {
+	testBatchTRXCreditsOnly(t)
 }
 
-// BenchmarkBatchTRXServiceClass220 benchmarks validating BatchTRX create for an invalid ServiceClassCode 220
-func BenchmarkBatchTRXServiceClass220(b *testing.B) {
+// BenchmarkBatchTRXCreditsOnly benchmarks validating BatchTRX create for an invalid CreditsOnly
+func BenchmarkBatchTRXCreditsOnly(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchTRXServiceClass220(b)
+		testBatchTRXCreditsOnly(b)
 	}
 }
 
-// testBatchTRXServiceClass280 validates BatchTRX create for an invalid ServiceClassCode 280
-func testBatchTRXServiceClass280(t testing.TB) {
+// testBatchTRXAutomatedAccountingAdvices validates BatchTRX create for an invalid AutomatedAccountingAdvices
+func testBatchTRXAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchTRX()
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	mockBatch.Create()
@@ -641,16 +641,16 @@ func testBatchTRXServiceClass280(t testing.TB) {
 	}
 }
 
-// TestBatchTRXServiceClass280 tests validating BatchTRX create for an invalid ServiceClassCode 280
-func TestBatchTRXServiceClass280(t *testing.T) {
-	testBatchTRXServiceClass280(t)
+// TestBatchTRXAutomatedAccountingAdvices tests validating BatchTRX create for an invalid AutomatedAccountingAdvices
+func TestBatchTRXAutomatedAccountingAdvices(t *testing.T) {
+	testBatchTRXAutomatedAccountingAdvices(t)
 }
 
-// BenchmarkBatchTRXServiceClass280 benchmarks validating BatchTRX create for an invalid ServiceClassCode 280
-func BenchmarkBatchTRXServiceClass280(b *testing.B) {
+// BenchmarkBatchTRXAutomatedAccountingAdvices benchmarks validating BatchTRX create for an invalid AutomatedAccountingAdvices
+func BenchmarkBatchTRXAutomatedAccountingAdvices(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchTRXServiceClass280(b)
+		testBatchTRXAutomatedAccountingAdvices(b)
 	}
 }
 

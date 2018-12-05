@@ -179,8 +179,8 @@ func BenchmarkBatchTRCServiceClassCodeEquality(b *testing.B) {
 	}
 }
 
-// testBatchTRCServiceClass200 validates BatchTRC create for an invalid ServiceClassCode 200
-func testBatchTRCServiceClass200(t testing.TB) {
+// testBatchTRCMixedCreditsAndDebits validates BatchTRC create for an invalid MixedCreditsAndDebits
+func testBatchTRCMixedCreditsAndDebits(t testing.TB) {
 	mockBatch := mockBatchTRC()
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	mockBatch.Create()
@@ -195,21 +195,21 @@ func testBatchTRCServiceClass200(t testing.TB) {
 	}
 }
 
-// TestBatchTRCServiceClass200 tests validating BatchTRC create for an invalid ServiceClassCode 200
-func TestBatchTRCServiceClass200(t *testing.T) {
-	testBatchTRCServiceClass200(t)
+// TestBatchTRCMixedCreditsAndDebits tests validating BatchTRC create for an invalid MixedCreditsAndDebits
+func TestBatchTRCMixedCreditsAndDebits(t *testing.T) {
+	testBatchTRCMixedCreditsAndDebits(t)
 }
 
-// BenchmarkBatchTRCServiceClass200 benchmarks validating BatchTRC create for an invalid ServiceClassCode 200
-func BenchmarkBatchTRCServiceClass200(b *testing.B) {
+// BenchmarkBatchTRCMixedCreditsAndDebits benchmarks validating BatchTRC create for an invalid MixedCreditsAndDebits
+func BenchmarkBatchTRCMixedCreditsAndDebits(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchTRCServiceClass200(b)
+		testBatchTRCMixedCreditsAndDebits(b)
 	}
 }
 
-// testBatchTRCServiceClass220 validates BatchTRC create for an invalid ServiceClassCode 220
-func testBatchTRCServiceClass220(t testing.TB) {
+// testBatchTRCCreditsOnly validates BatchTRC create for an invalid CreditsOnly
+func testBatchTRCCreditsOnly(t testing.TB) {
 	mockBatch := mockBatchTRC()
 	mockBatch.Header.ServiceClassCode = CreditsOnly
 	mockBatch.Create()
@@ -224,21 +224,21 @@ func testBatchTRCServiceClass220(t testing.TB) {
 	}
 }
 
-// TestBatchTRCServiceClass220 tests validating BatchTRC create for an invalid ServiceClassCode 220
-func TestBatchTRCServiceClass220(t *testing.T) {
-	testBatchTRCServiceClass220(t)
+// TestBatchTRCCreditsOnly tests validating BatchTRC create for an invalid CreditsOnly
+func TestBatchTRCCreditsOnly(t *testing.T) {
+	testBatchTRCCreditsOnly(t)
 }
 
-// BenchmarkBatchTRCServiceClass220 benchmarks validating BatchTRC create for an invalid ServiceClassCode 220
-func BenchmarkBatchTRCServiceClass220(b *testing.B) {
+// BenchmarkBatchTRCCreditsOnly benchmarks validating BatchTRC create for an invalid CreditsOnly
+func BenchmarkBatchTRCCreditsOnly(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchTRCServiceClass220(b)
+		testBatchTRCCreditsOnly(b)
 	}
 }
 
-// testBatchTRCServiceClass280 validates BatchTRC create for an invalid ServiceClassCode 280
-func testBatchTRCServiceClass280(t testing.TB) {
+// testBatchTRCAutomatedAccountingAdvices validates BatchTRC create for an invalid AutomatedAccountingAdvices
+func testBatchTRCAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchTRC()
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	mockBatch.Create()
@@ -253,16 +253,16 @@ func testBatchTRCServiceClass280(t testing.TB) {
 	}
 }
 
-// TestBatchTRCServiceClass280 tests validating BatchTRC create for an invalid ServiceClassCode 280
-func TestBatchTRCServiceClass280(t *testing.T) {
-	testBatchTRCServiceClass280(t)
+// TestBatchTRCAutomatedAccountingAdvices tests validating BatchTRC create for an invalid AutomatedAccountingAdvices
+func TestBatchTRCAutomatedAccountingAdvices(t *testing.T) {
+	testBatchTRCAutomatedAccountingAdvices(t)
 }
 
-// BenchmarkBatchTRCServiceClass280 benchmarks validating BatchTRC create for an invalid ServiceClassCode 280
-func BenchmarkBatchTRCServiceClass280(b *testing.B) {
+// BenchmarkBatchTRCAutomatedAccountingAdvices benchmarks validating BatchTRC create for an invalid AutomatedAccountingAdvices
+func BenchmarkBatchTRCAutomatedAccountingAdvices(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchTRCServiceClass280(b)
+		testBatchTRCAutomatedAccountingAdvices(b)
 	}
 }
 

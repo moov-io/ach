@@ -146,8 +146,8 @@ func BenchmarkBatchCIEServiceClassCodeEquality(b *testing.B) {
 	}
 }
 
-// testBatchCIEServiceClass200 validates BatchCIE create for an invalid ServiceClassCode 200
-func testBatchCIEServiceClass200(t testing.TB) {
+// testBatchCIEMixedCreditsAndDebits validates BatchCIE create for an invalid MixedCreditsAndDebits
+func testBatchCIEMixedCreditsAndDebits(t testing.TB) {
 	mockBatch := mockBatchCIE()
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	mockBatch.Create()
@@ -162,21 +162,21 @@ func testBatchCIEServiceClass200(t testing.TB) {
 	}
 }
 
-// TestBatchCIEServiceClass200 tests validating BatchCIE create for an invalid ServiceClassCode 200
-func TestBatchCIEServiceClass200(t *testing.T) {
-	testBatchCIEServiceClass200(t)
+// TestBatchCIEMixedCreditsAndDebits tests validating BatchCIE create for an invalid MixedCreditsAndDebits
+func TestBatchCIEMixedCreditsAndDebits(t *testing.T) {
+	testBatchCIEMixedCreditsAndDebits(t)
 }
 
-// BenchmarkBatchCIEServiceClass200 benchmarks validating BatchCIE create for an invalid ServiceClassCode 200
-func BenchmarkBatchCIEServiceClass200(b *testing.B) {
+// BenchmarkBatchCIEMixedCreditsAndDebits benchmarks validating BatchCIE create for an invalid MixedCreditsAndDebits
+func BenchmarkBatchCIEMixedCreditsAndDebits(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchCIEServiceClass200(b)
+		testBatchCIEMixedCreditsAndDebits(b)
 	}
 }
 
-// testBatchCIEServiceClass225 validates BatchCIE create for an invalid ServiceClassCode 225
-func testBatchCIEServiceClass225(t testing.TB) {
+// testBatchCIEDebitsOnly validates BatchCIE create for an invalid DebitsOnly
+func testBatchCIEDebitsOnly(t testing.TB) {
 	mockBatch := mockBatchCIE()
 	mockBatch.Header.ServiceClassCode = DebitsOnly
 	mockBatch.Create()
@@ -191,21 +191,21 @@ func testBatchCIEServiceClass225(t testing.TB) {
 	}
 }
 
-// TestBatchCIEServiceClass225 tests validating BatchCIE create for an invalid ServiceClassCode 225
-func TestBatchCIEServiceClass225(t *testing.T) {
-	testBatchCIEServiceClass225(t)
+// TestBatchCIEDebitsOnly tests validating BatchCIE create for an invalid DebitsOnly
+func TestBatchCIEDebitsOnly(t *testing.T) {
+	testBatchCIEDebitsOnly(t)
 }
 
-// BenchmarkBatchCIEServiceClass225 benchmarks validating BatchCIE create for an invalid ServiceClassCode 225
-func BenchmarkBatchCIEServiceClass225(b *testing.B) {
+// BenchmarkBatchCIEDebitsOnly benchmarks validating BatchCIE create for an invalid DebitsOnly
+func BenchmarkBatchCIEDebitsOnly(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchCIEServiceClass225(b)
+		testBatchCIEDebitsOnly(b)
 	}
 }
 
-// testBatchCIEServiceClass280 validates BatchCIE create for an invalid ServiceClassCode 280
-func testBatchCIEServiceClass280(t testing.TB) {
+// testBatchCIEAutomatedAccountingAdvices validates BatchCIE create for an invalid AutomatedAccountingAdvices
+func testBatchCIEAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchCIE()
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	mockBatch.Create()
@@ -220,16 +220,16 @@ func testBatchCIEServiceClass280(t testing.TB) {
 	}
 }
 
-// TestBatchCIEServiceClass280 tests validating BatchCIE create for an invalid ServiceClassCode 280
-func TestBatchCIEServiceClass280(t *testing.T) {
-	testBatchCIEServiceClass280(t)
+// TestBatchCIEAutomatedAccountingAdvices tests validating BatchCIE create for an invalid AutomatedAccountingAdvices
+func TestBatchCIEAutomatedAccountingAdvices(t *testing.T) {
+	testBatchCIEAutomatedAccountingAdvices(t)
 }
 
-// BenchmarkBatchCIEServiceClass280 benchmarks validating BatchCIE create for an invalid ServiceClassCode 280
-func BenchmarkBatchCIEServiceClass280(b *testing.B) {
+// BenchmarkBatchCIEAutomatedAccountingAdvices benchmarks validating BatchCIE create for an invalid AutomatedAccountingAdvices
+func BenchmarkBatchCIEAutomatedAccountingAdvices(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchCIEServiceClass280(b)
+		testBatchCIEAutomatedAccountingAdvices(b)
 	}
 }
 

@@ -18,9 +18,7 @@ type ADVBatchControl struct {
 	ID string `json:"id"`
 	// RecordType defines the type of record in the block.
 	recordType string
-	// ServiceClassCode ACH Mixed Debits and Credits ‘200’
-	// ACH Credits Only ‘220’
-	// ACH Debits Only ‘225'
+	// AutomatedAccountingAdvices: 280
 	// Same as 'ServiceClassCode' in BatchHeaderRecord
 	ServiceClassCode int `json:"serviceClassCode"`
 	// EntryAddendaCount is a tally of each Entry Detail Record and each Addenda
