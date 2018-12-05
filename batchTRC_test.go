@@ -154,7 +154,7 @@ func BenchmarkBatchTRCStandardEntryClassCode(b *testing.B) {
 // testBatchTRCServiceClassCodeEquality validates service class code equality
 func testBatchTRCServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchTRC()
-	mockBatch.GetControl().ServiceClassCode = 200
+	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
@@ -182,7 +182,7 @@ func BenchmarkBatchTRCServiceClassCodeEquality(b *testing.B) {
 // testBatchTRCServiceClass200 validates BatchTRC create for an invalid ServiceClassCode 200
 func testBatchTRCServiceClass200(t testing.TB) {
 	mockBatch := mockBatchTRC()
-	mockBatch.Header.ServiceClassCode = 200
+	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

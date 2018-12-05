@@ -331,7 +331,7 @@ func BenchmarkBatchCORCreate(b *testing.B) {
 // testBatchCORServiceClassCodeEquality validates service class code equality
 func testBatchCORServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchCOR()
-	mockBatch.GetControl().ServiceClassCode = 200
+	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {

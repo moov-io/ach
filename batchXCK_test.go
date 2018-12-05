@@ -154,7 +154,7 @@ func BenchmarkBatchXCKStandardEntryClassCode(b *testing.B) {
 // testBatchXCKServiceClassCodeEquality validates service class code equality
 func testBatchXCKServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchXCK()
-	mockBatch.GetControl().ServiceClassCode = 200
+	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
@@ -182,7 +182,7 @@ func BenchmarkBatchXCKServiceClassCodeEquality(b *testing.B) {
 // testBatchXCKServiceClass200 validates BatchXCK create for an invalid ServiceClassCode 200
 func testBatchXCKServiceClass200(t testing.TB) {
 	mockBatch := mockBatchXCK()
-	mockBatch.Header.ServiceClassCode = 200
+	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

@@ -155,7 +155,7 @@ func BenchmarkBatchPOPStandardEntryClassCode(b *testing.B) {
 // testBatchPOPServiceClassCodeEquality validates service class code equality
 func testBatchPOPServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchPOP()
-	mockBatch.GetControl().ServiceClassCode = 200
+	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
@@ -183,7 +183,7 @@ func BenchmarkBatchPOPServiceClassCodeEquality(b *testing.B) {
 // testBatchPOPServiceClass200 validates BatchPOP create for an invalid ServiceClassCode 200
 func testBatchPOPServiceClass200(t testing.TB) {
 	mockBatch := mockBatchPOP()
-	mockBatch.Header.ServiceClassCode = 200
+	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

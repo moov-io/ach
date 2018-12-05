@@ -121,7 +121,7 @@ func BenchmarkBatchPOSStandardEntryClassCode(b *testing.B) {
 // testBatchPOSServiceClassCodeEquality validates service class code equality
 func testBatchPOSServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchPOS()
-	mockBatch.GetControl().ServiceClassCode = 200
+	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
@@ -149,7 +149,7 @@ func BenchmarkBatchPOSServiceClassCodeEquality(b *testing.B) {
 // testBatchPOSServiceClass200 validates BatchPOS create for an invalid ServiceClassCode 200
 func testBatchPOSServiceClass200(t testing.TB) {
 	mockBatch := mockBatchPOS()
-	mockBatch.Header.ServiceClassCode = 200
+	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

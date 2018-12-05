@@ -38,7 +38,7 @@ func mockPPDEntryDetail() *EntryDetail {
 // mockBatchPPDHeader2 creates a 2nd PPD batch header
 func mockBatchPPDHeader2() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 200
+	bh.ServiceClassCode = MixedDebitsAndCredits
 	bh.CompanyName = "MY BEST COMP."
 	bh.CompanyDiscretionaryData = "INCLUDES OVERTIME"
 	bh.CompanyIdentification = "121042882"

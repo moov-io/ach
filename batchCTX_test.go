@@ -124,7 +124,7 @@ func BenchmarkBatchCTXStandardEntryClassCode(b *testing.B) {
 // testBatchCTXServiceClassCodeEquality validates service class code equality
 func testBatchCTXServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchCTX()
-	mockBatch.GetControl().ServiceClassCode = 200
+	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {

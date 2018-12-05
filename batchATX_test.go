@@ -124,7 +124,7 @@ func BenchmarkBatchATXStandardEntryClassCode(b *testing.B) {
 // testBatchATXServiceClassCodeEquality validates service class code equality
 func testBatchATXServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchATX()
-	mockBatch.GetControl().ServiceClassCode = 200
+	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {

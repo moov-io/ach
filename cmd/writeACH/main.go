@@ -64,7 +64,7 @@ func write(path string) {
 	// Create 4 Batches of SEC Code PPD
 	for i := 0; i < 4; i++ {
 		bh := ach.NewBatchHeader()
-		bh.ServiceClassCode = 200
+		bh.ServiceClassCode = ach.MixedDebitsAndCredits
 		bh.CompanyName = "Wells Fargo"
 		bh.CompanyIdentification = "121042882"
 		bh.StandardEntryClassCode = "PPD"

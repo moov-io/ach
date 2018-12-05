@@ -121,7 +121,7 @@ func BenchmarkBatchCIEStandardEntryClassCode(b *testing.B) {
 // testBatchCIEServiceClassCodeEquality validates service class code equality
 func testBatchCIEServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchCIE()
-	mockBatch.GetControl().ServiceClassCode = 200
+	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
@@ -149,7 +149,7 @@ func BenchmarkBatchCIEServiceClassCodeEquality(b *testing.B) {
 // testBatchCIEServiceClass200 validates BatchCIE create for an invalid ServiceClassCode 200
 func testBatchCIEServiceClass200(t testing.TB) {
 	mockBatch := mockBatchCIE()
-	mockBatch.Header.ServiceClassCode = 200
+	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

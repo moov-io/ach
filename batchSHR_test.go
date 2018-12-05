@@ -124,7 +124,7 @@ func BenchmarkBatchSHRStandardEntryClassCode(b *testing.B) {
 // testBatchSHRServiceClassCodeEquality validates service class code equality
 func testBatchSHRServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchSHR()
-	mockBatch.GetControl().ServiceClassCode = 200
+	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
@@ -152,7 +152,7 @@ func BenchmarkBatchSHRServiceClassCodeEquality(b *testing.B) {
 // testBatchSHRServiceClass200 validates BatchSHR create for an invalid ServiceClassCode 200
 func testBatchSHRServiceClass200(t testing.TB) {
 	mockBatch := mockBatchSHR()
-	mockBatch.Header.ServiceClassCode = 200
+	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
