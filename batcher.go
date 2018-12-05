@@ -50,7 +50,7 @@ func (e *BatchError) Error() string {
 var (
 	// generic messages
 	msgBatchHeaderControlEquality     = "header %v is not equal to control %v"
-	msgBatchCalculatedControlEquality = "calculated %v is out-of-balance with control %v"
+	msgBatchCalculatedControlEquality = "calculated %v is out-of-balance with batch control %v"
 	msgBatchAscending                 = "%v is less than last %v. Must be in ascending order"
 	// specific messages for error
 	msgBatchCompanyEntryDescription = "Company entry description %v is not valid for batch type %v"

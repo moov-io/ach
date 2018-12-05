@@ -28,7 +28,7 @@ const (
 
 // Errors strings specific to parsing a Batch container
 var (
-	msgFileCalculatedControlEquality = "calculated %v is out-of-balance with control %v"
+	msgFileCalculatedControlEquality = "calculated %v is out-of-balance with file control %v"
 	// specific messages
 	msgRecordLength      = "must be 94 characters and found %d"
 	msgFileBatchOutside  = "outside of current batch"
@@ -118,11 +118,12 @@ func FileFromJSON(bs []byte) (*File, error) {
 
 	// Read FileHeader
 	header := fileHeader{
-		Header: NewFileHeader(),
+		Header: file.Header,
 	}
 	if err := json.NewDecoder(bytes.NewReader(bs)).Decode(&header); err != nil {
 		return nil, fmt.Errorf("problem reading FileHeader: %v", err)
 	}
+	file.Header = header.Header
 
 	if !file.IsADV() {
 		// Read FileControl
@@ -148,14 +149,15 @@ func FileFromJSON(bs []byte) (*File, error) {
 	if err := file.setBatchesFromJSON(bs); err != nil {
 		return nil, err
 	}
-	file.Header = header.Header
+
 	if !file.IsADV() {
 		file.Control.BatchCount = len(file.Batches)
 	} else {
-
 		file.ADVControl.BatchCount = len(file.Batches)
 	}
-
+	if err := file.Create(); err != nil {
+		return file, err
+	}
 	return file, nil
 }
 
@@ -177,7 +179,7 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 	if err := json.Unmarshal(bs, &batches); err != nil {
 		return err
 	}
-	// Clear out any nil batchs
+	// Clear out any nil batchess
 	for i := range f.Batches {
 		if f.Batches[i] == nil {
 			f.Batches = append(f.Batches[:i], f.Batches[i+1:]...)
@@ -187,6 +189,9 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 	for i := range batches.Batches {
 		if batches.Batches[i] == nil {
 			continue
+		}
+		if err := batches.Batches[i].build(); err != nil {
+			return fmt.Errorf("batch %s: %v", batches.Batches[i].Header.ID, err)
 		}
 		f.Batches = append(f.Batches, batches.Batches[i])
 	}
@@ -214,6 +219,12 @@ func (f *File) Create() error {
 		totalCreditAmount := 0
 
 		for i, batch := range f.Batches {
+			if v := f.Batches[i].GetHeader(); v == nil {
+				f.Batches[i].SetHeader(NewBatchHeader())
+			}
+			if v := f.Batches[i].GetControl(); v == nil {
+				f.Batches[i].SetControl(NewBatchControl())
+			}
 
 			// create ascending batch numbers
 			f.Batches[i].GetHeader().BatchNumber = batchSeq

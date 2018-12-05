@@ -151,7 +151,7 @@ func NewReader(r io.Reader) *Reader {
 // on the first character of each line. It also enforces ACH formatting rules and returns
 // the appropriate error if issues are found.
 //
-// A parsed file may not be valid and callers should confirm with Validate(). Invalid files may
+// A parsed file may not be valid and callers should confirm with Create() Validate(). Invalid files may
 // be rejected by other Financial Institutions or ACH tools.
 func (r *Reader) Read() (File, error) {
 	r.lineNum = 0
