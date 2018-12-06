@@ -207,8 +207,8 @@ func (v *validator) isOriginatorStatusCode(code int) error {
 func (v *validator) isSECCode(code string) error {
 	switch code {
 	case
-		ACK, ADV, ARC, "ATX", "BOC", "CCD", "CIE", "COR", "CTX", "DNE", "ENR",
-		"IAT", "MTE", "POS", "PPD", "POP", "RCK", "SHR", "TEL", "TRC", "TRX", "WEB", "XCK":
+		ACK, ADV, ARC, ATX, BOC, CCD, CIE, COR, CTX, DNE, ENR,
+		IAT, MTE, POS, PPD, POP, RCK, SHR, TEL, TRC, TRX, WEB, XCK:
 		return nil
 	}
 	return errors.New(msgSECCode)

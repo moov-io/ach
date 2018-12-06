@@ -33,11 +33,51 @@ const (
 	// ADV Automated Accounting Advice – A code that  provide accounting information regarding an Entry. It is an
 	// optional service.
 	ADV = "ADV"
-	// Accounts Receivable Entry – A code that indicates a consumer check converted to a one-time ACH debit.
+	// ARC Accounts Receivable Entry – A code that indicates a consumer check converted to a one-time ACH debit.
 	// The Accounts Receivable (ARC) Entry provides initiates a single-entry ACH debit to customer accounts by
 	// converting checks at the point of receipt through the U.S. mail, at a drop box location or in-person for
 	// payment of a bill at a manned location.
 	ARC = "ARC"
+	// ATX Financial EDi Acknowledgment
+	ATX = "ATX"
+	// BOC Back Office Conversion Entry
+	BOC = "BOC"
+	// CCD Corporate Credit or Debit Entry
+	CCD = "CCD"
+	// CIE Customer Initiated Entry
+	CIE = "CIE"
+	// COR Notification of Change or Refused Notification of Change
+	COR = "COR"
+	// CTX Corporate Trade Exchange
+	CTX = "CTX"
+	// DNE Death Notification Entry
+	DNE = "DNE"
+	// ENR Automated Enrollment Entry
+	ENR = "ENR"
+	// IAT International ACH Transaction
+	IAT = "IAT"
+	// MTE Machine Transfer Entry
+	MTE = "MTE"
+	// POP Point of Purchase Entry
+	POP = "POP"
+	// POS Point of Sale Entry
+	POS = "POS"
+	// PPD Prearranged Payment and Deposit Entry
+	PPD = "PPD"
+	// RCK Re-presented Check Entry
+	RCK = "RCK"
+	// SHR Shared Network Transaction
+	SHR = "SHR"
+	// TEL Telephone Initiated Entry
+	TEL = "TEL"
+	// TRC Check Truncation Entry
+	TRC = "TRC"
+	// TRX Check Truncation Entries Exchange
+	TRX = "TRX"
+	// WEB Internet-Initiated/Mobile Entry
+	WEB = "WEB"
+	// XCK Destroyed Check Entry
+	XCK = "XCK"
 )
 
 func (batch *Batch) UnmarshalJSON(p []byte) error {
@@ -66,46 +106,46 @@ func NewBatch(bh *BatchHeader) (Batcher, error) {
 		return NewBatchADV(bh), nil
 	case ARC:
 		return NewBatchARC(bh), nil
-	case "ATX":
+	case ATX:
 		return NewBatchATX(bh), nil
-	case "BOC":
+	case BOC:
 		return NewBatchBOC(bh), nil
-	case "CCD":
+	case CCD:
 		return NewBatchCCD(bh), nil
-	case "CIE":
+	case CIE:
 		return NewBatchCIE(bh), nil
-	case "COR":
+	case COR:
 		return NewBatchCOR(bh), nil
-	case "CTX":
+	case CTX:
 		return NewBatchCTX(bh), nil
-	case "DNE":
+	case DNE:
 		return NewBatchDNE(bh), nil
-	case "ENR":
+	case ENR:
 		return NewBatchENR(bh), nil
-	case "IAT":
+	case IAT:
 		msg := fmt.Sprintf(msgFileIATSEC, bh.StandardEntryClassCode)
 		return nil, &FileError{FieldName: "StandardEntryClassCode", Value: bh.StandardEntryClassCode, Msg: msg}
-	case "MTE":
+	case MTE:
 		return NewBatchMTE(bh), nil
-	case "POP":
+	case POP:
 		return NewBatchPOP(bh), nil
-	case "POS":
+	case POS:
 		return NewBatchPOS(bh), nil
-	case "PPD":
+	case PPD:
 		return NewBatchPPD(bh), nil
-	case "RCK":
+	case RCK:
 		return NewBatchRCK(bh), nil
-	case "SHR":
+	case SHR:
 		return NewBatchSHR(bh), nil
-	case "TEL":
+	case TEL:
 		return NewBatchTEL(bh), nil
-	case "TRC":
+	case TRC:
 		return NewBatchTRC(bh), nil
-	case "TRX":
+	case TRX:
 		return NewBatchTRX(bh), nil
-	case "WEB":
+	case WEB:
 		return NewBatchWEB(bh), nil
-	case "XCK":
+	case XCK:
 		return NewBatchXCK(bh), nil
 	default:
 	}
