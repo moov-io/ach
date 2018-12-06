@@ -18,7 +18,7 @@ type ADVBatchControl struct {
 	ID string `json:"id"`
 	// RecordType defines the type of record in the block.
 	recordType string
-	// AutomatedAccountingAdvices: 280
+	// Constant AutomatedAccountingAdvices: 280
 	// Same as 'ServiceClassCode' in BatchHeaderRecord
 	ServiceClassCode int `json:"serviceClassCode"`
 	// EntryAddendaCount is a tally of each Entry Detail Record and each Addenda
@@ -58,7 +58,8 @@ func (bc *ADVBatchControl) Parse(record string) {
 
 	// 1-1 Always "8"
 	bc.recordType = "8"
-	// 2-4 This is the same as the "Service code" field in previous Batch Header Record
+	// 2-4 This is the same as the "Service code" field in previous Batch Header Record -
+	// AutomatedAccountingAdvices: 280
 	bc.ServiceClassCode = bc.parseNumField(record[1:4])
 	// 5-10 Total number of Entry Detail Record in the batch
 	bc.EntryAddendaCount = bc.parseNumField(record[4:10])

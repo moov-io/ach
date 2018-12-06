@@ -53,7 +53,7 @@ func testParseBatchControl(t testing.TB) {
 	r := NewReader(strings.NewReader(line))
 	r.line = line
 	bh := BatchHeader{BatchNumber: 1,
-		ServiceClassCode:      225,
+		ServiceClassCode:      DebitsOnly,
 		CompanyIdentification: "origid",
 		ODFIIdentification:    "7640125"}
 	r.addCurrentBatch(NewBatchPPD(&bh))
@@ -118,7 +118,7 @@ func testBCString(t testing.TB) {
 	r := NewReader(strings.NewReader(line))
 	r.line = line
 	bh := BatchHeader{BatchNumber: 1,
-		ServiceClassCode:      225,
+		ServiceClassCode:      DebitsOnly,
 		CompanyIdentification: "origid",
 		ODFIIdentification:    "7640125"}
 	r.addCurrentBatch(NewBatchPPD(&bh))
