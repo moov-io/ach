@@ -12,7 +12,7 @@ import (
 func mockBatchSHRHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = PPD
+	bh.StandardEntryClassCode = SHR
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "ACH SHR"
