@@ -38,15 +38,15 @@ func (batch *BatchSHR) Validate() error {
 	}
 
 	// Add configuration and type specific validation for this type.
-	if batch.Header.StandardEntryClassCode != "SHR" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "SHR")
+	if batch.Header.StandardEntryClassCode != PPD {
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, PPD)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
 	// SHR detail entries can only be a debit, ServiceClassCode must allow debits
 	switch batch.Header.ServiceClassCode {
 	case MixedDebitsAndCredits, CreditsOnly:
-		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, "SHR")
+		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, PPD)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
 	}
 

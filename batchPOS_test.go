@@ -10,7 +10,7 @@ import "testing"
 func mockBatchPOSHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "POS"
+	bh.StandardEntryClassCode = POS
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "ACH POS"

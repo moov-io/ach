@@ -27,8 +27,8 @@ func (batch *BatchPPD) Validate() error {
 	}
 	// Add configuration and type specific validation for this type.
 
-	if batch.Header.StandardEntryClassCode != "PPD" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "PPD")
+	if batch.Header.StandardEntryClassCode != PPD {
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, PPD)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 

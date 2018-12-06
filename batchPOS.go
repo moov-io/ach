@@ -44,15 +44,15 @@ func (batch *BatchPOS) Validate() error {
 
 	// Add configuration and type specific validation for this type.
 
-	if batch.Header.StandardEntryClassCode != "POS" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "POS")
+	if batch.Header.StandardEntryClassCode != POS {
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, POS)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
 	// POS detail entries can only be a debit, ServiceClassCode must allow debits
 	switch batch.Header.ServiceClassCode {
 	case MixedDebitsAndCredits, CreditsOnly:
-		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, "POS")
+		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, POS)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
 	}
 

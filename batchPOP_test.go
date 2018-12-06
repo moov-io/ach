@@ -10,7 +10,7 @@ import "testing"
 func mockBatchPOPHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "POP"
+	bh.StandardEntryClassCode = POP
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "Point of Purchase"
@@ -48,10 +48,10 @@ func mockBatchPOP() *BatchPOP {
 func mockBatchPOPHeaderCredit() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "POP"
+	bh.StandardEntryClassCode = POP
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
-	bh.CompanyEntryDescription = "POP"
+	bh.CompanyEntryDescription = POP
 	bh.ODFIIdentification = "12104288"
 	return bh
 }

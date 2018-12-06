@@ -13,7 +13,7 @@ import (
 func mockBatchPPDHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
-	bh.StandardEntryClassCode = "PPD"
+	bh.StandardEntryClassCode = PPD
 	bh.CompanyName = "ACME Corporation"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "PAYROLL"
@@ -42,7 +42,7 @@ func mockBatchPPDHeader2() *BatchHeader {
 	bh.CompanyName = "MY BEST COMP."
 	bh.CompanyDiscretionaryData = "INCLUDES OVERTIME"
 	bh.CompanyIdentification = "121042882"
-	bh.StandardEntryClassCode = "PPD"
+	bh.StandardEntryClassCode = PPD
 	bh.CompanyEntryDescription = "PAYROLL"
 	bh.EffectiveEntryDate = time.Now()
 	bh.ODFIIdentification = "12104288"
