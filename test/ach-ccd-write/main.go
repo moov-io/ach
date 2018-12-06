@@ -26,7 +26,7 @@ func main() {
 	bh.ServiceClassCode = ach.DebitsOnly
 	bh.CompanyName = "Name on Account" // The name of the company/person that has relationship with receiver
 	bh.CompanyIdentification = fh.ImmediateOrigin
-	bh.StandardEntryClassCode = "CCD"       // Consumer destination vs Company CCD
+	bh.StandardEntryClassCode = ach.CCD
 	bh.CompanyEntryDescription = "Vndr Pay" // will be on receiving accounts statement
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
 	bh.ODFIIdentification = "031300012" // Originating Routing Number
