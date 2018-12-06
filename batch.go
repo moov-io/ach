@@ -54,35 +54,57 @@ const (
 	// COR Notification of Change or Refused Notification of Change - A code used by an RDFI or ODFI when originating a
 	// Notification of Change or Refused Notification of Change in automated format.
 	COR = "COR"
-	// CTX Corporate Trade Exchange
+	// CTX Corporate Trade Exchange - A code that indicates the ability to collect and disburse funds and information
+	// between companies. Generally it is used by businesses paying one another for goods or services.
 	CTX = "CTX"
-	// DNE Death Notification Entry
+	// DNE Death Notification Entry - A code that United States Federal agencies (e.g. Social Security) use to notify
+	// depository financial institutions that the recipient of government benefit payments has died.
 	DNE = "DNE"
-	// ENR Automated Enrollment Entry
+	// ENR Automated Enrollment Entry - A code indicating enrollment of a person with an agency of the US government
+	// for a depository financial institution.
 	ENR = "ENR"
-	// IAT International ACH Transaction
+	// IAT International ACH Transaction - A code IAT indicating a  credit or debit ACH entry that is part of a payment
+	// transaction involving a financial agency’s office (i.e., depository financial institution or business issuing
+	// money orders) that is not located in the territorial jurisdiction of the United States. IAT entries can be made
+	// to or from a corporate or consumer account and must be accompanied by seven (7) mandatory addenda records
+	// identifying the name and physical address of the Originator, name and physical address of the Receiver,
+	// Receiver’s account number, Receiver’s bank identity and reason for the payment.
 	IAT = "IAT"
-	// MTE Machine Transfer Entry
+	// MTE Machine Transfer Entry - A code that indicates when a consumer uses their debit card at an Automated Teller
+	// Machine (ATM) to withdraw cash.  MTE transactions cannot be aggregated together under a single Entry.
 	MTE = "MTE"
-	// POP Point of Purchase Entry
+	// POP Point of Purchase Entry - A code that indicates a check presented in-person to a merchant for purchase
+	// is presented as an ACH entry instead of a physical check.
 	POP = "POP"
-	// POS Point of Sale Entry
+	// POS Point of Sale Entry - A code that indicates a debit entry initiated at an “electronic terminal” to a
+	// consumer account of the receiver to pay an obligation incurred in a point-of-sale transaction, or to effect a
+	// point-of-sale terminal cash withdrawal.
 	POS = "POS"
-	// PPD Prearranged Payment and Deposit Entry
+	// PPD Prearranged Payment and Deposit Entry - A code tha indicates a an entry initiated by an organization based
+	// on a standing or a single entry authorization to transfer funds.
 	PPD = "PPD"
-	// RCK Re-presented Check Entry
+	// RCK Re-presented Check Entry - A code that indicates a physical check that was presented but returned because of
+	//// insufficient funds may be represented as an ACH entry.
 	RCK = "RCK"
-	// SHR Shared Network Transaction
+	// SHR Shared Network Transaction - A code that indicates a debit Entry initiated at an “electronic terminal,” as
+	// that term is defined in Regulation E, to a Consumer Account of the Receiver to pay an obligation incurred in a
+	// point-of-sale transaction, or to effect a point-of-sale terminal cash withdrawal. Also an adjusting or other
+	// credit Entry related to such debit Entry, transfer of funds, or obligation. SHR Entries are initiated in a
+	// shared network where the ODFI and RDFI have an agreement in addition to these Rules to process such Entries.
 	SHR = "SHR"
-	// TEL Telephone Initiated Entry
+	// TEL Telephone Initiated Entry - A code indicating a Telephone-Initiated consumer debit transactions. The NACHA
+	// Operating Rules permit TEL entries when the originator obtains the Receiver’s authorization for the debit entry
+	// orally via the telephone.  An entry based upon a Receiver’s oral authorization must utilize the TEL
+	// Standard Entry Class (SEC) Code.
 	TEL = "TEL"
-	// TRC Check Truncation Entry
+	// TRC Check Truncation Entry - is a code used to identify a debit entry of a truncated check.
 	TRC = "TRC"
-	// TRX Check Truncation Entries Exchange
+	// TRX Check Truncation Entries Exchange - used to identify a debit entry exchange of a truncated checks (multiple).
 	TRX = "TRX"
-	// WEB Internet-Initiated/Mobile Entry
+	// WEB Internet-Initiated/Mobile Entry - A code indicating an entry submitted pursuant to an authorization obtained
+	// solely via the Internet or a mobile network. For consumer accounts only.
 	WEB = "WEB"
-	// XCK Destroyed Check Entry
+	// XCK Destroyed Check Entry - A code indicating a debit entry initiated for a a destroyed check eligible items
 	XCK = "XCK"
 )
 

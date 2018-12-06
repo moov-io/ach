@@ -11,8 +11,8 @@ import (
 
 // BatchPOS holds the BatchHeader and BatchControl and all EntryDetail for POS Entries.
 //
-// A POS Entry is a debit Entry initiated at an “electronic terminal” to a Consumer
-// Account of the Receiver to pay an obligation incurred in a point- of-sale
+// A POS Entry is a debit Entry initiated at an “electronic terminal” to a consumer
+// account of the receiver to pay an obligation incurred in a point- of-sale
 // transaction, or to effect a point-of-sale terminal cash withdrawal.
 //
 // Point-of-Sale Entries (POS) are ACH debit entries typically initiated by the use

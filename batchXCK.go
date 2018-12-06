@@ -8,7 +8,7 @@ import "fmt"
 
 // BatchXCK holds the BatchHeader and BatchControl and all EntryDetail for XCK Entries.
 //
-// Destroyed Check Entry identifies a debit entry initiated for a XCk eligible items.
+// Destroyed Check Entry identifies a debit entry initiated for a XCK eligible items.
 type BatchXCK struct {
 	Batch
 }
