@@ -9,10 +9,10 @@ import (
 	"testing"
 )
 
-// mockBatchheader creates a batch header
+// mockBatchHeader creates a batch header
 func mockBatchHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.StandardEntryClassCode = "PPD"
 	bh.CompanyName = "ACME Corporation"
 	bh.CompanyIdentification = "121042882"
@@ -27,7 +27,7 @@ func testMockBatchHeader(t testing.TB) {
 	if err := bh.Validate(); err != nil {
 		t.Error("mockBatchHeader does not validate and will break other tests")
 	}
-	if bh.ServiceClassCode != 220 {
+	if bh.ServiceClassCode != CreditsOnly {
 		t.Error("ServiceClassCode dependent default value has changed")
 	}
 	if bh.StandardEntryClassCode != "PPD" {
@@ -73,7 +73,7 @@ func testParseBatchHeader(t testing.TB) {
 	if record.recordType != "5" {
 		t.Errorf("RecordType Expected '5' got: %v", record.recordType)
 	}
-	if record.ServiceClassCode != 225 {
+	if record.ServiceClassCode != DebitsOnly {
 		t.Errorf("ServiceClassCode Expected '225' got: %v", record.ServiceClassCode)
 	}
 	if record.CompanyNameField() != "companyname     " {

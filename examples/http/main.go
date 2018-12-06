@@ -36,12 +36,12 @@ func main() {
 	fh.ImmediateDestination = "231380104" // Routing Number of the ACH Operator or receiving point to which the file is being sent
 	fh.ImmediateOrigin = "121042882"      // Routing Number of the ACH Operator or sending point that is sending the file
 	fh.FileCreationDate = time.Now()      // Today's Date
-	fh.ImmediateDestinationName = "Federal Reserve Bank"
-	fh.ImmediateOriginName = "My Bank Name"
+	fh.ImmediateDestinationName = "Receiver Bank Name"
+	fh.ImmediateOriginName = "Origin Bank Name"
 
 	// BatchHeader identifies the originating entity and the type of transactions contained in the batch
 	bh := ach.NewBatchHeader()
-	bh.ServiceClassCode = 220          // ACH credit pushes money out, 225 debits/pulls money in.
+	bh.ServiceClassCode = ach.CreditsOnly
 	bh.CompanyName = "Name on Account" // The name of the company/person that has relationship with receiver
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = "PPD"         // Consumer destination vs Company CCD

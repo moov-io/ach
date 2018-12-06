@@ -91,7 +91,7 @@ func testADVEDString(t testing.TB) {
 	r.line = line
 	bh := BatchHeader{BatchNumber: 1,
 		StandardEntryClassCode: "ADV",
-		ServiceClassCode:       280,
+		ServiceClassCode:       AutomatedAccountingAdvices,
 		CompanyIdentification:  "origid",
 		ODFIIdentification:     "121042882"}
 	r.addCurrentBatch(NewBatchADV(&bh))
@@ -363,7 +363,7 @@ func TestInvalidADVEDParse(t *testing.T) {
 	r.line = line
 	bh := BatchHeader{BatchNumber: 1,
 		StandardEntryClassCode: "ADV",
-		ServiceClassCode:       280,
+		ServiceClassCode:       AutomatedAccountingAdvices,
 		CompanyIdentification:  "origid",
 		ODFIIdentification:     "121042882"}
 	r.addCurrentBatch(NewBatchADV(&bh))

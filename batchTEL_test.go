@@ -7,7 +7,7 @@ import (
 // mockBatchTELHeader creates a TEL batch header
 func mockBatchTELHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "TEL"
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "121042882"
@@ -252,7 +252,7 @@ func TestBatchTELAddendum99(t *testing.T) {
 // TestBatchTELValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
 func TestBatchTELValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchTEL()
-	mockBatch.GetHeader().ServiceClassCode = 220
+	mockBatch.GetHeader().ServiceClassCode = CreditsOnly
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TransactionCode" {

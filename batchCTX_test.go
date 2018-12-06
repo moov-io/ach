@@ -12,7 +12,7 @@ import (
 // mockBatchCTXHeader creates a BatchCTX BatchHeader
 func mockBatchCTXHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.StandardEntryClassCode = "CTX"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -124,7 +124,7 @@ func BenchmarkBatchCTXStandardEntryClassCode(b *testing.B) {
 // testBatchCTXServiceClassCodeEquality validates service class code equality
 func testBatchCTXServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchCTX()
-	mockBatch.GetControl().ServiceClassCode = 200
+	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
@@ -300,7 +300,7 @@ func BenchmarkBatchCTXInvalidBuild(b *testing.B) {
 func testBatchCTXAddenda10000(t testing.TB) {
 
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.StandardEntryClassCode = "CTX"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -353,7 +353,7 @@ func BenchmarkBatchCTXAddenda10000(b *testing.B) {
 // testBatchCTXAddendaRecords validates error for AddendaRecords not equal to addendum
 func testBatchCTXAddendaRecords(t testing.TB) {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.StandardEntryClassCode = "CTX"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -451,7 +451,7 @@ func BenchmarkBatchCTXReserved(b *testing.B) {
 // testBatchCTXZeroAddendaRecords validates zero addenda records
 func testBatchCTXZeroAddendaRecords(t testing.TB) {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.StandardEntryClassCode = "CTX"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -500,7 +500,7 @@ func BenchmarkBatchCTXZeroAddendaRecords(b *testing.B) {
 // testBatchCTXPrenoteAddendaRecords validates prenote addenda records
 func testBatchCTXPrenoteAddendaRecords(t testing.TB) {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.StandardEntryClassCode = "CTX"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -589,7 +589,7 @@ func TestBatchCTXAddendum99(t *testing.T) {
 // TestBatchCTXValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
 func TestBatchCTXValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchCTX()
-	mockBatch.GetHeader().ServiceClassCode = 225
+	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TransactionCode" {

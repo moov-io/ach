@@ -9,7 +9,7 @@ import "testing"
 // mockBatchPOSHeader creates a BatchPOS BatchHeader
 func mockBatchPOSHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "POS"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -121,7 +121,7 @@ func BenchmarkBatchPOSStandardEntryClassCode(b *testing.B) {
 // testBatchPOSServiceClassCodeEquality validates service class code equality
 func testBatchPOSServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchPOS()
-	mockBatch.GetControl().ServiceClassCode = 200
+	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
@@ -146,10 +146,10 @@ func BenchmarkBatchPOSServiceClassCodeEquality(b *testing.B) {
 	}
 }
 
-// testBatchPOSServiceClass200 validates BatchPOS create for an invalid ServiceClassCode 200
-func testBatchPOSServiceClass200(t testing.TB) {
+// testBatchPOSMixedCreditsAndDebits validates BatchPOS create for an invalid MixedCreditsAndDebits
+func testBatchPOSMixedCreditsAndDebits(t testing.TB) {
 	mockBatch := mockBatchPOS()
-	mockBatch.Header.ServiceClassCode = 200
+	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -162,23 +162,23 @@ func testBatchPOSServiceClass200(t testing.TB) {
 	}
 }
 
-// TestBatchPOSServiceClass200 tests validating BatchPOS create for an invalid ServiceClassCode 200
-func TestBatchPOSServiceClass200(t *testing.T) {
-	testBatchPOSServiceClass200(t)
+// TestBatchPOSMixedCreditsAndDebits tests validating BatchPOS create for an invalid MixedCreditsAndDebits
+func TestBatchPOSMixedCreditsAndDebits(t *testing.T) {
+	testBatchPOSMixedCreditsAndDebits(t)
 }
 
-// BenchmarkBatchPOSServiceClass200 benchmarks validating BatchPOS create for an invalid ServiceClassCode 200
-func BenchmarkBatchPOSServiceClass200(b *testing.B) {
+// BenchmarkBatchPOSMixedCreditsAndDebits benchmarks validating BatchPOS create for an invalid MixedCreditsAndDebits
+func BenchmarkBatchPOSMixedCreditsAndDebits(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchPOSServiceClass200(b)
+		testBatchPOSMixedCreditsAndDebits(b)
 	}
 }
 
-// testBatchPOSServiceClass220 validates BatchPOS create for an invalid ServiceClassCode 220
-func testBatchPOSServiceClass220(t testing.TB) {
+// testBatchPOSCreditsOnly validates BatchPOS create for an invalid CreditsOnly
+func testBatchPOSCreditsOnly(t testing.TB) {
 	mockBatch := mockBatchPOS()
-	mockBatch.Header.ServiceClassCode = 220
+	mockBatch.Header.ServiceClassCode = CreditsOnly
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -191,23 +191,23 @@ func testBatchPOSServiceClass220(t testing.TB) {
 	}
 }
 
-// TestBatchPOSServiceClass220 tests validating BatchPOS create for an invalid ServiceClassCode 220
-func TestBatchPOSServiceClass220(t *testing.T) {
-	testBatchPOSServiceClass220(t)
+// TestBatchPOSCreditsOnly tests validating BatchPOS create for an invalid CreditsOnly
+func TestBatchPOSCreditsOnly(t *testing.T) {
+	testBatchPOSCreditsOnly(t)
 }
 
-// BenchmarkBatchPOSServiceClass220 benchmarks validating BatchPOS create for an invalid ServiceClassCode 220
-func BenchmarkBatchPOSServiceClass220(b *testing.B) {
+// BenchmarkBatchPOSCreditsOnly benchmarks validating BatchPOS create for an invalid CreditsOnly
+func BenchmarkBatchPOSCreditsOnly(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchPOSServiceClass220(b)
+		testBatchPOSCreditsOnly(b)
 	}
 }
 
-// testBatchPOSServiceClass280 validates BatchPOS create for an invalid ServiceClassCode 280
-func testBatchPOSServiceClass280(t testing.TB) {
+// testBatchPOSAutomatedAccountingAdvices validates BatchPOS create for an invalid AutomatedAccountingAdvices
+func testBatchPOSAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchPOS()
-	mockBatch.Header.ServiceClassCode = 280
+	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -220,16 +220,16 @@ func testBatchPOSServiceClass280(t testing.TB) {
 	}
 }
 
-// TestBatchPOSServiceClass280 tests validating BatchPOS create for an invalid ServiceClassCode 280
-func TestBatchPOSServiceClass280(t *testing.T) {
-	testBatchPOSServiceClass280(t)
+// TestBatchPOSAutomatedAccountingAdvices tests validating BatchPOS create for an invalid AutomatedAccountingAdvices
+func TestBatchPOSAutomatedAccountingAdvices(t *testing.T) {
+	testBatchPOSAutomatedAccountingAdvices(t)
 }
 
-// BenchmarkBatchPOSServiceClass280 benchmarks validating BatchPOS create for an invalid ServiceClassCode 280
-func BenchmarkBatchPOSServiceClass280(b *testing.B) {
+// BenchmarkBatchPOSAutomatedAccountingAdvices benchmarks validating BatchPOS create for an invalid AutomatedAccountingAdvices
+func BenchmarkBatchPOSAutomatedAccountingAdvices(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchPOSServiceClass280(b)
+		testBatchPOSAutomatedAccountingAdvices(b)
 	}
 }
 

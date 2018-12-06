@@ -12,7 +12,7 @@ import (
 // mockBatchATXHeader creates a BatchATX BatchHeader
 func mockBatchATXHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.StandardEntryClassCode = "ATX"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "231380104"
@@ -124,7 +124,7 @@ func BenchmarkBatchATXStandardEntryClassCode(b *testing.B) {
 // testBatchATXServiceClassCodeEquality validates service class code equality
 func testBatchATXServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchATX()
-	mockBatch.GetControl().ServiceClassCode = 200
+	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
@@ -288,7 +288,7 @@ func BenchmarkBatchATXInvalidBuild(b *testing.B) {
 func testBatchATXAddenda10000(t testing.TB) {
 
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.StandardEntryClassCode = "ATX"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "231380104"
@@ -343,7 +343,7 @@ func BenchmarkBatchATXAddenda10000(b *testing.B) {
 // testBatchATXAddendaRecords validates error for AddendaRecords not equal to addendum
 func testBatchATXAddendaRecords(t testing.TB) {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.StandardEntryClassCode = "ATX"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "231380104"
@@ -442,7 +442,7 @@ func BenchmarkBatchATXReserved(b *testing.B) {
 // testBatchATXZeroAddendaRecords validates zero addenda records
 func testBatchATXZeroAddendaRecords(t testing.TB) {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.StandardEntryClassCode = "ATX"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "231380104"
@@ -493,7 +493,7 @@ func BenchmarkBatchATXZeroAddendaRecords(b *testing.B) {
 // testBatchATXTransactionCode validates TransactionCode
 func testBatchATXTransactionCode(t testing.TB) {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.StandardEntryClassCode = "ATX"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "231380104"
@@ -545,7 +545,7 @@ func BenchmarkBatchATXTransactionCode(b *testing.B) {
 // TestBatchATXAmount validates Amount
 func TestBatchATXAmount(t *testing.T) {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.StandardEntryClassCode = "ATX"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "231380104"
@@ -622,7 +622,7 @@ func TestBatchATXAddendum99(t *testing.T) {
 // TestBatchATXValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
 func TestBatchATXValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchATX()
-	mockBatch.GetHeader().ServiceClassCode = 225
+	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TransactionCode" {

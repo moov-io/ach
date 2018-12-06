@@ -11,7 +11,7 @@ import (
 
 func mockBatchControl() *BatchControl {
 	bc := NewBatchControl()
-	bc.ServiceClassCode = 220
+	bc.ServiceClassCode = CreditsOnly
 	bc.CompanyIdentification = "121042882"
 	bc.ODFIIdentification = "12104288"
 	return bc
@@ -23,7 +23,7 @@ func testMockBatchControl(t testing.TB) {
 	if err := bc.Validate(); err != nil {
 		t.Error("mockBatchControl does not validate and will break other tests")
 	}
-	if bc.ServiceClassCode != 220 {
+	if bc.ServiceClassCode != CreditsOnly {
 		t.Error("ServiceClassCode depedendent default value has changed")
 	}
 	if bc.CompanyIdentification != "121042882" {
@@ -53,7 +53,7 @@ func testParseBatchControl(t testing.TB) {
 	r := NewReader(strings.NewReader(line))
 	r.line = line
 	bh := BatchHeader{BatchNumber: 1,
-		ServiceClassCode:      225,
+		ServiceClassCode:      DebitsOnly,
 		CompanyIdentification: "origid",
 		ODFIIdentification:    "7640125"}
 	r.addCurrentBatch(NewBatchPPD(&bh))
@@ -67,7 +67,7 @@ func testParseBatchControl(t testing.TB) {
 	if record.recordType != "8" {
 		t.Errorf("RecordType Expected '8' got: %v", record.recordType)
 	}
-	if record.ServiceClassCode != 225 {
+	if record.ServiceClassCode != DebitsOnly {
 		t.Errorf("ServiceClassCode Expected '225' got: %v", record.ServiceClassCode)
 	}
 	if record.EntryAddendaCountField() != "000001" {
@@ -118,7 +118,7 @@ func testBCString(t testing.TB) {
 	r := NewReader(strings.NewReader(line))
 	r.line = line
 	bh := BatchHeader{BatchNumber: 1,
-		ServiceClassCode:      225,
+		ServiceClassCode:      DebitsOnly,
 		CompanyIdentification: "origid",
 		ODFIIdentification:    "7640125"}
 	r.addCurrentBatch(NewBatchPPD(&bh))

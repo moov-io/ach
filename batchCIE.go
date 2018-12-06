@@ -44,9 +44,9 @@ func (batch *BatchCIE) Validate() error {
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
-	// CIE detail entries can only be a debit, ServiceClassCode must allow debits
+	// CIE detail entries can only be a credit, ServiceClassCode must allow credit
 	switch batch.Header.ServiceClassCode {
-	case 200, 225:
+	case MixedDebitsAndCredits, DebitsOnly:
 		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, "CIE")
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
 	}

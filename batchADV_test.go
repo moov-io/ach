@@ -11,7 +11,7 @@ import (
 // mockBatchADVHeader creates a ADV batch header
 func mockBatchADVHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 280
+	bh.ServiceClassCode = AutomatedAccountingAdvices
 	bh.StandardEntryClassCode = "ADV"
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "121042882"

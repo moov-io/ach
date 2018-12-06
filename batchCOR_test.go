@@ -12,7 +12,7 @@ import (
 // mockBatchCORHeader creates a COR BatchHeader
 func mockBatchCORHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.StandardEntryClassCode = "COR"
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "121042882"
@@ -331,7 +331,7 @@ func BenchmarkBatchCORCreate(b *testing.B) {
 // testBatchCORServiceClassCodeEquality validates service class code equality
 func testBatchCORServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchCOR()
-	mockBatch.GetControl().ServiceClassCode = 200
+	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
@@ -415,7 +415,7 @@ func TestBatchCORCategoryNOCAddenda98(t *testing.T) {
 // TestBatchCORValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
 func TestBatchCORValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchCOR()
-	mockBatch.GetHeader().ServiceClassCode = 280
+	mockBatch.GetHeader().ServiceClassCode = AutomatedAccountingAdvices
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {

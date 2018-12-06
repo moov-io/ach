@@ -18,10 +18,7 @@ type ADVBatchControl struct {
 	ID string `json:"id"`
 	// RecordType defines the type of record in the block.
 	recordType string
-	// ServiceClassCode ACH Mixed Debits and Credits ‘200’
-	// ACH Credits Only ‘220’
-	// ACH Debits Only ‘225'
-	// Same as 'ServiceClassCode' in BatchHeaderRecord
+	// This should be the same as BatchHeader ServiceClassCode for ADV: AutomatedAccountingAdvices.
 	ServiceClassCode int `json:"serviceClassCode"`
 	// EntryAddendaCount is a tally of each Entry Detail Record and each Addenda
 	// Record processed, within either the batch or file as appropriate.
@@ -83,7 +80,7 @@ func (bc *ADVBatchControl) Parse(record string) {
 func NewADVBatchControl() *ADVBatchControl {
 	return &ADVBatchControl{
 		recordType:       "8",
-		ServiceClassCode: 280,
+		ServiceClassCode: AutomatedAccountingAdvices,
 		EntryHash:        1,
 		BatchNumber:      1,
 	}

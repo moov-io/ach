@@ -107,6 +107,19 @@ type BatchHeader struct {
 	converters
 }
 
+const (
+	// BatchHeader.ServiceClassCode and BatchControl.ServiceClassCode
+
+	// MixedDebitsAndCredits indicates a batch can have debit and credit ACH entries
+	MixedDebitsAndCredits = 200
+	// CreditsOnly indicates a batch can only have credit ACH entries
+	CreditsOnly = 220
+	// DebitsOnly indicates a batch can only have debit ACH entries
+	DebitsOnly = 225
+	// AutomatedAccountingAdvices indicates a batch can only have Automated Accounting Advices (debit and credit)
+	AutomatedAccountingAdvices = 280
+)
+
 // NewBatchHeader returns a new BatchHeader with default values for non exported fields
 func NewBatchHeader() *BatchHeader {
 	bh := &BatchHeader{
@@ -127,7 +140,7 @@ func (bh *BatchHeader) Parse(record string) {
 
 	// 1-1 Always "5"
 	bh.recordType = "5"
-	// 2-4 If the entries are credits, always "220". If the entries are debits, always "225"
+	// 2-4 MixedCreditsAnDebits (220), CreditsOnly 9220), DebitsOnly (225)
 	bh.ServiceClassCode = bh.parseNumField(record[1:4])
 	// 5-20 Your company's name. This name may appear on the receivers’ statements prepared by the RDFI.
 	bh.CompanyName = strings.TrimSpace(record[4:20])

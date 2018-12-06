@@ -179,7 +179,7 @@ func (iatBh *IATBatchHeader) Parse(record string) {
 
 	// 1-1 Always "5"
 	iatBh.recordType = "5"
-	// 2-4 If the entries are credits, always "220". If the entries are debits, always "225"
+	// 2-4 MixedCreditsAnDebits (220), CReditsOnly 9220), DebitsOnly (225)"
 	iatBh.ServiceClassCode = iatBh.parseNumField(record[1:4])
 	// 05-20  Blank except for corrected IAT entries
 	iatBh.IATIndicator = iatBh.parseStringField(record[4:20])

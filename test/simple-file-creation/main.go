@@ -23,7 +23,7 @@ func main() {
 	// To create a batch.
 	// Errors only if payment type is not supported.
 	bh := ach.NewBatchHeader()
-	bh.ServiceClassCode = 200
+	bh.ServiceClassCode = ach.MixedDebitsAndCredits
 	bh.CompanyName = "Your Company"
 	bh.CompanyIdentification = file.Header.ImmediateOrigin
 	bh.StandardEntryClassCode = "PPD"
@@ -68,7 +68,7 @@ func main() {
 	// Now add a new batch for accepting payments on the web
 
 	bh2 := ach.NewBatchHeader()
-	bh2.ServiceClassCode = 220
+	bh2.ServiceClassCode = ach.CreditsOnly
 	bh2.CompanyName = "Your Company"
 	bh2.CompanyIdentification = file.Header.ImmediateOrigin
 	bh2.StandardEntryClassCode = "WEB"

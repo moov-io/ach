@@ -491,7 +491,7 @@ func TestPOSDishonoredReturnWrite(t *testing.T) {
 	entry.Addenda99 = addenda99
 
 	posHeader := NewBatchHeader()
-	posHeader.ServiceClassCode = 225
+	posHeader.ServiceClassCode = DebitsOnly
 	posHeader.StandardEntryClassCode = "POS"
 	posHeader.CompanyName = "Payee Name"
 	posHeader.CompanyIdentification = "231380104"

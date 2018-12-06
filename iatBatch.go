@@ -548,7 +548,7 @@ func (batch *IATBatch) Validate() error {
 			msg := fmt.Sprintf(msgBatchIATAddendumCount, addenda18Count, "18")
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda18", Msg: msg}
 		}
-		if batch.Header.ServiceClassCode == 280 {
+		if batch.Header.ServiceClassCode == AutomatedAccountingAdvices {
 			msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, "IAT")
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
 		}

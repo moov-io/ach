@@ -11,7 +11,7 @@ import (
 
 func mockADVBatchControl() *ADVBatchControl {
 	bc := NewADVBatchControl()
-	bc.ServiceClassCode = 220
+	bc.ServiceClassCode = CreditsOnly
 	bc.ACHOperatorData = "T-BANK"
 	bc.ODFIIdentification = "12104288"
 	return bc
@@ -23,7 +23,7 @@ func testMockADVBatchControl(t testing.TB) {
 	if err := bc.Validate(); err != nil {
 		t.Error("mockADVBatchControl does not validate and will break other tests")
 	}
-	if bc.ServiceClassCode != 220 {
+	if bc.ServiceClassCode != CreditsOnly {
 		t.Error("ServiceClassCode depedendent default value has changed")
 	}
 	if bc.ACHOperatorData != "T-BANK" {
@@ -49,12 +49,12 @@ func BenchmarkMockADVBatchControl(b *testing.B) {
 
 // TestParseADVBatchControl parses a known Batch ControlRecord string.
 func testParseADVBatchControl(t testing.TB) {
-	var line = "822500000100053200010000000000000001050000000000000000000000T-BANK             076401250000001"
+	var line = "828000000100053200010000000000000001050000000000000000000000T-BANK             076401250000001"
 	r := NewReader(strings.NewReader(line))
 	r.line = line
 	bh := BatchHeader{BatchNumber: 1,
 		StandardEntryClassCode: "ADV",
-		ServiceClassCode:       280,
+		ServiceClassCode:       AutomatedAccountingAdvices,
 		CompanyIdentification:  "origid",
 		ODFIIdentification:     "12104288"}
 	r.addCurrentBatch(NewBatchADV(&bh))
@@ -68,8 +68,8 @@ func testParseADVBatchControl(t testing.TB) {
 	if record.recordType != "8" {
 		t.Errorf("RecordType Expected '8' got: %v", record.recordType)
 	}
-	if record.ServiceClassCode != 225 {
-		t.Errorf("ServiceClassCode Expected '225' got: %v", record.ServiceClassCode)
+	if record.ServiceClassCode != AutomatedAccountingAdvices {
+		t.Errorf("ServiceClassCode Expected '280' got: %v", record.ServiceClassCode)
 	}
 	if record.EntryAddendaCountField() != "000001" {
 		t.Errorf("EntryAddendaCount Expected '000001' got: %v", record.EntryAddendaCountField())
@@ -114,7 +114,7 @@ func testADVBCString(t testing.TB) {
 	r.line = line
 	bh := BatchHeader{BatchNumber: 1,
 		StandardEntryClassCode: "ADV",
-		ServiceClassCode:       280,
+		ServiceClassCode:       AutomatedAccountingAdvices,
 		CompanyIdentification:  "origid",
 		ODFIIdentification:     "12104288"}
 	r.addCurrentBatch(NewBatchADV(&bh))

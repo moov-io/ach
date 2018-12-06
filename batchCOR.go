@@ -43,7 +43,7 @@ func (batch *BatchCOR) Validate() error {
 		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "COR")
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
-	if batch.Header.ServiceClassCode == 280 {
+	if batch.Header.ServiceClassCode == AutomatedAccountingAdvices {
 		msg := fmt.Sprintf(msgBatchSECType, batch.Header.ServiceClassCode, "COR")
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
 	}

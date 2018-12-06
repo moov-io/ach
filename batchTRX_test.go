@@ -12,7 +12,7 @@ import (
 // mockBatchTRXHeader creates a BatchTRX BatchHeader
 func mockBatchTRXHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "TRX"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -52,7 +52,7 @@ func mockBatchTRX() *BatchTRX {
 // mockBatchTRXHeaderCredit creates a BatchTRX BatchHeader
 func mockBatchTRXHeaderCredit() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "TRX"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -158,7 +158,7 @@ func BenchmarkBatchTRXStandardEntryClassCode(b *testing.B) {
 // testBatchTRXServiceClassCodeEquality validates service class code equality
 func testBatchTRXServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchTRX()
-	mockBatch.GetControl().ServiceClassCode = 200
+	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
@@ -334,7 +334,7 @@ func BenchmarkBatchTRXInvalidBuild(b *testing.B) {
 func testBatchTRXAddenda10000(t testing.TB) {
 
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "TRX"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -387,7 +387,7 @@ func BenchmarkBatchTRXAddenda10000(b *testing.B) {
 // testBatchTRXAddendaRecords validates error for AddendaRecords not equal to addendum
 func testBatchTRXAddendaRecords(t testing.TB) {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "TRX"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -485,7 +485,7 @@ func BenchmarkBatchTRXReserved(b *testing.B) {
 // testBatchTRXZeroAddendaRecords validates zero addenda records
 func testBatchTRXZeroAddendaRecords(t testing.TB) {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "TRX"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -596,10 +596,10 @@ func TestBatchTRXAddendum99(t *testing.T) {
 	}
 }
 
-// testBatchTRXServiceClass220 validates BatchTRX create for an invalid ServiceClassCode 220
-func testBatchTRXServiceClass220(t testing.TB) {
+// testBatchTRXCreditsOnly validates BatchTRX create for an invalid CreditsOnly
+func testBatchTRXCreditsOnly(t testing.TB) {
 	mockBatch := mockBatchTRX()
-	mockBatch.Header.ServiceClassCode = 220
+	mockBatch.Header.ServiceClassCode = CreditsOnly
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -612,23 +612,23 @@ func testBatchTRXServiceClass220(t testing.TB) {
 	}
 }
 
-// TestBatchTRXServiceClass220 tests validating BatchTRX create for an invalid ServiceClassCode 220
-func TestBatchTRXServiceClass220(t *testing.T) {
-	testBatchTRXServiceClass220(t)
+// TestBatchTRXCreditsOnly tests validating BatchTRX create for an invalid CreditsOnly
+func TestBatchTRXCreditsOnly(t *testing.T) {
+	testBatchTRXCreditsOnly(t)
 }
 
-// BenchmarkBatchTRXServiceClass220 benchmarks validating BatchTRX create for an invalid ServiceClassCode 220
-func BenchmarkBatchTRXServiceClass220(b *testing.B) {
+// BenchmarkBatchTRXCreditsOnly benchmarks validating BatchTRX create for an invalid CreditsOnly
+func BenchmarkBatchTRXCreditsOnly(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchTRXServiceClass220(b)
+		testBatchTRXCreditsOnly(b)
 	}
 }
 
-// testBatchTRXServiceClass280 validates BatchTRX create for an invalid ServiceClassCode 280
-func testBatchTRXServiceClass280(t testing.TB) {
+// testBatchTRXAutomatedAccountingAdvices validates BatchTRX create for an invalid AutomatedAccountingAdvices
+func testBatchTRXAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchTRX()
-	mockBatch.Header.ServiceClassCode = 280
+	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -641,16 +641,16 @@ func testBatchTRXServiceClass280(t testing.TB) {
 	}
 }
 
-// TestBatchTRXServiceClass280 tests validating BatchTRX create for an invalid ServiceClassCode 280
-func TestBatchTRXServiceClass280(t *testing.T) {
-	testBatchTRXServiceClass280(t)
+// TestBatchTRXAutomatedAccountingAdvices tests validating BatchTRX create for an invalid AutomatedAccountingAdvices
+func TestBatchTRXAutomatedAccountingAdvices(t *testing.T) {
+	testBatchTRXAutomatedAccountingAdvices(t)
 }
 
-// BenchmarkBatchTRXServiceClass280 benchmarks validating BatchTRX create for an invalid ServiceClassCode 280
-func BenchmarkBatchTRXServiceClass280(b *testing.B) {
+// BenchmarkBatchTRXAutomatedAccountingAdvices benchmarks validating BatchTRX create for an invalid AutomatedAccountingAdvices
+func BenchmarkBatchTRXAutomatedAccountingAdvices(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchTRXServiceClass280(b)
+		testBatchTRXAutomatedAccountingAdvices(b)
 	}
 }
 

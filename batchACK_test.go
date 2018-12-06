@@ -12,7 +12,7 @@ import (
 // mockBatchACKHeader creates a ACK batch header
 func mockBatchACKHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.StandardEntryClassCode = "ACK"
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "231380104"
@@ -361,7 +361,7 @@ func TestBatchACKAddendum99Category(t *testing.T) {
 // TestBatchACKValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
 func TestBatchACKValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchACK()
-	mockBatch.GetHeader().ServiceClassCode = 225
+	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TransactionCode" {

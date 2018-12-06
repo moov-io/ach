@@ -12,7 +12,7 @@ import (
 // mockIATBatchHeaderFF creates a IAT BatchHeader that is Fixed-Fixed
 func mockIATBatchHeaderFF() *IATBatchHeader {
 	bh := NewIATBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.ForeignExchangeIndicator = "FF"
 	bh.ForeignExchangeReferenceIndicator = 3
 	bh.ISODestinationCountryCode = "US"
@@ -28,7 +28,7 @@ func mockIATBatchHeaderFF() *IATBatchHeader {
 // mockIATBatchReturnHeaderFF creates a IAT Return BatchHeader that is Fixed-Fixed
 func mockIATReturnBatchHeaderFF() *IATBatchHeader {
 	bh := NewIATBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.ForeignExchangeIndicator = "FF"
 	bh.ForeignExchangeReferenceIndicator = 3
 	bh.ISODestinationCountryCode = "US"
@@ -44,7 +44,7 @@ func mockIATReturnBatchHeaderFF() *IATBatchHeader {
 // mockIATNOCBatchHeaderFF creates a IAT Return BatchHeader that is Fixed-Fixed
 func mockIATNOCBatchHeaderFF() *IATBatchHeader {
 	bh := NewIATBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.IATIndicator = "IATCOR"
 	bh.ForeignExchangeIndicator = "FF"
 	bh.ForeignExchangeReferenceIndicator = 3
@@ -64,7 +64,7 @@ func testMockIATBatchHeaderFF(t testing.TB) {
 	if err := bh.Validate(); err != nil {
 		t.Error("mockIATBatchHeaderFF does not validate and will break other tests: ", err)
 	}
-	if bh.ServiceClassCode != 220 {
+	if bh.ServiceClassCode != CreditsOnly {
 		t.Error("ServiceClassCode dependent default value has changed")
 	}
 	if bh.ForeignExchangeIndicator != "FF" {
@@ -122,8 +122,8 @@ func testParseIATBatchHeader(t testing.TB) {
 	if record.recordType != "5" {
 		t.Errorf("RecordType Expected '5' got: %v", record.recordType)
 	}
-	if record.ServiceClassCode != 220 {
-		t.Errorf("ServiceClassCode Expected '225' got: %v", record.ServiceClassCode)
+	if record.ServiceClassCode != CreditsOnly {
+		t.Errorf("ServiceClassCode Expected '220' got: %v", record.ServiceClassCode)
 	}
 	if record.IATIndicator != "" {
 		t.Errorf("IATIndicator Expected '' got: %v", record.IATIndicator)

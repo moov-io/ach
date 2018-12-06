@@ -27,7 +27,7 @@ func mockFileHeader() *ach.FileHeader {
 func mockBatchHeaderWeb() *ach.BatchHeader {
 	bh := ach.NewBatchHeader()
 	bh.ID = "54321"
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = ach.CreditsOnly
 	bh.StandardEntryClassCode = "WEB"
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "121042882"

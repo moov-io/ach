@@ -22,7 +22,7 @@ func main() {
 
 	// BatchHeader identifies the originating entity and the type of transactions contained in the batch
 	bh := ach.NewIATBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = ach.DebitsOnly
 	bh.ForeignExchangeIndicator = "FF"
 	bh.ForeignExchangeReferenceIndicator = 3
 	bh.ISODestinationCountryCode = "US"

@@ -9,7 +9,7 @@ import "testing"
 // mockBatchCIEHeader creates a BatchCIE BatchHeader
 func mockBatchCIEHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 220
+	bh.ServiceClassCode = CreditsOnly
 	bh.StandardEntryClassCode = "CIE"
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
@@ -121,7 +121,7 @@ func BenchmarkBatchCIEStandardEntryClassCode(b *testing.B) {
 // testBatchCIEServiceClassCodeEquality validates service class code equality
 func testBatchCIEServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchCIE()
-	mockBatch.GetControl().ServiceClassCode = 200
+	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
@@ -146,10 +146,10 @@ func BenchmarkBatchCIEServiceClassCodeEquality(b *testing.B) {
 	}
 }
 
-// testBatchCIEServiceClass200 validates BatchCIE create for an invalid ServiceClassCode 200
-func testBatchCIEServiceClass200(t testing.TB) {
+// testBatchCIEMixedCreditsAndDebits validates BatchCIE create for an invalid MixedCreditsAndDebits
+func testBatchCIEMixedCreditsAndDebits(t testing.TB) {
 	mockBatch := mockBatchCIE()
-	mockBatch.Header.ServiceClassCode = 200
+	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -162,23 +162,23 @@ func testBatchCIEServiceClass200(t testing.TB) {
 	}
 }
 
-// TestBatchCIEServiceClass200 tests validating BatchCIE create for an invalid ServiceClassCode 200
-func TestBatchCIEServiceClass200(t *testing.T) {
-	testBatchCIEServiceClass200(t)
+// TestBatchCIEMixedCreditsAndDebits tests validating BatchCIE create for an invalid MixedCreditsAndDebits
+func TestBatchCIEMixedCreditsAndDebits(t *testing.T) {
+	testBatchCIEMixedCreditsAndDebits(t)
 }
 
-// BenchmarkBatchCIEServiceClass200 benchmarks validating BatchCIE create for an invalid ServiceClassCode 200
-func BenchmarkBatchCIEServiceClass200(b *testing.B) {
+// BenchmarkBatchCIEMixedCreditsAndDebits benchmarks validating BatchCIE create for an invalid MixedCreditsAndDebits
+func BenchmarkBatchCIEMixedCreditsAndDebits(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchCIEServiceClass200(b)
+		testBatchCIEMixedCreditsAndDebits(b)
 	}
 }
 
-// testBatchCIEServiceClass225 validates BatchCIE create for an invalid ServiceClassCode 225
-func testBatchCIEServiceClass225(t testing.TB) {
+// testBatchCIEDebitsOnly validates BatchCIE create for an invalid DebitsOnly
+func testBatchCIEDebitsOnly(t testing.TB) {
 	mockBatch := mockBatchCIE()
-	mockBatch.Header.ServiceClassCode = 225
+	mockBatch.Header.ServiceClassCode = DebitsOnly
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -191,23 +191,23 @@ func testBatchCIEServiceClass225(t testing.TB) {
 	}
 }
 
-// TestBatchCIEServiceClass225 tests validating BatchCIE create for an invalid ServiceClassCode 225
-func TestBatchCIEServiceClass225(t *testing.T) {
-	testBatchCIEServiceClass225(t)
+// TestBatchCIEDebitsOnly tests validating BatchCIE create for an invalid DebitsOnly
+func TestBatchCIEDebitsOnly(t *testing.T) {
+	testBatchCIEDebitsOnly(t)
 }
 
-// BenchmarkBatchCIEServiceClass225 benchmarks validating BatchCIE create for an invalid ServiceClassCode 225
-func BenchmarkBatchCIEServiceClass225(b *testing.B) {
+// BenchmarkBatchCIEDebitsOnly benchmarks validating BatchCIE create for an invalid DebitsOnly
+func BenchmarkBatchCIEDebitsOnly(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchCIEServiceClass225(b)
+		testBatchCIEDebitsOnly(b)
 	}
 }
 
-// testBatchCIEServiceClass280 validates BatchCIE create for an invalid ServiceClassCode 280
-func testBatchCIEServiceClass280(t testing.TB) {
+// testBatchCIEAutomatedAccountingAdvices validates BatchCIE create for an invalid AutomatedAccountingAdvices
+func testBatchCIEAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchCIE()
-	mockBatch.Header.ServiceClassCode = 280
+	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -220,16 +220,16 @@ func testBatchCIEServiceClass280(t testing.TB) {
 	}
 }
 
-// TestBatchCIEServiceClass280 tests validating BatchCIE create for an invalid ServiceClassCode 280
-func TestBatchCIEServiceClass280(t *testing.T) {
-	testBatchCIEServiceClass280(t)
+// TestBatchCIEAutomatedAccountingAdvices tests validating BatchCIE create for an invalid AutomatedAccountingAdvices
+func TestBatchCIEAutomatedAccountingAdvices(t *testing.T) {
+	testBatchCIEAutomatedAccountingAdvices(t)
 }
 
-// BenchmarkBatchCIEServiceClass280 benchmarks validating BatchCIE create for an invalid ServiceClassCode 280
-func BenchmarkBatchCIEServiceClass280(b *testing.B) {
+// BenchmarkBatchCIEAutomatedAccountingAdvices benchmarks validating BatchCIE create for an invalid AutomatedAccountingAdvices
+func BenchmarkBatchCIEAutomatedAccountingAdvices(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchCIEServiceClass280(b)
+		testBatchCIEAutomatedAccountingAdvices(b)
 	}
 }
 

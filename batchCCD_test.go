@@ -11,7 +11,7 @@ import (
 // mockBatchCCDHeader creates a CCD batch header
 func mockBatchCCDHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "CCD"
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "121042882"
@@ -307,7 +307,7 @@ func BenchmarkBatchCCDReceivingCompanyField(b *testing.B) {
 // TestBatchCCDValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
 func TestBatchCCDValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchCCD()
-	mockBatch.GetHeader().ServiceClassCode = 220
+	mockBatch.GetHeader().ServiceClassCode = CreditsOnly
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TransactionCode" {

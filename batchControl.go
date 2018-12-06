@@ -21,6 +21,7 @@ type BatchControl struct {
 	// ServiceClassCode ACH Mixed Debits and Credits ‘200’
 	// ACH Credits Only ‘220’
 	// ACH Debits Only ‘225'
+	// Constants: MixedCreditsAnDebits (220), CReditsOnly 9220), DebitsOnly (225)
 	// Same as 'ServiceClassCode' in BatchHeaderRecord
 	ServiceClassCode int `json:"serviceClassCode"`
 	// EntryAddendaCount is a tally of each Entry Detail Record and each Addenda
@@ -108,7 +109,7 @@ func (bc *BatchControl) Parse(record string) {
 func NewBatchControl() *BatchControl {
 	return &BatchControl{
 		recordType:       "8",
-		ServiceClassCode: 200,
+		ServiceClassCode: MixedDebitsAndCredits,
 		EntryHash:        1,
 		BatchNumber:      1,
 	}

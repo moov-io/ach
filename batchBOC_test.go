@@ -9,7 +9,7 @@ import "testing"
 // mockBatchBOCHeader creates a BatchBOC BatchHeader
 func mockBatchBOCHeader() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "BOC"
 	bh.CompanyName = "Company Name"
 	bh.CompanyIdentification = "121042882"
@@ -45,7 +45,7 @@ func mockBatchBOC() *BatchBOC {
 // mockBatchBOCHeaderCredit creates a BatchBOC BatchHeader
 func mockBatchBOCHeaderCredit() *BatchHeader {
 	bh := NewBatchHeader()
-	bh.ServiceClassCode = 225
+	bh.ServiceClassCode = DebitsOnly
 	bh.StandardEntryClassCode = "BOC"
 	bh.CompanyName = "Company Name"
 	bh.CompanyIdentification = "121042882"
@@ -151,7 +151,7 @@ func BenchmarkBatchBOCStandardEntryClassCode(b *testing.B) {
 // testBatchBOCServiceClassCodeEquality validates service class code equality
 func testBatchBOCServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchBOC()
-	mockBatch.GetControl().ServiceClassCode = 200
+	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
@@ -176,10 +176,10 @@ func BenchmarkBatchBOCServiceClassCodeEquality(b *testing.B) {
 	}
 }
 
-// testBatchBOCServiceClass200 validates BatchBOC create for an invalid ServiceClassCode 200
-func testBatchBOCServiceClass200(t testing.TB) {
+// testBatchBOCMixedCreditsAndDebits validates BatchBOC create for an invalid MixedCreditsAndDebits
+func testBatchBOCMixedCreditsAndDebits(t testing.TB) {
 	mockBatch := mockBatchBOC()
-	mockBatch.Header.ServiceClassCode = 200
+	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -192,23 +192,23 @@ func testBatchBOCServiceClass200(t testing.TB) {
 	}
 }
 
-// TestBatchBOCServiceClass200 tests validating BatchBOC create for an invalid ServiceClassCode 200
-func TestBatchBOCServiceClass200(t *testing.T) {
-	testBatchBOCServiceClass200(t)
+// TestBatchBOCMixedCreditsAndDebits tests validating BatchBOC create for an invalid MixedCreditsAndDebits
+func TestBatchBOCMixedCreditsAndDebits(t *testing.T) {
+	testBatchBOCMixedCreditsAndDebits(t)
 }
 
-// BenchmarkBatchBOCServiceClass200 benchmarks validating BatchBOC create for an invalid ServiceClassCode 200
-func BenchmarkBatchBOCServiceClass200(b *testing.B) {
+// BenchmarkBatchBOCMixedCreditsAndDebits benchmarks validating BatchBOC create for an invalid MixedCreditsAndDebits
+func BenchmarkBatchBOCMixedCreditsAndDebits(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchBOCServiceClass200(b)
+		testBatchBOCMixedCreditsAndDebits(b)
 	}
 }
 
-// testBatchBOCServiceClass220 validates BatchBOC create for an invalid ServiceClassCode 220
-func testBatchBOCServiceClass220(t testing.TB) {
+// testBatchBOCCreditsOnly validates BatchBOC create for an invalid CreditsOnly
+func testBatchBOCCreditsOnly(t testing.TB) {
 	mockBatch := mockBatchBOC()
-	mockBatch.Header.ServiceClassCode = 220
+	mockBatch.Header.ServiceClassCode = CreditsOnly
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -221,23 +221,23 @@ func testBatchBOCServiceClass220(t testing.TB) {
 	}
 }
 
-// TestBatchBOCServiceClass220 tests validating BatchBOC create for an invalid ServiceClassCode 220
-func TestBatchBOCServiceClass220(t *testing.T) {
-	testBatchBOCServiceClass220(t)
+// TestBatchBOCCreditsOnly tests validating BatchBOC create for an invalid CreditsOnly
+func TestBatchBOCCreditsOnly(t *testing.T) {
+	testBatchBOCCreditsOnly(t)
 }
 
-// BenchmarkBatchBOCServiceClass220 benchmarks validating BatchBOC create for an invalid ServiceClassCode 220
-func BenchmarkBatchBOCServiceClass220(b *testing.B) {
+// BenchmarkBatchBOCCreditsOnly benchmarks validating BatchBOC create for an invalid CreditsOnly
+func BenchmarkBatchBOCCreditsOnly(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchBOCServiceClass220(b)
+		testBatchBOCCreditsOnly(b)
 	}
 }
 
-// testBatchBOCServiceClass280 validates BatchBOC create for an invalid ServiceClassCode 280
-func testBatchBOCServiceClass280(t testing.TB) {
+// testBatchBOCAutomatedAccountingAdvices validates BatchBOC create for an invalid AutomatedAccountingAdvices
+func testBatchBOCAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchBOC()
-	mockBatch.Header.ServiceClassCode = 280
+	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -250,16 +250,16 @@ func testBatchBOCServiceClass280(t testing.TB) {
 	}
 }
 
-// TestBatchBOCServiceClass280 tests validating BatchBOC create for an invalid ServiceClassCode 280
-func TestBatchBOCServiceClass280(t *testing.T) {
-	testBatchBOCServiceClass280(t)
+// TestBatchBOCAutomatedAccountingAdvices tests validating BatchBOC create for an invalid AutomatedAccountingAdvices
+func TestBatchBOCAutomatedAccountingAdvices(t *testing.T) {
+	testBatchBOCAutomatedAccountingAdvices(t)
 }
 
-// BenchmarkBatchBOCServiceClass280 benchmarks validating BatchBOC create for an invalid ServiceClassCode 280
-func BenchmarkBatchBOCServiceClass280(b *testing.B) {
+// BenchmarkBatchBOCAutomatedAccountingAdvices benchmarks validating BatchBOC create for an invalid AutomatedAccountingAdvices
+func BenchmarkBatchBOCAutomatedAccountingAdvices(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testBatchBOCServiceClass280(b)
+		testBatchBOCAutomatedAccountingAdvices(b)
 	}
 }
 
