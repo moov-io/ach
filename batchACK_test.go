@@ -13,7 +13,7 @@ import (
 func mockBatchACKHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
-	bh.StandardEntryClassCode = "ACK"
+	bh.StandardEntryClassCode = ACK
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "231380104"
 	bh.CompanyEntryDescription = "Vndr Pay"

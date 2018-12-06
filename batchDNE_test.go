@@ -179,7 +179,7 @@ func BenchmarkBatchDNEAddendaTypeCode(b *testing.B) {
 // testBatchDNESEC validates that the standard entry class code is DNE for batchDNE
 func testBatchDNESEC(t testing.TB) {
 	mockBatch := mockBatchDNE()
-	mockBatch.Header.StandardEntryClassCode = "ACK"
+	mockBatch.Header.StandardEntryClassCode = ACK
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {

@@ -172,7 +172,7 @@ func BenchmarkBatchENRAddendaTypeCode(b *testing.B) {
 // testBatchENRSEC validates that the standard entry class code is ENR for batchENR
 func testBatchENRSEC(t testing.TB) {
 	mockBatch := mockBatchENR()
-	mockBatch.Header.StandardEntryClassCode = "ACK"
+	mockBatch.Header.StandardEntryClassCode = ACK
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {

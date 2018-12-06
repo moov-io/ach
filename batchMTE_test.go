@@ -187,7 +187,7 @@ func BenchmarkBatchMTEAddendaTypeCode(b *testing.B) {
 // testBatchMTESEC validates that the standard entry class code is MTE for batchMTE
 func testBatchMTESEC(t testing.TB) {
 	mockBatch := mockBatchMTE()
-	mockBatch.Header.StandardEntryClassCode = "ACK"
+	mockBatch.Header.StandardEntryClassCode = ACK
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {

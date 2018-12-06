@@ -26,6 +26,11 @@ type Batch struct {
 	converters
 }
 
+const (
+	// ACH Payment Acknowledgment: A code that indicates acknowledgment of receipt of a corporate credit payment (CCD).
+	ACK = "ACK"
+)
+
 func (batch *Batch) UnmarshalJSON(p []byte) error {
 	batch.Header = NewBatchHeader()
 	batch.Control = NewBatchControl()
@@ -46,7 +51,7 @@ func (batch *Batch) UnmarshalJSON(p []byte) error {
 // NewBatch takes a BatchHeader and returns a matching SEC code batch type that is a batcher. Returns an error if the SEC code is not supported.
 func NewBatch(bh *BatchHeader) (Batcher, error) {
 	switch bh.StandardEntryClassCode {
-	case "ACK":
+	case ACK:
 		return NewBatchACK(bh), nil
 	case "ADV":
 		return NewBatchADV(bh), nil
@@ -699,7 +704,7 @@ func (batch *Batch) addendaFieldInclusionForward(entry *EntryDetail) error {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda05", Msg: msg}
 		}
 	// ACK, ATX, CCD, CIE, CTX, DNE, ENR WEB, PPD, TRX can only have Addenda05
-	case "ACK", "ATX", "CCD", "CIE", "CTX", "DNE", "ENR", "WEB", "PPD", "TRX":
+	case ACK, "ATX", "CCD", "CIE", "CTX", "DNE", "ENR", "WEB", "PPD", "TRX":
 		if entry.Addenda02 != nil {
 			msg := fmt.Sprintf(msgBatchAddenda, "Addenda02", entry.Category, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda02", Msg: msg}
