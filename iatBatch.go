@@ -549,7 +549,7 @@ func (batch *IATBatch) Validate() error {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda18", Msg: msg}
 		}
 		if batch.Header.ServiceClassCode == AutomatedAccountingAdvices {
-			msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, "IAT")
+			msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, IAT)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
 		}
 		if entry.Category == CategoryNOC {

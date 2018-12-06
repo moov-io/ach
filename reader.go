@@ -276,7 +276,7 @@ func (r *Reader) parseLine() error {
 
 // parseBH parses determines whether to parse an IATBatchHeader or BatchHeader
 func (r *Reader) parseBH() error {
-	if r.line[50:53] == "IAT" {
+	if r.line[50:53] == IAT {
 		if err := r.parseIATBatchHeader(); err != nil {
 			return err
 		}

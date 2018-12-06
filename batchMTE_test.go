@@ -16,7 +16,7 @@ func mockBatchMTEHeader() *BatchHeader {
 	bh.ServiceClassCode = DebitsOnly
 	bh.CompanyName = "Merchant with ATM"
 	bh.CompanyIdentification = "231380104"
-	bh.StandardEntryClassCode = "MTE"
+	bh.StandardEntryClassCode = MTE
 	bh.CompanyEntryDescription = "CASH WITHDRAW"
 	bh.EffectiveEntryDate = time.Now()
 	bh.ODFIIdentification = "23138010"

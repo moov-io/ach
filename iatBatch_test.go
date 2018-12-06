@@ -2128,7 +2128,7 @@ func TestIATBatchAddenda98IATIndicator(t *testing.T) {
 func TestIATBatchAddenda98SECCode(t *testing.T) {
 	mockBatch := IATBatch{}
 	mockBatch.SetHeader(mockIATNOCBatchHeaderFF())
-	mockBatch.GetHeader().StandardEntryClassCode = "IAT"
+	mockBatch.GetHeader().StandardEntryClassCode = IAT
 	mockBatch.AddEntry(mockIATEntryDetail())
 	mockBatch.GetEntries()[0].TransactionCode = CheckingReturnNOCCredit
 	mockBatch.GetEntries()[0].Category = CategoryNOC

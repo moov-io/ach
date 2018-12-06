@@ -645,7 +645,7 @@ func BenchmarkBatchControl(b *testing.B) {
 func testIATBatch(t testing.TB) {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
-	bh.StandardEntryClassCode = "IAT"
+	bh.StandardEntryClassCode = IAT
 	bh.CompanyName = "ACME Corporation"
 	bh.CompanyIdentification = "123456789"
 	bh.CompanyEntryDescription = "PAYROLL"

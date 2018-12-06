@@ -138,7 +138,7 @@ Finally add the batch type to the NewBatch factory in batch.go.
 
 ```go
 //...
-case "MTE":
+case MTE:
 		return NewBatchMTE(bh), nil
 //...
 ```
