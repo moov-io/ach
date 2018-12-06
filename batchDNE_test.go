@@ -16,7 +16,7 @@ func mockBatchDNEHeader() *BatchHeader {
 	bh.ServiceClassCode = CreditsOnly
 	bh.CompanyName = "Name on Account"
 	bh.CompanyIdentification = "231380104"
-	bh.StandardEntryClassCode = "DNE"
+	bh.StandardEntryClassCode = DNE
 	bh.CompanyEntryDescription = "Death"
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
 	bh.ODFIIdentification = "23138010"

@@ -33,8 +33,8 @@ func (batch *BatchENR) Validate() error {
 	}
 
 	// Batch Header checks
-	if batch.Header.StandardEntryClassCode != "ENR" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "ENR")
+	if batch.Header.StandardEntryClassCode != ENR {
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, ENR)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 	if batch.Header.CompanyEntryDescription != "AUTOENROLL" {
@@ -49,14 +49,14 @@ func (batch *BatchENR) Validate() error {
 		}
 
 		if entry.Amount != 0 {
-			msg := fmt.Sprintf(msgBatchAmountZero, entry.Amount, "ENR")
+			msg := fmt.Sprintf(msgBatchAmountZero, entry.Amount, ENR)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
 		}
 
 		switch entry.TransactionCode {
 		case CheckingCredit, CheckingDebit, SavingsCredit, SavingsDebit:
 		default:
-			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "ENR")
+			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, ENR)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode

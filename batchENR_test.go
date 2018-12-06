@@ -15,7 +15,7 @@ func mockBatchENRHeader() *BatchHeader {
 	bh.ServiceClassCode = CreditsOnly
 	bh.CompanyName = "Name on Account"
 	bh.CompanyIdentification = "231380104"
-	bh.StandardEntryClassCode = "ENR"
+	bh.StandardEntryClassCode = ENR
 	bh.CompanyEntryDescription = "AUTOENROLL"
 	bh.ODFIIdentification = "23138010"
 	return bh

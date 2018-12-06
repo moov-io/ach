@@ -26,7 +26,7 @@ func main() {
 	bh.ServiceClassCode = ach.DebitsOnly
 	bh.CompanyName = "Name on Account" // The name of the company/person that has relationship with receiver
 	bh.CompanyIdentification = fh.ImmediateOrigin
-	bh.StandardEntryClassCode = "ENR"
+	bh.StandardEntryClassCode = ach.ENR
 	bh.CompanyEntryDescription = "AUTOENROLL"
 	bh.ODFIIdentification = "23138010" // Originating Routing Number
 
