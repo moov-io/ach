@@ -39,7 +39,7 @@ func (batch *BatchCIE) Validate() error {
 
 	// Add type specific validation.
 
-	if batch.Header.StandardEntryClassCode != CCD {
+	if batch.Header.StandardEntryClassCode != CIE {
 		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, CCD)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}

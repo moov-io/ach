@@ -10,7 +10,7 @@ import "testing"
 func mockBatchCIEHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
-	bh.StandardEntryClassCode = CCD
+	bh.StandardEntryClassCode = CIE
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "ACH CIE"

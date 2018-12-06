@@ -13,7 +13,7 @@ import (
 func mockBatchCTXHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
-	bh.StandardEntryClassCode = "CTX"
+	bh.StandardEntryClassCode = CTX
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "ACH CTX"
@@ -301,7 +301,7 @@ func testBatchCTXAddenda10000(t testing.TB) {
 
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
-	bh.StandardEntryClassCode = "CTX"
+	bh.StandardEntryClassCode = CTX
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "ACH CTX"
@@ -354,7 +354,7 @@ func BenchmarkBatchCTXAddenda10000(b *testing.B) {
 func testBatchCTXAddendaRecords(t testing.TB) {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
-	bh.StandardEntryClassCode = "CTX"
+	bh.StandardEntryClassCode = CTX
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "ACH CTX"
@@ -452,7 +452,7 @@ func BenchmarkBatchCTXReserved(b *testing.B) {
 func testBatchCTXZeroAddendaRecords(t testing.TB) {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
-	bh.StandardEntryClassCode = "CTX"
+	bh.StandardEntryClassCode = CTX
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "ACH CTX"
@@ -501,7 +501,7 @@ func BenchmarkBatchCTXZeroAddendaRecords(b *testing.B) {
 func testBatchCTXPrenoteAddendaRecords(t testing.TB) {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
-	bh.StandardEntryClassCode = "CTX"
+	bh.StandardEntryClassCode = CTX
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "ACH CTX"
