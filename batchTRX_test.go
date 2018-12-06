@@ -13,7 +13,7 @@ import (
 func mockBatchTRXHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "TRX"
+	bh.StandardEntryClassCode = TRX
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "ACH TRX"
@@ -53,10 +53,10 @@ func mockBatchTRX() *BatchTRX {
 func mockBatchTRXHeaderCredit() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "TRX"
+	bh.StandardEntryClassCode = TRX
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
-	bh.CompanyEntryDescription = "TRX"
+	bh.CompanyEntryDescription = TRX
 	bh.ODFIIdentification = "12104288"
 	return bh
 }
@@ -335,7 +335,7 @@ func testBatchTRXAddenda10000(t testing.TB) {
 
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "TRX"
+	bh.StandardEntryClassCode = TRX
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "ACH TRX"
@@ -388,7 +388,7 @@ func BenchmarkBatchTRXAddenda10000(b *testing.B) {
 func testBatchTRXAddendaRecords(t testing.TB) {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "TRX"
+	bh.StandardEntryClassCode = TRX
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "ACH TRX"
@@ -486,7 +486,7 @@ func BenchmarkBatchTRXReserved(b *testing.B) {
 func testBatchTRXZeroAddendaRecords(t testing.TB) {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "TRX"
+	bh.StandardEntryClassCode = TRX
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "ACH TRX"

@@ -27,10 +27,10 @@ type Batch struct {
 }
 
 const (
-	// ACK ACH Payment Acknowledgment: A code that indicates acknowledgment of receipt of a corporate credit payment
+	// ACK ACH Payment Acknowledgment - A code that indicates acknowledgment of receipt of a corporate credit payment
 	// (CCD).
 	ACK = "ACK"
-	// ADV Automated Accounting Advice – A code that  provide accounting information regarding an Entry. It is an
+	// ADV Automated Accounting Advice – A code that provide accounting information regarding an Entry. It is an
 	// optional service.
 	ADV = "ADV"
 	// ARC Accounts Receivable Entry – A code that indicates a consumer check converted to a one-time ACH debit.
@@ -38,15 +38,21 @@ const (
 	// converting checks at the point of receipt through the U.S. mail, at a drop box location or in-person for
 	// payment of a bill at a manned location.
 	ARC = "ARC"
-	// ATX Financial EDi Acknowledgment
+	// ATX Financial EDI Acknowledgment -  A code that indicates acknowledgement by the Receiving Depository Financial
+	// Institution (RDFI) that a Corporate Credit Exchange (CTX) has been received.
 	ATX = "ATX"
-	// BOC Back Office Conversion Entry
+	// BOC Back Office Conversion Entry - A code that indicates single entry debit initiated at the point of purchase
+	// or at a manned bill payment location to transfer funds through conversion to an ACH debit entry during back
+	// office processing.
 	BOC = "BOC"
-	// CCD Corporate Credit or Debit Entry
+	// CCD Corporate Credit or Debit Entry - A code that indicates an entry initiated by an Organization to transfer
+	// funds to or from an account of that Organization or another Organization. For commercial accounts only.
 	CCD = "CCD"
-	// CIE Customer Initiated Entry
+	// CIE Customer Initiated Entry - A code that indicates a credit entry initiated on behalf of, and upon the
+	// instruction of, a consumer to transfer funds to a non-consumer Receiver.
 	CIE = "CIE"
-	// COR Notification of Change or Refused Notification of Change
+	// COR Notification of Change or Refused Notification of Change - A code used by an RDFI or ODFI when originating a
+	// Notification of Change or Refused Notification of Change in automated format.
 	COR = "COR"
 	// CTX Corporate Trade Exchange
 	CTX = "CTX"

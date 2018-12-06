@@ -10,10 +10,10 @@ import "testing"
 func mockBatchTRCHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "TRC"
+	bh.StandardEntryClassCode = TRC
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
-	bh.CompanyEntryDescription = "TRC"
+	bh.CompanyEntryDescription = TRC
 	bh.ODFIIdentification = "12104288"
 	return bh
 }
@@ -48,10 +48,10 @@ func mockBatchTRC() *BatchTRC {
 func mockBatchTRCHeaderCredit() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "TRC"
+	bh.StandardEntryClassCode = TRC
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
-	bh.CompanyEntryDescription = "TRC"
+	bh.CompanyEntryDescription = TRC
 	bh.ODFIIdentification = "12104288"
 	return bh
 }

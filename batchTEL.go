@@ -28,8 +28,8 @@ func (batch *BatchTEL) Validate() error {
 		return err
 	}
 	// Add configuration and type specific based validation for this type.
-	if batch.Header.StandardEntryClassCode != "TEL" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "TEL")
+	if batch.Header.StandardEntryClassCode != TEL {
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, TEL)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 	// can not have credits in TEL batches

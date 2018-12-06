@@ -8,7 +8,7 @@ import (
 func mockBatchTELHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "TEL"
+	bh.StandardEntryClassCode = TEL
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "Vndr Pay"
