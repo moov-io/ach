@@ -1,3 +1,16 @@
+## v.0.7.0 (Not Released)
+
+ADDITIONS
+
+- Add const values for BatchHeader.ServiceClassCode and BatchControl.ServiceClassCode.
+ (See [#391](https://github.com/moov-io/ach/issues/391))
+ 
+ ## v.0.6.0 (Released 2018-12-04)
+ 
+ ADDITIONS
+ 
+- Add const values for TransactionCode (See [#363](https://github.com/moov-io/ach/issues/363))
+
 ## v0.5.0 (Released 2018-11-29)
 
 BREAKING CHANGES
