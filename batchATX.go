@@ -38,21 +38,21 @@ func (batch *BatchATX) Validate() error {
 	}
 
 	// Add configuration and type specific validation for this type.
-	if batch.Header.StandardEntryClassCode != "ATX" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "ATX")
+	if batch.Header.StandardEntryClassCode != ATX {
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, ATX)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
 	for _, entry := range batch.Entries {
 		// Amount must be zero for Acknowledgement Entries
 		if entry.Amount > 0 {
-			msg := fmt.Sprintf(msgBatchAmountZero, entry.Amount, "ATX")
+			msg := fmt.Sprintf(msgBatchAmountZero, entry.Amount, ATX)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
 		}
 		switch entry.TransactionCode {
 		case CheckingZeroDollarRemittanceCredit, SavingsZeroDollarRemittanceCredit:
 		default:
-			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "ATX")
+			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, ATX)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 		}
 

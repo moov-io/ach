@@ -10,10 +10,10 @@ import "testing"
 func mockBatchBOCHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "BOC"
+	bh.StandardEntryClassCode = BOC
 	bh.CompanyName = "Company Name"
 	bh.CompanyIdentification = "121042882"
-	bh.CompanyEntryDescription = "BOC"
+	bh.CompanyEntryDescription = BOC
 	bh.ODFIIdentification = "12104288"
 	return bh
 }
@@ -46,7 +46,7 @@ func mockBatchBOC() *BatchBOC {
 func mockBatchBOCHeaderCredit() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "BOC"
+	bh.StandardEntryClassCode = BOC
 	bh.CompanyName = "Company Name"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "REDEPCHECK"
