@@ -791,7 +791,7 @@ func (batch *Batch) addendaFieldInclusionNOC(entry *EntryDetail) error {
 		msg := fmt.Sprintf(msgBatchAddenda, "Addenda05", entry.Category, batch.Header.StandardEntryClassCode)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda05", Msg: msg}
 	}
-	if batch.Header.StandardEntryClassCode != "COR" {
+	if batch.Header.StandardEntryClassCode != COR {
 		if entry.Addenda98 != nil {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda98", Msg: msgFieldInclusion}
 		}

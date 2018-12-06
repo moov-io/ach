@@ -39,12 +39,12 @@ func (batch *BatchCOR) Validate() error {
 	}
 
 	// Add type specific validation.
-	if batch.Header.StandardEntryClassCode != "COR" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "COR")
+	if batch.Header.StandardEntryClassCode != COR {
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, COR)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 	if batch.Header.ServiceClassCode == AutomatedAccountingAdvices {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.ServiceClassCode, "COR")
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.ServiceClassCode, COR)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
 	}
 	// The Amount field must be zero
@@ -69,7 +69,7 @@ func (batch *BatchCOR) Validate() error {
 			GLCredit, GLDebit, GLPrenoteCredit, GLPrenoteDebit, GLZeroDollarRemittanceCredit,
 			GLZeroDollarRemittanceDebit, LoanCredit, LoanDebit, LoanPrenoteCredit,
 			LoanZeroDollarRemittanceCredit:
-			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "COR")
+			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, COR)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode

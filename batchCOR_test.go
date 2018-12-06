@@ -13,7 +13,7 @@ import (
 func mockBatchCORHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
-	bh.StandardEntryClassCode = "COR"
+	bh.StandardEntryClassCode = COR
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "Vendor Pay"

@@ -557,8 +557,8 @@ func (batch *IATBatch) Validate() error {
 				msg := fmt.Sprintf(msgBatchIATNOC, batch.GetHeader().IATIndicator, "IATCOR")
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "IATIndicator", Msg: msg}
 			}
-			if batch.GetHeader().StandardEntryClassCode != "COR" {
-				msg := fmt.Sprintf(msgBatchIATNOC, batch.GetHeader().StandardEntryClassCode, "COR")
+			if batch.GetHeader().StandardEntryClassCode != COR {
+				msg := fmt.Sprintf(msgBatchIATNOC, batch.GetHeader().StandardEntryClassCode, COR)
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 			}
 			switch entry.TransactionCode {

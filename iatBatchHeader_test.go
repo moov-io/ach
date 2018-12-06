@@ -50,7 +50,7 @@ func mockIATNOCBatchHeaderFF() *IATBatchHeader {
 	bh.ForeignExchangeReferenceIndicator = 3
 	bh.ISODestinationCountryCode = "US"
 	bh.OriginatorIdentification = "123456789"
-	bh.StandardEntryClassCode = "COR"
+	bh.StandardEntryClassCode = COR
 	bh.CompanyEntryDescription = "TRADEPAYMT"
 	bh.ISOOriginatingCurrencyCode = "CAD"
 	bh.ISODestinationCurrencyCode = "USD"
