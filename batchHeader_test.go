@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-// mockBatchheader creates a batch header
+// mockBatchHeader creates a batch header
 func mockBatchHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
