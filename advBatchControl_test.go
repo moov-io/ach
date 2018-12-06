@@ -53,7 +53,7 @@ func testParseADVBatchControl(t testing.TB) {
 	r := NewReader(strings.NewReader(line))
 	r.line = line
 	bh := BatchHeader{BatchNumber: 1,
-		StandardEntryClassCode: "ADV",
+		StandardEntryClassCode: ADV,
 		ServiceClassCode:       AutomatedAccountingAdvices,
 		CompanyIdentification:  "origid",
 		ODFIIdentification:     "12104288"}
@@ -113,7 +113,7 @@ func testADVBCString(t testing.TB) {
 	r := NewReader(strings.NewReader(line))
 	r.line = line
 	bh := BatchHeader{BatchNumber: 1,
-		StandardEntryClassCode: "ADV",
+		StandardEntryClassCode: ADV,
 		ServiceClassCode:       AutomatedAccountingAdvices,
 		CompanyIdentification:  "origid",
 		ODFIIdentification:     "12104288"}

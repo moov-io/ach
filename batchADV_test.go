@@ -12,7 +12,7 @@ import (
 func mockBatchADVHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = AutomatedAccountingAdvices
-	bh.StandardEntryClassCode = "ADV"
+	bh.StandardEntryClassCode = ADV
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "Accounting"

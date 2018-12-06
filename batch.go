@@ -27,8 +27,12 @@ type Batch struct {
 }
 
 const (
-	// ACH Payment Acknowledgment: A code that indicates acknowledgment of receipt of a corporate credit payment (CCD).
+	// ACK ACH Payment Acknowledgment: A code that indicates acknowledgment of receipt of a corporate credit payment
+	// (CCD).
 	ACK = "ACK"
+	// ADV Automated Accounting Advice – A code that  provide accounting information regarding an Entry. It is an
+	// optional service.
+	ADV = "ADV"
 )
 
 func (batch *Batch) UnmarshalJSON(p []byte) error {
@@ -53,7 +57,7 @@ func NewBatch(bh *BatchHeader) (Batcher, error) {
 	switch bh.StandardEntryClassCode {
 	case ACK:
 		return NewBatchACK(bh), nil
-	case "ADV":
+	case ADV:
 		return NewBatchADV(bh), nil
 	case "ARC":
 		return NewBatchARC(bh), nil
@@ -776,7 +780,7 @@ func (batch *Batch) addendaFieldInclusionReturn(entry *EntryDetail) error {
 
 // IsADV determines if a batch is batch type ADV - BatchADV
 func (batch *Batch) IsADV() bool {
-	ok := batch.GetHeader().StandardEntryClassCode == "ADV"
+	ok := batch.GetHeader().StandardEntryClassCode == ADV
 	return ok
 }
 
