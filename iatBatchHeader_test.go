@@ -123,7 +123,7 @@ func testParseIATBatchHeader(t testing.TB) {
 		t.Errorf("RecordType Expected '5' got: %v", record.recordType)
 	}
 	if record.ServiceClassCode != CreditsOnly {
-		t.Errorf("ServiceClassCode Expected '225' got: %v", record.ServiceClassCode)
+		t.Errorf("ServiceClassCode Expected '220' got: %v", record.ServiceClassCode)
 	}
 	if record.IATIndicator != "" {
 		t.Errorf("IATIndicator Expected '' got: %v", record.IATIndicator)
