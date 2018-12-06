@@ -743,7 +743,7 @@ func (batch *Batch) addendaFieldInclusion(entry *EntryDetail) error {
 // addendaFieldInclusionForward verifies Addenda* Field Inclusion for entry.Category Forward
 func (batch *Batch) addendaFieldInclusionForward(entry *EntryDetail) error {
 	switch batch.Header.StandardEntryClassCode {
-	case "MTE", "POS", "SHR":
+	case MTE, POS, SHR:
 		if entry.Addenda02 == nil {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda02", Msg: msgFieldInclusion}
 
@@ -753,12 +753,12 @@ func (batch *Batch) addendaFieldInclusionForward(entry *EntryDetail) error {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda05", Msg: msg}
 		}
 	// ACK, ATX, CCD, CIE, CTX, DNE, ENR WEB, PPD, TRX can only have Addenda05
-	case ACK, "ATX", "CCD", "CIE", "CTX", "DNE", "ENR", "WEB", "PPD", "TRX":
+	case ACK, ATX, CCD, CIE, CTX, DNE, ENR, WEB, PPD, TRX:
 		if entry.Addenda02 != nil {
 			msg := fmt.Sprintf(msgBatchAddenda, "Addenda02", entry.Category, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda02", Msg: msg}
 		}
-	case ARC, "BOC", "COR", "POP", "RCK", "TEL", "TRC", "XCK":
+	case ARC, BOC, COR, POP, RCK, TEL, TRC, XCK:
 		if entry.Addenda02 != nil {
 			msg := fmt.Sprintf(msgBatchAddenda, "Addenda02", entry.Category, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda02", Msg: msg}
@@ -768,7 +768,7 @@ func (batch *Batch) addendaFieldInclusionForward(entry *EntryDetail) error {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda05", Msg: msg}
 		}
 	}
-	if batch.Header.StandardEntryClassCode != "COR" {
+	if batch.Header.StandardEntryClassCode != COR {
 		if entry.Addenda98 != nil {
 			msg := fmt.Sprintf(msgBatchAddenda, "Addenda98", entry.Category, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda98", Msg: msg}

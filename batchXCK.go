@@ -29,15 +29,15 @@ func (batch *BatchXCK) Validate() error {
 	}
 	// Add configuration and type specific validation for this type.
 
-	if batch.Header.StandardEntryClassCode != "XCK" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "XCK")
+	if batch.Header.StandardEntryClassCode != XCK {
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, XCK)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
 	// XCK detail entries can only be a debit, ServiceClassCode must allow debits
 	switch batch.Header.ServiceClassCode {
 	case MixedDebitsAndCredits, CreditsOnly:
-		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, "XCK")
+		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, XCK)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
 	}
 
@@ -49,7 +49,7 @@ func (batch *BatchXCK) Validate() error {
 		}
 		// Amount must be 2,500 or less
 		if entry.Amount > 250000 {
-			msg := fmt.Sprintf(msgBatchAmount, "2,500", "XCK")
+			msg := fmt.Sprintf(msgBatchAmount, "2,500", XCK)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
 		}
 		// ProcessControlField underlying IdentificationNumber, must be defined
