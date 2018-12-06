@@ -10,10 +10,10 @@ import "testing"
 func mockBatchARCHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "ARC"
+	bh.StandardEntryClassCode = ARC
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
-	bh.CompanyEntryDescription = "ARC"
+	bh.CompanyEntryDescription = ARC
 	bh.ODFIIdentification = "12104288"
 	return bh
 }
@@ -46,10 +46,10 @@ func mockBatchARC() *BatchARC {
 func mockBatchARCHeaderCredit() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "ARC"
+	bh.StandardEntryClassCode = ARC
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
-	bh.CompanyEntryDescription = "ARC"
+	bh.CompanyEntryDescription = ARC
 	bh.ODFIIdentification = "12104288"
 	return bh
 }

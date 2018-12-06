@@ -33,6 +33,11 @@ const (
 	// ADV Automated Accounting Advice – A code that  provide accounting information regarding an Entry. It is an
 	// optional service.
 	ADV = "ADV"
+	// Accounts Receivable Entry – A code that indicates a consumer check converted to a one-time ACH debit.
+	// The Accounts Receivable (ARC) Entry provides initiates a single-entry ACH debit to customer accounts by
+	// converting checks at the point of receipt through the U.S. mail, at a drop box location or in-person for
+	// payment of a bill at a manned location.
+	ARC = "ARC"
 )
 
 func (batch *Batch) UnmarshalJSON(p []byte) error {
@@ -59,7 +64,7 @@ func NewBatch(bh *BatchHeader) (Batcher, error) {
 		return NewBatchACK(bh), nil
 	case ADV:
 		return NewBatchADV(bh), nil
-	case "ARC":
+	case ARC:
 		return NewBatchARC(bh), nil
 	case "ATX":
 		return NewBatchATX(bh), nil
@@ -713,7 +718,7 @@ func (batch *Batch) addendaFieldInclusionForward(entry *EntryDetail) error {
 			msg := fmt.Sprintf(msgBatchAddenda, "Addenda02", entry.Category, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda02", Msg: msg}
 		}
-	case "ARC", "BOC", "COR", "POP", "RCK", "TEL", "TRC", "XCK":
+	case ARC, "BOC", "COR", "POP", "RCK", "TEL", "TRC", "XCK":
 		if entry.Addenda02 != nil {
 			msg := fmt.Sprintf(msgBatchAddenda, "Addenda02", entry.Category, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda02", Msg: msg}
