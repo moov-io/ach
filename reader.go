@@ -276,7 +276,7 @@ func (r *Reader) parseLine() error {
 
 // parseBH parses determines whether to parse an IATBatchHeader or BatchHeader
 func (r *Reader) parseBH() error {
-	if r.line[50:53] == "IAT" {
+	if r.line[50:53] == IAT {
 		if err := r.parseIATBatchHeader(); err != nil {
 			return err
 		}
@@ -364,7 +364,7 @@ func (r *Reader) parseEntryDetail() error {
 	if r.currentBatch == nil {
 		return r.parseError(&FileError{Msg: msgFileBatchOutside})
 	}
-	if r.currentBatch.GetHeader().StandardEntryClassCode != "ADV" {
+	if r.currentBatch.GetHeader().StandardEntryClassCode != ADV {
 		ed := new(EntryDetail)
 		ed.Parse(r.line)
 		if err := ed.Validate(); err != nil {
@@ -391,7 +391,7 @@ func (r *Reader) parseAddenda() error {
 		return r.parseError(&FileError{FieldName: "Addenda", Msg: msg})
 	}
 
-	if r.currentBatch.GetHeader().StandardEntryClassCode != "ADV" {
+	if r.currentBatch.GetHeader().StandardEntryClassCode != ADV {
 		if len(r.currentBatch.GetEntries()) == 0 {
 			return r.parseError(&FileError{FieldName: "Addenda", Msg: msgFileBatchOutside})
 		}
@@ -474,7 +474,7 @@ func (r *Reader) parseBatchControl() error {
 		return r.parseError(&FileError{Msg: msgFileBatchOutside})
 	}
 	if r.currentBatch != nil {
-		if r.currentBatch.GetHeader().StandardEntryClassCode == "ADV" {
+		if r.currentBatch.GetHeader().StandardEntryClassCode == ADV {
 			r.currentBatch.GetADVControl().Parse(r.line)
 			if err := r.currentBatch.GetADVControl().Validate(); err != nil {
 				return r.parseError(err)

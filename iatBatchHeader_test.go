@@ -17,7 +17,7 @@ func mockIATBatchHeaderFF() *IATBatchHeader {
 	bh.ForeignExchangeReferenceIndicator = 3
 	bh.ISODestinationCountryCode = "US"
 	bh.OriginatorIdentification = "123456789"
-	bh.StandardEntryClassCode = "IAT"
+	bh.StandardEntryClassCode = IAT
 	bh.CompanyEntryDescription = "TRADEPAYMT"
 	bh.ISOOriginatingCurrencyCode = "CAD"
 	bh.ISODestinationCurrencyCode = "USD"
@@ -33,7 +33,7 @@ func mockIATReturnBatchHeaderFF() *IATBatchHeader {
 	bh.ForeignExchangeReferenceIndicator = 3
 	bh.ISODestinationCountryCode = "US"
 	bh.OriginatorIdentification = "123456789"
-	bh.StandardEntryClassCode = "IAT"
+	bh.StandardEntryClassCode = IAT
 	bh.CompanyEntryDescription = "TRADEPAYMT"
 	bh.ISOOriginatingCurrencyCode = "CAD"
 	bh.ISODestinationCurrencyCode = "USD"
@@ -50,7 +50,7 @@ func mockIATNOCBatchHeaderFF() *IATBatchHeader {
 	bh.ForeignExchangeReferenceIndicator = 3
 	bh.ISODestinationCountryCode = "US"
 	bh.OriginatorIdentification = "123456789"
-	bh.StandardEntryClassCode = "COR"
+	bh.StandardEntryClassCode = COR
 	bh.CompanyEntryDescription = "TRADEPAYMT"
 	bh.ISOOriginatingCurrencyCode = "CAD"
 	bh.ISODestinationCurrencyCode = "USD"
@@ -79,7 +79,7 @@ func testMockIATBatchHeaderFF(t testing.TB) {
 	if bh.OriginatorIdentification != "123456789" {
 		t.Error("OriginatorIdentification dependent default value has changed")
 	}
-	if bh.StandardEntryClassCode != "IAT" {
+	if bh.StandardEntryClassCode != IAT {
 		t.Error("StandardEntryClassCode dependent default value has changed")
 	}
 	if bh.CompanyEntryDescription != "TRADEPAYMT" {
@@ -140,7 +140,7 @@ func testParseIATBatchHeader(t testing.TB) {
 		t.Errorf("ForeignExchangeReference Expected '                ' got: %v",
 			record.ForeignExchangeReference)
 	}
-	if record.StandardEntryClassCode != "IAT" {
+	if record.StandardEntryClassCode != IAT {
 		t.Errorf("StandardEntryClassCode Expected 'PPD' got: %v", record.StandardEntryClassCode)
 	}
 	if record.CompanyEntryDescription != "TRADEPAYMT" {

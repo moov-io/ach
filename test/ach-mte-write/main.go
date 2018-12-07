@@ -26,7 +26,7 @@ func main() {
 	bh.ServiceClassCode = ach.DebitsOnly
 	bh.CompanyName = "Merchant with ATM" // Merchant with the ATM
 	bh.CompanyIdentification = fh.ImmediateOrigin
-	bh.StandardEntryClassCode = "MTE"
+	bh.StandardEntryClassCode = ach.MTE
 	bh.CompanyEntryDescription = "CASH WITHDRAW" // will be on receiving accounts statement // TODO
 	bh.EffectiveEntryDate = time.Now()           // Date physical money was received
 	bh.ODFIIdentification = "23138010"           // Originating Routing Number

@@ -10,7 +10,7 @@ import "testing"
 func mockBatchPOPHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "POP"
+	bh.StandardEntryClassCode = POP
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "Point of Purchase"
@@ -48,10 +48,10 @@ func mockBatchPOP() *BatchPOP {
 func mockBatchPOPHeaderCredit() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "POP"
+	bh.StandardEntryClassCode = POP
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
-	bh.CompanyEntryDescription = "POP"
+	bh.CompanyEntryDescription = POP
 	bh.ODFIIdentification = "12104288"
 	return bh
 }
@@ -126,7 +126,7 @@ func BenchmarkBatchPOPCreate(b *testing.B) {
 // testBatchPOPStandardEntryClassCode validates BatchPOP create for an invalid StandardEntryClassCode
 func testBatchPOPStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchPOP()
-	mockBatch.Header.StandardEntryClassCode = "WEB"
+	mockBatch.Header.StandardEntryClassCode = WEB
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

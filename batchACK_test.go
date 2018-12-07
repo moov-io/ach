@@ -13,7 +13,7 @@ import (
 func mockBatchACKHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
-	bh.StandardEntryClassCode = "ACK"
+	bh.StandardEntryClassCode = ACK
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "231380104"
 	bh.CompanyEntryDescription = "Vndr Pay"
@@ -196,7 +196,7 @@ func BenchmarkBatchACKAddendaTypeCode(b *testing.B) {
 // testBatchACKSEC validates that the standard entry class code is ACK for batchACK
 func testBatchACKSEC(t testing.TB) {
 	mockBatch := mockBatchACK()
-	mockBatch.Header.StandardEntryClassCode = "RCK"
+	mockBatch.Header.StandardEntryClassCode = RCK
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {

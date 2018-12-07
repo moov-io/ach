@@ -127,7 +127,7 @@ func (w *Writer) writeBatch(file *File) error {
 			}
 		}
 
-		if batch.GetHeader().StandardEntryClassCode != "ADV" {
+		if batch.GetHeader().StandardEntryClassCode != ADV {
 			if _, err := w.w.WriteString(batch.GetControl().String() + "\n"); err != nil {
 				return err
 			}

@@ -12,7 +12,7 @@ import (
 func mockBatchADVHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = AutomatedAccountingAdvices
-	bh.StandardEntryClassCode = "ADV"
+	bh.StandardEntryClassCode = ADV
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "Accounting"
@@ -75,7 +75,7 @@ func TestBatchADVAddendum99(t *testing.T) {
 // testBatchADVSEC validates that the standard entry class code is ADV for batchADV
 func testBatchADVSEC(t testing.TB) {
 	mockBatch := mockBatchADV()
-	mockBatch.Header.StandardEntryClassCode = "RCK"
+	mockBatch.Header.StandardEntryClassCode = RCK
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {

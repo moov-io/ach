@@ -13,7 +13,7 @@ import (
 func mockBatchCORHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
-	bh.StandardEntryClassCode = "COR"
+	bh.StandardEntryClassCode = COR
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "Vendor Pay"
@@ -74,7 +74,7 @@ func BenchmarkBatchCORHeader(b *testing.B) {
 func testBatchCORSEC(t testing.TB) {
 	mockBatch := mockBatchCOR()
 	mockBatch.GetEntries()[0].Category = CategoryNOC
-	mockBatch.Header.StandardEntryClassCode = "WEB"
+	mockBatch.Header.StandardEntryClassCode = WEB
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {
@@ -440,6 +440,22 @@ func TestBatchCORTestBatchCORInvalidAddenda98(t *testing.T) {
 	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchCORTransactionCodeInvalid validates BatchCOR returns an error for an invalid TransactionCode
+func TestBatchCORAutomatedAccountingAdvices(t *testing.T) {
+	mockBatch := mockBatchCOR()
+	mockBatch.GetEntries()[0].TransactionCode = 65
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TransactionCode" {
 				t.Errorf("%T: %s", err, err)
 			}
 		} else {

@@ -13,7 +13,7 @@ import (
 func mockBatchHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
-	bh.StandardEntryClassCode = "PPD"
+	bh.StandardEntryClassCode = PPD
 	bh.CompanyName = "ACME Corporation"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "PAYROLL"
@@ -30,7 +30,7 @@ func testMockBatchHeader(t testing.TB) {
 	if bh.ServiceClassCode != CreditsOnly {
 		t.Error("ServiceClassCode dependent default value has changed")
 	}
-	if bh.StandardEntryClassCode != "PPD" {
+	if bh.StandardEntryClassCode != PPD {
 		t.Error("StandardEntryClassCode dependent default value has changed")
 	}
 	if bh.CompanyName != "ACME Corporation" {
@@ -85,7 +85,7 @@ func testParseBatchHeader(t testing.TB) {
 	if record.CompanyIdentificationField() != "origid    " {
 		t.Errorf("CompanyIdentification Expected 'origid    ' got: %v", record.CompanyIdentificationField())
 	}
-	if record.StandardEntryClassCode != "PPD" {
+	if record.StandardEntryClassCode != PPD {
 		t.Errorf("StandardEntryClassCode Expected 'PPD' got: %v", record.StandardEntryClassCode)
 	}
 	if record.CompanyEntryDescriptionField() != "CHECKPAYMT" {

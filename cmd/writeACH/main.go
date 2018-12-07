@@ -71,7 +71,7 @@ func write(path string) {
 		bh.ServiceClassCode = ach.MixedDebitsAndCredits
 		bh.CompanyName = "Wells Fargo"
 		bh.CompanyIdentification = "121042882"
-		bh.StandardEntryClassCode = "PPD"
+		bh.StandardEntryClassCode = ach.PPD
 		bh.CompanyEntryDescription = "Trans. Description"
 		bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
 		bh.ODFIIdentification = "121042882"

@@ -26,6 +26,88 @@ type Batch struct {
 	converters
 }
 
+const (
+	// ACK ACH Payment Acknowledgment - A code that indicates acknowledgment of receipt of a corporate credit payment
+	// (CCD).
+	ACK = "ACK"
+	// ADV Automated Accounting Advice – A code that provide accounting information regarding an Entry. It is an
+	// optional service.
+	ADV = "ADV"
+	// ARC Accounts Receivable Entry – A code that indicates a consumer check converted to a one-time ACH debit.
+	// The Accounts Receivable (ARC) Entry provides initiates a single-entry ACH debit to customer accounts by
+	// converting checks at the point of receipt through the U.S. mail, at a drop box location or in-person for
+	// payment of a bill at a manned location.
+	ARC = "ARC"
+	// ATX Financial EDI Acknowledgment -  A code that indicates acknowledgement by the Receiving Depository Financial
+	// Institution (RDFI) that a Corporate Credit Exchange (CTX) has been received.
+	ATX = "ATX"
+	// BOC Back Office Conversion Entry - A code that indicates single entry debit initiated at the point of purchase
+	// or at a manned bill payment location to transfer funds through conversion to an ACH debit entry during back
+	// office processing.
+	BOC = "BOC"
+	// CCD Corporate Credit or Debit Entry - A code that indicates an entry initiated by an Organization to transfer
+	// funds to or from an account of that Organization or another Organization. For commercial accounts only.
+	CCD = "CCD"
+	// CIE Customer Initiated Entry - A code that indicates a credit entry initiated on behalf of, and upon the
+	// instruction of, a consumer to transfer funds to a non-consumer Receiver.
+	CIE = "CIE"
+	// COR Notification of Change or Refused Notification of Change - A code used by an RDFI or ODFI when originating a
+	// Notification of Change or Refused Notification of Change in automated format.
+	COR = "COR"
+	// CTX Corporate Trade Exchange - A code that indicates the ability to collect and disburse funds and information
+	// between companies. Generally it is used by businesses paying one another for goods or services.
+	CTX = "CTX"
+	// DNE Death Notification Entry - A code that United States Federal agencies (e.g. Social Security) use to notify
+	// depository financial institutions that the recipient of government benefit payments has died.
+	DNE = "DNE"
+	// ENR Automated Enrollment Entry - A code indicating enrollment of a person with an agency of the US government
+	// for a depository financial institution.
+	ENR = "ENR"
+	// IAT International ACH Transaction - A code IAT indicating a  credit or debit ACH entry that is part of a payment
+	// transaction involving a financial agency’s office (i.e., depository financial institution or business issuing
+	// money orders) that is not located in the territorial jurisdiction of the United States. IAT entries can be made
+	// to or from a corporate or consumer account and must be accompanied by seven (7) mandatory addenda records
+	// identifying the name and physical address of the Originator, name and physical address of the Receiver,
+	// Receiver’s account number, Receiver’s bank identity and reason for the payment.
+	IAT = "IAT"
+	// MTE Machine Transfer Entry - A code that indicates when a consumer uses their debit card at an Automated Teller
+	// Machine (ATM) to withdraw cash.  MTE transactions cannot be aggregated together under a single Entry.
+	MTE = "MTE"
+	// POP Point of Purchase Entry - A code that indicates a check presented in-person to a merchant for purchase
+	// is presented as an ACH entry instead of a physical check.
+	POP = "POP"
+	// POS Point of Sale Entry - A code that indicates a debit entry initiated at an “electronic terminal” to a
+	// consumer account of the receiver to pay an obligation incurred in a point-of-sale transaction, or to effect a
+	// point-of-sale terminal cash withdrawal.
+	POS = "POS"
+	// PPD Prearranged Payment and Deposit Entry - A code tha indicates a an entry initiated by an organization based
+	// on a standing or a single entry authorization to transfer funds.
+	PPD = "PPD"
+	// RCK Re-presented Check Entry - A code that indicates a physical check that was presented but returned because of
+	//// insufficient funds may be represented as an ACH entry.
+	RCK = "RCK"
+	// SHR Shared Network Transaction - A code that indicates a debit Entry initiated at an “electronic terminal,” as
+	// that term is defined in Regulation E, to a Consumer Account of the Receiver to pay an obligation incurred in a
+	// point-of-sale transaction, or to effect a point-of-sale terminal cash withdrawal. Also an adjusting or other
+	// credit Entry related to such debit Entry, transfer of funds, or obligation. SHR Entries are initiated in a
+	// shared network where the ODFI and RDFI have an agreement in addition to these Rules to process such Entries.
+	SHR = "SHR"
+	// TEL Telephone Initiated Entry - A code indicating a Telephone-Initiated consumer debit transactions. The NACHA
+	// Operating Rules permit TEL entries when the originator obtains the Receiver’s authorization for the debit entry
+	// orally via the telephone.  An entry based upon a Receiver’s oral authorization must utilize the TEL
+	// Standard Entry Class (SEC) Code.
+	TEL = "TEL"
+	// TRC Check Truncation Entry - is a code used to identify a debit entry of a truncated check.
+	TRC = "TRC"
+	// TRX Check Truncation Entries Exchange - used to identify a debit entry exchange of a truncated checks (multiple).
+	TRX = "TRX"
+	// WEB Internet-Initiated/Mobile Entry - A code indicating an entry submitted pursuant to an authorization obtained
+	// solely via the Internet or a mobile network. For consumer accounts only.
+	WEB = "WEB"
+	// XCK Destroyed Check Entry - A code indicating a debit entry initiated for a a destroyed check eligible items
+	XCK = "XCK"
+)
+
 func (batch *Batch) UnmarshalJSON(p []byte) error {
 	batch.Header = NewBatchHeader()
 	batch.Control = NewBatchControl()
@@ -46,52 +128,52 @@ func (batch *Batch) UnmarshalJSON(p []byte) error {
 // NewBatch takes a BatchHeader and returns a matching SEC code batch type that is a batcher. Returns an error if the SEC code is not supported.
 func NewBatch(bh *BatchHeader) (Batcher, error) {
 	switch bh.StandardEntryClassCode {
-	case "ACK":
+	case ACK:
 		return NewBatchACK(bh), nil
-	case "ADV":
+	case ADV:
 		return NewBatchADV(bh), nil
-	case "ARC":
+	case ARC:
 		return NewBatchARC(bh), nil
-	case "ATX":
+	case ATX:
 		return NewBatchATX(bh), nil
-	case "BOC":
+	case BOC:
 		return NewBatchBOC(bh), nil
-	case "CCD":
+	case CCD:
 		return NewBatchCCD(bh), nil
-	case "CIE":
+	case CIE:
 		return NewBatchCIE(bh), nil
-	case "COR":
+	case COR:
 		return NewBatchCOR(bh), nil
-	case "CTX":
+	case CTX:
 		return NewBatchCTX(bh), nil
-	case "DNE":
+	case DNE:
 		return NewBatchDNE(bh), nil
-	case "ENR":
+	case ENR:
 		return NewBatchENR(bh), nil
-	case "IAT":
+	case IAT:
 		msg := fmt.Sprintf(msgFileIATSEC, bh.StandardEntryClassCode)
 		return nil, &FileError{FieldName: "StandardEntryClassCode", Value: bh.StandardEntryClassCode, Msg: msg}
-	case "MTE":
+	case MTE:
 		return NewBatchMTE(bh), nil
-	case "POP":
+	case POP:
 		return NewBatchPOP(bh), nil
-	case "POS":
+	case POS:
 		return NewBatchPOS(bh), nil
-	case "PPD":
+	case PPD:
 		return NewBatchPPD(bh), nil
-	case "RCK":
+	case RCK:
 		return NewBatchRCK(bh), nil
-	case "SHR":
+	case SHR:
 		return NewBatchSHR(bh), nil
-	case "TEL":
+	case TEL:
 		return NewBatchTEL(bh), nil
-	case "TRC":
+	case TRC:
 		return NewBatchTRC(bh), nil
-	case "TRX":
+	case TRX:
 		return NewBatchTRX(bh), nil
-	case "WEB":
+	case WEB:
 		return NewBatchWEB(bh), nil
-	case "XCK":
+	case XCK:
 		return NewBatchXCK(bh), nil
 	default:
 	}
@@ -689,7 +771,7 @@ func (batch *Batch) addendaFieldInclusion(entry *EntryDetail) error {
 // addendaFieldInclusionForward verifies Addenda* Field Inclusion for entry.Category Forward
 func (batch *Batch) addendaFieldInclusionForward(entry *EntryDetail) error {
 	switch batch.Header.StandardEntryClassCode {
-	case "MTE", "POS", "SHR":
+	case MTE, POS, SHR:
 		if entry.Addenda02 == nil {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda02", Msg: msgFieldInclusion}
 
@@ -699,12 +781,12 @@ func (batch *Batch) addendaFieldInclusionForward(entry *EntryDetail) error {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda05", Msg: msg}
 		}
 	// ACK, ATX, CCD, CIE, CTX, DNE, ENR WEB, PPD, TRX can only have Addenda05
-	case "ACK", "ATX", "CCD", "CIE", "CTX", "DNE", "ENR", "WEB", "PPD", "TRX":
+	case ACK, ATX, CCD, CIE, CTX, DNE, ENR, WEB, PPD, TRX:
 		if entry.Addenda02 != nil {
 			msg := fmt.Sprintf(msgBatchAddenda, "Addenda02", entry.Category, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda02", Msg: msg}
 		}
-	case "ARC", "BOC", "COR", "POP", "RCK", "TEL", "TRC", "XCK":
+	case ARC, BOC, COR, POP, RCK, TEL, TRC, XCK:
 		if entry.Addenda02 != nil {
 			msg := fmt.Sprintf(msgBatchAddenda, "Addenda02", entry.Category, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda02", Msg: msg}
@@ -714,7 +796,7 @@ func (batch *Batch) addendaFieldInclusionForward(entry *EntryDetail) error {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda05", Msg: msg}
 		}
 	}
-	if batch.Header.StandardEntryClassCode != "COR" {
+	if batch.Header.StandardEntryClassCode != COR {
 		if entry.Addenda98 != nil {
 			msg := fmt.Sprintf(msgBatchAddenda, "Addenda98", entry.Category, batch.Header.StandardEntryClassCode)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda98", Msg: msg}
@@ -737,7 +819,7 @@ func (batch *Batch) addendaFieldInclusionNOC(entry *EntryDetail) error {
 		msg := fmt.Sprintf(msgBatchAddenda, "Addenda05", entry.Category, batch.Header.StandardEntryClassCode)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda05", Msg: msg}
 	}
-	if batch.Header.StandardEntryClassCode != "COR" {
+	if batch.Header.StandardEntryClassCode != COR {
 		if entry.Addenda98 != nil {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda98", Msg: msgFieldInclusion}
 		}
@@ -771,7 +853,7 @@ func (batch *Batch) addendaFieldInclusionReturn(entry *EntryDetail) error {
 
 // IsADV determines if a batch is batch type ADV - BatchADV
 func (batch *Batch) IsADV() bool {
-	ok := batch.GetHeader().StandardEntryClassCode == "ADV"
+	ok := batch.GetHeader().StandardEntryClassCode == ADV
 	return ok
 }
 

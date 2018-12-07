@@ -26,7 +26,7 @@ func main() {
 	bh.ServiceClassCode = ach.MixedDebitsAndCredits
 	bh.CompanyName = "Your Company"
 	bh.CompanyIdentification = file.Header.ImmediateOrigin
-	bh.StandardEntryClassCode = "PPD"
+	bh.StandardEntryClassCode = ach.PPD
 	bh.CompanyEntryDescription = "Trans. Description"
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
 	bh.ODFIIdentification = "121042882"
@@ -71,7 +71,7 @@ func main() {
 	bh2.ServiceClassCode = ach.CreditsOnly
 	bh2.CompanyName = "Your Company"
 	bh2.CompanyIdentification = file.Header.ImmediateOrigin
-	bh2.StandardEntryClassCode = "WEB"
+	bh2.StandardEntryClassCode = ach.WEB
 	bh2.CompanyEntryDescription = "Subscribe"
 	bh2.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
 	bh2.ODFIIdentification = "121042882"

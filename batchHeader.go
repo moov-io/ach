@@ -149,8 +149,8 @@ func (bh *BatchHeader) Parse(record string) {
 	// 41-50 A 10-digit number assigned to you by the ODFI once they approve you to
 	// originate ACH files through them. This is the same as the "Immediate origin" field in File Header Record
 	bh.CompanyIdentification = strings.TrimSpace(record[40:50])
-	// 51-53 If the entries are PPD (credits/debits towards consumer account), use "PPD".
-	// If the entries are CCD (credits/debits towards corporate account), use "CCD".
+	// 51-53 If the entries are PPD (credits/debits towards consumer account), use PPD.
+	// If the entries are CCD (credits/debits towards corporate account), use CCD.
 	// The difference between the 2 SEC codes are outside of the scope of this post.
 	bh.StandardEntryClassCode = record[50:53]
 	// 54-63 Your description of the transaction. This text will appear on the receivers’ bank statement.

@@ -28,12 +28,12 @@ func NewBatchADV(bh *BatchHeader) *BatchADV {
 // Validate checks valid NACHA batch rules. Assumes properly parsed records.
 func (batch *BatchADV) Validate() error {
 
-	if batch.Header.StandardEntryClassCode != "ADV" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "ADV")
+	if batch.Header.StandardEntryClassCode != ADV {
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, ADV)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 	if batch.Header.ServiceClassCode != AutomatedAccountingAdvices {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.ServiceClassCode, "ADV")
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.ServiceClassCode, ADV)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
 	}
 	// basic verification of the batch before we validate specific rules.
@@ -48,7 +48,7 @@ func (batch *BatchADV) Validate() error {
 			case CreditForDebitsOriginated, CreditForCreditsReceived, CreditForCreditsRejected, CreditSummary,
 				DebitForCreditsOriginated, DebitForDebitsReceived, DebitForDebitsRejectedBatches, DebitSummary:
 			default:
-				msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "ADV")
+				msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, ADV)
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 			}
 		}

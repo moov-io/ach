@@ -29,15 +29,15 @@ func (batch *BatchTRC) Validate() error {
 	}
 	// Add configuration and type specific validation for this type.
 
-	if batch.Header.StandardEntryClassCode != "TRC" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "TRC")
+	if batch.Header.StandardEntryClassCode != TRC {
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, TRC)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
 	// TRC detail entries can only be a debit, ServiceClassCode must allow debits
 	switch batch.Header.ServiceClassCode {
 	case MixedDebitsAndCredits, CreditsOnly:
-		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, "TRC")
+		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, TRC)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
 	}
 

@@ -10,10 +10,10 @@ import "testing"
 func mockBatchARCHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "ARC"
+	bh.StandardEntryClassCode = ARC
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
-	bh.CompanyEntryDescription = "ARC"
+	bh.CompanyEntryDescription = ARC
 	bh.ODFIIdentification = "12104288"
 	return bh
 }
@@ -46,10 +46,10 @@ func mockBatchARC() *BatchARC {
 func mockBatchARCHeaderCredit() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "ARC"
+	bh.StandardEntryClassCode = ARC
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
-	bh.CompanyEntryDescription = "ARC"
+	bh.CompanyEntryDescription = ARC
 	bh.ODFIIdentification = "12104288"
 	return bh
 }
@@ -122,7 +122,7 @@ func BenchmarkBatchARCCreate(b *testing.B) {
 // testBatchARCStandardEntryClassCode validates BatchARC create for an invalid StandardEntryClassCode
 func testBatchARCStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchARC()
-	mockBatch.Header.StandardEntryClassCode = "WEB"
+	mockBatch.Header.StandardEntryClassCode = WEB
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

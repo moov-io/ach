@@ -39,8 +39,8 @@ func (batch *BatchCTX) Validate() error {
 	}
 
 	// Add configuration and type specific validation for this type.
-	if batch.Header.StandardEntryClassCode != "CTX" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "CTX")
+	if batch.Header.StandardEntryClassCode != CTX {
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, CTX)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
@@ -63,7 +63,7 @@ func (batch *BatchCTX) Validate() error {
 		switch entry.TransactionCode {
 		case CheckingPrenoteCredit, CheckingPrenoteDebit, SavingsPrenoteCredit, SavingsReturnNOCDebit, GLPrenoteCredit,
 			GLPrenoteDebit, LoanPrenoteCredit:
-			msg := fmt.Sprintf(msgBatchTransactionCodeAddenda, entry.TransactionCode, "CTX")
+			msg := fmt.Sprintf(msgBatchTransactionCodeAddenda, entry.TransactionCode, CTX)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
 		default:
 		}

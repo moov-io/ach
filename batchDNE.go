@@ -36,22 +36,22 @@ func (batch *BatchDNE) Validate() error {
 	}
 
 	// SEC code
-	if batch.Header.StandardEntryClassCode != "DNE" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "DNE")
+	if batch.Header.StandardEntryClassCode != DNE {
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, DNE)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
 	// Range over Entries
 	for _, entry := range batch.Entries {
 		if entry.Amount != 0 {
-			msg := fmt.Sprintf(msgBatchAmountZero, entry.Amount, "DNE")
+			msg := fmt.Sprintf(msgBatchAmountZero, entry.Amount, DNE)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
 		}
 
 		switch entry.TransactionCode {
 		case CheckingReturnNOCCredit, CheckingPrenoteCredit, SavingsReturnNOCCredit, SavingsPrenoteCredit:
 		default:
-			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "DNE")
+			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, DNE)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 		}
 

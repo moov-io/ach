@@ -13,7 +13,7 @@ import (
 func mockBatchATXHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
-	bh.StandardEntryClassCode = "ATX"
+	bh.StandardEntryClassCode = ATX
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "231380104"
 	bh.CompanyEntryDescription = "ACH ATX"
@@ -95,7 +95,7 @@ func BenchmarkBatchATXCreate(b *testing.B) {
 // testBatchATXStandardEntryClassCode validates BatchATX create for an invalid StandardEntryClassCode
 func testBatchATXStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchATX()
-	mockBatch.Header.StandardEntryClassCode = "WEB"
+	mockBatch.Header.StandardEntryClassCode = WEB
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -289,7 +289,7 @@ func testBatchATXAddenda10000(t testing.TB) {
 
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
-	bh.StandardEntryClassCode = "ATX"
+	bh.StandardEntryClassCode = ATX
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "231380104"
 	bh.CompanyEntryDescription = "ACH ATX"
@@ -344,7 +344,7 @@ func BenchmarkBatchATXAddenda10000(b *testing.B) {
 func testBatchATXAddendaRecords(t testing.TB) {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
-	bh.StandardEntryClassCode = "ATX"
+	bh.StandardEntryClassCode = ATX
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "231380104"
 	bh.CompanyEntryDescription = "ACH ATX"
@@ -443,7 +443,7 @@ func BenchmarkBatchATXReserved(b *testing.B) {
 func testBatchATXZeroAddendaRecords(t testing.TB) {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
-	bh.StandardEntryClassCode = "ATX"
+	bh.StandardEntryClassCode = ATX
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "231380104"
 	bh.CompanyEntryDescription = "ACH ATX"
@@ -494,7 +494,7 @@ func BenchmarkBatchATXZeroAddendaRecords(b *testing.B) {
 func testBatchATXTransactionCode(t testing.TB) {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
-	bh.StandardEntryClassCode = "ATX"
+	bh.StandardEntryClassCode = ATX
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "231380104"
 	bh.CompanyEntryDescription = "ACH ATX"
@@ -546,7 +546,7 @@ func BenchmarkBatchATXTransactionCode(b *testing.B) {
 func TestBatchATXAmount(t *testing.T) {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
-	bh.StandardEntryClassCode = "ATX"
+	bh.StandardEntryClassCode = ATX
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "231380104"
 	bh.CompanyEntryDescription = "ACH ATX"

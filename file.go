@@ -478,7 +478,7 @@ func (f *File) calculateEntryHash(IsADV bool) string {
 func (f *File) IsADV() bool {
 	ok := false
 	for _, batch := range f.Batches {
-		ok = batch.GetHeader().StandardEntryClassCode == "ADV"
+		ok = batch.GetHeader().StandardEntryClassCode == ADV
 		if ok {
 			break
 		}
@@ -499,7 +499,7 @@ func (f *File) createFileADV() error {
 	for i, batch := range f.Batches {
 		// create ascending batch numbers
 
-		if batch.GetHeader().StandardEntryClassCode != "ADV" {
+		if batch.GetHeader().StandardEntryClassCode != ADV {
 			return &FileError{FieldName: "EntryAddendaCount", Value: batch.GetHeader().StandardEntryClassCode,
 				Msg: msgFileADV}
 		}

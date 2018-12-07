@@ -39,15 +39,15 @@ func (batch *BatchCIE) Validate() error {
 
 	// Add type specific validation.
 
-	if batch.Header.StandardEntryClassCode != "CIE" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "CIE")
+	if batch.Header.StandardEntryClassCode != CIE {
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, CCD)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
 	// CIE detail entries can only be a credit, ServiceClassCode must allow credit
 	switch batch.Header.ServiceClassCode {
 	case MixedDebitsAndCredits, DebitsOnly:
-		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, "CIE")
+		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, CCD)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
 	}
 

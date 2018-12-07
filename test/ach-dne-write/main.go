@@ -26,7 +26,7 @@ func main() {
 	bh.ServiceClassCode = ach.CreditsOnly
 	bh.CompanyName = "Name on Account" // The name of the company/person that has relationship with receiver
 	bh.CompanyIdentification = fh.ImmediateOrigin
-	bh.StandardEntryClassCode = "DNE"
+	bh.StandardEntryClassCode = ach.DNE
 	bh.CompanyEntryDescription = "Death" // will be on receiving accounts statement // TODO
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
 	bh.ODFIIdentification = "23138010" // Originating Routing Number

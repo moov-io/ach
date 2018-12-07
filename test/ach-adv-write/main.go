@@ -23,7 +23,7 @@ func main() {
 	bh.ServiceClassCode = ach.AutomatedAccountingAdvices
 	bh.CompanyName = "Company Name, Inc" // The name of the company/person that has relationship with receiver
 	bh.CompanyIdentification = fh.ImmediateOrigin
-	bh.StandardEntryClassCode = "ADV"         // Consumer destination vs Company CCD
+	bh.StandardEntryClassCode = ach.ADV
 	bh.CompanyEntryDescription = "Accounting" // will be on receiving accounts statement
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
 	bh.ODFIIdentification = "121042882" // Originating Routing Number

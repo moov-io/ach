@@ -12,7 +12,7 @@ import (
 func mockBatchWEBHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
-	bh.StandardEntryClassCode = "WEB"
+	bh.StandardEntryClassCode = WEB
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "Online Order"
@@ -176,7 +176,7 @@ func BenchmarkBatchWEBAddendaTypeCode(b *testing.B) {
 // testBatchWebSEC validates that the standard entry class code is WEB for batch Web
 func testBatchWebSEC(t testing.TB) {
 	mockBatch := mockBatchWEB()
-	mockBatch.Header.StandardEntryClassCode = "RCK"
+	mockBatch.Header.StandardEntryClassCode = RCK
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {

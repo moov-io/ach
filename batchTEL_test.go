@@ -12,7 +12,7 @@ import (
 func mockBatchTELHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "TEL"
+	bh.StandardEntryClassCode = TEL
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "Vndr Pay"
@@ -130,7 +130,7 @@ func BenchmarkBatchTELAddendaCount(b *testing.B) {
 // testBatchTELSEC validates SEC code for batch TEL
 func testBatchTELSEC(t testing.TB) {
 	mockBatch := mockBatchTEL()
-	mockBatch.Header.StandardEntryClassCode = "RCK"
+	mockBatch.Header.StandardEntryClassCode = RCK
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {

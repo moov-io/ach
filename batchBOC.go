@@ -44,15 +44,15 @@ func (batch *BatchBOC) Validate() error {
 	}
 	// Add configuration and type specific validation for this type.
 
-	if batch.Header.StandardEntryClassCode != "BOC" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "BOC")
+	if batch.Header.StandardEntryClassCode != BOC {
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, BOC)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
 	// BOC detail entries can only be a debit, ServiceClassCode must allow debits
 	switch batch.Header.ServiceClassCode {
 	case MixedDebitsAndCredits, CreditsOnly:
-		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, "RCK")
+		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, BOC)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
 	}
 
@@ -65,13 +65,13 @@ func (batch *BatchBOC) Validate() error {
 
 		// Amount must be 25,000 or less
 		if entry.Amount > 2500000 {
-			msg := fmt.Sprintf(msgBatchAmount, "25,000", "BOC")
+			msg := fmt.Sprintf(msgBatchAmount, "25,000", BOC)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
 		}
 
 		// CheckSerialNumber underlying IdentificationNumber, must be defined
 		if entry.IdentificationNumber == "" {
-			msg := fmt.Sprintf(msgBatchCheckSerialNumber, "BOC")
+			msg := fmt.Sprintf(msgBatchCheckSerialNumber, BOC)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "CheckSerialNumber", Msg: msg}
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode

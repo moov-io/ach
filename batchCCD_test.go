@@ -12,7 +12,7 @@ import (
 func mockBatchCCDHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "CCD"
+	bh.StandardEntryClassCode = CCD
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "Vndr Pay"
@@ -195,7 +195,7 @@ func BenchmarkBatchCCDAddendaTypeCode(b *testing.B) {
 // testBatchCCDSEC validates that the standard entry class code is CCD for batchCCD
 func testBatchCCDSEC(t testing.TB) {
 	mockBatch := mockBatchCCD()
-	mockBatch.Header.StandardEntryClassCode = "RCK"
+	mockBatch.Header.StandardEntryClassCode = RCK
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {

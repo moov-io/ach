@@ -207,8 +207,8 @@ func (v *validator) isOriginatorStatusCode(code int) error {
 func (v *validator) isSECCode(code string) error {
 	switch code {
 	case
-		"ACK", "ADV", "ARC", "ATX", "BOC", "CCD", "CIE", "COR", "CTX", "DNE", "ENR",
-		"IAT", "MTE", "POS", "PPD", "POP", "RCK", "SHR", "TEL", "TRC", "TRX", "WEB", "XCK":
+		ACK, ADV, ARC, ATX, BOC, CCD, CIE, COR, CTX, DNE, ENR,
+		IAT, MTE, POS, PPD, POP, RCK, SHR, TEL, TRC, TRX, WEB, XCK:
 		return nil
 	}
 	return errors.New(msgSECCode)
@@ -391,8 +391,8 @@ func (v *validator) isTransactionCode(code int) error {
 func (v *validator) isTransactionTypeCode(s string) error {
 	switch s {
 	case "ANN", "BUS", "DEP", "LOA", "MIS", "MOR",
-		"PEN", "RLS", "REM", "SAL", "TAX", "TEL", "WEB",
-		"ARC", "BOC", "POP", "RCK":
+		"PEN", "RLS", "REM", "SAL", "TAX", TEL, WEB,
+		ARC, BOC, POP, RCK:
 		return nil
 	}
 	return errors.New(msgTransactionTypeCode)

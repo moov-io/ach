@@ -9,16 +9,16 @@ import (
 )
 
 func main() {
-	// Example transfer to write an ACH CCD file to send/credit a external institutions account
+	// Example transfer to write an ACH TEL file to send/credit a external institutions account
 	// Important: All financial institutions are different and will require registration and exact field values.
 
 	// Set originator bank ODFI and destination Operator for the financial institution
 	// this is the funding/receiving source of the transfer
 	fh := ach.NewFileHeader()
 	fh.ImmediateDestination = "231380104" // Routing Number of the ACH Operator or receiving point to which the file is being sent
-	fh.ImmediateOrigin = "031300012"      // Routing Number of the ACH Operator or sending point that is sending the file
+	fh.ImmediateOrigin = "121042882"      // Routing Number of the ACH Operator or sending point that is sending the file
 	fh.FileCreationDate = time.Now()      // Today's Date
-	fh.ImmediateDestinationName = "Federal Reserve Bank"
+	fh.ImmediateDestinationName = "Receiver Bank Name"
 	fh.ImmediateOriginName = "My Bank Name"
 
 	// BatchHeader identifies the originating entity and the type of transactions contained in the batch
@@ -26,38 +26,25 @@ func main() {
 	bh.ServiceClassCode = ach.DebitsOnly
 	bh.CompanyName = "Name on Account" // The name of the company/person that has relationship with receiver
 	bh.CompanyIdentification = fh.ImmediateOrigin
-	bh.StandardEntryClassCode = ach.CCD
-	bh.CompanyEntryDescription = "Vndr Pay" // will be on receiving accounts statement
+	bh.StandardEntryClassCode = ach.TEL
+	bh.CompanyEntryDescription = "Payment" // will be on receiving accounts statement
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
-	bh.ODFIIdentification = "031300012" // Originating Routing Number
+	bh.ODFIIdentification = "121042882" // Originating Routing Number
 
 	// Identifies the receivers account information
 	// can be multiple entry's per batch
 	entry := ach.NewEntryDetail()
 	// Identifies the entry as a debit and credit entry AND to what type of account (Savings, DDA, Loan, GL)
-	entry.TransactionCode = ach.CheckingDebit // Code 22: Demand Debit(deposit) to checking account
-	entry.SetRDFI("231380104")                // Receivers bank transit routing number
-	entry.DFIAccountNumber = "744-5678-99"    // Receivers bank account number
-	entry.Amount = 500000                     // Amount of transaction with no decimal. One dollar and eleven cents = 111
-	entry.IdentificationNumber = "location #1"
-	entry.SetReceivingCompany("Best Co. #1")
+	entry.TransactionCode = ach.CheckingDebit
+	entry.SetRDFI("231380104")          // Receivers bank transit routing number
+	entry.DFIAccountNumber = "12345678" // Receivers bank account number
+	entry.Amount = 50000                // Amount of transaction with no decimal. One dollar and eleven cents = 111
 	entry.SetTraceNumber(bh.ODFIIdentification, 1)
-	entry.DiscretionaryData = "S"
-
-	entryOne := ach.NewEntryDetail()             // Fee Entry
-	entryOne.TransactionCode = ach.CheckingDebit // Code 22: Demand Debit(deposit) to checking account
-	entryOne.SetRDFI("231380104")                // Receivers bank transit routing number
-	entryOne.DFIAccountNumber = "744-5678-99"    // Receivers bank account number
-	entryOne.Amount = 125                        // Amount of transaction with no decimal. One dollar and eleven cents = 111
-	entryOne.IdentificationNumber = "Fee #1"
-	entryOne.SetReceivingCompany("Best Co. #1")
-	entryOne.SetTraceNumber(bh.ODFIIdentification, 2)
-	entryOne.DiscretionaryData = "S"
+	entry.IndividualName = "Receiver Account Name" // Identifies the receiver of the transaction
 
 	// build the batch
-	batch := ach.NewBatchCCD(bh)
+	batch := ach.NewBatchTEL(bh)
 	batch.AddEntry(entry)
-	batch.AddEntry(entryOne)
 	if err := batch.Create(); err != nil {
 		log.Fatalf("Unexpected error building batch: %s\n", err)
 	}

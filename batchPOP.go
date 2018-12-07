@@ -41,15 +41,15 @@ func (batch *BatchPOP) Validate() error {
 	}
 
 	// Add configuration and type specific validation for this type.
-	if batch.Header.StandardEntryClassCode != "POP" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "POP")
+	if batch.Header.StandardEntryClassCode != POP {
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, POP)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
 	// POP detail entries can only be a debit, ServiceClassCode must allow debits
 	switch batch.Header.ServiceClassCode {
 	case MixedDebitsAndCredits, CreditsOnly:
-		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, "POP")
+		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, POP)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
 	}
 
@@ -61,12 +61,12 @@ func (batch *BatchPOP) Validate() error {
 		}
 		// Amount must be 25,000 or less
 		if entry.Amount > 2500000 {
-			msg := fmt.Sprintf(msgBatchAmount, "25,000", "POP")
+			msg := fmt.Sprintf(msgBatchAmount, "25,000", POP)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
 		}
 		// CheckSerialNumber, Terminal City, Terminal State underlying IdentificationNumber, must be defined
 		if entry.IdentificationNumber == "" {
-			msg := fmt.Sprintf(msgBatchCheckSerialNumber, "POP")
+			msg := fmt.Sprintf(msgBatchCheckSerialNumber, POP)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "CheckSerialNumber", Msg: msg}
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode

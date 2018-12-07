@@ -10,10 +10,10 @@ import "testing"
 func mockBatchTRCHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "TRC"
+	bh.StandardEntryClassCode = TRC
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
-	bh.CompanyEntryDescription = "TRC"
+	bh.CompanyEntryDescription = TRC
 	bh.ODFIIdentification = "12104288"
 	return bh
 }
@@ -48,10 +48,10 @@ func mockBatchTRC() *BatchTRC {
 func mockBatchTRCHeaderCredit() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "TRC"
+	bh.StandardEntryClassCode = TRC
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
-	bh.CompanyEntryDescription = "TRC"
+	bh.CompanyEntryDescription = TRC
 	bh.ODFIIdentification = "12104288"
 	return bh
 }
@@ -125,7 +125,7 @@ func BenchmarkBatchTRCCreate(b *testing.B) {
 // testBatchTRCStandardEntryClassCode validates BatchTRC create for an invalid StandardEntryClassCode
 func testBatchTRCStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchTRC()
-	mockBatch.Header.StandardEntryClassCode = "WEB"
+	mockBatch.Header.StandardEntryClassCode = WEB
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

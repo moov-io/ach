@@ -10,10 +10,10 @@ import "testing"
 func mockBatchXCKHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "XCK"
+	bh.StandardEntryClassCode = XCK
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
-	bh.CompanyEntryDescription = "XCK"
+	bh.CompanyEntryDescription = XCK
 	bh.ODFIIdentification = "12104288"
 	return bh
 }
@@ -48,10 +48,10 @@ func mockBatchXCK() *BatchXCK {
 func mockBatchXCKHeaderCredit() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "XCK"
+	bh.StandardEntryClassCode = XCK
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
-	bh.CompanyEntryDescription = "XCK"
+	bh.CompanyEntryDescription = XCK
 	bh.ODFIIdentification = "12104288"
 	return bh
 }
@@ -125,7 +125,7 @@ func BenchmarkBatchXCKCreate(b *testing.B) {
 // testBatchXCKStandardEntryClassCode validates BatchXCK create for an invalid StandardEntryClassCode
 func testBatchXCKStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchXCK()
-	mockBatch.Header.StandardEntryClassCode = "WEB"
+	mockBatch.Header.StandardEntryClassCode = WEB
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

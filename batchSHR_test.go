@@ -12,7 +12,7 @@ import (
 func mockBatchSHRHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "SHR"
+	bh.StandardEntryClassCode = SHR
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "ACH SHR"
@@ -95,7 +95,7 @@ func BenchmarkBatchSHRCreate(b *testing.B) {
 // testBatchSHRStandardEntryClassCode validates BatchSHR create for an invalid StandardEntryClassCode
 func testBatchSHRStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchSHR()
-	mockBatch.Header.StandardEntryClassCode = "WEB"
+	mockBatch.Header.StandardEntryClassCode = WEB
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

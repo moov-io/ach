@@ -645,7 +645,7 @@ func BenchmarkBatchControl(b *testing.B) {
 func testIATBatch(t testing.TB) {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
-	bh.StandardEntryClassCode = "IAT"
+	bh.StandardEntryClassCode = IAT
 	bh.CompanyName = "ACME Corporation"
 	bh.CompanyIdentification = "123456789"
 	bh.CompanyEntryDescription = "PAYROLL"
@@ -889,7 +889,7 @@ func TestBatchDishonoredReturnsCategory(t *testing.T) {
 
 	posHeader := NewBatchHeader()
 	posHeader.ServiceClassCode = DebitsOnly
-	posHeader.StandardEntryClassCode = "POS"
+	posHeader.StandardEntryClassCode = POS
 	posHeader.CompanyName = "Payee Name"
 	posHeader.CompanyIdentification = "231380104"
 	posHeader.CompanyEntryDescription = "ACH POS"

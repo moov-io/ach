@@ -16,7 +16,7 @@ func mockBatchDNEHeader() *BatchHeader {
 	bh.ServiceClassCode = CreditsOnly
 	bh.CompanyName = "Name on Account"
 	bh.CompanyIdentification = "231380104"
-	bh.StandardEntryClassCode = "DNE"
+	bh.StandardEntryClassCode = DNE
 	bh.CompanyEntryDescription = "Death"
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
 	bh.ODFIIdentification = "23138010"
@@ -179,7 +179,7 @@ func BenchmarkBatchDNEAddendaTypeCode(b *testing.B) {
 // testBatchDNESEC validates that the standard entry class code is DNE for batchDNE
 func testBatchDNESEC(t testing.TB) {
 	mockBatch := mockBatchDNE()
-	mockBatch.Header.StandardEntryClassCode = "ACK"
+	mockBatch.Header.StandardEntryClassCode = ACK
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {

@@ -32,14 +32,14 @@ func (batch *BatchMTE) Validate() error {
 		return err
 	}
 
-	if batch.Header.StandardEntryClassCode != "MTE" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "MTE")
+	if batch.Header.StandardEntryClassCode != MTE {
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, MTE)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
 	for _, entry := range batch.Entries {
 		if entry.Amount <= 0 {
-			msg := fmt.Sprintf(msgBatchAmountNonZero, entry.Amount, "MTE")
+			msg := fmt.Sprintf(msgBatchAmountNonZero, entry.Amount, MTE)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode

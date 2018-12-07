@@ -32,7 +32,7 @@ func mockBatchHeaderWeb() *ach.BatchHeader {
 	bh := ach.NewBatchHeader()
 	bh.ID = "54321"
 	bh.ServiceClassCode = ach.CreditsOnly
-	bh.StandardEntryClassCode = "WEB"
+	bh.StandardEntryClassCode = ach.WEB
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "Online Order"

@@ -30,15 +30,15 @@ func (batch *BatchACK) Validate() error {
 		return err
 	}
 	// Add configuration and type specific validation.
-	if batch.Header.StandardEntryClassCode != "ACK" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, "ACK")
+	if batch.Header.StandardEntryClassCode != ACK {
+		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, ACK)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 	// Range through Entries
 	for _, entry := range batch.Entries {
 		// Amount must be zero for Acknowledgement Entries
 		if entry.Amount > 0 {
-			msg := fmt.Sprintf(msgBatchAmountZero, entry.Amount, "ACK")
+			msg := fmt.Sprintf(msgBatchAmountZero, entry.Amount, ACK)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
 		}
 		if len(entry.Addenda05) > 1 {
@@ -48,7 +48,7 @@ func (batch *BatchACK) Validate() error {
 		switch entry.TransactionCode {
 		case CheckingZeroDollarRemittanceCredit, SavingsZeroDollarRemittanceCredit:
 		default:
-			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "ACK")
+			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, ACK)
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
