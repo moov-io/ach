@@ -75,7 +75,7 @@ func TestBatchADVAddendum99(t *testing.T) {
 // testBatchADVSEC validates that the standard entry class code is ADV for batchADV
 func testBatchADVSEC(t testing.TB) {
 	mockBatch := mockBatchADV()
-	mockBatch.Header.StandardEntryClassCode = "RCK"
+	mockBatch.Header.StandardEntryClassCode = RCK
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {

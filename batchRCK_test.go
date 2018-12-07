@@ -10,7 +10,7 @@ import "testing"
 func mockBatchRCKHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "RCK"
+	bh.StandardEntryClassCode = RCK
 	bh.CompanyName = "Company Name"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "REDEPCHECK"
@@ -46,7 +46,7 @@ func mockBatchRCK() *BatchRCK {
 func mockBatchRCKHeaderCredit() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = DebitsOnly
-	bh.StandardEntryClassCode = "RCK"
+	bh.StandardEntryClassCode = RCK
 	bh.CompanyName = "Company Name"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "REDEPCHECK"

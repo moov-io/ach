@@ -338,7 +338,7 @@ func TestBatchPPDAddendum99(t *testing.T) {
 // TestBatchPPDSEC validates that the standard entry class code is PPD for batch Web
 func TestBatchPPDSEC(t *testing.T) {
 	mockBatch := mockBatchPPD()
-	mockBatch.Header.StandardEntryClassCode = "RCK"
+	mockBatch.Header.StandardEntryClassCode = RCK
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {
