@@ -43,10 +43,6 @@ func (batch *BatchCOR) Validate() error {
 		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, COR)
 		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
-	if batch.Header.ServiceClassCode == AutomatedAccountingAdvices {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.ServiceClassCode, COR)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
-	}
 	// The Amount field must be zero
 	// batch.verify calls batch.isBatchAmount which ensures the batch.Control values are accurate.
 	if batch.Control.TotalCreditEntryDollarAmount != 0 || batch.Control.TotalDebitEntryDollarAmount != 0 {

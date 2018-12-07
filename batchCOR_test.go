@@ -447,3 +447,19 @@ func TestBatchCORTestBatchCORInvalidAddenda98(t *testing.T) {
 		}
 	}
 }
+
+// TestBatchCORTransactionCodeInvalid validates BatchCOR returns an error for an invalid TransactionCode
+func TestBatchCORAutomatedAccountingAdvices(t *testing.T) {
+	mockBatch := mockBatchCOR()
+	mockBatch.GetEntries()[0].TransactionCode = 65
+	mockBatch.Create()
+	if err := mockBatch.Validate(); err != nil {
+		if e, ok := err.(*BatchError); ok {
+			if e.FieldName != "TransactionCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}

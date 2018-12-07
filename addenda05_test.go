@@ -139,6 +139,18 @@ func TestAddenda05FieldInclusion(t *testing.T) {
 	}
 }
 
+func TestAddenda05FieldInclusionSequenceNumber(t *testing.T) {
+	addenda05 := mockAddenda05()
+	addenda05.SequenceNumber = 0
+	if err := addenda05.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "SequenceNumber" {
+				t.Errorf("%T: %s", err, err)
+			}
+		}
+	}
+}
+
 func TestAddenda05FieldInclusionRecordType(t *testing.T) {
 	addenda05 := mockAddenda05()
 	addenda05.recordType = ""
