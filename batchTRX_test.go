@@ -129,7 +129,7 @@ func BenchmarkBatchTRXCreate(b *testing.B) {
 // testBatchTRXStandardEntryClassCode validates BatchTRX create for an invalid StandardEntryClassCode
 func testBatchTRXStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchTRX()
-	mockBatch.Header.StandardEntryClassCode = "WEB"
+	mockBatch.Header.StandardEntryClassCode = WEB
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

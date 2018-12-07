@@ -126,7 +126,7 @@ func BenchmarkBatchPOPCreate(b *testing.B) {
 // testBatchPOPStandardEntryClassCode validates BatchPOP create for an invalid StandardEntryClassCode
 func testBatchPOPStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchPOP()
-	mockBatch.Header.StandardEntryClassCode = "WEB"
+	mockBatch.Header.StandardEntryClassCode = WEB
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

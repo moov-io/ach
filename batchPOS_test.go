@@ -92,7 +92,7 @@ func BenchmarkBatchPOSCreate(b *testing.B) {
 // testBatchPOSStandardEntryClassCode validates BatchPOS create for an invalid StandardEntryClassCode
 func testBatchPOSStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchPOS()
-	mockBatch.Header.StandardEntryClassCode = "WEB"
+	mockBatch.Header.StandardEntryClassCode = WEB
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

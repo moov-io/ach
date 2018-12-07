@@ -8,7 +8,7 @@ import (
 func mockBatchWEBHeader() *BatchHeader {
 	bh := NewBatchHeader()
 	bh.ServiceClassCode = CreditsOnly
-	bh.StandardEntryClassCode = "WEB"
+	bh.StandardEntryClassCode = WEB
 	bh.CompanyName = "Your Company, inc"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "Online Order"

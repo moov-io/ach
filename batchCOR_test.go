@@ -74,7 +74,7 @@ func BenchmarkBatchCORHeader(b *testing.B) {
 func testBatchCORSEC(t testing.TB) {
 	mockBatch := mockBatchCOR()
 	mockBatch.GetEntries()[0].Category = CategoryNOC
-	mockBatch.Header.StandardEntryClassCode = "WEB"
+	mockBatch.Header.StandardEntryClassCode = WEB
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {

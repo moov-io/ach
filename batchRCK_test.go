@@ -122,7 +122,7 @@ func BenchmarkBatchRCKCreate(b *testing.B) {
 // testBatchRCKStandardEntryClassCode validates BatchRCK create for an invalid StandardEntryClassCode
 func testBatchRCKStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchRCK()
-	mockBatch.Header.StandardEntryClassCode = "WEB"
+	mockBatch.Header.StandardEntryClassCode = WEB
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

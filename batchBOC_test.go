@@ -122,7 +122,7 @@ func BenchmarkBatchBOCCreate(b *testing.B) {
 // testBatchBOCStandardEntryClassCode validates BatchBOC create for an invalid StandardEntryClassCode
 func testBatchBOCStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchBOC()
-	mockBatch.Header.StandardEntryClassCode = "WEB"
+	mockBatch.Header.StandardEntryClassCode = WEB
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

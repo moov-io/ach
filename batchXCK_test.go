@@ -125,7 +125,7 @@ func BenchmarkBatchXCKCreate(b *testing.B) {
 // testBatchXCKStandardEntryClassCode validates BatchXCK create for an invalid StandardEntryClassCode
 func testBatchXCKStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchXCK()
-	mockBatch.Header.StandardEntryClassCode = "WEB"
+	mockBatch.Header.StandardEntryClassCode = WEB
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

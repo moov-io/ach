@@ -95,7 +95,7 @@ func BenchmarkBatchSHRCreate(b *testing.B) {
 // testBatchSHRStandardEntryClassCode validates BatchSHR create for an invalid StandardEntryClassCode
 func testBatchSHRStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchSHR()
-	mockBatch.Header.StandardEntryClassCode = "WEB"
+	mockBatch.Header.StandardEntryClassCode = WEB
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {

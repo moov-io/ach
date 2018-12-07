@@ -95,7 +95,7 @@ func BenchmarkBatchATXCreate(b *testing.B) {
 // testBatchATXStandardEntryClassCode validates BatchATX create for an invalid StandardEntryClassCode
 func testBatchATXStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchATX()
-	mockBatch.Header.StandardEntryClassCode = "WEB"
+	mockBatch.Header.StandardEntryClassCode = WEB
 	mockBatch.Create()
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
