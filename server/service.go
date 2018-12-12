@@ -6,9 +6,6 @@ package server
 
 import (
 	"bytes"
-	"crypto/rand"
-	"crypto/sha1"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -164,18 +161,4 @@ func (s *service) GetBatches(fileID string) []ach.Batcher {
 
 func (s *service) DeleteBatch(fileID string, batchID string) error {
 	return s.store.DeleteBatch(fileID, batchID)
-}
-
-// NextID generates a new resource ID.
-// Do not assume anything about the data structure.
-//
-// Multiple calls to NextID() have no concern about producing
-// lexicographically ordered output.
-func NextID() string {
-	bs := make([]byte, 20)
-	rand.Reader.Read(bs)
-
-	h := sha1.New()
-	h.Write(bs)
-	return hex.EncodeToString(h.Sum(nil))[:16]
 }

@@ -47,19 +47,15 @@ func createFileEndpoint(s Service, r Repository) endpoint.Endpoint {
 			filesCreated.With("destination", req.File.Header.ImmediateDestination, "origin", req.File.Header.ImmediateOrigin).Add(1)
 		}
 
+		// Create a random file ID if none was provided
 		if req.File.ID == "" {
-			// No File ID, so create the file
-			id, e := s.CreateFile(&req.File.Header)
-			return createFileResponse{
-				ID:  id,
-				Err: e,
-			}, nil
-		} else {
-			return createFileResponse{
-				ID:  req.File.ID,
-				Err: r.StoreFile(req.File),
-			}, nil
+			req.File.ID = NextID()
 		}
+
+		return createFileResponse{
+			ID:  req.File.ID,
+			Err: r.StoreFile(req.File),
+		}, nil
 	}
 }
 
