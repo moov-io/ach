@@ -5,9 +5,9 @@ VERSION := $(shell grep -Eo '(v[0-9]+[\.][0-9]+[\.][0-9]+([-a-zA-Z0-9]*)?)' vers
 build:
 	go fmt ./...
 	@mkdir -p ./bin/
-	go build -mod=vendor github.com/moov-io/ach
-	go build -o bin/examples-http -mod=vendor github.com/moov-io/ach/examples/http
-	CGO_ENABLED=0 go build -o ./bin/server -mod=vendor github.com/moov-io/ach/cmd/server
+	go build github.com/moov-io/ach
+	go build -o bin/examples-http github.com/moov-io/ach/examples/http
+	CGO_ENABLED=0 go build -o ./bin/server github.com/moov-io/ach/cmd/server
 
 generate: clean
 	@go run internal/iso3166/iso3166_gen.go
@@ -21,7 +21,7 @@ docker: clean
 	docker tag moov/ach:$(VERSION) moov/ach:latest
 
 release: docker generate AUTHORS
-	go test ./... -mod=vendor
+	go test ./...
 	git tag -f $(VERSION)
 
 release-push:
