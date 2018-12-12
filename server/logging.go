@@ -63,7 +63,6 @@ func (mw loggingMiddleware) CreateFile(f *ach.FileHeader) (id string, err error)
 	defer func() {
 		// f.ID can be empty here if the request does not specify it, do we care?
 		// The ID is properly generated and stored, so there's no "issue", just flakey logs.
-		// TODO(adam): figure out if we care to fix this
 		mw.logger.Log("method", "CreateFile", "id", f.ID, "took", t, "err", err)
 	}()
 	return mw.next.CreateFile(f)
