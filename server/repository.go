@@ -6,6 +6,7 @@ package server
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 
 	"github.com/moov-io/ach"
@@ -81,18 +82,23 @@ func (r *repositoryInMemory) DeleteFile(id string) error {
 func (r *repositoryInMemory) StoreBatch(fileID string, batch ach.Batcher) error {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
+
 	// Ensure the file does not already exist
-	if _, ok := r.files[fileID]; !ok {
+	file, ok := r.files[fileID]
+	if !ok || file == nil {
 		return ErrNotFound
 	}
+
 	// ensure the batch does not already exist
-	for _, val := range r.files[fileID].Batches {
+	for _, val := range file.Batches {
 		if val.ID() == batch.ID() {
 			return ErrAlreadyExists
 		}
 	}
+
 	// Add the batch to the file
 	r.files[fileID].AddBatch(batch)
+
 	return nil
 }
 
@@ -100,11 +106,18 @@ func (r *repositoryInMemory) StoreBatch(fileID string, batch ach.Batcher) error 
 func (r *repositoryInMemory) FindBatch(fileID string, batchID string) (ach.Batcher, error) {
 	r.mtx.RLock()
 	defer r.mtx.RUnlock()
-	for _, val := range r.files[fileID].Batches {
+
+	file, ok := r.files[fileID]
+	if !ok || file == nil {
+		return nil, ErrNotFound
+	}
+
+	for _, val := range file.Batches {
 		if val.ID() == batchID {
 			return val, nil
 		}
 	}
+
 	return nil, ErrNotFound
 }
 
@@ -112,8 +125,15 @@ func (r *repositoryInMemory) FindBatch(fileID string, batchID string) (ach.Batch
 func (r *repositoryInMemory) FindAllBatches(fileID string) []ach.Batcher {
 	r.mtx.RLock()
 	defer r.mtx.RUnlock()
-	batches := make([]ach.Batcher, 0, len(r.files[fileID].Batches))
-	batches = append(batches, r.files[fileID].Batches...)
+
+	file, ok := r.files[fileID]
+	if !ok || file == nil {
+		return nil
+	}
+
+	batches := make([]ach.Batcher, 0, len(file.Batches))
+	batches = append(batches, file.Batches...)
+
 	return batches
 }
 
@@ -121,12 +141,17 @@ func (r *repositoryInMemory) DeleteBatch(fileID string, batchID string) error {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 
-	for i := len(r.files[fileID].Batches) - 1; i >= 0; i-- {
-		if r.files[fileID].Batches[i].ID() == batchID {
-			r.files[fileID].Batches = append(r.files[fileID].Batches[:i], r.files[fileID].Batches[i+1:]...)
-			//fmt.Println(r.files[fileID].Batches)
+	file, ok := r.files[fileID]
+	if !ok || file == nil {
+		return fmt.Errorf("%v: no file %s with batch %s found", ErrNotFound, fileID, batchID)
+	}
+
+	for i := len(file.Batches) - 1; i >= 0; i-- {
+		if file.Batches[i].ID() == batchID {
+			file.Batches = append(file.Batches[:i], file.Batches[i+1:]...)
 			return nil
 		}
 	}
+
 	return ErrNotFound
 }
