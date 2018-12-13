@@ -264,7 +264,6 @@ func (batch *Batch) verify() error {
 	if err := batch.isTraceNumberODFI(); err != nil {
 		return err
 	}
-	// TODO this is specific to batch SEC types and should be called by that validator
 	if err := batch.isAddendaSequence(); err != nil {
 		return err
 	}
