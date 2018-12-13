@@ -71,7 +71,6 @@ func main() {
 	// Setup underlying ach service
 	r := server.NewRepositoryInMemory()
 	svc = server.NewService(r)
-	svc = server.LoggingMiddleware(logger)(svc)
 
 	// Create HTTP server
 	handler = server.MakeHTTPHandler(svc, r, log.With(logger, "component", "HTTP"))
