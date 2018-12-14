@@ -5,10 +5,13 @@ ADDITIONS
 - Add const values for `BatchHeader.StandardEntryClassCode` (See [#392](https://github.com/moov-io/ach/issues/391))
 - Add const values for `BatchHeader.ServiceClassCode` and `BatchControl.ServiceClassCode`. (See [#391](https://github.com/moov-io/ach/issues/391))
 - Add const values for `EntryDetail.TransactionCode` (See [#363](https://github.com/moov-io/ach/issues/363))
+- server: Record `ach_files_deleted` metric. (See: [#408](https://github.com/moov-io/ach/pull/408))
+- server: log x-request-id header if present. (See: [#407](https://github.com/moov-io/ach/pull/407))
 
 BUG FIXES
 
 - Accept File's without an ID specified. Generate a random ID. (See: [#405](https://github.com/moov-io/ach/pull/405))
+- server: Fix nil panics. (See: [#406](https://github.com/moov-io/ach/pull/406))
 
 ## v0.5.0 (Released 2018-11-29)
 
