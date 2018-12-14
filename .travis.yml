@@ -1,12 +1,5 @@
 language: go
 sudo: false
-# os:
-# - linux
-# - osx
-# - windows
-# go:
-# - 1.11.x
-osx_image: xcode9.1
 matrix:
   allow_failures:
     - os: windows
