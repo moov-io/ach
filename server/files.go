@@ -25,6 +25,11 @@ var (
 		Name: "ach_files_created",
 		Help: "The number of ACH files created",
 	}, []string{"destination", "origin"})
+
+	filesDeleted = prometheus.NewCounterFrom(stdprometheus.CounterOpts{
+		Name: "ach_files_deleted",
+		Help: "The number of ACH files deleted",
+	}, nil)
 )
 
 type createFileRequest struct {
@@ -158,6 +163,7 @@ func (r deleteFileResponse) error() error { return r.Err }
 func deleteFileEndpoint(s Service) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(deleteFileRequest)
+		filesDeleted.Add(1)
 		return deleteFileResponse{
 			Err: s.DeleteFile(req.ID),
 		}, nil
