@@ -13,8 +13,10 @@ import (
 	"strings"
 
 	"github.com/moov-io/ach"
+	moovhttp "github.com/moov-io/base/http"
 
 	"github.com/go-kit/kit/endpoint"
+	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/gorilla/mux"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
@@ -34,6 +36,8 @@ var (
 
 type createFileRequest struct {
 	File *ach.File
+
+	requestId string
 }
 
 type createFileResponse struct {
@@ -43,7 +47,7 @@ type createFileResponse struct {
 
 func (r createFileResponse) error() error { return r.Err }
 
-func createFileEndpoint(s Service, r Repository) endpoint.Endpoint {
+func createFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(createFileRequest)
 
@@ -57,9 +61,14 @@ func createFileEndpoint(s Service, r Repository) endpoint.Endpoint {
 			req.File.ID = NextID()
 		}
 
+		err := r.StoreFile(req.File)
+		if req.requestId != "" && logger != nil {
+			logger.Log("files", "createFile", "requestId", req.requestId, "error", err)
+		}
+
 		return createFileResponse{
 			ID:  req.File.ID,
-			Err: r.StoreFile(req.File),
+			Err: err,
 		}, nil
 	}
 }
@@ -67,6 +76,8 @@ func createFileEndpoint(s Service, r Repository) endpoint.Endpoint {
 func decodeCreateFileRequest(_ context.Context, request *http.Request) (interface{}, error) {
 	var r io.Reader
 	var req createFileRequest
+
+	req.requestId = moovhttp.GetRequestId(request)
 
 	// Sets default values
 	req.File = ach.NewFile()
@@ -95,7 +106,9 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 	return req, nil
 }
 
-type getFilesRequest struct{}
+type getFilesRequest struct {
+	requestId string
+}
 
 type getFilesResponse struct {
 	Files []*ach.File `json:"files"`
@@ -116,11 +129,15 @@ func getFilesEndpoint(s Service) endpoint.Endpoint {
 }
 
 func decodeGetFilesRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	return getFilesRequest{}, nil
+	return getFilesRequest{
+		requestId: moovhttp.GetRequestId(r),
+	}, nil
 }
 
 type getFileRequest struct {
 	ID string
+
+	requestId string
 }
 
 type getFileResponse struct {
@@ -130,13 +147,18 @@ type getFileResponse struct {
 
 func (r getFileResponse) error() error { return r.Err }
 
-func getFileEndpoint(s Service) endpoint.Endpoint {
+func getFileEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(getFileRequest)
-		f, e := s.GetFile(req.ID)
+		f, err := s.GetFile(req.ID)
+
+		if req.requestId != "" && logger != nil {
+			logger.Log("files", "getFile", "requestId", req.requestId, "error", err)
+		}
+
 		return getFileResponse{
 			File: f,
-			Err:  e,
+			Err:  err,
 		}, nil
 	}
 }
@@ -147,11 +169,16 @@ func decodeGetFileRequest(_ context.Context, r *http.Request) (interface{}, erro
 	if !ok {
 		return nil, ErrBadRouting
 	}
-	return getFileRequest{ID: id}, nil
+	return getFileRequest{
+		ID:        id,
+		requestId: moovhttp.GetRequestId(r),
+	}, nil
 }
 
 type deleteFileRequest struct {
 	ID string
+
+	requestId string
 }
 
 type deleteFileResponse struct {
@@ -160,12 +187,19 @@ type deleteFileResponse struct {
 
 func (r deleteFileResponse) error() error { return r.Err }
 
-func deleteFileEndpoint(s Service) endpoint.Endpoint {
+func deleteFileEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(deleteFileRequest)
 		filesDeleted.Add(1)
+
+		err := s.DeleteFile(req.ID)
+
+		if req.requestId != "" && logger != nil {
+			logger.Log("files", "deleteFile", "requestId", req.requestId, "error", err)
+		}
+
 		return deleteFileResponse{
-			Err: s.DeleteFile(req.ID),
+			Err: err,
 		}, nil
 	}
 }
@@ -176,11 +210,16 @@ func decodeDeleteFileRequest(_ context.Context, r *http.Request) (interface{}, e
 	if !ok {
 		return nil, ErrBadRouting
 	}
-	return deleteFileRequest{ID: id}, nil
+	return deleteFileRequest{
+		ID:        id,
+		requestId: moovhttp.GetRequestId(r),
+	}, nil
 }
 
 type getFileContentsRequest struct {
 	ID string
+
+	requestId string
 }
 
 type getFileContentsResponse struct {
@@ -189,14 +228,18 @@ type getFileContentsResponse struct {
 
 func (v getFileContentsResponse) error() error { return v.Err }
 
-func getFileContentsEndpoint(s Service) endpoint.Endpoint {
+func getFileContentsEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(getFileContentsRequest)
 		r, err := s.GetFileContents(req.ID)
+
+		if req.requestId != "" && logger != nil {
+			logger.Log("files", "getFileContents", "requestId", req.requestId, "error", err)
+		}
 		if err != nil {
-			// TODO(adam): log? if requestId != ""
 			return getFileContentsResponse{Err: err}, nil
 		}
+
 		return r, nil
 	}
 }
@@ -207,11 +250,16 @@ func decodeGetFileContentsRequest(_ context.Context, r *http.Request) (interface
 	if !ok {
 		return nil, ErrBadRouting
 	}
-	return getFileContentsRequest{ID: id}, nil
+	return getFileContentsRequest{
+		ID:        id,
+		requestId: moovhttp.GetRequestId(r),
+	}, nil
 }
 
 type validateFileRequest struct {
 	ID string
+
+	requestId string
 }
 
 type validateFileResponse struct {
@@ -220,11 +268,17 @@ type validateFileResponse struct {
 
 func (v validateFileResponse) error() error { return v.Err }
 
-func validateFileEndpoint(s Service) endpoint.Endpoint {
+func validateFileEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(validateFileRequest)
+		err := s.ValidateFile(req.ID)
+
+		if req.requestId != "" && logger != nil {
+			logger.Log("files", "validateFile", "requestId", req.requestId, "error", err)
+		}
+
 		return validateFileResponse{
-			Err: s.ValidateFile(req.ID),
+			Err: err,
 		}, nil
 	}
 }
@@ -235,5 +289,8 @@ func decodeValidateFileRequest(_ context.Context, r *http.Request) (interface{},
 	if !ok {
 		return nil, ErrBadRouting
 	}
-	return validateFileRequest{ID: id}, nil
+	return validateFileRequest{
+		ID:        id,
+		requestId: moovhttp.GetRequestId(r),
+	}, nil
 }

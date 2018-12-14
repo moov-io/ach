@@ -99,55 +99,55 @@ func MakeHTTPHandler(s Service, repo Repository, logger log.Logger) http.Handler
 		options...,
 	))
 	r.Methods("POST").Path("/files/create").Handler(httptransport.NewServer(
-		createFileEndpoint(s, repo),
+		createFileEndpoint(s, repo, logger),
 		decodeCreateFileRequest,
 		encodeResponse,
 		options...,
 	))
 	r.Methods("GET").Path("/files/{id}").Handler(httptransport.NewServer(
-		getFileEndpoint(s),
+		getFileEndpoint(s, logger),
 		decodeGetFileRequest,
 		encodeResponse,
 		options...,
 	))
 	r.Methods("GET").Path("/files/{id}/contents").Handler(httptransport.NewServer(
-		getFileContentsEndpoint(s),
+		getFileContentsEndpoint(s, logger),
 		decodeGetFileContentsRequest,
 		encodeTextResponse,
 		options...,
 	))
 	r.Methods("GET").Path("/files/{id}/validate").Handler(httptransport.NewServer(
-		validateFileEndpoint(s),
+		validateFileEndpoint(s, logger),
 		decodeValidateFileRequest,
 		encodeResponse,
 		options...,
 	))
 	r.Methods("DELETE").Path("/files/{id}").Handler(httptransport.NewServer(
-		deleteFileEndpoint(s),
+		deleteFileEndpoint(s, logger),
 		decodeDeleteFileRequest,
 		encodeResponse,
 		options...,
 	))
 	r.Methods("POST").Path("/files/{fileID}/batches").Handler(httptransport.NewServer(
-		createBatchEndpoint(s),
+		createBatchEndpoint(s, logger),
 		decodeCreateBatchRequest,
 		encodeResponse,
 		options...,
 	))
 	r.Methods("GET").Path("/files/{fileID}/batches").Handler(httptransport.NewServer(
-		getBatchesEndpoint(s),
+		getBatchesEndpoint(s, logger),
 		decodeGetBatchesRequest,
 		encodeResponse,
 		options...,
 	))
 	r.Methods("GET").Path("/files/{fileID}/batches/{batchID}").Handler(httptransport.NewServer(
-		getBatchEndpoint(s),
+		getBatchEndpoint(s, logger),
 		decodeGetBatchRequest,
 		encodeResponse,
 		options...,
 	))
 	r.Methods("DELETE").Path("/files/{fileID}/batches/{batchID}").Handler(httptransport.NewServer(
-		deleteBatchEndpoint(s),
+		deleteBatchEndpoint(s, logger),
 		decodeDeleteBatchRequest,
 		encodeResponse,
 		options...,
