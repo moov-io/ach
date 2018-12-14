@@ -10,6 +10,17 @@ osx_image: xcode9.1
 matrix:
   allow_failures:
     - os: windows
+  include:
+    - os: linux
+      go: 1.11.x
+      cache:
+        directories:
+          - "/home/travis/.cache/go-build" # GOCACHE
+    - os: osx
+      go: 1.11.x
+      cache:
+        directories:
+          - "/Users/travis/Library/Caches/go-build" # GOCACHE
 env:
   global:
     secure: QPkcX77j8QEqTwOYyLGItqvxYwE6Na5WaSZWjmhp48OlxYatWRHxJBwcFYSn1OWD5FMn+3oW39fHknReIxtrnhXMaNvI7x3/0gy4zujD/xZ2xAg7NsQ+l5buvEFO8/LEwwo0fp4knItFcBv8xH/ziJBJyXvgfMtj7Is4Q/pB1p6pWDdVy1vtAj3zH02bcqh1yXXS3HvcD8UhTszfU017gVNXDN1ow0rp1L3ainr3btrVK9izUxZfKvb7PlWJO1ogah7xNr/dIOJLsx2SfKgzKp+3H28L2WegtbzON74Op4jXvRywCwqjmUt/nwJ/Y9anunMNHT136h+ye4ziG1i/VdbWq0Q4PopQ8yYqinujG7SjfQio+wNCV2cwc2r/WjNBjbH0N9/Pflogq3RHvgy/9VtPif1tY+RrZCSntohoEZbYpVcFQFE1xDyf6xq/uLxVeEcCU33gqq7cKEfpcUgyCITa+yCPfBdtgkLBJ8h7Sew1j08D1kTKUW6g3D1epmwlCh/Z16oHG5VwSnCLGDjJy8wm/hQk1i/g7qeP7g24CfNzffzlFBCy88HhjzmrhUpcaTyfVVDf4h8wK6Zu/J3dHjHXQYwfiQRqpMa+2DYyjGgZhniccuh4GWolGZauDQdmO9SD4Ugyt9PEMk02i32ax3A4XE/Q6VNOam+qszviX3Q=
