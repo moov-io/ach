@@ -1,0 +1,35 @@
+{
+        "batchHeader": {
+            "serviceClassCode": 220,
+            "companyName": "Company Name",
+            "ODFIIdentification": "121042882",
+            "id": "",
+            "companyDiscretionaryData": "",
+            "standardEntryClassCode": "PPD",
+            "companyEntryDescription": "PAYROLL",
+            "companyDescriptiveDate": "122018",
+            "effectiveEntryDate": "2018-12-14T12:52:34Z",
+            "originatorStatusCode": 1,
+            "batchNumber": 1
+        },
+        "entryDetails": [{
+            "id": "",
+            "transactionCode": 22,
+            "RDFIIdentification": "23138010",
+            "checkDigit": "4",
+            "DFIAccountNumber": "123456789",
+            "amount": "200000",
+            "individualName": "Edward James",
+            "identificationNumber": "26",
+            "discretionaryData": "",
+            "addendaRecordIndicator": 0,
+            "traceNumber": "",
+            "addenda02": "",
+            "addenda05": [
+                {
+                 "paymentRelatedInformation": "December Payroll"
+                }
+            ],
+            "category": "Forward"
+        }]
+}
