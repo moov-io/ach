@@ -1,0 +1,35 @@
+language: go
+sudo: required
+os:
+- linux
+- osx
+- windows
+go:
+- 1.11
+dist: xenial # Ubuntu 16.04
+osx_image: xcode9.1
+matrix:
+  allow_failures:
+    - os: windows
+before_install:
+- go get -u github.com/client9/misspell/cmd/misspell
+- go get -u golang.org/x/lint/golint
+- go get -u honnef.co/go/tools/cmd/megacheck
+- go get github.com/fzipp/gocyclo
+- go get golang.org/x/tools/cmd/cover
+# Install gcc, from https://travis-ci.community/t/go-cant-find-gcc-with-go1-11-1-on-windows/293/5
+- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then choco install -y mingw; export PATH=/c/tools/mingw64/bin:"$PATH"; fi
+# Install ruby on linux
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update -qq && sudo apt-get install -y -qq ruby; fi
+before_script:
+- GOFILES=$(find . -type f -name '*.go' | grep -v vendor)
+script:
+# Just check gofmt on linux, it's the fastest builder
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then test -z $(gofmt -s -l $GOFILES); fi
+- go test ./... -race -coverprofile=coverage.txt -covermode=atomic
+- misspell -error -locale US $GOFILES
+- gocyclo -over 19 $GOFILES
+- golint -set_exit_status $GOFILES
+- megacheck ./...
+after_success:
+- bash <(curl -s https://codecov.io/bash)
