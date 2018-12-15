@@ -7,8 +7,9 @@ package ach
 import (
 	"fmt"
 	"strings"
-	"time"
 	"unicode/utf8"
+
+	"github.com/moov-io/base"
 )
 
 // Errors specific to a File Header Record
@@ -46,15 +47,17 @@ type FileHeader struct {
 	// number.
 	ImmediateOrigin string `json:"immediateOrigin"`
 
-	// FileCreationDate is expressed in a "YYMMDD" format. The File Creation
-	// Date is the date on which the file is prepared by an ODFI (ACH input files)
+	// FileCreationDate is the date on which the file is prepared by an ODFI (ACH input files)
 	// or the date (exchange date) on which a file is transmitted from ACH Operator
 	// to ACH Operator, or from ACH Operator to RDFIs (ACH output files).
-	FileCreationDate time.Time `json:"fileCreationDate"`
+	//
+	// The JSON representation is ISO 8601.
+	FileCreationDate base.Time `json:"fileCreationDate"`
 
-	// FileCreationTime is expressed ina n "HHMM" (24 hour clock) format.
-	// The system time when the ACH file was created
-	FileCreationTime time.Time `json:"fileCreationTime"`
+	// FileCreationTime is the system time when the ACH file was created
+	//
+	// The JSON representation is ISO 8601.
+	FileCreationTime base.Time `json:"fileCreationTime"`
 
 	// This field should start at zero and increment by 1 (up to 9) and then go to
 	// letters starting at A through Z for each subsequent file that is created for

@@ -8,8 +8,9 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 	"unicode/utf8"
+
+	"github.com/moov-io/base"
 )
 
 // msgServiceClass
@@ -79,7 +80,7 @@ type BatchHeader struct {
 	CompanyDescriptiveDate string `json:"companyDescriptiveDate,omitempty"`
 
 	// EffectiveEntryDate the date on which the entries are to settle
-	EffectiveEntryDate time.Time `json:"effectiveEntryDate,omitempty"`
+	EffectiveEntryDate base.Time `json:"effectiveEntryDate,omitempty"`
 
 	// SettlementDate Leave blank, this field is inserted by the ACH operator
 	settlementDate string

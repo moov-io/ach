@@ -8,11 +8,11 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 	"unicode/utf8"
 
 	"github.com/moov-io/ach/internal/iso3166"
 	"github.com/moov-io/ach/internal/iso4217"
+	"github.com/moov-io/base"
 )
 
 // msgServiceClass
@@ -128,7 +128,7 @@ type IATBatchHeader struct {
 	ISODestinationCurrencyCode string `json:"ISODestinationCurrencyCode"`
 
 	// EffectiveEntryDate the date on which the entries are to settle format YYMMDD
-	EffectiveEntryDate time.Time `json:"effectiveEntryDate,omitempty"`
+	EffectiveEntryDate base.Time `json:"effectiveEntryDate,omitempty"`
 
 	// SettlementDate Leave blank, this field is inserted by the ACH operator
 	settlementDate string

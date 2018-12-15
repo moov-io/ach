@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/moov-io/base"
 )
 
 // converters handles golang to ACH type Converters
@@ -23,26 +25,26 @@ func (c *converters) parseStringField(r string) (s string) {
 	return s
 }
 
-// formatSimpleDate takes a time.Time and returns a string of YYMMDD
-func (c *converters) formatSimpleDate(t time.Time) string {
+// formatSimpleDate takes a github.com/moov-io/base Time and returns a string of YYMMDD
+func (c *converters) formatSimpleDate(t base.Time) string {
 	return t.Format("060102")
 }
 
-// parseSimpleDate returns a time.Time when passed time as YYMMDD
-func (c *converters) parseSimpleDate(s string) time.Time {
+// parseSimpleDate returns a github.com/moov-io/base Time when passed time as YYMMDD
+func (c *converters) parseSimpleDate(s string) base.Time {
 	t, _ := time.Parse("060102", s)
-	return t
+	return base.NewTime(t)
 }
 
-// formatSimpleTime returns a string of HHMM when  passed a time.Time
-func (c *converters) formatSimpleTime(t time.Time) string {
+// formatSimpleTime returns a string of HHMM when passed a github.com/moov-io/base Time
+func (c *converters) formatSimpleTime(t base.Time) string {
 	return t.Format("1504")
 }
 
-// parseSimpleTime returns a time.Time when passed a string of HHMM
-func (c *converters) parseSimpleTime(s string) time.Time {
+// parseSimpleTime returns a github.com/moov-io/base Time when passed a string of HHMM
+func (c *converters) parseSimpleTime(s string) base.Time {
 	t, _ := time.Parse("1504", s)
-	return t
+	return base.NewTime(t)
 }
 
 // alphaField Alphanumeric and Alphabetic fields are left-justified and space filled.

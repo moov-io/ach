@@ -8,6 +8,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/moov-io/base"
 )
 
 // mockFileHeader build a validate File Header for tests
@@ -15,7 +17,7 @@ func mockFileHeader() FileHeader {
 	fh := NewFileHeader()
 	fh.ImmediateDestination = "231380104"
 	fh.ImmediateOrigin = "121042882"
-	fh.FileCreationDate = time.Now()
+	fh.FileCreationDate = base.NewTime(time.Now())
 	fh.ImmediateDestinationName = "Federal Reserve Bank"
 	fh.ImmediateOriginName = "My Bank Name"
 	return fh
@@ -584,7 +586,7 @@ func BenchmarkFHFieldInclusionFormatCode(b *testing.B) {
 // testFHFieldInclusionCreationDate validates creation date field inclusion
 func testFHFieldInclusionCreationDate(t testing.TB) {
 	fh := mockFileHeader()
-	fh.FileCreationDate = time.Time{}
+	fh.FileCreationDate = base.NewTime(time.Time{})
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if !strings.Contains(e.Msg, msgFieldInclusion) {
