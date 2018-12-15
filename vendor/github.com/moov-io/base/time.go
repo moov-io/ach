@@ -52,11 +52,13 @@ func (t *Time) UnmarshalJSON(data []byte) error {
 	if string(data) == "null" {
 		return nil
 	}
-	if tt, err := time.Parse(`"`+iso8601Format+`"`, string(data)); err != nil {
-		return err
-	} else {
-		t.Time = tt.Truncate(1 * time.Second) // drop millis
+	tt, err := time.Parse(`"`+iso8601Format+`"`, string(data))
+	if err != nil || tt.IsZero() {
+		// Try in RFC3339 format (default Go time)
+		tt, _ = time.Parse(time.RFC3339, string(data))
+		*t = NewTime(tt)
 	}
+	t.Time = tt.Truncate(1 * time.Second) // drop millis
 	return nil
 }
 

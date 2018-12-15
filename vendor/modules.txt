@@ -19,7 +19,7 @@ github.com/gorilla/mux
 github.com/kr/logfmt
 # github.com/matttproud/golang_protobuf_extensions v1.0.1
 github.com/matttproud/golang_protobuf_extensions/pbutil
-# github.com/moov-io/base v0.0.0-20181214235706-7d7561f2f84d
+# github.com/moov-io/base v0.0.0-20181215015100-c67bf567921f
 github.com/moov-io/base
 github.com/moov-io/base/admin
 github.com/moov-io/base/http/bind
