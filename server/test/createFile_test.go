@@ -15,15 +15,16 @@ import (
 )
 
 //
-// TestCreatFile Tests Creating an ACH File From Json
-func TestCreatFile(t *testing.T) {
+// TestCreateFile Tests Creating an ACH File From Json
+func TestCreateFile(t *testing.T) {
 	createFileError := func(path string, msg string) {
 		_, err := os.Open(path)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		bs, err := ioutil.ReadFile("ppd-debit.json")
+		bs, err := ioutil.ReadFile(path)
+
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -60,5 +61,6 @@ func TestCreatFile(t *testing.T) {
 	createFileError("ack-credit.json", "ACK credit zero dollar remittance failed to create")
 	createFileError("adv-debitForCreditsOriginated.json", "ADV debit for credits originated failed to create")
 	createFileError("arc-debit.json", "ARC debit failed to create")
+	createFileError("atx-credit.json", "ATX credit failed to create")
 	createFileError("ppd-debit.json", "PPD debit failed to create")
 }
