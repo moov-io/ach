@@ -1,0 +1,71 @@
+{
+	"id": "BEK457",
+	"fileHeader": {
+		"id": "",
+		"immediateDestination": "076401251",
+		"immediateOrigin": "076401251",
+		"fileCreationDate": "2008-07-29T00:00:00Z",
+		"fileCreationTime": "0000-01-01T15:11:00Z",
+		"fileIDModifier": "A",
+		"immediateDestinationName": "achdestname",
+		"immediateOriginName": "companyname"
+	},
+	"batches": [{
+		"batchHeader": {
+			"id": "",
+			"serviceClassCode": 225,
+			"companyName": "companyname",
+			"companyIdentification": "origid",
+			"standardEntryClassCode": "PPD",
+			"companyEntryDescription": "CHECKPAYMT",
+			"companyDescriptiveDate": "000002",
+			"effectiveEntryDate": "2008-07-30T00:00:00Z",
+			"originatorStatusCode": 1,
+			"ODFIIdentification": "07640125",
+			"batchNumber": 1
+		},
+		"entryDetails": [{
+			"id": "",
+			"transactionCode": 27,
+			"RDFIIdentification": "05320001",
+			"checkDigit": "9",
+			"DFIAccountNumber": "12345            ",
+			"amount": 10500,
+			"identificationNumber": "c-1            ",
+			"individualName": "Bachman Eric          ",
+			"discretionaryData": "DD",
+			"traceNumber": "076401255655291"
+		}],
+		"batchControl": {
+			"id": "",
+			"serviceClassCode": 225,
+			"entryAddendaÇount": 1,
+			"entryHash": 5320001,
+			"totalDebit": 10500,
+			"totalCredit": 0,
+			"companyIdentification": "origid",
+			"ODFIIdentification": "07640125",
+			"batchNumber": 1
+		}
+	}],
+	"IATBatches": null,
+	"fileControl": {
+		"id": "",
+		"batchCount": 1,
+		"blockCount": 1,
+		"entryAddendaCount": 1,
+		"entryHash": 5320001,
+		"totalDebit": 10500,
+		"totalCredit": 0
+	},
+	"fileADVControl": {
+		"id": "",
+		"batchCount": 0,
+		"entryAddendaCount": 0,
+		"entryHash": 0,
+		"totalDebit": 0,
+		"totalCredit": 0
+	},
+	"NotificationOfChange": null,
+	"ReturnEntries": null
+}
