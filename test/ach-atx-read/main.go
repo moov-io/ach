@@ -27,10 +27,6 @@ func main() {
 		fmt.Printf("Could not build file with read properties: %v", err)
 	}
 
-
-	s, err := achFile.ACHFileToJSON()
-	fmt.Println(string(s))
-
 	fmt.Printf("Total Amount Debit: %v \n", achFile.Control.TotalDebitEntryDollarAmountInFile)
 	fmt.Printf("Total Amount Credit: %v \n", achFile.Control.TotalCreditEntryDollarAmountInFile)
 	fmt.Printf("SEC Code: %v \n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
