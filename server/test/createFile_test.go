@@ -57,6 +57,8 @@ func TestCreatFile(t *testing.T) {
 	}
 
 	// test cases
-	createFileError("ppd-debit.json", "PPD Debit failed to create")
-
+	createFileError("ack-credit.json", "ACK credit zero dollar remittance failed to create")
+	createFileError("adv-debitForCreditsOriginated.json", "ADV debit for credits originated failed to create")
+	createFileError("arc-debit.json", "ARC debit failed to create")
+	createFileError("ppd-debit.json", "PPD debit failed to create")
 }

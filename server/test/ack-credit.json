@@ -1,0 +1,80 @@
+{
+	"id": "",
+	"fileHeader": {
+		"id": "",
+		"immediateDestination": "031300012",
+		"immediateOrigin": "231380104",
+		"fileCreationDate": "2018-10-29T00:00:00Z",
+		"fileCreationTime": "0000-01-01T00:00:00Z",
+		"fileIDModifier": "A",
+		"immediateDestinationName": "Federal Reserve Bank",
+		"immediateOriginName": "My Bank Name"
+	},
+	"batches": [{
+		"batchHeader": {
+			"id": "",
+			"serviceClassCode": 220,
+			"companyName": "Name on Account",
+			"companyIdentification": "231380104",
+			"standardEntryClassCode": "ACK",
+			"companyEntryDescription": "Vndr Pay",
+			"effectiveEntryDate": "2018-10-30T00:00:00Z",
+			"ODFIIdentification": "23138010",
+			"batchNumber": 1
+		},
+		"entryDetails": [{
+			"id": "",
+			"transactionCode": 24,
+			"RDFIIdentification": "03130001",
+			"checkDigit": "2",
+			"DFIAccountNumber": "744-5678-99      ",
+			"amount": 0,
+			"identificationNumber": "031300010000001",
+			"individualName": "Best. #1              ",
+			"discretionaryData": "  ",
+			"traceNumber": "231380100000001"
+		}, {
+			"id": "",
+			"transactionCode": 24,
+			"RDFIIdentification": "03130001",
+			"checkDigit": "2",
+			"DFIAccountNumber": "744-5678-99      ",
+			"amount": 0,
+			"identificationNumber": "031300010000002",
+			"individualName": "Best. #1              ",
+			"discretionaryData": "  ",
+			"traceNumber": "231380100000002"
+		}],
+		"batchControl": {
+			"id": "",
+			"serviceClassCode": 220,
+			"entryAddendaÇount": 2,
+			"entryHash": 6260002,
+			"totalDebit": 0,
+			"totalCredit": 0,
+			"companyIdentification": "231380104",
+			"ODFIIdentification": "23138010",
+			"batchNumber": 1
+		}
+	}],
+	"IATBatches": null,
+	"fileControl": {
+		"id": "",
+		"batchCount": 1,
+		"blockCount": 1,
+		"entryAddendaCount": 2,
+		"entryHash": 6260002,
+		"totalDebit": 0,
+		"totalCredit": 0
+	},
+	"fileADVControl": {
+		"id": "",
+		"batchCount": 0,
+		"entryAddendaCount": 0,
+		"entryHash": 0,
+		"totalDebit": 0,
+		"totalCredit": 0
+	},
+	"NotificationOfChange": null,
+	"ReturnEntries": null
+}
