@@ -5,6 +5,7 @@
 package base
 
 import (
+	"errors"
 	"time"
 )
 
@@ -59,6 +60,12 @@ func (t *Time) UnmarshalJSON(data []byte) error {
 		*t = NewTime(tt)
 	}
 	t.Time = tt.Truncate(1 * time.Second) // drop millis
+
+	// Return an error if nothing was parsed.
+	if t.Time.IsZero() {
+		return errors.New("empty date time")
+	}
+
 	return nil
 }
 
