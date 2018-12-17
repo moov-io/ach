@@ -7,6 +7,8 @@ package ach
 import (
 	"testing"
 	"time"
+
+	"github.com/moov-io/base"
 )
 
 // batch should never be used directly.
@@ -57,7 +59,7 @@ func mockBatchInvalidSECHeader() *BatchHeader {
 	bh.CompanyName = "ACME Corporation"
 	bh.CompanyIdentification = "123456789"
 	bh.CompanyEntryDescription = "PAYROLL"
-	bh.EffectiveEntryDate = time.Now()
+	bh.EffectiveEntryDate = base.NewTime(time.Now())
 	bh.ODFIIdentification = "123456789"
 	return bh
 }
@@ -649,7 +651,7 @@ func testIATBatch(t testing.TB) {
 	bh.CompanyName = "ACME Corporation"
 	bh.CompanyIdentification = "123456789"
 	bh.CompanyEntryDescription = "PAYROLL"
-	bh.EffectiveEntryDate = time.Now()
+	bh.EffectiveEntryDate = base.NewTime(time.Now())
 	bh.ODFIIdentification = "123456789"
 
 	_, err := NewBatch(bh)

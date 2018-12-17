@@ -7,7 +7,8 @@ package ach
 import (
 	"fmt"
 	"strings"
-	"time"
+
+	"github.com/moov-io/base"
 )
 
 // When a Return Entry is prepared, the original Company/Batch Header Record, the original Entry Detail Record,
@@ -46,7 +47,7 @@ type Addenda99 struct {
 	// in the Addenda Record of an 98, within an Acknowledgment Entry, or with an RDFI request for a copy of an authorization.
 	OriginalTrace string `json:"originalTrace"`
 	// DateOfDeath The field date of death is to be supplied on Entries being returned for reason of death (return reason codes R14 and R15).
-	DateOfDeath time.Time `json:"dateOfDeath"`
+	DateOfDeath base.Time `json:"dateOfDeath"`
 	// OriginalDFI field contains the Receiving DFI Identification (addenda.RDFIIdentification) as originally included on the forward Entry or Prenotification that the RDFI is returning or correcting.
 	OriginalDFI string `json:"originalDFI"`
 	// AddendaInformation

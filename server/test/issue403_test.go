@@ -26,7 +26,7 @@ func TestIssue403(t *testing.T) {
 		var batch ach.Batch
 		if err := json.NewDecoder(fd).Decode(&batch); err != nil {
 			if !strings.Contains(err.Error(), msg) {
-				t.Errorf("%q doesn't contain expected %q", err.Error(), msg)
+				t.Errorf("(file: %s) %q doesn't contain expected %q", path, err.Error(), msg)
 			}
 		} else {
 			t.Error("expected error, but got none")
@@ -36,5 +36,5 @@ func TestIssue403(t *testing.T) {
 	// test cases
 	expectError("issue403-addenda02.json", "EntryDetail.addenda02")
 	expectError("issue403-amount.json", "field EntryDetail.amount")
-	expectError("issue403-effectiveEntryDate.json", "parsing time")
+	expectError("issue403-effectiveEntryDate.json", "empty date time")
 }
