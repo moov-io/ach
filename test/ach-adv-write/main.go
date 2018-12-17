@@ -1,12 +1,10 @@
 package main
 
 import (
+	"github.com/moov-io/ach"
 	"log"
 	"os"
 	"time"
-
-	"github.com/moov-io/ach"
-	"github.com/moov-io/base"
 )
 
 func main() {
@@ -14,9 +12,9 @@ func main() {
 	// Important: All financial institutions are different and will require registration and exact field values.
 
 	fh := ach.NewFileHeader()
-	fh.ImmediateDestination = "231380104"          // Routing Number of the ACH Operator or receiving point to which the file is being sent
-	fh.ImmediateOrigin = "121042882"               // Routing Number of the ACH Operator or sending point that is sending the file
-	fh.FileCreationDate = base.NewTime(time.Now()) // Today's Date
+	fh.ImmediateDestination = "231380104" // Routing Number of the ACH Operator or receiving point to which the file is being sent
+	fh.ImmediateOrigin = "121042882"      // Routing Number of the ACH Operator or sending point that is sending the file
+	fh.FileCreationDate = time.Now()      // Today's Date
 	fh.ImmediateDestinationName = "Federal Reserve Bank"
 	fh.ImmediateOriginName = "My Bank Name"
 
@@ -27,15 +25,15 @@ func main() {
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = ach.ADV
 	bh.CompanyEntryDescription = "Accounting" // will be on receiving accounts statement
-	bh.EffectiveEntryDate = base.NewTime(time.Now().AddDate(0, 0, 1))
+	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
 	bh.ODFIIdentification = "121042882" // Originating Routing Number
 
 	// Identifies the receivers account information
 	// can be multiple entry's per batch
 	entry := ach.NewADVEntryDetail()
 	// Credit for ACH debits originated
-	entry.TransactionCode = 81 //
-	entry.SetRDFI("231380104") // Receivers bank transit routing number
+	entry.TransactionCode = ach.CreditForDebitsOriginated //
+	entry.SetRDFI("231380104")                            // Receivers bank transit routing number
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 50000
 	entry.AdviceRoutingNumber = "121042882"
@@ -50,8 +48,8 @@ func main() {
 
 	entryOne := ach.NewADVEntryDetail()
 	// Debit for ACH credits originated
-	entryOne.TransactionCode = 82 //
-	entryOne.SetRDFI("231380104") // Receivers bank transit routing number
+	entryOne.TransactionCode = ach.DebitForCreditsOriginated //
+	entryOne.SetRDFI("231380104")                            // Receivers bank transit routing number
 	entryOne.DFIAccountNumber = "744-5678-99"
 	entryOne.Amount = 250000
 	entryOne.AdviceRoutingNumber = "121042882"
