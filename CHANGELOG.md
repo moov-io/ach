@@ -1,5 +1,9 @@
 ## v0.6.0 (Unreleased)
 
+BREAKING CHANGES
+
+- Timestamp values are now returned in ISO 8601 format. (See: [moov-io/base #7](https://github.com/moov-io/base/issues/7))
+
 ADDITIONS
 
 - Add const values for `BatchHeader.StandardEntryClassCode` (See [#392](https://github.com/moov-io/ach/issues/391))
