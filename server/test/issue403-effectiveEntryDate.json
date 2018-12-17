@@ -18,13 +18,13 @@
             "RDFIIdentification": "23138010",
             "checkDigit": "4",
             "DFIAccountNumber": "123456789",
-            "amount": "200000",
+            "amount": 200000,
             "individualName": "Edward James",
             "identificationNumber": "26",
             "discretionaryData": "",
             "addendaRecordIndicator": 0,
             "traceNumber": "",
-            "addenda02": "",
+            "addenda02": null,
             "addenda05": [
                 {
                  "paymentRelatedInformation": "December Payroll"

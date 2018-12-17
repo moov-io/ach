@@ -8,6 +8,8 @@ import (
 	"log"
 	"testing"
 	"time"
+
+	"github.com/moov-io/base"
 )
 
 // mockBatchDNEHeader creates a DNE batch header
@@ -18,7 +20,7 @@ func mockBatchDNEHeader() *BatchHeader {
 	bh.CompanyIdentification = "231380104"
 	bh.StandardEntryClassCode = DNE
 	bh.CompanyEntryDescription = "Death"
-	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1)
+	bh.EffectiveEntryDate = base.NewTime(time.Now().AddDate(0, 0, 1))
 	bh.ODFIIdentification = "23138010"
 	bh.OriginatorStatusCode = 2
 	return bh

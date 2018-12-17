@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/moov-io/ach"
+	"github.com/moov-io/base"
 )
 
 func main() {
@@ -19,7 +20,7 @@ func main() {
 	fh.ImmediateOrigin = "231380104"      // Routing Number of the ACH Operator or sending point that is sending the file
 	fh.ImmediateDestinationName = "Federal Reserve Bank"
 	fh.ImmediateOriginName = "My Bank Name"
-	fh.FileCreationDate = time.Now()
+	fh.FileCreationDate = base.NewTime(time.Now())
 
 	// BatchHeader identifies the originating entity and the type of transactions contained in the batch
 	bh := ach.NewBatchHeader()

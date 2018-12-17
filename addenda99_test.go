@@ -7,6 +7,8 @@ package ach
 import (
 	"testing"
 	"time"
+
+	"github.com/moov-io/base"
 )
 
 func mockAddenda99() *Addenda99 {
@@ -184,7 +186,7 @@ func testAddenda99DateOfDeathField(t testing.TB) {
 		t.Errorf("expected %v received %v", "      ", addenda99.DateOfDeathField())
 	}
 	// Year: 1978 Month: October Day: 23
-	addenda99.DateOfDeath = time.Date(1978, time.October, 23, 0, 0, 0, 0, time.UTC)
+	addenda99.DateOfDeath = base.NewTime(time.Date(1978, time.October, 23, 0, 0, 0, 0, time.UTC))
 	if addenda99.DateOfDeathField() != "781023" {
 		t.Errorf("expected %v received %v", "781023", addenda99.DateOfDeathField())
 	}
