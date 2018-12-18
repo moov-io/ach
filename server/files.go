@@ -7,12 +7,16 @@ package server
 import (
 	"bytes"
 	"context"
+	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/moov-io/ach"
+	"github.com/moov-io/base"
 	moovhttp "github.com/moov-io/base/http"
 
 	"github.com/go-kit/kit/endpoint"
@@ -61,6 +65,14 @@ func createFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.End
 			req.File.ID = NextID()
 		}
 
+		// Reject files with a batch that was supposed to be posted in the past.
+		if err := fileHasOldBatches(req.File); err != nil {
+			return createFileResponse{
+				ID:  req.File.ID,
+				Err: err,
+			}, err
+		}
+
 		err := r.StoreFile(req.File)
 		if req.requestId != "" && logger != nil {
 			logger.Log("files", "createFile", "requestId", req.requestId, "error", err)
@@ -71,6 +83,37 @@ func createFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.End
 			Err: err,
 		}, nil
 	}
+}
+
+func fileHasOldBatches(file *ach.File) error {
+	if file == nil {
+		return errors.New("no ACH file provided")
+	}
+
+	// Get a time.Time for the start of today
+	now := base.Now()
+	y, m, d := now.Date()
+	today := time.Date(y, m, d, 0, 0, 0, 0, now.Location())
+
+	for i := range file.Batches {
+		header := file.Batches[i].GetHeader()
+		if header == nil {
+			continue
+		}
+		if header.EffectiveEntryDate.Before(today) {
+			return fmt.Errorf("file=%s batch=%s has EffectiveEntryDate before today: %v", file.ID, file.Batches[i].ID(), header.EffectiveEntryDate)
+		}
+	}
+	for i := range file.IATBatches {
+		header := file.Batches[i].GetHeader()
+		if header == nil {
+			continue
+		}
+		if header.EffectiveEntryDate.Before(today) {
+			return fmt.Errorf("file=%s IATBatch=%s has EffectiveEntryDate before today: %v", file.ID, file.Batches[i].ID(), header.EffectiveEntryDate)
+		}
+	}
+	return nil
 }
 
 func decodeCreateFileRequest(_ context.Context, request *http.Request) (interface{}, error) {
