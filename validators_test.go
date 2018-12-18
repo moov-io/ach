@@ -5,6 +5,7 @@
 package ach
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -26,6 +27,9 @@ func TestValidators__checkDigit(t *testing.T) {
 		answer := v.CalculateCheckDigit(rtn)
 		if check != answer {
 			t.Errorf("input=%s answer=%d expected=%d", rtn, answer, check)
+		}
+		if err := CheckRoutingNumber(fmt.Sprintf("%s%d", rtn, check)); err != nil && check >= 0 {
+			t.Errorf("input=%s answer=%d expected=%d: %v", rtn, answer, check, err)
 		}
 	}
 }
