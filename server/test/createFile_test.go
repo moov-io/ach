@@ -14,8 +14,8 @@ import (
 	"github.com/moov-io/ach"
 )
 
-//
-// TestCreateFile Tests Creating an ACH File From Json
+// TestCreateFile Tests Creating an ACH File From JSON
+// These tests are not designed to have a failure but can be used as TEST for JSON formatting for an SEC Code
 func TestCreateFile(t *testing.T) {
 	createFileError := func(path string, msg string) {
 		_, err := os.Open(path)
@@ -71,5 +71,6 @@ func TestCreateFile(t *testing.T) {
 	//createFileError("iat-credit.json", "IAT credit failed to create")
 	createFileError("mte-debit.json", "MTE debit failed to create")
 	createFileError("pop-debit.json", "POP debit failed to create")
+	createFileError("pos-debit.json", "POS debit failed to create")
 	createFileError("ppd-debit.json", "PPD debit failed to create")
 }

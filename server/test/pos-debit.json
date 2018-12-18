@@ -1,0 +1,84 @@
+{
+	"id": "",
+	"fileHeader": {
+		"id": "",
+		"immediateDestination": "231380104",
+		"immediateOrigin": "121042882",
+		"fileCreationDate": "2018-06-14T00:00:00Z",
+		"fileCreationTime": "0000-01-01T00:00:00Z",
+		"fileIDModifier": "A",
+		"immediateDestinationName": "Federal Reserve Bank",
+		"immediateOriginName": "My Bank Name"
+	},
+	"batches": [{
+		"batchHeader": {
+			"id": "",
+			"serviceClassCode": 225,
+			"companyName": "Name on Account",
+			"companyIdentification": "121042882",
+			"standardEntryClassCode": "POS",
+			"companyEntryDescription": "REG.SALARY",
+			"effectiveEntryDate": "2018-06-15T00:00:00Z",
+			"ODFIIdentification": "12104288",
+			"batchNumber": 1
+		},
+		"entryDetails": [{
+			"id": "",
+			"transactionCode": 27,
+			"RDFIIdentification": "23138010",
+			"checkDigit": "4",
+			"DFIAccountNumber": "12345678         ",
+			"amount": 100000000,
+			"identificationNumber": "               ",
+			"individualName": "Receiver Account Name ",
+			"discretionaryData": "01",
+			"addendaRecordIndicator": 1,
+			"traceNumber": "121042880000001",
+			"addenda02": {
+				"id": "",
+				"typeCode": "02",
+				"referenceInformationOne": "REFONEA",
+				"referenceInformationTwo": "REF",
+				"terminalIdentificationCode": "TERM02",
+				"transactionSerialNumber": "100049",
+				"transactionDate": "0614",
+				"authorizationCodeOrExpireDate": "123456",
+				"terminalLocation": "Target Store 0049",
+				"terminalCity": "PHILADELPHIA",
+				"terminalState": "PA",
+				"traceNumber": "121042880000001"
+			}
+		}],
+		"batchControl": {
+			"id": "",
+			"serviceClassCode": 225,
+			"entryAddendaÇount": 2,
+			"entryHash": 23138010,
+			"totalDebit": 100000000,
+			"totalCredit": 0,
+			"companyIdentification": "121042882",
+			"ODFIIdentification": "12104288",
+			"batchNumber": 1
+		}
+	}],
+	"IATBatches": null,
+	"fileControl": {
+		"id": "",
+		"batchCount": 1,
+		"blockCount": 1,
+		"entryAddendaCount": 2,
+		"entryHash": 23138010,
+		"totalDebit": 100000000,
+		"totalCredit": 0
+	},
+	"fileADVControl": {
+		"id": "",
+		"batchCount": 0,
+		"entryAddendaCount": 0,
+		"entryHash": 0,
+		"totalDebit": 0,
+		"totalCredit": 0
+	},
+	"NotificationOfChange": null,
+	"ReturnEntries": null
+}
