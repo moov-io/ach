@@ -9,7 +9,7 @@ import (
 
 func main() {
 	// open a file for reading. Any io.Reader Can be used
-	f, err := os.Open("web-debit.ach")
+	f, err := os.Open("web-credit.ach")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -27,7 +27,7 @@ func main() {
 		fmt.Printf("Could not build file with read properties: %v", err)
 	}
 
-	fmt.Printf("Total Amount Debit: %v \n", achFile.Control.TotalDebitEntryDollarAmountInFile)
+	fmt.Printf("Total Amount Credit: %v \n", achFile.Control.TotalCreditEntryDollarAmountInFile)
 	fmt.Printf("SEC Code: %v \n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
 	fmt.Printf("Entry One : %v \n", achFile.Batches[0].GetEntries()[0])
 	fmt.Printf("Entry One Addenda Record Indicator: %v \n", achFile.Batches[0].GetEntries()[0].AddendaRecordIndicator)
