@@ -64,5 +64,10 @@ func TestCreateFile(t *testing.T) {
 	createFileError("atx-credit.json", "ATX credit failed to create")
 	createFileError("boc-debit.json", "BOC debit failed to create")
 	createFileError("ccd-debit.json", "CCD debit failed to create")
+	createFileError("cie-credit.json", "CIE credit failed to create")
+	createFileError("ctx-debit.json", "CTX debit failed to create")
+	createFileError("dne-debit.json", "DNE debit failed to create")
+	createFileError("enr-debit.json", "ENR debit failed to create")
+	createFileError("iat-credit.json", "IAT credit failed to create")
 	createFileError("ppd-debit.json", "PPD debit failed to create")
 }

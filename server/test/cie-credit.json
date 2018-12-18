@@ -1,0 +1,77 @@
+{
+	"id": "",
+	"fileHeader": {
+		"id": "",
+		"immediateDestination": "231380104",
+		"immediateOrigin": "121042882",
+		"fileCreationDate": "2018-06-20T00:00:00Z",
+		"fileCreationTime": "0000-01-01T00:00:00Z",
+		"fileIDModifier": "A",
+		"immediateDestinationName": "Federal Reserve Bank",
+		"immediateOriginName": "My Bank Name"
+	},
+	"batches": [{
+		"batchHeader": {
+			"id": "",
+			"serviceClassCode": 220,
+			"companyName": "Name on Account",
+			"companyIdentification": "121042882",
+			"standardEntryClassCode": "CIE",
+			"companyEntryDescription": "Payment",
+			"effectiveEntryDate": "2018-06-21T00:00:00Z",
+			"ODFIIdentification": "12104288",
+			"batchNumber": 1
+		},
+		"entryDetails": [{
+			"id": "",
+			"transactionCode": 22,
+			"RDFIIdentification": "23138010",
+			"checkDigit": "4",
+			"DFIAccountNumber": "12345678         ",
+			"amount": 100000000,
+			"identificationNumber": "               ",
+			"individualName": "Receiver Account Name ",
+			"discretionaryData": "01",
+			"addendaRecordIndicator": 1,
+			"traceNumber": "121042880000001",
+			"addenda05": [{
+				"id": "",
+				"typeCode": "05",
+				"paymentRelatedInformation": "Credit Store Account",
+				"sequenceNumber": 1,
+				"entryDetailSequenceNumber": 1
+			}]
+		}],
+		"batchControl": {
+			"id": "",
+			"serviceClassCode": 220,
+			"entryAddendaÇount": 2,
+			"entryHash": 23138010,
+			"totalDebit": 0,
+			"totalCredit": 100000000,
+			"companyIdentification": "121042882",
+			"ODFIIdentification": "12104288",
+			"batchNumber": 1
+		}
+	}],
+	"IATBatches": null,
+	"fileControl": {
+		"id": "",
+		"batchCount": 1,
+		"blockCount": 1,
+		"entryAddendaCount": 2,
+		"entryHash": 23138010,
+		"totalDebit": 0,
+		"totalCredit": 100000000
+	},
+	"fileADVControl": {
+		"id": "",
+		"batchCount": 0,
+		"entryAddendaCount": 0,
+		"entryHash": 0,
+		"totalDebit": 0,
+		"totalCredit": 0
+	},
+	"NotificationOfChange": null,
+	"ReturnEntries": null
+}
