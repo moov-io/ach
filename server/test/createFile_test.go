@@ -56,7 +56,6 @@ func TestCreateFile(t *testing.T) {
 		}
 
 	}
-
 	// test cases
 	createFileError("ack-credit.json", "ACK credit zero dollar remittance failed to create")
 	createFileError("adv-debitForCreditsOriginated.json", "ADV debit for credits originated failed to create")
@@ -68,7 +67,7 @@ func TestCreateFile(t *testing.T) {
 	createFileError("ctx-debit.json", "CTX debit failed to create")
 	createFileError("dne-debit.json", "DNE debit failed to create")
 	//createFileError("enr-debit.json", "ENR debit failed to create")
-	//createFileError("iat-credit.json", "IAT credit failed to create")
+	createFileError("iat-credit.json", "IAT credit failed to create")
 	createFileError("mte-debit.json", "MTE debit failed to create")
 	createFileError("pop-debit.json", "POP debit failed to create")
 	createFileError("pos-debit.json", "POS debit failed to create")

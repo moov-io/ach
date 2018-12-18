@@ -171,6 +171,7 @@ func (f *File) ACHFileToJSON() ([]byte, error) {
 	fileJSON := File{
 		Header:     f.Header,
 		Batches:    f.Batches,
+		IATBatches: f.IATBatches,
 		Control:    f.Control,
 		ADVControl: f.ADVControl,
 	}
@@ -182,16 +183,22 @@ type batchesJSON struct {
 	Batches []*Batch `json:"batches"`
 }
 
+type iatBatchesJSON struct {
+	IATBatches []IATBatch `json:"iatBatches"`
+}
+
 // setBatchesFromJson takes bs as JSON and attempts to read out all the Batches within.
 //
 // We have to break this out as Batcher is an interface (and can't be read by Go's
 // json struct tag decoding).
 func (f *File) setBatchesFromJSON(bs []byte) error {
 	var batches batchesJSON
+	var iatBatches iatBatchesJSON
+
 	if err := json.Unmarshal(bs, &batches); err != nil {
 		return err
 	}
-	// Clear out any nil batchess
+	// Clear out any nil batches
 	for i := range f.Batches {
 		if f.Batches[i] == nil {
 			f.Batches = append(f.Batches[:i], f.Batches[i+1:]...)
@@ -207,6 +214,22 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 		}
 		f.Batches = append(f.Batches, batches.Batches[i])
 	}
+
+	if err := json.Unmarshal(bs, &iatBatches); err != nil {
+		return err
+	}
+
+	// Add new iatBatches to file
+	for i := range iatBatches.IATBatches {
+		if len(iatBatches.IATBatches) == 0 {
+			continue
+		}
+		if err := iatBatches.IATBatches[i].build(); err != nil {
+			return fmt.Errorf("batch %s: %v", iatBatches.IATBatches[i].Header.ID, err)
+		}
+		f.IATBatches = append(f.IATBatches, iatBatches.IATBatches[i])
+	}
+
 	return nil
 }
 
