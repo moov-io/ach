@@ -54,7 +54,6 @@ func TestCreateFile(t *testing.T) {
 		if err == server.ErrNotFound {
 			t.Errorf("expected %s received %s w/ error %s", "ErrNotFound", getFile.ID, err)
 		}
-
 	}
 	// test cases
 	createFileError("ack-credit.json", "ACK credit zero dollar remittance failed to create")
@@ -66,7 +65,7 @@ func TestCreateFile(t *testing.T) {
 	createFileError("cie-credit.json", "CIE credit failed to create")
 	createFileError("ctx-debit.json", "CTX debit failed to create")
 	createFileError("dne-debit.json", "DNE debit failed to create")
-	//createFileError("enr-debit.json", "ENR debit failed to create")
+	createFileError("enr-debit.json", "ENR debit failed to create")
 	createFileError("iat-credit.json", "IAT credit failed to create")
 	createFileError("mte-debit.json", "MTE debit failed to create")
 	createFileError("pop-debit.json", "POP debit failed to create")
