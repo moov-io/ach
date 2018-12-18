@@ -454,6 +454,25 @@ func (v *validator) CalculateCheckDigit(routingNumber string) int {
 	return v.roundUp10(sum) - sum
 }
 
+// CheckRoutingNumber returns a nil error if the provided routingNumber is valid according to
+// NACHA rules. See CalculateCheckDigit for details on computing the check digit.
+func CheckRoutingNumber(routingNumber string) error {
+	if routingNumber == "" {
+		return errors.New("no routing number provided")
+	}
+	if n := utf8.RuneCountInString(routingNumber); n != 9 {
+		return fmt.Errorf("invalid routing number length of %d", n)
+	}
+
+	v := new(validator)
+	check := fmt.Sprintf("%d", v.CalculateCheckDigit(routingNumber))
+	last := string(routingNumber[len(routingNumber)-1])
+	if check != last {
+		return fmt.Errorf("routing number checksum mismatch: expected %s but got %s", check, last)
+	}
+	return nil
+}
+
 // roundUp10 round number up to the next ten spot.
 func (v *validator) roundUp10(n int) int {
 	return int(math.Ceil(float64(n)/10.0)) * 10
