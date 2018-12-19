@@ -4,7 +4,7 @@
 		"id": "",
 		"immediateDestination": "031300012",
 		"immediateOrigin": "231380104",
-		"fileCreationDate": "2018-11-26T00:00:00Z",
+		"fileCreationDate": "2018-12-18T00:00:00Z",
 		"fileCreationTime": "0000-01-01T00:00:00Z",
 		"fileIDModifier": "A",
 		"immediateDestinationName": "Federal Reserve Bank",
@@ -18,7 +18,7 @@
 			"companyIdentification": "231380104",
 			"standardEntryClassCode": "MTE",
 			"companyEntryDescription": "CASH WITHD",
-			"effectiveEntryDate": "2018-11-26T00:00:00Z",
+			"effectiveEntryDate": "2018-12-19T00:00:00Z",
 			"ODFIIdentification": "23138010",
 			"batchNumber": 1
 		},

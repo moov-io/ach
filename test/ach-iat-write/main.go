@@ -34,6 +34,7 @@ func main() {
 	bh.ISOOriginatingCurrencyCode = "CAD"
 	bh.ISODestinationCurrencyCode = "USD"
 	bh.ODFIIdentification = "23138010"
+	bh.EffectiveEntryDate = base.NewTime(time.Now().AddDate(0, 0, 1))
 
 	// Identifies the receivers account information
 	// can be multiple entry's per batch
