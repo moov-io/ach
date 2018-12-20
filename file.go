@@ -79,10 +79,6 @@ func NewFile() *File {
 
 type file struct {
 	ID string `json:"id"`
-
-	// TODO(adam): support other JSON attributes
-	// NotificationOfChange []*BatchCOR
-	// ReturnEntries []Batcher
 }
 
 type fileHeader struct {
