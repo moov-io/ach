@@ -5,6 +5,10 @@
 package ach
 
 import (
+	"encoding/json"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -62,6 +66,38 @@ func mockBatchInvalidSECHeader() *BatchHeader {
 	bh.EffectiveEntryDate = base.NewTime(time.Now())
 	bh.ODFIIdentification = "123456789"
 	return bh
+}
+
+// TestBatch__UnmarshalJSON reads an example File (with Batches) and attempts to unmarshal it as JSON
+func TestBatch__UnmarshalJSON(t *testing.T) {
+	// Make sure we don't panic with nil in the mix
+	var batch *Batch
+	if err := batch.UnmarshalJSON(nil); err != nil && !strings.Contains(err.Error(), "unexpected end of JSON input") {
+		t.Fatal(err)
+	}
+
+	// Read file, convert to JSON
+	fd, err := os.Open(filepath.Join("test", "ach-pos-read", "pos-debit.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	f, err := NewReader(fd).Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+	bs, err := json.Marshal(f)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Read as JSON
+	file, err := FileFromJSON(bs)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if file == nil {
+		t.Error("file == nil")
+	}
 }
 
 // Test cases that apply to all batch types
