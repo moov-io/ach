@@ -60,7 +60,7 @@ func TestCreateJSONFromACHFiles(t *testing.T) {
 
 		fmt.Printf("JSON Output: %v \r\n", string(bs))
 
-		fmt.Printf("Validating JSON byte stream %v created \r\n", file.jsonName)
+		fmt.Printf("Validating JSON byte stream %v \r\n", file.jsonName)
 
 		// Create ACH File from JSON
 		file, err := ach.FileFromJSON(bs)
