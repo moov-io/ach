@@ -17,7 +17,7 @@ clean:
 	@rm -rf tmp/
 
 docker: clean
-	docker build -t moov/ach:$(VERSION) -f Dockerfile .
+	docker build --pull -t moov/ach:$(VERSION) -f Dockerfile .
 	docker tag moov/ach:$(VERSION) moov/ach:latest
 
 release: docker generate AUTHORS
@@ -37,5 +37,5 @@ AUTHORS:
 
 .PHONY: fuzz
 fuzz:
-	docker build -t moov/achfuzz:latest . -f Dockerfile-fuzz
+	docker build --pull -t moov/achfuzz:latest . -f Dockerfile-fuzz
 	docker run moov/achfuzz:latest
