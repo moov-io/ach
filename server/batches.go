@@ -34,7 +34,14 @@ func (r createBatchResponse) error() error { return r.Err }
 
 func createBatchEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(createBatchRequest)
+		req, ok := request.(createBatchRequest)
+		if !ok {
+			err := errors.New("invalid request")
+			return createBatchResponse{
+				Err: err,
+			}, err
+		}
+
 		id, err := s.CreateBatch(req.FileID, req.Batch)
 
 		if req.requestId != "" && logger != nil {
@@ -99,7 +106,14 @@ func decodeGetBatchesRequest(_ context.Context, r *http.Request) (interface{}, e
 
 func getBatchesEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(getBatchesRequest)
+		req, ok := request.(getBatchesRequest)
+		if !ok {
+			err := errors.New("invalid request")
+			return getBatchesResponse{
+				Err: err,
+			}, err
+		}
+
 		if req.requestId != "" && logger != nil {
 			logger.Log("batches", "getBatches", "file", req.fileID, "requestId", req.requestId)
 		}
@@ -145,7 +159,14 @@ func decodeGetBatchRequest(_ context.Context, r *http.Request) (interface{}, err
 
 func getBatchEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(getBatchRequest)
+		req, ok := request.(getBatchRequest)
+		if !ok {
+			err := errors.New("invalid request")
+			return getBatchResponse{
+				Err: err,
+			}, err
+		}
+
 		batch, err := s.GetBatch(req.fileID, req.batchID)
 
 		if req.requestId != "" && logger != nil {
@@ -193,7 +214,14 @@ func decodeDeleteBatchRequest(_ context.Context, r *http.Request) (interface{}, 
 
 func deleteBatchEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(deleteBatchRequest)
+		req, ok := request.(deleteBatchRequest)
+		if !ok {
+			err := errors.New("invalid request")
+			return deleteBatchResponse{
+				Err: err,
+			}, err
+		}
+
 		err := s.DeleteBatch(req.fileID, req.batchID)
 
 		if req.requestId != "" && logger != nil {
