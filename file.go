@@ -168,14 +168,14 @@ func (f *File) UnmarshalJSON(p []byte) error {
 
 // ACHFileToJSON returns an ACH file in JSON format from ACH.File.
 func (f *File) ACHFileToJSON() ([]byte, error) {
-	fileJSON := File{
+	/*	fileJSON := File{
 		Header:     f.Header,
 		Batches:    f.Batches,
 		IATBatches: f.IATBatches,
 		Control:    f.Control,
 		ADVControl: f.ADVControl,
-	}
-	JSONFile, err := json.Marshal(fileJSON)
+	}*/
+	JSONFile, err := json.Marshal(f)
 	return JSONFile, err
 }
 

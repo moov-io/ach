@@ -51,6 +51,10 @@ func (batch *IATBatch) UnmarshalJSON(p []byte) error {
 	batch.Header = NewIATBatchHeader()
 	batch.Control = NewBatchControl()
 
+	if batch == nil {
+		*batch = NewIATBatch(batch.Header)
+	}
+
 	type Alias IATBatch
 	aux := struct {
 		*Alias
