@@ -37,7 +37,7 @@ script:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then test -z $(gofmt -s -l $GOFILES); fi
 - go test ./... -race -coverprofile=coverage.txt -covermode=atomic
 - misspell -error -locale US $GOFILES
-- gocyclo -over 25 $GOFILES
+- gocyclo -over 26 $GOFILES
 - golint -set_exit_status $GOFILES
 - megacheck ./...
 after_success:
