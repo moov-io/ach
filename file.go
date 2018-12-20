@@ -166,19 +166,6 @@ func (f *File) UnmarshalJSON(p []byte) error {
 	return errors.New("json struct tag unmarshal is deprecated, use ach.FileFromJSON instead")
 }
 
-// ACHFileToJSON returns an ACH file in JSON format from ACH.File.
-func (f *File) ACHFileToJSON() ([]byte, error) {
-	/*	fileJSON := File{
-		Header:     f.Header,
-		Batches:    f.Batches,
-		IATBatches: f.IATBatches,
-		Control:    f.Control,
-		ADVControl: f.ADVControl,
-	}*/
-	JSONFile, err := json.Marshal(f)
-	return JSONFile, err
-}
-
 type batchesJSON struct {
 	Batches []*Batch `json:"batches"`
 }
