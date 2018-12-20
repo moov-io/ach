@@ -27,9 +27,11 @@ func main() {
 		fmt.Printf("Could not build file with read properties: %v", err)
 	}
 
-	fmt.Printf("Total Amount Debit: %v \n", achFile.Control.TotalDebitEntryDollarAmountInFile)
+	fmt.Printf("Total File Amount Credit: %v \n", achFile.Control.TotalCreditEntryDollarAmountInFile)
+	fmt.Printf("Total Batch Amount Credit: %v \n", achFile.IATBatches[0].Control.TotalCreditEntryDollarAmount)
 	fmt.Printf("SEC Code: %v \n", achFile.IATBatches[0].GetHeader().StandardEntryClassCode)
 	fmt.Printf("Entry: %v \n", achFile.IATBatches[0].GetEntries()[0])
+	fmt.Printf("Entry Amount: %v \n", achFile.IATBatches[0].GetEntries()[0].Amount)
 	fmt.Printf("Addenda Record Indicator: %v \n", achFile.IATBatches[0].GetEntries()[0].AddendaRecordIndicator)
 	fmt.Printf("Addenda10: %v \n", achFile.IATBatches[0].GetEntries()[0].Addenda10)
 	fmt.Printf("Addenda11: %v \n", achFile.IATBatches[0].GetEntries()[0].Addenda11)

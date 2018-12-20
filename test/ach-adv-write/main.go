@@ -34,8 +34,8 @@ func main() {
 	// can be multiple entry's per batch
 	entry := ach.NewADVEntryDetail()
 	// Credit for ACH debits originated
-	entry.TransactionCode = 81 //
-	entry.SetRDFI("231380104") // Receivers bank transit routing number
+	entry.TransactionCode = ach.CreditForDebitsOriginated //
+	entry.SetRDFI("231380104")                            // Receivers bank transit routing number
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 50000
 	entry.AdviceRoutingNumber = "121042882"
@@ -50,8 +50,8 @@ func main() {
 
 	entryOne := ach.NewADVEntryDetail()
 	// Debit for ACH credits originated
-	entryOne.TransactionCode = 82 //
-	entryOne.SetRDFI("231380104") // Receivers bank transit routing number
+	entryOne.TransactionCode = ach.DebitForCreditsOriginated //
+	entryOne.SetRDFI("231380104")                            // Receivers bank transit routing number
 	entryOne.DFIAccountNumber = "744-5678-99"
 	entryOne.Amount = 250000
 	entryOne.AdviceRoutingNumber = "121042882"

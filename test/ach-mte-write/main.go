@@ -28,9 +28,9 @@ func main() {
 	bh.CompanyName = "Merchant with ATM" // Merchant with the ATM
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = ach.MTE
-	bh.CompanyEntryDescription = "CASH WITHDRAW"     // will be on receiving accounts statement
-	bh.EffectiveEntryDate = base.NewTime(time.Now()) // Date physical money was received
-	bh.ODFIIdentification = "23138010"               // Originating Routing Number
+	bh.CompanyEntryDescription = "CASH WITHDRAW"                      // will be on receiving accounts statement
+	bh.EffectiveEntryDate = base.NewTime(time.Now().AddDate(0, 0, 1)) // Date physical money was received
+	bh.ODFIIdentification = "23138010"                                // Originating Routing Number
 
 	// Identifies the receivers account information
 	// can be multiple entry's per batch

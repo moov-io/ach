@@ -5,6 +5,7 @@
 package ach
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 )
@@ -43,6 +44,27 @@ func NewIATBatch(bh *IATBatchHeader) IATBatch {
 	iatBatch.SetControl(NewBatchControl())
 	iatBatch.SetHeader(bh)
 	return iatBatch
+}
+
+// UnmarshalJSON un-marshals JSOn IATBatch
+func (batch *IATBatch) UnmarshalJSON(p []byte) error {
+	batch.Header = NewIATBatchHeader()
+	batch.Control = NewBatchControl()
+
+	if batch == nil {
+		*batch = NewIATBatch(batch.Header)
+	}
+
+	type Alias IATBatch
+	aux := struct {
+		*Alias
+	}{
+		(*Alias)(batch),
+	}
+	if err := json.Unmarshal(p, &aux); err != nil {
+		return err
+	}
+	return nil
 }
 
 // verify checks basic valid NACHA batch rules. Assumes properly parsed records. This does not mean it is a valid batch as validity is tied to each batch type
