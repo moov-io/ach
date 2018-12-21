@@ -105,9 +105,8 @@ func testBatchADVServiceClassCode(t testing.TB) {
 	mockBatch := mockBatchADV()
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetHeader().ServiceClassCode = 0
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "ServiceClassCode" {
 				t.Errorf("%T: %s", err, err)
 			}
@@ -153,8 +152,7 @@ func TestBatchADVInvalidTransactionCode(t *testing.T) {
 	mockBatch := mockBatchADV()
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetADVEntries()[0].TransactionCode = CheckingCredit
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := 	mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TransactionCode" {
 				t.Errorf("%T: %s", err, err)
