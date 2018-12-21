@@ -103,8 +103,7 @@ func BenchmarkBatchXCKHeader(b *testing.B) {
 // testBatchXCKCreate validates BatchXCK create
 func testBatchXCKCreate(t testing.TB) {
 	mockBatch := mockBatchXCK()
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -126,8 +125,7 @@ func BenchmarkBatchXCKCreate(b *testing.B) {
 func testBatchXCKStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchXCK()
 	mockBatch.Header.StandardEntryClassCode = WEB
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {
 				t.Errorf("%T: %s", err, err)
@@ -183,8 +181,7 @@ func BenchmarkBatchXCKServiceClassCodeEquality(b *testing.B) {
 func testBatchXCKMixedCreditsAndDebits(t testing.TB) {
 	mockBatch := mockBatchXCK()
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
 				t.Errorf("%T: %s", err, err)
@@ -212,8 +209,7 @@ func BenchmarkBatchXCKMixedCreditsAndDebits(b *testing.B) {
 func testBatchXCKCreditsOnly(t testing.TB) {
 	mockBatch := mockBatchXCK()
 	mockBatch.Header.ServiceClassCode = CreditsOnly
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
 				t.Errorf("%T: %s", err, err)
@@ -241,8 +237,7 @@ func BenchmarkBatchXCKCreditsOnly(b *testing.B) {
 func testBatchXCKAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchXCK()
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
 				t.Errorf("%T: %s", err, err)
@@ -329,8 +324,7 @@ func testBatchXCKAddendaCount(t testing.TB) {
 	mockBatch := mockBatchXCK()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Addenda05" {
 				t.Errorf("%T: %s", err, err)
@@ -476,8 +470,7 @@ func TestBatchXCKItemResearchNumber(t *testing.T) {
 func TestBatchXCKAmount(t *testing.T) {
 	mockBatch := mockBatchXCK()
 	mockBatch.Entries[0].Amount = 260000
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Amount" {
 				t.Errorf("%T: %s", err, err)

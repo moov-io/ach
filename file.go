@@ -217,7 +217,13 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 	return nil
 }
 
-// Create creates a valid file and requires that the FileHeader and at least one Batch
+// Create will tabulate and assemble an ACH file into a valid state. This includes
+// setting any posting dates, sequence numbers, counts, and sums.
+//
+// Create requires that the FileHeader and at least one Batch be added to the File.
+//
+// Create implementations are free to modify computable fields in a file and should
+// call the Batch's Validate() function at the end of their execution.
 func (f *File) Create() error {
 	// Requires a valid FileHeader to build FileControl
 	if err := f.Header.Validate(); err != nil {
@@ -322,9 +328,11 @@ func (f *File) SetHeader(h FileHeader) *File {
 	return f
 }
 
-// Validate NACHA rules on the entire batch before being added to a File
+// Validate checks properties of the ACH file to ensure they match NACHA guidelines.
+// This includes computing checksums, totals, and sequence orderings.
+//
+// Validate will never modify the file.
 func (f *File) Validate() error {
-
 	if err := f.Header.Validate(); err != nil {
 		return err
 	}
@@ -347,7 +355,7 @@ func (f *File) Validate() error {
 		return f.isEntryHash(false)
 	}
 
-	//File contains ADV batches BatchADV
+	// File contains ADV batches BatchADV
 
 	// The value of the Batch Count Field is equal to the number of Company/Batch/Header Records in the file.
 	if f.ADVControl.BatchCount != len(f.Batches) {

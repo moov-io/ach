@@ -70,8 +70,7 @@ func BenchmarkBatchPOSHeader(b *testing.B) {
 // testBatchPOSCreate validates BatchPOS create
 func testBatchPOSCreate(t testing.TB) {
 	mockBatch := mockBatchPOS()
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -93,8 +92,7 @@ func BenchmarkBatchPOSCreate(b *testing.B) {
 func testBatchPOSStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchPOS()
 	mockBatch.Header.StandardEntryClassCode = WEB
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {
 				t.Errorf("%T: %s", err, err)
@@ -150,8 +148,7 @@ func BenchmarkBatchPOSServiceClassCodeEquality(b *testing.B) {
 func testBatchPOSMixedCreditsAndDebits(t testing.TB) {
 	mockBatch := mockBatchPOS()
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
 				t.Errorf("%T: %s", err, err)
@@ -179,8 +176,7 @@ func BenchmarkBatchPOSMixedCreditsAndDebits(b *testing.B) {
 func testBatchPOSCreditsOnly(t testing.TB) {
 	mockBatch := mockBatchPOS()
 	mockBatch.Header.ServiceClassCode = CreditsOnly
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
 				t.Errorf("%T: %s", err, err)
@@ -208,8 +204,7 @@ func BenchmarkBatchPOSCreditsOnly(b *testing.B) {
 func testBatchPOSAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchPOS()
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
 				t.Errorf("%T: %s", err, err)
@@ -265,8 +260,7 @@ func BenchmarkBatchPOSTransactionCode(b *testing.B) {
 func testBatchPOSAddendaCount(t testing.TB) {
 	mockBatch := mockBatchPOS()
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Addendum" {
 				t.Errorf("%T: %s", err, err)

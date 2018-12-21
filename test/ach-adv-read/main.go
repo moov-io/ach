@@ -24,8 +24,8 @@ func main() {
 		fmt.Printf("Could not validate entire read file: %v", err)
 	}
 	// If you trust the file but it's formatting is off building will probably resolve the malformed file.
-	if achFile.Create(); err != nil {
-		fmt.Printf("Could not build file with read properties: %v", err)
+	if err := achFile.Create(); err != nil {
+		fmt.Printf("Could not create file with read properties: %v", err)
 	}
 
 	fmt.Printf("Credit Total Amount: %v \n", achFile.ADVControl.TotalCreditEntryDollarAmountInFile)

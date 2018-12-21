@@ -96,8 +96,7 @@ func BenchmarkBatchCTXCreate(b *testing.B) {
 func testBatchCTXStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchCTX()
 	mockBatch.Header.StandardEntryClassCode = WEB
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {
 				t.Errorf("%T: %s", err, err)
@@ -153,8 +152,7 @@ func BenchmarkBatchCTXServiceClassCodeEquality(b *testing.B) {
 func testBatchCTXAddendaCount(t testing.TB) {
 	mockBatch := mockBatchCTX()
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Addendum" {
 				t.Errorf("%T: %s", err, err)
@@ -606,8 +604,7 @@ func TestBatchCTXAddenda02(t *testing.T) {
 	mockBatch := mockBatchCTX()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Addenda02" {
 				t.Errorf("%T: %s", err, err)

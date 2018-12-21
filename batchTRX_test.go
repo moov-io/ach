@@ -130,8 +130,7 @@ func BenchmarkBatchTRXCreate(b *testing.B) {
 func testBatchTRXStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchTRX()
 	mockBatch.Header.StandardEntryClassCode = WEB
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {
 				t.Errorf("%T: %s", err, err)
@@ -187,8 +186,7 @@ func BenchmarkBatchTRXServiceClassCodeEquality(b *testing.B) {
 func testBatchTRXAddendaCount(t testing.TB) {
 	mockBatch := mockBatchTRX()
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Addendum" {
 				t.Errorf("%T: %s", err, err)
@@ -600,8 +598,7 @@ func TestBatchTRXAddendum99(t *testing.T) {
 func testBatchTRXCreditsOnly(t testing.TB) {
 	mockBatch := mockBatchTRX()
 	mockBatch.Header.ServiceClassCode = CreditsOnly
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
 				t.Errorf("%T: %s", err, err)
@@ -629,8 +626,7 @@ func BenchmarkBatchTRXCreditsOnly(b *testing.B) {
 func testBatchTRXAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchTRX()
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
 				t.Errorf("%T: %s", err, err)
@@ -659,8 +655,7 @@ func TestBatchTRXAddenda02(t *testing.T) {
 	mockBatch := mockBatchTRX()
 	mockBatch.Entries[0].Addenda02 = mockAddenda02()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Addenda02" {
 				t.Errorf("%T: %s", err, err)

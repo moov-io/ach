@@ -193,7 +193,9 @@ func BenchmarkFileCreditAmount(b *testing.B) {
 func testFileEntryHash(t testing.TB) {
 	file := mockFilePPD()
 	file.AddBatch(mockBatchPPD())
-	file.Create()
+	if err := file.Create(); err != nil {
+		t.Fatal(err)
+	}
 	file.Control.EntryHash = 63
 	if err := file.Validate(); err != nil {
 		if e, ok := err.(*FileError); ok {
@@ -223,13 +225,29 @@ func BenchmarkFileEntryHash(b *testing.B) {
 func testFileBlockCount10(t testing.TB) {
 	file := NewFile().SetHeader(mockFileHeader())
 	batch := NewBatchPPD(mockBatchPPDHeader())
-	batch.AddEntry(mockEntryDetail())
-	batch.AddEntry(mockEntryDetail())
-	batch.AddEntry(mockEntryDetail())
-	batch.AddEntry(mockEntryDetail())
-	batch.AddEntry(mockEntryDetail())
-	batch.AddEntry(mockEntryDetail())
-	batch.Create()
+
+	ed1 := mockEntryDetail()
+	ed1.SetTraceNumber(mockBatchHeader().ODFIIdentification, 1)
+	batch.AddEntry(ed1)
+	ed2 := mockEntryDetail()
+	ed2.SetTraceNumber(mockBatchHeader().ODFIIdentification, 2)
+	batch.AddEntry(ed2)
+	ed3 := mockEntryDetail()
+	ed3.SetTraceNumber(mockBatchHeader().ODFIIdentification, 3)
+	batch.AddEntry(ed3)
+	ed4 := mockEntryDetail()
+	ed4.SetTraceNumber(mockBatchHeader().ODFIIdentification, 4)
+	batch.AddEntry(ed4)
+	ed5 := mockEntryDetail()
+	ed5.SetTraceNumber(mockBatchHeader().ODFIIdentification, 5)
+	batch.AddEntry(ed5)
+	ed6 := mockEntryDetail()
+	ed6.SetTraceNumber(mockBatchHeader().ODFIIdentification, 6)
+	batch.AddEntry(ed6)
+
+	if err := batch.Create(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
 	file.AddBatch(batch)
 	if err := file.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
@@ -240,8 +258,13 @@ func testFileBlockCount10(t testing.TB) {
 		t.Error("BlockCount on 10 records is not equal to 1")
 	}
 	// make 11th record which should produce BlockCount of 2
-	file.Batches[0].AddEntry(mockEntryDetail())
-	file.Batches[0].Create() // File.Build does not re-build Batches
+	ed7 := mockEntryDetail()
+	ed7.SetTraceNumber(mockBatchHeader().ODFIIdentification, 7)
+	file.Batches[0].AddEntry(ed7)
+
+	if err := file.Batches[0].Create(); err != nil {
+		t.Fatal(err)
+	} // File.Build does not re-build Batches
 	if err := file.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -324,8 +347,9 @@ func testFileNotificationOfChange(t testing.TB) {
 	file.AddBatch(mockBatchPPD())
 	bCOR := mockBatchCOR()
 	file.AddBatch(bCOR)
-	file.Create()
-
+	if err := file.Create(); err != nil {
+		t.Fatal(err)
+	}
 	if file.NotificationOfChange[0] != bCOR {
 		t.Error("BatchCOR added to File.AddBatch should exist in NotificationOfChange")
 	}
@@ -350,6 +374,7 @@ func BenchmarkFileNotificationOfChange(b *testing.B) {
 func testFileReturnEntries(t testing.TB) {
 	// create or copy the entry to be returned record
 	entry := mockEntryDetail()
+	entry.AddendaRecordIndicator = 1
 	// Add the addenda return with appropriate ReturnCode and addenda information
 	entry.Addenda99 = mockAddenda99()
 	entry.Category = CategoryReturn
@@ -366,7 +391,9 @@ func testFileReturnEntries(t testing.TB) {
 	// Add the entry to be returned to the batch
 	batch.AddEntry(entry)
 	// Create the batch
-	batch.Create()
+	if err := batch.Create(); err != nil {
+		t.Fatal(err)
+	}
 	// Add the batch to your file.
 	file := NewFile().SetHeader(mockFileHeader())
 	file.AddBatch(batch)

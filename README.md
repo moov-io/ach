@@ -62,7 +62,7 @@ Examples: [Go](examples/http/main.go) | [Ruby](https://github.com/moov-io/ruby-a
 
 ## Getting Started
 
-- [Running ACH Server](https://docs.moov.io/en/latest/ach-server/)
+- [Running ACH Server](https://docs.moov.io/en/latest/tutorials/ach-server/)
 - [ACH Server metrics](documentation/metrics.md)
 
 ### From Source
