@@ -681,7 +681,9 @@ func BenchmarkIATBatch(b *testing.B) {
 // TestBatchADVInvalidServiceClassCode validates ServiceClassCode
 func TestBatchADVInvalidServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchADV()
-	mockBatch.Create()
+	if err := mockBatch.Create(); err != nil {
+		t.Fatal(err)
+	}
 	mockBatch.ADVControl.ServiceClassCode = CreditsOnly
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -697,7 +699,9 @@ func TestBatchADVInvalidServiceClassCode(t *testing.T) {
 // TestBatchADVInvalidODFIIdentification validates ODFIIdentification
 func TestBatchADVInvalidODFIIdentification(t *testing.T) {
 	mockBatch := mockBatchADV()
-	mockBatch.Create()
+	if err := mockBatch.Create(); err != nil {
+		t.Fatal(err)
+	}
 	mockBatch.ADVControl.ODFIIdentification = "231380104"
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -713,7 +717,9 @@ func TestBatchADVInvalidODFIIdentification(t *testing.T) {
 // TestBatchADVInvalidBatchNumber validates BatchNumber
 func TestBatchADVInvalidBatchNumber(t *testing.T) {
 	mockBatch := mockBatchADV()
-	mockBatch.Create()
+	if err := mockBatch.Create(); err != nil {
+		t.Fatal(err)
+	}
 	mockBatch.ADVControl.BatchNumber = 2
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -729,7 +735,9 @@ func TestBatchADVInvalidBatchNumber(t *testing.T) {
 // TestBatchADVEntryAddendaCount validates EntryAddendaCount
 func TestBatchADVInvalidEntryAddendaCount(t *testing.T) {
 	mockBatch := mockBatchADV()
-	mockBatch.Create()
+	if err := mockBatch.Create(); err != nil {
+		t.Fatal(err)
+	}
 	mockBatch.ADVControl.EntryAddendaCount = CheckingCredit
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -746,7 +754,9 @@ func TestBatchADVInvalidEntryAddendaCount(t *testing.T) {
 func TestBatchADVInvalidTotalDebitEntryDollarAmount(t *testing.T) {
 	mockBatch := mockBatchADV()
 	mockBatch.GetADVEntries()[0].TransactionCode = DebitForCreditsOriginated
-	mockBatch.Create()
+	if err := mockBatch.Create(); err != nil {
+		t.Fatal(err)
+	}
 	mockBatch.ADVControl.TotalDebitEntryDollarAmount = 2200
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -762,7 +772,9 @@ func TestBatchADVInvalidTotalDebitEntryDollarAmount(t *testing.T) {
 // TestBatchADVTotalCreditEntryDollarAmount validates TotalCreditEntryDollarAmount
 func TestBatchADVInvalidTotalCreditEntryDollarAmount(t *testing.T) {
 	mockBatch := mockBatchADV()
-	mockBatch.Create()
+	if err := mockBatch.Create(); err != nil {
+		t.Fatal(err)
+	}
 	mockBatch.ADVControl.TotalCreditEntryDollarAmount = 2200
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
@@ -778,7 +790,9 @@ func TestBatchADVInvalidTotalCreditEntryDollarAmount(t *testing.T) {
 // TestBatchADVEntryHash validates EntryHash
 func TestBatchADVInvalidEntryHash(t *testing.T) {
 	mockBatch := mockBatchADV()
-	mockBatch.Create()
+	if err := mockBatch.Create(); err != nil {
+		t.Fatal(err)
+	}
 	mockBatch.ADVControl.EntryHash = 2200233
 	if err := mockBatch.Validate(); err != nil {
 		if e, ok := err.(*BatchError); ok {
