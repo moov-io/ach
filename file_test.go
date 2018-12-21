@@ -193,7 +193,9 @@ func BenchmarkFileCreditAmount(b *testing.B) {
 func testFileEntryHash(t testing.TB) {
 	file := mockFilePPD()
 	file.AddBatch(mockBatchPPD())
-	file.Create()
+	if err := file.Create(); err != nil {
+		t.Fatal(err)
+	}
 	file.Control.EntryHash = 63
 	if err := file.Validate(); err != nil {
 		if e, ok := err.(*FileError); ok {
@@ -324,8 +326,9 @@ func testFileNotificationOfChange(t testing.TB) {
 	file.AddBatch(mockBatchPPD())
 	bCOR := mockBatchCOR()
 	file.AddBatch(bCOR)
-	file.Create()
-
+	if err := file.Create(); err != nil {
+		t.Fatal(err)
+	}
 	if file.NotificationOfChange[0] != bCOR {
 		t.Error("BatchCOR added to File.AddBatch should exist in NotificationOfChange")
 	}
