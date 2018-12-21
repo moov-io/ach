@@ -151,6 +151,7 @@ func FileFromJSON(bs []byte) (*File, error) {
 	} else {
 		file.ADVControl.BatchCount = len(file.Batches)
 	}
+
 	if err := file.Create(); err != nil {
 		return file, err
 	}
@@ -228,9 +229,10 @@ func (f *File) Create() error {
 	if err := f.Header.Validate(); err != nil {
 		return err
 	}
+
 	// Requires at least one Batch in the new file.
 	if len(f.Batches) <= 0 && len(f.IATBatches) <= 0 {
-		return &FileError{FieldName: "Batches", Value: strconv.Itoa(len(f.Batches)), Msg: "must have []*Batches to be built"}
+		return &FileError{FieldName: "Batches", Value: strconv.Itoa(len(f.Batches)), Msg: "must have []*Batches or []*IATBatches to be built"}
 	}
 
 	if !f.IsADV() {

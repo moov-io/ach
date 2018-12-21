@@ -109,9 +109,11 @@ const (
 )
 
 func (batch *Batch) UnmarshalJSON(p []byte) error {
-	batch.Header = NewBatchHeader()
-	batch.Control = NewBatchControl()
-	batch.ADVControl = NewADVBatchControl()
+	if batch != nil {
+		batch.Header = NewBatchHeader()
+		batch.Control = NewBatchControl()
+		batch.ADVControl = NewADVBatchControl()
+	}
 
 	type Alias Batch
 	aux := struct {
@@ -127,6 +129,10 @@ func (batch *Batch) UnmarshalJSON(p []byte) error {
 
 // NewBatch takes a BatchHeader and returns a matching SEC code batch type that is a batcher. Returns an error if the SEC code is not supported.
 func NewBatch(bh *BatchHeader) (Batcher, error) {
+	if bh == nil {
+		return nil, errors.New("nil BatchHeader provided")
+	}
+
 	switch bh.StandardEntryClassCode {
 	case ACK:
 		return NewBatchACK(bh), nil

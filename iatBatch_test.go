@@ -5,6 +5,9 @@
 package ach
 
 import (
+	"encoding/json"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -125,6 +128,38 @@ func TestMockIATBatch(t *testing.T) {
 	iatBatch := mockIATBatch(t)
 	if err := iatBatch.verify(); err != nil {
 		t.Error("mockIATBatch does not validate and will break other tests")
+	}
+}
+
+// TestIATBatch__UnmarshalJSON reads an example File (with IAT Batches) and attempts to unmarshal it as JSON
+func TestIATBatch__UnmarshalJSON(t *testing.T) {
+	// Make sure we don't panic with nil in the mix
+	var batch *IATBatch
+	if err := batch.UnmarshalJSON(nil); err != nil && !strings.Contains(err.Error(), "unexpected end of JSON input") {
+		t.Fatal(err)
+	}
+
+	// Read file, convert to JSON
+	fd, err := os.Open(filepath.Join("test", "ach-iat-read", "iat-credit.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	f, err := NewReader(fd).Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+	bs, err := json.Marshal(f)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Read as JSON
+	file, err := FileFromJSON(bs)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if file == nil {
+		t.Error("file == nil")
 	}
 }
 

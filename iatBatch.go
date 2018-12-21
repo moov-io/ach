@@ -40,6 +40,10 @@ type IATBatch struct {
 
 // NewIATBatch takes a BatchHeader and returns a matching SEC code batch type that is a batcher. Returns an error if the SEC code is not supported.
 func NewIATBatch(bh *IATBatchHeader) IATBatch {
+	if bh == nil {
+		bh = NewIATBatchHeader()
+	}
+
 	iatBatch := IATBatch{}
 	iatBatch.SetControl(NewBatchControl())
 	iatBatch.SetHeader(bh)
@@ -48,11 +52,12 @@ func NewIATBatch(bh *IATBatchHeader) IATBatch {
 
 // UnmarshalJSON un-marshals JSON IATBatch
 func (batch *IATBatch) UnmarshalJSON(p []byte) error {
-	batch.Header = NewIATBatchHeader()
-	batch.Control = NewBatchControl()
-
 	if batch == nil {
-		*batch = NewIATBatch(batch.Header)
+		b := NewIATBatch(nil)
+		batch = &b
+	} else {
+		batch.Header = NewIATBatchHeader()
+		batch.Control = NewBatchControl()
 	}
 
 	type Alias IATBatch
