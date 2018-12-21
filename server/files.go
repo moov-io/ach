@@ -7,6 +7,7 @@ package server
 import (
 	"bytes"
 	"context"
+	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -49,7 +50,13 @@ func (r createFileResponse) error() error { return r.Err }
 
 func createFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(createFileRequest)
+		req, ok := request.(createFileRequest)
+		if !ok {
+			err := errors.New("invalid request")
+			return createFileResponse{
+				Err: err,
+			}, err
+		}
 
 		// record a metric for files created
 		if req.File != nil && req.File.Header.ImmediateDestination != "" && req.File.Header.ImmediateOrigin != "" {
@@ -149,7 +156,14 @@ func (r getFileResponse) error() error { return r.Err }
 
 func getFileEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(getFileRequest)
+		req, ok := request.(getFileRequest)
+		if !ok {
+			err := errors.New("invalid request")
+			return getFileResponse{
+				Err: err,
+			}, err
+		}
+
 		f, err := s.GetFile(req.ID)
 
 		if req.requestId != "" && logger != nil {
@@ -189,7 +203,14 @@ func (r deleteFileResponse) error() error { return r.Err }
 
 func deleteFileEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(deleteFileRequest)
+		req, ok := request.(deleteFileRequest)
+		if !ok {
+			err := errors.New("invalid request")
+			return deleteFileResponse{
+				Err: err,
+			}, err
+		}
+
 		filesDeleted.Add(1)
 
 		err := s.DeleteFile(req.ID)
@@ -230,7 +251,14 @@ func (v getFileContentsResponse) error() error { return v.Err }
 
 func getFileContentsEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(getFileContentsRequest)
+		req, ok := request.(getFileContentsRequest)
+		if !ok {
+			err := errors.New("invalid request")
+			return getFileContentsResponse{
+				Err: err,
+			}, err
+		}
+
 		r, err := s.GetFileContents(req.ID)
 
 		if req.requestId != "" && logger != nil {
@@ -270,7 +298,14 @@ func (v validateFileResponse) error() error { return v.Err }
 
 func validateFileEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(validateFileRequest)
+		req, ok := request.(validateFileRequest)
+		if !ok {
+			err := errors.New("invalid request")
+			return validateFileResponse{
+				Err: err,
+			}, err
+		}
+
 		err := s.ValidateFile(req.ID)
 
 		if req.requestId != "" && logger != nil {
