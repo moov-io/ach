@@ -103,8 +103,7 @@ func BenchmarkBatchTRCHeader(b *testing.B) {
 // testBatchTRCCreate validates BatchTRC create
 func testBatchTRCCreate(t testing.TB) {
 	mockBatch := mockBatchTRC()
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -126,8 +125,7 @@ func BenchmarkBatchTRCCreate(b *testing.B) {
 func testBatchTRCStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchTRC()
 	mockBatch.Header.StandardEntryClassCode = WEB
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {
 				t.Errorf("%T: %s", err, err)
@@ -183,8 +181,7 @@ func BenchmarkBatchTRCServiceClassCodeEquality(b *testing.B) {
 func testBatchTRCMixedCreditsAndDebits(t testing.TB) {
 	mockBatch := mockBatchTRC()
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
 				t.Errorf("%T: %s", err, err)
@@ -212,8 +209,7 @@ func BenchmarkBatchTRCMixedCreditsAndDebits(b *testing.B) {
 func testBatchTRCCreditsOnly(t testing.TB) {
 	mockBatch := mockBatchTRC()
 	mockBatch.Header.ServiceClassCode = CreditsOnly
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
 				t.Errorf("%T: %s", err, err)
@@ -241,8 +237,7 @@ func BenchmarkBatchTRCCreditsOnly(b *testing.B) {
 func testBatchTRCAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchTRC()
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
 				t.Errorf("%T: %s", err, err)
@@ -329,8 +324,7 @@ func testBatchTRCAddendaCount(t testing.TB) {
 	mockBatch := mockBatchTRC()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Addenda05" {
 				t.Errorf("%T: %s", err, err)

@@ -219,9 +219,8 @@ func testBatchMTEServiceClassCode(t testing.TB) {
 	mockBatch := mockBatchMTE()
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetHeader().ServiceClassCode = 0
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "ServiceClassCode" {
 				t.Errorf("%T: %s", err, err)
 			}
@@ -248,8 +247,7 @@ func BenchmarkBatchMTEServiceClassCode(b *testing.B) {
 func TestBatchMTEAmount(t *testing.T) {
 	mockBatch := mockBatchMTE()
 	mockBatch.GetEntries()[0].Amount = 0
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Amount" {
 				t.Errorf("%T: %s", err, err)
@@ -263,8 +261,7 @@ func TestBatchMTEAmount(t *testing.T) {
 func TestBatchMTETerminaalState(t *testing.T) {
 	mockBatch := mockBatchMTE()
 	mockBatch.GetEntries()[0].Addenda02.TerminalState = "XX"
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TerminalState" {
 				t.Errorf("%T: %s", err, err)
@@ -279,8 +276,7 @@ func TestBatchMTETerminaalState(t *testing.T) {
 func TestBatchMTEIndividualName(t *testing.T) {
 	mockBatch := mockBatchMTE()
 	mockBatch.GetEntries()[0].IndividualName = ""
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "IndividualName" {
 				t.Errorf("%T: %s", err, err)
@@ -297,8 +293,7 @@ func TestBatchMTEIdentificationNumber(t *testing.T) {
 
 	// NACHA rules state MTE records can't be all spaces or all zeros
 	mockBatch.GetEntries()[0].IdentificationNumber = "   "
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "IdentificationNumber" {
 				t.Errorf("%T: %s", err, err)
@@ -309,8 +304,7 @@ func TestBatchMTEIdentificationNumber(t *testing.T) {
 	}
 
 	mockBatch.GetEntries()[0].IdentificationNumber = "000000"
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "IdentificationNumber" {
 				t.Errorf("%T: %s", err, err)
@@ -341,8 +335,7 @@ func TestBatchMTEAddenda05(t *testing.T) {
 	mockBatch := mockBatchMTE()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Addenda05" {
 				t.Errorf("%T: %s", err, err)

@@ -210,8 +210,7 @@ func BenchmarkBatchDNESEC(b *testing.B) {
 func testBatchDNEAddendaCount(t testing.TB) {
 	mockBatch := mockBatchDNE()
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "AddendaCount" {
 				t.Errorf("%T: %s", err, err)
@@ -240,9 +239,8 @@ func testBatchDNEServiceClassCode(t testing.TB) {
 	mockBatch := mockBatchDNE()
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetHeader().ServiceClassCode = 0
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "ServiceClassCode" {
 				t.Errorf("%T: %s", err, err)
 			}
@@ -270,8 +268,7 @@ func TestBatchDNEAmount(t *testing.T) {
 	mockBatch := mockBatchDNE()
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetEntries()[0].Amount = 25000
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Amount" {
 				t.Errorf("%T: %s", err, err)
@@ -286,8 +283,7 @@ func TestBatchDNEAmount(t *testing.T) {
 func TestBatchDNETransactionCode(t *testing.T) {
 	mockBatch := mockBatchDNE()
 	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TransactionCode" {
 				t.Errorf("%T: %s", err, err)

@@ -224,8 +224,7 @@ func BenchmarkBatchCCDSEC(b *testing.B) {
 func testBatchCCDAddendaCount(t testing.TB) {
 	mockBatch := mockBatchCCD()
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "AddendaCount" {
 				t.Errorf("%T: %s", err, err)
@@ -254,9 +253,8 @@ func testBatchCCDCreate(t testing.TB) {
 	mockBatch := mockBatchCCD()
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetHeader().ServiceClassCode = 0
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "ServiceClassCode" {
 				t.Errorf("%T: %s", err, err)
 			}
@@ -324,8 +322,7 @@ func TestBatchCCDAddenda02(t *testing.T) {
 	mockBatch := mockBatchCCD()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Addenda02" {
 				t.Errorf("%T: %s", err, err)
