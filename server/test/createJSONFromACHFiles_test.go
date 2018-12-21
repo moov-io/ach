@@ -35,7 +35,7 @@ func TestCreateJSONFromACHFiles(t *testing.T) {
 			fmt.Printf("Could not validate entire read file: %v", err)
 		}
 		// If you trust the file but it's formatting is off building will probably resolve the malformed file.
-		if achFile.Create(); err != nil {
+		if err := achFile.Create(); err != nil {
 			fmt.Printf("Could not build file with read properties: %v", err)
 		}
 

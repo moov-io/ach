@@ -129,9 +129,8 @@ func testBatchPPDCreate(t testing.TB) {
 	mockBatch := mockBatchPPD()
 	// can not have default values in Batch Header to build batch
 	mockBatch.GetHeader().ServiceClassCode = 0
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
+	if err := mockBatch.Create(); err != nil {
+		if e, ok := err.(*FieldError); ok {
 			if e.FieldName != "ServiceClassCode" {
 				t.Errorf("%T: %s", err, err)
 			}
@@ -161,8 +160,7 @@ func testBatchPPDTypeCode(t testing.TB) {
 	a := mockAddenda05()
 	a.TypeCode = "63"
 	mockBatch.GetEntries()[0].AddAddenda05(a)
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "TypeCode" {
 				t.Errorf("%T: %s", err, err)
@@ -274,8 +272,7 @@ func testBatchPPDAddendaCount(t testing.TB) {
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "AddendaCount" {
 				t.Errorf("%T: %s", err, err)
@@ -372,8 +369,7 @@ func TestBatchPPDAddenda02(t *testing.T) {
 	mockBatch := mockBatchPPD()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Addenda02" {
 				t.Errorf("%T: %s", err, err)

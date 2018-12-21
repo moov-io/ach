@@ -46,7 +46,7 @@ func NewIATBatch(bh *IATBatchHeader) IATBatch {
 	return iatBatch
 }
 
-// UnmarshalJSON un-marshals JSOn IATBatch
+// UnmarshalJSON un-marshals JSON IATBatch
 func (batch *IATBatch) UnmarshalJSON(p []byte) error {
 	batch.Header = NewIATBatchHeader()
 	batch.Control = NewBatchControl()

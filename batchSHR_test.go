@@ -73,8 +73,7 @@ func BenchmarkBatchSHRHeader(b *testing.B) {
 // testBatchSHRCreate validates BatchSHR create
 func testBatchSHRCreate(t testing.TB) {
 	mockBatch := mockBatchSHR()
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -96,8 +95,7 @@ func BenchmarkBatchSHRCreate(b *testing.B) {
 func testBatchSHRStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.Header.StandardEntryClassCode = WEB
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "StandardEntryClassCode" {
 				t.Errorf("%T: %s", err, err)
@@ -153,8 +151,7 @@ func BenchmarkBatchSHRServiceClassCodeEquality(b *testing.B) {
 func testBatchSHRMixedCreditsAndDebits(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
 				t.Errorf("%T: %s", err, err)
@@ -182,8 +179,7 @@ func BenchmarkBatchSHRMixedCreditsAndDebits(b *testing.B) {
 func testBatchSHRCreditsOnly(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.Header.ServiceClassCode = CreditsOnly
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
 				t.Errorf("%T: %s", err, err)
@@ -211,8 +207,7 @@ func BenchmarkBatchSHRCreditsOnly(b *testing.B) {
 func testBatchSHRAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
 				t.Errorf("%T: %s", err, err)
@@ -268,8 +263,7 @@ func BenchmarkBatchSHRTransactionCode(b *testing.B) {
 func testBatchSHRAddendaCount(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
-	mockBatch.Create()
-	if err := mockBatch.Validate(); err != nil {
+	if err := mockBatch.Create(); err != nil {
 		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "Addendum" {
 				t.Errorf("%T: %s", err, err)

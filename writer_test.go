@@ -19,7 +19,9 @@ func testPPDWrite(t testing.TB) {
 	batch := NewBatchPPD(mockBatchPPDHeader())
 	batch.SetHeader(mockBatchHeader())
 	batch.AddEntry(entry)
-	batch.Create()
+	if err := batch.Create(); err != nil {
+		t.Fatal(err)
+	}
 	file.AddBatch(batch)
 
 	if err := file.Create(); err != nil {
@@ -68,7 +70,9 @@ func testFileWriteErr(t testing.TB) {
 	batch := NewBatchPPD(mockBatchPPDHeader())
 	batch.SetHeader(mockBatchHeader())
 	batch.AddEntry(entry)
-	batch.Create()
+	if err := batch.Create(); err != nil {
+		t.Fatal(err)
+	}
 	if err := batch.Validate(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -130,7 +134,9 @@ func testIATWrite(t testing.TB) {
 	iatBatch.Entries[0].AddAddenda18(mockAddenda18C())
 	iatBatch.Entries[0].AddAddenda18(mockAddenda18D())
 	iatBatch.Entries[0].AddAddenda18(mockAddenda18E())
-	iatBatch.Create()
+	if err := iatBatch.Create(); err != nil {
+		t.Fatal(err)
+	}
 	file.AddIATBatch(iatBatch)
 
 	iatBatch2 := IATBatch{}
@@ -152,7 +158,9 @@ func testIATWrite(t testing.TB) {
 	iatBatch2.Entries[0].AddAddenda18(mockAddenda18C())
 	iatBatch2.Entries[0].AddAddenda18(mockAddenda18D())
 	iatBatch2.Entries[0].AddAddenda18(mockAddenda18E())
-	iatBatch2.Create()
+	if err := iatBatch2.Create(); err != nil {
+		t.Fatal(err)
+	}
 	file.AddIATBatch(iatBatch2)
 
 	if err := file.Create(); err != nil {
@@ -209,7 +217,9 @@ func testPPDIATWrite(t testing.TB) {
 	batch := NewBatchPPD(mockBatchPPDHeader())
 	batch.SetHeader(mockBatchHeader())
 	batch.AddEntry(entry)
-	batch.Create()
+	if err := batch.Create(); err != nil {
+		t.Fatal(err)
+	}
 	file.AddBatch(batch)
 
 	iatBatch := IATBatch{}
@@ -229,7 +239,9 @@ func testPPDIATWrite(t testing.TB) {
 	iatBatch.Entries[0].AddAddenda18(mockAddenda18C())
 	iatBatch.Entries[0].AddAddenda18(mockAddenda18D())
 	iatBatch.Entries[0].AddAddenda18(mockAddenda18E())
-	iatBatch.Create()
+	if err := iatBatch.Create(); err != nil {
+		t.Fatal(err)
+	}
 	file.AddIATBatch(iatBatch)
 
 	iatBatch2 := IATBatch{}
@@ -251,7 +263,9 @@ func testPPDIATWrite(t testing.TB) {
 	iatBatch2.Entries[0].AddAddenda18(mockAddenda18C())
 	iatBatch2.Entries[0].AddAddenda18(mockAddenda18D())
 	iatBatch2.Entries[0].AddAddenda18(mockAddenda18E())
-	iatBatch2.Create()
+	if err := iatBatch2.Create(); err != nil {
+		t.Fatal(err)
+	}
 	file.AddIATBatch(iatBatch2)
 
 	if err := file.Create(); err != nil {
@@ -313,7 +327,9 @@ func testIATReturn(t testing.TB) {
 	iatBatch.Entries[0].Addenda16 = mockAddenda16()
 	iatBatch.Entries[0].Addenda99 = mockIATAddenda99()
 	iatBatch.Entries[0].Category = CategoryReturn
-	iatBatch.Create()
+	if err := iatBatch.Create(); err != nil {
+		t.Fatal(err)
+	}
 	file.AddIATBatch(iatBatch)
 
 	if err := file.Create(); err != nil {
@@ -368,7 +384,9 @@ func TestADVWrite(t *testing.T) {
 	batch := NewBatchADV(mockBatchADVHeader())
 	batch.SetHeader(mockBatchADVHeader())
 	batch.AddADVEntry(entry)
-	batch.Create()
+	if err := batch.Create(); err != nil {
+		t.Fatal(err)
+	}
 	file.AddBatch(batch)
 
 	if err := file.Create(); err != nil {
@@ -405,7 +423,9 @@ func TestPOSWrite(t *testing.T) {
 	batch := NewBatchPOS(posHeader)
 	batch.SetHeader(posHeader)
 	batch.AddEntry(entry)
-	batch.Create()
+	if err := batch.Create(); err != nil {
+		t.Fatal(err)
+	}
 	file.AddBatch(batch)
 
 	if err := file.Create(); err != nil {
@@ -443,7 +463,9 @@ func TestPOSReturnWrite(t *testing.T) {
 	batch := NewBatchPOS(posHeader)
 	batch.SetHeader(posHeader)
 	batch.AddEntry(entry)
-	batch.Create()
+	if err := batch.Create(); err != nil {
+		t.Fatal(err)
+	}
 	file.AddBatch(batch)
 
 	if err := file.Create(); err != nil {
@@ -501,7 +523,9 @@ func TestPOSDishonoredReturnWrite(t *testing.T) {
 	batch := NewBatchPOS(posHeader)
 	batch.SetHeader(posHeader)
 	batch.AddEntry(entry)
-	batch.Create()
+	if err := batch.Create(); err != nil {
+		t.Fatal(err)
+	}
 	file.AddBatch(batch)
 
 	if err := file.Create(); err != nil {
@@ -539,7 +563,9 @@ func TestNOCWrite(t *testing.T) {
 	batch := NewBatchCOR(corHeader)
 	batch.SetHeader(corHeader)
 	batch.AddEntry(entry)
-	batch.Create()
+	if err := batch.Create(); err != nil {
+		t.Fatal(err)
+	}
 	file.AddBatch(batch)
 
 	if err := file.Create(); err != nil {
@@ -577,7 +603,9 @@ func TestADVReturnWrite(t *testing.T) {
 	batch := NewBatchADV(advHeader)
 	batch.SetHeader(advHeader)
 	batch.AddADVEntry(entry)
-	batch.Create()
+	if err := batch.Create(); err != nil {
+		t.Fatal(err)
+	}
 	file.AddBatch(batch)
 
 	if err := file.Create(); err != nil {
