@@ -1668,7 +1668,9 @@ func TestADVReturnError(t *testing.T) {
 	batch := NewBatchADV(advHeader)
 	batch.SetHeader(advHeader)
 	batch.AddADVEntry(entry)
-	batch.Create()
+	if err := batch.Create(); err != nil {
+		t.Fatal(err)
+	}
 	file.AddBatch(batch)
 
 	if err := file.Create(); err != nil {

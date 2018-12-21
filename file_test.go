@@ -258,8 +258,13 @@ func testFileBlockCount10(t testing.TB) {
 		t.Error("BlockCount on 10 records is not equal to 1")
 	}
 	// make 11th record which should produce BlockCount of 2
-	file.Batches[0].AddEntry(mockEntryDetail())
-	file.Batches[0].Create() // File.Build does not re-build Batches
+	ed7 := mockEntryDetail()
+	ed7.SetTraceNumber(mockBatchHeader().ODFIIdentification, 7)
+	file.Batches[0].AddEntry(ed7)
+
+	if err := file.Batches[0].Create(); err != nil {
+		t.Fatal(err)
+	} // File.Build does not re-build Batches
 	if err := file.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}

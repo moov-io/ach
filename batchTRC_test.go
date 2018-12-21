@@ -466,12 +466,13 @@ func TestBatchTRCItemResearchNumber(t *testing.T) {
 	}
 }
 
-// TestBatchTRCItemTypeIndicator returns an error if ItemTypeIndicator is 01.
+// TestBatchTRCItemTypeIndicator returns an error if ItemTypeIndicator is not 01.
 func TestBatchTRCItemTypeIndicator(t *testing.T) {
 	mockBatch := NewBatchTRC(mockBatchTRCHeader())
 	mockBatch.AddEntry(mockTRCEntryDetail())
-	mockBatch.Create()
-
+	if err := mockBatch.Create(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
 	if mockBatch.GetEntries()[0].ItemTypeIndicator() != "01" {
 		t.Error("ItemTypeIndicator does not validate")
 	}
