@@ -16,6 +16,7 @@ BUG FIXES
 
 - Accept File's without an ID specified. Generate a random ID. (See: [#405](https://github.com/moov-io/ach/pull/405))
 - server: Fix nil panics. (See: [#406](https://github.com/moov-io/ach/pull/406))
+- server: Fix type-casting panics. (See: [#423](https://github.com/moov-io/ach/pull/423))
 
 ## v0.5.0 (Released 2018-11-29)
 
