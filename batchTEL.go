@@ -52,7 +52,11 @@ func (batch *BatchTEL) Validate() error {
 	return nil
 }
 
-// Create builds the batch sequence numbers and batch control. Additional creation
+// Create will tabulate and assemble an ACH batch into a valid state. This includes
+// setting any posting dates, sequence numbers, counts, and sums.
+//
+// Create implementations are free to modify computable fields in a file and should
+// call the Batch's Validate() function at the end of their execution.
 func (batch *BatchTEL) Create() error {
 	// generates sequence numbers and batch control
 	if err := batch.build(); err != nil {

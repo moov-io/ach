@@ -102,7 +102,10 @@ To support the Batcher interface you must add the following functions that are n
 Validate is designed to enforce the NACHA rules for the MTE payment type. Validate is run after a batch of this type is read from a file. If you are creating a batch from code call validate afterwards.
 
 ```go
-// Validate checks valid NACHA batch rules. Assumes properly parsed records.
+// Validate checks properties of the ACH batch to ensure they match NACHA guidelines.
+// This includes computing checksums, totals, and sequence orderings.
+//
+// Validate will never modify the batch.
 func (batch *BatchMTE) Validate() error {
 	// basic verification of the batch before we validate specific rules.
 	if err := batch.verify(); err != nil {
@@ -118,7 +121,11 @@ func (batch *BatchMTE) Validate() error {
 Create takes the Batch Header and Entry details and creates the proper sequence number and batch control. If additional logic specific to the SEC type is required it building a batch file it should be added here.
 
 ```go
-// Create takes Batch Header and Entries and builds a valid batch
+// Create will tabulate and assemble an ACH batch into a valid state. This includes
+// setting any posting dates, sequence numbers, counts, and sums.
+//
+// Create implementations are free to modify computable fields in a file and should
+// call the Batch's Validate() function at the end of their execution.
 func (batch *BatchMTE) Create() error {
 	// generates sequence numbers and batch control
 	if err := batch.build(); err != nil {
