@@ -25,7 +25,7 @@ var (
 
 	// ErrBadRouting is returned when an expected path variable is missing, which is always programmer error.
 	ErrBadRouting = fmt.Errorf("inconsistent mapping between route and handler, %s", bugReportHelp)
-	ErrFoundABug  = fmt.Errorf("Snuck into encodeError with err == nil, %s", bugReportHelp)
+	ErrFoundABug  = fmt.Errorf("snuck into encodeError with err == nil, %s", bugReportHelp)
 )
 
 // contextKey is a unique (and compariable) type we use

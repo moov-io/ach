@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	ErrNotFound      = errors.New("Not Found")
-	ErrAlreadyExists = errors.New("Already Exists")
+	ErrNotFound      = errors.New("not found")
+	ErrAlreadyExists = errors.New("already exists")
 )
 
 // Service is a REST interface for interacting with ACH file structures

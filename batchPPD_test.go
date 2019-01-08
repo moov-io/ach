@@ -65,6 +65,19 @@ func mockPPDEntryDetail2() *EntryDetail {
 	return entry
 }
 
+// mockPPDEntryDetailNOC creates a PPD Entry Detail
+func mockPPDEntryDetailNOC() *EntryDetail {
+	entry := NewEntryDetail()
+	entry.TransactionCode = CheckingCredit
+	entry.SetRDFI("231380104")
+	entry.DFIAccountNumber = "123456789"
+	entry.Amount = 100000000
+	entry.IndividualName = "Wade Arnold"
+	entry.SetTraceNumber(mockBatchPPDHeader().ODFIIdentification, 1)
+	entry.Category = CategoryNOC
+	return entry
+}
+
 // mockBatchPPD creates a PPD batch
 func mockBatchPPD() *BatchPPD {
 	mockBatch := NewBatchPPD(mockBatchPPDHeader())
