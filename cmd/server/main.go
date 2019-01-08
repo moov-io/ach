@@ -69,7 +69,15 @@ func main() {
 	logger.Log("startup", fmt.Sprintf("Starting ach server version %s", ach.Version))
 
 	// Setup underlying ach service
-	r := server.NewRepositoryInMemory()
+	var achFileTTL time.Duration
+	if v := os.Getenv("ACH_FILE_TTL"); v != "" {
+		dur, err := time.ParseDuration(v)
+		if err == nil {
+			achFileTTL = dur
+			logger.Log("main", fmt.Sprintf("Using %v as ach.File TTL", achFileTTL))
+		}
+	}
+	r := server.NewRepositoryInMemory(achFileTTL)
 	svc = server.NewService(r)
 
 	// Create HTTP server

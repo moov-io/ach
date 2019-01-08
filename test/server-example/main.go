@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/moov-io/ach/server"
 
@@ -17,7 +18,7 @@ import (
 
 func TestServer__CreateFile(t *testing.T) {
 	// Local server setup - usually ach would be running on another machine.
-	repo := server.NewRepositoryInMemory()
+	repo := server.NewRepositoryInMemory(24 * time.Hour)
 	service := server.NewService(repo)
 	logger := log.NewLogfmtLogger(os.Stderr)
 	handler := server.MakeHTTPHandler(service, repo, logger)
