@@ -31,6 +31,7 @@ func main() {
 	bh.CompanyEntryDescription = "REG.SALARY" // will be on receiving accounts statement
 	// Same Day ACH
 	bh.EffectiveEntryDate = base.NewTime(time.Now())
+	bh.CompanyDescriptiveDate = "SD1300"
 	bh.ODFIIdentification = "121042882" // Originating Routing Number
 
 	// Identifies the receivers account information
