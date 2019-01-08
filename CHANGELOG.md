@@ -2,11 +2,12 @@
 
 BREAKING CHANGES
 
+- `file.NotificationOfChange` accepts `Batcher` instead of `*BatchCOR` to comply with linter errors
 - Timestamp values are now returned in ISO 8601 format. (See: [moov-io/base #7](https://github.com/moov-io/base/issues/7))
 
 ADDITIONS
 
-- Add const values for `BatchHeader.StandardEntryClassCode` (See [#392](https://github.com/moov-io/ach/issues/391))
+- Add const values for `BatchHeader.StandardEntryClassCode` (See [#392](https://github.com/moov-io/ach/issues/392))
 - Add const values for `BatchHeader.ServiceClassCode` and `BatchControl.ServiceClassCode`. (See [#391](https://github.com/moov-io/ach/issues/391))
 - Add const values for `EntryDetail.TransactionCode` (See [#363](https://github.com/moov-io/ach/issues/363))
 - server: Record `ach_files_deleted` metric. (See: [#408](https://github.com/moov-io/ach/pull/408))
@@ -17,6 +18,10 @@ BUG FIXES
 - Accept File's without an ID specified. Generate a random ID. (See: [#405](https://github.com/moov-io/ach/pull/405))
 - server: Fix nil panics. (See: [#406](https://github.com/moov-io/ach/pull/406))
 - server: Fix type-casting panics. (See: [#423](https://github.com/moov-io/ach/pull/423))
+
+BUILD
+
+- `megacheck` is deprecated. staticcheck should be used instead. (See [#430](https://github.com/moov-io/ach/issues/430))
 
 ## v0.5.0 (Released 2018-11-29)
 

@@ -344,13 +344,13 @@ func BenchmarkFileBuildNoBatch(b *testing.B) {
 // BatchNOC notification of change
 func testFileNotificationOfChange(t testing.TB) {
 	file := NewFile().SetHeader(mockFileHeader())
-	file.AddBatch(mockBatchPPD())
-	bCOR := mockBatchCOR()
-	file.AddBatch(bCOR)
+	mockBatch := NewBatchPPD(mockBatchPPDHeader())
+	mockBatch.AddEntry(mockPPDEntryDetailNOC())
+	file.AddBatch(mockBatch)
 	if err := file.Create(); err != nil {
 		t.Fatal(err)
 	}
-	if file.NotificationOfChange[0] != bCOR {
+	if file.NotificationOfChange[0] != mockBatch {
 		t.Error("BatchCOR added to File.AddBatch should exist in NotificationOfChange")
 	}
 }

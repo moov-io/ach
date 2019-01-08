@@ -31,7 +31,7 @@ type repositoryInMemory struct {
 
 // NewRepositoryInMemory is an in memory ach storage repository for files
 func NewRepositoryInMemory() Repository {
-	f := make(map[string]*ach.File, 0)
+	f := make(map[string]*ach.File)
 	return &repositoryInMemory{
 		files: f,
 	}

@@ -62,7 +62,7 @@ type File struct {
 	ADVControl ADVFileControl `json:"fileADVControl"`
 
 	// NotificationOfChange (Notification of change) is a slice of references to BatchCOR in file.Batches
-	NotificationOfChange []*BatchCOR
+	NotificationOfChange []Batcher
 	// ReturnEntries is a slice of references to file.Batches that contain return entries
 	ReturnEntries []Batcher
 
@@ -305,9 +305,8 @@ func (f *File) Create() error {
 
 // AddBatch appends a Batch to the ach.File
 func (f *File) AddBatch(batch Batcher) []Batcher {
-	switch batch.(type) {
-	case *BatchCOR:
-		f.NotificationOfChange = append(f.NotificationOfChange, batch.(*BatchCOR))
+	if batch.Category() == CategoryNOC {
+		f.NotificationOfChange = append(f.NotificationOfChange, batch)
 	}
 	if batch.Category() == CategoryReturn {
 		f.ReturnEntries = append(f.ReturnEntries, batch)
