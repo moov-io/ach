@@ -65,6 +65,12 @@ Examples: [Go](examples/http/main.go) | [Ruby](https://github.com/moov-io/ruby-a
 - [Running ACH Server](https://docs.moov.io/en/latest/tutorials/ach-server/)
 - [ACH Server metrics](documentation/metrics.md)
 
+### Configuration
+
+| Environmental Variable | Description | Default |
+|-----|-----|-----|
+| `ACH_FILE_TTL` | Time to live (TTL) for `*ach.File` objects stored in the in-memory repository. | 0 = No TTL / Never delete files |
+
 ### From Source
 
 This project uses [Go Modules](https://github.com/golang/go/wiki/Modules) and thus requires Go 1.11+. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/ach/releases) as well. We highly recommend you use a tagged release for production.

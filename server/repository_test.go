@@ -6,12 +6,17 @@ package server
 
 import (
 	"testing"
+	"time"
 
 	"github.com/moov-io/ach"
 )
 
+var (
+	testTTLDuration = 0 * time.Second // disable TTL expiry
+)
+
 func TestRepositoryFiles(t *testing.T) {
-	r := NewRepositoryInMemory()
+	r := NewRepositoryInMemory(testTTLDuration)
 
 	if v := len(r.FindAllFiles()); v != 0 {
 		t.Errorf("unexpected length: %d", v)
@@ -41,7 +46,7 @@ func TestRepositoryFiles(t *testing.T) {
 }
 
 func TestRepositoryBatches(t *testing.T) {
-	r := NewRepositoryInMemory()
+	r := NewRepositoryInMemory(testTTLDuration)
 
 	// make sure our tests are setup
 	if v := len(r.FindAllFiles()); v != 0 {

@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/moov-io/ach"
 )
@@ -27,15 +28,33 @@ type Repository interface {
 type repositoryInMemory struct {
 	mtx   sync.RWMutex
 	files map[string]*ach.File
+
+	ttl time.Duration
 }
 
 // NewRepositoryInMemory is an in memory ach storage repository for files
-func NewRepositoryInMemory() Repository {
-	f := make(map[string]*ach.File)
-	return &repositoryInMemory{
-		files: f,
+func NewRepositoryInMemory(ttl time.Duration) Repository {
+	repo := &repositoryInMemory{
+		files: make(map[string]*ach.File),
+		ttl:   ttl,
 	}
+
+	if ttl <= 0*time.Second {
+		// Don't run the cleanup if we've disabled the TTL
+		return repo
+	}
+
+	// Run our anon goroutine to cleanup old ACH files
+	go func() {
+		t := time.NewTicker(1 * time.Minute)
+		for range t.C {
+			repo.cleanupOldFiles()
+		}
+	}()
+
+	return repo
 }
+
 func (r *repositoryInMemory) StoreFile(f *ach.File) error {
 	if f == nil {
 		return errors.New("nil ACH file provided")
@@ -154,4 +173,18 @@ func (r *repositoryInMemory) DeleteBatch(fileID string, batchID string) error {
 	}
 
 	return ErrNotFound
+}
+
+// cleanupOldFiles will iterate through r.files and delete entries which are older than
+// the environmental variable ACH_FILE_TTL (parsed as a time.Duration).
+func (r *repositoryInMemory) cleanupOldFiles() {
+	r.mtx.Lock()
+	defer r.mtx.Unlock()
+
+	tooOld := time.Now().Add(-1 * r.ttl)
+	for id, file := range r.files {
+		if file.Header.FileCreationDate.Before(tooOld) {
+			delete(r.files, id)
+		}
+	}
 }

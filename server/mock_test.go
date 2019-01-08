@@ -12,7 +12,7 @@ import (
 )
 
 func mockServiceInMemory() Service {
-	repository := NewRepositoryInMemory()
+	repository := NewRepositoryInMemory(testTTLDuration)
 	repository.StoreFile(&ach.File{ID: "98765"})
 	repository.StoreBatch("98765", mockBatchWEB())
 	return NewService(repository)

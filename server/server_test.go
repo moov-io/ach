@@ -82,7 +82,7 @@ func TestServer__CreateFileEndpoint(t *testing.T) {
 			t.Fatalf("file %s had error against HTTP decode: %v", file.ACHFilepath, err)
 		}
 
-		repo := NewRepositoryInMemory()
+		repo := NewRepositoryInMemory(testTTLDuration)
 		s := NewService(repo)
 
 		endpoint := createFileEndpoint(s, repo, nil) // nil logger

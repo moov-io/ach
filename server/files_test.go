@@ -11,7 +11,7 @@ import (
 )
 
 func TestFiles__createFileEndpoint(t *testing.T) {
-	repo := NewRepositoryInMemory()
+	repo := NewRepositoryInMemory(testTTLDuration)
 	svc := NewService(repo)
 
 	body := strings.NewReader(`{"random":"json"}`)
@@ -28,7 +28,7 @@ func TestFiles__createFileEndpoint(t *testing.T) {
 }
 
 func TestFiles__getFilesEndpoint(t *testing.T) {
-	repo := NewRepositoryInMemory()
+	repo := NewRepositoryInMemory(testTTLDuration)
 	svc := NewService(repo)
 
 	body := strings.NewReader(`{"random":"json"}`)
@@ -41,7 +41,7 @@ func TestFiles__getFilesEndpoint(t *testing.T) {
 }
 
 func TestFiles__getFileEndpoint(t *testing.T) {
-	repo := NewRepositoryInMemory()
+	repo := NewRepositoryInMemory(testTTLDuration)
 	svc := NewService(repo)
 
 	body := strings.NewReader(`{"random":"json"}`)
@@ -58,7 +58,7 @@ func TestFiles__getFileEndpoint(t *testing.T) {
 }
 
 func TestFiles__getFileContentsEndpoint(t *testing.T) {
-	repo := NewRepositoryInMemory()
+	repo := NewRepositoryInMemory(testTTLDuration)
 	svc := NewService(repo)
 
 	body := strings.NewReader(`{"random":"json"}`)
@@ -75,7 +75,7 @@ func TestFiles__getFileContentsEndpoint(t *testing.T) {
 }
 
 func TestFiles__validateFileEndpoint(t *testing.T) {
-	repo := NewRepositoryInMemory()
+	repo := NewRepositoryInMemory(testTTLDuration)
 	svc := NewService(repo)
 
 	body := strings.NewReader(`{"random":"json"}`)
