@@ -31,6 +31,10 @@ func main() {
 	bh.CompanyEntryDescription = "REG.SALARY" // will be on receiving accounts statement
 	// Same Day ACH
 	bh.EffectiveEntryDate = base.NewTime(time.Now())
+	// CompanyDescriptiveDate ODFIs at their discretion may require their Originators to further show intent for
+	// same-day settlement using an optional, yet standardized, same-day indicator in the Company Descriptive Date
+	// field. The Company Descriptive Date field (5 record, field 8) is an optional field with 6 positions available
+	// (positions 64-69).
 	bh.CompanyDescriptiveDate = "SD1300"
 	bh.ODFIIdentification = "121042882" // Originating Routing Number
 
