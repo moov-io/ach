@@ -85,7 +85,8 @@ func TestBatch__UnmarshalJSON(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	bs, err := json.Marshal(f)
+
+	bs, err := json.MarshalIndent(f, "  ", " ")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -97,6 +98,13 @@ func TestBatch__UnmarshalJSON(t *testing.T) {
 	}
 	if file == nil {
 		t.Error("file == nil")
+	}
+
+	if v := file.Header.FileCreationDate.String(); v != "2018-06-13 20:00:00 -0400 EDT" {
+		t.Errorf("got FileCreationDate of %q", v)
+	}
+	if v := file.Header.FileCreationTime.String(); v != "0000-12-31 19:00:00 -0500 EST" {
+		t.Errorf("got FileCreationTime of %q", v)
 	}
 }
 

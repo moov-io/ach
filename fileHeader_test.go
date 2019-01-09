@@ -79,11 +79,11 @@ func parseFileHeader(t testing.TB) {
 		t.Errorf("ImmediateOrigin Expected '   076401251' got: %v", record.ImmediateOriginField())
 	}
 
-	if record.FileCreationDateField() != "080729" {
-		t.Errorf("FileCreationDate Expected '080729' got:'%v'", record.FileCreationDateField())
+	if record.FileCreationDateField() != "080728" { // America/New_York
+		t.Errorf("FileCreationDate Expected '080728' got:'%v'", record.FileCreationDateField())
 	}
-	if record.FileCreationTimeField() != "1511" {
-		t.Errorf("FileCreationTime Expected '1511' got:'%v'", record.FileCreationTimeField())
+	if record.FileCreationTimeField() != "1900" { // America/New_York
+		t.Errorf("FileCreationTime Expected '1900' got:'%v'", record.FileCreationTimeField())
 	}
 
 	if record.FileIDModifier != "A" {
@@ -132,8 +132,8 @@ func testFHString(t testing.TB) {
 	}
 	record := r.File.Header
 
-	if record.String() != line {
-		t.Errorf("Strings do not match")
+	if v := record.String(); v != strings.Replace(line, "07291511", "07281900", 1) { // UTC -> America/New_York timezone conversion
+		t.Errorf("Strings do not match:\n   v=%q\nline=%q", v, line) // aligned vertically
 	}
 }
 

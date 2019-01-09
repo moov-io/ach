@@ -187,8 +187,8 @@ func testAddenda99DateOfDeathField(t testing.TB) {
 	}
 	// Year: 1978 Month: October Day: 23
 	addenda99.DateOfDeath = base.NewTime(time.Date(1978, time.October, 23, 0, 0, 0, 0, time.UTC))
-	if addenda99.DateOfDeathField() != "781023" {
-		t.Errorf("expected %v received %v", "781023", addenda99.DateOfDeathField())
+	if addenda99.DateOfDeathField() != "781022" { // base.Time defaults to American/New_York
+		t.Errorf("expected %v received %v", "781022", addenda99.DateOfDeathField())
 	}
 }
 
