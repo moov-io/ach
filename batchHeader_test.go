@@ -94,8 +94,8 @@ func testParseBatchHeader(t testing.TB) {
 	if record.CompanyDescriptiveDate != "000002" {
 		t.Errorf("CompanyDescriptiveDate Expected '000002' got: %v", record.CompanyDescriptiveDate)
 	}
-	if record.EffectiveEntryDateField() != "080730" {
-		t.Errorf("EffectiveEntryDate Expected '080730' got: %v", record.EffectiveEntryDateField())
+	if record.EffectiveEntryDateField() != "080729" { // base.Time defaults to American/New_York
+		t.Errorf("EffectiveEntryDate Expected '080729' got: %v", record.EffectiveEntryDateField())
 	}
 	if record.settlementDate != "   " {
 		t.Errorf("SettlementDate Expected '   ' got: %v", record.settlementDate)
@@ -134,8 +134,8 @@ func testBHString(t testing.TB) {
 	}
 	record := r.currentBatch.GetHeader()
 
-	if record.String() != line {
-		t.Errorf("Strings do not match")
+	if v := record.String(); v != strings.Replace(line, "0730", "0729", 1) { // UTC -> EST timezone shift (happens when BatchHeader is read)
+		t.Errorf("Strings do not match:\n   v=%q\nline=%q", v, line) // these are aligned with spaces
 	}
 }
 

@@ -19,6 +19,8 @@ import (
 // See: https://github.com/moov-io/ach/issues/403
 func TestIssue403(t *testing.T) {
 	expectError := func(path string, msg string) {
+		t.Helper()
+
 		fd, err := os.Open(path)
 		if err != nil {
 			t.Fatal(err)
@@ -36,5 +38,4 @@ func TestIssue403(t *testing.T) {
 	// test cases
 	expectError("issue403-addenda02.json", "EntryDetail.addenda02")
 	expectError("issue403-amount.json", "field EntryDetail.amount")
-	expectError("issue403-effectiveEntryDate.json", "empty date time")
 }
