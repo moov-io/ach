@@ -12,6 +12,7 @@ ADDITIONS
 - Add const values for `EntryDetail.TransactionCode` (See [#363](https://github.com/moov-io/ach/issues/363))
 - server: Record `ach_files_deleted` metric. (See: [#408](https://github.com/moov-io/ach/pull/408))
 - server: log x-request-id header if present. (See: [#407](https://github.com/moov-io/ach/pull/407))
+- server: Delete old `ach.File` objects from in-memory repository according to `ACH_FILE_TTL` env variable.
 
 BUG FIXES
 
