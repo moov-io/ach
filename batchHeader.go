@@ -70,13 +70,17 @@ type BatchHeader struct {
 	// This field must contain the word "NONSETTLED" (left justified) when the
 	// batch contains entries which could not settle.
 	CompanyEntryDescription string `json:"companyEntryDescription,omitempty"`
-
-	// CompanyDescriptiveDate except as otherwise noted below, the Originator establishes this field
-	// as the date it would like to see displayed to the receiver for
-	// descriptive purposes. This field is never used to control timing of any
-	// computer or manual operation. It is solely for descriptive purposes.
-	// The RDFI should not assume any specific format. Examples of possible
-	// entries in this field are "011392,", "01 92," "JAN 13," "JAN 92," etc.
+	// CompanyDescriptiveDate currently, the Rules provide that the “Originator establishes this field as the date it
+	// would like to see displayed to the Receiver for descriptive purposes.” NACHA recommends that, as desired,
+	// the content of this field be formatted using the convention “SDHHMM”, where the “SD” in positions 64- 65 denotes
+	// the intent for same-day settlement, and the hours and minutes in positions 66-69 denote the desired settlement
+	// time using a 24-hour clock. When electing to use this convention, the ODFI would validate that the field
+	// contains either.
+	//
+	// ODFIs at their discretion may require their Originators to further show intent for
+	// same-day settlement using an optional, yet standardized, same-day indicator in the Company Descriptive Date
+	// field. The Company Descriptive Date field (5 record, field 8) is an optional field with 6 positions available
+	// (positions 64-69).
 	CompanyDescriptiveDate string `json:"companyDescriptiveDate,omitempty"`
 
 	// EffectiveEntryDate the date on which the entries are to settle
