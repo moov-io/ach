@@ -121,6 +121,31 @@ func FileFromJSON(bs []byte) (*File, error) {
 	}
 	file.Header = header.Header
 
+	/*	if !file.IsADV() {
+			// Read FileControl
+			control := fileControl{
+				Control: NewFileControl(),
+			}
+			if err := json.NewDecoder(bytes.NewReader(bs)).Decode(&control); err != nil {
+				return nil, fmt.Errorf("problem reading FileControl: %v", err)
+			}
+			file.Control = control.Control
+		} else {
+			// Read ADVFileControl
+			advControl := advFileControl{
+				ADVControl: NewADVFileControl(),
+			}
+			if err := json.NewDecoder(bytes.NewReader(bs)).Decode(&advControl); err != nil {
+				return nil, fmt.Errorf("problem reading ADVFileControl: %v", err)
+			}
+			file.ADVControl = advControl.ADVControl
+		}*/
+
+	// Build resulting file
+	if err := file.setBatchesFromJSON(bs); err != nil {
+		return nil, err
+	}
+
 	if !file.IsADV() {
 		// Read FileControl
 		control := fileControl{
@@ -139,11 +164,6 @@ func FileFromJSON(bs []byte) (*File, error) {
 			return nil, fmt.Errorf("problem reading ADVFileControl: %v", err)
 		}
 		file.ADVControl = advControl.ADVControl
-	}
-
-	// Build resulting file
-	if err := file.setBatchesFromJSON(bs); err != nil {
-		return nil, err
 	}
 
 	if !file.IsADV() {
@@ -245,13 +265,6 @@ func (f *File) Create() error {
 		totalCreditAmount := 0
 
 		for i, batch := range f.Batches {
-			if v := f.Batches[i].GetHeader(); v == nil {
-				f.Batches[i].SetHeader(NewBatchHeader())
-			}
-			if v := f.Batches[i].GetControl(); v == nil {
-				f.Batches[i].SetControl(NewBatchControl())
-			}
-
 			// create ascending batch numbers
 			f.Batches[i].GetHeader().BatchNumber = batchSeq
 			f.Batches[i].GetControl().BatchNumber = batchSeq
@@ -505,6 +518,14 @@ func (f *File) calculateEntryHash(IsADV bool) string {
 func (f *File) IsADV() bool {
 	ok := false
 	for _, batch := range f.Batches {
+		if v := batch.GetHeader(); v == nil {
+			batch.SetHeader(NewBatchHeader())
+		}
+
+		if v := batch.GetControl(); v == nil {
+			batch.SetControl(NewBatchControl())
+		}
+
 		ok = batch.GetHeader().StandardEntryClassCode == ADV
 		if ok {
 			break
@@ -527,7 +548,7 @@ func (f *File) createFileADV() error {
 		// create ascending batch numbers
 
 		if batch.GetHeader().StandardEntryClassCode != ADV {
-			return &FileError{FieldName: "EntryAddendaCount", Value: batch.GetHeader().StandardEntryClassCode,
+			return &FileError{FieldName: "StandardEntryClassCode", Value: batch.GetHeader().StandardEntryClassCode,
 				Msg: msgFileADV}
 		}
 

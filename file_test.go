@@ -35,6 +35,27 @@ func mockFilePPD() *File {
 	return mockFile
 }
 
+func mockFileADV() *File {
+	mockFile := NewFile()
+	mockFile.ID = "fileId"
+	mockFile.SetHeader(mockFileHeader())
+	mockFile.Header.ID = mockFile.ID
+	mockFile.ADVControl = mockADVFileControl()
+	mockFile.Control.ID = mockFile.ID
+	mockBatchADV := mockBatchADV()
+	mockFile.AddBatch(mockBatchADV)
+	if err := mockFile.Create(); err != nil {
+		panic(err)
+	}
+	if mockFile.ID != mockFile.Header.ID {
+		panic(fmt.Sprintf("mockFile.ID=%s mockFile.Header.ID=%s", mockFile.ID, mockFile.Header.ID))
+	}
+	if mockFile.ID != mockFile.Control.ID {
+		panic(fmt.Sprintf("mockFile.ID=%s mockFile.Control.ID=%s", mockFile.ID, mockFile.Control.ID))
+	}
+	return mockFile
+}
+
 // testFileError validates a file error
 func testFileError(t testing.TB) {
 	err := &FileError{FieldName: "mock", Msg: "test message"}
@@ -507,5 +528,374 @@ func TestFile__jsonFileNoControlBlobs(t *testing.T) {
 
 	if file.ID != "adam-01" {
 		t.Errorf("file.ID: %s", file.ID)
+	}
+}
+
+func TestFileADV__Success(t *testing.T) {
+	fh := mockFileHeader()
+	bh := mockBatchADVHeader()
+
+	entryOne := mockADVEntryDetail()
+	entryTwo := mockADVEntryDetail()
+	entryTwo.SequenceNumber = 2
+
+	// build the batch
+	batch := NewBatchADV(bh)
+	batch.AddADVEntry(entryOne)
+	batch.AddADVEntry(entryTwo)
+	if err := batch.Create(); err != nil {
+		t.Fatalf("Unexpected error building batch: %s\n", err)
+	}
+
+	// build the file
+	file := NewFile()
+	file.SetHeader(fh)
+	file.AddBatch(batch)
+	if err := file.Create(); err != nil {
+		t.Fatalf("Unexpected error building file: %s\n", err)
+	}
+}
+
+func TestFileADVInvalid__StandardEntryClassCode(t *testing.T) {
+	fh := mockFileHeader()
+
+	// ADV
+	bhADV := mockBatchADVHeader()
+	entryADV := mockADVEntryDetail()
+
+	// build the ADV batch
+	batchADV := NewBatchADV(bhADV)
+	batchADV.AddADVEntry(entryADV)
+
+	if err := batchADV.Create(); err != nil {
+		t.Fatalf("Unexpected error building batch: %s\n", err)
+	}
+
+	// PPD
+	bhPPD := mockBatchPPDHeader()
+	entryPPD := mockPPDEntryDetail()
+
+	// build the PPD batch
+	batchPPD, err := NewBatch(bhPPD)
+	if err != nil {
+		t.Fatalf("Unexpected error with NewBatch: %s\n", err)
+	}
+	batchPPD.AddEntry(entryPPD)
+
+	if err := batchPPD.Create(); err != nil {
+		t.Fatalf("Unexpected error building batch: %s\n", err)
+	}
+
+	// build the file
+	file := NewFile()
+	file.SetHeader(fh)
+	file.AddBatch(batchADV)
+	file.AddBatch(batchPPD)
+	if err := file.Create(); err != nil {
+		if e, ok := err.(*FileError); ok {
+			if e.FieldName != "StandardEntryClassCode" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
+}
+
+// TestFileADVEntryHash validates entry hash
+func TestFileADVEntryHash(t *testing.T) {
+	file := mockFileADV()
+	file.AddBatch(mockBatchADV())
+	if err := file.Create(); err != nil {
+		t.Fatal(err)
+	}
+	file.ADVControl.EntryHash = 63
+	if err := file.Validate(); err != nil {
+		if e, ok := err.(*FileError); ok {
+			if e.FieldName != "EntryHash" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestFileADVDebitAmount validates file total debit amount
+func TestFileADVDebitAmount(t *testing.T) {
+	file := mockFileADV()
+
+	// inequality in total debit amount
+	file.ADVControl.TotalDebitEntryDollarAmountInFile = 06
+	if err := file.Validate(); err != nil {
+		if e, ok := err.(*FileError); ok {
+			if e.FieldName != "TotalDebitEntryDollarAmountInFile" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestFileADVCreditAmount validates file total credit amount
+func TestFileADVCreditAmount(t *testing.T) {
+	file := mockFileADV()
+
+	// inequality in total credit amount
+	file.ADVControl.TotalCreditEntryDollarAmountInFile = 07
+	if err := file.Validate(); err != nil {
+		if e, ok := err.(*FileError); ok {
+			if e.FieldName != "TotalCreditEntryDollarAmountInFile" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestFileADVEntryAddenda validates an addenda entry
+func TestFileADVEntryAddenda(t *testing.T) {
+	file := mockFileADV()
+
+	// more entries than the file control
+	file.ADVControl.EntryAddendaCount = 5
+	if err := file.Validate(); err != nil {
+		if e, ok := err.(*FileError); ok {
+			if e.FieldName != "EntryAddendaCount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestFileADVBatchCount validates if calculated count is different from control
+func TestFileADVBatchCount(t *testing.T) {
+	file := mockFileADV()
+
+	// More batches than the file control count.
+	file.AddBatch(mockBatchADV())
+	if err := file.Validate(); err != nil {
+		if e, ok := err.(*FileError); ok {
+			if e.FieldName != "BatchCount" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestFileADVBlockCount10 validates file block count
+func TestFileADVBlockCount10(t *testing.T) {
+	file := NewFile().SetHeader(mockFileHeader())
+	batchADV := NewBatchADV(mockBatchADVHeader())
+
+	ed1 := mockADVEntryDetail()
+	batchADV.AddADVEntry(ed1)
+
+	ed2 := mockADVEntryDetail()
+	ed2.SequenceNumber = 2
+	batchADV.AddADVEntry(ed2)
+
+	ed3 := mockADVEntryDetail()
+	ed3.SequenceNumber = 3
+	batchADV.AddADVEntry(ed3)
+
+	ed4 := mockADVEntryDetail()
+	ed4.SequenceNumber = 4
+	batchADV.AddADVEntry(ed4)
+
+	ed5 := mockADVEntryDetail()
+	ed5.SequenceNumber = 5
+	batchADV.AddADVEntry(ed5)
+
+	ed6 := mockADVEntryDetail()
+	ed6.SequenceNumber = 6
+	batchADV.AddADVEntry(ed6)
+
+	if err := batchADV.Create(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	file.AddBatch(batchADV)
+	if err := file.Create(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	// ensure with 10 records in file we don't get 2 for a block count
+	if file.ADVControl.BlockCount != 1 {
+		t.Error("BlockCount on 10 records is not equal to 1")
+	}
+	// make 11th record which should produce BlockCount of 2
+	ed7 := mockADVEntryDetail()
+	ed7.SequenceNumber = 7
+	file.Batches[0].AddADVEntry(ed7)
+
+	if err := file.Batches[0].Create(); err != nil {
+		t.Fatal(err)
+	} // File.Build does not re-build Batches
+	if err := file.Create(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if file.ADVControl.BlockCount != 2 {
+		t.Error("BlockCount on 11 records is not equal to 2")
+	}
+}
+
+// TestFileADVControlValidate validates ADV File Control
+func TestFileADVControlValidate(t *testing.T) {
+	file := mockFileADV()
+
+	file.ADVControl.recordType = "22"
+	if err := file.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestFileControlValidate validates PPD File Control
+func TestFileControlValidate(t *testing.T) {
+	file := mockFilePPD()
+
+	file.Control.recordType = "22"
+	if err := file.Validate(); err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "recordType" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestBatchHeaderNil Batch Header Nil
+func TestBatchHeaderNil(t *testing.T) {
+	fh := mockFileHeader()
+	bh := mockBatchPPDHeader()
+
+	entryOne := mockPPDEntryDetail()
+
+	// build the batch
+	batch := NewBatchPPD(bh)
+	batch.AddEntry(entryOne)
+
+	if err := batch.Create(); err != nil {
+		t.Fatalf("Unexpected error building batch: %s\n", err)
+	}
+
+	batch.Header = nil
+
+	// build the file
+	file := NewFile()
+	file.SetHeader(fh)
+	file.AddBatch(batch)
+	if err := file.Create(); err != nil {
+		t.Fatalf("Unexpected error building file: %s\n", err)
+	}
+
+}
+
+// TestBatchControlrNil Batch Control Nil
+func TestBatchControlNil(t *testing.T) {
+	fh := mockFileHeader()
+	bh := mockBatchPPDHeader()
+
+	entryOne := mockPPDEntryDetail()
+
+	// build the batch
+	batch := NewBatchPPD(bh)
+	batch.AddEntry(entryOne)
+
+	if err := batch.Create(); err != nil {
+		t.Fatalf("Unexpected error building batch: %s\n", err)
+	}
+
+	batch.Control = nil
+
+	// build the file
+	file := NewFile()
+	file.SetHeader(fh)
+	file.AddBatch(batch)
+	if err := file.Create(); err != nil {
+		t.Fatalf("Unexpected error building file: %s\n", err)
+	}
+
+}
+
+func TestFileADV__readFromJson(t *testing.T) {
+	path := filepath.Join("test", "testdata", "adv-valid.json")
+	bs, err := ioutil.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	file, err := FileFromJSON(bs)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Ensure the file is valid
+	if err := file.Create(); err != nil {
+		t.Error(err)
+	}
+	if err := file.Validate(); err != nil {
+		t.Error(err)
+	}
+
+	if file.ID != "adv-01" {
+		t.Errorf("file.ID: %s", file.ID)
+	}
+
+	// Header
+	if file.Header.ImmediateOrigin != "121042882" || file.Header.ImmediateOriginName != "Wells Fargo" {
+		t.Errorf("origin=%s name=%s", file.Header.ImmediateOrigin, file.Header.ImmediateOriginName)
+	}
+	if file.Header.ImmediateDestination != "231380104" || file.Header.ImmediateDestinationName != "Citadel" {
+		t.Errorf("destination=%s name=%s", file.Header.ImmediateDestination, file.Header.ImmediateDestinationName)
+	}
+	if file.Header.FileCreationTime.IsZero() || file.Header.FileCreationDate.IsZero() {
+		t.Errorf("time=%v date=%v", file.Header.FileCreationTime, file.Header.FileCreationDate)
+	}
+
+	// Batches
+	if len(file.Batches) != 1 {
+		t.Errorf("got %d batches: %v", len(file.Batches), file.Batches)
+	}
+	batch := file.Batches[0]
+	batchADVControl := batch.GetADVControl()
+	if batchADVControl.EntryAddendaCount != 1 {
+		t.Errorf("EntryAddendaCount: %d", batchADVControl.EntryAddendaCount)
+	}
+
+	// Control
+	if file.ADVControl.BatchCount != 1 {
+		t.Errorf("BatchCount: %d", file.ADVControl.BatchCount)
+	}
+	if file.ADVControl.EntryAddendaCount != 1 {
+		t.Errorf("File Control EntryAddendaCount: %d", file.ADVControl.EntryAddendaCount)
+	}
+	if file.ADVControl.TotalDebitEntryDollarAmountInFile != 0 || file.ADVControl.TotalCreditEntryDollarAmountInFile != 100000 {
+		t.Errorf("debit=%d credit=%d", file.ADVControl.TotalDebitEntryDollarAmountInFile, file.ADVControl.TotalCreditEntryDollarAmountInFile)
+	}
+
+	// ensure we error on struct tag unmarshal
+	var f File
+	err = json.Unmarshal(bs, &f)
+	if !strings.Contains(err.Error(), "use ach.FileFromJSON instead") {
+		t.Error("expected error, see FileFromJson definition")
+	}
+
+	if err := file.Validate(); err != nil {
+		t.Error(err)
 	}
 }
