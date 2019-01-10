@@ -121,26 +121,6 @@ func FileFromJSON(bs []byte) (*File, error) {
 	}
 	file.Header = header.Header
 
-	/*	if !file.IsADV() {
-			// Read FileControl
-			control := fileControl{
-				Control: NewFileControl(),
-			}
-			if err := json.NewDecoder(bytes.NewReader(bs)).Decode(&control); err != nil {
-				return nil, fmt.Errorf("problem reading FileControl: %v", err)
-			}
-			file.Control = control.Control
-		} else {
-			// Read ADVFileControl
-			advControl := advFileControl{
-				ADVControl: NewADVFileControl(),
-			}
-			if err := json.NewDecoder(bytes.NewReader(bs)).Decode(&advControl); err != nil {
-				return nil, fmt.Errorf("problem reading ADVFileControl: %v", err)
-			}
-			file.ADVControl = advControl.ADVControl
-		}*/
-
 	// Build resulting file
 	if err := file.setBatchesFromJSON(bs); err != nil {
 		return nil, err
