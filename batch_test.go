@@ -102,12 +102,12 @@ func TestBatch__UnmarshalJSON(t *testing.T) {
 
 	// ToDo:  Commented base.Time does not work and this test fails.
 
-	/*	if v := file.Header.FileCreationDate.String(); v != "2018-06-13 20:00:00 -0400 EDT" {
-			t.Errorf("got FileCreationDate of %q", v)
-		}
-		if v := file.Header.FileCreationTime.String(); v != "0000-12-31 19:00:00 -0500 EST" {
-			t.Errorf("got FileCreationTime of %q", v)
-		}*/
+	if v := file.Header.FileCreationDate.String(); v != "2018-06-13 20:00:00 -0400 EDT" {
+		t.Errorf("got FileCreationDate of %q", v)
+	}
+	if v := file.Header.FileCreationTime.String(); v != "0000-12-31 19:00:00 -0500 EST" {
+		t.Errorf("got FileCreationTime of %q", v)
+	}
 }
 
 // Test cases that apply to all batch types
