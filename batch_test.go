@@ -100,8 +100,6 @@ func TestBatch__UnmarshalJSON(t *testing.T) {
 		t.Error("file == nil")
 	}
 
-	// ToDo:  Commented base.Time does not work and this test fails.
-
 	if v := file.Header.FileCreationDate.String(); v != "2018-06-13 20:00:00 -0400 EDT" {
 		t.Errorf("got FileCreationDate of %q", v)
 	}
