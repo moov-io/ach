@@ -83,11 +83,9 @@ func parseFileHeader(t testing.TB) {
 		t.Errorf("FileCreationDate Expected '080728' got:'%v'", record.FileCreationDateField())
 	}
 
-	// ToDo:  Commented base.Time does not work and this test fails.
-
-	/*	if record.FileCreationTimeField() != "1900" { // America/New_York
+	if record.FileCreationTimeField() != "1900" { // America/New_York
 		t.Errorf("FileCreationTime Expected '1900' got:'%v'", record.FileCreationTimeField())
-	}*/
+	}
 
 	if record.FileIDModifier != "A" {
 		t.Errorf("FileIDModifier Expected 'A' got:'%v'", record.FileIDModifier)
