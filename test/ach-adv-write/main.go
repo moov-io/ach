@@ -29,6 +29,7 @@ func main() {
 	bh.CompanyEntryDescription = "Accounting" // will be on receiving accounts statement
 	bh.EffectiveEntryDate = base.NewTime(time.Now().AddDate(0, 0, 1))
 	bh.ODFIIdentification = "121042882" // Originating Routing Number
+	bh.OriginatorStatusCode = 0
 
 	// Identifies the receivers account information
 	// can be multiple entry's per batch

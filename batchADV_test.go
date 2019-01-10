@@ -5,7 +5,9 @@
 package ach
 
 import (
+	"github.com/moov-io/base"
 	"testing"
+	"time"
 )
 
 // mockBatchADVHeader creates a ADV batch header
@@ -18,6 +20,7 @@ func mockBatchADVHeader() *BatchHeader {
 	bh.CompanyEntryDescription = "Accounting"
 	bh.ODFIIdentification = "12104288"
 	bh.OriginatorStatusCode = 0
+	bh.EffectiveEntryDate = base.NewTime(time.Now().AddDate(0, 0, 1))
 	return bh
 }
 
