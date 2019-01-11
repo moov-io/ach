@@ -899,3 +899,69 @@ func TestFileADV__readFromJson(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestFile__readInvalidJson(t *testing.T) {
+	path := filepath.Join("test", "testdata", "ppd-invalid.json")
+	bs, err := ioutil.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = FileFromJSON(bs)
+
+	if err != nil {
+		if strings.Contains(err.Error(), "problem reading File") {
+		} else {
+			t.Fatal(err)
+		}
+	}
+}
+
+func TestFile__readEmptyJson(t *testing.T) {
+	bs := make([]byte, 0)
+	_, err := FileFromJSON(bs)
+
+	if err != nil {
+		if strings.Contains(err.Error(), "no JSON data provided") {
+		} else {
+			t.Fatal(err)
+		}
+	}
+}
+
+func TestFile__readNoBatchesJson(t *testing.T) {
+	path := filepath.Join("test", "testdata", "ppd-noBatches.json")
+	bs, err := ioutil.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = FileFromJSON(bs)
+
+	if err != nil {
+		if strings.Contains(err.Error(), "did you use NewBatchHeader") {
+		} else {
+			t.Fatal(err)
+		}
+	}
+}
+
+func TestFile__readInvalidFilesJson(t *testing.T) {
+	path := filepath.Join("test", "testdata", "ppd-invalidFile.json")
+	bs, err := ioutil.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = FileFromJSON(bs)
+
+	if err != nil {
+		if e, ok := err.(*FieldError); ok {
+			if e.FieldName != "FileIDModifier" {
+				t.Errorf("%T: %s", err, err)
+			}
+		} else {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
