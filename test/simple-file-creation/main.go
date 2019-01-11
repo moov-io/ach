@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/moov-io/ach"
-	"github.com/moov-io/base"
 )
 
 func main() {
@@ -14,7 +13,7 @@ func main() {
 	fh := ach.NewFileHeader()
 	fh.ImmediateDestination = "231380104"
 	fh.ImmediateOrigin = "121042882"
-	fh.FileCreationDate = base.NewTime(time.Now())
+	fh.FileCreationDate = time.Now().Format("060102")
 	fh.ImmediateDestinationName = "Federal Reserve Bank"
 	fh.ImmediateOriginName = "My Bank Name"
 	file := ach.NewFile()
@@ -28,7 +27,7 @@ func main() {
 	bh.CompanyIdentification = file.Header.ImmediateOrigin
 	bh.StandardEntryClassCode = ach.PPD
 	bh.CompanyEntryDescription = "Trans. Description"
-	bh.EffectiveEntryDate = base.NewTime(time.Now().AddDate(0, 0, 1))
+	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
 	bh.ODFIIdentification = "121042882"
 
 	batch, _ := ach.NewBatch(bh)
@@ -73,7 +72,7 @@ func main() {
 	bh2.CompanyIdentification = file.Header.ImmediateOrigin
 	bh2.StandardEntryClassCode = ach.WEB
 	bh2.CompanyEntryDescription = "Subscribe"
-	bh2.EffectiveEntryDate = base.NewTime(time.Now().AddDate(0, 0, 1))
+	bh2.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
 	bh2.ODFIIdentification = "121042882"
 
 	batch2, _ := ach.NewBatch(bh2)

@@ -61,7 +61,7 @@ func checkFileHeader(f *ach.File) int {
 	if f.Header.ImmediateDestination != "" || f.Header.ImmediateOrigin != "" {
 		return 1
 	}
-	if !f.Header.FileCreationDate.IsZero() || !f.Header.FileCreationTime.IsZero() {
+	if f.Header.FileCreationDate != "" || f.Header.FileCreationTime != "" {
 		return 1
 	}
 	if f.Header.FileIDModifier != "" {

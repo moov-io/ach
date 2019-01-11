@@ -12,7 +12,6 @@ import (
 
 	"github.com/moov-io/ach/internal/iso3166"
 	"github.com/moov-io/ach/internal/iso4217"
-	"github.com/moov-io/base"
 )
 
 // msgServiceClass
@@ -127,11 +126,12 @@ type IATBatchHeader struct {
 	// Standardization website for value: www.iso.org -- (Payment Currency)
 	ISODestinationCurrencyCode string `json:"ISODestinationCurrencyCode"`
 
-	// EffectiveEntryDate the date on which the entries are to settle format YYMMDD
-	EffectiveEntryDate base.Time `json:"effectiveEntryDate,omitempty"`
+	// EffectiveEntryDate the date on which the entries are to settle. Format: YYMMDD (Y=Year, M=Month, D=Day)
+	EffectiveEntryDate string `json:"effectiveEntryDate,omitempty"`
 
 	// SettlementDate Leave blank, this field is inserted by the ACH operator
 	settlementDate string
+
 	// OriginatorStatusCode refers to the ODFI initiating the Entry.
 	// 0 ADV File prepared by an ACH Operator.
 	// 1 This code identifies the Originator as a depository financial institution.
@@ -216,7 +216,7 @@ func (iatBh *IATBatchHeader) Parse(record string) {
 	iatBh.ISODestinationCurrencyCode = iatBh.parseStringField(record[66:69])
 	// 70-75 Date transactions are to be posted to the receivers’ account.
 	// You almost always want the transaction to post as soon as possible, so put tomorrow's date in YYMMDD format
-	iatBh.EffectiveEntryDate = iatBh.parseSimpleDate(record[69:75])
+	iatBh.EffectiveEntryDate = iatBh.validateSimpleDate(record[69:75])
 	// 76-79 Always blank (just fill with spaces)
 	iatBh.settlementDate = "   "
 	// 79-79 Always 1
@@ -409,7 +409,7 @@ func (iatBh *IATBatchHeader) ISODestinationCurrencyCodeField() string {
 
 // EffectiveEntryDateField get the EffectiveEntryDate in YYMMDD format
 func (iatBh *IATBatchHeader) EffectiveEntryDateField() string {
-	return iatBh.formatSimpleDate(iatBh.EffectiveEntryDate)
+	return iatBh.stringField(iatBh.EffectiveEntryDate, 6) // YYMMDD
 }
 
 // ODFIIdentificationField get the odfi number zero padded

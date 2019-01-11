@@ -468,7 +468,7 @@ func TestFile__readFromJson(t *testing.T) {
 	if file.Header.ImmediateDestination != "231380104" || file.Header.ImmediateDestinationName != "Citadel" {
 		t.Errorf("destination=%s name=%s", file.Header.ImmediateDestination, file.Header.ImmediateDestinationName)
 	}
-	if file.Header.FileCreationTime.IsZero() || file.Header.FileCreationDate.IsZero() {
+	if file.Header.FileCreationTime == "" || file.Header.FileCreationDate == "" {
 		t.Errorf("time=%v date=%v", file.Header.FileCreationTime, file.Header.FileCreationDate)
 	}
 
@@ -863,7 +863,7 @@ func TestFileADV__readFromJson(t *testing.T) {
 	if file.Header.ImmediateDestination != "231380104" || file.Header.ImmediateDestinationName != "Citadel" {
 		t.Errorf("destination=%s name=%s", file.Header.ImmediateDestination, file.Header.ImmediateDestinationName)
 	}
-	if file.Header.FileCreationTime.IsZero() || file.Header.FileCreationDate.IsZero() {
+	if file.Header.FileCreationTime == "" || file.Header.FileCreationDate == "" {
 		t.Errorf("time=%v date=%v", file.Header.FileCreationTime, file.Header.FileCreationDate)
 	}
 

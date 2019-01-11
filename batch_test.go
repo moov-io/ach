@@ -11,8 +11,6 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/moov-io/base"
 )
 
 // batch should never be used directly.
@@ -63,7 +61,7 @@ func mockBatchInvalidSECHeader() *BatchHeader {
 	bh.CompanyName = "ACME Corporation"
 	bh.CompanyIdentification = "123456789"
 	bh.CompanyEntryDescription = "PAYROLL"
-	bh.EffectiveEntryDate = base.NewTime(time.Now())
+	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
 	bh.ODFIIdentification = "123456789"
 	return bh
 }
@@ -86,7 +84,7 @@ func TestBatch__UnmarshalJSON(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	bs, err := json.MarshalIndent(f, "  ", " ")
+	bs, err := json.Marshal(f)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,10 +98,10 @@ func TestBatch__UnmarshalJSON(t *testing.T) {
 		t.Error("file == nil")
 	}
 
-	if v := file.Header.FileCreationDate.String(); v != "2018-06-13 20:00:00 -0400 EDT" {
+	if v := file.Header.FileCreationDate; v != "180614" {
 		t.Errorf("got FileCreationDate of %q", v)
 	}
-	if v := file.Header.FileCreationTime.String(); v != "0000-12-31 19:00:00 -0500 EST" {
+	if v := file.Header.FileCreationTime; v != "0000" {
 		t.Errorf("got FileCreationTime of %q", v)
 	}
 }
@@ -695,7 +693,7 @@ func testIATBatch(t testing.TB) {
 	bh.CompanyName = "ACME Corporation"
 	bh.CompanyIdentification = "123456789"
 	bh.CompanyEntryDescription = "PAYROLL"
-	bh.EffectiveEntryDate = base.NewTime(time.Now())
+	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
 	bh.ODFIIdentification = "123456789"
 
 	_, err := NewBatch(bh)

@@ -7,9 +7,6 @@ package ach
 import (
 	"strconv"
 	"strings"
-	"time"
-
-	"github.com/moov-io/base"
 )
 
 // converters handles golang to ACH type Converters
@@ -25,26 +22,20 @@ func (c *converters) parseStringField(r string) (s string) {
 	return s
 }
 
-// formatSimpleDate takes a github.com/moov-io/base Time and returns a string of YYMMDD
-func (c *converters) formatSimpleDate(t base.Time) string {
-	return t.Format("060102")
+// formatSimpleDate takes a YYMMDD date and formats it for the fixed-width ACH file format
+func (c *converters) formatSimpleDate(s string) string {
+	if s == "" {
+		return c.stringField(s, 6)
+	}
+	return s
 }
 
-// parseSimpleDate returns a github.com/moov-io/base Time when passed time as YYMMDD
-func (c *converters) parseSimpleDate(s string) base.Time {
-	t, _ := time.Parse("060102", s)
-	return base.NewTime(t)
-}
-
-// formatSimpleTime returns a string of HHMM when passed a github.com/moov-io/base Time
-func (c *converters) formatSimpleTime(t base.Time) string {
-	return t.Format("1504")
-}
-
-// parseSimpleTime returns a github.com/moov-io/base Time when passed a string of HHMM
-func (c *converters) parseSimpleTime(s string) base.Time {
-	t, _ := time.Parse("1504", s)
-	return base.NewTime(t)
+// formatSimpleTime takes a HHMM time and formats it for the fixed-width ACH file format
+func (c *converters) formatSimpleTime(s string) string {
+	if s == "" {
+		return c.stringField(s, 4)
+	}
+	return s
 }
 
 // alphaField Alphanumeric and Alphabetic fields are left-justified and space filled.

@@ -33,3 +33,52 @@ func TestValidators__checkDigit(t *testing.T) {
 		}
 	}
 }
+
+func TestValidators__validateSimpleDate(t *testing.T) {
+	cases := map[string]string{
+		// invalid
+		"":       "",
+		"01":     "",
+		"001520": "", // no 15th month
+		"001240": "", // no 40th Day
+		"190001": "", // no 0th month
+		"190100": "", // no 0th day
+		// valid
+		"190101": "190101", // Jan 1st
+		"201231": "201231", // Dec 31st
+		"220731": "220731", // July 31st
+		"350430": "350430", // April 30th
+		"500229": "500229", // Feb 29th
+	}
+
+	v := validator{}
+	for input, expected := range cases {
+		answer := v.validateSimpleDate(input)
+		if expected != answer {
+			t.Errorf("input=%q got=%q expected=%q", input, answer, expected)
+		}
+	}
+}
+
+func TestValidators__validateSimpleTime(t *testing.T) {
+	cases := map[string]string{
+		// invalid
+		"":       "",
+		"01":     "",
+		"012":    "",
+		"123142": "",
+		// valid
+		"0000": "0000",
+		"0100": "0100",
+		"2359": "2359",
+		"1201": "1201",
+		"1238": "1238",
+	}
+	v := validator{}
+	for input, expected := range cases {
+		answer := v.validateSimpleTime(input)
+		if expected != answer {
+			t.Errorf("input=%q got=%q expected=%q", input, answer, expected)
+		}
+	}
+}

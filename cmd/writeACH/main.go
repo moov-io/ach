@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/moov-io/ach"
-	"github.com/moov-io/base"
 )
 
 var (
@@ -61,7 +60,7 @@ func write(path string) {
 	fh := ach.NewFileHeader()
 	fh.ImmediateDestination = "231380104"
 	fh.ImmediateOrigin = "121042882"
-	fh.FileCreationDate = base.NewTime(time.Now())
+	fh.FileCreationDate = time.Now().Format("060102")
 	fh.ImmediateDestinationName = "Citadel"
 	fh.ImmediateOriginName = "Wells Fargo"
 	file := ach.NewFile()
@@ -75,7 +74,7 @@ func write(path string) {
 		bh.CompanyIdentification = "121042882"
 		bh.StandardEntryClassCode = ach.PPD
 		bh.CompanyEntryDescription = "Trans. Description"
-		bh.EffectiveEntryDate = base.NewTime(time.Now().AddDate(0, 0, 1))
+		bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102")
 		bh.ODFIIdentification = "121042882"
 
 		batch, _ := ach.NewBatch(bh)

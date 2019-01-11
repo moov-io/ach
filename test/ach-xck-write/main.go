@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/moov-io/ach"
-	"github.com/moov-io/base"
 )
 
 func main() {
@@ -14,9 +13,9 @@ func main() {
 	// Important: All financial institutions are different and will require registration and exact field values.
 
 	fh := ach.NewFileHeader()
-	fh.ImmediateDestination = "231380104"          // Routing Number of the ACH Operator or receiving point to which the file is being sent
-	fh.ImmediateOrigin = "121042882"               // Routing Number of the ACH Operator or sending point that is sending the file
-	fh.FileCreationDate = base.NewTime(time.Now()) // Today's Date
+	fh.ImmediateDestination = "231380104"             // Routing Number of the ACH Operator or receiving point to which the file is being sent
+	fh.ImmediateOrigin = "121042882"                  // Routing Number of the ACH Operator or sending point that is sending the file
+	fh.FileCreationDate = time.Now().Format("060102") // Today's Date
 	fh.ImmediateDestinationName = "Federal Reserve Bank"
 	fh.ImmediateOriginName = "My Bank Name"
 
@@ -25,10 +24,10 @@ func main() {
 	bh.ServiceClassCode = ach.DebitsOnly
 	bh.CompanyName = "Payee Name" // The name of the company/person that has relationship with receiver
 	bh.CompanyIdentification = fh.ImmediateOrigin
-	bh.StandardEntryClassCode = ach.XCK    // Consumer destination vs Company CCD
-	bh.CompanyEntryDescription = "ACH XCK" // will be on receiving accounts statement
-	bh.EffectiveEntryDate = base.NewTime(time.Now().AddDate(0, 0, 1))
-	bh.ODFIIdentification = "121042882" // Originating Routing Number
+	bh.StandardEntryClassCode = ach.XCK                                  // Consumer destination vs Company CCD
+	bh.CompanyEntryDescription = "ACH XCK"                               // will be on receiving accounts statement
+	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
+	bh.ODFIIdentification = "121042882"                                  // Originating Routing Number
 
 	// Identifies the receivers account information
 	// can be multiple entry's per batch

@@ -7,8 +7,6 @@ package ach
 import (
 	"fmt"
 	"strings"
-
-	"github.com/moov-io/base"
 )
 
 // When a Return Entry is prepared, the original Company/Batch Header Record, the original Entry Detail Record,
@@ -46,8 +44,8 @@ type Addenda99 struct {
 	// The RDFI must include the Original Entry Trace Number in the Addenda Record of an Entry being returned to an ODFI,
 	// in the Addenda Record of an 98, within an Acknowledgment Entry, or with an RDFI request for a copy of an authorization.
 	OriginalTrace string `json:"originalTrace"`
-	// DateOfDeath The field date of death is to be supplied on Entries being returned for reason of death (return reason codes R14 and R15).
-	DateOfDeath base.Time `json:"dateOfDeath"`
+	// DateOfDeath The field date of death is to be supplied on Entries being returned for reason of death (return reason codes R14 and R15). Format: YYMMDD (Y=Year, M=Month, D=Day)
+	DateOfDeath string `json:"dateOfDeath"`
 	// OriginalDFI field contains the Receiving DFI Identification (addenda.RDFIIdentification) as originally included on the forward Entry or Prenotification that the RDFI is returning or correcting.
 	OriginalDFI string `json:"originalDFI"`
 	// AddendaInformation
@@ -92,7 +90,7 @@ func (Addenda99 *Addenda99) Parse(record string) {
 	// 7-21
 	Addenda99.OriginalTrace = strings.TrimSpace(record[6:21])
 	// 22-27, might be a date or blank
-	Addenda99.DateOfDeath = Addenda99.parseSimpleDate(record[21:27])
+	Addenda99.DateOfDeath = Addenda99.validateSimpleDate(record[21:27])
 	// 28-35
 	Addenda99.OriginalDFI = Addenda99.parseStringField(record[27:35])
 	// 36-79
@@ -149,10 +147,9 @@ func (Addenda99 *Addenda99) OriginalTraceField() string {
 // DateOfDeathField returns a space padded DateOfDeath string
 func (Addenda99 *Addenda99) DateOfDeathField() string {
 	// Return space padded 6 characters if it is a zero value of DateOfDeath
-	if Addenda99.DateOfDeath.IsZero() {
+	if Addenda99.DateOfDeath == "" {
 		return Addenda99.alphaField("", 6)
 	}
-	// YYMMDD
 	return Addenda99.formatSimpleDate(Addenda99.DateOfDeath)
 }
 
