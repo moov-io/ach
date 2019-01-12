@@ -62,7 +62,7 @@ func BenchmarkMockBatchHeader(b *testing.B) {
 
 // testParseBatchHeader parses a known batch header record string
 func testParseBatchHeader(t testing.TB) {
-	var line = "5225companyname                         origid    PPDCHECKPAYMT000002080730   1076401250000001"
+	var line = "5225companyname                         origid    PPDCHECKPAYMT000002190730   1076401250000001"
 	r := NewReader(strings.NewReader(line))
 	r.line = line
 	if err := r.parseBatchHeader(); err != nil {
@@ -94,8 +94,8 @@ func testParseBatchHeader(t testing.TB) {
 	if record.CompanyDescriptiveDate != "000002" {
 		t.Errorf("CompanyDescriptiveDate Expected '000002' got: %v", record.CompanyDescriptiveDate)
 	}
-	if record.EffectiveEntryDateField() != "080730" {
-		t.Errorf("EffectiveEntryDate Expected '080730' got: %v", record.EffectiveEntryDateField())
+	if record.EffectiveEntryDateField() != "190730" {
+		t.Errorf("EffectiveEntryDate Expected '190730' got: %v", record.EffectiveEntryDateField())
 	}
 	if record.settlementDate != "   " {
 		t.Errorf("SettlementDate Expected '   ' got: %v", record.settlementDate)
@@ -126,7 +126,7 @@ func BenchmarkParseBatchHeader(b *testing.B) {
 
 // testBHString validates that a known parsed file can be return to a string of the same value
 func testBHString(t testing.TB) {
-	var line = "5225companyname                         origid    PPDCHECKPAYMT000002080730   1076401250000001"
+	var line = "5225companyname                         origid    PPDCHECKPAYMT000002180730   1076401250000001"
 	r := NewReader(strings.NewReader(line))
 	r.line = line
 	if err := r.parseBatchHeader(); err != nil {

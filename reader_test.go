@@ -144,8 +144,7 @@ func testPPDDebitRead(t testing.TB) {
 	}
 	defer f.Close()
 	r := NewReader(f)
-	_, err = r.Read()
-	if err != nil {
+	if _, err := r.Read(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 	if err = r.File.Validate(); err != nil {

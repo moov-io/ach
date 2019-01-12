@@ -90,6 +90,15 @@ func (v *validator) isYear(s string) error {
 	return nil
 }
 
+// isCreditCardYear validates a 2 digit year for credit cards, but
+// only accepts a range of years. 2018 to 2050
+func (v *validator) isCreditCardYear(s string) error {
+	if s < "18" || s > "50" {
+		return errors.New(msgValidYear)
+	}
+	return nil
+}
+
 // isMonth validates a 2 digit month 01-12
 func (v *validator) isMonth(s string) error {
 	switch s {

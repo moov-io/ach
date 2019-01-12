@@ -56,7 +56,7 @@ func BenchmarkMockFileHeader(b *testing.B) {
 
 // parseFileHeader validates parsing a file header
 func parseFileHeader(t testing.TB) {
-	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
+	var line = "101 076401251 0764012511807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
 	r.line = line
 	if err := r.parseFileHeader(); err != nil {
@@ -77,8 +77,8 @@ func parseFileHeader(t testing.TB) {
 		t.Errorf("ImmediateOrigin Expected '   076401251' got: %v", record.ImmediateOriginField())
 	}
 
-	if record.FileCreationDateField() != "080729" {
-		t.Errorf("FileCreationDate Expected '080728' got:'%v'", record.FileCreationDateField())
+	if record.FileCreationDateField() != "180729" {
+		t.Errorf("FileCreationDate Expected '180729' got:'%v'", record.FileCreationDateField())
 	}
 
 	if record.FileCreationTimeField() != "1511" {
@@ -123,7 +123,7 @@ func BenchmarkParseFileHeader(b *testing.B) {
 
 // testFHString validates that a known parsed file can return to a string of the same value
 func testFHString(t testing.TB) {
-	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
+	var line = "101 076401251 0764012511807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
 	r.line = line
 	if err := r.parseFileHeader(); err != nil {
