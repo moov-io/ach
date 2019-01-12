@@ -34,6 +34,29 @@ func TestValidators__checkDigit(t *testing.T) {
 	}
 }
 
+func TestValidators__isCreditCardYear(t *testing.T) {
+	cases := map[string]bool{
+		// invalid (or out of range)
+		"10": false,
+		"00": false,
+		"51": false,
+		"17": false,
+		// valid
+		"20": true,
+		"19": true,
+	}
+	v := validator{}
+	for yy, valid := range cases {
+		err := v.isCreditCardYear(yy)
+		if valid && err != nil {
+			t.Errorf("yy=%s failed: %v", yy, err)
+		}
+		if !valid && err == nil {
+			t.Errorf("yy=%s should have failed", yy)
+		}
+	}
+}
+
 func TestValidators__validateSimpleDate(t *testing.T) {
 	cases := map[string]string{
 		// invalid
