@@ -3,7 +3,6 @@
 BREAKING CHANGES
 
 - `file.NotificationOfChange` accepts `Batcher` instead of `*BatchCOR` to comply with linter errors
-- Timestamp values are now returned in ISO 8601 format. (See: [moov-io/base #7](https://github.com/moov-io/base/issues/7))
 
 ADDITIONS
 
