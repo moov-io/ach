@@ -6,29 +6,28 @@ package ach
 
 import (
 	"bufio"
-	"bytes"
-	"encoding/json"
 	"fmt"
+	"github.com/moov-io/base"
 	"io"
 	"strconv"
 )
 
-// ParseError is returned for parsing reader errors.
+/*// ParseError is returned for parsing reader errors.
 // The first line is 1.
 type ParseError struct {
 	Line   int    // Line number where the error occurred
 	Record string // Name of the record type being parsed
 	Err    error  // The actual error
-}
+}*/
 
-func (e ParseError) Error() string {
+/*func (e ParseError) Error() string {
 	if e.Record == "" {
 		return fmt.Sprintf("line:%d %T %s", e.Line, e.Err, e.Err)
 	}
 	return fmt.Sprintf("line:%d record:%s %T %s", e.Line, e.Record, e.Err, e.Err)
-}
+}*/
 
-// ErrorList represents an array of errors which is also an error itself.
+/*// ErrorList represents an array of errors which is also an error itself.
 type ErrorList []error
 
 // Add appends err onto the ErrorList. Errors are kept in order.
@@ -42,9 +41,9 @@ func (e ErrorList) Err() error {
 		return nil
 	}
 	return e[0]
-}
+}*/
 
-// Error implements the error interface
+/*// Error implements the error interface
 func (e ErrorList) Error() string {
 	if len(e) == 0 {
 		return "<nil>"
@@ -84,7 +83,7 @@ func (e ErrorList) Empty() bool {
 // MarshalJSON marshals error list
 func (e ErrorList) MarshalJSON() ([]byte, error) {
 	return json.Marshal(e.Error())
-}
+}*/
 
 // Reader reads records from a ACH-encoded file.
 type Reader struct {
@@ -110,7 +109,7 @@ type Reader struct {
 	recordName string
 
 	// errors holds each error encountered when attempting to parse the file
-	errors ErrorList
+	errors base.ErrorList
 }
 
 // error returns a new ParseError based on err
@@ -118,10 +117,10 @@ func (r *Reader) parseError(err error) error {
 	if err == nil {
 		return nil
 	}
-	if _, ok := err.(*ParseError); ok {
+	if _, ok := err.(*base.ParseError); ok {
 		return err
 	}
-	return &ParseError{
+	return &base.ParseError{
 		Line:   r.lineNum,
 		Record: r.recordName,
 		Err:    err,

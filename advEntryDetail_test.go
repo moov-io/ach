@@ -5,6 +5,7 @@
 package ach
 
 import (
+	"github.com/moov-io/base"
 	"strings"
 	"testing"
 )
@@ -369,7 +370,7 @@ func TestInvalidADVEDParse(t *testing.T) {
 	r.addCurrentBatch(NewBatchADV(&bh))
 
 	if err := r.parseEntryDetail(); err != nil {
-		if p, ok := err.(*ParseError); ok {
+		if p, ok := err.(*base.ParseError); ok {
 			if p.Record != "EntryDetail" {
 				t.Errorf("%T: %s", p, p)
 			}

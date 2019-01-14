@@ -5,6 +5,7 @@
 package ach
 
 import (
+	"github.com/moov-io/base"
 	"strings"
 	"testing"
 )
@@ -302,7 +303,7 @@ func TestInvalidADVFCParse(t *testing.T) {
 	r.File.AddBatch(batchADV)
 
 	if err := r.parseFileControl(); err != nil {
-		if p, ok := err.(*ParseError); ok {
+		if p, ok := err.(*base.ParseError); ok {
 			if p.Record != "FileControl" {
 				t.Errorf("%T: %s", p, p)
 			}
