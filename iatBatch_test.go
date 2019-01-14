@@ -6,6 +6,7 @@ package ach
 
 import (
 	"encoding/json"
+	"github.com/moov-io/base"
 	"os"
 	"path/filepath"
 	"strings"
@@ -2239,7 +2240,7 @@ func TestParseRuneCountIATBatchHeader(t *testing.T) {
 	r := NewReader(strings.NewReader(line))
 	r.line = line
 	if err := r.parseIATBatchHeader(); err != nil {
-		if e, ok := err.(*ParseError); ok {
+		if e, ok := err.(*base.ParseError); ok {
 			if e.Record != "BatchHeader" {
 				t.Errorf("%T: %s", err, err)
 			}
