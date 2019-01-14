@@ -9,8 +9,6 @@ import (
 	"strconv"
 	"strings"
 	"unicode/utf8"
-
-	"github.com/moov-io/base"
 )
 
 // msgServiceClass
@@ -83,8 +81,8 @@ type BatchHeader struct {
 	// (positions 64-69).
 	CompanyDescriptiveDate string `json:"companyDescriptiveDate,omitempty"`
 
-	// EffectiveEntryDate the date on which the entries are to settle
-	EffectiveEntryDate base.Time `json:"effectiveEntryDate,omitempty"`
+	// EffectiveEntryDate the date on which the entries are to settle. Format: YYMMDD (Y=Year, M=Month, D=Day)
+	EffectiveEntryDate string `json:"effectiveEntryDate,omitempty"`
 
 	// SettlementDate Leave blank, this field is inserted by the ACH operator
 	settlementDate string
@@ -166,7 +164,7 @@ func (bh *BatchHeader) Parse(record string) {
 	bh.CompanyDescriptiveDate = strings.TrimSpace(record[63:69])
 	// 70-75 Date transactions are to be posted to the receivers’ account.
 	// You almost always want the transaction to post as soon as possible, so put tomorrow's date in YYMMDD format
-	bh.EffectiveEntryDate = bh.parseSimpleDate(record[69:75])
+	bh.EffectiveEntryDate = bh.validateSimpleDate(record[69:75])
 	// 76-79 Always blank (just fill with spaces)
 	bh.settlementDate = "   "
 	// 79-79 Always 1
@@ -317,9 +315,9 @@ func (bh *BatchHeader) CompanyDescriptiveDateField() string {
 func (bh *BatchHeader) EffectiveEntryDateField() string {
 	// ENR records require EffectiveEntryDate to be space filled. NACHA Page OR108
 	if bh.CompanyEntryDescription == "AUTOENROLL" {
-		return bh.alphaField("", 6) // YYMMDD
+		return bh.alphaField("", 6)
 	}
-	return bh.formatSimpleDate(bh.EffectiveEntryDate)
+	return bh.stringField(bh.EffectiveEntryDate, 6) // YYMMDD
 }
 
 // ODFIIdentificationField get the odfi number zero padded

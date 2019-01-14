@@ -7,8 +7,6 @@ package ach
 import (
 	"testing"
 	"time"
-
-	"github.com/moov-io/base"
 )
 
 // mockBatchPPDHeader creates a PPD batch header
@@ -19,7 +17,7 @@ func mockBatchPPDHeader() *BatchHeader {
 	bh.CompanyName = "ACME Corporation"
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "PAYROLL"
-	bh.EffectiveEntryDate = base.NewTime(time.Now())
+	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
 	bh.ODFIIdentification = "12104288"
 	return bh
 }
@@ -46,7 +44,7 @@ func mockBatchPPDHeader2() *BatchHeader {
 	bh.CompanyIdentification = "121042882"
 	bh.StandardEntryClassCode = PPD
 	bh.CompanyEntryDescription = "PAYROLL"
-	bh.EffectiveEntryDate = base.NewTime(time.Now())
+	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
 	bh.ODFIIdentification = "12104288"
 	return bh
 }

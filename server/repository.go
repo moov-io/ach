@@ -181,9 +181,9 @@ func (r *repositoryInMemory) cleanupOldFiles() {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 
-	tooOld := time.Now().Add(-1 * r.ttl)
+	tooOld := time.Now().Add(-1 * r.ttl).Format("060102") // YYMMDD
 	for id, file := range r.files {
-		if file.Header.FileCreationDate.Before(tooOld) {
+		if file.Header.FileCreationDate < tooOld {
 			delete(r.files, id)
 		}
 	}

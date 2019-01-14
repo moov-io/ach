@@ -70,7 +70,7 @@ func (batch *BatchSHR) Validate() error {
 		if err := entry.isMonth(month); err != nil {
 			return &FieldError{FieldName: "CardExpirationDate", Value: month, Msg: msgValidMonth}
 		}
-		if err := entry.isYear(year); err != nil {
+		if err := entry.isCreditCardYear(year); err != nil {
 			return &FieldError{FieldName: "CardExpirationDate", Value: year, Msg: msgValidYear}
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode

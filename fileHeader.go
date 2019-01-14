@@ -8,8 +8,6 @@ import (
 	"fmt"
 	"strings"
 	"unicode/utf8"
-
-	"github.com/moov-io/base"
 )
 
 // Errors specific to a File Header Record
@@ -51,13 +49,13 @@ type FileHeader struct {
 	// or the date (exchange date) on which a file is transmitted from ACH Operator
 	// to ACH Operator, or from ACH Operator to RDFIs (ACH output files).
 	//
-	// The JSON representation is ISO 8601.
-	FileCreationDate base.Time `json:"fileCreationDate"`
+	// The format is: YYMMDD. Y=Year, M=Month, D=Day
+	FileCreationDate string `json:"fileCreationDate"`
 
-	// FileCreationTime is the system time when the ACH file was created
+	// FileCreationTime is the system time when the ACH file was created.
 	//
-	// The JSON representation is ISO 8601.
-	FileCreationTime base.Time `json:"fileCreationTime"`
+	// The format is: HHMM. H=Hour, M=Minute
+	FileCreationTime string `json:"fileCreationTime"`
 
 	// This field should start at zero and increment by 1 (up to 9) and then go to
 	// letters starting at A through Z for each subsequent file that is created for
@@ -127,9 +125,9 @@ func (fh *FileHeader) Parse(record string) {
 	fh.ImmediateOrigin = fh.parseStringField(record[13:23])
 	// 24-29 Today's date in YYMMDD format
 	// must be after today's date.
-	fh.FileCreationDate = fh.parseSimpleDate(record[23:29])
+	fh.FileCreationDate = fh.validateSimpleDate(record[23:29])
 	// 30-33 The current time in HHMM format
-	fh.FileCreationTime = fh.parseSimpleTime(record[29:33])
+	fh.FileCreationTime = fh.validateSimpleTime(record[29:33])
 	// 35-37 Always "A"
 	fh.FileIDModifier = record[33:34]
 	// 35-37 always "094"
@@ -249,10 +247,10 @@ func (fh *FileHeader) fieldInclusion() error {
 			Msg:       msgFieldInclusion + ", did you use NewFileHeader()?",
 		}
 	}
-	if fh.FileCreationDate.IsZero() {
+	if fh.FileCreationDate == "" {
 		return &FieldError{
 			FieldName: "FileCreationDate",
-			Value:     fh.FileCreationDate.String(),
+			Value:     fh.FileCreationDate,
 			Msg:       msgFieldInclusion + ", did you use NewFileHeader()?",
 		}
 	}
@@ -299,12 +297,12 @@ func (fh *FileHeader) ImmediateOriginField() string {
 
 // FileCreationDateField gets the file creation date in YYMMDD format
 func (fh *FileHeader) FileCreationDateField() string {
-	return fh.formatSimpleDate(fh.FileCreationDate)
+	return fh.formatSimpleDate(fh.FileCreationDate) // YYMMDD
 }
 
 // FileCreationTimeField gets the file creation time in HHMM format
 func (fh *FileHeader) FileCreationTimeField() string {
-	return fh.formatSimpleTime(fh.FileCreationTime)
+	return fh.formatSimpleTime(fh.FileCreationTime) // HHMM
 }
 
 // ImmediateDestinationNameField gets the ImmediateDestinationName field padded

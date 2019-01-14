@@ -8,8 +8,6 @@ import (
 	"log"
 	"testing"
 	"time"
-
-	"github.com/moov-io/base"
 )
 
 // mockBatchMTEHeader creates a MTE batch header
@@ -20,7 +18,7 @@ func mockBatchMTEHeader() *BatchHeader {
 	bh.CompanyIdentification = "231380104"
 	bh.StandardEntryClassCode = MTE
 	bh.CompanyEntryDescription = "CASH WITHDRAW"
-	bh.EffectiveEntryDate = base.NewTime(time.Now())
+	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
 	bh.ODFIIdentification = "23138010"
 	return bh
 }

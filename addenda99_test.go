@@ -6,9 +6,6 @@ package ach
 
 import (
 	"testing"
-	"time"
-
-	"github.com/moov-io/base"
 )
 
 func mockAddenda99() *Addenda99 {
@@ -38,8 +35,8 @@ func testAddenda99Parse(t testing.TB) {
 	if addenda99.OriginalTrace != "099912340000015" {
 		t.Errorf("expected: %v got: %v", "099912340000015", addenda99.OriginalTrace)
 	}
-	if !addenda99.DateOfDeath.IsZero() {
-		t.Errorf("expected: %v got: %v", time.Time{}, addenda99.DateOfDeath)
+	if addenda99.DateOfDeathField() == "" {
+		t.Errorf("got: %v", addenda99.DateOfDeath)
 	}
 	if addenda99.OriginalDFI != "09101298" {
 		t.Errorf("expected: %s got: %s", "09101298", addenda99.OriginalDFI)
@@ -186,9 +183,9 @@ func testAddenda99DateOfDeathField(t testing.TB) {
 		t.Errorf("expected %v received %v", "      ", addenda99.DateOfDeathField())
 	}
 	// Year: 1978 Month: October Day: 23
-	addenda99.DateOfDeath = base.NewTime(time.Date(1978, time.October, 23, 0, 0, 0, 0, time.UTC))
-	if addenda99.DateOfDeathField() != "781022" { // base.Time defaults to American/New_York
-		t.Errorf("expected %v received %v", "781022", addenda99.DateOfDeathField())
+	addenda99.DateOfDeath = "781023"
+	if addenda99.DateOfDeathField() != "781023" {
+		t.Errorf("expected %v received %v", "781023", addenda99.DateOfDeathField())
 	}
 }
 

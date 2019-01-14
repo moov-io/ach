@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/moov-io/ach"
-	"github.com/moov-io/base"
 )
 
 func mockServiceInMemory() Service {
@@ -23,7 +22,7 @@ func mockFileHeader() *ach.FileHeader {
 	fh.ID = "12345"
 	fh.ImmediateDestination = "9876543210"
 	fh.ImmediateOrigin = "1234567890"
-	fh.FileCreationDate = base.NewTime(time.Now())
+	fh.FileCreationDate = time.Now().Format("060102")
 	fh.ImmediateDestinationName = "Federal Reserve Bank"
 	fh.ImmediateOriginName = "My Bank Name"
 	return &fh

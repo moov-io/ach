@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/moov-io/ach"
-	"github.com/moov-io/base"
 )
 
 func main() {
@@ -16,9 +15,9 @@ func main() {
 	// Set originator bank ODFI and destination Operator for the financial institution
 	// this is the funding/receiving source of the transfer
 	fh := ach.NewFileHeader()
-	fh.ImmediateDestination = "121042882"          // Routing Number of the ACH Operator or receiving point to which the file is being sent
-	fh.ImmediateOrigin = "231380104"               // Routing Number of the ACH Operator or sending point that is sending the file
-	fh.FileCreationDate = base.NewTime(time.Now()) // Today's Date
+	fh.ImmediateDestination = "121042882"             // Routing Number of the ACH Operator or receiving point to which the file is being sent
+	fh.ImmediateOrigin = "231380104"                  // Routing Number of the ACH Operator or sending point that is sending the file
+	fh.FileCreationDate = time.Now().Format("060102") // Today's Date
 	fh.ImmediateDestinationName = "Bank"
 	fh.ImmediateOriginName = "My Bank Name"
 
@@ -34,7 +33,7 @@ func main() {
 	bh.ISOOriginatingCurrencyCode = "CAD"
 	bh.ISODestinationCurrencyCode = "USD"
 	bh.ODFIIdentification = "23138010"
-	bh.EffectiveEntryDate = base.NewTime(time.Now().AddDate(0, 0, 1))
+	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
 
 	// Identifies the receivers account information
 	// can be multiple entry's per batch

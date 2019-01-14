@@ -82,19 +82,21 @@ func (v *validator) isCardTransactionType(code string) error {
 	return errors.New(msgCardTransactionType)
 }
 
-// isYear validates a 2 digit year 18-50 (2018 - 2050)
-// ToDo:  Add/remove more years as card expiration dates need/don't need them
+// isYear validates a 2 digit year 00-99
 func (v *validator) isYear(s string) error {
-	switch s {
-	case
-		"18", "19",
-		"20", "21", "22", "23", "24", "25", "26", "27", "28", "29",
-		"30", "31", "32", "33", "34", "35", "36", "37", "38", "39",
-		"40", "41", "42", "43", "44", "45", "46", "47", "48", "49",
-		"50":
-		return nil
+	if s < "00" || s > "99" {
+		return errors.New(msgValidYear)
 	}
-	return errors.New(msgValidYear)
+	return nil
+}
+
+// isCreditCardYear validates a 2 digit year for credit cards, but
+// only accepts a range of years. 2018 to 2050
+func (v *validator) isCreditCardYear(s string) error {
+	if s < "18" || s > "50" {
+		return errors.New(msgValidYear)
+	}
+	return nil
 }
 
 // isMonth validates a 2 digit month 01-12
@@ -148,6 +150,39 @@ func (v *validator) isDay(m string, d string) error {
 		}
 	}
 	return errors.New(msgValidDay)
+}
+
+// validateSimpleDate will return the incoming string only if it matches a valid YYMMDD
+// date format. (Y=Year, M=Month, D=Day)
+func (v *validator) validateSimpleDate(s string) string {
+	if length := utf8.RuneCountInString(s); length != 6 {
+		return ""
+	}
+	yy, mm, dd := s[:2], s[2:4], s[4:6]
+	if err := v.isYear(yy); err != nil {
+		return ""
+	}
+	if err := v.isMonth(mm); err != nil {
+		return ""
+	}
+	if err := v.isDay(mm, dd); err != nil {
+		return ""
+	}
+	return fmt.Sprintf("%s%s%s", yy, mm, dd)
+}
+
+var (
+	// hhmmRegex defines a regex for all valid 24-hour clock timestamps.
+	// Format: HHMM (first H can only be 0, 1, or 2)
+	hhmmRegex = regexp.MustCompile(`^([0-2]{1}[\d]{1}[0-5]{1}\d{1})$`)
+)
+
+// validateSimpleTime will return the incoming string only if it is a valid 24-hour clock time.
+func (v *validator) validateSimpleTime(s string) string {
+	if hhmmRegex.MatchString(s) {
+		return s // successfully matched and validated
+	}
+	return ""
 }
 
 // isForeignExchangeIndicator ensures foreign exchange indicators of an

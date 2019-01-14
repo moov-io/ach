@@ -18,7 +18,6 @@ import (
 	"time"
 
 	"github.com/moov-io/ach"
-	"github.com/moov-io/base"
 )
 
 // TestServer__CreateFileEndpoint creates JSON from existing ACH Files and submits them to our
@@ -59,7 +58,7 @@ func TestServer__CreateFileEndpoint(t *testing.T) {
 		// calling ach.FileFromJSON(bs) and it fails with an empty date time.
 		if file.SECCode == "ENR" {
 			for _, batch := range achFile.Batches {
-				batch.GetHeader().EffectiveEntryDate = base.NewTime(time.Now().AddDate(0, 0, 1))
+				batch.GetHeader().EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102")
 			}
 
 		}

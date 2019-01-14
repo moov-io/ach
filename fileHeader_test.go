@@ -8,8 +8,6 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/moov-io/base"
 )
 
 // mockFileHeader build a validate File Header for tests
@@ -17,7 +15,7 @@ func mockFileHeader() FileHeader {
 	fh := NewFileHeader()
 	fh.ImmediateDestination = "231380104"
 	fh.ImmediateOrigin = "121042882"
-	fh.FileCreationDate = base.NewTime(time.Now())
+	fh.FileCreationDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
 	fh.ImmediateDestinationName = "Federal Reserve Bank"
 	fh.ImmediateOriginName = "My Bank Name"
 	return fh
@@ -58,7 +56,7 @@ func BenchmarkMockFileHeader(b *testing.B) {
 
 // parseFileHeader validates parsing a file header
 func parseFileHeader(t testing.TB) {
-	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
+	var line = "101 076401251 0764012511807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
 	r.line = line
 	if err := r.parseFileHeader(); err != nil {
@@ -79,11 +77,11 @@ func parseFileHeader(t testing.TB) {
 		t.Errorf("ImmediateOrigin Expected '   076401251' got: %v", record.ImmediateOriginField())
 	}
 
-	if record.FileCreationDateField() != "080728" { // America/New_York
-		t.Errorf("FileCreationDate Expected '080728' got:'%v'", record.FileCreationDateField())
+	if record.FileCreationDateField() != "180729" {
+		t.Errorf("FileCreationDate Expected '180729' got:'%v'", record.FileCreationDateField())
 	}
 
-	if record.FileCreationTimeField() != "1900" { // America/New_York
+	if record.FileCreationTimeField() != "1511" {
 		t.Errorf("FileCreationTime Expected '1900' got:'%v'", record.FileCreationTimeField())
 	}
 
@@ -125,21 +123,12 @@ func BenchmarkParseFileHeader(b *testing.B) {
 
 // testFHString validates that a known parsed file can return to a string of the same value
 func testFHString(t testing.TB) {
-	var line = "101 076401251 0764012510807291511A094101achdestname            companyname                    "
+	var line = "101 076401251 0764012511807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
 	r.line = line
 	if err := r.parseFileHeader(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
-
-	// ToDo:  Commented base.Time does not work and this test fails.
-
-	/*	record := r.File.Header
-
-
-		if v := record.String(); v != strings.Replace(line, "07291511", "07281900", 1) { // UTC -> America/New_York timezone conversion
-			t.Errorf("Strings do not match:\n   v=%q\nline=%q", v, line) // aligned vertically
-		}*/
 }
 
 // TestFHString tests validating that a known parsed file can return to a string of the same value
@@ -591,7 +580,7 @@ func BenchmarkFHFieldInclusionFormatCode(b *testing.B) {
 // testFHFieldInclusionCreationDate validates creation date field inclusion
 func testFHFieldInclusionCreationDate(t testing.TB) {
 	fh := mockFileHeader()
-	fh.FileCreationDate = base.NewTime(time.Time{})
+	fh.FileCreationDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
 	if err := fh.Validate(); err != nil {
 		if e, ok := err.(*FieldError); ok {
 			if !strings.Contains(e.Msg, msgFieldInclusion) {

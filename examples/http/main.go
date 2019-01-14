@@ -19,7 +19,6 @@ import (
 	"time"
 
 	"github.com/moov-io/ach"
-	"github.com/moov-io/base"
 )
 
 var (
@@ -36,7 +35,7 @@ func main() {
 	fh := ach.NewFileHeader()
 	fh.ImmediateDestination = "231380104" // Routing Number of the ACH Operator or receiving point to which the file is being sent
 	fh.ImmediateOrigin = "121042882"      // Routing Number of the ACH Operator or sending point that is sending the file
-	fh.FileCreationDate = base.Now()      // Today's Date
+	fh.FileCreationDate = time.Now().Format("060102")
 	fh.ImmediateDestinationName = "Receiver Bank Name"
 	fh.ImmediateOriginName = "Origin Bank Name"
 
@@ -46,9 +45,9 @@ func main() {
 	bh.CompanyName = "Name on Account" // The name of the company/person that has relationship with receiver
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = ach.PPD
-	bh.CompanyEntryDescription = "REG.SALARY" // will be on receiving accounts statement
-	bh.EffectiveEntryDate = base.NewTime(time.Now().AddDate(0, 0, 1))
-	bh.ODFIIdentification = "121042882" // Originating Routing Number
+	bh.CompanyEntryDescription = "REG.SALARY"                            // will be on receiving accounts statement
+	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
+	bh.ODFIIdentification = "121042882"                                  // Originating Routing Number
 
 	// Identifies the receivers account information
 	// can be multiple entry's per batch

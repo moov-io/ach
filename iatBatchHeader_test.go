@@ -147,8 +147,8 @@ func testParseIATBatchHeader(t testing.TB) {
 		t.Errorf("CompanyEntryDescription Expected 'TRADEPAYMT' got: %v", record.CompanyEntryDescriptionField())
 	}
 
-	if record.EffectiveEntryDateField() != "180620" { // base.Time defaults to American/New_York
-		t.Errorf("EffectiveEntryDate Expected '180620' got: %v", record.EffectiveEntryDateField())
+	if record.EffectiveEntryDateField() != "180621" {
+		t.Errorf("EffectiveEntryDate Expected '180621' got: %v", record.EffectiveEntryDateField())
 	}
 	if record.settlementDate != "   " {
 		t.Errorf("SettlementDate Expected '   ' got: %v", record.settlementDate)
@@ -188,7 +188,7 @@ func testIATBHString(t testing.TB) {
 	}
 	record := r.IATCurrentBatch.GetHeader()
 
-	if v := record.String(); v != strings.Replace(line, "0621", "0620", 1) { // UTC -> America/New_York timezone conversion
+	if v := record.String(); v != line {
 		t.Errorf("Strings do not match:\n   v=%q\nline=%q", v, line) // vertically aligned
 	}
 }
@@ -219,7 +219,7 @@ func testIATBHFVString(t testing.TB) {
 	}
 	record := r.IATCurrentBatch.GetHeader()
 
-	if v := record.String(); v != strings.Replace(line, "0621", "0620", 1) { // UTC -> America/New_York timezone conversion
+	if v := record.String(); v != line {
 		t.Errorf("Strings do not match:\n   v=%q\nline=%q", v, line)
 	}
 }
