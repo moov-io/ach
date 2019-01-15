@@ -1455,7 +1455,7 @@ func BenchmarkACHIATAddenda1718(b *testing.B) {
 
 // testACHFileIATBatchHeader validates error when reading an invalid IATBatchHeader
 func testACHFileIATBatchHeader(t testing.TB) {
-	f, err := os.Open("./test/testdata/IAT-InvalidBatchHeader.ach")
+	f, err := os.Open("./test/testdata/iat-invalidBatchHeader.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1493,7 +1493,7 @@ func BenchmarkACHFileIATBatchHeader(b *testing.B) {
 
 // testACHFileIATEntryDetail validates error when reading an invalid IATEntryDetail
 func testACHFileIATEntryDetail(t testing.TB) {
-	f, err := os.Open("./test/testdata/IAT-InvalidEntryDetail.ach")
+	f, err := os.Open("./test/testdata/iat-invalidEntryDetail.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1531,7 +1531,7 @@ func BenchmarkACHFileIATEntryDetail(b *testing.B) {
 
 // TestIATAddendaRecordIndicator validates error when reading an invalid IATEntryDetail
 func TestIATAddendaRecordIndicator(t *testing.T) {
-	f, err := os.Open("./test/testdata/IAT-InvalidAddendaRecordIndicator.ach")
+	f, err := os.Open("./test/testdata/iat-invalidAddendaRecordIndicator.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1556,7 +1556,7 @@ func TestIATAddendaRecordIndicator(t *testing.T) {
 
 // TestACHFileIATAddenda10 validates error when reading an invalid IATAddenda10
 func TestACHFileIATAddenda10(t *testing.T) {
-	f, err := os.Open("./test/testdata/IAT-InvalidAddenda10.ach")
+	f, err := os.Open("./test/testdata/iat-invalidAddenda10.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1581,7 +1581,7 @@ func TestACHFileIATAddenda10(t *testing.T) {
 
 // TestACHFileIATAddenda11 validates error when reading an invalid IATAddenda10
 func TestACHFileIATAddenda11(t *testing.T) {
-	f, err := os.Open("./test/testdata/IAT-InvalidAddenda11.ach")
+	f, err := os.Open("./test/testdata/iat-invalidAddenda11.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1606,7 +1606,7 @@ func TestACHFileIATAddenda11(t *testing.T) {
 
 // TestACHFileIATAddenda12 validates error when reading an invalid IATAddenda10
 func TestACHFileIATAddenda12(t *testing.T) {
-	f, err := os.Open("./test/testdata/IAT-InvalidAddenda12.ach")
+	f, err := os.Open("./test/testdata/iat-invalidAddenda12.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1631,7 +1631,7 @@ func TestACHFileIATAddenda12(t *testing.T) {
 
 // TestACHFileIATAddenda13 validates error when reading an invalid IATAddenda13
 func TestACHFileIATAddenda13(t *testing.T) {
-	f, err := os.Open("./test/testdata/IAT-InvalidAddenda13.ach")
+	f, err := os.Open("./test/testdata/Iat-invalidAddenda13.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1656,7 +1656,7 @@ func TestACHFileIATAddenda13(t *testing.T) {
 
 // TestACHFileIATAddenda14 validates error when reading an invalid IATAddenda14
 func TestACHFileIATAddenda14(t *testing.T) {
-	f, err := os.Open("./test/testdata/IAT-InvalidAddenda14.ach")
+	f, err := os.Open("./test/testdata/iat-invalidAddenda14.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1681,7 +1681,7 @@ func TestACHFileIATAddenda14(t *testing.T) {
 
 // TestACHFileIATAddenda15 validates error when reading an invalid IATAddenda15
 func TestACHFileIATAddenda15(t *testing.T) {
-	f, err := os.Open("./test/testdata/IAT-InvalidAddenda15.ach")
+	f, err := os.Open("./test/testdata/iat-invalidAddenda15.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1706,7 +1706,7 @@ func TestACHFileIATAddenda15(t *testing.T) {
 
 // TestACHFileIATAddenda16 validates error when reading an invalid IATAddenda16
 func TestACHFileIATAddenda16(t *testing.T) {
-	f, err := os.Open("./test/testdata/IAT-InvalidAddenda16.ach")
+	f, err := os.Open("./test/testdata/iat-invalidAddenda16.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1731,7 +1731,7 @@ func TestACHFileIATAddenda16(t *testing.T) {
 
 // TestACHFileIATAddenda17 validates error when reading an invalid IATAddenda17
 func TestACHFileIATAddenda17(t *testing.T) {
-	f, err := os.Open("./test/testdata/IAT-InvalidAddenda17.ach")
+	f, err := os.Open("./test/testdata/iat-invalidAddenda17.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1756,7 +1756,7 @@ func TestACHFileIATAddenda17(t *testing.T) {
 
 // TestACHFileIATAddenda18 validates error when reading an invalid IATAddenda18
 func TestACHFileIATAddenda18(t *testing.T) {
-	f, err := os.Open("./test/testdata/IAT-InvalidAddenda18.ach")
+	f, err := os.Open("./test/testdata/iat-invalidAddenda18.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1781,7 +1781,7 @@ func TestACHFileIATAddenda18(t *testing.T) {
 
 // TestACHFileIATAddenda98 validates error when reading an invalid IATAddenda98
 func TestACHFileIATAddenda98(t *testing.T) {
-	f, err := os.Open("./test/testdata/IAT-InvalidAddenda98.ach")
+	f, err := os.Open("./test/testdata/iat-invalidAddenda98.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1806,7 +1806,32 @@ func TestACHFileIATAddenda98(t *testing.T) {
 
 // TestACHFileIATAddenda99 validates error when reading an invalid IATAddenda99
 func TestACHFileIATAddenda99(t *testing.T) {
-	f, err := os.Open("./test/testdata/IAT-InvalidAddenda99.ach")
+	f, err := os.Open("./test/testdata/iat-invalidAddenda99.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FieldError); ok {
+					if e.FieldName != "ReturnCode" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
+// TestPOSInvalidReturnFile validates error when reading an invalid POS Return
+func TestPOSInvalidReturnFile(t *testing.T) {
+	f, err := os.Open("./test/testdata/pos-invalidReturnFile.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1831,7 +1856,7 @@ func TestACHFileIATAddenda99(t *testing.T) {
 
 // testACHFileIATBC validates error when reading an invalid IAT Batch Control
 func testACHFileIATBC(t testing.TB) {
-	f, err := os.Open("./test/testdata/IAT-InvalidBatchControl.ach")
+	f, err := os.Open("./test/testdata/iat-invalidBatchControl.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1869,7 +1894,7 @@ func BenchmarkACHFileIATBC(b *testing.B) {
 
 // testACHFileIATBH validates error when reading an invalid IAT Batch Header
 func testACHFileIATBH(t testing.TB) {
-	f, err := os.Open("./test/testdata/IAT-BatchHeaderErr.ach")
+	f, err := os.Open("./test/testdata/iat-batchHeaderErr.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
