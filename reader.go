@@ -312,11 +312,6 @@ func (r *Reader) parseEntryDetail() error {
 func (r *Reader) parseAddenda() error {
 	r.recordName = "Addenda"
 
-	if r.currentBatch == nil {
-		msg := fmt.Sprint(msgFileBatchOutside)
-		return r.parseError(&FileError{FieldName: "Addenda", Msg: msg})
-	}
-
 	if r.currentBatch.GetHeader().StandardEntryClassCode != ADV {
 		if len(r.currentBatch.GetEntries()) == 0 {
 			return r.parseError(&FileError{FieldName: "Addenda", Msg: msgFileBatchOutside})

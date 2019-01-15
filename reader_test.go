@@ -1854,6 +1854,106 @@ func TestPOSInvalidReturnFile(t *testing.T) {
 	}
 }
 
+// TestWEBInvalidNOCFile validates error when reading an invalid WEB NOC
+func TestWEBInvalidNOCFile(t *testing.T) {
+	f, err := os.Open("./test/testdata/web-invalidNOCFile.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FieldError); ok {
+					if e.FieldName != "ChangeCode" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
+// TestPOSInvalidEntryDetail validates error when reading an invalid POS EntryDetail
+func TestPOSInvalidEntryDetail(t *testing.T) {
+	f, err := os.Open("./test/testdata/pos-invalidEntryDetail.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FieldError); ok {
+					if e.FieldName != "IndividualName" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
+// TestADVInvalidBatchEntries validates error when reading an invalid ADV file with no entries in a batch
+func TestADVInvalidBatchEntries(t *testing.T) {
+	f, err := os.Open("./test/testdata/adv-invalidBatchEntries.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*BatchError); ok {
+					if e.FieldName != "entries" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
+// TestADVNoFileControl validates error when reading an invalid ADV file with no FileControl
+func TestADVNoFileControl(t *testing.T) {
+	f, err := os.Open("./test/testdata/adv-noFileControl.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FileError); ok {
+					if e.Msg != msgFileControl {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
 // testACHFileIATBC validates error when reading an invalid IAT Batch Control
 func testACHFileIATBC(t testing.TB) {
 	f, err := os.Open("./test/testdata/iat-invalidBatchControl.ach")
@@ -1996,7 +2096,7 @@ func TestADVReturnError(t *testing.T) {
 
 // TestADVFileControl validates error when reading an invalid ADV File Control
 func TestADVFileControl(t *testing.T) {
-	f, err := os.Open("./test/testdata/ADV-InvalidFileControl.ach")
+	f, err := os.Open("./test/testdata/adv-invalidFileControl.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
