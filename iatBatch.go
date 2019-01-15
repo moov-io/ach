@@ -587,8 +587,8 @@ func (batch *IATBatch) Validate() error {
 			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
 		}
 		if entry.Category == CategoryNOC {
-			if batch.GetHeader().IATIndicator != "IATCOR" {
-				msg := fmt.Sprintf(msgBatchIATNOC, batch.GetHeader().IATIndicator, "IATCOR")
+			if batch.GetHeader().IATIndicator != IATCOR {
+				msg := fmt.Sprintf(msgBatchIATNOC, batch.GetHeader().IATIndicator, IATCOR)
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "IATIndicator", Msg: msg}
 			}
 			if batch.GetHeader().StandardEntryClassCode != COR {
@@ -596,9 +596,13 @@ func (batch *IATBatch) Validate() error {
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 			}
 			switch entry.TransactionCode {
-			case 22, 27, 32, 37, 42, 47, 52, 55,
-				23, 28, 33, 38, 43, 48, 53,
-				24, 29, 34, 39, 44, 49, 54:
+			case CheckingCredit, CheckingDebit, CheckingPrenoteCredit, CheckingPrenoteDebit,
+				CheckingZeroDollarRemittanceCredit, CheckingZeroDollarRemittanceDebit,
+				SavingsCredit, SavingsDebit, SavingsPrenoteCredit, SavingsPrenoteDebit,
+				SavingsZeroDollarRemittanceCredit, SavingsZeroDollarRemittanceDebit,
+				GLCredit, GLDebit, GLPrenoteCredit, GLPrenoteDebit,
+				GLZeroDollarRemittanceCredit, GLZeroDollarRemittanceDebit,
+				LoanCredit, LoanDebit, LoanPrenoteCredit, LoanZeroDollarRemittanceCredit:
 				msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, "IATCOR")
 				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
 			}

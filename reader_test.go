@@ -1455,7 +1455,7 @@ func BenchmarkACHIATAddenda1718(b *testing.B) {
 
 // testACHFileIATBatchHeader validates error when reading an invalid IATBatchHeader
 func testACHFileIATBatchHeader(t testing.TB) {
-	f, err := os.Open("./test/testdata/IAT-InvalidBatchHeader.ach")
+	f, err := os.Open("./test/testdata/iat-invalidBatchHeader.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1493,7 +1493,7 @@ func BenchmarkACHFileIATBatchHeader(b *testing.B) {
 
 // testACHFileIATEntryDetail validates error when reading an invalid IATEntryDetail
 func testACHFileIATEntryDetail(t testing.TB) {
-	f, err := os.Open("./test/testdata/IAT-InvalidEntryDetail.ach")
+	f, err := os.Open("./test/testdata/iat-invalidEntryDetail.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1529,9 +1529,34 @@ func BenchmarkACHFileIATEntryDetail(b *testing.B) {
 	}
 }
 
-// testACHFileIATAddenda10 validates error when reading an invalid IATAddenda10
-func testACHFileIATAddenda10(t testing.TB) {
-	f, err := os.Open("./test/testdata/IAT-InvalidAddenda10.ach")
+// TestIATAddendaRecordIndicator validates error when reading an invalid IATEntryDetail
+func TestIATAddendaRecordIndicator(t *testing.T) {
+	f, err := os.Open("./test/testdata/iat-invalidAddendaRecordIndicator.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FileError); ok {
+					if e.FieldName != "AddendaRecordIndicator" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
+// TestACHFileIATAddenda10 validates error when reading an invalid IATAddenda10
+func TestACHFileIATAddenda10(t *testing.T) {
+	f, err := os.Open("./test/testdata/iat-invalidAddenda10.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1554,22 +1579,384 @@ func testACHFileIATAddenda10(t testing.TB) {
 	}
 }
 
-// TestACHFileIATAddenda10 tests validating error when reading an invalid IATAddenda10
-func TestACHFileIATAddenda10(t *testing.T) {
-	testACHFileIATAddenda10(t)
+// TestACHFileIATAddenda11 validates error when reading an invalid IATAddenda10
+func TestACHFileIATAddenda11(t *testing.T) {
+	f, err := os.Open("./test/testdata/iat-invalidAddenda11.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FieldError); ok {
+					if e.FieldName != "OriginatorName" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
 }
 
-// BenchmarkACHFileIATAddenda10 benchmarks validating error when reading an invalid IATAddenda10
-func BenchmarkACHFileIATAddenda10(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testACHFileIATAddenda10(b)
+// TestACHFileIATAddenda12 validates error when reading an invalid IATAddenda10
+func TestACHFileIATAddenda12(t *testing.T) {
+	f, err := os.Open("./test/testdata/iat-invalidAddenda12.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FieldError); ok {
+					if e.FieldName != "OriginatorCityStateProvince" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
+// TestACHFileIATAddenda13 validates error when reading an invalid IATAddenda13
+func TestACHFileIATAddenda13(t *testing.T) {
+	f, err := os.Open("./test/testdata/Iat-invalidAddenda13.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FieldError); ok {
+					if e.FieldName != "ODFIName" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
+// TestACHFileIATAddenda14 validates error when reading an invalid IATAddenda14
+func TestACHFileIATAddenda14(t *testing.T) {
+	f, err := os.Open("./test/testdata/iat-invalidAddenda14.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FieldError); ok {
+					if e.FieldName != "RDFIName" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
+// TestACHFileIATAddenda15 validates error when reading an invalid IATAddenda15
+func TestACHFileIATAddenda15(t *testing.T) {
+	f, err := os.Open("./test/testdata/iat-invalidAddenda15.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FieldError); ok {
+					if e.FieldName != "ReceiverStreetAddress" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
+// TestACHFileIATAddenda16 validates error when reading an invalid IATAddenda16
+func TestACHFileIATAddenda16(t *testing.T) {
+	f, err := os.Open("./test/testdata/iat-invalidAddenda16.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FieldError); ok {
+					if e.FieldName != "ReceiverCityStateProvince" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
+// TestACHFileIATAddenda17 validates error when reading an invalid IATAddenda17
+func TestACHFileIATAddenda17(t *testing.T) {
+	f, err := os.Open("./test/testdata/iat-invalidAddenda17.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FieldError); ok {
+					if e.FieldName != "PaymentRelatedInformation" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
+// TestACHFileIATAddenda18 validates error when reading an invalid IATAddenda18
+func TestACHFileIATAddenda18(t *testing.T) {
+	f, err := os.Open("./test/testdata/iat-invalidAddenda18.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FieldError); ok {
+					if e.FieldName != "ForeignCorrespondentBankName" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
+// TestACHFileIATAddenda98 validates error when reading an invalid IATAddenda98
+func TestACHFileIATAddenda98(t *testing.T) {
+	f, err := os.Open("./test/testdata/iat-invalidAddenda98.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FieldError); ok {
+					if e.FieldName != "ChangeCode" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
+// TestACHFileIATAddenda99 validates error when reading an invalid IATAddenda99
+func TestACHFileIATAddenda99(t *testing.T) {
+	f, err := os.Open("./test/testdata/iat-invalidAddenda99.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FieldError); ok {
+					if e.FieldName != "ReturnCode" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
+// TestPOSInvalidReturnFile validates error when reading an invalid POS Return
+func TestPOSInvalidReturnFile(t *testing.T) {
+	f, err := os.Open("./test/testdata/pos-invalidReturnFile.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FieldError); ok {
+					if e.FieldName != "ReturnCode" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
+// TestWEBInvalidNOCFile validates error when reading an invalid WEB NOC
+func TestWEBInvalidNOCFile(t *testing.T) {
+	f, err := os.Open("./test/testdata/web-invalidNOCFile.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FieldError); ok {
+					if e.FieldName != "ChangeCode" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
+// TestPOSInvalidEntryDetail validates error when reading an invalid POS EntryDetail
+func TestPOSInvalidEntryDetail(t *testing.T) {
+	f, err := os.Open("./test/testdata/pos-invalidEntryDetail.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FieldError); ok {
+					if e.FieldName != "IndividualName" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
+// TestADVInvalidBatchEntries validates error when reading an invalid ADV file with no entries in a batch
+func TestADVInvalidBatchEntries(t *testing.T) {
+	f, err := os.Open("./test/testdata/adv-invalidBatchEntries.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*BatchError); ok {
+					if e.FieldName != "entries" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
+// TestADVNoFileControl validates error when reading an invalid ADV file with no FileControl
+func TestADVNoFileControl(t *testing.T) {
+	f, err := os.Open("./test/testdata/adv-noFileControl.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FileError); ok {
+					if e.Msg != msgFileControl {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
 	}
 }
 
 // testACHFileIATBC validates error when reading an invalid IAT Batch Control
 func testACHFileIATBC(t testing.TB) {
-	f, err := os.Open("./test/testdata/IAT-InvalidBatchControl.ach")
+	f, err := os.Open("./test/testdata/iat-invalidBatchControl.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1607,7 +1994,7 @@ func BenchmarkACHFileIATBC(b *testing.B) {
 
 // testACHFileIATBH validates error when reading an invalid IAT Batch Header
 func testACHFileIATBH(t testing.TB) {
-	f, err := os.Open("./test/testdata/IAT-BatchHeaderErr.ach")
+	f, err := os.Open("./test/testdata/iat-batchHeaderErr.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1709,7 +2096,7 @@ func TestADVReturnError(t *testing.T) {
 
 // TestADVFileControl validates error when reading an invalid ADV File Control
 func TestADVFileControl(t *testing.T) {
-	f, err := os.Open("./test/testdata/ADV-InvalidFileControl.ach")
+	f, err := os.Open("./test/testdata/adv-invalidFileControl.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
