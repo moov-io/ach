@@ -295,14 +295,17 @@ func testTwoFileControls(t testing.TB) {
 
 	r.File.AddBatch(r.currentBatch)
 	r.File.Control.EntryHash = 5320001
-	_, err := r.Read()
-	if p, ok := err.(*base.ParseError); ok {
-		if e, ok := p.Err.(*FileError); ok {
-			if e.Msg != msgFileControl {
-				t.Errorf("%T: %s", e, e)
+	if _, err := r.Read(); err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FileError); ok {
+					if e.Msg != msgFileControl {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
 			}
-		} else {
-			t.Errorf("%T: %s", p.Err, p.Err)
 		}
 	}
 }
@@ -1699,6 +1702,57 @@ func TestADVReturnError(t *testing.T) {
 				} else {
 					t.Errorf("%T: %s", el, el)
 				}
+			}
+		}
+	}
+}
+
+// TestADVFileControl validates error when reading an invalid ADV File Control
+func TestADVFileControl(t *testing.T) {
+	f, err := os.Open("./test/testdata/ADV-InvalidFileControl.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if p.Record != "FileControl" {
+					t.Errorf("%T: %s", p, p)
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
+// TestTwoFileADVControls validates one file control
+func TestTwoFileADVControls(t *testing.T) {
+	var line = "9000001000001000000010005320001000000010500000000000000                                       "
+	var twoControls = line + "\n" + line
+	r := NewReader(strings.NewReader(twoControls))
+	r.addCurrentBatch(NewBatchADV(mockBatchADVHeader()))
+	bc := ADVBatchControl{
+		TotalDebitEntryDollarAmount: 10500,
+		EntryHash:                   5320001}
+	r.currentBatch.SetADVControl(&bc)
+
+	r.File.AddBatch(r.currentBatch)
+	r.File.ADVControl.EntryHash = 5320001
+	if _, err := r.Read(); err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FileError); ok {
+					if e.Msg != msgFileControl {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
 			}
 		}
 	}
