@@ -1529,6 +1529,31 @@ func BenchmarkACHFileIATEntryDetail(b *testing.B) {
 	}
 }
 
+// TestIATAddendaRecordIndicator validates error when reading an invalid IATEntryDetail
+func TestIATAddendaRecordIndicator(t *testing.T) {
+	f, err := os.Open("./test/testdata/IAT-InvalidAddendaRecordIndicator.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FileError); ok {
+					if e.FieldName != "AddendaRecordIndicator" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
 // testACHFileIATAddenda10 validates error when reading an invalid IATAddenda10
 func testACHFileIATAddenda10(t testing.TB) {
 	f, err := os.Open("./test/testdata/IAT-InvalidAddenda10.ach")

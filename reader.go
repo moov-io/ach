@@ -10,6 +10,7 @@ import (
 	"github.com/moov-io/base"
 	"io"
 	"strconv"
+	"strings"
 )
 
 // Reader reads records from a ACH-encoded file.
@@ -201,7 +202,7 @@ func (r *Reader) parseLine() error {
 
 // parseBH parses determines whether to parse an IATBatchHeader or BatchHeader
 func (r *Reader) parseBH() error {
-	if r.line[50:53] == IAT {
+	if r.line[50:53] == IAT || strings.TrimSpace(r.line[04:20]) == IATCOR {
 		if err := r.parseIATBatchHeader(); err != nil {
 			return err
 		}
@@ -230,7 +231,7 @@ func (r *Reader) parseED() error {
 
 // parseEd parses determines whether to parse an IATEntryDetail Addenda or EntryDetail Addenda
 func (r *Reader) parseEDAddenda() error {
-	if r.currentBatch != nil {
+	if r.currentBatch != nil && r.currentBatch.GetHeader().CompanyName != IATCOR {
 		if err := r.parseAddenda(); err != nil {
 			return err
 		}
@@ -494,9 +495,6 @@ func (r *Reader) parseIATAddenda() error {
 	if r.IATCurrentBatch.GetEntries() == nil {
 		msg := fmt.Sprint(msgFileBatchOutside)
 		return r.parseError(&FileError{FieldName: "Addenda", Msg: msg})
-	}
-	if len(r.IATCurrentBatch.GetEntries()) == 0 {
-		return r.parseError(&FileError{FieldName: "Addenda", Msg: msgFileBatchOutside})
 	}
 	entryIndex := len(r.IATCurrentBatch.GetEntries()) - 1
 	entry := r.IATCurrentBatch.GetEntries()[entryIndex]

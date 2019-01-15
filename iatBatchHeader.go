@@ -159,6 +159,11 @@ type IATBatchHeader struct {
 	converters
 }
 
+const (
+	// IATCOR is the valid value for IATBatchHeader.IATIndicator for IAT Notification Of Changr
+	IATCOR = "IATCOR"
+)
+
 // NewIATBatchHeader returns a new BatchHeader with default values for non exported fields
 func NewIATBatchHeader() *IATBatchHeader {
 	iatBh := &IATBatchHeader{
