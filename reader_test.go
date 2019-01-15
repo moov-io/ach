@@ -1779,6 +1779,56 @@ func TestACHFileIATAddenda18(t *testing.T) {
 	}
 }
 
+// TestACHFileIATAddenda98 validates error when reading an invalid IATAddenda98
+func TestACHFileIATAddenda98(t *testing.T) {
+	f, err := os.Open("./test/testdata/IAT-InvalidAddenda98.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FieldError); ok {
+					if e.FieldName != "ChangeCode" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
+// TestACHFileIATAddenda99 validates error when reading an invalid IATAddenda99
+func TestACHFileIATAddenda99(t *testing.T) {
+	f, err := os.Open("./test/testdata/IAT-InvalidAddenda99.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if err != nil {
+		if el, ok := err.(base.ErrorList); ok {
+			if p, ok := el.Err().(*base.ParseError); ok {
+				if e, ok := p.Err.(*FieldError); ok {
+					if e.FieldName != "ReturnCode" {
+						t.Errorf("%T: %s", e, e)
+					}
+				}
+			} else {
+				t.Errorf("%T: %s", el, el)
+			}
+		}
+	}
+}
+
 // testACHFileIATBC validates error when reading an invalid IAT Batch Control
 func testACHFileIATBC(t testing.TB) {
 	f, err := os.Open("./test/testdata/IAT-InvalidBatchControl.ach")
