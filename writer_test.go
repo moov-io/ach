@@ -185,13 +185,6 @@ func testIATWrite(t testing.TB) {
 	if err = r.File.Validate(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
-
-	/*	// Write IAT records to standard output. Anything io.Writer
-		w := NewWriter(os.Stdout)
-		if err := w.Write(file); err != nil {
-			log.Fatalf("Unexpected error: %s\n", err)
-		}
-		w.Flush()*/
 }
 
 // TestIATWrite tests writing a IAT ACH file
