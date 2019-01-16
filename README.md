@@ -69,7 +69,7 @@ Examples: [Go](examples/http/main.go) | [Ruby](https://github.com/moov-io/ruby-a
 
 | Environmental Variable | Description | Default |
 |-----|-----|-----|
-| `ACH_FILE_TTL` | Time to live (TTL) for `*ach.File` objects stored in the in-memory repository. | 0 = No TTL / Never delete files |
+| `ACH_FILE_TTL` | Time to live (TTL) for `*ach.File` objects stored in the in-memory repository. | 0 = No TTL / Never delete files (Example: `240m`) |
 
 ### From Source
 
