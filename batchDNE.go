@@ -88,10 +88,15 @@ func (batch *BatchDNE) Create() error {
 // details returns the Date of Death (YYMMDD), Customer SSN (9 digits), and Amount ($$$$.cc)
 // from the Addenda05 record. This method assumes the addenda05 PaymentRelatedInformation is valid.
 func (batch *BatchDNE) details() (string, string, string) {
+	if batch == nil || len(batch.Entries) == 0 {
+		return "", "", ""
+	}
+
 	addendas := batch.Entries[0].Addenda05
 	if len(addendas) != 1 {
 		return "", "", ""
 	}
+
 	line := addendas[0].PaymentRelatedInformation
 	return line[18:24], line[37:46], strings.TrimSuffix(line[54:], `\`)
 }
