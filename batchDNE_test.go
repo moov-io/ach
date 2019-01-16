@@ -316,3 +316,11 @@ func TestBatchDNE__Details(t *testing.T) {
 		t.Errorf("got %s expected %s", v, amount)
 	}
 }
+
+func TestBatchDNE__nil(t *testing.T) {
+	var batch *BatchDNE = nil
+	date, ssn, amount := batch.details()
+	if date != "" || ssn != "" || amount != "" {
+		t.Errorf("got non-empty details from nil BatchDNE: date=%q ssn=%q amount=%q", date, ssn, amount)
+	}
+}
