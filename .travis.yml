@@ -3,7 +3,7 @@ sudo: false
 matrix:
   allow_failures:
     - os: windows
-    - go: 1.12beta1
+    - go: 1.12beta2
   include:
     - os: linux
       go: 1.11.x
@@ -11,7 +11,7 @@ matrix:
         directories:
           - "/home/travis/.cache/go-build" # GOCACHE
     - os: linux
-      go: 1.12beta1
+      go: 1.12beta2
     - os: osx
       go: 1.11.x
       cache:
