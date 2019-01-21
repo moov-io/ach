@@ -2,7 +2,7 @@
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
-// Generated on 2018-11-06T03:52:05Z by adam, any modifications will be overwritten
+// Generated on 2019-01-21T12:30:42Z by adam, any modifications will be overwritten
 package iso4217
 
 var currencyCodes = map[string]bool{

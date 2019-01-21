@@ -25,14 +25,14 @@ import (
 	"log"
 	"net/http"
 	"os/user"
+	"path/filepath"
 	"runtime"
 	"time"
 )
 
-const (
-	downloadUrl = "https://datahub.io/core/currency-codes/r/codes-all.json"
-
-	outputFilename = "internal/iso4217/iso4217.go"
+var (
+	downloadUrl    = "https://datahub.io/core/currency-codes/r/codes-all.json"
+	outputFilename = filepath.Join("internal", "iso4217", "iso4217.go")
 )
 
 // {"AlphabeticCode": "AFN", "Currency": "Afghani", ... }
