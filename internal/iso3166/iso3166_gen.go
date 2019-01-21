@@ -25,15 +25,15 @@ import (
 	"log"
 	"net/http"
 	"os/user"
+	"path/filepath"
 	"runtime"
 	"time"
 )
 
-const (
+var (
 	// From https://datahub.io/core/country-list#data
-	downloadUrl = "https://datahub.io/core/country-list/r/data.json"
-
-	outputFilename = "internal/iso3166/iso3166.go"
+	downloadUrl    = "https://datahub.io/core/country-list/r/data.json"
+	outputFilename = filepath.Join("internal", "iso3166", "iso3166.go")
 )
 
 // [{"Code": "AF", "Name": "Afghanistan"}, ...]
