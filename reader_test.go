@@ -8,12 +8,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/moov-io/base"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 func TestReader__crashers(t *testing.T) {
@@ -2143,4 +2144,40 @@ func TestTwoFileADVControls(t *testing.T) {
 			}
 		}
 	}
+}
+
+// testACHFileTooLongErr checks that it errors on a file that is too long
+func testACHFileTooLongErr(t testing.TB) {
+	// To make testing this more manageable, we'll artificially cap the size of the file to 200 lines
+	maxLines = 200
+
+	f, err := os.Open("./test/testdata/20110729A.ach")
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	_, err = r.Read()
+
+	if el, ok := err.(base.ErrorList); ok {
+		if p, ok := el.Err().(*base.ParseError); ok {
+			if e, ok := p.Err.(*FileError); ok {
+				if e.Msg != msgFileTooLong {
+					t.Errorf("%T: %s", e, e)
+				}
+			}
+		} else {
+			t.Errorf("%T: %s", el, el)
+		}
+	} else {
+		t.Errorf("No error even though file was too long")
+	}
+
+	// reset maxLines to its original value
+	maxLines = 2 + 2000000 + 100000000 + 8
+}
+
+// TestACHFileTooLongErr checks that it errors on a file that is too long
+func TestACHFileTooLongErr(t *testing.T) {
+	testACHFileTooLongErr(t)
 }

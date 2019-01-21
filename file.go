@@ -39,6 +39,7 @@ var (
 	msgFileNoneSEC       = "%v Standard Entry Class Code is not implemented"
 	msgFileIATSEC        = "%v Standard Entry Class Code should use iatBatch"
 	msgFileADV           = "file can only have ADV Batches"
+	msgFileTooLong       = "file has exceeded the maximum possible number of lines"
 )
 
 // FileError is an error describing issues validating a file
