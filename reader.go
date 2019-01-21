@@ -7,10 +7,20 @@ package ach
 import (
 	"bufio"
 	"fmt"
-	"github.com/moov-io/base"
 	"io"
 	"strconv"
 	"strings"
+
+	"github.com/moov-io/base"
+)
+
+var (
+	// maxLines is the maximum number of lines a file can have. It is limited by the
+	// EntryAddendaCount field which has 8 digits, and the BatchCount field which has
+	// 6 digits in the File Control Record. So we can have at most the 2 file records,
+	// 2 records for each of 10^6 batches, 10^8 entry and addenda records, and 8 lines
+	// of 9's to round up to the nearest multiple of 10.
+	maxLines = 2 + 2000000 + 100000000 + 8
 )
 
 // Reader reads records from a ACH-encoded file.
@@ -85,6 +95,12 @@ func (r *Reader) Read() (File, error) {
 	for r.scanner.Scan() {
 		line := r.scanner.Text()
 		r.lineNum++
+		if r.lineNum > maxLines {
+			err := &FileError{FieldName: "FileLength", Value: strconv.Itoa(r.lineNum), Msg: msgFileTooLong}
+			r.errors.Add(r.parseError(err))
+			break
+		}
+
 		lineLength := len(line)
 
 		switch {
