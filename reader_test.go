@@ -2148,7 +2148,7 @@ func testACHFileTooLongErr(t testing.TB) {
 	r := NewReader(f)
 	_, err = r.Read()
 
-	if !Has(err, FileTooLongErr("file too long")) {
+	if !Has(err, ErrFileTooLong) {
 		t.Errorf("%T: %s", err, err)
 	}
 

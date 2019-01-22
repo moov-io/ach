@@ -5,18 +5,15 @@
 package ach
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 
 	"github.com/moov-io/base"
 )
 
-// FileTooLongErr is the error given when a file exceeds the maximum possible length
-type FileTooLongErr string
-
-func (e FileTooLongErr) Error() string {
-	return string(e)
-}
+// ErrFileTooLong is the error given when a file exceeds the maximum possible length
+var ErrFileTooLong = errors.New("file exceeds maximum possible number of lines")
 
 // RecordWrongLengthErr is the error given when a record is the wrong length
 type RecordWrongLengthErr struct {
@@ -46,6 +43,9 @@ func Has(list error, err error) bool {
 		return false
 	}
 	for i := 0; i < len(el); i++ {
+		if el[i] == err {
+			return true
+		}
 		if reflect.TypeOf(el[i]) == reflect.TypeOf(err) {
 			return true
 		}

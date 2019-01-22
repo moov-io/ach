@@ -95,7 +95,7 @@ func (r *Reader) Read() (File, error) {
 		line := r.scanner.Text()
 		r.lineNum++
 		if r.lineNum > maxLines {
-			r.errors.Add(FileTooLongErr("file has exceeded the maximum possible number of lines"))
+			r.errors.Add(ErrFileTooLong)
 			break
 		}
 
