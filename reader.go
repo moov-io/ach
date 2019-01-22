@@ -8,7 +8,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"strconv"
 	"strings"
 
 	"github.com/moov-io/base"
@@ -96,8 +95,7 @@ func (r *Reader) Read() (File, error) {
 		line := r.scanner.Text()
 		r.lineNum++
 		if r.lineNum > maxLines {
-			err := &FileError{FieldName: "FileLength", Value: strconv.Itoa(r.lineNum), Msg: msgFileTooLong}
-			r.errors.Add(r.parseError(err))
+			r.errors.Add(FileTooLongErr("file has exceeded the maximum possible number of lines"))
 			break
 		}
 
@@ -109,9 +107,7 @@ func (r *Reader) Read() (File, error) {
 				r.errors.Add(err)
 			}
 		case lineLength != RecordLength:
-			msg := fmt.Sprintf(msgRecordLength, lineLength)
-			err := &FileError{FieldName: "RecordLength", Value: strconv.Itoa(lineLength), Msg: msg}
-			r.errors.Add(r.parseError(err))
+			r.errors.Add(NewRecordWrongLengthErr(lineLength))
 		default:
 			r.line = line
 			if err := r.parseLine(); err != nil {

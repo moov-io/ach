@@ -359,14 +359,8 @@ func testFileLineShort(t testing.TB) {
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
 
-	if p, ok := err.(*base.ParseError); ok {
-		if e, ok := p.Err.(*FileError); ok {
-			if e.FieldName != "RecordLength" {
-				t.Errorf("%T: %s", e, e)
-			}
-		} else {
-			t.Errorf("%T: %s", e, e)
-		}
+	if !Has(err, NewRecordWrongLengthErr(70)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -388,14 +382,9 @@ func testFileLineLong(t testing.TB) {
 	var line = "1 line is 100 characters ..........................................................................!"
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
-	if p, ok := err.(*base.ParseError); ok {
-		if e, ok := p.Err.(*FileError); ok {
-			if e.FieldName != "RecordLength" {
-				t.Errorf("%T: %s", e, e)
-			}
-		} else {
-			t.Errorf("%T: %s", p.Err, p.Err)
-		}
+
+	if !Has(err, NewRecordWrongLengthErr(100)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -2159,18 +2148,8 @@ func testACHFileTooLongErr(t testing.TB) {
 	r := NewReader(f)
 	_, err = r.Read()
 
-	if el, ok := err.(base.ErrorList); ok {
-		if p, ok := el.Err().(*base.ParseError); ok {
-			if e, ok := p.Err.(*FileError); ok {
-				if e.Msg != msgFileTooLong {
-					t.Errorf("%T: %s", e, e)
-				}
-			}
-		} else {
-			t.Errorf("%T: %s", el, el)
-		}
-	} else {
-		t.Errorf("No error even though file was too long")
+	if !Has(err, FileTooLongErr("file too long")) {
+		t.Errorf("%T: %s", err, err)
 	}
 
 	// reset maxLines to its original value
