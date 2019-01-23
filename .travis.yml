@@ -41,5 +41,5 @@ script:
 - golint -set_exit_status $GOFILES
 - staticcheck ./...
 after_success:
-- bash <(curl -s https://codecov.io/bash) -X fix
+- bash <(curl -s https://codecov.io/bash)
 - make docker
