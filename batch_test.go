@@ -456,11 +456,7 @@ func BenchmarkBatchAddendaTraceNumber(b *testing.B) {
 func testNewBatchDefault(t testing.TB) {
 	_, err := NewBatch(mockBatchInvalidSECHeader())
 
-	if e, ok := err.(*FileError); ok {
-		if e.FieldName != "StandardEntryClassCode" {
-			t.Errorf("%T: %s", err, err)
-		}
-	} else {
+	if err != NewErrFileUnknownSEC("NIL") {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -698,11 +694,7 @@ func testIATBatch(t testing.TB) {
 
 	_, err := NewBatch(bh)
 
-	if e, ok := err.(*FileError); ok {
-		if e.FieldName != "StandardEntryClassCode" {
-			t.Errorf("%T: %s", err, err)
-		}
-	} else {
+	if err != ErrFileIATSEC {
 		t.Errorf("%T: %s", err, err)
 	}
 }

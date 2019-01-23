@@ -90,14 +90,9 @@ func testFileWriteErr(t testing.TB) {
 	b := &bytes.Buffer{}
 	f := NewWriter(b)
 
-	if err := f.Write(file); err != nil {
-		if e, ok := err.(*FileError); ok {
-			if e.FieldName != "EntryAddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := f.Write(file)
+	if err != NewErrFileCalculatedControlEquality("EntryAddendaCount", 10, 2) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

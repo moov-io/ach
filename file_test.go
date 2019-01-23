@@ -96,14 +96,9 @@ func testFileBatchCount(t testing.TB) {
 
 	// More batches than the file control count.
 	file.AddBatch(mockBatchPPD())
-	if err := file.Validate(); err != nil {
-		if e, ok := err.(*FileError); ok {
-			if e.FieldName != "BatchCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := file.Validate()
+	if err != NewErrFileCalculatedControlEquality("BatchCount", 2, 1) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -126,14 +121,9 @@ func testFileEntryAddenda(t testing.TB) {
 
 	// more entries than the file control
 	file.Control.EntryAddendaCount = 5
-	if err := file.Validate(); err != nil {
-		if e, ok := err.(*FileError); ok {
-			if e.FieldName != "EntryAddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := file.Validate()
+	if err != NewErrFileCalculatedControlEquality("EntryAddendaCount", 1, 5) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -156,14 +146,9 @@ func testFileDebitAmount(t testing.TB) {
 
 	// inequality in total debit amount
 	file.Control.TotalDebitEntryDollarAmountInFile = 63
-	if err := file.Validate(); err != nil {
-		if e, ok := err.(*FileError); ok {
-			if e.FieldName != "TotalDebitEntryDollarAmountInFile" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := file.Validate()
+	if err != NewErrFileCalculatedControlEquality("TotalDebitEntryDollarAmountInFile", 0, 63) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -186,14 +171,9 @@ func testFileCreditAmount(t testing.TB) {
 
 	// inequality in total credit amount
 	file.Control.TotalCreditEntryDollarAmountInFile = 63
-	if err := file.Validate(); err != nil {
-		if e, ok := err.(*FileError); ok {
-			if e.FieldName != "TotalCreditEntryDollarAmountInFile" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := file.Validate()
+	if err != NewErrFileCalculatedControlEquality("TotalCreditEntryDollarAmountInFile", 100000000, 63) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -218,14 +198,9 @@ func testFileEntryHash(t testing.TB) {
 		t.Fatal(err)
 	}
 	file.Control.EntryHash = 63
-	if err := file.Validate(); err != nil {
-		if e, ok := err.(*FileError); ok {
-			if e.FieldName != "EntryHash" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := file.Validate()
+	if err != NewErrFileCalculatedControlEquality("EntryHash", 46276020, 63) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -591,16 +566,10 @@ func TestFileADVInvalid__StandardEntryClassCode(t *testing.T) {
 	file.SetHeader(fh)
 	file.AddBatch(batchADV)
 	file.AddBatch(batchPPD)
-	if err := file.Create(); err != nil {
-		if e, ok := err.(*FileError); ok {
-			if e.FieldName != "StandardEntryClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err = file.Create()
+	if err != ErrFileADVOnly {
+		t.Errorf("%T: %s", err, err)
 	}
-
 }
 
 // TestFileADVEntryHash validates entry hash
@@ -611,14 +580,9 @@ func TestFileADVEntryHash(t *testing.T) {
 		t.Fatal(err)
 	}
 	file.ADVControl.EntryHash = 63
-	if err := file.Validate(); err != nil {
-		if e, ok := err.(*FileError); ok {
-			if e.FieldName != "EntryHash" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := file.Validate()
+	if err != NewErrFileCalculatedControlEquality("EntryHash", 46276020, 63) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -628,14 +592,9 @@ func TestFileADVDebitAmount(t *testing.T) {
 
 	// inequality in total debit amount
 	file.ADVControl.TotalDebitEntryDollarAmountInFile = 06
-	if err := file.Validate(); err != nil {
-		if e, ok := err.(*FileError); ok {
-			if e.FieldName != "TotalDebitEntryDollarAmountInFile" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := file.Validate()
+	if err != NewErrFileCalculatedControlEquality("TotalDebitEntryDollarAmountInFile", 0, 6) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -645,14 +604,9 @@ func TestFileADVCreditAmount(t *testing.T) {
 
 	// inequality in total credit amount
 	file.ADVControl.TotalCreditEntryDollarAmountInFile = 07
-	if err := file.Validate(); err != nil {
-		if e, ok := err.(*FileError); ok {
-			if e.FieldName != "TotalCreditEntryDollarAmountInFile" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := file.Validate()
+	if err != NewErrFileCalculatedControlEquality("TotalCreditEntryDollarAmountInFile", 50000, 7) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -662,14 +616,9 @@ func TestFileADVEntryAddenda(t *testing.T) {
 
 	// more entries than the file control
 	file.ADVControl.EntryAddendaCount = 5
-	if err := file.Validate(); err != nil {
-		if e, ok := err.(*FileError); ok {
-			if e.FieldName != "EntryAddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := file.Validate()
+	if err != NewErrFileCalculatedControlEquality("EntryAddendaCount", 1, 5) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -679,14 +628,9 @@ func TestFileADVBatchCount(t *testing.T) {
 
 	// More batches than the file control count.
 	file.AddBatch(mockBatchADV())
-	if err := file.Validate(); err != nil {
-		if e, ok := err.(*FileError); ok {
-			if e.FieldName != "BatchCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := file.Validate()
+	if err != NewErrFileCalculatedControlEquality("BatchCount", 2, 1) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

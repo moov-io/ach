@@ -229,14 +229,8 @@ func testRecordTypeUnknown(t testing.TB) {
 	var line = "301 076401251 0764012510807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
-	if p, ok := err.(*base.ParseError); ok {
-		if e, ok := p.Err.(*FileError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", e, e)
-			}
-		} else {
-			t.Errorf("%T: %s", p.Err, p.Err)
-		}
+	if !Has(err, NewErrUnknownRecordType("3")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -259,14 +253,9 @@ func testTwoFileHeaders(t testing.TB) {
 	var twoHeaders = line + "\n" + line
 	r := NewReader(strings.NewReader(twoHeaders))
 	_, err := r.Read()
-	if p, ok := err.(*base.ParseError); ok {
-		if e, ok := p.Err.(*FileError); ok {
-			if e.Msg != msgFileControl {
-				t.Errorf("%T: %s", e, e)
-			}
-		} else {
-			t.Errorf("%T: %s", p.Err, p.Err)
-		}
+
+	if !Has(err, ErrFileHeader) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -296,18 +285,10 @@ func testTwoFileControls(t testing.TB) {
 
 	r.File.AddBatch(r.currentBatch)
 	r.File.Control.EntryHash = 5320001
-	if _, err := r.Read(); err != nil {
-		if el, ok := err.(base.ErrorList); ok {
-			if p, ok := el.Err().(*base.ParseError); ok {
-				if e, ok := p.Err.(*FileError); ok {
-					if e.Msg != msgFileControl {
-						t.Errorf("%T: %s", e, e)
-					}
-				}
-			} else {
-				t.Errorf("%T: %s", el, el)
-			}
-		}
+
+	_, err := r.Read()
+	if !Has(err, ErrFileControl) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -329,14 +310,8 @@ func testFileLineEmpty(t testing.TB) {
 	line := ""
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
-	if p, ok := err.(*base.ParseError); ok {
-		if e, ok := p.Err.(*FileError); ok {
-			if e.Msg != msgFileHeader {
-				t.Errorf("%#v", e)
-			}
-		} else {
-			t.Errorf("%T: %s", e, e)
-		}
+	if !Has(err, ErrFileHeader) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -450,8 +425,6 @@ func testFileBatchHeaderErr(t testing.TB) {
 					t.Errorf("%T: %s", e, e)
 				}
 			}
-		} else {
-			t.Errorf("%T: %s", el, el)
 		}
 	}
 }
@@ -478,16 +451,8 @@ func testFileBatchHeaderDuplicate(t testing.TB) {
 	r.addCurrentBatch(NewBatchPPD(bh))
 	// read should fail because it is parsing a second batch header and there can only be one.
 	_, err := r.Read()
-	if el, ok := err.(base.ErrorList); ok {
-		if p, ok := el.Err().(*base.ParseError); ok {
-			if e, ok := p.Err.(*FieldError); ok {
-				if !strings.Contains(e.Msg, msgFieldInclusion) {
-					t.Errorf("%T: %s", e, e)
-				}
-			}
-		} else {
-			t.Errorf("%T: %s", el, el)
-		}
+	if !Has(err, ErrFileBatchHeaderInsideBatch) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -509,16 +474,8 @@ func testFileEntryDetailOutsideBatch(t testing.TB) {
 	ed := mockEntryDetail()
 	r := NewReader(strings.NewReader(ed.String()))
 	_, err := r.Read()
-	if el, ok := err.(base.ErrorList); ok {
-		if p, ok := el.Err().(*base.ParseError); ok {
-			if e, ok := p.Err.(*FileError); ok {
-				if e.Msg != msgFileBatchOutside {
-					t.Errorf("%T: %s", e, e)
-				}
-			}
-		} else {
-			t.Errorf("%T: %s", el, el)
-		}
+	if !Has(err, ErrFileEntryOutsideBatch) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -544,16 +501,8 @@ func testFileEntryDetail(t testing.TB) {
 	r.addCurrentBatch(NewBatchPPD(mockBatchPPDHeader()))
 	r.currentBatch.SetHeader(mockBatchHeader())
 	_, err := r.Read()
-	if el, ok := err.(base.ErrorList); ok {
-		if p, ok := el.Err().(*base.ParseError); ok {
-			if e, ok := p.Err.(*FieldError); ok {
-				if !strings.Contains(e.Msg, msgFieldInclusion) {
-					t.Errorf("%T: %s", e, e)
-				}
-			}
-		} else {
-			t.Errorf("%T: %s", el, el)
-		}
+	if !Has(err, NewRecordWrongLengthErr(93)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -847,21 +796,16 @@ func BenchmarkFileAddenda99(b *testing.B) {
 
 // testFileAddendaOutsideBatch validates error populates through the reader
 func testFileAddendaOutsideBatch(t testing.TB) {
+	ed := mockEntryDetail()
 	addenda := mockAddenda05()
-	r := NewReader(strings.NewReader(addenda.String()))
+	line := ed.String() + "\n" + addenda.String()
+	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
-	if err != nil {
-		if el, ok := err.(base.ErrorList); ok {
-			if p, ok := el.Err().(*base.ParseError); ok {
-				if e, ok := p.Err.(*FileError); ok {
-					if e.Msg != msgFileBatchOutside {
-						t.Errorf("%T: %s", e, e)
-					}
-				}
-			} else {
-				t.Errorf("%T: %s", el, el)
-			}
-		}
+
+	// Note that the entry doesn't get counted since it is rejected due to being outside of a batch
+	// So the parser considers the addenda to be outside of an entry since there are no valid entries
+	if !Has(err, ErrFileAddendaOutsideEntry) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -976,32 +920,26 @@ func BenchmarkFileBatchHeaderSEC(b *testing.B) {
 	}
 }
 
-// testFileFileControlNoCurrentBatch validates no current batch
-func testFileFileControlNoCurrentBatch(t testing.TB) {
+// testFileBatchControlNoCurrentBatch validates no current batch
+func testFileBatchControlNoCurrentBatch(t testing.TB) {
 	bc := mockBatchControl()
 	r := NewReader(strings.NewReader(bc.String()))
 	_, err := r.Read()
-	if el, ok := err.(base.ErrorList); ok {
-		if p, ok := el.Err().(*base.ParseError); ok {
-			if p.Record != "BatchControl" {
-				t.Errorf("%T: %s", p, p)
-			}
-		} else {
-			t.Errorf("%T: %s", el, el)
-		}
+	if !Has(err, ErrFileBatchControlOutsideBatch) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
-// TestFileFileControlNoCurrentBatch tests validating no current batch
-func TestFileFileControlNoCurrentBatch(t *testing.T) {
-	testFileFileControlNoCurrentBatch(t)
+// TestFileBatchControlNoCurrentBatch tests validating no current batch
+func TestFileBatchControlNoCurrentBatch(t *testing.T) {
+	testFileBatchControlNoCurrentBatch(t)
 }
 
-// BenchmarkFileFileControlNoCurrentBatch benchmarks validating no current batch
-func BenchmarkFileFileControlNoCurrentBatch(b *testing.B) {
+// BenchmarkFileBatchControlNoCurrentBatch benchmarks validating no current batch
+func BenchmarkFileBatchControlNoCurrentBatch(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testFileFileControlNoCurrentBatch(b)
+		testFileBatchControlNoCurrentBatch(b)
 	}
 }
 
@@ -1110,16 +1048,9 @@ func testFileAddendaOutsideEntry(t testing.TB) {
 	line := bh.String() + "\n" + addenda.String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
-	if el, ok := err.(base.ErrorList); ok {
-		if p, ok := el.Err().(*base.ParseError); ok {
-			if e, ok := p.Err.(*FileError); ok {
-				if e.FieldName != "Addenda" {
-					t.Errorf("%T: %s", e, e)
-				}
-			}
-		} else {
-			t.Errorf("%T: %s", el, el)
-		}
+
+	if !Has(err, ErrFileAddendaOutsideEntry) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1292,8 +1223,6 @@ func testACHFileRead3(t testing.TB) {
 						t.Errorf("%T: %s", e, e)
 					}
 				}
-			} else {
-				t.Errorf("%T: %s", el, el)
 			}
 		}
 	}
@@ -1904,18 +1833,8 @@ func TestADVInvalidBatchEntries(t *testing.T) {
 	r := NewReader(f)
 	_, err = r.Read()
 
-	if err != nil {
-		if el, ok := err.(base.ErrorList); ok {
-			if p, ok := el.Err().(*base.ParseError); ok {
-				if e, ok := p.Err.(*BatchError); ok {
-					if e.FieldName != "entries" {
-						t.Errorf("%T: %s", e, e)
-					}
-				}
-			} else {
-				t.Errorf("%T: %s", el, el)
-			}
-		}
+	if !Has(err, ErrFileAddendaOutsideEntry) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1929,18 +1848,8 @@ func TestADVNoFileControl(t *testing.T) {
 	r := NewReader(f)
 	_, err = r.Read()
 
-	if err != nil {
-		if el, ok := err.(base.ErrorList); ok {
-			if p, ok := el.Err().(*base.ParseError); ok {
-				if e, ok := p.Err.(*FileError); ok {
-					if e.Msg != msgFileControl {
-						t.Errorf("%T: %s", e, e)
-					}
-				}
-			} else {
-				t.Errorf("%T: %s", el, el)
-			}
-		}
+	if !Has(err, ErrFileControl) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1992,18 +1901,8 @@ func testACHFileIATBH(t testing.TB) {
 	r := NewReader(f)
 	_, err = r.Read()
 
-	if err != nil {
-		if el, ok := err.(base.ErrorList); ok {
-			if p, ok := el.Err().(*base.ParseError); ok {
-				if e, ok := p.Err.(*FileError); ok {
-					if e.Msg != msgFileBatchInside {
-						t.Errorf("%T: %s", e, e)
-					}
-				}
-			} else {
-				t.Errorf("%T: %s", el, el)
-			}
-		}
+	if !Has(err, ErrFileBatchHeaderInsideBatch) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -2120,18 +2019,10 @@ func TestTwoFileADVControls(t *testing.T) {
 
 	r.File.AddBatch(r.currentBatch)
 	r.File.ADVControl.EntryHash = 5320001
-	if _, err := r.Read(); err != nil {
-		if el, ok := err.(base.ErrorList); ok {
-			if p, ok := el.Err().(*base.ParseError); ok {
-				if e, ok := p.Err.(*FileError); ok {
-					if e.Msg != msgFileControl {
-						t.Errorf("%T: %s", e, e)
-					}
-				}
-			} else {
-				t.Errorf("%T: %s", el, el)
-			}
-		}
+
+	_, err := r.Read()
+	if !Has(err, ErrFileControl) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
