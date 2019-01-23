@@ -26,4 +26,4 @@ comment:
   require_changes: no
 
 ignore:
-  - "*Error.go"  # ignore error files
+  - "*Errors.go"  # ignore error files

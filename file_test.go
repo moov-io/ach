@@ -6,11 +6,14 @@ package ach
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockFilePPD creates an ACH file with PPD batch and entry
@@ -67,6 +70,28 @@ func testFileError(t testing.TB) {
 // TestFileError tests validating a file error
 func TestFileError(t *testing.T) {
 	testFileError(t)
+}
+
+// testHas validates the Has error function
+func testHas(t testing.TB) {
+	err := errors.New("Non list error")
+
+	if Has(err, err) {
+		t.Error("Has should return false when given a non-list error as the first arg")
+	}
+
+	if Has(nil, err) {
+		t.Error("Has should not return true if there are no errors")
+	}
+
+	if Has(base.ErrorList([]error{}), err) {
+		t.Error("Has should not return true if there are no errors")
+	}
+}
+
+// TestHas validates the Has error function
+func TestHas(t *testing.T) {
+	testHas(t)
 }
 
 // BenchmarkFileError benchmarks validating a file error
