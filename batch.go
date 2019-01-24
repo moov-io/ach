@@ -157,8 +157,7 @@ func NewBatch(bh *BatchHeader) (Batcher, error) {
 	case ENR:
 		return NewBatchENR(bh), nil
 	case IAT:
-		msg := fmt.Sprintf(msgFileIATSEC, bh.StandardEntryClassCode)
-		return nil, &FileError{FieldName: "StandardEntryClassCode", Value: bh.StandardEntryClassCode, Msg: msg}
+		return nil, ErrFileIATSEC
 	case MTE:
 		return NewBatchMTE(bh), nil
 	case POP:
@@ -183,8 +182,7 @@ func NewBatch(bh *BatchHeader) (Batcher, error) {
 		return NewBatchXCK(bh), nil
 	default:
 	}
-	msg := fmt.Sprintf(msgFileNoneSEC, bh.StandardEntryClassCode)
-	return nil, &FileError{FieldName: "StandardEntryClassCode", Value: bh.StandardEntryClassCode, Msg: msg}
+	return nil, NewErrFileUnknownSEC(bh.StandardEntryClassCode)
 }
 
 // Create will tabulate and assemble an ACH batch into a valid state. This includes

@@ -26,22 +26,6 @@ const (
 	RecordLength = 94
 )
 
-// Errors strings specific to parsing a Batch container
-var (
-	msgFileCalculatedControlEquality = "calculated %v is out-of-balance with file control %v"
-	// specific messages
-	msgRecordLength      = "must be 94 characters and found %d"
-	msgFileBatchOutside  = "outside of current batch"
-	msgFileBatchInside   = "inside of current batch"
-	msgFileControl       = "none or more than one file control exists"
-	msgFileHeader        = "none or more than one file headers exists"
-	msgUnknownRecordType = "%s is an unknown record type"
-	msgFileNoneSEC       = "%v Standard Entry Class Code is not implemented"
-	msgFileIATSEC        = "%v Standard Entry Class Code should use iatBatch"
-	msgFileADV           = "file can only have ADV Batches"
-	msgFileTooLong       = "file has exceeded the maximum possible number of lines"
-)
-
 // FileError is an error describing issues validating a file
 type FileError struct {
 	FieldName string
@@ -66,8 +50,6 @@ type File struct {
 	NotificationOfChange []Batcher
 	// ReturnEntries is a slice of references to file.Batches that contain return entries
 	ReturnEntries []Batcher
-
-	converters
 }
 
 // NewFile constructs a file template.
@@ -333,8 +315,7 @@ func (f *File) Validate() error {
 	if !f.IsADV() {
 		// The value of the Batch Count Field is equal to the number of Company/Batch/Header Records in the file.
 		if f.Control.BatchCount != (len(f.Batches) + len(f.IATBatches)) {
-			msg := fmt.Sprintf(msgFileCalculatedControlEquality, len(f.Batches), f.Control.BatchCount)
-			return &FileError{FieldName: "BatchCount", Value: strconv.Itoa(len(f.Batches)), Msg: msg}
+			return NewErrFileCalculatedControlEquality("BatchCount", len(f.Batches), f.Control.BatchCount)
 		}
 		if err := f.Control.Validate(); err != nil {
 			return err
@@ -352,8 +333,7 @@ func (f *File) Validate() error {
 
 	// The value of the Batch Count Field is equal to the number of Company/Batch/Header Records in the file.
 	if f.ADVControl.BatchCount != len(f.Batches) {
-		msg := fmt.Sprintf(msgFileCalculatedControlEquality, len(f.Batches), f.ADVControl.BatchCount)
-		return &FileError{FieldName: "BatchCount", Value: strconv.Itoa(len(f.Batches)), Msg: msg}
+		return NewErrFileCalculatedControlEquality("BatchCount", len(f.Batches), f.ADVControl.BatchCount)
 	}
 	if err := f.ADVControl.Validate(); err != nil {
 		return err
@@ -386,16 +366,14 @@ func (f *File) isEntryAddendaCount(IsADV bool) error {
 			count += iatBatch.GetControl().EntryAddendaCount
 		}
 		if f.Control.EntryAddendaCount != count {
-			msg := fmt.Sprintf(msgFileCalculatedControlEquality, count, f.Control.EntryAddendaCount)
-			return &FileError{FieldName: "EntryAddendaCount", Value: f.Control.EntryAddendaCountField(), Msg: msg}
+			return NewErrFileCalculatedControlEquality("EntryAddendaCount", count, f.Control.EntryAddendaCount)
 		}
 	} else {
 		for _, batch := range f.Batches {
 			count += batch.GetADVControl().EntryAddendaCount
 		}
 		if f.ADVControl.EntryAddendaCount != count {
-			msg := fmt.Sprintf(msgFileCalculatedControlEquality, count, f.ADVControl.EntryAddendaCount)
-			return &FileError{FieldName: "EntryAddendaCount", Value: f.ADVControl.EntryAddendaCountField(), Msg: msg}
+			return NewErrFileCalculatedControlEquality("EntryAddendaCount", count, f.ADVControl.EntryAddendaCount)
 		}
 	}
 	return nil
@@ -423,12 +401,10 @@ func (f *File) isFileAmount(IsADV bool) error {
 		}
 
 		if f.Control.TotalDebitEntryDollarAmountInFile != debit {
-			msg := fmt.Sprintf(msgFileCalculatedControlEquality, debit, f.Control.TotalDebitEntryDollarAmountInFile)
-			return &FileError{FieldName: "TotalDebitEntryDollarAmountInFile", Value: f.Control.TotalDebitEntryDollarAmountInFileField(), Msg: msg}
+			return NewErrFileCalculatedControlEquality("TotalDebitEntryDollarAmountInFile", debit, f.Control.TotalDebitEntryDollarAmountInFile)
 		}
 		if f.Control.TotalCreditEntryDollarAmountInFile != credit {
-			msg := fmt.Sprintf(msgFileCalculatedControlEquality, credit, f.Control.TotalCreditEntryDollarAmountInFile)
-			return &FileError{FieldName: "TotalCreditEntryDollarAmountInFile", Value: f.Control.TotalCreditEntryDollarAmountInFileField(), Msg: msg}
+			return NewErrFileCalculatedControlEquality("TotalCreditEntryDollarAmountInFile", credit, f.Control.TotalCreditEntryDollarAmountInFile)
 		}
 	} else {
 		for _, batch := range f.Batches {
@@ -437,12 +413,11 @@ func (f *File) isFileAmount(IsADV bool) error {
 		}
 
 		if f.ADVControl.TotalDebitEntryDollarAmountInFile != debit {
-			msg := fmt.Sprintf(msgFileCalculatedControlEquality, debit, f.ADVControl.TotalDebitEntryDollarAmountInFile)
-			return &FileError{FieldName: "TotalDebitEntryDollarAmountInFile", Value: f.ADVControl.TotalDebitEntryDollarAmountInFileField(), Msg: msg}
+			return NewErrFileCalculatedControlEquality("TotalDebitEntryDollarAmountInFile", debit, f.ADVControl.TotalDebitEntryDollarAmountInFile)
 		}
 		if f.ADVControl.TotalCreditEntryDollarAmountInFile != credit {
-			msg := fmt.Sprintf(msgFileCalculatedControlEquality, credit, f.ADVControl.TotalCreditEntryDollarAmountInFile)
-			return &FileError{FieldName: "TotalCreditEntryDollarAmountInFile", Value: f.ADVControl.TotalCreditEntryDollarAmountInFileField(), Msg: msg}
+			return NewErrFileCalculatedControlEquality("TotalCreditEntryDollarAmountInFile", credit, f.ADVControl.TotalCreditEntryDollarAmountInFile)
+
 		}
 	}
 	return nil
@@ -457,14 +432,12 @@ func (f *File) isEntryHash(IsADV bool) error {
 	hashField := f.calculateEntryHash(IsADV)
 
 	if !IsADV {
-		if hashField != f.Control.EntryHashField() {
-			msg := fmt.Sprintf(msgFileCalculatedControlEquality, hashField, f.Control.EntryHashField())
-			return &FileError{FieldName: "EntryHash", Value: f.Control.EntryHashField(), Msg: msg}
+		if hashField != f.Control.EntryHash {
+			return NewErrFileCalculatedControlEquality("EntryHash", hashField, f.Control.EntryHash)
 		}
 	} else {
-		if hashField != f.ADVControl.EntryHashField() {
-			msg := fmt.Sprintf(msgFileCalculatedControlEquality, hashField, f.ADVControl.EntryHashField())
-			return &FileError{FieldName: "EntryHash", Value: f.ADVControl.EntryHashField(), Msg: msg}
+		if hashField != f.ADVControl.EntryHash {
+			return NewErrFileCalculatedControlEquality("EntryHash", hashField, f.ADVControl.EntryHash)
 		}
 	}
 	return nil
@@ -472,7 +445,7 @@ func (f *File) isEntryHash(IsADV bool) error {
 
 // calculateEntryHash This field is prepared by hashing the 8-digit Routing Number in each batch.
 // The Entry Hash provides a check against inadvertent alteration of data
-func (f *File) calculateEntryHash(IsADV bool) string {
+func (f *File) calculateEntryHash(IsADV bool) int {
 	// IsADV
 	// true: the file contains ADV batches
 	// false: the file contains other batch types but not ADV
@@ -492,7 +465,7 @@ func (f *File) calculateEntryHash(IsADV bool) string {
 			hash = hash + batch.GetADVControl().EntryHash
 		}
 	}
-	return f.numericField(hash, 10)
+	return hash
 }
 
 // IsADV determines if the File is an File containing ADV batches
@@ -529,8 +502,7 @@ func (f *File) createFileADV() error {
 		// create ascending batch numbers
 
 		if batch.GetHeader().StandardEntryClassCode != ADV {
-			return &FileError{FieldName: "StandardEntryClassCode", Value: batch.GetHeader().StandardEntryClassCode,
-				Msg: msgFileADV}
+			return ErrFileADVOnly
 		}
 
 		f.Batches[i].GetHeader().BatchNumber = batchSeq
