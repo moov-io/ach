@@ -1237,8 +1237,6 @@ func testACHFileRead3(t testing.TB) {
 					if e.FieldName != "RecordLength" {
 						t.Errorf("%T: %s", e, e)
 					}
-				} else {
-					t.Errorf("%T: %s", el, el)
 				}
 			}
 			// Check second error

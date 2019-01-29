@@ -111,14 +111,9 @@ func TestBatch__UnmarshalJSON(t *testing.T) {
 func testBatchNumberMismatch(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.GetControl().BatchNumber = 2
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "BatchNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchHeaderControlEquality(1, 2)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -153,14 +148,9 @@ func testCreditBatchIsBatchAmount(t testing.TB) {
 	}
 
 	mockBatch.GetControl().TotalCreditEntryDollarAmount = 1
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TotalCreditEntryDollarAmount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchCalculatedControlEquality(200, 1)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -197,14 +187,9 @@ func testSavingsBatchIsBatchAmount(t testing.TB) {
 	}
 
 	mockBatch.GetControl().TotalDebitEntryDollarAmount = 1
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TotalDebitEntryDollarAmount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchCalculatedControlEquality(200, 1)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -224,14 +209,9 @@ func BenchmarkSavingsBatchIsBatchAmount(b *testing.B) {
 func testBatchIsEntryHash(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.GetControl().EntryHash = 1
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "EntryHash" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchCalculatedControlEquality(12104288, 1)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -315,14 +295,9 @@ func testBatchEntryCountEquality(t testing.TB) {
 	}
 
 	mockBatch.GetControl().EntryAddendaCount = 1
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "EntryAddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchCalculatedControlEquality(3, 1)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -342,14 +317,9 @@ func testBatchAddendaIndicator(t testing.TB) {
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 0
 	mockBatch.GetControl().EntryAddendaCount = 2
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaRecordIndicator" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, ErrBatchAddendaIndicator) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -373,14 +343,9 @@ func testBatchIsAddendaSeqAscending(t testing.TB) {
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda05[0].SequenceNumber = 2
 	mockBatch.GetEntries()[0].Addenda05[1].SequenceNumber = 1
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "SequenceNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchAscending(2, 1)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -400,14 +365,9 @@ func testBatchIsSequenceAscending(t testing.TB) {
 	e3.TraceNumber = "1"
 	mockBatch.AddEntry(e3)
 	mockBatch.GetControl().EntryAddendaCount = 2
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TraceNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchAscending(121042880000001, 1)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -617,27 +577,16 @@ func BenchmarkBatchInvalidTraceNumberODFI(b *testing.B) {
 // testBatchNoEntry validates error for a batch with no entries
 func testBatchNoEntry(t testing.TB) {
 	mockBatch := mockBatchNoEntry()
-	if err := mockBatch.build(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "entries" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.build()
+	if !Match(err, ErrBatchNoEntries) {
+		t.Errorf("%T: %s", err, err)
 	}
 
 	// test verify
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "entries" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err = mockBatch.verify()
+	if !Match(err, ErrBatchNoEntries) {
+		t.Errorf("%T: %s", err, err)
 	}
-
 }
 
 // TestBatchNoEntry tests validating error for a batch with no entries
@@ -773,14 +722,9 @@ func TestBatchADVInvalidEntryAddendaCount(t *testing.T) {
 		t.Fatal(err)
 	}
 	mockBatch.ADVControl.EntryAddendaCount = CheckingCredit
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "EntryAddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchCalculatedControlEquality(1, 22)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -792,14 +736,9 @@ func TestBatchADVInvalidTotalDebitEntryDollarAmount(t *testing.T) {
 		t.Fatal(err)
 	}
 	mockBatch.ADVControl.TotalDebitEntryDollarAmount = 2200
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TotalDebitEntryDollarAmount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchCalculatedControlEquality(50000, 2200)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -810,14 +749,9 @@ func TestBatchADVInvalidTotalCreditEntryDollarAmount(t *testing.T) {
 		t.Fatal(err)
 	}
 	mockBatch.ADVControl.TotalCreditEntryDollarAmount = 2200
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TotalCreditEntryDollarAmount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchCalculatedControlEquality(50000, 2200)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -828,14 +762,9 @@ func TestBatchADVInvalidEntryHash(t *testing.T) {
 		t.Fatal(err)
 	}
 	mockBatch.ADVControl.EntryHash = 2200233
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "EntryHash" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchCalculatedControlEquality(23138010, 2200233)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -843,14 +772,9 @@ func TestBatchADVInvalidEntryHash(t *testing.T) {
 func TestBatchAddenda98InvalidAddendaRecordIndicator(t *testing.T) {
 	mockBatch := mockBatchCOR()
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 0
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaRecordIndicator" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchAddendaIndicator) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -858,14 +782,9 @@ func TestBatchAddenda98InvalidAddendaRecordIndicator(t *testing.T) {
 func TestBatchAddenda02InvalidAddendaRecordIndicator(t *testing.T) {
 	mockBatch := mockBatchPOS()
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 0
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaRecordIndicator" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchAddendaIndicator) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

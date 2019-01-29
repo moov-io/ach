@@ -88,8 +88,8 @@ func mockBatchPPD() *BatchPPD {
 
 // testBatchError validates batch error handling
 func testBatchError(t testing.TB) {
-	err := &BatchError{BatchNumber: 1, FieldName: "mock", Msg: "test message"}
-	if err.Error() != "BatchNumber 1 mock test message" {
+	err := &BatchError{BatchNumber: 1, FieldName: "mock", Err: ErrBatchNoEntries}
+	if err.Error() != "BatchNumber 1 () mock must have Entry Record(s) to be built" {
 		t.Error("BatchError Error has changed formatting")
 	}
 }
