@@ -130,14 +130,9 @@ func BenchmarkBatchTRXCreate(b *testing.B) {
 func testBatchTRXStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchTRX()
 	mockBatch.Header.StandardEntryClassCode = WEB
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "StandardEntryClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchSECType) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -158,14 +153,9 @@ func BenchmarkBatchTRXStandardEntryClassCode(b *testing.B) {
 func testBatchTRXServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchTRX()
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -358,14 +348,9 @@ func testBatchTRXAddenda10000(t testing.TB) {
 		mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	}
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, NewErrBatchAddendaCount(10000, 9999)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -532,14 +517,9 @@ func BenchmarkBatchTRXZeroAddendaRecords(b *testing.B) {
 // testBatchTRXTransactionCode validates BatchTRX TransactionCode is not a credit
 func testBatchTRXTransactionCode(t testing.TB) {
 	mockBatch := mockBatchTRXCredit()
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchDebitOnly) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -598,14 +578,9 @@ func TestBatchTRXAddendum99(t *testing.T) {
 func testBatchTRXCreditsOnly(t testing.TB) {
 	mockBatch := mockBatchTRX()
 	mockBatch.Header.ServiceClassCode = CreditsOnly
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -626,14 +601,9 @@ func BenchmarkBatchTRXCreditsOnly(b *testing.B) {
 func testBatchTRXAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchTRX()
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(AutomatedAccountingAdvices, 225)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -655,13 +625,8 @@ func TestBatchTRXAddenda02(t *testing.T) {
 	mockBatch := mockBatchTRX()
 	mockBatch.Entries[0].Addenda02 = mockAddenda02()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda02" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchAddendaCategory) {
+		t.Errorf("%T: %s", err, err)
 	}
 }

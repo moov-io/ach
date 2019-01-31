@@ -119,10 +119,7 @@ func Match(errA, errB error) bool {
 		simpleError := errors.New("simple error")
 		if reflect.TypeOf(errB) == reflect.TypeOf(simpleError) {
 			// simple errors all have the same type, so we need to compare them directly
-			if errA == errB {
-				return true
-			}
-			return false
+			return errA == errB
 		}
 		return true
 	}

@@ -4,10 +4,6 @@
 
 package ach
 
-import (
-	"fmt"
-)
-
 // BatchCIE holds the BatchHeader and BatchControl and all EntryDetail for CIE Entries.
 //
 // Customer-Initiated Entry (or CIE entry) is a credit entry initiated on behalf of,
@@ -43,27 +39,23 @@ func (batch *BatchCIE) Validate() error {
 	// Add type specific validation.
 
 	if batch.Header.StandardEntryClassCode != CIE {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, CCD)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
+		return batch.Error("StandardEntryClassCode", ErrBatchSECType, CIE)
 	}
 
 	// CIE detail entries can only be a credit, ServiceClassCode must allow credit
 	switch batch.Header.ServiceClassCode {
 	case MixedDebitsAndCredits, DebitsOnly:
-		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, CCD)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
+		return batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode)
 	}
 
 	for _, entry := range batch.Entries {
 		// CIE detail entries must be a debit
 		if entry.CreditOrDebit() != "C" {
-			msg := fmt.Sprintf(msgBatchTransactionCodeCredit, entry.TransactionCode)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
+			return batch.Error("TransactionCode", ErrBatchDebitOnly, entry.TransactionCode)
 		}
 		// CIE must have one Addenda05 record
 		if len(entry.Addenda05) != 1 {
-			msg := fmt.Sprintf(msgBatchRequiredAddendaCount, len(entry.Addenda05), 1, batch.Header.StandardEntryClassCode)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+			return batch.Error("AddendaCount", NewErrBatchRequiredAddendaCount(len(entry.Addenda05), 1))
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {

@@ -236,14 +236,9 @@ func testBatchDNEMismatch(t testing.TB) {
 
 	mockBatch.GetHeader().OriginatorStatusCode = 1
 	mockBatch.GetEntries()[0].TransactionCode = CheckingPrenoteCredit
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "OriginatorStatusCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, ErrBatchOriginatorDNE) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -261,14 +256,9 @@ func BenchmarkBatchDNEMismatch(b *testing.B) {
 func testBatchTraceNumberNotODFI(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.GetEntries()[0].SetTraceNumber("12345678", 1)
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ODFIIdentificationField" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchTraceNumberNotODFI("12104288", "12345678")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -390,14 +380,9 @@ func testBatchAddendaTraceNumber(t testing.TB) {
 	}
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda05[0].EntryDetailSequenceNumber = 99
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TraceNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchAscending("1", "1")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -480,14 +465,9 @@ func testBatchCategoryForwardReturn(t testing.TB) {
 	if err := mockBatch.build(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Category" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchCategory("Return", "Forward")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -606,14 +586,9 @@ func BenchmarkBatchNoEntry(b *testing.B) {
 func testBatchControl(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.Control.ODFIIdentification = ""
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ODFIIdentification" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchHeaderControlEquality("12104288", "")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -668,14 +643,9 @@ func TestBatchADVInvalidServiceClassCode(t *testing.T) {
 		t.Fatal(err)
 	}
 	mockBatch.ADVControl.ServiceClassCode = CreditsOnly
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchHeaderControlEquality("280", "220")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -686,14 +656,9 @@ func TestBatchADVInvalidODFIIdentification(t *testing.T) {
 		t.Fatal(err)
 	}
 	mockBatch.ADVControl.ODFIIdentification = "231380104"
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ODFIIdentification" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchHeaderControlEquality("12104288", "231380104")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -704,14 +669,9 @@ func TestBatchADVInvalidBatchNumber(t *testing.T) {
 		t.Fatal(err)
 	}
 	mockBatch.ADVControl.BatchNumber = 2
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "BatchNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchHeaderControlEquality("1", "2")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -809,14 +769,9 @@ func TestBatchADVCategory(t *testing.T) {
 	entryOne.Category = CategoryReturn
 
 	mockBatch.AddADVEntry(entryOne)
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Category" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, NewErrBatchCategory("Return", "Forward")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -869,13 +824,8 @@ func TestBatchDishonoredReturnsCategory(t *testing.T) {
 	batch.AddEntry(entry)
 	batch.AddEntry(entryOne)
 
-	if err := batch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Category" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := batch.Create()
+	if !Match(err, NewErrBatchCategory("Return", "DishonoredReturn")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }

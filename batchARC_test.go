@@ -122,14 +122,9 @@ func BenchmarkBatchARCCreate(b *testing.B) {
 func testBatchARCStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchARC()
 	mockBatch.Header.StandardEntryClassCode = WEB
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "StandardEntryClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchSECType) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -150,14 +145,9 @@ func BenchmarkBatchARCStandardEntryClassCode(b *testing.B) {
 func testBatchARCServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchARC()
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -178,14 +168,9 @@ func BenchmarkBatchARCServiceClassCodeEquality(b *testing.B) {
 func testBatchARCMixedCreditsAndDebits(t testing.TB) {
 	mockBatch := mockBatchARC()
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -206,14 +191,9 @@ func BenchmarkBatchARCMixedCreditsAndDebits(b *testing.B) {
 func testBatchARCCreditsOnly(t testing.TB) {
 	mockBatch := mockBatchARC()
 	mockBatch.Header.ServiceClassCode = CreditsOnly
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -234,14 +214,9 @@ func BenchmarkBatchARCCreditsOnly(b *testing.B) {
 func testBatchARCAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchARC()
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(AutomatedAccountingAdvices, 225)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -262,14 +237,9 @@ func BenchmarkBatchARCAutomatedAccountingAdvices(b *testing.B) {
 func testBatchARCAmount(t testing.TB) {
 	mockBatch := mockBatchARC()
 	mockBatch.Entries[0].Amount = 2600000
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Amount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, NewErrBatchAmount(2600000, 2500000)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -320,14 +290,9 @@ func BenchmarkBatchARCCheckSerialNumber(b *testing.B) {
 // testBatchARCTransactionCode validates BatchARC TransactionCode is not a credit
 func testBatchARCTransactionCode(t testing.TB) {
 	mockBatch := mockBatchARCCredit()
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchDebitOnly) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -349,14 +314,9 @@ func testBatchARCAddendaCount(t testing.TB) {
 	mockBatch := mockBatchARC()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda05" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchAddendaCategory) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -446,13 +406,8 @@ func TestBatchARCAddendum99Category(t *testing.T) {
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Category = CategoryForward
 	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda99" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchAddendaCategory) {
+		t.Errorf("%T: %s", err, err)
 	}
 }

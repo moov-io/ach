@@ -95,14 +95,9 @@ func BenchmarkBatchSHRCreate(b *testing.B) {
 func testBatchSHRStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.Header.StandardEntryClassCode = WEB
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "StandardEntryClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchSECType) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -123,14 +118,9 @@ func BenchmarkBatchSHRStandardEntryClassCode(b *testing.B) {
 func testBatchSHRServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -151,14 +141,9 @@ func BenchmarkBatchSHRServiceClassCodeEquality(b *testing.B) {
 func testBatchSHRMixedCreditsAndDebits(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -179,14 +164,9 @@ func BenchmarkBatchSHRMixedCreditsAndDebits(b *testing.B) {
 func testBatchSHRCreditsOnly(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.Header.ServiceClassCode = CreditsOnly
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -207,14 +187,9 @@ func BenchmarkBatchSHRCreditsOnly(b *testing.B) {
 func testBatchSHRAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(AutomatedAccountingAdvices, 225)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -235,14 +210,9 @@ func BenchmarkBatchSHRAutomatedAccountingAdvices(b *testing.B) {
 func testBatchSHRTransactionCode(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchDebitOnly) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -294,14 +264,9 @@ func testBatchSHRAddendaCountZero(t testing.TB) {
 	mockAddenda02 := mockAddenda02()
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality("225", "200")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -363,14 +328,9 @@ func testBatchSHRInvalidAddendum(t testing.TB) {
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda05" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchAddendaCategory) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -451,14 +411,9 @@ func BenchmarkBatchSHRInvalidBuild(b *testing.B) {
 func testBatchSHRCardTransactionType(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.GetEntries()[0].DiscretionaryData = "555"
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "CardTransactionType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, ErrBatchInvalidCardTransactionType) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -614,14 +569,9 @@ func TestBatchSHRAddendum99Category(t *testing.T) {
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.Entries[0].Category = CategoryNOC
 	mockBatch.Entries[0].Addenda99 = mockAddenda99
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda99" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchAddendaCategory) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -633,13 +583,8 @@ func TestBatchSHRTerminalState(t *testing.T) {
 	mockAddenda02.TerminalState = "YY"
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TerminalState" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality("225", "200")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }

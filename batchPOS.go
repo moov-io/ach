@@ -6,6 +6,7 @@ package ach
 
 import (
 	"fmt"
+
 	"github.com/moov-io/ach/internal/usabbrev"
 )
 
@@ -48,26 +49,22 @@ func (batch *BatchPOS) Validate() error {
 	// Add configuration and type specific validation for this type.
 
 	if batch.Header.StandardEntryClassCode != POS {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, POS)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
+		return batch.Error("StandardEntryClassCode", ErrBatchSECType, POS)
 	}
 
 	// POS detail entries can only be a debit, ServiceClassCode must allow debits
 	switch batch.Header.ServiceClassCode {
 	case MixedDebitsAndCredits, CreditsOnly:
-		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, POS)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
+		return batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode)
 	}
 
 	for _, entry := range batch.Entries {
 		// POS detail entries must be a debit
 		if entry.CreditOrDebit() != "D" {
-			msg := fmt.Sprintf(msgBatchTransactionCodeCredit, entry.TransactionCode)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
+			return batch.Error("TransactionCode", ErrBatchDebitOnly, entry.TransactionCode)
 		}
 		if err := entry.isCardTransactionType(entry.DiscretionaryData); err != nil {
-			msg := fmt.Sprintf(msgBatchCardTransactionType, entry.DiscretionaryData)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "CardTransactionType", Msg: msg}
+			return batch.Error("CardTransactionType", ErrBatchInvalidCardTransactionType, entry.DiscretionaryData)
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {

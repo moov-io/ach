@@ -4,10 +4,6 @@
 
 package ach
 
-import (
-	"fmt"
-)
-
 // BatchWEB creates a batch file that handles SEC payment type WEB.
 // Entry submitted pursuant to an authorization obtained solely via the Internet or a wireless network
 // For consumer accounts only.
@@ -31,15 +27,13 @@ func (batch *BatchWEB) Validate() error {
 	}
 	// Add configuration and type specific validation for this type.
 	if batch.Header.StandardEntryClassCode != WEB {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, WEB)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
+		return batch.Error("StandardEntryClassCode", ErrBatchSECType, WEB)
 	}
 
 	for _, entry := range batch.Entries {
 		// WEB can have up to one Addenda05 record
 		if len(entry.Addenda05) > 1 {
-			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addenda05), 1, batch.Header.StandardEntryClassCode)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+			return batch.Error("AddendaCount", NewErrBatchAddendaCount(len(entry.Addenda05), 1))
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {

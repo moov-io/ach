@@ -92,14 +92,9 @@ func BenchmarkBatchCIECreate(b *testing.B) {
 func testBatchCIEStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchCIE()
 	mockBatch.Header.StandardEntryClassCode = WEB
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "StandardEntryClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchSECType) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -120,14 +115,9 @@ func BenchmarkBatchCIEStandardEntryClassCode(b *testing.B) {
 func testBatchCIEServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchCIE()
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -148,14 +138,9 @@ func BenchmarkBatchCIEServiceClassCodeEquality(b *testing.B) {
 func testBatchCIEMixedCreditsAndDebits(t testing.TB) {
 	mockBatch := mockBatchCIE()
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 220)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -176,14 +161,9 @@ func BenchmarkBatchCIEMixedCreditsAndDebits(b *testing.B) {
 func testBatchCIEDebitsOnly(t testing.TB) {
 	mockBatch := mockBatchCIE()
 	mockBatch.Header.ServiceClassCode = DebitsOnly
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(DebitsOnly, 220)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -204,14 +184,9 @@ func BenchmarkBatchCIEDebitsOnly(b *testing.B) {
 func testBatchCIEAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchCIE()
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(AutomatedAccountingAdvices, 220)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -232,14 +207,9 @@ func BenchmarkBatchCIEAutomatedAccountingAdvices(b *testing.B) {
 func testBatchCIETransactionCode(t testing.TB) {
 	mockBatch := mockBatchCIE()
 	mockBatch.GetEntries()[0].TransactionCode = CheckingDebit
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchDebitOnly) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -260,14 +230,9 @@ func BenchmarkBatchCIETransactionCode(b *testing.B) {
 func testBatchCIEAddendaCount(t testing.TB) {
 	mockBatch := mockBatchCIE()
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, NewErrBatchRequiredAddendaCount(2, 1)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -288,14 +253,9 @@ func BenchmarkBatchCIEAddendaCount(b *testing.B) {
 func testBatchCIEAddendaCountZero(t testing.TB) {
 	mockBatch := NewBatchCIE(mockBatchCIEHeader())
 	mockBatch.AddEntry(mockCIEEntryDetail())
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, NewErrBatchRequiredAddendaCount(0, 1)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -318,14 +278,9 @@ func testBatchCIEInvalidAddendum(t testing.TB) {
 	mockBatch.AddEntry(mockCIEEntryDetail())
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, NewErrBatchRequiredAddendaCount(0, 1)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -489,13 +444,8 @@ func TestBatchCIEAddenda02(t *testing.T) {
 	mockBatch := mockBatchCIE()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda02" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchAddendaCategory) {
+		t.Errorf("%T: %s", err, err)
 	}
 }

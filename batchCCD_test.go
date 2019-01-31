@@ -73,14 +73,9 @@ func testBatchCCDAddendumCount(t testing.TB) {
 	mockBatch := mockBatchCCD()
 	// Adding a second addenda to the mock entry
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "EntryAddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchCalculatedControlEquality(3, 2)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -196,14 +191,9 @@ func BenchmarkBatchCCDAddendaTypeCode(b *testing.B) {
 func testBatchCCDSEC(t testing.TB) {
 	mockBatch := mockBatchCCD()
 	mockBatch.Header.StandardEntryClassCode = RCK
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "StandardEntryClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, ErrBatchSECType) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -306,14 +296,9 @@ func BenchmarkBatchCCDReceivingCompanyField(b *testing.B) {
 func TestBatchCCDValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchCCD()
 	mockBatch.GetHeader().ServiceClassCode = CreditsOnly
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, NewErrBatchServiceClassTranCode(CreditsOnly, 27)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -322,13 +307,8 @@ func TestBatchCCDAddenda02(t *testing.T) {
 	mockBatch := mockBatchCCD()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda02" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchAddendaCategory) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
