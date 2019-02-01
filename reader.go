@@ -107,7 +107,7 @@ func (r *Reader) Read() (File, error) {
 				r.errors.Add(err)
 			}
 		case lineLength != RecordLength:
-			r.errors.Add(NewRecordWrongLengthErr(lineLength))
+			r.errors.Add(r.parseError(NewRecordWrongLengthErr(lineLength)))
 		default:
 			r.line = line
 			if err := r.parseLine(); err != nil {
@@ -357,10 +357,7 @@ func (r *Reader) parseAddenda() error {
 				r.currentBatch.GetEntries()[entryIndex].Addenda99 = addenda99
 			}
 		} else {
-			return r.parseError(&FileError{
-				FieldName: "AddendaRecordIndicator",
-				Msg:       fmt.Sprint(msgBatchAddendaIndicator),
-			})
+			return r.parseError(r.currentBatch.Error("AddendaRecordIndicator", ErrBatchAddendaIndicator))
 		}
 	} else {
 		if err := r.parseADVAddenda(); err != nil {
@@ -379,10 +376,7 @@ func (r *Reader) parseADVAddenda() error {
 	entry := r.currentBatch.GetADVEntries()[entryIndex]
 
 	if entry.AddendaRecordIndicator != 1 {
-		return r.parseError(&FileError{
-			FieldName: "AddendaRecordIndicator",
-			Msg:       fmt.Sprint(msgBatchAddendaIndicator),
-		})
+		return r.parseError(r.currentBatch.Error("AddendaRecordIndicator", ErrBatchAddendaIndicator))
 	}
 	addenda99 := NewAddenda99()
 	addenda99.Parse(r.line)

@@ -43,16 +43,14 @@ func (batch *BatchCTX) Validate() error {
 
 	// Add configuration and type specific validation for this type.
 	if batch.Header.StandardEntryClassCode != CTX {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, CTX)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
+		return batch.Error("StandardEntryClassCode", ErrBatchSECType, CTX)
 	}
 
 	for _, entry := range batch.Entries {
 
 		// Trapping this error, as entry.CTXAddendaRecordsField() can not be greater than 9999
 		if len(entry.Addenda05) > 9999 {
-			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addenda05), 9999, batch.Header.StandardEntryClassCode)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+			return batch.Error("AddendaCount", NewErrBatchAddendaCount(len(entry.Addenda05), 9999))
 		}
 
 		// validate CTXAddendaRecord Field is equal to the actual number of Addenda records
@@ -66,8 +64,7 @@ func (batch *BatchCTX) Validate() error {
 		switch entry.TransactionCode {
 		case CheckingPrenoteCredit, CheckingPrenoteDebit, SavingsPrenoteCredit, SavingsReturnNOCDebit, GLPrenoteCredit,
 			GLPrenoteDebit, LoanPrenoteCredit:
-			msg := fmt.Sprintf(msgBatchTransactionCodeAddenda, entry.TransactionCode, CTX)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
+			return batch.Error("Addendum", ErrBatchTransactionCodeAddenda, entry.TransactionCode)
 		default:
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode

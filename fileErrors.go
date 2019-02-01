@@ -109,6 +109,35 @@ func (e ErrFileCalculatedControlEquality) Error() string {
 	return e.Message
 }
 
+func Match(errA, errB error) bool {
+	if errA == nil {
+		return false
+	}
+
+	// typed errors can be compared by type
+	if reflect.TypeOf(errA) == reflect.TypeOf(errB) {
+		simpleError := errors.New("simple error")
+		if reflect.TypeOf(errB) == reflect.TypeOf(simpleError) {
+			// simple errors all have the same type, so we need to compare them directly
+			return errA == errB
+		}
+		return true
+	}
+
+	// match wrapped errors
+	parseError := &base.ParseError{}
+	batchError := &BatchError{}
+	if reflect.TypeOf(errA) == reflect.TypeOf(parseError) {
+		pErr := errA.(*base.ParseError)
+		return Match(pErr.Err, errB)
+	}
+	if reflect.TypeOf(errA) == reflect.TypeOf(batchError) {
+		pErr := errA.(*BatchError)
+		return Match(pErr.Err, errB)
+	}
+	return false
+}
+
 // Has takes in a (potential) list of errors, and an error to check for. If any of the errors
 // in the list have the same type as the error to check, it returns true. If the "list" isn't
 // actually a list (typically because it is nil), or no errors in the list match the other error
@@ -119,17 +148,8 @@ func Has(list error, err error) bool {
 		return false
 	}
 	for i := 0; i < len(el); i++ {
-		simpleError := errors.New("simple error")
-		if reflect.TypeOf(err) == reflect.TypeOf(simpleError) {
-			// simple errors all have the same type, so we need to compare them directly
-			if el[i] == err {
-				return true
-			}
-		} else {
-			// typed errors can be compared by type
-			if reflect.TypeOf(el[i]) == reflect.TypeOf(err) {
-				return true
-			}
+		if Match(el[i], err) {
+			return true
 		}
 	}
 	return false

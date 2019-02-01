@@ -4,8 +4,6 @@
 
 package ach
 
-import "fmt"
-
 // BatchTRC holds the BatchHeader and BatchControl and all EntryDetail for TRC Entries.
 //
 // Check Truncation Entry (Truncated Entry) is used to identify a debit entry of a truncated check.
@@ -33,22 +31,19 @@ func (batch *BatchTRC) Validate() error {
 	// Add configuration and type specific validation for this type.
 
 	if batch.Header.StandardEntryClassCode != TRC {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, TRC)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
+		return batch.Error("StandardEntryClassCode", ErrBatchSECType, TRC)
 	}
 
 	// TRC detail entries can only be a debit, ServiceClassCode must allow debits
 	switch batch.Header.ServiceClassCode {
 	case MixedDebitsAndCredits, CreditsOnly:
-		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, TRC)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
+		return batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode)
 	}
 
 	for _, entry := range batch.Entries {
 		// TRC detail entries must be a debit
 		if entry.CreditOrDebit() != "D" {
-			msg := fmt.Sprintf(msgBatchTransactionCodeCredit, entry.TransactionCode)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
+			return batch.Error("TransactionCode", ErrBatchDebitOnly, entry.TransactionCode)
 		}
 		// ProcessControlField underlying IdentificationNumber, must be defined
 		if entry.ProcessControlField() == "" {

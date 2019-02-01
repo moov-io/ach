@@ -117,14 +117,9 @@ func TestBatchENRAddendum98(t *testing.T) {
 func testBatchENRCompanyEntryDescription(t testing.TB) {
 	mockBatch := mockBatchENR()
 	mockBatch.Header.CompanyEntryDescription = "bad"
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "CompanyEntryDescription" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchCompanyEntryDescriptionAutoenroll) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -173,14 +168,9 @@ func BenchmarkBatchENRAddendaTypeCode(b *testing.B) {
 func testBatchENRSEC(t testing.TB) {
 	mockBatch := mockBatchENR()
 	mockBatch.Header.StandardEntryClassCode = ACK
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "StandardEntryClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, ErrBatchSECType) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -257,14 +247,9 @@ func BenchmarkBatchENRServiceClassCode(b *testing.B) {
 func TestBatchENRAmount(t *testing.T) {
 	mockBatch := mockBatchENR()
 	mockBatch.GetEntries()[0].Amount = 25000
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Amount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchAmountNonZero) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -272,14 +257,9 @@ func TestBatchENRAmount(t *testing.T) {
 func TestBatchENRTransactionCode(t *testing.T) {
 	mockBatch := mockBatchENR()
 	mockBatch.GetEntries()[0].TransactionCode = CheckingReturnNOCCredit
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchTransactionCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -321,14 +301,9 @@ func TestBatchENR__PaymentInformation(t *testing.T) {
 func TestBatchENRValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchENR()
 	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, NewErrBatchServiceClassTranCode(DebitsOnly, 22)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -337,13 +312,8 @@ func TestBatchENRAddenda02(t *testing.T) {
 	mockBatch := mockBatchENR()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda02" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchAddendaCategory) {
+		t.Errorf("%T: %s", err, err)
 	}
 }

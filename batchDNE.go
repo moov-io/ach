@@ -5,13 +5,12 @@
 package ach
 
 import (
-	"fmt"
 	"strings"
 )
 
 // BatchDNE is a batch file that handles SEC code Death Notification Entry (DNE)
 // United States Federal agencies (e.g. Social Security) use this to notify depository
-// financial institutions that the recipient of government benefit paymetns has died.
+// financial institutions that the recipient of government benefit payments has died.
 //
 // Notes:
 //  - Date of death always in positions 18-23
@@ -37,28 +36,24 @@ func (batch *BatchDNE) Validate() error {
 
 	// SEC code
 	if batch.Header.StandardEntryClassCode != DNE {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, DNE)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
+		return batch.Error("StandardEntryClassCode", ErrBatchSECType, DNE)
 	}
 
 	// Range over Entries
 	for _, entry := range batch.Entries {
 		if entry.Amount != 0 {
-			msg := fmt.Sprintf(msgBatchAmountZero, entry.Amount, DNE)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
+			return batch.Error("Amount", ErrBatchAmountNonZero, entry.Amount)
 		}
 
 		switch entry.TransactionCode {
 		case CheckingReturnNOCCredit, CheckingPrenoteCredit, SavingsReturnNOCCredit, SavingsPrenoteCredit:
 		default:
-			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, DNE)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
+			return batch.Error("TransactionCode", ErrBatchTransactionCode, entry.TransactionCode)
 		}
 
 		// DNE must have one Addenda05
 		if len(entry.Addenda05) != 1 {
-			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addenda05), 1, batch.Header.StandardEntryClassCode)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+			return batch.Error("AddendaCount", NewErrBatchAddendaCount(len(entry.Addenda05), 1))
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {

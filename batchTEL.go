@@ -4,8 +4,6 @@
 
 package ach
 
-import "fmt"
-
 // BatchTEL is a batch that handles SEC payment type Telephone-Initiated Entries (TEL)
 // Telephone-Initiated Entries (TEL) are consumer debit transactions. The NACHA Operating Rules permit TEL entries when
 // the Originator obtains the Receiver’s authorization for the debit entry orally via the telephone.
@@ -31,14 +29,12 @@ func (batch *BatchTEL) Validate() error {
 	}
 	// Add configuration and type specific based validation for this type.
 	if batch.Header.StandardEntryClassCode != TEL {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, TEL)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
+		return batch.Error("StandardEntryClassCode", ErrBatchSECType, TEL)
 	}
 	// can not have credits in TEL batches
 	for _, entry := range batch.Entries {
 		if entry.CreditOrDebit() != "D" {
-			msg := fmt.Sprintf(msgBatchTransactionCodeCredit, entry.IndividualName)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
+			return batch.Error("TransactionCode", ErrBatchDebitOnly, entry.TransactionCode)
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {

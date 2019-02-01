@@ -101,14 +101,9 @@ func testBatchTELAddendaCount(t testing.TB) {
 	// TEL can not have an addenda02
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda02" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchCalculatedControlEquality(2, 1)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -129,14 +124,9 @@ func BenchmarkBatchTELAddendaCount(b *testing.B) {
 func testBatchTELSEC(t testing.TB) {
 	mockBatch := mockBatchTEL()
 	mockBatch.Header.StandardEntryClassCode = RCK
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "StandardEntryClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, ErrBatchSECType) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -157,14 +147,9 @@ func BenchmarkBatchTELSEC(b *testing.B) {
 func testBatchTELDebit(t testing.TB) {
 	mockBatch := mockBatchTEL()
 	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchDebitOnly) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -255,13 +240,8 @@ func TestBatchTELAddendum99(t *testing.T) {
 func TestBatchTELValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchTEL()
 	mockBatch.GetHeader().ServiceClassCode = CreditsOnly
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, NewErrBatchServiceClassTranCode(CreditsOnly, 27)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }

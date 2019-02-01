@@ -6,6 +6,7 @@ package ach
 
 import (
 	"fmt"
+
 	"github.com/moov-io/ach/internal/usabbrev"
 )
 
@@ -36,14 +37,12 @@ func (batch *BatchMTE) Validate() error {
 	}
 
 	if batch.Header.StandardEntryClassCode != MTE {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, MTE)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
+		return batch.Error("StandardEntryClassCode", ErrBatchSECType, MTE)
 	}
 
 	for _, entry := range batch.Entries {
 		if entry.Amount <= 0 {
-			msg := fmt.Sprintf(msgBatchAmountNonZero, entry.Amount, MTE)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
+			return batch.Error("Amount", ErrBatchAmountZero, entry.Amount)
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {

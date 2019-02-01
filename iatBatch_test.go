@@ -6,11 +6,12 @@ package ach
 
 import (
 	"encoding/json"
-	"github.com/moov-io/base"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockIATBatch
@@ -379,14 +380,9 @@ func BenchmarkIATBatchAddenda16Error(b *testing.B) {
 func testAddenda10EntryDetailSequenceNumber(t testing.TB) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda10.EntryDetailSequenceNumber = 00000005
-	if err := iatBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TraceNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := iatBatch.verify()
+	if !Match(err, NewErrBatchAddendaTraceNumber("0000005", "0000001")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -410,14 +406,9 @@ func BenchmarkAddenda10EntryDetailSequenceNumber(b *testing.B) {
 func testAddenda11EntryDetailSequenceNumber(t testing.TB) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda11.EntryDetailSequenceNumber = 00000005
-	if err := iatBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TraceNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := iatBatch.verify()
+	if !Match(err, NewErrBatchAddendaTraceNumber("0000005", "0000001")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -441,14 +432,9 @@ func BenchmarkAddenda11EntryDetailSequenceNumber(b *testing.B) {
 func testAddenda12EntryDetailSequenceNumber(t testing.TB) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda12.EntryDetailSequenceNumber = 00000005
-	if err := iatBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TraceNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := iatBatch.verify()
+	if !Match(err, NewErrBatchAddendaTraceNumber("0000005", "0000001")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -472,14 +458,9 @@ func BenchmarkAddenda12EntryDetailSequenceNumber(b *testing.B) {
 func testAddenda13EntryDetailSequenceNumber(t testing.TB) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda13.EntryDetailSequenceNumber = 00000005
-	if err := iatBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TraceNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := iatBatch.verify()
+	if !Match(err, NewErrBatchAddendaTraceNumber("0000005", "0000001")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -503,14 +484,9 @@ func BenchmarkAddenda13EntryDetailSequenceNumber(b *testing.B) {
 func testAddenda14EntryDetailSequenceNumber(t testing.TB) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda14.EntryDetailSequenceNumber = 00000005
-	if err := iatBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TraceNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := iatBatch.verify()
+	if !Match(err, NewErrBatchAddendaTraceNumber("0000005", "0000001")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -534,14 +510,9 @@ func BenchmarkAddenda14EntryDetailSequenceNumber(b *testing.B) {
 func testAddenda15EntryDetailSequenceNumber(t testing.TB) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda15.EntryDetailSequenceNumber = 00000005
-	if err := iatBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TraceNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := iatBatch.verify()
+	if !Match(err, NewErrBatchAddendaTraceNumber("0000005", "0000001")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -565,14 +536,9 @@ func BenchmarkAddenda15EntryDetailSequenceNumber(b *testing.B) {
 func testAddenda16EntryDetailSequenceNumber(t testing.TB) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda16.EntryDetailSequenceNumber = 00000005
-	if err := iatBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TraceNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := iatBatch.verify()
+	if !Match(err, NewErrBatchAddendaTraceNumber("0000005", "0000001")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -595,14 +561,9 @@ func BenchmarkAddenda16EntryDetailSequenceNumber(b *testing.B) {
 func testIATBatchNumberMismatch(t testing.TB) {
 	mockBatch := mockIATBatch(t)
 	mockBatch.GetControl().BatchNumber = 2
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "BatchNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchHeaderControlEquality(1, 2)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -623,14 +584,9 @@ func BenchmarkIATBatchNumberMismatch(b *testing.B) {
 func testIATServiceClassCodeMismatch(t testing.TB) {
 	mockBatch := mockIATBatch(t)
 	mockBatch.GetControl().ServiceClassCode = DebitsOnly
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, DebitsOnly)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -669,14 +625,9 @@ func testIATBatchCreditIsBatchAmount(t testing.TB) {
 	}
 
 	mockBatch.GetControl().TotalCreditEntryDollarAmount = 1000
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TotalCreditEntryDollarAmount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchCalculatedControlEquality(105000, 1000)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -717,14 +668,9 @@ func testIATBatchDebitIsBatchAmount(t testing.TB) {
 	}
 
 	mockBatch.GetControl().TotalDebitEntryDollarAmount = 1000
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TotalDebitEntryDollarAmount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchCalculatedControlEquality(105000, 1000)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -825,14 +771,9 @@ func BenchmarkIATBatchBuild(b *testing.B) {
 func testIATODFIIdentificationMismatch(t testing.TB) {
 	mockBatch := mockIATBatch(t)
 	mockBatch.GetControl().ODFIIdentification = "53158020"
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ODFIIdentification" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchHeaderControlEquality(23138010, 53158020)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -881,14 +822,9 @@ func BenchmarkIATBatchAddendaRecordIndicator(b *testing.B) {
 func testIATBatchInvalidTraceNumberODFI(t testing.TB) {
 	mockBatch := mockIATBatch(t)
 	mockBatch.GetEntries()[0].SetTraceNumber("9928272", 1)
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ODFIIdentificationField" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchTraceNumberNotODFI("23138010", "09928272")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -909,14 +845,9 @@ func BenchmarkIATBatchInvalidTraceNumberODFI(b *testing.B) {
 func testIATBatchControl(t testing.TB) {
 	mockBatch := mockIATBatch(t)
 	mockBatch.Control.ODFIIdentification = ""
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ODFIIdentification" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchHeaderControlEquality("23138010", "")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -941,14 +872,9 @@ func testIATBatchEntryCountEquality(t testing.TB) {
 	}
 
 	mockBatch.GetControl().EntryAddendaCount = 1
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "EntryAddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchCalculatedControlEquality(8, 1)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -969,14 +895,9 @@ func BenchmarkIATBatchEntryCountEquality(b *testing.B) {
 func testIATBatchisEntryHash(t testing.TB) {
 	mockBatch := mockIATBatch(t)
 	mockBatch.GetControl().EntryHash = 1
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "EntryHash" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchCalculatedControlEquality("0012104288", "1")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1007,14 +928,9 @@ func testIATBatchIsSequenceAscending(t testing.TB) {
 	mockBatch.Entries[1].Addenda15 = mockAddenda15()
 	mockBatch.Entries[1].Addenda16 = mockAddenda16()
 	mockBatch.GetControl().EntryAddendaCount = 16
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TraceNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchAscending("231380100000001", "1")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1385,14 +1301,9 @@ func testIATBatchValidate(t testing.TB) {
 	mockBatch := mockIATBatch(t)
 	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
 
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchHeaderControlEquality(DebitsOnly, CreditsOnly)) {
+		t.Errorf("%T: %s", err, err)
 	}
 
 	file.AddIATBatch(mockBatch)
@@ -1484,16 +1395,10 @@ func testIATBatchAddenda17EDSequenceNumber(t testing.TB) {
 
 	addenda17B.SequenceNumber = 1
 	addenda17B.EntryDetailSequenceNumber = 0000002
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TraceNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchAddendaTraceNumber("0000002", "0000001")) {
+		t.Errorf("%T: %s", err, err)
 	}
-
 }
 
 // TestIATBatchAddenda17EDSequenceNumber tests validating IATBatch Addenda17 Entry Detail Sequence Number error
@@ -1537,16 +1442,10 @@ func testIATBatchAddenda17Sequence(t testing.TB) {
 	}
 
 	addenda17B.SequenceNumber = -1
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "SequenceNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchAscending("-1", "1")) {
+		t.Errorf("%T: %s", err, err)
 	}
-
 }
 
 // TestIATBatchAddenda17Sequence tests validating IATBatch Addenda17 Sequence Number error
@@ -1607,16 +1506,10 @@ func testIATBatchAddenda18EDSequenceNumber(t testing.TB) {
 
 	addenda18B.SequenceNumber = 1
 	addenda18B.EntryDetailSequenceNumber = 0000002
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TraceNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchAddendaTraceNumber("0000002", "0000001")) {
+		t.Errorf("%T: %s", err, err)
 	}
-
 }
 
 // TestIATBatchAddenda18EDSequenceNumber tests validating IATBatch Addenda18 Entry Detail Sequence Number error
@@ -1676,16 +1569,10 @@ func testIATBatchAddenda18Sequence(t testing.TB) {
 	}
 
 	addenda18B.SequenceNumber = -1
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "SequenceNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchAscending("-1", "1")) {
+		t.Errorf("%T: %s", err, err)
 	}
-
 }
 
 // TestIATBatchAddenda18Sequence tests validating IATBatch Addenda18 Sequence Number error
@@ -1705,14 +1592,9 @@ func BenchmarkIATBatchAddenda18Sequence(b *testing.B) {
 func testIATNoEntry(t testing.TB) {
 	mockBatch := IATBatch{}
 	mockBatch.SetHeader(mockIATBatchHeaderFF())
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "entries" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, ErrBatchNoEntries) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1914,14 +1796,9 @@ func testIATBatchBHODFI(t testing.TB) {
 	mockBatch := mockIATBatch(t)
 	mockBatch.GetEntries()[0].SetTraceNumber("39387337", 1)
 
-	if err := mockBatch.build(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "entries" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !Match(err, NewErrBatchTraceNumberNotODFI("23138010", "39387337")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

@@ -4,10 +4,6 @@
 
 package ach
 
-import (
-	"fmt"
-)
-
 // BatchCCD is a batch file that handles SEC payment type CCD and CCD+.
 // Corporate credit or debit. Identifies an Entry initiated by an Organization to transfer funds to or from an account of that Organization or another Organization.
 // For commercial accounts only.
@@ -32,15 +28,13 @@ func (batch *BatchCCD) Validate() error {
 
 	// Add configuration and type specific validation.
 	if batch.Header.StandardEntryClassCode != CCD {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, CCD)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
+		return batch.Error("StandardEntryClassCode", ErrBatchSECType, CCD)
 	}
 
 	for _, entry := range batch.Entries {
 		// CCD can have up to one Addenda05 record,
 		if len(entry.Addenda05) > 1 {
-			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addenda05), 1, batch.Header.StandardEntryClassCode)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+			return batch.Error("AddendaCount", NewErrBatchAddendaCount(len(entry.Addenda05), 1))
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {

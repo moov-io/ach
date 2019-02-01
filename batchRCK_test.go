@@ -122,14 +122,9 @@ func BenchmarkBatchRCKCreate(b *testing.B) {
 func testBatchRCKStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchRCK()
 	mockBatch.Header.StandardEntryClassCode = WEB
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "StandardEntryClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchSECType) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -150,14 +145,9 @@ func BenchmarkBatchRCKStandardEntryClassCode(b *testing.B) {
 func testBatchRCKServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchRCK()
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -178,14 +168,9 @@ func BenchmarkBatchRCKServiceClassCodeEquality(b *testing.B) {
 func testBatchRCKMixedCreditsAndDebits(t testing.TB) {
 	mockBatch := mockBatchRCK()
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -206,14 +191,9 @@ func BenchmarkBatchRCKMixedCreditsAndDebits(b *testing.B) {
 func testBatchRCKCreditsOnly(t testing.TB) {
 	mockBatch := mockBatchRCK()
 	mockBatch.Header.ServiceClassCode = CreditsOnly
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -234,14 +214,9 @@ func BenchmarkBatchRCKCreditsOnly(b *testing.B) {
 func testBatchRCKAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchRCK()
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(AutomatedAccountingAdvices, 225)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -290,14 +265,9 @@ func BenchmarkBatchRCKCompanyEntryDescription(b *testing.B) {
 func testBatchRCKAmount(t testing.TB) {
 	mockBatch := mockBatchRCK()
 	mockBatch.Entries[0].Amount = 250001
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Amount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, NewErrBatchAmount(250001, 250000)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -348,14 +318,9 @@ func BenchmarkBatchRCKCheckSerialNumber(b *testing.B) {
 // testBatchRCKTransactionCode validates BatchRCK TransactionCode is not a credit
 func testBatchRCKTransactionCode(t testing.TB) {
 	mockBatch := mockBatchRCKCredit()
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchDebitOnly) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
