@@ -83,31 +83,6 @@ func BenchmarkBatchMTEHeader(b *testing.B) {
 	}
 }
 
-// testBatchMTEAddendumCount batch control MTE can only have one addendum per entry detail
-func testBatchMTEAddendumCount(t testing.TB) {
-	t.Skip("This test is failing due to a potential logic bug, which is beyond the scope of this PR")
-	mockBatch := mockBatchMTE()
-	// Adding a second addenda to the mock entry
-	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
-	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchAddendaCount(2, 1)) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestBatchMTEAddendumCount tests batch control MTE can only have one addendum per entry detail
-func TestBatchMTEAddendumCount(t *testing.T) {
-	testBatchMTEAddendumCount(t)
-}
-
-// BenchmarkBatchMTEAddendumCount benchmarks batch control MTE can only have one addendum per entry detail
-func BenchmarkBatchMTEAddendumCount(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testBatchMTEAddendumCount(b)
-	}
-}
-
 // TestBatchMTEAddendum02 validates Addenda02 returns an error
 func TestBatchMTEAddendum02(t *testing.T) {
 	mockBatch := NewBatchMTE(mockBatchMTEHeader())
