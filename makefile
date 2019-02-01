@@ -17,8 +17,12 @@ clean:
 	@rm -rf tmp/
 
 docker: clean
+# ACH docker image
 	docker build --pull -t moov/ach:$(VERSION) -f Dockerfile .
 	docker tag moov/ach:$(VERSION) moov/ach:latest
+# ACH Fuzzing docker image
+	docker build --pull -t moov/achfuzz:$(VERSION) . -f Dockerfile-fuzz
+	docker tag moov/achfuzz:$(VERSION) moov/achfuzz:latest
 
 release: docker generate AUTHORS
 	go test ./...
@@ -27,6 +31,7 @@ release: docker generate AUTHORS
 release-push:
 	git push origin $(VERSION)
 	docker push moov/ach:$(VERSION)
+	docker push moov/achfuzz:$(VERSION)
 
 # From https://github.com/genuinetools/img
 .PHONY: AUTHORS
@@ -37,5 +42,4 @@ AUTHORS:
 
 .PHONY: fuzz
 fuzz:
-	docker build --pull -t moov/achfuzz:latest . -f Dockerfile-fuzz
 	docker run moov/achfuzz:latest
