@@ -264,10 +264,8 @@ func BenchmarkBatchCORTransactionCode27(b *testing.B) {
 // testBatchCORTransactionCode21 validates BatchCOR TransactionCode 21 is a valid TransactionCode to be used for NOC
 // mockBatch.Create() should not return an error for this test
 func testBatchCORTransactionCode21(t testing.TB) {
-	t.Skip("This test is failing due to a potential logic bug, which is beyond the scope of this PR")
 	mockBatch := mockBatchCOR()
 	mockBatch.GetEntries()[0].TransactionCode = CheckingReturnNOCCredit
-
 	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
