@@ -194,36 +194,6 @@ func BenchmarkBatchCTXAddendaCountZero(b *testing.B) {
 	}
 }
 
-// testBatchCTXInvalidAddendum validates Addendum must be Addenda05
-func testBatchCTXInvalidAddendum(t testing.TB) {
-	mockBatch := NewBatchCTX(mockBatchCTXHeader())
-	mockBatch.AddEntry(mockCTXEntryDetail())
-	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
-	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
-	}
-}
-
-// TestBatchCTXInvalidAddendum tests validating Addendum must be Addenda05
-func TestBatchCTXInvalidAddendum(t *testing.T) {
-	testBatchCTXInvalidAddendum(t)
-}
-
-// BenchmarkBatchCTXInvalidAddendum benchmarks validating Addendum must be Addenda05
-func BenchmarkBatchCTXInvalidAddendum(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testBatchCTXInvalidAddendum(b)
-	}
-}
-
 // testBatchCTXInvalidAddenda validates Addendum must be Addenda05 with record type 7
 func testBatchCTXInvalidAddenda(t testing.TB) {
 	mockBatch := NewBatchCTX(mockBatchCTXHeader())
