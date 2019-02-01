@@ -4,8 +4,6 @@
 
 package ach
 
-import "fmt"
-
 // BatchPPD holds the Batch Header and Batch Control and all Entry Records for PPD Entries
 type BatchPPD struct {
 	Batch
@@ -31,15 +29,13 @@ func (batch *BatchPPD) Validate() error {
 	// Add configuration and type specific validation for this type.
 
 	if batch.Header.StandardEntryClassCode != PPD {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, PPD)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
+		return batch.Error("StandardEntryClassCode", ErrBatchSECType, PPD)
 	}
 
 	for _, entry := range batch.Entries {
 		// PPD can have up to one Addenda05 record
 		if len(entry.Addenda05) > 1 {
-			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addenda05), 1, batch.Header.StandardEntryClassCode)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+			return batch.Error("AddendaCount", NewErrBatchAddendaCount(len(entry.Addenda05), 1))
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {

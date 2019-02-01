@@ -88,9 +88,9 @@ func mockBatchPPD() *BatchPPD {
 
 // testBatchError validates batch error handling
 func testBatchError(t testing.TB) {
-	err := &BatchError{BatchNumber: 1, FieldName: "mock", Msg: "test message"}
-	if err.Error() != "BatchNumber 1 mock test message" {
-		t.Error("BatchError Error has changed formatting")
+	err := &BatchError{BatchNumber: 1, FieldName: "mock", Err: ErrBatchNoEntries}
+	if err.Error() != "batch #1 () mock must have Entry Record(s) to be built" {
+		t.Errorf("BatchError Error has changed formatting: %v", err)
 	}
 }
 
@@ -111,14 +111,9 @@ func BenchmarkBatchError(b *testing.B) {
 func testBatchServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchPPD()
 	mockBatch.GetControl().ServiceClassCode = DebitsOnly
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -199,14 +194,9 @@ func BenchmarkBatchPPDTypeCode(b *testing.B) {
 func testBatchCompanyIdentification(t testing.TB) {
 	mockBatch := mockBatchPPD()
 	mockBatch.GetControl().CompanyIdentification = "XYZ Inc"
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "CompanyIdentification" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality("121042882", "XYZ Inc")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -227,14 +217,9 @@ func BenchmarkBatchCompanyIdentification(b *testing.B) {
 func testBatchODFIIDMismatch(t testing.TB) {
 	mockBatch := mockBatchPPD()
 	mockBatch.GetControl().ODFIIdentification = "987654321"
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ODFIIdentification" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality("12104288", "987654321")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -283,14 +268,9 @@ func testBatchPPDAddendaCount(t testing.TB) {
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchCalculatedControlEquality(3, 1)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -349,14 +329,9 @@ func TestBatchPPDAddendum99(t *testing.T) {
 func TestBatchPPDSEC(t *testing.T) {
 	mockBatch := mockBatchPPD()
 	mockBatch.Header.StandardEntryClassCode = RCK
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "StandardEntryClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, ErrBatchSECType) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -364,14 +339,9 @@ func TestBatchPPDSEC(t *testing.T) {
 func TestBatchPPDValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchPPD()
 	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, NewErrBatchServiceClassTranCode(DebitsOnly, 22)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -380,13 +350,8 @@ func TestBatchPPDAddenda02(t *testing.T) {
 	mockBatch := mockBatchPPD()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda02" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchAddendaCategory) {
+		t.Errorf("%T: %s", err, err)
 	}
 }

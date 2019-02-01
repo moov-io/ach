@@ -96,14 +96,9 @@ func BenchmarkBatchCTXCreate(b *testing.B) {
 func testBatchCTXStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchCTX()
 	mockBatch.Header.StandardEntryClassCode = WEB
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "StandardEntryClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchSECType) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -124,14 +119,9 @@ func BenchmarkBatchCTXStandardEntryClassCode(b *testing.B) {
 func testBatchCTXServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchCTX()
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -324,14 +314,9 @@ func testBatchCTXAddenda10000(t testing.TB) {
 		mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	}
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, NewErrBatchAddendaCount(10000, 9999)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -588,14 +573,9 @@ func TestBatchCTXAddendum99(t *testing.T) {
 func TestBatchCTXValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchCTX()
 	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, NewErrBatchServiceClassTranCode(DebitsOnly, 22)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -604,13 +584,8 @@ func TestBatchCTXAddenda02(t *testing.T) {
 	mockBatch := mockBatchCTX()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda02" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchAddendaCategory) {
+		t.Errorf("%T: %s", err, err)
 	}
 }

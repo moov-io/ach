@@ -4,10 +4,6 @@
 
 package ach
 
-import (
-	"fmt"
-)
-
 // BatchACK is a batch file that handles SEC payment type ACK and ACK+.
 // Acknowledgement of a Corporate credit by the Receiving Depository Financial Institution (RDFI).
 // For commercial accounts only.
@@ -34,25 +30,21 @@ func (batch *BatchACK) Validate() error {
 	}
 	// Add configuration and type specific validation.
 	if batch.Header.StandardEntryClassCode != ACK {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, ACK)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
+		return batch.Error("StandardEntryClassCode", ErrBatchSECType, ACK)
 	}
 	// Range through Entries
 	for _, entry := range batch.Entries {
 		// Amount must be zero for Acknowledgement Entries
 		if entry.Amount > 0 {
-			msg := fmt.Sprintf(msgBatchAmountZero, entry.Amount, ACK)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
+			return batch.Error("Amount", ErrBatchAmountNonZero, entry.Amount)
 		}
 		if len(entry.Addenda05) > 1 {
-			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addenda05), 1, batch.Header.StandardEntryClassCode)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+			return batch.Error("AddendaCount", NewErrBatchAddendaCount(len(entry.Addenda05), 1))
 		}
 		switch entry.TransactionCode {
 		case CheckingZeroDollarRemittanceCredit, SavingsZeroDollarRemittanceCredit:
 		default:
-			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, ACK)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
+			return batch.Error("TransactionCode", ErrBatchTransactionCode, entry.TransactionCode)
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {

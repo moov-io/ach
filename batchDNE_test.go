@@ -80,14 +80,9 @@ func testBatchDNEAddendumCount(t testing.TB) {
 	mockBatch := mockBatchDNE()
 	// Adding a second addenda to the mock entry
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "EntryAddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchCalculatedControlEquality(3, 2)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -180,14 +175,9 @@ func BenchmarkBatchDNEAddendaTypeCode(b *testing.B) {
 func testBatchDNESEC(t testing.TB) {
 	mockBatch := mockBatchDNE()
 	mockBatch.Header.StandardEntryClassCode = ACK
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "StandardEntryClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, ErrBatchSECType) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -266,14 +256,9 @@ func TestBatchDNEAmount(t *testing.T) {
 	mockBatch := mockBatchDNE()
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetEntries()[0].Amount = 25000
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Amount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchAmountNonZero) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -281,14 +266,9 @@ func TestBatchDNEAmount(t *testing.T) {
 func TestBatchDNETransactionCode(t *testing.T) {
 	mockBatch := mockBatchDNE()
 	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchTransactionCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

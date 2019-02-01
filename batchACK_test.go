@@ -74,14 +74,9 @@ func testBatchACKAddendumCount(t testing.TB) {
 	mockBatch := mockBatchACK()
 	// Adding a second addenda to the mock entry
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, NewErrBatchAddendaCount(2, 1)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -197,14 +192,9 @@ func BenchmarkBatchACKAddendaTypeCode(b *testing.B) {
 func testBatchACKSEC(t testing.TB) {
 	mockBatch := mockBatchACK()
 	mockBatch.Header.StandardEntryClassCode = RCK
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "StandardEntryClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, ErrBatchSECType) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -226,14 +216,9 @@ func testBatchACKAddendaCount(t testing.TB) {
 	mockBatch := mockBatchACK()
 	addenda05 := mockAddenda05()
 	mockBatch.GetEntries()[0].AddAddenda05(addenda05)
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, NewErrBatchAddendaCount(2, 1)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -309,30 +294,20 @@ func TestBatchACKAmount(t *testing.T) {
 	mockBatch := mockBatchACK()
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetEntries()[0].Amount = 25000
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Amount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchAmountNonZero) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
-// TestBatchACKTransactionCode validates Amount
+// TestBatchACKTransactionCode validates TransactionCode
 func TestBatchACKTransactionCode(t *testing.T) {
 	mockBatch := mockBatchACK()
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchTransactionCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -343,14 +318,9 @@ func TestBatchACKAddendum99Category(t *testing.T) {
 	mockAddenda99 := mockAddenda99()
 	mockBatch.GetEntries()[0].Category = CategoryForward
 	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda99" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchAddendaCategory) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -358,13 +328,8 @@ func TestBatchACKAddendum99Category(t *testing.T) {
 func TestBatchACKValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchACK()
 	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, NewErrBatchServiceClassTranCode(DebitsOnly, 24)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }

@@ -40,8 +40,7 @@ func (batch *BatchCOR) Validate() error {
 
 	// Add type specific validation.
 	if batch.Header.StandardEntryClassCode != COR {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, COR)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
+		return batch.Error("StandardEntryClassCode", ErrBatchSECType, COR)
 	}
 	// The Amount field must be zero
 	// batch.verify calls batch.isBatchAmount which ensures the batch.Control values are accurate.
@@ -65,8 +64,7 @@ func (batch *BatchCOR) Validate() error {
 			GLCredit, GLDebit, GLPrenoteCredit, GLPrenoteDebit, GLZeroDollarRemittanceCredit,
 			GLZeroDollarRemittanceDebit, LoanCredit, LoanDebit, LoanPrenoteCredit,
 			LoanZeroDollarRemittanceCredit:
-			msg := fmt.Sprintf(msgBatchTransactionCode, entry.TransactionCode, COR)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
+			return batch.Error("TransactionCode", ErrBatchTransactionCode, entry.TransactionCode)
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {

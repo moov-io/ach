@@ -4,8 +4,6 @@
 
 package ach
 
-import "fmt"
-
 // BatchARC holds the BatchHeader and BatchControl and all EntryDetail for ARC Entries.
 //
 // Accounts Receivable Entry (ARC). A consumer check converted to a one-time ACH debit.
@@ -43,34 +41,29 @@ func (batch *BatchARC) Validate() error {
 	// Add configuration and type specific validation for this type.
 
 	if batch.Header.StandardEntryClassCode != ARC {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, ARC)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
+		return batch.Error("StandardEntryClassCode", ErrBatchSECType, ARC)
 	}
 
 	// ARC detail entries can only be a debit, ServiceClassCode must allow debits
 	switch batch.Header.ServiceClassCode {
 	case MixedDebitsAndCredits, CreditsOnly:
-		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, ARC)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
+		return batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode)
 	}
 
 	for _, entry := range batch.Entries {
 		// ARC detail entries must be a debit
 		if entry.CreditOrDebit() != "D" {
-			msg := fmt.Sprintf(msgBatchTransactionCodeCredit, entry.TransactionCode)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
+			return batch.Error("TransactionCode", ErrBatchDebitOnly, entry.TransactionCode)
 		}
 
 		// Amount must be 25,000 or less
 		if entry.Amount > 2500000 {
-			msg := fmt.Sprintf(msgBatchAmount, "25,000", ARC)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
+			return batch.Error("Amount", NewErrBatchAmount(entry.Amount, 2500000))
 		}
 
 		// CheckSerialNumber underlying IdentificationNumber, must be defined
 		if entry.IdentificationNumber == "" {
-			msg := fmt.Sprintf(msgBatchCheckSerialNumber, ARC)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "CheckSerialNumber", Msg: msg}
+			return batch.Error("CheckSerialNumber", ErrBatchCheckSerialNumber)
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {

@@ -4,8 +4,6 @@
 
 package ach
 
-import "fmt"
-
 // BatchXCK holds the BatchHeader and BatchControl and all EntryDetail for XCK Entries.
 //
 // Destroyed Check Entry identifies a debit entry initiated for a XCK eligible items.
@@ -33,27 +31,23 @@ func (batch *BatchXCK) Validate() error {
 	// Add configuration and type specific validation for this type.
 
 	if batch.Header.StandardEntryClassCode != XCK {
-		msg := fmt.Sprintf(msgBatchSECType, batch.Header.StandardEntryClassCode, XCK)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
+		return batch.Error("StandardEntryClassCode", ErrBatchSECType, XCK)
 	}
 
 	// XCK detail entries can only be a debit, ServiceClassCode must allow debits
 	switch batch.Header.ServiceClassCode {
 	case MixedDebitsAndCredits, CreditsOnly:
-		msg := fmt.Sprintf(msgBatchServiceClassCode, batch.Header.ServiceClassCode, XCK)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ServiceClassCode", Msg: msg}
+		return batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode)
 	}
 
 	for _, entry := range batch.Entries {
 		// XCK detail entries must be a debit
 		if entry.CreditOrDebit() != "D" {
-			msg := fmt.Sprintf(msgBatchTransactionCodeCredit, entry.TransactionCode)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TransactionCode", Msg: msg}
+			return batch.Error("TransactionCode", ErrBatchDebitOnly, entry.TransactionCode)
 		}
 		// Amount must be 2,500 or less
 		if entry.Amount > 250000 {
-			msg := fmt.Sprintf(msgBatchAmount, "2,500", XCK)
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
+			return batch.Error("Amount", NewErrBatchAmount(entry.Amount, 250000))
 		}
 		// ProcessControlField underlying IdentificationNumber, must be defined
 		if entry.ProcessControlField() == "" {

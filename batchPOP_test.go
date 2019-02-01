@@ -126,14 +126,9 @@ func BenchmarkBatchPOPCreate(b *testing.B) {
 func testBatchPOPStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchPOP()
 	mockBatch.Header.StandardEntryClassCode = WEB
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "StandardEntryClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchSECType) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -154,14 +149,9 @@ func BenchmarkBatchPOPStandardEntryClassCode(b *testing.B) {
 func testBatchPOPServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchPOP()
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -182,14 +172,9 @@ func BenchmarkBatchPOPServiceClassCodeEquality(b *testing.B) {
 func testBatchPOPMixedCreditsAndDebits(t testing.TB) {
 	mockBatch := mockBatchPOP()
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -210,14 +195,9 @@ func BenchmarkBatchPOPMixedCreditsAndDebits(b *testing.B) {
 func testBatchPOPCreditsOnly(t testing.TB) {
 	mockBatch := mockBatchPOP()
 	mockBatch.Header.ServiceClassCode = CreditsOnly
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -238,14 +218,9 @@ func BenchmarkBatchPOPCreditsOnly(b *testing.B) {
 func testBatchPOPAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchPOP()
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -266,14 +241,9 @@ func BenchmarkBatchPOPAutomatedAccountingAdvices(b *testing.B) {
 func testBatchPOPAmount(t testing.TB) {
 	mockBatch := mockBatchPOP()
 	mockBatch.Entries[0].Amount = 2600000
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Amount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, NewErrBatchAmount(2600000, 2500000)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -399,14 +369,9 @@ func BenchmarkBatchPOPTerminalStateField(b *testing.B) {
 // testBatchPOPTransactionCode validates BatchPOP TransactionCode is not a credit
 func testBatchPOPTransactionCode(t testing.TB) {
 	mockBatch := mockBatchPOPCredit()
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !Match(err, ErrBatchDebitOnly) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
