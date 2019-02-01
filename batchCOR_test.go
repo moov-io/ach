@@ -271,18 +271,13 @@ func BenchmarkBatchCORTransactionCode27(b *testing.B) {
 	}
 }
 
-// testBatchCORTransactionCode21 validates BatchCOR TransactionCode 21
+// testBatchCORTransactionCode21 validates BatchCOR TransactionCode 21 is a valid transaction Code to be used for NOC
+// mockBatch.Create() should not return an error for this test
 func testBatchCORTransactionCode21(t testing.TB) {
 	mockBatch := mockBatchCOR()
 	mockBatch.GetEntries()[0].TransactionCode = CheckingReturnNOCCredit
 	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
