@@ -101,9 +101,9 @@ func BenchmarkBatchADVSEC(b *testing.B) {
 func testBatchADVServiceClassCode(t testing.TB) {
 	mockBatch := mockBatchADV()
 	// Batch Header information is required to Create a batch.
-	mockBatch.GetHeader().ServiceClassCode = 0
+	mockBatch.GetHeader().ServiceClassCode = 220
 	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*FieldError); ok {
+		if e, ok := err.(*BatchError); ok {
 			if e.FieldName != "ServiceClassCode" {
 				t.Errorf("%T: %s", err, err)
 			}
@@ -128,7 +128,6 @@ func BenchmarkBatchADVServiceClassCode(b *testing.B) {
 
 // TestBatchADVAddendum99Category validates Addenda99 returns an error
 func TestBatchADVAddendum99Category(t *testing.T) {
-	t.Skip("This test is failing due to a potential logic bug, which is beyond the scope of this PR")
 	mockBatch := NewBatchADV(mockBatchADVHeader())
 	mockBatch.AddADVEntry(mockADVEntryDetail())
 	mockAddenda99 := mockAddenda99()

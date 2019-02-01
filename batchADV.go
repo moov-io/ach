@@ -46,6 +46,9 @@ func (batch *BatchADV) Validate() error {
 			default:
 				return batch.Error("TransactionCode", ErrBatchTransactionCode, entry.TransactionCode)
 			}
+			if entry.Addenda99 != nil {
+				return batch.Error("Addenda99", ErrBatchAddendaCategory, entry.Category)
+			}
 		}
 	}
 	return nil
