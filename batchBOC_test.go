@@ -4,7 +4,11 @@
 
 package ach
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/moov-io/base"
+)
 
 // mockBatchBOCHeader creates a BatchBOC BatchHeader
 func mockBatchBOCHeader() *BatchHeader {
@@ -123,7 +127,7 @@ func testBatchBOCStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchBOC()
 	mockBatch.Header.StandardEntryClassCode = WEB
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchSECType) {
+	if !base.Match(err, ErrBatchSECType) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -146,7 +150,7 @@ func testBatchBOCServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchBOC()
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -169,7 +173,7 @@ func testBatchBOCMixedCreditsAndDebits(t testing.TB) {
 	mockBatch := mockBatchBOC()
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -193,7 +197,7 @@ func testBatchBOCCreditsOnly(t testing.TB) {
 	mockBatch.Header.ServiceClassCode = CreditsOnly
 
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -216,7 +220,7 @@ func testBatchBOCAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchBOC()
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(AutomatedAccountingAdvices, 225)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(AutomatedAccountingAdvices, 225)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -239,7 +243,7 @@ func testBatchBOCAmount(t testing.TB) {
 	mockBatch := mockBatchBOC()
 	mockBatch.Entries[0].Amount = 2500001
 	err := mockBatch.Create()
-	if !Match(err, NewErrBatchAmount(2500001, 2500000)) {
+	if !base.Match(err, NewErrBatchAmount(2500001, 2500000)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -291,7 +295,7 @@ func BenchmarkBatchBOCCheckSerialNumber(b *testing.B) {
 func testBatchBOCTransactionCode(t testing.TB) {
 	mockBatch := mockBatchBOCCredit()
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchDebitOnly) {
+	if !base.Match(err, ErrBatchDebitOnly) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -315,7 +319,7 @@ func testBatchBOCAddenda05(t testing.TB) {
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAddendaCategory) {
+	if !base.Match(err, ErrBatchAddendaCategory) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

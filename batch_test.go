@@ -11,6 +11,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/moov-io/base"
 )
 
 // batch should never be used directly.
@@ -112,7 +114,7 @@ func testBatchNumberMismatch(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.GetControl().BatchNumber = 2
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchHeaderControlEquality(1, 2)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(1, 2)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -149,7 +151,7 @@ func testCreditBatchIsBatchAmount(t testing.TB) {
 
 	mockBatch.GetControl().TotalCreditEntryDollarAmount = 1
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchCalculatedControlEquality(200, 1)) {
+	if !base.Match(err, NewErrBatchCalculatedControlEquality(200, 1)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -188,7 +190,7 @@ func testSavingsBatchIsBatchAmount(t testing.TB) {
 
 	mockBatch.GetControl().TotalDebitEntryDollarAmount = 1
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchCalculatedControlEquality(200, 1)) {
+	if !base.Match(err, NewErrBatchCalculatedControlEquality(200, 1)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -210,7 +212,7 @@ func testBatchIsEntryHash(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.GetControl().EntryHash = 1
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchCalculatedControlEquality(12104288, 1)) {
+	if !base.Match(err, NewErrBatchCalculatedControlEquality(12104288, 1)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -237,7 +239,7 @@ func testBatchDNEMismatch(t testing.TB) {
 	mockBatch.GetHeader().OriginatorStatusCode = 1
 	mockBatch.GetEntries()[0].TransactionCode = CheckingPrenoteCredit
 	err := mockBatch.verify()
-	if !Match(err, ErrBatchOriginatorDNE) {
+	if !base.Match(err, ErrBatchOriginatorDNE) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -257,7 +259,7 @@ func testBatchTraceNumberNotODFI(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.GetEntries()[0].SetTraceNumber("12345678", 1)
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchTraceNumberNotODFI("12104288", "12345678")) {
+	if !base.Match(err, NewErrBatchTraceNumberNotODFI("12104288", "12345678")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -286,7 +288,7 @@ func testBatchEntryCountEquality(t testing.TB) {
 
 	mockBatch.GetControl().EntryAddendaCount = 1
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchCalculatedControlEquality(3, 1)) {
+	if !base.Match(err, NewErrBatchCalculatedControlEquality(3, 1)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -308,7 +310,7 @@ func testBatchAddendaIndicator(t testing.TB) {
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 0
 	mockBatch.GetControl().EntryAddendaCount = 2
 	err := mockBatch.verify()
-	if !Match(err, ErrBatchAddendaIndicator) {
+	if !base.Match(err, ErrBatchAddendaIndicator) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -334,7 +336,7 @@ func testBatchIsAddendaSeqAscending(t testing.TB) {
 	mockBatch.GetEntries()[0].Addenda05[0].SequenceNumber = 2
 	mockBatch.GetEntries()[0].Addenda05[1].SequenceNumber = 1
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchAscending(2, 1)) {
+	if !base.Match(err, NewErrBatchAscending(2, 1)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -356,7 +358,7 @@ func testBatchIsSequenceAscending(t testing.TB) {
 	mockBatch.AddEntry(e3)
 	mockBatch.GetControl().EntryAddendaCount = 2
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchAscending(121042880000001, 1)) {
+	if !base.Match(err, NewErrBatchAscending(121042880000001, 1)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -381,7 +383,7 @@ func testBatchAddendaTraceNumber(t testing.TB) {
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda05[0].EntryDetailSequenceNumber = 99
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchAscending("1", "1")) {
+	if !base.Match(err, NewErrBatchAscending("1", "1")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -466,7 +468,7 @@ func testBatchCategoryForwardReturn(t testing.TB) {
 		t.Errorf("%T: %s", err, err)
 	}
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchCategory("Return", "Forward")) {
+	if !base.Match(err, NewErrBatchCategory("Return", "Forward")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -558,13 +560,13 @@ func BenchmarkBatchInvalidTraceNumberODFI(b *testing.B) {
 func testBatchNoEntry(t testing.TB) {
 	mockBatch := mockBatchNoEntry()
 	err := mockBatch.build()
-	if !Match(err, ErrBatchNoEntries) {
+	if !base.Match(err, ErrBatchNoEntries) {
 		t.Errorf("%T: %s", err, err)
 	}
 
 	// test verify
 	err = mockBatch.verify()
-	if !Match(err, ErrBatchNoEntries) {
+	if !base.Match(err, ErrBatchNoEntries) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -587,7 +589,7 @@ func testBatchControl(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.Control.ODFIIdentification = ""
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchHeaderControlEquality("12104288", "")) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality("12104288", "")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -644,7 +646,7 @@ func TestBatchADVInvalidServiceClassCode(t *testing.T) {
 	}
 	mockBatch.ADVControl.ServiceClassCode = CreditsOnly
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchHeaderControlEquality("280", "220")) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality("280", "220")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -657,7 +659,7 @@ func TestBatchADVInvalidODFIIdentification(t *testing.T) {
 	}
 	mockBatch.ADVControl.ODFIIdentification = "231380104"
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchHeaderControlEquality("12104288", "231380104")) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality("12104288", "231380104")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -670,7 +672,7 @@ func TestBatchADVInvalidBatchNumber(t *testing.T) {
 	}
 	mockBatch.ADVControl.BatchNumber = 2
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchHeaderControlEquality("1", "2")) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality("1", "2")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -683,7 +685,7 @@ func TestBatchADVInvalidEntryAddendaCount(t *testing.T) {
 	}
 	mockBatch.ADVControl.EntryAddendaCount = CheckingCredit
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchCalculatedControlEquality(1, 22)) {
+	if !base.Match(err, NewErrBatchCalculatedControlEquality(1, 22)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -697,7 +699,7 @@ func TestBatchADVInvalidTotalDebitEntryDollarAmount(t *testing.T) {
 	}
 	mockBatch.ADVControl.TotalDebitEntryDollarAmount = 2200
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchCalculatedControlEquality(50000, 2200)) {
+	if !base.Match(err, NewErrBatchCalculatedControlEquality(50000, 2200)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -710,7 +712,7 @@ func TestBatchADVInvalidTotalCreditEntryDollarAmount(t *testing.T) {
 	}
 	mockBatch.ADVControl.TotalCreditEntryDollarAmount = 2200
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchCalculatedControlEquality(50000, 2200)) {
+	if !base.Match(err, NewErrBatchCalculatedControlEquality(50000, 2200)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -723,7 +725,7 @@ func TestBatchADVInvalidEntryHash(t *testing.T) {
 	}
 	mockBatch.ADVControl.EntryHash = 2200233
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchCalculatedControlEquality(23138010, 2200233)) {
+	if !base.Match(err, NewErrBatchCalculatedControlEquality(23138010, 2200233)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -733,7 +735,7 @@ func TestBatchAddenda98InvalidAddendaRecordIndicator(t *testing.T) {
 	mockBatch := mockBatchCOR()
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 0
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAddendaIndicator) {
+	if !base.Match(err, ErrBatchAddendaIndicator) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -743,7 +745,7 @@ func TestBatchAddenda02InvalidAddendaRecordIndicator(t *testing.T) {
 	mockBatch := mockBatchPOS()
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 0
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAddendaIndicator) {
+	if !base.Match(err, ErrBatchAddendaIndicator) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -770,7 +772,7 @@ func TestBatchADVCategory(t *testing.T) {
 
 	mockBatch.AddADVEntry(entryOne)
 	err := mockBatch.Create()
-	if !Match(err, NewErrBatchCategory("Return", "Forward")) {
+	if !base.Match(err, NewErrBatchCategory("Return", "Forward")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -825,7 +827,7 @@ func TestBatchDishonoredReturnsCategory(t *testing.T) {
 	batch.AddEntry(entryOne)
 
 	err := batch.Create()
-	if !Match(err, NewErrBatchCategory("Return", "DishonoredReturn")) {
+	if !base.Match(err, NewErrBatchCategory("Return", "DishonoredReturn")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

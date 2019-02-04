@@ -7,6 +7,8 @@ package ach
 import (
 	"testing"
 	"time"
+
+	"github.com/moov-io/base"
 )
 
 // mockBatchPPDHeader creates a PPD batch header
@@ -112,7 +114,7 @@ func testBatchServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchPPD()
 	mockBatch.GetControl().ServiceClassCode = DebitsOnly
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -195,7 +197,7 @@ func testBatchCompanyIdentification(t testing.TB) {
 	mockBatch := mockBatchPPD()
 	mockBatch.GetControl().CompanyIdentification = "XYZ Inc"
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality("121042882", "XYZ Inc")) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality("121042882", "XYZ Inc")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -218,7 +220,7 @@ func testBatchODFIIDMismatch(t testing.TB) {
 	mockBatch := mockBatchPPD()
 	mockBatch.GetControl().ODFIIdentification = "987654321"
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality("12104288", "987654321")) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality("12104288", "987654321")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -269,7 +271,7 @@ func testBatchPPDAddendaCount(t testing.TB) {
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchCalculatedControlEquality(3, 1)) {
+	if !base.Match(err, NewErrBatchCalculatedControlEquality(3, 1)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -330,7 +332,7 @@ func TestBatchPPDSEC(t *testing.T) {
 	mockBatch := mockBatchPPD()
 	mockBatch.Header.StandardEntryClassCode = RCK
 	err := mockBatch.Validate()
-	if !Match(err, ErrBatchSECType) {
+	if !base.Match(err, ErrBatchSECType) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -340,7 +342,7 @@ func TestBatchPPDValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchPPD()
 	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
 	err := mockBatch.Create()
-	if !Match(err, NewErrBatchServiceClassTranCode(DebitsOnly, 22)) {
+	if !base.Match(err, NewErrBatchServiceClassTranCode(DebitsOnly, 22)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -351,7 +353,7 @@ func TestBatchPPDAddenda02(t *testing.T) {
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAddendaCategory) {
+	if !base.Match(err, ErrBatchAddendaCategory) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

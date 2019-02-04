@@ -6,6 +6,8 @@ package ach
 
 import (
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockBatchSHRHeader creates a BatchSHR BatchHeader
@@ -96,7 +98,7 @@ func testBatchSHRStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.Header.StandardEntryClassCode = WEB
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchSECType) {
+	if !base.Match(err, ErrBatchSECType) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -119,7 +121,7 @@ func testBatchSHRServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -142,7 +144,7 @@ func testBatchSHRMixedCreditsAndDebits(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -165,7 +167,7 @@ func testBatchSHRCreditsOnly(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.Header.ServiceClassCode = CreditsOnly
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -188,7 +190,7 @@ func testBatchSHRAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(AutomatedAccountingAdvices, 225)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(AutomatedAccountingAdvices, 225)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -211,7 +213,7 @@ func testBatchSHRTransactionCode(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchDebitOnly) {
+	if !base.Match(err, ErrBatchDebitOnly) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -265,7 +267,7 @@ func testBatchSHRAddendaCountZero(t testing.TB) {
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality("225", "200")) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality("225", "200")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -329,7 +331,7 @@ func testBatchSHRInvalidAddendum(t testing.TB) {
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAddendaCategory) {
+	if !base.Match(err, ErrBatchAddendaCategory) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -412,7 +414,7 @@ func testBatchSHRCardTransactionType(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.GetEntries()[0].DiscretionaryData = "555"
 	err := mockBatch.Validate()
-	if !Match(err, ErrBatchInvalidCardTransactionType) {
+	if !base.Match(err, ErrBatchInvalidCardTransactionType) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -570,7 +572,7 @@ func TestBatchSHRAddendum99Category(t *testing.T) {
 	mockBatch.Entries[0].Category = CategoryNOC
 	mockBatch.Entries[0].Addenda99 = mockAddenda99
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAddendaCategory) {
+	if !base.Match(err, ErrBatchAddendaCategory) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -584,7 +586,7 @@ func TestBatchSHRTerminalState(t *testing.T) {
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality("225", "200")) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality("225", "200")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

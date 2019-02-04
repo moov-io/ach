@@ -61,6 +61,11 @@ func (e *BatchError) Error() string {
 	return fmt.Sprintf("batch #%d (%v) %s %v: %v", e.BatchNumber, e.BatchType, e.FieldName, e.Err, e.FieldValue)
 }
 
+// Unwrap implements the base.UnwrappableError interface for BatchError
+func (e *BatchError) Unwrap() error {
+	return e.Err
+}
+
 // error returns a new BatchError based on err
 func (b *Batch) Error(field string, err error, values ...interface{}) error {
 	if err == nil {

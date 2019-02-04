@@ -45,7 +45,7 @@ func (w *ResponseWriter) WriteHeader(code int) {
 
 	// Record route timing
 	diff := time.Since(w.start)
-	if w.metric != nil {
+	if w != nil && w.metric != nil {
 		w.metric.Observe(diff.Seconds())
 	}
 
@@ -67,7 +67,7 @@ func (w *ResponseWriter) WriteHeader(code int) {
 	}
 }
 
-// Wrap returns a ResponseWriter usable by applications. No parts of the request are inspected.
+// Wrap returns a ResponseWriter usable by applications. No parts of the Request are inspected or ResponseWriter modified.
 func Wrap(logger log.Logger, m metrics.Histogram, w http.ResponseWriter, r *http.Request) *ResponseWriter {
 	now := time.Now()
 	return &ResponseWriter{
@@ -103,8 +103,10 @@ func (w *ResponseWriter) ensureHeaders(rec idempotent.Recorder) error {
 		}
 		return ErrNoUserId
 	}
-	if _, seen := idempotent.FromRequest(w.request, rec); seen {
-		return idempotent.ErrSeenBefore
+	if rec != nil {
+		if _, seen := idempotent.FromRequest(w.request, rec); seen {
+			return idempotent.ErrSeenBefore
+		}
 	}
 	return nil
 }

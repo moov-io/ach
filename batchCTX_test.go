@@ -7,6 +7,8 @@ package ach
 import (
 	"log"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockBatchCTXHeader creates a BatchCTX BatchHeader
@@ -97,7 +99,7 @@ func testBatchCTXStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchCTX()
 	mockBatch.Header.StandardEntryClassCode = WEB
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchSECType) {
+	if !base.Match(err, ErrBatchSECType) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -120,7 +122,7 @@ func testBatchCTXServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchCTX()
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -285,7 +287,7 @@ func testBatchCTXAddenda10000(t testing.TB) {
 	}
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	err := mockBatch.Create()
-	if !Match(err, NewErrBatchAddendaCount(10000, 9999)) {
+	if !base.Match(err, NewErrBatchAddendaCount(10000, 9999)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -544,7 +546,7 @@ func TestBatchCTXValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchCTX()
 	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
 	err := mockBatch.Create()
-	if !Match(err, NewErrBatchServiceClassTranCode(DebitsOnly, 22)) {
+	if !base.Match(err, NewErrBatchServiceClassTranCode(DebitsOnly, 22)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -555,7 +557,7 @@ func TestBatchCTXAddenda02(t *testing.T) {
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAddendaCategory) {
+	if !base.Match(err, ErrBatchAddendaCategory) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

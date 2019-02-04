@@ -7,9 +7,18 @@ package base
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
+	"reflect"
 )
+
+// UnwrappableError is an interface for errors that wrap another error with some extra context
+// The interface allows these errors to get automatically unwrapped by the Match function
+type UnwrappableError interface {
+	Error() string
+	Unwrap() error
+}
 
 // ParseError is returned for parsing reader errors.
 // The first line is 1.
@@ -24,6 +33,11 @@ func (e ParseError) Error() string {
 		return fmt.Sprintf("line:%d %T %s", e.Line, e.Err, e.Err)
 	}
 	return fmt.Sprintf("line:%d record:%s %T %s", e.Line, e.Record, e.Err, e.Err)
+}
+
+// Unwrap implements the UnwrappableError interface for ParseError
+func (e ParseError) Unwrap() error {
+	return e.Err
 }
 
 // ErrorList represents an array of errors which is also an error itself.
@@ -82,4 +96,49 @@ func (e ErrorList) Empty() bool {
 // MarshalJSON marshals error list
 func (e ErrorList) MarshalJSON() ([]byte, error) {
 	return json.Marshal(e.Error())
+}
+
+// Match takes in two errors and compares them, returning true if they match and false if they don't
+// The matching is done by basic equality for simple errors (i.e. defined by errors.New) and by type
+// for other errors. If errA is wrapped with an error supporting the UnwrappableError interface it
+// will also unwrap it and then recursively compare the unwrapped error with errB.
+func Match(errA, errB error) bool {
+	if errA == nil {
+		return errB == nil
+	}
+
+	// typed errors can be compared by type
+	if reflect.TypeOf(errA) == reflect.TypeOf(errB) {
+		simpleError := errors.New("simple error")
+		if reflect.TypeOf(errB) == reflect.TypeOf(simpleError) {
+			// simple errors all have the same type, so we need to compare them directly
+			return errA == errB
+		}
+		return true
+	}
+
+	// match wrapped errors
+	uwErr, ok := errA.(UnwrappableError)
+	if ok {
+		return Match(uwErr.Unwrap(), errB)
+	}
+
+	return false
+}
+
+// Has takes in a (potential) list of errors, and an error to check for. If any of the errors
+// in the list have the same type as the error to check, it returns true. If the "list" isn't
+// actually a list (typically because it is nil), or no errors in the list match the other error
+// it returns false. So it can be used as an easy way to check for a particular kind of error.
+func Has(list error, err error) bool {
+	el, ok := list.(ErrorList)
+	if !ok {
+		return false
+	}
+	for i := 0; i < len(el); i++ {
+		if Match(el[i], err) {
+			return true
+		}
+	}
+	return false
 }

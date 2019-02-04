@@ -4,7 +4,11 @@
 
 package ach
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/moov-io/base"
+)
 
 // mockBatchPOPHeader creates a BatchPOP BatchHeader
 func mockBatchPOPHeader() *BatchHeader {
@@ -127,7 +131,7 @@ func testBatchPOPStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchPOP()
 	mockBatch.Header.StandardEntryClassCode = WEB
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchSECType) {
+	if !base.Match(err, ErrBatchSECType) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -150,7 +154,7 @@ func testBatchPOPServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchPOP()
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -173,7 +177,7 @@ func testBatchPOPMixedCreditsAndDebits(t testing.TB) {
 	mockBatch := mockBatchPOP()
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -196,7 +200,7 @@ func testBatchPOPCreditsOnly(t testing.TB) {
 	mockBatch := mockBatchPOP()
 	mockBatch.Header.ServiceClassCode = CreditsOnly
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -219,7 +223,7 @@ func testBatchPOPAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchPOP()
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -242,7 +246,7 @@ func testBatchPOPAmount(t testing.TB) {
 	mockBatch := mockBatchPOP()
 	mockBatch.Entries[0].Amount = 2600000
 	err := mockBatch.Create()
-	if !Match(err, NewErrBatchAmount(2600000, 2500000)) {
+	if !base.Match(err, NewErrBatchAmount(2600000, 2500000)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -370,7 +374,7 @@ func BenchmarkBatchPOPTerminalStateField(b *testing.B) {
 func testBatchPOPTransactionCode(t testing.TB) {
 	mockBatch := mockBatchPOPCredit()
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchDebitOnly) {
+	if !base.Match(err, ErrBatchDebitOnly) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

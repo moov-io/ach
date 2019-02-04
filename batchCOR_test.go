@@ -7,6 +7,8 @@ package ach
 import (
 	"log"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockBatchCORHeader creates a COR BatchHeader
@@ -76,7 +78,7 @@ func testBatchCORSEC(t testing.TB) {
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 	mockBatch.Header.StandardEntryClassCode = WEB
 	err := mockBatch.Validate()
-	if !Match(err, ErrBatchSECType) {
+	if !base.Match(err, ErrBatchSECType) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -242,7 +244,7 @@ func testBatchCORTransactionCode27(t testing.TB) {
 	mockBatch := mockBatchCOR()
 	mockBatch.GetEntries()[0].TransactionCode = CheckingDebit
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchTransactionCode) {
+	if !base.Match(err, ErrBatchTransactionCode) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -318,7 +320,7 @@ func testBatchCORServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchCOR()
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -364,7 +366,7 @@ func TestBatchCORCategoryNOCAddenda02(t *testing.T) {
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAddendaCategory) {
+	if !base.Match(err, ErrBatchAddendaCategory) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -392,7 +394,7 @@ func TestBatchCORValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchCOR()
 	mockBatch.GetHeader().ServiceClassCode = AutomatedAccountingAdvices
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchServiceClassCode) {
+	if !base.Match(err, ErrBatchServiceClassCode) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

@@ -4,7 +4,11 @@
 
 package ach
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/moov-io/base"
+)
 
 // mockBatchPOSHeader creates a BatchPOS BatchHeader
 func mockBatchPOSHeader() *BatchHeader {
@@ -93,7 +97,7 @@ func testBatchPOSStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchPOS()
 	mockBatch.Header.StandardEntryClassCode = WEB
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchSECType) {
+	if !base.Match(err, ErrBatchSECType) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -116,7 +120,7 @@ func testBatchPOSServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchPOS()
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -139,7 +143,7 @@ func testBatchPOSMixedCreditsAndDebits(t testing.TB) {
 	mockBatch := mockBatchPOS()
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -162,7 +166,7 @@ func testBatchPOSCreditsOnly(t testing.TB) {
 	mockBatch := mockBatchPOS()
 	mockBatch.Header.ServiceClassCode = CreditsOnly
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -185,7 +189,7 @@ func testBatchPOSAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchPOS()
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -208,7 +212,7 @@ func testBatchPOSTransactionCode(t testing.TB) {
 	mockBatch := mockBatchPOS()
 	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchDebitOnly) {
+	if !base.Match(err, ErrBatchDebitOnly) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -293,7 +297,7 @@ func testBatchPOSInvalidAddendum(t testing.TB) {
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAddendaCategory) {
+	if !base.Match(err, ErrBatchAddendaCategory) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -414,7 +418,7 @@ func testBatchPOSCardTransactionType(t testing.TB) {
 	mockBatch := mockBatchPOS()
 	mockBatch.GetEntries()[0].DiscretionaryData = "555"
 	err := mockBatch.Validate()
-	if !Match(err, ErrBatchInvalidCardTransactionType) {
+	if !base.Match(err, ErrBatchInvalidCardTransactionType) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -441,7 +445,7 @@ func TestBatchPOSAddendum99Category(t *testing.T) {
 	mockBatch.Entries[0].Category = CategoryNOC
 	mockBatch.Entries[0].Addenda99 = mockAddenda99
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAddendaCategory) {
+	if !base.Match(err, ErrBatchAddendaCategory) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -491,7 +495,7 @@ func TestBatchPOSTerminalState(t *testing.T) {
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality("225", "200")) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality("225", "200")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

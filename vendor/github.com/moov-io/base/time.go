@@ -5,7 +5,6 @@
 package base
 
 import (
-	"sync"
 	"time"
 
 	"github.com/rickar/cal"
@@ -13,13 +12,6 @@ import (
 
 const (
 	iso8601Format = "2006-01-02T15:04:05Z07:00"
-)
-
-var (
-	// DefaultLocation is the *time.Location used when creating a BankTime instance.
-	// By default America/New_York is populated here.
-	DefaultLocation *time.Location
-	setup           sync.Once
 )
 
 // Time is an time.Time struct that encodes and decodes in ISO 8601.
@@ -51,21 +43,10 @@ func Now() Time {
 	cal.AddUsHolidays(calendar)
 	calendar.Observed = cal.ObservedMonday
 
-	loc := getNYCLocation()
-
 	return Time{
 		cal:  calendar,
-		Time: time.Now().In(loc).Truncate(1 * time.Second),
+		Time: time.Now().UTC().Truncate(1 * time.Second),
 	}
-}
-
-func getNYCLocation() *time.Location {
-	loc := DefaultLocation
-	setup.Do(func() {
-		loc, _ = time.LoadLocation("America/New_York")
-		DefaultLocation = loc
-	})
-	return loc
 }
 
 // NewTime wraps a time.Time value in Moov's base.Time struct.
@@ -76,18 +57,8 @@ func getNYCLocation() *time.Location {
 // now := Now()
 // fmt.Println(start.Sub(now.Time))
 func NewTime(t time.Time) Time {
-	tt := Now() // sets DefaultLocation via sync.Once
-	tt.Time = t.In(DefaultLocation)
-
-	if tt.Time.Before(time.Time{}) {
-		// The conversion can fall negative due to reading 0000
-		// and calling .In with a timezone that shifts backwards.
-		//
-		// If that happens we need to reset to Time.IsZero() and then
-		// set our America/New_York timezone.
-		tt.Time = (time.Time{}).In(DefaultLocation)
-	}
-
+	tt := Now()
+	tt.Time = t.UTC() // overwrite underlying Time
 	return tt
 }
 
@@ -114,8 +85,7 @@ func (t *Time) UnmarshalJSON(data []byte) error {
 		*t = NewTime(tt)
 	}
 
-	loc := getNYCLocation()
-	t.Time = tt.In(loc).Truncate(1 * time.Second) // convert to our location and drop millis
+	t.Time = tt.UTC().Truncate(1 * time.Second) // convert to UTC and drop millis
 
 	return nil
 }
