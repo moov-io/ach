@@ -25,10 +25,13 @@ import (
 // and pprof requests.
 func NewServer(addr string) *Server {
 	timeout, _ := time.ParseDuration("45s")
+	router := handler()
+
 	return &Server{
+		router: router,
 		svc: &http.Server{
 			Addr:         addr,
-			Handler:      Handler(),
+			Handler:      router,
 			ReadTimeout:  timeout,
 			WriteTimeout: timeout,
 			IdleTimeout:  timeout,
@@ -39,7 +42,8 @@ func NewServer(addr string) *Server {
 // Server represents a holder around a net/http Server which
 // is used for admin endpoints. (i.e. metrics, healthcheck)
 type Server struct {
-	svc *http.Server
+	router *mux.Router
+	svc    *http.Server
 }
 
 // BindAddr returns the server's bind address. This is in Go's format so :8080 is valid.
@@ -61,6 +65,11 @@ func (s *Server) Shutdown() {
 		return
 	}
 	s.svc.Shutdown(context.TODO())
+}
+
+// AddHandler will append an http.HandlerFunc to the admin Server
+func (s *Server) AddHandler(path string, hf http.HandlerFunc) {
+	s.router.HandleFunc(path, hf)
 }
 
 // profileEnabled returns if a given pprof handler should be
@@ -86,6 +95,10 @@ func profileEnabled(name string) bool {
 // We only want to expose on the admin servlet because these
 // profiles/dumps can contain sensitive info (raw memory).
 func Handler() http.Handler {
+	return handler()
+}
+
+func handler() *mux.Router {
 	r := mux.NewRouter()
 
 	// prometheus metrics

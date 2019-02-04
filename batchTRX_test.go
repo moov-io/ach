@@ -7,6 +7,8 @@ package ach
 import (
 	"log"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockBatchTRXHeader creates a BatchTRX BatchHeader
@@ -131,7 +133,7 @@ func testBatchTRXStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchTRX()
 	mockBatch.Header.StandardEntryClassCode = WEB
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchSECType) {
+	if !base.Match(err, ErrBatchSECType) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -154,7 +156,7 @@ func testBatchTRXServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchTRX()
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -349,7 +351,7 @@ func testBatchTRXAddenda10000(t testing.TB) {
 	}
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	err := mockBatch.Create()
-	if !Match(err, NewErrBatchAddendaCount(10000, 9999)) {
+	if !base.Match(err, NewErrBatchAddendaCount(10000, 9999)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -518,7 +520,7 @@ func BenchmarkBatchTRXZeroAddendaRecords(b *testing.B) {
 func testBatchTRXTransactionCode(t testing.TB) {
 	mockBatch := mockBatchTRXCredit()
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchDebitOnly) {
+	if !base.Match(err, ErrBatchDebitOnly) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -579,7 +581,7 @@ func testBatchTRXCreditsOnly(t testing.TB) {
 	mockBatch := mockBatchTRX()
 	mockBatch.Header.ServiceClassCode = CreditsOnly
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -602,7 +604,7 @@ func testBatchTRXAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchTRX()
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(AutomatedAccountingAdvices, 225)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(AutomatedAccountingAdvices, 225)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -626,7 +628,7 @@ func TestBatchTRXAddenda02(t *testing.T) {
 	mockBatch.Entries[0].Addenda02 = mockAddenda02()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAddendaCategory) {
+	if !base.Match(err, ErrBatchAddendaCategory) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

@@ -7,6 +7,8 @@ package ach
 import (
 	"log"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockBatchATXHeader creates a BatchATX BatchHeader
@@ -97,7 +99,7 @@ func testBatchATXStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchATX()
 	mockBatch.Header.StandardEntryClassCode = WEB
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchSECType) {
+	if !base.Match(err, ErrBatchSECType) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -120,7 +122,7 @@ func testBatchATXServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchATX()
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -203,7 +205,7 @@ func TestBatchATXInvalidAddend02(t *testing.T) {
 	entry.Addenda02 = mockAddenda02()
 	mockBatch.AddEntry(entry)
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAddendaCategory) {
+	if !base.Match(err, ErrBatchAddendaCategory) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -299,7 +301,7 @@ func testBatchATXAddenda10000(t testing.TB) {
 
 	}
 	err := mockBatch.Create()
-	if !Match(err, NewErrBatchAddendaCount(10000, 9999)) {
+	if !base.Match(err, NewErrBatchAddendaCount(10000, 9999)) {
 		t.Errorf("%T: %s", err, err)
 	}
 
@@ -497,7 +499,7 @@ func testBatchATXTransactionCode(t testing.TB) {
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchTransactionCode) {
+	if !base.Match(err, ErrBatchTransactionCode) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -544,7 +546,7 @@ func TestBatchATXAmount(t *testing.T) {
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAmountNonZero) {
+	if !base.Match(err, ErrBatchAmountNonZero) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -592,7 +594,7 @@ func TestBatchATXValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchATX()
 	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
 	err := mockBatch.Create()
-	if !Match(err, NewErrBatchServiceClassTranCode(DebitsOnly, 24)) {
+	if !base.Match(err, NewErrBatchServiceClassTranCode(DebitsOnly, 24)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

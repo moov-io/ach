@@ -7,6 +7,8 @@ package ach
 import (
 	"log"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockBatchENRHeader creates a ENR batch header
@@ -118,7 +120,7 @@ func testBatchENRCompanyEntryDescription(t testing.TB) {
 	mockBatch := mockBatchENR()
 	mockBatch.Header.CompanyEntryDescription = "bad"
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchCompanyEntryDescriptionAutoenroll) {
+	if !base.Match(err, ErrBatchCompanyEntryDescriptionAutoenroll) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -169,7 +171,7 @@ func testBatchENRSEC(t testing.TB) {
 	mockBatch := mockBatchENR()
 	mockBatch.Header.StandardEntryClassCode = ACK
 	err := mockBatch.Validate()
-	if !Match(err, ErrBatchSECType) {
+	if !base.Match(err, ErrBatchSECType) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -248,7 +250,7 @@ func TestBatchENRAmount(t *testing.T) {
 	mockBatch := mockBatchENR()
 	mockBatch.GetEntries()[0].Amount = 25000
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAmountNonZero) {
+	if !base.Match(err, ErrBatchAmountNonZero) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -258,7 +260,7 @@ func TestBatchENRTransactionCode(t *testing.T) {
 	mockBatch := mockBatchENR()
 	mockBatch.GetEntries()[0].TransactionCode = CheckingReturnNOCCredit
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchTransactionCode) {
+	if !base.Match(err, ErrBatchTransactionCode) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -302,7 +304,7 @@ func TestBatchENRValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchENR()
 	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
 	err := mockBatch.Create()
-	if !Match(err, NewErrBatchServiceClassTranCode(DebitsOnly, 22)) {
+	if !base.Match(err, NewErrBatchServiceClassTranCode(DebitsOnly, 22)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -313,7 +315,7 @@ func TestBatchENRAddenda02(t *testing.T) {
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAddendaCategory) {
+	if !base.Match(err, ErrBatchAddendaCategory) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

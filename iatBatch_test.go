@@ -381,7 +381,7 @@ func testAddenda10EntryDetailSequenceNumber(t testing.TB) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda10.EntryDetailSequenceNumber = 00000005
 	err := iatBatch.verify()
-	if !Match(err, NewErrBatchAddendaTraceNumber("0000005", "0000001")) {
+	if !base.Match(err, NewErrBatchAddendaTraceNumber("0000005", "0000001")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -407,7 +407,7 @@ func testAddenda11EntryDetailSequenceNumber(t testing.TB) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda11.EntryDetailSequenceNumber = 00000005
 	err := iatBatch.verify()
-	if !Match(err, NewErrBatchAddendaTraceNumber("0000005", "0000001")) {
+	if !base.Match(err, NewErrBatchAddendaTraceNumber("0000005", "0000001")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -433,7 +433,7 @@ func testAddenda12EntryDetailSequenceNumber(t testing.TB) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda12.EntryDetailSequenceNumber = 00000005
 	err := iatBatch.verify()
-	if !Match(err, NewErrBatchAddendaTraceNumber("0000005", "0000001")) {
+	if !base.Match(err, NewErrBatchAddendaTraceNumber("0000005", "0000001")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -459,7 +459,7 @@ func testAddenda13EntryDetailSequenceNumber(t testing.TB) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda13.EntryDetailSequenceNumber = 00000005
 	err := iatBatch.verify()
-	if !Match(err, NewErrBatchAddendaTraceNumber("0000005", "0000001")) {
+	if !base.Match(err, NewErrBatchAddendaTraceNumber("0000005", "0000001")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -485,7 +485,7 @@ func testAddenda14EntryDetailSequenceNumber(t testing.TB) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda14.EntryDetailSequenceNumber = 00000005
 	err := iatBatch.verify()
-	if !Match(err, NewErrBatchAddendaTraceNumber("0000005", "0000001")) {
+	if !base.Match(err, NewErrBatchAddendaTraceNumber("0000005", "0000001")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -511,7 +511,7 @@ func testAddenda15EntryDetailSequenceNumber(t testing.TB) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda15.EntryDetailSequenceNumber = 00000005
 	err := iatBatch.verify()
-	if !Match(err, NewErrBatchAddendaTraceNumber("0000005", "0000001")) {
+	if !base.Match(err, NewErrBatchAddendaTraceNumber("0000005", "0000001")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -537,7 +537,7 @@ func testAddenda16EntryDetailSequenceNumber(t testing.TB) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda16.EntryDetailSequenceNumber = 00000005
 	err := iatBatch.verify()
-	if !Match(err, NewErrBatchAddendaTraceNumber("0000005", "0000001")) {
+	if !base.Match(err, NewErrBatchAddendaTraceNumber("0000005", "0000001")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -562,7 +562,7 @@ func testIATBatchNumberMismatch(t testing.TB) {
 	mockBatch := mockIATBatch(t)
 	mockBatch.GetControl().BatchNumber = 2
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchHeaderControlEquality(1, 2)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(1, 2)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -585,7 +585,7 @@ func testIATServiceClassCodeMismatch(t testing.TB) {
 	mockBatch := mockIATBatch(t)
 	mockBatch.GetControl().ServiceClassCode = DebitsOnly
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, DebitsOnly)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, DebitsOnly)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -626,7 +626,7 @@ func testIATBatchCreditIsBatchAmount(t testing.TB) {
 
 	mockBatch.GetControl().TotalCreditEntryDollarAmount = 1000
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchCalculatedControlEquality(105000, 1000)) {
+	if !base.Match(err, NewErrBatchCalculatedControlEquality(105000, 1000)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -669,7 +669,7 @@ func testIATBatchDebitIsBatchAmount(t testing.TB) {
 
 	mockBatch.GetControl().TotalDebitEntryDollarAmount = 1000
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchCalculatedControlEquality(105000, 1000)) {
+	if !base.Match(err, NewErrBatchCalculatedControlEquality(105000, 1000)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -772,7 +772,7 @@ func testIATODFIIdentificationMismatch(t testing.TB) {
 	mockBatch := mockIATBatch(t)
 	mockBatch.GetControl().ODFIIdentification = "53158020"
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchHeaderControlEquality(23138010, 53158020)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(23138010, 53158020)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -823,7 +823,7 @@ func testIATBatchInvalidTraceNumberODFI(t testing.TB) {
 	mockBatch := mockIATBatch(t)
 	mockBatch.GetEntries()[0].SetTraceNumber("9928272", 1)
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchTraceNumberNotODFI("23138010", "09928272")) {
+	if !base.Match(err, NewErrBatchTraceNumberNotODFI("23138010", "09928272")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -846,7 +846,7 @@ func testIATBatchControl(t testing.TB) {
 	mockBatch := mockIATBatch(t)
 	mockBatch.Control.ODFIIdentification = ""
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchHeaderControlEquality("23138010", "")) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality("23138010", "")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -873,7 +873,7 @@ func testIATBatchEntryCountEquality(t testing.TB) {
 
 	mockBatch.GetControl().EntryAddendaCount = 1
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchCalculatedControlEquality(8, 1)) {
+	if !base.Match(err, NewErrBatchCalculatedControlEquality(8, 1)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -896,7 +896,7 @@ func testIATBatchisEntryHash(t testing.TB) {
 	mockBatch := mockIATBatch(t)
 	mockBatch.GetControl().EntryHash = 1
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchCalculatedControlEquality("0012104288", "1")) {
+	if !base.Match(err, NewErrBatchCalculatedControlEquality("0012104288", "1")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -929,7 +929,7 @@ func testIATBatchIsSequenceAscending(t testing.TB) {
 	mockBatch.Entries[1].Addenda16 = mockAddenda16()
 	mockBatch.GetControl().EntryAddendaCount = 16
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchAscending("231380100000001", "1")) {
+	if !base.Match(err, NewErrBatchAscending("231380100000001", "1")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -1302,7 +1302,7 @@ func testIATBatchValidate(t testing.TB) {
 	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
 
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchHeaderControlEquality(DebitsOnly, CreditsOnly)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(DebitsOnly, CreditsOnly)) {
 		t.Errorf("%T: %s", err, err)
 	}
 
@@ -1396,7 +1396,7 @@ func testIATBatchAddenda17EDSequenceNumber(t testing.TB) {
 	addenda17B.SequenceNumber = 1
 	addenda17B.EntryDetailSequenceNumber = 0000002
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchAddendaTraceNumber("0000002", "0000001")) {
+	if !base.Match(err, NewErrBatchAddendaTraceNumber("0000002", "0000001")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -1443,7 +1443,7 @@ func testIATBatchAddenda17Sequence(t testing.TB) {
 
 	addenda17B.SequenceNumber = -1
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchAscending("-1", "1")) {
+	if !base.Match(err, NewErrBatchAscending("-1", "1")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -1507,7 +1507,7 @@ func testIATBatchAddenda18EDSequenceNumber(t testing.TB) {
 	addenda18B.SequenceNumber = 1
 	addenda18B.EntryDetailSequenceNumber = 0000002
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchAddendaTraceNumber("0000002", "0000001")) {
+	if !base.Match(err, NewErrBatchAddendaTraceNumber("0000002", "0000001")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -1570,7 +1570,7 @@ func testIATBatchAddenda18Sequence(t testing.TB) {
 
 	addenda18B.SequenceNumber = -1
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchAscending("-1", "1")) {
+	if !base.Match(err, NewErrBatchAscending("-1", "1")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -1593,7 +1593,7 @@ func testIATNoEntry(t testing.TB) {
 	mockBatch := IATBatch{}
 	mockBatch.SetHeader(mockIATBatchHeaderFF())
 	err := mockBatch.verify()
-	if !Match(err, ErrBatchNoEntries) {
+	if !base.Match(err, ErrBatchNoEntries) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -1797,7 +1797,7 @@ func testIATBatchBHODFI(t testing.TB) {
 	mockBatch.GetEntries()[0].SetTraceNumber("39387337", 1)
 
 	err := mockBatch.verify()
-	if !Match(err, NewErrBatchTraceNumberNotODFI("23138010", "39387337")) {
+	if !base.Match(err, NewErrBatchTraceNumberNotODFI("23138010", "39387337")) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

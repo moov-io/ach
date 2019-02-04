@@ -6,6 +6,8 @@ package ach
 
 import (
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockBatchTELHeader creates a TEL batch header
@@ -102,7 +104,7 @@ func testBatchTELAddendaCount(t testing.TB) {
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchCalculatedControlEquality(2, 1)) {
+	if !base.Match(err, NewErrBatchCalculatedControlEquality(2, 1)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -125,7 +127,7 @@ func testBatchTELSEC(t testing.TB) {
 	mockBatch := mockBatchTEL()
 	mockBatch.Header.StandardEntryClassCode = RCK
 	err := mockBatch.Validate()
-	if !Match(err, ErrBatchSECType) {
+	if !base.Match(err, ErrBatchSECType) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -148,7 +150,7 @@ func testBatchTELDebit(t testing.TB) {
 	mockBatch := mockBatchTEL()
 	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchDebitOnly) {
+	if !base.Match(err, ErrBatchDebitOnly) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -241,7 +243,7 @@ func TestBatchTELValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchTEL()
 	mockBatch.GetHeader().ServiceClassCode = CreditsOnly
 	err := mockBatch.Create()
-	if !Match(err, NewErrBatchServiceClassTranCode(CreditsOnly, 27)) {
+	if !base.Match(err, NewErrBatchServiceClassTranCode(CreditsOnly, 27)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

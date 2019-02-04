@@ -7,6 +7,8 @@ package ach
 import (
 	"testing"
 	"time"
+
+	"github.com/moov-io/base"
 )
 
 // mockBatchADVHeader creates a ADV batch header
@@ -79,7 +81,7 @@ func testBatchADVSEC(t testing.TB) {
 	mockBatch := mockBatchADV()
 	mockBatch.Header.StandardEntryClassCode = RCK
 	err := mockBatch.Validate()
-	if !Match(err, ErrBatchSECType) {
+	if !base.Match(err, ErrBatchSECType) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -134,7 +136,7 @@ func TestBatchADVAddendum99Category(t *testing.T) {
 	mockBatch.GetADVEntries()[0].Category = CategoryForward
 	mockBatch.GetADVEntries()[0].Addenda99 = mockAddenda99
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAddendaCategory) {
+	if !base.Match(err, ErrBatchAddendaCategory) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -145,7 +147,7 @@ func TestBatchADVInvalidTransactionCode(t *testing.T) {
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetADVEntries()[0].TransactionCode = CheckingCredit
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchTransactionCode) {
+	if !base.Match(err, ErrBatchTransactionCode) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -161,7 +163,7 @@ func TestADVMaximumEntries(t *testing.T) {
 		batch.AddADVEntry(entry)
 	}
 	err := batch.Create()
-	if !Match(err, ErrBatchADVCount) {
+	if !base.Match(err, ErrBatchADVCount) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

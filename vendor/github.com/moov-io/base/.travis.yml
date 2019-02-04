@@ -1,5 +1,7 @@
 language: go
 sudo: required
+services:
+- docker
 os:
 - linux
 - osx
@@ -8,13 +10,10 @@ go:
 - 1.11
 dist: xenial # Ubuntu 16.04
 osx_image: xcode9.1
-matrix:
-  allow_failures:
-    - os: windows
 before_install:
 - go get -u github.com/client9/misspell/cmd/misspell
 - go get -u golang.org/x/lint/golint
-- go get -u honnef.co/go/tools/cmd/megacheck
+- go get -u honnef.co/go/tools/cmd/staticcheck
 - go get github.com/fzipp/gocyclo
 - go get golang.org/x/tools/cmd/cover
 # Install gcc, from https://travis-ci.community/t/go-cant-find-gcc-with-go1-11-1-on-windows/293/5
@@ -30,6 +29,6 @@ script:
 - misspell -error -locale US $GOFILES
 - gocyclo -over 19 $GOFILES
 - golint -set_exit_status $GOFILES
-- megacheck ./...
+- staticcheck ./...
 after_success:
-- bash <(curl -s https://codecov.io/bash)
+- bash <(curl -s https://codecov.io/bash) -X fix

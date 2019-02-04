@@ -8,6 +8,8 @@ import (
 	"log"
 	"testing"
 	"time"
+
+	"github.com/moov-io/base"
 )
 
 // mockBatchMTEHeader creates a MTE batch header
@@ -160,7 +162,7 @@ func testBatchMTESEC(t testing.TB) {
 	mockBatch := mockBatchMTE()
 	mockBatch.Header.StandardEntryClassCode = ACK
 	err := mockBatch.Validate()
-	if !Match(err, ErrBatchSECType) {
+	if !base.Match(err, ErrBatchSECType) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -212,7 +214,7 @@ func TestBatchMTEAmount(t *testing.T) {
 	mockBatch := mockBatchMTE()
 	mockBatch.GetEntries()[0].Amount = 0
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAmountZero) {
+	if !base.Match(err, ErrBatchAmountZero) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -279,7 +281,7 @@ func TestBatchMTEValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchMTE()
 	mockBatch.GetHeader().ServiceClassCode = CreditsOnly
 	err := mockBatch.Create()
-	if !Match(err, NewErrBatchServiceClassTranCode(CreditsOnly, 27)) {
+	if !base.Match(err, NewErrBatchServiceClassTranCode(CreditsOnly, 27)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -290,7 +292,7 @@ func TestBatchMTEAddenda05(t *testing.T) {
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAddendaCategory) {
+	if !base.Match(err, ErrBatchAddendaCategory) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

@@ -6,6 +6,8 @@ package ach
 
 import (
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockBatchCCDHeader creates a CCD batch header
@@ -74,7 +76,7 @@ func testBatchCCDAddendumCount(t testing.TB) {
 	// Adding a second addenda to the mock entry
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchCalculatedControlEquality(3, 2)) {
+	if !base.Match(err, NewErrBatchCalculatedControlEquality(3, 2)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -192,7 +194,7 @@ func testBatchCCDSEC(t testing.TB) {
 	mockBatch := mockBatchCCD()
 	mockBatch.Header.StandardEntryClassCode = RCK
 	err := mockBatch.Validate()
-	if !Match(err, ErrBatchSECType) {
+	if !base.Match(err, ErrBatchSECType) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -297,7 +299,7 @@ func TestBatchCCDValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchCCD()
 	mockBatch.GetHeader().ServiceClassCode = CreditsOnly
 	err := mockBatch.Create()
-	if !Match(err, NewErrBatchServiceClassTranCode(CreditsOnly, 27)) {
+	if !base.Match(err, NewErrBatchServiceClassTranCode(CreditsOnly, 27)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -308,7 +310,7 @@ func TestBatchCCDAddenda02(t *testing.T) {
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAddendaCategory) {
+	if !base.Match(err, ErrBatchAddendaCategory) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

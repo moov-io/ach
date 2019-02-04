@@ -6,6 +6,8 @@ package ach
 
 import (
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockBatchWEBHeader creates a WEB batch header
@@ -52,7 +54,7 @@ func testBatchWebAddenda(t testing.TB) {
 	// mock batch already has one addenda. Creating two addenda should error
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Create()
-	if !Match(err, NewErrBatchAddendaCount(2, 1)) {
+	if !base.Match(err, NewErrBatchAddendaCount(2, 1)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -173,7 +175,7 @@ func testBatchWebSEC(t testing.TB) {
 	mockBatch := mockBatchWEB()
 	mockBatch.Header.StandardEntryClassCode = RCK
 	err := mockBatch.Validate()
-	if !Match(err, ErrBatchSECType) {
+	if !base.Match(err, ErrBatchSECType) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -294,7 +296,7 @@ func TestBatchWEBAddendum99Category(t *testing.T) {
 	mockBatch.Entries[0].Category = CategoryForward
 	mockBatch.Entries[0].Addenda99 = mockAddenda99
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAddendaCategory) {
+	if !base.Match(err, ErrBatchAddendaCategory) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -308,7 +310,7 @@ func TestBatchWEBCategoryReturn(t *testing.T) {
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05)
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAddendaCategory) {
+	if !base.Match(err, ErrBatchAddendaCategory) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -322,7 +324,7 @@ func TestBatchWEBCategoryReturnAddenda98(t *testing.T) {
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAddendaCategory) {
+	if !base.Match(err, ErrBatchAddendaCategory) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -332,7 +334,7 @@ func TestBatchWEBValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchWEB()
 	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
 	err := mockBatch.Create()
-	if !Match(err, NewErrBatchServiceClassTranCode(DebitsOnly, 22)) {
+	if !base.Match(err, NewErrBatchServiceClassTranCode(DebitsOnly, 22)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

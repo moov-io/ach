@@ -8,6 +8,8 @@ import (
 	"log"
 	"testing"
 	"time"
+
+	"github.com/moov-io/base"
 )
 
 // mockBatchDNEHeader creates a DNE batch header
@@ -81,7 +83,7 @@ func testBatchDNEAddendumCount(t testing.TB) {
 	// Adding a second addenda to the mock entry
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchCalculatedControlEquality(3, 2)) {
+	if !base.Match(err, NewErrBatchCalculatedControlEquality(3, 2)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -176,7 +178,7 @@ func testBatchDNESEC(t testing.TB) {
 	mockBatch := mockBatchDNE()
 	mockBatch.Header.StandardEntryClassCode = ACK
 	err := mockBatch.Validate()
-	if !Match(err, ErrBatchSECType) {
+	if !base.Match(err, ErrBatchSECType) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -257,7 +259,7 @@ func TestBatchDNEAmount(t *testing.T) {
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetEntries()[0].Amount = 25000
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAmountNonZero) {
+	if !base.Match(err, ErrBatchAmountNonZero) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -267,7 +269,7 @@ func TestBatchDNETransactionCode(t *testing.T) {
 	mockBatch := mockBatchDNE()
 	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchTransactionCode) {
+	if !base.Match(err, ErrBatchTransactionCode) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

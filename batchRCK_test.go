@@ -4,7 +4,11 @@
 
 package ach
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/moov-io/base"
+)
 
 // mockBatchRCKHeader creates a BatchRCK BatchHeader
 func mockBatchRCKHeader() *BatchHeader {
@@ -123,7 +127,7 @@ func testBatchRCKStandardEntryClassCode(t testing.TB) {
 	mockBatch := mockBatchRCK()
 	mockBatch.Header.StandardEntryClassCode = WEB
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchSECType) {
+	if !base.Match(err, ErrBatchSECType) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -146,7 +150,7 @@ func testBatchRCKServiceClassCodeEquality(t testing.TB) {
 	mockBatch := mockBatchRCK()
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -169,7 +173,7 @@ func testBatchRCKMixedCreditsAndDebits(t testing.TB) {
 	mockBatch := mockBatchRCK()
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -192,7 +196,7 @@ func testBatchRCKCreditsOnly(t testing.TB) {
 	mockBatch := mockBatchRCK()
 	mockBatch.Header.ServiceClassCode = CreditsOnly
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -215,7 +219,7 @@ func testBatchRCKAutomatedAccountingAdvices(t testing.TB) {
 	mockBatch := mockBatchRCK()
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	err := mockBatch.Validate()
-	if !Match(err, NewErrBatchHeaderControlEquality(AutomatedAccountingAdvices, 225)) {
+	if !base.Match(err, NewErrBatchHeaderControlEquality(AutomatedAccountingAdvices, 225)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -266,7 +270,7 @@ func testBatchRCKAmount(t testing.TB) {
 	mockBatch := mockBatchRCK()
 	mockBatch.Entries[0].Amount = 250001
 	err := mockBatch.Create()
-	if !Match(err, NewErrBatchAmount(250001, 250000)) {
+	if !base.Match(err, NewErrBatchAmount(250001, 250000)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -319,7 +323,7 @@ func BenchmarkBatchRCKCheckSerialNumber(b *testing.B) {
 func testBatchRCKTransactionCode(t testing.TB) {
 	mockBatch := mockBatchRCKCredit()
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchDebitOnly) {
+	if !base.Match(err, ErrBatchDebitOnly) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

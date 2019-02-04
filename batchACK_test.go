@@ -7,6 +7,8 @@ package ach
 import (
 	"log"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockBatchACKHeader creates a ACK batch header
@@ -75,7 +77,7 @@ func testBatchACKAddendumCount(t testing.TB) {
 	// Adding a second addenda to the mock entry
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Create()
-	if !Match(err, NewErrBatchAddendaCount(2, 1)) {
+	if !base.Match(err, NewErrBatchAddendaCount(2, 1)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -193,7 +195,7 @@ func testBatchACKSEC(t testing.TB) {
 	mockBatch := mockBatchACK()
 	mockBatch.Header.StandardEntryClassCode = RCK
 	err := mockBatch.Validate()
-	if !Match(err, ErrBatchSECType) {
+	if !base.Match(err, ErrBatchSECType) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -217,7 +219,7 @@ func testBatchACKAddendaCount(t testing.TB) {
 	addenda05 := mockAddenda05()
 	mockBatch.GetEntries()[0].AddAddenda05(addenda05)
 	err := mockBatch.Create()
-	if !Match(err, NewErrBatchAddendaCount(2, 1)) {
+	if !base.Match(err, NewErrBatchAddendaCount(2, 1)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -295,7 +297,7 @@ func TestBatchACKAmount(t *testing.T) {
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetEntries()[0].Amount = 25000
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAmountNonZero) {
+	if !base.Match(err, ErrBatchAmountNonZero) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -306,7 +308,7 @@ func TestBatchACKTransactionCode(t *testing.T) {
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchTransactionCode) {
+	if !base.Match(err, ErrBatchTransactionCode) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -319,7 +321,7 @@ func TestBatchACKAddendum99Category(t *testing.T) {
 	mockBatch.GetEntries()[0].Category = CategoryForward
 	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
 	err := mockBatch.Create()
-	if !Match(err, ErrBatchAddendaCategory) {
+	if !base.Match(err, ErrBatchAddendaCategory) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -329,7 +331,7 @@ func TestBatchACKValidTranCodeForServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchACK()
 	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
 	err := mockBatch.Create()
-	if !Match(err, NewErrBatchServiceClassTranCode(DebitsOnly, 24)) {
+	if !base.Match(err, NewErrBatchServiceClassTranCode(DebitsOnly, 24)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

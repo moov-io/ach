@@ -76,15 +76,15 @@ func TestFileError(t *testing.T) {
 func testHas(t testing.TB) {
 	err := errors.New("Non list error")
 
-	if Has(err, err) {
+	if base.Has(err, err) {
 		t.Error("Has should return false when given a non-list error as the first arg")
 	}
 
-	if Has(nil, err) {
+	if base.Has(nil, err) {
 		t.Error("Has should not return true if there are no errors")
 	}
 
-	if Has(base.ErrorList([]error{}), err) {
+	if base.Has(base.ErrorList([]error{}), err) {
 		t.Error("Has should not return true if there are no errors")
 	}
 }
