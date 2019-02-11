@@ -265,32 +265,26 @@ func (iatBh *IATBatchHeader) Validate() error {
 		return err
 	}
 	if iatBh.recordType != "5" {
-		msg := fmt.Sprintf(msgRecordType, 5)
-		return &FieldError{FieldName: "recordType", Value: iatBh.recordType, Msg: msg}
+		fieldError("recordType", NewErrRecordType(5), iatBh.recordType)
 	}
 	if err := iatBh.isServiceClass(iatBh.ServiceClassCode); err != nil {
-		return &FieldError{FieldName: "ServiceClassCode",
-			Value: strconv.Itoa(iatBh.ServiceClassCode), Msg: err.Error()}
+		return fieldError("ServiceClassCode", err, strconv.Itoa(iatBh.ServiceClassCode))
 	}
 	if err := iatBh.isForeignExchangeIndicator(iatBh.ForeignExchangeIndicator); err != nil {
-		return &FieldError{FieldName: "ForeignExchangeIndicator",
-			Value: iatBh.ForeignExchangeIndicator, Msg: err.Error()}
+		return fieldError("ForeignExchangeIndicator", err, iatBh.ForeignExchangeIndicator)
 	}
 	if err := iatBh.isForeignExchangeReferenceIndicator(iatBh.ForeignExchangeReferenceIndicator); err != nil {
-		return &FieldError{FieldName: "ForeignExchangeReferenceIndicator",
-			Value: strconv.Itoa(iatBh.ForeignExchangeReferenceIndicator), Msg: err.Error()}
+		return fieldError("ForeignExchangeReferenceIndicator", err, strconv.Itoa(iatBh.ForeignExchangeReferenceIndicator))
 	}
 	if !iso3166.Valid(iatBh.ISODestinationCountryCode) {
 		return &FieldError{FieldName: "ISODestinationCountryCode",
 			Value: iatBh.ISODestinationCountryCode, Msg: "invalid ISO 3166-1-alpha-2 code"}
 	}
 	if err := iatBh.isSECCode(iatBh.StandardEntryClassCode); err != nil {
-		return &FieldError{FieldName: "StandardEntryClassCode",
-			Value: iatBh.StandardEntryClassCode, Msg: err.Error()}
+		return fieldError("StandardEntryClassCode", err, iatBh.StandardEntryClassCode)
 	}
 	if err := iatBh.isAlphanumeric(iatBh.CompanyEntryDescription); err != nil {
-		return &FieldError{FieldName: "CompanyEntryDescription",
-			Value: iatBh.CompanyEntryDescription, Msg: err.Error()}
+		return fieldError("CompanyEntryDescription", err, iatBh.CompanyEntryDescription)
 	}
 	if !iso4217.Valid(iatBh.ISOOriginatingCurrencyCode) {
 		return &FieldError{FieldName: "ISOOriginatingCurrencyCode",
@@ -301,8 +295,7 @@ func (iatBh *IATBatchHeader) Validate() error {
 			Value: iatBh.ISODestinationCurrencyCode, Msg: "invalid ISO 4217 code"}
 	}
 	if err := iatBh.isOriginatorStatusCode(iatBh.OriginatorStatusCode); err != nil {
-		return &FieldError{FieldName: "OriginatorStatusCode",
-			Value: strconv.Itoa(iatBh.OriginatorStatusCode), Msg: err.Error()}
+		return fieldError("OriginatorStatusCode", err, strconv.Itoa(iatBh.OriginatorStatusCode))
 	}
 	return nil
 }
@@ -311,53 +304,42 @@ func (iatBh *IATBatchHeader) Validate() error {
 // invalid the ACH transfer will be returned.
 func (iatBh *IATBatchHeader) fieldInclusion() error {
 	if iatBh.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: iatBh.recordType, Msg: msgFieldInclusion}
+		return fieldError("recordType", ErrFieldInclusion, iatBh.recordType)
 	}
 	if iatBh.ServiceClassCode == 0 {
-		return &FieldError{FieldName: "ServiceClassCode",
-			Value: strconv.Itoa(iatBh.ServiceClassCode), Msg: msgFieldInclusion}
+		return fieldError("ServiceClassCode", ErrFieldInclusion, strconv.Itoa(iatBh.ServiceClassCode))
 	}
 	if iatBh.ForeignExchangeIndicator == "" {
-		return &FieldError{FieldName: "ForeignExchangeIndicator",
-			Value: iatBh.ForeignExchangeIndicator, Msg: msgFieldInclusion}
+		return fieldError("ForeignExchangeIndicator", ErrFieldInclusion, iatBh.ForeignExchangeIndicator)
 	}
 	if iatBh.ForeignExchangeReferenceIndicator == 0 {
-		return &FieldError{FieldName: "ForeignExchangeReferenceIndicator",
-			Value: strconv.Itoa(iatBh.ForeignExchangeReferenceIndicator), Msg: msgFieldRequired}
+		return fieldError("ForeignExchangeReferenceIndicator", ErrFieldRequired, strconv.Itoa(iatBh.ForeignExchangeReferenceIndicator))
 	}
 	// ToDo: It can be space filled based on ForeignExchangeReferenceIndicator just use a validator to handle -
 	// ToDo: Calling Field ok for validation?
 	/*	if iatBh.ForeignExchangeReference == "" {
-		return &FieldError{FieldName: "ForeignExchangeReference",
-			Value: iatBh.ForeignExchangeReference, Msg: msgFieldRequired}
+		return fieldError("ForeignExchangeReference", ErrFieldRequired, iatBh.ForeignExchangeReference)
 	}*/
 	if iatBh.ISODestinationCountryCode == "" {
-		return &FieldError{FieldName: "ISODestinationCountryCode",
-			Value: iatBh.ISODestinationCountryCode, Msg: msgFieldInclusion}
+		return fieldError("ISODestinationCountryCode", ErrFieldInclusion, iatBh.ISODestinationCountryCode)
 	}
 	if iatBh.OriginatorIdentification == "" {
-		return &FieldError{FieldName: "OriginatorIdentification",
-			Value: iatBh.OriginatorIdentification, Msg: msgFieldInclusion}
+		return fieldError("OriginatorIdentification", ErrFieldInclusion, iatBh.OriginatorIdentification)
 	}
 	if iatBh.StandardEntryClassCode == "" {
-		return &FieldError{FieldName: "StandardEntryClassCode",
-			Value: iatBh.StandardEntryClassCode, Msg: msgFieldInclusion}
+		return fieldError("StandardEntryClassCode", ErrFieldInclusion, iatBh.StandardEntryClassCode)
 	}
 	if iatBh.CompanyEntryDescription == "" {
-		return &FieldError{FieldName: "CompanyEntryDescription",
-			Value: iatBh.CompanyEntryDescription, Msg: msgFieldInclusion}
+		return fieldError("CompanyEntryDescription", ErrFieldInclusion, iatBh.CompanyEntryDescription)
 	}
 	if iatBh.ISOOriginatingCurrencyCode == "" {
-		return &FieldError{FieldName: "ISOOriginatingCurrencyCode",
-			Value: iatBh.ISOOriginatingCurrencyCode, Msg: msgFieldInclusion}
+		return fieldError("ISOOriginatingCurrencyCode", ErrFieldInclusion, iatBh.ISOOriginatingCurrencyCode)
 	}
 	if iatBh.ISODestinationCurrencyCode == "" {
-		return &FieldError{FieldName: "ISODestinationCurrencyCode",
-			Value: iatBh.ISODestinationCurrencyCode, Msg: msgFieldInclusion}
+		return fieldError("ISODestinationCurrencyCode", ErrFieldInclusion, iatBh.ISODestinationCurrencyCode)
 	}
 	if iatBh.ODFIIdentification == "" {
-		return &FieldError{FieldName: "ODFIIdentification",
-			Value: iatBh.ODFIIdentificationField(), Msg: msgFieldInclusion}
+		return fieldError("ODFIIdentification", ErrFieldInclusion, iatBh.ODFIIdentificationField())
 	}
 	return nil
 }

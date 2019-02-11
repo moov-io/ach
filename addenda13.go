@@ -5,7 +5,6 @@
 package ach
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -113,32 +112,27 @@ func (addenda13 *Addenda13) Validate() error {
 		return err
 	}
 	if addenda13.recordType != "7" {
-		msg := fmt.Sprintf(msgRecordType, 7)
-		return &FieldError{FieldName: "recordType", Value: addenda13.recordType, Msg: msg}
+		fieldError("recordType", NewErrRecordType(7), addenda13.recordType)
 	}
 	if err := addenda13.isTypeCode(addenda13.TypeCode); err != nil {
-		return &FieldError{FieldName: "TypeCode", Value: addenda13.TypeCode, Msg: err.Error()}
+		return fieldError("TypeCode", err, addenda13.TypeCode)
 	}
 	// Type Code must be 13
 	if addenda13.TypeCode != "13" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda13.TypeCode, Msg: msgAddendaTypeCode}
+		return fieldError("TypeCode", ErrAddendaTypeCode, addenda13.TypeCode)
 	}
 	if err := addenda13.isAlphanumeric(addenda13.ODFIName); err != nil {
-		return &FieldError{FieldName: "ODFIName",
-			Value: addenda13.ODFIName, Msg: err.Error()}
+		return fieldError("ODFIName", err, addenda13.ODFIName)
 	}
 	// Valid ODFI Identification Number Qualifier
 	if err := addenda13.isIDNumberQualifier(addenda13.ODFIIDNumberQualifier); err != nil {
-		return &FieldError{FieldName: "ODFIIDNumberQualifier",
-			Value: addenda13.ODFIIDNumberQualifier, Msg: err.Error()}
+		return fieldError("ODFIIDNumberQualifier", err, addenda13.ODFIIDNumberQualifier)
 	}
 	if err := addenda13.isAlphanumeric(addenda13.ODFIIdentification); err != nil {
-		return &FieldError{FieldName: "ODFIIdentification",
-			Value: addenda13.ODFIIdentification, Msg: err.Error()}
+		return fieldError("ODFIIdentification", err, addenda13.ODFIIdentification)
 	}
 	if err := addenda13.isAlphanumeric(addenda13.ODFIBranchCountryCode); err != nil {
-		return &FieldError{FieldName: "ODFIBranchCountryCode",
-			Value: addenda13.ODFIBranchCountryCode, Msg: err.Error()}
+		return fieldError("ODFIBranchCountryCode", err, addenda13.ODFIBranchCountryCode)
 	}
 	return nil
 }
@@ -147,53 +141,25 @@ func (addenda13 *Addenda13) Validate() error {
 // invalid the ACH transfer will be returned.
 func (addenda13 *Addenda13) fieldInclusion() error {
 	if addenda13.recordType == "" {
-		return &FieldError{
-			FieldName: "recordType",
-			Value:     addenda13.recordType,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda13()?",
-		}
+		return fieldError("recordType", ErrConstructor, addenda13.recordType)
 	}
 	if addenda13.TypeCode == "" {
-		return &FieldError{
-			FieldName: "TypeCode",
-			Value:     addenda13.TypeCode,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda13()?",
-		}
+		return fieldError("TypeCode", ErrConstructor, addenda13.TypeCode)
 	}
 	if addenda13.ODFIName == "" {
-		return &FieldError{
-			FieldName: "ODFIName",
-			Value:     addenda13.ODFIName,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda13()?",
-		}
+		return fieldError("ODFIName", ErrConstructor, addenda13.ODFIName)
 	}
 	if addenda13.ODFIIDNumberQualifier == "" {
-		return &FieldError{
-			FieldName: "ODFIIDNumberQualifier",
-			Value:     addenda13.ODFIIDNumberQualifier,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda13()?",
-		}
+		return fieldError("ODFIIDNumberQualifier", ErrConstructor, addenda13.ODFIIDNumberQualifier)
 	}
 	if addenda13.ODFIIdentification == "" {
-		return &FieldError{
-			FieldName: "ODFIIdentification",
-			Value:     addenda13.ODFIIdentification,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda13()?",
-		}
+		return fieldError("ODFIIdentification", ErrConstructor, addenda13.ODFIIdentification)
 	}
 	if addenda13.ODFIBranchCountryCode == "" {
-		return &FieldError{
-			FieldName: "ODFIBranchCountryCode",
-			Value:     addenda13.ODFIBranchCountryCode,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda13()?",
-		}
+		return fieldError("ODFIBranchCountryCode", ErrConstructor, addenda13.ODFIBranchCountryCode)
 	}
 	if addenda13.EntryDetailSequenceNumber == 0 {
-		return &FieldError{
-			FieldName: "EntryDetailSequenceNumber",
-			Value:     addenda13.EntryDetailSequenceNumberField(),
-			Msg:       msgFieldInclusion + ", did you use NewAddenda13()?",
-		}
+		return fieldError("EntryDetailSequenceNumber", ErrConstructor, addenda13.EntryDetailSequenceNumberField())
 	}
 	return nil
 }

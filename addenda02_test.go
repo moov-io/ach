@@ -5,8 +5,9 @@
 package ach
 
 import (
-	"strings"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockAddenda02 creates a mock Addenda02 record
@@ -121,12 +122,9 @@ func BenchmarkAddenda02TypeCode02(b *testing.B) {
 func testAddenda02FieldInclusionRecordType(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.recordType = ""
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda02.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -147,12 +145,9 @@ func BenchmarkAddenda02FieldInclusionRecordType(b *testing.B) {
 func testAddenda02FieldInclusionTypeCode(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TypeCode = ""
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda02.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -173,12 +168,9 @@ func BenchmarkAddenda02FieldInclusionTypeCode(b *testing.B) {
 func testAddenda02TerminalIdentificationCode(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TerminalIdentificationCode = ""
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldRequired {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda02.Validate()
+	if !base.Match(err, ErrFieldRequired) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -199,12 +191,9 @@ func BenchmarkAddenda02TerminalIdentificationCode(b *testing.B) {
 func testAddenda02TransactionSerialNumber(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TransactionSerialNumber = ""
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldRequired {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda02.Validate()
+	if !base.Match(err, ErrFieldRequired) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -225,12 +214,9 @@ func BenchmarkAddenda02TransactionSerialNumber(b *testing.B) {
 func testAddenda02TransactionDate(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TransactionDate = ""
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldRequired {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda02.Validate()
+	if !base.Match(err, ErrFieldRequired) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -251,12 +237,9 @@ func BenchmarkAddenda02TransactionDate(b *testing.B) {
 func testAddenda02TerminalLocation(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TerminalLocation = ""
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldRequired {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda02.Validate()
+	if !base.Match(err, ErrFieldRequired) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -277,12 +260,9 @@ func BenchmarkAddenda02TerminalLocation(b *testing.B) {
 func testAddenda02TerminalCity(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TerminalCity = ""
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldRequired {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda02.Validate()
+	if !base.Match(err, ErrFieldRequired) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -303,12 +283,9 @@ func BenchmarkAddenda02TerminalCity(b *testing.B) {
 func testAddenda02TerminalState(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TerminalState = ""
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldRequired {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda02.Validate()
+	if !base.Match(err, ErrFieldRequired) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

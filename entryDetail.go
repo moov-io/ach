@@ -235,35 +235,33 @@ func (ed *EntryDetail) Validate() error {
 		return err
 	}
 	if ed.recordType != "6" {
-		msg := fmt.Sprintf(msgRecordType, 6)
-		return &FieldError{FieldName: "recordType", Value: ed.recordType, Msg: msg}
+		fieldError("recordType", NewErrRecordType(6), ed.recordType)
 	}
 	if err := ed.isTransactionCode(ed.TransactionCode); err != nil {
-		return &FieldError{FieldName: "TransactionCode", Value: strconv.Itoa(ed.TransactionCode), Msg: err.Error()}
+		return fieldError("TransactionCode", err, strconv.Itoa(ed.TransactionCode))
 	}
 	if err := ed.isAlphanumeric(ed.DFIAccountNumber); err != nil {
-		return &FieldError{FieldName: "DFIAccountNumber", Value: ed.DFIAccountNumber, Msg: err.Error()}
+		return fieldError("DFIAccountNumber", err, ed.DFIAccountNumber)
 	}
 	if err := ed.isAlphanumeric(ed.IdentificationNumber); err != nil {
-		return &FieldError{FieldName: "IdentificationNumber", Value: ed.IdentificationNumber, Msg: err.Error()}
+		return fieldError("IdentificationNumber", err, ed.IdentificationNumber)
 	}
 	if err := ed.isAlphanumeric(ed.IndividualName); err != nil {
-		return &FieldError{FieldName: "IndividualName", Value: ed.IndividualName, Msg: err.Error()}
+		return fieldError("IndividualName", err, ed.IndividualName)
 	}
 	if err := ed.isAlphanumeric(ed.DiscretionaryData); err != nil {
-		return &FieldError{FieldName: "DiscretionaryData", Value: ed.DiscretionaryData, Msg: err.Error()}
+		return fieldError("DiscretionaryData", err, ed.DiscretionaryData)
 	}
 
 	calculated := ed.CalculateCheckDigit(ed.RDFIIdentificationField())
 
 	edCheckDigit, err := strconv.Atoi(ed.CheckDigit)
 	if err != nil {
-		return &FieldError{FieldName: "CheckDigit", Value: ed.CheckDigit, Msg: err.Error()}
+		return fieldError("CheckDigit", err, ed.CheckDigit)
 	}
 
 	if calculated != edCheckDigit {
-		msg := fmt.Sprintf(msgValidCheckDigit, calculated)
-		return &FieldError{FieldName: "RDFIIdentification", Value: ed.CheckDigit, Msg: msg}
+		return fieldError("RDFIIdentification", NewErrValidCheckDigit(calculated), ed.CheckDigit)
 	}
 	return nil
 }
@@ -272,46 +270,22 @@ func (ed *EntryDetail) Validate() error {
 // invalid the ACH transfer will be returned.
 func (ed *EntryDetail) fieldInclusion() error {
 	if ed.recordType == "" {
-		return &FieldError{
-			FieldName: "recordType",
-			Value:     ed.recordType,
-			Msg:       msgFieldInclusion + ", did you use NewEntryDetail()?",
-		}
+		return fieldError("recordType", ErrConstructor, ed.recordType)
 	}
 	if ed.TransactionCode == 0 {
-		return &FieldError{
-			FieldName: "TransactionCode",
-			Value:     strconv.Itoa(ed.TransactionCode),
-			Msg:       msgFieldInclusion + ", did you use NewEntryDetail()?",
-		}
+		return fieldError("TransactionCode", ErrConstructor, strconv.Itoa(ed.TransactionCode))
 	}
 	if ed.RDFIIdentification == "" {
-		return &FieldError{
-			FieldName: "RDFIIdentification",
-			Value:     ed.RDFIIdentificationField(),
-			Msg:       msgFieldInclusion + ", did you use NewEntryDetail()?",
-		}
+		return fieldError("RDFIIdentification", ErrConstructor, ed.RDFIIdentificationField())
 	}
 	if ed.DFIAccountNumber == "" {
-		return &FieldError{
-			FieldName: "DFIAccountNumber",
-			Value:     ed.DFIAccountNumber,
-			Msg:       msgFieldInclusion + ", did you use NewEntryDetail()?",
-		}
+		return fieldError("DFIAccountNumber", ErrConstructor, ed.DFIAccountNumber)
 	}
 	if ed.IndividualName == "" {
-		return &FieldError{
-			FieldName: "IndividualName",
-			Value:     ed.IndividualName,
-			Msg:       msgFieldInclusion + ", did you use NewEntryDetail()?",
-		}
+		return fieldError("IndividualName", ErrConstructor, ed.IndividualName)
 	}
 	if ed.TraceNumber == "" {
-		return &FieldError{
-			FieldName: "TraceNumber",
-			Value:     ed.TraceNumberField(),
-			Msg:       msgFieldInclusion + ", did you use NewEntryDetail()?",
-		}
+		return fieldError("TraceNumber", ErrConstructor, ed.TraceNumberField())
 	}
 	return nil
 }

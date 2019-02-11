@@ -5,8 +5,9 @@
 package ach
 
 import (
-	"strings"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockAddenda15 creates a mock Addenda15 record
@@ -205,12 +206,9 @@ func BenchmarkReceiverStreetAddressAlphaNumeric(b *testing.B) {
 func testAddenda15FieldInclusionRecordType(t testing.TB) {
 	addenda15 := mockAddenda15()
 	addenda15.recordType = ""
-	if err := addenda15.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda15.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -231,12 +229,9 @@ func BenchmarkAddenda15FieldInclusionRecordType(b *testing.B) {
 func testAddenda15FieldInclusionTypeCode(t testing.TB) {
 	addenda15 := mockAddenda15()
 	addenda15.TypeCode = ""
-	if err := addenda15.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda15.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -257,12 +252,9 @@ func BenchmarkAddenda15FieldInclusionTypeCode(b *testing.B) {
 func testAddenda15FieldInclusionReceiverStreetAddress(t testing.TB) {
 	addenda15 := mockAddenda15()
 	addenda15.ReceiverStreetAddress = ""
-	if err := addenda15.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda15.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -283,12 +275,9 @@ func BenchmarkAddenda15FieldInclusionReceiverStreetAddress(b *testing.B) {
 func testAddenda15FieldInclusionEntryDetailSequenceNumber(t testing.TB) {
 	addenda15 := mockAddenda15()
 	addenda15.EntryDetailSequenceNumber = 0
-	if err := addenda15.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda15.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

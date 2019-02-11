@@ -5,7 +5,6 @@
 package ach
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -19,9 +18,6 @@ import (
 
 var (
 	returnCodeDict = map[string]*returnCode{}
-
-	// Error messages specific to Return Addenda
-	msgAddenda99ReturnCode = "found is not a valid return code"
 )
 
 func init() {
@@ -117,24 +113,19 @@ func (Addenda99 *Addenda99) String() string {
 // Validate verifies NACHA rules for Addenda99
 func (Addenda99 *Addenda99) Validate() error {
 	if Addenda99.recordType != "7" {
-		msg := fmt.Sprintf(msgRecordType, 7)
-		return &FieldError{FieldName: "recordType", Value: Addenda99.recordType, Msg: msg}
+		fieldError("recordType", NewErrRecordType(7), Addenda99.recordType)
 	}
 	if Addenda99.TypeCode == "" {
-		return &FieldError{
-			FieldName: "TypeCode",
-			Value:     Addenda99.TypeCode,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda99()?",
-		}
+		return fieldError("TypeCode", ErrConstructor, Addenda99.TypeCode)
 	}
 	if Addenda99.TypeCode != "99" {
-		return &FieldError{FieldName: "TypeCode", Value: Addenda99.TypeCode, Msg: msgAddendaTypeCode}
+		return fieldError("TypeCode", ErrAddendaTypeCode, Addenda99.TypeCode)
 	}
 
 	_, ok := returnCodeDict[Addenda99.ReturnCode]
 	if !ok {
 		// Return Addenda requires a valid ReturnCode
-		return &FieldError{FieldName: "ReturnCode", Value: Addenda99.ReturnCode, Msg: msgAddenda99ReturnCode}
+		return fieldError("ReturnCode", ErrAddenda99ReturnCode, Addenda99.ReturnCode)
 	}
 	return nil
 }

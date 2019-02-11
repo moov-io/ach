@@ -16,7 +16,6 @@ type BatchCOR struct {
 }
 
 var msgBatchCORAmount = "debit:%v credit:%v entry detail amount fields must be zero for SEC type COR"
-var msgBatchCORAddenda = "found and 1 Addenda98 is required for SEC Type COR"
 
 // NewBatchCOR returns a *BatchCOR
 func NewBatchCOR(bh *BatchHeader) *BatchCOR {
@@ -96,7 +95,7 @@ func (batch *BatchCOR) Create() error {
 func (batch *BatchCOR) isAddenda98() error {
 	for _, entry := range batch.Entries {
 		if entry.Addenda98 == nil {
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda98", Msg: msgBatchCORAddenda}
+			return batch.Error("Addenda98", ErrBatchCORAddenda)
 		}
 	}
 	return nil

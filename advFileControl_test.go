@@ -5,9 +5,10 @@
 package ach
 
 import (
-	"github.com/moov-io/base"
 	"strings"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockADVFileControl create a file control
@@ -168,12 +169,9 @@ func BenchmarkValidateADVFCRecordType(b *testing.B) {
 func testADVFCFieldInclusion(t testing.TB) {
 	fc := mockADVFileControl()
 	fc.BatchCount = 0
-	if err := fc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fc.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -194,12 +192,9 @@ func BenchmarkADVFCFieldInclusion(b *testing.B) {
 func testADVFCFieldInclusionRecordType(t testing.TB) {
 	fc := mockADVFileControl()
 	fc.recordType = ""
-	if err := fc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fc.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -220,12 +215,9 @@ func BenchmarkADVFCFieldInclusionRecordType(b *testing.B) {
 func testADVFCFieldInclusionBlockCount(t testing.TB) {
 	fc := mockADVFileControl()
 	fc.BlockCount = 0
-	if err := fc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fc.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -246,12 +238,11 @@ func BenchmarkADVFCFieldInclusionBlockCount(b *testing.B) {
 func testADVFCFieldInclusionEntryAddendaCount(t testing.TB) {
 	fc := mockADVFileControl()
 	fc.EntryAddendaCount = 0
-	if err := fc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fc.Validate()
+	if !base.Match(err, ErrConstructor) {
+
+		t.Errorf("%T: %s", err, err)
+
 	}
 }
 
@@ -272,12 +263,9 @@ func BenchmarkADVFCFieldInclusionEntryAddendaCount(b *testing.B) {
 func testADVFCFieldInclusionEntryHash(t testing.TB) {
 	fc := mockADVFileControl()
 	fc.EntryHash = 0
-	if err := fc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fc.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

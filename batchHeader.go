@@ -204,29 +204,28 @@ func (bh *BatchHeader) Validate() error {
 		return err
 	}
 	if bh.recordType != "5" {
-		msg := fmt.Sprintf(msgRecordType, 5)
-		return &FieldError{FieldName: "recordType", Value: bh.recordType, Msg: msg}
+		fieldError("recordType", NewErrRecordType(5), bh.recordType)
 	}
 	if err := bh.isServiceClass(bh.ServiceClassCode); err != nil {
-		return &FieldError{FieldName: "ServiceClassCode", Value: strconv.Itoa(bh.ServiceClassCode), Msg: err.Error()}
+		return fieldError("ServiceClassCode", err, strconv.Itoa(bh.ServiceClassCode))
 	}
 	if err := bh.isSECCode(bh.StandardEntryClassCode); err != nil {
-		return &FieldError{FieldName: "StandardEntryClassCode", Value: bh.StandardEntryClassCode, Msg: err.Error()}
+		return fieldError("StandardEntryClassCode", err, bh.StandardEntryClassCode)
 	}
 	if err := bh.isOriginatorStatusCode(bh.OriginatorStatusCode); err != nil {
-		return &FieldError{FieldName: "OriginatorStatusCode", Value: strconv.Itoa(bh.OriginatorStatusCode), Msg: err.Error()}
+		return fieldError("OriginatorStatusCode", err, strconv.Itoa(bh.OriginatorStatusCode))
 	}
 	if err := bh.isAlphanumeric(bh.CompanyName); err != nil {
-		return &FieldError{FieldName: "CompanyName", Value: bh.CompanyName, Msg: err.Error()}
+		return fieldError("CompanyName", err, bh.CompanyName)
 	}
 	if err := bh.isAlphanumeric(bh.CompanyDiscretionaryData); err != nil {
-		return &FieldError{FieldName: "CompanyDiscretionaryData", Value: bh.CompanyDiscretionaryData, Msg: err.Error()}
+		return fieldError("CompanyDiscretionaryData", err, bh.CompanyDiscretionaryData)
 	}
 	if err := bh.isAlphanumeric(bh.CompanyIdentification); err != nil {
-		return &FieldError{FieldName: "CompanyIdentification", Value: bh.CompanyIdentification, Msg: err.Error()}
+		return fieldError("CompanyIdentification", err, bh.CompanyIdentification)
 	}
 	if err := bh.isAlphanumeric(bh.CompanyEntryDescription); err != nil {
-		return &FieldError{FieldName: "CompanyEntryDescription", Value: bh.CompanyEntryDescription, Msg: err.Error()}
+		return fieldError("CompanyEntryDescription", err, bh.CompanyEntryDescription)
 	}
 	return nil
 }
@@ -235,53 +234,25 @@ func (bh *BatchHeader) Validate() error {
 // invalid the ACH transfer will be returned.
 func (bh *BatchHeader) fieldInclusion() error {
 	if bh.recordType == "" {
-		return &FieldError{
-			FieldName: "recordType",
-			Value:     bh.recordType,
-			Msg:       msgFieldInclusion + ", did you use NewBatchHeader()?",
-		}
+		return fieldError("recordType", ErrConstructor, bh.recordType)
 	}
 	if bh.ServiceClassCode == 0 {
-		return &FieldError{
-			FieldName: "ServiceClassCode",
-			Value:     strconv.Itoa(bh.ServiceClassCode),
-			Msg:       msgFieldInclusion + ", did you use NewBatchHeader()?",
-		}
+		return fieldError("ServiceClassCode", ErrConstructor, strconv.Itoa(bh.ServiceClassCode))
 	}
 	if bh.CompanyName == "" {
-		return &FieldError{
-			FieldName: "CompanyName",
-			Value:     bh.CompanyName,
-			Msg:       msgFieldInclusion + ", did you use NewBatchHeader()?",
-		}
+		return fieldError("CompanyName", ErrConstructor, bh.CompanyName)
 	}
 	if bh.CompanyIdentification == "" {
-		return &FieldError{
-			FieldName: "CompanyIdentification",
-			Value:     bh.CompanyIdentification,
-			Msg:       msgFieldInclusion + ", did you use NewBatchHeader()?",
-		}
+		return fieldError("CompanyIdentification", ErrConstructor, bh.CompanyIdentification)
 	}
 	if bh.StandardEntryClassCode == "" {
-		return &FieldError{
-			FieldName: "StandardEntryClassCode",
-			Value:     bh.StandardEntryClassCode,
-			Msg:       msgFieldInclusion + ", did you use NewBatchHeader()?",
-		}
+		return fieldError("StandardEntryClassCode", ErrConstructor, bh.StandardEntryClassCode)
 	}
 	if bh.CompanyEntryDescription == "" {
-		return &FieldError{
-			FieldName: "CompanyEntryDescription",
-			Value:     bh.CompanyEntryDescription,
-			Msg:       msgFieldInclusion + ", did you use NewBatchHeader()?",
-		}
+		return fieldError("CompanyEntryDescription", ErrConstructor, bh.CompanyEntryDescription)
 	}
 	if bh.ODFIIdentification == "" {
-		return &FieldError{
-			FieldName: "ODFIIdentification",
-			Value:     bh.ODFIIdentificationField(),
-			Msg:       msgFieldInclusion + ", did you use NewBatchHeader()?",
-		}
+		return fieldError("ODFIIdentification", ErrConstructor, bh.ODFIIdentificationField())
 	}
 	return nil
 }

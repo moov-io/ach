@@ -5,7 +5,6 @@
 package ach
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -90,23 +89,20 @@ func (addenda16 *Addenda16) Validate() error {
 		return err
 	}
 	if addenda16.recordType != "7" {
-		msg := fmt.Sprintf(msgRecordType, 7)
-		return &FieldError{FieldName: "recordType", Value: addenda16.recordType, Msg: msg}
+		fieldError("recordType", NewErrRecordType(7), addenda16.recordType)
 	}
 	if err := addenda16.isTypeCode(addenda16.TypeCode); err != nil {
-		return &FieldError{FieldName: "TypeCode", Value: addenda16.TypeCode, Msg: err.Error()}
+		return fieldError("TypeCode", err, addenda16.TypeCode)
 	}
 	// Type Code must be 16
 	if addenda16.TypeCode != "16" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda16.TypeCode, Msg: msgAddendaTypeCode}
+		return fieldError("TypeCode", ErrAddendaTypeCode, addenda16.TypeCode)
 	}
 	if err := addenda16.isAlphanumeric(addenda16.ReceiverCityStateProvince); err != nil {
-		return &FieldError{FieldName: "ReceiverCityStateProvince",
-			Value: addenda16.ReceiverCityStateProvince, Msg: err.Error()}
+		return fieldError("ReceiverCityStateProvince", err, addenda16.ReceiverCityStateProvince)
 	}
 	if err := addenda16.isAlphanumeric(addenda16.ReceiverCountryPostalCode); err != nil {
-		return &FieldError{FieldName: "ReceiverCountryPostalCode",
-			Value: addenda16.ReceiverCountryPostalCode, Msg: err.Error()}
+		return fieldError("ReceiverCountryPostalCode", err, addenda16.ReceiverCountryPostalCode)
 	}
 	return nil
 }
@@ -115,39 +111,19 @@ func (addenda16 *Addenda16) Validate() error {
 // invalid the ACH transfer will be returned.
 func (addenda16 *Addenda16) fieldInclusion() error {
 	if addenda16.recordType == "" {
-		return &FieldError{
-			FieldName: "recordType",
-			Value:     addenda16.recordType,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda16()?",
-		}
+		return fieldError("recordType", ErrConstructor, addenda16.recordType)
 	}
 	if addenda16.TypeCode == "" {
-		return &FieldError{
-			FieldName: "TypeCode",
-			Value:     addenda16.TypeCode,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda16()?",
-		}
+		return fieldError("TypeCode", ErrConstructor, addenda16.TypeCode)
 	}
 	if addenda16.ReceiverCityStateProvince == "" {
-		return &FieldError{
-			FieldName: "ReceiverCityStateProvince",
-			Value:     addenda16.ReceiverCityStateProvince,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda16()?",
-		}
+		return fieldError("ReceiverCityStateProvince", ErrConstructor, addenda16.ReceiverCityStateProvince)
 	}
 	if addenda16.ReceiverCountryPostalCode == "" {
-		return &FieldError{
-			FieldName: "ReceiverCountryPostalCode",
-			Value:     addenda16.ReceiverCountryPostalCode,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda16()?",
-		}
+		return fieldError("ReceiverCountryPostalCode", ErrConstructor, addenda16.ReceiverCountryPostalCode)
 	}
 	if addenda16.EntryDetailSequenceNumber == 0 {
-		return &FieldError{
-			FieldName: "EntryDetailSequenceNumber",
-			Value:     addenda16.EntryDetailSequenceNumberField(),
-			Msg:       msgFieldInclusion + ", did you use NewAddenda16()?",
-		}
+		return fieldError("EntryDetailSequenceNumber", ErrConstructor, addenda16.EntryDetailSequenceNumberField())
 	}
 	return nil
 }

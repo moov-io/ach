@@ -112,32 +112,6 @@ func TestParser__errorJSON(t *testing.T) {
 	}
 }
 
-// testParseError validates a a parsing error
-func testParseError(t testing.TB) {
-	e := &FieldError{FieldName: "testField", Value: "nil", Msg: "could not parse"}
-	err := &base.ParseError{Line: 63, Err: e}
-	if err.Error() != "line:63 *ach.FieldError testField nil could not parse" {
-		t.Error("ParseError error string formatting has changed")
-	}
-	err.Record = "TestRecord"
-	if err.Error() != "line:63 record:TestRecord *ach.FieldError testField nil could not parse" {
-		t.Error("ParseError error string formatting has changed")
-	}
-}
-
-// TestParseError tests validating a a parsing error
-func TestParseError(t *testing.T) {
-	testParseError(t)
-}
-
-// BenchmarkParseError benchmarks validating a a parsing error
-func BenchmarkParseError(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testParseError(b)
-	}
-}
-
 // testPPDDebitRead validates reading a PPD debit
 func testPPDDebitRead(t testing.TB) {
 	f, err := os.Open("./test/testdata/ppd-debit.ach")
@@ -385,16 +359,9 @@ func testFileFileHeaderErr(t testing.TB) {
 	// necessary to have a file control not nil
 	r.File.Control = mockFileControl()
 	_, err := r.Read()
-	if el, ok := err.(base.ErrorList); ok {
-		if p, ok := el.Err().(*base.ParseError); ok {
-			if e, ok := p.Err.(*FieldError); ok {
-				if !strings.Contains(e.Msg, msgFieldInclusion) {
-					t.Errorf("%T: %s", e, e)
-				}
-			}
-		} else {
-			t.Errorf("%T: %s", el, el)
-		}
+	// TODO: is this testing what we want to be testing?
+	if !base.Has(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -418,14 +385,9 @@ func testFileBatchHeaderErr(t testing.TB) {
 	bh.ODFIIdentification = ""
 	r := NewReader(strings.NewReader(bh.String()))
 	_, err := r.Read()
-	if el, ok := err.(base.ErrorList); ok {
-		if p, ok := el.Err().(*base.ParseError); ok {
-			if e, ok := p.Err.(*FieldError); ok {
-				if !strings.Contains(e.Msg, msgFieldInclusion) {
-					t.Errorf("%T: %s", e, e)
-				}
-			}
-		}
+	// TODO: is this testing what we want to be testing?
+	if !base.Has(err, ErrFileHeader) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -529,18 +491,8 @@ func testFileAddenda05(t testing.TB) {
 	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addenda05[0].String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
-	if err != nil {
-		if el, ok := err.(base.ErrorList); ok {
-			if p, ok := el.Err().(*base.ParseError); ok {
-				if e, ok := p.Err.(*FieldError); ok {
-					if !strings.Contains(e.Msg, msgFieldInclusion) {
-						t.Errorf("%T: %s", e, e)
-					}
-				}
-			} else {
-				t.Errorf("%T: %s", el, el)
-			}
-		}
+	if !base.Has(err, ErrBatchAddendaIndicator) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -686,18 +638,8 @@ func testFileAddenda98(t testing.TB) {
 	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addenda98.String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
-	if err != nil {
-		if el, ok := err.(base.ErrorList); ok {
-			if p, ok := el.Err().(*base.ParseError); ok {
-				if e, ok := p.Err.(*FieldError); ok {
-					if !strings.Contains(e.Msg, msgFieldInclusion) {
-						t.Errorf("%T: %s", e, e)
-					}
-				}
-			} else {
-				t.Errorf("%T: %s", el, el)
-			}
-		}
+	if !base.Has(err, ErrBatchAddendaIndicator) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -766,18 +708,8 @@ func testFileAddenda99(t testing.TB) {
 	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addenda99.String()
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
-	if err != nil {
-		if el, ok := err.(base.ErrorList); ok {
-			if p, ok := el.Err().(*base.ParseError); ok {
-				if e, ok := p.Err.(*FieldError); ok {
-					if !strings.Contains(e.Msg, msgFieldInclusion) {
-						t.Errorf("%T: %s", e, e)
-					}
-				}
-			} else {
-				t.Errorf("%T: %s", el, el)
-			}
-		}
+	if !base.Has(err, ErrBatchAddendaIndicator) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -862,16 +794,8 @@ func testFileFileControlErr(t testing.TB) {
 	fc.BatchCount = 0
 	r := NewReader(strings.NewReader(fc.String()))
 	_, err := r.Read()
-	if el, ok := err.(base.ErrorList); ok {
-		if p, ok := el.Err().(*base.ParseError); ok {
-			if e, ok := p.Err.(*FieldError); ok {
-				if !strings.Contains(e.Msg, msgFieldInclusion) {
-					t.Errorf("%T: %s", e, e)
-				}
-			}
-		} else {
-			t.Errorf("%T: %s", el, el)
-		}
+	if !base.Has(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1017,14 +941,8 @@ func testFileLongErr(t testing.TB) {
 	line := "101 076401251 0764012510807291511A094101achdestname            companyname                    5000companyname                         origid    PPDCHECKPAYMT000002080730   1076401250000001"
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
-	if el, ok := err.(base.ErrorList); ok {
-		if p, ok := el.Err().(*base.ParseError); ok {
-			if e, ok := p.Err.(*FieldError); ok {
-				if !strings.Contains(e.Msg, msgFieldInclusion) {
-					t.Errorf("%T: %s", e, e)
-				}
-			}
-		}
+	if !base.Has(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1075,16 +993,8 @@ func testFileFHImmediateOrigin(t testing.TB) {
 	// necessary to have a file control not nil
 	r.File.Control = mockFileControl()
 	_, err := r.Read()
-	if el, ok := err.(base.ErrorList); ok {
-		if p, ok := el.Err().(*base.ParseError); ok {
-			if e, ok := p.Err.(*FieldError); ok {
-				if !strings.Contains(e.Msg, msgFieldInclusion) {
-					t.Errorf("%T: %s", e, e)
-				}
-			}
-		} else {
-			t.Errorf("%T: %s", el, el)
-		}
+	if !base.Has(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

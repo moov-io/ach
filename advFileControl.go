@@ -5,7 +5,6 @@
 package ach
 
 import (
-	"fmt"
 	"strings"
 	"unicode/utf8"
 )
@@ -101,8 +100,7 @@ func (fc *ADVFileControl) Validate() error {
 		return err
 	}
 	if fc.recordType != "9" {
-		msg := fmt.Sprintf(msgRecordType, 9)
-		return &FieldError{FieldName: "recordType", Value: fc.recordType, Msg: msg}
+		fieldError("recordType", NewErrRecordType(9), fc.recordType)
 	}
 	return nil
 }
@@ -111,39 +109,19 @@ func (fc *ADVFileControl) Validate() error {
 // invalid the ACH transfer will be returned.
 func (fc *ADVFileControl) fieldInclusion() error {
 	if fc.recordType == "" {
-		return &FieldError{
-			FieldName: "recordType",
-			Value:     fc.recordType,
-			Msg:       msgFieldInclusion + ", did you use NewADVFileControl()?",
-		}
+		return fieldError("recordType", ErrConstructor, fc.recordType)
 	}
 	if fc.BatchCount == 0 {
-		return &FieldError{
-			FieldName: "BatchCount",
-			Value:     fc.BatchCountField(),
-			Msg:       msgFieldInclusion + ", did you use NewADVFileControl()?",
-		}
+		return fieldError("BatchCount", ErrConstructor, fc.BatchCountField())
 	}
 	if fc.BlockCount == 0 {
-		return &FieldError{
-			FieldName: "BlockCount",
-			Value:     fc.BlockCountField(),
-			Msg:       msgFieldInclusion + ", did you use NewADVFileControl()?",
-		}
+		return fieldError("BlockCount", ErrConstructor, fc.BlockCountField())
 	}
 	if fc.EntryAddendaCount == 0 {
-		return &FieldError{
-			FieldName: "EntryAddendaCount",
-			Value:     fc.EntryAddendaCountField(),
-			Msg:       msgFieldInclusion + ", did you use NewADVFileControl()?",
-		}
+		return fieldError("EntryAddendaCount", ErrConstructor, fc.EntryAddendaCountField())
 	}
 	if fc.EntryHash == 0 {
-		return &FieldError{
-			FieldName: "EntryHash",
-			Value:     fc.EntryAddendaCountField(),
-			Msg:       msgFieldInclusion + ", did you use NewADVFileControl()?",
-		}
+		return fieldError("EntryHash", ErrConstructor, fc.EntryAddendaCountField())
 	}
 	return nil
 }

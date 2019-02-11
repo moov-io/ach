@@ -7,6 +7,8 @@ package ach
 import (
 	"strings"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 func mockADVBatchControl() *ADVBatchControl {
@@ -250,12 +252,9 @@ func BenchmarkADVACHOperatorDataAlphaNumeric(b *testing.B) {
 func testADVBCFieldInclusionRecordType(t testing.TB) {
 	bc := mockADVBatchControl()
 	bc.recordType = ""
-	if err := bc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bc.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -276,12 +275,9 @@ func BenchmarkADVBCFieldInclusionRecordType(b *testing.B) {
 func testADVBCFieldInclusionServiceClassCode(t testing.TB) {
 	bc := mockADVBatchControl()
 	bc.ServiceClassCode = 0
-	if err := bc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bc.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -302,12 +298,9 @@ func BenchmarkADVBCFieldInclusionServiceClassCode(b *testing.B) {
 func testADVBCFieldInclusionODFIIdentification(t testing.TB) {
 	bc := mockADVBatchControl()
 	bc.ODFIIdentification = "000000000"
-	if err := bc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bc.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

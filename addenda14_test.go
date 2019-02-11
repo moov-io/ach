@@ -5,8 +5,9 @@
 package ach
 
 import (
-	"strings"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockAddenda14 creates a mock Addenda14 record
@@ -265,12 +266,9 @@ func BenchmarkRDFIBranchCountryCodeAlphaNumeric(b *testing.B) {
 func testAddenda14FieldInclusionRecordType(t testing.TB) {
 	addenda14 := mockAddenda14()
 	addenda14.recordType = ""
-	if err := addenda14.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda14.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -291,12 +289,9 @@ func BenchmarkAddenda14FieldInclusionRecordType(b *testing.B) {
 func testAddenda14FieldInclusionTypeCode(t testing.TB) {
 	addenda14 := mockAddenda14()
 	addenda14.TypeCode = ""
-	if err := addenda14.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda14.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -317,12 +312,9 @@ func BenchmarkAddenda14FieldInclusionTypeCode(b *testing.B) {
 func testAddenda14FieldInclusionRDFIName(t testing.TB) {
 	addenda14 := mockAddenda14()
 	addenda14.RDFIName = ""
-	if err := addenda14.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda14.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -343,12 +335,9 @@ func BenchmarkAddenda14FieldInclusionRDFIName(b *testing.B) {
 func testAddenda14FieldInclusionRDFIIDNumberQualifier(t testing.TB) {
 	addenda14 := mockAddenda14()
 	addenda14.RDFIIDNumberQualifier = ""
-	if err := addenda14.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda14.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -369,12 +358,9 @@ func BenchmarkAddenda14FieldInclusionRDFIIdNumberQualifier(b *testing.B) {
 func testAddenda14FieldInclusionRDFIIdentification(t testing.TB) {
 	addenda14 := mockAddenda14()
 	addenda14.RDFIIdentification = ""
-	if err := addenda14.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda14.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -395,12 +381,9 @@ func BenchmarkAddenda14FieldInclusionRDFIIdentification(b *testing.B) {
 func testAddenda14FieldInclusionRDFIBranchCountryCode(t testing.TB) {
 	addenda14 := mockAddenda14()
 	addenda14.RDFIBranchCountryCode = ""
-	if err := addenda14.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda14.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -421,12 +404,9 @@ func BenchmarkAddenda14FieldInclusionRDFIBranchCountryCode(b *testing.B) {
 func testAddenda14FieldInclusionEntryDetailSequenceNumber(t testing.TB) {
 	addenda14 := mockAddenda14()
 	addenda14.EntryDetailSequenceNumber = 0
-	if err := addenda14.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda14.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

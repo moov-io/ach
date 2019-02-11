@@ -7,6 +7,8 @@ package ach
 import (
 	"strings"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 func mockBatchControl() *BatchControl {
@@ -280,12 +282,9 @@ func BenchmarkBCMessageAuthenticationCodeAlphaNumeric(b *testing.B) {
 func testBCFieldInclusionRecordType(t testing.TB) {
 	bc := mockBatchControl()
 	bc.recordType = ""
-	if err := bc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bc.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -306,12 +305,9 @@ func BenchmarkBCFieldInclusionRecordType(b *testing.B) {
 func testBCFieldInclusionServiceClassCode(t testing.TB) {
 	bc := mockBatchControl()
 	bc.ServiceClassCode = 0
-	if err := bc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bc.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -332,12 +328,9 @@ func BenchmarkBCFieldInclusionServiceClassCode(b *testing.B) {
 func testBCFieldInclusionODFIIdentification(t testing.TB) {
 	bc := mockBatchControl()
 	bc.ODFIIdentification = "000000000"
-	if err := bc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bc.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

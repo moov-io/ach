@@ -6,7 +6,6 @@ package ach
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
@@ -70,28 +69,6 @@ func testFileError(t testing.TB) {
 // TestFileError tests validating a file error
 func TestFileError(t *testing.T) {
 	testFileError(t)
-}
-
-// testHas validates the Has error function
-func testHas(t testing.TB) {
-	err := errors.New("Non list error")
-
-	if base.Has(err, err) {
-		t.Error("Has should return false when given a non-list error as the first arg")
-	}
-
-	if base.Has(nil, err) {
-		t.Error("Has should not return true if there are no errors")
-	}
-
-	if base.Has(base.ErrorList([]error{}), err) {
-		t.Error("Has should not return true if there are no errors")
-	}
-}
-
-// TestHas validates the Has error function
-func TestHas(t *testing.T) {
-	testHas(t)
 }
 
 // BenchmarkFileError benchmarks validating a file error
@@ -310,14 +287,9 @@ func BenchmarkFileBlockCount10(b *testing.B) {
 // testFileBuildBadFileHeader validates a bad file header
 func testFileBuildBadFileHeader(t testing.TB) {
 	file := NewFile().SetHeader(FileHeader{})
-	if err := file.Create(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := file.Create()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -907,11 +879,8 @@ func TestFile__readNoBatchesJson(t *testing.T) {
 
 	_, err = FileFromJSON(bs)
 
-	if err != nil {
-		if strings.Contains(err.Error(), "did you use NewBatchHeader") {
-		} else {
-			t.Fatal(err)
-		}
+	if !base.Match(err, ErrConstructor) {
+		t.Fatal(err)
 	}
 }
 

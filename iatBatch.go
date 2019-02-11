@@ -11,9 +11,8 @@ import (
 )
 
 var (
-	msgIATBatchAddendaIndicator = "is invalid for addenda record(s) found"
-	msgBatchIATAddendumCount    = "%v Addenda %v for SEC Code IAT"
-	msgBatchIATNOC              = "%v invalid for IAT NOC, should be %v"
+	msgBatchIATAddendumCount = "%v Addenda %v for SEC Code IAT"
+	msgBatchIATNOC           = "%v invalid for IAT NOC, should be %v"
 )
 
 // IATBatch holds the Batch Header and Batch Control and all Entry Records for an IAT batch
@@ -296,7 +295,7 @@ func (batch *IATBatch) isFieldInclusion() error {
 		}
 		if entry.Category == CategoryNOC {
 			if entry.Addenda98 == nil {
-				return &FieldError{FieldName: "Addenda98", Msg: msgFieldInclusion}
+				return fieldError("Addenda98", ErrFieldInclusion)
 			}
 			if err := entry.Addenda98.Validate(); err != nil {
 				return err
@@ -304,7 +303,7 @@ func (batch *IATBatch) isFieldInclusion() error {
 		}
 		if entry.Category == CategoryReturn {
 			if entry.Addenda99 == nil {
-				return &FieldError{FieldName: "Addenda99", Msg: msgFieldInclusion}
+				return fieldError("Addenda99", ErrFieldInclusion)
 			}
 
 			if err := entry.Addenda99.Validate(); err != nil {
@@ -425,7 +424,7 @@ func (batch *IATBatch) isAddendaSequence() error {
 	for _, entry := range batch.Entries {
 		// addenda without indicator flag of 1
 		if entry.AddendaRecordIndicator != 1 {
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "AddendaRecordIndicator", Msg: msgIATBatchAddendaIndicator}
+			return batch.Error("AddendaRecordIndicator", ErrIATBatchAddendaIndicator)
 		}
 
 		if entry.Category == CategoryNOC {
@@ -506,25 +505,25 @@ func (batch *IATBatch) addendaFieldInclusion(entry *IATEntryDetail) error {
 		return nil
 	}
 	if entry.Addenda10 == nil {
-		return &FieldError{FieldName: "Addenda10", Msg: msgFieldInclusion}
+		return fieldError("Addenda10", ErrFieldInclusion)
 	}
 	if entry.Addenda11 == nil {
-		return &FieldError{FieldName: "Addenda11", Msg: msgFieldInclusion}
+		return fieldError("Addenda11", ErrFieldInclusion)
 	}
 	if entry.Addenda12 == nil {
-		return &FieldError{FieldName: "Addenda12", Msg: msgFieldInclusion}
+		return fieldError("Addenda12", ErrFieldInclusion)
 	}
 	if entry.Addenda13 == nil {
-		return &FieldError{FieldName: "Addenda13", Msg: msgFieldInclusion}
+		return fieldError("Addenda13", ErrFieldInclusion)
 	}
 	if entry.Addenda14 == nil {
-		return &FieldError{FieldName: "Addenda14", Msg: msgFieldInclusion}
+		return fieldError("Addenda14", ErrFieldInclusion)
 	}
 	if entry.Addenda15 == nil {
-		return &FieldError{FieldName: "Addenda15", Msg: msgFieldInclusion}
+		return fieldError("Addenda15", ErrFieldInclusion)
 	}
 	if entry.Addenda16 == nil {
-		return &FieldError{FieldName: "Addenda16", Msg: msgFieldInclusion}
+		return fieldError("Addenda16", ErrFieldInclusion)
 	}
 	return nil
 }

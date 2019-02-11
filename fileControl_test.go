@@ -7,6 +7,8 @@ package ach
 import (
 	"strings"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockFileControl create a file control
@@ -161,12 +163,9 @@ func BenchmarkValidateFCRecordType(b *testing.B) {
 func testFCFieldInclusion(t testing.TB) {
 	fc := mockFileControl()
 	fc.BatchCount = 0
-	if err := fc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fc.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -187,12 +186,9 @@ func BenchmarkFCFieldInclusion(b *testing.B) {
 func testFCFieldInclusionRecordType(t testing.TB) {
 	fc := mockFileControl()
 	fc.recordType = ""
-	if err := fc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fc.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -213,12 +209,9 @@ func BenchmarkFCFieldInclusionRecordType(b *testing.B) {
 func testFCFieldInclusionBlockCount(t testing.TB) {
 	fc := mockFileControl()
 	fc.BlockCount = 0
-	if err := fc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fc.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -239,12 +232,9 @@ func BenchmarkFCFieldInclusionBlockCount(b *testing.B) {
 func testFCFieldInclusionEntryAddendaCount(t testing.TB) {
 	fc := mockFileControl()
 	fc.EntryAddendaCount = 0
-	if err := fc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fc.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -265,12 +255,9 @@ func BenchmarkFCFieldInclusionEntryAddendaCount(b *testing.B) {
 func testFCFieldInclusionEntryHash(t testing.TB) {
 	fc := mockFileControl()
 	fc.EntryHash = 0
-	if err := fc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fc.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

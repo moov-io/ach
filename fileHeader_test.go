@@ -8,6 +8,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/moov-io/base"
 )
 
 // mockFileHeader build a validate File Header for tests
@@ -279,12 +281,9 @@ func BenchmarkFormatCode(b *testing.B) {
 func testFHFieldInclusion(t testing.TB) {
 	fh := mockFileHeader()
 	fh.ImmediateOrigin = ""
-	if err := fh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fh.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -424,12 +423,9 @@ func BenchmarkImmediateReferenceCodeAlphaNumeric(b *testing.B) {
 func testFHFieldInclusionRecordType(t testing.TB) {
 	fh := mockFileHeader()
 	fh.recordType = ""
-	if err := fh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fh.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -450,12 +446,9 @@ func BenchmarkFHFieldInclusionRecordType(b *testing.B) {
 func testFHFieldInclusionImmediateDestination(t testing.TB) {
 	fh := mockFileHeader()
 	fh.ImmediateDestination = ""
-	if err := fh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fh.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -476,12 +469,9 @@ func BenchmarkFHFieldInclusionImmediateDestination(b *testing.B) {
 func testFHFieldInclusionFileIDModifier(t testing.TB) {
 	fh := mockFileHeader()
 	fh.FileIDModifier = ""
-	if err := fh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fh.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -502,12 +492,9 @@ func BenchmarkFHFieldInclusionFileIDModifier(b *testing.B) {
 func testFHFieldInclusionRecordSize(t testing.TB) {
 	fh := mockFileHeader()
 	fh.recordSize = ""
-	if err := fh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fh.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -528,12 +515,9 @@ func BenchmarkFHFieldInclusionRecordSize(b *testing.B) {
 func testFHFieldInclusionBlockingFactor(t testing.TB) {
 	fh := mockFileHeader()
 	fh.blockingFactor = ""
-	if err := fh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fh.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -555,12 +539,9 @@ func BenchmarkFHFieldInclusionBlockingFactor(b *testing.B) {
 func testFHFieldInclusionFormatCode(t testing.TB) {
 	fh := mockFileHeader()
 	fh.formatCode = ""
-	if err := fh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fh.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -581,12 +562,10 @@ func BenchmarkFHFieldInclusionFormatCode(b *testing.B) {
 func testFHFieldInclusionCreationDate(t testing.TB) {
 	fh := mockFileHeader()
 	fh.FileCreationDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
-	if err := fh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fh.Validate()
+	// TODO: are we expecting to see an error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

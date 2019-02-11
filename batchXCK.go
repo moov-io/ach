@@ -51,11 +51,11 @@ func (batch *BatchXCK) Validate() error {
 		}
 		// ProcessControlField underlying IdentificationNumber, must be defined
 		if entry.ProcessControlField() == "" {
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ProcessControlField", Msg: msgFieldRequired}
+			return batch.Error("ProcessControlField", ErrFieldRequired)
 		}
 		// ItemResearchNumber underlying IdentificationNumber, must be defined
 		if entry.ItemResearchNumber() == "" {
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "ItemResearchNumber", Msg: msgFieldRequired}
+			return batch.Error("ItemResearchNumber", ErrFieldRequired)
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {

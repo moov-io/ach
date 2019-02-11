@@ -109,15 +109,14 @@ func (bc *ADVBatchControl) Validate() error {
 		return err
 	}
 	if bc.recordType != "8" {
-		msg := fmt.Sprintf(msgRecordType, 7)
-		return &FieldError{FieldName: "recordType", Value: bc.recordType, Msg: msg}
+		fieldError("recordType", NewErrRecordType(7), bc.recordType)
 	}
 	if err := bc.isServiceClass(bc.ServiceClassCode); err != nil {
-		return &FieldError{FieldName: "ServiceClassCode", Value: strconv.Itoa(bc.ServiceClassCode), Msg: err.Error()}
+		return fieldError("ServiceClassCode", err, strconv.Itoa(bc.ServiceClassCode))
 	}
 
 	if err := bc.isAlphanumeric(bc.ACHOperatorData); err != nil {
-		return &FieldError{FieldName: "ACHOperatorData", Value: bc.ACHOperatorData, Msg: err.Error()}
+		return fieldError("ACHOperatorData", err, bc.ACHOperatorData)
 	}
 	return nil
 }
@@ -126,24 +125,13 @@ func (bc *ADVBatchControl) Validate() error {
 // invalid the ACH transfer will be returned.
 func (bc *ADVBatchControl) fieldInclusion() error {
 	if bc.recordType == "" {
-		return &FieldError{
-			FieldName: "recordType",
-			Value:     bc.recordType,
-			Msg:       msgFieldInclusion + ", did you use NewADVBatchControl()?"}
+		return fieldError("recordType", ErrConstructor, bc.recordType)
 	}
 	if bc.ServiceClassCode == 0 {
-		return &FieldError{
-			FieldName: "ServiceClassCode",
-			Value:     strconv.Itoa(bc.ServiceClassCode),
-			Msg:       msgFieldInclusion + ", did you use NewADVBatchControl()?",
-		}
+		return fieldError("ServiceClassCode", ErrConstructor, strconv.Itoa(bc.ServiceClassCode))
 	}
 	if bc.ODFIIdentification == "000000000" || bc.ODFIIdentification == "" {
-		return &FieldError{
-			FieldName: "ODFIIdentification",
-			Value:     bc.ODFIIdentificationField(),
-			Msg:       msgFieldInclusion + ", did you use NewADVBatchControl()?",
-		}
+		return fieldError("ODFIIdentification", ErrConstructor, bc.ODFIIdentificationField())
 	}
 	return nil
 }

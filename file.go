@@ -177,7 +177,7 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 			continue
 		}
 		if err := batches.Batches[i].build(); err != nil {
-			return fmt.Errorf("batch %s: %v", batches.Batches[i].Header.ID, err)
+			return batches.Batches[i].Error("Invalid Batch", err, batches.Batches[i].Header.ID)
 		}
 		f.Batches = append(f.Batches, batches.Batches[i])
 	}

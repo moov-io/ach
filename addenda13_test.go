@@ -5,8 +5,9 @@
 package ach
 
 import (
-	"strings"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockAddenda13 creates a mock Addenda13 record
@@ -265,12 +266,9 @@ func BenchmarkODFIBranchCountryCodeAlphaNumeric(b *testing.B) {
 func testAddenda13FieldInclusionRecordType(t testing.TB) {
 	addenda13 := mockAddenda13()
 	addenda13.recordType = ""
-	if err := addenda13.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda13.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -291,12 +289,9 @@ func BenchmarkAddenda13FieldInclusionRecordType(b *testing.B) {
 func testAddenda13FieldInclusionTypeCode(t testing.TB) {
 	addenda13 := mockAddenda13()
 	addenda13.TypeCode = ""
-	if err := addenda13.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda13.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -317,12 +312,9 @@ func BenchmarkAddenda13FieldInclusionTypeCode(b *testing.B) {
 func testAddenda13FieldInclusionODFIName(t testing.TB) {
 	addenda13 := mockAddenda13()
 	addenda13.ODFIName = ""
-	if err := addenda13.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda13.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -343,12 +335,9 @@ func BenchmarkAddenda13FieldInclusionODFIName(b *testing.B) {
 func testAddenda13FieldInclusionODFIIDNumberQualifier(t testing.TB) {
 	addenda13 := mockAddenda13()
 	addenda13.ODFIIDNumberQualifier = ""
-	if err := addenda13.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda13.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -369,12 +358,9 @@ func BenchmarkAddenda13FieldInclusionODFIIDNumberQualifier(b *testing.B) {
 func testAddenda13FieldInclusionODFIIdentification(t testing.TB) {
 	addenda13 := mockAddenda13()
 	addenda13.ODFIIdentification = ""
-	if err := addenda13.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda13.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -395,12 +381,9 @@ func BenchmarkAddenda13FieldInclusionODFIIdentification(b *testing.B) {
 func testAddenda13FieldInclusionODFIBranchCountryCode(t testing.TB) {
 	addenda13 := mockAddenda13()
 	addenda13.ODFIBranchCountryCode = ""
-	if err := addenda13.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda13.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -421,12 +404,9 @@ func BenchmarkAddenda13FieldInclusionODFIBranchCountryCode(b *testing.B) {
 func testAddenda13FieldInclusionEntryDetailSequenceNumber(t testing.TB) {
 	addenda13 := mockAddenda13()
 	addenda13.EntryDetailSequenceNumber = 0
-	if err := addenda13.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda13.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

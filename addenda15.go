@@ -5,7 +5,6 @@
 package ach
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -87,21 +86,20 @@ func (addenda15 *Addenda15) Validate() error {
 		return err
 	}
 	if addenda15.recordType != "7" {
-		msg := fmt.Sprintf(msgRecordType, 7)
-		return &FieldError{FieldName: "recordType", Value: addenda15.recordType, Msg: msg}
+		fieldError("recordType", NewErrRecordType(7), addenda15.recordType)
 	}
 	if err := addenda15.isTypeCode(addenda15.TypeCode); err != nil {
-		return &FieldError{FieldName: "TypeCode", Value: addenda15.TypeCode, Msg: err.Error()}
+		return fieldError("TypeCode", err, addenda15.TypeCode)
 	}
 	// Type Code must be 15
 	if addenda15.TypeCode != "15" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda15.TypeCode, Msg: msgAddendaTypeCode}
+		return fieldError("TypeCode", ErrAddendaTypeCode, addenda15.TypeCode)
 	}
 	if err := addenda15.isAlphanumeric(addenda15.ReceiverIDNumber); err != nil {
-		return &FieldError{FieldName: "ReceiverIDNumber", Value: addenda15.ReceiverIDNumber, Msg: err.Error()}
+		return fieldError("ReceiverIDNumber", err, addenda15.ReceiverIDNumber)
 	}
 	if err := addenda15.isAlphanumeric(addenda15.ReceiverStreetAddress); err != nil {
-		return &FieldError{FieldName: "ReceiverStreetAddress", Value: addenda15.ReceiverStreetAddress, Msg: err.Error()}
+		return fieldError("ReceiverStreetAddress", err, addenda15.ReceiverStreetAddress)
 	}
 	return nil
 }
@@ -110,32 +108,16 @@ func (addenda15 *Addenda15) Validate() error {
 // invalid the ACH transfer will be returned.
 func (addenda15 *Addenda15) fieldInclusion() error {
 	if addenda15.recordType == "" {
-		return &FieldError{
-			FieldName: "recordType",
-			Value:     addenda15.recordType,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda15()?",
-		}
+		return fieldError("recordType", ErrConstructor, addenda15.recordType)
 	}
 	if addenda15.TypeCode == "" {
-		return &FieldError{
-			FieldName: "TypeCode",
-			Value:     addenda15.TypeCode,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda15()?",
-		}
+		return fieldError("TypeCode", ErrConstructor, addenda15.TypeCode)
 	}
 	if addenda15.ReceiverStreetAddress == "" {
-		return &FieldError{
-			FieldName: "ReceiverStreetAddress",
-			Value:     addenda15.ReceiverStreetAddress,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda15()?",
-		}
+		return fieldError("ReceiverStreetAddress", ErrConstructor, addenda15.ReceiverStreetAddress)
 	}
 	if addenda15.EntryDetailSequenceNumber == 0 {
-		return &FieldError{
-			FieldName: "EntryDetailSequenceNumber",
-			Value:     addenda15.EntryDetailSequenceNumberField(),
-			Msg:       msgFieldInclusion + ", did you use NewAddenda15()?",
-		}
+		return fieldError("EntryDetailSequenceNumber", ErrConstructor, addenda15.EntryDetailSequenceNumberField())
 	}
 	return nil
 }

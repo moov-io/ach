@@ -778,8 +778,7 @@ func (batch *Batch) addendaFieldInclusionForward(entry *EntryDetail) error {
 	switch batch.Header.StandardEntryClassCode {
 	case MTE, POS, SHR:
 		if entry.Addenda02 == nil {
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda02", Msg: msgFieldInclusion}
-
+			return batch.Error("Addenda02", ErrFieldInclusion)
 		}
 		if entry.Addenda05 != nil {
 			return batch.Error("Addenda05", ErrBatchAddendaCategory, entry.Category)
@@ -818,7 +817,7 @@ func (batch *Batch) addendaFieldInclusionNOC(entry *EntryDetail) error {
 	}
 	if batch.Header.StandardEntryClassCode != COR {
 		if entry.Addenda98 != nil {
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda98", Msg: msgFieldInclusion}
+			return batch.Error("Addenda98", ErrFieldInclusion)
 		}
 	}
 	if entry.Addenda99 != nil {
@@ -839,7 +838,7 @@ func (batch *Batch) addendaFieldInclusionReturn(entry *EntryDetail) error {
 		return batch.Error("Addenda98", ErrBatchAddendaCategory, entry.Category)
 	}
 	if entry.Addenda99 == nil {
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda99", Msg: msgFieldInclusion}
+		return batch.Error("Addenda99", ErrFieldInclusion)
 	}
 	return nil
 }
