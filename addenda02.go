@@ -5,7 +5,6 @@
 package ach
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -118,27 +117,26 @@ func (addenda02 *Addenda02) Validate() error {
 		return err
 	}
 	if addenda02.recordType != "7" {
-		msg := fmt.Sprintf(msgRecordType, 7)
-		return &FieldError{FieldName: "recordType", Value: addenda02.recordType, Msg: msg}
+		fieldError("recordType", NewErrRecordType(7), addenda02.recordType)
 	}
 	if err := addenda02.isTypeCode(addenda02.TypeCode); err != nil {
-		return &FieldError{FieldName: "TypeCode", Value: addenda02.TypeCode, Msg: err.Error()}
+		return fieldError("TypeCode", err, addenda02.TypeCode)
 	}
 	// Type Code must be 02
 	if addenda02.TypeCode != "02" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda02.TypeCode, Msg: msgAddendaTypeCode}
+		return fieldError("TypeCode", ErrAddendaTypeCode, addenda02.TypeCode)
 	}
 	if err := addenda02.isAlphanumeric(addenda02.ReferenceInformationOne); err != nil {
-		return &FieldError{FieldName: "ReferenceInformationOne", Value: addenda02.ReferenceInformationOne, Msg: err.Error()}
+		return fieldError("ReferenceInformationOne", err, addenda02.ReferenceInformationOne)
 	}
 	if err := addenda02.isAlphanumeric(addenda02.ReferenceInformationTwo); err != nil {
-		return &FieldError{FieldName: "ReferenceInformationTwo", Value: addenda02.ReferenceInformationTwo, Msg: err.Error()}
+		return fieldError("ReferenceInformationTwo", err, addenda02.ReferenceInformationTwo)
 	}
 	if err := addenda02.isAlphanumeric(addenda02.TerminalIdentificationCode); err != nil {
-		return &FieldError{FieldName: "TerminalIdentificationCode", Value: addenda02.TerminalIdentificationCode, Msg: err.Error()}
+		return fieldError("TerminalIdentificationCode", err, addenda02.TerminalIdentificationCode)
 	}
 	if err := addenda02.isAlphanumeric(addenda02.TransactionSerialNumber); err != nil {
-		return &FieldError{FieldName: "TransactionSerialNumber", Value: addenda02.TransactionSerialNumber, Msg: err.Error()}
+		return fieldError("TransactionSerialNumber", err, addenda02.TransactionSerialNumber)
 	}
 
 	// TransactionDate Addenda02 ACH File format is MMDD. Validate MM is 01-12 and day for the
@@ -146,31 +144,23 @@ func (addenda02 *Addenda02) Validate() error {
 	mm := addenda02.parseStringField(addenda02.TransactionDateField()[0:2])
 	dd := addenda02.parseStringField(addenda02.TransactionDateField()[2:4])
 	if err := addenda02.isMonth(mm); err != nil {
-		return &FieldError{
-			FieldName: "TransactionDate",
-			Value:     mm,
-			Msg:       msgValidMonth,
-		}
+		return fieldError("TransactionDate", ErrValidMonth, mm)
 	}
 	if err := addenda02.isDay(mm, dd); err != nil {
-		return &FieldError{
-			FieldName: "TransactionDate",
-			Value:     dd,
-			Msg:       msgValidDay,
-		}
+		return fieldError("TransactionDate", ErrValidDay, mm)
 	}
 
 	if err := addenda02.isAlphanumeric(addenda02.AuthorizationCodeOrExpireDate); err != nil {
-		return &FieldError{FieldName: "AuthorizationCodeOrExpireDate", Value: addenda02.AuthorizationCodeOrExpireDate, Msg: err.Error()}
+		return fieldError("AuthorizationCodeOrExpireDate", err, addenda02.AuthorizationCodeOrExpireDate)
 	}
 	if err := addenda02.isAlphanumeric(addenda02.TerminalLocation); err != nil {
-		return &FieldError{FieldName: "TerminalLocation", Value: addenda02.TerminalLocation, Msg: err.Error()}
+		return fieldError("TerminalLocation", err, addenda02.TerminalLocation)
 	}
 	if err := addenda02.isAlphanumeric(addenda02.TerminalCity); err != nil {
-		return &FieldError{FieldName: "TerminalCity", Value: addenda02.TerminalCity, Msg: err.Error()}
+		return fieldError("TerminalCity", err, addenda02.TerminalCity)
 	}
 	if err := addenda02.isAlphanumeric(addenda02.TerminalState); err != nil {
-		return &FieldError{FieldName: "TerminalState", Value: addenda02.TerminalState, Msg: err.Error()}
+		return fieldError("TerminalState", err, addenda02.TerminalState)
 	}
 	return nil
 }
@@ -180,36 +170,29 @@ func (addenda02 *Addenda02) Validate() error {
 
 func (addenda02 *Addenda02) fieldInclusion() error {
 	if addenda02.recordType == "" {
-		return &FieldError{
-			FieldName: "recordType",
-			Value:     addenda02.recordType,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda02()?",
-		}
+		return fieldError("recordType", ErrConstructor, addenda02.recordType)
 	}
 	if addenda02.TypeCode == "" {
-		return &FieldError{
-			FieldName: "TypeCode",
-			Value:     addenda02.TypeCode,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda02()?"}
+		return fieldError("TypeCode", ErrConstructor, addenda02.TypeCode)
 	}
 	// Required Fields
 	if addenda02.TerminalIdentificationCode == "" {
-		return &FieldError{FieldName: "TerminalIdentificationCode", Value: addenda02.TerminalIdentificationCode, Msg: msgFieldRequired}
+		return fieldError("TerminalIdentificationCode", ErrFieldRequired, addenda02.TerminalIdentificationCode)
 	}
 	if addenda02.TransactionSerialNumber == "" {
-		return &FieldError{FieldName: "TransactionSerialNumber", Value: addenda02.TransactionSerialNumber, Msg: msgFieldRequired}
+		return fieldError("TransactionSerialNumber", ErrFieldRequired, addenda02.TransactionSerialNumber)
 	}
 	if addenda02.TransactionDate == "" {
-		return &FieldError{FieldName: "TransactionDate", Value: addenda02.TransactionDate, Msg: msgFieldRequired}
+		return fieldError("TransactionDate", ErrFieldRequired, addenda02.TransactionDate)
 	}
 	if addenda02.TerminalLocation == "" {
-		return &FieldError{FieldName: "TerminalLocation", Value: addenda02.TerminalLocation, Msg: msgFieldRequired}
+		return fieldError("TerminalLocation", ErrFieldRequired, addenda02.TerminalLocation)
 	}
 	if addenda02.TerminalCity == "" {
-		return &FieldError{FieldName: "TerminalCity", Value: addenda02.TerminalCity, Msg: msgFieldRequired}
+		return fieldError("TerminalCity", ErrFieldRequired, addenda02.TerminalCity)
 	}
 	if addenda02.TerminalState == "" {
-		return &FieldError{FieldName: "TerminalState", Value: addenda02.TerminalState, Msg: msgFieldRequired}
+		return fieldError("TerminalState", ErrFieldRequired, addenda02.TerminalState)
 	}
 	return nil
 }

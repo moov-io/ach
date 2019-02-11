@@ -5,8 +5,9 @@
 package ach
 
 import (
-	"strings"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockAddenda17 creates a mock Addenda17 record
@@ -149,12 +150,11 @@ func TestAddenda17FieldInclusionSequenceNumber(t *testing.T) {
 func TestAddenda17FieldInclusionRecordType(t *testing.T) {
 	addenda17 := mockAddenda17()
 	addenda17.recordType = ""
-	if err := addenda17.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda17.Validate()
+	if !base.Match(err, ErrConstructor) {
+
+		t.Errorf("%T: %s", err, err)
+
 	}
 }
 

@@ -140,19 +140,18 @@ func (bc *BatchControl) Validate() error {
 		return err
 	}
 	if bc.recordType != "8" {
-		msg := fmt.Sprintf(msgRecordType, 7)
-		return &FieldError{FieldName: "recordType", Value: bc.recordType, Msg: msg}
+		fieldError("recordType", NewErrRecordType(7), bc.recordType)
 	}
 	if err := bc.isServiceClass(bc.ServiceClassCode); err != nil {
-		return &FieldError{FieldName: "ServiceClassCode", Value: strconv.Itoa(bc.ServiceClassCode), Msg: err.Error()}
+		return fieldError("ServiceClassCode", err, strconv.Itoa(bc.ServiceClassCode))
 	}
 
 	if err := bc.isAlphanumeric(bc.CompanyIdentification); err != nil {
-		return &FieldError{FieldName: "CompanyIdentification", Value: bc.CompanyIdentification, Msg: err.Error()}
+		return fieldError("CompanyIdentification", err, bc.CompanyIdentification)
 	}
 
 	if err := bc.isAlphanumeric(bc.MessageAuthenticationCode); err != nil {
-		return &FieldError{FieldName: "MessageAuthenticationCode", Value: bc.MessageAuthenticationCode, Msg: err.Error()}
+		return fieldError("MessageAuthenticationCode", err, bc.MessageAuthenticationCode)
 	}
 
 	return nil
@@ -162,24 +161,13 @@ func (bc *BatchControl) Validate() error {
 // invalid the ACH transfer will be returned.
 func (bc *BatchControl) fieldInclusion() error {
 	if bc.recordType == "" {
-		return &FieldError{
-			FieldName: "recordType",
-			Value:     bc.recordType,
-			Msg:       msgFieldInclusion + ", did you use NewBatchControl()?"}
+		return fieldError("recordType", ErrConstructor, bc.recordType)
 	}
 	if bc.ServiceClassCode == 0 {
-		return &FieldError{
-			FieldName: "ServiceClassCode",
-			Value:     strconv.Itoa(bc.ServiceClassCode),
-			Msg:       msgFieldInclusion + ", did you use NewBatchControl()?",
-		}
+		return fieldError("ServiceClassCode", ErrConstructor, strconv.Itoa(bc.ServiceClassCode))
 	}
 	if bc.ODFIIdentification == "000000000" {
-		return &FieldError{
-			FieldName: "ODFIIdentification",
-			Value:     bc.ODFIIdentificationField(),
-			Msg:       msgFieldInclusion + ", did you use NewBatchControl()?",
-		}
+		return fieldError("ODFIIdentification", ErrConstructor, bc.ODFIIdentificationField())
 	}
 	return nil
 }

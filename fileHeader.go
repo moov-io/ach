@@ -5,17 +5,8 @@
 package ach
 
 import (
-	"fmt"
 	"strings"
 	"unicode/utf8"
-)
-
-// Errors specific to a File Header Record
-var (
-	msgRecordType     = "received expecting %d"
-	msgRecordSize     = "is not 094"
-	msgBlockingFactor = "is not 10"
-	msgFormatCode     = "is not 1"
 )
 
 // FileHeader is a Record designating physical file characteristics and identify
@@ -171,47 +162,37 @@ func (fh *FileHeader) Validate() error {
 		return err
 	}
 	if fh.recordType != "1" {
-		msg := fmt.Sprintf(msgRecordType, 1)
-		return &FieldError{FieldName: "recordType", Value: fh.recordType, Msg: msg}
+		fieldError("recordType", NewErrRecordType(1), fh.recordType)
 	}
 	if err := fh.isUpperAlphanumeric(fh.FileIDModifier); err != nil {
-		return &FieldError{FieldName: "FileIDModifier", Value: fh.FileIDModifier, Msg: err.Error()}
+		return fieldError("FileIDModifier", err, fh.FileIDModifier)
 	}
 	if len(fh.FileIDModifier) != 1 {
-		msg := fmt.Sprintf(msgValidFieldLength, 1)
-		return &FieldError{FieldName: "FileIDModifier", Value: fh.FileIDModifier, Msg: msg}
+		return fieldError("FileIDModifier", NewErrValidFieldLength(1), fh.FileIDModifier)
 	}
 	if fh.recordSize != "094" {
-		return &FieldError{FieldName: "recordSize", Value: fh.recordSize, Msg: msgRecordSize}
+		return fieldError("recordSize", ErrRecordSize, fh.recordSize)
 	}
 	if fh.blockingFactor != "10" {
-		return &FieldError{FieldName: "blockingFactor", Value: fh.blockingFactor, Msg: msgBlockingFactor}
+		return fieldError("blockingFactor", ErrBlockingFactor, fh.blockingFactor)
 	}
 	if fh.formatCode != "1" {
-		return &FieldError{FieldName: "formatCode", Value: fh.formatCode, Msg: msgFormatCode}
+		return fieldError("formatCode", ErrFormatCode, fh.formatCode)
 	}
 	if err := fh.isAlphanumeric(fh.ImmediateDestinationName); err != nil {
-		return &FieldError{FieldName: "ImmediateDestinationName", Value: fh.ImmediateDestinationName, Msg: err.Error()}
+		return fieldError("ImmediateDestinationName", err, fh.ImmediateDestinationName)
 	}
 	if fh.ImmediateOrigin == "000000000" {
-		return &FieldError{
-			FieldName: "ImmediateOrigin",
-			Value:     fh.ImmediateOrigin,
-			Msg:       msgFieldInclusion + ", did you use NewFileHeader()?",
-		}
+		return fieldError("ImmediateOrigin", ErrConstructor, fh.ImmediateOrigin)
 	}
 	if fh.ImmediateDestination == "000000000" {
-		return &FieldError{
-			FieldName: "ImmediateDestination",
-			Value:     fh.ImmediateDestination,
-			Msg:       msgFieldInclusion + ", did you use NewFileHeader()?",
-		}
+		return fieldError("ImmediateDestination", ErrConstructor, fh.ImmediateDestination)
 	}
 	if err := fh.isAlphanumeric(fh.ImmediateOriginName); err != nil {
-		return &FieldError{FieldName: "ImmediateOriginName", Value: fh.ImmediateOriginName, Msg: err.Error()}
+		return fieldError("ImmediateOriginName", err, fh.ImmediateOriginName)
 	}
 	if err := fh.isAlphanumeric(fh.ReferenceCode); err != nil {
-		return &FieldError{FieldName: "ReferenceCode", Value: fh.ReferenceCode, Msg: err.Error()}
+		return fieldError("ReferenceCode", err, fh.ReferenceCode)
 	}
 
 	// todo: handle test cases for before date
@@ -227,60 +208,28 @@ func (fh *FileHeader) Validate() error {
 // invalid the ACH transfer will be returned.
 func (fh *FileHeader) fieldInclusion() error {
 	if fh.recordType == "" {
-		return &FieldError{
-			FieldName: "recordType",
-			Value:     fh.recordType,
-			Msg:       msgFieldInclusion + ", did you use NewFileHeader()?",
-		}
+		return fieldError("recordType", ErrConstructor, fh.recordType)
 	}
 	if fh.ImmediateDestination == "" {
-		return &FieldError{
-			FieldName: "ImmediateDestination",
-			Value:     fh.ImmediateDestinationField(),
-			Msg:       msgFieldInclusion + ", did you use NewFileHeader()?",
-		}
+		return fieldError("ImmediateDestination", ErrConstructor, fh.ImmediateDestinationField())
 	}
 	if fh.ImmediateOrigin == "" {
-		return &FieldError{
-			FieldName: "ImmediateOrigin",
-			Value:     fh.ImmediateOriginField(),
-			Msg:       msgFieldInclusion + ", did you use NewFileHeader()?",
-		}
+		return fieldError("ImmediateOrigin", ErrConstructor, fh.ImmediateOriginField())
 	}
 	if fh.FileCreationDate == "" {
-		return &FieldError{
-			FieldName: "FileCreationDate",
-			Value:     fh.FileCreationDate,
-			Msg:       msgFieldInclusion + ", did you use NewFileHeader()?",
-		}
+		return fieldError("FileCreationDate", ErrConstructor, fh.FileCreationDate)
 	}
 	if fh.FileIDModifier == "" {
-		return &FieldError{
-			FieldName: "FileIDModifier",
-			Value:     fh.FileIDModifier,
-			Msg:       msgFieldInclusion + ", did you use NewFileHeader()?",
-		}
+		return fieldError("FileIDModifier", ErrConstructor, fh.FileIDModifier)
 	}
 	if fh.recordSize == "" {
-		return &FieldError{
-			FieldName: "recordSize",
-			Value:     fh.recordSize,
-			Msg:       msgFieldInclusion + ", did you use NewFileHeader()?",
-		}
+		return fieldError("recordSize", ErrConstructor, fh.recordSize)
 	}
 	if fh.blockingFactor == "" {
-		return &FieldError{
-			FieldName: "blockingFactor",
-			Value:     fh.blockingFactor,
-			Msg:       msgFieldInclusion + ", did you use NewFileHeader()?",
-		}
+		return fieldError("blockingFactor", ErrConstructor, fh.blockingFactor)
 	}
 	if fh.formatCode == "" {
-		return &FieldError{
-			FieldName: "formatCode",
-			Value:     fh.formatCode,
-			Msg:       msgFieldInclusion + ", did you use NewFileHeader()?",
-		}
+		return fieldError("formatCode", ErrConstructor, fh.formatCode)
 	}
 	return nil
 }

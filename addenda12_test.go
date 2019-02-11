@@ -5,8 +5,9 @@
 package ach
 
 import (
-	"strings"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockAddenda12 creates a mock Addenda12 record
@@ -205,12 +206,9 @@ func BenchmarkOriginatorCountryPostalCodeAlphaNumeric(b *testing.B) {
 func testAddenda12FieldInclusionRecordType(t testing.TB) {
 	addenda12 := mockAddenda12()
 	addenda12.recordType = ""
-	if err := addenda12.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda12.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -231,12 +229,9 @@ func BenchmarkAddenda12FieldInclusionRecordType(b *testing.B) {
 func testAddenda12FieldInclusionTypeCode(t testing.TB) {
 	addenda12 := mockAddenda12()
 	addenda12.TypeCode = ""
-	if err := addenda12.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda12.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -257,12 +252,9 @@ func BenchmarkAddenda12FieldInclusionTypeCode(b *testing.B) {
 func testAddenda12FieldInclusionOriginatorCityStateProvince(t testing.TB) {
 	addenda12 := mockAddenda12()
 	addenda12.OriginatorCityStateProvince = ""
-	if err := addenda12.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda12.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -283,12 +275,9 @@ func BenchmarkAddenda12FieldInclusionOriginatorCityStateProvince(b *testing.B) {
 func testAddenda12FieldInclusionOriginatorCountryPostalCode(t testing.TB) {
 	addenda12 := mockAddenda12()
 	addenda12.OriginatorCountryPostalCode = ""
-	if err := addenda12.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda12.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -309,12 +298,9 @@ func BenchmarkAddenda12FieldInclusionOriginatorCountryPostalCode(b *testing.B) {
 func testAddenda12FieldInclusionEntryDetailSequenceNumber(t testing.TB) {
 	addenda12 := mockAddenda12()
 	addenda12.EntryDetailSequenceNumber = 0
-	if err := addenda12.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda12.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

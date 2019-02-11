@@ -5,7 +5,6 @@
 package ach
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -102,25 +101,24 @@ func (addenda10 *Addenda10) Validate() error {
 		return err
 	}
 	if addenda10.recordType != "7" {
-		msg := fmt.Sprintf(msgRecordType, 7)
-		return &FieldError{FieldName: "recordType", Value: addenda10.recordType, Msg: msg}
+		fieldError("recordType", NewErrRecordType(7), addenda10.recordType)
 	}
 	if err := addenda10.isTypeCode(addenda10.TypeCode); err != nil {
-		return &FieldError{FieldName: "TypeCode", Value: addenda10.TypeCode, Msg: err.Error()}
+		return fieldError("TypeCode", err, addenda10.TypeCode)
 	}
 	// Type Code must be 10
 	if addenda10.TypeCode != "10" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda10.TypeCode, Msg: msgAddendaTypeCode}
+		return fieldError("TypeCode", ErrAddendaTypeCode, addenda10.TypeCode)
 	}
 	if err := addenda10.isTransactionTypeCode(addenda10.TransactionTypeCode); err != nil {
-		return &FieldError{FieldName: "TransactionTypeCode", Value: addenda10.TransactionTypeCode, Msg: err.Error()}
+		return fieldError("TransactionTypeCode", err, addenda10.TransactionTypeCode)
 	}
 	// ToDo: Foreign Payment Amount blank ?
 	if err := addenda10.isAlphanumeric(addenda10.ForeignTraceNumber); err != nil {
-		return &FieldError{FieldName: "ForeignTraceNumber", Value: addenda10.ForeignTraceNumber, Msg: err.Error()}
+		return fieldError("ForeignTraceNumber", err, addenda10.ForeignTraceNumber)
 	}
 	if err := addenda10.isAlphanumeric(addenda10.Name); err != nil {
-		return &FieldError{FieldName: "Name", Value: addenda10.Name, Msg: err.Error()}
+		return fieldError("Name", err, addenda10.Name)
 	}
 	return nil
 }
@@ -129,44 +127,23 @@ func (addenda10 *Addenda10) Validate() error {
 // invalid the ACH transfer will be returned.
 func (addenda10 *Addenda10) fieldInclusion() error {
 	if addenda10.recordType == "" {
-		return &FieldError{
-			FieldName: "recordType",
-			Value:     addenda10.recordType,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda10()?",
-		}
+		return fieldError("recordType", ErrConstructor, addenda10.recordType)
 	}
 	if addenda10.TypeCode == "" {
-		return &FieldError{
-			FieldName: "TypeCode",
-			Value:     addenda10.TypeCode,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda10()?",
-		}
+		return fieldError("TypeCode", ErrConstructor, addenda10.TypeCode)
 	}
 	if addenda10.TransactionTypeCode == "" {
-		return &FieldError{
-			FieldName: "TransactionTypeCode",
-			Value:     addenda10.TransactionTypeCode,
-			Msg:       msgFieldRequired,
-		}
+		return fieldError("TransactionTypeCode", ErrFieldRequired, addenda10.TransactionTypeCode)
 	}
 	// ToDo:  Commented because it appears this value can be all 000 (maybe blank?)
 	/*	if addenda10.ForeignPaymentAmount == 0 {
-		return &FieldError{FieldName: "ForeignPaymentAmount",
-			Value: strconv.Itoa(addenda10.ForeignPaymentAmount), Msg: msgFieldRequired}
+		return fieldError( "ForeignPaymentAmount", ErrFieldRequired,  strconv.Itoa(addenda10.ForeignPaymentAmount))
 	}*/
 	if addenda10.Name == "" {
-		return &FieldError{
-			FieldName: "Name",
-			Value:     addenda10.Name,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda10()?",
-		}
+		return fieldError("Name", ErrConstructor, addenda10.Name)
 	}
 	if addenda10.EntryDetailSequenceNumber == 0 {
-		return &FieldError{
-			FieldName: "EntryDetailSequenceNumber",
-			Value:     addenda10.EntryDetailSequenceNumberField(),
-			Msg:       msgFieldInclusion + ", did you use NewAddenda10()?",
-		}
+		return fieldError("EntryDetailSequenceNumber", ErrConstructor, addenda10.EntryDetailSequenceNumberField())
 	}
 	return nil
 }

@@ -7,6 +7,8 @@ package ach
 import (
 	"strings"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 func mockAddenda05() *Addenda05 {
@@ -154,12 +156,9 @@ func TestAddenda05FieldInclusionSequenceNumber(t *testing.T) {
 func TestAddenda05FieldInclusionRecordType(t *testing.T) {
 	addenda05 := mockAddenda05()
 	addenda05.recordType = ""
-	if err := addenda05.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda05.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

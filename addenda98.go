@@ -5,7 +5,6 @@
 package ach
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -44,8 +43,7 @@ var (
 	changeCodeDict = map[string]*changeCode{}
 
 	// Error messages specific to Addenda98
-	msgAddenda98ChangeCode    = "found is not a valid addenda Change Code"
-	msgAddenda98CorrectedData = "must contain the corrected information corresponding to the Change Code"
+
 )
 
 func init() {
@@ -107,30 +105,25 @@ func (addenda98 *Addenda98) String() string {
 // Validate verifies NACHA rules for Addenda98
 func (addenda98 *Addenda98) Validate() error {
 	if addenda98.recordType != "7" {
-		msg := fmt.Sprintf(msgRecordType, 7)
-		return &FieldError{FieldName: "recordType", Value: addenda98.recordType, Msg: msg}
+		fieldError("recordType", NewErrRecordType(7), addenda98.recordType)
 	}
 	if addenda98.TypeCode == "" {
-		return &FieldError{
-			FieldName: "TypeCode",
-			Value:     addenda98.TypeCode,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda98()?",
-		}
+		return fieldError("TypeCode", ErrConstructor, addenda98.TypeCode)
 	}
 	// Type Code must be 98
 	if addenda98.TypeCode != "98" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda98.TypeCode, Msg: msgAddendaTypeCode}
+		return fieldError("TypeCode", ErrAddendaTypeCode, addenda98.TypeCode)
 	}
 
 	// Addenda98 requires a valid ChangeCode
 	_, ok := changeCodeDict[addenda98.ChangeCode]
 	if !ok {
-		return &FieldError{FieldName: "ChangeCode", Value: addenda98.ChangeCode, Msg: msgAddenda98ChangeCode}
+		return fieldError("ChangeCode", ErrAddenda98ChangeCode, addenda98.ChangeCode)
 	}
 
 	// Addenda98 Record must contain the corrected information corresponding to the Change Code used
 	if addenda98.CorrectedData == "" {
-		return &FieldError{FieldName: "CorrectedData", Value: addenda98.CorrectedData, Msg: msgAddenda98CorrectedData}
+		return fieldError("CorrectedData", ErrAddenda98CorrectedData, addenda98.CorrectedData)
 	}
 
 	return nil

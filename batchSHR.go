@@ -65,10 +65,10 @@ func (batch *BatchSHR) Validate() error {
 		month := entry.parseStringField(entry.SHRCardExpirationDateField()[0:2])
 		year := entry.parseStringField(entry.SHRCardExpirationDateField()[2:4])
 		if err := entry.isMonth(month); err != nil {
-			return &FieldError{FieldName: "CardExpirationDate", Value: month, Msg: msgValidMonth}
+			return fieldError("CardExpirationDate", ErrValidMonth, month)
 		}
 		if err := entry.isCreditCardYear(year); err != nil {
-			return &FieldError{FieldName: "CardExpirationDate", Value: year, Msg: msgValidYear}
+			return fieldError("CardExpirationDate", ErrValidYear, year)
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {

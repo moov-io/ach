@@ -5,8 +5,9 @@
 package ach
 
 import (
-	"strings"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockAddenda10 creates a mock Addenda10 record
@@ -241,12 +242,9 @@ func BenchmarkNameAlphaNumeric(b *testing.B) {
 func testAddenda10FieldInclusionRecordType(t testing.TB) {
 	addenda10 := mockAddenda10()
 	addenda10.recordType = ""
-	if err := addenda10.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda10.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -267,12 +265,9 @@ func BenchmarkAddenda10FieldInclusionRecordType(b *testing.B) {
 func testAddenda10FieldInclusionTypeCode(t testing.TB) {
 	addenda10 := mockAddenda10()
 	addenda10.TypeCode = ""
-	if err := addenda10.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda10.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -293,12 +288,9 @@ func BenchmarkAddenda10FieldInclusionTypeCode(b *testing.B) {
 func testAddenda10FieldInclusionTransactionTypeCode(t testing.TB) {
 	addenda10 := mockAddenda10()
 	addenda10.TransactionTypeCode = ""
-	if err := addenda10.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldRequired {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda10.Validate()
+	if !base.Match(err, ErrFieldRequired) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -321,12 +313,9 @@ func BenchmarkAddenda10FieldInclusionTransactionTypeCode(b *testing.B) {
 func testAddenda10FieldInclusionForeignPaymentAmount(t testing.TB) {
 	addenda10 := mockAddenda10()
 	addenda10.ForeignPaymentAmount = 0
-	if err := addenda10.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.Msg != msgFieldRequired {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda10.Validate()
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -347,12 +336,9 @@ func BenchmarkAddenda10FieldInclusionForeignPaymentAmount(b *testing.B) {
 func testAddenda10FieldInclusionName(t testing.TB) {
 	addenda10 := mockAddenda10()
 	addenda10.Name = ""
-	if err := addenda10.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda10.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -373,12 +359,9 @@ func BenchmarkAddenda10FieldInclusionName(b *testing.B) {
 func testAddenda10FieldInclusionEntryDetailSequenceNumber(t testing.TB) {
 	addenda10 := mockAddenda10()
 	addenda10.EntryDetailSequenceNumber = 0
-	if err := addenda10.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda10.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

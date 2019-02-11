@@ -6,7 +6,6 @@ package ach
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"strings"
 
@@ -499,8 +498,7 @@ func (r *Reader) parseIATAddenda() error {
 			return r.parseError(err)
 		}
 	} else {
-		msg := fmt.Sprint(msgIATBatchAddendaIndicator)
-		return r.parseError(&FileError{FieldName: "AddendaRecordIndicator", Msg: msg})
+		return r.parseError(fieldError("AddendaRecordIndicator", ErrIATBatchAddendaIndicator))
 	}
 	return nil
 }

@@ -5,7 +5,6 @@
 package ach
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -84,18 +83,17 @@ func (addenda17 *Addenda17) Validate() error {
 		return err
 	}
 	if addenda17.recordType != "7" {
-		msg := fmt.Sprintf(msgRecordType, 7)
-		return &FieldError{FieldName: "recordType", Value: addenda17.recordType, Msg: msg}
+		fieldError("recordType", NewErrRecordType(7), addenda17.recordType)
 	}
 	if err := addenda17.isTypeCode(addenda17.TypeCode); err != nil {
-		return &FieldError{FieldName: "TypeCode", Value: addenda17.TypeCode, Msg: err.Error()}
+		return fieldError("TypeCode", err, addenda17.TypeCode)
 	}
 	// Type Code must be 17
 	if addenda17.TypeCode != "17" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda17.TypeCode, Msg: msgAddendaTypeCode}
+		return fieldError("TypeCode", ErrAddendaTypeCode, addenda17.TypeCode)
 	}
 	if err := addenda17.isAlphanumeric(addenda17.PaymentRelatedInformation); err != nil {
-		return &FieldError{FieldName: "PaymentRelatedInformation", Value: addenda17.PaymentRelatedInformation, Msg: err.Error()}
+		return fieldError("PaymentRelatedInformation", err, addenda17.PaymentRelatedInformation)
 	}
 
 	return nil
@@ -105,32 +103,16 @@ func (addenda17 *Addenda17) Validate() error {
 // invalid the ACH transfer will be returned.
 func (addenda17 *Addenda17) fieldInclusion() error {
 	if addenda17.recordType == "" {
-		return &FieldError{
-			FieldName: "recordType",
-			Value:     addenda17.recordType,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda17()?",
-		}
+		return fieldError("recordType", ErrConstructor, addenda17.recordType)
 	}
 	if addenda17.TypeCode == "" {
-		return &FieldError{
-			FieldName: "TypeCode",
-			Value:     addenda17.TypeCode,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda17()?",
-		}
+		return fieldError("TypeCode", ErrConstructor, addenda17.TypeCode)
 	}
 	if addenda17.SequenceNumber == 0 {
-		return &FieldError{
-			FieldName: "SequenceNumber",
-			Value:     addenda17.SequenceNumberField(),
-			Msg:       msgFieldInclusion + ", did you use NewAddenda17()?",
-		}
+		return fieldError("SequenceNumber", ErrConstructor, addenda17.SequenceNumberField())
 	}
 	if addenda17.EntryDetailSequenceNumber == 0 {
-		return &FieldError{
-			FieldName: "EntryDetailSequenceNumber",
-			Value:     addenda17.EntryDetailSequenceNumberField(),
-			Msg:       msgFieldInclusion + ", did you use NewAddenda17()?",
-		}
+		return fieldError("EntryDetailSequenceNumber", ErrConstructor, addenda17.EntryDetailSequenceNumberField())
 	}
 	return nil
 }

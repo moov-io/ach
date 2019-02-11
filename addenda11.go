@@ -5,7 +5,6 @@
 package ach
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -86,21 +85,20 @@ func (addenda11 *Addenda11) Validate() error {
 		return err
 	}
 	if addenda11.recordType != "7" {
-		msg := fmt.Sprintf(msgRecordType, 7)
-		return &FieldError{FieldName: "recordType", Value: addenda11.recordType, Msg: msg}
+		fieldError("recordType", NewErrRecordType(7), addenda11.recordType)
 	}
 	if err := addenda11.isTypeCode(addenda11.TypeCode); err != nil {
-		return &FieldError{FieldName: "TypeCode", Value: addenda11.TypeCode, Msg: err.Error()}
+		return fieldError("TypeCode", err, addenda11.TypeCode)
 	}
 	// Type Code must be 11
 	if addenda11.TypeCode != "11" {
-		return &FieldError{FieldName: "TypeCode", Value: addenda11.TypeCode, Msg: msgAddendaTypeCode}
+		return fieldError("TypeCode", ErrAddendaTypeCode, addenda11.TypeCode)
 	}
 	if err := addenda11.isAlphanumeric(addenda11.OriginatorName); err != nil {
-		return &FieldError{FieldName: "OriginatorName", Value: addenda11.OriginatorName, Msg: err.Error()}
+		return fieldError("OriginatorName", err, addenda11.OriginatorName)
 	}
 	if err := addenda11.isAlphanumeric(addenda11.OriginatorStreetAddress); err != nil {
-		return &FieldError{FieldName: "OriginatorStreetAddress", Value: addenda11.OriginatorStreetAddress, Msg: err.Error()}
+		return fieldError("OriginatorStreetAddress", err, addenda11.OriginatorStreetAddress)
 	}
 	return nil
 }
@@ -109,39 +107,19 @@ func (addenda11 *Addenda11) Validate() error {
 // invalid the ACH transfer will be returned.
 func (addenda11 *Addenda11) fieldInclusion() error {
 	if addenda11.recordType == "" {
-		return &FieldError{
-			FieldName: "recordType",
-			Value:     addenda11.recordType,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda11()?",
-		}
+		return fieldError("recordType", ErrConstructor, addenda11.recordType)
 	}
 	if addenda11.TypeCode == "" {
-		return &FieldError{
-			FieldName: "TypeCode",
-			Value:     addenda11.TypeCode,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda11()?",
-		}
+		return fieldError("TypeCode", ErrConstructor, addenda11.TypeCode)
 	}
 	if addenda11.OriginatorName == "" {
-		return &FieldError{
-			FieldName: "OriginatorName",
-			Value:     addenda11.OriginatorName,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda11()?",
-		}
+		return fieldError("OriginatorName", ErrConstructor, addenda11.OriginatorName)
 	}
 	if addenda11.OriginatorStreetAddress == "" {
-		return &FieldError{
-			FieldName: "OriginatorStreetAddress",
-			Value:     addenda11.OriginatorStreetAddress,
-			Msg:       msgFieldInclusion + ", did you use NewAddenda11()?",
-		}
+		return fieldError("OriginatorStreetAddress", ErrConstructor, addenda11.OriginatorStreetAddress)
 	}
 	if addenda11.EntryDetailSequenceNumber == 0 {
-		return &FieldError{
-			FieldName: "EntryDetailSequenceNumber",
-			Value:     addenda11.EntryDetailSequenceNumberField(),
-			Msg:       msgFieldInclusion + ", did you use NewAddenda11()?",
-		}
+		return fieldError("EntryDetailSequenceNumber", ErrConstructor, addenda11.EntryDetailSequenceNumberField())
 	}
 	return nil
 }

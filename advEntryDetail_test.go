@@ -231,12 +231,11 @@ func TestADVEDisCheckDigit(t *testing.T) {
 func TestADVEDFieldInclusionRecordType(t *testing.T) {
 	entry := mockADVEntryDetail()
 	entry.recordType = ""
-	if err := entry.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
+	err := entry.Validate()
+if !base.Match(err, ErrConstructor) {
+
 				t.Errorf("%T: %s", err, err)
-			}
-		}
+			
 	}
 }
 
@@ -244,12 +243,11 @@ func TestADVEDFieldInclusionRecordType(t *testing.T) {
 func TestADVEDFieldInclusionTransactionCode(t *testing.T) {
 	entry := mockADVEntryDetail()
 	entry.TransactionCode = 0
-	if err := entry.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
+	err := entry.Validate()
+if !base.Match(err, ErrConstructor) {
+
 				t.Errorf("%T: %s", err, err)
-			}
-		}
+			
 	}
 }
 
@@ -257,12 +255,11 @@ func TestADVEDFieldInclusionTransactionCode(t *testing.T) {
 func TestADVEDFieldInclusionRDFIIdentification(t *testing.T) {
 	entry := mockADVEntryDetail()
 	entry.RDFIIdentification = ""
-	if err := entry.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
+	err := entry.Validate()
+if !base.Match(err, ErrConstructor) {
+
 				t.Errorf("%T: %s", err, err)
-			}
-		}
+			
 	}
 }
 
@@ -270,12 +267,11 @@ func TestADVEDFieldInclusionRDFIIdentification(t *testing.T) {
 func TestADVEDFieldInclusionDFIAccountNumber(t *testing.T) {
 	entry := mockADVEntryDetail()
 	entry.DFIAccountNumber = ""
-	if err := entry.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
+	err := entry.Validate()
+if !base.Match(err, ErrConstructor) {
+
 				t.Errorf("%T: %s", err, err)
-			}
-		}
+			
 	}
 }
 
@@ -283,12 +279,11 @@ func TestADVEDFieldInclusionDFIAccountNumber(t *testing.T) {
 func TestADVEDFieldInclusionAdviceRoutingNumber(t *testing.T) {
 	entry := mockADVEntryDetail()
 	entry.AdviceRoutingNumber = ""
-	if err := entry.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
+	err := entry.Validate()
+if !base.Match(err, ErrConstructor) {
+
 				t.Errorf("%T: %s", err, err)
-			}
-		}
+			
 	}
 }
 
@@ -296,12 +291,11 @@ func TestADVEDFieldInclusionAdviceRoutingNumber(t *testing.T) {
 func TestADVEDFieldInclusionIndividualName(t *testing.T) {
 	entry := mockADVEntryDetail()
 	entry.IndividualName = ""
-	if err := entry.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldRequired) {
+	err := entry.Validate()
+if !base.Match(err, ErrFieldRequired) {
+
 				t.Errorf("%T: %s", err, err)
-			}
-		}
+			
 	}
 }
 
@@ -309,12 +303,11 @@ func TestADVEDFieldInclusionIndividualName(t *testing.T) {
 func TestADVEDFieldInclusionACHOperatorRoutingNumber(t *testing.T) {
 	entry := mockADVEntryDetail()
 	entry.ACHOperatorRoutingNumber = ""
-	if err := entry.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
+	err := entry.Validate()
+if !base.Match(err, ErrConstructor) {
+
 				t.Errorf("%T: %s", err, err)
-			}
-		}
+			
 	}
 }
 
@@ -322,12 +315,11 @@ func TestADVEDFieldInclusionACHOperatorRoutingNumber(t *testing.T) {
 func TestADVEDFieldInclusionJulianDateDay(t *testing.T) {
 	entry := mockADVEntryDetail()
 	entry.JulianDay = 0
-	if err := entry.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
+	err := entry.Validate()
+if !base.Match(err, ErrConstructor) {
+
 				t.Errorf("%T: %s", err, err)
-			}
-		}
+			
 	}
 }
 
@@ -335,12 +327,11 @@ func TestADVEDFieldInclusionJulianDateDay(t *testing.T) {
 func TestADVEDFieldInclusionSequenceNumber(t *testing.T) {
 	entry := mockADVEntryDetail()
 	entry.SequenceNumber = 0
-	if err := entry.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
+	err := entry.Validate()
+if !base.Match(err, ErrConstructor) {
+
 				t.Errorf("%T: %s", err, err)
-			}
-		}
+			
 	}
 }
 

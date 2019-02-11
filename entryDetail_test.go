@@ -7,6 +7,8 @@ package ach
 import (
 	"strings"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockEntryDetail creates an entry detail
@@ -209,12 +211,9 @@ func BenchmarkValidateEDTransactionCode(b *testing.B) {
 func testEDFieldInclusion(t testing.TB) {
 	ed := mockEntryDetail()
 	ed.Amount = 0
-	if err := ed.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := ed.Validate()
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -390,12 +389,9 @@ func BenchmarkEDSetRDFI(b *testing.B) {
 func testEDFieldInclusionRecordType(t testing.TB) {
 	entry := mockEntryDetail()
 	entry.recordType = ""
-	if err := entry.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := entry.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -416,12 +412,9 @@ func BenchmarkEDFieldInclusionRecordType(b *testing.B) {
 func testEDFieldInclusionTransactionCode(t testing.TB) {
 	entry := mockEntryDetail()
 	entry.TransactionCode = 0
-	if err := entry.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := entry.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -442,12 +435,9 @@ func BenchmarkEDFieldInclusionTransactionCode(b *testing.B) {
 func testEDFieldInclusionRDFIIdentification(t testing.TB) {
 	entry := mockEntryDetail()
 	entry.RDFIIdentification = ""
-	if err := entry.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := entry.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -468,12 +458,9 @@ func BenchmarkEDFieldInclusionRDFIIdentification(b *testing.B) {
 func testEDFieldInclusionDFIAccountNumber(t testing.TB) {
 	entry := mockEntryDetail()
 	entry.DFIAccountNumber = ""
-	if err := entry.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := entry.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -494,12 +481,9 @@ func BenchmarkEDFieldInclusionDFIAccountNumber(b *testing.B) {
 func testEDFieldInclusionIndividualName(t testing.TB) {
 	entry := mockEntryDetail()
 	entry.IndividualName = ""
-	if err := entry.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := entry.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -520,12 +504,10 @@ func BenchmarkEDFieldInclusionIndividualName(b *testing.B) {
 func testEDFieldInclusionTraceNumber(t testing.TB) {
 	entry := mockEntryDetail()
 	entry.TraceNumber = "0"
-	if err := entry.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if !strings.Contains(e.Msg, msgFieldInclusion) {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := entry.Validate()
+	// TODO: are we expecting to see no error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

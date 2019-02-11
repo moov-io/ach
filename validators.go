@@ -16,46 +16,10 @@ import (
 var (
 	upperAlphanumericRegex = regexp.MustCompile(`[^ A-Z0-9!"#$%&'()*+,-.\\/:;<>=?@\[\]^_{}|~]+`)
 	alphanumericRegex      = regexp.MustCompile(`[^ \w!"#$%&'()*+,-.\\/:;<>=?@\[\]^_{}|~]+`)
-	// Errors specific to validation
-	msgAlphanumeric        = "has non alphanumeric characters"
-	msgUpperAlpha          = "is not uppercase A-Z or 0-9"
-	msgFieldInclusion      = "is a mandatory field and has a default value"
-	msgFieldRequired       = "is a required field"
-	msgValidFieldLength    = "is not length %d"
-	msgServiceClass        = "is an invalid Service Class Code"
-	msgSECCode             = "is an invalid Standard Entry Class Code"
-	msgOrigStatusCode      = "is an invalid Originator Status Code"
-	msgAddendaTypeCode     = "is an invalid Addenda Type Code"
-	msgTransactionCode     = "is an invalid Transaction Code"
-	msgValidCheckDigit     = "does not match calculated check digit %d"
-	msgCardTransactionType = "is an invalid Card Transaction Type"
-	msgValidMonth          = "is an invalid month"
-	msgValidDay            = "is an invalid day"
-	msgValidYear           = "is an invalid year"
-	// IAT
-	msgForeignExchangeIndicator          = "is an invalid Foreign Exchange Indicator"
-	msgForeignExchangeReferenceIndicator = "is an invalid Foreign Exchange Reference Indicator"
-	msgTransactionTypeCode               = "is an invalid Addenda10 Transaction Type Code"
-	msgIDNumberQualifier                 = "is an invalid Identification Number Qualifier"
 )
 
 // validator is common validation and formatting of golang types to ach type strings
 type validator struct{}
-
-// FieldError is returned for errors at a field level in a record
-type FieldError struct {
-	FieldName string // field name where error happened
-	Value     string // value that cause error
-	Msg       string // context of the error.
-}
-
-// Error message is constructed
-// FieldName Msg Value
-// Example1: BatchCount $% has none alphanumeric characters
-// Example2: BatchCount 5 is out-of-balance with file count 6
-func (e *FieldError) Error() string {
-	return fmt.Sprintf("%s %s %s", e.FieldName, e.Value, e.Msg)
-}
 
 // isCardTransactionType ensures card transaction type of a batchPOS is valid
 func (v *validator) isCardTransactionType(code string) error {
@@ -79,13 +43,13 @@ func (v *validator) isCardTransactionType(code string) error {
 		"99":
 		return nil
 	}
-	return errors.New(msgCardTransactionType)
+	return ErrCardTransactionType
 }
 
 // isYear validates a 2 digit year 00-99
 func (v *validator) isYear(s string) error {
 	if s < "00" || s > "99" {
-		return errors.New(msgValidYear)
+		return ErrValidYear
 	}
 	return nil
 }
@@ -94,7 +58,7 @@ func (v *validator) isYear(s string) error {
 // only accepts a range of years. 2018 to 2050
 func (v *validator) isCreditCardYear(s string) error {
 	if s < "18" || s > "50" {
-		return errors.New(msgValidYear)
+		return ErrValidYear
 	}
 	return nil
 }
@@ -107,7 +71,7 @@ func (v *validator) isMonth(s string) error {
 		"07", "08", "09", "10", "11", "12":
 		return nil
 	}
-	return errors.New(msgValidMonth)
+	return ErrValidMonth
 }
 
 // isDay validates a 2 digit day based on a 2 digit month
@@ -149,7 +113,7 @@ func (v *validator) isDay(m string, d string) error {
 			return nil
 		}
 	}
-	return errors.New(msgValidDay)
+	return ErrValidDay
 }
 
 // validateSimpleDate will return the incoming string only if it matches a valid YYMMDD
@@ -193,7 +157,7 @@ func (v *validator) isForeignExchangeIndicator(code string) error {
 		"FV", "VF", "FF":
 		return nil
 	}
-	return errors.New(msgForeignExchangeIndicator)
+	return ErrForeignExchangeIndicator
 }
 
 // isForeignExchangeReferenceIndicator ensures foreign exchange reference
@@ -204,7 +168,7 @@ func (v *validator) isForeignExchangeReferenceIndicator(code int) error {
 		1, 2, 3:
 		return nil
 	}
-	return errors.New(msgForeignExchangeReferenceIndicator)
+	return ErrForeignExchangeReferenceIndicator
 }
 
 // isIDNumberQualifier ensures ODFI Identification Number Qualifier is valid
@@ -220,7 +184,7 @@ func (v *validator) isIDNumberQualifier(s string) error {
 		"01", "02", "03":
 		return nil
 	}
-	return errors.New(msgIDNumberQualifier)
+	return ErrIDNumberQualifier
 }
 
 // isOriginatorStatusCode ensures status code of a batch is valid
@@ -235,7 +199,7 @@ func (v *validator) isOriginatorStatusCode(code int) error {
 		2:
 		return nil
 	}
-	return errors.New(msgOrigStatusCode)
+	return ErrOrigStatusCode
 }
 
 // isSECCode returns true if a SEC Code of a Batch is found
@@ -246,7 +210,7 @@ func (v *validator) isSECCode(code string) error {
 		IAT, MTE, POS, PPD, POP, RCK, SHR, TEL, TRC, TRX, WEB, XCK:
 		return nil
 	}
-	return errors.New(msgSECCode)
+	return ErrSECCode
 }
 
 // iServiceClass returns true if a valid service class code of a batch is found
@@ -263,7 +227,7 @@ func (v *validator) isServiceClass(code int) error {
 		AutomatedAccountingAdvices:
 		return nil
 	}
-	return errors.New(msgServiceClass)
+	return ErrServiceClass
 }
 
 // isTypeCode returns true if a valid type code of an Addendum is found
@@ -286,7 +250,7 @@ func (v *validator) isTypeCode(code string) error {
 		"05":
 		return nil
 	}
-	return errors.New(msgAddendaTypeCode)
+	return ErrAddendaTypeCode
 }
 
 // isTransactionCode ensures TransactionCode of an Entry is valid
@@ -415,7 +379,7 @@ func (v *validator) isTransactionCode(code int) error {
 		DebitSummary:
 		return nil
 	}
-	return errors.New(msgTransactionCode)
+	return ErrTransactionCode
 }
 
 // isTransactionTypeCode verifies Addenda10 TransactionTypeCode is a valid value
@@ -430,13 +394,13 @@ func (v *validator) isTransactionTypeCode(s string) error {
 		ARC, BOC, POP, RCK:
 		return nil
 	}
-	return errors.New(msgTransactionTypeCode)
+	return ErrTransactionTypeCode
 }
 
 // isUpperAlphanumeric checks if string only contains ASCII alphanumeric upper case characters
 func (v *validator) isUpperAlphanumeric(s string) error {
 	if upperAlphanumericRegex.MatchString(s) {
-		return errors.New(msgUpperAlpha)
+		return ErrUpperAlpha
 	}
 	return nil
 }
@@ -445,7 +409,7 @@ func (v *validator) isUpperAlphanumeric(s string) error {
 func (v *validator) isAlphanumeric(s string) error {
 	if alphanumericRegex.MatchString(s) {
 		// ^[ A-Za-z0-9_@./#&+-]*$/
-		return errors.New(msgAlphanumeric)
+		return ErrNonAlphanumeric
 	}
 	return nil
 }
