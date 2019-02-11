@@ -165,9 +165,7 @@ func testFCFieldInclusion(t testing.TB) {
 	fc.BatchCount = 0
 	err := fc.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -190,9 +188,7 @@ func testFCFieldInclusionRecordType(t testing.TB) {
 	fc.recordType = ""
 	err := fc.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -215,9 +211,7 @@ func testFCFieldInclusionBlockCount(t testing.TB) {
 	fc.BlockCount = 0
 	err := fc.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -240,9 +234,7 @@ func testFCFieldInclusionEntryAddendaCount(t testing.TB) {
 	fc.EntryAddendaCount = 0
 	err := fc.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -265,9 +257,7 @@ func testFCFieldInclusionEntryHash(t testing.TB) {
 	fc.EntryHash = 0
 	err := fc.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 

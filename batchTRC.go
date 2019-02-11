@@ -47,11 +47,11 @@ func (batch *BatchTRC) Validate() error {
 		}
 		// ProcessControlField underlying IdentificationNumber, must be defined
 		if entry.ProcessControlField() == "" {
-			return batch.Error( "ProcessControlField", ErrFieldRequired)
+			return batch.Error("ProcessControlField", ErrFieldRequired)
 		}
 		// ItemResearchNumber underlying IdentificationNumber, must be defined
 		if entry.ItemResearchNumber() == "" {
-			return batch.Error( "ItemResearchNumber", ErrFieldRequired)
+			return batch.Error("ItemResearchNumber", ErrFieldRequired)
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {

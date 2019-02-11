@@ -5,9 +5,10 @@
 package ach
 
 import (
-	"github.com/moov-io/base"
 	"strings"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockADVFileControl create a file control
@@ -169,10 +170,8 @@ func testADVFCFieldInclusion(t testing.TB) {
 	fc := mockADVFileControl()
 	fc.BatchCount = 0
 	err := fc.Validate()
-if !base.Match(err, ErrConstructor) {
-
-				t.Errorf("%T: %s", err, err)
-			
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -194,10 +193,8 @@ func testADVFCFieldInclusionRecordType(t testing.TB) {
 	fc := mockADVFileControl()
 	fc.recordType = ""
 	err := fc.Validate()
-if !base.Match(err, ErrConstructor) {
-
-				t.Errorf("%T: %s", err, err)
-			
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -219,10 +216,8 @@ func testADVFCFieldInclusionBlockCount(t testing.TB) {
 	fc := mockADVFileControl()
 	fc.BlockCount = 0
 	err := fc.Validate()
-if !base.Match(err, ErrConstructor) {
-
-				t.Errorf("%T: %s", err, err)
-			
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -244,10 +239,10 @@ func testADVFCFieldInclusionEntryAddendaCount(t testing.TB) {
 	fc := mockADVFileControl()
 	fc.EntryAddendaCount = 0
 	err := fc.Validate()
-if !base.Match(err, ErrConstructor) {
+	if !base.Match(err, ErrConstructor) {
 
-				t.Errorf("%T: %s", err, err)
-			
+		t.Errorf("%T: %s", err, err)
+
 	}
 }
 
@@ -269,10 +264,8 @@ func testADVFCFieldInclusionEntryHash(t testing.TB) {
 	fc := mockADVFileControl()
 	fc.EntryHash = 0
 	err := fc.Validate()
-if !base.Match(err, ErrConstructor) {
-
-				t.Errorf("%T: %s", err, err)
-			
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

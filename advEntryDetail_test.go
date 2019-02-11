@@ -232,10 +232,8 @@ func TestADVEDFieldInclusionRecordType(t *testing.T) {
 	entry := mockADVEntryDetail()
 	entry.recordType = ""
 	err := entry.Validate()
-if !base.Match(err, ErrConstructor) {
-
-				t.Errorf("%T: %s", err, err)
-			
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -244,10 +242,8 @@ func TestADVEDFieldInclusionTransactionCode(t *testing.T) {
 	entry := mockADVEntryDetail()
 	entry.TransactionCode = 0
 	err := entry.Validate()
-if !base.Match(err, ErrConstructor) {
-
-				t.Errorf("%T: %s", err, err)
-			
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -256,10 +252,8 @@ func TestADVEDFieldInclusionRDFIIdentification(t *testing.T) {
 	entry := mockADVEntryDetail()
 	entry.RDFIIdentification = ""
 	err := entry.Validate()
-if !base.Match(err, ErrConstructor) {
-
-				t.Errorf("%T: %s", err, err)
-			
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -268,10 +262,8 @@ func TestADVEDFieldInclusionDFIAccountNumber(t *testing.T) {
 	entry := mockADVEntryDetail()
 	entry.DFIAccountNumber = ""
 	err := entry.Validate()
-if !base.Match(err, ErrConstructor) {
-
-				t.Errorf("%T: %s", err, err)
-			
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -280,10 +272,8 @@ func TestADVEDFieldInclusionAdviceRoutingNumber(t *testing.T) {
 	entry := mockADVEntryDetail()
 	entry.AdviceRoutingNumber = ""
 	err := entry.Validate()
-if !base.Match(err, ErrConstructor) {
-
-				t.Errorf("%T: %s", err, err)
-			
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -292,10 +282,8 @@ func TestADVEDFieldInclusionIndividualName(t *testing.T) {
 	entry := mockADVEntryDetail()
 	entry.IndividualName = ""
 	err := entry.Validate()
-if !base.Match(err, ErrFieldRequired) {
-
-				t.Errorf("%T: %s", err, err)
-			
+	if !base.Match(err, ErrFieldRequired) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -304,10 +292,8 @@ func TestADVEDFieldInclusionACHOperatorRoutingNumber(t *testing.T) {
 	entry := mockADVEntryDetail()
 	entry.ACHOperatorRoutingNumber = ""
 	err := entry.Validate()
-if !base.Match(err, ErrConstructor) {
-
-				t.Errorf("%T: %s", err, err)
-			
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -316,10 +302,8 @@ func TestADVEDFieldInclusionJulianDateDay(t *testing.T) {
 	entry := mockADVEntryDetail()
 	entry.JulianDay = 0
 	err := entry.Validate()
-if !base.Match(err, ErrConstructor) {
-
-				t.Errorf("%T: %s", err, err)
-			
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -328,10 +312,8 @@ func TestADVEDFieldInclusionSequenceNumber(t *testing.T) {
 	entry := mockADVEntryDetail()
 	entry.SequenceNumber = 0
 	err := entry.Validate()
-if !base.Match(err, ErrConstructor) {
-
-				t.Errorf("%T: %s", err, err)
-			
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

@@ -208,9 +208,7 @@ func testAddenda16FieldInclusionRecordType(t testing.TB) {
 	addenda16.recordType = ""
 	err := addenda16.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -233,9 +231,7 @@ func testAddenda16FieldInclusionTypeCode(t testing.TB) {
 	addenda16.TypeCode = ""
 	err := addenda16.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -258,9 +254,7 @@ func testAddenda16FieldInclusionReceiverCityStateProvince(t testing.TB) {
 	addenda16.ReceiverCityStateProvince = ""
 	err := addenda16.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -283,9 +277,7 @@ func testAddenda16FieldInclusionReceiverCountryPostalCode(t testing.TB) {
 	addenda16.ReceiverCountryPostalCode = ""
 	err := addenda16.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -308,9 +300,7 @@ func testAddenda16FieldInclusionEntryDetailSequenceNumber(t testing.TB) {
 	addenda16.EntryDetailSequenceNumber = 0
 	err := addenda16.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 

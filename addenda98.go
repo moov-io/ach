@@ -41,9 +41,6 @@ type Addenda98 struct {
 
 var (
 	changeCodeDict = map[string]*changeCode{}
-
-	// Error messages specific to Addenda98
-
 )
 
 func init() {

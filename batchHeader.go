@@ -204,7 +204,7 @@ func (bh *BatchHeader) Validate() error {
 		return err
 	}
 	if bh.recordType != "5" {
-		fieldError( "recordType", NewErrRecordType( 5), bh.recordType)
+		fieldError("recordType", NewErrRecordType(5), bh.recordType)
 	}
 	if err := bh.isServiceClass(bh.ServiceClassCode); err != nil {
 		return fieldError("ServiceClassCode", err, strconv.Itoa(bh.ServiceClassCode))

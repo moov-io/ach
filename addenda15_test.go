@@ -208,9 +208,7 @@ func testAddenda15FieldInclusionRecordType(t testing.TB) {
 	addenda15.recordType = ""
 	err := addenda15.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -233,9 +231,7 @@ func testAddenda15FieldInclusionTypeCode(t testing.TB) {
 	addenda15.TypeCode = ""
 	err := addenda15.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -258,9 +254,7 @@ func testAddenda15FieldInclusionReceiverStreetAddress(t testing.TB) {
 	addenda15.ReceiverStreetAddress = ""
 	err := addenda15.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -283,9 +277,7 @@ func testAddenda15FieldInclusionEntryDetailSequenceNumber(t testing.TB) {
 	addenda15.EntryDetailSequenceNumber = 0
 	err := addenda15.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 

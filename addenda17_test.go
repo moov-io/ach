@@ -152,9 +152,7 @@ func TestAddenda17FieldInclusionRecordType(t *testing.T) {
 	addenda17.recordType = ""
 	err := addenda17.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 

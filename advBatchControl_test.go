@@ -254,9 +254,7 @@ func testADVBCFieldInclusionRecordType(t testing.TB) {
 	bc.recordType = ""
 	err := bc.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -279,9 +277,7 @@ func testADVBCFieldInclusionServiceClassCode(t testing.TB) {
 	bc.ServiceClassCode = 0
 	err := bc.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -304,9 +300,7 @@ func testADVBCFieldInclusionODFIIdentification(t testing.TB) {
 	bc.ODFIIdentification = "000000000"
 	err := bc.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 

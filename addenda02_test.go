@@ -193,9 +193,7 @@ func testAddenda02TransactionSerialNumber(t testing.TB) {
 	addenda02.TransactionSerialNumber = ""
 	err := addenda02.Validate()
 	if !base.Match(err, ErrFieldRequired) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -218,9 +216,7 @@ func testAddenda02TransactionDate(t testing.TB) {
 	addenda02.TransactionDate = ""
 	err := addenda02.Validate()
 	if !base.Match(err, ErrFieldRequired) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -243,9 +239,7 @@ func testAddenda02TerminalLocation(t testing.TB) {
 	addenda02.TerminalLocation = ""
 	err := addenda02.Validate()
 	if !base.Match(err, ErrFieldRequired) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -268,9 +262,7 @@ func testAddenda02TerminalCity(t testing.TB) {
 	addenda02.TerminalCity = ""
 	err := addenda02.Validate()
 	if !base.Match(err, ErrFieldRequired) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -293,9 +285,7 @@ func testAddenda02TerminalState(t testing.TB) {
 	addenda02.TerminalState = ""
 	err := addenda02.Validate()
 	if !base.Match(err, ErrFieldRequired) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 

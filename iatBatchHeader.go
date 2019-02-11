@@ -265,7 +265,7 @@ func (iatBh *IATBatchHeader) Validate() error {
 		return err
 	}
 	if iatBh.recordType != "5" {
-		fieldError( "recordType", NewErrRecordType( 5), iatBh.recordType)
+		fieldError("recordType", NewErrRecordType(5), iatBh.recordType)
 	}
 	if err := iatBh.isServiceClass(iatBh.ServiceClassCode); err != nil {
 		return fieldError("ServiceClassCode", err, strconv.Itoa(iatBh.ServiceClassCode))
@@ -307,39 +307,39 @@ func (iatBh *IATBatchHeader) fieldInclusion() error {
 		return fieldError("recordType", ErrFieldInclusion, iatBh.recordType)
 	}
 	if iatBh.ServiceClassCode == 0 {
-		return fieldError( "ServiceClassCode", ErrFieldInclusion,  strconv.Itoa(iatBh.ServiceClassCode))
+		return fieldError("ServiceClassCode", ErrFieldInclusion, strconv.Itoa(iatBh.ServiceClassCode))
 	}
 	if iatBh.ForeignExchangeIndicator == "" {
-		return fieldError( "ForeignExchangeIndicator", ErrFieldInclusion,  iatBh.ForeignExchangeIndicator)
+		return fieldError("ForeignExchangeIndicator", ErrFieldInclusion, iatBh.ForeignExchangeIndicator)
 	}
 	if iatBh.ForeignExchangeReferenceIndicator == 0 {
-		return fieldError( "ForeignExchangeReferenceIndicator", ErrFieldRequired,  strconv.Itoa(iatBh.ForeignExchangeReferenceIndicator))
+		return fieldError("ForeignExchangeReferenceIndicator", ErrFieldRequired, strconv.Itoa(iatBh.ForeignExchangeReferenceIndicator))
 	}
 	// ToDo: It can be space filled based on ForeignExchangeReferenceIndicator just use a validator to handle -
 	// ToDo: Calling Field ok for validation?
 	/*	if iatBh.ForeignExchangeReference == "" {
-		return fieldError( "ForeignExchangeReference", ErrFieldRequired,  iatBh.ForeignExchangeReference)
+		return fieldError("ForeignExchangeReference", ErrFieldRequired, iatBh.ForeignExchangeReference)
 	}*/
 	if iatBh.ISODestinationCountryCode == "" {
-		return fieldError( "ISODestinationCountryCode", ErrFieldInclusion,  iatBh.ISODestinationCountryCode)
+		return fieldError("ISODestinationCountryCode", ErrFieldInclusion, iatBh.ISODestinationCountryCode)
 	}
 	if iatBh.OriginatorIdentification == "" {
-		return fieldError( "OriginatorIdentification", ErrFieldInclusion,  iatBh.OriginatorIdentification)
+		return fieldError("OriginatorIdentification", ErrFieldInclusion, iatBh.OriginatorIdentification)
 	}
 	if iatBh.StandardEntryClassCode == "" {
-		return fieldError( "StandardEntryClassCode", ErrFieldInclusion,  iatBh.StandardEntryClassCode)
+		return fieldError("StandardEntryClassCode", ErrFieldInclusion, iatBh.StandardEntryClassCode)
 	}
 	if iatBh.CompanyEntryDescription == "" {
-		return fieldError( "CompanyEntryDescription", ErrFieldInclusion,  iatBh.CompanyEntryDescription)
+		return fieldError("CompanyEntryDescription", ErrFieldInclusion, iatBh.CompanyEntryDescription)
 	}
 	if iatBh.ISOOriginatingCurrencyCode == "" {
-		return fieldError( "ISOOriginatingCurrencyCode", ErrFieldInclusion,  iatBh.ISOOriginatingCurrencyCode)
+		return fieldError("ISOOriginatingCurrencyCode", ErrFieldInclusion, iatBh.ISOOriginatingCurrencyCode)
 	}
 	if iatBh.ISODestinationCurrencyCode == "" {
-		return fieldError( "ISODestinationCurrencyCode", ErrFieldInclusion,  iatBh.ISODestinationCurrencyCode)
+		return fieldError("ISODestinationCurrencyCode", ErrFieldInclusion, iatBh.ISODestinationCurrencyCode)
 	}
 	if iatBh.ODFIIdentification == "" {
-		return fieldError( "ODFIIdentification", ErrFieldInclusion,  iatBh.ODFIIdentificationField())
+		return fieldError("ODFIIdentification", ErrFieldInclusion, iatBh.ODFIIdentificationField())
 	}
 	return nil
 }

@@ -268,9 +268,7 @@ func testAddenda14FieldInclusionRecordType(t testing.TB) {
 	addenda14.recordType = ""
 	err := addenda14.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -293,9 +291,7 @@ func testAddenda14FieldInclusionTypeCode(t testing.TB) {
 	addenda14.TypeCode = ""
 	err := addenda14.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -318,9 +314,7 @@ func testAddenda14FieldInclusionRDFIName(t testing.TB) {
 	addenda14.RDFIName = ""
 	err := addenda14.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -343,9 +337,7 @@ func testAddenda14FieldInclusionRDFIIDNumberQualifier(t testing.TB) {
 	addenda14.RDFIIDNumberQualifier = ""
 	err := addenda14.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -368,9 +360,7 @@ func testAddenda14FieldInclusionRDFIIdentification(t testing.TB) {
 	addenda14.RDFIIdentification = ""
 	err := addenda14.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -393,9 +383,7 @@ func testAddenda14FieldInclusionRDFIBranchCountryCode(t testing.TB) {
 	addenda14.RDFIBranchCountryCode = ""
 	err := addenda14.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -418,9 +406,7 @@ func testAddenda14FieldInclusionEntryDetailSequenceNumber(t testing.TB) {
 	addenda14.EntryDetailSequenceNumber = 0
 	err := addenda14.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 

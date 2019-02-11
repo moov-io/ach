@@ -268,9 +268,7 @@ func testAddenda13FieldInclusionRecordType(t testing.TB) {
 	addenda13.recordType = ""
 	err := addenda13.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -293,9 +291,7 @@ func testAddenda13FieldInclusionTypeCode(t testing.TB) {
 	addenda13.TypeCode = ""
 	err := addenda13.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
@@ -318,9 +314,7 @@ func testAddenda13FieldInclusionODFIName(t testing.TB) {
 	addenda13.ODFIName = ""
 	err := addenda13.Validate()
 	if !base.Match(err, ErrConstructor) {
-
 		t.Errorf("%T: %s", err, err)
-
 	}
 }
 
