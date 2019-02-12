@@ -277,8 +277,7 @@ func (iatBh *IATBatchHeader) Validate() error {
 		return fieldError("ForeignExchangeReferenceIndicator", err, strconv.Itoa(iatBh.ForeignExchangeReferenceIndicator))
 	}
 	if !iso3166.Valid(iatBh.ISODestinationCountryCode) {
-		return &FieldError{FieldName: "ISODestinationCountryCode",
-			Value: iatBh.ISODestinationCountryCode, Msg: "invalid ISO 3166-1-alpha-2 code"}
+		return fieldError("ISODestinationCountryCode", ErrValidISO3166, iatBh.ISODestinationCountryCode)
 	}
 	if err := iatBh.isSECCode(iatBh.StandardEntryClassCode); err != nil {
 		return fieldError("StandardEntryClassCode", err, iatBh.StandardEntryClassCode)
@@ -287,12 +286,10 @@ func (iatBh *IATBatchHeader) Validate() error {
 		return fieldError("CompanyEntryDescription", err, iatBh.CompanyEntryDescription)
 	}
 	if !iso4217.Valid(iatBh.ISOOriginatingCurrencyCode) {
-		return &FieldError{FieldName: "ISOOriginatingCurrencyCode",
-			Value: iatBh.ISOOriginatingCurrencyCode, Msg: "invalid ISO 4217 code"}
+		return fieldError("ISOOriginatingCurrencyCode", ErrValidISO4217, iatBh.ISOOriginatingCurrencyCode)
 	}
 	if !iso4217.Valid(iatBh.ISODestinationCurrencyCode) {
-		return &FieldError{FieldName: "ISODestinationCurrencyCode",
-			Value: iatBh.ISODestinationCurrencyCode, Msg: "invalid ISO 4217 code"}
+		return fieldError("ISODestinationCurrencyCode", ErrValidISO4217, iatBh.ISODestinationCurrencyCode)
 	}
 	if err := iatBh.isOriginatorStatusCode(iatBh.OriginatorStatusCode); err != nil {
 		return fieldError("OriginatorStatusCode", err, strconv.Itoa(iatBh.OriginatorStatusCode))

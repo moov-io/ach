@@ -151,12 +151,10 @@ func BenchmarkFHString(b *testing.B) {
 func testValidateFHRecordType(t testing.TB) {
 	fh := mockFileHeader()
 	fh.recordType = "2"
-	if err := fh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fh.Validate()
+	// TODO: are we expecting there to be an error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -177,12 +175,9 @@ func BenchmarkValidateFHRecordType(b *testing.B) {
 func testValidateIDModifier(t testing.TB) {
 	fh := mockFileHeader()
 	fh.FileIDModifier = "®"
-	if err := fh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "FileIDModifier" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fh.Validate()
+	if !base.Match(err, ErrUpperAlpha) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -203,12 +198,9 @@ func BenchmarkValidateIDModifier(b *testing.B) {
 func testValidateRecordSize(t testing.TB) {
 	fh := mockFileHeader()
 	fh.recordSize = "666"
-	if err := fh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordSize" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fh.Validate()
+	if !base.Match(err, ErrRecordSize) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -229,12 +221,9 @@ func BenchmarkValidateRecordSize(b *testing.B) {
 func testBlockingFactor(t testing.TB) {
 	fh := mockFileHeader()
 	fh.blockingFactor = "99"
-	if err := fh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "blockingFactor" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fh.Validate()
+	if !base.Match(err, ErrBlockingFactor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -255,12 +244,9 @@ func BenchmarkBlockingFactor(b *testing.B) {
 func testFormatCode(t testing.TB) {
 	fh := mockFileHeader()
 	fh.formatCode = "2"
-	if err := fh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "formatCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fh.Validate()
+	if !base.Match(err, ErrFormatCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -304,21 +290,15 @@ func BenchmarkFHFieldInclusion(b *testing.B) {
 func testUpperLengthFileID(t testing.TB) {
 	fh := mockFileHeader()
 	fh.FileIDModifier = "a"
-	if err := fh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "FileIDModifier" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fh.Validate()
+	if !base.Match(err, ErrUpperAlpha) {
+		t.Errorf("%T: %s", err, err)
 	}
 
 	fh.FileIDModifier = "AA"
-	if err := fh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "FileIDModifier" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err = fh.Validate()
+	if !base.Match(err, NewErrValidFieldLength(1)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -340,12 +320,9 @@ func testImmediateDestinationNameAlphaNumeric(t testing.TB) {
 	fh := mockFileHeader()
 	fh.ImmediateDestinationName = "Super Big Bank"
 	fh.ImmediateDestinationName = "Big ®$$ Bank"
-	if err := fh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ImmediateDestinationName" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fh.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -369,12 +346,9 @@ func testImmediateOriginNameAlphaNumeric(t testing.TB) {
 	fh := mockFileHeader()
 	fh.ImmediateOriginName = "Super Big Bank"
 	fh.ImmediateOriginName = "Bigger ®$$ Bank"
-	if err := fh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ImmediateOriginName" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fh.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -397,12 +371,9 @@ func testImmediateReferenceCodeAlphaNumeric(t testing.TB) {
 	fh := mockFileHeader()
 	fh.ReferenceCode = " "
 	fh.ReferenceCode = "®"
-	if err := fh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ReferenceCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fh.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

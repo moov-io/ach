@@ -65,14 +65,9 @@ func TestBatchADVAddendum99(t *testing.T) {
 	mockAddenda99.TypeCode = "05"
 	mockBatch.GetADVEntries()[0].Category = CategoryReturn
 	mockBatch.GetADVEntries()[0].Addenda99 = mockAddenda99
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -104,14 +99,9 @@ func testBatchADVServiceClassCode(t testing.TB) {
 	mockBatch := mockBatchADV()
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetHeader().ServiceClassCode = 220
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrBatchServiceClassCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

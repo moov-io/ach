@@ -145,14 +145,9 @@ func testBatchATXAddendaCount(t testing.TB) {
 	mockBatch := mockBatchATX()
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, NewErrBatchExpectedAddendaCount(2, 1)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -174,14 +169,10 @@ func testBatchATXAddendaCountZero(t testing.TB) {
 	mockBatch := NewBatchATX(mockBatchATXHeader())
 	mockBatch.AddEntry(mockATXEntryDetail())
 	//mockBatch.GetEntries()[0].Addenda05[0].
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	// TODO: are we expecting there to be an error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -218,8 +209,7 @@ func testBatchATXInvalidAddenda(t testing.TB) {
 	addenda05.recordType = "63"
 	mockBatch.GetEntries()[0].AddAddenda05(addenda05)
 	err := mockBatch.Create()
-	// TODO: are we expecting to see an error here?
-	if !base.Match(err, nil) {
+	if !base.Match(err, NewErrBatchExpectedAddendaCount(2, 1)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -241,14 +231,10 @@ func BenchmarkBatchATXInvalidAddenda(b *testing.B) {
 func testBatchATXInvalidBuild(t testing.TB) {
 	mockBatch := mockBatchATX()
 	mockBatch.GetHeader().recordType = "3"
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	// TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -346,14 +332,10 @@ func testBatchATXAddendaRecords(t testing.TB) {
 		mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	}
 
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	// TODO: are we expecting there to be an error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -442,14 +424,10 @@ func testBatchATXZeroAddendaRecords(t testing.TB) {
 	mockBatch := NewBatchATX(bh)
 	mockBatch.AddEntry(entry)
 
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	// TODO: are we expecting there to be an error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -555,14 +533,9 @@ func TestBatchATXAddendum98(t *testing.T) {
 	mockAddenda98.TypeCode = "05"
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -574,14 +547,9 @@ func TestBatchATXAddendum99(t *testing.T) {
 	mockAddenda99.TypeCode = "05"
 	mockBatch.GetEntries()[0].Category = CategoryReturn
 	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

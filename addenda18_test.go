@@ -6,6 +6,8 @@ package ach
 
 import (
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockAddenda18 creates a mock Addenda18 record
@@ -170,108 +172,82 @@ func BenchmarkAddenda18String(b *testing.B) {
 func TestValidateAddenda18RecordType(t *testing.T) {
 	addenda18 := mockAddenda18()
 	addenda18.recordType = "63"
-	if err := addenda18.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda18.Validate()
+	// TODO: are we not expecting any errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
 func TestAddenda18FieldInclusionTypeCode(t *testing.T) {
 	addenda18 := mockAddenda18()
 	addenda18.TypeCode = ""
-	if err := addenda18.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda18.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
 func TestAddenda18FieldInclusion(t *testing.T) {
 	addenda18 := mockAddenda18()
 	addenda18.EntryDetailSequenceNumber = 0
-	if err := addenda18.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "EntryDetailSequenceNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda18.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
 func TestAddenda18FieldInclusionSequenceNumber(t *testing.T) {
 	addenda18 := mockAddenda18()
 	addenda18.SequenceNumber = 0
-	if err := addenda18.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "SequenceNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda18.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
 func TestAddenda18FieldInclusionRecordType(t *testing.T) {
 	addenda18 := mockAddenda18()
 	addenda18.recordType = ""
-	if err := addenda18.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda18.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
 func TestAddenda18FieldInclusionFCBankName(t *testing.T) {
 	addenda18 := mockAddenda18()
 	addenda18.ForeignCorrespondentBankName = ""
-	if err := addenda18.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ForeignCorrespondentBankName" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda18.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
 func TestAddenda18FieldInclusionFCBankIDNumberQualifier(t *testing.T) {
 	addenda18 := mockAddenda18()
 	addenda18.ForeignCorrespondentBankIDNumberQualifier = ""
-	if err := addenda18.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ForeignCorrespondentBankIDNumberQualifier" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda18.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
 func TestAddenda18FieldInclusionFCBankIDNumber(t *testing.T) {
 	addenda18 := mockAddenda18()
 	addenda18.ForeignCorrespondentBankIDNumber = ""
-	if err := addenda18.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ForeignCorrespondentBankIDNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda18.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
 func TestAddenda18FieldInclusionFCBankBranchCountryCode(t *testing.T) {
 	addenda18 := mockAddenda18()
 	addenda18.ForeignCorrespondentBankBranchCountryCode = ""
-	if err := addenda18.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ForeignCorrespondentBankBranchCountryCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda18.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -279,12 +255,9 @@ func TestAddenda18FieldInclusionFCBankBranchCountryCode(t *testing.T) {
 func testAddenda18ForeignCorrespondentBankNameAlphaNumeric(t testing.TB) {
 	addenda18 := mockAddenda18()
 	addenda18.ForeignCorrespondentBankName = "®©"
-	if err := addenda18.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ForeignCorrespondentBankName" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda18.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -306,12 +279,9 @@ func BenchmarkAddenda18ForeignCorrespondentBankNameAlphaNumeric(b *testing.B) {
 func testAddenda18ForeignCorrespondentBankIDQualifierAlphaNumeric(t testing.TB) {
 	addenda18 := mockAddenda18()
 	addenda18.ForeignCorrespondentBankIDNumberQualifier = "®©"
-	if err := addenda18.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ForeignCorrespondentBankIDNumberQualifier" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda18.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -332,12 +302,9 @@ func BenchmarkAddenda18ForeignCorrespondentBankIDQualifierAlphaNumeric(b *testin
 func testAddenda18ForeignCorrespondentBankBranchCountryCodeAlphaNumeric(t testing.TB) {
 	addenda18 := mockAddenda18()
 	addenda18.ForeignCorrespondentBankBranchCountryCode = "®©"
-	if err := addenda18.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ForeignCorrespondentBankBranchCountryCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda18.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -358,12 +325,9 @@ func BenchmarkAddenda18ForeignCorrespondentBankBranchCountryCodeAlphaNumeric(b *
 func testAddenda18ForeignCorrespondentBankIDNumberAlphaNumeric(t testing.TB) {
 	addenda18 := mockAddenda18()
 	addenda18.ForeignCorrespondentBankIDNumber = "®©"
-	if err := addenda18.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ForeignCorrespondentBankIDNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda18.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -384,14 +348,9 @@ func BenchmarkAddendaForeignCorrespondentBankIDNumberAlphaNumeric(b *testing.B) 
 func testAddenda18ValidTypeCode(t testing.TB) {
 	addenda18 := mockAddenda18()
 	addenda18.TypeCode = "65"
-	if err := addenda18.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda18.Validate()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -412,14 +371,9 @@ func BenchmarkAddenda18ValidTypeCode(b *testing.B) {
 func testAddenda18TypeCode18(t testing.TB) {
 	addenda18 := mockAddenda18()
 	addenda18.TypeCode = "05"
-	if err := addenda18.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda18.Validate()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

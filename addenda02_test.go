@@ -38,14 +38,10 @@ func TestMockAddenda02(t *testing.T) {
 func testAddenda02ValidRecordType(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.recordType = "63"
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda02.Validate()
+	// TODO: are we not expecting any errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -66,14 +62,9 @@ func BenchmarkAddenda02ValidRecordType(b *testing.B) {
 func testAddenda02ValidTypeCode(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TypeCode = "65"
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda02.Validate()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -94,14 +85,9 @@ func BenchmarkAddenda02ValidTypeCode(b *testing.B) {
 func testAddenda02TypeCode02(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TypeCode = "05"
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda02.Validate()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -332,14 +318,9 @@ func BenchmarkAddenda02String(b *testing.B) {
 func testAddenda02TransactionDateMonth(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TransactionDate = "1306"
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TransactionDate" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda02.Validate()
+	if !base.Match(err, ErrValidMonth) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -360,14 +341,10 @@ func BenchmarkAddenda02TransactionDateMonth(b *testing.B) {
 func testAddenda02TransactionDateDay(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TransactionDate = "0205"
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TransactionDate" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda02.Validate()
+	// no error expected
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -388,14 +365,9 @@ func BenchmarkAddenda02TransactionDateDay(b *testing.B) {
 func testAddenda02TransactionDateFeb(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TransactionDate = "0230"
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TransactionDate" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda02.Validate()
+	if !base.Match(err, ErrValidDay) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -416,14 +388,10 @@ func BenchmarkAddenda02TransactionDateFeb(b *testing.B) {
 func testAddenda02TransactionDate30Day(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TransactionDate = "0630"
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TransactionDate" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda02.Validate()
+	// no error expected
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -444,14 +412,10 @@ func BenchmarkAddenda02TransactionDate30Day(b *testing.B) {
 func testAddenda02TransactionDate31Day(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TransactionDate = "0131"
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TransactionDate" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda02.Validate()
+	// no error expected
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -472,14 +436,9 @@ func BenchmarkAddenda02TransactionDate31Day(b *testing.B) {
 func testAddenda02TransactionDateInvalidDay(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TransactionDate = "1039"
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TransactionDate" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda02.Validate()
+	if !base.Match(err, ErrValidDay) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -500,12 +459,9 @@ func BenchmarkAddenda02TransactionDateInvalidDay(b *testing.B) {
 func testReferenceInformationOneAlphaNumeric(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.ReferenceInformationOne = "®"
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ReferenceInformationOne" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda02.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -526,12 +482,9 @@ func BenchmarkReferenceInformationOneAlphaNumeric(b *testing.B) {
 func testReferenceInformationTwoAlphaNumeric(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.ReferenceInformationTwo = "®"
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ReferenceInformationTwo" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda02.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -552,12 +505,9 @@ func BenchmarkReferenceInformationTwoAlphaNumeric(b *testing.B) {
 func testTerminalIdentificationCodeAlphaNumeric(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TerminalIdentificationCode = "®"
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TerminalIdentificationCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda02.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -578,12 +528,9 @@ func BenchmarkTerminalIdentificationCodeAlphaNumeric(b *testing.B) {
 func testTransactionSerialNumberAlphaNumeric(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TransactionSerialNumber = "®"
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TransactionSerialNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda02.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -604,12 +551,9 @@ func BenchmarkTransactionSerialNumberAlphaNumeric(b *testing.B) {
 func testAuthorizationCodeOrExpireDateAlphaNumeric(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.AuthorizationCodeOrExpireDate = "®"
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "AuthorizationCodeOrExpireDate" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda02.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -630,12 +574,9 @@ func BenchmarkAuthorizationCodeOrExpireDateAlphaNumeric(b *testing.B) {
 func testTerminalLocationAlphaNumeric(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TerminalLocation = "®"
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TerminalLocation" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda02.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -656,12 +597,9 @@ func BenchmarkTerminalLocationAlphaNumeric(b *testing.B) {
 func testTerminalCityAlphaNumeric(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TerminalCity = "®"
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TerminalCity" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda02.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -682,12 +620,9 @@ func BenchmarkTerminalCityAlphaNumeric(b *testing.B) {
 func testTerminalStateAlphaNumeric(t testing.TB) {
 	addenda02 := mockAddenda02()
 	addenda02.TerminalState = "®"
-	if err := addenda02.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TerminalState" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda02.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

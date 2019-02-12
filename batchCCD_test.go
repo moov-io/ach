@@ -102,14 +102,9 @@ func TestBatchCCDAddendum98(t *testing.T) {
 	mockAddenda98.TypeCode = "05"
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -121,14 +116,9 @@ func TestBatchCCDAddendum99(t *testing.T) {
 	mockAddenda99.TypeCode = "05"
 	mockBatch.GetEntries()[0].Category = CategoryReturn
 	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -137,14 +127,9 @@ func testBatchCCDReceivingCompanyName(t testing.TB) {
 	mockBatch := mockBatchCCD()
 	// modify the Individual name / receiving company to nothing
 	mockBatch.GetEntries()[0].SetReceivingCompany("")
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "IndividualName" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -165,14 +150,9 @@ func BenchmarkBatchCCDReceivingCompanyName(b *testing.B) {
 func testBatchCCDAddendaTypeCode(t testing.TB) {
 	mockBatch := mockBatchCCD()
 	mockBatch.GetEntries()[0].Addenda05[0].TypeCode = "07"
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -216,14 +196,9 @@ func BenchmarkBatchCCDSEC(b *testing.B) {
 func testBatchCCDAddendaCount(t testing.TB) {
 	mockBatch := mockBatchCCD()
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, NewErrBatchAddendaCount(0,1)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -245,14 +220,9 @@ func testBatchCCDCreate(t testing.TB) {
 	mockBatch := mockBatchCCD()
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetHeader().ServiceClassCode = 0
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

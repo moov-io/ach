@@ -6,13 +6,7 @@ package ach
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
-)
-
-var (
-	msgBatchIATAddendumCount = "%v Addenda %v for SEC Code IAT"
-	msgBatchIATNOC           = "%v invalid for IAT NOC, should be %v"
 )
 
 // IATBatch holds the Batch Header and Batch Control and all Entry Records for an IAT batch
@@ -73,19 +67,14 @@ func (batch *IATBatch) UnmarshalJSON(p []byte) error {
 
 // verify checks basic valid NACHA batch rules. Assumes properly parsed records. This does not mean it is a valid batch as validity is tied to each batch type
 func (batch *IATBatch) verify() error {
-	batchNumber := batch.Header.BatchNumber
-
 	// No entries in batch
 	if len(batch.Entries) <= 0 {
 		return batch.Error("entries", ErrBatchNoEntries)
 	}
 	// verify field inclusion in all the records of the batch.
 	if err := batch.isFieldInclusion(); err != nil {
-		// convert the field error in to a batch error for a consistent api
-		if e, ok := err.(*FieldError); ok {
-			return &BatchError{BatchNumber: batchNumber, FieldName: e.FieldName, Msg: e.Msg}
-		}
-		return &BatchError{BatchNumber: batchNumber, FieldName: "FieldError", Msg: err.Error()}
+		// wrap the field error in to a batch error for a consistent api
+		return batch.Error("FieldError", err)
 	}
 	// validate batch header and control codes are the same
 	if batch.Header.ServiceClassCode != batch.Control.ServiceClassCode {
@@ -555,30 +544,22 @@ func (batch *IATBatch) Validate() error {
 	// Add configuration based validation for this type.
 
 	for _, entry := range batch.Entries {
-
-		addenda17Count := 0
-		addenda18Count := 0
-
 		if len(entry.Addenda17) > 2 {
-			msg := fmt.Sprintf(msgBatchIATAddendumCount, addenda17Count, "17")
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda17", Msg: msg}
+			return batch.Error("Addenda17", NewErrBatchAddendaCount(len(entry.Addenda17), 2))
 		}
 
 		if len(entry.Addenda18) > 5 {
-			msg := fmt.Sprintf(msgBatchIATAddendumCount, addenda18Count, "18")
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addenda18", Msg: msg}
+			return batch.Error("Addenda18", NewErrBatchAddendaCount(len(entry.Addenda18), 5))
 		}
 		if batch.Header.ServiceClassCode == AutomatedAccountingAdvices {
 			return batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode)
 		}
 		if entry.Category == CategoryNOC {
 			if batch.GetHeader().IATIndicator != IATCOR {
-				msg := fmt.Sprintf(msgBatchIATNOC, batch.GetHeader().IATIndicator, IATCOR)
-				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "IATIndicator", Msg: msg}
+				return batch.Error("IATIndicator", NewErrBatchIATNOC(batch.GetHeader().IATIndicator, IATCOR))
 			}
 			if batch.GetHeader().StandardEntryClassCode != COR {
-				msg := fmt.Sprintf(msgBatchIATNOC, batch.GetHeader().StandardEntryClassCode, COR)
-				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
+				return batch.Error("StandardEntryClassCode", NewErrBatchIATNOC(batch.GetHeader().StandardEntryClassCode, COR))
 			}
 			switch entry.TransactionCode {
 			case CheckingCredit, CheckingDebit, CheckingPrenoteCredit, CheckingPrenoteDebit,

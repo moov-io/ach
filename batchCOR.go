@@ -4,18 +4,12 @@
 
 package ach
 
-import (
-	"fmt"
-)
-
 // BatchCOR COR - Automated Notification of Change (NOC) or Refused Notification of Change
 // This Standard Entry Class Code is used by an RDFI or ODFI when originating a Notification of Change or Refused Notification of Change in automated format.
 // A Notification of Change may be created by an RDFI to notify the ODFI that a posted Entry or Prenotification Entry contains invalid or erroneous information and should be changed.
 type BatchCOR struct {
 	Batch
 }
-
-var msgBatchCORAmount = "debit:%v credit:%v entry detail amount fields must be zero for SEC type COR"
 
 // NewBatchCOR returns a *BatchCOR
 func NewBatchCOR(bh *BatchHeader) *BatchCOR {
@@ -43,9 +37,11 @@ func (batch *BatchCOR) Validate() error {
 	}
 	// The Amount field must be zero
 	// batch.verify calls batch.isBatchAmount which ensures the batch.Control values are accurate.
-	if batch.Control.TotalCreditEntryDollarAmount != 0 || batch.Control.TotalDebitEntryDollarAmount != 0 {
-		msg := fmt.Sprintf(msgBatchCORAmount, batch.Control.TotalCreditEntryDollarAmount, batch.Control.TotalDebitEntryDollarAmount)
-		return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Amount", Msg: msg}
+	if batch.Control.TotalCreditEntryDollarAmount != 0 {
+		return batch.Error("TotalCreditEntryDollarAmount", ErrBatchAmountNonZero, batch.Control.TotalCreditEntryDollarAmount)
+	}
+	if batch.Control.TotalDebitEntryDollarAmount != 0 {
+		return batch.Error("TotalDebitEntryDollarAmount", ErrBatchAmountNonZero, batch.Control.TotalDebitEntryDollarAmount)
 	}
 
 	for _, entry := range batch.Entries {

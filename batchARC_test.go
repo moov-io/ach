@@ -265,14 +265,9 @@ func testBatchARCCheckSerialNumber(t testing.TB) {
 	mockBatch := mockBatchARC()
 	// modify CheckSerialNumber / IdentificationNumber to nothing
 	mockBatch.GetEntries()[0].SetCheckSerialNumber("")
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "CheckSerialNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !base.Match(err, ErrBatchCheckSerialNumber) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -341,14 +336,10 @@ func BenchmarkBatchARCAddendaCount(b *testing.B) {
 func testBatchARCInvalidBuild(t testing.TB) {
 	mockBatch := mockBatchARC()
 	mockBatch.GetHeader().recordType = "3"
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	// TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -373,14 +364,9 @@ func TestBatchARCAddendum98(t *testing.T) {
 	mockAddenda98.TypeCode = "05"
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -391,14 +377,9 @@ func TestBatchARCAddendum99(t *testing.T) {
 	mockAddenda99 := mockAddenda99()
 	mockAddenda99.TypeCode = "05"
 	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

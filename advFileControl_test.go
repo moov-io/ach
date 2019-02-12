@@ -143,12 +143,10 @@ func testValidateADVFCRecordType(t testing.TB) {
 	fc := mockADVFileControl()
 	fc.recordType = "2"
 
-	if err := fc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fc.Validate()
+	// TODO: are we not expecting any errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -290,13 +288,8 @@ func TestInvalidADVFCParse(t *testing.T) {
 	batchADV := mockBatchADV()
 	r.File.AddBatch(batchADV)
 
-	if err := r.parseFileControl(); err != nil {
-		if p, ok := err.(*base.ParseError); ok {
-			if p.Record != "FileControl" {
-				t.Errorf("%T: %s", p, p)
-			}
-		} else {
-			t.Errorf("%T: %s", p.Err, p.Err)
-		}
+	err := r.parseFileControl()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }

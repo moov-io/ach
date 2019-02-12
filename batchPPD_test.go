@@ -137,14 +137,9 @@ func testBatchPPDCreate(t testing.TB) {
 	mockBatch := mockBatchPPD()
 	// can not have default values in Batch Header to build batch
 	mockBatch.GetHeader().ServiceClassCode = 0
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -168,14 +163,9 @@ func testBatchPPDTypeCode(t testing.TB) {
 	a := mockAddenda05()
 	a.TypeCode = "63"
 	mockBatch.GetEntries()[0].AddAddenda05(a)
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -297,14 +287,9 @@ func TestBatchPPDAddendum98(t *testing.T) {
 	mockAddenda98.TypeCode = "05"
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -316,14 +301,9 @@ func TestBatchPPDAddendum99(t *testing.T) {
 	mockAddenda99.TypeCode = "05"
 	mockBatch.GetEntries()[0].Category = CategoryReturn
 	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

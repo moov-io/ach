@@ -309,14 +309,9 @@ func BenchmarkFileBuildBadFileHeader(b *testing.B) {
 // testFileBuildNoBatch validates a file with no batches
 func testFileBuildNoBatch(t testing.TB) {
 	file := NewFile().SetHeader(mockFileHeader())
-	if err := file.Create(); err != nil {
-		if e, ok := err.(*FileError); ok {
-			if e.FieldName != "Batches" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := file.Create()
+	if !base.Match(err, ErrFileNoBatches) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -692,14 +687,10 @@ func TestFileADVControlValidate(t *testing.T) {
 	file := mockFileADV()
 
 	file.ADVControl.recordType = "22"
-	if err := file.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := file.Validate()
+	// TODO: are we expecting there to be an error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -708,14 +699,10 @@ func TestFileControlValidate(t *testing.T) {
 	file := mockFilePPD()
 
 	file.Control.recordType = "22"
-	if err := file.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := file.Validate()
+	// TODO: are we expecting there to be an error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -893,13 +880,7 @@ func TestFile__readInvalidFilesJson(t *testing.T) {
 
 	_, err = FileFromJSON(bs)
 
-	if err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "FileIDModifier" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	if !base.Match(err, ErrUpperAlpha) {
+		t.Errorf("%T: %s", err, err)
 	}
 }

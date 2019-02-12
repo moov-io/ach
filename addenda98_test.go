@@ -6,6 +6,8 @@ package ach
 
 import (
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 func mockAddenda98() *Addenda98 {
@@ -82,14 +84,10 @@ func BenchmarkAddenda98String(b *testing.B) {
 func testAddenda98ValidRecordType(t testing.TB) {
 	addenda98 := mockAddenda98()
 	addenda98.recordType = "63"
-	if err := addenda98.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda98.Validate()
+	// TODO: are we not expecting any errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 func TestAddenda98ValidRecordType(t *testing.T) {
@@ -106,14 +104,9 @@ func BenchmarkAddenda98ValidRecordType(b *testing.B) {
 func testAddenda98ValidTypeCode(t testing.TB) {
 	addenda98 := mockAddenda98()
 	addenda98.TypeCode = "05"
-	if err := addenda98.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda98.Validate()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -131,14 +124,9 @@ func BenchmarkAddenda98ValidTypeCode(b *testing.B) {
 func testAddenda98ValidCorrectedData(t testing.TB) {
 	addenda98 := mockAddenda98()
 	addenda98.CorrectedData = ""
-	if err := addenda98.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "CorrectedData" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda98.Validate()
+	if !base.Match(err, ErrAddenda98CorrectedData) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -156,14 +144,10 @@ func BenchmarkAddenda98ValidCorrectedData(b *testing.B) {
 func testAddenda98ValidateTrue(t testing.TB) {
 	addenda98 := mockAddenda98()
 	addenda98.ChangeCode = "C11"
-	if err := addenda98.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ChangeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda98.Validate()
+	// no error expected
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -181,14 +165,9 @@ func BenchmarkAddenda98ValidateTrue(b *testing.B) {
 func testAddenda98ValidateChangeCodeFalse(t testing.TB) {
 	addenda98 := mockAddenda98()
 	addenda98.ChangeCode = "C63"
-	if err := addenda98.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ChangeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda98.Validate()
+	if !base.Match(err, ErrAddenda98ChangeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -283,14 +262,9 @@ func BenchmarkAddenda98TraceNumberField(b *testing.B) {
 func testAddenda98TypeCodeNil(t testing.TB) {
 	addenda98 := mockAddenda98()
 	addenda98.TypeCode = ""
-	if err := addenda98.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda98.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

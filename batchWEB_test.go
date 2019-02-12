@@ -79,14 +79,9 @@ func testBatchWebIndividualNameRequired(t testing.TB) {
 	mockBatch := mockBatchWEB()
 	// mock batch already has one addenda. Creating two addenda should error
 	mockBatch.GetEntries()[0].IndividualName = ""
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "IndividualName" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -111,14 +106,9 @@ func TestBatchWEBAddendum98(t *testing.T) {
 	mockAddenda98.TypeCode = "05"
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -130,14 +120,9 @@ func TestBatchWEBAddendum99(t *testing.T) {
 	mockAddenda99.TypeCode = "05"
 	mockBatch.GetEntries()[0].Category = CategoryReturn
 	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -146,14 +131,9 @@ func testBatchWEBAddendaTypeCode(t testing.TB) {
 	mockBatch := mockBatchWEB()
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.GetEntries()[0].Addenda05[0].TypeCode = "02"
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -198,14 +178,10 @@ func BenchmarkBatchWebSEC(b *testing.B) {
 func testBatchWebPaymentType(t testing.TB) {
 	mockBatch := mockBatchWEB()
 	mockBatch.GetEntries()[0].DiscretionaryData = "AA"
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "PaymentType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	// TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -229,14 +205,9 @@ func testBatchWebCreate(t testing.TB) {
 	mockBatch := mockBatchWEB()
 	// Must have valid batch header to create a batch
 	mockBatch.GetHeader().ServiceClassCode = 63
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrServiceClass) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -258,14 +229,10 @@ func BenchmarkBatchWebCreate(b *testing.B) {
 func testBatchWebPaymentTypeR(t testing.TB) {
 	mockBatch := mockBatchWEB()
 	mockBatch.GetEntries()[0].DiscretionaryData = "R"
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "PaymentType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	// TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 	if mockBatch.GetEntries()[0].PaymentTypeField() != "R" {
 		t.Errorf("PaymentTypeField %v was expecting R", mockBatch.GetEntries()[0].PaymentTypeField())

@@ -241,14 +241,9 @@ func BenchmarkBatchRCKAutomatedAccountingAdvices(b *testing.B) {
 func testBatchRCKCompanyEntryDescription(t testing.TB) {
 	mockBatch := mockBatchRCK()
 	mockBatch.Header.CompanyEntryDescription = "XYZ975"
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "CompanyEntryDescription" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrBatchCompanyEntryDescriptionREDEPCHECK) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -293,14 +288,9 @@ func testBatchRCKCheckSerialNumber(t testing.TB) {
 	mockBatch := mockBatchRCK()
 	// modify CheckSerialNumber / IdentificationNumber to empty string
 	mockBatch.GetEntries()[0].SetCheckSerialNumber("")
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "CheckSerialNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !base.Match(err, ErrBatchCheckSerialNumber) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -346,14 +336,9 @@ func testBatchRCKAddendaCount(t testing.TB) {
 	mockBatch := mockBatchRCK()
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda05" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrBatchAddendaCategory) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -400,14 +385,10 @@ func BenchmarkBatchRCKParseCheckSerialNumber(b *testing.B) {
 func testBatchRCKInvalidBuild(t testing.TB) {
 	mockBatch := mockBatchRCK()
 	mockBatch.GetHeader().recordType = "3"
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	// TODO: are we expecting there to be an error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -432,14 +413,9 @@ func TestBatchRCKAddendum98(t *testing.T) {
 	mockAddenda98.TypeCode = "05"
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -451,13 +427,8 @@ func TestBatchRCKAddendum99(t *testing.T) {
 	mockAddenda99.TypeCode = "05"
 	mockBatch.GetEntries()[0].Category = CategoryReturn
 	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }

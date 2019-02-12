@@ -137,12 +137,10 @@ func testValidateFCRecordType(t testing.TB) {
 	fc := mockFileControl()
 	fc.recordType = "2"
 
-	if err := fc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := fc.Validate()
+	// TODO: are we expecting there to be an error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

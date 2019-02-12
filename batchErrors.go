@@ -50,7 +50,6 @@ type BatchError struct {
 	BatchType   string
 	FieldName   string
 	FieldValue  interface{}
-	Msg         string // deprecated
 	Err         error
 }
 
@@ -268,6 +267,27 @@ func (e ErrBatchRequiredAddendaCount) Error() string {
 	return e.Message
 }
 
+// ErrBatchExpectedAddendaCount is the error given when the batch type has entries with a field
+// for the number of addenda, and a different number of addenda are foound
+type ErrBatchExpectedAddendaCount struct {
+	Message       string
+	FoundCount    int
+	ExpectedCount int
+}
+
+// NewErrBatchExpectedAddendaCount creates a new error of the ErrBatchExpectedAddendaCount type
+func NewErrBatchExpectedAddendaCount(found, expected int) ErrBatchExpectedAddendaCount {
+	return ErrBatchExpectedAddendaCount{
+		Message:       fmt.Sprintf("%v addendum found where %v are Expected for this batch type", found, expected),
+		FoundCount:    found,
+		ExpectedCount: expected,
+	}
+}
+
+func (e ErrBatchExpectedAddendaCount) Error() string {
+	return e.Message
+}
+
 // ErrBatchServiceClassTranCode is the error given when the transaction code is not valid for the batch's service class
 type ErrBatchServiceClassTranCode struct {
 	Message          string
@@ -306,5 +326,26 @@ func NewErrBatchAmount(amount, limit int) ErrBatchAmount {
 }
 
 func (e ErrBatchAmount) Error() string {
+	return e.Message
+}
+
+// ErrBatchIATNOC is the error given when an IAT batch has an NOC, and there are invalid values
+type ErrBatchIATNOC struct {
+	Message  string
+	Found    interface{}
+	Expected interface{}
+}
+
+// NewErrBatchIATNOC creates a new error of the ErrBatchIATNOC type
+func NewErrBatchIATNOC(found, expected interface{}) ErrBatchIATNOC {
+	// TODO: pretty format the amounts to make it more readable
+	return ErrBatchIATNOC{
+		Message:  fmt.Sprintf("%v invalid for IAT NOC, should be %v", found, expected),
+		Found:    found,
+		Expected: expected,
+	}
+}
+
+func (e ErrBatchIATNOC) Error() string {
 	return e.Message
 }

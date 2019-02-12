@@ -40,6 +40,12 @@ var (
 	ErrValidDay = errors.New("is an invalid day")
 	//ErrValidYear is given when there's an invalid year
 	ErrValidYear = errors.New("is an invalid year")
+	// ErrValidState is the error given when a field has an invalid US state or territory
+	ErrValidState = errors.New("is an invalid US state or territory")
+	// ErrValidISO3166 is the error given when a field has an invalid ISO 3166-1-alpha-2 code
+	ErrValidISO3166 = errors.New("is an invalid ISO 3166-1-alpha-2 code")
+	// ErrValidISO4217 is the error given when a field has an invalid ISO 4217 code
+	ErrValidISO4217 = errors.New("is an invalid ISO 4217 code")
 
 	// Addenda errors
 
@@ -50,7 +56,7 @@ var (
 	// ErrAddenda99ReturnCode is given when there's an invalid return code
 	ErrAddenda99ReturnCode = errors.New("found is not a valid return code")
 	// ErrBatchCORAddenda is given when an entry in a COR batch does not have an addenda98
-	ErrBatchCORAddenda = errors.New("found and one Addenda98 record is required for each entry in SEC Type COR")
+	ErrBatchCORAddenda = errors.New("one Addenda98 record is required for each entry in SEC Type COR")
 
 	// FileHeader errors
 
@@ -113,8 +119,6 @@ func fieldError(field string, err error, values ...interface{}) error {
 	}
 	return &fe
 }
-
-// ErrValidFieldLength    = "is not length %d"
 
 // ErrValidCheckDigit is the error given when the observed check digit does not match the calculated one
 type ErrValidCheckDigit struct {

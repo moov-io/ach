@@ -235,14 +235,10 @@ func BenchmarkBatchSHRTransactionCode(b *testing.B) {
 func testBatchSHRAddendaCount(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	// TODO: are we expecting there to be an error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -293,14 +289,9 @@ func TestBatchSHRAddendum98(t *testing.T) {
 	mockAddenda98.TypeCode = "05"
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -312,14 +303,9 @@ func TestBatchSHRAddendum99(t *testing.T) {
 	mockAddenda99.TypeCode = "05"
 	mockBatch.GetEntries()[0].Category = CategoryReturn
 	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -357,14 +343,10 @@ func testBatchSHRInvalidAddenda(t testing.TB) {
 	addenda02.recordType = "63"
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	//TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -385,14 +367,10 @@ func BenchmarkBatchSHRInvalidAddenda(b *testing.B) {
 func testBatchSHRInvalidBuild(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.GetHeader().recordType = "3"
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	// TODO: are we expecting there to be an error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -511,14 +489,9 @@ func BenchmarkBatchSHRDocumentReferenceNumberField(b *testing.B) {
 func testSHRCardExpirationDateMonth(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.GetEntries()[0].SetSHRCardExpirationDate("1306")
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "CardExpirationDate" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !base.Match(err, ErrValidMonth) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -539,14 +512,9 @@ func BenchmarkSHRCardExpirationDateMonth(b *testing.B) {
 func testSHRCardExpirationDateYear(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.GetEntries()[0].SetSHRCardExpirationDate("0612")
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "CardExpirationDate" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !base.Match(err, ErrValidYear) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

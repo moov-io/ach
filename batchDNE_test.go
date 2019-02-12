@@ -105,14 +105,10 @@ func BenchmarkBatchDNEAddendumCount(b *testing.B) {
 func TestBatchDNEAddendum98(t *testing.T) {
 	mockBatch := NewBatchDNE(mockBatchDNEHeader())
 	mockBatch.AddEntry(mockDNEEntryDetail())
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	// TODO: are we expecting there to be an error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -121,14 +117,9 @@ func testBatchDNEReceivingCompanyName(t testing.TB) {
 	mockBatch := mockBatchDNE()
 	// modify the Individual name / receiving company to nothing
 	mockBatch.GetEntries()[0].SetReceivingCompany("")
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "IndividualName" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -149,14 +140,10 @@ func BenchmarkBatchDNEReceivingCompanyName(b *testing.B) {
 func testBatchDNEAddendaTypeCode(t testing.TB) {
 	mockBatch := mockBatchDNE()
 	mockBatch.GetEntries()[0].Addenda05[0].TypeCode = "05"
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	// no error expected
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -200,14 +187,9 @@ func BenchmarkBatchDNESEC(b *testing.B) {
 func testBatchDNEAddendaCount(t testing.TB) {
 	mockBatch := mockBatchDNE()
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, NewErrBatchAddendaCount(0,1)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -229,14 +211,9 @@ func testBatchDNEServiceClassCode(t testing.TB) {
 	mockBatch := mockBatchDNE()
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetHeader().ServiceClassCode = 0
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

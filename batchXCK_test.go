@@ -245,14 +245,10 @@ func testBatchXCKCheckSerialNumber(t testing.TB) {
 	mockBatch := mockBatchXCK()
 	// modify CheckSerialNumber / IdentificationNumber to nothing
 	mockBatch.GetEntries()[0].SetCheckSerialNumber("")
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "CheckSerialNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	// no error expected
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -298,14 +294,9 @@ func testBatchXCKAddendaCount(t testing.TB) {
 	mockBatch := mockBatchXCK()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda05" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrBatchAddendaCategory) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -326,14 +317,10 @@ func BenchmarkBatchXCKAddendaCount(b *testing.B) {
 func testBatchXCKInvalidBuild(t testing.TB) {
 	mockBatch := mockBatchXCK()
 	mockBatch.GetHeader().recordType = "3"
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	// TODO: are we expecting there to be an error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -358,14 +345,9 @@ func TestBatchXCKAddendum98(t *testing.T) {
 	mockAddenda98.TypeCode = "05"
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -376,14 +358,9 @@ func TestBatchXCKAddendum99(t *testing.T) {
 	mockAddenda99 := mockAddenda99()
 	mockAddenda99.TypeCode = "05"
 	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -406,14 +383,9 @@ func TestBatchXCKProcessControlField(t *testing.T) {
 	mockBatch := NewBatchXCK(mockBatchXCKHeader())
 	mockBatch.AddEntry(mockXCKEntryDetail())
 	mockBatch.GetEntries()[0].SetProcessControlField("")
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ProcessControlField" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrFieldRequired) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -424,14 +396,9 @@ func TestBatchXCKItemResearchNumber(t *testing.T) {
 	mockBatch.GetEntries()[0].IndividualName = ""
 	mockBatch.GetEntries()[0].SetProcessControlField("CHECK1")
 	mockBatch.GetEntries()[0].SetItemResearchNumber("")
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ItemResearchNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrFieldRequired) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
