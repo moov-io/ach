@@ -197,7 +197,7 @@ func testBatchCCDAddendaCount(t testing.TB) {
 	mockBatch := mockBatchCCD()
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Create()
-	if !base.Match(err, NewErrBatchAddendaCount(0,1)) {
+	if !base.Match(err, NewErrBatchAddendaCount(0, 1)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

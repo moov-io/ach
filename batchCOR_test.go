@@ -195,8 +195,16 @@ func BenchmarkBatchCORAddendaTypeCode(b *testing.B) {
 // testBatchCORAmount validates BatchCOR Amount
 func testBatchCORAmount(t testing.TB) {
 	mockBatch := mockBatchCOR()
+	// test a nonzero credit amount
 	mockBatch.GetEntries()[0].Amount = 9999
 	err := mockBatch.Create()
+	if !base.Match(err, ErrBatchAmountNonZero) {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	// test a nonzero debit amount
+	mockBatch.GetEntries()[0].TransactionCode = CheckingReturnNOCDebit
+	err = mockBatch.Create()
 	if !base.Match(err, ErrBatchAmountNonZero) {
 		t.Errorf("%T: %s", err, err)
 	}

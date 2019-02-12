@@ -553,8 +553,8 @@ func TestBatchSHRTerminalState(t *testing.T) {
 	mockAddenda02.TerminalState = "YY"
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	err := mockBatch.Validate()
-	if !base.Match(err, NewErrBatchHeaderControlEquality("225", "200")) {
+	err := mockBatch.Create()
+	if !base.Match(err, ErrValidState) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
