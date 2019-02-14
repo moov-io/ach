@@ -107,6 +107,10 @@ Yes please! Please review our [Contributing guide](CONTRIBUTING.md) and [Code of
 
 Note: This project uses Go Modules, which requires Go 1.11 or higher, but we ship the vendor directory in our repository.
 
+### Fuzzing
+
+We currently run fuzzing over ACH in the form of a [`moov/achfuzz`](https://hub.docker.com/r/moov/achfuzz) Docker image. You can [read more](./test/fuzz-reader/README.md) or run the image and report crasher examples to [`security@moov.io`](mailto:security@moov.io). Thanks!
+
 ## License
 
 Apache License 2.0 See [LICENSE](LICENSE) for details.
