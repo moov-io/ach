@@ -7,6 +7,8 @@ package ach
 import (
 	"strings"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockIATBatchHeaderFF creates a IAT BatchHeader that is Fixed-Fixed
@@ -243,12 +245,10 @@ func BenchmarkIATBHFVString(b *testing.B) {
 func testValidateIATBHRecordType(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
 	bh.recordType = "2"
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	// TODO: are we expecting there to be an error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -270,12 +270,9 @@ func BenchmarkValidateIATBHRecordType(b *testing.B) {
 func testValidateIATBHServiceClassCode(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
 	bh.ServiceClassCode = 999
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrServiceClass) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -299,12 +296,9 @@ func BenchmarkValidateIATBHServiceClassCode(b *testing.B) {
 func testValidateIATBHForeignExchangeIndicator(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
 	bh.ForeignExchangeIndicator = "XY"
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ForeignExchangeIndicator" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrForeignExchangeIndicator) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -328,12 +322,9 @@ func BenchmarkValidateIATBHForeignExchangeIndicator(b *testing.B) {
 func testValidateIATBHForeignExchangeReferenceIndicator(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
 	bh.ForeignExchangeReferenceIndicator = 5
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ForeignExchangeReferenceIndicator" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrForeignExchangeReferenceIndicator) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -357,12 +348,9 @@ func BenchmarkValidateIATBHForeignExchangeReferenceIndicator(b *testing.B) {
 func testValidateIATBHISODestinationCountryCode(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
 	bh.ISODestinationCountryCode = "®"
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ISODestinationCountryCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrValidISO3166) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -386,12 +374,10 @@ func BenchmarkValidateIATBHISODestinationCountryCode(b *testing.B) {
 func testValidateIATBHOriginatorIdentification(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
 	bh.OriginatorIdentification = "®"
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "OriginatorIdentification" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	// TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -415,12 +401,9 @@ func BenchmarkValidateIATBHOriginatorIdentification(b *testing.B) {
 func testValidateIATBHStandardEntryClassCode(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
 	bh.StandardEntryClassCode = "ABC"
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "StandardEntryClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrSECCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -444,12 +427,9 @@ func BenchmarkValidateIATBHStandardEntryClassCode(b *testing.B) {
 func testValidateIATBHCompanyEntryDescription(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
 	bh.CompanyEntryDescription = "®"
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "CompanyEntryDescription" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -473,12 +453,9 @@ func BenchmarkValidateIATBHCompanyEntryDescription(b *testing.B) {
 func testValidateIATBHISOOriginatingCurrencyCode(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
 	bh.ISOOriginatingCurrencyCode = "®"
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ISOOriginatingCurrencyCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrValidISO4217) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -502,12 +479,9 @@ func BenchmarkValidateIATBHISOOriginatingCurrencyCode(b *testing.B) {
 func testValidateIATBHISODestinationCurrencyCode(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
 	bh.ISODestinationCurrencyCode = "®"
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ISODestinationCurrencyCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrValidISO4217) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -531,12 +505,9 @@ func BenchmarkValidateIATBHISODestinationCurrencyCode(b *testing.B) {
 func testValidateIATBHOriginatorStatusCode(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
 	bh.OriginatorStatusCode = 7
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "OriginatorStatusCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrOrigStatusCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -561,12 +532,9 @@ func BenchmarkValidateIATBHOriginatorStatusCode(b *testing.B) {
 func testIATBHRecordType(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
 	bh.recordType = ""
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -587,12 +555,9 @@ func BenchmarkIATBHRecordType(b *testing.B) {
 func testIATBHServiceClassCode(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
 	bh.ServiceClassCode = 0
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -613,12 +578,9 @@ func BenchmarkIATBHServiceClassCode(b *testing.B) {
 func testIATBHForeignExchangeIndicator(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
 	bh.ForeignExchangeIndicator = ""
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ForeignExchangeIndicator" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -639,12 +601,9 @@ func BenchmarkIATBHForeignExchangeIndicator(b *testing.B) {
 func testIATBHForeignExchangeReferenceIndicator(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
 	bh.ForeignExchangeReferenceIndicator = 0
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ForeignExchangeReferenceIndicator" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrFieldRequired) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -665,12 +624,9 @@ func BenchmarkIATBHForeignExchangeReferenceIndicator(b *testing.B) {
 func testIATBHISODestinationCountryCode(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
 	bh.ISODestinationCountryCode = ""
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ISODestinationCountryCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -691,12 +647,9 @@ func BenchmarkIATBHISODestinationCountryCode(b *testing.B) {
 func testIATBHOriginatorIdentification(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
 	bh.OriginatorIdentification = ""
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "OriginatorIdentification" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -717,12 +670,9 @@ func BenchmarkIATBHOriginatorIdentification(b *testing.B) {
 func testIATBHStandardEntryClassCode(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
 	bh.StandardEntryClassCode = ""
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "StandardEntryClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -743,12 +693,9 @@ func BenchmarkIATBHStandardEntryClassCode(b *testing.B) {
 func testIATBHCompanyEntryDescription(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
 	bh.CompanyEntryDescription = ""
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "CompanyEntryDescription" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -769,12 +716,9 @@ func BenchmarkIATBHCompanyEntryDescription(b *testing.B) {
 func testIATBHISOOriginatingCurrencyCode(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
 	bh.ISOOriginatingCurrencyCode = ""
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ISOOriginatingCurrencyCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -795,12 +739,9 @@ func BenchmarkIATBHISOOriginatingCurrencyCode(b *testing.B) {
 func testIATBHISODestinationCurrencyCode(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
 	bh.ISODestinationCurrencyCode = ""
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ISODestinationCurrencyCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -821,12 +762,9 @@ func BenchmarkIATBHISODestinationCurrencyCode(b *testing.B) {
 func testIATBHODFIIdentification(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
 	bh.ODFIIdentification = ""
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ODFIIdentification" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

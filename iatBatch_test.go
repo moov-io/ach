@@ -169,14 +169,9 @@ func TestIATBatch__UnmarshalJSON(t *testing.T) {
 func testIATBatchAddenda10Error(t testing.TB) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda10 = nil
-	if err := iatBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda10" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := iatBatch.verify()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -199,14 +194,9 @@ func BenchmarkIATBatchAddenda10Error(b *testing.B) {
 func testIATBatchAddenda11Error(t testing.TB) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda11 = nil
-	if err := iatBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda11" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := iatBatch.verify()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -229,14 +219,9 @@ func BenchmarkIATBatchAddenda11Error(b *testing.B) {
 func testIATBatchAddenda12Error(t testing.TB) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda12 = nil
-	if err := iatBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda12" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := iatBatch.verify()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -259,14 +244,9 @@ func BenchmarkIATBatchAddenda12Error(b *testing.B) {
 func testIATBatchAddenda13Error(t testing.TB) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda13 = nil
-	if err := iatBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda13" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := iatBatch.verify()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -289,14 +269,9 @@ func BenchmarkIATBatchAddenda13Error(b *testing.B) {
 func testIATBatchAddenda14Error(t testing.TB) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda14 = nil
-	if err := iatBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda14" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := iatBatch.verify()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -319,14 +294,9 @@ func BenchmarkIATBatchAddenda14Error(b *testing.B) {
 func testIATBatchAddenda15Error(t testing.TB) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda15 = nil
-	if err := iatBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda15" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := iatBatch.verify()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -349,14 +319,9 @@ func BenchmarkIATBatchAddenda15Error(b *testing.B) {
 func testIATBatchAddenda16Error(t testing.TB) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.GetEntries()[0].Addenda16 = nil
-	if err := iatBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda16" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := iatBatch.verify()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -694,32 +659,20 @@ func testIATBatchFieldInclusion(t testing.TB) {
 	mockBatch2 := mockIATBatch(t)
 	mockBatch2.Header.recordType = "4"
 
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	//TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
-	if err := mockBatch2.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err = mockBatch2.verify()
+	//TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
-	if err := mockBatch2.build(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err = mockBatch2.build()
+	// TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -742,14 +695,9 @@ func testIATBatchBuild(t testing.TB) {
 	mockBatch := IATBatch{}
 	mockBatch.SetHeader(mockIATBatchHeaderFF())
 
-	if err := mockBatch.build(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "entries" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.build()
+	if !base.Match(err, ErrBatchNoEntries) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -794,14 +742,9 @@ func BenchmarkIATODFIIdentificationMismatch(b *testing.B) {
 func testIATBatchAddendaRecordIndicator(t testing.TB) {
 	mockBatch := mockIATBatch(t)
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 2
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaRecordIndicator" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !base.Match(err, ErrIATBatchAddendaIndicator) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -952,14 +895,9 @@ func testIATBatchIsCategory(t testing.TB) {
 	mockBatch := mockIATBatchManyEntries(t)
 	mockBatch.GetEntries()[1].Category = CategoryReturn
 
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda99" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1007,14 +945,10 @@ func testIATBatchValidateEntry(t testing.TB) {
 	mockBatch := mockIATBatch(t)
 	mockBatch.GetEntries()[0].recordType = "5"
 
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	//TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1036,14 +970,9 @@ func testIATBatchValidateAddenda10(t testing.TB) {
 	mockBatch := mockIATBatchManyEntries(t)
 	mockBatch.GetEntries()[1].Addenda10.TypeCode = "02"
 
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1065,14 +994,9 @@ func testIATBatchValidateAddenda11(t testing.TB) {
 	mockBatch := mockIATBatchManyEntries(t)
 	mockBatch.GetEntries()[1].Addenda11.TypeCode = "02"
 
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1094,14 +1018,9 @@ func testIATBatchValidateAddenda12(t testing.TB) {
 	mockBatch := mockIATBatchManyEntries(t)
 	mockBatch.GetEntries()[1].Addenda12.TypeCode = "02"
 
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1123,14 +1042,9 @@ func testIATBatchValidateAddenda13(t testing.TB) {
 	mockBatch := mockIATBatchManyEntries(t)
 	mockBatch.GetEntries()[1].Addenda13.TypeCode = "02"
 
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1152,14 +1066,9 @@ func testIATBatchValidateAddenda14(t testing.TB) {
 	mockBatch := mockIATBatchManyEntries(t)
 	mockBatch.GetEntries()[1].Addenda14.TypeCode = "02"
 
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1181,14 +1090,9 @@ func testIATBatchValidateAddenda15(t testing.TB) {
 	mockBatch := mockIATBatchManyEntries(t)
 	mockBatch.GetEntries()[1].Addenda15.TypeCode = "02"
 
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1210,14 +1114,9 @@ func testIATBatchValidateAddenda16(t testing.TB) {
 	mockBatch := mockIATBatchManyEntries(t)
 	mockBatch.GetEntries()[1].Addenda16.TypeCode = "02"
 
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1238,14 +1137,9 @@ func BenchmarkIATBatchValidateAddenda16(b *testing.B) {
 func testIATBatchValidateAddenda17(t testing.TB) {
 	mockBatch := mockInvalidIATBatch(t)
 
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1268,14 +1162,10 @@ func testIATBatchCreate(t testing.TB) {
 	mockBatch := mockIATBatch(t)
 	mockBatch.GetHeader().recordType = "7"
 
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	// TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 
 	file.AddIATBatch(mockBatch)
@@ -1340,14 +1230,9 @@ func testIATBatchEntryAddendum(t testing.TB) {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda18" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !base.Match(err, NewErrBatchAddendaCount(6, 5)) {
+		t.Errorf("%T: %s", err, err)
 	}
 
 	file.AddIATBatch(mockBatch)
@@ -1620,14 +1505,10 @@ func testIATBatchAddendumTypeCode(t testing.TB) {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	// no error expected
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1677,14 +1558,9 @@ func testIATBatchAddenda17Count(t testing.TB) {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda17" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !base.Match(err, NewErrBatchAddendaCount(3, 2)) {
+		t.Errorf("%T: %s", err, err)
 	}
 
 }
@@ -1735,14 +1611,9 @@ func testIATBatchAddenda18Count(t testing.TB) {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda18" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !base.Match(err, NewErrBatchAddendaCount(6, 5)) {
+		t.Errorf("%T: %s", err, err)
 	}
 
 }
@@ -1766,14 +1637,9 @@ func testIATBatchBuildAddendaError(t testing.TB) {
 	mockBatch.SetHeader(mockIATBatchHeaderFF())
 	mockBatch.AddEntry(mockIATEntryDetail())
 
-	if err := mockBatch.build(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "Addenda10" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.build()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1837,14 +1703,10 @@ func testIATBatchAddenda99Count(t testing.TB) {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	// TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 
 }
@@ -1877,14 +1739,10 @@ func TestIATBatchAddenda98TotalCount(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	// TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1901,14 +1759,9 @@ func TestIATBatchAddenda98Nil(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda98" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1928,14 +1781,10 @@ func TestIATBatchAddenda98RecordType(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	//TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1953,14 +1802,10 @@ func TestIATBatchAddenda99RecordType(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	//TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -1976,14 +1821,10 @@ func TestIATBatchAddenda18RecordType(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	//TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -2001,14 +1842,10 @@ func TestIATBatchAddenda98TransactionCode(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	// TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -2027,14 +1864,9 @@ func TestIATBatchAddenda98IATIndicator(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "IATIndicator" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !base.Match(err, NewErrBatchIATNOC("B", "IATCOR")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -2052,14 +1884,9 @@ func TestIATBatchAddenda98SECCode(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "StandardEntryClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !base.Match(err, NewErrBatchIATNOC("IAT", "COR")) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -2067,14 +1894,9 @@ func TestIATBatchAddenda98SECCode(t *testing.T) {
 func TestMockISODestinationCountryCode(t *testing.T) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.Header.ISODestinationCountryCode = "®©"
-	if err := iatBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ISODestinationCountryCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := iatBatch.Validate()
+	if !base.Match(err, ErrValidISO3166) {
+		t.Errorf("%T: %s", err, err)
 	}
 
 }
@@ -2083,14 +1905,9 @@ func TestMockISODestinationCountryCode(t *testing.T) {
 func TestMockISOOriginatingCurrencyCode(t *testing.T) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.Header.ISOOriginatingCurrencyCode = "®©"
-	if err := iatBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ISOOriginatingCurrencyCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := iatBatch.Validate()
+	if !base.Match(err, ErrValidISO4217) {
+		t.Errorf("%T: %s", err, err)
 	}
 
 }
@@ -2099,16 +1916,10 @@ func TestMockISOOriginatingCurrencyCode(t *testing.T) {
 func TestMockISODestinationCurrencyCode(t *testing.T) {
 	iatBatch := mockIATBatch(t)
 	iatBatch.Header.ISODestinationCurrencyCode = "®©"
-	if err := iatBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ISODestinationCurrencyCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := iatBatch.Validate()
+	if !base.Match(err, ErrValidISO4217) {
+		t.Errorf("%T: %s", err, err)
 	}
-
 }
 
 // TestParseRuneCountIATBatchHeader tests parsing an invalid RuneCount in IATBatchHeader
@@ -2116,13 +1927,8 @@ func TestParseRuneCountIATBatchHeader(t *testing.T) {
 	line := "5220                FF3               US123456789 IATTRADEPAYMTCADUSD010101"
 	r := NewReader(strings.NewReader(line))
 	r.line = line
-	if err := r.parseIATBatchHeader(); err != nil {
-		if e, ok := err.(*base.ParseError); ok {
-			if e.Record != "BatchHeader" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := r.parseIATBatchHeader()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }

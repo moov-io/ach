@@ -78,14 +78,10 @@ func TestMockAddenda13(t *testing.T) {
 func testAddenda13ValidRecordType(t testing.TB) {
 	addenda13 := mockAddenda13()
 	addenda13.recordType = "63"
-	if err := addenda13.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda13.Validate()
+	// TODO: are we not expecting any errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -106,14 +102,9 @@ func BenchmarkAddenda13ValidRecordType(b *testing.B) {
 func testAddenda13ValidTypeCode(t testing.TB) {
 	addenda13 := mockAddenda13()
 	addenda13.TypeCode = "65"
-	if err := addenda13.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda13.Validate()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -134,14 +125,9 @@ func BenchmarkAddenda13ValidTypeCode(b *testing.B) {
 func testAddenda13TypeCode13(t testing.TB) {
 	addenda13 := mockAddenda13()
 	addenda13.TypeCode = "05"
-	if err := addenda13.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda13.Validate()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -162,12 +148,9 @@ func BenchmarkAddenda13TypeCode13(b *testing.B) {
 func testODFINameAlphaNumeric(t testing.TB) {
 	addenda13 := mockAddenda13()
 	addenda13.ODFIName = "Wells®Fargo"
-	if err := addenda13.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ODFIName" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda13.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -188,12 +171,9 @@ func BenchmarkODFINameAlphaNumeric(b *testing.B) {
 func testODFIIDNumberQualifierValid(t testing.TB) {
 	addenda13 := mockAddenda13()
 	addenda13.ODFIIDNumberQualifier = "®1"
-	if err := addenda13.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ODFIIDNumberQualifier" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda13.Validate()
+	if !base.Match(err, ErrIDNumberQualifier) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -214,12 +194,9 @@ func BenchmarkODFIIDNumberQualifierValid(b *testing.B) {
 func testODFIIdentificationAlphaNumeric(t testing.TB) {
 	addenda13 := mockAddenda13()
 	addenda13.ODFIIdentification = "®121042882"
-	if err := addenda13.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ODFIIdentification" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda13.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -240,12 +217,9 @@ func BenchmarkODFIIdentificationAlphaNumeric(b *testing.B) {
 func testODFIBranchCountryCodeAlphaNumeric(t testing.TB) {
 	addenda13 := mockAddenda13()
 	addenda13.ODFIBranchCountryCode = "U®"
-	if err := addenda13.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ODFIBranchCountryCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda13.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

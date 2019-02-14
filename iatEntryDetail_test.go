@@ -5,8 +5,11 @@
 package ach
 
 import (
+	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockIATEntryDetail creates an IAT EntryDetail
@@ -166,12 +169,10 @@ func BenchmarkIATEDString(b *testing.B) {
 func testIATEDInvalidRecordType(t testing.TB) {
 	iatEd := mockIATEntryDetail()
 	iatEd.recordType = "2"
-	if err := iatEd.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := iatEd.Validate()
+	// TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -192,12 +193,9 @@ func BenchmarkIATEDInvalidRecordType(b *testing.B) {
 func testIATEDInvalidTransactionCode(t testing.TB) {
 	iatEd := mockIATEntryDetail()
 	iatEd.TransactionCode = 77
-	if err := iatEd.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := iatEd.Validate()
+	if !base.Match(err, ErrTransactionCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -218,12 +216,9 @@ func BenchmarkIATEDInvalidTransactionCode(b *testing.B) {
 func testEDIATDFIAccountNumberAlphaNumeric(t testing.TB) {
 	ed := mockIATEntryDetail()
 	ed.DFIAccountNumber = "®"
-	if err := ed.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "DFIAccountNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := ed.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -244,12 +239,9 @@ func BenchmarkEDIATDFIAccountNumberAlphaNumeric(b *testing.B) {
 func testEDIATisCheckDigit(t testing.TB) {
 	ed := mockIATEntryDetail()
 	ed.CheckDigit = "1"
-	if err := ed.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "RDFIIdentification" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := ed.Validate()
+	if !base.Match(err, NewErrValidCheckDigit(7)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -295,12 +287,9 @@ func BenchmarkEDIATSetRDFI(b *testing.B) {
 func testValidateEDIATCheckDigit(t testing.TB) {
 	ed := mockIATEntryDetail()
 	ed.CheckDigit = "XYZ"
-	if err := ed.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "CheckDigit" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := ed.Validate()
+	if !base.Match(err, &strconv.NumError{}) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -317,18 +306,13 @@ func BenchmarkValidateEDIATCheckDigit(b *testing.B) {
 	}
 }
 
-//FieldInclusion
-
 // testIATEDRecordType validates IATEntryDetail recordType fieldInclusion
 func testIATEDRecordType(t testing.TB) {
 	iatEd := mockIATEntryDetail()
 	iatEd.recordType = ""
-	if err := iatEd.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := iatEd.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -349,12 +333,9 @@ func BenchmarkIATEDRecordType(b *testing.B) {
 func testIATEDTransactionCode(t testing.TB) {
 	iatEd := mockIATEntryDetail()
 	iatEd.TransactionCode = 0
-	if err := iatEd.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := iatEd.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -375,12 +356,9 @@ func BenchmarkIATEDTransactionCode(b *testing.B) {
 func testIATEDRDFIIdentification(t testing.TB) {
 	iatEd := mockIATEntryDetail()
 	iatEd.RDFIIdentification = ""
-	if err := iatEd.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "RDFIIdentification" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := iatEd.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -401,12 +379,9 @@ func BenchmarkIATEDRDFIIdentification(b *testing.B) {
 func testIATEDAddendaRecords(t testing.TB) {
 	iatEd := mockIATEntryDetail()
 	iatEd.AddendaRecords = 0
-	if err := iatEd.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "AddendaRecords" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := iatEd.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -427,12 +402,9 @@ func BenchmarkIATEDAddendaRecords(b *testing.B) {
 func testIATEDDFIAccountNumber(t testing.TB) {
 	iatEd := mockIATEntryDetail()
 	iatEd.DFIAccountNumber = ""
-	if err := iatEd.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "DFIAccountNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := iatEd.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -453,12 +425,10 @@ func BenchmarkIATEDDFIAccountNumber(b *testing.B) {
 func testIATEDTraceNumber(t testing.TB) {
 	iatEd := mockIATEntryDetail()
 	iatEd.TraceNumber = "0"
-	if err := iatEd.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TraceNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := iatEd.Validate()
+	// TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -479,12 +449,9 @@ func BenchmarkIATEDTraceNumber(b *testing.B) {
 func testIATEDAddendaRecordIndicator(t testing.TB) {
 	iatEd := mockIATEntryDetail()
 	iatEd.AddendaRecordIndicator = 0
-	if err := iatEd.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "AddendaRecordIndicator" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := iatEd.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

@@ -7,6 +7,8 @@ package ach
 import (
 	"strings"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockBatchHeader creates a batch header
@@ -156,12 +158,10 @@ func BenchmarkBHString(b *testing.B) {
 func testValidateBHRecordType(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.recordType = "2"
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	// TODO: are we expecting there to be an error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -182,12 +182,9 @@ func BenchmarkValidateBHRecordType(b *testing.B) {
 func testInvalidServiceCode(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.ServiceClassCode = 123
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrServiceClass) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -208,12 +205,9 @@ func BenchmarkInvalidServiceCode(b *testing.B) {
 func testInvalidSECCode(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.StandardEntryClassCode = "123"
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "StandardEntryClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrSECCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -234,12 +228,9 @@ func BenchmarkInvalidSECCode(b *testing.B) {
 func testInvalidOrigStatusCode(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.OriginatorStatusCode = 3
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "OriginatorStatusCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrOrigStatusCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -260,12 +251,10 @@ func BenchmarkInvalidOrigStatusCode(b *testing.B) {
 func testBatchHeaderFieldInclusion(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.BatchNumber = 0
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "BatchNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	// TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -286,12 +275,9 @@ func BenchmarkBatchHeaderFieldInclusion(b *testing.B) {
 func testBatchHeaderCompanyNameAlphaNumeric(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.CompanyName = "AT&T®"
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "CompanyName" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -312,12 +298,9 @@ func BenchmarkBatchHeaderCompanyNameAlphaNumeric(b *testing.B) {
 func testBatchCompanyDiscretionaryDataAlphaNumeric(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.CompanyDiscretionaryData = "®"
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "CompanyDiscretionaryData" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -338,12 +321,9 @@ func BenchmarkBatchCompanyDiscretionaryDataAlphaNumeric(b *testing.B) {
 func testBatchCompanyIdentificationAlphaNumeric(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.CompanyIdentification = "®"
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "CompanyIdentification" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -364,12 +344,9 @@ func BenchmarkBatchCompanyIdentificationAlphaNumeric(b *testing.B) {
 func testBatchCompanyEntryDescriptionAlphaNumeric(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.CompanyEntryDescription = "P®YROLL"
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "CompanyEntryDescription" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -390,12 +367,9 @@ func BenchmarkBatchCompanyEntryDescriptionAlphaNumeric(b *testing.B) {
 func testBHFieldInclusionRecordType(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.recordType = ""
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -416,12 +390,9 @@ func BenchmarkBHFieldInclusionRecordType(b *testing.B) {
 func testBHFieldInclusionCompanyName(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.CompanyName = ""
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "CompanyName" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -442,12 +413,9 @@ func BenchmarkBHFieldInclusionCompanyName(b *testing.B) {
 func testBHFieldInclusionCompanyIdentification(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.CompanyIdentification = ""
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "CompanyIdentification" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -468,12 +436,9 @@ func BenchmarkBHFieldInclusionCompanyIdentification(b *testing.B) {
 func testBHFieldInclusionStandardEntryClassCode(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.StandardEntryClassCode = ""
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "StandardEntryClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -494,12 +459,9 @@ func BenchmarkBHFieldInclusionStandardEntryClassCode(b *testing.B) {
 func testBHFieldInclusionCompanyEntryDescription(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.CompanyEntryDescription = ""
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "CompanyEntryDescription" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -520,12 +482,10 @@ func BenchmarkBHFieldInclusionCompanyEntryDescription(b *testing.B) {
 func testBHFieldInclusionOriginatorStatusCode(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.OriginatorStatusCode = 0
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "OriginatorStatusCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	// TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -546,12 +506,9 @@ func BenchmarkBHFieldInclusionOriginatorStatusCode(b *testing.B) {
 func testBHFieldInclusionODFIIdentification(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.ODFIIdentification = ""
-	if err := bh.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ODFIIdentification" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bh.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

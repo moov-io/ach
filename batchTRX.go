@@ -5,7 +5,6 @@
 package ach
 
 import (
-	"fmt"
 	"strconv"
 )
 
@@ -15,10 +14,6 @@ import (
 type BatchTRX struct {
 	Batch
 }
-
-var (
-	msgBatchTRXAddendaCount = "%v entry detail addenda records not equal to addendum %v"
-)
 
 // NewBatchTRX returns a *BatchTRX
 func NewBatchTRX(bh *BatchHeader) *BatchTRX {
@@ -62,8 +57,7 @@ func (batch *BatchTRX) Validate() error {
 		// use 0 value if there is no Addenda records
 		addendaRecords, _ := strconv.Atoi(entry.CATXAddendaRecordsField())
 		if len(entry.Addenda05) != addendaRecords {
-			msg := fmt.Sprintf(msgBatchTRXAddendaCount, addendaRecords, len(entry.Addenda05))
-			return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "Addendum", Msg: msg}
+			return batch.Error("AddendaCount", NewErrBatchExpectedAddendaCount(len(entry.Addenda05), addendaRecords))
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {

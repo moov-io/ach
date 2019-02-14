@@ -5,6 +5,7 @@
 package ach
 
 import (
+	"strconv"
 	"strings"
 	"testing"
 
@@ -159,12 +160,10 @@ func BenchmarkEDString(b *testing.B) {
 func testValidateEDRecordType(t testing.TB) {
 	ed := mockEntryDetail()
 	ed.recordType = "2"
-	if err := ed.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := ed.Validate()
+	// TODO: are we expecting there to be an error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -185,12 +184,9 @@ func BenchmarkValidateEDRecordType(b *testing.B) {
 func testValidateEDTransactionCode(t testing.TB) {
 	ed := mockEntryDetail()
 	ed.TransactionCode = 63
-	if err := ed.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := ed.Validate()
+	if !base.Match(err, ErrTransactionCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -234,12 +230,9 @@ func BenchmarkEDFieldInclusion(b *testing.B) {
 func testEDdfiAccountNumberAlphaNumeric(t testing.TB) {
 	ed := mockEntryDetail()
 	ed.DFIAccountNumber = "®"
-	if err := ed.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "DFIAccountNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := ed.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -260,12 +253,9 @@ func BenchmarkEDdfiAccountNumberAlphaNumeric(b *testing.B) {
 func testEDIdentificationNumberAlphaNumeric(t testing.TB) {
 	ed := mockEntryDetail()
 	ed.IdentificationNumber = "®"
-	if err := ed.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "IdentificationNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := ed.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -286,12 +276,9 @@ func BenchmarkEDIdentificationNumberAlphaNumeric(b *testing.B) {
 func testEDIndividualNameAlphaNumeric(t testing.TB) {
 	ed := mockEntryDetail()
 	ed.IndividualName = "W®DE"
-	if err := ed.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "IndividualName" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := ed.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -312,12 +299,9 @@ func BenchmarkEDIndividualNameAlphaNumeric(b *testing.B) {
 func testEDDiscretionaryDataAlphaNumeric(t testing.TB) {
 	ed := mockEntryDetail()
 	ed.DiscretionaryData = "®!"
-	if err := ed.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "DiscretionaryData" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := ed.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -338,12 +322,9 @@ func BenchmarkEDDiscretionaryDataAlphaNumeric(b *testing.B) {
 func testEDisCheckDigit(t testing.TB) {
 	ed := mockEntryDetail()
 	ed.CheckDigit = "1"
-	if err := ed.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "RDFIIdentification" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := ed.Validate()
+	if !base.Match(err, NewErrValidCheckDigit(7)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -625,12 +606,9 @@ func BenchmarkEDCreditOrDebit(b *testing.B) {
 func testValidateEDCheckDigit(t testing.TB) {
 	ed := mockEntryDetail()
 	ed.CheckDigit = "XYZ"
-	if err := ed.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "CheckDigit" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := ed.Validate()
+	if !base.Match(err, &strconv.NumError{}) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

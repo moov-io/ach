@@ -6,6 +6,8 @@ package ach
 
 import (
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 func mockAddenda99() *Addenda99 {
@@ -110,14 +112,10 @@ func BenchmarkAddenda99MakeReturnCodeDict(b *testing.B) {
 func testAddenda99ValidateTrue(t testing.TB) {
 	addenda99 := mockAddenda99()
 	addenda99.ReturnCode = "R13"
-	if err := addenda99.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ReturnCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda99.Validate()
+	// no error expected
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -135,14 +133,9 @@ func BenchmarkAddenda99ValidateTrue(b *testing.B) {
 func testAddenda99ValidateReturnCodeFalse(t testing.TB) {
 	addenda99 := mockAddenda99()
 	addenda99.ReturnCode = ""
-	if err := addenda99.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ReturnCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda99.Validate()
+	if !base.Match(err, ErrAddenda99ReturnCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -260,14 +253,10 @@ func BenchmarkAddenda99TraceNumberField(b *testing.B) {
 func testAddenda99ValidRecordType(t testing.TB) {
 	addenda99 := mockAddenda99()
 	addenda99.recordType = "63"
-	if err := addenda99.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda99.Validate()
+	// TODO: are we not expecting any errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 func TestAddenda99ValidRecordType(t *testing.T) {
@@ -285,14 +274,9 @@ func BenchmarkAddenda99ValidRecordType(b *testing.B) {
 func testAddenda99TypeCode99(t testing.TB) {
 	addenda99 := mockAddenda99()
 	addenda99.TypeCode = "05"
-	if err := addenda99.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda99.Validate()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -313,14 +297,9 @@ func BenchmarkAddenda99TypeCode99(b *testing.B) {
 func testAddenda99TypeCodeNil(t testing.TB) {
 	addenda99 := mockAddenda99()
 	addenda99.TypeCode = ""
-	if err := addenda99.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda99.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

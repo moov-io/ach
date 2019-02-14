@@ -70,14 +70,10 @@ func BenchmarkAddenda11Parse(b *testing.B) {
 func testAddenda11ValidRecordType(t testing.TB) {
 	addenda11 := mockAddenda11()
 	addenda11.recordType = "63"
-	if err := addenda11.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda11.Validate()
+	// TODO: are we not expecting any errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -98,14 +94,9 @@ func BenchmarkAddenda11ValidRecordType(b *testing.B) {
 func testAddenda11ValidTypeCode(t testing.TB) {
 	addenda11 := mockAddenda11()
 	addenda11.TypeCode = "65"
-	if err := addenda11.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda11.Validate()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -126,14 +117,9 @@ func BenchmarkAddenda11ValidTypeCode(b *testing.B) {
 func testAddenda11TypeCode11(t testing.TB) {
 	addenda11 := mockAddenda11()
 	addenda11.TypeCode = "05"
-	if err := addenda11.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda11.Validate()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -154,12 +140,9 @@ func BenchmarkAddenda11TypeCode11(b *testing.B) {
 func testOriginatorNameAlphaNumeric(t testing.TB) {
 	addenda11 := mockAddenda11()
 	addenda11.OriginatorName = "BEK S®lutions"
-	if err := addenda11.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "OriginatorName" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda11.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -180,12 +163,9 @@ func BenchmarkOriginatorNameAlphaNumeric(b *testing.B) {
 func testOriginatorStreetAddressAlphaNumeric(t testing.TB) {
 	addenda11 := mockAddenda11()
 	addenda11.OriginatorStreetAddress = "15 W®st"
-	if err := addenda11.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "OriginatorStreetAddress" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda11.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

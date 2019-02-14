@@ -101,14 +101,10 @@ func testBatchCORAddendumCountTwo(t testing.TB) {
 	mockBatch := mockBatchCOR()
 	// Adding a second addenda to the mock entry
 	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98()
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	// TODO: are we expecting there to be an error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -129,14 +125,9 @@ func BenchmarkBatchCORAddendumCountTwo(b *testing.B) {
 func testBatchCORAddendaCountZero(t testing.TB) {
 	mockBatch := NewBatchCOR(mockBatchCORHeader())
 	mockBatch.AddEntry(mockCOREntryDetail())
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda98" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrBatchCORAddenda) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -159,14 +150,9 @@ func testBatchCORAddendaType(t testing.TB) {
 	mockBatch.AddEntry(mockCOREntryDetail())
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda98" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrBatchCORAddenda) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -187,14 +173,9 @@ func BenchmarkBatchCORAddendaType(b *testing.B) {
 func testBatchCORAddendaTypeCode(t testing.TB) {
 	mockBatch := mockBatchCOR()
 	mockBatch.GetEntries()[0].Addenda98.TypeCode = "07"
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -214,15 +195,18 @@ func BenchmarkBatchCORAddendaTypeCode(b *testing.B) {
 // testBatchCORAmount validates BatchCOR Amount
 func testBatchCORAmount(t testing.TB) {
 	mockBatch := mockBatchCOR()
+	// test a nonzero credit amount
 	mockBatch.GetEntries()[0].Amount = 9999
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Amount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrBatchAmountNonZero) {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	// test a nonzero debit amount
+	mockBatch.GetEntries()[0].TransactionCode = CheckingReturnNOCDebit
+	err = mockBatch.Create()
+	if !base.Match(err, ErrBatchAmountNonZero) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -291,14 +275,9 @@ func testBatchCORCreate(t testing.TB) {
 	mockBatch := mockBatchCOR()
 	// Must have valid batch header to create a Batch
 	mockBatch.GetHeader().ServiceClassCode = 63
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrServiceClass) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -346,14 +325,9 @@ func TestBatchCORCategoryNOCAddenda05(t *testing.T) {
 	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98()
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda05" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrBatchAddendaCategory) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -378,14 +352,10 @@ func TestBatchCORCategoryNOCAddenda98(t *testing.T) {
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda98" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	// no error expected
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -409,14 +379,10 @@ func TestBatchCORTestBatchCORInvalidAddenda98(t *testing.T) {
 	mockBatch.GetEntries()[0].Addenda98 = addenda98
 
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	//TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -424,13 +390,8 @@ func TestBatchCORTestBatchCORInvalidAddenda98(t *testing.T) {
 func TestBatchCORAutomatedAccountingAdvices(t *testing.T) {
 	mockBatch := mockBatchCOR()
 	mockBatch.GetEntries()[0].TransactionCode = 65
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrTransactionCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }

@@ -149,12 +149,10 @@ func BenchmarkADVBCString(b *testing.B) {
 func testValidateADVBCRecordType(t testing.TB) {
 	bc := mockADVBatchControl()
 	bc.recordType = "2"
-	if err := bc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bc.Validate()
+	// TODO: are we not expecting any errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -175,12 +173,9 @@ func BenchmarkValidateADVBCRecordType(b *testing.B) {
 func testADVBCisServiceClassErr(t testing.TB) {
 	bc := mockADVBatchControl()
 	bc.ServiceClassCode = 123
-	if err := bc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bc.Validate()
+	if !base.Match(err, ErrServiceClass) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -200,12 +195,10 @@ func BenchmarkADVBCisServiceClassErr(b *testing.B) {
 func testADVBCBatchNumber(t testing.TB) {
 	bc := mockADVBatchControl()
 	bc.BatchNumber = 0
-	if err := bc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "BatchNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bc.Validate()
+	// TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -226,12 +219,9 @@ func BenchmarkADVBCBatchNumber(b *testing.B) {
 func testADVBCACHOperatorDataAlphaNumeric(t testing.TB) {
 	bc := mockADVBatchControl()
 	bc.ACHOperatorData = "®"
-	if err := bc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ACHOperatorData" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bc.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

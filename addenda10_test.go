@@ -78,14 +78,10 @@ func BenchmarkAddenda10Parse(b *testing.B) {
 func testAddenda10ValidRecordType(t testing.TB) {
 	addenda10 := mockAddenda10()
 	addenda10.recordType = "63"
-	if err := addenda10.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda10.Validate()
+	// TODO: are we not expecting any errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -106,14 +102,9 @@ func BenchmarkAddenda10ValidRecordType(b *testing.B) {
 func testAddenda10ValidTypeCode(t testing.TB) {
 	addenda10 := mockAddenda10()
 	addenda10.TypeCode = "65"
-	if err := addenda10.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda10.Validate()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -134,14 +125,9 @@ func BenchmarkAddenda10ValidTypeCode(b *testing.B) {
 func testAddenda10TypeCode10(t testing.TB) {
 	addenda10 := mockAddenda10()
 	addenda10.TypeCode = "05"
-	if err := addenda10.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda10.Validate()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -162,14 +148,9 @@ func BenchmarkAddenda10TypeCode10(b *testing.B) {
 func testAddenda10TransactionTypeCode(t testing.TB) {
 	addenda10 := mockAddenda10()
 	addenda10.TransactionTypeCode = "ABC"
-	if err := addenda10.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TransactionTypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda10.Validate()
+	if !base.Match(err, ErrTransactionTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -190,12 +171,9 @@ func BenchmarkAddenda10TransactionTypeCode(b *testing.B) {
 func testForeignTraceNumberAlphaNumeric(t testing.TB) {
 	addenda10 := mockAddenda10()
 	addenda10.ForeignTraceNumber = "®"
-	if err := addenda10.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ForeignTraceNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda10.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -216,12 +194,9 @@ func BenchmarkForeignTraceNumberAlphaNumeric(b *testing.B) {
 func testNameAlphaNumeric(t testing.TB) {
 	addenda10 := mockAddenda10()
 	addenda10.Name = "Jas®n"
-	if err := addenda10.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "Name" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda10.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

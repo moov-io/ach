@@ -102,48 +102,37 @@ func BenchmarkAddenda17String(b *testing.B) {
 func TestValidateAddenda17RecordType(t *testing.T) {
 	addenda17 := mockAddenda17()
 	addenda17.recordType = "63"
-	if err := addenda17.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda17.Validate()
+	// TODO: are we not expecting any errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
 func TestAddenda17FieldInclusionTypeCode(t *testing.T) {
 	addenda17 := mockAddenda17()
 	addenda17.TypeCode = ""
-	if err := addenda17.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda17.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
 func TestAddenda17FieldInclusion(t *testing.T) {
 	addenda17 := mockAddenda17()
 	addenda17.EntryDetailSequenceNumber = 0
-	if err := addenda17.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "EntryDetailSequenceNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda17.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
 func TestAddenda17FieldInclusionSequenceNumber(t *testing.T) {
 	addenda17 := mockAddenda17()
 	addenda17.SequenceNumber = 0
-	if err := addenda17.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "SequenceNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda17.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -160,12 +149,9 @@ func TestAddenda17FieldInclusionRecordType(t *testing.T) {
 func testAddenda17PaymentRelatedInformationAlphaNumeric(t testing.TB) {
 	addenda17 := mockAddenda17()
 	addenda17.PaymentRelatedInformation = "®©"
-	if err := addenda17.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "PaymentRelatedInformation" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := addenda17.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -187,14 +173,9 @@ func BenchmarkAddenda17PaymentRelatedInformationAlphaNumeric(b *testing.B) {
 func testAddenda17ValidTypeCode(t testing.TB) {
 	addenda17 := mockAddenda17()
 	addenda17.TypeCode = "65"
-	if err := addenda17.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda17.Validate()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -215,14 +196,9 @@ func BenchmarkAddenda17ValidTypeCode(b *testing.B) {
 func testAddenda17TypeCode17(t testing.TB) {
 	addenda17 := mockAddenda17()
 	addenda17.TypeCode = "05"
-	if err := addenda17.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := addenda17.Validate()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

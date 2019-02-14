@@ -153,12 +153,10 @@ func BenchmarkBCString(b *testing.B) {
 func testValidateBCRecordType(t testing.TB) {
 	bc := mockBatchControl()
 	bc.recordType = "2"
-	if err := bc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bc.Validate()
+	// TODO: are we expecting there to be an error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -179,12 +177,9 @@ func BenchmarkValidateBCRecordType(b *testing.B) {
 func testBCisServiceClassErr(t testing.TB) {
 	bc := mockBatchControl()
 	bc.ServiceClassCode = 123
-	if err := bc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bc.Validate()
+	if !base.Match(err, ErrServiceClass) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -204,12 +199,10 @@ func BenchmarkBCisServiceClassErr(b *testing.B) {
 func testBCBatchNumber(t testing.TB) {
 	bc := mockBatchControl()
 	bc.BatchNumber = 0
-	if err := bc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "BatchNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bc.Validate()
+	// TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -230,12 +223,9 @@ func BenchmarkBCBatchNumber(b *testing.B) {
 func testBCCompanyIdentificationAlphaNumeric(t testing.TB) {
 	bc := mockBatchControl()
 	bc.CompanyIdentification = "®"
-	if err := bc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "CompanyIdentification" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bc.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -256,12 +246,9 @@ func BenchmarkBCCompanyIdentificationAlphaNumeric(b *testing.B) {
 func testBCMessageAuthenticationCodeAlphaNumeric(t testing.TB) {
 	bc := mockBatchControl()
 	bc.MessageAuthenticationCode = "®"
-	if err := bc.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "MessageAuthenticationCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := bc.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

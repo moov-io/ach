@@ -513,14 +513,9 @@ func BenchmarkBatchTraceNumberExists(b *testing.B) {
 func testBatchFieldInclusion(t testing.TB) {
 	mockBatch := mockBatch()
 	mockBatch.Header.ODFIIdentification = ""
-	if err := mockBatch.verify(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "ODFIIdentification" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.verify()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

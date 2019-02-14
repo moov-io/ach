@@ -89,14 +89,10 @@ func BenchmarkBatchMTEHeader(b *testing.B) {
 func TestBatchMTEAddendum02(t *testing.T) {
 	mockBatch := NewBatchMTE(mockBatchMTEHeader())
 	mockBatch.AddEntry(mockMTEEntryDetail())
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	// TODO: are we expecting there to be an error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -105,14 +101,9 @@ func testBatchMTEReceivingCompanyName(t testing.TB) {
 	mockBatch := mockBatchMTE()
 	// modify the Individual name / receiving company to nothing
 	mockBatch.GetEntries()[0].SetReceivingCompany("")
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "IndividualName" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -133,14 +124,9 @@ func BenchmarkBatchMTEReceivingCompanyName(b *testing.B) {
 func testBatchMTEAddendaTypeCode(t testing.TB) {
 	mockBatch := mockBatchMTE()
 	mockBatch.GetEntries()[0].Addenda02.TypeCode = "05"
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -185,14 +171,9 @@ func testBatchMTEServiceClassCode(t testing.TB) {
 	mockBatch := mockBatchMTE()
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetHeader().ServiceClassCode = 0
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -222,14 +203,9 @@ func TestBatchMTEAmount(t *testing.T) {
 func TestBatchMTETerminalState(t *testing.T) {
 	mockBatch := mockBatchMTE()
 	mockBatch.GetEntries()[0].Addenda02.TerminalState = "XX"
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TerminalState" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrValidState) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -237,14 +213,9 @@ func TestBatchMTETerminalState(t *testing.T) {
 func TestBatchMTEIndividualName(t *testing.T) {
 	mockBatch := mockBatchMTE()
 	mockBatch.GetEntries()[0].IndividualName = ""
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "IndividualName" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -254,25 +225,17 @@ func TestBatchMTEIdentificationNumber(t *testing.T) {
 
 	// NACHA rules state MTE records can't be all spaces or all zeros
 	mockBatch.GetEntries()[0].IdentificationNumber = "   "
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "IdentificationNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	// TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 
 	mockBatch.GetEntries()[0].IdentificationNumber = "000000"
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "IdentificationNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err = mockBatch.Create()
+	// TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

@@ -203,8 +203,6 @@ func (batch *Batch) Validate() error {
 
 // verify checks basic valid NACHA batch rules. Assumes properly parsed records. This does not mean it is a valid batch as validity is tied to each batch type
 func (batch *Batch) verify() error {
-	batchNumber := batch.Header.BatchNumber
-
 	// No entries in batch
 	if len(batch.Entries) <= 0 && len(batch.ADVEntries) <= 0 {
 		return batch.Error("entries", ErrBatchNoEntries)
@@ -212,10 +210,7 @@ func (batch *Batch) verify() error {
 	// verify field inclusion in all the records of the batch.
 	if err := batch.isFieldInclusion(); err != nil {
 		// convert the field error in to a batch error for a consistent api
-		if e, ok := err.(*FieldError); ok {
-			return &BatchError{BatchNumber: batchNumber, FieldName: e.FieldName, Err: e}
-		}
-		return &BatchError{BatchNumber: batchNumber, FieldName: "FieldError", Err: err}
+		return batch.Error("FieldError", err)
 	}
 
 	if !batch.IsADV() {

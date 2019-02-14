@@ -104,14 +104,10 @@ func BenchmarkBatchENRAddendumCount(b *testing.B) {
 func TestBatchENRAddendum98(t *testing.T) {
 	mockBatch := NewBatchENR(mockBatchENRHeader())
 	mockBatch.AddEntry(mockENREntryDetail())
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	// TODO: are we expecting there to be an error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -142,14 +138,9 @@ func BenchmarkBatchENRCompanyEntryDescription(b *testing.B) {
 func testBatchENRAddendaTypeCode(t testing.TB) {
 	mockBatch := mockBatchENR()
 	mockBatch.GetEntries()[0].Addenda05[0].TypeCode = "98"
-	if err := mockBatch.Validate(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Validate()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -193,14 +184,10 @@ func BenchmarkBatchENRSEC(b *testing.B) {
 func testBatchENRAddendaCount(t testing.TB) {
 	mockBatch := mockBatchENR()
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	// TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -221,14 +208,9 @@ func BenchmarkBatchENRAddendaCount(b *testing.B) {
 func testBatchENRServiceClassCode(t testing.TB) {
 	mockBatch := mockBatchENR()
 	mockBatch.GetHeader().ServiceClassCode = 0
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ServiceClassCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 

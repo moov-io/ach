@@ -234,14 +234,10 @@ func BenchmarkBatchPOSTransactionCode(b *testing.B) {
 func testBatchPOSAddendaCount(t testing.TB) {
 	mockBatch := mockBatchPOS()
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addendum" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	// TODO: are we expecting there to be an error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -265,14 +261,10 @@ func testBatchPOSAddendaCountZero(t testing.TB) {
 	mockAddenda02 := mockAddenda02()
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "AddendaCount" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	// TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -323,14 +315,9 @@ func TestBatchPOSAddendum98(t *testing.T) {
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda98" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -342,14 +329,9 @@ func TestBatchPOSAddendum99(t *testing.T) {
 	mockAddenda99.TypeCode = "05"
 	mockBatch.GetEntries()[0].Category = CategoryReturn
 	mockBatch.GetEntries()[0].Addenda99 = mockAddenda99
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "TypeCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrAddendaTypeCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -361,14 +343,10 @@ func testBatchPOSInvalidAddenda(t testing.TB) {
 	addenda02.recordType = "63"
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	//TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -389,14 +367,10 @@ func BenchmarkBatchPOSInvalidAddenda(b *testing.B) {
 func testBatchPOSInvalidBuild(t testing.TB) {
 	mockBatch := mockBatchPOS()
 	mockBatch.GetHeader().recordType = "3"
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	// TODO: are we expecting there to be an error here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -458,14 +432,9 @@ func TestBatchPOSCategoryReturn(t *testing.T) {
 	mockBatch.GetEntries()[0].Category = CategoryReturn
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda02" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrBatchAddendaCategory) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -475,14 +444,9 @@ func TestBatchPOSCategoryReturnAddenda99(t *testing.T) {
 	mockBatch.AddEntry(mockPOSEntryDetail())
 	mockBatch.GetEntries()[0].Category = CategoryReturn
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		if e, ok := err.(*BatchError); ok {
-			if e.FieldName != "Addenda99" {
-				t.Errorf("%T: %s", err, err)
-			}
-		} else {
-			t.Errorf("%T: %s", err, err)
-		}
+	err := mockBatch.Create()
+	if !base.Match(err, ErrFieldInclusion) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -494,8 +458,8 @@ func TestBatchPOSTerminalState(t *testing.T) {
 	mockAddenda02.TerminalState = "YY"
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	err := mockBatch.Validate()
-	if !base.Match(err, NewErrBatchHeaderControlEquality("225", "200")) {
+	err := mockBatch.Create()
+	if !base.Match(err, ErrValidState) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

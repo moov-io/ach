@@ -5,8 +5,6 @@
 package ach
 
 import (
-	"fmt"
-
 	"github.com/moov-io/ach/internal/usabbrev"
 )
 
@@ -80,8 +78,7 @@ func (batch *BatchSHR) Validate() error {
 		}
 		if entry.Category == CategoryForward {
 			if !usabbrev.Valid(entry.Addenda02.TerminalState) {
-				msg := fmt.Sprintf("%q is not a valid US state or territory", entry.Addenda02.TerminalState)
-				return &BatchError{BatchNumber: batch.Header.BatchNumber, FieldName: "TerminalState", Msg: msg}
+				return batch.Error("TerminalState", ErrValidState, entry.Addenda02.TerminalState)
 			}
 		}
 	}

@@ -5,9 +5,10 @@
 package ach
 
 import (
-	"github.com/moov-io/base"
 	"strings"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // mockADVEntryDetail creates a ADV entry detail
@@ -127,12 +128,10 @@ func BenchmarkADVEDString(b *testing.B) {
 func TestValidateADVEDRecordType(t *testing.T) {
 	ed := mockADVEntryDetail()
 	ed.recordType = "2"
-	if err := ed.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "recordType" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := ed.Validate()
+	// TODO: are we not expecting any errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -140,12 +139,9 @@ func TestValidateADVEDRecordType(t *testing.T) {
 func TestValidateADVEDTransactionCode(t *testing.T) {
 	ed := mockADVEntryDetail()
 	ed.TransactionCode = 63
-	if err := ed.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := ed.Validate()
+	if !base.Match(err, ErrTransactionCode) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -153,12 +149,9 @@ func TestValidateADVEDTransactionCode(t *testing.T) {
 func TestADVEDDFIAccountNumberAlphaNumeric(t *testing.T) {
 	ed := mockADVEntryDetail()
 	ed.DFIAccountNumber = "®"
-	if err := ed.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "DFIAccountNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := ed.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -166,12 +159,9 @@ func TestADVEDDFIAccountNumberAlphaNumeric(t *testing.T) {
 func TestADVEDAdviceRoutingNumberAlphaNumeric(t *testing.T) {
 	ed := mockADVEntryDetail()
 	ed.AdviceRoutingNumber = "®"
-	if err := ed.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "AdviceRoutingNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := ed.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -179,12 +169,9 @@ func TestADVEDAdviceRoutingNumberAlphaNumeric(t *testing.T) {
 func TestADVEDIndividualNameAlphaNumeric(t *testing.T) {
 	ed := mockADVEntryDetail()
 	ed.IndividualName = "®"
-	if err := ed.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "IndividualName" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := ed.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -192,12 +179,9 @@ func TestADVEDIndividualNameAlphaNumeric(t *testing.T) {
 func TestADVEDDiscretionaryDataAlphaNumeric(t *testing.T) {
 	ed := mockADVEntryDetail()
 	ed.DiscretionaryData = "®"
-	if err := ed.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "DiscretionaryData" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := ed.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -205,12 +189,9 @@ func TestADVEDDiscretionaryDataAlphaNumeric(t *testing.T) {
 func TestADVEDACHOperatorRoutingNumberAlphaNumeric(t *testing.T) {
 	ed := mockADVEntryDetail()
 	ed.ACHOperatorRoutingNumber = "®"
-	if err := ed.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "ACHOperatorRoutingNumber" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := ed.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -218,12 +199,9 @@ func TestADVEDACHOperatorRoutingNumberAlphaNumeric(t *testing.T) {
 func TestADVEDisCheckDigit(t *testing.T) {
 	ed := mockADVEntryDetail()
 	ed.CheckDigit = "1"
-	if err := ed.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "RDFIIdentification" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := ed.Validate()
+	if !base.Match(err, NewErrValidCheckDigit(7)) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -321,12 +299,10 @@ func TestADVEDFieldInclusionSequenceNumber(t *testing.T) {
 func TestBadTransactionCode(t *testing.T) {
 	entry := mockADVEntryDetail()
 	entry.TransactionCode = CheckingDebit
-	if err := entry.Validate(); err != nil {
-		if e, ok := err.(*FieldError); ok {
-			if e.FieldName != "TransactionCode" {
-				t.Errorf("%T: %s", err, err)
-			}
-		}
+	err := entry.Validate()
+	// TODO: are we expecting there to be no errors here?
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
@@ -342,13 +318,8 @@ func TestInvalidADVEDParse(t *testing.T) {
 		ODFIIdentification:     "121042882"}
 	r.addCurrentBatch(NewBatchADV(&bh))
 
-	if err := r.parseEntryDetail(); err != nil {
-		if p, ok := err.(*base.ParseError); ok {
-			if p.Record != "EntryDetail" {
-				t.Errorf("%T: %s", p, p)
-			}
-		} else {
-			t.Errorf("%T: %s", p.Err, p.Err)
-		}
+	err := r.parseEntryDetail()
+	if !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
 	}
 }
