@@ -233,7 +233,7 @@ func TestBatchMTEIdentificationNumber(t *testing.T) {
 
 	mockBatch.GetEntries()[0].IdentificationNumber = "000000"
 	err = mockBatch.Create()
-	// TODO: are we expecting there to be no errors here?
+	// TODO: are we not expecting any errors here?
 	if !base.Match(err, nil) {
 		t.Errorf("%T: %s", err, err)
 	}

@@ -129,8 +129,7 @@ func TestValidateADVEDRecordType(t *testing.T) {
 	ed := mockADVEntryDetail()
 	ed.recordType = "2"
 	err := ed.Validate()
-	// TODO: are we not expecting any errors here?
-	if !base.Match(err, nil) {
+	if !base.Match(err, NewErrRecordType(6)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

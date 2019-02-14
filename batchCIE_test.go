@@ -334,8 +334,7 @@ func testBatchCIEInvalidBuild(t testing.TB) {
 	mockBatch := mockBatchCIE()
 	mockBatch.GetHeader().recordType = "3"
 	err := mockBatch.Create()
-	// TODO: are we expecting there to be no errors here?
-	if !base.Match(err, nil) {
+	if !base.Match(err, NewErrRecordType(5)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -358,7 +357,7 @@ func testBatchCIECardTransactionType(t testing.TB) {
 	mockBatch := mockBatchCIE()
 	mockBatch.GetEntries()[0].DiscretionaryData = "555"
 	err := mockBatch.Validate()
-	// TODO: are we expecting there to be no errors here?
+	// TODO: are we not expecting any errors here?
 	if !base.Match(err, nil) {
 		t.Errorf("%T: %s", err, err)
 	}

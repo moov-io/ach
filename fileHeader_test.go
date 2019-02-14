@@ -152,8 +152,7 @@ func testValidateFHRecordType(t testing.TB) {
 	fh := mockFileHeader()
 	fh.recordType = "2"
 	err := fh.Validate()
-	// TODO: are we expecting there to be an error here?
-	if !base.Match(err, nil) {
+	if !base.Match(err, NewErrRecordType(1)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

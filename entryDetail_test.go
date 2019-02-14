@@ -161,8 +161,7 @@ func testValidateEDRecordType(t testing.TB) {
 	ed := mockEntryDetail()
 	ed.recordType = "2"
 	err := ed.Validate()
-	// TODO: are we expecting there to be an error here?
-	if !base.Match(err, nil) {
+	if !base.Match(err, NewErrRecordType(6)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

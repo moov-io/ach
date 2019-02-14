@@ -112,8 +112,8 @@ func (Addenda99 *Addenda99) String() string {
 
 // Validate verifies NACHA rules for Addenda99
 func (Addenda99 *Addenda99) Validate() error {
-	if Addenda99.recordType != "7" {
-		fieldError("recordType", NewErrRecordType(7), Addenda99.recordType)
+	if Addenda99.recordType != "7"{
+		return fieldError("recordType",NewErrRecordType(7), Addenda99.recordType)
 	}
 	if Addenda99.TypeCode == "" {
 		return fieldError("TypeCode", ErrConstructor, Addenda99.TypeCode)

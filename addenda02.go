@@ -117,7 +117,7 @@ func (addenda02 *Addenda02) Validate() error {
 		return err
 	}
 	if addenda02.recordType != "7" {
-		fieldError("recordType", NewErrRecordType(7), addenda02.recordType)
+		return fieldError("recordType", NewErrRecordType(7), addenda02.recordType)
 	}
 	if err := addenda02.isTypeCode(addenda02.TypeCode); err != nil {
 		return fieldError("TypeCode", err, addenda02.TypeCode)

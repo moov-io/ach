@@ -138,8 +138,7 @@ func testValidateFCRecordType(t testing.TB) {
 	fc.recordType = "2"
 
 	err := fc.Validate()
-	// TODO: are we expecting there to be an error here?
-	if !base.Match(err, nil) {
+	if !base.Match(err, NewErrRecordType(9)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

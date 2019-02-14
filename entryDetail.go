@@ -234,8 +234,8 @@ func (ed *EntryDetail) Validate() error {
 	if err := ed.fieldInclusion(); err != nil {
 		return err
 	}
-	if ed.recordType != "6" {
-		fieldError("recordType", NewErrRecordType(6), ed.recordType)
+	if ed.recordType != "6"{
+		return fieldError("recordType",NewErrRecordType(6), ed.recordType)
 	}
 	if err := ed.isTransactionCode(ed.TransactionCode); err != nil {
 		return fieldError("TransactionCode", err, strconv.Itoa(ed.TransactionCode))

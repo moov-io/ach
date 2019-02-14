@@ -368,8 +368,7 @@ func testBatchPOSInvalidBuild(t testing.TB) {
 	mockBatch := mockBatchPOS()
 	mockBatch.GetHeader().recordType = "3"
 	err := mockBatch.Create()
-	// TODO: are we expecting there to be an error here?
-	if !base.Match(err, nil) {
+		if !base.Match(err, NewErrRecordType(5)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

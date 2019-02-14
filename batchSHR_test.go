@@ -236,7 +236,7 @@ func testBatchSHRAddendaCount(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	err := mockBatch.Create()
-	// TODO: are we expecting there to be an error here?
+	// TODO: are we not expecting any errors here?
 	if !base.Match(err, nil) {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -368,8 +368,7 @@ func testBatchSHRInvalidBuild(t testing.TB) {
 	mockBatch := mockBatchSHR()
 	mockBatch.GetHeader().recordType = "3"
 	err := mockBatch.Create()
-	// TODO: are we expecting there to be an error here?
-	if !base.Match(err, nil) {
+	if !base.Match(err, NewErrRecordType(5)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
