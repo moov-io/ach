@@ -8,6 +8,8 @@ import (
 	"bytes"
 	"strings"
 	"testing"
+
+	"github.com/moov-io/base"
 )
 
 // testPPDWrite writes a PPD ACH file
@@ -91,7 +93,7 @@ func testFileWriteErr(t testing.TB) {
 	f := NewWriter(b)
 
 	err := f.Write(file)
-	if err != NewErrFileCalculatedControlEquality("EntryAddendaCount", 10, 2) {
+	if !base.Match(err, NewErrBatchCalculatedControlEquality(10, 2)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

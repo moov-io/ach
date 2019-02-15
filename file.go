@@ -153,6 +153,75 @@ type iatBatchesJSON struct {
 	IATBatches []IATBatch `json:"iatBatches"`
 }
 
+func setEntryRecordType(e *EntryDetail) {
+	e.recordType = "6"
+	if e.Addenda02 != nil {
+		e.Addenda02.recordType = "7"
+		e.Addenda02.TypeCode = "02"
+	}
+	for _, a := range e.Addenda05 {
+		a.recordType = "7"
+		a.TypeCode = "05"
+	}
+	if e.Addenda98 != nil {
+		e.Addenda98.recordType = "7"
+		e.Addenda98.TypeCode = "98"
+	}
+	if e.Addenda99 != nil {
+		e.Addenda99.recordType = "7"
+		e.Addenda99.TypeCode = "99"
+	}
+}
+
+func setIATEntryRecordType(e *IATEntryDetail) {
+	// these values need to be inferred from the json field names
+	e.recordType = "6"
+	if e.Addenda10 != nil {
+		e.Addenda10.recordType = "7"
+		e.Addenda10.TypeCode = "10"
+	}
+	if e.Addenda11 != nil {
+		e.Addenda11.recordType = "7"
+		e.Addenda11.TypeCode = "11"
+	}
+	if e.Addenda12 != nil {
+		e.Addenda12.recordType = "7"
+		e.Addenda12.TypeCode = "12"
+	}
+	if e.Addenda13 != nil {
+		e.Addenda13.recordType = "7"
+		e.Addenda13.TypeCode = "13"
+	}
+	if e.Addenda14 != nil {
+		e.Addenda14.recordType = "7"
+		e.Addenda14.TypeCode = "14"
+	}
+	if e.Addenda15 != nil {
+		e.Addenda15.recordType = "7"
+		e.Addenda15.TypeCode = "15"
+	}
+	if e.Addenda16 != nil {
+		e.Addenda16.recordType = "7"
+		e.Addenda16.TypeCode = "16"
+	}
+	for _, a := range e.Addenda17 {
+		a.recordType = "7"
+		a.TypeCode = "17"
+	}
+	for _, a := range e.Addenda18 {
+		a.recordType = "7"
+		a.TypeCode = "18"
+	}
+	if e.Addenda98 != nil {
+		e.Addenda98.recordType = "7"
+		e.Addenda98.TypeCode = "98"
+	}
+	if e.Addenda99 != nil {
+		e.Addenda99.recordType = "7"
+		e.Addenda99.TypeCode = "99"
+	}
+}
+
 // setBatchesFromJson takes bs as JSON and attempts to read out all the Batches within.
 //
 // We have to break this out as Batcher is an interface (and can't be read by Go's
@@ -175,10 +244,20 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 		if batches.Batches[i] == nil {
 			continue
 		}
-		if err := batches.Batches[i].build(); err != nil {
-			return batches.Batches[i].Error("Invalid Batch", err, batches.Batches[i].Header.ID)
+		batch := *batches.Batches[i]
+		batch.Header.recordType = batchHeaderPos
+
+		for _, e := range batch.Entries {
+			// these values need to be inferred from the json field names
+			setEntryRecordType(e)
 		}
-		f.Batches = append(f.Batches, batches.Batches[i])
+
+		if err := batch.build(); err != nil {
+			return batch.Error("Invalid Batch", err, batch.Header.ID)
+		}
+
+		// Attach a batch with the correct type
+		f.Batches = append(f.Batches, ConvertBatchType(batch))
 	}
 
 	if err := json.Unmarshal(bs, &iatBatches); err != nil {
@@ -190,10 +269,17 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 		if len(iatBatches.IATBatches) == 0 {
 			continue
 		}
-		if err := iatBatches.IATBatches[i].build(); err != nil {
-			return fmt.Errorf("batch %s: %v", iatBatches.IATBatches[i].Header.ID, err)
+
+		iatBatch := iatBatches.IATBatches[i]
+		iatBatch.Header.recordType = "5"
+		for _, e := range iatBatch.Entries {
+			setIATEntryRecordType(e)
 		}
-		f.IATBatches = append(f.IATBatches, iatBatches.IATBatches[i])
+
+		if err := iatBatch.build(); err != nil {
+			return iatBatch.Error("from JSON", err)
+		}
+		f.IATBatches = append(f.IATBatches, iatBatch)
 	}
 
 	return nil
@@ -316,6 +402,13 @@ func (f *File) Validate() error {
 		if f.Control.BatchCount != (len(f.Batches) + len(f.IATBatches)) {
 			return NewErrFileCalculatedControlEquality("BatchCount", len(f.Batches), f.Control.BatchCount)
 		}
+
+		for _, b := range f.Batches {
+			if err := b.Validate(); err != nil {
+				return err
+			}
+		}
+
 		if err := f.Control.Validate(); err != nil {
 			return err
 		}

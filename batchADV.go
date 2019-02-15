@@ -32,6 +32,9 @@ func (batch *BatchADV) Validate() error {
 	if batch.Header.ServiceClassCode != AutomatedAccountingAdvices {
 		return batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode)
 	}
+	if batch.Header.OriginatorStatusCode != 0 {
+		return batch.Error("OriginatorStatusCode", ErrOrigStatusCode, batch.Header.OriginatorStatusCode)
+	}
 	// basic verification of the batch before we validate specific rules.
 	if err := batch.verify(); err != nil {
 		return err

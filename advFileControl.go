@@ -100,7 +100,7 @@ func (fc *ADVFileControl) Validate() error {
 		return err
 	}
 	if fc.recordType != "9" {
-		fieldError("recordType", NewErrRecordType(9), fc.recordType)
+		return fieldError("recordType", NewErrRecordType(9), fc.recordType)
 	}
 	return nil
 }

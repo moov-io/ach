@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -824,5 +825,119 @@ func TestBatchDishonoredReturnsCategory(t *testing.T) {
 	err := batch.Create()
 	if !base.Match(err, NewErrBatchCategory("Return", "DishonoredReturn")) {
 		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestBatchConvertBatchType validates ConvertBatchType
+func TestBatchConvertBatchType(t *testing.T) {
+	mockBatchACK := mockBatchACK()
+	convertedACK := ConvertBatchType(mockBatchACK.Batch)
+	if reflect.TypeOf(convertedACK) != reflect.TypeOf(mockBatchACK) {
+		t.Error("ACK batch type is not converted correctly")
+	}
+	mockBatchADV := mockBatchADV()
+	convertedADV := ConvertBatchType(mockBatchADV.Batch)
+	if reflect.TypeOf(convertedADV) != reflect.TypeOf(mockBatchADV) {
+		t.Error("ADV batch type is not converted correctly")
+	}
+	mockBatchARC := mockBatchARC()
+	convertedARC := ConvertBatchType(mockBatchARC.Batch)
+	if reflect.TypeOf(convertedARC) != reflect.TypeOf(mockBatchARC) {
+		t.Error("ARC batch type is not converted correctly")
+	}
+	mockBatchATX := mockBatchATX()
+	convertedATX := ConvertBatchType(mockBatchATX.Batch)
+	if reflect.TypeOf(convertedATX) != reflect.TypeOf(mockBatchATX) {
+		t.Error("ATX batch type is not converted correctly")
+	}
+	mockBatchBOC := mockBatchBOC()
+	convertedBOC := ConvertBatchType(mockBatchBOC.Batch)
+	if reflect.TypeOf(convertedBOC) != reflect.TypeOf(mockBatchBOC) {
+		t.Error("BOC batch type is not converted correctly")
+	}
+	mockBatchCCD := mockBatchCCD()
+	convertedCCD := ConvertBatchType(mockBatchCCD.Batch)
+	if reflect.TypeOf(convertedCCD) != reflect.TypeOf(mockBatchCCD) {
+		t.Error("CCD batch type is not converted correctly")
+	}
+	mockBatchCIE := mockBatchCIE()
+	convertedCIE := ConvertBatchType(mockBatchCIE.Batch)
+	if reflect.TypeOf(convertedCIE) != reflect.TypeOf(mockBatchCIE) {
+		t.Error("CIE batch type is not converted correctly")
+	}
+	mockBatchCOR := mockBatchCOR()
+	convertedCOR := ConvertBatchType(mockBatchCOR.Batch)
+	if reflect.TypeOf(convertedCOR) != reflect.TypeOf(mockBatchCOR) {
+		t.Error("COR batch type is not converted correctly")
+	}
+	mockBatchCTX := mockBatchCTX()
+	convertedCTX := ConvertBatchType(mockBatchCTX.Batch)
+	if reflect.TypeOf(convertedCTX) != reflect.TypeOf(mockBatchCTX) {
+		t.Error("CTX batch type is not converted correctly")
+	}
+	mockBatchDNE := mockBatchDNE()
+	convertedDNE := ConvertBatchType(mockBatchDNE.Batch)
+	if reflect.TypeOf(convertedDNE) != reflect.TypeOf(mockBatchDNE) {
+		t.Error("DNE batch type is not converted correctly")
+	}
+	mockBatchENR := mockBatchENR()
+	convertedENR := ConvertBatchType(mockBatchENR.Batch)
+	if reflect.TypeOf(convertedENR) != reflect.TypeOf(mockBatchENR) {
+		t.Error("ENR batch type is not converted correctly")
+	}
+	mockBatchMTE := mockBatchMTE()
+	convertedMTE := ConvertBatchType(mockBatchMTE.Batch)
+	if reflect.TypeOf(convertedMTE) != reflect.TypeOf(mockBatchMTE) {
+		t.Error("MTE batch type is not converted correctly")
+	}
+	mockBatchPOP := mockBatchPOP()
+	convertedPOP := ConvertBatchType(mockBatchPOP.Batch)
+	if reflect.TypeOf(convertedPOP) != reflect.TypeOf(mockBatchPOP) {
+		t.Error("POP batch type is not converted correctly")
+	}
+	mockBatchPOS := mockBatchPOS()
+	convertedPOS := ConvertBatchType(mockBatchPOS.Batch)
+	if reflect.TypeOf(convertedPOS) != reflect.TypeOf(mockBatchPOS) {
+		t.Error("POS batch type is not converted correctly")
+	}
+	mockBatchPPD := mockBatchPPD()
+	convertedPPD := ConvertBatchType(mockBatchPPD.Batch)
+	if reflect.TypeOf(convertedPPD) != reflect.TypeOf(mockBatchPPD) {
+		t.Error("PPD batch type is not converted correctly")
+	}
+	mockBatchRCK := mockBatchRCK()
+	convertedRCK := ConvertBatchType(mockBatchRCK.Batch)
+	if reflect.TypeOf(convertedRCK) != reflect.TypeOf(mockBatchRCK) {
+		t.Error("RCK batch type is not converted correctly")
+	}
+	mockBatchSHR := mockBatchSHR()
+	convertedSHR := ConvertBatchType(mockBatchSHR.Batch)
+	if reflect.TypeOf(convertedSHR) != reflect.TypeOf(mockBatchSHR) {
+		t.Error("SHR batch type is not converted correctly")
+	}
+	mockBatchTEL := mockBatchTEL()
+	convertedTEL := ConvertBatchType(mockBatchTEL.Batch)
+	if reflect.TypeOf(convertedTEL) != reflect.TypeOf(mockBatchTEL) {
+		t.Error("TEL batch type is not converted correctly")
+	}
+	mockBatchTRC := mockBatchTRC()
+	convertedTRC := ConvertBatchType(mockBatchTRC.Batch)
+	if reflect.TypeOf(convertedTRC) != reflect.TypeOf(mockBatchTRC) {
+		t.Error("TRC batch type is not converted correctly")
+	}
+	mockBatchTRX := mockBatchTRX()
+	convertedTRX := ConvertBatchType(mockBatchTRX.Batch)
+	if reflect.TypeOf(convertedTRX) != reflect.TypeOf(mockBatchTRX) {
+		t.Error("TRX batch type is not converted correctly")
+	}
+	mockBatchWEB := mockBatchWEB()
+	convertedWEB := ConvertBatchType(mockBatchWEB.Batch)
+	if reflect.TypeOf(convertedWEB) != reflect.TypeOf(mockBatchWEB) {
+		t.Error("WEB batch type is not converted correctly")
+	}
+	mockBatchXCK := mockBatchXCK()
+	convertedXCK := ConvertBatchType(mockBatchXCK.Batch)
+	if reflect.TypeOf(convertedXCK) != reflect.TypeOf(mockBatchXCK) {
+		t.Error("XCK batch type is not converted correctly")
 	}
 }

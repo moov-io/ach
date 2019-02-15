@@ -1,5 +1,5 @@
 101 987654321 1234567891807160000A094101Federal Reserve Bank   My Bank Name                   
-5220                FF3               US123456789 IATTRADEPAYMTCADUSD010101   0231380100000001
+5220                FF3               US123456789 IATTRADEPAYMTCADUSD010101   1231380100000001
 6221210428820007             0000100000123456789                              1231380100000001
 710ANN000000000000100000928383-23938          BEK Enterprises                          0000001
 711BEK Solutions                      15 West Place Street                             0000001
@@ -11,7 +11,7 @@
 717This is an international payment                                                00010000001
 717Transfer of money from one country to another                                   00020000001
 82200000100012104288000000000000000000100000                                   231380100000001
-5220                FF3               US123456789 IATTRADEPAYMTCADUSD010101   0231380100000002
+5220                FF3               US123456789 IATTRADEPAYMTCADUSD010101   1231380100000002
 6271210428820007             0000002000123456789                              1231380100000001
 710ANN000000000000100000928383-23938          BEK Enterprises                          0000001
 711BEK Solutions                      15 West Place Street                             0000001

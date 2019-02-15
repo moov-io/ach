@@ -159,8 +159,7 @@ func testValidateBHRecordType(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.recordType = "2"
 	err := bh.Validate()
-	// TODO: are we expecting there to be an error here?
-	if !base.Match(err, nil) {
+	if !base.Match(err, NewErrRecordType(5)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -483,8 +482,7 @@ func testBHFieldInclusionOriginatorStatusCode(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.OriginatorStatusCode = 0
 	err := bh.Validate()
-	// TODO: are we expecting there to be no errors here?
-	if !base.Match(err, nil) {
+	if !base.Match(err, ErrOrigStatusCode) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

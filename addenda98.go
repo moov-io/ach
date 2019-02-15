@@ -102,7 +102,7 @@ func (addenda98 *Addenda98) String() string {
 // Validate verifies NACHA rules for Addenda98
 func (addenda98 *Addenda98) Validate() error {
 	if addenda98.recordType != "7" {
-		fieldError("recordType", NewErrRecordType(7), addenda98.recordType)
+		return fieldError("recordType", NewErrRecordType(7), addenda98.recordType)
 	}
 	if addenda98.TypeCode == "" {
 		return fieldError("TypeCode", ErrConstructor, addenda98.TypeCode)

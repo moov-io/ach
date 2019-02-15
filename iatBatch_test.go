@@ -660,18 +660,16 @@ func testIATBatchFieldInclusion(t testing.TB) {
 	mockBatch2.Header.recordType = "4"
 
 	err := mockBatch.verify()
-	//TODO: are we expecting there to be no errors here?
+	// no errors expected
 	if !base.Match(err, nil) {
 		t.Errorf("%T: %s", err, err)
 	}
 	err = mockBatch2.verify()
-	//TODO: are we expecting there to be no errors here?
-	if !base.Match(err, nil) {
+	if !base.Match(err, NewErrRecordType(5)) {
 		t.Errorf("%T: %s", err, err)
 	}
 	err = mockBatch2.build()
-	// TODO: are we expecting there to be no errors here?
-	if !base.Match(err, nil) {
+	if !base.Match(err, NewErrRecordType(5)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -946,8 +944,7 @@ func testIATBatchValidateEntry(t testing.TB) {
 	mockBatch.GetEntries()[0].recordType = "5"
 
 	err := mockBatch.verify()
-	//TODO: are we expecting there to be no errors here?
-	if !base.Match(err, nil) {
+	if !base.Match(err, NewErrRecordType(6)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -1163,8 +1160,7 @@ func testIATBatchCreate(t testing.TB) {
 	mockBatch.GetHeader().recordType = "7"
 
 	err := mockBatch.Create()
-	// TODO: are we expecting there to be no errors here?
-	if !base.Match(err, nil) {
+	if !base.Match(err, NewErrRecordType(5)) {
 		t.Errorf("%T: %s", err, err)
 	}
 
@@ -1782,8 +1778,7 @@ func TestIATBatchAddenda98RecordType(t *testing.T) {
 	}
 
 	err := mockBatch.Validate()
-	//TODO: are we expecting there to be no errors here?
-	if !base.Match(err, nil) {
+	if !base.Match(err, NewErrRecordType(7)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -1803,8 +1798,7 @@ func TestIATBatchAddenda99RecordType(t *testing.T) {
 	}
 
 	err := mockBatch.Validate()
-	//TODO: are we expecting there to be no errors here?
-	if !base.Match(err, nil) {
+	if !base.Match(err, NewErrRecordType(7)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -1822,8 +1816,7 @@ func TestIATBatchAddenda18RecordType(t *testing.T) {
 	}
 
 	err := mockBatch.Validate()
-	//TODO: are we expecting there to be no errors here?
-	if !base.Match(err, nil) {
+	if !base.Match(err, NewErrRecordType(7)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

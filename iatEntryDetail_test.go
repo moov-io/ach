@@ -170,8 +170,7 @@ func testIATEDInvalidRecordType(t testing.TB) {
 	iatEd := mockIATEntryDetail()
 	iatEd.recordType = "2"
 	err := iatEd.Validate()
-	// TODO: are we expecting there to be no errors here?
-	if !base.Match(err, nil) {
+	if !base.Match(err, NewErrRecordType(6)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

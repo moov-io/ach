@@ -127,7 +127,7 @@ const (
 func NewBatchHeader() *BatchHeader {
 	bh := &BatchHeader{
 		recordType:           "5",
-		OriginatorStatusCode: 0, //Prepared by an Originator
+		OriginatorStatusCode: 1, // Prepared by a financial institution
 		BatchNumber:          1,
 	}
 	return bh
@@ -204,17 +204,23 @@ func (bh *BatchHeader) Validate() error {
 		return err
 	}
 	if bh.recordType != "5" {
-		fieldError("recordType", NewErrRecordType(5), bh.recordType)
+		return fieldError("recordType", NewErrRecordType(5), bh.recordType)
 	}
 	if err := bh.isServiceClass(bh.ServiceClassCode); err != nil {
-		return fieldError("ServiceClassCode", err, strconv.Itoa(bh.ServiceClassCode))
+		return fieldError("ServiceClassCode", err, bh.ServiceClassCode)
 	}
 	if err := bh.isSECCode(bh.StandardEntryClassCode); err != nil {
 		return fieldError("StandardEntryClassCode", err, bh.StandardEntryClassCode)
 	}
 	if err := bh.isOriginatorStatusCode(bh.OriginatorStatusCode); err != nil {
-		return fieldError("OriginatorStatusCode", err, strconv.Itoa(bh.OriginatorStatusCode))
+		return fieldError("OriginatorStatusCode", err, bh.OriginatorStatusCode)
 	}
+
+	// Originator status code 0 is used for ADV batches only
+	if bh.StandardEntryClassCode != ADV && bh.OriginatorStatusCode == 0 {
+		return fieldError("OriginatorStatusCode", ErrOrigStatusCode, bh.OriginatorStatusCode)
+	}
+
 	if err := bh.isAlphanumeric(bh.CompanyName); err != nil {
 		return fieldError("CompanyName", err, bh.CompanyName)
 	}

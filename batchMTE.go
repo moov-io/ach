@@ -5,6 +5,8 @@
 package ach
 
 import (
+	"strings"
+
 	"github.com/moov-io/ach/internal/usabbrev"
 )
 
@@ -54,6 +56,11 @@ func (batch *BatchMTE) Validate() error {
 			if !usabbrev.Valid(entry.Addenda02.TerminalState) {
 				return batch.Error("TerminalState", ErrValidState, entry.Addenda02.TerminalState)
 			}
+		}
+
+		// MTE entries cannot have an identification number that is all spaces or all zeros
+		if strings.Trim(entry.IdentificationNumber, " 0") == "" {
+			return batch.Error("IdentificationNumber", ErrIdentificationNumber, entry.IdentificationNumber)
 		}
 	}
 	return nil

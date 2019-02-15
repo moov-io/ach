@@ -140,7 +140,7 @@ func (bc *BatchControl) Validate() error {
 		return err
 	}
 	if bc.recordType != "8" {
-		fieldError("recordType", NewErrRecordType(7), bc.recordType)
+		return fieldError("recordType", NewErrRecordType(8), bc.recordType)
 	}
 	if err := bc.isServiceClass(bc.ServiceClassCode); err != nil {
 		return fieldError("ServiceClassCode", err, strconv.Itoa(bc.ServiceClassCode))

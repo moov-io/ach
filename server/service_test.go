@@ -124,9 +124,7 @@ func TestGetFileContents(t *testing.T) {
 	}
 
 	// make the file valid
-	bh := mockBatchHeaderWeb()
-	bh.ID = "11111"
-	batch, _ := ach.NewBatch(bh)
+	batch := mockBatchWEB()
 	s.CreateBatch(id, batch)
 
 	// build file

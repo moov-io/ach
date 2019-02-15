@@ -688,8 +688,7 @@ func TestFileADVControlValidate(t *testing.T) {
 
 	file.ADVControl.recordType = "22"
 	err := file.Validate()
-	// TODO: are we expecting there to be an error here?
-	if !base.Match(err, nil) {
+	if !base.Match(err, NewErrRecordType(9)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -700,8 +699,7 @@ func TestFileControlValidate(t *testing.T) {
 
 	file.Control.recordType = "22"
 	err := file.Validate()
-	// TODO: are we expecting there to be an error here?
-	if !base.Match(err, nil) {
+	if !base.Match(err, NewErrRecordType(9)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

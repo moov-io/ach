@@ -32,6 +32,8 @@ var (
 	ErrAddendaTypeCode = errors.New("is an invalid Addenda Type Code")
 	//ErrTransactionCode is given when there's an invalid transaction code
 	ErrTransactionCode = errors.New("is an invalid Transaction Code")
+	//ErrIdentificationNumber is given when there's an invalid identification number
+	ErrIdentificationNumber = errors.New("is an invalid identification number")
 	//ErrCardTransactionType  is given when there's an invalid card transaction type
 	ErrCardTransactionType = errors.New("is an invalid Card Transaction Type")
 	//ErrValidMonth is given when there's an invalid month
