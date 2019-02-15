@@ -660,7 +660,7 @@ func testIATBatchFieldInclusion(t testing.TB) {
 	mockBatch2.Header.recordType = "4"
 
 	err := mockBatch.verify()
-	//TODO: are we expecting there to be no errors here?
+	// no errors expected
 	if !base.Match(err, nil) {
 		t.Errorf("%T: %s", err, err)
 	}

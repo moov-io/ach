@@ -225,16 +225,14 @@ func TestBatchMTEIdentificationNumber(t *testing.T) {
 
 	// NACHA rules state MTE records can't be all spaces or all zeros
 	mockBatch.GetEntries()[0].IdentificationNumber = "   "
-	err := mockBatch.Create()
-	// TODO: are we expecting there to be no errors here?
-	if !base.Match(err, nil) {
+	err := mockBatch.Validate()
+	if !base.Match(err, ErrIdentificationNumber) {
 		t.Errorf("%T: %s", err, err)
 	}
 
 	mockBatch.GetEntries()[0].IdentificationNumber = "000000"
-	err = mockBatch.Create()
-	// TODO: are we not expecting any errors here?
-	if !base.Match(err, nil) {
+	err = mockBatch.Validate()
+	if !base.Match(err, ErrIdentificationNumber) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

@@ -150,7 +150,7 @@ func testValidateADVBCRecordType(t testing.TB) {
 	bc := mockADVBatchControl()
 	bc.recordType = "2"
 	err := bc.Validate()
-		if !base.Match(err, NewErrRecordType(7)) {
+	if !base.Match(err, NewErrRecordType(7)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

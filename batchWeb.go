@@ -14,7 +14,9 @@ type BatchWEB struct {
 // NewBatchWEB returns a *BatchWEB
 func NewBatchWEB(bh *BatchHeader) *BatchWEB {
 	batch := new(BatchWEB)
-	batch.SetControl(NewBatchControl())
+	bc := NewBatchControl()
+	bc.ServiceClassCode = bh.ServiceClassCode
+	batch.SetControl(bc)
 	batch.SetHeader(bh)
 	return batch
 }

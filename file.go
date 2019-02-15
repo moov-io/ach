@@ -316,6 +316,13 @@ func (f *File) Validate() error {
 		if f.Control.BatchCount != (len(f.Batches) + len(f.IATBatches)) {
 			return NewErrFileCalculatedControlEquality("BatchCount", len(f.Batches), f.Control.BatchCount)
 		}
+
+		for _, b := range f.Batches {
+			if err := b.Validate(); err != nil {
+				return err
+			}
+		}
+
 		if err := f.Control.Validate(); err != nil {
 			return err
 		}

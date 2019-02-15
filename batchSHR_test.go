@@ -341,11 +341,10 @@ func testBatchSHRInvalidAddenda(t testing.TB) {
 	mockBatch.AddEntry(mockSHREntryDetail())
 	addenda02 := mockAddenda02()
 	addenda02.recordType = "63"
-	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
+	mockBatch.GetEntries()[0].Addenda02 = addenda02
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	err := mockBatch.Create()
-	//TODO: are we expecting there to be no errors here?
-	if !base.Match(err, nil) {
+	if !base.Match(err, NewErrRecordType(7)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

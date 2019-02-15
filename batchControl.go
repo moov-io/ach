@@ -139,8 +139,8 @@ func (bc *BatchControl) Validate() error {
 	if err := bc.fieldInclusion(); err != nil {
 		return err
 	}
-	if bc.recordType != "8"{
-		return fieldError("recordType",NewErrRecordType(7), bc.recordType)
+	if bc.recordType != "8" {
+		return fieldError("recordType", NewErrRecordType(8), bc.recordType)
 	}
 	if err := bc.isServiceClass(bc.ServiceClassCode); err != nil {
 		return fieldError("ServiceClassCode", err, strconv.Itoa(bc.ServiceClassCode))

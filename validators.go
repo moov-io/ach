@@ -193,7 +193,7 @@ func (v *validator) isOriginatorStatusCode(code int) error {
 	case
 		// ADV file - prepared by an ACH Operator
 		0,
-		//Originator is a financial institution
+		// Originator is a financial institution
 		1,
 		// Originator is a Government Agency or other agency not subject to ACH Rules
 		2:

@@ -251,11 +251,10 @@ func testBatchTRXInvalidAddenda(t testing.TB) {
 	mockBatch.AddEntry(mockTRXEntryDetail())
 	addenda05 := mockAddenda05()
 	addenda05.recordType = "63"
-	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
+	mockBatch.GetEntries()[0].AddAddenda05(addenda05)
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	err := mockBatch.Create()
-	//TODO: are we expecting there to be no errors here?
-	if !base.Match(err, nil) {
+	if !base.Match(err, NewErrRecordType(7)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -278,7 +277,7 @@ func testBatchTRXInvalidBuild(t testing.TB) {
 	mockBatch := mockBatchTRX()
 	mockBatch.GetHeader().recordType = "3"
 	err := mockBatch.Create()
-		if !base.Match(err, NewErrRecordType(5)) {
+	if !base.Match(err, NewErrRecordType(5)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
