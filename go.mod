@@ -9,7 +9,7 @@ require (
 	github.com/hashicorp/golang-lru v0.5.0 // indirect
 	github.com/moov-io/base v0.8.0
 	github.com/prometheus/client_golang v0.9.2
-	github.com/prometheus/client_model v0.0.0-20190109181635-f287a105a20e // indirect
+	github.com/prometheus/client_model v0.0.0-20190215201837-fd36f4220a90 // indirect
 	github.com/prometheus/common v0.0.0-20190107103113-2998b132700a // indirect
 	github.com/prometheus/procfs v0.0.0-20190104112138-b1a0a9a36d74 // indirect
 	github.com/rickar/cal v1.0.0 // indirect
