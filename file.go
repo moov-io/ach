@@ -175,10 +175,79 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 		if batches.Batches[i] == nil {
 			continue
 		}
-		if err := batches.Batches[i].build(); err != nil {
-			return batches.Batches[i].Error("Invalid Batch", err, batches.Batches[i].Header.ID)
+		batch := *batches.Batches[i]
+		batch.Header.recordType = batchHeaderPos
+
+		for _, e := range batch.Entries {
+			e.recordType = "6"
+			if e.Addenda02 != nil {
+				e.Addenda02.recordType = "7"
+			}
+			for _, a := range e.Addenda05 {
+				a.recordType = "7"
+			}
+			if e.Addenda98 != nil {
+				e.Addenda98.recordType = "7"
+			}
+			if e.Addenda99 != nil {
+				e.Addenda99.recordType = "7"
+			}
 		}
-		f.Batches = append(f.Batches, batches.Batches[i])
+		if err := batch.build(); err != nil {
+			return batch.Error("Invalid Batch", err, batch.Header.ID)
+		}
+
+		// Attach a batch with the correct type
+		switch batch.Header.StandardEntryClassCode {
+		case ACK:
+			f.Batches = append(f.Batches, &BatchACK{batch})
+		case ADV:
+			f.Batches = append(f.Batches, &BatchADV{batch})
+		case ARC:
+			f.Batches = append(f.Batches, &BatchARC{batch})
+		case ATX:
+			f.Batches = append(f.Batches, &BatchATX{batch})
+		case BOC:
+			f.Batches = append(f.Batches, &BatchBOC{batch})
+		case CCD:
+			f.Batches = append(f.Batches, &BatchCCD{batch})
+		case CIE:
+			f.Batches = append(f.Batches, &BatchCIE{batch})
+		case COR:
+			f.Batches = append(f.Batches, &BatchCOR{batch})
+		case CTX:
+			f.Batches = append(f.Batches, &BatchCTX{batch})
+		case DNE:
+			f.Batches = append(f.Batches, &BatchDNE{batch})
+		case ENR:
+			f.Batches = append(f.Batches, &BatchENR{batch})
+		case IAT:
+			return ErrFileIATSEC
+		case MTE:
+			f.Batches = append(f.Batches, &BatchMTE{batch})
+		case POP:
+			f.Batches = append(f.Batches, &BatchPOP{batch})
+		case POS:
+			f.Batches = append(f.Batches, &BatchPOS{batch})
+		case PPD:
+			f.Batches = append(f.Batches, &BatchPPD{batch})
+		case RCK:
+			f.Batches = append(f.Batches, &BatchRCK{batch})
+		case SHR:
+			f.Batches = append(f.Batches, &BatchSHR{batch})
+		case TEL:
+			f.Batches = append(f.Batches, &BatchTEL{batch})
+		case TRC:
+			f.Batches = append(f.Batches, &BatchTRC{batch})
+		case TRX:
+			f.Batches = append(f.Batches, &BatchTRX{batch})
+		case WEB:
+			f.Batches = append(f.Batches, &BatchWEB{batch})
+		case XCK:
+			f.Batches = append(f.Batches, &BatchXCK{batch})
+		default:
+			f.Batches = append(f.Batches, &batch)
+		}
 	}
 
 	if err := json.Unmarshal(bs, &iatBatches); err != nil {
@@ -190,10 +259,50 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 		if len(iatBatches.IATBatches) == 0 {
 			continue
 		}
-		if err := iatBatches.IATBatches[i].build(); err != nil {
-			return fmt.Errorf("batch %s: %v", iatBatches.IATBatches[i].Header.ID, err)
+
+		iatBatch := iatBatches.IATBatches[i]
+		iatBatch.Header.recordType = "5"
+		for _, e := range iatBatch.Entries {
+			e.recordType = "6"
+			if e.Addenda10 != nil {
+				e.Addenda10.recordType = "7"
+			}
+			if e.Addenda11 != nil {
+				e.Addenda11.recordType = "7"
+			}
+			if e.Addenda12 != nil {
+				e.Addenda12.recordType = "7"
+			}
+			if e.Addenda13 != nil {
+				e.Addenda13.recordType = "7"
+			}
+			if e.Addenda14 != nil {
+				e.Addenda14.recordType = "7"
+			}
+			if e.Addenda15 != nil {
+				e.Addenda15.recordType = "7"
+			}
+			if e.Addenda16 != nil {
+				e.Addenda16.recordType = "7"
+			}
+			for _, a := range e.Addenda17 {
+				a.recordType = "7"
+			}
+			for _, a := range e.Addenda18 {
+				a.recordType = "7"
+			}
+			if e.Addenda98 != nil {
+				e.Addenda98.recordType = "7"
+			}
+			if e.Addenda99 != nil {
+				e.Addenda99.recordType = "7"
+			}
 		}
-		f.IATBatches = append(f.IATBatches, iatBatches.IATBatches[i])
+
+		if err := iatBatch.build(); err != nil {
+			return iatBatch.Error("from JSON", err)
+		}
+		f.IATBatches = append(f.IATBatches, iatBatch)
 	}
 
 	return nil
