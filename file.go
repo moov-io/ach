@@ -204,56 +204,7 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 		}
 
 		// Attach a batch with the correct type
-		switch batch.Header.StandardEntryClassCode {
-		case ACK:
-			f.Batches = append(f.Batches, &BatchACK{batch})
-		case ADV:
-			f.Batches = append(f.Batches, &BatchADV{batch})
-		case ARC:
-			f.Batches = append(f.Batches, &BatchARC{batch})
-		case ATX:
-			f.Batches = append(f.Batches, &BatchATX{batch})
-		case BOC:
-			f.Batches = append(f.Batches, &BatchBOC{batch})
-		case CCD:
-			f.Batches = append(f.Batches, &BatchCCD{batch})
-		case CIE:
-			f.Batches = append(f.Batches, &BatchCIE{batch})
-		case COR:
-			f.Batches = append(f.Batches, &BatchCOR{batch})
-		case CTX:
-			f.Batches = append(f.Batches, &BatchCTX{batch})
-		case DNE:
-			f.Batches = append(f.Batches, &BatchDNE{batch})
-		case ENR:
-			f.Batches = append(f.Batches, &BatchENR{batch})
-		case IAT:
-			return ErrFileIATSEC
-		case MTE:
-			f.Batches = append(f.Batches, &BatchMTE{batch})
-		case POP:
-			f.Batches = append(f.Batches, &BatchPOP{batch})
-		case POS:
-			f.Batches = append(f.Batches, &BatchPOS{batch})
-		case PPD:
-			f.Batches = append(f.Batches, &BatchPPD{batch})
-		case RCK:
-			f.Batches = append(f.Batches, &BatchRCK{batch})
-		case SHR:
-			f.Batches = append(f.Batches, &BatchSHR{batch})
-		case TEL:
-			f.Batches = append(f.Batches, &BatchTEL{batch})
-		case TRC:
-			f.Batches = append(f.Batches, &BatchTRC{batch})
-		case TRX:
-			f.Batches = append(f.Batches, &BatchTRX{batch})
-		case WEB:
-			f.Batches = append(f.Batches, &BatchWEB{batch})
-		case XCK:
-			f.Batches = append(f.Batches, &BatchXCK{batch})
-		default:
-			f.Batches = append(f.Batches, &batch)
-		}
+		f.Batches = append(f.Batches, ConvertBatchType(batch))
 	}
 
 	if err := json.Unmarshal(bs, &iatBatches); err != nil {

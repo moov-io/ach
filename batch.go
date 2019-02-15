@@ -184,6 +184,58 @@ func NewBatch(bh *BatchHeader) (Batcher, error) {
 	return nil, NewErrFileUnknownSEC(bh.StandardEntryClassCode)
 }
 
+// ConvertBatchType will take a batch object and convert it into one of the correct batch type
+func ConvertBatchType(b Batch) Batcher {
+	switch b.Header.StandardEntryClassCode {
+	case ACK:
+		return &BatchACK{b}
+	case ADV:
+		return &BatchADV{b}
+	case ARC:
+		return &BatchARC{b}
+	case ATX:
+		return &BatchATX{b}
+	case BOC:
+		return &BatchBOC{b}
+	case CCD:
+		return &BatchCCD{b}
+	case CIE:
+		return &BatchCIE{b}
+	case COR:
+		return &BatchCOR{b}
+	case CTX:
+		return &BatchCTX{b}
+	case DNE:
+		return &BatchDNE{b}
+	case ENR:
+		return &BatchENR{b}
+	case MTE:
+		return &BatchMTE{b}
+	case POP:
+		return &BatchPOP{b}
+	case POS:
+		return &BatchPOS{b}
+	case PPD:
+		return &BatchPPD{b}
+	case RCK:
+		return &BatchRCK{b}
+	case SHR:
+		return &BatchSHR{b}
+	case TEL:
+		return &BatchTEL{b}
+	case TRC:
+		return &BatchTRC{b}
+	case TRX:
+		return &BatchTRX{b}
+	case WEB:
+		return &BatchWEB{b}
+	case XCK:
+		return &BatchXCK{b}
+	default:
+		return &b
+	}
+}
+
 // Create will tabulate and assemble an ACH batch into a valid state. This includes
 // setting any posting dates, sequence numbers, counts, and sums.
 //

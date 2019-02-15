@@ -27,4 +27,3 @@ comment:
 
 ignore:
   - "*Errors.go"  # ignore error files
-  - "file.go"
