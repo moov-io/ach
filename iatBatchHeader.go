@@ -264,8 +264,8 @@ func (iatBh *IATBatchHeader) Validate() error {
 	if err := iatBh.fieldInclusion(); err != nil {
 		return err
 	}
-	if iatBh.recordType != "5"{
-		return fieldError("recordType",NewErrRecordType(5), iatBh.recordType)
+	if iatBh.recordType != "5" {
+		return fieldError("recordType", NewErrRecordType(5), iatBh.recordType)
 	}
 	if err := iatBh.isServiceClass(iatBh.ServiceClassCode); err != nil {
 		return fieldError("ServiceClassCode", err, strconv.Itoa(iatBh.ServiceClassCode))

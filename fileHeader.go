@@ -161,8 +161,8 @@ func (fh *FileHeader) Validate() error {
 	if err := fh.fieldInclusion(); err != nil {
 		return err
 	}
-	if fh.recordType != "1"{
-		return fieldError("recordType",NewErrRecordType(1), fh.recordType)
+	if fh.recordType != "1" {
+		return fieldError("recordType", NewErrRecordType(1), fh.recordType)
 	}
 	if err := fh.isUpperAlphanumeric(fh.FileIDModifier); err != nil {
 		return fieldError("FileIDModifier", err, fh.FileIDModifier)

@@ -79,7 +79,7 @@ func testAddenda13ValidRecordType(t testing.TB) {
 	addenda13 := mockAddenda13()
 	addenda13.recordType = "63"
 	err := addenda13.Validate()
-		if !base.Match(err, NewErrRecordType(7)) {
+	if !base.Match(err, NewErrRecordType(7)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

@@ -180,7 +180,7 @@ func testBuildFile(t testing.TB) {
 
 	// Add the addenda record to the detail entry
 	entry.AddAddenda05(addendaPPD)
-	
+
 	// Entries are added to batches like so:
 	batch.AddEntry(entry)
 

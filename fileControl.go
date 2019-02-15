@@ -94,8 +94,8 @@ func (fc *FileControl) Validate() error {
 	if err := fc.fieldInclusion(); err != nil {
 		return err
 	}
-	if fc.recordType != "9"{
-		return fieldError("recordType",NewErrRecordType(9), fc.recordType)
+	if fc.recordType != "9" {
+		return fieldError("recordType", NewErrRecordType(9), fc.recordType)
 	}
 	return nil
 }

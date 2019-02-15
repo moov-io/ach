@@ -310,7 +310,6 @@ func testBatchCIEInvalidAddenda(t testing.TB) {
 	mockBatch.GetEntries()[0].AddAddenda05(addenda05)
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	err := mockBatch.Create()
-	//TODO: are we expecting there to be no errors here?
 	if !base.Match(err, NewErrRecordType(7)) {
 		t.Errorf("%T: %s", err, err)
 	}

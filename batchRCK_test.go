@@ -386,7 +386,7 @@ func testBatchRCKInvalidBuild(t testing.TB) {
 	mockBatch := mockBatchRCK()
 	mockBatch.GetHeader().recordType = "3"
 	err := mockBatch.Create()
-		if !base.Match(err, NewErrRecordType(5)) {
+	if !base.Match(err, NewErrRecordType(5)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
