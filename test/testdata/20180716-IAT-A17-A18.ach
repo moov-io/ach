@@ -1,5 +1,5 @@
 101 987654321 1234567891807160000A094101Federal Reserve Bank   My Bank Name                   
-5220                FF3               US123456789 IATTRADEPAYMTCADUSD010101   0231380100000001
+5220                FF3               US123456789 IATTRADEPAYMTCADUSD010101   1231380100000001
 6221210428820007             0000100000123456789                              1231380100000001
 710ANN000000000000100000928383-23938          BEK Enterprises                          0000001
 711BEK Solutions                      15 West Place Street                             0000001
@@ -16,7 +16,7 @@
 718Bank of Turkey                     0112312345678910                    TR       00040000001
 718Bank of United Kingdom             011234567890123456789012345678901234GB       00050000001
 82200000150012104288000000000000000000100000                                   231380100000001
-5220                FF3               US123456789 IATTRADEPAYMTCADUSD010101   0231380100000002
+5220                FF3               US123456789 IATTRADEPAYMTCADUSD010101   1231380100000002
 6271210428820007             0000002000123456789                              1231380100000001
 710ANN000000000000100000928383-23938          BEK Enterprises                          0000001
 711BEK Solutions                      15 West Place Street                             0000001

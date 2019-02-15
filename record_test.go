@@ -180,9 +180,8 @@ func testBuildFile(t testing.TB) {
 
 	// Add the addenda record to the detail entry
 	entry.AddAddenda05(addendaPPD)
-
+	
 	// Entries are added to batches like so:
-
 	batch.AddEntry(entry)
 
 	// When all of the Entries are added to the batch we must build it.
@@ -211,12 +210,18 @@ func testBuildFile(t testing.TB) {
 	// Add the addenda record to the detail entry
 	entry.AddAddenda05(addendaWEB)
 
-	// add the second batch to the file
+	// Add the entry to the batch
+	batch.AddEntry(entry)
 
+	// Now we must build this batch
+	if err := batch.Create(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	// And add the second batch to the file
 	file.AddBatch(batch)
 
 	// Once we added all our batches we must build the file
-
 	if err := file.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}

@@ -157,3 +157,13 @@ func TestADVMaximumEntries(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
+
+// TestBatchADVOriginatorStatusCode validates the originator status code
+func TestBatchADVOriginatorStatusCode(t *testing.T) {
+	mockBatch := mockBatchADV()
+	mockBatch.Header.OriginatorStatusCode = 1
+	err := mockBatch.Create()
+	if !base.Match(err, ErrOrigStatusCode) {
+		t.Errorf("%T: %s", err, err)
+	}
+}
