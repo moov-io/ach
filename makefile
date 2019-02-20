@@ -16,6 +16,11 @@ generate: clean
 clean:
 	@rm -rf tmp/
 
+dist: clean build generate
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./bin/ach-linux-amd64
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o ./bin/ach-darwin-amd64
+	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o ./bin/ach-amd64.exe
+
 docker: clean
 # ACH docker image
 	docker build --pull -t moov/ach:$(VERSION) -f Dockerfile .
