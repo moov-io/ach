@@ -34,7 +34,6 @@ release: docker generate AUTHORS
 	git tag -f $(VERSION)
 
 release-push:
-	git push origin $(VERSION)
 	docker push moov/ach:$(VERSION)
 	docker push moov/achfuzz:$(VERSION)
 

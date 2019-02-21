@@ -43,3 +43,20 @@ script:
 after_success:
 - bash <(curl -s https://codecov.io/bash)
 - make docker
+before_deploy:
+- make dist
+deploy:
+  provider: releases
+  api_key:
+    secure: TODO
+  on:
+    tags: true
+  file:
+    - bin/ach-amd64.exe
+    - bin/ach-darwin-amd64
+    - bin/ach-linux-amd64
+  skip_cleanup: true
+after_deploy:
+# Upload Docker images
+- echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+- make release-push
