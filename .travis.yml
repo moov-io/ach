@@ -32,7 +32,7 @@ before_install:
 before_script:
   - GOFILES=$(find . -type f -name '*.go' | grep -v vendor)
 script:
-  # # Just check gofmt on linux, it's the fastest builder
+  # Just check gofmt on linux, it's the fastest builder
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then test -z $(gofmt -s -l $GOFILES); fi
   - go test ./... -race -coverprofile=coverage.txt -covermode=atomic
   - misspell -error -locale US $GOFILES
@@ -47,7 +47,7 @@ before_deploy:
 deploy:
   provider: releases
   api_key:
-    secure: j35B1Ki8XUo8RHTjLczymqH3zlO+Gpj0hCLvZZDubh8y52ajQYfLoFOFtCrSAoUvtjq1HLHoZ9X1IwkHjQOoWw34ZUu+1VDn+Tj6+b1149uXZ4e86TZRoRM7P8vRoXoGTkVOuupnA4FDX2eV9Z/SEMLCTz88q4MYNXT6XCFtG2pVnYovGc1h9g/O9DfdUY/9HHJKGQPHT78bDPKudBZ2PiKbK3c9XSjSJuYQZqXOGFIzZtT770wVpMbmi9tbjzni8DMFTCMGFZr4wN7FDgPW0ZBsybrT82i5gOkvAMxxMZuDPz5dx6xjKDKZIkvmCCvOVIEvWySvBvqRnhncw6TTNE63UYh/EcVBQAXSSG6QW+ja403v4dBNxyCddlrG42HmQ+OlhUs7s1xSId+Cz/mKABkBhiRlBMyYH/iTeQaQJBOE7FYqZ135h2VVjZvUyeWfIh0L46M6FMVuf7GIJUEYTcThcCwj9oAGQ8TfCJ6Dg/lbPYQGahJy6LWdi6hZicLITMuO3OHDp2PVK2tQqM11zKJwLcfJWga8xpbT9BwWiTAlk9/NsclnVJy6YF/Ul3l+okaH4AM2J4k37l+GQFvuY+ApASbK4usW6Heu3YKIgtnSWX9nAKjfCYKudJNFk68NcYj6mRDppPBCmEvT+qXoRlla8Mp/Af6eJ/f4vsfGgc8=
+    secure: GxT+ZSBd2KK/NPqIlDQ/aDDXgUSpLa7VatmYe4MgHI3cE/nKPagMtxPUNG8i4m2qR1nSh5E+Iqg91lnI59lWYlCDKyFw5w328bHR4fuuzWo18AY0ENA4oXYaoqkwbmQ0GDkR/XW2W78SveMhsrhkMdyHIcg8Z4rRyCSnZRO1sYd7TB67ExNzEZezR+37j1ygzD2tem/l2na/ltCPKo6xlL5saAORYw5UKWwHWEpLtn2tc4xYUSqYWJ5Vmczypa6W9NNfBRVoFqywyytQjRDnXG1zOEQaBnxb6/GsE/o3CmSlMIyVtH3aco9M9PnnQ3J9AOm7ojgovoozUF2uEEpEYc99U1hWH++FBL5eVejnKka0mKZ6pkt/0li541M2yfT0tN8w/w44a14s10HNrygeQLn6F1ua4LkqgmbbWFeGZ1Fa5dppQGQkXGc5uyUj27UMPUR5eNPkEhz3Yu004zBLHym8TJIJv20+VQn3sW0cPlNLYVIYUDamwOyznaXKX+/u0ks+npcCpRYgEiAdK3fSYNk6L8ziDs8V61sJTSS6hN2Ny2ncz1s3hDX+iejmDZdon1VEvvcnWFwzNS14fUMKhzyus9ufCjdyFJqZTtqRICtvKEfUDIavm93HAKyUdDR5A2foShf/mIq+lyG6Eo6QK9RbiXHwoAB8tnxj0TB1bMw=
   on:
     tags: true
   file:
