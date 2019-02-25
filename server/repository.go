@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"github.com/moov-io/ach"
+
+	"github.com/go-kit/kit/log"
 )
 
 // Repository is the Service storage mechanism abstraction
@@ -30,13 +32,16 @@ type repositoryInMemory struct {
 	files map[string]*ach.File
 
 	ttl time.Duration
+
+	logger log.Logger
 }
 
 // NewRepositoryInMemory is an in memory ach storage repository for files
-func NewRepositoryInMemory(ttl time.Duration) Repository {
+func NewRepositoryInMemory(ttl time.Duration, logger log.Logger) Repository {
 	repo := &repositoryInMemory{
-		files: make(map[string]*ach.File),
-		ttl:   ttl,
+		files:  make(map[string]*ach.File),
+		ttl:    ttl,
+		logger: logger,
 	}
 
 	if ttl <= 0*time.Second {
@@ -181,10 +186,18 @@ func (r *repositoryInMemory) cleanupOldFiles() {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 
-	tooOld := time.Now().Add(-1 * r.ttl).Format("060102") // YYMMDD
-	for id, file := range r.files {
-		if file.Header.FileCreationDate < tooOld {
-			delete(r.files, id)
+	removed := 0
+	tooOld := time.Now().Add(-1 * r.ttl)
+	tooOldStr := tooOld.Format("060102") // YYMMDD
+
+	for i := range r.files {
+		if r.files[i].Header.FileCreationDate < tooOldStr {
+			removed++
+			delete(r.files, i)
 		}
+	}
+
+	if r.logger != nil {
+		r.logger.Log("files", fmt.Sprintf("removed %d ACH files older than %v", removed, tooOld.Format(time.RFC3339)))
 	}
 }
