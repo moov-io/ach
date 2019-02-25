@@ -77,7 +77,7 @@ func main() {
 			logger.Log("main", fmt.Sprintf("Using %v as ach.File TTL", achFileTTL))
 		}
 	}
-	r := server.NewRepositoryInMemory(achFileTTL)
+	r := server.NewRepositoryInMemory(achFileTTL, logger)
 	svc = server.NewService(r)
 
 	// Create HTTP server

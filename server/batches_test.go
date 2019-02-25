@@ -11,7 +11,7 @@ import (
 )
 
 func TestFiles__createBatchEndpoint(t *testing.T) {
-	repo := NewRepositoryInMemory(testTTLDuration)
+	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)
 
 	body := strings.NewReader(`{"random":"json"}`)
@@ -27,7 +27,7 @@ func TestFiles__createBatchEndpoint(t *testing.T) {
 }
 
 func TestFiles__getBatchesEndpoint(t *testing.T) {
-	repo := NewRepositoryInMemory(testTTLDuration)
+	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)
 
 	body := strings.NewReader(`{"random":"json"}`)
@@ -43,7 +43,7 @@ func TestFiles__getBatchesEndpoint(t *testing.T) {
 }
 
 func TestFiles__getBatchEndpoint(t *testing.T) {
-	repo := NewRepositoryInMemory(testTTLDuration)
+	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)
 
 	body := strings.NewReader(`{"random":"json"}`)
@@ -59,7 +59,7 @@ func TestFiles__getBatchEndpoint(t *testing.T) {
 }
 
 func TestFiles__deleteBatchEndpoint(t *testing.T) {
-	repo := NewRepositoryInMemory(testTTLDuration)
+	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)
 
 	body := strings.NewReader(`{"random":"json"}`)
