@@ -10,6 +10,6 @@ require (
 	github.com/prometheus/client_golang v0.9.2
 	github.com/prometheus/client_model v0.0.0-20190129233127-fd36f4220a90 // indirect
 	github.com/prometheus/common v0.2.0 // indirect
-	github.com/prometheus/procfs v0.0.0-20190219184716-e4d4a2206da0 // indirect
+	github.com/prometheus/procfs v0.0.0-20190226182429-6ed1f7e10411 // indirect
 	github.com/rickar/cal v1.0.0 // indirect
 )
