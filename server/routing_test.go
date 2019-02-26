@@ -7,6 +7,8 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"github.com/moov-io/ach"
 	"net/http"
 	"net/http/httptest"
@@ -15,6 +17,24 @@ import (
 
 	httptransport "github.com/go-kit/kit/transport/http"
 )
+
+func TestRouting_codeFrom(t *testing.T) {
+	if v := codeFrom(nil); v != http.StatusOK {
+		t.Errorf("HTTP status: %d", v)
+	}
+	if v := codeFrom(fmt.Errorf("%v: other", errInvalidFile)); v != http.StatusBadRequest {
+		t.Errorf("HTTP status: %d", v)
+	}
+	if v := codeFrom(ErrNotFound); v != http.StatusNotFound {
+		t.Errorf("HTTP status: %d", v)
+	}
+	if v := codeFrom(ErrAlreadyExists); v != http.StatusBadRequest {
+		t.Errorf("HTTP status: %d", v)
+	}
+	if v := codeFrom(errors.New("other")); v != http.StatusInternalServerError {
+		t.Errorf("HTTP status: %d", v)
+	}
+}
 
 func TestEncodeResponse(t *testing.T) {
 	ctx := context.TODO()

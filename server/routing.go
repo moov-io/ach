@@ -7,10 +7,12 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 
 	moovhttp "github.com/moov-io/base/http"
 
@@ -26,6 +28,8 @@ var (
 	// ErrBadRouting is returned when an expected path variable is missing, which is always programmer error.
 	ErrBadRouting = fmt.Errorf("inconsistent mapping between route and handler, %s", bugReportHelp)
 	ErrFoundABug  = fmt.Errorf("snuck into encodeError with err == nil, %s", bugReportHelp)
+
+	errInvalidFile = errors.New("invalid ACH file")
 )
 
 // contextKey is a unique (and compariable) type we use
@@ -224,14 +228,16 @@ func codeFrom(err error) int {
 	if err == nil {
 		return http.StatusOK
 	}
-
+	if strings.Contains(err.Error(), errInvalidFile.Error()) {
+		// This branch comes from validateFileEndpoint
+		return http.StatusBadRequest
+	}
 	switch err {
 	case ErrNotFound:
 		return http.StatusNotFound
 	case ErrAlreadyExists:
 		return http.StatusBadRequest
+	default:
+		return http.StatusInternalServerError
 	}
-	// TODO(adam): this should really probably be a 4xx error
-	// TODO(adam): on GET /files/:id/validate a "bad" file returns 500
-	return http.StatusInternalServerError
 }
