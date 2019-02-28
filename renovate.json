@@ -2,5 +2,6 @@
   "extends": [
     "config:base"
   ],
+  "gomodTidy": true,
   "groupName": "all"
 }

@@ -14,7 +14,7 @@ generate: clean
 	@go run internal/iso4217/iso4217_gen.go
 
 clean:
-	@rm -rf tmp/
+	@rm -rf bin/ tmp/
 
 dist: clean build generate
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./bin/ach-linux-amd64
