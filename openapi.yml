@@ -1,0 +1,822 @@
+openapi: 3.0.2
+info:
+  description: Moov ACH ([Automated Clearing House](https://en.wikipedia.org/wiki/Automated_Clearing_House)) implements an HTTP API for creating, parsing and validating ACH files. ACH is the primary method of electronic money movement throughout the United States.
+  version: v1
+  title: ACH API
+  contact:
+    url: https://github.com/moov-io/ach
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - url: http://localhost:8080
+    description: Local development
+
+tags:
+  - name: Files
+    description: |
+      File contains the structures of a ACH File. It contains one and only one File Header and File Control with at least one Batch.
+      Batch objects within Files hold the Batch Header and Batch Control and all Entry Records and Addenda records for the Batch.
+
+paths:
+  /ping:
+    get:
+      tags:
+        - Files
+      summary: Ping the ACH service to check if running
+      operationId: ping
+      responses:
+        '200':
+          description: Service is running properly
+  /files:
+    get:
+      tags:
+      - Files
+      summary: Gets a list of Files
+      operationId: getFiles
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/requestId'
+      responses:
+        '200':
+          description: A list of File objects
+          headers:
+            X-Total-Count:
+              description: The total number of Originators
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Files'
+  /files/create:
+    post:
+      tags:
+      - Files
+      summary: Create a new File object
+      operationId: createFile
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/requestId'
+        - $ref: '#/components/parameters/idempotencyKey'
+      requestBody:
+        description: Content of the ACH file (in json or raw text)
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFile'
+          text/plain:
+            schema:
+              description: A plaintext ACH file
+              type: string
+              example: 101 222380104 1210428821805100000A094101Citadel                Bank Name
+      responses:
+        '201':
+          description: A JSON object containing a new File
+          headers:
+            Location:
+              description: The location of the new resource
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+        '400':
+          description: "Invalid File Header Object"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /files/{file_id}:
+    get:
+      tags:
+      - Files
+      summary: Retrieves the details of an existing File. You need only supply the unique File identifier that was returned upon creation.
+      operationId: getFileByID
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/requestId'
+        - name: file_id
+          in: path
+          description: File ID
+          required: true
+          schema:
+            type: string
+            example: 3f2d23ee214
+      responses:
+        '200':
+          description: A File object for the supplied ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+        '404':
+          description: A resource with the specified ID was not found
+    post:
+      tags:
+      - Files
+      summary: Updates the specified File Header by setting the values of the parameters passed. Any parameters not provided will be left unchanged.
+      operationId: updateFile
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/requestId'
+        - $ref: '#/components/parameters/idempotencyKey'
+        - name: file_id
+          in: path
+          description: File ID
+          required: true
+          schema:
+            type: string
+            example: 3f2d23ee214
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFile'
+      responses:
+        '201':
+          description: A JSON object containing a new File
+          headers:
+            Location:
+              description: The location of the new resource
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+        '400':
+          description: "Invalid File Header Object"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+      - Files
+      summary: Permanently deletes a File and associated Batches. It cannot be undone.
+      operationId: deleteACHFile
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      parameters:
+        - name: file_id
+          in: path
+          description: File ID
+          required: true
+          schema:
+            type: string
+            example: 3f2d23ee214
+        - $ref: '#/components/parameters/requestId'
+      responses:
+          '200':
+            description: Permanently deleted File.
+          '404':
+            description: A File with the specified ID was not found.
+  /files/{file_id}/contents:
+    get:
+      tags:
+        - Files
+      summary: Assembles the existing file (batches and controls) records, computes sequence numbers and totals. Returns plaintext file.
+      operationId: getFileContents
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/requestId'
+        - name: file_id
+          in: path
+          description: File ID
+          required: true
+          schema:
+            type: string
+            example: 3f2d23ee214
+      responses:
+        '200':
+          description: File built successfully without errors.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/RawFile'
+  /files/{file_id}/validate:
+    get:
+      tags:
+        - Files
+      summary: Validates the existing file. You need only supply the unique File identifier that was returned upon creation.
+      operationId: validateFile
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/requestId'
+        - name: file_id
+          in: path
+          description: File ID
+          required: true
+          schema:
+            type: string
+            example: 3f2d23ee214
+      responses:
+        '200':
+          description: File validated successfully without errors.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+        '400':
+          description: Validation failed. Check response for errors
+  /files/{file_id}/batches:
+    get:
+      tags:
+        - Files
+      summary: Get the batches on a File.
+      operationId: getFileBatches
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/requestId'
+        - name: file_id
+          in: path
+          description: File ID
+          required: true
+          schema:
+            type: string
+            example: 3f2d23ee214
+      responses:
+        '200':
+          description: A list of Batch objects
+          headers:
+            X-Total-Count:
+              description: The total number of Batches on the File.
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batches'
+    post:
+      tags:
+        - Files
+      summary: Add Batch to File
+      operationId: addBatchToFile
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/requestId'
+        - $ref: '#/components/parameters/idempotencyKey'
+        - name: file_id
+          in: path
+          description: File ID
+          required: true
+          schema:
+            type: string
+            example: 3f2d23ee214
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Batch'
+      responses:
+        '200':
+          description: Batch added to File
+  /files/{file_id}/batches/{batch_id}:
+    get:
+      tags:
+        - Files
+      summary: Get a specific Batch on a FIle
+      operationId: getFileBatch
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/requestId'
+        - name: file_id
+          in: path
+          description: File ID
+          required: true
+          schema:
+            type: string
+            example: 3f2d23ee214
+        - name: batch_id
+          in: path
+          description: Batch ID
+          required: true
+          schema:
+            type: string
+            example: 45758063
+      responses:
+        '200':
+          description: Batch object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '404':
+          description: Batch or File not found
+    delete:
+      tags:
+        - Files
+      summary: Delete a Batch from a File
+      operationId: deleteFileBatch
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/requestId'
+        - name: file_id
+          in: path
+          description: File ID
+          required: true
+          schema:
+            type: string
+            example: 3f2d23ee214
+        - name: batch_id
+          in: path
+          description: Batch ID
+          required: true
+          schema:
+            type: string
+            example: 45758063
+      responses:
+        '200':
+          description: Batch deleted
+        '404':
+          description: Batch or File not found
+
+components:
+  schemas:
+    CreateFile:
+      properties:
+        id:
+          type: string
+          description: File ID
+          example: 3f2d23ee214
+        fileHeader:
+          $ref: '#/components/schemas/FileHeader'
+        batches:
+          type: array
+          items:
+            $ref: '#/components/schemas/Batch'
+        IATBatches:
+          type: array
+          items:
+            $ref: '#/components/schemas/IATBatch'
+        fileControl:
+          $ref: '#/components/schemas/FileControl'
+      required:
+        - fileHeader
+    File:
+      properties:
+        id:
+          type: string
+          description: File ID
+          example: 3f2d23ee214
+        fileHeader:
+          $ref: '#/components/schemas/FileHeader'
+        batches:
+          type: array
+          items:
+            $ref: '#/components/schemas/Batch'
+        IATBatches:
+          type: array
+          items:
+            $ref: '#/components/schemas/IATBatch'
+        fileControl:
+          $ref: '#/components/schemas/FileControl'
+        # NotificationOfChange: # TODO(adam)
+        # ReturnEntries: # TODO(adam)
+    FileHeader:
+      properties:
+        immediateOrigin:
+          type: string
+          description: contains the Routing Number of the ACH Operator or sending point that is sending the file.
+          minLength: 9
+          maxLength: 10
+          example: "99991234"
+        immediateOriginName:
+          type: string
+          description: The name of the ACH operator or sending point that is sending the file.
+          maxLength: 23
+          example: My Bank Name
+        immediateDestination:
+          type: string
+          maxLength: 10
+          minLength: 9
+          example: "69100013"
+          description: contains the Routing Number of the ACH Operator or receiving point to which the file is being sent
+        immediateDestinationName:
+          type: string
+          description: The name of the ACH or receiving point for which that file is destined.
+          maxLength: 23
+          example: Federal Reserve Bank
+        fileCreationTime:
+          description: 'The File Creation Date is the date when the file was prepared by an ODFI. (Format HHMM - H=Hour, M=Minute)'
+          type: string
+          example: 1504
+        fileCreationDate:
+          description: 'The File Creation Time is the time when the file was prepared by an ODFI. (Format YYMMDD - Y=Year, M=Month, D=Day)'
+          type: string
+          example: 190102
+        fileIDModifier:
+          type: string
+          description: Incremented value for each file for RDFI's.
+          example: 0
+      required:
+        - immediateOrigin
+        - immediateOriginName
+        - immediateDestination
+        - immediateDestinationName
+    FileControl:
+      properties:
+        id:
+          description: Moov API File ID
+          type: string
+          example: d1e26288
+        batchCount:
+          description: Count of Batches in the File
+          type: integer
+          example: 1
+        blockCount:
+          description: |
+            BlockCount total number of records in the file (include all headers and trailer) divided by 10 (This number must be evenly divisible by 10. If not, additional records consisting of all 9’s are added to the file after the initial ‘9’ record to fill out the block 10.)
+          type: integer
+          example: 1
+        entryAddendaCount:
+          description: Total detail and addenda records in the file
+          type: integer
+          example: 0
+        entryHash:
+          description: EntryHash calculated in the same manner as the batch has total but includes total from entire file
+          type: integer
+          example: 0
+        totalDebit:
+          description: Accumulated Batch debit totals within the file.
+          type: integer
+          example: 100
+        totalCredit:
+          description: Accumulated Batch credit totals within the file.
+          type: integer
+          example: 20
+    RawFile:
+      type: string
+      description: Plaintext ACH file
+      example: "101 222380104 1210428821805100000A094101Citadel                Bank Name"
+    Files:
+      type: array
+      items:
+        $ref: '#/components/schemas/File'
+    Batch:
+      properties:
+        batchHeader:
+          $ref: '#/components/schemas/BatchHeader'
+        entryDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntryDetail'
+        batchControl:
+          $ref: '#/components/schemas/BatchControl'
+    BatchHeader:
+      required:
+        - serviceClassCode
+        - companyName
+        - companyIdentification
+        - ODFIIdentification
+      properties:
+        id:
+          type: string
+          description: Batch Header ID
+          example: 913b5742
+        serviceClassCode:
+          type: integer
+          description: Service Class Code - ACH Credits Only 220 and ACH Debits Only 225
+          example: 220
+        companyName:
+          type: string
+          description: Company originating the entries in the batch
+          example: Acme Corp
+        companyDiscretionaryData:
+          type: string
+          description: The 9 digit FEIN number (proceeded by a predetermined alpha or numeric character) of the entity in the company name field
+          example: 123456789
+        standardEntryClassCode:
+          type: string
+          description: Identifies the payment type (product) found within an ACH batch-using a 3-character code.
+          example: PPD
+        companyEntryDescription:
+          type: string
+          description: |
+            A description of the entries contained in the batch.
+            The Originator establishes the value of this field to provide a description of the purpose of the entry to be displayed back to the receive For example, "GAS BILL," "REG. SALARY," "INS. PREM,", "SOC. SEC.," "DTC," "TRADE PAY," "PURCHASE," etc.
+            This field must contain the word "REVERSAL" (left justified) when the batch contains reversing entries.
+            This field must contain the word "RECLAIM" (left justified) when the batch contains reclamation entries.
+            This field must contain the word "NONSETTLED" (left justified) when the batch contains entries which could not settle.
+          example: PURCHASE
+        companyDescriptiveDate:
+          type: string
+          description: |
+            The Originator establishes this field as the date it would like to see displayed to the receiver for descriptive purposes. This field is never used to control timing of any computer or manual operation. It is solely for descriptive purposes. The RDFI should not assume any specific format.
+        effectiveEntryDate:
+          description: 'Date on which the entries are to settle. Format YYMMDD (Y=Year, M=Month, D=Day)'
+          type: string
+          example: 190102
+        originatorStatusCode:
+          type: integer
+          description: |
+            ODFI initiating the Entry.
+            0 ADV File prepared by an ACH Operator.
+            1 This code identifies the Originator as a depository financial institution.
+            2 This code identifies the Originator as a Federal Government entity or agency.
+        ODFIIdentification:
+          description: First 8 digits of the originating DFI transit routing number
+          type: string
+          example: 12345678
+        batchNumber:
+          type: string
+          description: |
+            BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
+    BatchControl:
+      properties:
+        id:
+          description: Batch ID
+          type: string
+          example: 62d8f0cd
+        serviceClassCode:
+          description: Same as ServiceClassCode in BatchHeaderRecord
+          type: integer
+          example: 220
+        entryAddendaÇount:
+          description: EntryAddendaCount is a tally of each Entry Detail Record and each Addenda Record processed, within either the batch or file as appropriate.
+          type: integer
+          example: 1
+        entryHash:
+          description: |
+            Validate the Receiving DFI Identification in each Entry Detail Record is hashed to provide a check against inadvertent alteration of data contents due to hardware failure or program error.
+            In this context the Entry Hash is the sum of the corresponding fields in the Entry Detail Records on the file.
+          type: integer
+          example: 0
+        totalDebit:
+          description: Contains accumulated Entry debit totals within the batch.
+          type: integer
+          example: 100
+        totalCredit:
+          description: Contains accumulated Entry credit totals within the batch.
+          type: integer
+          example: 100
+        companyIdentification:
+          description: |
+            Alphanumeric code used to identify an Originator The Company Identification Field must be included on all prenotification records and on each entry initiated pursuant to such prenotification. The Company ID may begin with the ANSI one-digit Identification Code Designator (ICD), followed by the identification number The ANSI Identification Numbers and related Identification Code
+            IRS Employer Identification Number (EIN) "1"
+            Data Universal Numbering Systems (DUNS) "3"
+            User Assigned Number "9"
+          type: string
+          example: 1
+        messageAuthentication:
+          description: MAC is an eight character code derived from a special key used in conjunction with the DES algorithm. The purpose of the MAC is to validate the authenticity of ACH entries. The DES algorithm and key message standards must be in accordance with standards adopted by the American National Standards Institute. The remaining eleven characters of this field are blank.
+          type: string
+          example: 3fe106cf
+        ODFIIdentification:
+          description: The routing number is used to identify the DFI originating entries within a given branch.
+          type: string
+          example: 123456789
+        batchNumber:
+          type: string
+          description: BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
+    Batches:
+      type: array
+      items:
+        $ref: '#/components/schemas/Batch'
+    EntryDetail:
+      required:
+        - id
+        - transactionCode
+        - RDFIIdentification
+        - checkDigit
+        - DFIAccountNumber
+        - amount
+        - individualName
+      properties:
+        id:
+          type: string
+          description: Entry Detail ID
+          example: 842a2261
+        transactionCode:
+          type: integer
+          description: |
+            transactionCode if the receivers account is:
+            Credit (deposit) to checking account 22
+            Prenote for credit to checking account 23
+            Debit (withdrawal) to checking account 27
+            Prenote for debit to checking account 28
+            Credit to savings account 32
+            Prenote for credit to savings account 33
+            Debit to savings account 37
+            Prenote for debit to savings account 38
+          example: 22
+        RDFIIdentification:
+          type: string
+          description: RDFI's routing number without the last digit.
+          example: 12345678
+        checkDigit:
+          type: string
+          description: Last digit in RDFI routing number.
+          example: "0"
+        DFIAccountNumber:
+          type: string
+          description: |
+            The receiver's bank account number you are crediting/debiting. It important to note that this is an alphanumeric field, so its space padded, no zero padded
+          example: 181141847
+        amount:
+          type: integer
+          description: Number of cents you are debiting/crediting this account
+          example: 1235
+        identificationNumber:
+          type: string
+          description: Internal identification (alphanumeric) that you use to uniquely identify this Entry Detail Record
+          example: 8aa786
+        individualName:
+          type: string
+          description: The name of the receiver, usually the name on the bank account
+          example: Taylor Swift
+        discretionaryData:
+          type: string
+          description: |
+            DiscretionaryData allows ODFIs to include codes, of significance only to them, to enable specialized handling of the entry. There will be no standardized interpretation for the value of this field. It can either be a single two-character code, or two distinct one-character codes, according to the needs of the ODFI and/or Originator involved. This field must be returned intact for any returned entry.
+            WEB uses the Discretionary Data Field as the Payment Type Code
+          example: AB
+        addendaRecordIndicator:
+          type: integer
+          description: |
+            AddendaRecordIndicator indicates the existence of an Addenda Record. A value of "1" indicates that one ore more addenda records follow, and "0" means no such record is present.
+          example: 1
+        traceNumber:
+          type: integer
+          description: |
+            TraceNumber assigned by the ODFI in ascending sequence, is included in each Entry Detail Record, Corporate Entry Detail Record, and addenda Record.
+            Trace Numbers uniquely identify each entry within a batch in an ACH input file. In association with the Batch Number, transmission (File Creation) Date, and File ID Modifier, the Trace Number uniquely identifies an entry within a given file.
+            For addenda Records, the Trace Number will be identical to the Trace Number in the associated Entry Detail Record, since the Trace Number is associated with an entry or item rather than a physical record.
+        addendum:
+          type: array
+          description: List of Addenda for the Entry Detail
+          items:
+            $ref: '#/components/schemas/Addendum'
+        category:
+          type: string
+          description: Category defines if the entry is a Forward, Return, or NOC
+          example: Forward
+    Addendum:
+      required:
+        - typeCode
+      properties:
+        typeCode:
+          type: string
+          description: TODO
+          example: '02'
+    IATBatch:
+      properties:
+        id:
+          description: Client defined string used as a reference to this record.
+          type: string
+          example: a747e53f
+        IATBatchHeader:
+          $ref: '#/components/schemas/IATBatchHeader'
+    IATBatchHeader:
+      properties:
+        id:
+          description: ID is a client defined string used as a reference to this record.
+          type: string
+          example: a747e53f
+        serviceClassCode:
+          description: |
+            ServiceClassCode ACH Mixed Debits and Credits ‘200’
+            ACH Credits Only ‘220’
+            ACH Debits Only ‘225'
+          type: integer
+          example: 220
+        IATIndicator:
+          description: Leave Blank. Only used for corrected IAT entries
+          type: string
+          example: ""
+        foreignExchangeIndicator:
+          description: |
+            Code indicating currency conversion.
+            FV Fixed-to-Variable – Entry is originated in a fixed-value amount and is to be received in a variable amount resulting from the execution of the foreign exchange conversion.
+            VF Variable-to-Fixed – Entry is originated in a variable-value amount based on a specific foreign exchange rate for conversion to a fixed-value amount in which the entry is to be received.
+            FF Fixed-to-Fixed – Entry is originated in a fixed-value amount and is to be received in the same fixed-value amount in the same currency denomination. There is no foreign exchange conversion for entries transmitted using this code. For entries originated in a fixed value amount, the foreign Exchange Reference Field will be space filled.
+          type: string
+          example: FF
+        foreignExchangeReferenceIndicator:
+          description: |
+            Code used to indicate the content of the Foreign Exchange Reference Field and is filled by the gateway operator. Valid entries are
+            1 - Foreign Exchange Rate;
+            2 - Foreign Exchange Reference Number; or
+            3 - Space Filled
+          type: integer
+          example: 2
+        foreignExchangeReference:
+          description: |
+            Contains either the foreign exchange rate used to execute the foreign exchange conversion of a cross-border entry or another reference to the foreign exchange transaction.
+          type: string
+        ISODestinationCountryCode:
+          description: Two-character code, as approved by the International Organization for Standardization (ISO), to identify the country in which the entry is to be received. For United States use US.
+          type: string
+          example: US
+        originatorIdentification:
+          description: |
+            For U.S. entities: the number assigned will be your tax ID (often Social Security Number)
+            For non-U.S. entities: the number assigned will be your DDA number, or the last 9 characters of your account number if it exceeds 9 characters
+          type: string
+          example: 123456789
+        standardEntryClassCode:
+          description: |
+            StandardEntryClassCode for consumer and non consumer international payments is IAT.
+            Identifies the payment type (product) found within an ACH batch-using a 3-character code.
+            The SEC Code pertains to all items within batch.
+            Determines format of the detail records.
+            Determines addenda records (required or optional PLUS one or up to 9,999 records).
+            Determines rules to follow (return time frames).
+            Some SEC codes require specific data in predetermined fields within the ACH record
+          type: string
+          example: IAT
+        companyEntryDescription:
+          description: |
+            A description of the entries contained in the batch
+            The Originator establishes the value of this field to provide a description of the purpose of the entry to be displayed back to the receive For example, "GAS BILL," "REG. SALARY," "INS. PREM," "SOC. SEC.," "DTC," "TRADE PAY," "PURCHASE," etc.
+            This field must contain the word "REVERSAL" (left justified) when the batch contains reversing entries.
+            This field must contain the word "RECLAIM" (left justified) when the batch contains reclamation entries.
+            This field must contain the word "NONSETTLED" (left justified) when the batch contains entries which could not settle.
+          type: string
+          example: GAS BILL
+        ISOOriginatingCurrencyCode:
+          description: |
+            Three-character code, as approved by the International Organization for Standardization (ISO), to identify the currency denomination in which the entry was first originated. If the source of funds is within the territorial jurisdiction of the U.S., enter 'USD', otherwise refer to International Organization for Standardization website for value: www.iso.org
+          type: string
+          example: USD
+        ISODestinationCurrencyCode:
+          description: |
+            ISODestinationCurrencyCode is the three-character code, as approved by the International Organization for Standardization (ISO), to identify the currency denomination in which the entry will ultimately be settled. If the final destination of funds is within the territorial jurisdiction of the U.S., enter “USD”, otherwise refer to International Organization for Standardization website for value: www.iso.org
+          type: string
+          example: USD
+        effectiveEntryDate:
+          description: |
+            EffectiveEntryDate the date on which the entries are to settle format YYMMDD (Y=Year, M=Month, D=Day)
+          type: string
+          example: 181231
+        originatorStatusCode:
+          description: |
+            SettlementDate Leave blank, this field is inserted by the ACH operator settlementDate string OriginatorStatusCode refers to the ODFI initiating the Entry.
+            0 ADV File prepared by an ACH Operator.
+            1 This code identifies the Originator as a depository financial institution.
+            2 This code identifies the Originator as a Federal Government entity or agency.
+          type: integer
+          example: 1
+        ODFIIdentification:
+          description: |
+            ODFIIdentification First 8 digits of the originating DFI transit routing number for Inbound IAT Entries, this field contains the routing number of the U.S. Gateway Operator.  For Outbound IAT Entries, this field contains the standard routing number, as assigned by Accuity, that identifies the U.S. ODFI initiating the Entry. Format - TTTTAAAA
+          type: string
+          example: 12345678
+        batchNumber:
+          description: |
+            BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
+          type: integer
+          example: 1
+    Error:
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: An error message describing the problem intended for humans.
+          example: Validation error(s) present.
+  parameters:
+    requestId:
+      in: header
+      name: X-Request-Id
+      description: Optional Request ID allows application developer to trace requests through the systems logs
+      example: rs4f9915
+      schema:
+        type: string
+    idempotencyKey:
+      in: header
+      name: X-Idempotency-Key
+      description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy for to not collide with each other in your requests.
+      example: a4f88150
+      required: false
+      schema:
+        type: string
