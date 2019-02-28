@@ -16,10 +16,12 @@ generate: clean
 clean:
 	@rm -rf tmp/
 
-dist: clean build generate
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./bin/ach-linux-amd64
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o ./bin/ach-darwin-amd64
-	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o ./bin/ach-amd64.exe
+dist: clean generate build
+ifeq ($(OS),Windows_NT)
+	CGO_ENABLED=1 GOOS=windows go build -o bin/ach-windows-amd64.exe github.com/moov-io/ach/cmd/server
+else
+	CGO_ENABLED=1 GOOS=$(PLATFORM) go build -o bin/ach-$(PLATFORM)-amd64 github.com/moov-io/ach/cmd/server
+endif
 
 docker: clean
 # ACH docker image

@@ -1,5 +1,7 @@
 language: go
-sudo: false
+sudo: true
+services:
+- docker
 matrix:
   allow_failures:
   - os: windows
@@ -18,8 +20,6 @@ matrix:
       directories:
       - "/Users/travis/Library/Caches/go-build"
 env:
-  global:
-    secure: QPkcX77j8QEqTwOYyLGItqvxYwE6Na5WaSZWjmhp48OlxYatWRHxJBwcFYSn1OWD5FMn+3oW39fHknReIxtrnhXMaNvI7x3/0gy4zujD/xZ2xAg7NsQ+l5buvEFO8/LEwwo0fp4knItFcBv8xH/ziJBJyXvgfMtj7Is4Q/pB1p6pWDdVy1vtAj3zH02bcqh1yXXS3HvcD8UhTszfU017gVNXDN1ow0rp1L3ainr3btrVK9izUxZfKvb7PlWJO1ogah7xNr/dIOJLsx2SfKgzKp+3H28L2WegtbzON74Op4jXvRywCwqjmUt/nwJ/Y9anunMNHT136h+ye4ziG1i/VdbWq0Q4PopQ8yYqinujG7SjfQio+wNCV2cwc2r/WjNBjbH0N9/Pflogq3RHvgy/9VtPif1tY+RrZCSntohoEZbYpVcFQFE1xDyf6xq/uLxVeEcCU33gqq7cKEfpcUgyCITa+yCPfBdtgkLBJ8h7Sew1j08D1kTKUW6g3D1epmwlCh/Z16oHG5VwSnCLGDjJy8wm/hQk1i/g7qeP7g24CfNzffzlFBCy88HhjzmrhUpcaTyfVVDf4h8wK6Zu/J3dHjHXQYwfiQRqpMa+2DYyjGgZhniccuh4GWolGZauDQdmO9SD4Ugyt9PEMk02i32ax3A4XE/Q6VNOam+qszviX3Q=
   matrix:
   - GO111MODULE=auto
 before_install:
@@ -47,13 +47,14 @@ before_deploy:
 deploy:
   provider: releases
   api_key:
-    secure: GxT+ZSBd2KK/NPqIlDQ/aDDXgUSpLa7VatmYe4MgHI3cE/nKPagMtxPUNG8i4m2qR1nSh5E+Iqg91lnI59lWYlCDKyFw5w328bHR4fuuzWo18AY0ENA4oXYaoqkwbmQ0GDkR/XW2W78SveMhsrhkMdyHIcg8Z4rRyCSnZRO1sYd7TB67ExNzEZezR+37j1ygzD2tem/l2na/ltCPKo6xlL5saAORYw5UKWwHWEpLtn2tc4xYUSqYWJ5Vmczypa6W9NNfBRVoFqywyytQjRDnXG1zOEQaBnxb6/GsE/o3CmSlMIyVtH3aco9M9PnnQ3J9AOm7ojgovoozUF2uEEpEYc99U1hWH++FBL5eVejnKka0mKZ6pkt/0li541M2yfT0tN8w/w44a14s10HNrygeQLn6F1ua4LkqgmbbWFeGZ1Fa5dppQGQkXGc5uyUj27UMPUR5eNPkEhz3Yu004zBLHym8TJIJv20+VQn3sW0cPlNLYVIYUDamwOyznaXKX+/u0ks+npcCpRYgEiAdK3fSYNk6L8ziDs8V61sJTSS6hN2Ny2ncz1s3hDX+iejmDZdon1VEvvcnWFwzNS14fUMKhzyus9ufCjdyFJqZTtqRICtvKEfUDIavm93HAKyUdDR5A2foShf/mIq+lyG6Eo6QK9RbiXHwoAB8tnxj0TB1bMw=
+    secure: S/CFrglarZ42a3crv+GgWSPZrPjIJglk1exzjbcP5KoPVinuucRxfQW/+92pfOSGTK2XZA1N20ZZE7+ba7HlWXkJDiICew8hCKHkDMW1Rj+E89zwzJMURXxDPTUkecE3h7BwSv72+XqQiezBo2HW5cPecQo3bmuhlmJO0ja9ntzhSpXTr1lcpBDIWvxHGzLR/Dcoceki3PI/nbv4i9ZVoUFtx9f/bbCQ7S/7qX6Dn5WKSjoEIvMgwtuAptYbEeDZ51mmudAuMAduNQpXJKiUUeryokP3sEP6FcwP7oKy6b7Dk92l1Q7MJ7lLj0xRcWIty5YCx1jKy5L/EKPLFinYdCJVyI1e11sF2YLvlzC3tsbOJHDgA2W4brt3hBfTW23FXgVJBAfKsCmwzcMrtR3WC0ukcwdTBva/oCIZUBkw0M2d4rDBgWLQ6vKtuCrn2WOlDTEVSyfzSxOSBdcLCgTeDELwdCW8nniuW9ldVUYotwDy/v9RljzOsb+dUwBtbagtXeQ2nraPWJnj8zHAkMQS11/FxxOQ53W5BQQGAEbeUIbwi5P4EJCHip70IqVKPkkWtPo3iVUyR7C4m0TkgA3L47PV/t8o4alvdHbhyP+DKYalQkdLiZSlFTMjavmXVO4ofhTHNAfz2LkemF8gcBiXQxpsBrUc5j+gi+nG3mfAgrE=
+  file_glob: true
+  file:
+    - bin/ach-*
   on:
     tags: true
-  file:
-    - bin/ach-amd64.exe
-    - bin/ach-darwin-amd64
-    - bin/ach-linux-amd64
+    repo: moov-io/ach
+    go: 1.12.x
   skip_cleanup: true
 after_deploy:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
