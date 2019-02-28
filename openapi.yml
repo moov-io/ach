@@ -237,8 +237,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/File'
-        '500':
-          # TODO(adam): should be a 4xx error
+        '400':
           description: Validation failed. Check response for errors
   /files/{file_id}/batches:
     get:
