@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -313,7 +314,7 @@ func validateFileEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 		}
 
 		return validateFileResponse{
-			Err: err,
+			fmt.Errorf("%v: %v", errInvalidFile, err),
 		}, nil
 	}
 }

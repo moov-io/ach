@@ -6,8 +6,19 @@ package server
 
 import (
 	"context"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/moov-io/ach"
+
+	httptransport "github.com/go-kit/kit/transport/http"
+	"github.com/gorilla/mux"
 )
 
 func TestFiles__createFileEndpoint(t *testing.T) {
@@ -78,14 +89,43 @@ func TestFiles__validateFileEndpoint(t *testing.T) {
 	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)
 
-	body := strings.NewReader(`{"random":"json"}`)
+	rawBody := `{"random":"json"}`
 
-	resp, err := validateFileEndpoint(svc, nil)(context.TODO(), body)
+	resp, err := validateFileEndpoint(svc, nil)(context.TODO(), strings.NewReader(rawBody))
 	r, ok := resp.(validateFileResponse)
 	if !ok {
 		t.Errorf("got %#v", resp)
 	}
 	if err == nil || r.Err == nil {
 		t.Errorf("expected error: err=%v resp.Err=%v", err, r.Err)
+	}
+
+	// write an ACH file into repository
+	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-valid.json"))
+	if fd == nil {
+		t.Fatalf("empty ACH file: %v", err)
+	}
+	defer fd.Close()
+	bs, _ := ioutil.ReadAll(fd)
+	file, _ := ach.FileFromJSON(bs)
+	file.Header.ImmediateDestination = "" // invalid routing number
+	repo.StoreFile(file)
+
+	// test status code
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", fmt.Sprintf("/files/%s/validate", file.ID), strings.NewReader(rawBody))
+
+	router := mux.NewRouter()
+	router.Methods("GET").Path("/files/{id}/validate").Handler(
+		httptransport.NewServer(validateFileEndpoint(svc, nil), decodeValidateFileRequest, encodeResponse),
+	)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+	if !strings.HasPrefix(w.Body.String(), `{"error":"invalid ACH file: ImmediateDestination`) {
+		t.Errorf("unknown error: %v", err)
 	}
 }
