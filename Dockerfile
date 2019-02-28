@@ -1,8 +1,13 @@
 FROM golang:1.12-alpine as builder
 WORKDIR /go/src/github.com/moov-io/ach
-RUN apk add -U make
+RUN apk add -U git make
 RUN adduser -D -g '' --shell /bin/false moov
 COPY . .
+
+# Pull Go dependency files into vendor/
+ENV GO111MODULE=on
+RUN go mod vendor
+
 RUN make build
 USER moov
 

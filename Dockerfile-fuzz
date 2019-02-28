@@ -2,6 +2,11 @@ FROM golang:1.12-alpine as builder
 RUN apk add -U git make
 WORKDIR /go/src/github.com/moov-io/ach
 COPY . .
+
+# Pull Go dependency files into vendor/
+ENV GO111MODULE=on
+RUN go mod vendor
+
 WORKDIR /go/src/github.com/moov-io/ach/test/fuzz-reader
 RUN make install
 ENTRYPOINT ["make"]
