@@ -1,4 +1,4 @@
-// Copyright 2018 The Moov Authors
+// Copyright 2019 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -9,8 +9,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/moov-io/base"
 )
@@ -880,5 +882,100 @@ func TestFile__readInvalidFilesJson(t *testing.T) {
 
 	if !base.Match(err, ErrUpperAlpha) {
 		t.Errorf("%T: %s", err, err)
+	}
+}
+
+func TestFile_largeFileEntryHash(t *testing.T) {
+	// To create a file
+	fh := NewFileHeader()
+	fh.ImmediateDestination = "231380104"
+	fh.ImmediateOrigin = "121042882"
+	fh.FileCreationDate = time.Now().Format("060102")
+	fh.ImmediateDestinationName = "Citadel"
+	fh.ImmediateOriginName = "Wells Fargo"
+	file := NewFile()
+	file.SetHeader(fh)
+
+	// Create 2 Batches of SEC Code PPD
+
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = MixedDebitsAndCredits
+	bh.CompanyName = "Wells Fargo"
+	bh.CompanyIdentification = "121042882"
+	bh.StandardEntryClassCode = PPD
+	bh.CompanyEntryDescription = "Trans. Description"
+	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102")
+	bh.ODFIIdentification = "121042882"
+
+	batch, _ := NewBatch(bh)
+
+	// Create Entry
+	entrySeq := 0
+	for i := 0; i < 1250; i++ {
+		entrySeq = entrySeq + 1
+
+		entryEntrySeq := NewEntryDetail()
+		entryEntrySeq.TransactionCode = CheckingCredit
+		entryEntrySeq.SetRDFI("231380104")
+		entryEntrySeq.DFIAccountNumber = "81967038518"
+		entryEntrySeq.Amount = 100000
+		entryEntrySeq.IndividualName = "Steven Tander"
+		entryEntrySeq.SetTraceNumber(bh.ODFIIdentification, entrySeq)
+		entryEntrySeq.IdentificationNumber = "#83738AB#"
+		entryEntrySeq.Category = CategoryForward
+		entryEntrySeq.AddendaRecordIndicator = 1
+
+		// Add addenda record for an entry
+		addendaEntrySeq := NewAddenda05()
+		addendaEntrySeq.PaymentRelatedInformation = "bonus pay for amazing work on #OSS"
+		entryEntrySeq.AddAddenda05(addendaEntrySeq)
+
+		// Add entries
+		batch.AddEntry(entryEntrySeq)
+
+	}
+
+	// Create the batch.
+	if err := batch.Create(); err != nil {
+		fmt.Printf("%T: %s", err, err)
+	}
+
+	// Add batch to the file
+	file.AddBatch(batch)
+
+	// Create the file
+	if err := file.Create(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	// ensure we have a validated file structure
+	if err := file.Validate(); err != nil {
+		t.Errorf("Could not validate entire file: %v", err)
+	}
+
+	testHash := 0
+	for _, batch := range file.Batches {
+
+		for _, entry := range batch.GetEntries() {
+
+			entryRDFI, _ := strconv.Atoi(entry.RDFIIdentification)
+
+			testHash = testHash + entryRDFI
+		}
+
+		if testHash != 28922512500 {
+			t.Errorf("Expected '28922512500' Calculated Entry Hash: %d", testHash)
+		}
+
+		s := strconv.Itoa(testHash)
+		ln := uint(len(s))
+		if ln > 10 {
+			s = s[ln-10:]
+		}
+
+		testHash, _ = strconv.Atoi(s)
+
+		if testHash != 8922512500 {
+			t.Errorf("Expected '8922512500' Calculated Entry Hash: %d", testHash)
+		}
 	}
 }
