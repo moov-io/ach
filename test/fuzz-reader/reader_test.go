@@ -8,10 +8,15 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 )
 
 func TestCorpusSymlinks(t *testing.T) {
+	// avoid symbolic link error on windows
+	if runtime.GOOS == "windows" {
+		t.Skip()
+	}
 	fds, err := ioutil.ReadDir("corpus")
 	if err != nil {
 		t.Fatal(err)
