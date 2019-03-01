@@ -689,6 +689,12 @@ func (batch *Batch) calculateEntryHash() int {
 		}
 	}
 
+	// This follows what is done in BatchControl.Parse()
+	// EntryHash is essentially the sum of all the RDFI routing numbers in the batch. If the sum exceeds 10 digits
+	// (because you have lots of Entry Detail Records), lop off the most significant digits of the sum until there
+	// are only 10.
+	s := batch.numericField(hash, 10)
+	hash, _ = strconv.Atoi(s)
 	return hash
 }
 
