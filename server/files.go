@@ -308,14 +308,13 @@ func validateFileEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 		}
 
 		err := s.ValidateFile(req.ID)
-
 		if req.requestId != "" && logger != nil {
 			logger.Log("files", "validateFile", "requestId", req.requestId, "error", err)
 		}
-
-		return validateFileResponse{
-			fmt.Errorf("%v: %v", errInvalidFile, err),
-		}, nil
+		if err != nil { // wrap err with context
+			err = fmt.Errorf("%v: %v", errInvalidFile, err)
+		}
+		return validateFileResponse{err}, nil
 	}
 }
 
