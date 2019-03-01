@@ -952,6 +952,11 @@ func TestFile_largeFileEntryHash(t *testing.T) {
 		t.Errorf("Could not validate entire file: %v", err)
 	}
 
+	// Per BatchControl.Parse() and Batch.calculateEntryHash()
+	// EntryHash is essentially the sum of all the RDFI routing numbers in the batch. If the sum exceeds 10 digits
+	// (because you have lots of Entry Detail Records), lop off the most significant digits of the sum until there
+	// are only 10.  This allows the entryHash to be 10 digits as per the ACH specification.
+
 	testHash := 0
 	for _, batch := range file.Batches {
 
