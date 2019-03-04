@@ -18,10 +18,14 @@ BUG FIXES
 - Accept File's without an ID specified. Generate a random ID. (See: [#405](https://github.com/moov-io/ach/pull/405))
 - server: Fix nil panics. (See: [#406](https://github.com/moov-io/ach/pull/406))
 - server: Fix type-casting panics. (See: [#423](https://github.com/moov-io/ach/pull/423))
+- server: validate file endpoint returns 400 instead of 500 (See: [#488](https://github.com/moov-io/ach/pull/488))
 
 BUILD
 
 - `megacheck` is deprecated. staticcheck should be used instead. (See [#430](https://github.com/moov-io/ach/issues/430))
+- Automate releases with Docker and binary uploads to release page.
+- Update dependencies to their latest versions
+- Update to Go 1.12
 
 ## v0.5.0 (Released 2018-11-29)
 
