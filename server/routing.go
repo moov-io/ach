@@ -93,6 +93,7 @@ func MakeHTTPHandler(s Service, repo Repository, logger log.Logger) http.Handler
 	// HTTP Methods
 	r.Methods("OPTIONS").Handler(preflightHandler(options)) // CORS pre-flight handler
 	r.Methods("GET").Path("/ping").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		moovhttp.SetAccessControlAllowHeaders(w, r.Header.Get("Origin"))
 		w.Header().Set("Content-Type", "text/plain")
 		w.Write([]byte("PONG"))
 	})
