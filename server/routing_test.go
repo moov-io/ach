@@ -14,7 +14,9 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
+	"github.com/go-kit/kit/log"
 	httptransport "github.com/go-kit/kit/transport/http"
 )
 
@@ -33,6 +35,30 @@ func TestRouting_codeFrom(t *testing.T) {
 	}
 	if v := codeFrom(errors.New("other")); v != http.StatusInternalServerError {
 		t.Errorf("HTTP status: %d", v)
+	}
+}
+
+func TestRouting_ping(t *testing.T) {
+	logger := log.NewNopLogger()
+	r := NewRepositoryInMemory(1*time.Minute, logger)
+	svc := NewService(r)
+	router := MakeHTTPHandler(svc, r, logger)
+
+	req := httptest.NewRequest("GET", "/ping", nil)
+	req.Header.Set("Origin", "https://moov.io")
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+	if v := w.Body.String(); v != "PONG" {
+		t.Errorf("body: %s", v)
+	}
+	if v := w.Result().Header.Get("Access-Control-Allow-Origin"); v != "https://moov.io" {
+		t.Errorf("Access-Control-Allow-Origin: %s", v)
 	}
 }
 
