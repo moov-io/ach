@@ -53,6 +53,8 @@ var (
 	httpAddr  = flag.String("http.addr", bind.HTTP("ach"), "HTTP listen address")
 	adminAddr = flag.String("admin.addr", bind.Admin("ach"), "Admin HTTP listen address")
 
+	flagLogFormat = flag.String("log.format", "", "Format for log lines (Options: json, plain")
+
 	logger log.Logger
 
 	svc     server.Service
@@ -63,7 +65,11 @@ func main() {
 	flag.Parse()
 
 	// Setup logging, default to stdout
-	logger = log.NewLogfmtLogger(os.Stderr)
+	if *flagLogFormat == "json" {
+		logger = log.NewJSONLogger(os.Stdout)
+	} else {
+		logger = log.NewLogfmtLogger(os.Stdout)
+	}
 	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 	logger = log.With(logger, "caller", log.DefaultCaller)
 	logger.Log("startup", fmt.Sprintf("Starting ach server version %s", ach.Version))
