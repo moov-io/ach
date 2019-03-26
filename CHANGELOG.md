@@ -1,4 +1,4 @@
-## v0.6.0 (Unreleased)
+## v0.6.0 (Released 2019-03-26)
 
 BREAKING CHANGES
 
@@ -12,6 +12,7 @@ ADDITIONS
 - server: Record `ach_files_deleted` metric. (See: [#408](https://github.com/moov-io/ach/pull/408))
 - server: log x-request-id header if present. (See: [#407](https://github.com/moov-io/ach/pull/407))
 - server: Delete old `ach.File` objects from in-memory repository according to `ACH_FILE_TTL` env variable.
+- server: Support `-log.format=json` for JSON formatted logs
 
 BUG FIXES
 
@@ -19,6 +20,7 @@ BUG FIXES
 - server: Fix nil panics. (See: [#406](https://github.com/moov-io/ach/pull/406))
 - server: Fix type-casting panics. (See: [#423](https://github.com/moov-io/ach/pull/423))
 - server: validate file endpoint returns 400 instead of 500 (See: [#488](https://github.com/moov-io/ach/pull/488))
+- server: set CORS headers on `GET /ping` route
 
 BUILD
 
