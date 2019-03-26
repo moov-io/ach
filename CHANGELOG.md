@@ -1,3 +1,7 @@
+## v1.0.0 (Released 2019-03-26)
+
+- No changes from v0.6.0
+
 ## v0.6.0 (Released 2019-03-26)
 
 BREAKING CHANGES
