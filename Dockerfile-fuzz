@@ -4,4 +4,5 @@ WORKDIR /go/src/github.com/moov-io/ach
 COPY . .
 WORKDIR /go/src/github.com/moov-io/ach/test/fuzz-reader
 RUN make install
-ENTRYPOINT ["make"]
+RUN make fuzz-build
+ENTRYPOINT make fuzz-run
