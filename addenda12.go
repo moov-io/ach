@@ -25,11 +25,11 @@ type Addenda12 struct {
 	// Originator City & State / Province
 	// Data elements City and State / Province  should be separated with an asterisk (*) as a delimiter
 	// and the field should end with a backslash (\).
-	// For example: San FranciscoCA.
+	// For example: San Francisco*CA\
 	OriginatorCityStateProvince string `json:"originatorCityStateProvince"`
 	// Originator Country & Postal Code
 	// Data elements must be separated by an asterisk (*) and must end with a backslash (\)
-	// For example: US10036\
+	// For example: US*10036\
 	OriginatorCountryPostalCode string `json:"originatorCountryPostalCode"`
 	// reserved - Leave blank
 	reserved string
