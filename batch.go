@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"strconv"
+	"strings"
 )
 
 // Batch holds the Batch Header and Batch Control and all Entry Records
@@ -926,4 +927,67 @@ func (batch *Batch) ValidTranCodeForServiceClassCode(entry *EntryDetail) error {
 		}
 	}
 	return nil
+}
+
+// Equal returns true only if two Batch (or any Batcher) objects are equal. Equality is determined by
+// many of the ACH Batch and EntryDetail properties.
+func (batch *Batch) Equal(other Batcher) bool {
+	// Some fields are intentionally not compared as they could vary between batches that would otherwise be the same.
+	if batch == nil || other == nil || batch.Header == nil || other.GetHeader() == nil {
+		return false
+	}
+	ohead := other.GetHeader()
+	if batch.Header.ServiceClassCode != ohead.ServiceClassCode {
+		return false
+	}
+	if !strings.EqualFold(batch.Header.CompanyName, ohead.CompanyName) {
+		return false
+	}
+	if batch.Header.CompanyIdentification != ohead.CompanyIdentification {
+		return false
+	}
+	if batch.Header.StandardEntryClassCode != ohead.StandardEntryClassCode {
+		return false
+	}
+	if batch.Header.EffectiveEntryDate != ohead.EffectiveEntryDate {
+		return false
+	}
+	if batch.Header.ODFIIdentification != ohead.ODFIIdentification {
+		return false
+	}
+	oentries := other.GetEntries()
+	if len(batch.Entries) != len(oentries) {
+		return false
+	}
+	equalEntries := 0
+	for i := range batch.Entries {
+		for j := range oentries {
+			if batch.Entries[i].TransactionCode != oentries[j].TransactionCode {
+				continue // skip to next EntryDetail
+			}
+			if batch.Entries[i].RDFIIdentification != oentries[j].RDFIIdentification {
+				continue // skip to next EntryDetail
+			}
+			if batch.Entries[i].CheckDigit != oentries[j].CheckDigit {
+				continue // skip to next EntryDetail
+			}
+			if batch.Entries[i].DFIAccountNumber != oentries[j].DFIAccountNumber {
+				continue // skip to next EntryDetail
+			}
+			if batch.Entries[i].Amount != oentries[j].Amount {
+				continue // skip to next EntryDetail
+			}
+			if batch.Entries[i].IdentificationNumber != oentries[j].IdentificationNumber {
+				continue // skip to next EntryDetail
+			}
+			if batch.Entries[i].IndividualName != oentries[j].IndividualName {
+				continue // skip to next EntryDetail
+			}
+			if batch.Entries[i].DiscretionaryData != oentries[j].DiscretionaryData {
+				continue // skip to next EntryDetail
+			}
+			equalEntries++
+		}
+	}
+	return len(batch.Entries) == equalEntries && equalEntries != 0
 }
