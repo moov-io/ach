@@ -182,7 +182,7 @@ func (fh *FileHeader) Validate() error {
 	if err := fh.isAlphanumeric(fh.ImmediateDestinationName); err != nil {
 		return fieldError("ImmediateDestinationName", err, fh.ImmediateDestinationName)
 	}
-	if fh.ImmediateOrigin == "000000000" {
+	if fh.ImmediateOrigin == "0000000000" {
 		return fieldError("ImmediateOrigin", ErrConstructor, fh.ImmediateOrigin)
 	}
 	if fh.ImmediateDestination == "000000000" {
@@ -241,7 +241,7 @@ func (fh *FileHeader) ImmediateDestinationField() string {
 
 // ImmediateOriginField gets the immediate origin number with 0 padding
 func (fh *FileHeader) ImmediateOriginField() string {
-	return " " + fh.stringField(fh.ImmediateOrigin, 9)
+	return fh.stringField(fh.ImmediateOrigin, 10)
 }
 
 // FileCreationDateField gets the file creation date in YYMMDD format

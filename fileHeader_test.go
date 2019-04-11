@@ -75,8 +75,8 @@ func parseFileHeader(t testing.TB) {
 	if record.ImmediateDestinationField() != " 076401251" {
 		t.Errorf("ImmediateDestination Expected ' 076401251' got: %v", record.ImmediateDestinationField())
 	}
-	if record.ImmediateOriginField() != " 076401251" {
-		t.Errorf("ImmediateOrigin Expected '   076401251' got: %v", record.ImmediateOriginField())
+	if record.ImmediateOriginField() != "0076401251" {
+		t.Errorf("ImmediateOrigin Expected '  0076401251' got: %v", record.ImmediateOriginField())
 	}
 
 	if record.FileCreationDateField() != "180729" {
