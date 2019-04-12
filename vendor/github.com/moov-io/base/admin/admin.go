@@ -27,7 +27,7 @@ func NewServer(addr string) *Server {
 	timeout, _ := time.ParseDuration("45s")
 	router := handler()
 
-	return &Server{
+	svc := &Server{
 		router: router,
 		svc: &http.Server{
 			Addr:         addr,
@@ -37,6 +37,9 @@ func NewServer(addr string) *Server {
 			IdleTimeout:  timeout,
 		},
 	}
+	svc.AddHandler("/live", svc.livenessHandler())
+	svc.AddHandler("/ready", svc.readinessHandler())
+	return svc
 }
 
 // Server represents a holder around a net/http Server which
@@ -44,10 +47,16 @@ func NewServer(addr string) *Server {
 type Server struct {
 	router *mux.Router
 	svc    *http.Server
+
+	liveChecks  []*healthCheck
+	readyChecks []*healthCheck
 }
 
 // BindAddr returns the server's bind address. This is in Go's format so :8080 is valid.
 func (s *Server) BindAddr() string {
+	if s == nil || s.svc == nil {
+		return ""
+	}
 	return s.svc.Addr
 }
 

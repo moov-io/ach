@@ -89,11 +89,19 @@ func JulianDate(t time.Time) float32 {
 		float32(utc.Minute())/1440.0 + float32(utc.Second())/86400.0
 }
 
+// WorkdayFn reports whether the given date is a workday.
+// This is useful for situations where work days change throughout the year.
+//
+// If your workdays are fixed (Mon-Fri for example) then a WorkdayFn
+// is not necessary and you can use cal.SetWorkday() instead.
+type WorkdayFn func(date time.Time) bool
+
 // Calendar represents a yearly calendar with a list of holidays.
 type Calendar struct {
-	holidays [13][]Holiday // 0 for offset based holidays, 1-12 for month based
-	workday  [7]bool       // flags to indicate a day of the week is a workday
-	Observed ObservedRule
+	holidays    [13][]Holiday // 0 for offset based holidays, 1-12 for month based
+	workday     [7]bool       // flags to indicate a day of the week is a workday
+	WorkdayFunc WorkdayFn     // optional function to override workday flags
+	Observed    ObservedRule
 }
 
 // NewCalendar creates a new Calendar with no holidays defined
@@ -144,7 +152,14 @@ func (c *Calendar) IsHoliday(date time.Time) bool {
 func (c *Calendar) IsWorkday(date time.Time) bool {
 	day := date.Weekday()
 
-	if !c.workday[day] || c.IsHoliday(date) {
+	var workday bool
+	if c.WorkdayFunc == nil {
+		workday = c.workday[day]
+	} else {
+		workday = c.WorkdayFunc(date)
+	}
+
+	if !workday || c.IsHoliday(date) {
 		return false
 	}
 
