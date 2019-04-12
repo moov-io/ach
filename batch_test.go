@@ -101,7 +101,7 @@ func TestBatch__UnmarshalJSON(t *testing.T) {
 		t.Error("file == nil")
 	}
 
-	if v := file.Header.FileCreationDate; v != "180614" {
+	if v := file.Header.FileCreationDate; v != time.Now().Format("060102") { // YYMMDD
 		t.Errorf("got FileCreationDate of %q", v)
 	}
 	if v := file.Header.FileCreationTime; v != "0000" {
