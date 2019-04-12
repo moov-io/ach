@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/moov-io/ach"
@@ -74,7 +75,15 @@ func main() {
 	}
 
 	// write the file to std out. Anything io.Writer
-	w := ach.NewWriter(os.Stdout)
+	fd, err := os.Create(filepath.Join("..", "ach-ctx-read", "ctx-debit.ach"))
+	if err != nil {
+		log.Fatalf("Unexpected error creating output file: %s\n", err)
+	}
+	defer func() {
+		fd.Sync()
+		fd.Close()
+	}()
+	w := ach.NewWriter(fd)
 	if err := w.Write(file); err != nil {
 		log.Fatalf("Unexpected error: %s\n", err)
 	}
