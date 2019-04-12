@@ -941,3 +941,120 @@ func TestBatchConvertBatchType(t *testing.T) {
 		t.Error("XCK batch type is not converted correctly")
 	}
 }
+
+func TestBatch__Equal(t *testing.T) {
+	testFile := func(t *testing.T) *File {
+		t.Helper()
+		fd, err := os.Open(filepath.Join("test", "testdata", "ppd-debit.ach"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer fd.Close()
+		file, err := NewReader(fd).Read()
+		if err != nil {
+			t.Fatal(err)
+		}
+		return &file
+	}
+
+	firstBatch := testFile(t).Batches[0]
+
+	// Let's check and ensure equality
+	secondBatch := testFile(t).Batches[0]
+	if !firstBatch.Equal(secondBatch) {
+		t.Fatal("identical .Equal failed, uhh")
+	}
+
+	// nil cases
+	var b *Batch
+	if b.Equal(secondBatch) || secondBatch.Equal(nil) {
+		t.Fatalf("b.Equal(secondBatch)=%v secondBatch.Equal(nil)=%v", b.Equal(secondBatch), secondBatch.Equal(nil))
+	}
+
+	// Now change each field in .Equal and see
+	secondBatch = testFile(t).Batches[0]
+	secondBatch.GetHeader().ServiceClassCode = 1
+	if firstBatch.Equal(secondBatch) {
+		t.Error("changed ServiceClassCode, expected not equal")
+	}
+
+	secondBatch = testFile(t).Batches[0]
+	secondBatch.GetHeader().StandardEntryClassCode = "ZZZ"
+	if firstBatch.Equal(secondBatch) {
+		t.Error("changed StandardEntryClassCode, expected not equal")
+	}
+
+	secondBatch = testFile(t).Batches[0]
+	secondBatch.GetHeader().CompanyName = "foo"
+	if firstBatch.Equal(secondBatch) {
+		t.Error("changed CompanyName, expected not equal")
+	}
+
+	secondBatch = testFile(t).Batches[0]
+	secondBatch.GetHeader().CompanyIdentification = "new company"
+	if firstBatch.Equal(secondBatch) {
+		t.Error("changed CompanyIdentification, expected not equal")
+	}
+
+	secondBatch = testFile(t).Batches[0]
+	secondBatch.GetHeader().EffectiveEntryDate = "1111"
+	if firstBatch.Equal(secondBatch) {
+		t.Error("changed EffectiveEntryDate, expected not equal")
+	}
+
+	secondBatch = testFile(t).Batches[0]
+	secondBatch.GetHeader().ODFIIdentification = "12"
+	if firstBatch.Equal(secondBatch) {
+		t.Error("changed ODFIIdentification, expected not equal")
+	}
+
+	// Check differences in EntryDetail
+	secondBatch = testFile(t).Batches[0]
+	secondBatch.GetEntries()[0].TransactionCode = 1
+	if firstBatch.Equal(secondBatch) {
+		t.Error("changed TransactionCode, expected not equal")
+	}
+
+	secondBatch = testFile(t).Batches[0]
+	secondBatch.GetEntries()[0].RDFIIdentification = "41"
+	if firstBatch.Equal(secondBatch) {
+		t.Error("changed RDFIIdentification, expected not equal")
+	}
+
+	secondBatch = testFile(t).Batches[0]
+	secondBatch.GetEntries()[0].DFIAccountNumber = "542"
+	if firstBatch.Equal(secondBatch) {
+		t.Error("changed DFIAccountNumber, expected not equal")
+	}
+
+	secondBatch = testFile(t).Batches[0]
+	secondBatch.GetEntries()[0].Amount = 1
+	if firstBatch.Equal(secondBatch) {
+		t.Error("changed Amount, expected not equal")
+	}
+
+	secondBatch = testFile(t).Batches[0]
+	secondBatch.GetEntries()[0].IdentificationNumber = "99"
+	if firstBatch.Equal(secondBatch) {
+		t.Error("changed IdentificationNumber, expected not equal")
+	}
+
+	secondBatch = testFile(t).Batches[0]
+	secondBatch.GetEntries()[0].IndividualName = "jane doe"
+	if firstBatch.Equal(secondBatch) {
+		t.Error("changed IndividualName, expected not equal")
+	}
+
+	secondBatch = testFile(t).Batches[0]
+	secondBatch.GetEntries()[0].DiscretionaryData = "other info"
+	if firstBatch.Equal(secondBatch) {
+		t.Error("changed DiscretionaryData, expected not equal")
+	}
+
+	// Add another EntryDetail and make sure we fail
+	secondBatch = testFile(t).Batches[0]
+	secondBatch.AddEntry(secondBatch.GetEntries()[0])
+	if firstBatch.Equal(secondBatch) {
+		t.Error("added EntryDetail, expected not equal")
+	}
+}
