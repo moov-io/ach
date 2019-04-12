@@ -6,24 +6,25 @@ import "time"
 
 // Holidays in Germany
 var (
-	DENeujahr                = NewYear
-	DEHeiligeDreiKoenige     = NewHoliday(time.January, 6)
-	DEKarFreitag             = GoodFriday
-	DEOstersonntag           = NewHolidayFunc(calculateOstersonntag)
-	DEOstermontag            = EasterMonday
-	DETagderArbeit           = NewHoliday(time.May, 1)
-	DEChristiHimmelfahrt     = NewHolidayFunc(calculateHimmelfahrt)
-	DEPfingstsonntag         = NewHolidayFunc(calculatePfingstSonntag)
-	DEPfingstmontag          = NewHolidayFunc(calculatePfingstMontag)
-	DEFronleichnam           = NewHolidayFunc(calculateFronleichnam)
-	DEMariaHimmelfahrt       = NewHoliday(time.August, 15)
-	DETagderDeutschenEinheit = NewHoliday(time.October, 3)
-	DEReformationstag        = NewHoliday(time.October, 31)
-	DEReformationstag2017    = NewHolidayExact(time.October, 31, 2017)
-	DEAllerheiligen          = NewHoliday(time.November, 1)
-	DEBußUndBettag           = NewHolidayFunc(calculateBußUndBettag)
-	DEErsterWeihnachtstag    = Christmas
-	DEZweiterWeihnachtstag   = Christmas2
+	DENeujahr                  = NewYear
+	DEHeiligeDreiKoenige       = NewHoliday(time.January, 6)
+	DEInternationalerFrauentag = NewHoliday(time.March, 8)
+	DEKarFreitag               = GoodFriday
+	DEOstersonntag             = NewHolidayFunc(calculateOstersonntag)
+	DEOstermontag              = EasterMonday
+	DETagderArbeit             = NewHoliday(time.May, 1)
+	DEChristiHimmelfahrt       = NewHolidayFunc(calculateHimmelfahrt)
+	DEPfingstsonntag           = NewHolidayFunc(calculatePfingstSonntag)
+	DEPfingstmontag            = NewHolidayFunc(calculatePfingstMontag)
+	DEFronleichnam             = NewHolidayFunc(calculateFronleichnam)
+	DEMariaHimmelfahrt         = NewHoliday(time.August, 15)
+	DETagderDeutschenEinheit   = NewHoliday(time.October, 3)
+	DEReformationstag          = NewHoliday(time.October, 31)
+	DEReformationstag2017      = NewHolidayExact(time.October, 31, 2017)
+	DEAllerheiligen            = NewHoliday(time.November, 1)
+	DEBußUndBettag             = NewHolidayFunc(calculateBußUndBettag)
+	DEErsterWeihnachtstag      = Christmas
+	DEZweiterWeihnachtstag     = Christmas2
 )
 
 // AddGermanHolidays adds all German holidays to the Calendar
@@ -49,6 +50,10 @@ func AddGermanyStateHolidays(c *Calendar, state string) {
 			DEOstersonntag,
 			DEPfingstsonntag,
 			DEReformationstag,
+		)
+	case "BE": // Berlin
+		c.AddHoliday(
+			DEInternationalerFrauentag,
 		)
 	case "BW": // Baden-Württemberg
 		c.AddHoliday(

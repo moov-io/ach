@@ -1,3 +1,9 @@
+## v0.9.0 (Released 2019-03-04)
+
+ADDITIONS
+
+- admin: Added `AddLivenessCheck` and `AddReadinessCheck` for HTTP health checks
+
 ## v0.8.0 (Released 2019-02-01)
 
 ADDITIONS
