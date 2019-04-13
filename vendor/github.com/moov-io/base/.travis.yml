@@ -7,7 +7,7 @@ os:
 - osx
 - windows
 go:
-- 1.11
+- 1.12.x
 dist: xenial # Ubuntu 16.04
 osx_image: xcode9.1
 before_install:
