@@ -30,9 +30,10 @@ type FileHeader struct {
 
 	// ImmediateOrigin contains the Routing Number of the ACH Operator or sending
 	// point that is sending the file. The ach file format specifies a 10 character field
-	// which can begin with a blank space or '1' in the first position, followed by the four digit
+	// which can begin with a blank space, 0 or 1 in the first position, followed by the four digit
 	// Federal Reserve Routing Symbol, the four digit ABA Institution Identifier, and the Check
-	// Digit (bTTTTAAAAC).  ImmediateOriginField() will append the blank space to the routing number.
+	// Digit (bTTTTAAAAC).  ImmediateOriginField() will prepend a 0 to the routing number to match
+	// the field size.
 	ImmediateOrigin string `json:"immediateOrigin"`
 
 	// FileCreationDate is the date on which the file is prepared by an ODFI (ACH input files)
