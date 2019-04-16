@@ -1,3 +1,19 @@
+## v1.1.0 (Unreleased)
+
+BUG FIXES
+
+- fileHeader: allow immediate origin to be a 10 digit value (See: [#513](https://github.com/moov-io/ach/pull/513) by [@eduardev](https://github.com/eduardev))
+- Fix JSON omitempty typo in `ADVEntryDetail`
+
+ADDITIONS
+
+- batch: add Equal method
+
+BUILD
+
+- vendor: update dependencies
+- Fix `moov/achfuzz` docker image build
+
 ## v1.0.0 (Released 2019-03-26)
 
 - No changes from v0.6.0
