@@ -30,10 +30,9 @@ type FileHeader struct {
 
 	// ImmediateOrigin contains the Routing Number of the ACH Operator or sending
 	// point that is sending the file. The ach file format specifies a 10 character field
-	// which begins with a blank space in the first position, followed by the four digit
+	// which can begin with a blank space or '1' in the first position, followed by the four digit
 	// Federal Reserve Routing Symbol, the four digit ABA Institution Identifier, and the Check
-	// Digit (bTTTTAAAAC).  ImmediateOriginField() will append the blank space to the routing
-	// number.
+	// Digit (bTTTTAAAAC).  ImmediateOriginField() will append the blank space to the routing number.
 	ImmediateOrigin string `json:"immediateOrigin"`
 
 	// FileCreationDate is the date on which the file is prepared by an ODFI (ACH input files)
@@ -182,7 +181,7 @@ func (fh *FileHeader) Validate() error {
 	if err := fh.isAlphanumeric(fh.ImmediateDestinationName); err != nil {
 		return fieldError("ImmediateDestinationName", err, fh.ImmediateDestinationName)
 	}
-	if fh.ImmediateOrigin == "000000000" {
+	if fh.ImmediateOrigin == "0000000000" {
 		return fieldError("ImmediateOrigin", ErrConstructor, fh.ImmediateOrigin)
 	}
 	if fh.ImmediateDestination == "000000000" {
@@ -241,7 +240,7 @@ func (fh *FileHeader) ImmediateDestinationField() string {
 
 // ImmediateOriginField gets the immediate origin number with 0 padding
 func (fh *FileHeader) ImmediateOriginField() string {
-	return " " + fh.stringField(fh.ImmediateOrigin, 9)
+	return fh.stringField(fh.ImmediateOrigin, 10)
 }
 
 // FileCreationDateField gets the file creation date in YYMMDD format
