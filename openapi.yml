@@ -39,7 +39,12 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       parameters:
-        - $ref: '#/components/parameters/requestId'
+        - name: X-Request-Id
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
       responses:
         '200':
           description: A list of File objects
@@ -62,8 +67,19 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       parameters:
-        - $ref: '#/components/parameters/requestId'
-        - $ref: '#/components/parameters/idempotencyKey'
+        - name: X-Request-Id
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-Idempotency-Key
+          in: header
+          description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy for to not collide with each other in your requests.
+          example: a4f88150
+          required: false
+          schema:
+            type: string
       requestBody:
         description: Content of the ACH file (in json or raw text)
         required: true
@@ -105,7 +121,12 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       parameters:
-        - $ref: '#/components/parameters/requestId'
+        - name: X-Request-Id
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
         - name: file_id
           in: path
           description: File ID
@@ -131,8 +152,19 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       parameters:
-        - $ref: '#/components/parameters/requestId'
-        - $ref: '#/components/parameters/idempotencyKey'
+        - name: X-Request-Id
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-Idempotency-Key
+          in: header
+          description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy for to not collide with each other in your requests.
+          example: a4f88150
+          required: false
+          schema:
+            type: string
         - name: file_id
           in: path
           description: File ID
@@ -181,7 +213,12 @@ paths:
           schema:
             type: string
             example: 3f2d23ee214
-        - $ref: '#/components/parameters/requestId'
+        - name: X-Request-Id
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
       responses:
           '200':
             description: Permanently deleted File.
@@ -197,7 +234,12 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       parameters:
-        - $ref: '#/components/parameters/requestId'
+        - name: X-Request-Id
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
         - name: file_id
           in: path
           description: File ID
@@ -222,7 +264,12 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       parameters:
-        - $ref: '#/components/parameters/requestId'
+        - name: X-Request-Id
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
         - name: file_id
           in: path
           description: File ID
@@ -249,7 +296,12 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       parameters:
-        - $ref: '#/components/parameters/requestId'
+        - name: X-Request-Id
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
         - name: file_id
           in: path
           description: File ID
@@ -278,8 +330,19 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       parameters:
-        - $ref: '#/components/parameters/requestId'
-        - $ref: '#/components/parameters/idempotencyKey'
+        - name: X-Request-Id
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-Idempotency-Key
+          in: header
+          description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy for to not collide with each other in your requests.
+          example: a4f88150
+          required: false
+          schema:
+            type: string
         - name: file_id
           in: path
           description: File ID
@@ -306,7 +369,12 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       parameters:
-        - $ref: '#/components/parameters/requestId'
+        - name: X-Request-Id
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
         - name: file_id
           in: path
           description: File ID
@@ -339,7 +407,12 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       parameters:
-        - $ref: '#/components/parameters/requestId'
+        - name: X-Request-Id
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
         - name: file_id
           in: path
           description: File ID
@@ -804,19 +877,3 @@ components:
           type: string
           description: An error message describing the problem intended for humans.
           example: Validation error(s) present.
-  parameters:
-    requestId:
-      in: header
-      name: X-Request-Id
-      description: Optional Request ID allows application developer to trace requests through the systems logs
-      example: rs4f9915
-      schema:
-        type: string
-    idempotencyKey:
-      in: header
-      name: X-Idempotency-Key
-      description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy for to not collide with each other in your requests.
-      example: a4f88150
-      required: false
-      schema:
-        type: string
