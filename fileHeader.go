@@ -113,7 +113,7 @@ func (fh *FileHeader) Parse(record string) {
 	// (4-13) A blank space followed by your ODFI's routing number. For example: " 121140399"
 	fh.ImmediateDestination = fh.parseStringField(record[3:13])
 	// (14-23) A 10-digit number assigned to you by the ODFI once they approve you to originate ACH files through them
-	fh.ImmediateOrigin = fh.parseStringField(record[13:23])
+	fh.ImmediateOrigin = trimImmediateOriginLeadingZero(fh.parseStringField(record[13:23]))
 	// 24-29 Today's date in YYMMDD format
 	// must be after today's date.
 	fh.FileCreationDate = fh.validateSimpleDate(record[23:29])
@@ -133,6 +133,14 @@ func (fh *FileHeader) Parse(record string) {
 	fh.ImmediateOriginName = strings.TrimSpace(record[63:86])
 	//97-94 Optional field that may be used to describe the ACH file for internal accounting purposes
 	fh.ReferenceCode = strings.TrimSpace(record[86:94])
+}
+
+func trimImmediateOriginLeadingZero(s string) string {
+	if utf8.RuneCountInString(s) == 10 && s[0] == '0' && s != "0000000000" {
+		// trim off a leading 0 as ImmediateOriginField() will pad it back
+		return s[1:]
+	}
+	return s
 }
 
 // String writes the FileHeader struct to a 94 character string.
