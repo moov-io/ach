@@ -17,11 +17,11 @@ import (
 // See Appendix Four: Return Entries in the NACHA Corporate
 
 var (
-	returnCodeDict = map[string]*returnCode{}
+	returnCodeDict = map[string]*ReturnCode{}
 )
 
 func init() {
-	// populate the returnCode map with lookup values
+	// populate the ReturnCode map with lookup values
 	returnCodeDict = makeReturnCodeDict()
 }
 
@@ -57,10 +57,10 @@ type Addenda99 struct {
 	converters
 }
 
-// returnCode holds a return Code, Reason/Title, and Description
+// ReturnCode holds a return Code, Reason/Title, and Description
 //
 // Table of return codes exists in Part 4.2 of the NACHA corporate rules and guidelines
-type returnCode struct {
+type ReturnCode struct {
 	Code, Reason, Description string
 }
 
@@ -182,10 +182,19 @@ func (Addenda99 *Addenda99) TraceNumberField() string {
 	return Addenda99.stringField(Addenda99.TraceNumber, 15)
 }
 
-func makeReturnCodeDict() map[string]*returnCode {
-	dict := make(map[string]*returnCode)
+// ReturnCodeField gives the ReturnCode struct for the given Addenda99 record
+func (Addenda99 *Addenda99) ReturnCodeField() *ReturnCode {
+	code, ok := returnCodeDict[Addenda99.ReturnCode]
+	if ok {
+		return code
+	}
+	return nil
+}
 
-	codes := []returnCode{
+func makeReturnCodeDict() map[string]*ReturnCode {
+	dict := make(map[string]*ReturnCode)
+
+	codes := []ReturnCode{
 		// Return Reason Codes for RDFIs
 		{"R01", "Insufficient Funds", "Available balance is not sufficient to cover the dollar value of the debit entry"},
 		{"R02", "Account Closed", "Previously active account has been closed by customer or RDFI"},
@@ -263,8 +272,8 @@ func makeReturnCodeDict() map[string]*returnCode {
 		{"R85", "Incorrectly Coded Outbound International Payment", "The RDFI/Gateway has identified the Entry as an Outbound international payment and is returning the Entry because it bears an SEC Code that lacks information required by the Gateway for OFAC compliance."},
 	}
 	// populate the map
-	for _, code := range codes {
-		dict[code.Code] = &code
+	for i := range codes {
+		dict[codes[i].Code] = &codes[i]
 	}
 	return dict
 }

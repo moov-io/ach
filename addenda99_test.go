@@ -49,6 +49,13 @@ func testAddenda99Parse(t testing.TB) {
 	if addenda99.TraceNumber != "091012980000066" {
 		t.Errorf("expected: %v got: %v", "091012980000066", addenda99.TraceNumber)
 	}
+	if code := addenda99.ReturnCodeField(); code != nil {
+		if code.Code != "R07" || code.Reason != "Authorization Revoked by Customer" {
+			t.Errorf("code.Code=%q code.Reason=%q", code.Code, code.Reason)
+		}
+	} else {
+		t.Errorf("got nil ReturnCode")
+	}
 }
 
 func TestAddenda99Parse(t *testing.T) {

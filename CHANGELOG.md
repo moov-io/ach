@@ -8,6 +8,7 @@ BUG FIXES
 ADDITIONS
 
 - batch: add Equal method
+- Addenda99: Add `ReturnCodeField()` for detailed information about a returned file
 
 BUILD
 
