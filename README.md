@@ -16,6 +16,8 @@ Moov ACH is under active development and in production for multiple companies. P
 
 ## Usage
 
+The ACH project implements a Go library and HTTP server for creating and modifying ACH files. If you're looking for a more general implementation of ACH file creation, OFAC checks, micro-deposits, SFTP uploading the [moov-io/paygate](https://github.com/moov-io/paygate) project implements those features.
+
 ### Go library
 
 `github.com/moov-io/ach` offers a Go based ACH file reader and writer. To get started checkout a specific example:
