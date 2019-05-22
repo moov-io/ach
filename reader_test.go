@@ -17,6 +17,20 @@ import (
 	"github.com/moov-io/base"
 )
 
+func readACHFilepath(path string) (*File, error) {
+	fd, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer fd.Close()
+
+	file, err := NewReader(fd).Read()
+	if err != nil {
+		return nil, err
+	}
+	return &file, nil
+}
+
 func TestReader__crashers(t *testing.T) {
 	dir := filepath.Join("test", "testdata", "crashes")
 	fds, err := ioutil.ReadDir(dir)

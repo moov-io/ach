@@ -376,6 +376,31 @@ func (f *File) AddBatch(batch Batcher) []Batcher {
 	return f.Batches
 }
 
+// RemoveBatch will delete a given Batcher from an ach.File
+func (f *File) RemoveBatch(batch Batcher) {
+	if batch.Category() == CategoryNOC {
+		for i := range f.NotificationOfChange {
+			if f.NotificationOfChange[i].Equal(batch) {
+				f.NotificationOfChange = append(f.NotificationOfChange[:i], f.NotificationOfChange[i+1:]...)
+				return
+			}
+		}
+	}
+	if batch.Category() == CategoryReturn {
+		for i := range f.ReturnEntries {
+			if f.ReturnEntries[i].Equal(batch) {
+				f.ReturnEntries = append(f.ReturnEntries[:i], f.ReturnEntries[i+1:]...)
+				return
+			}
+		}
+	}
+	for i := range f.Batches {
+		if f.Batches[i].Equal(batch) {
+			f.Batches = append(f.Batches[:i], f.Batches[i+1:]...)
+		}
+	}
+}
+
 // AddIATBatch appends a IATBatch to the ach.File
 func (f *File) AddIATBatch(iatBatch IATBatch) []IATBatch {
 	f.IATBatches = append(f.IATBatches, iatBatch)
