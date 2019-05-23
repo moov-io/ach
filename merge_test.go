@@ -203,15 +203,25 @@ func TestMergeFiles__splitFiles(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// read a third file
+	f3, err := readACHFilepath(filepath.Join("test", "testdata", "20110729A.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	f3.Header = file.Header // replace Header so they're merged into one file
+	if err := f3.Create(); err != nil {
+		t.Fatal(err)
+	}
+
 	// Merge our big file into another file and verify we get two back
 	// TODO(adam): We should probably recurse back on `file` to ensure we don't exceed the
 	// 10k line limit. That shouldn't happen as MergeFiles processes one batch at a time, but
 	// an incoming file might be invalid in that way.
-	out, err := MergeFiles([]*File{file, f2})
+	out, err := MergeFiles([]*File{file, f2, f3})
 	if err != nil || len(out) != 2 {
 		t.Fatalf("got %d files, error=%v", len(out), err)
 	}
-	if len(out[0].Batches) != 4001 || len(out[1].Batches) != 3 {
+	if len(out[0].Batches) != 4001 || len(out[1].Batches) != 5 {
 		// These batch counts will change when we recurse back through out[0]
 		// so it doesn't exceed the 10k line limit.
 		t.Errorf("out[0].Batches:%d out[1].Batches:%d", len(out[0].Batches), len(out[1].Batches))
