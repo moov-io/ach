@@ -984,3 +984,69 @@ func TestFile_largeFileEntryHash(t *testing.T) {
 		}
 	}
 }
+
+func TestFile__RemoveBatch(t *testing.T) {
+	file, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(file.Batches) != 1 {
+		t.Errorf("unexpected number of batches: %d", len(file.Batches))
+	}
+
+	// remove the batch and check
+	file.RemoveBatch(file.Batches[0])
+	if len(file.Batches) != 0 {
+		t.Errorf("unexpected number of batches: %d", len(file.Batches))
+	}
+
+	// NOC Entries
+	nocHeader := NewBatchHeader()
+	nocHeader.ServiceClassCode = CreditsOnly
+	nocHeader.StandardEntryClassCode = COR
+	nocHeader.CompanyName = "Your Company, inc"
+	nocHeader.CompanyIdentification = "121042882"
+	nocHeader.CompanyEntryDescription = "Vendor Pay"
+	nocHeader.ODFIIdentification = "121042882"
+	noc := NewBatchCOR(nocHeader)
+	nocED := mockCOREntryDetail()
+	nocED.Addenda98 = mockAddenda98()
+	nocED.Category = CategoryNOC
+	nocED.AddendaRecordIndicator = 1
+	noc.AddEntry(nocED)
+	if err := noc.Create(); err != nil {
+		t.Fatal(err)
+	}
+	file.AddBatch(noc)
+	if len(file.NotificationOfChange) != 1 {
+		t.Errorf("unexpected number of NOC batches: %d", len(file.NotificationOfChange))
+	}
+	file.RemoveBatch(noc)
+	if len(file.NotificationOfChange) != 0 {
+		t.Errorf("unexpected number of NOC batches: %d", len(file.NotificationOfChange))
+	}
+
+	// Returns
+	file, err = readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(file.ReturnEntries) != 0 {
+		t.Errorf("unexpected number of return entries: %d", len(file.ReturnEntries))
+	}
+	ppdHeader := mockBatchPPDHeader()
+	ppd := NewBatchPPD(ppdHeader)
+	ppdED := mockPPDEntryDetail()
+	ppdED.Addenda99 = mockAddenda99()
+	ppdED.Category = CategoryReturn
+	ppd.AddEntry(ppdED)
+
+	file.AddBatch(ppd)
+	if len(file.ReturnEntries) != 1 {
+		t.Errorf("unexpected number of return entries: %d", len(file.ReturnEntries))
+	}
+	file.RemoveBatch(ppd)
+	if len(file.ReturnEntries) != 0 {
+		t.Errorf("unexpected number of return entries: %d", len(file.ReturnEntries))
+	}
+}
