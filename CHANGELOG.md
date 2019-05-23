@@ -4,16 +4,20 @@ BUG FIXES
 
 - fileHeader: allow immediate origin to be a 10 digit value (See: [#513](https://github.com/moov-io/ach/pull/513) by [@eduardev](https://github.com/eduardev))
 - Fix JSON omitempty typo in `ADVEntryDetail`
+- fileHeader: trim padded 0's from ImmediateOriginField() and fixup docs
+- batch: only check DNE specifics if the SEC code is DNE
 
 ADDITIONS
 
 - batch: add Equal method
 - Addenda99: Add `ReturnCodeField()` for detailed information about a returned file
+- files: support arbitrary merging of ACH files (See [#529](https://github.com/moov-io/ach/issues/529))
 
 BUILD
 
 - vendor: update dependencies
 - Fix `moov/achfuzz` docker image build
+- api: inline parameters to fix codegen crash
 
 ## v1.0.0 (Released 2019-03-26)
 
