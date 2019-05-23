@@ -703,7 +703,7 @@ func (batch *Batch) calculateEntryHash() int {
 // allowed for DNEs. Tranaction codes 21 and 31 are just for returns or NOCs of the 23 and 33 codes.
 // So we check that the Originator Status Code is not equal to “2” for DNE if the Transaction Code is 23 or 33
 func (batch *Batch) isOriginatorDNE() error {
-	if batch.Header.OriginatorStatusCode != 2 {
+	if batch.Header.OriginatorStatusCode != 2 && batch.Header.StandardEntryClassCode == DNE {
 		for _, entry := range batch.Entries {
 			if entry.TransactionCode == CheckingPrenoteCredit || entry.TransactionCode == SavingsPrenoteCredit {
 				return batch.Error("OriginatorStatusCode", ErrBatchOriginatorDNE, batch.Header.OriginatorStatusCode)

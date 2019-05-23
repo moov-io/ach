@@ -230,8 +230,10 @@ func BenchmarkBatchIsEntryHash(b *testing.B) {
 }
 
 func testBatchDNEMismatch(t testing.TB) {
+	bh := mockBatchHeader()
+	bh.StandardEntryClassCode = DNE
 	mockBatch := mockBatch()
-	mockBatch.SetHeader(mockBatchHeader())
+	mockBatch.SetHeader(bh)
 	ed := mockBatch.GetEntries()[0]
 	ed.AddAddenda05(mockAddenda05())
 	ed.AddAddenda05(mockAddenda05())
@@ -253,6 +255,19 @@ func BenchmarkBatchDNEMismatch(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchDNEMismatch(b)
+	}
+}
+
+func TestBatch__DNEOriginatorCheck(t *testing.T) {
+	bh := mockBatchHeader()
+	bh.OriginatorStatusCode = 1
+	bh.StandardEntryClassCode = PPD
+
+	batch := mockBatch()
+	batch.SetHeader(bh)
+
+	if err := batch.isOriginatorDNE(); err != nil {
+		t.Errorf("%T: %s", err, err)
 	}
 }
 
