@@ -167,6 +167,12 @@ func TestMergeFiles__lineCount(t *testing.T) {
 	if n, err := lineCount(file); n != 310 || err != nil {
 		t.Errorf("unexpected line count of %d: %v", n, err)
 	}
+
+	// make the file invalid and ensure we error
+	file.Control.BatchCount = 0
+	if n, err := lineCount(file); n != 0 || err == nil {
+		t.Errorf("expected error n=%d error=%v", n, err)
+	}
 }
 
 // TestMergeFiles__splitFiles generates a file over the 10k line limit and attempts to merge
@@ -225,5 +231,24 @@ func TestMergeFiles__splitFiles(t *testing.T) {
 		// These batch counts will change when we recurse back through out[0]
 		// so it doesn't exceed the 10k line limit.
 		t.Errorf("out[0].Batches:%d out[1].Batches:%d", len(out[0].Batches), len(out[1].Batches))
+	}
+}
+
+func TestMergeFiles__invalid(t *testing.T) {
+	f1, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	f1.Header.ImmediateOrigin = "0000000000" // make file invalid
+
+	f2, err := readACHFilepath(filepath.Join("test", "testdata", "web-debit.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	f2.Header = f1.Header
+
+	out, err := MergeFiles([]*File{f1, f2})
+	if len(out) != 0 || err == nil {
+		t.Errorf("expected error: len(out)=%d error=%v", len(out), err)
 	}
 }
