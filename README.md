@@ -66,6 +66,7 @@ Examples: [Go](examples/http/main.go) | [Ruby](https://github.com/moov-io/ruby-a
 
 - [Running ACH Server](https://docs.moov.io/en/latest/tutorials/ach-server/)
 - [ACH Server metrics](documentation/metrics.md)
+- [Merging ACH files](https://docs.moov.io/en/latest/ach/merging-files/)
 
 ### From Source
 
