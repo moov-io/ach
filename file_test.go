@@ -1056,3 +1056,103 @@ func TestFile__RemoveBatch(t *testing.T) {
 		t.Errorf("unexpected number of return entries: %d", len(file.ReturnEntries))
 	}
 }
+
+func TestFile__CalculateBalancedOffsetCredit(t *testing.T) {
+	// Create an ACH file with a debit and add a credit offset record
+	f := mockFilePPD()
+	if b, ok := f.Batches[0].(*BatchPPD); ok {
+		b.Header.ServiceClassCode = DebitsOnly
+		b.Entries[0].TransactionCode = CheckingDebit
+		if err := f.Batches[0].Create(); err != nil {
+			t.Fatal(err)
+		}
+	} else {
+		t.Fatalf("got %T: %#v", f.Batches[0], f.Batches[0])
+	}
+	if len(f.Batches) != 1 {
+		t.Errorf("found unexpected %d batches", len(f.Batches))
+	}
+	if err := f.Create(); err != nil {
+		t.Fatal(err)
+	}
+
+	bh := NewBatchHeader()
+	bh.StandardEntryClassCode = PPD
+	bh.CompanyName = "ACME Corporation"
+	bh.CompanyIdentification = "121042882"
+	bh.CompanyEntryDescription = "OFFSET"
+	bh.ODFIIdentification = "12104288"
+
+	ed := NewEntryDetail()
+	ed.SetRDFI("121042882")
+	ed.DFIAccountNumber = "123456789"
+	ed.IndividualName = "OFFSET"
+	ed.TransactionCode = CheckingCredit
+
+	if err := f.CalculateBalancedOffset(bh, ed); err != nil {
+		t.Fatal(err)
+	}
+
+	if len(f.Batches) != 2 {
+		t.Errorf("found unexpected %d batches", len(f.Batches))
+	}
+	if n := len(f.Batches[1].GetEntries()); n != 1 {
+		t.Errorf("offset record had %d EntryDetails", n)
+	}
+	if f.Batches[1].GetHeader().ServiceClassCode != CreditsOnly {
+		t.Errorf("offset record has unexpected ServiceClassCode: %v", f.Batches[1].GetHeader().ServiceClassCode)
+	}
+	if f.Batches[1].GetEntries()[0].Amount != f.Batches[0].GetEntries()[0].Amount {
+		t.Errorf("offset record amount didn't match: batch[0]=%d offset=%d", f.Batches[0].GetEntries()[0].Amount, f.Batches[1].GetEntries()[0].Amount)
+	}
+}
+
+func TestFile__CalculateBalancedOffsetDebit(t *testing.T) {
+	// Create an ACH file with a credit and add a debit offset record
+	f := mockFilePPD()
+	if b, ok := f.Batches[0].(*BatchPPD); ok {
+		b.Header.ServiceClassCode = CreditsOnly
+		b.Entries[0].TransactionCode = CheckingCredit
+		if err := f.Batches[0].Create(); err != nil {
+			t.Fatal(err)
+		}
+	} else {
+		t.Fatalf("got %T: %#v", f.Batches[0], f.Batches[0])
+	}
+	if len(f.Batches) != 1 {
+		t.Errorf("found unexpected %d batches", len(f.Batches))
+	}
+	if err := f.Create(); err != nil {
+		t.Fatal(err)
+	}
+
+	bh := NewBatchHeader()
+	bh.StandardEntryClassCode = PPD
+	bh.CompanyName = "ACME Corporation"
+	bh.CompanyIdentification = "121042882"
+	bh.CompanyEntryDescription = "OFFSET"
+	bh.ODFIIdentification = "12104288"
+
+	ed := NewEntryDetail()
+	ed.SetRDFI("121042882")
+	ed.DFIAccountNumber = "123456789"
+	ed.IndividualName = "OFFSET"
+	ed.TransactionCode = CheckingDebit
+
+	if err := f.CalculateBalancedOffset(bh, ed); err != nil {
+		t.Fatal(err)
+	}
+
+	if len(f.Batches) != 2 {
+		t.Errorf("found unexpected %d batches", len(f.Batches))
+	}
+	if n := len(f.Batches[1].GetEntries()); n != 1 {
+		t.Errorf("offset record had %d EntryDetails", n)
+	}
+	if f.Batches[1].GetHeader().ServiceClassCode != DebitsOnly {
+		t.Errorf("offset record has unexpected ServiceClassCode: %v", f.Batches[1].GetHeader().ServiceClassCode)
+	}
+	if f.Batches[1].GetEntries()[0].Amount != f.Batches[0].GetEntries()[0].Amount {
+		t.Errorf("offset record amount didn't match: batch[0]=%d offset=%d", f.Batches[0].GetEntries()[0].Amount, f.Batches[1].GetEntries()[0].Amount)
+	}
+}
