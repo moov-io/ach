@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"time"
 )
 
 // First position of all Record Types. These codes are uniquely assigned to
@@ -651,63 +650,5 @@ func (f *File) createFileADV() error {
 	fc.TotalCreditEntryDollarAmountInFile = totalCreditAmount
 	f.ADVControl = fc
 
-	return nil
-}
-
-// CalculateBalancedOffset will append a "balanced offset" record to the end of an ACH File.
-// Balanced offset records sum a File's Debits or Credits to zero in a single transaction.
-// Offset files are used to offset transactions from a single account inside of the ODFI.
-//
-// If a file contains Debits the offset record will be a Credit and if a file contains Credits
-// the offset record will be a debit.
-//
-// The ACH File will have its FileControl record retabulated after appending the Batch.
-func (f *File) CalculateBalancedOffset(bh *BatchHeader, ed *EntryDetail) error {
-	if err := f.Create(); err != nil {
-		return fmt.Errorf("CalculateBalancedOffset: initial tabulate: %v", err)
-	}
-	if f.Control.TotalDebitEntryDollarAmountInFile > 0 && f.Control.TotalCreditEntryDollarAmountInFile > 0 {
-		return errors.New("CalculateBalancedOffset: file must contain only debits or credits")
-	}
-
-	// Set required BatchHeader fields if they are left empty
-	if bh.EffectiveEntryDate == "" {
-		bh.EffectiveEntryDate = time.Now().Format("060102") // YYMMDD
-	}
-
-	if f.Control.TotalDebitEntryDollarAmountInFile > 0 {
-		// Create a Credit entry
-		bh.ServiceClassCode = CreditsOnly
-		ed.Amount = f.Control.TotalDebitEntryDollarAmountInFile
-	} else {
-		// Create a Debit entry
-		bh.ServiceClassCode = DebitsOnly
-		ed.Amount = f.Control.TotalCreditEntryDollarAmountInFile
-	}
-
-	// Create our batch to add onto the file
-	batch, err := NewBatch(bh)
-	if err != nil {
-		return fmt.Errorf("CalculateBalancedOffset: new batch: %v", err)
-	}
-
-	// Set required EntryDetail fields if they are left empty
-	if ed.Category == "" {
-		ed.Category = CategoryForward
-	}
-
-	batch.AddEntry(ed)
-	if err := batch.Create(); err != nil {
-		return fmt.Errorf("CalculateBalancedOffset: batch create: %v", err)
-	}
-	f.AddBatch(batch)
-
-	// Perform some final checks on the file
-	if err := f.Create(); err != nil {
-		return fmt.Errorf("CalculateBalancedOffset: final file create: %v", err)
-	}
-	if n, err := lineCount(f); err != nil || n > NACHAFileLineLimit {
-		return fmt.Errorf("CalculateBalancedOffset: NACHA file length limit reached (lines=%d): error=%v", n, err)
-	}
 	return nil
 }

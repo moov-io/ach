@@ -7,8 +7,10 @@ package ach
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 // Batch holds the Batch Header and Batch Control and all Entry Records
@@ -20,6 +22,11 @@ type Batch struct {
 	Control    *BatchControl     `json:"batchControl,omitempty"`
 	ADVEntries []*ADVEntryDetail `json:"advEntryDetails,omitempty"`
 	ADVControl *ADVBatchControl  `json:"advBatchControl,omitempty"`
+
+	// offset holds the information to build an EntryDetail record which
+	// balances the batch by debiting or crediting the sum of amounts in the batch.
+	offset *Offset
+
 	// category defines if the entry is a Forward, Return, or NOC
 	category string
 	// Converters is composed for ACH to GoLang Converters
@@ -410,7 +417,7 @@ func (batch *Batch) build() error {
 		bcADV.TotalCreditEntryDollarAmount, bcADV.TotalDebitEntryDollarAmount = batch.calculateADVBatchAmounts()
 		batch.ADVControl = bcADV
 	}
-	return nil
+	return batch.upsertOffset()
 }
 
 // SetHeader appends an BatchHeader to the Batch
@@ -990,4 +997,64 @@ func (batch *Batch) Equal(other Batcher) bool {
 		}
 	}
 	return len(batch.Entries) == equalEntries && equalEntries != 0
+}
+
+// CalculateBalancedOffset will append a "balanced offset" record to the end of an ACH File.
+// Balanced offset records sum a File's Debits or Credits to zero in a single transaction.
+// Offset files are used to offset transactions from a single account inside of the ODFI.
+//
+// If a file contains Debits the offset record will be a Credit and if a file contains Credits
+// the offset record will be a debit.
+//
+// The ACH File will have its FileControl record retabulated after appending the Batch.
+
+// WithOffset ...
+func (b *Batch) WithOffset(off *Offset) {
+	b.offset = off
+}
+
+func (b *Batch) upsertOffset() error {
+	if b == nil || b.offset == nil {
+		return nil
+	}
+
+	// remove any Offset records already on the batch
+	for i := 0; i < len(b.Entries); i++ {
+		if strings.EqualFold(b.Entries[i].IndividualName, "OFFSET") {
+			b.Entries = append(b.Entries[:i], b.Entries[i+i:]...)
+			i++
+		}
+	}
+
+	// verify our Batch
+	if err := b.Create(); err != nil {
+		return fmt.Errorf("WithOffset: initial create: %v", err)
+	}
+	if b.Control.TotalDebitEntryDollarAmount > 0 && b.Control.TotalCreditEntryDollarAmount > 0 {
+		return errors.New("WithOffset: batch must contain only debits or credits")
+	}
+	if utf8.RuneCountInString(b.offset.RoutingNumber) != 9 {
+		return fmt.Errorf("WithOffset: invalid routing number %s", b.offset.RoutingNumber)
+	}
+
+	ed := NewEntryDetail()
+	ed.TransactionCode = CheckingDebit // TODO(adam): how to determine between Checking and Savings? GL? Loan?
+	ed.RDFIIdentification = b.offset.RoutingNumber[:8]
+	ed.CheckDigit = b.offset.RoutingNumber[8:9]
+	ed.DFIAccountNumber = b.offset.AccountNumber
+	ed.IdentificationNumber = "" // TODO(adam): what to put here?
+	ed.IndividualName = "OFFSET"
+	ed.DiscretionaryData = b.offset.Description
+	// ed.TraceNumber = ""
+
+	if b.Control.TotalDebitEntryDollarAmount > 0 {
+		ed.Amount = b.Control.TotalDebitEntryDollarAmount
+	} else {
+		ed.Amount = b.Control.TotalCreditEntryDollarAmount
+	}
+	if ed.Category == "" {
+		ed.Category = CategoryForward
+	}
+	b.AddEntry(ed)
+	return nil
 }

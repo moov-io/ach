@@ -31,4 +31,12 @@ type Batcher interface {
 	Category() string
 	Error(string, error, ...interface{}) error
 	Equal(other Batcher) bool
+	WithOffset(off *Offset)
+}
+
+// Offset ... // TODO(adam):
+type Offset struct {
+	RoutingNumber string
+	AccountNumber string
+	Description   string
 }
