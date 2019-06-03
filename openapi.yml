@@ -14,7 +14,7 @@ servers:
     description: Local development
 
 tags:
-  - name: Files
+  - name: 'ACH Files'
     description: |
       File contains the structures of a ACH File. It contains one and only one File Header and File Control with at least one Batch.
       Batch objects within Files hold the Batch Header and Batch Control and all Entry Records and Addenda records for the Batch.
@@ -31,8 +31,7 @@ paths:
           description: Service is running properly
   /files:
     get:
-      tags:
-      - Files
+      tags: ['ACH Files']
       summary: Gets a list of Files
       operationId: getFiles
       security:
@@ -59,8 +58,7 @@ paths:
                 $ref: '#/components/schemas/Files'
   /files/create:
     post:
-      tags:
-      - Files
+      tags: ['ACH Files']
       summary: Create a new File object
       operationId: createFile
       security:
@@ -113,8 +111,7 @@ paths:
                 $ref: '#/components/schemas/Error'
   /files/{file_id}:
     get:
-      tags:
-      - Files
+      tags: ['ACH Files']
       summary: Retrieves the details of an existing File. You need only supply the unique File identifier that was returned upon creation.
       operationId: getFileByID
       security:
@@ -144,8 +141,7 @@ paths:
         '404':
           description: A resource with the specified ID was not found
     post:
-      tags:
-      - Files
+      tags: ['ACH Files']
       summary: Updates the specified File Header by setting the values of the parameters passed. Any parameters not provided will be left unchanged.
       operationId: updateFile
       security:
@@ -198,8 +194,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     delete:
-      tags:
-      - Files
+      tags: ['ACH Files']
       summary: Permanently deletes a File and associated Batches. It cannot be undone.
       operationId: deleteACHFile
       security:
@@ -226,8 +221,7 @@ paths:
             description: A File with the specified ID was not found.
   /files/{file_id}/contents:
     get:
-      tags:
-        - Files
+      tags: ['ACH Files']
       summary: Assembles the existing file (batches and controls) records, computes sequence numbers and totals. Returns plaintext file.
       operationId: getFileContents
       security:
@@ -256,8 +250,7 @@ paths:
                 $ref: '#/components/schemas/RawFile'
   /files/{file_id}/validate:
     get:
-      tags:
-        - Files
+      tags: ['ACH Files']
       summary: Validates the existing file. You need only supply the unique File identifier that was returned upon creation.
       operationId: validateFile
       security:
@@ -288,8 +281,7 @@ paths:
           description: Validation failed. Check response for errors
   /files/{file_id}/batches:
     get:
-      tags:
-        - Files
+      tags: ['ACH Files']
       summary: Get the batches on a File.
       operationId: getFileBatches
       security:
@@ -322,8 +314,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Batches'
     post:
-      tags:
-        - Files
+      tags: ['ACH Files']
       summary: Add Batch to File
       operationId: addBatchToFile
       security:
@@ -361,8 +352,7 @@ paths:
           description: Batch added to File
   /files/{file_id}/batches/{batch_id}:
     get:
-      tags:
-        - Files
+      tags: ['ACH Files']
       summary: Get a specific Batch on a FIle
       operationId: getFileBatch
       security:
@@ -399,8 +389,7 @@ paths:
         '404':
           description: Batch or File not found
     delete:
-      tags:
-        - Files
+      tags: ['ACH Files']
       summary: Delete a Batch from a File
       operationId: deleteFileBatch
       security:
