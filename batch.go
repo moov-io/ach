@@ -1028,6 +1028,7 @@ func (b *Batch) upsertOffset() error {
 		// TODO(adam): Should we remove this based on checking the last element is
 		// debit/credit and sums to all the other elements (which are mutually exclusive to
 		// the last record being debit or credit)?
+		// See: https://github.com/moov-io/ach/issues/540
 		if strings.EqualFold(b.Entries[i].IndividualName, "OFFSET") {
 			// fixup BatchControl records for our conditional after this for loop
 			if b.Entries[i].TransactionCode == CheckingCredit || b.Entries[i].TransactionCode == SavingsCredit {
@@ -1057,7 +1058,7 @@ func (b *Batch) upsertOffset() error {
 	ed.RDFIIdentification = b.offset.RoutingNumber[:8]
 	ed.CheckDigit = b.offset.RoutingNumber[8:9]
 	ed.DFIAccountNumber = b.offset.AccountNumber
-	ed.IdentificationNumber = "" // TODO(adam): what to put here?
+	ed.IdentificationNumber = "" // left empty
 	ed.IndividualName = "OFFSET"
 	ed.DiscretionaryData = b.offset.Description
 	ed.TraceNumber = createTraceNumber(b.offset.RoutingNumber)
