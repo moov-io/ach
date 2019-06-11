@@ -8,6 +8,8 @@ moov-io/ach
 
 Package `github.com/moov-io/ach` implements a file reader and writer written in Go along with a HTTP API for creating, parsing and validating Automated Clearing House ([ACH](https://en.wikipedia.org/wiki/Automated_Clearing_House)) files. ACH is the primary method of electronic money movement throughout the United States.
 
+If you're looking for a complete implementation of ACH origination (file creation), OFAC checks, micro-deposits, SFTP uploading, and other featues the [moov-io/paygate](https://github.com/moov-io/paygate) project aims to be a full system for ACH transfers.
+
 Docs: [docs.moov.io](https://docs.moov.io/en/latest/) | [api docs](https://api.moov.io/apps/ach/)
 
 ## Project Status
@@ -16,7 +18,7 @@ Moov ACH is under active development and in production for multiple companies. P
 
 ## Usage
 
-The ACH project implements a Go library and HTTP server for creating and modifying ACH files. If you're looking for a more general implementation of ACH file creation, OFAC checks, micro-deposits, SFTP uploading the [moov-io/paygate](https://github.com/moov-io/paygate) project implements those features.
+The ACH project implements a Go library and HTTP server for creating and modifying ACH files. For a complete ACH origination service checkout [moov-io/paygate](https://github.com/moov-io/paygate).
 
 ### Go library
 
