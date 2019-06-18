@@ -23,32 +23,6 @@ import (
 	"github.com/go-kit/kit/log"
 )
 
-/**
-CreateFile
-curl -d '{"id":"1234","immediateDestination":"9876543210", "immediateDestinationName":"Federal Reserve Bank", "immediateOrigin":"1234567890","immediateOriginName":"My Bank Name"}' -H "Content-Type: application/json" -X POST http://localhost:8080/files/create
-
-GetFile
-curl -H "Content-Type: application/json" -X GET http://localhost:8080/files/1234
-
-GetFiles
-curl -H "Content-Type: application/json" -X GET http://localhost:8080/files/
-
-DeleteFile
-curl -H "Content-Type: application/json" -X DELETE http://localhost:8080/files/1234
-
-CreateBatch
-curl -d '{"id":"54321","serviceClassCode":220,"standardEntryClassCode":"WEB","companyName":"Your Company inc","companyIdentification":"121042882","companyEntryDescription":"Online Order","ODFIIdentification":"12104288"}' -H "Content-Type: application/json" -X POST http://localhost:8080/files/08B751B2/batches/
-
-GetBatch
-curl -H "Content-Type: application/json" -X GET http://localhost:8080/files/08B751B2/batches/54321
-
-GetBatches
-curl -H "Content-Type: application/json" -X GET http://localhost:8080/files/08B751B2/batches/
-
-DeleteBatch
-curl -H "Content-Type: application/json" -X DELETE http://localhost:8080/files/08B751B2/batches/54321
-**/
-
 var (
 	httpAddr  = flag.String("http.addr", bind.HTTP("ach"), "HTTP listen address")
 	adminAddr = flag.String("admin.addr", bind.Admin("ach"), "Admin HTTP listen address")
