@@ -7,7 +7,7 @@ github.com/go-kit/kit/metrics/prometheus
 github.com/go-kit/kit/transport/http
 github.com/go-kit/kit/metrics
 github.com/go-kit/kit/metrics/internal/lv
-# github.com/go-logfmt/logfmt v0.4.0
+# github.com/go-logfmt/logfmt v0.3.0
 github.com/go-logfmt/logfmt
 # github.com/golang/protobuf v1.3.1
 github.com/golang/protobuf/proto
@@ -23,17 +23,17 @@ github.com/moov-io/base/admin
 github.com/moov-io/base/http/bind
 github.com/moov-io/base/http
 github.com/moov-io/base/idempotent
-# github.com/prometheus/client_golang v0.9.3
+# github.com/prometheus/client_golang v0.9.4
 github.com/prometheus/client_golang/prometheus
 github.com/prometheus/client_golang/prometheus/promhttp
 github.com/prometheus/client_golang/prometheus/internal
 # github.com/prometheus/client_model v0.0.0-20190129233127-fd36f4220a90
 github.com/prometheus/client_model/go
-# github.com/prometheus/common v0.4.0
+# github.com/prometheus/common v0.4.1
 github.com/prometheus/common/expfmt
 github.com/prometheus/common/model
 github.com/prometheus/common/internal/bitbucket.org/ww/goautoneg
-# github.com/prometheus/procfs v0.0.0-20190520144149-9935e8e0588d
+# github.com/prometheus/procfs v0.0.2
 github.com/prometheus/procfs
 github.com/prometheus/procfs/internal/fs
 # github.com/rickar/cal v1.0.1
