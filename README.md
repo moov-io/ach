@@ -89,6 +89,8 @@ $ go doc github.com/moov-io/ach BatchHeader
 |-----|-----|-----|
 | `ACH_FILE_TTL` | Time to live (TTL) for `*ach.File` objects stored in the in-memory repository. | 0 = No TTL / Never delete files (Example: `240m`) |
 
+Note: By design ACH **does not persist** (save) any data about the files, batches or entry details created. The only storage occurs in memory of the process and upon restart ACH will have no files, batches, or data saved. Also, no in memory encryption of the data is performed.
+
 ## Getting Help
 
 If you have ACH specific questions NACHA (National Automated Clearing House Association) has their [complete specification](documentation/2013-Corporate-Rules-and-Guidelines.pdf) for all file formats and message types.
