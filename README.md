@@ -88,8 +88,6 @@ Public Pre-built Docker images
 
 https://hub.docker.com/r/moov/ach/tags
 
-To generate code with this image, run the following command:
-
 docker run -p 8080:8080 moov/ach:1.0.2
 
 ### Configuration
