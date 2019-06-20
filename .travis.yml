@@ -40,7 +40,7 @@ script:
   - golint -set_exit_status $GOFILES
   - staticcheck ./...
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  # - bash <(curl -s https://codecov.io/bash)
   - make docker
 before_deploy:
   - make dist
