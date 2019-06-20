@@ -31,7 +31,7 @@ The ACH project implements a Go library and HTTP server for creating and modifyi
 |----------|---------------------------------------|----------------------------------------|-----------------------------------|------------------------------------|
 | ACK      | Acknowledgment Entry for CCD          | [Link](test/ach-ack-read/ack-read.ach) | [Link](test/ach-ack-read/main.go) | [Link](test/ach-ack-write/main.go) |
 | ADV      | Automated Accounting Advice           | [Link](test/ach-adv-read/adv-read.ach) | [Link](test/ach-adv-read/main.go) | [Link](test/ach-adv-write/main.go) |
-| ARC      | Accounts Receivable Entry             | [Link](test/ach-adv-read/arc-read.ach) | [Link](test/ach-arc-read/main.go) | [Link](test/ach-arc-write/main.go) |
+| ARC      | Accounts Receivable Entry             | [Link](test/ach-arc-read/arc-read.ach) | [Link](test/ach-arc-read/main.go) | [Link](test/ach-arc-write/main.go) |
 | ATX      | Acknowledgment Entry for CTX          | [Link](test/ach-atx-read/atx-read.ach) | [Link](test/ach-atx-read/main.go) | [Link](test/ach-atx-write/main.go) |
 | BOC      | Back Office Conversion                | [Link](test/ach-boc-read/boc-read.ach) | [Link](test/ach-boc-read/main.go) | [Link](test/ach-boc-write/main.go) |
 | CCD      | Corporate credit or debit             | [Link](test/ach-ccd-read/ccd-read.ach) | [Link](test/ach-ccd-read/main.go) | [Link](test/ach-ccd-write/main.go) |
