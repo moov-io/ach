@@ -29,19 +29,19 @@ The ACH project implements a Go library and HTTP server for creating and modifyi
 
 | SEC Code | Name                                  | Example                                  | Read                | Write                                            |
 |----------|---------------------------------------|------------------------------------------|-----------------------------------|------------------------------------|
-| ACK      | Acknowledgment Entry for CCD          | [Link](test/ach-ack-read/ack-read.ach)   | [ACK Read](test/ach-ack-read/main.go) | [ACK Write](test/ach-ack-write/main.go) |
-| ADV      | Automated Accounting Advice           | [Link](test/ach-adv-read/adv-read.ach)   | [ADV Read](test/ach-adv-read/main.go) | [ADV Write](test/ach-adv-write/main.go) |
+| ACK      | Acknowledgment Entry for CCD          | [Credit](test/ach-ack-read/ack-read.ach) | [ACK Read](test/ach-ack-read/main.go) | [ACK Write](test/ach-ack-write/main.go) |
+| ADV      | Automated Accounting Advice           | [Prenote Debit](test/ach-adv-read/adv-read.ach) | [ADV Read](test/ach-adv-read/main.go) | [ADV Write](test/ach-adv-write/main.go) |
 | ARC      | Accounts Receivable Entry             | [Debit](test/ach-arc-read/arc-debit.ach) | [ARC Read](test/ach-arc-read/main.go) | [ARC Write](test/ach-arc-write/main.go) |
-| ATX      | Acknowledgment Entry for CTX          | [Link](test/ach-atx-read/atx-read.ach)   | [ATX Read](test/ach-atx-read/main.go) | [ATX Write](test/ach-atx-write/main.go) |
+| ATX      | Acknowledgment Entry for CTX          | [Credit](test/ach-atx-read/atx-read.ach)  | [ATX Read](test/ach-atx-read/main.go) | [ATX Write](test/ach-atx-write/main.go) |
 | BOC      | Back Office Conversion                | [Debit](test/ach-boc-read/boc-debit.ach) | [BOC Read](test/ach-boc-read/main.go) | [BOC Write](test/ach-boc-write/main.go) |
 | CCD      | Corporate credit or debit             | [Debit](test/ach-ccd-read/ccd-debit.ach) | [CCD Read](test/ach-ccd-read/main.go) | [CCD Write](test/ach-ccd-write/main.go) |
 | CIE      | Customer-Initiated Entry              | [Credit](test/ach-cie-read/cie-credit.ach) | [CIE Read](test/ach-cie-read/main.go) | [CIE Write](test/ach-cie-write/main.go) |
-| COR      | Automated Notification of Change(NOC) | [Link](test/ach-cor-read/cor-read.ach)   | [COR Read](test/ach-cor-read/main.go) | [COR Write](test/ach-cor-write/main.go) |
+| COR      | Automated Notification of Change(NOC) | [NOC](test/ach-cor-read/cor-read.ach)   | [COR Read](test/ach-cor-read/main.go) | [COR Write](test/ach-cor-write/main.go) |
 | CTX      | Corporate Trade Exchange              | [Debit](test/ach-ctx-read/ctx-debit.ach) | [CTX Read](test/ach-ctx-read/main.go) | [CTX Write](test/ach-ctx-write/main.go) |
-| DNE      | Death Notification Entry              | [Link](test/ach-dne-read/dne-read.ach)   | [DNE Read](test/ach-dne-read/main.go) | [DNE Write](test/ach-dne-write/main.go) |
-| ENR      | Automatic Enrollment Entry            | [Link](test/ach-enr-read/enr-read.ach)   | [ENR Read](test/ach-enr-read/main.go) | [ENR Write](test/ach-enr-write/main.go) |
+| DNE      | Death Notification Entry              | [DNE](test/ach-dne-read/dne-read.ach)   | [DNE Read](test/ach-dne-read/main.go) | [DNE Write](test/ach-dne-write/main.go) |
+| ENR      | Automatic Enrollment Entry            | [ENR](test/ach-enr-read/enr-read.ach)   | [ENR Read](test/ach-enr-read/main.go) | [ENR Write](test/ach-enr-write/main.go) |
 | IAT      | International ACH Transactions        | [Credit](test/ach-iat-read/iat-credit.ach) | [IAT Read](test/ach-iat-read/main.go) | [IAT Write](test/ach-iat-write/main.go) |
-| MTE      | Machine Transfer Entry                | [Link](test/ach-mte-read/mte-read.ach)   | [MTE Read](test/ach-mte-read/main.go) | [MTE Write](test/ach-mte-write/main.go) |
+| MTE      | Machine Transfer Entry                | [Credit](test/ach-mte-read/mte-read.ach)   | [MTE Read](test/ach-mte-read/main.go) | [MTE Write](test/ach-mte-write/main.go) |
 | POP      | Point of Purchase                     | [Debit](test/ach-pop-read/pop-debit.ach) | [POP Read](test/ach-pop-read/main.go) | [POP Write](test/ach-pop-write/main.go) |
 | POS      | Point of Sale                         | [Debit](test/ach-pos-read/pos-debit.ach) | [POS Read](test/ach-pos-read/main.go) | [POS Write](test/ach-pos-write/main.go) |
 | PPD      | Prearranged payment and deposits      | [Debit](test/ach-ppd-read/ppd-debit.ach) [Credit](test/ach-ppd-read/ppd-credit.ach) | [PPD Read](test/ach-ppd-read/main.go) | [PPD Write](test/ach-ppd-write/main.go) |
