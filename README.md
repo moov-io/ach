@@ -27,32 +27,32 @@ The ACH project implements a Go library and HTTP server for creating and modifyi
 <details>
 <summary>Supported Standard Entry Class (SEC) codes</summary>
 
-| SEC Code | Name                                  | Read Example                      | Write Example                      |
-|----------|---------------------------------------|-----------------------------------|------------------------------------|
-| ACK      | Acknowledgment Entry for CCD          | [Link](test/ach-ack-read/main.go) | [Link](test/ach-ack-write/main.go) |
-| ADV      | Automated Accounting Advice           | [Link](test/ach-adv-read/main.go) | [Link](test/ach-adv-write/main.go) |
-| ARC      | Accounts Receivable Entry             | [Link](test/ach-arc-read/main.go) | [Link](test/ach-arc-write/main.go) |
-| ATX      | Acknowledgment Entry for CTX          | [Link](test/ach-atx-read/main.go) | [Link](test/ach-atx-write/main.go) |
-| BOC      | Back Office Conversion                | [Link](test/ach-boc-read/main.go) | [Link](test/ach-boc-write/main.go) |
-| CCD      | Corporate credit or debit             | [Link](test/ach-ccd-read/main.go) | [Link](test/ach-ccd-write/main.go) |
-| CIE      | Customer-Initiated Entry              | [Link](test/ach-cie-read/main.go) | [Link](test/ach-cie-write/main.go) |
-| COR      | Automated Notification of Change(NOC) | [Link](test/ach-cor-read/main.go) | [Link](test/ach-cor-write/main.go) |
-| CTX      | Corporate Trade Exchange              | [Link](test/ach-ctx-read/main.go) | [Link](test/ach-ctx-write/main.go) |
-| DNE      | Death Notification Entry              | [Link](test/ach-dne-read/main.go) | [Link](test/ach-dne-write/main.go) |
-| ENR      | Automatic Enrollment Entry            | [Link](test/ach-enr-read/main.go) | [Link](test/ach-enr-write/main.go) |
-| IAT      | International ACH Transactions        | [Link](test/ach-iat-read/main.go) | [Link](test/ach-iat-write/main.go) |
-| MTE      | Machine Transfer Entry                | [Link](test/ach-mte-read/main.go) | [Link](test/ach-mte-write/main.go) |
-| POP      | Point of Purchase                     | [Link](test/ach-pop-read/main.go) | [Link](test/ach-pop-write/main.go) |
-| POS      | Point of Sale                         | [Link](test/ach-pos-read/main.go) | [Link](test/ach-pos-write/main.go) |
-| PPD      | Prearranged payment and deposits      | [Link](test/ach-ppd-read/main.go) | [Link](test/ach-ppd-write/main.go) |
-| RCK      | Represented Check Entries             | [Link](test/ach-rck-read/main.go) | [Link](test/ach-rck-write/main.go) |
-| SHR      | Shared Network Entry                  | [Link](test/ach-shr-read/main.go) | [Link](test/ach-shr-write/main.go) |
-| TRC      | Check Truncation Entry                | [Link](test/ach-trc-read/main.go) | [Link](test/ach-trc-write/main.go) |
-| TRX      | Check Truncation Entries Exchange     | [Link](test/ach-trx-read/main.go) | [Link](test/ach-trx-write/main.go) |
-| TEL      | Telephone-Initiated Entry             | [Link](test/ach-tel-read/main.go) | [Link](test/ach-tel-write/main.go) |
-| TRC      | Truncated Check Entry                 | [Link](test/ach-trc-read/main.go) | [Link](test/ach-trc-write/main.go) |
-| WEB      | Internet-initiated Entries            | [Link](test/ach-web-read/main.go) | [Link](test/ach-web-write/main.go) |
-| XCK      | Destroyed Check Entry                 | [Link](test/ach-xck-read/main.go) | [Link](test/ach-xck-write/main.go) |
+| SEC Code | Name                                  | Example                                | Read                | Write                                            |
+|----------|---------------------------------------|----------------------------------------|-----------------------------------|------------------------------------|
+| ACK      | Acknowledgment Entry for CCD          | [Link](test/ach-ack-read/ack-read.ach) | [Link](test/ach-ack-read/main.go) | [Link](test/ach-ack-write/main.go) |
+| ADV      | Automated Accounting Advice           | [Link](test/ach-adv-read/adv-read.ach) | [Link](test/ach-adv-read/main.go) | [Link](test/ach-adv-write/main.go) |
+| ARC      | Accounts Receivable Entry             | [Link](test/ach-adv-read/arc-read.ach) | [Link](test/ach-arc-read/main.go) | [Link](test/ach-arc-write/main.go) |
+| ATX      | Acknowledgment Entry for CTX          | [Link](test/ach-atx-read/atx-read.ach) | [Link](test/ach-atx-read/main.go) | [Link](test/ach-atx-write/main.go) |
+| BOC      | Back Office Conversion                | [Link](test/ach-boc-read/boc-read.ach) | [Link](test/ach-boc-read/main.go) | [Link](test/ach-boc-write/main.go) |
+| CCD      | Corporate credit or debit             | [Link](test/ach-ccd-read/ccd-read.ach) | [Link](test/ach-ccd-read/main.go) | [Link](test/ach-ccd-write/main.go) |
+| CIE      | Customer-Initiated Entry              | [Link](test/ach-cie-read/cie-read.ach) | [Link](test/ach-cie-read/main.go) | [Link](test/ach-cie-write/main.go) |
+| COR      | Automated Notification of Change(NOC) | [Link](test/ach-cor-read/cor-read.ach) | [Link](test/ach-cor-read/main.go) | [Link](test/ach-cor-write/main.go) |
+| CTX      | Corporate Trade Exchange              | [Link](test/ach-ctx-read/ctx-read.ach) | [Link](test/ach-ctx-read/main.go) | [Link](test/ach-ctx-write/main.go) |
+| DNE      | Death Notification Entry              | [Link](test/ach-dne-read/dne-read.ach) | [Link](test/ach-dne-read/main.go) | [Link](test/ach-dne-write/main.go) |
+| ENR      | Automatic Enrollment Entry            | [Link](test/ach-enr-read/enr-read.ach) | [Link](test/ach-enr-read/main.go) | [Link](test/ach-enr-write/main.go) |
+| IAT      | International ACH Transactions        | [Link](test/ach-iat-read/iat-read.ach) | [Link](test/ach-iat-read/main.go) | [Link](test/ach-iat-write/main.go) |
+| MTE      | Machine Transfer Entry                | [Link](test/ach-mte-read/mte-read.ach) | [Link](test/ach-mte-read/main.go) | [Link](test/ach-mte-write/main.go) |
+| POP      | Point of Purchase                     | [Link](test/ach-pop-read/pop-read.ach) | [Link](test/ach-pop-read/main.go) | [Link](test/ach-pop-write/main.go) |
+| POS      | Point of Sale                         | [Link](test/ach-pos-read/pos-read.ach) | [Link](test/ach-pos-read/main.go) | [Link](test/ach-pos-write/main.go) |
+| PPD      | Prearranged payment and deposits      | [Link](test/ach-ppd-read/ppd-read.ach) | [Link](test/ach-ppd-read/main.go) | [Link](test/ach-ppd-write/main.go) |
+| RCK      | Represented Check Entries             | [Link](test/ach-rck-read/rck-read.ach) | [Link](test/ach-rck-read/main.go) | [Link](test/ach-rck-write/main.go) |
+| SHR      | Shared Network Entry                  | [Link](test/ach-shr-read/shr-read.ach) | [Link](test/ach-shr-read/main.go) | [Link](test/ach-shr-write/main.go) |
+| TRC      | Check Truncation Entry                | [Link](test/ach-trc-read/trc-read.ach) | [Link](test/ach-trc-read/main.go) | [Link](test/ach-trc-write/main.go) |
+| TRX      | Check Truncation Entries Exchange     | [Link](test/ach-trx-read/trx-read.ach) | [Link](test/ach-trx-read/main.go) | [Link](test/ach-trx-write/main.go) |
+| TEL      | Telephone-Initiated Entry             | [Link](test/ach-tel-read/tel-read.ach) | [Link](test/ach-tel-read/main.go) | [Link](test/ach-tel-write/main.go) |
+| TRC      | Truncated Check Entry                 | [Link](test/ach-trc-read/trc-read.ach) | [Link](test/ach-trc-read/main.go) | [Link](test/ach-trc-write/main.go) |
+| WEB      | Internet-initiated Entries            | [Link](test/ach-web-read/web-read.ach) | [Link](test/ach-web-read/main.go) | [Link](test/ach-web-write/main.go) |
+| XCK      | Destroyed Check Entry                 | [Link](test/ach-xck-read/xck-read.ach) | [Link](test/ach-xck-read/main.go) | [Link](test/ach-xck-write/main.go) |
 
 </details>
 
