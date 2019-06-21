@@ -1089,12 +1089,15 @@ func TestBatchABA8(t *testing.T) {
 }
 
 func TestBatchCreateTraceNumber(t *testing.T) {
-	routingNumber := "231380104"
-	if v := createTraceNumber(routingNumber); !strings.HasPrefix(v, aba8(routingNumber)) {
+	prev := "21124231380104"
+	if v := createTraceNumber(prev); v != "21124231380105" {
 		t.Errorf("got %s", v)
 	}
-	if v := createTraceNumber(""); len(v) == 0 {
-		t.Errorf("TraceNumber of %d digits", len(v))
+	if v := createTraceNumber(""); v != "" {
+		t.Errorf("got %s", v)
+	}
+	if v := createTraceNumber("A"); v != "" {
+		t.Errorf("got %s", v)
 	}
 }
 

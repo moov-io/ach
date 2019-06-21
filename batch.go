@@ -8,15 +8,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"math/rand"
 	"strconv"
 	"strings"
-	"time"
 	"unicode/utf8"
-)
-
-var (
-	traceNumberSource = rand.NewSource(time.Now().Unix())
 )
 
 // Batch holds the Batch Header and Batch Control and all Entry Records
@@ -1061,7 +1055,7 @@ func (b *Batch) upsertOffset() error {
 	ed.IdentificationNumber = "" // left empty
 	ed.IndividualName = "OFFSET"
 	ed.DiscretionaryData = b.offset.Description
-	ed.TraceNumber = createTraceNumber(b.offset.RoutingNumber)
+	ed.TraceNumber = createTraceNumber(b.Entries[len(b.Entries)-1].TraceNumber)
 
 	if b.Control.TotalDebitEntryDollarAmount > 0 {
 		ed.Amount = b.Control.TotalDebitEntryDollarAmount
@@ -1116,10 +1110,10 @@ func aba8(rtn string) string {
 	return rtn[:8]
 }
 
-func createTraceNumber(odfiRoutingNumber string) string {
-	v := fmt.Sprintf("%s%d", aba8(odfiRoutingNumber), traceNumberSource.Int63())
-	if utf8.RuneCountInString(v) > 15 {
-		return v[:15]
+func createTraceNumber(prevTraceNumber string) string {
+	n, err := strconv.Atoi(prevTraceNumber)
+	if err != nil {
+		return ""
 	}
-	return v
+	return strconv.Itoa(n + 1)
 }
