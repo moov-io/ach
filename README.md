@@ -69,19 +69,6 @@ Examples: [Go](examples/http/main.go) | [Ruby](https://github.com/moov-io/ruby-a
 - [ACH Server metrics](documentation/metrics.md)
 - [Merging ACH files](https://docs.moov.io/en/latest/ach/merging-files/)
 
-### From Source
-
-This project uses [Go Modules](https://github.com/golang/go/wiki/Modules) and thus requires Go 1.11+. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/ach/releases) as well. We highly recommend you use a tagged release for production.
-
-```
-$ git@github.com:moov-io/ach.git
-
-# Pull down into the Go Module cache
-$ go get -u github.com/moov-io/ach
-
-$ go doc github.com/moov-io/ach BatchHeader
-```
-
 ### Docker
 
 We publish a [public docker image `moov/ach`](https://hub.docker.com/r/moov/ach/tags) on Docker Hub with each tagged release of ACH. No configuration is required to serve on `:8080` and metrics at `:9090/metrics` in Prometheus format.
@@ -94,6 +81,19 @@ ts=2019-06-20T23:58:44.5018409Z caller=main.go:125 admin="listening on :9090"
 
 $ curl localhost:8080/files
 {"files":[],"error":null}
+```
+
+### From Source
+
+This project uses [Go Modules](https://github.com/golang/go/wiki/Modules) and thus requires Go 1.11+. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/ach/releases) as well. We highly recommend you use a tagged release for production.
+
+```
+$ git@github.com:moov-io/ach.git
+
+# Pull down into the Go Module cache
+$ go get -u github.com/moov-io/ach
+
+$ go doc github.com/moov-io/ach BatchHeader
 ```
 
 ### Configuration
