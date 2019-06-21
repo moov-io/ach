@@ -38,6 +38,7 @@ release: docker generate AUTHORS
 
 release-push:
 	docker push moov/ach:$(VERSION)
+	docker push moov/ach:latest
 	docker push moov/achfuzz:$(VERSION)
 
 # From https://github.com/genuinetools/img

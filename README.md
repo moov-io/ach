@@ -84,11 +84,17 @@ $ go doc github.com/moov-io/ach BatchHeader
 
 ### Docker
 
-Public Pre-built Docker images
+We publish a [public docker image `moov/ach`](https://hub.docker.com/r/moov/ach/tags) on Docker Hub with each tagged release of ACH. No configuration is required to serve on `:8080` and metrics at `:9090/metrics` in Prometheus format.
 
-https://hub.docker.com/r/moov/ach/tags
+```
+$ docker run -p 8080:8080 -p 9090:9090 moov/ach:latest
+ts=2019-06-20T23:58:44.4931106Z caller=main.go:75 startup="Starting ach server version v1.0.2"
+ts=2019-06-20T23:58:44.5010238Z caller=main.go:135 transport=HTTP addr=:8080
+ts=2019-06-20T23:58:44.5018409Z caller=main.go:125 admin="listening on :9090"
 
-docker run -p 8080:8080 moov/ach:1.0.2
+$ curl localhost:8080/files
+{"files":[],"error":null}
+```
 
 ### Configuration
 
