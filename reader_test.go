@@ -989,7 +989,7 @@ func BenchmarkACHFileRead(b *testing.B) {
 
 // testACHFileRead2 validates reading a file with PPD and IAT entries
 func testACHFileRead2(t testing.TB) {
-	f, err := os.Open("./test/testdata/20110729A.ach")
+	f, err := os.Open("./test/testdata/20110805A.ach")
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}

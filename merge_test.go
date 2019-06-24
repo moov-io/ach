@@ -210,7 +210,7 @@ func TestMergeFiles__splitFiles(t *testing.T) {
 	}
 
 	// read a third file
-	f3, err := readACHFilepath(filepath.Join("test", "testdata", "20110729A.ach"))
+	f3, err := readACHFilepath(filepath.Join("test", "testdata", "20110805A.ach"))
 	if err != nil {
 		t.Fatal(err)
 	}

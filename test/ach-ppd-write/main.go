@@ -23,7 +23,7 @@ func main() {
 
 	// BatchHeader identifies the originating entity and the type of transactions contained in the batch
 	bh := ach.NewBatchHeader()
-	bh.ServiceClassCode = ach.CreditsOnly
+	bh.ServiceClassCode = ach.DebitsOnly
 	bh.CompanyName = "Name on Account" // The name of the company/person that has relationship with receiver
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = ach.PPD
@@ -35,7 +35,7 @@ func main() {
 	// can be multiple entry's per batch
 	entry := ach.NewEntryDetail()
 	// Identifies the entry as a debit and credit entry AND to what type of account (Savings, DDA, Loan, GL)
-	entry.TransactionCode = ach.CheckingCredit
+	entry.TransactionCode = ach.CheckingDebit
 	entry.SetRDFI("231380104")          // Receivers bank transit routing number
 	entry.DFIAccountNumber = "12345678" // Receivers bank account number
 	entry.Amount = 100000000            // Amount of transaction with no decimal. One dollar and eleven cents = 111
