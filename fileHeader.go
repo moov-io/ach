@@ -196,7 +196,7 @@ func (fh *FileHeader) Validate() error {
 	if fh.ImmediateDestination == "000000000" {
 		return fieldError("ImmediateDestination", ErrConstructor, fh.ImmediateDestination)
 	}
-	if err := CheckRoutingNumber(fh.ImmediateOrigin); err != nil {
+	if err := CheckRoutingNumber(trimImmediateOriginLeadingZero(fh.ImmediateOrigin)); err != nil {
 		return fieldError("ImmediateOrigin", err, fh.ImmediateOrigin)
 	}
 	if err := CheckRoutingNumber(fh.ImmediateDestination); err != nil {
