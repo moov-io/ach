@@ -190,28 +190,24 @@ func (fh *FileHeader) Validate() error {
 	if err := fh.isAlphanumeric(fh.ImmediateDestinationName); err != nil {
 		return fieldError("ImmediateDestinationName", err, fh.ImmediateDestinationName)
 	}
-
-	if err := CheckRoutingNumber(trimImmediateOriginLeadingZero(fh.ImmediateOrigin)); err != nil {
-		return fieldError("ImmediateOrigin", err, fh.ImmediateOrigin)
-	}
-	if err := CheckRoutingNumber(fh.ImmediateDestination); err != nil {
-		return fieldError("ImmediateDestination", err, fh.ImmediateDestination)
-	}
-
 	if fh.ImmediateOrigin == "0000000000" {
 		return fieldError("ImmediateOrigin", ErrConstructor, fh.ImmediateOrigin)
 	}
 	if fh.ImmediateDestination == "000000000" {
 		return fieldError("ImmediateDestination", ErrConstructor, fh.ImmediateDestination)
 	}
-
+	if err := CheckRoutingNumber(trimImmediateOriginLeadingZero(fh.ImmediateOrigin)); err != nil {
+		return fieldError("ImmediateOrigin", err, fh.ImmediateOrigin)
+	}
+	if err := CheckRoutingNumber(fh.ImmediateDestination); err != nil {
+		return fieldError("ImmediateDestination", err, fh.ImmediateDestination)
+	}
 	if err := fh.isAlphanumeric(fh.ImmediateOriginName); err != nil {
 		return fieldError("ImmediateOriginName", err, fh.ImmediateOriginName)
 	}
 	if err := fh.isAlphanumeric(fh.ReferenceCode); err != nil {
 		return fieldError("ReferenceCode", err, fh.ReferenceCode)
 	}
-
 	// todo: handle test cases for before date
 	/*
 		if fh.fileCreationDate.Before(time.Now()) {
