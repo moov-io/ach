@@ -30,7 +30,7 @@ func (c *converters) formatSimpleDate(s string) string {
 	return s
 }
 
-// formatSimpleTime takes a HHMM time and formats it for the fixed-width ACH file format
+// formatSimpleTime takes a HHmm (H=hour, m=minute) time and formats it for the fixed-width ACH file format
 func (c *converters) formatSimpleTime(s string) string {
 	if s == "" {
 		return c.stringField(s, 4)

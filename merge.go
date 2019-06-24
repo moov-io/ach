@@ -84,7 +84,7 @@ next:
 	out := NewFile()
 	out.Header = f.Header
 	out.Header.FileCreationDate = now.Format("060102") // YYMMDD
-	out.Header.FileCreationTime = now.Format("1504")   // HHMM
+	out.Header.FileCreationTime = now.Format("1504")   // HHmm
 	out.Create()
 	fs.outfiles = append(fs.outfiles, out) // add the new outfile
 

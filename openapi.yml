@@ -489,7 +489,7 @@ components:
           maxLength: 23
           example: Federal Reserve Bank
         fileCreationTime:
-          description: 'The File Creation Date is the date when the file was prepared by an ODFI. (Format HHMM - H=Hour, M=Minute)'
+          description: 'The File Creation Date is the date when the file was prepared by an ODFI. (Format HHmm - H=Hour, m=Minute)'
           type: string
           example: 1504
         fileCreationDate:

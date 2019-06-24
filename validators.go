@@ -137,7 +137,7 @@ func (v *validator) validateSimpleDate(s string) string {
 
 var (
 	// hhmmRegex defines a regex for all valid 24-hour clock timestamps.
-	// Format: HHMM (first H can only be 0, 1, or 2)
+	// Format: HHmm (H=hour, m=minute) - (first H can only be 0, 1, or 2)
 	hhmmRegex = regexp.MustCompile(`^([0-2]{1}[\d]{1}[0-5]{1}\d{1})$`)
 )
 

@@ -6,7 +6,10 @@ package ach
 
 import (
 	"strings"
+	"time"
 	"unicode/utf8"
+
+	"github.com/moov-io/base"
 )
 
 // FileHeader is a Record designating physical file characteristics and identify
@@ -45,7 +48,7 @@ type FileHeader struct {
 
 	// FileCreationTime is the system time when the ACH file was created.
 	//
-	// The format is: HHMM. H=Hour, M=Minute
+	// The format is: HHmm. H=Hour, m=Minute
 	FileCreationTime string `json:"fileCreationTime"`
 
 	// This field should start at zero and increment by 1 (up to 9) and then go to
@@ -117,7 +120,7 @@ func (fh *FileHeader) Parse(record string) {
 	// 24-29 Today's date in YYMMDD format
 	// must be after today's date.
 	fh.FileCreationDate = fh.validateSimpleDate(record[23:29])
-	// 30-33 The current time in HHMM format
+	// 30-33 The current time in HHmm format
 	fh.FileCreationTime = fh.validateSimpleTime(record[29:33])
 	// 35-37 Always "A"
 	fh.FileIDModifier = record[33:34]
@@ -257,14 +260,34 @@ func (fh *FileHeader) ImmediateOriginField() string {
 	return fh.stringField(fh.ImmediateOrigin, 10)
 }
 
-// FileCreationDateField gets the file creation date in YYMMDD format
+// FileCreationDateField gets the file creation date in YYMMDD (year, month, day) format
 func (fh *FileHeader) FileCreationDateField() string {
-	return fh.formatSimpleDate(fh.FileCreationDate) // YYMMDD
+	switch utf8.RuneCountInString(fh.FileCreationDate) {
+	case 0:
+		return base.Now().AddBankingDay(1).Format("060102")
+	case 6:
+		return fh.formatSimpleDate(fh.FileCreationDate) // YYMMDD
+	}
+	t, err := time.Parse(base.ISO8601Format, fh.FileCreationDate)
+	if err != nil {
+		return ""
+	}
+	return t.Format("060102") // YYMMDD
 }
 
-// FileCreationTimeField gets the file creation time in HHMM format
+// FileCreationTimeField gets the file creation time in HHmm (hour, minute) format
 func (fh *FileHeader) FileCreationTimeField() string {
-	return fh.formatSimpleTime(fh.FileCreationTime) // HHMM
+	switch utf8.RuneCountInString(fh.FileCreationTime) {
+	case 0:
+		return base.Now().AddBankingDay(1).Format("1504")
+	case 4:
+		return fh.formatSimpleTime(fh.FileCreationTime) // HHmm
+	}
+	t, err := time.Parse(base.ISO8601Format, fh.FileCreationTime)
+	if err != nil {
+		return ""
+	}
+	return t.Format("1504") // HHmm
 }
 
 // ImmediateDestinationNameField gets the ImmediateDestinationName field padded

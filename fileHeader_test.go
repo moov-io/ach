@@ -566,9 +566,12 @@ func BenchmarkFHFieldInclusionFormatCode(b *testing.B) {
 func testFHFieldInclusionCreationDate(t testing.TB) {
 	fh := mockFileHeader()
 	fh.FileCreationDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
-	err := fh.Validate()
-	// TODO: are we expecting to see an error here?
-	if !base.Match(err, nil) {
+	if err := fh.Validate(); !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	fh.FileCreationDate = time.Now().Format(base.ISO8601Format)
+	if err := fh.Validate(); !base.Match(err, nil) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -619,5 +622,32 @@ func TestFHImmediateOriginInvalidCheckSum(t *testing.T) {
 	err := fh.Validate()
 	if !strings.Contains(err.Error(), "routing number checksum mismatch") {
 		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// testFHFieldInclusionCreationTime validates creation date field inclusion
+func testFHFieldInclusionCreationTime(t testing.TB) {
+	fh := mockFileHeader()
+	fh.FileCreationTime = time.Now().AddDate(0, 0, 1).Format("1504") // HHmm
+	if err := fh.Validate(); !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	fh.FileCreationTime = time.Now().Format(base.ISO8601Format)
+	if err := fh.Validate(); !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestFHFieldInclusionCreationTime tests validating creation date field inclusion
+func TestFHFieldInclusionCreationTime(t *testing.T) {
+	testFHFieldInclusionCreationTime(t)
+}
+
+// BenchmarkFHFieldInclusionCreationTime benchmarks validating creation date field inclusion
+func BenchmarkFHFieldInclusionCreationTime(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFHFieldInclusionCreationTime(b)
 	}
 }
