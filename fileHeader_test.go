@@ -585,3 +585,39 @@ func BenchmarkFHFieldInclusionCreationDate(b *testing.B) {
 		testFHFieldInclusionCreationDate(b)
 	}
 }
+
+func TestFHImmediateDestinationInvalidLength(t *testing.T) {
+	fh := mockFileHeader()
+	fh.ImmediateDestination = "198387"
+	err := fh.Validate()
+	if !strings.Contains(err.Error(), "invalid routing number length") {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+func TestFHImmediateDestinationInvalidCheckSum(t *testing.T) {
+	fh := mockFileHeader()
+	fh.ImmediateDestination = "121042880"
+	err := fh.Validate()
+	if !strings.Contains(err.Error(), "routing number checksum mismatch") {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+func TestFHImmediateOriginInvalidLength(t *testing.T) {
+	fh := mockFileHeader()
+	fh.ImmediateOrigin = "198387"
+	err := fh.Validate()
+	if !strings.Contains(err.Error(), "invalid routing number length") {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+func TestFHImmediateOriginInvalidCheckSum(t *testing.T) {
+	fh := mockFileHeader()
+	fh.ImmediateOrigin = "121042880"
+	err := fh.Validate()
+	if !strings.Contains(err.Error(), "routing number checksum mismatch") {
+		t.Errorf("%T: %s", err, err)
+	}
+}

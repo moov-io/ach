@@ -196,13 +196,18 @@ func (fh *FileHeader) Validate() error {
 	if fh.ImmediateDestination == "000000000" {
 		return fieldError("ImmediateDestination", ErrConstructor, fh.ImmediateDestination)
 	}
+	if err := CheckRoutingNumber(trimImmediateOriginLeadingZero(fh.ImmediateOrigin)); err != nil {
+		return fieldError("ImmediateOrigin", err, fh.ImmediateOrigin)
+	}
+	if err := CheckRoutingNumber(fh.ImmediateDestination); err != nil {
+		return fieldError("ImmediateDestination", err, fh.ImmediateDestination)
+	}
 	if err := fh.isAlphanumeric(fh.ImmediateOriginName); err != nil {
 		return fieldError("ImmediateOriginName", err, fh.ImmediateOriginName)
 	}
 	if err := fh.isAlphanumeric(fh.ReferenceCode); err != nil {
 		return fieldError("ReferenceCode", err, fh.ReferenceCode)
 	}
-
 	// todo: handle test cases for before date
 	/*
 		if fh.fileCreationDate.Before(time.Now()) {
