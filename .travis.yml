@@ -21,7 +21,7 @@ matrix:
       - "/Users/travis/Library/Caches/go-build"
 env:
   matrix:
-  - GO111MODULE=auto
+    - GO111MODULE=on
 before_install:
   - go get -u github.com/client9/misspell/cmd/misspell
   - go get -u golang.org/x/lint/golint
