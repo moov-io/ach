@@ -261,6 +261,8 @@ func (fh *FileHeader) ImmediateOriginField() string {
 }
 
 // FileCreationDateField gets the file creation date in YYMMDD (year, month, day) format
+// A blank string is returned when an error occurred while parsing the timestamp. ISO 8601
+// is the only other format supported.
 func (fh *FileHeader) FileCreationDateField() string {
 	switch utf8.RuneCountInString(fh.FileCreationDate) {
 	case 0:
@@ -276,6 +278,8 @@ func (fh *FileHeader) FileCreationDateField() string {
 }
 
 // FileCreationTimeField gets the file creation time in HHmm (hour, minute) format
+// A blank string is returned when an error occurred while parsing the timestamp. ISO 8601
+// is the only other format supported.
 func (fh *FileHeader) FileCreationTimeField() string {
 	switch utf8.RuneCountInString(fh.FileCreationTime) {
 	case 0:

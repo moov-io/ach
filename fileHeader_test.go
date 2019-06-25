@@ -562,33 +562,6 @@ func BenchmarkFHFieldInclusionFormatCode(b *testing.B) {
 	}
 }
 
-// testFHFieldInclusionCreationDate validates creation date field inclusion
-func testFHFieldInclusionCreationDate(t testing.TB) {
-	fh := mockFileHeader()
-	fh.FileCreationDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
-	if err := fh.Validate(); !base.Match(err, nil) {
-		t.Errorf("%T: %s", err, err)
-	}
-
-	fh.FileCreationDate = time.Now().Format(base.ISO8601Format)
-	if err := fh.Validate(); !base.Match(err, nil) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestFHFieldInclusionCreationDate tests validating creation date field inclusion
-func TestFHFieldInclusionCreationDate(t *testing.T) {
-	testFHFieldInclusionCreationDate(t)
-}
-
-// BenchmarkFHFieldInclusionCreationDate benchmarks validating creation date field inclusion
-func BenchmarkFHFieldInclusionCreationDate(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testFHFieldInclusionCreationDate(b)
-	}
-}
-
 func TestFHImmediateDestinationInvalidLength(t *testing.T) {
 	fh := mockFileHeader()
 	fh.ImmediateDestination = "198387"
@@ -625,8 +598,64 @@ func TestFHImmediateOriginInvalidCheckSum(t *testing.T) {
 	}
 }
 
-// testFHFieldInclusionCreationTime validates creation date field inclusion
-func testFHFieldInclusionCreationTime(t testing.TB) {
+func TestFHFieldInclusionFileCreationDate(t *testing.T) {
+	fh := mockFileHeader()
+	fh.FileCreationDate = ""
+	if err := fh.Validate(); !base.Match(err, ErrConstructor) {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// testFileHeaderCreationDate validates creation date field inclusion
+func testFileHeaderCreationDate(t testing.TB) {
+	fh := mockFileHeader()
+	fh.FileCreationDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
+	if err := fh.Validate(); !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	fh.FileCreationDate = time.Now().Format(base.ISO8601Format)
+	if err := fh.Validate(); !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
+	}
+	if v := fh.FileCreationDateField(); len(v) != 6 {
+		t.Errorf("got %q", v)
+	}
+
+	fh.FileCreationDate = "      "
+	if err := fh.Validate(); !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	fh.FileCreationDate = ""
+	if v := fh.FileCreationDateField(); len(v) != 6 {
+		t.Errorf("got %q", v)
+	}
+
+	fh.FileCreationDate = "05/01/2019" // non ISO 8601 date
+	if err := fh.Validate(); !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
+	}
+	if v := fh.FileCreationDateField(); v != "" {
+		t.Errorf("got %q", v)
+	}
+}
+
+// TestFileHeaderCreationDate tests validating creation date field inclusion
+func TestFileHeaderCreationDate(t *testing.T) {
+	testFileHeaderCreationDate(t)
+}
+
+// BenchmarkFileHeaderCreationDate benchmarks validating creation date field inclusion
+func BenchmarkFileHeaderCreationDate(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testFileHeaderCreationDate(b)
+	}
+}
+
+// testFileHeaderCreationTime validates creation date field inclusion
+func testFileHeaderCreationTime(t testing.TB) {
 	fh := mockFileHeader()
 	fh.FileCreationTime = time.Now().AddDate(0, 0, 1).Format("1504") // HHmm
 	if err := fh.Validate(); !base.Match(err, nil) {
@@ -637,17 +666,38 @@ func testFHFieldInclusionCreationTime(t testing.TB) {
 	if err := fh.Validate(); !base.Match(err, nil) {
 		t.Errorf("%T: %s", err, err)
 	}
+	if v := fh.FileCreationTimeField(); len(v) != 4 {
+		t.Errorf("got %q", v)
+	}
+
+	fh.FileCreationTime = "    "
+	if err := fh.Validate(); !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	fh.FileCreationTime = ""
+	if v := fh.FileCreationTimeField(); len(v) != 4 {
+		t.Errorf("got %q", v)
+	}
+
+	fh.FileCreationTime = "05/01/2019" // non ISO 8601 date
+	if err := fh.Validate(); !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
+	}
+	if v := fh.FileCreationTimeField(); v != "" {
+		t.Errorf("got %q", v)
+	}
 }
 
-// TestFHFieldInclusionCreationTime tests validating creation date field inclusion
-func TestFHFieldInclusionCreationTime(t *testing.T) {
-	testFHFieldInclusionCreationTime(t)
+// TestFileHeaderCreationTime tests validating creation date field inclusion
+func TestFileHeaderCreationTime(t *testing.T) {
+	testFileHeaderCreationTime(t)
 }
 
-// BenchmarkFHFieldInclusionCreationTime benchmarks validating creation date field inclusion
-func BenchmarkFHFieldInclusionCreationTime(b *testing.B) {
+// BenchmarkFileHeaderCreationTime benchmarks validating creation date field inclusion
+func BenchmarkFileHeaderCreationTime(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		testFHFieldInclusionCreationTime(b)
+		testFileHeaderCreationTime(b)
 	}
 }
