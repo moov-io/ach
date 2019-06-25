@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -1086,18 +1087,25 @@ func TestBatchABA8(t *testing.T) {
 	if v := aba8(""); v != "" {
 		t.Errorf("got %s", v)
 	}
+	if v := aba8(strings.Repeat("1", 20)); v != "" {
+		t.Errorf("got %s", v)
+	}
 }
 
-func TestBatchCreateTraceNumber(t *testing.T) {
-	prev := "21124231380104"
-	if v := createTraceNumber(prev); v != "21124231380105" {
-		t.Errorf("got %s", v)
+func TestBatch__largestTraceNumber(t *testing.T) {
+	if n := largestTraceNumber(nil); n != 0 {
+		t.Errorf("largestTraceNumber=%d", n)
 	}
-	if v := createTraceNumber(""); v != "" {
-		t.Errorf("got %s", v)
-	}
-	if v := createTraceNumber("A"); v != "" {
-		t.Errorf("got %s", v)
+
+	var entries []*EntryDetail
+	entries = append(entries, &EntryDetail{
+		TraceNumber: "1241",
+	})
+	entries = append(entries, &EntryDetail{
+		TraceNumber: "1244",
+	})
+	if n := largestTraceNumber(entries); n != 1244 {
+		t.Errorf("largestTraceNumber=%d", n)
 	}
 }
 
@@ -1133,7 +1141,6 @@ func TestBatch__CalculateBalancedOffsetCredit(t *testing.T) {
 	if off.TransactionCode != CheckingCredit {
 		t.Errorf("unexpected TransactionCode: %d", off.TransactionCode)
 	}
-
 	if b.Control.TotalDebitEntryDollarAmount != b.Control.TotalCreditEntryDollarAmount {
 		t.Errorf("debits=%d credits=%d", b.Control.TotalDebitEntryDollarAmount, b.Control.TotalCreditEntryDollarAmount)
 	}
@@ -1157,13 +1164,13 @@ func TestBatch__CalculateBalancedOffsetDebit(t *testing.T) {
 		AccountType:   OffsetSavings,
 		Description:   "test offset",
 	})
-
-	if err := f.Batches[0].Create(); err != nil {
+	if err := b.Create(); err != nil {
 		t.Error(err)
 	}
 	if len(b.Entries) != 2 {
-		t.Errorf("got %d Entries", len(b.Entries))
+		t.Fatalf("got %d Entries", len(b.Entries))
 	}
+
 	off := b.Entries[1]
 	if off.Amount != b.Entries[0].Amount {
 		t.Errorf("offset.Amount=%d b.Entries[0].Amount=%d", off.Amount, b.Entries[0].Amount)
@@ -1175,24 +1182,98 @@ func TestBatch__CalculateBalancedOffsetDebit(t *testing.T) {
 	if b.Control.TotalDebitEntryDollarAmount != b.Control.TotalCreditEntryDollarAmount {
 		t.Errorf("debits=%d credits=%d", b.Control.TotalDebitEntryDollarAmount, b.Control.TotalCreditEntryDollarAmount)
 	}
-
-	// test out determineTransactionCode
-	b.offset.AccountType = OffsetChecking
-	b.Control.TotalDebitEntryDollarAmount = 0
-	b.Control.TotalCreditEntryDollarAmount = 1000
-	if code, err := b.determineTransactionCode(); err != nil {
-		t.Error(err)
-	} else {
-		if code != CheckingDebit {
-			t.Errorf("unexpected TransactionCode: %d", code)
-		}
-	}
 }
 
-func TestBatch__determineTransactionCode(t *testing.T) {
-	var b Batch
-	if code, err := b.determineTransactionCode(); code != 0 || err == nil {
-		t.Errorf("code=%d and expected error", code)
+func TestBatch__CalculateBalancedOffsetDebitAndCredit(t *testing.T) {
+	off := &Offset{
+		RoutingNumber: "121042882",
+		AccountNumber: "123456789",
+		AccountType:   OffsetSavings,
+		Description:   "test offset",
+	}
+
+	// Setup a file and make our only batch a Debit
+	f := mockFilePPD()
+	b, ok := f.Batches[0].(*BatchPPD)
+	if !ok {
+		t.Fatalf("got %T: %#v", f.Batches[0], f.Batches[0])
+	}
+	b.Header.ServiceClassCode = MixedDebitsAndCredits
+	b.Entries[0].TransactionCode = SavingsDebit // force one debit tx
+	b.WithOffset(off)
+
+	// Add another EntryDetail
+	ed := mockEntryDetail()
+	ed.Amount = 500
+	ed.TraceNumber = strconv.Itoa(largestTraceNumber([]*EntryDetail{ed}) + 1)
+	b.AddEntry(ed)
+
+	if err := b.Create(); err != nil {
+		t.Fatal(err)
+	}
+
+	// Append a second (Credit) Batch
+	f2 := mockFilePPD()
+	b, ok = f2.Batches[0].(*BatchPPD)
+	if !ok {
+		t.Fatalf("got %T: %#v", f.Batches[0], f.Batches[0])
+	}
+	b.Entries[0].TransactionCode = CheckingCredit // force one credit tx
+	b.Entries[0].Amount += 1000
+	b.Header.ServiceClassCode = MixedDebitsAndCredits
+	b.WithOffset(off)
+	if err := b.Create(); err != nil {
+		t.Fatal(err)
+	}
+	f.AddBatch(b)
+
+	// Assemble the larger File
+	if err := f.Create(); err != nil {
+		t.Fatal(err)
+	}
+	if len(f.Batches) != 2 {
+		t.Errorf("expected 2 Batches, but got %d", len(f.Batches))
+		for i := range f.Batches {
+			t.Errorf("batch %d/%d: %#v", i+1, len(f.Batches), f.Batches[i])
+			entries := f.Batches[i].GetEntries()
+			for j := range entries {
+				t.Errorf("  entry %d/%d: %#v", j+1, len(entries), entries[j])
+			}
+			t.Error("")
+		}
+		t.Fatal("")
+	}
+
+	// Check first batch
+	b = f.Batches[0].(*BatchPPD)
+	if len(b.Entries) != 4 {
+		t.Errorf("got %d batches, expected 4", len(b.Entries))
+	}
+	// First EntryDetail with its offset
+	if b.Entries[0].TransactionCode != SavingsDebit || b.Entries[0].Amount != 100000000 {
+		t.Errorf("entry=%d TransactionCode=%d Amount=%d", 0, b.Entries[0].TransactionCode, 100000000)
+	}
+	if b.Entries[3].TransactionCode != SavingsCredit || b.Entries[3].Amount != 100000000 {
+		t.Errorf("entry=%d TransactionCode=%d Amount=%d", 3, b.Entries[3].TransactionCode, 100000000)
+	}
+	// Second EntryDetail with its offset
+	if b.Entries[1].TransactionCode != CheckingCredit || b.Entries[1].Amount != 500 {
+		t.Errorf("entry=%d TransactionCode=%d Amount=%d", 1, b.Entries[1].TransactionCode, 100000000)
+	}
+	if b.Entries[2].TransactionCode != SavingsDebit || b.Entries[2].Amount != 500 {
+		t.Errorf("entry=%d TransactionCode=%d Amount=%d", 2, b.Entries[2].TransactionCode, 100000000)
+	}
+
+	// Second batch
+	b = f.Batches[1].(*BatchPPD)
+	if len(b.Entries) != 2 {
+		t.Errorf("got %d batches, expected 2", len(b.Entries))
+	}
+	if b.Entries[0].TransactionCode != CheckingCredit || b.Entries[0].Amount != 100001000 {
+		t.Errorf("entry=%d TransactionCode=%d Amount=%d", 0, b.Entries[0].TransactionCode, 100000000)
+	}
+	if b.Entries[1].TransactionCode != SavingsDebit || b.Entries[1].Amount != 100001000 {
+		t.Errorf("entry=%d TransactionCode=%d Amount=%d", 1, b.Entries[1].TransactionCode, 100000000)
 	}
 }
 
@@ -1215,21 +1296,22 @@ func TestBatch__upsertOffsetIdempotent(t *testing.T) {
 		AccountType:   OffsetSavings,
 		Description:   "test offset",
 	})
-	if err := f.Batches[0].Create(); err != nil {
-		t.Error(err)
-	}
-	// re-create/upsert the Batch's OFFSET record
-	if err := b.upsertOffset(); err != nil {
-		t.Fatal(err)
-	}
-
-	// Check our Batch just like the above tests
-	if err := f.Batches[0].Create(); err != nil {
+	if err := b.Create(); err != nil {
 		t.Error(err)
 	}
 	if len(b.Entries) != 2 {
 		t.Errorf("got %d Entries", len(b.Entries))
 	}
+
+	// Call Create / upsertOffsets again and verify idempotence
+	if err := b.Create(); err != nil {
+		t.Error(err)
+	}
+	if len(b.Entries) != 2 {
+		t.Errorf("got %d Entries", len(b.Entries))
+	}
+
+	// Verify the offset EntryDetail
 	off := b.Entries[1]
 	if off.Amount != b.Entries[0].Amount {
 		t.Errorf("offset.Amount=%d b.Entries[0].Amount=%d", off.Amount, b.Entries[0].Amount)
@@ -1241,21 +1323,9 @@ func TestBatch__upsertOffsetIdempotent(t *testing.T) {
 	if b.Control.TotalDebitEntryDollarAmount != b.Control.TotalCreditEntryDollarAmount {
 		t.Errorf("debits=%d credits=%d", b.Control.TotalDebitEntryDollarAmount, b.Control.TotalCreditEntryDollarAmount)
 	}
-
-	// test out determineTransactionCode
-	b.offset.AccountType = OffsetSavings
-	b.Control.TotalDebitEntryDollarAmount = 1000
-	b.Control.TotalCreditEntryDollarAmount = 0
-	if code, err := b.determineTransactionCode(); err != nil {
-		t.Error(err)
-	} else {
-		if code != SavingsCredit {
-			t.Errorf("unexpected TransactionCode: %d", code)
-		}
-	}
 }
 
-func TestBatch__upsertOffset(t *testing.T) {
+func TestBatch__upsertOffsetsErr(t *testing.T) {
 	f := mockFilePPD()
 	b, ok := f.Batches[0].(*BatchPPD)
 	if !ok {
@@ -1274,7 +1344,7 @@ func TestBatch__upsertOffset(t *testing.T) {
 		AccountType:   OffsetAccountType(0),
 		Description:   "test offset",
 	})
-	if err := f.Batches[0].Create(); err == nil {
+	if err := b.Create(); err == nil {
 		t.Error("expected error")
 	}
 
@@ -1282,7 +1352,7 @@ func TestBatch__upsertOffset(t *testing.T) {
 	b.offset.RoutingNumber = "1"
 	if err := f.Batches[0].Create(); err == nil {
 		t.Error("expected error")
-	} else if !strings.Contains(err.Error(), "WithOffset: invalid routing number") {
+	} else if !strings.Contains(err.Error(), "offset: invalid routing number") {
 		t.Errorf("unexpected error: %v", err)
 	}
 }
