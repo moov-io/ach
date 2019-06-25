@@ -437,8 +437,14 @@ func TestFile__readFromJson(t *testing.T) {
 	if file.Header.ImmediateDestination != "231380104" || file.Header.ImmediateDestinationName != "Citadel" {
 		t.Errorf("destination=%s name=%s", file.Header.ImmediateDestination, file.Header.ImmediateDestinationName)
 	}
-	if file.Header.FileCreationTime == "" || file.Header.FileCreationDate == "" {
+	if file.Header.FileCreationTime != "" || file.Header.FileCreationDate != "181008" {
 		t.Errorf("time=%v date=%v", file.Header.FileCreationTime, file.Header.FileCreationDate)
+	}
+	if v := file.Header.FileCreationTimeField(); v == "" || len(v) != 4 {
+		t.Errorf("time=%v", v)
+	}
+	if v := file.Header.FileCreationDateField(); v != "181008" {
+		t.Errorf("date=%v", v)
 	}
 
 	// Batches
