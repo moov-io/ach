@@ -202,6 +202,14 @@ func BenchmarkValidateEDTransactionCode(b *testing.B) {
 	}
 }
 
+func TestEntryDetailAmountNegative(t *testing.T) {
+	ed := mockEntryDetail()
+	ed.Amount = -100
+	if err := ed.Validate(); !base.Match(err, ErrNegativeAmount) {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
 // testEDFieldInclusion validates entry detail field inclusion
 func testEDFieldInclusion(t testing.TB) {
 	ed := mockEntryDetail()
