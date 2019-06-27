@@ -618,7 +618,8 @@ func testFileHeaderCreationDate(t testing.TB) {
 	if err := fh.Validate(); !base.Match(err, nil) {
 		t.Errorf("%T: %s", err, err)
 	}
-	if v := fh.FileCreationDateField(); len(v) != 6 {
+	yymmdd := time.Now().Format("060102")
+	if v := fh.FileCreationDateField(); v != yymmdd {
 		t.Errorf("got %q", v)
 	}
 
