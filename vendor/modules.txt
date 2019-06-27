@@ -1,12 +1,13 @@
 # github.com/beorn7/perks v1.0.0
 github.com/beorn7/perks/quantile
-# github.com/go-kit/kit v0.8.0
+# github.com/go-kit/kit v0.9.0
 github.com/go-kit/kit/log
 github.com/go-kit/kit/endpoint
 github.com/go-kit/kit/metrics/prometheus
 github.com/go-kit/kit/transport/http
 github.com/go-kit/kit/metrics
 github.com/go-kit/kit/metrics/internal/lv
+github.com/go-kit/kit/transport
 # github.com/go-logfmt/logfmt v0.3.0
 github.com/go-logfmt/logfmt
 # github.com/golang/protobuf v1.3.1
@@ -17,7 +18,7 @@ github.com/gorilla/mux
 github.com/kr/logfmt
 # github.com/matttproud/golang_protobuf_extensions v1.0.1
 github.com/matttproud/golang_protobuf_extensions/pbutil
-# github.com/moov-io/base v0.9.0
+# github.com/moov-io/base v0.10.0-rc1.0.20190624220657-442e0f291a97
 github.com/moov-io/base
 github.com/moov-io/base/admin
 github.com/moov-io/base/http/bind

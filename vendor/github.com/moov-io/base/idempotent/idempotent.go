@@ -12,7 +12,10 @@ import (
 
 const (
 	// maxIdempotencyKeyLength is the longest X-Idempotency-Key string legnth allowed.
-	maxIdempotencyKeyLength = 36
+	maxIdempotencyKeyLength = 50
+
+	// HeaderKey is the HTTP header key used to stored idempotency keys
+	HeaderKey = "X-Idempotency-Key"
 )
 
 var (
@@ -26,12 +29,17 @@ type Recorder interface {
 	SeenBefore(key string) bool
 }
 
+// Header returns the idempotency key from a http.Request headers
+func Header(r *http.Request) string {
+	return truncate(r.Header.Get(HeaderKey))
+}
+
 // FromRequest extracts the idempotency key from HTTP headers and records its presence in
 // the provided Recorder.
 //
 // A nil Recorder will always return idempotency keys as unseen.
 func FromRequest(req *http.Request, rec Recorder) (key string, seen bool) {
-	key = truncate(req.Header.Get("X-Idempotency-Key"))
+	key = Header(req)
 	if rec == nil {
 		return key, false
 	}

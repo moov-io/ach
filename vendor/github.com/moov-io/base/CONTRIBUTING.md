@@ -30,7 +30,7 @@ We use GitHub to manage reviews of pull requests.
 
 ## Getting the code
 
-We recommend using additional git remote's for pushing/pulling code. Go cares about where the `ach` project lives relative to `GOPATH`.
+We recommend using additional git remote's for pushing/pulling code. Go cares about where the `ach` project lives relative to [GOPATH](http://golang.org/doc/code.html#GOPATH).
 
 To pull our source code run:
 

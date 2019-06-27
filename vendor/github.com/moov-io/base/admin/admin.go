@@ -10,6 +10,7 @@ package admin
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
 	"net/http/pprof"
 	"os"
@@ -23,9 +24,19 @@ import (
 
 // NewServer returns an admin Server instance that handles Prometheus metrics
 // and pprof requests.
+// Callers can use ':0' to bind onto a random port and call BindAddr() for the address.
 func NewServer(addr string) *Server {
 	timeout, _ := time.ParseDuration("45s")
 	router := handler()
+
+	if strings.HasSuffix(addr, ":0") {
+		l, _ := net.Listen("tcp", "127.0.0.1:0")
+		if l != nil {
+			l.Close()
+			parts := strings.Split(l.Addr().String(), ":")
+			addr = ":" + addr[:len(addr)-2] + parts[len(parts)-1]
+		}
+	}
 
 	svc := &Server{
 		router: router,
