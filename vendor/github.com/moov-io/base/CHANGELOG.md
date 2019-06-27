@@ -1,3 +1,19 @@
+## v0.10.0 (Unreleased)
+
+ADDITIONS
+
+- idempotent: add [`Header(*http.Request) string`](https://godoc.org/github.com/moov-io/base/idempotent#Header) and `HeaderKey`
+- http/bind: add customers port
+- http/bind: rename gl to accounts
+
+BUG FIXES
+
+- http: respond with '429 PreconditionFailed' if X-Idempotency-Key has been seen before
+
+IMPROVEMENTS
+
+- idempotent: bump up max header length
+
 ## v0.9.0 (Released 2019-03-04)
 
 ADDITIONS

@@ -13,6 +13,7 @@ import (
 // ID creates a new random string for Moov systems.
 // Do not assume anything about these ID's other than they are non-empty strings.
 func ID() string {
+	// NOTE(adam): Moov's apps depend on the length and hex encoding of these ID's to cleanup HTTP Prometheus metrics.
 	bs := make([]byte, 20)
 	n, err := rand.Read(bs)
 	if err != nil || n == 0 {

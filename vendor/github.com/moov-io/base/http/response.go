@@ -6,9 +6,7 @@ package http
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/moov-io/base/idempotent"
@@ -56,14 +54,7 @@ func (w *ResponseWriter) WriteHeader(code int) {
 	}
 
 	if requestId := GetRequestId(w.request); requestId != "" && w.log != nil {
-		var buf strings.Builder
-		buf.WriteString(fmt.Sprintf("method=%s ", w.request.Method))
-		buf.WriteString(fmt.Sprintf("path=%s ", w.request.URL.Path))
-		buf.WriteString(fmt.Sprintf("status=%d ", code))
-		buf.WriteString(fmt.Sprintf("took=%s ", diff))
-		buf.WriteString(fmt.Sprintf("requestId=%s ", requestId))
-
-		w.log.Log(w.request.Method, buf.String())
+		w.log.Log("method", w.request.Method, "path", w.request.URL.Path, "status", code, "duration", diff, "requestId", requestId)
 	}
 }
 
@@ -105,6 +96,7 @@ func (w *ResponseWriter) ensureHeaders(rec idempotent.Recorder) error {
 	}
 	if rec != nil {
 		if _, seen := idempotent.FromRequest(w.request, rec); seen {
+			idempotent.SeenBefore(w)
 			return idempotent.ErrSeenBefore
 		}
 	}
