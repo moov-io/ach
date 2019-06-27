@@ -1090,6 +1090,9 @@ func TestBatchABA8(t *testing.T) {
 	if v := aba8(strings.Repeat("1", 20)); v != "" {
 		t.Errorf("got %s", v)
 	}
+	if v := aba8("2123456789"); v != "" {
+		t.Errorf("got %s", v)
+	}
 }
 
 func TestBatch__largestTraceNumber(t *testing.T) {
@@ -1105,6 +1108,16 @@ func TestBatch__largestTraceNumber(t *testing.T) {
 		TraceNumber: "1244",
 	})
 	if n := largestTraceNumber(entries); n != 1244 {
+		t.Errorf("largestTraceNumber=%d", n)
+	}
+
+	// invalid TraceNumber
+	entries = []*EntryDetail{
+		{
+			TraceNumber: "AA",
+		},
+	}
+	if n := largestTraceNumber(entries); n != 0 {
 		t.Errorf("largestTraceNumber=%d", n)
 	}
 }

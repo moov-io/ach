@@ -1036,10 +1036,7 @@ func (b *Batch) upsertOffsets() error {
 	}
 
 	// Create our debit offset EntryDetail
-	debitED, err := createOffsetEntryDetail(b.offset, b)
-	if err != nil {
-		return fmt.Errorf("offset: problem creating debit: %v", err)
-	}
+	debitED := createOffsetEntryDetail(b.offset, b)
 	debitED.TraceNumber = strconv.Itoa(largestTraceNumber(b.Entries) + 1)
 	debitED.Amount = b.Control.TotalCreditEntryDollarAmount
 	switch b.offset.AccountType {
@@ -1053,10 +1050,7 @@ func (b *Batch) upsertOffsets() error {
 	}
 
 	// Create our credit offset EntryDetail
-	creditED, err := createOffsetEntryDetail(b.offset, b)
-	if err != nil {
-		return fmt.Errorf("offset: problem creating credit: %v", err)
-	}
+	creditED := createOffsetEntryDetail(b.offset, b)
 	creditED.TraceNumber = strconv.Itoa(largestTraceNumber(b.Entries) + 2)
 	creditED.Amount = b.Control.TotalDebitEntryDollarAmount
 	switch b.offset.AccountType {
@@ -1086,7 +1080,7 @@ func (b *Batch) upsertOffsets() error {
 	return nil
 }
 
-func createOffsetEntryDetail(off *Offset, batch *Batch) (*EntryDetail, error) {
+func createOffsetEntryDetail(off *Offset, batch *Batch) *EntryDetail {
 	ed := NewEntryDetail()
 	ed.RDFIIdentification = batch.offset.RoutingNumber[:8]
 	ed.CheckDigit = batch.offset.RoutingNumber[8:9]
@@ -1095,7 +1089,7 @@ func createOffsetEntryDetail(off *Offset, batch *Batch) (*EntryDetail, error) {
 	ed.IndividualName = "OFFSET"
 	ed.DiscretionaryData = batch.offset.Description
 	ed.Category = CategoryForward
-	return ed, nil
+	return ed
 }
 
 // aba8 returns the first 8 digits of an ABA routing number.
