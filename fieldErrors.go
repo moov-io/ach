@@ -49,6 +49,12 @@ var (
 	// ErrValidISO4217 is the error given when a field has an invalid ISO 4217 code
 	ErrValidISO4217 = errors.New("is an invalid ISO 4217 code")
 
+	// EntryDetail errors
+
+	// ErrNegativeAmount is the error given when an Amount value is negaitve, which is
+	// against NACHA rules and guidelines.
+	ErrNegativeAmount = errors.New("amounts cannot be negative")
+
 	// Addenda errors
 
 	// ErrAddenda98ChangeCode is given when there's an invalid addenda change code

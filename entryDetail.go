@@ -243,6 +243,9 @@ func (ed *EntryDetail) Validate() error {
 	if err := ed.isAlphanumeric(ed.DFIAccountNumber); err != nil {
 		return fieldError("DFIAccountNumber", err, ed.DFIAccountNumber)
 	}
+	if ed.Amount < 0 {
+		return fieldError("Amount", ErrNegativeAmount, ed.Amount)
+	}
 	if err := ed.isAlphanumeric(ed.IdentificationNumber); err != nil {
 		return fieldError("IdentificationNumber", err, ed.IdentificationNumber)
 	}
