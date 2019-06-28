@@ -266,7 +266,7 @@ func (fh *FileHeader) ImmediateOriginField() string {
 func (fh *FileHeader) FileCreationDateField() string {
 	switch utf8.RuneCountInString(fh.FileCreationDate) {
 	case 0:
-		return base.Now().AddBankingDay(1).Format("060102")
+		return time.Now().Format("060102")
 	case 6:
 		return fh.formatSimpleDate(fh.FileCreationDate) // YYMMDD
 	}
@@ -283,7 +283,7 @@ func (fh *FileHeader) FileCreationDateField() string {
 func (fh *FileHeader) FileCreationTimeField() string {
 	switch utf8.RuneCountInString(fh.FileCreationTime) {
 	case 0:
-		return base.Now().AddBankingDay(1).Format("1504")
+		return time.Now().Format("1504")
 	case 4:
 		return fh.formatSimpleTime(fh.FileCreationTime) // HHmm
 	}
