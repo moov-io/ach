@@ -10,7 +10,7 @@ Package `github.com/moov-io/ach` implements a file reader and writer written in 
 
 If you're looking for a complete implementation of ACH origination (file creation), OFAC checks, micro-deposits, SFTP uploading, and other featues the [moov-io/paygate](https://github.com/moov-io/paygate) project aims to be a full system for ACH transfers.
 
-Docs: [docs.moov.io](https://docs.moov.io/en/latest/) | [api docs](https://api.moov.io/apps/ach/)
+Docs: [docs.moov.io](https://docs.moov.io/) | [api docs](https://api.moov.io/apps/ach/)
 
 ## Project Status
 
@@ -65,9 +65,14 @@ Examples: [Go](examples/http/main.go) | [Ruby](https://github.com/moov-io/ruby-a
 
 ## Getting Started
 
-- [Running ACH Server](https://docs.moov.io/en/latest/tutorials/ach-server/)
+- [Running ACH Server](https://docs.moov.io/ach/#running-moov-ach-server)
+- [Intro to ACH](https://docs.moov.io/ach/intro/)
+
+## Guides
+
+- [ACH File Structure](https://docs.moov.io/ach/file-structure/)
+- [Merging ACH files](https://docs.moov.io/ach/merging-files/)
 - [ACH Server metrics](documentation/metrics.md)
-- [Merging ACH files](https://docs.moov.io/en/latest/ach/merging-files/)
 
 ### Docker
 
@@ -110,7 +115,7 @@ If you have ACH specific questions NACHA (National Automated Clearing House Asso
 
  channel | info
  ------- | -------
- [Project Documentation](https://docs.moov.io/en/latest/) | Our project documentation available online.
+ [Project Documentation](https://docs.moov.io/) | Our project documentation available online.
  Google Group [moov-users](https://groups.google.com/forum/#!forum/moov-users)| The Moov users Google group is for contributors other people contributing to the Moov project. You can join them without a google account by sending an email to [moov-users+subscribe@googlegroups.com](mailto:moov-users+subscribe@googlegroups.com). After receiving the join-request message, you can simply reply to that to confirm the subscription.
 Twitter [@moov_io](https://twitter.com/moov_io)	| You can follow Moov.IO's Twitter feed to get updates on our project(s). You can also tweet us questions or just share blogs or stories.
 [GitHub Issue](https://github.com/moov-io) | If you are able to reproduce an problem please open a GitHub Issue under the specific project that caused the error.
