@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/moov-io/ach"
+	"github.com/moov-io/base"
 
 	"github.com/go-kit/kit/log"
 )
@@ -26,7 +27,7 @@ func TestRepositoryFiles(t *testing.T) {
 
 	header := mockFileHeader()
 	f := &ach.File{
-		ID:     NextID(),
+		ID:     base.ID(),
 		Header: *header,
 	}
 	if err := r.StoreFile(f); err != nil {
@@ -57,7 +58,7 @@ func TestRepositoryBatches(t *testing.T) {
 
 	header := mockFileHeader()
 	f := &ach.File{
-		ID:     NextID(),
+		ID:     base.ID(),
 		Header: *header,
 	}
 	if err := r.StoreFile(f); err != nil {
