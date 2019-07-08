@@ -12,7 +12,7 @@ github.com/go-kit/kit/transport
 github.com/go-logfmt/logfmt
 # github.com/golang/protobuf v1.3.1
 github.com/golang/protobuf/proto
-# github.com/gorilla/mux v1.7.2
+# github.com/gorilla/mux v1.7.3
 github.com/gorilla/mux
 # github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515
 github.com/kr/logfmt
