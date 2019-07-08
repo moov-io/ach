@@ -67,10 +67,12 @@ Examples: [Go](examples/http/main.go) | [Ruby](https://github.com/moov-io/ruby-a
 
 - [Running ACH Server](https://docs.moov.io/ach/#running-moov-ach-server)
 - [Intro to ACH](https://docs.moov.io/ach/intro/)
+- [Create an ACH File](https://docs.moov.io/ach/create-file/)
 
 ## Guides
 
 - [ACH File Structure](https://docs.moov.io/ach/file-structure/)
+- [Balaced offset files](https://docs.moov.io/ach/balanced-offset/)
 - [Merging ACH files](https://docs.moov.io/ach/merging-files/)
 - [ACH Server metrics](documentation/metrics.md)
 
