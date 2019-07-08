@@ -7,8 +7,10 @@ package ach
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 // Batch holds the Batch Header and Batch Control and all Entry Records
@@ -20,6 +22,11 @@ type Batch struct {
 	Control    *BatchControl     `json:"batchControl,omitempty"`
 	ADVEntries []*ADVEntryDetail `json:"advEntryDetails,omitempty"`
 	ADVControl *ADVBatchControl  `json:"advBatchControl,omitempty"`
+
+	// offset holds the information to build an EntryDetail record which
+	// balances the batch by debiting or crediting the sum of amounts in the batch.
+	offset *Offset
+
 	// category defines if the entry is a Forward, Return, or NOC
 	category string
 	// Converters is composed for ACH to GoLang Converters
@@ -410,7 +417,7 @@ func (batch *Batch) build() error {
 		bcADV.TotalCreditEntryDollarAmount, bcADV.TotalDebitEntryDollarAmount = batch.calculateADVBatchAmounts()
 		batch.ADVControl = bcADV
 	}
-	return nil
+	return batch.upsertOffsets()
 }
 
 // SetHeader appends an BatchHeader to the Batch
@@ -990,4 +997,127 @@ func (batch *Batch) Equal(other Batcher) bool {
 		}
 	}
 	return len(batch.Entries) == equalEntries && equalEntries != 0
+}
+
+// WithOffset sets the Offset information onto a Batch so that during Create a balanced offset record(s) at the end of each batch.
+//
+// If there are debits, there is a credit offset matching the sum of the debits. If there are credits, there is a debit offset matching
+// the sum of the credits. They are mutually exclusive.
+func (b *Batch) WithOffset(off *Offset) {
+	b.offset = off
+}
+
+func (b *Batch) upsertOffsets() error {
+	if b == nil || b.offset == nil {
+		return nil
+	}
+	if err := CheckRoutingNumber(b.offset.RoutingNumber); err != nil {
+		return fmt.Errorf("offset: invalid routing number %s: %v", b.offset.RoutingNumber, err)
+	}
+
+	// remove any Offset records already on the batch
+	for i := 0; i < len(b.Entries); i++ {
+		// TODO(adam): Should we remove this based on checking the last element is
+		// debit/credit and sums to all the other elements (which are mutually exclusive to
+		// the last record being debit or credit)?
+		// See: https://github.com/moov-io/ach/issues/540
+		if strings.EqualFold(b.Entries[i].IndividualName, "OFFSET") {
+			// fixup BatchControl records for our conditional after this for loop
+			if b.Entries[i].TransactionCode == CheckingCredit || b.Entries[i].TransactionCode == SavingsCredit {
+				b.Control.TotalCreditEntryDollarAmount -= b.Entries[i].Amount
+			} else {
+				b.Control.TotalDebitEntryDollarAmount -= b.Entries[i].Amount
+			}
+			// remove the EntryDetail
+			b.Control.EntryAddendaCount -= 1
+			b.Entries = append(b.Entries[:i], b.Entries[i+i:]...)
+			i--
+		}
+	}
+
+	// Create our debit offset EntryDetail
+	debitED := createOffsetEntryDetail(b.offset, b)
+	debitED.TraceNumber = strconv.Itoa(largestTraceNumber(b.Entries) + 1)
+	debitED.Amount = b.Control.TotalCreditEntryDollarAmount
+	switch b.offset.AccountType {
+	case OffsetChecking:
+		debitED.TransactionCode = CheckingDebit
+	case OffsetSavings:
+		debitED.TransactionCode = SavingsDebit
+	}
+	if debitED.Amount == 0 {
+		debitED = nil // zero out so we don't add an empty OFFSET EntryDetail
+	}
+
+	// Create our credit offset EntryDetail
+	creditED := createOffsetEntryDetail(b.offset, b)
+	creditED.TraceNumber = strconv.Itoa(largestTraceNumber(b.Entries) + 2)
+	creditED.Amount = b.Control.TotalDebitEntryDollarAmount
+	switch b.offset.AccountType {
+	case OffsetChecking:
+		creditED.TransactionCode = CheckingCredit
+	case OffsetSavings:
+		creditED.TransactionCode = SavingsCredit
+	}
+	if creditED.Amount == 0 {
+		creditED = nil // zero out so we don't add an empty OFFSET EntryDetail
+	}
+
+	// Add both EntryDetails to our Batch and recalculate some fields
+	if debitED != nil {
+		b.AddEntry(debitED)
+		b.Control.EntryAddendaCount += 1
+		b.Control.TotalDebitEntryDollarAmount += debitED.Amount
+	}
+	if creditED != nil {
+		b.AddEntry(creditED)
+		b.Control.EntryAddendaCount += 1
+		b.Control.TotalCreditEntryDollarAmount += creditED.Amount
+	}
+	b.Header.ServiceClassCode = MixedDebitsAndCredits
+	b.Control.EntryHash = b.calculateEntryHash()
+
+	return nil
+}
+
+func createOffsetEntryDetail(off *Offset, batch *Batch) *EntryDetail {
+	ed := NewEntryDetail()
+	ed.RDFIIdentification = batch.offset.RoutingNumber[:8]
+	ed.CheckDigit = batch.offset.RoutingNumber[8:9]
+	ed.DFIAccountNumber = batch.offset.AccountNumber
+	ed.IdentificationNumber = "" // left empty
+	ed.IndividualName = "OFFSET"
+	ed.DiscretionaryData = batch.offset.Description
+	ed.Category = CategoryForward
+	return ed
+}
+
+// aba8 returns the first 8 digits of an ABA routing number.
+// If the input is invalid then an empty string is returned.
+func aba8(rtn string) string {
+	n := utf8.RuneCountInString(rtn)
+	switch {
+	case n > 10:
+		return ""
+	case n == 10:
+		if rtn[0] == '0' || rtn[0] == '1' {
+			return rtn[1:9] // ACH server will prefix with space, 0, or 1
+		}
+		return ""
+	case n != 8 && n != 9:
+		return ""
+	default:
+		return rtn[:8]
+	}
+}
+
+func largestTraceNumber(entries []*EntryDetail) int {
+	if len(entries) == 0 {
+		return 0
+	}
+	n, err := strconv.Atoi(entries[len(entries)-1].TraceNumber)
+	if err != nil {
+		return 0
+	}
+	return n
 }

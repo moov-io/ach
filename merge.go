@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+const NACHAFileLineLimit = 10000
+
 // MergeFiles is a helper function for consolidating an array of ACH Files into as few files
 // as possible. This is useful for optimizing cost and network efficiency.
 //
@@ -37,7 +39,7 @@ func MergeFiles(files []*File) ([]*File, error) {
 				if n == 0 || err != nil {
 					return nil, fmt.Errorf("problem getting line count of File (header: %#v): %v", outf.Header, err)
 				}
-				if n > 10000 {
+				if n > NACHAFileLineLimit {
 					outf.RemoveBatch(fs.infiles[i].Batches[j])
 					if err := outf.Create(); err != nil { // rebalance ACH file after removing the Batch
 						return nil, err

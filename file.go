@@ -607,7 +607,6 @@ func (f *File) IsADV() bool {
 }
 
 func (f *File) createFileADV() error {
-
 	// add 2 for FileHeader/control and reset if build was called twice do to error
 	totalRecordsInFile := 2
 	batchSeq := 1
