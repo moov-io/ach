@@ -6,18 +6,23 @@ BUG FIXES
 - Fix JSON omitempty typo in `ADVEntryDetail`
 - fileHeader: trim padded 0's from ImmediateOriginField() and fixup docs
 - batch: only check DNE specifics if the SEC code is DNE
+- files: FileHeader validate CheckRoutingNumber
+- files: on empty FileCreation dates or times render today's value
 
 ADDITIONS
 
 - batch: add Equal method
 - Addenda99: Add `ReturnCodeField()` for detailed information about a returned file
 - files: support arbitrary merging of ACH files (See [#529](https://github.com/moov-io/ach/issues/529))
+- entryDetail: validate that Amount is non-negative
+- batch: create Debit and Credit EntryDetail offset records if needed (via `WithOffset`)
 
 BUILD
 
 - vendor: update dependencies
 - Fix `moov/achfuzz` docker image build
 - api: inline parameters to fix codegen crash
+- build: push moov/ach:latest and update docs accordingly
 
 ## v1.0.0 (Released 2019-03-26)
 
