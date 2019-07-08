@@ -15,6 +15,7 @@ import (
 	"strings"
 
 	"github.com/moov-io/ach"
+	"github.com/moov-io/base"
 	moovhttp "github.com/moov-io/base/http"
 
 	"github.com/go-kit/kit/endpoint"
@@ -66,7 +67,7 @@ func createFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.End
 
 		// Create a random file ID if none was provided
 		if req.File.ID == "" {
-			req.File.ID = NextID()
+			req.File.ID = base.ID()
 		}
 
 		err := r.StoreFile(req.File)

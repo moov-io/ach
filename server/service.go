@@ -11,6 +11,7 @@ import (
 	"io"
 
 	"github.com/moov-io/ach"
+	"github.com/moov-io/base"
 )
 
 var (
@@ -64,7 +65,7 @@ func (s *service) CreateFile(fh *ach.FileHeader) (string, error) {
 	f.SetHeader(*fh)
 	// set resource id's
 	if fh.ID == "" {
-		id := NextID()
+		id := base.ID()
 		f.ID = id
 		f.Header.ID = id
 		f.Control.ID = id
@@ -133,7 +134,7 @@ func (s *service) CreateBatch(fileID string, batch ach.Batcher) (string, error) 
 		return "", errors.New("no batch provided")
 	}
 	if batch.GetHeader().ID == "" {
-		id := NextID()
+		id := base.ID()
 		batch.SetID(id)
 		batch.GetHeader().ID = id
 		batch.GetControl().ID = id
