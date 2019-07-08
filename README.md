@@ -10,7 +10,7 @@ Package `github.com/moov-io/ach` implements a file reader and writer written in 
 
 If you're looking for a complete implementation of ACH origination (file creation), OFAC checks, micro-deposits, SFTP uploading, and other featues the [moov-io/paygate](https://github.com/moov-io/paygate) project aims to be a full system for ACH transfers.
 
-Docs: [docs.moov.io](https://docs.moov.io/) | [api docs](https://api.moov.io/apps/ach/)
+Docs: [docs.moov.io](https://docs.moov.io/ach/) | [api docs](https://api.moov.io/apps/ach/)
 
 ## Project Status
 
