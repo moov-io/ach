@@ -39,6 +39,9 @@ func main() {
 	flag.Parse()
 
 	// Setup logging, default to stdout
+	if v := os.Getenv("LOG_FORMAT"); v != "" {
+		*flagLogFormat = v
+	}
 	if *flagLogFormat == "json" {
 		logger = log.NewJSONLogger(os.Stdout)
 	} else {
@@ -75,6 +78,11 @@ func main() {
 	writTimeout, _ := time.ParseDuration("30s")
 	idleTimeout, _ := time.ParseDuration("60s")
 
+	// Check to see if our -http.addr flag has been overridden
+	if v := os.Getenv("HTTP_BIND_ADDRESS"); v != "" {
+		*httpAddr = v
+	}
+
 	serve := &http.Server{
 		Addr:    *httpAddr,
 		Handler: handler,
@@ -91,6 +99,11 @@ func main() {
 		if err := serve.Shutdown(context.TODO()); err != nil {
 			logger.Log("shutdown", err)
 		}
+	}
+
+	// Check to see if our -admin.addr flag has been overridden
+	if v := os.Getenv("HTTP_ADMIN_BIND_ADDRESS"); v != "" {
+		*adminAddr = v
 	}
 
 	// Admin server (metrics and debugging)
