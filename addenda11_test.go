@@ -324,3 +324,14 @@ func BenchmarkAddenda11String(b *testing.B) {
 		testAddenda11String(b)
 	}
 }
+
+// TestAddenda11RuneCountInString validates RuneCountInString
+func TestAddenda11RuneCountInString(t *testing.T) {
+	addenda11 := NewAddenda11()
+	var line = "711BEK Solutions                      15 West Place Street"
+	addenda11.Parse(line)
+
+	if addenda11.OriginatorName != "" {
+		t.Error("Parsed with an invalid RuneCountInString not equal to 94")
+	}
+}

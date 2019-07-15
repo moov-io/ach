@@ -383,11 +383,11 @@ func BenchmarkAddenda10String(b *testing.B) {
 
 // TestAddenda10RuneCountInString validates RuneCountInString
 func TestAddenda10RuneCountInString(t *testing.T) {
-	addenda10 := NewAddenda05()
+	addenda10 := NewAddenda10()
 	var line = "710ANN000000000000100000928383-23938          BEK Enterprises"
 	addenda10.Parse(line)
 
-	if addenda10.PaymentRelatedInformation != "" {
+	if addenda10.TransactionTypeCode != "" {
 		t.Error("Parsed with an invalid RuneCountInString not equal to 94")
 	}
 }
