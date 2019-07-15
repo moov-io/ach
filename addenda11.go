@@ -55,6 +55,7 @@ func (addenda11 *Addenda11) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
+
 	// 1-1 Always "7"
 	addenda11.recordType = "7"
 	// 2-3 Always 11

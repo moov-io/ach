@@ -69,6 +69,7 @@ func (addenda02 *Addenda02) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
+
 	// 1-1 Always "7"
 	addenda02.recordType = "7"
 	// 2-3 Always 02

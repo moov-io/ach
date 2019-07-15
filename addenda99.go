@@ -81,6 +81,7 @@ func (Addenda99 *Addenda99) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
+
 	// 1-1 Always "7"
 	Addenda99.recordType = "7"
 	// 2-3 Defines the specific explanation and format for the addenda information contained in the same record
