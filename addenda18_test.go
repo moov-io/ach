@@ -250,7 +250,7 @@ func TestAddenda18FieldInclusionFCBankBranchCountryCode(t *testing.T) {
 	}
 }
 
-//testAddenda18ForeignCorrespondentBankNameAlphaNumeric validates ForeignCorrespondentBankName is alphanumeric
+// testAddenda18ForeignCorrespondentBankNameAlphaNumeric validates ForeignCorrespondentBankName is alphanumeric
 func testAddenda18ForeignCorrespondentBankNameAlphaNumeric(t testing.TB) {
 	addenda18 := mockAddenda18()
 	addenda18.ForeignCorrespondentBankName = "®©"
@@ -386,5 +386,16 @@ func BenchmarkAddenda18TypeCode18(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testAddenda18TypeCode18(b)
+	}
+}
+
+// TestAddenda18RuneCountInString validates RuneCountInString
+func TestAddenda18RuneCountInString(t *testing.T) {
+	addenda18 := NewAddenda18()
+	var line = "718Bank of United Kingdom           "
+	addenda18.Parse(line)
+
+	if addenda18.ForeignCorrespondentBankBranchCountryCode != "" {
+		t.Error("Parsed with an invalid RuneCountInString not equal to 94")
 	}
 }

@@ -424,3 +424,14 @@ func BenchmarkAddenda13String(b *testing.B) {
 		testAddenda13String(b)
 	}
 }
+
+// TestAddenda13RuneCountInString validates RuneCountInString
+func TestAddenda13RuneCountInString(t *testing.T) {
+	addenda13 := NewAddenda13()
+	var line = "713Wells Fargo                        121042882                         US"
+	addenda13.Parse(line)
+
+	if addenda13.ODFIBranchCountryCode != "" {
+		t.Error("Parsed with an invalid RuneCountInString not equal to 94")
+	}
+}

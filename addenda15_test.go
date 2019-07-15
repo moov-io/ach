@@ -301,3 +301,14 @@ func BenchmarkAddenda15String(b *testing.B) {
 		testAddenda15String(b)
 	}
 }
+
+// TestAddenda15RuneCountInString validates RuneCountInString
+func TestAddenda15RuneCountInString(t *testing.T) {
+	addenda15 := NewAddenda15()
+	var line = "7159874654932139872121 Front Street"
+	addenda15.Parse(line)
+
+	if addenda15.ReceiverIDNumber != "" {
+		t.Error("Parsed with an invalid RuneCountInString not equal to 94")
+	}
+}

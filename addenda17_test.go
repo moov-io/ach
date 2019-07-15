@@ -213,3 +213,14 @@ func BenchmarkAddenda17TypeCode17(b *testing.B) {
 		testAddenda17TypeCode17(b)
 	}
 }
+
+// TestAddenda17RuneCountInString validates RuneCountInString
+func TestAddenda17RuneCountInString(t *testing.T) {
+	addenda17 := NewAddenda17()
+	var line = "717IAT                                        DIEGO MAY"
+	addenda17.Parse(line)
+
+	if addenda17.PaymentRelatedInformation != "" {
+		t.Error("Parsed with an invalid RuneCountInString not equal to 94")
+	}
+}
