@@ -16,6 +16,7 @@ ADDITIONS
 - files: support arbitrary merging of ACH files (See [#529](https://github.com/moov-io/ach/issues/529))
 - entryDetail: validate that Amount is non-negative
 - batch: create Debit and Credit EntryDetail offset records if needed (via `WithOffset`)
+- addenda types: Add RuneCountInString check to Parse(record string) function
 
 BUILD
 
