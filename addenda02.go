@@ -6,6 +6,7 @@ package ach
 
 import (
 	"strings"
+	"unicode/utf8"
 )
 
 // Addenda02 is a Addendumer addenda which provides business transaction information for Addenda Type
@@ -65,6 +66,10 @@ func NewAddenda02() *Addenda02 {
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate() call to confirm successful parsing and data validity.
 func (addenda02 *Addenda02) Parse(record string) {
+	if utf8.RuneCountInString(record) != 94 {
+		return
+	}
+
 	// 1-1 Always "7"
 	addenda02.recordType = "7"
 	// 2-3 Always 02

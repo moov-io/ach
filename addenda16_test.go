@@ -330,3 +330,14 @@ func BenchmarkAddenda16String(b *testing.B) {
 		testAddenda16String(b)
 	}
 }
+
+// TestAddenda16RuneCountInString validates RuneCountInString
+func TestAddenda16RuneCountInString(t *testing.T) {
+	addenda16 := NewAddenda16()
+	var line = "716"
+	addenda16.Parse(line)
+
+	if addenda16.ReceiverCityStateProvince != "" {
+		t.Error("Parsed with an invalid RuneCountInString not equal to 94")
+	}
+}

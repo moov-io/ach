@@ -6,6 +6,7 @@ package ach
 
 import (
 	"strings"
+	"unicode/utf8"
 )
 
 // Addenda14 is an addenda which provides business transaction information for Addenda Type
@@ -68,6 +69,10 @@ func NewAddenda14() *Addenda14 {
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate() call to confirm successful parsing and data validity.
 func (addenda14 *Addenda14) Parse(record string) {
+	if utf8.RuneCountInString(record) != 94 {
+		return
+	}
+
 	// 1-1 Always "7"
 	addenda14.recordType = "7"
 	// 2-3 Always 14

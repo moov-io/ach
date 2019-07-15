@@ -279,3 +279,14 @@ func BenchmarkAddenda98TypeCodeNil(b *testing.B) {
 		testAddenda98TypeCodeNil(b)
 	}
 }
+
+// TestAddenda98RuneCountInString validates RuneCountInString
+func TestAddenda98RuneCountInString(t *testing.T) {
+	addenda98 := NewAddenda98()
+	var line = "798"
+	addenda98.Parse(line)
+
+	if addenda98.CorrectedData != "" {
+		t.Error("Parsed with an invalid RuneCountInString not equal to 94")
+	}
+}

@@ -6,6 +6,7 @@ package ach
 
 import (
 	"strings"
+	"unicode/utf8"
 )
 
 // Addenda98 is a Addendumer addenda record format for Notification OF Change(98)
@@ -67,6 +68,10 @@ func NewAddenda98() *Addenda98 {
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate() call to confirm successful parsing and data validity.
 func (addenda98 *Addenda98) Parse(record string) {
+	if utf8.RuneCountInString(record) != 94 {
+		return
+	}
+
 	// 1-1 Always "7"
 	addenda98.recordType = "7"
 	// 2-3 Always "98"

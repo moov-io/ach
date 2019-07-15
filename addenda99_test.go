@@ -321,3 +321,14 @@ func BenchmarkAddenda99TypeCodeNil(b *testing.B) {
 		testAddenda99TypeCodeNil(b)
 	}
 }
+
+// TestAddenda99RuneCountInString validates RuneCountInString
+func TestAddenda99RuneCountInString(t *testing.T) {
+	addenda99 := NewAddenda99()
+	var line = "799"
+	addenda99.Parse(line)
+
+	if addenda99.DateOfDeath != "" {
+		t.Error("Parsed with an invalid RuneCountInString not equal to 94")
+	}
+}

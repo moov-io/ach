@@ -6,6 +6,7 @@ package ach
 
 import (
 	"strings"
+	"unicode/utf8"
 )
 
 // Addenda10 is an addenda which provides business transaction information for Addenda Type
@@ -60,6 +61,10 @@ func NewAddenda10() *Addenda10 {
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate() call to confirm successful parsing and data validity.
 func (addenda10 *Addenda10) Parse(record string) {
+	if utf8.RuneCountInString(record) != 94 {
+		return
+	}
+
 	// 1-1 Always "7"
 	addenda10.recordType = "7"
 	// 2-3 Always 10

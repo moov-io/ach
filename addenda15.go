@@ -6,6 +6,7 @@ package ach
 
 import (
 	"strings"
+	"unicode/utf8"
 )
 
 // Addenda15 is an addenda which provides business transaction information for Addenda Type
@@ -52,6 +53,10 @@ func NewAddenda15() *Addenda15 {
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate() call to confirm successful parsing and data validity.
 func (addenda15 *Addenda15) Parse(record string) {
+	if utf8.RuneCountInString(record) != 94 {
+		return
+	}
+
 	// 1-1 Always "7"
 	addenda15.recordType = "7"
 	// 2-3 Always 15

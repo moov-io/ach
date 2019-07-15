@@ -425,3 +425,14 @@ func BenchmarkAddenda14String(b *testing.B) {
 		testAddenda14String(b)
 	}
 }
+
+// TestAddenda14RuneCountInString validates RuneCountInString
+func TestAddenda14RuneCountInString(t *testing.T) {
+	addenda14 := NewAddenda14()
+	var line = "714Citadel Bank                       231380104                         US"
+	addenda14.Parse(line)
+
+	if addenda14.RDFIBranchCountryCode != "" {
+		t.Error("Parsed with an invalid RuneCountInString not equal to 94")
+	}
+}

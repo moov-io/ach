@@ -637,3 +637,14 @@ func BenchmarkTerminalStateAlphaNumeric(b *testing.B) {
 		testTerminalStateAlphaNumeric(b)
 	}
 }
+
+// TestAddenda02RuneCountInString validates RuneCountInString
+func TestAddenda02RuneCountInString(t *testing.T) {
+	addenda02 := NewAddenda02()
+	var line = "702REFONEAREFTERM021000490612123456Target Store 0049          PHILADELPHIA"
+	addenda02.Parse(line)
+
+	if addenda02.ReferenceInformationOne != "" {
+		t.Error("Parsed with an invalid RuneCountInString not equal to 94")
+	}
+}

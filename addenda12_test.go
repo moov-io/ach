@@ -330,3 +330,14 @@ func BenchmarkAddenda12String(b *testing.B) {
 		testAddenda12String(b)
 	}
 }
+
+// TestAddenda12RuneCountInString validates RuneCountInString
+func TestAddenda12RuneCountInString(t *testing.T) {
+	addenda12 := NewAddenda12()
+	var line = "712" + "JacobsTown*PA\\                     " + "US*19305\\                                        "
+	addenda12.Parse(line)
+
+	if addenda12.OriginatorCountryPostalCode != "" {
+		t.Error("Parsed with an invalid RuneCountInString not equal to 94")
+	}
+}

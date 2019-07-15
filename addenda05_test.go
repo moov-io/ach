@@ -201,3 +201,14 @@ func BenchmarkAddenda05TypeCode05(b *testing.B) {
 		testAddenda05TypeCode05(b)
 	}
 }
+
+// TestAddenda05RuneCountInString validates RuneCountInString
+func TestAddenda05RuneCountInString(t *testing.T) {
+	addenda05 := NewAddenda05()
+	var line = "705WEB                                        DIEGO MAY                            "
+	addenda05.Parse(line)
+
+	if addenda05.PaymentRelatedInformation != "" {
+		t.Error("Parsed with an invalid RuneCountInString not equal to 94")
+	}
+}
