@@ -6,6 +6,7 @@ package ach
 
 import (
 	"strings"
+	"unicode/utf8"
 )
 
 // When a Return Entry is prepared, the original Company/Batch Header Record, the original Entry Detail Record,
@@ -77,6 +78,9 @@ func NewAddenda99() *Addenda99 {
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate() call to confirm successful parsing and data validity.
 func (Addenda99 *Addenda99) Parse(record string) {
+	if utf8.RuneCountInString(record) != 94 {
+		return
+	}
 	// 1-1 Always "7"
 	Addenda99.recordType = "7"
 	// 2-3 Defines the specific explanation and format for the addenda information contained in the same record
