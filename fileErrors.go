@@ -18,6 +18,8 @@ var (
 	ErrFileControl = errors.New("none or more than one file control exists")
 	// ErrFileEntryOutsideBatch is the error given if an entry is outside of a batch
 	ErrFileEntryOutsideBatch = errors.New("entry outside of batch")
+	// ErrFileAddendaOutsideBatch is the error given if an addenda is outside of a batch
+	ErrFileAddendaOutsideBatch = errors.New("addenda outside of batch")
 	// ErrFileAddendaOutsideEntry is the error given if an addenda is outside of an entry
 	ErrFileAddendaOutsideEntry = errors.New("addenda outside of entry")
 	// ErrFileBatchControlOutsideBatch is the error given if a batch control record is outside of a batch

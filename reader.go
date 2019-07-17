@@ -317,6 +317,10 @@ func (r *Reader) parseEntryDetail() error {
 // parseAddendaRecord takes the input record string and create an Addenda Type appended to the last EntryDetail
 func (r *Reader) parseAddenda() error {
 	r.recordName = "Addenda"
+	if r.currentBatch == nil {
+		return ErrFileAddendaOutsideBatch
+	}
+
 	if r.currentBatch.GetHeader().StandardEntryClassCode != ADV {
 		if len(r.currentBatch.GetEntries()) == 0 {
 			return ErrFileAddendaOutsideEntry
