@@ -8,6 +8,7 @@ BUG FIXES
 - batch: only check DNE specifics if the SEC code is DNE
 - files: FileHeader validate CheckRoutingNumber
 - files: on empty FileCreation dates or times render today's value
+- reader: return ErrFileAddendaOutsideBatch from parseAddenda when currentBatch is nil
 
 ADDITIONS
 

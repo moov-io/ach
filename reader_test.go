@@ -1603,3 +1603,15 @@ func testACHFileTooLongErr(t testing.TB) {
 func TestACHFileTooLongErr(t *testing.T) {
 	testACHFileTooLongErr(t)
 }
+
+func TestReader_AddendaParse(t *testing.T) {
+	var line = "702REFONEAREFTERM021000490614123456Target Store 0049          PHILADELPHIA   PA12104288000"
+	r := NewReader(strings.NewReader(line))
+	r.line = line
+
+	if err := r.parseAddenda(); err != nil {
+		if !base.Match(err, ErrFileAddendaOutsideBatch) {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
