@@ -27,7 +27,7 @@ func main() {
 		fmt.Printf("Could not validate entire read file: %v", err)
 	}
 
-	fmt.Printf("File Name: %s \n\n", f.Name())
+	fmt.Printf("File Name: %s \n", f.Name())
 	fmt.Printf("Total Debit Amount: %v \n", achFile.Control.TotalDebitEntryDollarAmountInFile)
 	fmt.Printf("Total Credit Amount: %v \n", achFile.Control.TotalCreditEntryDollarAmountInFile)
 	fmt.Printf("File Header: %v \n", achFile.Header.String())
@@ -36,7 +36,7 @@ func main() {
 	fmt.Printf("Entry Detail 2: %v \n", achFile.Batches[0].GetEntries()[1].String())
 	fmt.Printf("Entry Detail 3: %v \n", achFile.Batches[0].GetEntries()[2].String())
 	fmt.Printf("Batch Control: %v \n", achFile.Batches[0].GetControl().String())
-	fmt.Printf("File Header: %v \n", achFile.Control.String())
+	fmt.Printf("File Header: %v \n\n", achFile.Control.String())
 
 	// ToDo:  This may be temporary: Create a specific example for creating the Segmented File
 
@@ -46,6 +46,7 @@ func main() {
 		fmt.Printf("Could not segment the file: %v", err)
 	}
 
+	fmt.Println("Credit File:")
 	fmt.Printf("Total Debit Amount: %v \n", creditFile.Control.TotalDebitEntryDollarAmountInFile)
 	fmt.Printf("Total Credit Amount: %v \n", creditFile.Control.TotalCreditEntryDollarAmountInFile)
 	fmt.Printf("File Header: %v \n", creditFile.Header.String())
@@ -53,13 +54,14 @@ func main() {
 	fmt.Printf("Entry Detail 1: %v \n", creditFile.Batches[0].GetEntries()[0].String())
 	fmt.Printf("Entry Detail 2: %v \n", creditFile.Batches[0].GetEntries()[1].String())
 	fmt.Printf("Batch Control: %v \n", creditFile.Batches[0].GetControl().String())
-	fmt.Printf("File Header: %v \n", creditFile.Control.String())
+	fmt.Printf("File Header: %v \n\n", creditFile.Control.String())
 
+	fmt.Println("Debit File:")
 	fmt.Printf("Total Debit Amount: %v \n", debitFile.Control.TotalDebitEntryDollarAmountInFile)
 	fmt.Printf("Total Credit Amount: %v \n", debitFile.Control.TotalCreditEntryDollarAmountInFile)
 	fmt.Printf("File Header: %v \n", debitFile.Header.String())
 	fmt.Printf("Batch Header: %v \n", debitFile.Batches[0].GetHeader().String())
 	fmt.Printf("Entry Detail 1: %v \n", debitFile.Batches[0].GetEntries()[0].String())
 	fmt.Printf("Batch Control: %v \n", debitFile.Batches[0].GetControl().String())
-	fmt.Printf("File Header: %v \n", debitFile.Control.String())
+	fmt.Printf("File Header: %v \n\n", debitFile.Control.String())
 }

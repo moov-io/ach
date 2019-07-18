@@ -1061,6 +1061,40 @@ func TestFile__RemoveBatch(t *testing.T) {
 func TestFile__SegmentFile(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
 	f, err := os.Open(filepath.Join("examples", "ach-ppd-read-mixedDebitCredit", "ppd-mixedDebitCredit.ach"))
+	// f, err := os.Open(filepath.Join("test", "ach-ppd-credit", "ppd-credit.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := NewReader(f)
+	achFile, err := r.Read()
+	if err != nil {
+		t.Fatalf("Issue reading file: %+v \n", err)
+	}
+
+	// ensure we have a validated file structure
+	if achFile.Validate(); err != nil {
+		t.Fatalf("Could not validate entire read file: %v", err)
+	}
+
+	creditFile, debitFile, err := achFile.SegmentFile()
+
+	if err != nil {
+		t.Fatalf("Could not segment the file: %+v \n", err)
+	}
+
+	if err := creditFile.Validate(); err != nil {
+		t.Fatalf("Credit file did not validate: %+v \n", err)
+	}
+
+	if err := debitFile.Validate(); err != nil {
+		t.Fatalf("Debit File did not validate: %+v \n", err)
+	}
+}
+
+func TestFile__SegmentFileCredit(t *testing.T) {
+	// open a file for reading. Any io.Reader Can be used
+
+	f, err := os.Open(filepath.Join("test", "ach-ppd-read", "ppd-credit.ach"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1078,6 +1112,36 @@ func TestFile__SegmentFile(t *testing.T) {
 	_, _, err = achFile.SegmentFile()
 
 	if err != nil {
-		t.Fatalf("Could not segment the file: %v", err)
+		if !base.Match(err, ErrFileNoBatches) {
+			t.Errorf("%T: %s", err, err)
+		}
 	}
+}
+
+func TestFile__SegmentFileDebitOnly(t *testing.T) {
+	// open a file for reading. Any io.Reader Can be used
+
+	f, err := os.Open(filepath.Join("test", "ach-ppd-read", "ppd-debit.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := NewReader(f)
+	achFile, err := r.Read()
+	if err != nil {
+		t.Fatalf("Issue reading file: %+v \n", err)
+	}
+
+	// ensure we have a validated file structure
+	if achFile.Validate(); err != nil {
+		t.Fatalf("Could not validate entire read file: %v", err)
+	}
+
+	_, _, err = achFile.SegmentFile()
+
+	if err != nil {
+		if !base.Match(err, ErrFileNoBatches) {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+
 }

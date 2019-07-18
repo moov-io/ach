@@ -661,47 +661,8 @@ func (f *File) SegmentFile() (*File, *File, error) {
 		return nil, nil, err
 	}
 
-	// if validated create the Credit File and Debit File
-
 	creditFile := NewFile()
 	debitFile := NewFile()
-
-	creditFile.Header.ImmediateOrigin = f.Header.ImmediateOrigin
-	creditFile.Header.ImmediateDestination = f.Header.ImmediateDestination
-	creditFile.Header.FileCreationDate = time.Now().Format("060102")
-	// creditFile.Header.FileCreationTime =
-	creditFile.Header.ImmediateDestinationName = f.Header.ImmediateDestinationName
-	creditFile.Header.ImmediateOriginName = f.Header.ImmediateOriginName
-	//creditFile.Header.FileIDModifier =
-	/*	Use defaults
-		    RecordType:     "1",
-			priorityCode:   "01",
-			FileIDModifier: "A",
-			recordSize:     "094",
-			blockingFactor: "10",
-			formatCode:     "1",
-
-	*/
-
-	debitFile.Header.ImmediateOrigin = f.Header.ImmediateOrigin
-	debitFile.Header.ImmediateDestination = f.Header.ImmediateDestination
-	debitFile.Header.FileCreationDate = time.Now().Format("060102")
-	// debitFile.Header.FileCreationTime =
-	debitFile.Header.ImmediateDestinationName = f.Header.ImmediateDestinationName
-	debitFile.Header.ImmediateOriginName = f.Header.ImmediateOriginName
-	//debitFile.Header.FileIDModifier =
-
-	/*	Use defaults
-		    RecordType:     "1",
-			priorityCode:   "01",
-			FileIDModifier: "A",
-			recordSize:     "094",
-			blockingFactor: "10",
-			formatCode:     "1",
-
-	*/
-
-	// ToDo: Thought/Question - BatchNumbers and Sequence Numbers should be ok with file.Create()
 
 	for _, batch := range f.Batches {
 		bh := batch.GetHeader()
@@ -749,29 +710,47 @@ func (f *File) SegmentFile() (*File, *File, error) {
 
 	// ToDo: Sorting
 
+	// return error if either file does not have batches
+	if creditFile.Batches == nil || debitFile.Batches == nil {
+		return nil, nil, ErrFileNoBatches
+
+	}
+
 	// Create the files
 
-	// ToDo: Thought/Question: Only create if necessary or create an empty file?
+	creditFile.Header.ImmediateOrigin = f.Header.ImmediateOrigin
+	creditFile.Header.ImmediateDestination = f.Header.ImmediateDestination
+	creditFile.Header.FileCreationDate = time.Now().Format("060102")
+	creditFile.Header.FileCreationTime = time.Now().AddDate(0, 0, 1).Format("1504") // HHmm
+	creditFile.Header.ImmediateDestinationName = f.Header.ImmediateDestinationName
+	creditFile.Header.ImmediateOriginName = f.Header.ImmediateOriginName
+	// creditFile.Header.FileIDModifier =
 
 	if err := creditFile.Create(); err != nil {
 		return nil, nil, err
 	}
+
+	// Validate files
+	if err := creditFile.Validate(); err != nil {
+		return nil, nil, err
+	}
+
+	debitFile.Header.ImmediateOrigin = f.Header.ImmediateOrigin
+	debitFile.Header.ImmediateDestination = f.Header.ImmediateDestination
+	debitFile.Header.FileCreationDate = time.Now().Format("060102")
+	debitFile.Header.FileCreationTime = time.Now().AddDate(0, 0, 1).Format("1504") // HHmm
+	debitFile.Header.ImmediateDestinationName = f.Header.ImmediateDestinationName
+	debitFile.Header.ImmediateOriginName = f.Header.ImmediateOriginName
+	// debitFile.Header.FileIDModifier =
 
 	if err := debitFile.Create(); err != nil {
 		return nil, nil, err
 	}
 
 	// Validate files
-
-	if err := creditFile.Validate(); err != nil {
-		return nil, nil, err
-	}
-
 	if err := debitFile.Validate(); err != nil {
 		return nil, nil, err
 	}
-
-	// ToDo: Thought/Question: Only return if create and validation succeed
 
 	return creditFile, debitFile, nil
 }
