@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 )
 
 // First position of all Record Types. These codes are uniquely assigned to
@@ -651,4 +652,126 @@ func (f *File) createFileADV() error {
 	f.ADVControl = fc
 
 	return nil
+}
+
+func (f *File) SegmentFile() (*File, *File, error) {
+
+	// Validate the ACH File to be segmented
+	if err := f.Validate(); err != nil {
+		return nil, nil, err
+	}
+
+	// if validated create the Credit File and Debit File
+
+	creditFile := NewFile()
+	debitFile := NewFile()
+
+	creditFile.Header.ImmediateOrigin = f.Header.ImmediateOrigin
+	creditFile.Header.ImmediateDestination = f.Header.ImmediateDestination
+	creditFile.Header.FileCreationDate = time.Now().Format("060102")
+	// creditFile.Header.FileCreationTime =
+	creditFile.Header.ImmediateDestinationName = f.Header.ImmediateDestinationName
+	creditFile.Header.ImmediateOriginName = f.Header.ImmediateOriginName
+	//creditFile.Header.FileIDModifier =
+	/*	Use defaults
+		    RecordType:     "1",
+			priorityCode:   "01",
+			FileIDModifier: "A",
+			recordSize:     "094",
+			blockingFactor: "10",
+			formatCode:     "1",
+
+	*/
+
+	debitFile.Header.ImmediateOrigin = f.Header.ImmediateOrigin
+	debitFile.Header.ImmediateDestination = f.Header.ImmediateDestination
+	debitFile.Header.FileCreationDate = time.Now().Format("060102")
+	// debitFile.Header.FileCreationTime =
+	debitFile.Header.ImmediateDestinationName = f.Header.ImmediateDestinationName
+	debitFile.Header.ImmediateOriginName = f.Header.ImmediateOriginName
+	//debitFile.Header.FileIDModifier =
+
+	/*	Use defaults
+		    RecordType:     "1",
+			priorityCode:   "01",
+			FileIDModifier: "A",
+			recordSize:     "094",
+			blockingFactor: "10",
+			formatCode:     "1",
+
+	*/
+
+	// ToDo: Thought/Question - BatchNumbers and Sequence Numbers should be ok with file.Create()
+
+	for _, batch := range f.Batches {
+		bh := batch.GetHeader()
+
+		switch bh.ServiceClassCode {
+
+		case 200:
+			creditBatch, err := NewBatch(bh)
+			if err != nil {
+				return nil, nil, err
+			}
+
+			debitBatch, err := NewBatch(bh)
+			if err != nil {
+				return nil, nil, err
+			}
+
+			for _, entry := range batch.GetEntries() {
+				switch entry.CreditOrDebit() {
+				case "C":
+					creditBatch.AddEntry(entry)
+				case "D":
+					debitBatch.AddEntry(entry)
+				}
+
+			}
+
+			if err := creditBatch.Create(); err != nil {
+				return nil, nil, err
+			}
+			creditFile.AddBatch(creditBatch)
+
+			if err := debitBatch.Create(); err != nil {
+				return nil, nil, err
+			}
+			debitFile.AddBatch(debitBatch)
+
+		case 220:
+			creditFile.AddBatch(batch)
+		case 225:
+			debitFile.AddBatch(batch)
+		}
+
+	}
+
+	// ToDo: Sorting
+
+	// Create the files
+
+	// ToDo: Thought/Question: Only create if necessary or create an empty file?
+
+	if err := creditFile.Create(); err != nil {
+		return nil, nil, err
+	}
+
+	if err := debitFile.Create(); err != nil {
+		return nil, nil, err
+	}
+
+	// Validate files
+
+	if err := creditFile.Validate(); err != nil {
+		return nil, nil, err
+	}
+
+	if err := debitFile.Validate(); err != nil {
+		return nil, nil, err
+	}
+
+	// ToDo: Thought/Question: Only return if create and validation succeed
+
+	return creditFile, debitFile, nil
 }

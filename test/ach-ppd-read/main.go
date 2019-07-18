@@ -28,7 +28,7 @@ func main() {
 		fmt.Printf("Could not create file with read properties: %v", err)
 	}
 
-	fmt.Printf("File Name: %s \n\n", "ppd-credit.ach")
+	fmt.Printf("File Name: %s \n\n", f.Name())
 	fmt.Printf("Total Credit Amount: %v \n", achFile.Control.TotalCreditEntryDollarAmountInFile)
 	fmt.Printf("SEC Code: %v \n\n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
 
@@ -51,7 +51,7 @@ func main() {
 		fmt.Printf("Could not create file with read properties: %v", err)
 	}
 
-	fmt.Printf("File Name: %s \n\n", "ppd-debit.ach")
+	fmt.Printf("File Name: %s \n\n", fDebit.Name())
 	fmt.Printf("Total Debit Amount: %v \n", achFileDebit.Control.TotalDebitEntryDollarAmountInFile)
 	fmt.Printf("SEC Code: %v \n", achFileDebit.Batches[0].GetHeader().StandardEntryClassCode)
 }
