@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -1054,5 +1055,29 @@ func TestFile__RemoveBatch(t *testing.T) {
 	file.RemoveBatch(ppd)
 	if len(file.ReturnEntries) != 0 {
 		t.Errorf("unexpected number of return entries: %d", len(file.ReturnEntries))
+	}
+}
+
+func TestFile__SegmentFile(t *testing.T) {
+	// open a file for reading. Any io.Reader Can be used
+	f, err := os.Open(filepath.Join("examples", "ach-ppd-read-mixedDebitCredit", "ppd-mixedDebitCredit.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := NewReader(f)
+	achFile, err := r.Read()
+	if err != nil {
+		t.Fatalf("Issue reading file: %+v \n", err)
+	}
+
+	// ensure we have a validated file structure
+	if achFile.Validate(); err != nil {
+		t.Fatalf("Could not validate entire read file: %v", err)
+	}
+
+	_, _, err = achFile.SegmentFile()
+
+	if err != nil {
+		t.Fatalf("Could not segment the file: %v", err)
 	}
 }

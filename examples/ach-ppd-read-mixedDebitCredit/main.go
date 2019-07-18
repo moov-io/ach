@@ -16,8 +16,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	rMixed := ach.NewReader(f)
-	achFile, err := rMixed.Read()
+	r := ach.NewReader(f)
+	achFile, err := r.Read()
 	if err != nil {
 		fmt.Printf("Issue reading file: %+v \n", err)
 	}
