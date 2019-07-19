@@ -654,8 +654,9 @@ func (f *File) createFileADV() error {
 	return nil
 }
 
+// SegmentFile takes an ACH File and returns 2 segmented ACH Files, one ACH File containing credit entries and one
+// ACH File containing debit entries.
 func (f *File) SegmentFile() (*File, *File, error) {
-
 	// Validate the ACH File to be segmented
 	if err := f.Validate(); err != nil {
 		return nil, nil, err
@@ -670,10 +671,36 @@ func (f *File) SegmentFile() (*File, *File, error) {
 		switch bh.ServiceClassCode {
 
 		case 200:
-			creditBatch, _ := NewBatch(bh)
+			cbh := NewBatchHeader()
+			cbh.ServiceClassCode = 220
+			cbh.CompanyName = bh.CompanyName
+			cbh.CompanyDiscretionaryData = bh.CompanyDiscretionaryData
+			cbh.CompanyIdentification = bh.CompanyIdentification
+			cbh.StandardEntryClassCode = bh.StandardEntryClassCode
+			cbh.CompanyEntryDescription = bh.CompanyEntryDescription
+			cbh.CompanyDescriptiveDate = bh.CompanyDescriptiveDate
+			cbh.EffectiveEntryDate = bh.EffectiveEntryDate
+			cbh.settlementDate = bh.settlementDate
+			cbh.OriginatorStatusCode = bh.OriginatorStatusCode
+			cbh.ODFIIdentification = bh.ODFIIdentification
+			creditBatch, _ := NewBatch(cbh)
 
-			debitBatch, _ := NewBatch(bh)
+			dbh := NewBatchHeader()
+			dbh.ServiceClassCode = 225
+			dbh.CompanyName = bh.CompanyName
+			dbh.CompanyDiscretionaryData = bh.CompanyDiscretionaryData
+			dbh.CompanyIdentification = bh.CompanyIdentification
+			dbh.StandardEntryClassCode = bh.StandardEntryClassCode
+			dbh.CompanyEntryDescription = bh.CompanyEntryDescription
+			dbh.CompanyDescriptiveDate = bh.CompanyDescriptiveDate
+			dbh.EffectiveEntryDate = bh.EffectiveEntryDate
+			dbh.settlementDate = bh.settlementDate
+			dbh.OriginatorStatusCode = bh.OriginatorStatusCode
+			dbh.ODFIIdentification = bh.ODFIIdentification
 
+			debitBatch, _ := NewBatch(dbh)
+
+			// Add entries
 			for _, entry := range batch.GetEntries() {
 				switch entry.CreditOrDebit() {
 				case "C":
@@ -684,9 +711,11 @@ func (f *File) SegmentFile() (*File, *File, error) {
 
 			}
 
+			// Create credit Batch and add Batch to File
 			creditBatch.Create()
 			creditFile.AddBatch(creditBatch)
 
+			// Create debit Batch and add  Batch to File
 			debitBatch.Create()
 			debitFile.AddBatch(debitBatch)
 
@@ -695,10 +724,9 @@ func (f *File) SegmentFile() (*File, *File, error) {
 		case 225:
 			debitFile.AddBatch(batch)
 		}
-
 	}
 
-	// ToDo: Sorting
+	// ToDo: Additional Sorting to be FI specific
 
 	// return error if either file does not have batches
 	if creditFile.Batches == nil || debitFile.Batches == nil {
