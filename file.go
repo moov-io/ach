@@ -671,33 +671,11 @@ func (f *File) SegmentFile() (*File, *File, error) {
 		switch bh.ServiceClassCode {
 
 		case 200:
-			cbh := NewBatchHeader()
-			cbh.ServiceClassCode = 220
-			cbh.CompanyName = bh.CompanyName
-			cbh.CompanyDiscretionaryData = bh.CompanyDiscretionaryData
-			cbh.CompanyIdentification = bh.CompanyIdentification
-			cbh.StandardEntryClassCode = bh.StandardEntryClassCode
-			cbh.CompanyEntryDescription = bh.CompanyEntryDescription
-			cbh.CompanyDescriptiveDate = bh.CompanyDescriptiveDate
-			cbh.EffectiveEntryDate = bh.EffectiveEntryDate
-			cbh.settlementDate = bh.settlementDate
-			cbh.OriginatorStatusCode = bh.OriginatorStatusCode
-			cbh.ODFIIdentification = bh.ODFIIdentification
+
+			cbh := createBatchHeader(CreditsOnly, bh)
 			creditBatch, _ := NewBatch(cbh)
 
-			dbh := NewBatchHeader()
-			dbh.ServiceClassCode = 225
-			dbh.CompanyName = bh.CompanyName
-			dbh.CompanyDiscretionaryData = bh.CompanyDiscretionaryData
-			dbh.CompanyIdentification = bh.CompanyIdentification
-			dbh.StandardEntryClassCode = bh.StandardEntryClassCode
-			dbh.CompanyEntryDescription = bh.CompanyEntryDescription
-			dbh.CompanyDescriptiveDate = bh.CompanyDescriptiveDate
-			dbh.EffectiveEntryDate = bh.EffectiveEntryDate
-			dbh.settlementDate = bh.settlementDate
-			dbh.OriginatorStatusCode = bh.OriginatorStatusCode
-			dbh.ODFIIdentification = bh.ODFIIdentification
-
+			dbh := createBatchHeader(DebitsOnly, bh)
 			debitBatch, _ := NewBatch(dbh)
 
 			// Add entries
@@ -710,7 +688,6 @@ func (f *File) SegmentFile() (*File, *File, error) {
 				case "D":
 					debitBatch.AddEntry(entry)
 				}
-
 			}
 
 			// Create credit Batch and add Batch to File
@@ -728,7 +705,7 @@ func (f *File) SegmentFile() (*File, *File, error) {
 		}
 	}
 
-	// ToDo: Additional Sorting to be FI specific
+	// Additional Sorting to be FI specific
 
 	// return error if either file does not have batches
 	if creditFile.Batches == nil || debitFile.Batches == nil {
@@ -765,4 +742,20 @@ func (f *File) SegmentFile() (*File, *File, error) {
 	debitFile.Validate()
 
 	return creditFile, debitFile, nil
+}
+
+func createBatchHeader(serviceClassCode int, bh *BatchHeader) *BatchHeader {
+	rbh := NewBatchHeader()
+	rbh.ServiceClassCode = serviceClassCode
+	rbh.CompanyName = bh.CompanyName
+	rbh.CompanyDiscretionaryData = bh.CompanyDiscretionaryData
+	rbh.CompanyIdentification = bh.CompanyIdentification
+	rbh.StandardEntryClassCode = bh.StandardEntryClassCode
+	rbh.CompanyEntryDescription = bh.CompanyEntryDescription
+	rbh.CompanyDescriptiveDate = bh.CompanyDescriptiveDate
+	rbh.EffectiveEntryDate = bh.EffectiveEntryDate
+	rbh.settlementDate = bh.settlementDate
+	rbh.OriginatorStatusCode = bh.OriginatorStatusCode
+	rbh.ODFIIdentification = bh.ODFIIdentification
+	return rbh
 }
