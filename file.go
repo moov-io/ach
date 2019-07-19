@@ -654,7 +654,7 @@ func (f *File) createFileADV() error {
 	return nil
 }
 
-// SegmentFile takes an ACH File and returns 2 segmented ACH Files, one ACH File containing credit entries and one
+// SegmentFile takes a valid ACH File and returns 2 segmented ACH Files, one ACH File containing credit entries and one
 // ACH File containing debit entries.
 func (f *File) SegmentFile() (*File, *File, error) {
 	// Validate the ACH File to be segmented
@@ -669,13 +669,11 @@ func (f *File) SegmentFile() (*File, *File, error) {
 		bh := batch.GetHeader()
 
 		switch bh.ServiceClassCode {
-
 		case 200:
-
-			cbh := createBatchHeader(CreditsOnly, bh)
+			cbh := createSegmentFileBatchHeader(CreditsOnly, bh)
 			creditBatch, _ := NewBatch(cbh)
 
-			dbh := createBatchHeader(DebitsOnly, bh)
+			dbh := createSegmentFileBatchHeader(DebitsOnly, bh)
 			debitBatch, _ := NewBatch(dbh)
 
 			// Add entries
@@ -697,7 +695,6 @@ func (f *File) SegmentFile() (*File, *File, error) {
 			// Create debit Batch and add  Batch to File
 			debitBatch.Create()
 			debitFile.AddBatch(debitBatch)
-
 		case 220:
 			creditFile.AddBatch(batch)
 		case 225:
@@ -713,38 +710,19 @@ func (f *File) SegmentFile() (*File, *File, error) {
 
 	}
 
-	// Create the files
-
-	creditFile.Header.ImmediateOrigin = f.Header.ImmediateOrigin
-	creditFile.Header.ImmediateDestination = f.Header.ImmediateDestination
-	creditFile.Header.FileCreationDate = time.Now().Format("060102")
-	creditFile.Header.FileCreationTime = time.Now().AddDate(0, 0, 1).Format("1504") // HHmm
-	creditFile.Header.ImmediateDestinationName = f.Header.ImmediateDestinationName
-	creditFile.Header.ImmediateOriginName = f.Header.ImmediateOriginName
-	// creditFile.Header.FileIDModifier =
-
+	f.addFileHeaderData(creditFile)
 	creditFile.Create()
-
-	// Validate files
 	creditFile.Validate()
 
-	debitFile.Header.ImmediateOrigin = f.Header.ImmediateOrigin
-	debitFile.Header.ImmediateDestination = f.Header.ImmediateDestination
-	debitFile.Header.FileCreationDate = time.Now().Format("060102")
-	debitFile.Header.FileCreationTime = time.Now().AddDate(0, 0, 1).Format("1504") // HHmm
-	debitFile.Header.ImmediateDestinationName = f.Header.ImmediateDestinationName
-	debitFile.Header.ImmediateOriginName = f.Header.ImmediateOriginName
-	// debitFile.Header.FileIDModifier =
-
+	f.addFileHeaderData(debitFile)
 	debitFile.Create()
-
-	// Validate files
 	debitFile.Validate()
 
 	return creditFile, debitFile, nil
 }
 
-func createBatchHeader(serviceClassCode int, bh *BatchHeader) *BatchHeader {
+// createSegmentFileBatchHeader adds BatchHeader data for a debit/credit Segment File
+func createSegmentFileBatchHeader(serviceClassCode int, bh *BatchHeader) *BatchHeader {
 	rbh := NewBatchHeader()
 	rbh.ServiceClassCode = serviceClassCode
 	rbh.CompanyName = bh.CompanyName
@@ -758,4 +736,15 @@ func createBatchHeader(serviceClassCode int, bh *BatchHeader) *BatchHeader {
 	rbh.OriginatorStatusCode = bh.OriginatorStatusCode
 	rbh.ODFIIdentification = bh.ODFIIdentification
 	return rbh
+}
+
+// addFileHeaderData adds FileHeader data for a debit/credit Segment File
+func (f *File) addFileHeaderData(file *File) *File {
+	file.Header.ImmediateOrigin = f.Header.ImmediateOrigin
+	file.Header.ImmediateDestination = f.Header.ImmediateDestination
+	file.Header.FileCreationDate = time.Now().Format("060102")
+	file.Header.FileCreationTime = time.Now().AddDate(0, 0, 1).Format("1504") // HHmm
+	file.Header.ImmediateDestinationName = f.Header.ImmediateDestinationName
+	file.Header.ImmediateOriginName = f.Header.ImmediateOriginName
+	return file
 }
