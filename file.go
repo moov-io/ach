@@ -702,6 +702,8 @@ func (f *File) SegmentFile() (*File, *File, error) {
 
 			// Add entries
 			for _, entry := range batch.GetEntries() {
+				// Set EntryDetail.TraceNumber = "" Batch.Create calls Batch.build which will generate the TraceNumber
+				entry.TraceNumber = ""
 				switch entry.CreditOrDebit() {
 				case "C":
 					creditBatch.AddEntry(entry)
