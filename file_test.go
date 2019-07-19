@@ -740,7 +740,7 @@ func TestBatchHeaderNil(t *testing.T) {
 
 }
 
-// TestBatchControlrNil Batch Control Nil
+// TestBatchControlNil Batch Control Nil
 func TestBatchControlNil(t *testing.T) {
 	fh := mockFileHeader()
 	bh := mockBatchPPDHeader()
@@ -1144,4 +1144,18 @@ func TestFile__SegmentFileDebitOnly(t *testing.T) {
 		}
 	}
 
+}
+
+func TestSegmentFile_FileHeaderError(t *testing.T) {
+	// open a file for reading. Any io.Reader Can be used
+
+	achFile := NewFile()
+
+	_, _, err := achFile.SegmentFile()
+
+	if err != nil {
+		if !base.Match(err, ErrConstructor) {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
 }

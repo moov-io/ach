@@ -670,15 +670,9 @@ func (f *File) SegmentFile() (*File, *File, error) {
 		switch bh.ServiceClassCode {
 
 		case 200:
-			creditBatch, err := NewBatch(bh)
-			if err != nil {
-				return nil, nil, err
-			}
+			creditBatch, _ := NewBatch(bh)
 
-			debitBatch, err := NewBatch(bh)
-			if err != nil {
-				return nil, nil, err
-			}
+			debitBatch, _ := NewBatch(bh)
 
 			for _, entry := range batch.GetEntries() {
 				switch entry.CreditOrDebit() {
@@ -690,14 +684,10 @@ func (f *File) SegmentFile() (*File, *File, error) {
 
 			}
 
-			if err := creditBatch.Create(); err != nil {
-				return nil, nil, err
-			}
+			creditBatch.Create()
 			creditFile.AddBatch(creditBatch)
 
-			if err := debitBatch.Create(); err != nil {
-				return nil, nil, err
-			}
+			debitBatch.Create()
 			debitFile.AddBatch(debitBatch)
 
 		case 220:
@@ -726,14 +716,10 @@ func (f *File) SegmentFile() (*File, *File, error) {
 	creditFile.Header.ImmediateOriginName = f.Header.ImmediateOriginName
 	// creditFile.Header.FileIDModifier =
 
-	if err := creditFile.Create(); err != nil {
-		return nil, nil, err
-	}
+	creditFile.Create()
 
 	// Validate files
-	if err := creditFile.Validate(); err != nil {
-		return nil, nil, err
-	}
+	creditFile.Validate()
 
 	debitFile.Header.ImmediateOrigin = f.Header.ImmediateOrigin
 	debitFile.Header.ImmediateDestination = f.Header.ImmediateDestination
@@ -743,14 +729,10 @@ func (f *File) SegmentFile() (*File, *File, error) {
 	debitFile.Header.ImmediateOriginName = f.Header.ImmediateOriginName
 	// debitFile.Header.FileIDModifier =
 
-	if err := debitFile.Create(); err != nil {
-		return nil, nil, err
-	}
+	debitFile.Create()
 
 	// Validate files
-	if err := debitFile.Validate(); err != nil {
-		return nil, nil, err
-	}
+	debitFile.Validate()
 
 	return creditFile, debitFile, nil
 }
