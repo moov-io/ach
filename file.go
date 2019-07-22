@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/moov-io/base"
 	"time"
 )
 
@@ -740,6 +741,7 @@ func createSegmentFileBatchHeader(serviceClassCode int, bh *BatchHeader) *BatchH
 
 // addFileHeaderData adds FileHeader data for a debit/credit Segment File
 func (f *File) addFileHeaderData(file *File) *File {
+	file.Header.ID = base.ID()
 	file.Header.ImmediateOrigin = f.Header.ImmediateOrigin
 	file.Header.ImmediateDestination = f.Header.ImmediateDestination
 	file.Header.FileCreationDate = time.Now().Format("060102")
