@@ -19,6 +19,7 @@ ADDITIONS
 - batch: create Debit and Credit EntryDetail offset records if needed (via `WithOffset`)
 - addenda types: Add RuneCountInString check to Parse(record string) function
 - file: create debit ach file and credit ach file from a mixed debit and credit ach file (via `SegmentFile`) (see [#528](https://github.com/moov-io/ach/issues/528))
+- cmd/server: add environment variables to override command line flags (`-http.addr` and `-log.format`)
 
 BUILD
 
