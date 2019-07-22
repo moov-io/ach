@@ -18,6 +18,7 @@ ADDITIONS
 - entryDetail: validate that Amount is non-negative
 - batch: create Debit and Credit EntryDetail offset records if needed (via `WithOffset`)
 - addenda types: Add RuneCountInString check to Parse(record string) function
+- cmd/server: add environment variables to override command line flags (`-http.addr` and `-log.format`)
 
 BUILD
 
