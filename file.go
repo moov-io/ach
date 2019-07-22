@@ -673,7 +673,7 @@ func (f *File) SegmentFile() (*File, *File, error) {
 		bh := batch.GetHeader()
 
 		switch bh.ServiceClassCode {
-		case 200:
+		case MixedDebitsAndCredits:
 			cbh := createSegmentFileBatchHeader(CreditsOnly, bh)
 			creditBatch, _ := NewBatch(cbh)
 
@@ -699,9 +699,9 @@ func (f *File) SegmentFile() (*File, *File, error) {
 			// Create debit Batch and add  Batch to File
 			debitBatch.Create()
 			debitFile.AddBatch(debitBatch)
-		case 220:
+		case CreditsOnly:
 			creditFile.AddBatch(batch)
-		case 225:
+		case DebitsOnly:
 			debitFile.AddBatch(batch)
 		}
 	}
