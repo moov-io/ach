@@ -656,7 +656,10 @@ func (f *File) createFileADV() error {
 }
 
 // SegmentFile takes a valid ACH File and returns 2 segmented ACH Files, one ACH File containing credit entries and one
-// ACH File containing debit entries.
+// ACH File containing debit entries.  The return is 2 Files a Credit File and Debit File, or an error.:
+// File - Credit File
+// File - Debit File
+// Error - Error or Nil
 func (f *File) SegmentFile() (*File, *File, error) {
 	// Validate the ACH File to be segmented
 	if err := f.Validate(); err != nil {
