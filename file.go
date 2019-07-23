@@ -708,19 +708,17 @@ func (f *File) SegmentFile(sfc *SegmentFileConfiguration) (*File, *File, error) 
 
 	// Additional Sorting to be FI specific
 
-	// return error if either file does not have batches
-	if creditFile.Batches == nil || debitFile.Batches == nil {
-		return nil, nil, ErrFileNoBatches
-
+	if len(creditFile.Batches) != 0 {
+		f.addFileHeaderData(creditFile)
+		creditFile.Create()
+		creditFile.Validate()
 	}
 
-	f.addFileHeaderData(creditFile)
-	creditFile.Create()
-	creditFile.Validate()
-
-	f.addFileHeaderData(debitFile)
-	debitFile.Create()
-	debitFile.Validate()
+	if len(debitFile.Batches) != 0 {
+		f.addFileHeaderData(debitFile)
+		debitFile.Create()
+		debitFile.Validate()
+	}
 
 	return creditFile, debitFile, nil
 }
@@ -744,6 +742,7 @@ func createSegmentFileBatchHeader(serviceClassCode int, bh *BatchHeader) *BatchH
 
 // addFileHeaderData adds FileHeader data for a debit/credit Segment File
 func (f *File) addFileHeaderData(file *File) *File {
+	file.ID = base.ID()
 	file.Header.ID = base.ID()
 	file.Header.ImmediateOrigin = f.Header.ImmediateOrigin
 	file.Header.ImmediateDestination = f.Header.ImmediateDestination
