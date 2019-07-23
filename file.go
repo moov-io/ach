@@ -660,7 +660,7 @@ func (f *File) createFileADV() error {
 // File - Credit File
 // File - Debit File
 // Error - Error or Nil
-func (f *File) SegmentFile() (*File, *File, error) {
+func (f *File) SegmentFile(sfc *SegmentFileConfiguration) (*File, *File, error) {
 	// Validate the ACH File to be segmented
 	if err := f.Validate(); err != nil {
 		return nil, nil, err

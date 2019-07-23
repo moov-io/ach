@@ -29,7 +29,10 @@ func main() {
 	if achFile.Validate(); err != nil {
 		fmt.Printf("Could not validate entire read file: %v", err)
 	}
-	creditFile, debitFile, err := achFile.SegmentFile()
+
+	sfc := ach.NewSegmentFileConfiguration()
+	creditFile, debitFile, err := achFile.SegmentFile(sfc)
+
 	if err != nil {
 		fmt.Printf("Could not segment the file: %v", err)
 	}

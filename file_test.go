@@ -1076,7 +1076,8 @@ func TestFile__SegmentFile(t *testing.T) {
 		t.Fatalf("Could not validate entire read file: %v", err)
 	}
 
-	creditFile, debitFile, err := achFile.SegmentFile()
+	sfc := NewSegmentFileConfiguration()
+	creditFile, debitFile, err := achFile.SegmentFile(sfc)
 
 	if err != nil {
 		t.Fatalf("Could not segment the file: %+v \n", err)
@@ -1107,7 +1108,8 @@ func TestFile__SegmentFileCredit(t *testing.T) {
 		t.Fatalf("Could not validate entire read file: %v", err)
 	}
 
-	_, _, err = achFile.SegmentFile()
+	sfc := NewSegmentFileConfiguration()
+	_, _, err = achFile.SegmentFile(sfc)
 
 	if err != nil {
 		if !base.Match(err, ErrFileNoBatches) {
@@ -1132,7 +1134,8 @@ func TestFile__SegmentFileDebitOnly(t *testing.T) {
 		t.Fatalf("Could not validate entire read file: %v", err)
 	}
 
-	_, _, err = achFile.SegmentFile()
+	sfc := NewSegmentFileConfiguration()
+	_, _, err = achFile.SegmentFile(sfc)
 
 	if err != nil {
 		if !base.Match(err, ErrFileNoBatches) {
@@ -1145,7 +1148,8 @@ func TestFile__SegmentFileDebitOnly(t *testing.T) {
 func TestSegmentFile_FileHeaderError(t *testing.T) {
 	achFile := NewFile()
 
-	_, _, err := achFile.SegmentFile()
+	sfc := NewSegmentFileConfiguration()
+	_, _, err := achFile.SegmentFile(sfc)
 
 	if err != nil {
 		if !base.Match(err, ErrConstructor) {
@@ -1172,7 +1176,8 @@ func TestFile__SegmentFileBatchControlCreditAmount(t *testing.T) {
 		t.Fatalf("Could not validate entire read file: %v", err)
 	}
 
-	creditFile, debitFile, err := achFile.SegmentFile()
+	sfc := NewSegmentFileConfiguration()
+	creditFile, debitFile, err := achFile.SegmentFile(sfc)
 
 	if err != nil {
 		t.Fatalf("Could not segment the file: %+v \n", err)
@@ -1209,7 +1214,8 @@ func TestFile__SegmentFileBatchControlDebitAmount(t *testing.T) {
 		t.Fatalf("Could not validate entire read file: %v", err)
 	}
 
-	creditFile, debitFile, err := achFile.SegmentFile()
+	sfc := NewSegmentFileConfiguration()
+	creditFile, debitFile, err := achFile.SegmentFile(sfc)
 
 	if err != nil {
 		t.Fatalf("Could not segment the file: %+v \n", err)
@@ -1246,7 +1252,8 @@ func TestFile__SegmentFileCreditBatches(t *testing.T) {
 		t.Fatalf("Could not validate entire read file: %v", err)
 	}
 
-	creditFile, debitFile, err := achFile.SegmentFile()
+	sfc := NewSegmentFileConfiguration()
+	creditFile, debitFile, err := achFile.SegmentFile(sfc)
 
 	if err != nil {
 		t.Fatalf("Could not segment the file: %+v \n", err)
@@ -1283,7 +1290,8 @@ func TestFile__SegmentFileDebitBatches(t *testing.T) {
 		t.Fatalf("Could not validate entire read file: %v", err)
 	}
 
-	creditFile, debitFile, err := achFile.SegmentFile()
+	sfc := NewSegmentFileConfiguration()
+	creditFile, debitFile, err := achFile.SegmentFile(sfc)
 
 	if err != nil {
 		t.Fatalf("Could not segment the file: %+v \n", err)
