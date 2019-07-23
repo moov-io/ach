@@ -377,6 +377,10 @@ func TestSegmentFileError(t *testing.T) {
 	s := mockServiceInMemory()
 	f, err := s.GetFile("98765")
 
+	if err != nil {
+		t.Fatalf("could not get the file w/ error %v", err)
+	}
+
 	_, _, err = s.SegmentFile(f)
 
 	if err != nil {
