@@ -5,6 +5,7 @@
 package server
 
 import (
+	"github.com/moov-io/base"
 	"io/ioutil"
 	"log"
 	"strings"
@@ -369,7 +370,18 @@ func TestSegmentFile(t *testing.T) {
 	if debitFile == nil {
 		t.Fatal("No debit File")
 	}
-
 }
 
-// ToDo: create helper function to use for additional tests?
+// TestSegmentFile_FileValidateError return an error on file Validation
+func TestSegmentFileError(t *testing.T) {
+	s := mockServiceInMemory()
+	f, err := s.GetFile("98765")
+
+	_, _, err = s.SegmentFile(f)
+
+	if err != nil {
+		if !base.Match(err, ach.ErrConstructor) {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}

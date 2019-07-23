@@ -168,10 +168,6 @@ func (s *service) DeleteBatch(fileID string, batchID string) error {
 
 // SegmentFile takes an ACH File and segments the files into a credit ACH File and debit ACH File and adds to in memory storage.
 func (s *service) SegmentFile(f *ach.File) (*ach.File, *ach.File, error) {
-	if f.ID == "" {
-		return nil, nil, errors.New("no ACH file provided")
-	}
-
 	sfc := ach.NewSegmentFileConfiguration()
 	creditFile, debitFile, err := f.SegmentFile(sfc)
 
