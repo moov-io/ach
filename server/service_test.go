@@ -6,8 +6,10 @@ package server
 
 import (
 	"io/ioutil"
+	"log"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/moov-io/ach"
 )
@@ -269,3 +271,105 @@ func TestDeleteBatch(t *testing.T) {
 		t.Errorf("expected %s received error %v", "nil", err)
 	}
 }
+
+// TestSegmentFile creates a Segmented File from an existing ACH File
+func TestSegmentFile(t *testing.T) {
+	s := mockServiceInMemory()
+
+	fh := ach.NewFileHeader()
+	fh.ID = "333339"
+	fh.ImmediateDestination = "231380104"
+	fh.ImmediateOrigin = "121042882"
+	fh.FileCreationDate = time.Now().Format("060102")
+	fh.FileCreationTime = time.Now().AddDate(0, 0, 1).Format("1504") // HHmm
+	fh.ImmediateDestinationName = "Federal Reserve Bank"
+	fh.ImmediateOriginName = "My Bank Name"
+
+	bh := ach.NewBatchHeader()
+	bh.ServiceClassCode = ach.MixedDebitsAndCredits
+	bh.CompanyName = "Name on Account"
+	bh.CompanyIdentification = fh.ImmediateOrigin
+	bh.StandardEntryClassCode = ach.PPD
+	bh.CompanyEntryDescription = "REG.SALARY"
+	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102")
+	bh.ODFIIdentification = "121042882"
+	bh.ID = "433333"
+	b, _ := ach.NewBatch(bh)
+
+	entryOne := ach.NewEntryDetail()
+	entryOne.TransactionCode = ach.CheckingDebit
+	entryOne.SetRDFI("231380104")
+	entryOne.DFIAccountNumber = "123456789"
+	entryOne.Amount = 200000000
+	entryOne.SetTraceNumber(bh.ODFIIdentification, 1)
+	entryOne.IndividualName = "Debit Account"
+
+	entryTwo := ach.NewEntryDetail()
+	entryTwo.TransactionCode = ach.CheckingCredit
+	entryTwo.SetRDFI("231380104")
+	entryTwo.DFIAccountNumber = "987654321"
+	entryTwo.Amount = 100000000
+	entryTwo.SetTraceNumber(bh.ODFIIdentification, 2)
+	entryTwo.IndividualName = "Credit Account 1"
+
+	entryThree := ach.NewEntryDetail()
+	entryThree.TransactionCode = ach.CheckingCredit
+	entryThree.SetRDFI("231380104")
+	entryThree.DFIAccountNumber = "837098765"
+	entryThree.Amount = 100000000
+	entryThree.SetTraceNumber(bh.ODFIIdentification, 3)
+	entryThree.IndividualName = "Credit Account 2"
+
+	b.AddEntry(entryOne)
+	b.AddEntry(entryTwo)
+	b.AddEntry(entryThree)
+	if err := b.Create(); err != nil {
+		t.Fatalf("Unexpected error building batch: %s\n", err)
+	}
+
+	file := ach.NewFile()
+	file.SetHeader(fh)
+	file.AddBatch(b)
+	if err := file.Create(); err != nil {
+		log.Fatalf("Unexpected error building file: %s\n", err)
+	}
+
+	fileID, err := s.CreateFile(&fh)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	batchID, err := s.CreateBatch("333339", b)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if batchID == "" {
+		t.Fatal("No Batch ID")
+	}
+
+	f, err := s.GetFile(fileID)
+
+	f.Create()
+
+	if err != nil {
+		t.Fatalf("expected %s received %s w/ error %s", "111333", f.ID, err)
+	}
+
+	creditFile, debitFile, err := s.SegmentFile(f)
+
+	if err != nil {
+		t.Fatalf("could not segment file w/ error %v", err)
+	}
+
+	if creditFile == nil {
+		t.Fatal("No credit File")
+	}
+
+	if debitFile == nil {
+		t.Fatal("No debit File")
+	}
+
+}
+
+// ToDo: create helper function to use for additional tests?
