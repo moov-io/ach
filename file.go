@@ -9,6 +9,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/moov-io/base"
+	"time"
 )
 
 // First position of all Record Types. These codes are uniquely assigned to
@@ -651,4 +653,103 @@ func (f *File) createFileADV() error {
 	f.ADVControl = fc
 
 	return nil
+}
+
+// SegmentFile takes a valid ACH File and returns 2 segmented ACH Files, one ACH File containing credit entries and one
+// ACH File containing debit entries.  The return is 2 Files a Credit File and Debit File, or an error.:
+// File - Credit File
+// File - Debit File
+// Error - Error or Nil
+func (f *File) SegmentFile(sfc *SegmentFileConfiguration) (*File, *File, error) {
+	// Validate the ACH File to be segmented
+	if err := f.Validate(); err != nil {
+		return nil, nil, err
+	}
+
+	creditFile := NewFile()
+	debitFile := NewFile()
+
+	for _, batch := range f.Batches {
+		bh := batch.GetHeader()
+
+		switch bh.ServiceClassCode {
+		case MixedDebitsAndCredits:
+			cbh := createSegmentFileBatchHeader(CreditsOnly, bh)
+			creditBatch, _ := NewBatch(cbh)
+
+			dbh := createSegmentFileBatchHeader(DebitsOnly, bh)
+			debitBatch, _ := NewBatch(dbh)
+
+			// Add entries
+			for _, entry := range batch.GetEntries() {
+				// Set EntryDetail.TraceNumber = "" Batch.Create calls Batch.build which will generate the TraceNumber
+				entry.TraceNumber = ""
+				switch entry.CreditOrDebit() {
+				case "C":
+					creditBatch.AddEntry(entry)
+				case "D":
+					debitBatch.AddEntry(entry)
+				}
+			}
+
+			// Create credit Batch and add Batch to File
+			creditBatch.Create()
+			creditFile.AddBatch(creditBatch)
+
+			// Create debit Batch and add  Batch to File
+			debitBatch.Create()
+			debitFile.AddBatch(debitBatch)
+		case CreditsOnly:
+			creditFile.AddBatch(batch)
+		case DebitsOnly:
+			debitFile.AddBatch(batch)
+		}
+	}
+
+	// Additional Sorting to be FI specific
+
+	// return error if either file does not have batches
+	if creditFile.Batches == nil || debitFile.Batches == nil {
+		return nil, nil, ErrFileNoBatches
+
+	}
+
+	f.addFileHeaderData(creditFile)
+	creditFile.Create()
+	creditFile.Validate()
+
+	f.addFileHeaderData(debitFile)
+	debitFile.Create()
+	debitFile.Validate()
+
+	return creditFile, debitFile, nil
+}
+
+// createSegmentFileBatchHeader adds BatchHeader data for a debit/credit Segment File
+func createSegmentFileBatchHeader(serviceClassCode int, bh *BatchHeader) *BatchHeader {
+	rbh := NewBatchHeader()
+	rbh.ServiceClassCode = serviceClassCode
+	rbh.CompanyName = bh.CompanyName
+	rbh.CompanyDiscretionaryData = bh.CompanyDiscretionaryData
+	rbh.CompanyIdentification = bh.CompanyIdentification
+	rbh.StandardEntryClassCode = bh.StandardEntryClassCode
+	rbh.CompanyEntryDescription = bh.CompanyEntryDescription
+	rbh.CompanyDescriptiveDate = bh.CompanyDescriptiveDate
+	rbh.EffectiveEntryDate = bh.EffectiveEntryDate
+	rbh.settlementDate = bh.settlementDate
+	rbh.OriginatorStatusCode = bh.OriginatorStatusCode
+	rbh.ODFIIdentification = bh.ODFIIdentification
+	return rbh
+}
+
+// addFileHeaderData adds FileHeader data for a debit/credit Segment File
+func (f *File) addFileHeaderData(file *File) *File {
+	file.Header.ID = base.ID()
+	file.Header.ImmediateOrigin = f.Header.ImmediateOrigin
+	file.Header.ImmediateDestination = f.Header.ImmediateDestination
+	file.Header.FileCreationDate = time.Now().Format("060102")
+	file.Header.FileCreationTime = time.Now().AddDate(0, 0, 1).Format("1504") // HHmm
+	file.Header.ImmediateDestinationName = f.Header.ImmediateDestinationName
+	file.Header.ImmediateOriginName = f.Header.ImmediateOriginName
+	return file
 }

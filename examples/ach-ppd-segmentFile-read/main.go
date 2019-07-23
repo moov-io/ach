@@ -1,20 +1,24 @@
+// Copyright 2019 The Moov Authors
+// Use of this source code is governed by an Apache License
+// license that can be found in the LICENSE file.
+
 package main
 
 import (
 	"fmt"
+	"github.com/moov-io/ach"
 	"log"
 	"os"
-
-	"github.com/moov-io/ach"
+	"path/filepath"
 )
 
 func main() {
 	// open a file for reading. Any io.Reader Can be used
-	f, err := os.Open("ppd-credit.ach")
+	fCredit, err := os.Open(filepath.Join("examples", "ach-ppd-segmentFile-read", "segmentFile-ppd-credit.ach"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	r := ach.NewReader(f)
+	r := ach.NewReader(fCredit)
 	achFile, err := r.Read()
 	if err != nil {
 		fmt.Printf("Issue reading file: %+v \n", err)
@@ -28,12 +32,12 @@ func main() {
 		fmt.Printf("Could not create file with read properties: %v", err)
 	}
 
-	fmt.Printf("File Name: %s \n\n", f.Name())
+	fmt.Printf("File Name: %s \n\n", fCredit.Name())
 	fmt.Printf("Total Credit Amount: %v \n", achFile.Control.TotalCreditEntryDollarAmountInFile)
 	fmt.Printf("SEC Code: %v \n\n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
 
 	// open a file for reading. Any io.Reader Can be used
-	fDebit, err := os.Open("ppd-debit.ach")
+	fDebit, err := os.Open(filepath.Join("examples", "ach-ppd-segmentFile-read", "segmentFile-ppd-debit.ach"))
 	if err != nil {
 		log.Fatal(err)
 	}
