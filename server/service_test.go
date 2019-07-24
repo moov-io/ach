@@ -456,9 +456,95 @@ func TestSegmentFileDebitsOnly(t *testing.T) {
 		t.Fatalf("expected %s received %s w/ error %s", "111333", f.ID, err)
 	}
 
-	_, _, err = s.SegmentFile(f)
+	creditFile, debitFile, err := s.SegmentFile(f)
 
 	if err != nil {
 		t.Fatalf("could not segment file w/ error %v", err)
+	}
+
+	if len(creditFile.Batches) != 0 {
+		t.Fatal("Credit File should not have batches")
+	}
+
+	if len(debitFile.Batches) < 1 {
+		t.Fatal("Debit file should have batches")
+	}
+
+}
+
+// TestSegmentFileDebitsOnlyBatchID creates a Segmented File from an existing ACH File
+func TestSegmentFileDebitsOnlyBatchID(t *testing.T) {
+	s := mockServiceInMemory()
+
+	fh := ach.NewFileHeader()
+	fh.ID = "333339"
+	fh.ImmediateDestination = "231380104"
+	fh.ImmediateOrigin = "121042882"
+	fh.FileCreationDate = time.Now().Format("060102")
+	fh.FileCreationTime = time.Now().AddDate(0, 0, 1).Format("1504") // HHmm
+	fh.ImmediateDestinationName = "Federal Reserve Bank"
+	fh.ImmediateOriginName = "My Bank Name"
+
+	bh := ach.NewBatchHeader()
+	bh.ServiceClassCode = ach.DebitsOnly
+	bh.CompanyName = "Name on Account"
+	bh.CompanyIdentification = fh.ImmediateOrigin
+	bh.StandardEntryClassCode = ach.PPD
+	bh.CompanyEntryDescription = "REG.SALARY"
+	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102")
+	bh.ODFIIdentification = "121042882"
+	bh.ID = "433333"
+	b, _ := ach.NewBatch(bh)
+
+	entryOne := ach.NewEntryDetail()
+	entryOne.TransactionCode = ach.CheckingDebit
+	entryOne.SetRDFI("231380104")
+	entryOne.DFIAccountNumber = "123456789"
+	entryOne.Amount = 200000000
+	entryOne.SetTraceNumber(bh.ODFIIdentification, 1)
+	entryOne.IndividualName = "Debit Account"
+
+	b.AddEntry(entryOne)
+	if err := b.Create(); err != nil {
+		t.Fatalf("Unexpected error building batch: %s\n", err)
+	}
+
+	file := ach.NewFile()
+	file.SetHeader(fh)
+	file.AddBatch(b)
+	if err := file.Create(); err != nil {
+		log.Fatalf("Unexpected error building file: %s\n", err)
+	}
+
+	fileID, err := s.CreateFile(&fh)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	batchID, err := s.CreateBatch("333339", b)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if batchID == "" {
+		t.Fatal("No Batch ID")
+	}
+
+	f, err := s.GetFile(fileID)
+
+	f.Create()
+
+	if err != nil {
+		t.Fatalf("expected %s received %s w/ error %s", "111333", f.ID, err)
+	}
+
+	_, debitFile, err := s.SegmentFile(f)
+
+	if err != nil {
+		t.Fatalf("could not segment file w/ error %v", err)
+	}
+
+	if debitFile.Batches[0].ID() == "" {
+		t.Fatal("No Batch ID")
 	}
 }
