@@ -144,5 +144,4 @@ func TestFiles__segmentFileEndpoint(t *testing.T) {
 	if err == nil || r.Err == nil {
 		t.Errorf("expected error: err=%v resp.Err=%v", err, r.Err)
 	}
-
 }

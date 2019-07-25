@@ -332,7 +332,7 @@ func decodeValidateFileRequest(_ context.Context, r *http.Request) (interface{},
 }
 
 type segmentFileRequest struct {
-	ID string
+	fileID string
 
 	requestId string
 }
@@ -353,16 +353,7 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 			}, err
 		}
 
-		f, err := s.GetFile(req.ID)
-
-		if req.requestId != "" && logger != nil {
-			logger.Log("files", "getFile", "requestId", req.requestId, "error", err)
-		}
-		if err != nil {
-			return getFileResponse{Err: err}, nil
-		}
-
-		creditFile, debitFile, err := s.SegmentFile(f)
+		creditFile, debitFile, err := s.SegmentFile(req.fileID)
 
 		if req.requestId != "" && logger != nil {
 			logger.Log("files", "segmentFile", "requestId", req.requestId, "error", err)
@@ -394,12 +385,12 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 
 func decodeSegmentFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	vars := mux.Vars(r)
-	id, ok := vars["id"]
+	fileID, ok := vars["fileID"]
 	if !ok {
 		return nil, ErrBadRouting
 	}
 	return segmentFileRequest{
-		ID:        id,
+		fileID:    fileID,
 		requestId: moovhttp.GetRequestId(r),
 	}, nil
 }

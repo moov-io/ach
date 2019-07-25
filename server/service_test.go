@@ -349,15 +349,7 @@ func TestSegmentFile(t *testing.T) {
 		t.Fatal("No Batch ID")
 	}
 
-	f, err := s.GetFile(fileID)
-
-	f.Create()
-
-	if err != nil {
-		t.Fatalf("expected %s received %s w/ error %s", "111333", f.ID, err)
-	}
-
-	creditFile, debitFile, err := s.SegmentFile(f)
+	creditFile, debitFile, err := s.SegmentFile(fileID)
 
 	if err != nil {
 		t.Fatalf("could not segment file w/ error %v", err)
@@ -375,13 +367,7 @@ func TestSegmentFile(t *testing.T) {
 // TestSegmentFile_FileValidateError return an error on file Validation
 func TestSegmentFileError(t *testing.T) {
 	s := mockServiceInMemory()
-	f, err := s.GetFile("98765")
-
-	if err != nil {
-		t.Fatalf("could not get the file w/ error %v", err)
-	}
-
-	_, _, err = s.SegmentFile(f)
+	_, _, err := s.SegmentFile("98765")
 
 	if err != nil {
 		if !base.Match(err, ach.ErrConstructor) {
@@ -448,15 +434,7 @@ func TestSegmentFileDebitsOnly(t *testing.T) {
 		t.Fatal("No Batch ID")
 	}
 
-	f, err := s.GetFile(fileID)
-
-	f.Create()
-
-	if err != nil {
-		t.Fatalf("expected %s received %s w/ error %s", "111333", f.ID, err)
-	}
-
-	creditFile, debitFile, err := s.SegmentFile(f)
+	creditFile, debitFile, err := s.SegmentFile(fileID)
 
 	if err != nil {
 		t.Fatalf("could not segment file w/ error %v", err)
@@ -530,15 +508,7 @@ func TestSegmentFileDebitsOnlyBatchID(t *testing.T) {
 		t.Fatal("No Batch ID")
 	}
 
-	f, err := s.GetFile(fileID)
-
-	f.Create()
-
-	if err != nil {
-		t.Fatalf("expected %s received %s w/ error %s", "111333", f.ID, err)
-	}
-
-	_, debitFile, err := s.SegmentFile(f)
+	_, debitFile, err := s.SegmentFile(fileID)
 
 	if err != nil {
 		t.Fatalf("could not segment file w/ error %v", err)

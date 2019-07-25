@@ -35,7 +35,8 @@ type Service interface {
 	// ValidateFile
 	ValidateFile(id string) error
 	// SegmentFile
-	SegmentFile(file *ach.File) (*ach.File, *ach.File, error)
+	// SegmentFile(file *ach.File) (*ach.File, *ach.File, error)
+	SegmentFile(id string) (*ach.File, *ach.File, error)
 
 	// CreateBatch creates a new batch within and ach file and returns its resource ID
 	CreateBatch(fileID string, bh ach.Batcher) (string, error)
@@ -166,7 +167,7 @@ func (s *service) DeleteBatch(fileID string, batchID string) error {
 	return s.store.DeleteBatch(fileID, batchID)
 }
 
-// SegmentFile takes an ACH File and segments the files into a credit ACH File and debit ACH File and adds to in memory storage.
+/*// SegmentFile takes an ACH File and segments the files into a credit ACH File and debit ACH File and adds to in memory storage.
 func (s *service) SegmentFile(f *ach.File) (*ach.File, *ach.File, error) {
 	sfc := ach.NewSegmentFileConfiguration()
 	creditFile, debitFile, err := f.SegmentFile(sfc)
@@ -175,5 +176,26 @@ func (s *service) SegmentFile(f *ach.File) (*ach.File, *ach.File, error) {
 		return nil, nil, err
 	}
 
+	return creditFile, debitFile, nil
+}*/
+
+// SegmentFile takes an ACH File and segments the files into a credit ACH File and debit ACH File and adds to in memory storage.
+func (s *service) SegmentFile(fileID string) (*ach.File, *ach.File, error) {
+	f, err := s.GetFile(fileID)
+	if err != nil {
+		return nil, nil, err
+	}
+	// File Create in the case a file is malformed.
+
+	if err := f.Create(); err != nil {
+		return nil, nil, err
+	}
+
+	sfc := ach.NewSegmentFileConfiguration()
+	creditFile, debitFile, err := f.SegmentFile(sfc)
+
+	if err != nil {
+		return nil, nil, err
+	}
 	return creditFile, debitFile, nil
 }

@@ -157,7 +157,7 @@ func MakeHTTPHandler(s Service, repo Repository, logger log.Logger) http.Handler
 		encodeResponse,
 		options...,
 	))
-	r.Methods("POST").Path("/files/{id}/segment").Handler(httptransport.NewServer(
+	r.Methods("POST").Path("/files/{fileID}/segment").Handler(httptransport.NewServer(
 		segmentFileEndpoint(s, repo, logger),
 		decodeSegmentFileRequest,
 		encodeResponse,
