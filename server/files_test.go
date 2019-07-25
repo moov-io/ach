@@ -120,6 +120,9 @@ func TestFiles__validateFileEndpoint(t *testing.T) {
 	router.Methods("GET").Path("/files/{id}/validate").Handler(
 		httptransport.NewServer(validateFileEndpoint(svc, nil), decodeValidateFileRequest, encodeResponse),
 	)
+
+	req.Header.Set("Origin", "https://moov.io")
+	req.Header.Set("X-Request-Id", "55555")
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -131,7 +134,7 @@ func TestFiles__validateFileEndpoint(t *testing.T) {
 	}
 }
 
-func TestFiles__segmentFileEndpointError(t *testing.T) {
+func TestFilesError__segmentFileEndpoint(t *testing.T) {
 	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)
 
@@ -148,7 +151,7 @@ func TestFiles__segmentFileEndpointError(t *testing.T) {
 
 func TestFiles__segmentFileEndpoint(t *testing.T) {
 	logger := log.NewNopLogger()
-	repo := NewRepositoryInMemory(testTTLDuration, nil)
+	repo := NewRepositoryInMemory(testTTLDuration, logger)
 	svc := NewService(repo)
 	router := MakeHTTPHandler(svc, repo, logger)
 
@@ -174,4 +177,83 @@ func TestFiles__segmentFileEndpoint(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Errorf("bogus HTTP status: %d", w.Code)
 	}
+}
+
+func TestFilesByID__getFileEndpoint(t *testing.T) {
+	logger := log.NewNopLogger()
+	repo := NewRepositoryInMemory(testTTLDuration, logger)
+	svc := NewService(repo)
+	router := MakeHTTPHandler(svc, repo, logger)
+
+	// write an ACH file into repository
+	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-valid.json"))
+	if fd == nil {
+		t.Fatalf("empty ACH file: %v", err)
+	}
+	defer fd.Close()
+	bs, _ := ioutil.ReadAll(fd)
+	file, _ := ach.FileFromJSON(bs)
+	repo.StoreFile(file)
+
+	// test status code
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", fmt.Sprintf("/files/%s", file.ID), nil)
+	req.Header.Set("Origin", "https://moov.io")
+	req.Header.Set("X-Request-Id", "11112")
+
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+
+}
+
+func TestFilesByID__deleteFileEndpoint(t *testing.T) {
+	logger := log.NewNopLogger()
+	repo := NewRepositoryInMemory(testTTLDuration, logger)
+	svc := NewService(repo)
+	router := MakeHTTPHandler(svc, repo, logger)
+
+	// write an ACH file into repository
+	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-valid.json"))
+	if fd == nil {
+		t.Fatalf("empty ACH file: %v", err)
+	}
+	defer fd.Close()
+	bs, _ := ioutil.ReadAll(fd)
+	file, _ := ach.FileFromJSON(bs)
+	repo.StoreFile(file)
+
+	// test status code
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("DELETE", fmt.Sprintf("/files/%s", file.ID), nil)
+	req.Header.Set("Origin", "https://moov.io")
+	req.Header.Set("X-Request-Id", "11113")
+
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+
+}
+
+func TestFiles__deleteFileEndpoint(t *testing.T) {
+	repo := NewRepositoryInMemory(testTTLDuration, nil)
+	svc := NewService(repo)
+
+	body := strings.NewReader(`{"random":"json"}`)
+
+	resp, err := deleteFileEndpoint(svc, nil)(context.TODO(), body)
+	r, ok := resp.(deleteFileResponse)
+	if !ok {
+		t.Errorf("got %#v", resp)
+	}
+	if err == nil || r.Err == nil {
+		t.Errorf("expected error: err=%v resp.Err=%v", err, r.Err)
+	}
+
 }
