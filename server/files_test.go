@@ -129,3 +129,20 @@ func TestFiles__validateFileEndpoint(t *testing.T) {
 		t.Errorf("unknown error: %v", err)
 	}
 }
+
+func TestFiles__segmentFileEndpoint(t *testing.T) {
+	repo := NewRepositoryInMemory(testTTLDuration, nil)
+	svc := NewService(repo)
+
+	body := strings.NewReader(`{"id":"333339"}`)
+
+	resp, err := segmentFileEndpoint(svc, repo, nil)(context.TODO(), body)
+	r, ok := resp.(segmentFileResponse)
+	if !ok {
+		t.Errorf("got %#v", resp)
+	}
+	if err == nil || r.Err == nil {
+		t.Errorf("expected error: err=%v resp.Err=%v", err, r.Err)
+	}
+
+}

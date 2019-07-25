@@ -330,3 +330,76 @@ func decodeValidateFileRequest(_ context.Context, r *http.Request) (interface{},
 		requestId: moovhttp.GetRequestId(r),
 	}, nil
 }
+
+type segmentFileRequest struct {
+	ID string
+
+	requestId string
+}
+
+type segmentFileResponse struct {
+	creditFileID string `json:"creditFileID"`
+	debitFileID  string `json:"debitFileID"`
+	Err          error  `json:"error"`
+}
+
+func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req, ok := request.(segmentFileRequest)
+		if !ok {
+			err := errors.New("invalid request")
+			return segmentFileResponse{
+				Err: err,
+			}, err
+		}
+
+		f, err := s.GetFile(req.ID)
+
+		if req.requestId != "" && logger != nil {
+			logger.Log("files", "getFile", "requestId", req.requestId, "error", err)
+		}
+		if err != nil {
+			return getFileResponse{Err: err}, nil
+		}
+
+		creditFile, debitFile, err := s.SegmentFile(f)
+
+		if req.requestId != "" && logger != nil {
+			logger.Log("files", "segmentFile", "requestId", req.requestId, "error", err)
+		}
+		if err != nil {
+			return segmentFileResponse{Err: err}, nil
+		}
+
+		if creditFile.ID != "" {
+			err = r.StoreFile(creditFile)
+			if req.requestId != "" && logger != nil {
+				logger.Log("files", "storeCreditFile", "requestId", req.requestId, "error", err)
+			}
+		}
+
+		if debitFile.ID != "" {
+			err = r.StoreFile(debitFile)
+			if req.requestId != "" && logger != nil {
+				logger.Log("files", "storeDebitFile", "requestId", req.requestId, "error", err)
+			}
+		}
+		return segmentFileResponse{
+			creditFileID: creditFile.ID,
+			debitFileID:  debitFile.ID,
+			Err:          err,
+		}, nil
+	}
+}
+
+func decodeSegmentFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	id, ok := vars["id"]
+	if !ok {
+		return nil, ErrBadRouting
+	}
+	return segmentFileRequest{
+		ID:        id,
+		requestId: moovhttp.GetRequestId(r),
+	}, nil
+}
