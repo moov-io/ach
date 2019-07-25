@@ -686,14 +686,26 @@ func (f *File) SegmentFile(sfc *SegmentFileConfiguration) (*File, *File, error) 
 			debitBatch, _ := NewBatch(dbh)
 
 			// Add entries
-			for _, entry := range batch.GetEntries() {
-				// Set EntryDetail.TraceNumber = "" Batch.Create calls Batch.build which will generate the TraceNumber
-				entry.TraceNumber = ""
-				switch entry.CreditOrDebit() {
-				case "C":
-					creditBatch.AddEntry(entry)
-				case "D":
-					debitBatch.AddEntry(entry)
+			if bh.StandardEntryClassCode == ADV {
+				for _, entry := range batch.GetADVEntries() {
+					switch entry.TransactionCode {
+					case CreditForDebitsOriginated, CreditForCreditsReceived, CreditForCreditsRejected, CreditSummary:
+						creditBatch.AddADVEntry(entry)
+
+					case DebitForCreditsOriginated, DebitForDebitsReceived, DebitForDebitsRejectedBatches, DebitSummary:
+						debitBatch.AddADVEntry(entry)
+					}
+				}
+			} else {
+				for _, entry := range batch.GetEntries() {
+					entry.TraceNumber = "" // unset so Batch.build generates a TraceNumber
+
+					switch entry.CreditOrDebit() {
+					case "C":
+						creditBatch.AddEntry(entry)
+					case "D":
+						debitBatch.AddEntry(entry)
+					}
 				}
 			}
 
@@ -706,8 +718,10 @@ func (f *File) SegmentFile(sfc *SegmentFileConfiguration) (*File, *File, error) 
 			if err := debitBatch.Create(); err == nil {
 				debitFile.AddBatch(debitBatch)
 			}
+
 		case CreditsOnly:
 			creditFile.AddBatch(batch)
+
 		case DebitsOnly:
 			debitFile.AddBatch(batch)
 		}

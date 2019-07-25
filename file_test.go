@@ -1145,6 +1145,53 @@ func TestFile__SegmentFileDebitOnly(t *testing.T) {
 
 }
 
+func TestFile__SegmentADVFile(t *testing.T) {
+	bs, err := ioutil.ReadFile(filepath.Join("test", "testdata", "adv-valid.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	f, err := FileFromJSON(bs)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	creditFile, debitFile, err := f.SegmentFile(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !creditFile.IsADV() || !debitFile.IsADV() {
+		t.Errorf("creditFile.IsADV=%v debitFile.IsADV=%v", creditFile.IsADV(), debitFile.IsADV())
+	}
+	if len(creditFile.Batches) != 1 || len(debitFile.Batches) != 1 {
+		t.Errorf("credit: batches=%d | debit: batches=%d", len(creditFile.Batches), len(debitFile.Batches))
+	}
+
+	creditADVEntries := creditFile.Batches[0].GetADVEntries()
+	debitADVEntries := debitFile.Batches[0].GetADVEntries()
+
+	if len(creditADVEntries) != 1 || len(debitADVEntries) != 0 {
+		t.Errorf("creditADVEntries=%d debitADVEntries=%d", len(creditADVEntries), len(debitADVEntries))
+	}
+
+	entry := creditADVEntries[0]
+	if entry.ID != "adv-01" {
+		t.Errorf("ADV entry: %#v", entry)
+	}
+	if entry.TransactionCode != CreditForDebitsOriginated {
+		t.Errorf("ADV entry: %#v", entry)
+	}
+	if entry.AdviceRoutingNumber != "121042882" {
+		t.Errorf("ADV entry: %#v", entry)
+	}
+	if entry.FileIdentification != "11131" {
+		t.Errorf("ADV entry: %#v", entry)
+	}
+	if entry.ACHOperatorRoutingNumber != "01100001" {
+		t.Errorf("ADV entry: %#v", entry)
+	}
+}
+
 func TestSegmentFile_FileHeaderError(t *testing.T) {
 	achFile := NewFile()
 
