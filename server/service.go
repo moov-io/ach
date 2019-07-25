@@ -167,18 +167,6 @@ func (s *service) DeleteBatch(fileID string, batchID string) error {
 	return s.store.DeleteBatch(fileID, batchID)
 }
 
-/*// SegmentFile takes an ACH File and segments the files into a credit ACH File and debit ACH File and adds to in memory storage.
-func (s *service) SegmentFile(f *ach.File) (*ach.File, *ach.File, error) {
-	sfc := ach.NewSegmentFileConfiguration()
-	creditFile, debitFile, err := f.SegmentFile(sfc)
-
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return creditFile, debitFile, nil
-}*/
-
 // SegmentFile takes an ACH File and segments the files into a credit ACH File and debit ACH File and adds to in memory storage.
 func (s *service) SegmentFile(fileID string) (*ach.File, *ach.File, error) {
 	f, err := s.GetFile(fileID)

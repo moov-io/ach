@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-kit/kit/log"
+	"github.com/moov-io/base"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -134,6 +135,7 @@ func TestFiles__validateFileEndpoint(t *testing.T) {
 	}
 }
 
+// TestFilesError__segmentFileEndpoint test an error returned from segmentFileEndpoint
 func TestFilesError__segmentFileEndpoint(t *testing.T) {
 	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)
@@ -149,6 +151,7 @@ func TestFilesError__segmentFileEndpoint(t *testing.T) {
 
 }
 
+// TestFiles__segmentFileEndpoint tests segmentFileEndpoints
 func TestFiles__segmentFileEndpoint(t *testing.T) {
 	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)
@@ -179,6 +182,20 @@ func TestFiles__segmentFileEndpoint(t *testing.T) {
 	}
 }
 
+// TestFiles__decodeSegmentFileRequest tests segmentFileEndpoints
+func TestFiles__decodeSegmentFileRequest(t *testing.T) {
+	req := httptest.NewRequest("POST", fmt.Sprintf("/files/segment"), nil)
+	req.Header.Set("Origin", "https://moov.io")
+	req.Header.Set("X-Request-Id", "11111")
+
+	_, err := decodeSegmentFileRequest(context.TODO(), req)
+
+	if !base.Match(err, ErrBadRouting) {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestFilesByID__getFileEndpoint tests getFileEndpoint by File ID
 func TestFilesByID__getFileEndpoint(t *testing.T) {
 	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)
@@ -210,6 +227,7 @@ func TestFilesByID__getFileEndpoint(t *testing.T) {
 
 }
 
+// TestFileContentsByID__getFileContentsEndpoint tests getFileContentsEndpoint by File ID
 func TestFileContentsByID__getFileContentsEndpoint(t *testing.T) {
 	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)
@@ -241,6 +259,7 @@ func TestFileContentsByID__getFileContentsEndpoint(t *testing.T) {
 
 }
 
+// TestFilesByID__deleteFileEndpoint tests by File ID
 func TestFilesByID__deleteFileEndpoint(t *testing.T) {
 	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)
@@ -272,7 +291,8 @@ func TestFilesByID__deleteFileEndpoint(t *testing.T) {
 
 }
 
-func TestFiles__deleteFileEndpoint(t *testing.T) {
+// TestFilesError__deleteFileEndpoint tests error returned for deleteFileEndpoint
+func TestFilesError__deleteFileEndpoint(t *testing.T) {
 	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)
 
@@ -289,6 +309,7 @@ func TestFiles__deleteFileEndpoint(t *testing.T) {
 
 }
 
+// TestFiles__CreateFileEndpoint test CreateFileEndpoint
 func TestFiles__CreateFileEndpoint(t *testing.T) {
 	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)
