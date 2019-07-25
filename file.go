@@ -666,6 +666,7 @@ func (f *File) createFileADV() error {
 // be rejected by other Financial Institutions or ACH tools.
 func (f *File) SegmentFile(sfc *SegmentFileConfiguration) (*File, *File, error) {
 	// Validate the ACH File to be segmented
+
 	if err := f.Validate(); err != nil {
 		return nil, nil, err
 	}
@@ -697,12 +698,14 @@ func (f *File) SegmentFile(sfc *SegmentFileConfiguration) (*File, *File, error) 
 			}
 
 			// Create credit Batch and add Batch to File
-			creditBatch.Create()
-			creditFile.AddBatch(creditBatch)
+			if err := creditBatch.Create(); err == nil {
+				creditFile.AddBatch(creditBatch)
+			}
 
 			// Create debit Batch and add  Batch to File
-			debitBatch.Create()
-			debitFile.AddBatch(debitBatch)
+			if err := debitBatch.Create(); err == nil {
+				debitFile.AddBatch(debitBatch)
+			}
 		case CreditsOnly:
 			creditFile.AddBatch(batch)
 		case DebitsOnly:
@@ -720,8 +723,12 @@ func (f *File) SegmentFile(sfc *SegmentFileConfiguration) (*File, *File, error) 
 
 	if len(debitFile.Batches) != 0 {
 		f.addFileHeaderData(debitFile)
-		debitFile.Create()
-		debitFile.Validate()
+		if err := debitFile.Create(); err != nil {
+			return nil, nil, err
+		}
+		if err := debitFile.Validate(); err != nil {
+			return nil, nil, err
+		}
 	}
 
 	return creditFile, debitFile, nil
