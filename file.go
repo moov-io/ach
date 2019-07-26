@@ -660,8 +660,13 @@ func (f *File) createFileADV() error {
 // File - Credit File
 // File - Debit File
 // Error - Error or Nil
+// Callers should always check for a nil-error before using the returned file.
+//
+// The File returned may not be valid and callers should confirm with Validate(). Invalid files may
+// be rejected by other Financial Institutions or ACH tools.
 func (f *File) SegmentFile(sfc *SegmentFileConfiguration) (*File, *File, error) {
 	// Validate the ACH File to be segmented
+
 	if err := f.Validate(); err != nil {
 		return nil, nil, err
 	}
@@ -693,12 +698,14 @@ func (f *File) SegmentFile(sfc *SegmentFileConfiguration) (*File, *File, error) 
 			}
 
 			// Create credit Batch and add Batch to File
-			creditBatch.Create()
-			creditFile.AddBatch(creditBatch)
+			if err := creditBatch.Create(); err == nil {
+				creditFile.AddBatch(creditBatch)
+			}
 
 			// Create debit Batch and add  Batch to File
-			debitBatch.Create()
-			debitFile.AddBatch(debitBatch)
+			if err := debitBatch.Create(); err == nil {
+				debitFile.AddBatch(debitBatch)
+			}
 		case CreditsOnly:
 			creditFile.AddBatch(batch)
 		case DebitsOnly:
@@ -708,19 +715,21 @@ func (f *File) SegmentFile(sfc *SegmentFileConfiguration) (*File, *File, error) 
 
 	// Additional Sorting to be FI specific
 
-	// return error if either file does not have batches
-	if creditFile.Batches == nil || debitFile.Batches == nil {
-		return nil, nil, ErrFileNoBatches
-
+	if len(creditFile.Batches) != 0 {
+		f.addFileHeaderData(creditFile)
+		creditFile.Create()
+		creditFile.Validate()
 	}
 
-	f.addFileHeaderData(creditFile)
-	creditFile.Create()
-	creditFile.Validate()
-
-	f.addFileHeaderData(debitFile)
-	debitFile.Create()
-	debitFile.Validate()
+	if len(debitFile.Batches) != 0 {
+		f.addFileHeaderData(debitFile)
+		if err := debitFile.Create(); err != nil {
+			return nil, nil, err
+		}
+		if err := debitFile.Validate(); err != nil {
+			return nil, nil, err
+		}
+	}
 
 	return creditFile, debitFile, nil
 }
@@ -728,6 +737,7 @@ func (f *File) SegmentFile(sfc *SegmentFileConfiguration) (*File, *File, error) 
 // createSegmentFileBatchHeader adds BatchHeader data for a debit/credit Segment File
 func createSegmentFileBatchHeader(serviceClassCode int, bh *BatchHeader) *BatchHeader {
 	rbh := NewBatchHeader()
+	rbh.ID = base.ID()
 	rbh.ServiceClassCode = serviceClassCode
 	rbh.CompanyName = bh.CompanyName
 	rbh.CompanyDiscretionaryData = bh.CompanyDiscretionaryData
@@ -744,6 +754,7 @@ func createSegmentFileBatchHeader(serviceClassCode int, bh *BatchHeader) *BatchH
 
 // addFileHeaderData adds FileHeader data for a debit/credit Segment File
 func (f *File) addFileHeaderData(file *File) *File {
+	file.ID = base.ID()
 	file.Header.ID = base.ID()
 	file.Header.ImmediateOrigin = f.Header.ImmediateOrigin
 	file.Header.ImmediateDestination = f.Header.ImmediateDestination

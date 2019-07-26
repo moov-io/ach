@@ -5,9 +5,12 @@
 package server
 
 import (
+	"github.com/moov-io/base"
 	"io/ioutil"
+	"log"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/moov-io/ach"
 )
@@ -267,5 +270,251 @@ func TestDeleteBatch(t *testing.T) {
 	err := s.DeleteBatch("98765", "54321")
 	if err != nil {
 		t.Errorf("expected %s received error %v", "nil", err)
+	}
+}
+
+// TestSegmentFile creates a Segmented File from an existing ACH File
+func TestSegmentFile(t *testing.T) {
+	s := mockServiceInMemory()
+
+	fh := ach.NewFileHeader()
+	fh.ID = "333339"
+	fh.ImmediateDestination = "231380104"
+	fh.ImmediateOrigin = "121042882"
+	fh.FileCreationDate = time.Now().Format("060102")
+	fh.FileCreationTime = time.Now().AddDate(0, 0, 1).Format("1504") // HHmm
+	fh.ImmediateDestinationName = "Federal Reserve Bank"
+	fh.ImmediateOriginName = "My Bank Name"
+
+	bh := ach.NewBatchHeader()
+	bh.ServiceClassCode = ach.MixedDebitsAndCredits
+	bh.CompanyName = "Name on Account"
+	bh.CompanyIdentification = fh.ImmediateOrigin
+	bh.StandardEntryClassCode = ach.PPD
+	bh.CompanyEntryDescription = "REG.SALARY"
+	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102")
+	bh.ODFIIdentification = "121042882"
+	bh.ID = "433333"
+	b, _ := ach.NewBatch(bh)
+
+	entryOne := ach.NewEntryDetail()
+	entryOne.TransactionCode = ach.CheckingDebit
+	entryOne.SetRDFI("231380104")
+	entryOne.DFIAccountNumber = "123456789"
+	entryOne.Amount = 200000000
+	entryOne.SetTraceNumber(bh.ODFIIdentification, 1)
+	entryOne.IndividualName = "Debit Account"
+
+	entryTwo := ach.NewEntryDetail()
+	entryTwo.TransactionCode = ach.CheckingCredit
+	entryTwo.SetRDFI("231380104")
+	entryTwo.DFIAccountNumber = "987654321"
+	entryTwo.Amount = 100000000
+	entryTwo.SetTraceNumber(bh.ODFIIdentification, 2)
+	entryTwo.IndividualName = "Credit Account 1"
+
+	entryThree := ach.NewEntryDetail()
+	entryThree.TransactionCode = ach.CheckingCredit
+	entryThree.SetRDFI("231380104")
+	entryThree.DFIAccountNumber = "837098765"
+	entryThree.Amount = 100000000
+	entryThree.SetTraceNumber(bh.ODFIIdentification, 3)
+	entryThree.IndividualName = "Credit Account 2"
+
+	b.AddEntry(entryOne)
+	b.AddEntry(entryTwo)
+	b.AddEntry(entryThree)
+	if err := b.Create(); err != nil {
+		t.Fatalf("Unexpected error building batch: %s\n", err)
+	}
+
+	file := ach.NewFile()
+	file.SetHeader(fh)
+	file.AddBatch(b)
+	if err := file.Create(); err != nil {
+		log.Fatalf("Unexpected error building file: %s\n", err)
+	}
+
+	fileID, err := s.CreateFile(&fh)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	batchID, err := s.CreateBatch("333339", b)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if batchID == "" {
+		t.Fatal("No Batch ID")
+	}
+
+	creditFile, debitFile, err := s.SegmentFile(fileID)
+
+	if err != nil {
+		t.Fatalf("could not segment file w/ error %v", err)
+	}
+
+	if creditFile == nil {
+		t.Fatal("No credit File")
+	}
+
+	if debitFile == nil {
+		t.Fatal("No debit File")
+	}
+}
+
+// TestSegmentFile_FileValidateError return an error on file Validation
+func TestSegmentFileError(t *testing.T) {
+	s := mockServiceInMemory()
+	_, _, err := s.SegmentFile("98765")
+
+	if err != nil {
+		if !base.Match(err, ach.ErrConstructor) {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}
+
+// TestSegmentFileDebitsOnly creates a Segmented File from an existing ACH File
+func TestSegmentFileDebitsOnly(t *testing.T) {
+	s := mockServiceInMemory()
+
+	fh := ach.NewFileHeader()
+	fh.ID = "333339"
+	fh.ImmediateDestination = "231380104"
+	fh.ImmediateOrigin = "121042882"
+	fh.FileCreationDate = time.Now().Format("060102")
+	fh.FileCreationTime = time.Now().AddDate(0, 0, 1).Format("1504") // HHmm
+	fh.ImmediateDestinationName = "Federal Reserve Bank"
+	fh.ImmediateOriginName = "My Bank Name"
+
+	bh := ach.NewBatchHeader()
+	bh.ServiceClassCode = ach.DebitsOnly
+	bh.CompanyName = "Name on Account"
+	bh.CompanyIdentification = fh.ImmediateOrigin
+	bh.StandardEntryClassCode = ach.PPD
+	bh.CompanyEntryDescription = "REG.SALARY"
+	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102")
+	bh.ODFIIdentification = "121042882"
+	bh.ID = "433333"
+	b, _ := ach.NewBatch(bh)
+
+	entryOne := ach.NewEntryDetail()
+	entryOne.TransactionCode = ach.CheckingDebit
+	entryOne.SetRDFI("231380104")
+	entryOne.DFIAccountNumber = "123456789"
+	entryOne.Amount = 200000000
+	entryOne.SetTraceNumber(bh.ODFIIdentification, 1)
+	entryOne.IndividualName = "Debit Account"
+
+	b.AddEntry(entryOne)
+	if err := b.Create(); err != nil {
+		t.Fatalf("Unexpected error building batch: %s\n", err)
+	}
+
+	file := ach.NewFile()
+	file.SetHeader(fh)
+	file.AddBatch(b)
+	if err := file.Create(); err != nil {
+		log.Fatalf("Unexpected error building file: %s\n", err)
+	}
+
+	fileID, err := s.CreateFile(&fh)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	batchID, err := s.CreateBatch("333339", b)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if batchID == "" {
+		t.Fatal("No Batch ID")
+	}
+
+	creditFile, debitFile, err := s.SegmentFile(fileID)
+
+	if err != nil {
+		t.Fatalf("could not segment file w/ error %v", err)
+	}
+
+	if len(creditFile.Batches) != 0 {
+		t.Fatal("Credit File should not have batches")
+	}
+
+	if len(debitFile.Batches) < 1 {
+		t.Fatal("Debit file should have batches")
+	}
+
+}
+
+// TestSegmentFileDebitsOnlyBatchID creates a Segmented File from an existing ACH File
+func TestSegmentFileDebitsOnlyBatchID(t *testing.T) {
+	s := mockServiceInMemory()
+
+	fh := ach.NewFileHeader()
+	fh.ID = "333339"
+	fh.ImmediateDestination = "231380104"
+	fh.ImmediateOrigin = "121042882"
+	fh.FileCreationDate = time.Now().Format("060102")
+	fh.FileCreationTime = time.Now().AddDate(0, 0, 1).Format("1504") // HHmm
+	fh.ImmediateDestinationName = "Federal Reserve Bank"
+	fh.ImmediateOriginName = "My Bank Name"
+
+	bh := ach.NewBatchHeader()
+	bh.ServiceClassCode = ach.DebitsOnly
+	bh.CompanyName = "Name on Account"
+	bh.CompanyIdentification = fh.ImmediateOrigin
+	bh.StandardEntryClassCode = ach.PPD
+	bh.CompanyEntryDescription = "REG.SALARY"
+	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102")
+	bh.ODFIIdentification = "121042882"
+	bh.ID = "433333"
+	b, _ := ach.NewBatch(bh)
+
+	entryOne := ach.NewEntryDetail()
+	entryOne.TransactionCode = ach.CheckingDebit
+	entryOne.SetRDFI("231380104")
+	entryOne.DFIAccountNumber = "123456789"
+	entryOne.Amount = 200000000
+	entryOne.SetTraceNumber(bh.ODFIIdentification, 1)
+	entryOne.IndividualName = "Debit Account"
+
+	b.AddEntry(entryOne)
+	if err := b.Create(); err != nil {
+		t.Fatalf("Unexpected error building batch: %s\n", err)
+	}
+
+	file := ach.NewFile()
+	file.SetHeader(fh)
+	file.AddBatch(b)
+	if err := file.Create(); err != nil {
+		log.Fatalf("Unexpected error building file: %s\n", err)
+	}
+
+	fileID, err := s.CreateFile(&fh)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	batchID, err := s.CreateBatch("333339", b)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if batchID == "" {
+		t.Fatal("No Batch ID")
+	}
+
+	_, debitFile, err := s.SegmentFile(fileID)
+
+	if err != nil {
+		t.Fatalf("could not segment file w/ error %v", err)
+	}
+
+	if debitFile.Batches[0].ID() == "" {
+		t.Fatal("No Batch ID")
 	}
 }

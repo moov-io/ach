@@ -206,3 +206,25 @@ func TestPreflightHandler(t *testing.T) {
 		t.Error("missing Access-Control-Allow-Credentials")
 	}
 }
+
+func TestRouting_SegmentFile(t *testing.T) {
+	logger := log.NewNopLogger()
+	r := NewRepositoryInMemory(1*time.Minute, logger)
+	svc := NewService(r)
+	router := MakeHTTPHandler(svc, r, logger)
+
+	req := httptest.NewRequest("POST", "/files/333339/segment", nil)
+	req.Header.Set("Origin", "https://moov.io")
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+
+	if v := w.Result().Header.Get("Access-Control-Allow-Origin"); v != "https://moov.io" {
+		t.Errorf("Access-Control-Allow-Origin: %s", v)
+	}
+}
