@@ -301,6 +301,13 @@ paths:
           required: false
           schema:
             type: string
+        - name: file_id
+          in: path
+          description: File ID
+          required: true
+          schema:
+            type: string
+            example: 3f2d23ee214
       requestBody:
         description: Content of the ACH file (in json or raw text)
         required: true
