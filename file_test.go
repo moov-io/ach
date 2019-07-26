@@ -1309,3 +1309,55 @@ func TestFile__SegmentFileDebitBatches(t *testing.T) {
 		t.Errorf("expected %s received %v", "1", len(debitFile.Batches))
 	}
 }
+
+func TestSegmentFile__CreditOnly(t *testing.T) {
+	// write an ACH file into repository
+	fd, err := os.Open(filepath.Join("test", "testdata", "ppd-valid.json"))
+	if fd == nil {
+		t.Fatalf("empty ACH file: %v", err)
+	}
+	defer fd.Close()
+	bs, _ := ioutil.ReadAll(fd)
+	file, _ := FileFromJSON(bs)
+
+	sfc := NewSegmentFileConfiguration()
+	creditFile, debitFile, err := file.SegmentFile(sfc)
+
+	if err != nil {
+		t.Fatalf("Error: %v", err)
+	}
+
+	if len(creditFile.Batches) != 1 {
+		t.Errorf("expected %s received %v", "1", len(creditFile.Batches))
+	}
+
+	if debitFile.ID != "" {
+		t.Error("No Debit File")
+	}
+}
+
+func TestSegmentFile__DebitOnly(t *testing.T) {
+	// write an ACH file into repository
+	fd, err := os.Open(filepath.Join("test", "testdata", "ppd-valid-debit.json"))
+	if fd == nil {
+		t.Fatalf("empty ACH file: %v", err)
+	}
+	defer fd.Close()
+	bs, _ := ioutil.ReadAll(fd)
+	file, _ := FileFromJSON(bs)
+
+	sfc := NewSegmentFileConfiguration()
+	creditFile, debitFile, err := file.SegmentFile(sfc)
+
+	if err != nil {
+		t.Fatalf("Error: %v", err)
+	}
+
+	if creditFile.ID != "" {
+		t.Error("No Debit File")
+	}
+
+	if len(debitFile.Batches) != 1 {
+		t.Errorf("expected %s received %v", "1", len(debitFile.Batches))
+	}
+}

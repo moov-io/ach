@@ -359,7 +359,7 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 			logger.Log("files", "segmentFile", "requestId", req.requestId, "error", err)
 		}
 		if err != nil {
-			return segmentFileResponse{Err: err}, nil
+			return segmentFileResponse{Err: err}, err
 		}
 
 		if creditFile.ID != "" {
