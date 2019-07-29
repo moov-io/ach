@@ -679,66 +679,55 @@ func (f *File) SegmentFile(sfc *SegmentFileConfiguration) (*File, *File, error) 
 	for i := range f.Batches {
 		bh := f.Batches[i].GetHeader()
 
+		var creditBatch Batcher
+		var debitBatch Batcher
+
 		switch bh.ServiceClassCode {
-		case AutomatedAccountingAdvices:
-			cbh := createSegmentFileBatchHeader(AutomatedAccountingAdvices, bh)
-			creditBatch, _ := NewBatch(cbh)
+		case AutomatedAccountingAdvices, MixedDebitsAndCredits:
+			if bh.StandardEntryClassCode == ADV {
+				bh := createSegmentFileBatchHeader(AutomatedAccountingAdvices, bh)
+				creditBatch, _ = NewBatch(bh)
+				debitBatch, _ = NewBatch(bh)
 
-			dbh := createSegmentFileBatchHeader(AutomatedAccountingAdvices, bh)
-			debitBatch, _ := NewBatch(dbh)
+				entries := f.Batches[i].GetADVEntries()
+				for i := range entries {
+					switch entries[i].TransactionCode {
+					case CreditForDebitsOriginated, CreditForCreditsReceived, CreditForCreditsRejected, CreditSummary:
+						creditBatch.AddADVEntry(entries[i])
+					case DebitForCreditsOriginated, DebitForDebitsReceived, DebitForDebitsRejectedBatches, DebitSummary:
+						debitBatch.AddADVEntry(entries[i])
+					}
+				}
+			} else {
+				cbh := createSegmentFileBatchHeader(CreditsOnly, bh)
+				creditBatch, _ = NewBatch(cbh)
 
-			entries := f.Batches[i].GetADVEntries()
-			for i := range entries {
-				switch entries[i].TransactionCode {
-				case CreditForDebitsOriginated, CreditForCreditsReceived, CreditForCreditsRejected, CreditSummary:
-					creditBatch.AddADVEntry(entries[i])
-				case DebitForCreditsOriginated, DebitForDebitsReceived, DebitForDebitsRejectedBatches, DebitSummary:
-					debitBatch.AddADVEntry(entries[i])
+				dbh := createSegmentFileBatchHeader(DebitsOnly, bh)
+				debitBatch, _ = NewBatch(dbh)
+
+				entries := f.Batches[i].GetEntries()
+				for i := range entries {
+					entries[i].TraceNumber = "" // unset so Batch.build generates a TraceNumber
+
+					switch entries[i].CreditOrDebit() {
+					case "C":
+						creditBatch.AddEntry(entries[i])
+					case "D":
+						debitBatch.AddEntry(entries[i])
+					}
 				}
 			}
+
 			// Add the Entry to its Batch
-			if len(creditBatch.GetEntries())+len(creditBatch.GetADVEntries()) > 0 {
+			if creditBatch != nil && len(creditBatch.GetEntries())+len(creditBatch.GetADVEntries()) > 0 {
 				if err := creditBatch.Create(); err != nil {
 					return nil, nil, fmt.Errorf("ADV Segment: creditBatch.Create(): %v", err)
 				}
 				creditFile.AddBatch(creditBatch)
 			}
-			if len(debitBatch.GetEntries())+len(debitBatch.GetADVEntries()) > 0 {
+			if debitBatch != nil && len(debitBatch.GetEntries())+len(debitBatch.GetADVEntries()) > 0 {
 				if err := debitBatch.Create(); err != nil {
 					return nil, nil, fmt.Errorf("ADV Segment: debitBatch.Create(): %v", err)
-				}
-				debitFile.AddBatch(debitBatch)
-			}
-
-		case MixedDebitsAndCredits:
-			cbh := createSegmentFileBatchHeader(CreditsOnly, bh)
-			creditBatch, _ := NewBatch(cbh)
-
-			dbh := createSegmentFileBatchHeader(DebitsOnly, bh)
-			debitBatch, _ := NewBatch(dbh)
-
-			// Add entries
-			entries := f.Batches[i].GetEntries()
-			for i := range entries {
-				entries[i].TraceNumber = "" // unset so Batch.build generates a TraceNumber
-
-				switch entries[i].CreditOrDebit() {
-				case "C":
-					creditBatch.AddEntry(entries[i])
-				case "D":
-					debitBatch.AddEntry(entries[i])
-				}
-			}
-			// Add the Entry to its Batch
-			if len(creditBatch.GetEntries())+len(creditBatch.GetADVEntries()) > 0 {
-				if err := creditBatch.Create(); err != nil {
-					return nil, nil, fmt.Errorf("Segment: creditBatch.Create(): %v", err)
-				}
-				creditFile.AddBatch(creditBatch)
-			}
-			if len(debitBatch.GetEntries())+len(debitBatch.GetADVEntries()) > 0 {
-				if err := debitBatch.Create(); err != nil {
-					return nil, nil, fmt.Errorf("Segment: debitBatch.Create(): %v", err)
 				}
 				debitFile.AddBatch(debitBatch)
 			}
