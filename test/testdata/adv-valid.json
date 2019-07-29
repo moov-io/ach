@@ -14,7 +14,7 @@
     {
       "batchHeader": {
         "id": "adv-01",
-        "serviceClassCode": 200,
+        "serviceClassCode": 280,
         "companyName": "Wells Fargo",
         "companyIdentification": "121042882",
         "standardEntryClassCode": "ADV",
@@ -38,13 +38,13 @@
           "discretionaryData": "  ",
           "addendaRecordIndicator": 0,
           "achOperatorRoutingNumber": "01100001",
-          "julianDay ": 0,
+          "julianDay": 2,
           "sequenceNumber": 1
         }
       ],
       "advBatchControl": {
         "id": "adv-01",
-        "serviceClassCode": 200,
+        "serviceClassCode": 280,
         "entryAddendaÇount": 0,
         "entryHash": 23138010,
         "totalDebit": 0,

@@ -1159,19 +1159,19 @@ func TestFile__SegmentADVFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	if !creditFile.IsADV() || !debitFile.IsADV() {
-		t.Errorf("creditFile.IsADV=%v debitFile.IsADV=%v", creditFile.IsADV(), debitFile.IsADV())
+	if len(debitFile.Batches) != 0 {
+		t.Fatalf("debitFile.Batches=%#v", debitFile.Batches)
 	}
-	if len(creditFile.Batches) != 1 || len(debitFile.Batches) != 1 {
-		t.Errorf("credit: batches=%d | debit: batches=%d", len(creditFile.Batches), len(debitFile.Batches))
+	if !creditFile.IsADV() {
+		t.Errorf("creditFile.IsADV=%v", creditFile.IsADV())
+	}
+	if len(creditFile.Batches) != 1 {
+		t.Fatalf("credit: batches=%d", len(creditFile.Batches))
 	}
 
 	creditADVEntries := creditFile.Batches[0].GetADVEntries()
-	debitADVEntries := debitFile.Batches[0].GetADVEntries()
-
-	if len(creditADVEntries) != 1 || len(debitADVEntries) != 0 {
-		t.Errorf("creditADVEntries=%d debitADVEntries=%d", len(creditADVEntries), len(debitADVEntries))
+	if len(creditADVEntries) != 1 {
+		t.Errorf("creditADVEntries=%d", len(creditADVEntries))
 	}
 
 	entry := creditADVEntries[0]
@@ -1202,6 +1202,15 @@ func TestFile__SegmentADVFileDebit(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// Force Batch Header and Control to ADV types
+	bh := f.Batches[0].GetHeader()
+	bh.ServiceClassCode = AutomatedAccountingAdvices
+	f.Batches[0].SetHeader(bh)
+
+	bc := f.Batches[0].GetControl()
+	bc.ServiceClassCode = AutomatedAccountingAdvices
+	f.Batches[0].SetControl(bc)
+
 	// Force the ADVEntryDetail to Debit
 	f.Batches[0].GetADVEntries()[0].TransactionCode = DebitForDebitsReceived
 
@@ -1209,15 +1218,17 @@ func TestFile__SegmentADVFileDebit(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !creditFile.IsADV() || !debitFile.IsADV() {
-		t.Errorf("creditFile.IsADV=%v debitFile.IsADV=%v", creditFile.IsADV(), debitFile.IsADV())
+	if len(creditFile.Batches) != 0 {
+		t.Fatalf("creditFile.Batches=%#v", creditFile.Batches)
+	}
+	if !debitFile.IsADV() {
+		t.Fatalf("debitFile.IsADV=%v", debitFile.IsADV())
 	}
 
-	creditADVEntries := creditFile.Batches[0].GetADVEntries()
 	debitADVEntries := debitFile.Batches[0].GetADVEntries()
 
-	if len(creditADVEntries) != 0 || len(debitADVEntries) != 1 {
-		t.Errorf("creditADVEntries=%d debitADVEntries=%d", len(creditADVEntries), len(debitADVEntries))
+	if len(debitADVEntries) != 1 {
+		t.Errorf("debitADVEntries=%d", len(debitADVEntries))
 	}
 
 	entry := debitADVEntries[0]

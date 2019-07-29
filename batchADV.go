@@ -41,7 +41,6 @@ func (batch *BatchADV) Validate() error {
 	}
 	// Add configuration and type specific validation for this type.
 	for _, entry := range batch.ADVEntries {
-
 		if entry.Category == CategoryForward {
 			switch entry.TransactionCode {
 			case CreditForDebitsOriginated, CreditForCreditsReceived, CreditForCreditsRejected, CreditSummary,

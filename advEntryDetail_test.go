@@ -5,6 +5,7 @@
 package ach
 
 import (
+	"encoding/json"
 	"strings"
 	"testing"
 
@@ -320,5 +321,34 @@ func TestInvalidADVEDParse(t *testing.T) {
 	err := r.parseEntryDetail()
 	if !base.Match(err, ErrConstructor) {
 		t.Errorf("%T: %s", err, err)
+	}
+}
+
+func TestADVUnmarshal(t *testing.T) {
+	raw := []byte(`{
+          "id": "adv-01",
+          "transactionCode": 81,
+          "RDFIIdentification": "23138010",
+          "checkDigit": "4",
+          "DFIAccountNumber": "81967038518      ",
+          "amount": 100000,
+          "adviceRoutingNumber": "121042882",
+          "fileIdentification": "11131",
+          "achOperatorData": "",
+          "individualName": "Steven Tander         ",
+          "discretionaryData": "  ",
+          "addendaRecordIndicator": 0,
+          "achOperatorRoutingNumber": "01100001",
+          "julianDay": 2,
+          "sequenceNumber": 1
+        }`)
+
+	var ed ADVEntryDetail
+	if err := json.Unmarshal(raw, &ed); err != nil {
+		t.Fatal(err)
+	}
+
+	if ed.JulianDay != 2 {
+		t.Errorf("ed.JulianDay=%d", ed.JulianDay)
 	}
 }
