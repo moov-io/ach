@@ -720,15 +720,11 @@ func (f *File) SegmentFile(sfc *SegmentFileConfiguration) (*File, *File, error) 
 
 			// Add the Entry to its Batch
 			if creditBatch != nil && len(creditBatch.GetEntries())+len(creditBatch.GetADVEntries()) > 0 {
-				if err := creditBatch.Create(); err != nil {
-					return nil, nil, fmt.Errorf("ADV Segment: creditBatch.Create(): %v", err)
-				}
+				creditBatch.Create()
 				creditFile.AddBatch(creditBatch)
 			}
 			if debitBatch != nil && len(debitBatch.GetEntries())+len(debitBatch.GetADVEntries()) > 0 {
-				if err := debitBatch.Create(); err != nil {
-					return nil, nil, fmt.Errorf("ADV Segment: debitBatch.Create(): %v", err)
-				}
+				debitBatch.Create()
 				debitFile.AddBatch(debitBatch)
 			}
 
