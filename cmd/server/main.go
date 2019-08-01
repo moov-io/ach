@@ -118,11 +118,21 @@ func main() {
 	}()
 	defer adminServer.Shutdown()
 
+	// Start main HTTP server
 	go func() {
-		logger.Log("transport", "HTTP", "addr", *httpAddr)
-		errs <- serve.ListenAndServe()
-		// TODO(adam): support TLS
-		// func (srv *Server) ListenAndServeTLS(certFile, keyFile string) error
+		if certFile, keyFile := os.Getenv("HTTPS_CERT_FILE"), os.Getenv("HTTPS_KEY_FILE"); certFile != "" && keyFile != "" {
+			logger.Log("startup", fmt.Sprintf("binding to %s for secure HTTP server", *httpAddr))
+			if err := serve.ListenAndServeTLS(certFile, keyFile); err != nil {
+				errs <- err
+				logger.Log("exit", err)
+			}
+		} else {
+			logger.Log("startup", fmt.Sprintf("binding to %s for HTTP server", *httpAddr))
+			if err := serve.ListenAndServe(); err != nil {
+				errs <- err
+				logger.Log("exit", err)
+			}
+		}
 	}()
 
 	if err := <-errs; err != nil {
