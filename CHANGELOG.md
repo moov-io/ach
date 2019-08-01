@@ -20,6 +20,9 @@ ADDITIONS
 - addenda types: Add RuneCountInString check to Parse(record string) function
 - file: create debit ach file and credit ach file from a mixed debit and credit ach file (via `SegmentFile`) (see [#528](https://github.com/moov-io/ach/issues/528))
 - cmd/server: add environment variables to override command line flags (`-http.addr` and `-log.format`)
+- file: support ADV files in (*File).SegmentFile(...)
+- cmd/server: bind HTTP server with TLS if HTTPS_* variables are defined
+- cmd/server: add endpoints for segmenting files into debits and credits
 
 BUILD
 
