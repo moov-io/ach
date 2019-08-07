@@ -1465,3 +1465,37 @@ func TestSegmentFile__DebitOnly(t *testing.T) {
 		t.Errorf("expected %s received %v", "1", len(debitFile.Batches))
 	}
 }
+
+func TestFileIAT__SegmentFileCreditOnly(t *testing.T) {
+	// open a file for reading. Any io.Reader Can be used
+	f, err := os.Open(filepath.Join("test", "ach-iat-read", "iat-credit.ach"))
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := NewReader(f)
+	achFile, err := r.Read()
+	if err != nil {
+		t.Fatalf("Issue reading file: %+v \n", err)
+	}
+
+	// ensure we have a validated file structure
+	if achFile.Validate(); err != nil {
+		t.Fatalf("Could not validate entire read file: %v", err)
+	}
+
+	sfc := NewSegmentFileConfiguration()
+	creditFile, debitFile, err := achFile.SegmentFile(sfc)
+
+	if err != nil {
+		t.Fatalf("Could not segment the file: %+v \n", err)
+	}
+
+	if err := creditFile.Validate(); err != nil {
+		t.Fatalf("Credit file did not validate: %+v \n", err)
+	}
+
+	if len(debitFile.IATBatches) > 0 {
+		t.Fatalf("IATFile should not have IAT batches: %+v \n", err)
+	}
+}
