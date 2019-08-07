@@ -111,7 +111,6 @@ func main() {
 	addenda18.EntryDetailSequenceNumber = 0000001
 	entry.AddAddenda18(addenda18)
 
-
 	// Identifies the receivers account information
 	// can be multiple entry's per batch
 	entryTwo := ach.NewIATEntryDetail()
