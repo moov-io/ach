@@ -23,7 +23,7 @@ func main() {
 
 	// BatchHeader identifies the originating entity and the type of transactions contained in the batch
 	bh := ach.NewIATBatchHeader()
-	bh.ServiceClassCode = ach.DebitsOnly
+	bh.ServiceClassCode = ach.MixedDebitsAndCredits
 	bh.ForeignExchangeIndicator = "FF"
 	bh.ForeignExchangeReferenceIndicator = 3
 	bh.ISODestinationCountryCode = "US"
@@ -38,7 +38,7 @@ func main() {
 	// Identifies the receivers account information
 	// can be multiple entry's per batch
 	entry := ach.NewIATEntryDetail()
-	entry.TransactionCode = ach.CheckingCredit
+	entry.TransactionCode = ach.CheckingDebit
 	entry.SetRDFI("121042882")
 	entry.AddendaRecords = 007
 	entry.DFIAccountNumber = "123456789"
@@ -111,9 +111,87 @@ func main() {
 	addenda18.EntryDetailSequenceNumber = 0000001
 	entry.AddAddenda18(addenda18)
 
+
+	// Identifies the receivers account information
+	// can be multiple entry's per batch
+	entryTwo := ach.NewIATEntryDetail()
+	entryTwo.TransactionCode = ach.CheckingCredit
+	entryTwo.SetRDFI("121042882")
+	entryTwo.AddendaRecords = 007
+	entryTwo.DFIAccountNumber = "123456789"
+	entryTwo.Amount = 100000 // 1000.00
+	entryTwo.SetTraceNumber("23138010", 2)
+	entryTwo.Category = ach.CategoryForward
+
+	//addenda
+
+	addenda10Two := ach.NewAddenda10()
+	addenda10Two.TransactionTypeCode = "ANN"
+	addenda10Two.ForeignPaymentAmount = 100000
+	addenda10Two.ForeignTraceNumber = "928383-23938"
+	addenda10Two.Name = "ADCAF Enterprises"
+	addenda10Two.EntryDetailSequenceNumber = 00000002
+	entryTwo.Addenda10 = addenda10Two
+
+	addenda11Two := ach.NewAddenda11()
+	addenda11Two.OriginatorName = "ADCAF Solutions"
+	addenda11Two.OriginatorStreetAddress = "15 West Place Street"
+	addenda11Two.EntryDetailSequenceNumber = 00000002
+	entryTwo.Addenda11 = addenda11Two
+
+	addenda12Two := ach.NewAddenda12()
+	addenda12Two.OriginatorCityStateProvince = "JacobsTown*PA\\"
+	addenda12Two.OriginatorCountryPostalCode = "US*19305\\"
+	addenda12Two.EntryDetailSequenceNumber = 00000002
+	entryTwo.Addenda12 = addenda12Two
+
+	addenda13Two := ach.NewAddenda13()
+	addenda13Two.ODFIName = "Wells Fargo"
+	addenda13Two.ODFIIDNumberQualifier = "01"
+	addenda13Two.ODFIIdentification = "231380104"
+	addenda13Two.ODFIBranchCountryCode = "US"
+	addenda13Two.EntryDetailSequenceNumber = 00000002
+	entryTwo.Addenda13 = addenda13Two
+
+	addenda14Two := ach.NewAddenda14()
+	addenda14Two.RDFIName = "Citadel Bank"
+	addenda14Two.RDFIIDNumberQualifier = "01"
+	addenda14Two.RDFIIdentification = "121042882"
+	addenda14Two.RDFIBranchCountryCode = "CA"
+	addenda14Two.EntryDetailSequenceNumber = 00000002
+	entryTwo.Addenda14 = addenda14Two
+
+	addenda15Two := ach.NewAddenda15()
+	addenda15Two.ReceiverIDNumber = "987465493213987"
+	addenda15Two.ReceiverStreetAddress = "18 Fifth Street"
+	addenda15Two.EntryDetailSequenceNumber = 00000002
+	entryTwo.Addenda15 = addenda15Two
+
+	addenda16Two := ach.NewAddenda16()
+	addenda16Two.ReceiverCityStateProvince = "LetterTown*AB\\"
+	addenda16Two.ReceiverCountryPostalCode = "CA*80014\\"
+	addenda16Two.EntryDetailSequenceNumber = 00000002
+	entryTwo.Addenda16 = addenda16Two
+
+	addenda17Two := ach.NewAddenda17()
+	addenda17Two.PaymentRelatedInformation = "This is an international payment"
+	addenda17Two.SequenceNumber = 1
+	addenda17Two.EntryDetailSequenceNumber = 0000002
+	entry.AddAddenda17(addenda17)
+
+	addenda18Two := ach.NewAddenda18()
+	addenda18Two.ForeignCorrespondentBankName = "Bank of France"
+	addenda18Two.ForeignCorrespondentBankIDNumberQualifier = "01"
+	addenda18Two.ForeignCorrespondentBankIDNumber = "456456456987987"
+	addenda18Two.ForeignCorrespondentBankBranchCountryCode = "FR"
+	addenda18Two.SequenceNumber = 3
+	addenda18Two.EntryDetailSequenceNumber = 0000002
+	entryTwo.AddAddenda18(addenda18Two)
+
 	// build the batch
 	batch := ach.NewIATBatch(bh)
 	batch.AddEntry(entry)
+	batch.AddEntry(entryTwo)
 	if err := batch.Create(); err != nil {
 		log.Fatalf("Unexpected error building batch: %s\n", err)
 	}

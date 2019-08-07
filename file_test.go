@@ -1060,8 +1060,8 @@ func TestFile__RemoveBatch(t *testing.T) {
 
 func TestFile__SegmentFile(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
-	f, err := os.Open(filepath.Join("examples", "ach-ppd-read-mixedDebitCredit", "ppd-mixedDebitCredit.ach"))
-	// f, err := os.Open(filepath.Join("test", "ach-ppd-credit", "ppd-credit.ach"))
+	f, err := os.Open(filepath.Join("test", "testdata", "ppd-mixedDebitCredit.ach"))
+
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1264,8 +1264,7 @@ func TestSegmentFile_FileHeaderError(t *testing.T) {
 
 func TestFile__SegmentFileBatchControlCreditAmount(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
-	f, err := os.Open(filepath.Join("examples", "ach-ppd-read-mixedDebitCredit", "ppd-mixedDebitCredit.ach"))
-	// f, err := os.Open(filepath.Join("test", "ach-ppd-credit", "ppd-credit.ach"))
+	f, err := os.Open(filepath.Join("test", "testdata", "ppd-mixedDebitCredit.ach"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1302,8 +1301,7 @@ func TestFile__SegmentFileBatchControlCreditAmount(t *testing.T) {
 
 func TestFile__SegmentFileBatchControlDebitAmount(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
-	f, err := os.Open(filepath.Join("examples", "ach-ppd-read-mixedDebitCredit", "ppd-mixedDebitCredit.ach"))
-	// f, err := os.Open(filepath.Join("test", "ach-ppd-credit", "ppd-credit.ach"))
+	f, err := os.Open(filepath.Join("test", "testdata", "ppd-mixedDebitCredit.ach"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1340,8 +1338,7 @@ func TestFile__SegmentFileBatchControlDebitAmount(t *testing.T) {
 
 func TestFile__SegmentFileCreditBatches(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
-	f, err := os.Open(filepath.Join("examples", "ach-ppd-read-mixedDebitCredit", "ppd-mixedDebitCredit.ach"))
-	// f, err := os.Open(filepath.Join("test", "ach-ppd-credit", "ppd-credit.ach"))
+	f, err := os.Open(filepath.Join("test", "testdata", "ppd-mixedDebitCredit.ach"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1378,8 +1375,7 @@ func TestFile__SegmentFileCreditBatches(t *testing.T) {
 
 func TestFile__SegmentFileDebitBatches(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
-	f, err := os.Open(filepath.Join("examples", "ach-ppd-read-mixedDebitCredit", "ppd-mixedDebitCredit.ach"))
-	// f, err := os.Open(filepath.Join("test", "ach-ppd-credit", "ppd-credit.ach"))
+	f, err := os.Open(filepath.Join("test", "testdata", "ppd-mixedDebitCredit.ach"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1497,5 +1493,74 @@ func TestFileIAT__SegmentFileCreditOnly(t *testing.T) {
 
 	if len(debitFile.IATBatches) > 0 {
 		t.Fatalf("IATFile should not have IAT batches: %+v \n", err)
+	}
+}
+
+func TestFileIAT__SegmentFileDebitOnly(t *testing.T) {
+	// open a file for reading. Any io.Reader Can be used
+	f, err := os.Open(filepath.Join("test", "testdata", "iat-debit.ach"))
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := NewReader(f)
+	achFile, err := r.Read()
+	if err != nil {
+		t.Fatalf("Issue reading file: %+v \n", err)
+	}
+
+	// ensure we have a validated file structure
+	if achFile.Validate(); err != nil {
+		t.Fatalf("Could not validate entire read file: %v", err)
+	}
+
+	sfc := NewSegmentFileConfiguration()
+	creditFile, debitFile, err := achFile.SegmentFile(sfc)
+
+	if err != nil {
+		t.Fatalf("Could not segment the file: %+v \n", err)
+	}
+
+	if len(creditFile.IATBatches) > 0 {
+		t.Fatalf("IATFile should not have IAT credit batches: %+v \n", err)
+	}
+
+	if err := debitFile.Validate(); err != nil {
+		t.Fatalf("Debit file did not validate: %+v \n", err)
+	}
+}
+
+// TestFileIAT__SegmentFile test segmenting and IAT File
+func TestFileIAT__SegmentFile(t *testing.T) {
+	// open a file for reading. Any io.Reader Can be used
+	f, err := os.Open(filepath.Join("test", "testdata", "iat-mixedDebitCredit.ach"))
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := NewReader(f)
+	achFile, err := r.Read()
+	if err != nil {
+		t.Fatalf("Issue reading file: %+v \n", err)
+	}
+
+	// ensure we have a validated file structure
+	if achFile.Validate(); err != nil {
+		t.Fatalf("Could not validate entire read file: %v", err)
+	}
+
+	sfc := NewSegmentFileConfiguration()
+	creditFile, debitFile, err := achFile.SegmentFile(sfc)
+
+	if err != nil {
+		t.Fatalf("Could not segment the file: %+v \n", err)
+	}
+
+	if err := creditFile.Validate(); err != nil {
+		t.Fatalf("Credit file did not validate: %+v \n", err)
+	}
+
+	if err := debitFile.Validate(); err != nil {
+		t.Fatalf("Debit File did not validate: %+v \n", err)
 	}
 }

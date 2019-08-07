@@ -770,20 +770,33 @@ func (f *File) segmentFileBatches(creditFile, debitFile *File) {
 }
 
 func (f *File) segmentFileIATBatches(creditFile, debitFile *File) {
-	for _, IATBatch := range f.IATBatches {
-		IATBh := IATBatch.GetHeader()
+	for _, iatb:= range f.IATBatches {
+		IATBh := iatb.GetHeader()
 
 		switch IATBh.ServiceClassCode {
 		case MixedDebitsAndCredits:
 			cbh := createSegmentFileIATBatchHeader(CreditsOnly, IATBh)
 			creditIATBatch := NewIATBatch(cbh)
 
+
 			dbh := createSegmentFileIATBatchHeader(DebitsOnly, IATBh)
 			debitIATBatch := NewIATBatch(dbh)
 
-			entries := IATBatch.GetEntries()
+			entries := iatb.GetEntries()
 			for _, IATEntry := range entries {
-				segmentFileIATBatchAddEntry(creditIATBatch, debitIATBatch, IATEntry)
+				IATEntry.TraceNumber = "" // unset so Batch.build generates a TraceNumber
+				switch IATEntry.TransactionCode {
+				case CheckingCredit, CheckingReturnNOCCredit, CheckingPrenoteCredit, CheckingZeroDollarRemittanceCredit,
+					SavingsCredit, SavingsReturnNOCCredit, SavingsPrenoteCredit, SavingsZeroDollarRemittanceCredit,
+					GLCredit, GLReturnNOCCredit, GLPrenoteCredit, GLZeroDollarRemittanceCredit,
+					LoanCredit, LoanReturnNOCCredit, LoanPrenoteCredit, LoanZeroDollarRemittanceCredit:
+					creditIATBatch.AddEntry(IATEntry)
+				case CheckingDebit, CheckingReturnNOCDebit, CheckingPrenoteDebit, CheckingZeroDollarRemittanceDebit,
+					SavingsDebit, SavingsReturnNOCDebit, SavingsPrenoteDebit, SavingsZeroDollarRemittanceDebit,
+					GLDebit, GLReturnNOCDebit, GLPrenoteDebit, GLZeroDollarRemittanceDebit,
+					LoanDebit, LoanReturnNOCDebit:
+					debitIATBatch.AddEntry(IATEntry)
+				}
 			}
 
 			if len(creditIATBatch.GetEntries()) > 0 {
@@ -795,9 +808,9 @@ func (f *File) segmentFileIATBatches(creditFile, debitFile *File) {
 				debitFile.AddIATBatch(debitIATBatch)
 			}
 		case CreditsOnly:
-			creditFile.AddIATBatch(IATBatch)
+			creditFile.AddIATBatch(iatb)
 		case DebitsOnly:
-			debitFile.AddIATBatch(IATBatch)
+			debitFile.AddIATBatch(iatb)
 		}
 	}
 
@@ -856,6 +869,7 @@ func (f *File) addFileHeaderData(file *File) *File {
 }
 
 func segmentFileBatchAddEntry(creditBatch, debitBatch Batcher, entry *EntryDetail) {
+
 	entry.TraceNumber = "" // unset so Batch.build generates a TraceNumber
 	switch entry.TransactionCode {
 	case CheckingCredit, CheckingReturnNOCCredit, CheckingPrenoteCredit, CheckingZeroDollarRemittanceCredit,
@@ -871,7 +885,7 @@ func segmentFileBatchAddEntry(creditBatch, debitBatch Batcher, entry *EntryDetai
 	}
 }
 
-func segmentFileIATBatchAddEntry(creditIATBatch, debitBatch IATBatch, IATEntry *IATEntryDetail) {
+/*func segmentFileIATBatchAddEntry(creditIATBatch, debitBatch IATBatch, IATEntry *IATEntryDetail) {
 	IATEntry.TraceNumber = "" // unset so Batch.build generates a TraceNumber
 	switch IATEntry.TransactionCode {
 	case CheckingCredit, CheckingReturnNOCCredit, CheckingPrenoteCredit, CheckingZeroDollarRemittanceCredit,
@@ -885,7 +899,7 @@ func segmentFileIATBatchAddEntry(creditIATBatch, debitBatch IATBatch, IATEntry *
 		LoanDebit, LoanReturnNOCDebit:
 		debitBatch.AddEntry(IATEntry)
 	}
-}
+}*/
 
 func segmentFileBatchAddADVEntry(creditBatch Batcher, debitBatch Batcher, entry *ADVEntryDetail) {
 	switch entry.TransactionCode {
