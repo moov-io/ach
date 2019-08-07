@@ -770,14 +770,13 @@ func (f *File) segmentFileBatches(creditFile, debitFile *File) {
 }
 
 func (f *File) segmentFileIATBatches(creditFile, debitFile *File) {
-	for _, iatb:= range f.IATBatches {
+	for _, iatb := range f.IATBatches {
 		IATBh := iatb.GetHeader()
 
 		switch IATBh.ServiceClassCode {
 		case MixedDebitsAndCredits:
 			cbh := createSegmentFileIATBatchHeader(CreditsOnly, IATBh)
 			creditIATBatch := NewIATBatch(cbh)
-
 
 			dbh := createSegmentFileIATBatchHeader(DebitsOnly, IATBh)
 			debitIATBatch := NewIATBatch(dbh)
