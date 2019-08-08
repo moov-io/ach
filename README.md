@@ -55,9 +55,17 @@ The ACH project implements a Go library and HTTP server for creating and modifyi
 
 </details>
 
+<details>
+<summary>Segment Files</summary>
+| SEC Code | Name                                  | Example                                  | Read                | Write                                            |
+|----------|---------------------------------------|------------------------------------------|-----------------------------------|------------------------------------|
+| PPD      | Prearranged payment and deposits      | [Debit](examples/ach-ppd-segmentFile-read/segmentFile-ppd-debit.ach) [Credit](examples/ach-ppd-segmentFile-read/segmentFile-ppd-credit.ach) | [PPD Read](test/ach-ppd-segmentFile-read/main.go) | [PPD Write](examples/ach-ppd-segmentFile-write/main.go) |
+| IAT      | International ACH Transactions        | [Debit](examples/ach-iat-segmentFile-read/segmentFile-iat-debit.ach) [Credit](examples/ach-iat-segmentFile-read/segmentFile-iat-credit.ach) | [IAT Read](test/ach-iat-segmentFile-read/main.go) | [IAT Write](examples/ach-iat-segmentFile-write/main.go) |
+</details>
+
 ### HTTP API
 
-`github.com/moov-io/ach/server` offers a HTTP and JSON API for creating and editing files. If you're using Go the `ach.File` type can be used, otherwise just send properly formatted JSON. We have an [example JSON file](test/testdata/ppd-valid.json), but each SEC type will generate differnet JSON.
+`github.com/moov-io/ach/server` offers a HTTP and JSON API for creating and editing files. If you're using Go the `ach.File` type can be used, otherwise just send properly formatted JSON. We have an [example JSON file](test/testdata/ppd-valid.json), but each SEC type will generate different JSON.
 
 Examples: [Go](examples/http/main.go) | [Ruby](https://github.com/moov-io/ruby-ach-demo)
 
