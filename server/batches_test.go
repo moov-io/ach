@@ -8,6 +8,8 @@ import (
 	"context"
 	"strings"
 	"testing"
+
+	"github.com/go-kit/kit/log"
 )
 
 func TestFiles__createBatchEndpoint(t *testing.T) {
@@ -16,7 +18,7 @@ func TestFiles__createBatchEndpoint(t *testing.T) {
 
 	body := strings.NewReader(`{"random":"json"}`)
 
-	resp, err := createBatchEndpoint(svc, nil)(context.TODO(), body)
+	resp, err := createBatchEndpoint(svc, log.NewNopLogger())(context.TODO(), body)
 	r, ok := resp.(createBatchResponse)
 	if !ok {
 		t.Errorf("got %#v", resp)
@@ -32,7 +34,7 @@ func TestFiles__getBatchesEndpoint(t *testing.T) {
 
 	body := strings.NewReader(`{"random":"json"}`)
 
-	resp, err := getBatchesEndpoint(svc, nil)(context.TODO(), body)
+	resp, err := getBatchesEndpoint(svc, log.NewNopLogger())(context.TODO(), body)
 	r, ok := resp.(getBatchesResponse)
 	if !ok {
 		t.Errorf("got %#v", resp)
@@ -48,7 +50,7 @@ func TestFiles__getBatchEndpoint(t *testing.T) {
 
 	body := strings.NewReader(`{"random":"json"}`)
 
-	resp, err := getBatchEndpoint(svc, nil)(context.TODO(), body)
+	resp, err := getBatchEndpoint(svc, log.NewNopLogger())(context.TODO(), body)
 	r, ok := resp.(getBatchResponse)
 	if !ok {
 		t.Errorf("got %#v", resp)
@@ -64,7 +66,7 @@ func TestFiles__deleteBatchEndpoint(t *testing.T) {
 
 	body := strings.NewReader(`{"random":"json"}`)
 
-	resp, err := deleteBatchEndpoint(svc, nil)(context.TODO(), body)
+	resp, err := deleteBatchEndpoint(svc, log.NewNopLogger())(context.TODO(), body)
 	r, ok := resp.(deleteBatchResponse)
 	if !ok {
 		t.Errorf("got %#v", resp)
