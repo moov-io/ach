@@ -735,8 +735,6 @@ func (f *File) segmentFileBatches(creditFile, debitFile *File) {
 					debitBatch.Create()
 					debitFile.AddBatch(debitBatch)
 				}
-			default:
-				break
 			}
 		default:
 			switch bh.ServiceClassCode {
@@ -883,22 +881,6 @@ func segmentFileBatchAddEntry(creditBatch, debitBatch Batcher, entry *EntryDetai
 		debitBatch.AddEntry(entry)
 	}
 }
-
-/*func segmentFileIATBatchAddEntry(creditIATBatch, debitBatch IATBatch, IATEntry *IATEntryDetail) {
-	IATEntry.TraceNumber = "" // unset so Batch.build generates a TraceNumber
-	switch IATEntry.TransactionCode {
-	case CheckingCredit, CheckingReturnNOCCredit, CheckingPrenoteCredit, CheckingZeroDollarRemittanceCredit,
-		SavingsCredit, SavingsReturnNOCCredit, SavingsPrenoteCredit, SavingsZeroDollarRemittanceCredit,
-		GLCredit, GLReturnNOCCredit, GLPrenoteCredit, GLZeroDollarRemittanceCredit,
-		LoanCredit, LoanReturnNOCCredit, LoanPrenoteCredit, LoanZeroDollarRemittanceCredit:
-		creditIATBatch.AddEntry(IATEntry)
-	case CheckingDebit, CheckingReturnNOCDebit, CheckingPrenoteDebit, CheckingZeroDollarRemittanceDebit,
-		SavingsDebit, SavingsReturnNOCDebit, SavingsPrenoteDebit, SavingsZeroDollarRemittanceDebit,
-		GLDebit, GLReturnNOCDebit, GLPrenoteDebit, GLZeroDollarRemittanceDebit,
-		LoanDebit, LoanReturnNOCDebit:
-		debitBatch.AddEntry(IATEntry)
-	}
-}*/
 
 func segmentFileBatchAddADVEntry(creditBatch Batcher, debitBatch Batcher, entry *ADVEntryDetail) {
 	switch entry.TransactionCode {
