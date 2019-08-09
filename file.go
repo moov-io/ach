@@ -714,7 +714,7 @@ func (f *File) segmentFileBatches(creditFile, debitFile *File) {
 		var debitBatch Batcher
 
 		switch bh.StandardEntryClassCode {
-		case "ADV":
+		case ADV:
 			switch bh.ServiceClassCode {
 			case AutomatedAccountingAdvices:
 				bh := createSegmentFileBatchHeader(AutomatedAccountingAdvices, bh)
@@ -767,6 +767,7 @@ func (f *File) segmentFileBatches(creditFile, debitFile *File) {
 	}
 }
 
+// segmentFileIATBatches segments IAT batches debits and credits into debit and credit files
 func (f *File) segmentFileIATBatches(creditFile, debitFile *File) {
 	for _, iatb := range f.IATBatches {
 		IATBh := iatb.GetHeader()
@@ -865,6 +866,8 @@ func (f *File) addFileHeaderData(file *File) *File {
 	return file
 }
 
+// segmentFileBatchAddEntry adds entries to batches in a segmented file
+// Applies to All SEC Codes except ADV (Automated Accounting Advice)
 func segmentFileBatchAddEntry(creditBatch, debitBatch Batcher, entry *EntryDetail) {
 
 	entry.TraceNumber = "" // unset so Batch.build generates a TraceNumber
@@ -882,6 +885,7 @@ func segmentFileBatchAddEntry(creditBatch, debitBatch Batcher, entry *EntryDetai
 	}
 }
 
+// segmentFileBatchAddADVEntry adds entries to batches in a segment file for SEC Code ADV (Automated Accounting Advice)
 func segmentFileBatchAddADVEntry(creditBatch Batcher, debitBatch Batcher, entry *ADVEntryDetail) {
 	switch entry.TransactionCode {
 	case CreditForDebitsOriginated, CreditForCreditsReceived, CreditForCreditsRejected, CreditSummary:
