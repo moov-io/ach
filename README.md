@@ -57,10 +57,12 @@ The ACH project implements a Go library and HTTP server for creating and modifyi
 
 <details>
 <summary>Segment Files</summary>
+
 | SEC Code | Name                                  | Example                                  | Read                | Write                                            |
 |----------|---------------------------------------|------------------------------------------|-----------------------------------|------------------------------------|
 | PPD      | Prearranged payment and deposits      | [Debit](examples/ach-ppd-segmentFile-read/segmentFile-ppd-debit.ach) [Credit](examples/ach-ppd-segmentFile-read/segmentFile-ppd-credit.ach) | [PPD Read](test/ach-ppd-segmentFile-read/main.go) | [PPD Write](examples/ach-ppd-segmentFile-write/main.go) |
 | IAT      | International ACH Transactions        | [Debit](examples/ach-iat-segmentFile-read/segmentFile-iat-debit.ach) [Credit](examples/ach-iat-segmentFile-read/segmentFile-iat-credit.ach) | [IAT Read](test/ach-iat-segmentFile-read/main.go) | [IAT Write](examples/ach-iat-segmentFile-write/main.go) |
+
 </details>
 
 ### HTTP API
