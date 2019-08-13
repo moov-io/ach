@@ -7,8 +7,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/go-kit/kit/log"
-	"github.com/moov-io/base"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -18,7 +16,9 @@ import (
 	"testing"
 
 	"github.com/moov-io/ach"
+	"github.com/moov-io/base"
 
+	"github.com/go-kit/kit/log"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
 )

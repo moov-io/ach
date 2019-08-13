@@ -44,7 +44,7 @@ func createBatchEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 
 		id, err := s.CreateBatch(req.FileID, req.Batch)
 
-		if req.requestId != "" && logger != nil {
+		if logger != nil {
 			logger.Log("batches", "createBatch", "file", req.FileID, "requestId", req.requestId, "error", err)
 		}
 
@@ -114,7 +114,7 @@ func getBatchesEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 			}, err
 		}
 
-		if req.requestId != "" && logger != nil {
+		if logger != nil {
 			logger.Log("batches", "getBatches", "file", req.fileID, "requestId", req.requestId)
 		}
 		return getBatchesResponse{
@@ -169,7 +169,7 @@ func getBatchEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 
 		batch, err := s.GetBatch(req.fileID, req.batchID)
 
-		if req.requestId != "" && logger != nil {
+		if logger != nil {
 			logger.Log("batches", "getBatche", "file", req.fileID, "requestId", req.requestId, "error", err)
 		}
 
@@ -224,7 +224,7 @@ func deleteBatchEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 
 		err := s.DeleteBatch(req.fileID, req.batchID)
 
-		if req.requestId != "" && logger != nil {
+		if logger != nil {
 			logger.Log("batches", "deleteBatch", "file", req.fileID, "requestId", req.requestId, "error", err)
 		}
 
