@@ -65,7 +65,7 @@ func decodeCreateBatchRequest(_ context.Context, r *http.Request) (interface{}, 
 		return nil, ErrBadRouting
 	}
 	req.FileID = id
-	if err := json.NewDecoder(r.Body).Decode(req.Batch); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&req.Batch); err != nil {
 		return nil, err
 	}
 	if req.Batch == nil {

@@ -5,7 +5,11 @@
 package server
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 
@@ -13,6 +17,38 @@ import (
 
 	"github.com/go-kit/kit/log"
 )
+
+func TestFiles__decodeCreateBatchRequest(t *testing.T) {
+	f := ach.NewFile()
+	f.ID = "foo"
+
+	// Setup our persistence
+	repo := NewRepositoryInMemory(testTTLDuration, log.NewNopLogger())
+	svc := NewService(repo)
+	if err := repo.StoreFile(f); err != nil {
+		t.Fatal(err)
+	}
+
+	var body bytes.Buffer
+	if err := json.NewEncoder(&body).Encode(mockBatchWEB()); err != nil {
+		t.Fatal(err)
+	}
+
+	req := httptest.NewRequest("POST", "/files/foo/batches", &body)
+	req.Header.Set("x-request-id", "test")
+
+	// setup our HTTP handler
+	handler := MakeHTTPHandler(svc, repo, log.NewNopLogger())
+
+	// execute our HTTP request
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status code: %d: %s", w.Code, w.Body.String())
+	}
+}
 
 func TestFiles__createBatchEndpoint(t *testing.T) {
 	repo := NewRepositoryInMemory(testTTLDuration, log.NewNopLogger())
@@ -46,6 +82,33 @@ func TestFiles__createBatchEndpoint(t *testing.T) {
 		}
 	} else {
 		t.Errorf("%T %#v", resp, resp)
+	}
+}
+
+func TestFiles__decodeGetBatchesRequest(t *testing.T) {
+	f := ach.NewFile()
+	f.ID = "foo"
+
+	// Setup our persistence
+	repo := NewRepositoryInMemory(testTTLDuration, log.NewNopLogger())
+	svc := NewService(repo)
+	if err := repo.StoreFile(f); err != nil {
+		t.Fatal(err)
+	}
+
+	req := httptest.NewRequest("GET", "/files/foo/batches", nil)
+	req.Header.Set("x-request-id", "test")
+
+	// setup our HTTP handler
+	handler := MakeHTTPHandler(svc, repo, log.NewNopLogger())
+
+	// execute our HTTP request
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status code: %d: %s", w.Code, w.Body.String())
 	}
 }
 
@@ -86,6 +149,36 @@ func TestFiles__getBatchesEndpoint(t *testing.T) {
 	}
 }
 
+func TestFiles__decodeGetBatchRequest(t *testing.T) {
+	f := ach.NewFile()
+	f.ID = "foo"
+	b := mockBatchWEB()
+	b.SetID("foo2")
+	f.AddBatch(b)
+
+	// Setup our persistence
+	repo := NewRepositoryInMemory(testTTLDuration, log.NewNopLogger())
+	svc := NewService(repo)
+	if err := repo.StoreFile(f); err != nil {
+		t.Fatal(err)
+	}
+
+	req := httptest.NewRequest("GET", "/files/foo/batches/foo2", nil)
+	req.Header.Set("x-request-id", "test")
+
+	// setup our HTTP handler
+	handler := MakeHTTPHandler(svc, repo, log.NewNopLogger())
+
+	// execute our HTTP request
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status code: %d: %s", w.Code, w.Body.String())
+	}
+}
+
 func TestFiles__getBatchEndpoint(t *testing.T) {
 	repo := NewRepositoryInMemory(testTTLDuration, log.NewNopLogger())
 	svc := NewService(repo)
@@ -122,6 +215,36 @@ func TestFiles__getBatchEndpoint(t *testing.T) {
 		}
 	} else {
 		t.Errorf("%T %#v", resp, resp)
+	}
+}
+
+func TestFiles__decodeDeleteBatchRequest(t *testing.T) {
+	f := ach.NewFile()
+	f.ID = "foo"
+	b := mockBatchWEB()
+	b.SetID("foo2")
+	f.AddBatch(b)
+
+	// Setup our persistence
+	repo := NewRepositoryInMemory(testTTLDuration, log.NewNopLogger())
+	svc := NewService(repo)
+	if err := repo.StoreFile(f); err != nil {
+		t.Fatal(err)
+	}
+
+	req := httptest.NewRequest("DELETE", "/files/foo/batches/foo2", nil)
+	req.Header.Set("x-request-id", "test")
+
+	// setup our HTTP handler
+	handler := MakeHTTPHandler(svc, repo, log.NewNopLogger())
+
+	// execute our HTTP request
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status code: %d: %s", w.Code, w.Body.String())
 	}
 }
 
