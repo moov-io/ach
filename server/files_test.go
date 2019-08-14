@@ -5,7 +5,9 @@
 package server
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -23,6 +25,38 @@ import (
 	"github.com/gorilla/mux"
 )
 
+func TestFiles__decodeCreateFileRequest(t *testing.T) {
+	f := ach.NewFile()
+	f.ID = "foo"
+	f.Header = *mockFileHeader()
+	f.AddBatch(mockBatchWEB())
+
+	// Setup our persistence
+	repo := NewRepositoryInMemory(testTTLDuration, log.NewNopLogger())
+	svc := NewService(repo)
+
+	var body bytes.Buffer
+	if err := json.NewEncoder(&body).Encode(f); err != nil {
+		t.Fatal(err)
+	}
+
+	req := httptest.NewRequest("POST", "/files/create", &body)
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("content-type", "application/json")
+
+	// setup our HTTP handler
+	handler := MakeHTTPHandler(svc, repo, log.NewNopLogger())
+
+	// execute our HTTP request
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status code: %d: %s", w.Code, w.Body.String())
+	}
+}
+
 func TestFiles__createFileEndpoint(t *testing.T) {
 	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)
@@ -37,15 +71,38 @@ func TestFiles__createFileEndpoint(t *testing.T) {
 	if err == nil || r.Err == nil {
 		t.Errorf("expected error: err=%v resp.Err=%v", err, r.Err)
 	}
-
 }
 
 func TestFiles__getFilesEndpoint(t *testing.T) {
 	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)
 
-	body := strings.NewReader(`{"random":"json"}`)
+	f := ach.NewFile()
+	f.ID = "foo"
+	f.Header = *mockFileHeader()
+	f.AddBatch(mockBatchWEB())
+	if err := repo.StoreFile(f); err != nil {
+		t.Fatal(err)
+	}
 
+	req := httptest.NewRequest("GET", "/files", nil)
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("content-type", "application/json")
+
+	// setup our HTTP handler
+	handler := MakeHTTPHandler(svc, repo, log.NewNopLogger())
+
+	// execute our HTTP request
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status code: %d: %s", w.Code, w.Body.String())
+	}
+
+	// sad path
+	body := strings.NewReader(`{"random":"json"}`)
 	resp, err := getFilesEndpoint(svc)(context.TODO(), body)
 	_, ok := resp.(getFilesResponse)
 	if !ok || err != nil {
@@ -57,8 +114,32 @@ func TestFiles__getFileEndpoint(t *testing.T) {
 	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)
 
-	body := strings.NewReader(`{"random":"json"}`)
+	f := ach.NewFile()
+	f.ID = "foo"
+	f.Header = *mockFileHeader()
+	f.AddBatch(mockBatchWEB())
+	if err := repo.StoreFile(f); err != nil {
+		t.Fatal(err)
+	}
 
+	req := httptest.NewRequest("GET", "/files/foo", nil)
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("content-type", "application/json")
+
+	// setup our HTTP handler
+	handler := MakeHTTPHandler(svc, repo, log.NewNopLogger())
+
+	// execute our HTTP request
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status code: %d: %s", w.Code, w.Body.String())
+	}
+
+	// sad path
+	body := strings.NewReader(`{"random":"json"}`)
 	resp, err := getFileEndpoint(svc, nil)(context.TODO(), body)
 	r, ok := resp.(getFileResponse)
 	if !ok {
@@ -67,15 +148,40 @@ func TestFiles__getFileEndpoint(t *testing.T) {
 	if err == nil || r.Err == nil {
 		t.Errorf("expected error: err=%v resp.Err=%v", err, r.Err)
 	}
-
 }
 
 func TestFiles__getFileContentsEndpoint(t *testing.T) {
 	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)
 
-	body := strings.NewReader(`{"random":"json"}`)
+	f := ach.NewFile()
+	f.ID = "foo"
+	f.Header = *mockFileHeader()
+	f.AddBatch(mockBatchWEB())
+	if err := repo.StoreFile(f); err != nil {
+		t.Fatal(err)
+	}
 
+	req := httptest.NewRequest("GET", "/files/foo/contents", nil)
+	req.Header.Set("x-request-id", "test")
+
+	// setup our HTTP handler
+	handler := MakeHTTPHandler(svc, repo, log.NewNopLogger())
+
+	// execute our HTTP request
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status code: %d: %s", w.Code, w.Body.String())
+	}
+	if v := w.Header().Get("content-type"); v != "text/plain" {
+		t.Errorf("content-type: %s", v)
+	}
+
+	// sad path
+	body := strings.NewReader(`{"random":"json"}`)
 	resp, err := getFileContentsEndpoint(svc, nil)(context.TODO(), body)
 	_, ok := resp.(getFileContentsResponse)
 	if !ok {
@@ -84,7 +190,6 @@ func TestFiles__getFileContentsEndpoint(t *testing.T) {
 	if err == nil {
 		t.Errorf("expected error: err=%v", err)
 	}
-
 }
 
 func TestFiles__validateFileEndpoint(t *testing.T) {
