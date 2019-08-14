@@ -71,7 +71,7 @@ func createFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.End
 		}
 
 		err := r.StoreFile(req.File)
-		if req.requestId != "" && logger != nil {
+		if logger != nil {
 			logger.Log("files", "createFile", "requestId", req.requestId, "error", err)
 		}
 
@@ -168,7 +168,7 @@ func getFileEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 
 		f, err := s.GetFile(req.ID)
 
-		if req.requestId != "" && logger != nil {
+		if logger != nil {
 			logger.Log("files", "getFile", "requestId", req.requestId, "error", err)
 		}
 
@@ -217,7 +217,7 @@ func deleteFileEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 
 		err := s.DeleteFile(req.ID)
 
-		if req.requestId != "" && logger != nil {
+		if logger != nil {
 			logger.Log("files", "deleteFile", "requestId", req.requestId, "error", err)
 		}
 
@@ -263,7 +263,7 @@ func getFileContentsEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 
 		r, err := s.GetFileContents(req.ID)
 
-		if req.requestId != "" && logger != nil {
+		if logger != nil {
 			logger.Log("files", "getFileContents", "requestId", req.requestId, "error", err)
 		}
 		if err != nil {
@@ -309,7 +309,7 @@ func validateFileEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 		}
 
 		err := s.ValidateFile(req.ID)
-		if req.requestId != "" && logger != nil {
+		if logger != nil {
 			logger.Log("files", "validateFile", "requestId", req.requestId, "error", err)
 		}
 		if err != nil { // wrap err with context
@@ -355,7 +355,7 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 
 		creditFile, debitFile, err := s.SegmentFile(req.fileID)
 
-		if req.requestId != "" && logger != nil {
+		if logger != nil {
 			logger.Log("files", "segmentFile", "requestId", req.requestId, "error", err)
 		}
 		if err != nil {
@@ -364,14 +364,14 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 
 		if creditFile.ID != "" {
 			err = r.StoreFile(creditFile)
-			if req.requestId != "" && logger != nil {
+			if logger != nil {
 				logger.Log("files", "storeCreditFile", "requestId", req.requestId, "error", err)
 			}
 		}
 
 		if debitFile.ID != "" {
 			err = r.StoreFile(debitFile)
-			if req.requestId != "" && logger != nil {
+			if logger != nil {
 				logger.Log("files", "storeDebitFile", "requestId", req.requestId, "error", err)
 			}
 		}

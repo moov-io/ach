@@ -38,7 +38,7 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       parameters:
-        - name: X-Request-Id
+        - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
           example: rs4f9915
@@ -65,7 +65,7 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       parameters:
-        - name: X-Request-Id
+        - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
           example: rs4f9915
@@ -109,7 +109,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /files/{file_id}:
+  /files/{fileID}:
     get:
       tags: ['ACH Files']
       summary: Retrieves the details of an existing File. You need only supply the unique File identifier that was returned upon creation.
@@ -118,13 +118,13 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       parameters:
-        - name: X-Request-Id
+        - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
-        - name: file_id
+        - name: fileID
           in: path
           description: File ID
           required: true
@@ -148,7 +148,7 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       parameters:
-        - name: X-Request-Id
+        - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
           example: rs4f9915
@@ -161,7 +161,7 @@ paths:
           required: false
           schema:
             type: string
-        - name: file_id
+        - name: fileID
           in: path
           description: File ID
           required: true
@@ -201,14 +201,14 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       parameters:
-        - name: file_id
+        - name: fileID
           in: path
           description: File ID
           required: true
           schema:
             type: string
             example: 3f2d23ee214
-        - name: X-Request-Id
+        - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
           example: rs4f9915
@@ -219,7 +219,7 @@ paths:
             description: Permanently deleted File.
           '404':
             description: A File with the specified ID was not found.
-  /files/{file_id}/contents:
+  /files/{fileID}/contents:
     get:
       tags: ['ACH Files']
       summary: Assembles the existing file (batches and controls) records, computes sequence numbers and totals. Returns plaintext file.
@@ -228,13 +228,13 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       parameters:
-        - name: X-Request-Id
+        - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
-        - name: file_id
+        - name: fileID
           in: path
           description: File ID
           required: true
@@ -248,7 +248,7 @@ paths:
             text/plain:
               schema:
                 $ref: '#/components/schemas/RawFile'
-  /files/{file_id}/validate:
+  /files/{fileID}/validate:
     get:
       tags: ['ACH Files']
       summary: Validates the existing file. You need only supply the unique File identifier that was returned upon creation.
@@ -257,13 +257,13 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       parameters:
-        - name: X-Request-Id
+        - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
-        - name: file_id
+        - name: fileID
           in: path
           description: File ID
           required: true
@@ -279,7 +279,7 @@ paths:
                 $ref: '#/components/schemas/File'
         '400':
           description: Validation failed. Check response for errors
-  /files/{file_id}/segment:
+  /files/{fileID}/segment:
     post:
       tags: ['ACH Files']
       summary: Create a new file object
@@ -288,7 +288,7 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       parameters:
-        - name: X-Request-Id
+        - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
           example: rs4f9915
@@ -301,7 +301,7 @@ paths:
           required: false
           schema:
             type: string
-        - name: file_id
+        - name: fileID
           in: path
           description: File ID
           required: true
@@ -333,7 +333,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/File'
-  /files/{file_id}/batches:
+  /files/{fileID}/batches:
     get:
       tags: ['ACH Files']
       summary: Get the batches on a File.
@@ -342,13 +342,13 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       parameters:
-        - name: X-Request-Id
+        - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
-        - name: file_id
+        - name: fileID
           in: path
           description: File ID
           required: true
@@ -375,7 +375,7 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       parameters:
-        - name: X-Request-Id
+        - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
           example: rs4f9915
@@ -388,7 +388,7 @@ paths:
           required: false
           schema:
             type: string
-        - name: file_id
+        - name: fileID
           in: path
           description: File ID
           required: true
@@ -404,7 +404,7 @@ paths:
       responses:
         '200':
           description: Batch added to File
-  /files/{file_id}/batches/{batch_id}:
+  /files/{fileID}/batches/{batchID}:
     get:
       tags: ['ACH Files']
       summary: Get a specific Batch on a FIle
@@ -413,20 +413,20 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       parameters:
-        - name: X-Request-Id
+        - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
-        - name: file_id
+        - name: fileID
           in: path
           description: File ID
           required: true
           schema:
             type: string
             example: 3f2d23ee214
-        - name: batch_id
+        - name: batchID
           in: path
           description: Batch ID
           required: true
@@ -450,20 +450,20 @@ paths:
         - bearerAuth: []
         - cookieAuth: []
       parameters:
-        - name: X-Request-Id
+        - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
-        - name: file_id
+        - name: fileID
           in: path
           description: File ID
           required: true
           schema:
             type: string
             example: 3f2d23ee214
-        - name: batch_id
+        - name: batchID
           in: path
           description: Batch ID
           required: true
@@ -480,7 +480,7 @@ components:
   schemas:
     CreateFile:
       properties:
-        id:
+        ID:
           type: string
           description: File ID
           example: 3f2d23ee214
@@ -500,7 +500,7 @@ components:
         - fileHeader
     File:
       properties:
-        id:
+        ID:
           type: string
           description: File ID
           example: 3f2d23ee214
@@ -561,7 +561,7 @@ components:
         - immediateDestinationName
     FileControl:
       properties:
-        id:
+        ID:
           description: Moov API File ID
           type: string
           example: d1e26288
@@ -615,7 +615,7 @@ components:
         - companyIdentification
         - ODFIIdentification
       properties:
-        id:
+        ID:
           type: string
           description: Batch Header ID
           example: 913b5742
@@ -669,7 +669,7 @@ components:
             BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
     BatchControl:
       properties:
-        id:
+        ID:
           description: Batch ID
           type: string
           example: 62d8f0cd
@@ -728,7 +728,7 @@ components:
         - amount
         - individualName
       properties:
-        id:
+        ID:
           type: string
           description: Entry Detail ID
           example: 842a2261
@@ -806,7 +806,7 @@ components:
           example: '02'
     IATBatch:
       properties:
-        id:
+        ID:
           description: Client defined string used as a reference to this record.
           type: string
           example: a747e53f
@@ -814,7 +814,7 @@ components:
           $ref: '#/components/schemas/IATBatchHeader'
     IATBatchHeader:
       properties:
-        id:
+        ID:
           description: ID is a client defined string used as a reference to this record.
           type: string
           example: a747e53f
