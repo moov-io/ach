@@ -16,9 +16,11 @@ import (
 )
 
 var (
-	ErrNoUserId = errors.New("no X-User-Id header provided")
+	// ErrNoUserID is returned when no x-user-id header was found
+	ErrNoUserID = errors.New("no X-User-Id header provided")
 )
 
+// ResponseWriter implements Go's standard library http.ResponseWriter to complete HTTP requests
 type ResponseWriter struct {
 	http.ResponseWriter
 
@@ -31,6 +33,8 @@ type ResponseWriter struct {
 	log log.Logger
 }
 
+// WriteHeader sends an HTTP response header with the provided status code, records response duration,
+// and optionally records the HTTP metadata in a go-kit log.Logger
 func (w *ResponseWriter) WriteHeader(code int) {
 	if w.headersWritten {
 		return
@@ -53,8 +57,8 @@ func (w *ResponseWriter) WriteHeader(code int) {
 		w.ResponseWriter.Header().Set("X-Content-Type-Options", "nosniff")
 	}
 
-	if requestId := GetRequestId(w.request); requestId != "" && w.log != nil {
-		w.log.Log("method", w.request.Method, "path", w.request.URL.Path, "status", code, "duration", diff, "requestId", requestId)
+	if requestID := GetRequestID(w.request); requestID != "" && w.log != nil {
+		w.log.Log("method", w.request.Method, "path", w.request.URL.Path, "status", code, "duration", diff, "requestID", requestID)
 	}
 }
 
@@ -87,12 +91,12 @@ func EnsureHeaders(logger log.Logger, m metrics.Histogram, rec idempotent.Record
 
 // ensureHeaders verifies the headers which Moov apps all cares about.
 func (w *ResponseWriter) ensureHeaders(rec idempotent.Recorder) error {
-	if userId := GetUserId(w.request); userId == "" {
+	if userID := GetUserID(w.request); userID == "" {
 		if !w.headersWritten {
 			w.Header().Set("Content-Type", "text/plain")
 			w.WriteHeader(http.StatusForbidden)
 		}
-		return ErrNoUserId
+		return ErrNoUserID
 	}
 	if rec != nil {
 		if _, seen := idempotent.FromRequest(w.request, rec); seen {
