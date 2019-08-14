@@ -44,7 +44,7 @@ The ACH project implements a Go library and HTTP server for creating and modifyi
 | MTE      | Machine Transfer Entry                | [Credit](test/ach-mte-read/mte-read.ach)   | [MTE Read](examples/ach-mte-read/main.go) | [MTE Write](examples/ach-mte-write/main.go) |
 | POP      | Point of Purchase                     | [Debit](test/ach-pop-read/pop-debit.ach) | [POP Read](examples/ach-pop-read/main.go) | [POP Write](examples/ach-pop-write/main.go) |
 | POS      | Point of Sale                         | [Debit](test/ach-pos-read/pos-debit.ach) | [POS Read](examples/ach-pos-read/main.go) | [POS Write](examples/ach-pos-write/main.go) |
-| PPD      | Prearranged payment and deposits      | [Debit](test/ach-ppd-read/ppd-debit.ach) [Credit](examples/ach-ppd-read/ppd-credit.ach) | [PPD Read](examples/ach-ppd-read/main.go) | [PPD Write](examples/ach-ppd-write/main.go) |
+| PPD      | Prearranged payment and deposits      | [Debit](test/ach-ppd-read/ppd-debit.ach) [Credit](test/ach-ppd-read/ppd-credit.ach) | [PPD Read](examples/ach-ppd-read/main.go) | [PPD Write](examples/ach-ppd-write/main.go) |
 | RCK      | Represented Check Entries             | [Debit](test/ach-rck-read/rck-debit.ach) | [RCK Read](examples/ach-rck-read/main.go) | [RCK Write](examples/ach-rck-write/main.go) |
 | SHR      | Shared Network Entry                  | [Debit](test/ach-shr-read/shr-debit.ach) | [SHR Read](examples/ach-shr-read/main.go) | [SHR Write](examples/ach-shr-write/main.go) |
 | TEL      | Telephone-Initiated Entry             | [Debit](test/ach-tel-read/tel-debit.ach) | [TEL Read](examples/ach-tel-read/main.go) | [TEL Write](examples/ach-tel-write/main.go) |
@@ -60,8 +60,8 @@ The ACH project implements a Go library and HTTP server for creating and modifyi
 
 | SEC Code | Name                                  | Example                                  | Read                | Write                                            |
 |----------|---------------------------------------|------------------------------------------|-----------------------------------|------------------------------------|
-| PPD      | Prearranged payment and deposits      | [Debit](test/ach-ppd-read-segmentFile/segmentFile-ppd-debit.ach) [Credit](examples/ach-ppd-read-segmentFile/segmentFile-ppd-credit.ach) | [PPD Read](examples/ach-ppd-segmentFile-read/main.go) | [PPD Write](examples/ach-ppd-write-segmentFile/main.go) |
-| IAT      | International ACH Transactions        | [Debit](test/ach-iat-read-segmentFile/segmentFile-iat-debit.ach) [Credit](examples/ach-iat-read-segmentFile/segmentFile-iat-credit.ach) | [IAT Read](examples/ach-iat-segmentFile-read/main.go) | [IAT Write](examples/ach-iat-write-segmentFile/main.go) |
+| PPD      | Prearranged payment and deposits      | [Debit](test/ach-ppd-read-segmentFile/segmentFile-ppd-debit.ach) [Credit](test/ach-ppd-read-segmentFile/segmentFile-ppd-credit.ach) | [PPD Read](examples/ach-ppd-segmentFile-read/main.go) | [PPD Write](examples/ach-ppd-write-segmentFile/main.go) |
+| IAT      | International ACH Transactions        | [Debit](test/ach-iat-read-segmentFile/segmentFile-iat-debit.ach) [Credit](test/ach-iat-read-segmentFile/segmentFile-iat-credit.ach) | [IAT Read](examples/ach-iat-segmentFile-read/main.go) | [IAT Write](examples/ach-iat-write-segmentFile/main.go) |
 
 </details>
 
