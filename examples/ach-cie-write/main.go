@@ -11,7 +11,7 @@ import (
 func main() {
 	// Example transfer to write an ACH CIE file to send/credit a external institutions account
 	// Important: All financial institutions are different and will require registration and exact field values.
-	
+
 	fh := ach.NewFileHeader()
 	fh.ImmediateDestination = "231380104"             // Routing Number of the ACH Operator or receiving point to which the file is being sent
 	fh.ImmediateOrigin = "121042882"                  // Routing Number of the ACH Operator or sending point that is sending the file
