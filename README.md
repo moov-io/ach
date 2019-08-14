@@ -29,29 +29,29 @@ The ACH project implements a Go library and HTTP server for creating and modifyi
 
 | SEC Code | Name                                  | Example                                  | Read                | Write                                            |
 |----------|---------------------------------------|------------------------------------------|-----------------------------------|------------------------------------|
-| ACK      | Acknowledgment Entry for CCD          | [Credit](examples/ach-ack-read/ack-read.ach) | [ACK Read](examples/ach-ack-read/main.go) | [ACK Write](examples/ach-ack-write/main.go) |
-| ADV      | Automated Accounting Advice           | [Prenote Debit](examples/ach-adv-read/adv-read.ach) | [ADV Read](examples/ach-adv-read/main.go) | [ADV Write](examples/ach-adv-write/main.go) |
-| ARC      | Accounts Receivable Entry             | [Debit](examples/ach-arc-read/arc-debit.ach) | [ARC Read](examples/ach-arc-read/main.go) | [ARC Write](examples/ach-arc-write/main.go) |
-| ATX      | Acknowledgment Entry for CTX          | [Credit](examples/ach-atx-read/atx-read.ach)  | [ATX Read](examples/ach-atx-read/main.go) | [ATX Write](examples/ach-atx-write/main.go) |
-| BOC      | Back Office Conversion                | [Debit](examples/ach-boc-read/boc-debit.ach) | [BOC Read](examples/ach-boc-read/main.go) | [BOC Write](examples/ach-boc-write/main.go) |
-| CCD      | Corporate credit or debit             | [Debit](examples/ach-ccd-read/ccd-debit.ach) | [CCD Read](examples/ach-ccd-read/main.go) | [CCD Write](examples/ach-ccd-write/main.go) |
-| CIE      | Customer-Initiated Entry              | [Credit](examples/ach-cie-read/cie-credit.ach) | [CIE Read](examples/ach-cie-read/main.go) | [CIE Write](examples/ach-cie-write/main.go) |
-| COR      | Automated Notification of Change(NOC) | [NOC](examples/ach-cor-read/cor-read.ach)   | [COR Read](examples/ach-cor-read/main.go) | [COR Write](examples/ach-cor-write/main.go) |
-| CTX      | Corporate Trade Exchange              | [Debit](examples/ach-ctx-read/ctx-debit.ach) | [CTX Read](examples/ach-ctx-read/main.go) | [CTX Write](examples/ach-ctx-write/main.go) |
-| DNE      | Death Notification Entry              | [DNE](examples/ach-dne-read/dne-read.ach)   | [DNE Read](examples/ach-dne-read/main.go) | [DNE Write](examples/ach-dne-write/main.go) |
-| ENR      | Automatic Enrollment Entry            | [ENR](examples/ach-enr-read/enr-read.ach)   | [ENR Read](examples/ach-enr-read/main.go) | [ENR Write](examples/ach-enr-write/main.go) |
-| IAT      | International ACH Transactions        | [Credit](examples/ach-iat-read/iat-credit.ach) | [IAT Read](examples/ach-iat-read/main.go) | [IAT Write](examples/ach-iat-write/main.go) |
-| MTE      | Machine Transfer Entry                | [Credit](examples/ach-mte-read/mte-read.ach)   | [MTE Read](examples/ach-mte-read/main.go) | [MTE Write](examples/ach-mte-write/main.go) |
-| POP      | Point of Purchase                     | [Debit](examples/ach-pop-read/pop-debit.ach) | [POP Read](examples/ach-pop-read/main.go) | [POP Write](examples/ach-pop-write/main.go) |
-| POS      | Point of Sale                         | [Debit](examples/ach-pos-read/pos-debit.ach) | [POS Read](examples/ach-pos-read/main.go) | [POS Write](examples/ach-pos-write/main.go) |
-| PPD      | Prearranged payment and deposits      | [Debit](examples/ach-ppd-read/ppd-debit.ach) [Credit](examples/ach-ppd-read/ppd-credit.ach) | [PPD Read](examples/ach-ppd-read/main.go) | [PPD Write](examples/ach-ppd-write/main.go) |
-| RCK      | Represented Check Entries             | [Debit](examples/ach-rck-read/rck-debit.ach) | [RCK Read](examples/ach-rck-read/main.go) | [RCK Write](examples/ach-rck-write/main.go) |
-| SHR      | Shared Network Entry                  | [Debit](examples/ach-shr-read/shr-debit.ach) | [SHR Read](examples/ach-shr-read/main.go) | [SHR Write](examples/ach-shr-write/main.go) |
-| TEL      | Telephone-Initiated Entry             | [Debit](examples/ach-tel-read/tel-debit.ach) | [TEL Read](examples/ach-tel-read/main.go) | [TEL Write](examples/ach-tel-write/main.go) |
-| TRC      | Truncated Check Entry                 | [Debit](examples/ach-trc-read/trc-debit.ach) | [TRC Read](examples/ach-trc-read/main.go) | [TRC Write](examples/ach-trc-write/main.go) |
-| TRX      | Check Truncation Entries Exchange     | [Debit](examples/ach-trx-read/trx-debit.ach) | [TRX Read](examples/ach-trx-read/main.go) | [TRX Write](examples/ach-trx-write/main.go) |
-| WEB      | Internet-initiated Entries            | [Credit](examples/ach-web-read/web-credit.ach) | [WEB Read](examples/ach-web-read/main.go) | [WEB Write](examples/ach-web-write/main.go) |
-| XCK      | Destroyed Check Entry                 | [Debit](examples/ach-xck-read/xck-debit.ach)  | [XCK Read](examples/ach-xck-read/main.go) | [XCK Write](examples/ach-xck-write/main.go) |
+| ACK      | Acknowledgment Entry for CCD          | [Credit](test/ach-ack-read/ack-read.ach) | [ACK Read](examples/ach-ack-read/main.go) | [ACK Write](examples/ach-ack-write/main.go) |
+| ADV      | Automated Accounting Advice           | [Prenote Debit](test/ach-adv-read/adv-read.ach) | [ADV Read](examples/ach-adv-read/main.go) | [ADV Write](examples/ach-adv-write/main.go) |
+| ARC      | Accounts Receivable Entry             | [Debit](test/ach-arc-read/arc-debit.ach) | [ARC Read](examples/ach-arc-read/main.go) | [ARC Write](examples/ach-arc-write/main.go) |
+| ATX      | Acknowledgment Entry for CTX          | [Credit](test/ach-atx-read/atx-read.ach)  | [ATX Read](examples/ach-atx-read/main.go) | [ATX Write](examples/ach-atx-write/main.go) |
+| BOC      | Back Office Conversion                | [Debit](test/ach-boc-read/boc-debit.ach) | [BOC Read](examples/ach-boc-read/main.go) | [BOC Write](examples/ach-boc-write/main.go) |
+| CCD      | Corporate credit or debit             | [Debit](test/ach-ccd-read/ccd-debit.ach) | [CCD Read](examples/ach-ccd-read/main.go) | [CCD Write](examples/ach-ccd-write/main.go) |
+| CIE      | Customer-Initiated Entry              | [Credit](test/ach-cie-read/cie-credit.ach) | [CIE Read](examples/ach-cie-read/main.go) | [CIE Write](examples/ach-cie-write/main.go) |
+| COR      | Automated Notification of Change(NOC) | [NOC](test/ach-cor-read/cor-read.ach)   | [COR Read](examples/ach-cor-read/main.go) | [COR Write](examples/ach-cor-write/main.go) |
+| CTX      | Corporate Trade Exchange              | [Debit](test/ach-ctx-read/ctx-debit.ach) | [CTX Read](examples/ach-ctx-read/main.go) | [CTX Write](examples/ach-ctx-write/main.go) |
+| DNE      | Death Notification Entry              | [DNE](test/ach-dne-read/dne-read.ach)   | [DNE Read](examples/ach-dne-read/main.go) | [DNE Write](examples/ach-dne-write/main.go) |
+| ENR      | Automatic Enrollment Entry            | [ENR](test/ach-enr-read/enr-read.ach)   | [ENR Read](examples/ach-enr-read/main.go) | [ENR Write](examples/ach-enr-write/main.go) |
+| IAT      | International ACH Transactions        | [Credit](test/ach-iat-read/iat-credit.ach) | [IAT Read](examples/ach-iat-read/main.go) | [IAT Write](examples/ach-iat-write/main.go) |
+| MTE      | Machine Transfer Entry                | [Credit](test/ach-mte-read/mte-read.ach)   | [MTE Read](examples/ach-mte-read/main.go) | [MTE Write](examples/ach-mte-write/main.go) |
+| POP      | Point of Purchase                     | [Debit](test/ach-pop-read/pop-debit.ach) | [POP Read](examples/ach-pop-read/main.go) | [POP Write](examples/ach-pop-write/main.go) |
+| POS      | Point of Sale                         | [Debit](test/ach-pos-read/pos-debit.ach) | [POS Read](examples/ach-pos-read/main.go) | [POS Write](examples/ach-pos-write/main.go) |
+| PPD      | Prearranged payment and deposits      | [Debit](test/ach-ppd-read/ppd-debit.ach) [Credit](examples/ach-ppd-read/ppd-credit.ach) | [PPD Read](examples/ach-ppd-read/main.go) | [PPD Write](examples/ach-ppd-write/main.go) |
+| RCK      | Represented Check Entries             | [Debit](test/ach-rck-read/rck-debit.ach) | [RCK Read](examples/ach-rck-read/main.go) | [RCK Write](examples/ach-rck-write/main.go) |
+| SHR      | Shared Network Entry                  | [Debit](test/ach-shr-read/shr-debit.ach) | [SHR Read](examples/ach-shr-read/main.go) | [SHR Write](examples/ach-shr-write/main.go) |
+| TEL      | Telephone-Initiated Entry             | [Debit](test/ach-tel-read/tel-debit.ach) | [TEL Read](examples/ach-tel-read/main.go) | [TEL Write](examples/ach-tel-write/main.go) |
+| TRC      | Truncated Check Entry                 | [Debit](test/ach-trc-read/trc-debit.ach) | [TRC Read](examples/ach-trc-read/main.go) | [TRC Write](examples/ach-trc-write/main.go) |
+| TRX      | Check Truncation Entries Exchange     | [Debit](test/ach-trx-read/trx-debit.ach) | [TRX Read](examples/ach-trx-read/main.go) | [TRX Write](examples/ach-trx-write/main.go) |
+| WEB      | Internet-initiated Entries            | [Credit](test/ach-web-read/web-credit.ach) | [WEB Read](examples/ach-web-read/main.go) | [WEB Write](examples/ach-web-write/main.go) |
+| XCK      | Destroyed Check Entry                 | [Debit](test/ach-xck-read/xck-debit.ach)  | [XCK Read](examples/ach-xck-read/main.go) | [XCK Write](examples/ach-xck-write/main.go) |
 
 </details>
 
@@ -60,8 +60,8 @@ The ACH project implements a Go library and HTTP server for creating and modifyi
 
 | SEC Code | Name                                  | Example                                  | Read                | Write                                            |
 |----------|---------------------------------------|------------------------------------------|-----------------------------------|------------------------------------|
-| PPD      | Prearranged payment and deposits      | [Debit](examples/ach-ppd-read-segmentFile/segmentFile-ppd-debit.ach) [Credit](examples/ach-ppd-read-segmentFile/segmentFile-ppd-credit.ach) | [PPD Read](examples/ach-ppd-segmentFile-read/main.go) | [PPD Write](examples/ach-ppd-write-segmentFile/main.go) |
-| IAT      | International ACH Transactions        | [Debit](examples/ach-iat-read-segmentFile/segmentFile-iat-debit.ach) [Credit](examples/ach-iat-read-segmentFile/segmentFile-iat-credit.ach) | [IAT Read](examples/ach-iat-segmentFile-read/main.go) | [IAT Write](examples/ach-iat-write-segmentFile/main.go) |
+| PPD      | Prearranged payment and deposits      | [Debit](test/ach-ppd-read-segmentFile/segmentFile-ppd-debit.ach) [Credit](examples/ach-ppd-read-segmentFile/segmentFile-ppd-credit.ach) | [PPD Read](examples/ach-ppd-segmentFile-read/main.go) | [PPD Write](examples/ach-ppd-write-segmentFile/main.go) |
+| IAT      | International ACH Transactions        | [Debit](test/ach-iat-read-segmentFile/segmentFile-iat-debit.ach) [Credit](examples/ach-iat-read-segmentFile/segmentFile-iat-credit.ach) | [IAT Read](examples/ach-iat-segmentFile-read/main.go) | [IAT Write](examples/ach-iat-write-segmentFile/main.go) |
 
 </details>
 
