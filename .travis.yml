@@ -23,7 +23,7 @@ env:
   matrix:
     - GO111MODULE=on
 before_install:
-  - go get -u github.com/client9/misspell/cmd/misspell
+ # - go get -u github.com/client9/misspell/cmd/misspell
   - go get -u golang.org/x/lint/golint
   - go get github.com/fzipp/gocyclo
   - go get honnef.co/go/tools/cmd/staticcheck
@@ -35,7 +35,7 @@ script:
   # Just check gofmt on linux, it's the fastest builder
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then test -z $(gofmt -s -l $GOFILES); fi
   - go test ./... -race -coverprofile=coverage.txt -covermode=atomic
-  - misspell -error -locale US $GOFILES
+#  - misspell -error -locale US $GOFILES
   - gocyclo -over 26 $GOFILES
   - golint -set_exit_status $GOFILES
   - staticcheck ./...
