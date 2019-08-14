@@ -1,34 +1,64 @@
 language: go
 sudo: required
+
 services:
-- docker
-os:
-- linux
-- osx
-- windows
-go:
-- 1.12.x
+  - docker
+
+matrix:
+  include:
+    - os: linux
+      go: 1.12.x
+      cache:
+        directories:
+          - "/home/travis/.cache/go-build" # GOCACHE
+    - os: osx
+      go: 1.12.x
+      cache:
+        directories:
+          - "/Users/travis/Library/Caches/go-build" # GOCACHE
+    - os: windows
+      go: 1.12.x
+      cache:
+        directories:
+          - "C:\\Users\\travis\\AppData\\Local\\go-build"
+
 dist: xenial # Ubuntu 16.04
-osx_image: xcode9.1
+
 before_install:
-- go get -u github.com/client9/misspell/cmd/misspell
-- go get -u golang.org/x/lint/golint
-- go get -u honnef.co/go/tools/cmd/staticcheck
-- go get github.com/fzipp/gocyclo
-- go get golang.org/x/tools/cmd/cover
-# Install gcc, from https://travis-ci.community/t/go-cant-find-gcc-with-go1-11-1-on-windows/293/5
-- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then choco install -y mingw; export PATH=/c/tools/mingw64/bin:"$PATH"; fi
-# Install ruby on linux
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update -qq && sudo apt-get install -y -qq ruby; fi
+  # Setup directory for binaries
+  - mkdir ./bin
+  - export PATH=$PATH:$PWD/bin
+  # Misspell
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget -O misspell.tar.gz https://github.com/client9/misspell/releases/download/v0.3.4/misspell_0.3.4_linux_64bit.tar.gz; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then wget -O misspell.tar.gz https://github.com/client9/misspell/releases/download/v0.3.4/misspell_0.3.4_mac_64bit.tar.gz; fi
+  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then tar xf misspell.tar.gz && cp ./misspell ./bin/misspell; fi
+  # staticcheck
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget -O staticcheck.tar.gz https://github.com/dominikh/go-tools/releases/download/2019.2.2/staticcheck_linux_amd64.tar.gz; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then wget -O staticcheck.tar.gz https://github.com/dominikh/go-tools/releases/download/2019.2.2/staticcheck_darwin_amd64.tar.gz; fi
+  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then tar xf staticcheck.tar.gz && cp ./staticcheck/staticcheck ./bin/staticcheck; fi
+  # golint (revive is a faster drop-in replacement)
+  - go get -u github.com/mgechev/revive
+  # gocyclo
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget -O ./bin/gocyclo https://github.com/adamdecaf/gocyclo/releases/download/2019-08-09/gocyclo-linux-amd64; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then wget -O ./bin/gocyclo https://github.com/adamdecaf/gocyclo/releases/download/2019-08-09/gocyclo-darwin-amd64; fi
+  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then chmod +x ./bin/gocyclo; fi
+  # Install gcc, from https://travis-ci.community/t/go-cant-find-gcc-with-go1-11-1-on-windows/293/5
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then choco install -y mingw; export PATH=/c/tools/mingw64/bin:"$PATH"; fi
+  # Install ruby on linux
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update -qq && sudo apt-get install -y -qq ruby; fi
+
 before_script:
-- GOFILES=$(find . -type f -name '*.go' | grep -v vendor)
+  - GOFILES=$(find . -type f -name '*.go' | grep -v vendor)
+  - go mod graph
+
 script:
-# Just check gofmt on linux, it's the fastest builder
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then test -z $(gofmt -s -l $GOFILES); fi
-- go test ./... -race -coverprofile=coverage.txt -covermode=atomic
-- misspell -error -locale US $GOFILES
-- gocyclo -over 19 $GOFILES
-- golint -set_exit_status $GOFILES
-- staticcheck ./...
+  # Just check gofmt on linux, it's the fastest builder
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then test -z $(gofmt -s -l $GOFILES); fi
+  - go test ./... -race -coverprofile=coverage.txt -covermode=atomic
+  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then misspell -error -locale US $GOFILES; fi
+  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then gocyclo -over 19 $GOFILES; fi
+  - revive $GOFILES
+  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then staticcheck ./...; fi
+
 after_success:
-- bash <(curl -s https://codecov.io/bash) -X fix
+  - bash <(curl -s https://codecov.io/bash) -X fix

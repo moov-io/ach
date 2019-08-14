@@ -1,10 +1,16 @@
 ## v0.10.0 (Unreleased)
 
+BREAKING CHANGES
+
+We've renamed `http.GetRequestID` and `http.GetUserID` from `http.Get*Id` to match Go's preference for `ID` suffixes.
+
 ADDITIONS
 
 - idempotent: add [`Header(*http.Request) string`](https://godoc.org/github.com/moov-io/base/idempotent#Header) and `HeaderKey`
+- http/bind: add Wire HTTP service/port binding
 - http/bind: add customers port
 - http/bind: rename gl to accounts
+- time: expose ISO 8601 format
 
 BUG FIXES
 
@@ -13,6 +19,8 @@ BUG FIXES
 IMPROVEMENTS
 
 - idempotent: bump up max header length
+- admin: bind on a random port and return it in BindAddr on `:0`
+- build: enable windows in TravisCI
 
 ## v0.9.0 (Released 2019-03-04)
 
