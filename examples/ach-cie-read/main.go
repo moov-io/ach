@@ -1,7 +1,3 @@
-// Copyright 2019 The Moov Authors
-// Use of this source code is governed by an Apache License
-// license that can be found in the LICENSE file.
-
 package main
 
 import (
@@ -13,7 +9,7 @@ import (
 )
 
 func main() {
-	f, err := os.Open(filepath.Join("test", "ach-ack-read", "ack-read.ach"))
+	f, err := os.Open(filepath.Join("test", "ach-cie-read", "cie-credit.ach"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -23,7 +19,7 @@ func main() {
 		fmt.Printf("Issue reading file: %+v \n", err)
 	}
 	// ensure we have a validated file structure
-	if err := achFile.Validate(); err != nil {
+	if achFile.Validate(); err != nil {
 		fmt.Printf("Could not validate entire read file: %v", err)
 	}
 	// If you trust the file but it's formatting is off building will probably resolve the malformed file.
@@ -31,9 +27,8 @@ func main() {
 		fmt.Printf("Could not create file with read properties: %v", err)
 	}
 
-	fmt.Printf("Credit Total Amount: %v \n", achFile.Control.TotalCreditEntryDollarAmountInFile)
-	fmt.Printf("Batch Credit Total Amount: %v \n", achFile.Batches[0].GetControl().TotalCreditEntryDollarAmount)
-	fmt.Printf("Total Amount: %v \n", achFile.Batches[0].GetEntries()[0].Amount)
+	fmt.Printf("Total Amount Debit: %v \n", achFile.Control.TotalDebitEntryDollarAmountInFile)
+	fmt.Printf("Total Amount Credit: %v \n", achFile.Control.TotalCreditEntryDollarAmountInFile)
 	fmt.Printf("SEC Code: %v \n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
-	fmt.Printf("Original Trace Number: %v \n", achFile.Batches[0].GetEntries()[0].OriginalTraceNumberField())
+	fmt.Printf("Addenda05: %v \n", achFile.Batches[0].GetEntries()[0].Addenda05[0].String())
 }

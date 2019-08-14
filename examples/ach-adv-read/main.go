@@ -14,7 +14,6 @@ import (
 )
 
 func main() {
-	// open a file for reading. Any io.Reader Can be used
 	f, err := os.Open(filepath.Join("test", "ach-adv-read", "adv-read.ach"))
 	if err != nil {
 		log.Fatal(err)
