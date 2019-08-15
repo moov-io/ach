@@ -27,7 +27,7 @@ The ACH project implements a Go library and HTTP server for creating and modifyi
 <details>
 <summary>Supported Standard Entry Class (SEC) codes</summary>
 
-| SEC Code | Name                                  | Example                                  | Read                | Write                                            |
+| SEC Code | Description                                  | Example                                  | Read                | Write                                            |
 |----------|---------------------------------------|------------------------------------------|-----------------------------------|------------------------------------|
 | ACK      | Acknowledgment Entry for CCD          | [Credit](test/ach-ack-read/ack-read.ach) | [ACK Read](examples/ach-ack-read/main.go) | [ACK Write](examples/ach-ack-write/main.go) |
 | ADV      | Automated Accounting Advice           | [Prenote Debit](test/ach-adv-read/adv-read.ach) | [ADV Read](examples/ach-adv-read/main.go) | [ADV Write](examples/ach-adv-write/main.go) |
