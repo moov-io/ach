@@ -48,6 +48,22 @@ func TestFiles__decodeCreateBatchRequest(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Errorf("bogus HTTP status code: %d: %s", w.Code, w.Body.String())
 	}
+
+	// bad JSON body
+	body.Reset()
+	if _, err := body.WriteString(`{"batchHeader": "expected-an-object"}`); err != nil {
+		t.Fatal(err)
+	}
+	req = httptest.NewRequest("POST", "/files/foo/batches", &body)
+	req.Header.Set("x-request-id", "test")
+
+	w = httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("bogus HTTP status code: %d: %s", w.Code, w.Body.String())
+	}
 }
 
 func TestFiles__createBatchEndpoint(t *testing.T) {

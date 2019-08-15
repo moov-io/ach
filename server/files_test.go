@@ -193,12 +193,13 @@ func TestFiles__getFileContentsEndpoint(t *testing.T) {
 }
 
 func TestFiles__validateFileEndpoint(t *testing.T) {
-	repo := NewRepositoryInMemory(testTTLDuration, nil)
+	logger := log.NewNopLogger()
+	repo := NewRepositoryInMemory(testTTLDuration, logger)
 	svc := NewService(repo)
 
 	rawBody := `{"random":"json"}`
 
-	resp, err := validateFileEndpoint(svc, nil)(context.TODO(), strings.NewReader(rawBody))
+	resp, err := validateFileEndpoint(svc, logger)(context.TODO(), strings.NewReader(rawBody))
 	r, ok := resp.(validateFileResponse)
 	if !ok {
 		t.Errorf("got %#v", resp)
@@ -224,7 +225,7 @@ func TestFiles__validateFileEndpoint(t *testing.T) {
 
 	router := mux.NewRouter()
 	router.Methods("GET").Path("/files/{id}/validate").Handler(
-		httptransport.NewServer(validateFileEndpoint(svc, nil), decodeValidateFileRequest, encodeResponse),
+		httptransport.NewServer(validateFileEndpoint(svc, logger), decodeValidateFileRequest, encodeResponse),
 	)
 
 	req.Header.Set("Origin", "https://moov.io")
