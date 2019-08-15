@@ -8,13 +8,13 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/moov-io/ach"
 )
 
 func main() {
-	// open a file for reading. Any io.Reader Can be used
-	f, err := os.Open("adv-read.ach")
+	f, err := os.Open(filepath.Join("test", "ach-adv-read", "adv-read.ach"))
 	if err != nil {
 		log.Fatal(err)
 	}
