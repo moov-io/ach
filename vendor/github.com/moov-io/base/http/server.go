@@ -32,7 +32,7 @@ func Problem(w http.ResponseWriter, err error) {
 	})
 }
 
-// Problem writes err to w while also setting the HTTP status code, content-type and marshaling
+// InternalError writes err to w while also setting the HTTP status code, content-type and marshaling
 // err as the response body.
 //
 // Returned is the calling file and line number: server.go:33
@@ -102,12 +102,12 @@ func SetAccessControlAllowHeaders(w http.ResponseWriter, origin string) {
 	}
 }
 
-// GetRequestId returns the Moov header value for request IDs
-func GetRequestId(r *http.Request) string {
+// GetRequestID returns the Moov header value for request IDs
+func GetRequestID(r *http.Request) string {
 	return r.Header.Get("X-Request-Id")
 }
 
-// GetUserId returns the Moov userId from HTTP headers
-func GetUserId(r *http.Request) string {
+// GetUserID returns the Moov userId from HTTP headers
+func GetUserID(r *http.Request) string {
 	return r.Header.Get("X-User-Id")
 }

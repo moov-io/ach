@@ -22,7 +22,7 @@ type createBatchRequest struct {
 	FileID string
 	Batch  *ach.Batch
 
-	requestId string
+	requestID string
 }
 
 type createBatchResponse struct {
@@ -45,7 +45,7 @@ func createBatchEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 		id, err := s.CreateBatch(req.FileID, req.Batch)
 
 		if logger != nil {
-			logger.Log("batches", "createBatch", "file", req.FileID, "requestId", req.requestId, "error", err)
+			logger.Log("batches", "createBatch", "file", req.FileID, "requestID", req.requestID, "error", err)
 		}
 
 		return createBatchResponse{
@@ -57,7 +57,7 @@ func createBatchEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 
 func decodeCreateBatchRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req createBatchRequest
-	req.requestId = moovhttp.GetRequestId(r)
+	req.requestID = moovhttp.GetRequestID(r)
 
 	vars := mux.Vars(r)
 	id, ok := vars["fileID"]
@@ -65,7 +65,7 @@ func decodeCreateBatchRequest(_ context.Context, r *http.Request) (interface{}, 
 		return nil, ErrBadRouting
 	}
 	req.FileID = id
-	if err := json.NewDecoder(r.Body).Decode(req.Batch); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&req.Batch); err != nil {
 		return nil, err
 	}
 	if req.Batch == nil {
@@ -77,7 +77,7 @@ func decodeCreateBatchRequest(_ context.Context, r *http.Request) (interface{}, 
 type getBatchesRequest struct {
 	fileID string
 
-	requestId string
+	requestID string
 }
 
 type getBatchesResponse struct {
@@ -93,7 +93,7 @@ func (r getBatchesResponse) error() error { return r.Err }
 
 func decodeGetBatchesRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req getBatchesRequest
-	req.requestId = moovhttp.GetRequestId(r)
+	req.requestID = moovhttp.GetRequestID(r)
 
 	vars := mux.Vars(r)
 	id, ok := vars["fileID"]
@@ -115,7 +115,7 @@ func getBatchesEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 		}
 
 		if logger != nil {
-			logger.Log("batches", "getBatches", "file", req.fileID, "requestId", req.requestId)
+			logger.Log("batches", "getBatches", "file", req.fileID, "requestID", req.requestID)
 		}
 		return getBatchesResponse{
 			Batches: s.GetBatches(req.fileID),
@@ -128,7 +128,7 @@ type getBatchRequest struct {
 	fileID  string
 	batchID string
 
-	requestId string
+	requestID string
 }
 
 type getBatchResponse struct {
@@ -140,7 +140,7 @@ func (r getBatchResponse) error() error { return r.Err }
 
 func decodeGetBatchRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req getBatchRequest
-	req.requestId = moovhttp.GetRequestId(r)
+	req.requestID = moovhttp.GetRequestID(r)
 
 	vars := mux.Vars(r)
 	fileID, ok := vars["fileID"]
@@ -170,7 +170,7 @@ func getBatchEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 		batch, err := s.GetBatch(req.fileID, req.batchID)
 
 		if logger != nil {
-			logger.Log("batches", "getBatche", "file", req.fileID, "requestId", req.requestId, "error", err)
+			logger.Log("batches", "getBatche", "file", req.fileID, "requestID", req.requestID, "error", err)
 		}
 
 		return getBatchResponse{
@@ -184,7 +184,7 @@ type deleteBatchRequest struct {
 	fileID  string
 	batchID string
 
-	requestId string
+	requestID string
 }
 
 type deleteBatchResponse struct {
@@ -195,7 +195,7 @@ func (r deleteBatchResponse) error() error { return r.Err }
 
 func decodeDeleteBatchRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req deleteBatchRequest
-	req.requestId = moovhttp.GetRequestId(r)
+	req.requestID = moovhttp.GetRequestID(r)
 
 	vars := mux.Vars(r)
 	fileID, ok := vars["fileID"]
@@ -225,7 +225,7 @@ func deleteBatchEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 		err := s.DeleteBatch(req.fileID, req.batchID)
 
 		if logger != nil {
-			logger.Log("batches", "deleteBatch", "file", req.fileID, "requestId", req.requestId, "error", err)
+			logger.Log("batches", "deleteBatch", "file", req.fileID, "requestID", req.requestID, "error", err)
 		}
 
 		return deleteBatchResponse{

@@ -19,6 +19,7 @@ const (
 )
 
 var (
+	// ErrSeenBefore is returned when our http ResponseWriter has seen the idempotency key before
 	ErrSeenBefore = errors.New("X-Idempotency-Key seen before")
 )
 

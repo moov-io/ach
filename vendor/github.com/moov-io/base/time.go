@@ -63,6 +63,7 @@ func NewTime(t time.Time) Time {
 	return tt
 }
 
+// MarshalJSON returns JSON for the given Time
 func (t Time) MarshalJSON() ([]byte, error) {
 	var bs []byte
 	bs = append(bs, '"')
@@ -74,6 +75,7 @@ func (t Time) MarshalJSON() ([]byte, error) {
 	return bs, nil
 }
 
+// UnmarshalJSON unpacks a JSON string to populate a Time instance
 func (t *Time) UnmarshalJSON(data []byte) error {
 	// Ignore null, like in the main JSON package.
 	if string(data) == "null" {

@@ -40,7 +40,7 @@ var (
 type createFileRequest struct {
 	File *ach.File
 
-	requestId string
+	requestID string
 }
 
 type createFileResponse struct {
@@ -72,7 +72,7 @@ func createFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.End
 
 		err := r.StoreFile(req.File)
 		if logger != nil {
-			logger.Log("files", "createFile", "requestId", req.requestId, "error", err)
+			logger.Log("files", "createFile", "requestID", req.requestID, "error", err)
 		}
 
 		return createFileResponse{
@@ -86,7 +86,7 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 	var r io.Reader
 	var req createFileRequest
 
-	req.requestId = moovhttp.GetRequestId(request)
+	req.requestID = moovhttp.GetRequestID(request)
 
 	// Sets default values
 	req.File = ach.NewFile()
@@ -116,7 +116,7 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 }
 
 type getFilesRequest struct {
-	requestId string
+	requestID string
 }
 
 type getFilesResponse struct {
@@ -139,14 +139,14 @@ func getFilesEndpoint(s Service) endpoint.Endpoint {
 
 func decodeGetFilesRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	return getFilesRequest{
-		requestId: moovhttp.GetRequestId(r),
+		requestID: moovhttp.GetRequestID(r),
 	}, nil
 }
 
 type getFileRequest struct {
 	ID string
 
-	requestId string
+	requestID string
 }
 
 type getFileResponse struct {
@@ -169,7 +169,7 @@ func getFileEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 		f, err := s.GetFile(req.ID)
 
 		if logger != nil {
-			logger.Log("files", "getFile", "requestId", req.requestId, "error", err)
+			logger.Log("files", "getFile", "requestID", req.requestID, "error", err)
 		}
 
 		return getFileResponse{
@@ -187,14 +187,14 @@ func decodeGetFileRequest(_ context.Context, r *http.Request) (interface{}, erro
 	}
 	return getFileRequest{
 		ID:        id,
-		requestId: moovhttp.GetRequestId(r),
+		requestID: moovhttp.GetRequestID(r),
 	}, nil
 }
 
 type deleteFileRequest struct {
 	ID string
 
-	requestId string
+	requestID string
 }
 
 type deleteFileResponse struct {
@@ -218,7 +218,7 @@ func deleteFileEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 		err := s.DeleteFile(req.ID)
 
 		if logger != nil {
-			logger.Log("files", "deleteFile", "requestId", req.requestId, "error", err)
+			logger.Log("files", "deleteFile", "requestID", req.requestID, "error", err)
 		}
 
 		return deleteFileResponse{
@@ -235,14 +235,14 @@ func decodeDeleteFileRequest(_ context.Context, r *http.Request) (interface{}, e
 	}
 	return deleteFileRequest{
 		ID:        id,
-		requestId: moovhttp.GetRequestId(r),
+		requestID: moovhttp.GetRequestID(r),
 	}, nil
 }
 
 type getFileContentsRequest struct {
 	ID string
 
-	requestId string
+	requestID string
 }
 
 type getFileContentsResponse struct {
@@ -264,7 +264,7 @@ func getFileContentsEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 		r, err := s.GetFileContents(req.ID)
 
 		if logger != nil {
-			logger.Log("files", "getFileContents", "requestId", req.requestId, "error", err)
+			logger.Log("files", "getFileContents", "requestID", req.requestID, "error", err)
 		}
 		if err != nil {
 			return getFileContentsResponse{Err: err}, nil
@@ -282,14 +282,14 @@ func decodeGetFileContentsRequest(_ context.Context, r *http.Request) (interface
 	}
 	return getFileContentsRequest{
 		ID:        id,
-		requestId: moovhttp.GetRequestId(r),
+		requestID: moovhttp.GetRequestID(r),
 	}, nil
 }
 
 type validateFileRequest struct {
 	ID string
 
-	requestId string
+	requestID string
 }
 
 type validateFileResponse struct {
@@ -310,7 +310,7 @@ func validateFileEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 
 		err := s.ValidateFile(req.ID)
 		if logger != nil {
-			logger.Log("files", "validateFile", "requestId", req.requestId, "error", err)
+			logger.Log("files", "validateFile", "requestID", req.requestID, "error", err)
 		}
 		if err != nil { // wrap err with context
 			err = fmt.Errorf("%v: %v", errInvalidFile, err)
@@ -327,14 +327,14 @@ func decodeValidateFileRequest(_ context.Context, r *http.Request) (interface{},
 	}
 	return validateFileRequest{
 		ID:        id,
-		requestId: moovhttp.GetRequestId(r),
+		requestID: moovhttp.GetRequestID(r),
 	}, nil
 }
 
 type segmentFileRequest struct {
 	fileID string
 
-	requestId string
+	requestID string
 }
 
 type segmentFileResponse struct {
@@ -356,7 +356,7 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 		creditFile, debitFile, err := s.SegmentFile(req.fileID)
 
 		if logger != nil {
-			logger.Log("files", "segmentFile", "requestId", req.requestId, "error", err)
+			logger.Log("files", "segmentFile", "requestID", req.requestID, "error", err)
 		}
 		if err != nil {
 			return segmentFileResponse{Err: err}, err
@@ -365,14 +365,14 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 		if creditFile.ID != "" {
 			err = r.StoreFile(creditFile)
 			if logger != nil {
-				logger.Log("files", "storeCreditFile", "requestId", req.requestId, "error", err)
+				logger.Log("files", "storeCreditFile", "requestID", req.requestID, "error", err)
 			}
 		}
 
 		if debitFile.ID != "" {
 			err = r.StoreFile(debitFile)
 			if logger != nil {
-				logger.Log("files", "storeDebitFile", "requestId", req.requestId, "error", err)
+				logger.Log("files", "storeDebitFile", "requestID", req.requestID, "error", err)
 			}
 		}
 		return segmentFileResponse{
@@ -391,6 +391,6 @@ func decodeSegmentFileRequest(_ context.Context, r *http.Request) (interface{}, 
 	}
 	return segmentFileRequest{
 		fileID:    fileID,
-		requestId: moovhttp.GetRequestId(r),
+		requestID: moovhttp.GetRequestID(r),
 	}, nil
 }
