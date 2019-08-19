@@ -2,28 +2,15 @@ package examples
 
 import (
 	"fmt"
+	"github.com/moov-io/ach"
 	"log"
 	"strconv"
-	"time"
-
-	"github.com/moov-io/ach"
 )
 
 // Example_iatWriteMixedCreditDebit writes a IAT mixed debit and credit file
 func Example_iatWriteMixedCreditDebit() {
-	// Example transfer to write an ACH IAT file to debit a external institutions account
-	// Important: All financial institutions are different and will require registration and exact field values.
+	fh := mockFileHeader()
 
-	// Set originator bank ODFI and destination Operator for the financial institution
-	// this is the funding/receiving source of the transfer
-	fh := ach.NewFileHeader()
-	fh.ImmediateDestination = "121042882"             // Routing Number of the ACH Operator or receiving point to which the file is being sent
-	fh.ImmediateOrigin = "231380104"                  // Routing Number of the ACH Operator or sending point that is sending the file
-	fh.FileCreationDate = time.Now().Format("060102") // Today's Date
-	fh.ImmediateDestinationName = "Bank"
-	fh.ImmediateOriginName = "My Bank Name"
-
-	// BatchHeader identifies the originating entity and the type of transactions contained in the batch
 	bh := ach.NewIATBatchHeader()
 	bh.ServiceClassCode = ach.MixedDebitsAndCredits
 	bh.ForeignExchangeIndicator = "FF"
@@ -35,10 +22,8 @@ func Example_iatWriteMixedCreditDebit() {
 	bh.ISOOriginatingCurrencyCode = "CAD"
 	bh.ISODestinationCurrencyCode = "USD"
 	bh.ODFIIdentification = "23138010"
-	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
+	bh.EffectiveEntryDate = "190816"
 
-	// Identifies the receivers account information
-	// can be multiple entry's per batch
 	entry := ach.NewIATEntryDetail()
 	entry.TransactionCode = ach.CheckingDebit
 	entry.SetRDFI("121042882")
@@ -47,8 +32,6 @@ func Example_iatWriteMixedCreditDebit() {
 	entry.Amount = 100000 // 1000.00
 	entry.SetTraceNumber("23138010", 1)
 	entry.Category = ach.CategoryForward
-
-	//addenda
 
 	addenda10 := ach.NewAddenda10()
 	addenda10.TransactionTypeCode = "ANN"
@@ -113,8 +96,6 @@ func Example_iatWriteMixedCreditDebit() {
 	addenda18.EntryDetailSequenceNumber = 0000001
 	entry.AddAddenda18(addenda18)
 
-	// Identifies the receivers account information
-	// can be multiple entry's per batch
 	entryTwo := ach.NewIATEntryDetail()
 	entryTwo.TransactionCode = ach.CheckingCredit
 	entryTwo.SetRDFI("121042882")
