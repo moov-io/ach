@@ -50,3 +50,4 @@ tmp/
 test/fuzz-reader/crashes
 test/fuzz-reader/suppressions
 test/fuzz-reader/*.zip
+test/fuzz-reader/corpus/*.tar.gz

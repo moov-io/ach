@@ -1,4 +1,8 @@
-## v1.1.0 (Unreleased)
+## v1.1.0 (Released 2019-08-19)
+
+BREAKING CHANGES
+
+In our OpenAPI we've renamed fields generated as `Id` to `ID`, which is more in-line with Go's style conventions.
 
 BUG FIXES
 
@@ -20,7 +24,7 @@ ADDITIONS
 - addenda types: Add RuneCountInString check to Parse(record string) function
 - file: create debit ach file and credit ach file from a mixed debit and credit ach file (via `SegmentFile`) (see [#528](https://github.com/moov-io/ach/issues/528))
 - cmd/server: add environment variables to override command line flags (`-http.addr` and `-log.format`)
-- file: support ADV files in (*File).SegmentFile(...)
+- file: support ADV and IAT files in (*File).SegmentFile(...)
 - cmd/server: bind HTTP server with TLS if HTTPS_* variables are defined
 - cmd/server: add endpoints for segmenting files into debits and credits
 
@@ -30,6 +34,7 @@ BUILD
 - Fix `moov/achfuzz` docker image build
 - api: inline parameters to fix codegen crash
 - build: push moov/ach:latest and update docs accordingly
+- chore(deps): update module prometheus/client_golang to v1.1.0
 
 ## v1.0.0 (Released 2019-03-26)
 
