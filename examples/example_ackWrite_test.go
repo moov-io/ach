@@ -10,6 +10,7 @@ import (
 	"log"
 )
 
+// Example_ackWrite writes an ACK File
 func Example_ackWrite() {
 	fh := mockFileHeader()
 	bh := ach.NewBatchHeader()

@@ -13,8 +13,9 @@ import (
 	"strconv"
 )
 
+// Example_ackRead reads a ACK file
 func Example_ackRead() {
-	f, err := os.Open(filepath.Join("examplesData", "ack-read.ach"))
+	f, err := os.Open(filepath.Join("testdata", "ack-read.ach"))
 	if err != nil {
 		log.Fatal(err)
 	}

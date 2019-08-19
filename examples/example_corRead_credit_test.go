@@ -13,8 +13,9 @@ import (
 	"strconv"
 )
 
+// Example_corReadCredit reads a COR file
 func Example_corReadCredit() {
-	f, err := os.Open(filepath.Join("examplesData", "cor-read.ach"))
+	f, err := os.Open(filepath.Join("testdata", "cor-read.ach"))
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -10,6 +10,7 @@ import (
 	"log"
 )
 
+// Example_ppdWriteCredit writes a PPD credit file
 func Example_ppdWriteCredit() {
 	fh := mockFileHeader()
 

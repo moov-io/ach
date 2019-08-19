@@ -9,9 +9,10 @@ import (
 	"strconv"
 )
 
+// Example_webReadCredit reads a WEB credit file
 func Example_webReadCredit() {
 	// open a file for reading. Any io.Reader Can be used
-	f, err := os.Open(filepath.Join("examplesData", "web-credit.ach"))
+	f, err := os.Open(filepath.Join("testdata", "web-credit.ach"))
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -10,8 +10,9 @@ import (
 	"github.com/moov-io/ach"
 )
 
+// Example_ppdReadDebit reads a PPD debit file
 func Example_ppdReadDebit() {
-	f, err := os.Open(filepath.Join("examplesData", "ppd-debit.ach"))
+	f, err := os.Open(filepath.Join("testdata", "ppd-debit.ach"))
 	if err != nil {
 		log.Fatal(err)
 	}

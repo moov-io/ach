@@ -10,8 +10,9 @@ import (
 	"github.com/moov-io/ach"
 )
 
+// Example_ppdReadCredit reads a PPD credit file
 func Example_ppdReadCredit() {
-	f, err := os.Open(filepath.Join("examplesData", "ppd-credit.ach"))
+	f, err := os.Open(filepath.Join("testdata", "ppd-credit.ach"))
 	if err != nil {
 		log.Fatal(err)
 	}

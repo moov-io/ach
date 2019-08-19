@@ -6,6 +6,7 @@ import (
 	"log"
 )
 
+// Example_webWriteCredit writes a WEB credit file
 func Example_webWriteCredit() {
 	fh := mockFileHeader()
 

@@ -10,6 +10,7 @@ import (
 	"log"
 )
 
+// // Example_ppdWriteDebit writes a PPD debit file
 func Example_ppdWriteDebit() {
 
 	fh := mockFileHeader()

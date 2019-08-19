@@ -6,6 +6,7 @@ import (
 	"log"
 )
 
+// Example_corWriteCredit writes a COR file
 func Example_corWriteCredit() {
 	// Example transfer to write a COR File
 
