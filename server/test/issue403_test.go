@@ -37,5 +37,5 @@ func TestIssue403(t *testing.T) {
 
 	// test cases
 	expectError("issue403-addenda02.json", "EntryDetail.addenda02")
-	expectError("issue403-amount.json", "field EntryDetail.amount")
+	expectError("issue403-amount.json", "EntryDetail.amount")
 }
