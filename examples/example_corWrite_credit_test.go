@@ -12,7 +12,6 @@ func Example_corWriteCredit() {
 
 	fh := mockFileHeader()
 
-	// BatchHeader identifies the originating entity and the type of transactions contained in the batch
 	bh := ach.NewBatchHeader()
 	bh.ServiceClassCode = ach.CreditsOnly
 	bh.StandardEntryClassCode = ach.COR
@@ -20,11 +19,8 @@ func Example_corWriteCredit() {
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "Vendor Pay"
 	bh.ODFIIdentification = "121042882" // Originating Routing Number
-
-	// Identifies the receivers account information
-	// can be multiple entry's per batch
+	
 	entry := ach.NewEntryDetail()
-
 	entry.TransactionCode = ach.CheckingReturnNOCCredit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
