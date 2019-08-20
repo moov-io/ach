@@ -19,7 +19,7 @@ func Example_corWriteCredit() {
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "Vendor Pay"
 	bh.ODFIIdentification = "121042882" // Originating Routing Number
-	
+
 	entry := ach.NewEntryDetail()
 	entry.TransactionCode = ach.CheckingReturnNOCCredit
 	entry.SetRDFI("231380104")
