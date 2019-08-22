@@ -6,15 +6,15 @@ import (
 	"log"
 )
 
-func Example_trcWriteDebit() {
+func Example_xckWriteDebit() {
 	fh := mockFileHeader()
 
 	bh := ach.NewBatchHeader()
 	bh.ServiceClassCode = ach.DebitsOnly
 	bh.CompanyName = "Payee Name"
 	bh.CompanyIdentification = fh.ImmediateOrigin
-	bh.StandardEntryClassCode = ach.TRC
-	bh.CompanyEntryDescription = "ACH TRC"
+	bh.StandardEntryClassCode = ach.XCK
+	bh.CompanyEntryDescription = "ACH XCK"
 	bh.EffectiveEntryDate = "190816"
 	bh.ODFIIdentification = "121042882"
 
@@ -26,11 +26,10 @@ func Example_trcWriteDebit() {
 	entry.SetCheckSerialNumber("123456789012345")
 	entry.SetProcessControlField("CHECK1")
 	entry.SetItemResearchNumber("1234567890123456")
-	entry.SetItemTypeIndicator("01")
 	entry.SetTraceNumber(bh.ODFIIdentification, 1)
 
 	// build the batch
-	batch := ach.NewBatchTRC(bh)
+	batch := ach.NewBatchXCK(bh)
 	batch.AddEntry(entry)
 	if err := batch.Create(); err != nil {
 		log.Fatalf("Unexpected error building batch: %s\n", err)
@@ -50,9 +49,10 @@ func Example_trcWriteDebit() {
 	fmt.Printf("%s", file.Batches[0].GetControl().String()+"\n")
 	fmt.Printf("%s", file.Control.String()+"\n")
 
-	// Output: 101 03130001202313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
-	// 5225Payee Name                          231380104 TRCACH TRC         190816   1121042880000001
-	// 62723138010412345678         0000250000123456789012345CHECK11234567890123456010121042880000001
+	// Output:
+	// 101 03130001202313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
+	// 5225Payee Name                          231380104 XCKACH XCK         190816   1121042880000001
+	// 62723138010412345678         0000250000123456789012345CHECK11234567890123456  0121042880000001
 	// 82250000010023138010000000250000000000000000231380104                          121042880000001
 	// 9000001000001000000010023138010000000250000000000000000
 
