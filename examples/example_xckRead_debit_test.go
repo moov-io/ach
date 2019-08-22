@@ -36,9 +36,10 @@ func Example_xckReadDebit() {
 	fmt.Printf("Item Research Number: %s", achFile.Batches[0].GetEntries()[0].IndividualName[6:22]+"\n")
 
 	// Output:
+	// Total Amount Debit: 250000
 	// SEC Code: XCK
 	// Check Serial Number: 123456789012345
 	// Process Control Field: CHECK1
-	// Item Research Number: 182726
+	// Item Research Number: 1234567890123456
 
 }
