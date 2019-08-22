@@ -10,7 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/moov-io/base"
-	"strings"
 	"time"
 )
 
@@ -894,80 +893,4 @@ func segmentFileBatchAddADVEntry(creditBatch Batcher, debitBatch Batcher, entry 
 	case DebitForCreditsOriginated, DebitForDebitsReceived, DebitForDebitsRejectedBatches, DebitSummary:
 		debitBatch.AddADVEntry(entry)
 	}
-}
-
-// OptimizesBatchesInFile flattens a file with matching BatchHeaders to reduce cost
-func (f *File) OptimizeBatchesInFile() (*File, error) {
-	bhm := f.batchHeaderMap()
-
-	// create a map and then range again and check for
-	// SEC Code, CompanyName, CompanyEntryDescription, CompanyDescriptiveDate, EffectiveEntryDate, SettlementDate ServiceClassCode,
-	// OriginatorStatusCode, ODFIIdentification
-	for _, batch := range f.Batches {
-		match := false
-		bh := batch.GetHeader()
-		bhs := batch.GetHeader().String()
-
-		if !strings.EqualFold(bhm[bh.BatchNumber][0:1], bhs[0:1]) {
-			continue
-		}
-		if !strings.EqualFold(bhm[bh.BatchNumber][1:4], bhs[1:4]) {
-			continue
-		}
-		if !strings.EqualFold(bhm[bh.BatchNumber][4:20], bhs[4:20]) {
-			continue
-		}
-		if !strings.EqualFold(bhm[bh.BatchNumber][4:20], bhs[4:20]) {
-			continue
-		}
-		if !strings.EqualFold(bhm[bh.BatchNumber][20:40], bhs[20:40]) {
-			continue
-		}
-		if !strings.EqualFold(bhm[bh.BatchNumber][40:50], bhs[40:50]) {
-			continue
-		}
-		if !strings.EqualFold(bhm[bh.BatchNumber][50:53], bhs[50:53]) {
-			continue
-		}
-		if !strings.EqualFold(bhm[bh.BatchNumber][53:63], bhs[53:63]) {
-			continue
-		}
-		if !strings.EqualFold(bhm[bh.BatchNumber][63:69], bhs[63:69]) {
-			continue
-		}
-		if !strings.EqualFold(bhm[bh.BatchNumber][69:75], bhs[69:75]) {
-			continue
-		}
-		if !strings.EqualFold(bhm[bh.BatchNumber][78:79], bhs[78:79]) {
-			continue
-		}
-		if !strings.EqualFold(bhm[bh.BatchNumber][79:87], bhs[79:87]) {
-			continue
-		}
-		match = true
-
-		if match == true {
-			// use an index to set up new batches?
-
-		}
-	}
-
-	nf := NewFile()
-
-	return nf, nil
-}
-
-
-type mapBatchHeader struct {
-	StandardEntryClassCode string
-}
-
-func (f *File) batchHeaderMap() map[int]string {
-	bhm := make(map[int]string)
-
-	for _, batch := range f.Batches {
-		bh := batch.GetHeader()
-		bhm[bh.BatchNumber] = bh.String()
-	}
-	return bhm
 }
