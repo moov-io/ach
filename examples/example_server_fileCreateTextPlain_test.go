@@ -27,7 +27,7 @@ func Example_serverFileCreate() {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	// Read an Example ach.File in JSON format
+	// Read an Example ach.File in text/plain format
 	file, err := os.Open(filepath.Join("testdata", "ppd-credit.ach"))
 	if err != nil {
 		lg.Fatal(err)
