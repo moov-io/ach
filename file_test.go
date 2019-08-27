@@ -1262,7 +1262,7 @@ func TestSegmentFile_FileHeaderError(t *testing.T) {
 	}
 }
 
-func TestFile__SegmentFileBatchControlCreditAmount(t *testing.T) {
+func TestFileSegmentFileBatchControlCreditAmount(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
 	f, err := os.Open(filepath.Join("test", "testdata", "ppd-mixedDebitCredit.ach"))
 	if err != nil {
@@ -1299,7 +1299,7 @@ func TestFile__SegmentFileBatchControlCreditAmount(t *testing.T) {
 	}
 }
 
-func TestFile__SegmentFileBatchControlDebitAmount(t *testing.T) {
+func TestFileSegmentFileBatchControlDebitAmount(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
 	f, err := os.Open(filepath.Join("test", "testdata", "ppd-mixedDebitCredit.ach"))
 	if err != nil {
@@ -1336,7 +1336,7 @@ func TestFile__SegmentFileBatchControlDebitAmount(t *testing.T) {
 	}
 }
 
-func TestFile__SegmentFileCreditBatches(t *testing.T) {
+func TestFileSegmentFileCreditBatches(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
 	f, err := os.Open(filepath.Join("test", "testdata", "ppd-mixedDebitCredit.ach"))
 	if err != nil {
@@ -1373,7 +1373,7 @@ func TestFile__SegmentFileCreditBatches(t *testing.T) {
 	}
 }
 
-func TestFile__SegmentFileDebitBatches(t *testing.T) {
+func TestFileSegmentFileDebitBatches(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
 	f, err := os.Open(filepath.Join("test", "testdata", "ppd-mixedDebitCredit.ach"))
 	if err != nil {
@@ -1410,7 +1410,7 @@ func TestFile__SegmentFileDebitBatches(t *testing.T) {
 	}
 }
 
-func TestSegmentFile__CreditOnly(t *testing.T) {
+func TestSegmentFileCreditOnly(t *testing.T) {
 	// write an ACH file into repository
 	fd, err := os.Open(filepath.Join("test", "testdata", "ppd-valid.json"))
 	if fd == nil {
@@ -1436,7 +1436,7 @@ func TestSegmentFile__CreditOnly(t *testing.T) {
 	}
 }
 
-func TestSegmentFile__DebitOnly(t *testing.T) {
+func TestSegmentFileDebitOnly(t *testing.T) {
 	// write an ACH file into repository
 	fd, err := os.Open(filepath.Join("test", "testdata", "ppd-valid-debit.json"))
 	if fd == nil {
@@ -1462,7 +1462,7 @@ func TestSegmentFile__DebitOnly(t *testing.T) {
 	}
 }
 
-func TestFileIAT__SegmentFileCreditOnly(t *testing.T) {
+func TestFileIATSegmentFileCreditOnly(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
 	f, err := os.Open(filepath.Join("test", "ach-iat-read", "iat-credit.ach"))
 
@@ -1496,7 +1496,7 @@ func TestFileIAT__SegmentFileCreditOnly(t *testing.T) {
 	}
 }
 
-func TestFileIAT__SegmentFileDebitOnly(t *testing.T) {
+func TestFileIATSegmentFileDebitOnly(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
 	f, err := os.Open(filepath.Join("test", "testdata", "iat-debit.ach"))
 
@@ -1562,5 +1562,55 @@ func TestFileIAT__SegmentFile(t *testing.T) {
 
 	if err := debitFile.Validate(); err != nil {
 		t.Fatalf("Debit File did not validate: %+v \n", err)
+	}
+}
+
+// TestFile_OptimizeFileOneBatchHeader
+func TestFile_OptimizeFileOneBatchHeader(t *testing.T) {
+	// open a file for reading. Any io.Reader Can be used
+	f, err := os.Open(filepath.Join("test", "testdata", "optimizeFileOneBatchHeader.ach"))
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := NewReader(f)
+	achFile, err := r.Read()
+	if err != nil {
+		t.Fatalf("Issue reading file: %+v \n", err)
+	}
+
+	of, err := achFile.OptimizeFile()
+
+	if err != nil {
+		t.Fatalf("Could not optimize the file: %+v \n", err)
+	}
+
+	if err := of.Validate(); err != nil {
+		t.Fatalf("Optimized file did not validate: %+v \n", err)
+	}
+}
+
+// TestFileOptimizeFileMultipleBatchHeaders
+func TestFileOptimizeFileMultipleBatchHeaders(t *testing.T) {
+	// open a file for reading. Any io.Reader Can be used
+	f, err := os.Open(filepath.Join("test", "testdata", "optimizeFileMultipleBatchHeaders.ach"))
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := NewReader(f)
+	achFile, err := r.Read()
+	if err != nil {
+		t.Fatalf("Issue reading file: %+v \n", err)
+	}
+
+	of, err := achFile.OptimizeFile()
+
+	if err != nil {
+		t.Fatalf("Could not optimize the file: %+v \n", err)
+	}
+
+	if err := of.Validate(); err != nil {
+		t.Fatalf("Optimized file did not validate: %+v \n", err)
 	}
 }

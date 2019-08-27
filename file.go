@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/moov-io/base"
+	"strings"
 	"time"
 )
 
@@ -747,6 +748,7 @@ func (f *File) segmentFileBatches(creditFile, debitFile *File) {
 
 				entries := batch.GetEntries()
 				for _, entry := range entries {
+					entry.TraceNumber = "" // unset so Batch.build generates a TraceNumber
 					segmentFileBatchAddEntry(creditBatch, debitBatch, entry)
 				}
 
@@ -893,4 +895,79 @@ func segmentFileBatchAddADVEntry(creditBatch Batcher, debitBatch Batcher, entry 
 	case DebitForCreditsOriginated, DebitForDebitsReceived, DebitForDebitsRejectedBatches, DebitSummary:
 		debitBatch.AddADVEntry(entry)
 	}
+}
+
+// OptimizeFile optimizes a file by flattening batches with the same BatchHeader data into one batch.
+func (f *File) OptimizeFile() (*File, error) {
+	of := NewFile()
+
+	// Slice of BatchHeaders
+	sbh := make([]string, 0)
+	for _, b := range f.Batches {
+		bh := b.GetHeader().String()
+		sbh = append(sbh, bh[:94])
+	}
+
+	// Remove duplicate BatchHeader entries
+	sbh = removeDuplicateBatchHeaders(sbh)
+
+	// Add new batches for optimized file
+	for i := range sbh {
+		bh := NewBatchHeader()
+		bh.Parse(sbh[i])
+		b, _ := NewBatch(bh)
+		of.AddBatch(b)
+	}
+
+	for _, batch := range f.Batches {
+		fbh := batch.GetHeader().String()[:87]
+
+		for i, ofBatch := range of.Batches {
+			if strings.EqualFold(fbh, ofBatch.GetHeader().String()[:87]) {
+				entries := batch.GetEntries()
+				for _, entry := range entries {
+					of.Batches[i].AddEntry(entry)
+				}
+				break
+			}
+		}
+	}
+
+	for _, ofBatch := range of.Batches {
+		for _, ofEntry := range ofBatch.GetEntries() {
+			ofEntry.TraceNumber = ""
+		}
+		ofBatch.Create()
+	}
+
+	f.addFileHeaderData(of)
+
+	if err := of.Create(); err != nil {
+		return nil, err
+	}
+	if err := of.Validate(); err != nil {
+		return nil, err
+	}
+	return of, nil
+}
+
+// removeDuplicateBatchHeaders removes duplicate batch header
+func removeDuplicateBatchHeaders(s []string) []string {
+	r := make([]string, 0)
+
+	for i := 0; i < len(s); i++ {
+		// Scan slice for a previous element of the same value.
+		exists := false
+		for v := 0; v < i; v++ {
+			if strings.EqualFold(s[v][:87], s[i][:87]) {
+				exists = true
+				break
+			}
+		}
+		// If no previous element exists, append this one.
+		if !exists {
+			r = append(r, s[i])
+		}
+	}
+	return r
 }
