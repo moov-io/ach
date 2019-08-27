@@ -921,18 +921,18 @@ func (f *File) OptimizeFile() (*File, error) {
 
 	for _, batch := range f.Batches {
 		fbh := batch.GetHeader().String()[:87]
-
+		// Add entries for batches
 		for i, ofBatch := range of.Batches {
 			if strings.EqualFold(fbh, ofBatch.GetHeader().String()[:87]) {
 				entries := batch.GetEntries()
 				for _, entry := range entries {
 					of.Batches[i].AddEntry(entry)
 				}
-				break
 			}
 		}
 	}
 
+	// Reset TraceNumber
 	for _, ofBatch := range of.Batches {
 		for _, ofEntry := range ofBatch.GetEntries() {
 			ofEntry.TraceNumber = ""
@@ -940,6 +940,7 @@ func (f *File) OptimizeFile() (*File, error) {
 		ofBatch.Create()
 	}
 
+	// Add FileHeaderData.
 	f.addFileHeaderData(of)
 
 	if err := of.Create(); err != nil {
