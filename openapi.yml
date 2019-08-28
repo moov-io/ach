@@ -333,11 +333,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/File'
-  /files/{fileID}/optimize:
+  /files/{fileID}/flatten:
     post:
       tags: ['ACH Files']
       summary: Create a new file object
-      operationId: optimizetFile
+      operationId: flattenFile
       security:
         - bearerAuth: []
         - cookieAuth: []
@@ -376,7 +376,7 @@ paths:
               example: 101 222380104 1210428821805100000A094101Citadel                Bank Name
       responses:
         '201':
-          description: A JSON object containing an optimized ACH File.
+          description: A JSON object containing a flattened ACH File.
           headers:
             Location:
               description: The location of the new resource
