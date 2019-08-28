@@ -1565,10 +1565,10 @@ func TestFileIAT__SegmentFile(t *testing.T) {
 	}
 }
 
-// TestFile_OptimizeFileOneBatchHeader
-func TestFile_OptimizeFileOneBatchHeader(t *testing.T) {
+// TestFile_FlattenFileOneBatchHeader
+func TestFile_FlattenFileOneBatchHeader(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
-	f, err := os.Open(filepath.Join("test", "testdata", "optimizeFileOneBatchHeader.ach"))
+	f, err := os.Open(filepath.Join("test", "testdata", "flattenFileOneBatchHeader.ach"))
 
 	if err != nil {
 		t.Fatal(err)
@@ -1579,21 +1579,21 @@ func TestFile_OptimizeFileOneBatchHeader(t *testing.T) {
 		t.Fatalf("Issue reading file: %+v \n", err)
 	}
 
-	of, err := achFile.OptimizeFile()
+	of, err := achFile.FlattenFile()
 
 	if err != nil {
-		t.Fatalf("Could not optimize the file: %+v \n", err)
+		t.Fatalf("Could not flatten the file: %+v \n", err)
 	}
 
 	if err := of.Validate(); err != nil {
-		t.Fatalf("Optimized file did not validate: %+v \n", err)
+		t.Fatalf("Flattend file did not validate: %+v \n", err)
 	}
 }
 
-// TestFileOptimizeFileMultipleBatchHeaders
-func TestFileOptimizeFileMultipleBatchHeaders(t *testing.T) {
+// TestFileFlattenFileMultipleBatchHeaders
+func TestFileFlattenFileMultipleBatchHeaders(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
-	f, err := os.Open(filepath.Join("test", "testdata", "optimizeFileMultipleBatchHeaders.ach"))
+	f, err := os.Open(filepath.Join("test", "testdata", "flattenFileMultipleBatchHeaders.ach"))
 
 	if err != nil {
 		t.Fatal(err)
@@ -1604,13 +1604,13 @@ func TestFileOptimizeFileMultipleBatchHeaders(t *testing.T) {
 		t.Fatalf("Issue reading file: %+v \n", err)
 	}
 
-	of, err := achFile.OptimizeFile()
+	of, err := achFile.FlattenFile()
 
 	if err != nil {
-		t.Fatalf("Could not optimize the file: %+v \n", err)
+		t.Fatalf("Could not flatten the file: %+v \n", err)
 	}
 
 	if err := of.Validate(); err != nil {
-		t.Fatalf("Optimized file did not validate: %+v \n", err)
+		t.Fatalf("Flattend file did not validate: %+v \n", err)
 	}
 }

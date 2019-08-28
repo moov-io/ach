@@ -897,8 +897,8 @@ func segmentFileBatchAddADVEntry(creditBatch Batcher, debitBatch Batcher, entry 
 	}
 }
 
-// OptimizeFile optimizes a file by flattening batches with the same BatchHeader data into one batch.
-func (f *File) OptimizeFile() (*File, error) {
+// FlattenFile flattens by consolidating batches with the same BatchHeader data into one batch.
+func (f *File) FlattenFile() (*File, error) {
 	of := NewFile()
 
 	// Slice of BatchHeaders
@@ -911,7 +911,7 @@ func (f *File) OptimizeFile() (*File, error) {
 	// Remove duplicate BatchHeader entries
 	sbh = removeDuplicateBatchHeaders(sbh)
 
-	// Add new batches for optimized file
+	// Add new batches for flattened file
 	for i := range sbh {
 		bh := NewBatchHeader()
 		bh.Parse(sbh[i])
