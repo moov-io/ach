@@ -897,8 +897,8 @@ func segmentFileBatchAddADVEntry(creditBatch Batcher, debitBatch Batcher, entry 
 	}
 }
 
-// FlattenFile flattens by consolidating batches with the same BatchHeader data into one batch.
-func (f *File) FlattenFile() (*File, error) {
+// FlattenBatches flattens File Batches by consolidating batches with the same BatchHeader data into one batch.
+func (f *File) FlattenBatches() (*File, error) {
 	of := NewFile()
 
 	// Slice of BatchHeaders

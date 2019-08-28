@@ -1568,7 +1568,7 @@ func TestFileIAT__SegmentFile(t *testing.T) {
 // TestFile_FlattenFileOneBatchHeader
 func TestFile_FlattenFileOneBatchHeader(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
-	f, err := os.Open(filepath.Join("test", "testdata", "flattenFileOneBatchHeader.ach"))
+	f, err := os.Open(filepath.Join("test", "testdata", "flattenBatchesOneBatchHeader.ach"))
 
 	if err != nil {
 		t.Fatal(err)
@@ -1579,7 +1579,7 @@ func TestFile_FlattenFileOneBatchHeader(t *testing.T) {
 		t.Fatalf("Issue reading file: %+v \n", err)
 	}
 
-	of, err := achFile.FlattenFile()
+	of, err := achFile.FlattenBatches()
 
 	if err != nil {
 		t.Fatalf("Could not flatten the file: %+v \n", err)
@@ -1593,7 +1593,7 @@ func TestFile_FlattenFileOneBatchHeader(t *testing.T) {
 // TestFileFlattenFileMultipleBatchHeaders
 func TestFileFlattenFileMultipleBatchHeaders(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
-	f, err := os.Open(filepath.Join("test", "testdata", "flattenFileMultipleBatchHeaders.ach"))
+	f, err := os.Open(filepath.Join("test", "testdata", "flattenBatchesMultipleBatchHeaders.ach"))
 
 	if err != nil {
 		t.Fatal(err)
@@ -1604,7 +1604,7 @@ func TestFileFlattenFileMultipleBatchHeaders(t *testing.T) {
 		t.Fatalf("Issue reading file: %+v \n", err)
 	}
 
-	of, err := achFile.FlattenFile()
+	of, err := achFile.FlattenBatches()
 
 	if err != nil {
 		t.Fatalf("Could not flatten the file: %+v \n", err)
