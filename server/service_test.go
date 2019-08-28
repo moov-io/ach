@@ -521,8 +521,8 @@ func TestSegmentFileDebitsOnlyBatchID(t *testing.T) {
 	}
 }
 
-func TestOptimizeFile(t *testing.T) {
-	f, err := os.Open(filepath.Join("..", "test", "testdata", "optimizeFileMultipleBatchHeaders.ach"))
+func TestFlattenBatches(t *testing.T) {
+	f, err := os.Open(filepath.Join("..", "test", "testdata", "flattenBatchesMultipleBatchHeaders.ach"))
 
 	if err != nil {
 		t.Fatal(err)
@@ -533,7 +533,7 @@ func TestOptimizeFile(t *testing.T) {
 		t.Fatalf("Issue reading file: %+v \n", err)
 	}
 
-	of, err := achFile.OptimizeFile()
+	of, err := achFile.FlattenBatches()
 
 	if err != nil {
 		t.Fatalf("Could not optimize the file: %+v \n", err)

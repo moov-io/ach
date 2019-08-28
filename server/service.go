@@ -37,7 +37,7 @@ type Service interface {
 	// SegmentFile
 	// SegmentFile segments an ach file
 	SegmentFile(id string) (*ach.File, *ach.File, error)
-	OptimizeFile(id string) (*ach.File, error)
+	FlattenBatches(id string) (*ach.File, error)
 	// CreateBatch creates a new batch within and ach file and returns its resource ID
 	CreateBatch(fileID string, bh ach.Batcher) (string, error)
 	// GetBatch retrieves a batch based oin the file id and batch id
@@ -185,8 +185,8 @@ func (s *service) SegmentFile(fileID string) (*ach.File, *ach.File, error) {
 	return creditFile, debitFile, nil
 }
 
-// OptimizeFile takes an ACH File and optimizes the file by consolidating batches that have the same BatchHeader
-func (s *service) OptimizeFile(fileID string) (*ach.File, error) {
+// FlattenBatches consolidates batches that have the same BatchHeader
+func (s *service) FlattenBatches(fileID string) (*ach.File, error) {
 	f, err := s.GetFile(fileID)
 	if err != nil {
 		return nil, err
@@ -195,7 +195,7 @@ func (s *service) OptimizeFile(fileID string) (*ach.File, error) {
 	if err := f.Create(); err != nil {
 		return nil, err
 	}
-	of, err := f.OptimizeFile()
+	of, err := f.FlattenBatches()
 	if err != nil {
 		return nil, err
 	}

@@ -475,8 +475,8 @@ func TestFiles__segmentFileEndpointError(t *testing.T) {
 	}
 }
 
-// TestFiles_optimizeFileEndpointError tests optimizeFileEndpoints
-func TestFiles__optimizeFileEndpointError(t *testing.T) {
+// TestFiles_flattenFileEndpointError tests flattenFileEndpoints
+func TestFiles__flattenFileEndpointError(t *testing.T) {
 	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)
 	svc := NewService(repo)
@@ -495,7 +495,7 @@ func TestFiles__optimizeFileEndpointError(t *testing.T) {
 
 	// test status code
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest("POST", fmt.Sprintf("/files/%s/optimize", file.ID), nil)
+	req := httptest.NewRequest("POST", fmt.Sprintf("/files/%s/flatten", file.ID), nil)
 	req.Header.Set("Origin", "https://moov.io")
 	req.Header.Set("X-Request-Id", "11110")
 
