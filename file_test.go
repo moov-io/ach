@@ -1593,7 +1593,7 @@ func TestFile_OptimizeFileOneBatchHeader(t *testing.T) {
 // TestFileOptimizeFileMultipleBatchHeaders
 func TestFileOptimizeFileMultipleBatchHeaders(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
-	f, err := os.Open(filepath.Join("test", "testdata", "optimizeFileMultipleBatchHeaders.ach"))
+	f, err :=  os.Open(filepath.Join("..", "test", "testdata", "optimizeFileMultipleBatchHeaders.ach"))
 
 	if err != nil {
 		t.Fatal(err)

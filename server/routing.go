@@ -163,7 +163,12 @@ func MakeHTTPHandler(s Service, repo Repository, logger log.Logger) http.Handler
 		encodeResponse,
 		options...,
 	))
-
+	r.Methods("POST").Path("/files/{fileID}/optimize").Handler(httptransport.NewServer(
+		optimizeFileEndpoint(s, repo, logger),
+		decodeOptimizeFileRequest,
+		encodeResponse,
+		options...,
+	))
 	return r
 }
 

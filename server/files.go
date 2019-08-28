@@ -332,8 +332,7 @@ func decodeValidateFileRequest(_ context.Context, r *http.Request) (interface{},
 }
 
 type segmentFileRequest struct {
-	fileID string
-
+	fileID    string
 	requestID string
 }
 
@@ -390,6 +389,57 @@ func decodeSegmentFileRequest(_ context.Context, r *http.Request) (interface{}, 
 		return nil, ErrBadRouting
 	}
 	return segmentFileRequest{
+		fileID:    fileID,
+		requestID: moovhttp.GetRequestID(r),
+	}, nil
+}
+
+type optimizeFileRequest struct {
+	fileID    string
+	requestID string
+}
+
+type optimizeFileResponse struct {
+	optimizeFileID string `json:"optimizeFileID"`
+	Err            error  `json:"error"`
+}
+
+func optimizeFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req, ok := request.(optimizeFileRequest)
+		if !ok {
+			err := errors.New("invalid request")
+			return optimizeFileResponse{
+				Err: err,
+			}, err
+		}
+		optimizeFile, err := s.OptimizeFile(req.fileID)
+		if logger != nil {
+			logger.Log("files", "optimizeFile", "requestID", req.requestID, "error", err)
+		}
+		if err != nil {
+			return optimizeFileResponse{Err: err}, err
+		}
+		if optimizeFile.ID != "" {
+			err = r.StoreFile(optimizeFile)
+			if logger != nil {
+				logger.Log("files", "storeOptimizeFile", "requestID", req.requestID, "error", err)
+			}
+		}
+		return optimizeFileResponse{
+			optimizeFileID: optimizeFile.ID,
+			Err:            err,
+		}, nil
+	}
+}
+
+func decodeOptimizeFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	fileID, ok := vars["fileID"]
+	if !ok {
+		return nil, ErrBadRouting
+	}
+	return optimizeFileRequest{
 		fileID:    fileID,
 		requestID: moovhttp.GetRequestID(r),
 	}, nil

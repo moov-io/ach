@@ -8,6 +8,8 @@ import (
 	"github.com/moov-io/base"
 	"io/ioutil"
 	"log"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -516,5 +518,28 @@ func TestSegmentFileDebitsOnlyBatchID(t *testing.T) {
 
 	if debitFile.Batches[0].ID() == "" {
 		t.Fatal("No Batch ID")
+	}
+}
+
+func TestOptimizeFile(t *testing.T) {
+	f, err := os.Open(filepath.Join("..", "test", "testdata", "optimizeFileMultipleBatchHeaders.ach"))
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := ach.NewReader(f)
+	achFile, err := r.Read()
+	if err != nil {
+		t.Fatalf("Issue reading file: %+v \n", err)
+	}
+
+	of, err := achFile.OptimizeFile()
+
+	if err != nil {
+		t.Fatalf("Could not optimize the file: %+v \n", err)
+	}
+
+	if err := of.Validate(); err != nil {
+		t.Fatalf("Optimized file did not validate: %+v \n", err)
 	}
 }
