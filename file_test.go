@@ -1614,3 +1614,15 @@ func TestFileFlattenFileMultipleBatchHeaders(t *testing.T) {
 		t.Fatalf("Flattend file did not validate: %+v \n", err)
 	}
 }
+
+func TestFlattenFile_FileHeaderError(t *testing.T) {
+	achFile := NewFile()
+
+	_, err := achFile.FlattenBatches()
+
+	if err != nil {
+		if !base.Match(err, ErrConstructor) {
+			t.Errorf("%T: %s", err, err)
+		}
+	}
+}

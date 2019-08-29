@@ -899,22 +899,29 @@ func segmentFileBatchAddADVEntry(creditBatch Batcher, debitBatch Batcher, entry 
 
 // FlattenBatches flattens File Batches by consolidating batches with the same BatchHeader data into one batch.
 func (f *File) FlattenBatches() (*File, error) {
+	if err := f.Validate(); err != nil {
+		return nil, err
+	}
+
 	of := NewFile()
 
 	// Slice of BatchHeaders
 	sbh := make([]string, 0)
 	for _, b := range f.Batches {
 		bh := b.GetHeader().String()
-		sbh = append(sbh, bh[:94])
+		sbh = append(sbh, bh[:87])
 	}
 
 	// Remove duplicate BatchHeader entries
-	sbh = removeDuplicateBatchHeaders(sbh)
+	sbh = removeDuplicateBatchHeadersMap(sbh)
 
 	// Add new batches for flattened file
-	for i := range sbh {
-		bh := NewBatchHeader()
-		bh.Parse(sbh[i])
+	for _, record := range sbh {
+		/*		bh := NewBatchHeader()
+				bh.Parse(sbh[i])*/
+
+		bh := flattenBatchHeaderParse(record)
+
 		b, _ := NewBatch(bh)
 		of.AddBatch(b)
 	}
@@ -971,4 +978,39 @@ func removeDuplicateBatchHeaders(s []string) []string {
 		}
 	}
 	return r
+}
+
+// removeDuplicateBatchHeadersMap removes duplicate batch header
+func removeDuplicateBatchHeadersMap(s []string) []string {
+	encountered := map[string]bool{}
+
+	// Create a map of all unique elements.
+	for v := range s {
+		encountered[s[v]] = true
+	}
+
+	// Place all keys from the map into a slice.
+	result := []string{}
+	for key, _ := range encountered {
+		result = append(result, key)
+	}
+	return result
+}
+
+// flattenBatchHeaderParse parses a string of Batch Header data into a Batch Header
+func flattenBatchHeaderParse(record string) *BatchHeader {
+	bh := NewBatchHeader()
+	bh.recordType = "5"
+	bh.ServiceClassCode = bh.parseNumField(record[1:4])
+	bh.CompanyName = strings.TrimSpace(record[4:20])
+	bh.CompanyDiscretionaryData = strings.TrimSpace(record[20:40])
+	bh.CompanyIdentification = strings.TrimSpace(record[40:50])
+	bh.StandardEntryClassCode = record[50:53]
+	bh.CompanyEntryDescription = strings.TrimSpace(record[53:63])
+	bh.CompanyDescriptiveDate = strings.TrimSpace(record[63:69])
+	bh.EffectiveEntryDate = bh.validateSimpleDate(record[69:75])
+	bh.settlementDate = "   "
+	bh.OriginatorStatusCode = bh.parseNumField(record[78:79])
+	bh.ODFIIdentification = bh.parseStringField(record[79:87])
+	return bh
 }
