@@ -18,6 +18,10 @@
 package ach
 
 import (
+	"bytes"
+	"encoding/json"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
@@ -642,5 +646,62 @@ func BenchmarkValidateEDCheckDigit(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testValidateEDCheckDigit(b)
+	}
+}
+
+func TestEntryDetail__CategoryJSON(t *testing.T) {
+	ed := mockEntryDetail()
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(ed); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(buf.String(), `"category":"Forward"`) {
+		t.Error(buf.String())
+	}
+	buf.Reset()
+
+	// read our return file and marshal
+	fd, err := os.Open(filepath.Join("test", "testdata", "return-WEB.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	file, err := NewReader(fd).Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := json.NewEncoder(&buf).Encode(file); err != nil {
+		t.Fatal(err)
+	}
+	if n := strings.Count(buf.String(), `"category":"Return"`); n != 2 {
+		// return-WEB.ach has two EntryDetail records
+		t.Errorf("got %d category:Return\n%s", n, buf.String())
+	}
+}
+
+func TestEntryDetail__ParseReturn(t *testing.T) {
+	fd, err := os.Open(filepath.Join("test", "testdata", "return-WEB.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	file, err := NewReader(fd).Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if n := len(file.Batches); n != 2 {
+		t.Errorf("got %d batches: %#v", n, file.Batches)
+	}
+
+	for i := range file.Batches {
+		entries := file.Batches[i].GetEntries()
+		if n := len(entries); n != 1 {
+			t.Errorf("got %d EntryDetail records: %#v", n, entries)
+		}
+		for j := range entries {
+			if entries[j].Category != CategoryReturn {
+				t.Errorf("EntryDetail.Category=%s\n  %#v", entries[j].Category, entries[j])
+			}
+		}
 	}
 }
