@@ -959,7 +959,7 @@ func (f *File) FlattenBatches() (*File, error) {
 	return of, nil
 }
 
-// removeDuplicateBatchHeaders removes duplicate batch header
+/*// removeDuplicateBatchHeaders removes duplicate batch header
 func removeDuplicateBatchHeaders(s []string) []string {
 	r := make([]string, 0)
 
@@ -978,7 +978,7 @@ func removeDuplicateBatchHeaders(s []string) []string {
 		}
 	}
 	return r
-}
+}*/
 
 // removeDuplicateBatchHeadersMap removes duplicate batch header
 func removeDuplicateBatchHeadersMap(s []string) []string {
@@ -990,8 +990,8 @@ func removeDuplicateBatchHeadersMap(s []string) []string {
 	}
 
 	// Place all keys from the map into a slice.
-	result := []string{}
-	for key, _ := range encountered {
+	result := make([]string, 0)
+	for key := range encountered {
 		result = append(result, key)
 	}
 	return result
