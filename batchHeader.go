@@ -156,7 +156,7 @@ func (bh *BatchHeader) Parse(record string) {
 
 	// 1-1 Always "5"
 	bh.recordType = "5"
-	// 2-4 MixedCreditsAnDebits (220), CreditsOnly 9220), DebitsOnly (225)
+	// 2-4 MixedCreditsAnDebits (200), CreditsOnly (220), DebitsOnly (225)
 	bh.ServiceClassCode = bh.parseNumField(record[1:4])
 	// 5-20 Your company's name. This name may appear on the receivers’ statements prepared by the RDFI.
 	bh.CompanyName = strings.TrimSpace(record[4:20])
