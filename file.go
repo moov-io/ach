@@ -926,12 +926,10 @@ func (f *File) FlattenBatches() (*File, error) {
 	}
 
 	// Remove duplicate BatchHeader entries
-	sbh = removeDuplicateBatchHeadersMap(sbh)
+	sbh = removeDuplicateBatchHeaders(sbh)
 
 	// Add new batches for flattened file
 	for _, record := range sbh {
-		/*		bh := NewBatchHeader()
-				bh.Parse(sbh[i])*/
 
 		bh := flattenBatchHeaderParse(record)
 
@@ -972,29 +970,8 @@ func (f *File) FlattenBatches() (*File, error) {
 	return of, nil
 }
 
-/*// removeDuplicateBatchHeaders removes duplicate batch header
+// removeDuplicateBatchHeaders removes duplicate batch header
 func removeDuplicateBatchHeaders(s []string) []string {
-	r := make([]string, 0)
-
-	for i := 0; i < len(s); i++ {
-		// Scan slice for a previous element of the same value.
-		exists := false
-		for v := 0; v < i; v++ {
-			if strings.EqualFold(s[v][:87], s[i][:87]) {
-				exists = true
-				break
-			}
-		}
-		// If no previous element exists, append this one.
-		if !exists {
-			r = append(r, s[i])
-		}
-	}
-	return r
-}*/
-
-// removeDuplicateBatchHeadersMap removes duplicate batch header
-func removeDuplicateBatchHeadersMap(s []string) []string {
 	encountered := map[string]bool{}
 
 	// Create a map of all unique elements.
