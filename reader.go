@@ -357,6 +357,7 @@ func (r *Reader) parseAddenda() error {
 				if err := addenda99.Validate(); err != nil {
 					return r.parseError(err)
 				}
+				r.currentBatch.GetEntries()[entryIndex].Category = CategoryReturn
 				r.currentBatch.GetEntries()[entryIndex].Addenda99 = addenda99
 			}
 		} else {
