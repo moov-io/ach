@@ -15,29 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package main
+package examples
 
 import (
+	"fmt"
 	"log"
-	"os"
-	"time"
 
 	"github.com/moov-io/ach"
 )
 
-func main() {
+// Example_corWriteCredit writes a COR file
+func Example_corWriteCredit() {
 	// Example transfer to write a COR File
 
-	// Set originator bank ODFI and destination Operator for the financial institution
-	// this is the funding/receiving source of the transfer
-	fh := ach.NewFileHeader()
-	fh.ImmediateDestination = "231380104"             // Routing Number of the ACH Operator or receiving point to which the file is being sent
-	fh.ImmediateOrigin = "121042882"                  // Routing Number of the ACH Operator or sending point that is sending the file
-	fh.FileCreationDate = time.Now().Format("060102") // Today's Date
-	fh.ImmediateDestinationName = "Federal Reserve Bank"
-	fh.ImmediateOriginName = "My Bank Name"
+	fh := mockFileHeader()
 
-	// BatchHeader identifies the originating entity and the type of transactions contained in the batch
 	bh := ach.NewBatchHeader()
 	bh.ServiceClassCode = ach.CreditsOnly
 	bh.StandardEntryClassCode = ach.COR
@@ -46,10 +38,7 @@ func main() {
 	bh.CompanyEntryDescription = "Vendor Pay"
 	bh.ODFIIdentification = "121042882" // Originating Routing Number
 
-	// Identifies the receivers account information
-	// can be multiple entry's per batch
 	entry := ach.NewEntryDetail()
-
 	entry.TransactionCode = ach.CheckingReturnNOCCredit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
@@ -85,10 +74,19 @@ func main() {
 		log.Fatalf("Unexpected error building file: %s\n", err)
 	}
 
-	// write the file to std out. Anything io.Writer
-	w := ach.NewWriter(os.Stdout)
-	if err := w.Write(file); err != nil {
-		log.Fatalf("Unexpected error: %s\n", err)
-	}
-	w.Flush()
+	fmt.Printf("%s", file.Header.String()+"\n")
+	fmt.Printf("%s", file.Batches[0].GetHeader().String()+"\n")
+	fmt.Printf("%s", file.Batches[0].GetEntries()[0].String()+"\n")
+	fmt.Printf("%s", file.Batches[0].GetEntries()[0].Addenda98.String()+"\n")
+	fmt.Printf("%s", file.Batches[0].GetControl().String()+"\n")
+	fmt.Printf("%s", file.Control.String()+"\n")
+
+	// Output:
+	// 101 03130001202313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
+	// 5220Your Company, in                    121042882 CORVendor Pay      000000   1121042880000001
+	// 621231380104744-5678-99      0000000000location #23   Best Co. #23            1121042880000001
+	// 798C01121042880000001      121042881918171614                                  091012980000088
+	// 82200000020023138010000000000000000000000000121042882                          121042880000001
+	// 9000001000001000000020023138010000000000000000000000000
+
 }
