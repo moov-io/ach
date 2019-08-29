@@ -57,3 +57,15 @@ AUTHORS:
 .PHONY: fuzz
 fuzz:
 	docker run moov/achfuzz:latest
+
+.PHONY: legal
+legal:
+ifeq ($(OS),Linux)
+	@wget -q -nc https://github.com/elastic/go-licenser/releases/download/v0.3.0/go-licenser_0.3.0_Linux_x86_64.tar.gz
+	@tar xf go-licenser_0.3.0_Linux_x86_64.tar.gz
+else
+	@wget -q -nc https://github.com/elastic/go-licenser/releases/download/v0.3.0/go-licenser_0.3.0_Darwin_x86_64.tar.gz
+	@tar xf go-licenser_0.3.0_Darwin_x86_64.tar.gz
+endif
+	./go-licenser -exclude ./vendor/ -license ASL2 -licensor 'The Moov Authors' -notice
+	@git checkout README.md LICENSE vendor/
