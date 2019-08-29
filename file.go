@@ -1,6 +1,19 @@
-// Copyright 2018 The Moov Authors
-// Use of this source code is governed by an Apache License
-// license that can be found in the LICENSE file.
+// Licensed to The Moov Authors under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. The Moov Authors licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 package ach
 
@@ -899,22 +912,27 @@ func segmentFileBatchAddADVEntry(creditBatch Batcher, debitBatch Batcher, entry 
 
 // FlattenBatches flattens File Batches by consolidating batches with the same BatchHeader data into one batch.
 func (f *File) FlattenBatches() (*File, error) {
+	if err := f.Validate(); err != nil {
+		return nil, err
+	}
+
 	of := NewFile()
 
 	// Slice of BatchHeaders
 	sbh := make([]string, 0)
 	for _, b := range f.Batches {
 		bh := b.GetHeader().String()
-		sbh = append(sbh, bh[:94])
+		sbh = append(sbh, bh[:87])
 	}
 
 	// Remove duplicate BatchHeader entries
 	sbh = removeDuplicateBatchHeaders(sbh)
 
 	// Add new batches for flattened file
-	for i := range sbh {
-		bh := NewBatchHeader()
-		bh.Parse(sbh[i])
+	for _, record := range sbh {
+
+		bh := flattenBatchHeaderParse(record)
+
 		b, _ := NewBatch(bh)
 		of.AddBatch(b)
 	}
@@ -954,21 +972,35 @@ func (f *File) FlattenBatches() (*File, error) {
 
 // removeDuplicateBatchHeaders removes duplicate batch header
 func removeDuplicateBatchHeaders(s []string) []string {
-	r := make([]string, 0)
+	encountered := map[string]bool{}
 
-	for i := 0; i < len(s); i++ {
-		// Scan slice for a previous element of the same value.
-		exists := false
-		for v := 0; v < i; v++ {
-			if strings.EqualFold(s[v][:87], s[i][:87]) {
-				exists = true
-				break
-			}
-		}
-		// If no previous element exists, append this one.
-		if !exists {
-			r = append(r, s[i])
-		}
+	// Create a map of all unique elements.
+	for v := range s {
+		encountered[s[v]] = true
 	}
-	return r
+
+	// Place all keys from the map into a slice.
+	result := make([]string, 0)
+	for key := range encountered {
+		result = append(result, key)
+	}
+	return result
+}
+
+// flattenBatchHeaderParse parses a string of Batch Header data into a Batch Header
+func flattenBatchHeaderParse(record string) *BatchHeader {
+	bh := NewBatchHeader()
+	bh.recordType = "5"
+	bh.ServiceClassCode = bh.parseNumField(record[1:4])
+	bh.CompanyName = strings.TrimSpace(record[4:20])
+	bh.CompanyDiscretionaryData = strings.TrimSpace(record[20:40])
+	bh.CompanyIdentification = strings.TrimSpace(record[40:50])
+	bh.StandardEntryClassCode = record[50:53]
+	bh.CompanyEntryDescription = strings.TrimSpace(record[53:63])
+	bh.CompanyDescriptiveDate = strings.TrimSpace(record[63:69])
+	bh.EffectiveEntryDate = bh.validateSimpleDate(record[69:75])
+	bh.settlementDate = "   "
+	bh.OriginatorStatusCode = bh.parseNumField(record[78:79])
+	bh.ODFIIdentification = bh.parseStringField(record[79:87])
+	return bh
 }
