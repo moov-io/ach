@@ -1275,7 +1275,7 @@ func TestSegmentFile_FileHeaderError(t *testing.T) {
 	}
 }
 
-func TestFile__SegmentFileBatchControlCreditAmount(t *testing.T) {
+func TestFileSegmentFileBatchControlCreditAmount(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
 	f, err := os.Open(filepath.Join("test", "testdata", "ppd-mixedDebitCredit.ach"))
 	if err != nil {
@@ -1312,7 +1312,7 @@ func TestFile__SegmentFileBatchControlCreditAmount(t *testing.T) {
 	}
 }
 
-func TestFile__SegmentFileBatchControlDebitAmount(t *testing.T) {
+func TestFileSegmentFileBatchControlDebitAmount(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
 	f, err := os.Open(filepath.Join("test", "testdata", "ppd-mixedDebitCredit.ach"))
 	if err != nil {
@@ -1349,7 +1349,7 @@ func TestFile__SegmentFileBatchControlDebitAmount(t *testing.T) {
 	}
 }
 
-func TestFile__SegmentFileCreditBatches(t *testing.T) {
+func TestFileSegmentFileCreditBatches(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
 	f, err := os.Open(filepath.Join("test", "testdata", "ppd-mixedDebitCredit.ach"))
 	if err != nil {
@@ -1386,7 +1386,7 @@ func TestFile__SegmentFileCreditBatches(t *testing.T) {
 	}
 }
 
-func TestFile__SegmentFileDebitBatches(t *testing.T) {
+func TestFileSegmentFileDebitBatches(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
 	f, err := os.Open(filepath.Join("test", "testdata", "ppd-mixedDebitCredit.ach"))
 	if err != nil {
@@ -1423,7 +1423,7 @@ func TestFile__SegmentFileDebitBatches(t *testing.T) {
 	}
 }
 
-func TestSegmentFile__CreditOnly(t *testing.T) {
+func TestSegmentFileCreditOnly(t *testing.T) {
 	// write an ACH file into repository
 	fd, err := os.Open(filepath.Join("test", "testdata", "ppd-valid.json"))
 	if fd == nil {
@@ -1449,7 +1449,7 @@ func TestSegmentFile__CreditOnly(t *testing.T) {
 	}
 }
 
-func TestSegmentFile__DebitOnly(t *testing.T) {
+func TestSegmentFileDebitOnly(t *testing.T) {
 	// write an ACH file into repository
 	fd, err := os.Open(filepath.Join("test", "testdata", "ppd-valid-debit.json"))
 	if fd == nil {
@@ -1475,7 +1475,7 @@ func TestSegmentFile__DebitOnly(t *testing.T) {
 	}
 }
 
-func TestFileIAT__SegmentFileCreditOnly(t *testing.T) {
+func TestFileIATSegmentFileCreditOnly(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
 	f, err := os.Open(filepath.Join("test", "ach-iat-read", "iat-credit.ach"))
 
@@ -1509,7 +1509,7 @@ func TestFileIAT__SegmentFileCreditOnly(t *testing.T) {
 	}
 }
 
-func TestFileIAT__SegmentFileDebitOnly(t *testing.T) {
+func TestFileIATSegmentFileDebitOnly(t *testing.T) {
 	// open a file for reading. Any io.Reader Can be used
 	f, err := os.Open(filepath.Join("test", "testdata", "iat-debit.ach"))
 
@@ -1575,5 +1575,67 @@ func TestFileIAT__SegmentFile(t *testing.T) {
 
 	if err := debitFile.Validate(); err != nil {
 		t.Fatalf("Debit File did not validate: %+v \n", err)
+	}
+}
+
+// TestFile_FlattenFileOneBatchHeader
+func TestFile_FlattenFileOneBatchHeader(t *testing.T) {
+	// open a file for reading. Any io.Reader Can be used
+	f, err := os.Open(filepath.Join("test", "testdata", "flattenBatchesOneBatchHeader.ach"))
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := NewReader(f)
+	achFile, err := r.Read()
+	if err != nil {
+		t.Fatalf("Issue reading file: %+v \n", err)
+	}
+
+	of, err := achFile.FlattenBatches()
+
+	if err != nil {
+		t.Fatalf("Could not flatten the file: %+v \n", err)
+	}
+
+	if err := of.Validate(); err != nil {
+		t.Fatalf("Flattend file did not validate: %+v \n", err)
+	}
+}
+
+// TestFileFlattenFileMultipleBatchHeaders
+func TestFileFlattenFileMultipleBatchHeaders(t *testing.T) {
+	// open a file for reading. Any io.Reader Can be used
+	f, err := os.Open(filepath.Join("test", "testdata", "flattenBatchesMultipleBatchHeaders.ach"))
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := NewReader(f)
+	achFile, err := r.Read()
+	if err != nil {
+		t.Fatalf("Issue reading file: %+v \n", err)
+	}
+
+	of, err := achFile.FlattenBatches()
+
+	if err != nil {
+		t.Fatalf("Could not flatten the file: %+v \n", err)
+	}
+
+	if err := of.Validate(); err != nil {
+		t.Fatalf("Flattend file did not validate: %+v \n", err)
+	}
+}
+
+func TestFlattenFile_FileHeaderError(t *testing.T) {
+	achFile := NewFile()
+
+	_, err := achFile.FlattenBatches()
+
+	if err != nil {
+		if !base.Match(err, ErrConstructor) {
+			t.Errorf("%T: %s", err, err)
+		}
 	}
 }

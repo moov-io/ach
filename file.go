@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/moov-io/base"
+	"strings"
 	"time"
 )
 
@@ -760,6 +761,7 @@ func (f *File) segmentFileBatches(creditFile, debitFile *File) {
 
 				entries := batch.GetEntries()
 				for _, entry := range entries {
+					entry.TraceNumber = "" // unset so Batch.build generates a TraceNumber
 					segmentFileBatchAddEntry(creditBatch, debitBatch, entry)
 				}
 
@@ -906,4 +908,99 @@ func segmentFileBatchAddADVEntry(creditBatch Batcher, debitBatch Batcher, entry 
 	case DebitForCreditsOriginated, DebitForDebitsReceived, DebitForDebitsRejectedBatches, DebitSummary:
 		debitBatch.AddADVEntry(entry)
 	}
+}
+
+// FlattenBatches flattens File Batches by consolidating batches with the same BatchHeader data into one batch.
+func (f *File) FlattenBatches() (*File, error) {
+	if err := f.Validate(); err != nil {
+		return nil, err
+	}
+
+	of := NewFile()
+
+	// Slice of BatchHeaders
+	sbh := make([]string, 0)
+	for _, b := range f.Batches {
+		bh := b.GetHeader().String()
+		sbh = append(sbh, bh[:87])
+	}
+
+	// Remove duplicate BatchHeader entries
+	sbh = removeDuplicateBatchHeaders(sbh)
+
+	// Add new batches for flattened file
+	for _, record := range sbh {
+
+		bh := flattenBatchHeaderParse(record)
+
+		b, _ := NewBatch(bh)
+		of.AddBatch(b)
+	}
+
+	for _, batch := range f.Batches {
+		fbh := batch.GetHeader().String()[:87]
+		// Add entries for batches
+		for i, ofBatch := range of.Batches {
+			if strings.EqualFold(fbh, ofBatch.GetHeader().String()[:87]) {
+				entries := batch.GetEntries()
+				for _, entry := range entries {
+					of.Batches[i].AddEntry(entry)
+				}
+			}
+		}
+	}
+
+	// Reset TraceNumber
+	for _, ofBatch := range of.Batches {
+		for _, ofEntry := range ofBatch.GetEntries() {
+			ofEntry.TraceNumber = ""
+		}
+		ofBatch.Create()
+	}
+
+	// Add FileHeaderData.
+	f.addFileHeaderData(of)
+
+	if err := of.Create(); err != nil {
+		return nil, err
+	}
+	if err := of.Validate(); err != nil {
+		return nil, err
+	}
+	return of, nil
+}
+
+// removeDuplicateBatchHeaders removes duplicate batch header
+func removeDuplicateBatchHeaders(s []string) []string {
+	encountered := map[string]bool{}
+
+	// Create a map of all unique elements.
+	for v := range s {
+		encountered[s[v]] = true
+	}
+
+	// Place all keys from the map into a slice.
+	result := make([]string, 0)
+	for key := range encountered {
+		result = append(result, key)
+	}
+	return result
+}
+
+// flattenBatchHeaderParse parses a string of Batch Header data into a Batch Header
+func flattenBatchHeaderParse(record string) *BatchHeader {
+	bh := NewBatchHeader()
+	bh.recordType = "5"
+	bh.ServiceClassCode = bh.parseNumField(record[1:4])
+	bh.CompanyName = strings.TrimSpace(record[4:20])
+	bh.CompanyDiscretionaryData = strings.TrimSpace(record[20:40])
+	bh.CompanyIdentification = strings.TrimSpace(record[40:50])
+	bh.StandardEntryClassCode = record[50:53]
+	bh.CompanyEntryDescription = strings.TrimSpace(record[53:63])
+	bh.CompanyDescriptiveDate = strings.TrimSpace(record[63:69])
+	bh.EffectiveEntryDate = bh.validateSimpleDate(record[69:75])
+	bh.settlementDate = "   "
+	bh.OriginatorStatusCode = bh.parseNumField(record[78:79])
+	bh.ODFIIdentification = bh.parseStringField(record[79:87])
+	return bh
 }
