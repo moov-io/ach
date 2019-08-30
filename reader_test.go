@@ -1446,6 +1446,28 @@ func TestADVNoFileControl(t *testing.T) {
 	}
 }
 
+func TestADVCategoryReturn(t *testing.T) {
+	fd, err := os.Open(filepath.Join("test", "testdata", "adv-return.json"))
+	if err != nil {
+		t.Error(err)
+	}
+	bs, err := ioutil.ReadAll(fd)
+	if err != nil {
+		t.Error(err)
+	}
+	file, err := FileFromJSON(bs)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if n := len(file.Batches); n != 1 {
+		t.Errorf("got %d Batches", n)
+	}
+	if file.Batches[0].Category() != CategoryReturn {
+		t.Errorf("Category=%s", file.Batches[0].Category())
+	}
+}
+
 // testACHFileIATBC validates error when reading an invalid IAT Batch Control
 func testACHFileIATBC(t testing.TB) {
 	f, err := os.Open("./test/testdata/iat-invalidBatchControl.ach")
