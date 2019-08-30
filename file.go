@@ -976,10 +976,10 @@ func (f *File) FlattenBatches() (*File, error) {
 		// Add new IATBatches for flattened file
 		for _, record := range sIATBh {
 
-			IATBh := flattenBatchHeaderParse(record)
+			IATBh := flattenIATBatchHeaderParse(record)
 
-			b, _ := NewBatch(IATBh)
-			of.AddBatch(b)
+			b := NewIATBatch(IATBh)
+			of.AddIATBatch(b)
 		}
 		for _, iatBatch := range f.IATBatches {
 			fbh := iatBatch.GetHeader().String()[:87]
