@@ -191,7 +191,9 @@ func setEntryRecordType(e *EntryDetail) {
 
 func setADVEntryRecordType(e *ADVEntryDetail) {
 	e.recordType = "6"
-	e.Category = CategoryForward
+	if e.Addenda99 == nil {
+		e.Category = CategoryForward
+	}
 }
 
 func setIATEntryRecordType(e *IATEntryDetail) {

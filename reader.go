@@ -400,6 +400,7 @@ func (r *Reader) parseADVAddenda() error {
 	if err := addenda99.Validate(); err != nil {
 		return r.parseError(err)
 	}
+	r.currentBatch.GetADVEntries()[entryIndex].Category = CategoryReturn
 	r.currentBatch.GetADVEntries()[entryIndex].Addenda99 = addenda99
 	return nil
 }

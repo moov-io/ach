@@ -501,6 +501,12 @@ func (batch *Batch) Category() string {
 			return batch.Entries[i].Category
 		}
 	}
+	for i := range batch.ADVEntries {
+		switch batch.ADVEntries[i].Category {
+		case CategoryReturn, CategoryNOC:
+			return batch.ADVEntries[i].Category
+		}
+	}
 	return CategoryForward
 }
 
