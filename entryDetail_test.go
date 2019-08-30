@@ -670,10 +670,14 @@ func TestEntryDetail__CategoryJSON(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if n := len(file.ReturnEntries); n != 2 {
+		t.Errorf("got %d ReturnEntries", n)
+	}
 	if err := json.NewEncoder(&buf).Encode(file); err != nil {
 		t.Fatal(err)
 	}
-	if n := strings.Count(buf.String(), `"category":"Return"`); n != 2 {
+	// There are two ReturnEntries and two Batches
+	if n := strings.Count(buf.String(), `"category":"Return"`); n != 4 {
 		// return-WEB.ach has two EntryDetail records
 		t.Errorf("got %d category:Return\n%s", n, buf.String())
 	}
@@ -688,7 +692,9 @@ func TestEntryDetail__ParseReturn(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
+	if n := len(file.ReturnEntries); n != 2 {
+		t.Errorf("got %d ReturnEntries", n)
+	}
 	if n := len(file.Batches); n != 2 {
 		t.Errorf("got %d batches: %#v", n, file.Batches)
 	}
