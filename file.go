@@ -917,47 +917,89 @@ func (f *File) FlattenBatches() (*File, error) {
 	if err := f.Validate(); err != nil {
 		return nil, err
 	}
-
 	of := NewFile()
 
-	// Slice of BatchHeaders
-	sbh := make([]string, 0)
-	for _, b := range f.Batches {
-		bh := b.GetHeader().String()
-		sbh = append(sbh, bh[:87])
-	}
+	if f.Batches != nil {
+		// Slice of BatchHeaders
+		sbh := make([]string, 0)
+		for _, b := range f.Batches {
+			bh := b.GetHeader().String()
+			sbh = append(sbh, bh[:87])
+		}
+		// Remove duplicate BatchHeader entries
+		sbh = removeDuplicateBatchHeaders(sbh)
+		// Add new batches for flattened file
+		for _, record := range sbh {
 
-	// Remove duplicate BatchHeader entries
-	sbh = removeDuplicateBatchHeaders(sbh)
+			bh := flattenBatchHeaderParse(record)
 
-	// Add new batches for flattened file
-	for _, record := range sbh {
-
-		bh := flattenBatchHeaderParse(record)
-
-		b, _ := NewBatch(bh)
-		of.AddBatch(b)
-	}
-
-	for _, batch := range f.Batches {
-		fbh := batch.GetHeader().String()[:87]
-		// Add entries for batches
-		for i, ofBatch := range of.Batches {
-			if strings.EqualFold(fbh, ofBatch.GetHeader().String()[:87]) {
-				entries := batch.GetEntries()
-				for _, entry := range entries {
-					of.Batches[i].AddEntry(entry)
+			b, _ := NewBatch(bh)
+			of.AddBatch(b)
+		}
+		for _, batch := range f.Batches {
+			fbh := batch.GetHeader().String()[:87]
+			// Add entries for batches
+			for i, ofBatch := range of.Batches {
+				if strings.EqualFold(fbh, ofBatch.GetHeader().String()[:87]) {
+					if ofBatch.GetHeader().StandardEntryClassCode == "ADV" {
+						entries := batch.GetADVEntries()
+						for _, advEntry := range entries {
+							of.Batches[i].AddADVEntry(advEntry)
+						}
+					} else {
+						entries := batch.GetEntries()
+						for _, entry := range entries {
+							of.Batches[i].AddEntry(entry)
+						}
+					}
 				}
 			}
 		}
+		// Reset TraceNumber
+		for _, ofBatch := range of.Batches {
+			for _, ofEntry := range ofBatch.GetEntries() {
+				ofEntry.TraceNumber = ""
+			}
+			ofBatch.Create()
+		}
 	}
 
-	// Reset TraceNumber
-	for _, ofBatch := range of.Batches {
-		for _, ofEntry := range ofBatch.GetEntries() {
-			ofEntry.TraceNumber = ""
+	if f.IATBatches != nil {
+		// Slice of IATBatchHeaders
+		sIATBh := make([]string, 0)
+		for _, iatB := range f.IATBatches {
+			IATBh := iatB.GetHeader().String()
+			sIATBh = append(sIATBh, IATBh[:87])
 		}
-		ofBatch.Create()
+		// Remove duplicate IATBatchHeader entries
+		sIATBh = removeDuplicateBatchHeaders(sIATBh)
+		// Add new IATBatches for flattened file
+		for _, record := range sIATBh {
+
+			IATBh := flattenBatchHeaderParse(record)
+
+			b, _ := NewBatch(IATBh)
+			of.AddBatch(b)
+		}
+		for _, iatBatch := range f.IATBatches {
+			fbh := iatBatch.GetHeader().String()[:87]
+			// Add entries for IATBatches
+			for i, ofBatch := range of.Batches {
+				if strings.EqualFold(fbh, ofBatch.GetHeader().String()[:87]) {
+					iatEntries := iatBatch.GetEntries()
+					for _, iatEntry := range iatEntries {
+						of.IATBatches[i].AddEntry(iatEntry)
+					}
+				}
+			}
+		}
+		// Reset TraceNumber
+		for _, ofIATBatch := range of.IATBatches {
+			for _, ofEntry := range ofIATBatch.GetEntries() {
+				ofEntry.TraceNumber = ""
+			}
+			ofIATBatch.Create()
+		}
 	}
 
 	// Add FileHeaderData.
@@ -1005,4 +1047,26 @@ func flattenBatchHeaderParse(record string) *BatchHeader {
 	bh.OriginatorStatusCode = bh.parseNumField(record[78:79])
 	bh.ODFIIdentification = bh.parseStringField(record[79:87])
 	return bh
+}
+
+// flattenIATBatchHeaderParse parses a string of IAT Batch Header data into a IATBatchHeader
+func flattenIATBatchHeaderParse(record string) *IATBatchHeader {
+	iatBh := NewIATBatchHeader()
+	iatBh.recordType = "5"
+	iatBh.ServiceClassCode = iatBh.parseNumField(record[1:4])
+	iatBh.IATIndicator = iatBh.parseStringField(record[4:20])
+	iatBh.ForeignExchangeIndicator = iatBh.parseStringField(record[20:22])
+	iatBh.ForeignExchangeReferenceIndicator = iatBh.parseNumField(record[22:23])
+	iatBh.ForeignExchangeReference = iatBh.parseStringField(record[23:38])
+	iatBh.ISODestinationCountryCode = iatBh.parseStringField(record[38:40])
+	iatBh.OriginatorIdentification = iatBh.parseStringField(record[40:50])
+	iatBh.StandardEntryClassCode = record[50:53]
+	iatBh.CompanyEntryDescription = strings.TrimSpace(record[53:63])
+	iatBh.ISOOriginatingCurrencyCode = iatBh.parseStringField(record[63:66])
+	iatBh.ISODestinationCurrencyCode = iatBh.parseStringField(record[66:69])
+	iatBh.EffectiveEntryDate = iatBh.validateSimpleDate(record[69:75])
+	iatBh.settlementDate = "   "
+	iatBh.OriginatorStatusCode = iatBh.parseNumField(record[78:79])
+	iatBh.ODFIIdentification = iatBh.parseStringField(record[79:87])
+	return iatBh
 }
