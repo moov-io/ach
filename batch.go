@@ -491,7 +491,23 @@ func (batch *Batch) GetADVEntries() []*ADVEntryDetail {
 
 // Category returns batch category
 func (batch *Batch) Category() string {
-	return batch.category
+	if len(batch.Entries) == 0 && batch.category != "" {
+		return batch.category
+	}
+	// If an Entry has NOC or Return that's the Batch's category
+	for i := range batch.Entries {
+		switch batch.Entries[i].Category {
+		case CategoryReturn, CategoryNOC:
+			return batch.Entries[i].Category
+		}
+	}
+	for i := range batch.ADVEntries {
+		switch batch.ADVEntries[i].Category {
+		case CategoryReturn, CategoryNOC:
+			return batch.ADVEntries[i].Category
+		}
+	}
+	return CategoryForward
 }
 
 // ID returns the id of the batch
