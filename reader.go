@@ -363,6 +363,7 @@ func (r *Reader) parseAddenda() error {
 				if err := addenda98.Validate(); err != nil {
 					return r.parseError(err)
 				}
+				r.currentBatch.GetEntries()[entryIndex].Category = CategoryNOC
 				r.currentBatch.GetEntries()[entryIndex].Addenda98 = addenda98
 			case "99":
 				addenda99 := NewAddenda99()
