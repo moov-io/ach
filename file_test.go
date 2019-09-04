@@ -1639,3 +1639,28 @@ func TestFlattenFile_FileHeaderError(t *testing.T) {
 		}
 	}
 }
+
+// TestFile_FlattenFileOneIATBatchHeader
+func TestFile_FlattenFileOneIATBatchHeader(t *testing.T) {
+	// open a file for reading. Any io.Reader Can be used
+	f, err := os.Open(filepath.Join("test", "testdata", "flattenIATBatchesOneBatchHeader.ach"))
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := NewReader(f)
+	achFile, err := r.Read()
+	if err != nil {
+		t.Fatalf("Issue reading file: %+v \n", err)
+	}
+
+	of, err := achFile.FlattenBatches()
+
+	if err != nil {
+		t.Fatalf("Could not flatten the file: %+v \n", err)
+	}
+
+	if err := of.Validate(); err != nil {
+		t.Fatalf("Flattend file did not validate: %+v \n", err)
+	}
+}

@@ -743,12 +743,12 @@ func (f *File) segmentFileBatches(creditFile, debitFile *File) {
 				}
 				// Add the Entry to its Batch
 				if creditBatch != nil && len(creditBatch.GetADVEntries()) > 0 {
-					creditBatch.Create()
+					_ = creditBatch.Create()
 					creditFile.AddBatch(creditBatch)
 				}
 
 				if debitBatch != nil && len(debitBatch.GetADVEntries()) > 0 {
-					debitBatch.Create()
+					_ = debitBatch.Create()
 					debitFile.AddBatch(debitBatch)
 				}
 			}
@@ -768,11 +768,11 @@ func (f *File) segmentFileBatches(creditFile, debitFile *File) {
 				}
 
 				if creditBatch != nil && len(creditBatch.GetEntries()) > 0 {
-					creditBatch.Create()
+					_ = creditBatch.Create()
 					creditFile.AddBatch(creditBatch)
 				}
 				if debitBatch != nil && len(debitBatch.GetEntries()) > 0 {
-					debitBatch.Create()
+					_ = debitBatch.Create()
 					debitFile.AddBatch(debitBatch)
 				}
 			case CreditsOnly:
@@ -815,11 +815,11 @@ func (f *File) segmentFileIATBatches(creditFile, debitFile *File) {
 			}
 
 			if len(creditIATBatch.GetEntries()) > 0 {
-				creditIATBatch.Create()
+				_ = creditIATBatch.Create()
 				creditFile.AddIATBatch(creditIATBatch)
 			}
 			if len(debitIATBatch.GetEntries()) > 0 {
-				debitIATBatch.Create()
+				_ = debitIATBatch.Create()
 				debitFile.AddIATBatch(debitIATBatch)
 			}
 		case CreditsOnly:
@@ -949,18 +949,14 @@ func (f *File) FlattenBatches() (*File, error) {
 					} else {
 						entries := batch.GetEntries()
 						for _, entry := range entries {
+							// Reset TraceNumber
+							entry.TraceNumber = ""
 							of.Batches[i].AddEntry(entry)
 						}
 					}
+					_ = of.Batches[i].Create()
 				}
 			}
-		}
-		// Reset TraceNumber
-		for _, ofBatch := range of.Batches {
-			for _, ofEntry := range ofBatch.GetEntries() {
-				ofEntry.TraceNumber = ""
-			}
-			ofBatch.Create()
 		}
 	}
 
@@ -984,21 +980,17 @@ func (f *File) FlattenBatches() (*File, error) {
 		for _, iatBatch := range f.IATBatches {
 			fbh := iatBatch.GetHeader().String()[:87]
 			// Add entries for IATBatches
-			for i, ofBatch := range of.Batches {
+			for i, ofBatch := range of.IATBatches {
 				if strings.EqualFold(fbh, ofBatch.GetHeader().String()[:87]) {
 					iatEntries := iatBatch.GetEntries()
 					for _, iatEntry := range iatEntries {
+						// reset TraceNumber
+						iatEntry.TraceNumber = ""
 						of.IATBatches[i].AddEntry(iatEntry)
 					}
 				}
+				_ = of.IATBatches[i].Create()
 			}
-		}
-		// Reset TraceNumber
-		for _, ofIATBatch := range of.IATBatches {
-			for _, ofEntry := range ofIATBatch.GetEntries() {
-				ofEntry.TraceNumber = ""
-			}
-			ofIATBatch.Create()
 		}
 	}
 
