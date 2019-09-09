@@ -923,15 +923,16 @@ func (f *File) FlattenBatches() (*File, error) {
 		// Slice of BatchHeaders
 		sbh := make([]string, 0)
 		for _, b := range f.Batches {
-			bh := b.GetHeader().String()
-			sbh = append(sbh, bh[:87])
+			bh := b.GetHeader()
+			bh.BatchNumber = 0
+			sbh = append(sbh, bh.String())
 		}
 		// Remove duplicate BatchHeader entries
 		sbh = removeDuplicateBatchHeaders(sbh)
 		// Add new batches for flattened file
 		for _, record := range sbh {
-
-			bh := flattenBatchHeaderParse(record)
+			bh := &BatchHeader{}
+			bh.Parse(record)
 
 			b, _ := NewBatch(bh)
 			of.AddBatch(b)
@@ -964,17 +965,18 @@ func (f *File) FlattenBatches() (*File, error) {
 		// Slice of IATBatchHeaders
 		sIATBh := make([]string, 0)
 		for _, iatB := range f.IATBatches {
-			IATBh := iatB.GetHeader().String()
-			sIATBh = append(sIATBh, IATBh[:87])
+			bh := iatB.GetHeader()
+			bh.BatchNumber = 0
+			sIATBh = append(sIATBh, bh.String())
 		}
 		// Remove duplicate IATBatchHeader entries
 		sIATBh = removeDuplicateBatchHeaders(sIATBh)
 		// Add new IATBatches for flattened file
 		for _, record := range sIATBh {
+			iatBh := &IATBatchHeader{}
+			iatBh.Parse(record)
 
-			IATBh := flattenIATBatchHeaderParse(record)
-
-			b := NewIATBatch(IATBh)
+			b := NewIATBatch(iatBh)
 			of.AddIATBatch(b)
 		}
 		for _, iatBatch := range f.IATBatches {
@@ -1021,44 +1023,4 @@ func removeDuplicateBatchHeaders(s []string) []string {
 		result = append(result, key)
 	}
 	return result
-}
-
-// flattenBatchHeaderParse parses a string of Batch Header data into a Batch Header
-func flattenBatchHeaderParse(record string) *BatchHeader {
-	bh := NewBatchHeader()
-	bh.recordType = "5"
-	bh.ServiceClassCode = bh.parseNumField(record[1:4])
-	bh.CompanyName = strings.TrimSpace(record[4:20])
-	bh.CompanyDiscretionaryData = strings.TrimSpace(record[20:40])
-	bh.CompanyIdentification = strings.TrimSpace(record[40:50])
-	bh.StandardEntryClassCode = record[50:53]
-	bh.CompanyEntryDescription = strings.TrimSpace(record[53:63])
-	bh.CompanyDescriptiveDate = strings.TrimSpace(record[63:69])
-	bh.EffectiveEntryDate = bh.validateSimpleDate(record[69:75])
-	bh.settlementDate = "   "
-	bh.OriginatorStatusCode = bh.parseNumField(record[78:79])
-	bh.ODFIIdentification = bh.parseStringField(record[79:87])
-	return bh
-}
-
-// flattenIATBatchHeaderParse parses a string of IAT Batch Header data into a IATBatchHeader
-func flattenIATBatchHeaderParse(record string) *IATBatchHeader {
-	iatBh := NewIATBatchHeader()
-	iatBh.recordType = "5"
-	iatBh.ServiceClassCode = iatBh.parseNumField(record[1:4])
-	iatBh.IATIndicator = iatBh.parseStringField(record[4:20])
-	iatBh.ForeignExchangeIndicator = iatBh.parseStringField(record[20:22])
-	iatBh.ForeignExchangeReferenceIndicator = iatBh.parseNumField(record[22:23])
-	iatBh.ForeignExchangeReference = iatBh.parseStringField(record[23:38])
-	iatBh.ISODestinationCountryCode = iatBh.parseStringField(record[38:40])
-	iatBh.OriginatorIdentification = iatBh.parseStringField(record[40:50])
-	iatBh.StandardEntryClassCode = record[50:53]
-	iatBh.CompanyEntryDescription = strings.TrimSpace(record[53:63])
-	iatBh.ISOOriginatingCurrencyCode = iatBh.parseStringField(record[63:66])
-	iatBh.ISODestinationCurrencyCode = iatBh.parseStringField(record[66:69])
-	iatBh.EffectiveEntryDate = iatBh.validateSimpleDate(record[69:75])
-	iatBh.settlementDate = "   "
-	iatBh.OriginatorStatusCode = iatBh.parseNumField(record[78:79])
-	iatBh.ODFIIdentification = iatBh.parseStringField(record[79:87])
-	return iatBh
 }
