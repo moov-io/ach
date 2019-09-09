@@ -100,7 +100,7 @@ func (b *Batch) Error(field string, err error, values ...interface{}) error {
 }
 
 // error returns a new BatchError based on err
-func (b *IATBatch) Error(field string, err error, values ...interface{}) error {
+func (iatBatch *IATBatch) Error(field string, err error, values ...interface{}) error {
 	if err == nil {
 		return nil
 	}
@@ -108,8 +108,8 @@ func (b *IATBatch) Error(field string, err error, values ...interface{}) error {
 		return err
 	}
 	be := BatchError{
-		BatchNumber: b.Header.BatchNumber,
-		BatchType:   b.Header.StandardEntryClassCode,
+		BatchNumber: iatBatch.Header.BatchNumber,
+		BatchType:   iatBatch.Header.StandardEntryClassCode,
 		FieldName:   field,
 		Err:         err,
 	}

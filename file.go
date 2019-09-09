@@ -743,12 +743,12 @@ func (f *File) segmentFileBatches(creditFile, debitFile *File) {
 				}
 				// Add the Entry to its Batch
 				if creditBatch != nil && len(creditBatch.GetADVEntries()) > 0 {
-					creditBatch.Create()
+					_ = creditBatch.Create()
 					creditFile.AddBatch(creditBatch)
 				}
 
 				if debitBatch != nil && len(debitBatch.GetADVEntries()) > 0 {
-					debitBatch.Create()
+					_ = debitBatch.Create()
 					debitFile.AddBatch(debitBatch)
 				}
 			}
@@ -768,11 +768,11 @@ func (f *File) segmentFileBatches(creditFile, debitFile *File) {
 				}
 
 				if creditBatch != nil && len(creditBatch.GetEntries()) > 0 {
-					creditBatch.Create()
+					_ = creditBatch.Create()
 					creditFile.AddBatch(creditBatch)
 				}
 				if debitBatch != nil && len(debitBatch.GetEntries()) > 0 {
-					debitBatch.Create()
+					_ = debitBatch.Create()
 					debitFile.AddBatch(debitBatch)
 				}
 			case CreditsOnly:
@@ -815,11 +815,11 @@ func (f *File) segmentFileIATBatches(creditFile, debitFile *File) {
 			}
 
 			if len(creditIATBatch.GetEntries()) > 0 {
-				creditIATBatch.Create()
+				_ = creditIATBatch.Create()
 				creditFile.AddIATBatch(creditIATBatch)
 			}
 			if len(debitIATBatch.GetEntries()) > 0 {
-				debitIATBatch.Create()
+				_ = debitIATBatch.Create()
 				debitFile.AddIATBatch(debitIATBatch)
 			}
 		case CreditsOnly:
@@ -917,47 +917,83 @@ func (f *File) FlattenBatches() (*File, error) {
 	if err := f.Validate(); err != nil {
 		return nil, err
 	}
-
 	of := NewFile()
 
-	// Slice of BatchHeaders
-	sbh := make([]string, 0)
-	for _, b := range f.Batches {
-		bh := b.GetHeader().String()
-		sbh = append(sbh, bh[:87])
-	}
+	if f.Batches != nil {
+		// Slice of BatchHeaders
+		sbh := make([]string, 0)
+		for _, b := range f.Batches {
+			bh := b.GetHeader()
+			bh.BatchNumber = 0
+			sbh = append(sbh, bh.String())
+		}
+		// Remove duplicate BatchHeader entries
+		sbh = removeDuplicateBatchHeaders(sbh)
+		// Add new batches for flattened file
+		for _, record := range sbh {
+			bh := &BatchHeader{}
+			bh.Parse(record)
 
-	// Remove duplicate BatchHeader entries
-	sbh = removeDuplicateBatchHeaders(sbh)
-
-	// Add new batches for flattened file
-	for _, record := range sbh {
-
-		bh := flattenBatchHeaderParse(record)
-
-		b, _ := NewBatch(bh)
-		of.AddBatch(b)
-	}
-
-	for _, batch := range f.Batches {
-		fbh := batch.GetHeader().String()[:87]
-		// Add entries for batches
-		for i, ofBatch := range of.Batches {
-			if strings.EqualFold(fbh, ofBatch.GetHeader().String()[:87]) {
-				entries := batch.GetEntries()
-				for _, entry := range entries {
-					of.Batches[i].AddEntry(entry)
+			b, _ := NewBatch(bh)
+			of.AddBatch(b)
+		}
+		for _, batch := range f.Batches {
+			fbh := batch.GetHeader().String()[:87]
+			// Add entries for batches
+			for i, ofBatch := range of.Batches {
+				if strings.EqualFold(fbh, ofBatch.GetHeader().String()[:87]) {
+					if ofBatch.GetHeader().StandardEntryClassCode == "ADV" {
+						entries := batch.GetADVEntries()
+						for _, advEntry := range entries {
+							of.Batches[i].AddADVEntry(advEntry)
+						}
+					} else {
+						entries := batch.GetEntries()
+						for _, entry := range entries {
+							// Reset TraceNumber
+							entry.TraceNumber = ""
+							of.Batches[i].AddEntry(entry)
+						}
+					}
+					_ = of.Batches[i].Create()
 				}
 			}
 		}
 	}
 
-	// Reset TraceNumber
-	for _, ofBatch := range of.Batches {
-		for _, ofEntry := range ofBatch.GetEntries() {
-			ofEntry.TraceNumber = ""
+	if f.IATBatches != nil {
+		// Slice of IATBatchHeaders
+		sIATBh := make([]string, 0)
+		for _, iatB := range f.IATBatches {
+			bh := iatB.GetHeader()
+			bh.BatchNumber = 0
+			sIATBh = append(sIATBh, bh.String())
 		}
-		ofBatch.Create()
+		// Remove duplicate IATBatchHeader entries
+		sIATBh = removeDuplicateBatchHeaders(sIATBh)
+		// Add new IATBatches for flattened file
+		for _, record := range sIATBh {
+			iatBh := &IATBatchHeader{}
+			iatBh.Parse(record)
+
+			b := NewIATBatch(iatBh)
+			of.AddIATBatch(b)
+		}
+		for _, iatBatch := range f.IATBatches {
+			fbh := iatBatch.GetHeader().String()[:87]
+			// Add entries for IATBatches
+			for i, ofBatch := range of.IATBatches {
+				if strings.EqualFold(fbh, ofBatch.GetHeader().String()[:87]) {
+					iatEntries := iatBatch.GetEntries()
+					for _, iatEntry := range iatEntries {
+						// reset TraceNumber
+						iatEntry.TraceNumber = ""
+						of.IATBatches[i].AddEntry(iatEntry)
+					}
+				}
+				_ = of.IATBatches[i].Create()
+			}
+		}
 	}
 
 	// Add FileHeaderData.
@@ -987,22 +1023,4 @@ func removeDuplicateBatchHeaders(s []string) []string {
 		result = append(result, key)
 	}
 	return result
-}
-
-// flattenBatchHeaderParse parses a string of Batch Header data into a Batch Header
-func flattenBatchHeaderParse(record string) *BatchHeader {
-	bh := NewBatchHeader()
-	bh.recordType = "5"
-	bh.ServiceClassCode = bh.parseNumField(record[1:4])
-	bh.CompanyName = strings.TrimSpace(record[4:20])
-	bh.CompanyDiscretionaryData = strings.TrimSpace(record[20:40])
-	bh.CompanyIdentification = strings.TrimSpace(record[40:50])
-	bh.StandardEntryClassCode = record[50:53]
-	bh.CompanyEntryDescription = strings.TrimSpace(record[53:63])
-	bh.CompanyDescriptiveDate = strings.TrimSpace(record[63:69])
-	bh.EffectiveEntryDate = bh.validateSimpleDate(record[69:75])
-	bh.settlementDate = "   "
-	bh.OriginatorStatusCode = bh.parseNumField(record[78:79])
-	bh.ODFIIdentification = bh.parseStringField(record[79:87])
-	return bh
 }

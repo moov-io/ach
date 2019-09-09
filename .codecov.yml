@@ -8,8 +8,8 @@ coverage:
   range: "70...100"
 
   status:
-    project: no
-    patch: no
+    project: yes
+    patch: yes
     changes: no
 
 parsers:
