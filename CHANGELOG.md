@@ -1,3 +1,9 @@
+## v1.2.0 (Unreleased)
+
+BUILD
+
+- upgrade to Go 1.13
+
 ## v1.1.0 (Released 2019-08-19)
 
 BREAKING CHANGES

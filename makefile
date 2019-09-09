@@ -16,6 +16,7 @@ generate: clean
 
 clean:
 	@rm -rf tmp/
+	@rm -rf bin/
 
 dist: clean generate build
 ifeq ($(OS),Windows_NT)
