@@ -413,7 +413,7 @@ type flattenBatchesRequest struct {
 }
 
 type flattenBatchesResponse struct {
-	id  string `json:"id"`
+	ID string `json:"id"`
 	Err error  `json:"error"`
 }
 
