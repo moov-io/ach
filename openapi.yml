@@ -322,7 +322,7 @@ paths:
               example: 101 222380104 1210428821805100000A094101Citadel                Bank Name
       responses:
         '201':
-          description: A JSON object containing two new Files.  A credit ACH File and a debit ACH File
+          description: A JSON object containing the credit File ID and debit File ID
           headers:
             Location:
               description: The location of the new resource
@@ -376,7 +376,7 @@ paths:
               example: 101 222380104 1210428821805100000A094101Citadel                Bank Name
       responses:
         '201':
-          description: A JSON object containing a flattened ACH File.
+          description: A JSOn objeect containing the File ID associated with a Flattened ACH file.
           headers:
             Location:
               description: The location of the new resource
