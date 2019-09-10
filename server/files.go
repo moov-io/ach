@@ -413,7 +413,7 @@ type flattenBatchesRequest struct {
 }
 
 type flattenBatchesResponse struct {
-	ID string `json:"id"`
+	ID  string `json:"id"`
 	Err error  `json:"error"`
 }
 
@@ -440,7 +440,7 @@ func flattenBatchesEndpoint(s Service, r Repository, logger log.Logger) endpoint
 			}
 		}
 		return flattenBatchesResponse{
-			id:  flattenFile.ID,
+			ID:  flattenFile.ID,
 			Err: err,
 		}, nil
 	}
