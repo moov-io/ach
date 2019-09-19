@@ -573,3 +573,26 @@ func TestFlattenBatches(t *testing.T) {
 		t.Fatalf("Flatten file did not validate: %+v \n", err)
 	}
 }
+
+func TestSegmentFile_NoFileID(t *testing.T) {
+	s := mockServiceInMemory()
+	fileID := ""
+	_, err := s.FlattenBatches(fileID)
+
+	if err != nil {
+		if !strings.Contains(err.Error(), "not found") {
+			t.Fatal(err.Error())
+		}
+	}
+}
+
+func TestFlattenBatches_NoFileID(t *testing.T) {
+	s := mockServiceInMemory()
+	_, _, err := s.SegmentFile("")
+
+	if err != nil {
+		if !strings.Contains(err.Error(), "not found") {
+			t.Fatal(err.Error())
+		}
+	}
+}
