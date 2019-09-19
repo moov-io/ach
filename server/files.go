@@ -345,8 +345,7 @@ func decodeValidateFileRequest(_ context.Context, r *http.Request) (interface{},
 }
 
 type segmentFileRequest struct {
-	fileID string
-
+	fileID    string
 	requestID string
 }
 
@@ -403,6 +402,57 @@ func decodeSegmentFileRequest(_ context.Context, r *http.Request) (interface{}, 
 		return nil, ErrBadRouting
 	}
 	return segmentFileRequest{
+		fileID:    fileID,
+		requestID: moovhttp.GetRequestID(r),
+	}, nil
+}
+
+type flattenBatchesRequest struct {
+	fileID    string
+	requestID string
+}
+
+type flattenBatchesResponse struct {
+	ID  string `json:"id"`
+	Err error  `json:"error"`
+}
+
+func flattenBatchesEndpoint(s Service, r Repository, logger log.Logger) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req, ok := request.(flattenBatchesRequest)
+		if !ok {
+			err := errors.New("invalid request")
+			return flattenBatchesResponse{
+				Err: err,
+			}, err
+		}
+		flattenFile, err := s.FlattenBatches(req.fileID)
+		if logger != nil {
+			logger.Log("files", "FlattenBatches", "requestID", req.requestID, "error", err)
+		}
+		if err != nil {
+			return flattenBatchesResponse{Err: err}, err
+		}
+		if flattenFile.ID != "" {
+			err = r.StoreFile(flattenFile)
+			if logger != nil {
+				logger.Log("files", "storeFlattenFile", "requestID", req.requestID, "error", err)
+			}
+		}
+		return flattenBatchesResponse{
+			ID:  flattenFile.ID,
+			Err: err,
+		}, nil
+	}
+}
+
+func decodeFlattenBatchesRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	fileID, ok := vars["fileID"]
+	if !ok {
+		return nil, ErrBadRouting
+	}
+	return flattenBatchesRequest{
 		fileID:    fileID,
 		requestID: moovhttp.GetRequestID(r),
 	}, nil

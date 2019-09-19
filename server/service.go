@@ -48,9 +48,9 @@ type Service interface {
 	// ValidateFile
 	ValidateFile(id string) error
 	// SegmentFile
-	// SegmentFile(file *ach.File) (*ach.File, *ach.File, error)
+	// SegmentFile segments an ach file
 	SegmentFile(id string) (*ach.File, *ach.File, error)
-
+	FlattenBatches(id string) (*ach.File, error)
 	// CreateBatch creates a new batch within and ach file and returns its resource ID
 	CreateBatch(fileID string, bh ach.Batcher) (string, error)
 	// GetBatch retrieves a batch based oin the file id and batch id
@@ -187,16 +187,30 @@ func (s *service) SegmentFile(fileID string) (*ach.File, *ach.File, error) {
 		return nil, nil, err
 	}
 	// File Create in the case a file is malformed.
-
 	if err := f.Create(); err != nil {
 		return nil, nil, err
 	}
-
 	sfc := ach.NewSegmentFileConfiguration()
 	creditFile, debitFile, err := f.SegmentFile(sfc)
-
 	if err != nil {
 		return nil, nil, err
 	}
 	return creditFile, debitFile, nil
+}
+
+// FlattenBatches consolidates batches that have the same BatchHeader
+func (s *service) FlattenBatches(fileID string) (*ach.File, error) {
+	f, err := s.GetFile(fileID)
+	if err != nil {
+		return nil, err
+	}
+	// File Create in the case a file is malformed.
+	if err := f.Create(); err != nil {
+		return nil, err
+	}
+	ff, err := f.FlattenBatches()
+	if err != nil {
+		return nil, err
+	}
+	return ff, err
 }

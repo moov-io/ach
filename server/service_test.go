@@ -21,6 +21,8 @@ import (
 	"github.com/moov-io/base"
 	"io/ioutil"
 	"log"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -529,5 +531,68 @@ func TestSegmentFileDebitsOnlyBatchID(t *testing.T) {
 
 	if debitFile.Batches[0].ID() == "" {
 		t.Fatal("No Batch ID")
+	}
+}
+
+func TestFlattenBatches(t *testing.T) {
+	s := mockServiceInMemory()
+
+	f, err := os.Open(filepath.Join("..", "test", "testdata", "flattenBatchesMultipleBatchHeaders.ach"))
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := ach.NewReader(f)
+	achFile, err := r.Read()
+	if err != nil {
+		t.Fatalf("Issue reading file: %+v \n", err)
+	}
+
+	fileID, err := s.CreateFile(&achFile.Header)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	for _, b := range achFile.Batches {
+		batchID, err := s.CreateBatch(fileID, b)
+		if err != nil {
+			t.Fatal(err.Error())
+		}
+		if batchID == "" {
+			t.Fatal("No Batch ID")
+		}
+	}
+
+	ff, err := s.FlattenBatches(fileID)
+
+	if err != nil {
+		t.Fatalf("Could not flatten the file: %+v \n", err)
+	}
+
+	if err := ff.Validate(); err != nil {
+		t.Fatalf("Flatten file did not validate: %+v \n", err)
+	}
+}
+
+func TestSegmentFile_NoFileID(t *testing.T) {
+	s := mockServiceInMemory()
+	fileID := ""
+	_, err := s.FlattenBatches(fileID)
+
+	if err != nil {
+		if !strings.Contains(err.Error(), "not found") {
+			t.Fatal(err.Error())
+		}
+	}
+}
+
+func TestFlattenBatches_NoFileID(t *testing.T) {
+	s := mockServiceInMemory()
+	_, _, err := s.SegmentFile("")
+
+	if err != nil {
+		if !strings.Contains(err.Error(), "not found") {
+			t.Fatal(err.Error())
+		}
 	}
 }

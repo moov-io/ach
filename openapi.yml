@@ -322,7 +322,61 @@ paths:
               example: 101 222380104 1210428821805100000A094101Citadel                Bank Name
       responses:
         '201':
-          description: A JSON object containing two new Files.  A credit ACH File and a debit ACH File
+          description: A JSON object containing the credit File ID and debit File ID
+          headers:
+            Location:
+              description: The location of the new resource
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+  /files/{fileID}/flatten:
+    post:
+      tags: ['ACH Files']
+      summary: Create a new file object
+      operationId: flattenFile
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-Idempotency-Key
+          in: header
+          description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy for to not collide with each other in your requests.
+          example: a4f88150
+          required: false
+          schema:
+            type: string
+        - name: fileID
+          in: path
+          description: File ID
+          required: true
+          schema:
+            type: string
+            example: 3f2d23ee214
+      requestBody:
+        description: Content of the ACH file (in json or raw text)
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFile'
+          text/plain:
+            schema:
+              description: A plaintext ACH file
+              type: string
+              example: 101 222380104 1210428821805100000A094101Citadel                Bank Name
+      responses:
+        '201':
+          description: A JSOn objeect containing the File ID associated with a Flattened ACH file.
           headers:
             Location:
               description: The location of the new resource

@@ -314,6 +314,66 @@ func TestFiles__decodeSegmentFileRequest(t *testing.T) {
 	}
 }
 
+// TestFiles__flattenFileEndpoint tests flattenFileEndpoints
+func TestFiles__flattenFileEndpoint(t *testing.T) {
+	logger := log.NewNopLogger()
+	repo := NewRepositoryInMemory(testTTLDuration, logger)
+	svc := NewService(repo)
+	router := MakeHTTPHandler(svc, repo, logger)
+
+	// write an ACH file into repository
+	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-valid.json"))
+	if fd == nil {
+		t.Fatalf("empty ACH file: %v", err)
+	}
+	defer fd.Close()
+	bs, _ := ioutil.ReadAll(fd)
+	file, _ := ach.FileFromJSON(bs)
+	repo.StoreFile(file)
+
+	// test status code
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", fmt.Sprintf("/files/%s/flatten", file.ID), nil)
+	req.Header.Set("Origin", "https://moov.io")
+	req.Header.Set("X-Request-Id", "11111")
+
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+}
+
+// TestFilesError__flattenFileEndpoint test an error returned from flattenFileEndpoint
+func TestFilesError__flattenFileEndpoint(t *testing.T) {
+	repo := NewRepositoryInMemory(testTTLDuration, nil)
+	svc := NewService(repo)
+
+	resp, err := flattenBatchesEndpoint(svc, repo, nil)(context.TODO(), nil)
+	r, ok := resp.(flattenBatchesResponse)
+	if !ok {
+		t.Errorf("got %#v", resp)
+	}
+	if err == nil || r.Err == nil {
+		t.Errorf("expected error: err=%v resp.Err=%v", err, r.Err)
+	}
+
+}
+
+// TestFiles__decodeFlattenFileRequest tests segmentFileEndpoints
+func TestFiles__decodeFlattenFileRequest(t *testing.T) {
+	req := httptest.NewRequest("POST", fmt.Sprintf("/files/flatten"), nil)
+	req.Header.Set("Origin", "https://moov.io")
+	req.Header.Set("X-Request-Id", "11111")
+
+	_, err := decodeFlattenBatchesRequest(context.TODO(), req)
+
+	if !base.Match(err, ErrBadRouting) {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
 // TestFilesByID__getFileEndpoint tests getFileEndpoint by File ID
 func TestFilesByID__getFileEndpoint(t *testing.T) {
 	logger := log.NewNopLogger()
@@ -486,5 +546,36 @@ func TestFiles__segmentFileEndpointError(t *testing.T) {
 	if w.Code != http.StatusInternalServerError {
 		t.Errorf("bogus HTTP status: %d", w.Code)
 	}
+}
 
+// TestFiles_flattenFileEndpointError tests flattenFileEndpoints
+func TestFiles__flattenFileEndpointError(t *testing.T) {
+	logger := log.NewNopLogger()
+	repo := NewRepositoryInMemory(testTTLDuration, logger)
+	svc := NewService(repo)
+	router := MakeHTTPHandler(svc, repo, logger)
+
+	// write an ACH file into repository
+	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-valid.json"))
+	if fd == nil {
+		t.Fatalf("empty ACH file: %v", err)
+	}
+	defer fd.Close()
+	bs, _ := ioutil.ReadAll(fd)
+	file, _ := ach.FileFromJSON(bs)
+	file.Header.ImmediateDestination = "" // invalid routing number
+	repo.StoreFile(file)
+
+	// test status code
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", fmt.Sprintf("/files/%s/flatten", file.ID), nil)
+	req.Header.Set("Origin", "https://moov.io")
+	req.Header.Set("X-Request-Id", "11110")
+
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
 }
