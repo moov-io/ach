@@ -208,9 +208,9 @@ func (s *service) FlattenBatches(fileID string) (*ach.File, error) {
 	if err := f.Create(); err != nil {
 		return nil, err
 	}
-	of, err := f.FlattenBatches()
+	ff, err := f.FlattenBatches()
 	if err != nil {
 		return nil, err
 	}
-	return of, err
+	return ff, err
 }

@@ -1592,13 +1592,13 @@ func TestFile_FlattenFileOneBatchHeader(t *testing.T) {
 		t.Fatalf("Issue reading file: %+v \n", err)
 	}
 
-	of, err := achFile.FlattenBatches()
+	ff, err := achFile.FlattenBatches()
 
 	if err != nil {
 		t.Fatalf("Could not flatten the file: %+v \n", err)
 	}
 
-	if err := of.Validate(); err != nil {
+	if err := ff.Validate(); err != nil {
 		t.Fatalf("Flattend file did not validate: %+v \n", err)
 	}
 }
@@ -1617,13 +1617,13 @@ func TestFileFlattenFileMultipleBatchHeaders(t *testing.T) {
 		t.Fatalf("Issue reading file: %+v \n", err)
 	}
 
-	of, err := achFile.FlattenBatches()
+	ff, err := achFile.FlattenBatches()
 
 	if err != nil {
 		t.Fatalf("Could not flatten the file: %+v \n", err)
 	}
 
-	if err := of.Validate(); err != nil {
+	if err := ff.Validate(); err != nil {
 		t.Fatalf("Flattend file did not validate: %+v \n", err)
 	}
 }
@@ -1654,13 +1654,13 @@ func TestFile_FlattenFileOneIATBatchHeader(t *testing.T) {
 		t.Fatalf("Issue reading file: %+v \n", err)
 	}
 
-	of, err := achFile.FlattenBatches()
+	ff, err := achFile.FlattenBatches()
 
 	if err != nil {
 		t.Fatalf("Could not flatten the file: %+v \n", err)
 	}
 
-	if err := of.Validate(); err != nil {
+	if err := ff.Validate(); err != nil {
 		t.Fatalf("Flattend file did not validate: %+v \n", err)
 	}
 }
@@ -1679,13 +1679,13 @@ func TestFileFlattenFileMultipleIATBatchHeaders(t *testing.T) {
 		t.Fatalf("Issue reading file: %+v \n", err)
 	}
 
-	of, err := achFile.FlattenBatches()
+	ff, err := achFile.FlattenBatches()
 
 	if err != nil {
 		t.Fatalf("Could not flatten the file: %+v \n", err)
 	}
 
-	if err := of.Validate(); err != nil {
+	if err := ff.Validate(); err != nil {
 		t.Fatalf("Flattend file did not validate: %+v \n", err)
 	}
 }
@@ -1704,13 +1704,13 @@ func TestFile_FlattenFileOneADVBatchHeader(t *testing.T) {
 		t.Fatalf("Issue reading file: %+v \n", err)
 	}
 
-	of, err := achFile.FlattenBatches()
+	ff, err := achFile.FlattenBatches()
 
 	if err != nil {
 		t.Fatalf("Could not flatten the file: %+v \n", err)
 	}
 
-	if err := of.Validate(); err != nil {
+	if err := ff.Validate(); err != nil {
 		t.Fatalf("Flattend file did not validate: %+v \n", err)
 	}
 }
@@ -1729,13 +1729,13 @@ func TestFileFlattenFileMultipleADVTBatchHeaders(t *testing.T) {
 		t.Fatalf("Issue reading file: %+v \n", err)
 	}
 
-	of, err := achFile.FlattenBatches()
+	ff, err := achFile.FlattenBatches()
 
 	if err != nil {
 		t.Fatalf("Could not flatten the file: %+v \n", err)
 	}
 
-	if err := of.Validate(); err != nil {
+	if err := ff.Validate(); err != nil {
 		t.Fatalf("Flattend file did not validate: %+v \n", err)
 	}
 }

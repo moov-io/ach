@@ -535,6 +535,8 @@ func TestSegmentFileDebitsOnlyBatchID(t *testing.T) {
 }
 
 func TestFlattenBatches(t *testing.T) {
+	s := mockServiceInMemory()
+
 	f, err := os.Open(filepath.Join("..", "test", "testdata", "flattenBatchesMultipleBatchHeaders.ach"))
 
 	if err != nil {
@@ -546,13 +548,28 @@ func TestFlattenBatches(t *testing.T) {
 		t.Fatalf("Issue reading file: %+v \n", err)
 	}
 
-	of, err := achFile.FlattenBatches()
-
+	fileID, err := s.CreateFile(&achFile.Header)
 	if err != nil {
-		t.Fatalf("Could not optimize the file: %+v \n", err)
+		t.Fatal(err.Error())
 	}
 
-	if err := of.Validate(); err != nil {
-		t.Fatalf("Optimized file did not validate: %+v \n", err)
+	for _, b := range achFile.Batches {
+		batchID, err := s.CreateBatch(fileID, b)
+		if err != nil {
+			t.Fatal(err.Error())
+		}
+		if batchID == "" {
+			t.Fatal("No Batch ID")
+		}
+	}
+
+	ff, err := s.FlattenBatches(fileID)
+
+	if err != nil {
+		t.Fatalf("Could not flatten the file: %+v \n", err)
+	}
+
+	if err := ff.Validate(); err != nil {
+		t.Fatalf("Flatten file did not validate: %+v \n", err)
 	}
 }
