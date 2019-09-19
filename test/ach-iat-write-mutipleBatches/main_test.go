@@ -15,7 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ach
+package main
 
-// Version Number
-const Version = "v1.2.0-rc1"
+import "testing"
+
+func Test(t *testing.T) {
+	main()
+}

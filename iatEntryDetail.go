@@ -148,179 +148,179 @@ func NewIATEntryDetail() *IATEntryDetail {
 // Parse takes the input record string and parses the EntryDetail values
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate() call to confirm successful parsing and data validity.
-func (ed *IATEntryDetail) Parse(record string) {
+func (iatEd *IATEntryDetail) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
 
 	// 1-1 Always "6"
-	ed.recordType = "6"
+	iatEd.recordType = "6"
 	// 2-3 is checking credit 22 debit 27 savings credit 32 debit 37
-	ed.TransactionCode = ed.parseNumField(record[1:3])
+	iatEd.TransactionCode = iatEd.parseNumField(record[1:3])
 	// 4-11 the RDFI's routing number without the last digit.
-	ed.RDFIIdentification = ed.parseStringField(record[3:11])
+	iatEd.RDFIIdentification = iatEd.parseStringField(record[3:11])
 	// 12-12 The last digit of the RDFI's routing number
-	ed.CheckDigit = ed.parseStringField(record[11:12])
+	iatEd.CheckDigit = iatEd.parseStringField(record[11:12])
 	// 13-16 Number of addenda records
-	ed.AddendaRecords = ed.parseNumField(record[12:16])
+	iatEd.AddendaRecords = iatEd.parseNumField(record[12:16])
 	// 17-29 reserved - Leave blank
-	ed.reserved = "             "
+	iatEd.reserved = "             "
 	// 30-39 Number of cents you are debiting/crediting this account
-	ed.Amount = ed.parseNumField(record[29:39])
+	iatEd.Amount = iatEd.parseNumField(record[29:39])
 	// 40-74 The foreign receiver's account number you are crediting/debiting
-	ed.DFIAccountNumber = record[39:74]
+	iatEd.DFIAccountNumber = record[39:74]
 	// 75-76 reserved2 Leave blank
-	ed.reservedTwo = "  "
+	iatEd.reservedTwo = "  "
 	// 77 OFACScreeningIndicator
-	ed.OFACScreeningIndicator = " "
+	iatEd.OFACScreeningIndicator = " "
 	// 78-78 Secondary SecondaryOFACScreeningIndicator
-	ed.SecondaryOFACScreeningIndicator = " "
+	iatEd.SecondaryOFACScreeningIndicator = " "
 	// 79-79 1 if addenda exists 0 if it does not
-	//ed.AddendaRecordIndicator = 1
-	ed.AddendaRecordIndicator = ed.parseNumField(record[78:79])
+	//iatEd.AddendaRecordIndicator = 1
+	iatEd.AddendaRecordIndicator = iatEd.parseNumField(record[78:79])
 	// 80-94 An internal identification (alphanumeric) that you use to uniquely identify
 	// this Entry Detail Record This number should be unique to the transaction and will help identify the transaction in case of an inquiry
-	ed.TraceNumber = strings.TrimSpace(record[79:94])
+	iatEd.TraceNumber = strings.TrimSpace(record[79:94])
 }
 
 // String writes the EntryDetail struct to a 94 character string.
-func (ed *IATEntryDetail) String() string {
+func (iatEd *IATEntryDetail) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
-	buf.WriteString(ed.recordType)
-	buf.WriteString(fmt.Sprintf("%v", ed.TransactionCode))
-	buf.WriteString(ed.RDFIIdentificationField())
-	buf.WriteString(ed.CheckDigit)
-	buf.WriteString(ed.AddendaRecordsField())
-	buf.WriteString(ed.reservedField())
-	buf.WriteString(ed.AmountField())
-	buf.WriteString(ed.DFIAccountNumberField())
-	buf.WriteString(ed.reservedTwoField())
-	buf.WriteString(ed.OFACScreeningIndicatorField())
-	buf.WriteString(ed.SecondaryOFACScreeningIndicatorField())
-	buf.WriteString(fmt.Sprintf("%v", ed.AddendaRecordIndicator))
-	buf.WriteString(ed.TraceNumberField())
+	buf.WriteString(iatEd.recordType)
+	buf.WriteString(fmt.Sprintf("%v", iatEd.TransactionCode))
+	buf.WriteString(iatEd.RDFIIdentificationField())
+	buf.WriteString(iatEd.CheckDigit)
+	buf.WriteString(iatEd.AddendaRecordsField())
+	buf.WriteString(iatEd.reservedField())
+	buf.WriteString(iatEd.AmountField())
+	buf.WriteString(iatEd.DFIAccountNumberField())
+	buf.WriteString(iatEd.reservedTwoField())
+	buf.WriteString(iatEd.OFACScreeningIndicatorField())
+	buf.WriteString(iatEd.SecondaryOFACScreeningIndicatorField())
+	buf.WriteString(fmt.Sprintf("%v", iatEd.AddendaRecordIndicator))
+	buf.WriteString(iatEd.TraceNumberField())
 	return buf.String()
 }
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops that parsing.
-func (ed *IATEntryDetail) Validate() error {
-	if err := ed.fieldInclusion(); err != nil {
+func (iatEd *IATEntryDetail) Validate() error {
+	if err := iatEd.fieldInclusion(); err != nil {
 		return err
 	}
-	if ed.recordType != "6" {
-		return fieldError("recordType", NewErrRecordType(6), ed.recordType)
+	if iatEd.recordType != "6" {
+		return fieldError("recordType", NewErrRecordType(6), iatEd.recordType)
 	}
-	if err := ed.isTransactionCode(ed.TransactionCode); err != nil {
-		return fieldError("TransactionCode", err, strconv.Itoa(ed.TransactionCode))
+	if err := iatEd.isTransactionCode(iatEd.TransactionCode); err != nil {
+		return fieldError("TransactionCode", err, strconv.Itoa(iatEd.TransactionCode))
 	}
-	if err := ed.isAlphanumeric(ed.DFIAccountNumber); err != nil {
-		return fieldError("DFIAccountNumber", err, ed.DFIAccountNumber)
+	if err := iatEd.isAlphanumeric(iatEd.DFIAccountNumber); err != nil {
+		return fieldError("DFIAccountNumber", err, iatEd.DFIAccountNumber)
 	}
 	// CheckDigit calculations
-	calculated := ed.CalculateCheckDigit(ed.RDFIIdentificationField())
+	calculated := iatEd.CalculateCheckDigit(iatEd.RDFIIdentificationField())
 
-	edCheckDigit, err := strconv.Atoi(ed.CheckDigit)
+	edCheckDigit, err := strconv.Atoi(iatEd.CheckDigit)
 	if err != nil {
-		return fieldError("CheckDigit", err, ed.CheckDigit)
+		return fieldError("CheckDigit", err, iatEd.CheckDigit)
 	}
 	if calculated != edCheckDigit {
-		return fieldError("RDFIIdentification", NewErrValidCheckDigit(calculated), ed.CheckDigit)
+		return fieldError("RDFIIdentification", NewErrValidCheckDigit(calculated), iatEd.CheckDigit)
 	}
 	return nil
 }
 
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
-func (ed *IATEntryDetail) fieldInclusion() error {
-	if ed.recordType == "" {
-		return fieldError("recordType", ErrConstructor, ed.recordType)
+func (iatEd *IATEntryDetail) fieldInclusion() error {
+	if iatEd.recordType == "" {
+		return fieldError("recordType", ErrConstructor, iatEd.recordType)
 	}
-	if ed.TransactionCode == 0 {
-		return fieldError("TransactionCode", ErrConstructor, strconv.Itoa(ed.TransactionCode))
+	if iatEd.TransactionCode == 0 {
+		return fieldError("TransactionCode", ErrConstructor, strconv.Itoa(iatEd.TransactionCode))
 	}
-	if ed.RDFIIdentification == "" {
-		return fieldError("RDFIIdentification", ErrConstructor, ed.RDFIIdentificationField())
+	if iatEd.RDFIIdentification == "" {
+		return fieldError("RDFIIdentification", ErrConstructor, iatEd.RDFIIdentificationField())
 	}
-	if ed.AddendaRecords == 0 {
-		return fieldError("AddendaRecords", ErrConstructor, strconv.Itoa(ed.AddendaRecords))
+	if iatEd.AddendaRecords == 0 {
+		return fieldError("AddendaRecords", ErrConstructor, strconv.Itoa(iatEd.AddendaRecords))
 	}
-	if ed.DFIAccountNumber == "" {
-		return fieldError("DFIAccountNumber", ErrConstructor, ed.DFIAccountNumber)
+	if iatEd.DFIAccountNumber == "" {
+		return fieldError("DFIAccountNumber", ErrConstructor, iatEd.DFIAccountNumber)
 	}
-	if ed.AddendaRecordIndicator == 0 {
-		return fieldError("AddendaRecordIndicator", ErrConstructor, strconv.Itoa(ed.AddendaRecordIndicator))
+	if iatEd.AddendaRecordIndicator == 0 {
+		return fieldError("AddendaRecordIndicator", ErrConstructor, strconv.Itoa(iatEd.AddendaRecordIndicator))
 	}
-	if ed.TraceNumber == "" {
-		return fieldError("TraceNumber", ErrConstructor, ed.TraceNumberField())
+	if iatEd.TraceNumber == "" {
+		return fieldError("TraceNumber", ErrConstructor, iatEd.TraceNumberField())
 	}
 	return nil
 }
 
 // SetRDFI takes the 9 digit RDFI account number and separates it for RDFIIdentification and CheckDigit
-func (ed *IATEntryDetail) SetRDFI(rdfi string) *IATEntryDetail {
-	s := ed.stringField(rdfi, 9)
-	ed.RDFIIdentification = ed.parseStringField(s[:8])
-	ed.CheckDigit = ed.parseStringField(s[8:9])
-	return ed
+func (iatEd *IATEntryDetail) SetRDFI(rdfi string) *IATEntryDetail {
+	s := iatEd.stringField(rdfi, 9)
+	iatEd.RDFIIdentification = iatEd.parseStringField(s[:8])
+	iatEd.CheckDigit = iatEd.parseStringField(s[8:9])
+	return iatEd
 }
 
 // SetTraceNumber takes first 8 digits of ODFI and concatenates a sequence number onto the TraceNumber
-func (ed *IATEntryDetail) SetTraceNumber(ODFIIdentification string, seq int) {
-	ed.TraceNumber = ed.stringField(ODFIIdentification, 8) + ed.numericField(seq, 7)
+func (iatEd *IATEntryDetail) SetTraceNumber(ODFIIdentification string, seq int) {
+	iatEd.TraceNumber = iatEd.stringField(ODFIIdentification, 8) + iatEd.numericField(seq, 7)
 }
 
 // RDFIIdentificationField get the rdfiIdentification with zero padding
-func (ed *IATEntryDetail) RDFIIdentificationField() string {
-	return ed.stringField(ed.RDFIIdentification, 8)
+func (iatEd *IATEntryDetail) RDFIIdentificationField() string {
+	return iatEd.stringField(iatEd.RDFIIdentification, 8)
 }
 
 // AddendaRecordsField returns a zero padded AddendaRecords string
-func (ed *IATEntryDetail) AddendaRecordsField() string {
-	return ed.numericField(ed.AddendaRecords, 4)
+func (iatEd *IATEntryDetail) AddendaRecordsField() string {
+	return iatEd.numericField(iatEd.AddendaRecords, 4)
 }
 
-func (ed *IATEntryDetail) reservedField() string {
-	return ed.alphaField(ed.reserved, 13)
+func (iatEd *IATEntryDetail) reservedField() string {
+	return iatEd.alphaField(iatEd.reserved, 13)
 }
 
 // AmountField returns a zero padded string of amount
-func (ed *IATEntryDetail) AmountField() string {
-	return ed.numericField(ed.Amount, 10)
+func (iatEd *IATEntryDetail) AmountField() string {
+	return iatEd.numericField(iatEd.Amount, 10)
 }
 
 // DFIAccountNumberField gets the DFIAccountNumber with space padding
-func (ed *IATEntryDetail) DFIAccountNumberField() string {
-	return ed.alphaField(ed.DFIAccountNumber, 35)
+func (iatEd *IATEntryDetail) DFIAccountNumberField() string {
+	return iatEd.alphaField(iatEd.DFIAccountNumber, 35)
 }
 
 // reservedTwoField gets the reservedTwo
-func (ed *IATEntryDetail) reservedTwoField() string {
-	return ed.alphaField(ed.reservedTwo, 2)
+func (iatEd *IATEntryDetail) reservedTwoField() string {
+	return iatEd.alphaField(iatEd.reservedTwo, 2)
 }
 
 // OFACScreeningIndicatorField gets the OFACScreeningIndicator
-func (ed *IATEntryDetail) OFACScreeningIndicatorField() string {
-	return ed.alphaField(ed.OFACScreeningIndicator, 1)
+func (iatEd *IATEntryDetail) OFACScreeningIndicatorField() string {
+	return iatEd.alphaField(iatEd.OFACScreeningIndicator, 1)
 }
 
 // SecondaryOFACScreeningIndicatorField gets the SecondaryOFACScreeningIndicator
-func (ed *IATEntryDetail) SecondaryOFACScreeningIndicatorField() string {
-	return ed.alphaField(ed.SecondaryOFACScreeningIndicator, 1)
+func (iatEd *IATEntryDetail) SecondaryOFACScreeningIndicatorField() string {
+	return iatEd.alphaField(iatEd.SecondaryOFACScreeningIndicator, 1)
 }
 
 // TraceNumberField returns a zero padded TraceNumber string
-func (ed *IATEntryDetail) TraceNumberField() string {
-	return ed.stringField(ed.TraceNumber, 15)
+func (iatEd *IATEntryDetail) TraceNumberField() string {
+	return iatEd.stringField(iatEd.TraceNumber, 15)
 }
 
 // AddAddenda17 appends an Addenda17 to the IATEntryDetail
-func (ed *IATEntryDetail) AddAddenda17(addenda17 *Addenda17) {
-	ed.Addenda17 = append(ed.Addenda17, addenda17)
+func (iatEd *IATEntryDetail) AddAddenda17(addenda17 *Addenda17) {
+	iatEd.Addenda17 = append(iatEd.Addenda17, addenda17)
 }
 
 // AddAddenda18 appends an Addenda18 to the IATEntryDetail
-func (ed *IATEntryDetail) AddAddenda18(addenda18 *Addenda18) {
-	ed.Addenda18 = append(ed.Addenda18, addenda18)
+func (iatEd *IATEntryDetail) AddAddenda18(addenda18 *Addenda18) {
+	iatEd.Addenda18 = append(iatEd.Addenda18, addenda18)
 }

@@ -1,8 +1,26 @@
 ## v1.2.0 (Unreleased)
 
+ADDITIONS
+
+- Add `FlattenBatches() (*File, error)` to `ach.File`
+   - FlattenBatches flattens File Batches by consolidating batches with the same BatchHeader data into one batch.
+
+BUG FIXES
+
+- reader: set EntryDetail.Category to Return when Addenda99 is present
+- batch: inspect Entrydetail records for Category
+- batch: check ADV entries for Category
+- reader: set EntryDetail.Category to NOC when Addenda98 is present
+
+IMPROVEMENTS
+
+- created example files for HTTP routes
+
 BUILD
 
 - upgrade to Go 1.13
+- build: download CI tools rather than install
+- build: update staticcheck with Go 1.13
 
 ## v1.1.0 (Released 2019-08-19)
 

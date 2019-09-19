@@ -6,23 +6,27 @@ services:
 
 matrix:
   allow_failures:
-  - os: windows
-  - go: master
+    - os: windows
+    - go: master
   include:
-  - os: linux
-    go: 1.13.x
-    cache:
-      directories:
-      - "/home/travis/.cache/go-build"
-  - os: osx
-    go: 1.13.x
-    cache:
-      directories:
-      - "/Users/travis/Library/Caches/go-build"
-  # - os: windows
-  #   go: 1.13.x
-  - os: linux
-    go: master
+    # Linux
+    - os: linux
+      go: 1.13.x
+      cache:
+        directories: ["$HOME/.cache/go-build", "$GOPATH/pkg/mod"]
+    - os: linux
+      go: master
+    # macOS
+    - os: osx
+      go: 1.13.x
+      cache:
+        directories: ["$HOME/Library/Caches/go-build", "$GOPATH/pkg/mod"]
+    # Windows
+    - os: windows
+      go: 1.13.x
+      cache:
+        directories: ["C:\\Users\\travis\\AppData\\Local\\go-build"]
+
 env:
   matrix:
     - GO111MODULE=on
@@ -34,17 +38,17 @@ before_install:
   # Misspell
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget -O misspell.tar.gz https://github.com/client9/misspell/releases/download/v0.3.4/misspell_0.3.4_linux_64bit.tar.gz; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then wget -O misspell.tar.gz https://github.com/client9/misspell/releases/download/v0.3.4/misspell_0.3.4_mac_64bit.tar.gz; fi
-  - tar xf misspell.tar.gz && cp ./misspell ./bin/misspell
+  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then tar xf misspell.tar.gz && cp ./misspell ./bin/misspell; fi
   # staticcheck
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget -O staticcheck.tar.gz https://github.com/dominikh/go-tools/releases/download/2019.2.3/staticcheck_linux_amd64.tar.gz; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then wget -O staticcheck.tar.gz https://github.com/dominikh/go-tools/releases/download/2019.2.3/staticcheck_darwin_amd64.tar.gz; fi
-  - tar xf staticcheck.tar.gz && cp ./staticcheck/staticcheck ./bin/staticcheck
+  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then tar xf staticcheck.tar.gz && cp ./staticcheck/staticcheck ./bin/staticcheck; fi
   # golint
-  - go get -u golang.org/x/lint/golint
+  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then go get -u golang.org/x/lint/golint; fi
   # gocyclo
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget -O ./bin/gocyclo https://github.com/adamdecaf/gocyclo/releases/download/2019-08-09/gocyclo-linux-amd64; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then wget -O ./bin/gocyclo https://github.com/adamdecaf/gocyclo/releases/download/2019-08-09/gocyclo-darwin-amd64; fi
-  - chmod +x ./bin/gocyclo
+  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then chmod +x ./bin/gocyclo; fi
   # mingw (gnu libraries)
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then choco install -y mingw; export PATH=/c/tools/mingw64/bin:"$PATH";fi
 
@@ -56,10 +60,10 @@ script:
   # Just check gofmt on linux, it's the fastest builder
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then test -z $(gofmt -s -l $GOFILES); fi
   - go test ./... -race -coverprofile=coverage.txt -covermode=atomic
-  - misspell -error -locale US $GOFILES
-  - gocyclo -over 26 $GOFILES
-  - golint -set_exit_status $GOFILES
-  - staticcheck ./...
+  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then misspell -error -locale US $GOFILES; fi
+  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then gocyclo -over 26 $GOFILES; fi
+  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then golint -set_exit_status $GOFILES; fi
+  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then staticcheck ./...; fi
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
