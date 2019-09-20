@@ -356,18 +356,17 @@ func (f *File) overwriteDateTimeFields() {
 	}
 }
 
+var datetimeformats = []string{
+	"2006-01-02T15:04:05.999Z", // Default javascript (new Date).toISOString()
+	"2006-01-02T15:04:05Z",     // ISO 8601 without milliseconds
+	time.RFC3339,               // Go default
+}
+
 func datetimeParse(v string) (time.Time, error) {
-	// Default javascript (new Date).toISOString()
-	if t, err := time.Parse("2006-01-02T15:04:05.999Z", v); err == nil && !t.IsZero() {
-		return t, nil
-	}
-	// ISO 8601 without milliseconds
-	if t, err := time.Parse("2006-01-02T15:04:05Z", v); err == nil && !t.IsZero() {
-		return t, nil
-	}
-	// Go default
-	if t, err := time.Parse(time.RFC3339, v); err == nil && !t.IsZero() {
-		return t, nil
+	for i := range datetimeformats {
+		if t, err := time.Parse(datetimeformats[i], v); err == nil && !t.IsZero() {
+			return t, nil
+		}
 	}
 	return time.Time{}, fmt.Errorf("unknown format: %s", v)
 }

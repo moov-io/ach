@@ -599,10 +599,10 @@ func TestFile__datetimeParse(t *testing.T) {
 	}
 
 	// RFC3339 format
-	if ts, err := datetimeParse(time.Now().Format(time.RFC3339)); err != nil {
+	if ts, err := datetimeParse("2019-09-23T09:50:52-07:00"); err != nil {
 		t.Error(err)
 	} else {
-		if v := ts.Format("060102"); v != "190920" {
+		if v := ts.Format("060102"); v != "190923" {
 			t.Errorf("got %s", v)
 		}
 	}
