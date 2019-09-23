@@ -350,8 +350,8 @@ type segmentFileRequest struct {
 }
 
 type segmentFileResponse struct {
-	creditFileID string `json:"creditFileID"`
-	debitFileID  string `json:"debitFileID"`
+	CreditFileID string `json:"creditFileID"`
+	DebitFileID  string `json:"debitFileID"`
 	Err          error  `json:"error"`
 }
 
@@ -388,8 +388,8 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 			}
 		}
 		return segmentFileResponse{
-			creditFileID: creditFile.ID,
-			debitFileID:  debitFile.ID,
+			CreditFileID: creditFile.ID,
+			DebitFileID:  debitFile.ID,
 			Err:          err,
 		}, nil
 	}
