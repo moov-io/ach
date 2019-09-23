@@ -1119,7 +1119,9 @@ func createOffsetEntryDetail(off *Offset, batch *Batch) *EntryDetail {
 	ed.IdentificationNumber = "" // left empty
 	ed.IndividualName = "OFFSET"
 	ed.DiscretionaryData = batch.offset.Description
-	ed.Category = CategoryForward
+	if len(batch.Entries) > 0 {
+		ed.Category = batch.Entries[0].Category
+	}
 	return ed
 }
 
