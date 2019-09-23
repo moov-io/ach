@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/moov-io/ach"
 )
@@ -15,6 +16,8 @@ import (
 var (
 	flagVerbose = flag.Bool("v", false, "Print verbose details about each ACH file")
 	flagVersion = flag.Bool("version", false, "Print moov-io/ach cli version")
+
+	flagDiff = flag.Bool("diff", false, "Compare two files against each other")
 )
 
 func init() {
@@ -46,8 +49,27 @@ func main() {
 		fmt.Println("No command or ACH files provided, see -help")
 		os.Exit(1)
 	}
-	if err := describeACHFiles(args); err != nil {
-		fmt.Printf("ERROR: %v\n", err)
+	if *flagDiff && len(args) != 2 {
+		fmt.Printf("with -diff exactly two files are expected, found %d files\n", len(args))
 		os.Exit(1)
+	}
+	if len(args) == 0 {
+		fmt.Println("found no ACH files to describe")
+		os.Exit(1)
+	} else {
+		if *flagVerbose {
+			fmt.Printf("found %d ACH files to describe: %s\n", len(args), strings.Join(args, ", "))
+		}
+	}
+	if *flagDiff {
+		if err := diffFiles(args); err != nil {
+			fmt.Printf("ERROR: %v\n", err)
+			os.Exit(1)
+		}
+	} else {
+		if err := dumpFiles(args); err != nil {
+			fmt.Printf("ERROR: %v\n", err)
+			os.Exit(1)
+		}
 	}
 }

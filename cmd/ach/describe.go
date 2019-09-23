@@ -7,35 +7,22 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
 	"text/tabwriter"
 
 	"github.com/moov-io/ach"
 )
 
-func describeACHFiles(paths []string) error {
-	if len(paths) == 0 {
-		fmt.Println("found no ACH files to describe")
-		return nil
-	} else {
-		if *flagVerbose {
-			fmt.Printf("found %d ACH files to describe: %s\n", len(paths), strings.Join(paths, ", "))
-		}
-	}
+func dumpFiles(paths []string) error {
 	for i := range paths {
 		if i > 0 {
 			fmt.Println("") // extra newline between multiple ACH files
 		}
 		fmt.Printf("Describing ACH file '%s'\n", paths[i])
-		fd, err := os.Open(paths[i])
+		file, err := readACHFile(paths[i])
 		if err != nil {
-			return fmt.Errorf("describe ACH: file=%s error=%v", paths[i], err)
+			return fmt.Errorf("problem reading %s: %v", paths[i], err)
 		}
-		file, err := ach.NewReader(fd).Read()
-		if err != nil {
-			return fmt.Errorf("read ACH file=%s: %v", paths[i], err)
-		}
-		dumpFile(&file)
+		dumpFile(file)
 	}
 	return nil
 }
@@ -68,4 +55,13 @@ func dumpFile(file *ach.File) {
 		}
 	}
 	// TODO(adam): Do different stuff with -v enabeld
+}
+
+func readACHFile(path string) (*ach.File, error) {
+	fd, err := os.Open(path)
+	if err != nil {
+		return nil, fmt.Errorf("describe ACH: file=%s error=%v", path, err)
+	}
+	f, err := ach.NewReader(fd).Read()
+	return &f, err
 }
