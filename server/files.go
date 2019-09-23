@@ -20,6 +20,7 @@ package server
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -340,6 +341,59 @@ func decodeValidateFileRequest(_ context.Context, r *http.Request) (interface{},
 	}
 	return validateFileRequest{
 		ID:        id,
+		requestID: moovhttp.GetRequestID(r),
+	}, nil
+}
+
+type balanceFileRequest struct {
+	fileID    string
+	offset    *ach.Offset
+	requestID string
+}
+
+type balanceFileResponse struct {
+	FileID string `json:"id"`
+	Err    error  `json:"error"`
+}
+
+func balanceFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req, ok := request.(balanceFileRequest)
+		if !ok {
+			err := errors.New("invalid request")
+			return balanceFileResponse{Err: err}, err
+		}
+
+		balancedFile, err := s.BalanceFile(req.fileID, req.offset)
+		if balancedFile != nil && logger != nil {
+			logger.Log("files", fmt.Sprintf("balance file created %s", balancedFile.ID), "requestID", req.requestID, "error", err)
+		}
+		if err != nil {
+			if logger != nil {
+				logger.Log("files", fmt.Sprintf("problem balancing %s: %v", req.fileID, err), "requestID", req.requestID, "error", err)
+			}
+			return balanceFileResponse{Err: err}, err
+		}
+		return balanceFileResponse{
+			FileID: balancedFile.ID,
+		}, nil
+	}
+}
+
+func decodeBalanceFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	fileID, ok := vars["fileID"]
+	if !ok {
+		return nil, ErrBadRouting
+	}
+
+	var off ach.Offset
+	if err := json.NewDecoder(r.Body).Decode(&off); err != nil {
+		return nil, err
+	}
+	return balanceFileRequest{
+		fileID:    fileID,
+		offset:    &off,
 		requestID: moovhttp.GetRequestID(r),
 	}, nil
 }

@@ -49,15 +49,15 @@ type Batcher interface {
 
 // Offset contains the associated information to append an 'Offset Record' on an ACH batch during Create.
 type Offset struct {
-	RoutingNumber string
-	AccountNumber string
-	AccountType   OffsetAccountType
-	Description   string
+	RoutingNumber string            `json:"routingNumber"`
+	AccountNumber string            `json:"accountNumber"`
+	AccountType   OffsetAccountType `json:"accountType"`
+	Description   string            `json:"description"`
 }
 
-type OffsetAccountType int
+type OffsetAccountType string
 
 const (
-	OffsetChecking OffsetAccountType = 1
-	OffsetSavings  OffsetAccountType = 2
+	OffsetChecking OffsetAccountType = "checking"
+	OffsetSavings  OffsetAccountType = "savings"
 )
