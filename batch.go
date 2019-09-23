@@ -1104,6 +1104,8 @@ func (b *Batch) upsertOffsets() error {
 		b.Control.TotalCreditEntryDollarAmount += creditED.Amount
 	}
 	b.Header.ServiceClassCode = MixedDebitsAndCredits
+
+	b.Control.ServiceClassCode = MixedDebitsAndCredits
 	b.Control.EntryHash = b.calculateEntryHash()
 
 	return nil
