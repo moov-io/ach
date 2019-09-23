@@ -520,6 +520,120 @@ func TestFile__jsonFileNoControlBlobs(t *testing.T) {
 	}
 }
 
+func TestFile__rfc3339JSON(t *testing.T) {
+	bs, err := ioutil.ReadFile(filepath.Join("test", "testdata", "rfc3339.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	file, err := FileFromJSON(bs)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if file.ID != "rfc3339" {
+		t.Fatalf("file.ID=%s", file.ID)
+	}
+
+	if file.Header.FileCreationDate != "091110" {
+		t.Errorf("file.Header.FileCreationDate=%s", file.Header.FileCreationDate)
+	}
+	if file.Header.FileCreationTime != "2300" {
+		t.Errorf("file.Header.FileCreationTime=%s", file.Header.FileCreationTime)
+	}
+
+	if len(file.Batches) != 1 {
+		t.Fatalf("got %d Batches", len(file.Batches))
+	}
+
+	header := file.Batches[0].GetHeader()
+	if header.CompanyDescriptiveDate != "SD2300" {
+		t.Errorf("header.CompanyDescriptiveDate=%s", header.CompanyDescriptiveDate)
+	}
+	if header.EffectiveEntryDate != "091110" {
+		t.Errorf("header.EffectiveEntryDate=%s", header.EffectiveEntryDate)
+	}
+}
+
+func TestFile__iso8601JSON(t *testing.T) {
+	bs, err := ioutil.ReadFile(filepath.Join("test", "testdata", "iso8601.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	file, err := FileFromJSON(bs)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if file.ID != "iso8601" {
+		t.Fatalf("file.ID=%s", file.ID)
+	}
+
+	if file.Header.FileCreationDate != "190920" {
+		t.Errorf("file.Header.FileCreationDate=%s", file.Header.FileCreationDate)
+	}
+	if file.Header.FileCreationTime != "2114" {
+		t.Errorf("file.Header.FileCreationTime=%s", file.Header.FileCreationTime)
+	}
+
+	if len(file.Batches) != 1 {
+		t.Fatalf("got %d Batches", len(file.Batches))
+	}
+
+	header := file.Batches[0].GetHeader()
+	if header.CompanyDescriptiveDate != "SD2114" {
+		t.Errorf("header.CompanyDescriptiveDate=%s", header.CompanyDescriptiveDate)
+	}
+	if header.EffectiveEntryDate != "190920" {
+		t.Errorf("header.EffectiveEntryDate=%s", header.EffectiveEntryDate)
+	}
+}
+
+func TestFile__IATdatetimeParse(t *testing.T) {
+	bs, err := ioutil.ReadFile(filepath.Join("test", "testdata", "iat-debit.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	file, err := FileFromJSON(bs)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if file.ID != "iat-datetime" {
+		t.Fatalf("file.ID=%s", file.ID)
+	}
+	if len(file.IATBatches) != 1 {
+		t.Errorf("got %d IAT batches", len(file.IATBatches))
+	}
+	if date := file.IATBatches[0].Header.EffectiveEntryDate; date != "190923" {
+		t.Errorf("file.IATBatches[0].Header.EffectiveEntryDate=%s", date)
+	}
+}
+
+func TestFile__datetimeParse(t *testing.T) {
+	// from javascript: (new Date).toISOString()
+	if ts, err := datetimeParse("2019-09-20T20:49:35.177Z"); err != nil {
+		t.Error(err)
+	} else {
+		if v := ts.Format("060102"); v != "190920" {
+			t.Errorf("got %s", v)
+		}
+	}
+
+	// RFC3339 format
+	if ts, err := datetimeParse("2019-09-23T09:50:52-07:00"); err != nil {
+		t.Error(err)
+	} else {
+		if v := ts.Format("060102"); v != "190923" {
+			t.Errorf("got %s", v)
+		}
+	}
+
+	// other, expect zero time
+	if ts, err := datetimeParse(""); !ts.IsZero() || err == nil {
+		t.Errorf("ts=%v error=%v", ts, err)
+	}
+}
+
 func TestFileADV__Success(t *testing.T) {
 	fh := mockFileHeader()
 	bh := mockBatchADVHeader()

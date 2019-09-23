@@ -22,9 +22,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/moov-io/base"
 	"strings"
 	"time"
+
+	"github.com/moov-io/base"
 )
 
 // First position of all Record Types. These codes are uniquely assigned to
@@ -97,6 +98,9 @@ type advFileControl struct {
 //
 // The File returned may not be valid and callers should confirm with Validate().
 // Invalid files may be rejected by other Financial Institutions or ACH tools.
+//
+// Date and Time fields in formats: RFC 3339 and ISO 8601 will be parsed and rewritten
+// as their YYMMDD (year, month, day) or hhmm (hour, minute) formats.
 func FileFromJSON(bs []byte) (*File, error) {
 	if len(bs) == 0 {
 		return nil, errors.New("no JSON data provided")
@@ -123,6 +127,9 @@ func FileFromJSON(bs []byte) (*File, error) {
 	if err := file.setBatchesFromJSON(bs); err != nil {
 		return nil, err
 	}
+
+	// Overwrite various timestamps with their ACH formatted values
+	file.overwriteDateTimeFields()
 
 	if !file.IsADV() {
 		// Read FileControl
@@ -312,6 +319,56 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 	}
 
 	return nil
+}
+
+// overwriteDateTimeFields will scan through fields in a File for Date / Time
+// values which are not in their ACH format (YYMMDD, hhmm). It'll attempt to parse
+// various formats and overwrite them to the expected values (YYMMDD, hhmm).
+func (f *File) overwriteDateTimeFields() {
+	// File header
+	if t, err := datetimeParse(f.Header.FileCreationDate); err == nil {
+		f.Header.FileCreationDate = t.Format("060102")
+	}
+	if t, err := datetimeParse(f.Header.FileCreationTime); err == nil {
+		f.Header.FileCreationTime = t.Format("1504")
+	}
+
+	// Batches
+	for i := range f.Batches {
+		// BatchHeader
+		header := f.Batches[i].GetHeader()
+		if t, err := datetimeParse(strings.TrimPrefix(header.CompanyDescriptiveDate, "SD")); err == nil {
+			header.CompanyDescriptiveDate = "SD" + t.Format("1504")
+		}
+		if t, err := datetimeParse(header.EffectiveEntryDate); err == nil {
+			header.EffectiveEntryDate = t.Format("060102")
+		}
+		f.Batches[i].SetHeader(header)
+	}
+
+	// TODO(adam): Addenda99 has DateOfDeath which is hard to parse and overwrite with Batcher.GetEntries() copying structs
+
+	// IAT Batches
+	for i := range f.IATBatches {
+		if t, err := datetimeParse(f.IATBatches[i].Header.EffectiveEntryDate); err == nil {
+			f.IATBatches[i].Header.EffectiveEntryDate = t.Format("060102")
+		}
+	}
+}
+
+var datetimeformats = []string{
+	"2006-01-02T15:04:05.999Z", // Default javascript (new Date).toISOString()
+	"2006-01-02T15:04:05Z",     // ISO 8601 without milliseconds
+	time.RFC3339,               // Go default
+}
+
+func datetimeParse(v string) (time.Time, error) {
+	for i := range datetimeformats {
+		if t, err := time.Parse(datetimeformats[i], v); err == nil && !t.IsZero() {
+			return t, nil
+		}
+	}
+	return time.Time{}, fmt.Errorf("unknown format: %s", v)
 }
 
 // Create will tabulate and assemble an ACH file into a valid state. This includes
