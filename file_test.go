@@ -588,6 +588,27 @@ func TestFile__iso8601JSON(t *testing.T) {
 	}
 }
 
+func TestFile__IATdatetimeParse(t *testing.T) {
+	bs, err := ioutil.ReadFile(filepath.Join("test", "testdata", "iat-debit.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	file, err := FileFromJSON(bs)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if file.ID != "iat-datetime" {
+		t.Fatalf("file.ID=%s", file.ID)
+	}
+	if len(file.IATBatches) != 1 {
+		t.Errorf("got %d IAT batches", len(file.IATBatches))
+	}
+	if date := file.IATBatches[0].Header.EffectiveEntryDate; date != "190923" {
+		t.Errorf("file.IATBatches[0].Header.EffectiveEntryDate=%s", date)
+	}
+}
+
 func TestFile__datetimeParse(t *testing.T) {
 	// from javascript: (new Date).toISOString()
 	if ts, err := datetimeParse("2019-09-20T20:49:35.177Z"); err != nil {
