@@ -854,13 +854,25 @@ func TestFile__readInvalidJson(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	_, err = FileFromJSON(bs)
-
-	if err != nil {
-		if strings.Contains(err.Error(), "problem reading File") {
-		} else {
+	if _, err := FileFromJSON(bs); err == nil {
+		t.Error("expected error")
+	} else {
+		if !strings.Contains(err.Error(), "problem reading File") {
 			t.Fatal(err)
+		}
+	}
+
+	// a file which fails .Validate()
+	path = filepath.Join("test", "testdata", "ppd-invalid-EntryDetail-checkDigit.json")
+	bs, err = ioutil.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := FileFromJSON(bs); err == nil {
+		t.Error("expected error")
+	} else {
+		if !strings.Contains(err.Error(), "batch #1 (PPD) FieldError RDFIIdentification 1 does not match calculated check digit 4") {
+			t.Error(err)
 		}
 	}
 }

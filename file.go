@@ -95,8 +95,8 @@ type advFileControl struct {
 //
 // Callers should always check for a nil-error before using the returned file.
 //
-// The File returned may not be valid and callers should confirm with Validate(). Invalid files may
-// be rejected by other Financial Institutions or ACH tools.
+// The File returned may not be valid and callers should confirm with Validate().
+// Invalid files may be rejected by other Financial Institutions or ACH tools.
 func FileFromJSON(bs []byte) (*File, error) {
 	if len(bs) == 0 {
 		return nil, errors.New("no JSON data provided")
@@ -151,6 +151,9 @@ func FileFromJSON(bs []byte) (*File, error) {
 	}
 
 	if err := file.Create(); err != nil {
+		return file, err
+	}
+	if err := file.Validate(); err != nil {
 		return file, err
 	}
 	return file, nil
