@@ -50,6 +50,7 @@ type Service interface {
 	// SegmentFile
 	// SegmentFile segments an ach file
 	SegmentFile(id string) (*ach.File, *ach.File, error)
+	// FlattenBatches will minimize the ach.Batch objects in a file by consolidating EntryDetails under distinct batch headers
 	FlattenBatches(id string) (*ach.File, error)
 	// CreateBatch creates a new batch within and ach file and returns its resource ID
 	CreateBatch(fileID string, bh ach.Batcher) (string, error)
