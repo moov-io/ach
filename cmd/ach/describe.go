@@ -60,8 +60,10 @@ func dumpFile(file *ach.File) {
 func readACHFile(path string) (*ach.File, error) {
 	fd, err := os.Open(path)
 	if err != nil {
-		return nil, fmt.Errorf("describe ACH: file=%s error=%v", path, err)
+		return nil, fmt.Errorf("problem opening %s: %v", path, err)
 	}
+	defer fd.Close()
+
 	f, err := ach.NewReader(fd).Read()
 	return &f, err
 }
