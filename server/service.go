@@ -47,7 +47,8 @@ type Service interface {
 	GetFileContents(id string) (io.Reader, error)
 	// ValidateFile
 	ValidateFile(id string) error
-	// SegmentFile
+	// BalanceFile will apply a given offset record to the file
+	BalanceFile(fileID string, off *ach.Offset) (*ach.File, error)
 	// SegmentFile segments an ach file
 	SegmentFile(id string) (*ach.File, *ach.File, error)
 	// FlattenBatches will minimize the ach.Batch objects in a file by consolidating EntryDetails under distinct batch headers
@@ -179,6 +180,32 @@ func (s *service) GetBatches(fileID string) []ach.Batcher {
 
 func (s *service) DeleteBatch(fileID string, batchID string) error {
 	return s.store.DeleteBatch(fileID, batchID)
+}
+
+func (s *service) BalanceFile(fileID string, off *ach.Offset) (*ach.File, error) {
+	f, err := s.GetFile(fileID)
+	if err != nil {
+		return nil, err
+	}
+	if err := f.Create(); err != nil {
+		return nil, err
+	}
+	// Apply the Offset to each Batch and then re-create (to tabulate new EntryDetail records)
+	for i := range f.Batches {
+		f.Batches[i].WithOffset(off)
+		if err := f.Batches[i].Create(); err != nil {
+			return nil, err
+		}
+	}
+	f.ID = base.ID() // overwrite the ID so it's new and unique
+	if err := f.Create(); err != nil {
+		return nil, err
+	}
+	// Save our new file
+	if err := s.store.StoreFile(f); err != nil {
+		return nil, err
+	}
+	return f, nil
 }
 
 // SegmentFile takes an ACH File and segments the files into a credit ACH File and debit ACH File and adds to in memory storage.

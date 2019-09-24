@@ -254,6 +254,133 @@ func TestFiles__validateFileEndpoint(t *testing.T) {
 	}
 }
 
+func TestFilesErr__balanceFileEndpoint(t *testing.T) {
+	repo := NewRepositoryInMemory(testTTLDuration, nil)
+	svc := NewService(repo)
+
+	resp, err := balanceFileEndpoint(svc, repo, log.NewNopLogger())(context.TODO(), nil)
+	r, ok := resp.(balanceFileResponse)
+	if !ok {
+		t.Errorf("got %#v", resp)
+	}
+	if err == nil || r.Err == nil {
+		t.Errorf("expected error: err=%v resp.Err=%v", err, r.Err)
+	}
+}
+
+func TestFiles__balanceFileEndpoint(t *testing.T) {
+	logger := log.NewNopLogger()
+	repo := NewRepositoryInMemory(testTTLDuration, logger)
+	svc := NewService(repo)
+	router := MakeHTTPHandler(svc, repo, logger)
+
+	// write an ACH file into the repository
+	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-valid.json"))
+	if err != nil {
+		t.Fatalf("empty ACH file: %v", err)
+	}
+	defer fd.Close()
+
+	bs, _ := ioutil.ReadAll(fd)
+	file, _ := ach.FileFromJSON(bs)
+	repo.StoreFile(file)
+
+	w := httptest.NewRecorder()
+	body := strings.NewReader(`{"routingNumber": "987654320", "accountNumber": "216112", "accountType": "checking", "description": "OFFSET"}`)
+	req := httptest.NewRequest("POST", fmt.Sprintf("/files/%s/balance", file.ID), body)
+	req.Header.Set("X-Request-ID", base.ID())
+
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+
+	var resp balanceFileResponse
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatal(err)
+	}
+	if resp.FileID == "" {
+		t.Error("empty FileID")
+	}
+
+	// check for ErrBadRouting
+	if _, err := decodeBalanceFileRequest(context.TODO(), &http.Request{}); err != ErrBadRouting {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+func TestFilesErr__balanceInvalidFile(t *testing.T) {
+	logger := log.NewNopLogger()
+	repo := NewRepositoryInMemory(testTTLDuration, logger)
+	svc := NewService(repo)
+	router := MakeHTTPHandler(svc, repo, logger)
+
+	// write an invalid (partial) file
+	fh := ach.NewFileHeader()
+	fileID, err := svc.CreateFile(&fh)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	w := httptest.NewRecorder()
+	body := strings.NewReader(`{"routingNumber": "987654320", "accountNumber": "216112", "accountType": "checking", "description": "OFFSET"}`)
+	req := httptest.NewRequest("POST", fmt.Sprintf("/files/%s/balance", fileID), body)
+	req.Header.Set("X-Request-ID", base.ID())
+
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+}
+
+func TestFilesErr__balanceFileEndpointJSON(t *testing.T) {
+	logger := log.NewNopLogger()
+	repo := NewRepositoryInMemory(testTTLDuration, logger)
+	svc := NewService(repo)
+	router := MakeHTTPHandler(svc, repo, logger)
+
+	// write an ACH file into the repository
+	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-valid.json"))
+	if err != nil {
+		t.Fatalf("empty ACH file: %v", err)
+	}
+	defer fd.Close()
+
+	bs, _ := ioutil.ReadAll(fd)
+	file, _ := ach.FileFromJSON(bs)
+	repo.StoreFile(file)
+
+	w := httptest.NewRecorder()
+
+	body := strings.NewReader(`{"routingNumber": "987654320"}`) // partial JSON, but we left off fields
+	req := httptest.NewRequest("POST", fmt.Sprintf("/files/%s/balance", file.ID), body)
+	req.Header.Set("X-Request-ID", base.ID())
+
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+
+	// send totally invalid JSON
+	w = httptest.NewRecorder()
+	body = strings.NewReader(`invalid-json asdlsk`)
+	req = httptest.NewRequest("POST", fmt.Sprintf("/files/%s/balance", file.ID), body)
+	req.Header.Set("X-Request-ID", base.ID())
+
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+}
+
 // TestFilesError__segmentFileEndpoint test an error returned from segmentFileEndpoint
 func TestFilesError__segmentFileEndpoint(t *testing.T) {
 	repo := NewRepositoryInMemory(testTTLDuration, nil)
@@ -267,7 +394,6 @@ func TestFilesError__segmentFileEndpoint(t *testing.T) {
 	if err == nil || r.Err == nil {
 		t.Errorf("expected error: err=%v resp.Err=%v", err, r.Err)
 	}
-
 }
 
 // TestFiles__segmentFileEndpoint tests segmentFileEndpoints

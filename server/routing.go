@@ -170,6 +170,12 @@ func MakeHTTPHandler(s Service, repo Repository, logger log.Logger) http.Handler
 		encodeResponse,
 		options...,
 	))
+	r.Methods("POST").Path("/files/{fileID}/balance").Handler(httptransport.NewServer(
+		balanceFileEndpoint(s, repo, logger),
+		decodeBalanceFileRequest,
+		encodeResponse,
+		options...,
+	))
 	r.Methods("POST").Path("/files/{fileID}/segment").Handler(httptransport.NewServer(
 		segmentFileEndpoint(s, repo, logger),
 		decodeSegmentFileRequest,
