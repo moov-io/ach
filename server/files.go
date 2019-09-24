@@ -391,6 +391,9 @@ func decodeBalanceFileRequest(_ context.Context, r *http.Request) (interface{}, 
 	if err := json.NewDecoder(r.Body).Decode(&off); err != nil {
 		return nil, err
 	}
+	if off.RoutingNumber == "" || off.AccountNumber == "" || string(off.AccountType) == "" {
+		return nil, errors.New("missing some offset json fields")
+	}
 	return balanceFileRequest{
 		fileID:    fileID,
 		offset:    &off,
