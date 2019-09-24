@@ -335,6 +335,22 @@ func TestBalanceFile(t *testing.T) {
 	}
 }
 
+func TestBalanceFileErrors(t *testing.T) {
+	s := mockServiceInMemory()
+	if file, err := s.BalanceFile(base.ID(), &ach.Offset{}); err == nil {
+		t.Errorf("expected error file=%#v", file)
+	}
+
+	fh := ach.NewFileHeader()
+	fileID, err := s.CreateFile(&fh)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if file, err := s.BalanceFile(fileID, &ach.Offset{}); err == nil {
+		t.Errorf("expected error file=%#v", file)
+	}
+}
+
 // TestSegmentFile creates a Segmented File from an existing ACH File
 func TestSegmentFile(t *testing.T) {
 	s := mockServiceInMemory()

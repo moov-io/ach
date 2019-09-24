@@ -304,6 +304,37 @@ func TestFiles__balanceFileEndpoint(t *testing.T) {
 	if resp.FileID == "" {
 		t.Error("empty FileID")
 	}
+
+	// check for ErrBadRouting
+	if _, err := decodeBalanceFileRequest(context.TODO(), &http.Request{}); err != ErrBadRouting {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+func TestFilesErr__balanceInvalidFile(t *testing.T) {
+	logger := log.NewNopLogger()
+	repo := NewRepositoryInMemory(testTTLDuration, logger)
+	svc := NewService(repo)
+	router := MakeHTTPHandler(svc, repo, logger)
+
+	// write an invalid (partial) file
+	fh := ach.NewFileHeader()
+	fileID, err := svc.CreateFile(&fh)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	w := httptest.NewRecorder()
+	body := strings.NewReader(`{"routingNumber": "987654320", "accountNumber": "216112", "accountType": "checking", "description": "OFFSET"}`)
+	req := httptest.NewRequest("POST", fmt.Sprintf("/files/%s/balance", fileID), body)
+	req.Header.Set("X-Request-ID", base.ID())
+
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
 }
 
 func TestFilesErr__balanceFileEndpointJSON(t *testing.T) {
@@ -327,6 +358,19 @@ func TestFilesErr__balanceFileEndpointJSON(t *testing.T) {
 
 	body := strings.NewReader(`{"routingNumber": "987654320"}`) // partial JSON, but we left off fields
 	req := httptest.NewRequest("POST", fmt.Sprintf("/files/%s/balance", file.ID), body)
+	req.Header.Set("X-Request-ID", base.ID())
+
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+
+	// send totally invalid JSON
+	w = httptest.NewRecorder()
+	body = strings.NewReader(`invalid-json asdlsk`)
+	req = httptest.NewRequest("POST", fmt.Sprintf("/files/%s/balance", file.ID), body)
 	req.Header.Set("X-Request-ID", base.ID())
 
 	router.ServeHTTP(w, req)
