@@ -299,6 +299,17 @@ func TestFiles__segmentFileEndpoint(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Errorf("bogus HTTP status: %d", w.Code)
 	}
+
+	var resp segmentFileResponse
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatal(err)
+	}
+	if resp.CreditFileID == "" {
+		t.Errorf("empty CreditFileID")
+	}
+	if resp.DebitFileID == "" {
+		t.Errorf("empty DebitFileID")
+	}
 }
 
 // TestFiles__decodeSegmentFileRequest tests segmentFileEndpoints
