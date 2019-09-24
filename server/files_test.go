@@ -258,7 +258,7 @@ func TestFilesErr__balanceFileEndpoint(t *testing.T) {
 	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)
 
-	resp, err := balanceFileEndpoint(svc, repo, nil)(context.TODO(), nil)
+	resp, err := balanceFileEndpoint(svc, repo, log.NewNopLogger())(context.TODO(), nil)
 	r, ok := resp.(balanceFileResponse)
 	if !ok {
 		t.Errorf("got %#v", resp)

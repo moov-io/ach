@@ -288,6 +288,53 @@ func TestDeleteBatch(t *testing.T) {
 	}
 }
 
+func TestBalanceFile(t *testing.T) {
+	s := mockServiceInMemory()
+
+	// store a file in the Service and balance it
+	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-debit.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	file, err := ach.NewReader(fd).Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if bs, es := len(file.Batches), len(file.Batches[0].GetEntries()); bs != 1 || es != 1 {
+		t.Errorf("got %d batches and %d entries", bs, es)
+	}
+
+	// save our file
+	fileID, err := s.CreateFile(&file.Header)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.CreateBatch(fileID, file.Batches[0]); err != nil {
+		t.Fatal(err)
+	}
+
+	balancedFile, err := s.BalanceFile(fileID, &ach.Offset{
+		RoutingNumber: "987654320",
+		AccountNumber: "28198241",
+		AccountType:   ach.OffsetChecking,
+		Description:   "OFFSET",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if fileID == balancedFile.ID {
+		t.Errorf("fileID=%s balancedFile.ID=%s", fileID, balancedFile.ID)
+	}
+
+	if bs, es := len(balancedFile.Batches), len(balancedFile.Batches[0].GetEntries()); bs != 1 || es != 2 {
+		t.Errorf("got %d batches and %d entries", bs, es)
+	}
+	if ed := balancedFile.Batches[0].GetEntries()[1]; ed.IndividualName != "OFFSET" {
+		t.Errorf("ed.IndividualName=%s", ed.IndividualName)
+	}
+}
+
 // TestSegmentFile creates a Segmented File from an existing ACH File
 func TestSegmentFile(t *testing.T) {
 	s := mockServiceInMemory()
