@@ -270,6 +270,39 @@ func BenchmarkAddenda98TraceNumberField(b *testing.B) {
 	}
 }
 
+func TestAddenda98__ChangeCodeField(t *testing.T) {
+	addenda98 := mockAddenda98()
+	if addenda98.ChangeCode != "C01" {
+		t.Errorf("addenda98.ChangeCode=%s", addenda98.ChangeCode)
+	}
+	if code := addenda98.ChangeCodeField(); code == nil {
+		t.Fatal("nil Addenda98.ChangeCodeField")
+	} else {
+		if code.Code != "C01" {
+			t.Errorf("code.Code=%s", code.Code)
+		}
+		if code.Reason != "Incorrect bank account number" {
+			t.Errorf("code.Reason=%s", code.Reason)
+		}
+	}
+
+	// verify another change code
+	addenda98.ChangeCode = "C07"
+	if code := addenda98.ChangeCodeField(); code == nil {
+		t.Fatal("nil Addenda98.ChangeCodeField")
+	} else {
+		if code.Code != "C07" {
+			t.Errorf("code.Code=%s", code.Code)
+		}
+	}
+
+	// invalid change code
+	addenda98.ChangeCode = "C99"
+	if code := addenda98.ChangeCodeField(); code != nil {
+		t.Errorf("unexpected change code: %v", code)
+	}
+}
+
 // testAddenda98TypeCodeNil validates TypeCode is ""
 func testAddenda98TypeCodeNil(t testing.TB) {
 	addenda98 := mockAddenda98()

@@ -54,7 +54,7 @@ type Addenda98 struct {
 }
 
 var (
-	changeCodeDict = map[string]*changeCode{}
+	changeCodeDict = map[string]*ChangeCode{}
 )
 
 func init() {
@@ -62,9 +62,9 @@ func init() {
 	changeCodeDict = makeChangeCodeDict()
 }
 
-// changeCode holds a change Code, Reason/Title, and Description
+// ChangeCode holds a change Code, Reason/Title, and Description
 // table of return codes exists in Part 4.2 of the NACHA corporate rules and guidelines
-type changeCode struct {
+type ChangeCode struct {
 	Code, Reason, Description string
 }
 
@@ -164,10 +164,18 @@ func (addenda98 *Addenda98) TraceNumberField() string {
 	return addenda98.stringField(addenda98.TraceNumber, 15)
 }
 
-func makeChangeCodeDict() map[string]*changeCode {
-	dict := make(map[string]*changeCode)
+func (addenda98 *Addenda98) ChangeCodeField() *ChangeCode {
+	code, ok := changeCodeDict[addenda98.ChangeCode]
+	if ok {
+		return code
+	}
+	return nil
+}
 
-	codes := []changeCode{
+func makeChangeCodeDict() map[string]*ChangeCode {
+	dict := make(map[string]*ChangeCode)
+
+	codes := []ChangeCode{
 		{"C01", "Incorrect bank account number", "Bank account number incorrect or formatted incorrectly"},
 		{"C02", "Incorrect transit/routing number", "Once valid transit/routing number must be changed"},
 		{"C03", "Incorrect transit/routing number and bank account number", "Once valid transit/routing number must be changed and causes a change to bank account number structure"},
@@ -181,8 +189,8 @@ func makeChangeCodeDict() map[string]*changeCode {
 		{"C12", "Incorrect company name and company ID", "Both the company name and company id are no longer valid and must be changed"},
 	}
 	// populate the map
-	for _, code := range codes {
-		dict[code.Code] = &code
+	for i := range codes {
+		dict[codes[i].Code] = &codes[i]
 	}
 	return dict
 }
