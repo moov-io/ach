@@ -295,6 +295,12 @@ func TestAddenda98__ChangeCodeField(t *testing.T) {
 			t.Errorf("code.Code=%s", code.Code)
 		}
 	}
+
+	// invalid change code
+	addenda98.ChangeCode = "C99"
+	if code := addenda98.ChangeCodeField(); code != nil {
+		t.Errorf("unexpected change code: %v", code)
+	}
 }
 
 // testAddenda98TypeCodeNil validates TypeCode is ""
