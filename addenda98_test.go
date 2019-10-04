@@ -34,6 +34,22 @@ func mockAddenda98() *Addenda98 {
 	return addenda98
 }
 
+func TestAddenda98_LookupChangecode(t *testing.T) {
+	if code := LookupChangeCode("C05"); code == nil {
+		t.Error("expected ReturnCode")
+	} else {
+		if code.Code != "C05" {
+			t.Errorf("code.Code=%s", code.Code)
+		}
+		if code.Reason != "Incorrect payment code" {
+			t.Errorf("code.Reason=%s", code.Reason)
+		}
+	}
+	if code := LookupChangeCode("C99"); code != nil {
+		t.Errorf("expected nil: %#v", code)
+	}
+}
+
 func testAddenda98Parse(t testing.TB) {
 	addenda98 := NewAddenda98()
 	line := "798C01099912340000015      091012981918171614                                  091012980000088"
