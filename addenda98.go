@@ -65,7 +65,9 @@ func init() {
 // ChangeCode holds a change Code, Reason/Title, and Description
 // table of return codes exists in Part 4.2 of the NACHA corporate rules and guidelines
 type ChangeCode struct {
-	Code, Reason, Description string
+	Code        string `json:"code"`
+	Reason      string `json:"reason"`
+	Description string `json:"description"`
 }
 
 // NewAddenda98 returns an reference to an instantiated Addenda98 with default values
@@ -167,6 +169,15 @@ func (addenda98 *Addenda98) TraceNumberField() string {
 func (addenda98 *Addenda98) ChangeCodeField() *ChangeCode {
 	code, ok := changeCodeDict[addenda98.ChangeCode]
 	if ok {
+		return code
+	}
+	return nil
+}
+
+// LookupChangeCode will return a struct representing the reason and description for
+// the provided NACHA change code.
+func LookupChangeCode(code string) *ChangeCode {
+	if code, exists := changeCodeDict[strings.ToUpper(code)]; exists {
 		return code
 	}
 	return nil
