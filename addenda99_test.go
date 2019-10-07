@@ -71,6 +71,22 @@ func testAddenda99Parse(t testing.TB) {
 	}
 }
 
+func TestAddenda99__LookupReturnCode(t *testing.T) {
+	if code := LookupReturnCode("R02"); code == nil {
+		t.Error("expected ReturnCode")
+	} else {
+		if code.Code != "R02" {
+			t.Errorf("code.Code=%s", code.Code)
+		}
+		if code.Reason != "Account Closed" {
+			t.Errorf("code.Reason=%s", code.Reason)
+		}
+	}
+	if code := LookupReturnCode("R99"); code != nil {
+		t.Errorf("expected nil: %#v", code)
+	}
+}
+
 func TestAddenda99Parse(t *testing.T) {
 	testAddenda99Parse(t)
 }

@@ -75,7 +75,9 @@ type Addenda99 struct {
 //
 // Table of return codes exists in Part 4.2 of the NACHA corporate rules and guidelines
 type ReturnCode struct {
-	Code, Reason, Description string
+	Code        string `json:"code"`
+	Reason      string `json:"reason"`
+	Description string `json:"description"`
 }
 
 // NewAddenda99 returns a new Addenda99 with default values for none exported fields
@@ -204,6 +206,15 @@ func (Addenda99 *Addenda99) TraceNumberField() string {
 func (Addenda99 *Addenda99) ReturnCodeField() *ReturnCode {
 	code, ok := returnCodeDict[Addenda99.ReturnCode]
 	if ok {
+		return code
+	}
+	return nil
+}
+
+// LookupReturnCode will return a struct representing the reason and description for
+// the provided NACHA return code.
+func LookupReturnCode(code string) *ReturnCode {
+	if code, exists := returnCodeDict[strings.ToUpper(code)]; exists {
 		return code
 	}
 	return nil
