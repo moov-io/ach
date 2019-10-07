@@ -3,7 +3,11 @@
 ADDITIONS
 
 - Add `FlattenBatches() (*File, error)` to `ach.File`
-   - FlattenBatches flattens File Batches by consolidating batches with the same BatchHeader data into one batch.
+   - FlattenBatches [minimizes File Batches by consolidating them](https://docs.moov.io/ach/flatten-batches/) with the same BatchHeader data into one batch.
+- Add `POST /files/:id/flatten` which calls `FlattenBatches()` on a specific ACH file
+- Add `POST /files/:id/balance` to [add Offset records](https://docs.moov.io/ach/balanced-offset/) onto each Batch in an ACH File.
+- Addenda98: Add `ChangeCodeField()` for detailed information about a NOC/COR change file ([`ChangeCode`](https://godoc.org/github.com/moov-io/ach#ChangeCode))
+- Addenda99: Add `ReturnCodeField()` for detailed information about file returns ([`ReturnCode`](https://godoc.org/github.com/moov-io/ach#ReturnCode))
 
 BUG FIXES
 
@@ -11,10 +15,13 @@ BUG FIXES
 - batch: inspect Entrydetail records for Category
 - batch: check ADV entries for Category
 - reader: set EntryDetail.Category to NOC when Addenda98 is present
+- file: Validate files after reading them from their JSON representation
+- server: actaully render new Credit and Debit files from segmentation
 
 IMPROVEMENTS
 
 - created example files for HTTP routes
+- file: parse ISO8601 and RFC3339 timestamps in JSON blobs
 
 BUILD
 
