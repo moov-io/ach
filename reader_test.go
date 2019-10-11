@@ -45,7 +45,7 @@ func readACHFilepath(path string) (*File, error) {
 }
 
 func TestReader__crashers(t *testing.T) {
-	dir := filepath.Join("test", "testdata", "crashes")
+	dir := filepath.Join("test", "testdata", "crashers")
 	fds, err := ioutil.ReadDir(dir)
 	if err != nil {
 		t.Fatal(err)
@@ -65,6 +65,7 @@ func TestReader__crashers(t *testing.T) {
 
 	for i := range fds {
 		currentFile = fds[i].Name()
+		t.Logf("parsing %s to see if it crashes...", currentFile)
 
 		f, err := os.Open(filepath.Join(dir, fds[i].Name()))
 		if err != nil {
