@@ -593,21 +593,18 @@ func TestFHImmediateDestinationInvalidCheckSum(t *testing.T) {
 	}
 }
 
-func TestFHImmediateOriginInvalidLength(t *testing.T) {
+func TestFHImmediateOriginValidate(t *testing.T) {
 	fh := mockFileHeader()
-	fh.ImmediateOrigin = "198387"
-	err := fh.Validate()
-	if !strings.Contains(err.Error(), "invalid routing number length") {
-		t.Errorf("%T: %s", err, err)
+	fh.ImmediateOrigin = "0000000000"
+	if err := fh.Validate(); err == nil {
+		t.Error("expected error")
 	}
-}
 
-func TestFHImmediateOriginInvalidCheckSum(t *testing.T) {
-	fh := mockFileHeader()
-	fh.ImmediateOrigin = "121042880"
-	err := fh.Validate()
-	if !strings.Contains(err.Error(), "routing number checksum mismatch") {
-		t.Errorf("%T: %s", err, err)
+	// use an alphanumeric code (NACHA rules allow this with specific
+	// agreements between the ODFI and originator)
+	fh.ImmediateOrigin = "ABC124"
+	if err := fh.Validate(); err != nil {
+		t.Error(err)
 	}
 }
 
