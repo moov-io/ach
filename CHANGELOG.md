@@ -1,3 +1,9 @@
+## v1.2.1 (Released 2019-10-11)
+
+BUG FIXES
+
+- fileHeader: Remove requirement of ImmediateOrigin to be a routing number
+
 ## v1.2.0 (Released 2019-10-07)
 
 ADDITIONS
