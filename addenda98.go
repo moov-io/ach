@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"strconv"
 	"strings"
 	"unicode/utf8"
 )
@@ -204,4 +205,86 @@ func makeChangeCodeDict() map[string]*ChangeCode {
 		dict[codes[i].Code] = &codes[i]
 	}
 	return dict
+}
+
+type CorrectedData struct {
+	AccountNumber   string
+	RoutingNumber   string
+	Name            string
+	TransactionCode int
+	Identification  string
+}
+
+func (addenda98 *Addenda98) ParseCorrectedData() *CorrectedData {
+	if addenda98 == nil {
+		return nil
+	}
+	cc := addenda98.ChangeCodeField()
+	if cc == nil {
+		return nil
+	}
+	switch cc.Code {
+	case "C01": // Incorrect DFI Account Number
+		if v := first(17, addenda98.CorrectedData); v != "" {
+			return &CorrectedData{AccountNumber: v}
+		}
+	case "C02": // Incorrect Routing Number
+		if v := first(9, addenda98.CorrectedData); v != "" {
+			return &CorrectedData{RoutingNumber: v}
+		}
+	case "C03": // Incorrect Routing Number and Incorrect DFI Account Number
+		parts := strings.Fields(addenda98.CorrectedData)
+		if len(parts) == 2 {
+			return &CorrectedData{
+				RoutingNumber: parts[0],
+				AccountNumber: parts[1],
+			}
+		}
+	case "C04": // Incorrect Individual Name
+		if v := first(22, addenda98.CorrectedData); v != "" {
+			return &CorrectedData{Name: v}
+		}
+	case "C05": // Incorrect Transaction Code
+		if n, err := strconv.Atoi(first(2, addenda98.CorrectedData)); err == nil {
+			return &CorrectedData{TransactionCode: n}
+		}
+	case "C06": // Incorrect DFI Account Number and Incorrect Transaction Code
+		parts := strings.Fields(addenda98.CorrectedData)
+		if len(parts) == 2 {
+			if n, err := strconv.Atoi(parts[1]); err == nil {
+				return &CorrectedData{
+					AccountNumber:   parts[0],
+					TransactionCode: n,
+				}
+			}
+		}
+	case "C07": // Incorrect Routing Number, Incorrect DFI Account Number, and Incorrect Tranaction Code
+		parts := strings.Fields(addenda98.CorrectedData)
+		if len(parts) == 3 {
+			if n, err := strconv.Atoi(parts[2]); err == nil {
+				return &CorrectedData{
+					RoutingNumber:   parts[0],
+					AccountNumber:   parts[1],
+					TransactionCode: n,
+				}
+			}
+		}
+	case "C09": // Incorrect Individual Identification Number
+		if v := first(22, addenda98.CorrectedData); v != "" {
+			return &CorrectedData{Identification: v}
+		}
+	}
+	// The Code/Correction is either unsupported or wasn't parsed correctly
+	return nil
+}
+
+func first(size int, data string) string {
+	if utf8.RuneCountInString(data) < size {
+		if data != "" {
+			return strings.TrimSpace(data)
+		} else {
+			return ""
+		}
+	}
+	return strings.TrimSpace(data[:size])
 }

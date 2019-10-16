@@ -352,3 +352,58 @@ func TestAddenda98RuneCountInString(t *testing.T) {
 		t.Error("Parsed with an invalid RuneCountInString not equal to 94")
 	}
 }
+
+func TestCorrectedData__first(t *testing.T) {
+	if v := first(2, ""); v != "" {
+		t.Errorf("got='%s'", v)
+	}
+	if v := first(2, "    "); v != "" {
+		t.Errorf("got='%s'", v)
+	}
+	if v := first(3, "22"); v != "22" {
+		t.Errorf("got='%s'", v)
+	}
+	if v := first(17, "   123   "); v != "123" {
+		t.Errorf("got='%s'", v)
+	}
+	if v := first(17, "123456789   "); v != "123456789" {
+		t.Errorf("got='%s'", v)
+	}
+}
+
+func TestCorrectedData(t *testing.T) {
+	run := func(code, data string) *CorrectedData {
+		add := NewAddenda98()
+		add.ChangeCode = code
+		add.CorrectedData = data
+		return add.ParseCorrectedData()
+	}
+
+	if v := run("C01", "123456789       "); v.AccountNumber != "123456789" {
+		t.Errorf("%#v", v)
+	}
+	if v := run("C02", "987654320  "); v.RoutingNumber != "987654320" {
+		t.Errorf("%#v", v)
+	}
+	if v := run("C03", "987654320   123456"); v.AccountNumber != "123456" || v.RoutingNumber != "987654320" {
+		t.Errorf("%#v", v)
+	}
+	if v := run("C04", "Jane Doe"); v.Name != "Jane Doe" {
+		t.Errorf("%#v", v)
+	}
+	if v := run("C05", "22  other"); v.TransactionCode != 22 {
+		t.Errorf("%#v", v)
+	}
+	if v := run("C06", "123456789                22"); v.AccountNumber != "123456789" || v.TransactionCode != 22 {
+		t.Errorf("%#v", v)
+	}
+	if v := run("C07", "987654320  12345  22"); v.RoutingNumber != "987654320" || v.AccountNumber != "12345" || v.TransactionCode != 22 {
+		t.Errorf("%#v", v)
+	}
+	if v := run("C09", "21345678    "); v.Identification != "21345678" {
+		t.Errorf("%#v", v)
+	}
+	if v := run("C99", "    "); v != nil {
+		t.Error("expected nil CorrectedData")
+	}
+}
