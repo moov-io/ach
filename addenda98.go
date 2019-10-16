@@ -207,6 +207,10 @@ func makeChangeCodeDict() map[string]*ChangeCode {
 	return dict
 }
 
+// CorrectedData is a struct returned from our helper method for parsing the NOC/COR
+// corrected data from Addenda98 records.
+//
+// All fields are optional and a valid code may not have populated data in this struct.
 type CorrectedData struct {
 	AccountNumber   string
 	RoutingNumber   string
@@ -215,6 +219,8 @@ type CorrectedData struct {
 	Identification  string
 }
 
+// ParseCorrectedData returns a struct with some fields filled in depending on the Addenda98's
+// Code and CorrectedData. Fields are trimmed when populated in this struct.
 func (addenda98 *Addenda98) ParseCorrectedData() *CorrectedData {
 	if addenda98 == nil {
 		return nil
