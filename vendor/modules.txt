@@ -26,7 +26,7 @@ github.com/moov-io/base/admin
 github.com/moov-io/base/http
 github.com/moov-io/base/http/bind
 github.com/moov-io/base/idempotent
-# github.com/prometheus/client_golang v1.2.0
+# github.com/prometheus/client_golang v1.2.1
 github.com/prometheus/client_golang/prometheus
 github.com/prometheus/client_golang/prometheus/internal
 github.com/prometheus/client_golang/prometheus/promhttp
