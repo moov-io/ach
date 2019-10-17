@@ -371,7 +371,7 @@ func TestCorrectedData__first(t *testing.T) {
 	}
 }
 
-func TestCorrectedData(t *testing.T) {
+func TestCorrectedData__ParseCorrectedData(t *testing.T) {
 	run := func(code, data string) *CorrectedData {
 		add := NewAddenda98()
 		add.ChangeCode = code
@@ -405,5 +405,40 @@ func TestCorrectedData(t *testing.T) {
 	}
 	if v := run("C99", "    "); v != nil {
 		t.Error("expected nil CorrectedData")
+	}
+}
+
+func TestCorrectedData__WriteCorrectionData(t *testing.T) {
+	data := &CorrectedData{AccountNumber: "12345"}
+	if v := WriteCorrectionData("C01", data); v != "12345                 " {
+		t.Errorf("C01 got %q (length=%d)", v, len(v))
+	}
+	data = &CorrectedData{RoutingNumber: "987654320"}
+	if v := WriteCorrectionData("C02", data); v != "987654320             " {
+		t.Errorf("C02 got %q (length=%d)", v, len(v))
+	}
+	data = &CorrectedData{AccountNumber: "123", RoutingNumber: "987654320"}
+	if v := WriteCorrectionData("C03", data); v != "987654320          123" {
+		t.Errorf("C03 got %q (length=%d)", v, len(v))
+	}
+	data = &CorrectedData{Name: "Jane Doe"}
+	if v := WriteCorrectionData("C04", data); v != "Jane Doe              " {
+		t.Errorf("C04 got %q (length=%d)", v, len(v))
+	}
+	data = &CorrectedData{TransactionCode: 22}
+	if v := WriteCorrectionData("C05", data); v != "22                    " {
+		t.Errorf("C05 got %q (length=%d)", v, len(v))
+	}
+	data = &CorrectedData{AccountNumber: "5421", TransactionCode: 27}
+	if v := WriteCorrectionData("C06", data); v != "5421                27" {
+		t.Errorf("C06 got %q (length=%d)", v, len(v))
+	}
+	data = &CorrectedData{RoutingNumber: "987654320", AccountNumber: "5421", TransactionCode: 32}
+	if v := WriteCorrectionData("C07", data); v != "9876543205421       32" {
+		t.Errorf("C07 got %q (length=%d)", v, len(v))
+	}
+	data = &CorrectedData{Identification: "FooBar"}
+	if v := WriteCorrectionData("C09", data); v != "FooBar                " {
+		t.Errorf("C09 got %q (length=%d)", v, len(v))
 	}
 }
