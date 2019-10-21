@@ -352,3 +352,93 @@ func TestAddenda98RuneCountInString(t *testing.T) {
 		t.Error("Parsed with an invalid RuneCountInString not equal to 94")
 	}
 }
+
+func TestCorrectedData__first(t *testing.T) {
+	if v := first(2, ""); v != "" {
+		t.Errorf("got='%s'", v)
+	}
+	if v := first(2, "    "); v != "" {
+		t.Errorf("got='%s'", v)
+	}
+	if v := first(3, "22"); v != "22" {
+		t.Errorf("got='%s'", v)
+	}
+	if v := first(17, "   123   "); v != "123" {
+		t.Errorf("got='%s'", v)
+	}
+	if v := first(17, "123456789   "); v != "123456789" {
+		t.Errorf("got='%s'", v)
+	}
+}
+
+func TestCorrectedData__ParseCorrectedData(t *testing.T) {
+	run := func(code, data string) *CorrectedData {
+		add := NewAddenda98()
+		add.ChangeCode = code
+		add.CorrectedData = data
+		return add.ParseCorrectedData()
+	}
+
+	if v := run("C01", "123456789       "); v.AccountNumber != "123456789" {
+		t.Errorf("%#v", v)
+	}
+	if v := run("C02", "987654320  "); v.RoutingNumber != "987654320" {
+		t.Errorf("%#v", v)
+	}
+	if v := run("C03", "987654320   123456"); v.AccountNumber != "123456" || v.RoutingNumber != "987654320" {
+		t.Errorf("%#v", v)
+	}
+	if v := run("C04", "Jane Doe"); v.Name != "Jane Doe" {
+		t.Errorf("%#v", v)
+	}
+	if v := run("C05", "22  other"); v.TransactionCode != 22 {
+		t.Errorf("%#v", v)
+	}
+	if v := run("C06", "123456789                22"); v.AccountNumber != "123456789" || v.TransactionCode != 22 {
+		t.Errorf("%#v", v)
+	}
+	if v := run("C07", "987654320  12345  22"); v.RoutingNumber != "987654320" || v.AccountNumber != "12345" || v.TransactionCode != 22 {
+		t.Errorf("%#v", v)
+	}
+	if v := run("C09", "21345678    "); v.Identification != "21345678" {
+		t.Errorf("%#v", v)
+	}
+	if v := run("C99", "    "); v != nil {
+		t.Error("expected nil CorrectedData")
+	}
+}
+
+func TestCorrectedData__WriteCorrectionData(t *testing.T) {
+	data := &CorrectedData{AccountNumber: "12345"}
+	if v := WriteCorrectionData("C01", data); v != "12345                 " {
+		t.Errorf("C01 got %q (length=%d)", v, len(v))
+	}
+	data = &CorrectedData{RoutingNumber: "987654320"}
+	if v := WriteCorrectionData("C02", data); v != "987654320             " {
+		t.Errorf("C02 got %q (length=%d)", v, len(v))
+	}
+	data = &CorrectedData{AccountNumber: "123", RoutingNumber: "987654320"}
+	if v := WriteCorrectionData("C03", data); v != "987654320          123" {
+		t.Errorf("C03 got %q (length=%d)", v, len(v))
+	}
+	data = &CorrectedData{Name: "Jane Doe"}
+	if v := WriteCorrectionData("C04", data); v != "Jane Doe              " {
+		t.Errorf("C04 got %q (length=%d)", v, len(v))
+	}
+	data = &CorrectedData{TransactionCode: 22}
+	if v := WriteCorrectionData("C05", data); v != "22                    " {
+		t.Errorf("C05 got %q (length=%d)", v, len(v))
+	}
+	data = &CorrectedData{AccountNumber: "5421", TransactionCode: 27}
+	if v := WriteCorrectionData("C06", data); v != "5421                27" {
+		t.Errorf("C06 got %q (length=%d)", v, len(v))
+	}
+	data = &CorrectedData{RoutingNumber: "987654320", AccountNumber: "5421", TransactionCode: 32}
+	if v := WriteCorrectionData("C07", data); v != "9876543205421       32" {
+		t.Errorf("C07 got %q (length=%d)", v, len(v))
+	}
+	data = &CorrectedData{Identification: "FooBar"}
+	if v := WriteCorrectionData("C09", data); v != "FooBar                " {
+		t.Errorf("C09 got %q (length=%d)", v, len(v))
+	}
+}
