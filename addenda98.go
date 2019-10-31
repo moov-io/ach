@@ -266,15 +266,21 @@ func (addenda98 *Addenda98) ParseCorrectedData() *CorrectedData {
 			}
 		}
 	case "C07": // Incorrect Routing Number, Incorrect DFI Account Number, and Incorrect Tranaction Code
-		parts := strings.Fields(addenda98.CorrectedData)
-		if len(parts) == 3 {
-			if n, err := strconv.Atoi(parts[2]); err == nil {
-				return &CorrectedData{
-					RoutingNumber:   parts[0],
-					AccountNumber:   parts[1],
-					TransactionCode: n,
-				}
+		var cd CorrectedData
+		if n := len(addenda98.CorrectedData); n > 9 {
+			cd.RoutingNumber = addenda98.CorrectedData[:9]
+		} else {
+			return nil
+		}
+		parts := strings.Fields(addenda98.CorrectedData[9:])
+		if len(parts) == 2 {
+			if n, err := strconv.Atoi(parts[1]); err == nil {
+				cd.AccountNumber = parts[0]
+				cd.TransactionCode = n
+				return &cd
 			}
+		} else {
+			return nil
 		}
 	case "C09": // Incorrect Individual Identification Number
 		if v := first(22, addenda98.CorrectedData); v != "" {

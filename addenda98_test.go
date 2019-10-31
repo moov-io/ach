@@ -400,6 +400,15 @@ func TestCorrectedData__ParseCorrectedData(t *testing.T) {
 	if v := run("C07", "987654320  12345  22"); v.RoutingNumber != "987654320" || v.AccountNumber != "12345" || v.TransactionCode != 22 {
 		t.Errorf("%#v", v)
 	}
+	if v := run("C07", "9876543201242415    22"); v.RoutingNumber != "987654320" || v.AccountNumber != "1242415" || v.TransactionCode != 22 {
+		t.Errorf("%#v", v)
+	}
+	if v := run("C07", "1234"); v != nil {
+		t.Errorf("expected nil: %v", v)
+	}
+	if v := run("C07", "987654320 1234 1234 1234"); v != nil {
+		t.Errorf("expected nil: %v", v)
+	}
 	if v := run("C09", "21345678    "); v.Identification != "21345678" {
 		t.Errorf("%#v", v)
 	}
