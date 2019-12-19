@@ -74,6 +74,27 @@ func TestReadDirErr(t *testing.T) {
 	}
 }
 
+func TestReadDirSymlinkErr(t *testing.T) {
+	dir, err := ioutil.TempDir("", "readdir-symlink")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir)
+
+	// write an invalid symlink
+	if err := os.Symlink(filepath.Join("missing", "directory"), filepath.Join(dir, "foo.ach")); err != nil {
+		t.Fatal(err)
+	}
+
+	files, err := ReadDir(dir)
+	if len(files) != 0 {
+		t.Errorf("got %d files", len(files))
+	}
+	if err == nil {
+		t.Error("expected error")
+	}
+}
+
 func copyFilesToTempDir(t *testing.T, filenames []string) string {
 	dir, err := ioutil.TempDir("", "ach-readdir")
 	if err != nil {
