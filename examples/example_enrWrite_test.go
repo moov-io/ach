@@ -19,8 +19,9 @@ package examples
 
 import (
 	"fmt"
-	"github.com/moov-io/ach"
 	"log"
+
+	"github.com/moov-io/ach"
 )
 
 // Example_enrWrite writes and ENR file
@@ -72,7 +73,7 @@ func Example_enrWrite() {
 	fmt.Printf("%s", file.Batches[0].GetControl().String()+"\n")
 	fmt.Printf("%s", file.Control.String()+"\n")
 
-	// Output: 101 03130001202313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
+	// Output: 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
 	// 5225Name on Account                     231380104 ENRAUTOENROLL               1231380100000001
 	// 627031300012744-5678-99      0000000000031300010000001Best. #1                1231380100000001
 	// 70522*12200004*3*123987654321*777777777*DOE*JOHN*1\                                00010000001

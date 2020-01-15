@@ -36,20 +36,21 @@ type FileHeader struct {
 	recordType string
 	// PriorityCode consists of the numerals 01
 	priorityCode string
+
 	// ImmediateDestination contains the Routing Number of the ACH Operator or receiving
-	// point to which the file is being sent.  The ach file format specifies a 10 character
-	// field  begins with a blank space in the first position, followed by the four digit
+	// point to which the file is being sent. The ach file format specifies a 10 character
+	// field begins with a blank space in the first position, followed by the four digit
 	// Federal Reserve Routing Symbol, the four digit ABA Institution Identifier, and the Check
-	// Digit (bTTTTAAAAC).  ImmediateDestinationField() will append the blank space to the
+	// Digit (bTTTTAAAAC). ImmediateDestinationField() will append the blank space to the
 	// routing number.
 	ImmediateDestination string `json:"immediateDestination"`
 
 	// ImmediateOrigin contains the Routing Number of the ACH Operator or sending
-	// point that is sending the file. The ach file format specifies a 10 character field
-	// which can begin with a blank space, 0 or 1 in the first position, followed by the four digit
+	// point that is sending the file. The ach file format specifies a 10 character
+	// field begins with a blank space in the first position, followed by the four digit
 	// Federal Reserve Routing Symbol, the four digit ABA Institution Identifier, and the Check
-	// Digit (bTTTTAAAAC).  ImmediateOriginField() will prepend a 0 to the routing number to match
-	// the field size.
+	// Digit (bTTTTAAAAC). ImmediateOriginField() will append the blank space to the
+	// routing number.
 	ImmediateOrigin string `json:"immediateOrigin"`
 
 	// FileCreationDate is the date on which the file is prepared by an ODFI (ACH input files)
@@ -154,9 +155,9 @@ func (fh *FileHeader) Parse(record string) {
 func trimImmediateOriginLeadingZero(s string) string {
 	if utf8.RuneCountInString(s) == 10 && s[0] == '0' && s != "0000000000" {
 		// trim off a leading 0 as ImmediateOriginField() will pad it back
-		return s[1:]
+		return strings.TrimSpace(s[1:])
 	}
-	return s
+	return strings.TrimSpace(s)
 }
 
 // String writes the FileHeader struct to a 94 character string.
@@ -267,7 +268,10 @@ func (fh *FileHeader) ImmediateDestinationField() string {
 
 // ImmediateOriginField gets the immediate origin number with 0 padding
 func (fh *FileHeader) ImmediateOriginField() string {
-	return fh.stringField(fh.ImmediateOrigin, 10)
+	if fh.ImmediateOrigin == "" {
+		return strings.Repeat(" ", 10)
+	}
+	return " " + fh.stringField(strings.TrimSpace(fh.ImmediateOrigin), 9)
 }
 
 // FileCreationDateField gets the file creation date in YYMMDD (year, month, day) format

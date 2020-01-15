@@ -19,8 +19,9 @@ package examples
 
 import (
 	"fmt"
-	"github.com/moov-io/ach"
 	"log"
+
+	"github.com/moov-io/ach"
 )
 
 func Example_trxWriteDebit() {
@@ -83,7 +84,7 @@ func Example_trxWriteDebit() {
 	fmt.Printf("%s", file.Control.String()+"\n")
 
 	// Output:
-	// 101 03130001202313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
+	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
 	// 5225Name on Account                     231380104 TRXACH TRX         190816   1121042880000001
 	// 62723138010412345678         000025000045689033       0002Receiver Company  011121042880000001
 	// 705Debit First Account                                                             00010000001

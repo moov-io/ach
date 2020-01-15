@@ -19,8 +19,9 @@ package examples
 
 import (
 	"fmt"
-	"github.com/moov-io/ach"
 	"log"
+
+	"github.com/moov-io/ach"
 )
 
 func Example_trcWriteDebit() {
@@ -67,7 +68,7 @@ func Example_trcWriteDebit() {
 	fmt.Printf("%s", file.Batches[0].GetControl().String()+"\n")
 	fmt.Printf("%s", file.Control.String()+"\n")
 
-	// Output: 101 03130001202313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
+	// Output: 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
 	// 5225Payee Name                          231380104 TRCACH TRC         190816   1121042880000001
 	// 62723138010412345678         0000250000123456789012345CHECK11234567890123456010121042880000001
 	// 82250000010023138010000000250000000000000000231380104                          121042880000001

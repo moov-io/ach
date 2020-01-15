@@ -19,8 +19,9 @@ package examples
 
 import (
 	"fmt"
-	"github.com/moov-io/ach"
 	"log"
+
+	"github.com/moov-io/ach"
 )
 
 func Example_mteWriteDebit() {
@@ -78,7 +79,7 @@ func Example_mteWriteDebit() {
 	fmt.Printf("%s", file.Control.String()+"\n")
 
 	// Output:
-	// 101 03130001202313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
+	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
 	// 5225Merchant with AT                    231380104 MTECASH WITHD      190816   1231380100000001
 	// 627031300012744-5678-99      0000010000031300010000001JANE DOE                1231380100000001
 	// 82250000020003130001000000010000000000000000231380104                          231380100000001

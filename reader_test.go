@@ -381,7 +381,7 @@ func BenchmarkFileLineLong(b *testing.B) {
 // testFileFileHeaderErr validates error flows back from the parser
 func testFileFileHeaderErr(t testing.TB) {
 	fh := mockFileHeader()
-	//fh.ImmediateOrigin = "0"
+	// fh.ImmediateOrigin = "0000000000"
 	fh.ImmediateOrigin = ""
 	r := NewReader(strings.NewReader(fh.String()))
 	// necessary to have a file control not nil

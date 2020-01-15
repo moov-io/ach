@@ -19,8 +19,9 @@ package examples
 
 import (
 	"fmt"
-	"github.com/moov-io/ach"
 	"log"
+
+	"github.com/moov-io/ach"
 )
 
 // Example_ppdWriteCredit writes a PPD credit file
@@ -68,7 +69,7 @@ func Example_ppdWriteCredit() {
 	fmt.Printf("%s", file.Control.String()+"\n")
 
 	// Output:
-	// 101 03130001202313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
+	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
 	// 5220Name on Account                     231380104 PPDREG.SALARY      190816   1121042880000001
 	// 622231380104987654321        0100000000               Credit Account 1        0121042880000002
 	// 82200000010023138010000000000000000100000000231380104                          121042880000001

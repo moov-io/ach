@@ -19,8 +19,9 @@ package examples
 
 import (
 	"fmt"
-	"github.com/moov-io/ach"
 	"log"
+
+	"github.com/moov-io/ach"
 )
 
 // Example_ackWrite writes an ACK File
@@ -78,7 +79,7 @@ func Example_ackWrite() {
 	fmt.Printf("%s", file.Control.String()+"\n")
 
 	// Output:
-	// 101 03130001202313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
+	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
 	// 5220Name on Account                     231380104 ACKVndr Pay        190816   1231380100000001
 	// 624031300012744-5678-99      0000000000031300010000001Best. #1                0231380100000001
 	// 624031300012744-5678-99      0000000000031300010000002Best. #1                0231380100000002

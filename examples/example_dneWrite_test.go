@@ -19,8 +19,9 @@ package examples
 
 import (
 	"fmt"
-	"github.com/moov-io/ach"
 	"log"
+
+	"github.com/moov-io/ach"
 )
 
 // Example_dneWrite writes a DNR file
@@ -74,7 +75,7 @@ func Example_dneWrite() {
 	fmt.Printf("%s", file.Control.String()+"\n")
 
 	// Output:
-	// 101 03130001202313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
+	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
 	// 5220Name on Account                     231380104 DNEDeath           190816   2231380100000001
 	// 621031300012744-5678-99      0000000000031300010000001Best. #1                1231380100000001
 	// 705    DATE OF DEATH*010218*CUSTOMERSSN*#########*AMOUNT*$$$$.cc\                  00010000001
