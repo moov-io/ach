@@ -19,8 +19,9 @@ package examples
 
 import (
 	"fmt"
-	"github.com/moov-io/ach"
 	"log"
+
+	"github.com/moov-io/ach"
 )
 
 func Example_atxWrite() {
@@ -109,7 +110,7 @@ func Example_atxWrite() {
 	fmt.Printf("%s", file.Control.String()+"\n")
 
 	// Output:
-	// 101 03130001202313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
+	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
 	// 5220Name on Account                     231380104 ATXVndr Pay        190816   1231380100000001
 	// 624031300012744-5678-99      00000000000313000100000010002Receiver Company  011231380100000001
 	// 705Credit account 1 for service                                                    00010000001

@@ -82,7 +82,7 @@ func Example_corWriteCredit() {
 	fmt.Printf("%s", file.Control.String()+"\n")
 
 	// Output:
-	// 101 03130001202313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
+	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
 	// 5220Your Company, in                    121042882 CORVendor Pay      000000   1121042880000001
 	// 621231380104744-5678-99      0000000000location #23   Best Co. #23            1121042880000001
 	// 798C01121042880000001      121042881918171614                                  091012980000088

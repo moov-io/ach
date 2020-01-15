@@ -19,8 +19,9 @@ package examples
 
 import (
 	"fmt"
-	"github.com/moov-io/ach"
 	"log"
+
+	"github.com/moov-io/ach"
 )
 
 func Example_advWrite() {
@@ -91,7 +92,7 @@ func Example_advWrite() {
 	fmt.Printf("%s", file.Control.String()+"\n")
 
 	// Output:
-	// 101 03130001202313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
+	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
 	// 5280Company Name, In                    231380104 ADVAccounting      190816   0121042880000001
 	// 681231380104744-5678-99    00000005000012104288211131 Name                    0011000010500001
 	// 682231380104744-5678-99    00000025000012104288211139 Name                    0011000010500002

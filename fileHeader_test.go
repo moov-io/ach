@@ -78,15 +78,15 @@ func TestFileHeader__ImmediateOrigin(t *testing.T) {
 		t.Errorf("got %q", v)
 	}
 	header.ImmediateOrigin = "123456789" // 9 digit routing number
-	if v := header.ImmediateOriginField(); v != "0123456789" {
+	if v := header.ImmediateOriginField(); v != " 123456789" {
 		t.Errorf("got %q", v)
 	}
-	header.ImmediateOrigin = "0123456789" // 0 + routing number
-	if v := header.ImmediateOriginField(); v != "0123456789" {
+	header.ImmediateOrigin = trimImmediateOriginLeadingZero("0123456789") // 0 + routing number
+	if v := header.ImmediateOriginField(); v != " 123456789" {
 		t.Errorf("got %q", v)
 	}
-	header.ImmediateOrigin = "1123456789" // 1 + routing number
-	if v := header.ImmediateOriginField(); v != "1123456789" {
+	header.ImmediateOrigin = trimImmediateOriginLeadingZero("1123456789") // 1 + routing number
+	if v := header.ImmediateOriginField(); v != " 112345678" {
 		t.Errorf("got %q", v)
 	}
 
@@ -122,8 +122,8 @@ func parseFileHeader(t testing.TB) {
 	if record.ImmediateDestinationField() != " 076401251" {
 		t.Errorf("ImmediateDestination Expected ' 076401251' got: %v", record.ImmediateDestinationField())
 	}
-	if record.ImmediateOriginField() != "0076401251" {
-		t.Errorf("ImmediateOrigin Expected '  0076401251' got: %v", record.ImmediateOriginField())
+	if record.ImmediateOriginField() != " 076401251" {
+		t.Errorf("ImmediateOrigin Expected ' 076401251' got: %v", record.ImmediateOriginField())
 	}
 
 	if record.FileCreationDateField() != "180729" {

@@ -19,8 +19,9 @@ package examples
 
 import (
 	"fmt"
-	"github.com/moov-io/ach"
 	"log"
+
+	"github.com/moov-io/ach"
 )
 
 // Example_webWriteCredit writes a WEB credit file
@@ -77,7 +78,7 @@ func Example_webWriteCredit() {
 	fmt.Printf("%s", file.Control.String()+"\n")
 
 	// Output:
-	// 101 03130001202313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
+	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
 	// 5220Name on Account                     231380104 WEBSubscribe       190816   1121042880000001
 	// 62223138010412345678         0000010000#789654        John Doe              S 1121042880000001
 	// 705PAY-GATE payment\                                                               00010000001

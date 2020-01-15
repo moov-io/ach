@@ -19,8 +19,9 @@ package examples
 
 import (
 	"fmt"
-	"github.com/moov-io/ach"
 	"log"
+
+	"github.com/moov-io/ach"
 )
 
 func Example_ccdWriteDebit() {
@@ -78,7 +79,7 @@ func Example_ccdWriteDebit() {
 	fmt.Printf("%s", file.Batches[0].GetControl().String()+"\n")
 	fmt.Printf("%s", file.Control.String()+"\n")
 
-	// Output: 101 03130001202313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
+	// Output: 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
 	// 5225Name on Account                     231380104 CCDVndr Pay        190816   1031300010000001
 	// 627231380104744-5678-99      0000500000location #1234 Best Co. #1           S 0031300010000001
 	// 627231380104744-5678-99      0000000125Fee #1         Best Co. #1           S 0031300010000002

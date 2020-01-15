@@ -19,8 +19,9 @@ package examples
 
 import (
 	"fmt"
-	"github.com/moov-io/ach"
 	"log"
+
+	"github.com/moov-io/ach"
 )
 
 func Example_posWriteDebit() {
@@ -81,7 +82,7 @@ func Example_posWriteDebit() {
 	fmt.Printf("%s", file.Control.String()+"\n")
 
 	// Output:
-	// 101 03130001202313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
+	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
 	// 5225Name on Account                     231380104 POSSale            190816   1121042880000001
 	// 62723138010412345678         0100000000               Receiver Account Name 011121042880000001
 	// 702REFONEAREFTERM021000490614123456Target Store 0049          PHILADELPHIA   PA121042880000001

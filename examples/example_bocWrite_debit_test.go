@@ -19,8 +19,9 @@ package examples
 
 import (
 	"fmt"
-	"github.com/moov-io/ach"
 	"log"
+
+	"github.com/moov-io/ach"
 )
 
 func Example_bocWriteDebit() {
@@ -66,7 +67,7 @@ func Example_bocWriteDebit() {
 	fmt.Printf("%s", file.Control.String()+"\n")
 
 	// Output:
-	// 101 03130001202313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
+	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
 	// 5225Payee Name                          231380104 BOCACH BOC         190816   1121042880000001
 	// 62723138010412345678         0000250000123879654      ABC Company             0121042880000001
 	// 82250000010023138010000000250000000000000000231380104                          121042880000001
