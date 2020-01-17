@@ -7,17 +7,17 @@ services:
 matrix:
   include:
     - os: linux
-      go: 1.12.x
+      go: 1.13.x
       cache:
         directories:
           - "/home/travis/.cache/go-build" # GOCACHE
     - os: osx
-      go: 1.12.x
+      go: 1.13.x
       cache:
         directories:
           - "/Users/travis/Library/Caches/go-build" # GOCACHE
     - os: windows
-      go: 1.12.x
+      go: 1.13.x
       cache:
         directories:
           - "C:\\Users\\travis\\AppData\\Local\\go-build"
@@ -33,11 +33,11 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then wget -O misspell.tar.gz https://github.com/client9/misspell/releases/download/v0.3.4/misspell_0.3.4_mac_64bit.tar.gz; fi
   - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then tar xf misspell.tar.gz && cp ./misspell ./bin/misspell; fi
   # staticcheck
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget -O staticcheck.tar.gz https://github.com/dominikh/go-tools/releases/download/2019.2.2/staticcheck_linux_amd64.tar.gz; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then wget -O staticcheck.tar.gz https://github.com/dominikh/go-tools/releases/download/2019.2.2/staticcheck_darwin_amd64.tar.gz; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget -O staticcheck.tar.gz https://github.com/dominikh/go-tools/releases/download/2019.2.3/staticcheck_linux_amd64.tar.gz; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then wget -O staticcheck.tar.gz https://github.com/dominikh/go-tools/releases/download/2019.2.3/staticcheck_darwin_amd64.tar.gz; fi
   - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then tar xf staticcheck.tar.gz && cp ./staticcheck/staticcheck ./bin/staticcheck; fi
-  # golint (revive is a faster drop-in replacement)
-  - go get -u github.com/mgechev/revive
+  # golint
+  - go get -u golang.org/x/lint/golint
   # gocyclo
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget -O ./bin/gocyclo https://github.com/adamdecaf/gocyclo/releases/download/2019-08-09/gocyclo-linux-amd64; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then wget -O ./bin/gocyclo https://github.com/adamdecaf/gocyclo/releases/download/2019-08-09/gocyclo-darwin-amd64; fi
@@ -57,7 +57,7 @@ script:
   - go test ./... -race -coverprofile=coverage.txt -covermode=atomic
   - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then misspell -error -locale US $GOFILES; fi
   - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then gocyclo -over 19 $GOFILES; fi
-  - revive $GOFILES
+  - golint -set_exit_status $GOFILES
   - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then staticcheck ./...; fi
 
 after_success:

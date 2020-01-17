@@ -1,4 +1,20 @@
-## v0.10.0 (Unreleased)
+## v0.11.0 (Released 2020-01-16)
+
+ADDITIONS
+
+- admin: add a handler to print the version on 'GET /version'
+
+IMPROVEMENTS
+
+- http/bind: rename ofac as watchman
+
+BUILD
+
+- Update module prometheus/client_golang to v1.3.0
+- Update Copyright headers for 2020
+- chore(deps): update module hashicorp/golang-lru to v0.5.4
+
+## v0.10.0 (Released 2019-08-13)
 
 BREAKING CHANGES
 

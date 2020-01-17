@@ -1,4 +1,4 @@
-// Copyright 2018 The Moov Authors
+// Copyright 2020 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -25,7 +25,8 @@ var serviceBinds = map[string]string{
 	"paygate":   ":8082",
 	"x9":        ":8083", // x9 was renamed to icl
 	"icl":       ":8083",
-	"ofac":      ":8084",
+	"ofac":      ":8084", // ofac was renamed to watchman
+	"watchman":  ":8084",
 	"gl":        ":8085", // GL was renamed to accounts
 	"accounts":  ":8085",
 	"fed":       ":8086",
