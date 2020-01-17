@@ -27,6 +27,7 @@ import (
 	"runtime/pprof"
 	"time"
 
+	"github.com/Pallinder/go-randomdata"
 	"github.com/moov-io/ach"
 )
 
@@ -100,17 +101,16 @@ func write(path string) {
 			entryEntrySeq := ach.NewEntryDetail()
 			entryEntrySeq.TransactionCode = ach.CheckingCredit
 			entryEntrySeq.SetRDFI("231380104")
-			entryEntrySeq.DFIAccountNumber = "81967038518"
-			entryEntrySeq.Amount = 100000
-			entryEntrySeq.IndividualName = "Steven Tander"
+			entryEntrySeq.DFIAccountNumber = randomdata.StringNumber(10, "")
+			entryEntrySeq.IndividualName = randomdata.FullName(randomdata.RandomGender)
 			entryEntrySeq.SetTraceNumber(bh.ODFIIdentification, entrySeq)
-			entryEntrySeq.IdentificationNumber = "#83738AB#"
+			entryEntrySeq.IdentificationNumber = "#" + randomdata.StringNumber(6, "") + "#"
 			entryEntrySeq.Category = ach.CategoryForward
 			entryEntrySeq.AddendaRecordIndicator = 1
 
 			// Add addenda record for an entry
 			addendaEntrySeq := ach.NewAddenda05()
-			addendaEntrySeq.PaymentRelatedInformation = "bonus pay for amazing work on #OSS"
+			addendaEntrySeq.PaymentRelatedInformation = randomdata.SillyName() + " bonus pay for amazing work on #OSS"
 			entryEntrySeq.AddAddenda05(addendaEntrySeq)
 
 			// Add entries
