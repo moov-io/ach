@@ -27,10 +27,6 @@ matrix:
       cache:
         directories: ["C:\\Users\\travis\\AppData\\Local\\go-build"]
 
-env:
-  matrix:
-    - GO111MODULE=on
-
 before_install:
   # Setup directory for binaries
   - mkdir ./bin

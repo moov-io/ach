@@ -68,5 +68,5 @@ else
 	@wget -q -nc https://github.com/elastic/go-licenser/releases/download/v0.3.0/go-licenser_0.3.0_Darwin_x86_64.tar.gz
 	@tar xf go-licenser_0.3.0_Darwin_x86_64.tar.gz
 endif
-	./go-licenser -exclude ./vendor/ -license ASL2 -licensor 'The Moov Authors' -notice
-	@git checkout README.md LICENSE vendor/
+	./go-licenser -license ASL2 -licensor 'The Moov Authors' -notice
+	@git checkout README.md LICENSE
