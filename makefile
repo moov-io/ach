@@ -22,7 +22,7 @@ dist: clean generate build
 ifeq ($(OS),Windows_NT)
 	CGO_ENABLED=1 GOOS=windows go build -o bin/ach-windows-amd64.exe github.com/moov-io/ach/cmd/server
 else
-	CGO_ENABLED=1 GOOS=$(PLATFORM) go build -o bin/ach-$(PLATFORM)-amd64 github.com/moov-io/ach/cmd/server
+	CGO_ENABLED=0 GOOS=$(PLATFORM) go build -o bin/ach-$(PLATFORM)-amd64 github.com/moov-io/ach/cmd/server
 endif
 
 docker: clean
@@ -68,5 +68,5 @@ else
 	@wget -q -nc https://github.com/elastic/go-licenser/releases/download/v0.3.0/go-licenser_0.3.0_Darwin_x86_64.tar.gz
 	@tar xf go-licenser_0.3.0_Darwin_x86_64.tar.gz
 endif
-	./go-licenser -exclude ./vendor/ -license ASL2 -licensor 'The Moov Authors' -notice
-	@git checkout README.md LICENSE vendor/
+	./go-licenser -license ASL2 -licensor 'The Moov Authors' -notice
+	@git checkout README.md LICENSE
