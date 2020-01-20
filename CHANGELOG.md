@@ -1,4 +1,4 @@
-## v1.3.0 (Unreleased)
+## v1.3.0 (Released 2020-01-20)
 
 BREAKING CHANGES
 
