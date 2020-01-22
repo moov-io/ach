@@ -39,6 +39,10 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget -O staticcheck.tar.gz https://github.com/dominikh/go-tools/releases/download/2019.2.3/staticcheck_linux_amd64.tar.gz; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then wget -O staticcheck.tar.gz https://github.com/dominikh/go-tools/releases/download/2019.2.3/staticcheck_darwin_amd64.tar.gz; fi
   - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then tar xf staticcheck.tar.gz && cp ./staticcheck/staticcheck ./bin/staticcheck; fi
+  # nancy (vulnerable dependencies)
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then curl -L -o ./bin/nancy https://github.com/sonatype-nexus-community/nancy/releases/download/v0.0.40/nancy-linux.amd64-v0.0.40; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -L -o ./bin/nancy https://github.com/sonatype-nexus-community/nancy/releases/download/v0.0.40/nancy-darwin.amd64-v0.0.40; fi
+  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then chmod +x ./bin/nancy; fi
   # golint
   - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then go get -u golang.org/x/lint/golint; fi
   # gocyclo
@@ -60,6 +64,7 @@ script:
   - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then gocyclo -over 26 $GOFILES; fi
   - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then golint -set_exit_status $GOFILES; fi
   - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then staticcheck ./...; fi
+  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then go list -m all | ./bin/nancy; fi
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
