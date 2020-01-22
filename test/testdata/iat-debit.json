@@ -124,7 +124,7 @@
       "batchControl": {
         "id": "iat-datetime",
         "serviceClassCode": 225,
-        "entryAddendaÇount": 10,
+        "entryAddendaCount": 10,
         "entryHash": 12104288,
         "totalDebit": 100000,
         "totalCredit": 0,

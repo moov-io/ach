@@ -43,7 +43,7 @@
             "batchControl": {
                 "id": "iso8601",
                 "serviceClassCode": 200,
-                "entryAddendaÇount": 0,
+                "entryAddendaCount": 0,
                 "entryHash": 23138010,
                 "totalDebit": 0,
                 "totalCredit": 100000,
