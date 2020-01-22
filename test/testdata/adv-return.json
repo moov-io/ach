@@ -54,7 +54,7 @@
       "advBatchControl": {
         "id": "ADVReturn",
         "serviceClassCode": 280,
-        "entryAddendaÇount": 1,
+        "entryAddendaCount": 1,
         "entryHash": 23138010,
         "totalDebit": 0,
         "totalCredit": 100000,

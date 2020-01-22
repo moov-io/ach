@@ -35,7 +35,7 @@ type ADVBatchControl struct {
 	ServiceClassCode int `json:"serviceClassCode"`
 	// EntryAddendaCount is a tally of each Entry Detail Record and each Addenda
 	// Record processed, within either the batch or file as appropriate.
-	EntryAddendaCount int `json:"entryAddendaÇount"`
+	EntryAddendaCount int `json:"entryAddendaCount"`
 	// validate the Receiving DFI Identification in each Entry Detail Record is hashed
 	// to provide a check against inadvertent alteration of data contents due
 	// to hardware failure or program error

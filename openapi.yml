@@ -731,7 +731,7 @@ components:
           description: Same as ServiceClassCode in BatchHeaderRecord
           type: integer
           example: 220
-        entryAddendaÇount:
+        entryAddendaCount:
           description: EntryAddendaCount is a tally of each Entry Detail Record and each Addenda Record processed, within either the batch or file as appropriate.
           type: integer
           example: 1

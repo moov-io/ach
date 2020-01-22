@@ -56,7 +56,7 @@
       "batchControl": {
         "id": "adam-01",
         "serviceClassCode": 200,
-        "entryAddendaÇount": 2,
+        "entryAddendaCount": 2,
         "entryHash": 23138010,
         "totalDebit": 100000,
         "totalCredit": 100000,
