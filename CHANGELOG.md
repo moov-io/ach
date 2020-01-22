@@ -1,3 +1,17 @@
+## v1.3.1 (Released 2020-01-22)
+
+BUG FIXES
+
+- api,client: There was a mistaken character in the OpenAPI docs `Ç` which should have been `C`.
+
+IMPROVEMENTS
+
+- build: upgrade golang.org/x/crypto
+
+BUILD
+
+- build: run sonatype-nexus-community/nancy in CI
+
 ## v1.3.0 (Released 2020-01-20)
 
 BREAKING CHANGES
