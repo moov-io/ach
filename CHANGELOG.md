@@ -1,3 +1,9 @@
+## v1.4.0 (Unreleased)
+
+ADDITIONS
+
+- batches: Add `LiftEffectiveEntryDate()` to offer parsed `time.Time` values of `EffectiveEntryDate`
+
 ## v1.3.1 (Released 2020-01-22)
 
 BUG FIXES

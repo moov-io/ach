@@ -545,3 +545,21 @@ func TestBatchHeaderENR__EffectiveEntryDateField(t *testing.T) {
 		t.Errorf("got %q (len=%d), expected space filled (len=6)", v, len(ans))
 	}
 }
+
+func TestBatchHeader__LiftEffectiveEntryDate(t *testing.T) {
+	bh := mockBatchHeader()
+	bh.EffectiveEntryDate = "190730"
+
+	if tt, err := bh.LiftEffectiveEntryDate(); err != nil {
+		t.Fatal(err)
+	} else {
+		if tt.String() != "2019-07-30 00:00:00 +0000 UTC" {
+			t.Errorf("tt=%v", tt)
+		}
+	}
+
+	bh.EffectiveEntryDate = "aaaaaaaa"
+	if _, err := bh.LiftEffectiveEntryDate(); err == nil {
+		t.Error("expected error")
+	}
+}

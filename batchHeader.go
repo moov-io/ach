@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 	"unicode/utf8"
 )
 
@@ -322,4 +323,8 @@ func (bh *BatchHeader) BatchNumberField() string {
 
 func (bh *BatchHeader) settlementDateField() string {
 	return bh.alphaField(bh.settlementDate, 3)
+}
+
+func (bh *BatchHeader) LiftEffectiveEntryDate() (time.Time, error) {
+	return time.Parse("060102", bh.EffectiveEntryDate) // YYMMDD
 }
