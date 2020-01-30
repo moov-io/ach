@@ -505,7 +505,30 @@ func (f *File) SetHeader(h FileHeader) *File {
 //
 // Validate will never modify the file.
 func (f *File) Validate() error {
-	if err := f.Header.Validate(); err != nil {
+	return f.ValidateWith(nil)
+}
+
+// ValidateOpts contains specific overrides from the default set of validations
+// performed on a NACHA file, records and various fields within.
+type ValidateOpts struct {
+	// RequireABAOrigin can be set to enable routing number validation
+	// over the ImmediateOrigin file header field.
+	RequireABAOrigin bool
+
+	// BypassOriginValidation can be set to skip validation for the
+	// ImmediateOrigin file header field.
+	BypassOriginValidation bool
+}
+
+// ValidateWith performs NACHA format rule checks on each record according to their specification
+// overlayed with any custom flags.
+// The first error encountered is returned and stops the parsing.
+func (f *File) ValidateWith(opts *ValidateOpts) error {
+	if opts == nil {
+		opts = &ValidateOpts{}
+	}
+
+	if err := f.Header.ValidateWith(opts); err != nil {
 		return err
 	}
 
