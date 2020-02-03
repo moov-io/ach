@@ -22,8 +22,7 @@ tags:
 paths:
   /ping:
     get:
-      tags:
-        - Files
+      tags: ['ACH Files']
       summary: Ping the ACH service to check if running
       operationId: ping
       responses:
