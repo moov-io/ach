@@ -33,6 +33,17 @@ docker: clean
 	docker build --pull -t moov/achfuzz:$(VERSION) . -f Dockerfile-fuzz
 	docker tag moov/achfuzz:$(VERSION) moov/achfuzz:latest
 
+.PHONY: clean-integration test-integration
+
+clean-integration:
+	docker-compose kill
+	docker-compose rm -v -f
+
+test-integration: clean-integration
+	docker-compose up -d
+	sleep 5
+	curl -v http://localhost:8080/files
+
 release: docker generate AUTHORS
 	go test ./...
 	git tag -f $(VERSION)
