@@ -14,11 +14,20 @@ generate: clean
 	@go run internal/iso3166/iso3166_gen.go
 	@go run internal/iso4217/iso4217_gen.go
 
-clean:
-	@rm -rf tmp/
-	@rm -rf bin/
+.PHONY: client
+client:
+# Versions from https://github.com/OpenAPITools/openapi-generator/releases
+	@chmod +x ./openapi-generator
+	@rm -rf ./client
+	OPENAPI_GENERATOR_VERSION=4.2.0 ./openapi-generator generate --package-name client -i openapi.yml -g go -o ./client
+	rm -f client/go.mod client/go.sum
+	go fmt ./...
+	go test ./client
 
-dist: clean generate build
+clean:
+	@rm -rf bin/ tmp/
+
+dist: clean generate client build
 ifeq ($(OS),Windows_NT)
 	CGO_ENABLED=1 GOOS=windows go build -o bin/ach-windows-amd64.exe github.com/moov-io/ach/cmd/server
 else

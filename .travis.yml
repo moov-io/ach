@@ -53,7 +53,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then choco install -y mingw; export PATH=/c/tools/mingw64/bin:"$PATH";fi
 
 before_script:
-  - GOFILES=$(find . -type f -name '*.go' | grep -v vendor)
+  - GOFILES=$(find . -type f -name '*.go' | grep -v client | grep -v vendor)
   - go mod graph
 
 script:

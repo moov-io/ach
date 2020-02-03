@@ -1,0 +1,1605 @@
+openapi: 3.0.2
+info:
+  contact:
+    url: https://github.com/moov-io/ach
+  description: Moov ACH ([Automated Clearing House](https://en.wikipedia.org/wiki/Automated_Clearing_House))
+    implements an HTTP API for creating, parsing and validating ACH files. ACH is
+    the primary method of electronic money movement throughout the United States.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: ACH API
+  version: v1
+servers:
+- description: Local development
+  url: http://localhost:8080
+tags:
+- description: |
+    File contains the structures of a ACH File. It contains one and only one File Header and File Control with at least one Batch.
+    Batch objects within Files hold the Batch Header and Batch Control and all Entry Records and Addenda records for the Batch.
+  name: ACH Files
+paths:
+  /ping:
+    get:
+      operationId: ping
+      responses:
+        200:
+          description: Service is running properly
+      summary: Ping the ACH service to check if running
+      tags:
+      - ACH Files
+  /files:
+    get:
+      operationId: getFiles
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Files'
+          description: A list of File objects
+          headers:
+            X-Total-Count:
+              description: The total number of Originators
+              explode: false
+              schema:
+                type: integer
+              style: simple
+      security:
+      - bearerAuth: []
+      - cookieAuth: []
+      summary: Gets a list of Files
+      tags:
+      - ACH Files
+  /files/create:
+    post:
+      operationId: createFile
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Idempotent key in the header which expires after 24 hours. These
+          strings should contain enough entropy for to not collide with each other
+          in your requests.
+        example: a4f88150
+        explode: false
+        in: header
+        name: X-Idempotency-Key
+        required: false
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFile'
+          text/plain:
+            schema:
+              description: A plaintext ACH file
+              example: 101 222380104 1210428821805100000A094101Citadel                Bank
+                Name
+              type: string
+        description: Content of the ACH file (in json or raw text)
+        required: true
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+          description: A JSON object containing a new File
+          headers:
+            Location:
+              description: The location of the new resource
+              explode: false
+              schema:
+                format: uri
+                type: string
+              style: simple
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Invalid File Header Object
+      security:
+      - bearerAuth: []
+      - cookieAuth: []
+      summary: Create a new File object
+      tags:
+      - ACH Files
+  /files/{fileID}:
+    delete:
+      operationId: deleteACHFile
+      parameters:
+      - description: File ID
+        explode: false
+        in: path
+        name: fileID
+        required: true
+        schema:
+          example: 3f2d23ee214
+          type: string
+        style: simple
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      responses:
+        200:
+          description: Permanently deleted File.
+        404:
+          description: A File with the specified ID was not found.
+      security:
+      - bearerAuth: []
+      - cookieAuth: []
+      summary: Permanently deletes a File and associated Batches. It cannot be undone.
+      tags:
+      - ACH Files
+    get:
+      operationId: getFileByID
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: File ID
+        explode: false
+        in: path
+        name: fileID
+        required: true
+        schema:
+          example: 3f2d23ee214
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+          description: A File object for the supplied ID
+        404:
+          description: A resource with the specified ID was not found
+      security:
+      - bearerAuth: []
+      - cookieAuth: []
+      summary: Retrieves the details of an existing File. You need only supply the
+        unique File identifier that was returned upon creation.
+      tags:
+      - ACH Files
+    post:
+      operationId: updateFile
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Idempotent key in the header which expires after 24 hours. These
+          strings should contain enough entropy for to not collide with each other
+          in your requests.
+        example: a4f88150
+        explode: false
+        in: header
+        name: X-Idempotency-Key
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: File ID
+        explode: false
+        in: path
+        name: fileID
+        required: true
+        schema:
+          example: 3f2d23ee214
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFile'
+        required: true
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+          description: A JSON object containing a new File
+          headers:
+            Location:
+              description: The location of the new resource
+              explode: false
+              schema:
+                format: uri
+                type: string
+              style: simple
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Invalid File Header Object
+      security:
+      - bearerAuth: []
+      - cookieAuth: []
+      summary: Updates the specified File Header by setting the values of the parameters
+        passed. Any parameters not provided will be left unchanged.
+      tags:
+      - ACH Files
+  /files/{fileID}/contents:
+    get:
+      operationId: getFileContents
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: File ID
+        explode: false
+        in: path
+        name: fileID
+        required: true
+        schema:
+          example: 3f2d23ee214
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/RawFile'
+          description: File built successfully without errors.
+      security:
+      - bearerAuth: []
+      - cookieAuth: []
+      summary: Assembles the existing file (batches and controls) records, computes
+        sequence numbers and totals. Returns plaintext file.
+      tags:
+      - ACH Files
+  /files/{fileID}/validate:
+    get:
+      operationId: validateFile
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: File ID
+        explode: false
+        in: path
+        name: fileID
+        required: true
+        schema:
+          example: 3f2d23ee214
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+          description: File validated successfully without errors.
+        400:
+          description: Validation failed. Check response for errors
+      security:
+      - bearerAuth: []
+      - cookieAuth: []
+      summary: Validates the existing file. You need only supply the unique File identifier
+        that was returned upon creation.
+      tags:
+      - ACH Files
+  /files/{fileID}/segment:
+    post:
+      operationId: segmentFile
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Idempotent key in the header which expires after 24 hours. These
+          strings should contain enough entropy for to not collide with each other
+          in your requests.
+        example: a4f88150
+        explode: false
+        in: header
+        name: X-Idempotency-Key
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: File ID
+        explode: false
+        in: path
+        name: fileID
+        required: true
+        schema:
+          example: 3f2d23ee214
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFile'
+          text/plain:
+            schema:
+              description: A plaintext ACH file
+              example: 101 222380104 1210428821805100000A094101Citadel                Bank
+                Name
+              type: string
+        description: Content of the ACH file (in json or raw text)
+        required: true
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+          description: A JSON object containing the credit File ID and debit File
+            ID
+          headers:
+            Location:
+              description: The location of the new resource
+              explode: false
+              schema:
+                format: uri
+                type: string
+              style: simple
+      security:
+      - bearerAuth: []
+      - cookieAuth: []
+      summary: Create a new file object
+      tags:
+      - ACH Files
+  /files/{fileID}/flatten:
+    post:
+      operationId: flattenFile
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Idempotent key in the header which expires after 24 hours. These
+          strings should contain enough entropy for to not collide with each other
+          in your requests.
+        example: a4f88150
+        explode: false
+        in: header
+        name: X-Idempotency-Key
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: File ID
+        explode: false
+        in: path
+        name: fileID
+        required: true
+        schema:
+          example: 3f2d23ee214
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFile'
+          text/plain:
+            schema:
+              description: A plaintext ACH file
+              example: 101 222380104 1210428821805100000A094101Citadel                Bank
+                Name
+              type: string
+        description: Content of the ACH file (in json or raw text)
+        required: true
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+          description: A JSOn objeect containing the File ID associated with a Flattened
+            ACH file.
+          headers:
+            Location:
+              description: The location of the new resource
+              explode: false
+              schema:
+                format: uri
+                type: string
+              style: simple
+      security:
+      - bearerAuth: []
+      - cookieAuth: []
+      summary: Create a new file object
+      tags:
+      - ACH Files
+  /files/{fileID}/batches:
+    get:
+      operationId: getFileBatches
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: File ID
+        explode: false
+        in: path
+        name: fileID
+        required: true
+        schema:
+          example: 3f2d23ee214
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batches'
+          description: A list of Batch objects
+          headers:
+            X-Total-Count:
+              description: The total number of Batches on the File.
+              explode: false
+              schema:
+                type: integer
+              style: simple
+      security:
+      - bearerAuth: []
+      - cookieAuth: []
+      summary: Get the batches on a File.
+      tags:
+      - ACH Files
+    post:
+      operationId: addBatchToFile
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Idempotent key in the header which expires after 24 hours. These
+          strings should contain enough entropy for to not collide with each other
+          in your requests.
+        example: a4f88150
+        explode: false
+        in: header
+        name: X-Idempotency-Key
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: File ID
+        explode: false
+        in: path
+        name: fileID
+        required: true
+        schema:
+          example: 3f2d23ee214
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Batch'
+        required: true
+      responses:
+        200:
+          description: Batch added to File
+      security:
+      - bearerAuth: []
+      - cookieAuth: []
+      summary: Add Batch to File
+      tags:
+      - ACH Files
+  /files/{fileID}/batches/{batchID}:
+    delete:
+      operationId: deleteFileBatch
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: File ID
+        explode: false
+        in: path
+        name: fileID
+        required: true
+        schema:
+          example: 3f2d23ee214
+          type: string
+        style: simple
+      - description: Batch ID
+        explode: false
+        in: path
+        name: batchID
+        required: true
+        schema:
+          example: "45758063"
+          type: string
+        style: simple
+      responses:
+        200:
+          description: Batch deleted
+        404:
+          description: Batch or File not found
+      security:
+      - bearerAuth: []
+      - cookieAuth: []
+      summary: Delete a Batch from a File
+      tags:
+      - ACH Files
+    get:
+      operationId: getFileBatch
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: File ID
+        explode: false
+        in: path
+        name: fileID
+        required: true
+        schema:
+          example: 3f2d23ee214
+          type: string
+        style: simple
+      - description: Batch ID
+        explode: false
+        in: path
+        name: batchID
+        required: true
+        schema:
+          example: "45758063"
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+          description: Batch object
+        404:
+          description: Batch or File not found
+      security:
+      - bearerAuth: []
+      - cookieAuth: []
+      summary: Get a specific Batch on a FIle
+      tags:
+      - ACH Files
+components:
+  schemas:
+    CreateFile:
+      example:
+        batches:
+        - batchControl:
+            entryAddendaCount: 1
+            totalCredit: 100
+            messageAuthentication: 3fe106cf
+            entryHash: 0
+            totalDebit: 100
+            ID: 62d8f0cd
+            ODFIIdentification: "123456789"
+            serviceClassCode: 220
+            companyIdentification: "1"
+            batchNumber: batchNumber
+          entryDetails:
+          - amount: 1235
+            traceNumber: 6
+            individualName: Taylor Swift
+            transactionCode: 22
+            RDFIIdentification: "12345678"
+            addendaRecordIndicator: 1
+            identificationNumber: 8aa786
+            discretionaryData: AB
+            DFIAccountNumber: "181141847"
+            addendum:
+            - typeCode: "02"
+            - typeCode: "02"
+            ID: 842a2261
+            checkDigit: "0"
+            category: Forward
+          - amount: 1235
+            traceNumber: 6
+            individualName: Taylor Swift
+            transactionCode: 22
+            RDFIIdentification: "12345678"
+            addendaRecordIndicator: 1
+            identificationNumber: 8aa786
+            discretionaryData: AB
+            DFIAccountNumber: "181141847"
+            addendum:
+            - typeCode: "02"
+            - typeCode: "02"
+            ID: 842a2261
+            checkDigit: "0"
+            category: Forward
+          batchHeader:
+            companyEntryDescription: PURCHASE
+            effectiveEntryDate: "190102"
+            standardEntryClassCode: PPD
+            originatorStatusCode: 0
+            companyName: Acme Corp
+            ID: 913b5742
+            ODFIIdentification: "12345678"
+            serviceClassCode: 220
+            companyDiscretionaryData: "123456789"
+            companyDescriptiveDate: companyDescriptiveDate
+            batchNumber: batchNumber
+        - batchControl:
+            entryAddendaCount: 1
+            totalCredit: 100
+            messageAuthentication: 3fe106cf
+            entryHash: 0
+            totalDebit: 100
+            ID: 62d8f0cd
+            ODFIIdentification: "123456789"
+            serviceClassCode: 220
+            companyIdentification: "1"
+            batchNumber: batchNumber
+          entryDetails:
+          - amount: 1235
+            traceNumber: 6
+            individualName: Taylor Swift
+            transactionCode: 22
+            RDFIIdentification: "12345678"
+            addendaRecordIndicator: 1
+            identificationNumber: 8aa786
+            discretionaryData: AB
+            DFIAccountNumber: "181141847"
+            addendum:
+            - typeCode: "02"
+            - typeCode: "02"
+            ID: 842a2261
+            checkDigit: "0"
+            category: Forward
+          - amount: 1235
+            traceNumber: 6
+            individualName: Taylor Swift
+            transactionCode: 22
+            RDFIIdentification: "12345678"
+            addendaRecordIndicator: 1
+            identificationNumber: 8aa786
+            discretionaryData: AB
+            DFIAccountNumber: "181141847"
+            addendum:
+            - typeCode: "02"
+            - typeCode: "02"
+            ID: 842a2261
+            checkDigit: "0"
+            category: Forward
+          batchHeader:
+            companyEntryDescription: PURCHASE
+            effectiveEntryDate: "190102"
+            standardEntryClassCode: PPD
+            originatorStatusCode: 0
+            companyName: Acme Corp
+            ID: 913b5742
+            ODFIIdentification: "12345678"
+            serviceClassCode: 220
+            companyDiscretionaryData: "123456789"
+            companyDescriptiveDate: companyDescriptiveDate
+            batchNumber: batchNumber
+        fileControl:
+          blockCount: 1
+          entryAddendaCount: 0
+          totalCredit: 20
+          entryHash: 0
+          totalDebit: 100
+          ID: d1e26288
+          batchCount: 1
+        IATBatches:
+        - IATBatchHeader:
+            companyEntryDescription: GAS BILL
+            ISODestinationCountryCode: US
+            foreignExchangeIndicator: FF
+            ISODestinationCurrencyCode: USD
+            IATIndicator: IATIndicator
+            ISOOriginatingCurrencyCode: USD
+            serviceClassCode: 220
+            foreignExchangeReferenceIndicator: 2
+            effectiveEntryDate: "181231"
+            foreignExchangeReference: foreignExchangeReference
+            standardEntryClassCode: IAT
+            originatorStatusCode: 1
+            ID: a747e53f
+            originatorIdentification: "123456789"
+            ODFIIdentification: "12345678"
+            batchNumber: 1
+          ID: a747e53f
+        - IATBatchHeader:
+            companyEntryDescription: GAS BILL
+            ISODestinationCountryCode: US
+            foreignExchangeIndicator: FF
+            ISODestinationCurrencyCode: USD
+            IATIndicator: IATIndicator
+            ISOOriginatingCurrencyCode: USD
+            serviceClassCode: 220
+            foreignExchangeReferenceIndicator: 2
+            effectiveEntryDate: "181231"
+            foreignExchangeReference: foreignExchangeReference
+            standardEntryClassCode: IAT
+            originatorStatusCode: 1
+            ID: a747e53f
+            originatorIdentification: "123456789"
+            ODFIIdentification: "12345678"
+            batchNumber: 1
+          ID: a747e53f
+        ID: 3f2d23ee214
+        fileHeader:
+          immediateOrigin: "99991234"
+          fileCreationDate: "190102"
+          immediateDestinationName: Federal Reserve Bank
+          immediateDestination: "69100013"
+          fileCreationTime: "1504"
+          immediateOriginName: My Bank Name
+          fileIDModifier: "0"
+      properties:
+        ID:
+          description: File ID
+          example: 3f2d23ee214
+          type: string
+        fileHeader:
+          $ref: '#/components/schemas/FileHeader'
+        batches:
+          items:
+            $ref: '#/components/schemas/Batch'
+          type: array
+        IATBatches:
+          items:
+            $ref: '#/components/schemas/IATBatch'
+          type: array
+        fileControl:
+          $ref: '#/components/schemas/FileControl'
+      required:
+      - fileHeader
+    File:
+      example:
+        batches:
+        - batchControl:
+            entryAddendaCount: 1
+            totalCredit: 100
+            messageAuthentication: 3fe106cf
+            entryHash: 0
+            totalDebit: 100
+            ID: 62d8f0cd
+            ODFIIdentification: "123456789"
+            serviceClassCode: 220
+            companyIdentification: "1"
+            batchNumber: batchNumber
+          entryDetails:
+          - amount: 1235
+            traceNumber: 6
+            individualName: Taylor Swift
+            transactionCode: 22
+            RDFIIdentification: "12345678"
+            addendaRecordIndicator: 1
+            identificationNumber: 8aa786
+            discretionaryData: AB
+            DFIAccountNumber: "181141847"
+            addendum:
+            - typeCode: "02"
+            - typeCode: "02"
+            ID: 842a2261
+            checkDigit: "0"
+            category: Forward
+          - amount: 1235
+            traceNumber: 6
+            individualName: Taylor Swift
+            transactionCode: 22
+            RDFIIdentification: "12345678"
+            addendaRecordIndicator: 1
+            identificationNumber: 8aa786
+            discretionaryData: AB
+            DFIAccountNumber: "181141847"
+            addendum:
+            - typeCode: "02"
+            - typeCode: "02"
+            ID: 842a2261
+            checkDigit: "0"
+            category: Forward
+          batchHeader:
+            companyEntryDescription: PURCHASE
+            effectiveEntryDate: "190102"
+            standardEntryClassCode: PPD
+            originatorStatusCode: 0
+            companyName: Acme Corp
+            ID: 913b5742
+            ODFIIdentification: "12345678"
+            serviceClassCode: 220
+            companyDiscretionaryData: "123456789"
+            companyDescriptiveDate: companyDescriptiveDate
+            batchNumber: batchNumber
+        - batchControl:
+            entryAddendaCount: 1
+            totalCredit: 100
+            messageAuthentication: 3fe106cf
+            entryHash: 0
+            totalDebit: 100
+            ID: 62d8f0cd
+            ODFIIdentification: "123456789"
+            serviceClassCode: 220
+            companyIdentification: "1"
+            batchNumber: batchNumber
+          entryDetails:
+          - amount: 1235
+            traceNumber: 6
+            individualName: Taylor Swift
+            transactionCode: 22
+            RDFIIdentification: "12345678"
+            addendaRecordIndicator: 1
+            identificationNumber: 8aa786
+            discretionaryData: AB
+            DFIAccountNumber: "181141847"
+            addendum:
+            - typeCode: "02"
+            - typeCode: "02"
+            ID: 842a2261
+            checkDigit: "0"
+            category: Forward
+          - amount: 1235
+            traceNumber: 6
+            individualName: Taylor Swift
+            transactionCode: 22
+            RDFIIdentification: "12345678"
+            addendaRecordIndicator: 1
+            identificationNumber: 8aa786
+            discretionaryData: AB
+            DFIAccountNumber: "181141847"
+            addendum:
+            - typeCode: "02"
+            - typeCode: "02"
+            ID: 842a2261
+            checkDigit: "0"
+            category: Forward
+          batchHeader:
+            companyEntryDescription: PURCHASE
+            effectiveEntryDate: "190102"
+            standardEntryClassCode: PPD
+            originatorStatusCode: 0
+            companyName: Acme Corp
+            ID: 913b5742
+            ODFIIdentification: "12345678"
+            serviceClassCode: 220
+            companyDiscretionaryData: "123456789"
+            companyDescriptiveDate: companyDescriptiveDate
+            batchNumber: batchNumber
+        fileControl:
+          blockCount: 1
+          entryAddendaCount: 0
+          totalCredit: 20
+          entryHash: 0
+          totalDebit: 100
+          ID: d1e26288
+          batchCount: 1
+        IATBatches:
+        - IATBatchHeader:
+            companyEntryDescription: GAS BILL
+            ISODestinationCountryCode: US
+            foreignExchangeIndicator: FF
+            ISODestinationCurrencyCode: USD
+            IATIndicator: IATIndicator
+            ISOOriginatingCurrencyCode: USD
+            serviceClassCode: 220
+            foreignExchangeReferenceIndicator: 2
+            effectiveEntryDate: "181231"
+            foreignExchangeReference: foreignExchangeReference
+            standardEntryClassCode: IAT
+            originatorStatusCode: 1
+            ID: a747e53f
+            originatorIdentification: "123456789"
+            ODFIIdentification: "12345678"
+            batchNumber: 1
+          ID: a747e53f
+        - IATBatchHeader:
+            companyEntryDescription: GAS BILL
+            ISODestinationCountryCode: US
+            foreignExchangeIndicator: FF
+            ISODestinationCurrencyCode: USD
+            IATIndicator: IATIndicator
+            ISOOriginatingCurrencyCode: USD
+            serviceClassCode: 220
+            foreignExchangeReferenceIndicator: 2
+            effectiveEntryDate: "181231"
+            foreignExchangeReference: foreignExchangeReference
+            standardEntryClassCode: IAT
+            originatorStatusCode: 1
+            ID: a747e53f
+            originatorIdentification: "123456789"
+            ODFIIdentification: "12345678"
+            batchNumber: 1
+          ID: a747e53f
+        ID: 3f2d23ee214
+        fileHeader:
+          immediateOrigin: "99991234"
+          fileCreationDate: "190102"
+          immediateDestinationName: Federal Reserve Bank
+          immediateDestination: "69100013"
+          fileCreationTime: "1504"
+          immediateOriginName: My Bank Name
+          fileIDModifier: "0"
+      properties:
+        ID:
+          description: File ID
+          example: 3f2d23ee214
+          type: string
+        fileHeader:
+          $ref: '#/components/schemas/FileHeader'
+        batches:
+          items:
+            $ref: '#/components/schemas/Batch'
+          type: array
+        IATBatches:
+          items:
+            $ref: '#/components/schemas/IATBatch'
+          type: array
+        fileControl:
+          $ref: '#/components/schemas/FileControl'
+    FileHeader:
+      example:
+        immediateOrigin: "99991234"
+        fileCreationDate: "190102"
+        immediateDestinationName: Federal Reserve Bank
+        immediateDestination: "69100013"
+        fileCreationTime: "1504"
+        immediateOriginName: My Bank Name
+        fileIDModifier: "0"
+      properties:
+        immediateOrigin:
+          description: contains the Routing Number of the ACH Operator or sending
+            point that is sending the file.
+          example: "99991234"
+          maxLength: 10
+          minLength: 9
+          type: string
+        immediateOriginName:
+          description: The name of the ACH operator or sending point that is sending
+            the file.
+          example: My Bank Name
+          maxLength: 23
+          type: string
+        immediateDestination:
+          description: contains the Routing Number of the ACH Operator or receiving
+            point to which the file is being sent
+          example: "69100013"
+          maxLength: 10
+          minLength: 9
+          type: string
+        immediateDestinationName:
+          description: The name of the ACH or receiving point for which that file
+            is destined.
+          example: Federal Reserve Bank
+          maxLength: 23
+          type: string
+        fileCreationTime:
+          description: The File Creation Date is the date when the file was prepared
+            by an ODFI. (Format HHmm - H=Hour, m=Minute)
+          example: "1504"
+          type: string
+        fileCreationDate:
+          description: The File Creation Time is the time when the file was prepared
+            by an ODFI. (Format YYMMDD - Y=Year, M=Month, D=Day)
+          example: "190102"
+          type: string
+        fileIDModifier:
+          description: Incremented value for each file for RDFI's.
+          example: "0"
+          type: string
+      required:
+      - immediateDestination
+      - immediateDestinationName
+      - immediateOrigin
+      - immediateOriginName
+    FileControl:
+      example:
+        blockCount: 1
+        entryAddendaCount: 0
+        totalCredit: 20
+        entryHash: 0
+        totalDebit: 100
+        ID: d1e26288
+        batchCount: 1
+      properties:
+        ID:
+          description: Moov API File ID
+          example: d1e26288
+          type: string
+        batchCount:
+          description: Count of Batches in the File
+          example: 1
+          type: integer
+        blockCount:
+          description: |
+            BlockCount total number of records in the file (include all headers and trailer) divided by 10 (This number must be evenly divisible by 10. If not, additional records consisting of all 9’s are added to the file after the initial ‘9’ record to fill out the block 10.)
+          example: 1
+          type: integer
+        entryAddendaCount:
+          description: Total detail and addenda records in the file
+          example: 0
+          type: integer
+        entryHash:
+          description: EntryHash calculated in the same manner as the batch has total
+            but includes total from entire file
+          example: 0
+          type: integer
+        totalDebit:
+          description: Accumulated Batch debit totals within the file.
+          example: 100
+          type: integer
+        totalCredit:
+          description: Accumulated Batch credit totals within the file.
+          example: 20
+          type: integer
+    RawFile:
+      description: Plaintext ACH file
+      example: 101 222380104 1210428821805100000A094101Citadel                Bank
+        Name
+      type: string
+    Files:
+      items:
+        $ref: '#/components/schemas/File'
+      type: array
+    Batch:
+      example:
+        batchControl:
+          entryAddendaCount: 1
+          totalCredit: 100
+          messageAuthentication: 3fe106cf
+          entryHash: 0
+          totalDebit: 100
+          ID: 62d8f0cd
+          ODFIIdentification: "123456789"
+          serviceClassCode: 220
+          companyIdentification: "1"
+          batchNumber: batchNumber
+        entryDetails:
+        - amount: 1235
+          traceNumber: 6
+          individualName: Taylor Swift
+          transactionCode: 22
+          RDFIIdentification: "12345678"
+          addendaRecordIndicator: 1
+          identificationNumber: 8aa786
+          discretionaryData: AB
+          DFIAccountNumber: "181141847"
+          addendum:
+          - typeCode: "02"
+          - typeCode: "02"
+          ID: 842a2261
+          checkDigit: "0"
+          category: Forward
+        - amount: 1235
+          traceNumber: 6
+          individualName: Taylor Swift
+          transactionCode: 22
+          RDFIIdentification: "12345678"
+          addendaRecordIndicator: 1
+          identificationNumber: 8aa786
+          discretionaryData: AB
+          DFIAccountNumber: "181141847"
+          addendum:
+          - typeCode: "02"
+          - typeCode: "02"
+          ID: 842a2261
+          checkDigit: "0"
+          category: Forward
+        batchHeader:
+          companyEntryDescription: PURCHASE
+          effectiveEntryDate: "190102"
+          standardEntryClassCode: PPD
+          originatorStatusCode: 0
+          companyName: Acme Corp
+          ID: 913b5742
+          ODFIIdentification: "12345678"
+          serviceClassCode: 220
+          companyDiscretionaryData: "123456789"
+          companyDescriptiveDate: companyDescriptiveDate
+          batchNumber: batchNumber
+      properties:
+        batchHeader:
+          $ref: '#/components/schemas/BatchHeader'
+        entryDetails:
+          items:
+            $ref: '#/components/schemas/EntryDetail'
+          type: array
+        batchControl:
+          $ref: '#/components/schemas/BatchControl'
+    BatchHeader:
+      example:
+        companyEntryDescription: PURCHASE
+        effectiveEntryDate: "190102"
+        standardEntryClassCode: PPD
+        originatorStatusCode: 0
+        companyName: Acme Corp
+        ID: 913b5742
+        ODFIIdentification: "12345678"
+        serviceClassCode: 220
+        companyDiscretionaryData: "123456789"
+        companyDescriptiveDate: companyDescriptiveDate
+        batchNumber: batchNumber
+      properties:
+        ID:
+          description: Batch Header ID
+          example: 913b5742
+          type: string
+        serviceClassCode:
+          description: Service Class Code - ACH Credits Only 220 and ACH Debits Only
+            225
+          example: 220
+          type: integer
+        companyName:
+          description: Company originating the entries in the batch
+          example: Acme Corp
+          type: string
+        companyDiscretionaryData:
+          description: The 9 digit FEIN number (proceeded by a predetermined alpha
+            or numeric character) of the entity in the company name field
+          example: "123456789"
+          type: string
+        standardEntryClassCode:
+          description: Identifies the payment type (product) found within an ACH batch-using
+            a 3-character code.
+          example: PPD
+          type: string
+        companyEntryDescription:
+          description: |
+            A description of the entries contained in the batch.
+            The Originator establishes the value of this field to provide a description of the purpose of the entry to be displayed back to the receive For example, "GAS BILL," "REG. SALARY," "INS. PREM,", "SOC. SEC.," "DTC," "TRADE PAY," "PURCHASE," etc.
+            This field must contain the word "REVERSAL" (left justified) when the batch contains reversing entries.
+            This field must contain the word "RECLAIM" (left justified) when the batch contains reclamation entries.
+            This field must contain the word "NONSETTLED" (left justified) when the batch contains entries which could not settle.
+          example: PURCHASE
+          type: string
+        companyDescriptiveDate:
+          description: |
+            The Originator establishes this field as the date it would like to see displayed to the receiver for descriptive purposes. This field is never used to control timing of any computer or manual operation. It is solely for descriptive purposes. The RDFI should not assume any specific format.
+          type: string
+        effectiveEntryDate:
+          description: Date on which the entries are to settle. Format YYMMDD (Y=Year,
+            M=Month, D=Day)
+          example: "190102"
+          type: string
+        originatorStatusCode:
+          description: |
+            ODFI initiating the Entry.
+            0 ADV File prepared by an ACH Operator.
+            1 This code identifies the Originator as a depository financial institution.
+            2 This code identifies the Originator as a Federal Government entity or agency.
+          type: integer
+        ODFIIdentification:
+          description: First 8 digits of the originating DFI transit routing number
+          example: "12345678"
+          type: string
+        batchNumber:
+          description: |
+            BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
+          type: string
+      required:
+      - ODFIIdentification
+      - companyIdentification
+      - companyName
+      - serviceClassCode
+    BatchControl:
+      example:
+        entryAddendaCount: 1
+        totalCredit: 100
+        messageAuthentication: 3fe106cf
+        entryHash: 0
+        totalDebit: 100
+        ID: 62d8f0cd
+        ODFIIdentification: "123456789"
+        serviceClassCode: 220
+        companyIdentification: "1"
+        batchNumber: batchNumber
+      properties:
+        ID:
+          description: Batch ID
+          example: 62d8f0cd
+          type: string
+        serviceClassCode:
+          description: Same as ServiceClassCode in BatchHeaderRecord
+          example: 220
+          type: integer
+        entryAddendaCount:
+          description: EntryAddendaCount is a tally of each Entry Detail Record and
+            each Addenda Record processed, within either the batch or file as appropriate.
+          example: 1
+          type: integer
+        entryHash:
+          description: |
+            Validate the Receiving DFI Identification in each Entry Detail Record is hashed to provide a check against inadvertent alteration of data contents due to hardware failure or program error.
+            In this context the Entry Hash is the sum of the corresponding fields in the Entry Detail Records on the file.
+          example: 0
+          type: integer
+        totalDebit:
+          description: Contains accumulated Entry debit totals within the batch.
+          example: 100
+          type: integer
+        totalCredit:
+          description: Contains accumulated Entry credit totals within the batch.
+          example: 100
+          type: integer
+        companyIdentification:
+          description: |
+            Alphanumeric code used to identify an Originator The Company Identification Field must be included on all prenotification records and on each entry initiated pursuant to such prenotification. The Company ID may begin with the ANSI one-digit Identification Code Designator (ICD), followed by the identification number The ANSI Identification Numbers and related Identification Code
+            IRS Employer Identification Number (EIN) "1"
+            Data Universal Numbering Systems (DUNS) "3"
+            User Assigned Number "9"
+          example: "1"
+          type: string
+        messageAuthentication:
+          description: MAC is an eight character code derived from a special key used
+            in conjunction with the DES algorithm. The purpose of the MAC is to validate
+            the authenticity of ACH entries. The DES algorithm and key message standards
+            must be in accordance with standards adopted by the American National
+            Standards Institute. The remaining eleven characters of this field are
+            blank.
+          example: 3fe106cf
+          type: string
+        ODFIIdentification:
+          description: The routing number is used to identify the DFI originating
+            entries within a given branch.
+          example: "123456789"
+          type: string
+        batchNumber:
+          description: BatchNumber is assigned in ascending sequence to each batch
+            by the ODFI or its Sending Point in a given file of entries. Since the
+            batch number in the Batch Header Record and the Batch Control Record is
+            the same, the ascending sequence number should be assigned by batch and
+            not by record.
+          type: string
+    Batches:
+      items:
+        $ref: '#/components/schemas/Batch'
+      type: array
+    EntryDetail:
+      example:
+        amount: 1235
+        traceNumber: 6
+        individualName: Taylor Swift
+        transactionCode: 22
+        RDFIIdentification: "12345678"
+        addendaRecordIndicator: 1
+        identificationNumber: 8aa786
+        discretionaryData: AB
+        DFIAccountNumber: "181141847"
+        addendum:
+        - typeCode: "02"
+        - typeCode: "02"
+        ID: 842a2261
+        checkDigit: "0"
+        category: Forward
+      properties:
+        ID:
+          description: Entry Detail ID
+          example: 842a2261
+          type: string
+        transactionCode:
+          description: |
+            transactionCode if the receivers account is:
+            Credit (deposit) to checking account 22
+            Prenote for credit to checking account 23
+            Debit (withdrawal) to checking account 27
+            Prenote for debit to checking account 28
+            Credit to savings account 32
+            Prenote for credit to savings account 33
+            Debit to savings account 37
+            Prenote for debit to savings account 38
+          example: 22
+          type: integer
+        RDFIIdentification:
+          description: RDFI's routing number without the last digit.
+          example: "12345678"
+          type: string
+        checkDigit:
+          description: Last digit in RDFI routing number.
+          example: "0"
+          type: string
+        DFIAccountNumber:
+          description: |
+            The receiver's bank account number you are crediting/debiting. It important to note that this is an alphanumeric field, so its space padded, no zero padded
+          example: "181141847"
+          type: string
+        amount:
+          description: Number of cents you are debiting/crediting this account
+          example: 1235
+          type: integer
+        identificationNumber:
+          description: Internal identification (alphanumeric) that you use to uniquely
+            identify this Entry Detail Record
+          example: 8aa786
+          type: string
+        individualName:
+          description: The name of the receiver, usually the name on the bank account
+          example: Taylor Swift
+          type: string
+        discretionaryData:
+          description: |
+            DiscretionaryData allows ODFIs to include codes, of significance only to them, to enable specialized handling of the entry. There will be no standardized interpretation for the value of this field. It can either be a single two-character code, or two distinct one-character codes, according to the needs of the ODFI and/or Originator involved. This field must be returned intact for any returned entry.
+            WEB uses the Discretionary Data Field as the Payment Type Code
+          example: AB
+          type: string
+        addendaRecordIndicator:
+          description: |
+            AddendaRecordIndicator indicates the existence of an Addenda Record. A value of "1" indicates that one ore more addenda records follow, and "0" means no such record is present.
+          example: 1
+          type: integer
+        traceNumber:
+          description: |
+            TraceNumber assigned by the ODFI in ascending sequence, is included in each Entry Detail Record, Corporate Entry Detail Record, and addenda Record.
+            Trace Numbers uniquely identify each entry within a batch in an ACH input file. In association with the Batch Number, transmission (File Creation) Date, and File ID Modifier, the Trace Number uniquely identifies an entry within a given file.
+            For addenda Records, the Trace Number will be identical to the Trace Number in the associated Entry Detail Record, since the Trace Number is associated with an entry or item rather than a physical record.
+          type: integer
+        addendum:
+          description: List of Addenda for the Entry Detail
+          items:
+            $ref: '#/components/schemas/Addendum'
+          type: array
+        category:
+          description: Category defines if the entry is a Forward, Return, or NOC
+          example: Forward
+          type: string
+      required:
+      - DFIAccountNumber
+      - RDFIIdentification
+      - amount
+      - checkDigit
+      - id
+      - individualName
+      - transactionCode
+    Addendum:
+      example:
+        typeCode: "02"
+      properties:
+        typeCode:
+          description: TODO
+          example: "02"
+          type: string
+      required:
+      - typeCode
+    IATBatch:
+      example:
+        IATBatchHeader:
+          companyEntryDescription: GAS BILL
+          ISODestinationCountryCode: US
+          foreignExchangeIndicator: FF
+          ISODestinationCurrencyCode: USD
+          IATIndicator: IATIndicator
+          ISOOriginatingCurrencyCode: USD
+          serviceClassCode: 220
+          foreignExchangeReferenceIndicator: 2
+          effectiveEntryDate: "181231"
+          foreignExchangeReference: foreignExchangeReference
+          standardEntryClassCode: IAT
+          originatorStatusCode: 1
+          ID: a747e53f
+          originatorIdentification: "123456789"
+          ODFIIdentification: "12345678"
+          batchNumber: 1
+        ID: a747e53f
+      properties:
+        ID:
+          description: Client defined string used as a reference to this record.
+          example: a747e53f
+          type: string
+        IATBatchHeader:
+          $ref: '#/components/schemas/IATBatchHeader'
+    IATBatchHeader:
+      example:
+        companyEntryDescription: GAS BILL
+        ISODestinationCountryCode: US
+        foreignExchangeIndicator: FF
+        ISODestinationCurrencyCode: USD
+        IATIndicator: IATIndicator
+        ISOOriginatingCurrencyCode: USD
+        serviceClassCode: 220
+        foreignExchangeReferenceIndicator: 2
+        effectiveEntryDate: "181231"
+        foreignExchangeReference: foreignExchangeReference
+        standardEntryClassCode: IAT
+        originatorStatusCode: 1
+        ID: a747e53f
+        originatorIdentification: "123456789"
+        ODFIIdentification: "12345678"
+        batchNumber: 1
+      properties:
+        ID:
+          description: ID is a client defined string used as a reference to this record.
+          example: a747e53f
+          type: string
+        serviceClassCode:
+          description: |
+            ServiceClassCode ACH Mixed Debits and Credits ‘200’
+            ACH Credits Only ‘220’
+            ACH Debits Only ‘225'
+          example: 220
+          type: integer
+        IATIndicator:
+          description: Leave Blank. Only used for corrected IAT entries
+          type: string
+        foreignExchangeIndicator:
+          description: |
+            Code indicating currency conversion.
+            FV Fixed-to-Variable – Entry is originated in a fixed-value amount and is to be received in a variable amount resulting from the execution of the foreign exchange conversion.
+            VF Variable-to-Fixed – Entry is originated in a variable-value amount based on a specific foreign exchange rate for conversion to a fixed-value amount in which the entry is to be received.
+            FF Fixed-to-Fixed – Entry is originated in a fixed-value amount and is to be received in the same fixed-value amount in the same currency denomination. There is no foreign exchange conversion for entries transmitted using this code. For entries originated in a fixed value amount, the foreign Exchange Reference Field will be space filled.
+          example: FF
+          type: string
+        foreignExchangeReferenceIndicator:
+          description: |
+            Code used to indicate the content of the Foreign Exchange Reference Field and is filled by the gateway operator. Valid entries are
+            1 - Foreign Exchange Rate;
+            2 - Foreign Exchange Reference Number; or
+            3 - Space Filled
+          example: 2
+          type: integer
+        foreignExchangeReference:
+          description: |
+            Contains either the foreign exchange rate used to execute the foreign exchange conversion of a cross-border entry or another reference to the foreign exchange transaction.
+          type: string
+        ISODestinationCountryCode:
+          description: Two-character code, as approved by the International Organization
+            for Standardization (ISO), to identify the country in which the entry
+            is to be received. For United States use US.
+          example: US
+          type: string
+        originatorIdentification:
+          description: |
+            For U.S. entities: the number assigned will be your tax ID (often Social Security Number)
+            For non-U.S. entities: the number assigned will be your DDA number, or the last 9 characters of your account number if it exceeds 9 characters
+          example: "123456789"
+          type: string
+        standardEntryClassCode:
+          description: |
+            StandardEntryClassCode for consumer and non consumer international payments is IAT.
+            Identifies the payment type (product) found within an ACH batch-using a 3-character code.
+            The SEC Code pertains to all items within batch.
+            Determines format of the detail records.
+            Determines addenda records (required or optional PLUS one or up to 9,999 records).
+            Determines rules to follow (return time frames).
+            Some SEC codes require specific data in predetermined fields within the ACH record
+          example: IAT
+          type: string
+        companyEntryDescription:
+          description: |
+            A description of the entries contained in the batch
+            The Originator establishes the value of this field to provide a description of the purpose of the entry to be displayed back to the receive For example, "GAS BILL," "REG. SALARY," "INS. PREM," "SOC. SEC.," "DTC," "TRADE PAY," "PURCHASE," etc.
+            This field must contain the word "REVERSAL" (left justified) when the batch contains reversing entries.
+            This field must contain the word "RECLAIM" (left justified) when the batch contains reclamation entries.
+            This field must contain the word "NONSETTLED" (left justified) when the batch contains entries which could not settle.
+          example: GAS BILL
+          type: string
+        ISOOriginatingCurrencyCode:
+          description: |
+            Three-character code, as approved by the International Organization for Standardization (ISO), to identify the currency denomination in which the entry was first originated. If the source of funds is within the territorial jurisdiction of the U.S., enter 'USD', otherwise refer to International Organization for Standardization website for value: www.iso.org
+          example: USD
+          type: string
+        ISODestinationCurrencyCode:
+          description: |
+            ISODestinationCurrencyCode is the three-character code, as approved by the International Organization for Standardization (ISO), to identify the currency denomination in which the entry will ultimately be settled. If the final destination of funds is within the territorial jurisdiction of the U.S., enter “USD”, otherwise refer to International Organization for Standardization website for value: www.iso.org
+          example: USD
+          type: string
+        effectiveEntryDate:
+          description: |
+            EffectiveEntryDate the date on which the entries are to settle format YYMMDD (Y=Year, M=Month, D=Day)
+          example: "181231"
+          type: string
+        originatorStatusCode:
+          description: |
+            SettlementDate Leave blank, this field is inserted by the ACH operator settlementDate string OriginatorStatusCode refers to the ODFI initiating the Entry.
+            0 ADV File prepared by an ACH Operator.
+            1 This code identifies the Originator as a depository financial institution.
+            2 This code identifies the Originator as a Federal Government entity or agency.
+          example: 1
+          type: integer
+        ODFIIdentification:
+          description: |
+            ODFIIdentification First 8 digits of the originating DFI transit routing number for Inbound IAT Entries, this field contains the routing number of the U.S. Gateway Operator.  For Outbound IAT Entries, this field contains the standard routing number, as assigned by Accuity, that identifies the U.S. ODFI initiating the Entry. Format - TTTTAAAA
+          example: "12345678"
+          type: string
+        batchNumber:
+          description: |
+            BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
+          example: 1
+          type: integer
+    Error:
+      properties:
+        error:
+          description: An error message describing the problem intended for humans.
+          example: Validation error(s) present.
+          type: string
+      required:
+      - error

@@ -52,5 +52,7 @@ test/fuzz-reader/suppressions
 test/fuzz-reader/*.zip
 test/fuzz-reader/corpus/*.tar.gz
 
+openapi-generator*.jar
+
 go-licenser*.tar.gz
 go-licenser
