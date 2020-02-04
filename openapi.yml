@@ -108,7 +108,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
   /files/{fileID}:
     get:
       tags: ['ACH Files']
@@ -192,7 +192,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
     delete:
       tags: ['ACH Files']
       summary: Permanently deletes a File and associated Batches. It cannot be undone.
@@ -966,11 +966,3 @@ components:
             BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
           type: integer
           example: 1
-    Error:
-      required:
-        - error
-      properties:
-        error:
-          type: string
-          description: An error message describing the problem intended for humans.
-          example: Validation error(s) present.
