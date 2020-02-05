@@ -183,6 +183,16 @@ func (fh *FileHeader) String() string {
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops the parsing.
 func (fh *FileHeader) Validate() error {
+	return fh.ValidateWith(nil)
+}
+
+// ValidateWith performs NACHA format rule checks on each record according to their specification
+// overlayed with any custom flags.
+// The first error encountered is returned and stops the parsing.
+func (fh *FileHeader) ValidateWith(opts *ValidateOpts) error {
+	if opts == nil {
+		opts = &ValidateOpts{}
+	}
 	if err := fh.fieldInclusion(); err != nil {
 		return err
 	}
@@ -207,8 +217,16 @@ func (fh *FileHeader) Validate() error {
 	if err := fh.isAlphanumeric(fh.ImmediateDestinationName); err != nil {
 		return fieldError("ImmediateDestinationName", err, fh.ImmediateDestinationName)
 	}
-	if fh.ImmediateOrigin == "0000000000" {
-		return fieldError("ImmediateOrigin", ErrConstructor, fh.ImmediateOrigin)
+	if !opts.BypassOriginValidation {
+		if opts.RequireABAOrigin {
+			if err := CheckRoutingNumber(fh.ImmediateOrigin); err != nil {
+				return fieldError("ImmediateOrigin", ErrConstructor, fh.ImmediateOrigin)
+			}
+		} else {
+			if fh.ImmediateOrigin == "0000000000" {
+				return fieldError("ImmediateOrigin", ErrConstructor, fh.ImmediateOrigin)
+			}
+		}
 	}
 	if fh.ImmediateDestination == "000000000" {
 		return fieldError("ImmediateDestination", ErrConstructor, fh.ImmediateDestination)

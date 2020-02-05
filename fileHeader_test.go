@@ -712,3 +712,29 @@ func BenchmarkFileHeaderCreationTime(b *testing.B) {
 		testFileHeaderCreationTime(b)
 	}
 }
+
+func TestFileHeader__ValidateOrigin(t *testing.T) {
+	fh := mockFileHeader()
+	fh.ImmediateOrigin = "0000000000"
+
+	err := fh.ValidateWith(&ValidateOpts{
+		RequireABAOrigin: true,
+	})
+	if err != nil {
+		if !strings.Contains(err.Error(), ErrConstructor.Error()) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+
+	err = fh.ValidateWith(&ValidateOpts{})
+	if err == nil {
+		t.Error("expected error")
+	}
+
+	err = fh.ValidateWith(&ValidateOpts{
+		BypassOriginValidation: true,
+	})
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
