@@ -1066,7 +1066,7 @@ func (b *Batch) upsertOffsets() error {
 
 	// Create our debit offset EntryDetail
 	debitED := createOffsetEntryDetail(b.offset, b)
-	debitED.TraceNumber = strconv.Itoa(largestTraceNumber(b.Entries) + 1)
+	debitED.TraceNumber = strconv.Itoa(lastTraceNumber(b.Entries) + 1)
 	debitED.Amount = b.Control.TotalCreditEntryDollarAmount
 	switch b.offset.AccountType {
 	case OffsetChecking:
@@ -1080,7 +1080,7 @@ func (b *Batch) upsertOffsets() error {
 
 	// Create our credit offset EntryDetail
 	creditED := createOffsetEntryDetail(b.offset, b)
-	creditED.TraceNumber = strconv.Itoa(largestTraceNumber(b.Entries) + 2)
+	creditED.TraceNumber = strconv.Itoa(lastTraceNumber(b.Entries) + 2)
 	creditED.Amount = b.Control.TotalDebitEntryDollarAmount
 	switch b.offset.AccountType {
 	case OffsetChecking:
@@ -1144,7 +1144,7 @@ func aba8(rtn string) string {
 	}
 }
 
-func largestTraceNumber(entries []*EntryDetail) int {
+func lastTraceNumber(entries []*EntryDetail) int {
 	if len(entries) == 0 {
 		return 0
 	}

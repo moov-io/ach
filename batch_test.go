@@ -1108,9 +1108,9 @@ func TestBatchABA8(t *testing.T) {
 	}
 }
 
-func TestBatch__largestTraceNumber(t *testing.T) {
-	if n := largestTraceNumber(nil); n != 0 {
-		t.Errorf("largestTraceNumber=%d", n)
+func TestBatch__lastTraceNumber(t *testing.T) {
+	if n := lastTraceNumber(nil); n != 0 {
+		t.Errorf("lastTraceNumber=%d", n)
 	}
 
 	var entries []*EntryDetail
@@ -1120,8 +1120,8 @@ func TestBatch__largestTraceNumber(t *testing.T) {
 	entries = append(entries, &EntryDetail{
 		TraceNumber: "1244",
 	})
-	if n := largestTraceNumber(entries); n != 1244 {
-		t.Errorf("largestTraceNumber=%d", n)
+	if n := lastTraceNumber(entries); n != 1244 {
+		t.Errorf("lastTraceNumber=%d", n)
 	}
 
 	// invalid TraceNumber
@@ -1130,8 +1130,8 @@ func TestBatch__largestTraceNumber(t *testing.T) {
 			TraceNumber: "AA",
 		},
 	}
-	if n := largestTraceNumber(entries); n != 0 {
-		t.Errorf("largestTraceNumber=%d", n)
+	if n := lastTraceNumber(entries); n != 0 {
+		t.Errorf("lastTraceNumber=%d", n)
 	}
 }
 
@@ -1231,7 +1231,7 @@ func TestBatch__CalculateBalancedOffsetDebitAndCredit(t *testing.T) {
 	// Add another EntryDetail
 	ed := mockEntryDetail()
 	ed.Amount = 500
-	ed.TraceNumber = strconv.Itoa(largestTraceNumber([]*EntryDetail{ed}) + 1)
+	ed.TraceNumber = strconv.Itoa(lastTraceNumber([]*EntryDetail{ed}) + 1)
 	b.AddEntry(ed)
 
 	if err := b.Create(); err != nil {
