@@ -1719,11 +1719,9 @@ func TestFile_FlattenFileOneBatchHeader(t *testing.T) {
 	}
 
 	ff, err := achFile.FlattenBatches()
-
 	if err != nil {
 		t.Fatalf("Could not flatten the file: %+v \n", err)
 	}
-
 	if err := ff.Validate(); err != nil {
 		t.Fatalf("Flattend file did not validate: %+v \n", err)
 	}
@@ -1744,7 +1742,6 @@ func TestFileFlattenFileMultipleBatchHeaders(t *testing.T) {
 	}
 
 	ff, err := achFile.FlattenBatches()
-
 	if err != nil {
 		t.Fatalf("Could not flatten the file: %+v \n", err)
 	}
