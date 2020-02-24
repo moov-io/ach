@@ -846,7 +846,6 @@ func (f *File) segmentFileBatches(creditFile, debitFile *File) {
 
 				entries := batch.GetEntries()
 				for _, entry := range entries {
-					entry.TraceNumber = "" // unset so Batch.build generates a TraceNumber
 					segmentFileBatchAddEntry(creditBatch, debitBatch, entry)
 				}
 
@@ -969,8 +968,6 @@ func (f *File) addFileHeaderData(file *File) *File {
 // segmentFileBatchAddEntry adds entries to batches in a segmented file
 // Applies to All SEC Codes except ADV (Automated Accounting Advice)
 func segmentFileBatchAddEntry(creditBatch, debitBatch Batcher, entry *EntryDetail) {
-
-	entry.TraceNumber = "" // unset so Batch.build generates a TraceNumber
 	switch entry.TransactionCode {
 	case CheckingCredit, CheckingReturnNOCCredit, CheckingPrenoteCredit, CheckingZeroDollarRemittanceCredit,
 		SavingsCredit, SavingsReturnNOCCredit, SavingsPrenoteCredit, SavingsZeroDollarRemittanceCredit,
