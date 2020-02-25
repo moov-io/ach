@@ -17,7 +17,7 @@ func dumpFiles(paths []string) error {
 		if i > 0 {
 			fmt.Println("") // extra newline between multiple ACH files
 		}
-		fmt.Printf("Describing ACH file '%s'\n", paths[i])
+		fmt.Printf("Describing ACH file '%s'\n\n", paths[i])
 		file, err := readACHFile(paths[i])
 		if err != nil {
 			return fmt.Errorf("problem reading %s: %v", paths[i], err)
@@ -28,14 +28,18 @@ func dumpFiles(paths []string) error {
 }
 
 func dumpFile(file *ach.File) {
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	defer w.Flush()
 
-	fh := file.Header
+	fh, fc := file.Header, file.Control
 
 	// FileHeader
-	fmt.Fprintln(w, "  Origin\tOriginName\tDestination\tDestinationName")
-	fmt.Fprintln(w, fmt.Sprintf("  %s\t%s\t%s\t%s\t", fh.ImmediateOrigin, fh.ImmediateOriginName, fh.ImmediateDestination, fh.ImmediateDestinationName))
+	fmt.Fprintln(w, "  Origin\tOriginName\tDestination\tDestinationName\tFileCreationDate\tFileCreationTime")
+	fmt.Fprintln(w, fmt.Sprintf("  %s\t%s\t%s\t%s\t%s\t%s", fh.ImmediateOrigin, fh.ImmediateOriginName, fh.ImmediateDestination, fh.ImmediateDestinationName, fh.FileCreationDate, fh.FileCreationTime))
+
+	// FileControl
+	fmt.Fprintln(w, "\n  BatchCount\tBlockCount\tEntryAddendaCount\tTotalDebitAmount\tTotalCreditAmount")
+	fmt.Fprintln(w, fmt.Sprintf("  %d\t%d\t%d\t%d\t%d", fc.BatchCount, fc.BlockCount, fc.EntryAddendaCount, fc.TotalDebitEntryDollarAmountInFile, fc.TotalCreditEntryDollarAmountInFile))
 
 	// Batches
 	for i := range file.Batches {
