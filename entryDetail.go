@@ -26,7 +26,7 @@ import (
 
 // EntryDetail contains the actual transaction data for an individual entry.
 // Fields include those designating the entry as a deposit (credit) or
-// withdrawal (debit), the transit routing number for the entry recipient’s financial
+// withdrawal (debit), the transit routing number for the entry recipient's financial
 // institution, the account number (left justify,no zero fill), name, and dollar amount.
 type EntryDetail struct {
 	// ID is a client defined string used as a reference to this record.

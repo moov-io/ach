@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Generated on 2019-08-29T10:11:56Z by adam, any modifications will be overwritten
+// Generated on 2020-02-26T02:00:23Z by adam, any modifications will be overwritten
 package iso4217
 
 var currencyCodes = map[string]bool{
@@ -169,7 +169,7 @@ var currencyCodes = map[string]bool{
 	"TJS": true, // Somoni
 	"TZS": true, // Tanzanian Shilling
 	"THB": true, // Baht
-	"TOP": true, // Pa’anga
+	"TOP": true, // Pa'anga
 	"TTD": true, // Trinidad and Tobago Dollar
 	"TND": true, // Tunisian Dinar
 	"TRY": true, // Turkish Lira

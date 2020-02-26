@@ -574,7 +574,7 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 	return f.isEntryHash(true)
 }
 
-// isEntryAddendaCount is prepared by hashing the RDFI’s 8-digit Routing Number in each entry.
+// isEntryAddendaCount is prepared by hashing the RDFI's 8-digit Routing Number in each entry.
 // The Entry Hash provides a check against inadvertent alteration of data
 func (f *File) isEntryAddendaCount(IsADV bool) error {
 	// IsADV

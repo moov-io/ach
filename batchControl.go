@@ -31,9 +31,9 @@ type BatchControl struct {
 	ID string `json:"id"`
 	// RecordType defines the type of record in the block.
 	recordType string
-	// ServiceClassCode ACH Mixed Debits and Credits ‘200’
-	// ACH Credits Only ‘220’
-	// ACH Debits Only ‘225'
+	// ServiceClassCode ACH Mixed Debits and Credits '200'
+	// ACH Credits Only '220'
+	// ACH Debits Only '225'
 	// Constants: MixedCreditsAnDebits (220), CReditsOnly 9220), DebitsOnly (225)
 	// Same as 'ServiceClassCode' in BatchHeaderRecord
 	ServiceClassCode int `json:"serviceClassCode"`

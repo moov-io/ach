@@ -292,9 +292,9 @@ func (v *validator) isTransactionCode(code int) error {
 
 		// Automated Return or Notification of Change for original transaction code '22', '23, '24'
 		CheckingReturnNOCCredit,
-		// Credit (deposit) to checking account ‘22’
+		// Credit (deposit) to checking account '22'
 		CheckingCredit,
-		// Prenote for credit to checking account ‘23’
+		// Prenote for credit to checking account '23'
 		CheckingPrenoteCredit,
 		// Zero dollar with remittance data
 		CheckingZeroDollarRemittanceCredit,
@@ -303,9 +303,9 @@ func (v *validator) isTransactionCode(code int) error {
 
 		// Automated Return or Notification of Change for original transaction code 27, 28, or 29
 		CheckingReturnNOCDebit,
-		// Debit (withdrawal) to checking account ‘27’
+		// Debit (withdrawal) to checking account '27'
 		CheckingDebit,
-		// Prenote for debit to checking account ‘28’
+		// Prenote for debit to checking account '28'
 		CheckingPrenoteDebit,
 		// Zero dollar with remittance data (for CCD, CTX, and IAT Entries only)
 		CheckingZeroDollarRemittanceDebit,
@@ -314,9 +314,9 @@ func (v *validator) isTransactionCode(code int) error {
 
 		// Return or Notification of Change for original transaction code 32, 33, or 34
 		SavingsReturnNOCCredit,
-		// Credit to savings account ‘32’
+		// Credit to savings account '32'
 		SavingsCredit,
-		// Prenote for credit to savings account ‘33’
+		// Prenote for credit to savings account '33'
 		SavingsPrenoteCredit,
 		// Zero dollar with remittance data (for CCD, CTX, and IAT Entries only); Acknowledgment Entries (ACK and ATX Entries only)
 		SavingsZeroDollarRemittanceCredit,
@@ -325,9 +325,9 @@ func (v *validator) isTransactionCode(code int) error {
 
 		// Automated Return or Notification of Change for original transaction code '37', '38', '39
 		SavingsReturnNOCDebit,
-		// Debit to savings account ‘37’
+		// Debit to savings account '37'
 		SavingsDebit,
-		// Prenote for debit to savings account ‘38’
+		// Prenote for debit to savings account '38'
 		SavingsPrenoteDebit,
 		// Zero dollar with remittance data
 		SavingsZeroDollarRemittanceDebit,

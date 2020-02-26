@@ -30,11 +30,11 @@ type ADVFileControl struct {
 	// RecordType defines the type of record in the block. fileControlPos 9
 	recordType string
 
-	// BatchCount total number of batches (i.e., ‘5’ records) in the file
+	// BatchCount total number of batches (i.e., '5' records) in the file
 	BatchCount int `json:"batchCount"`
 
 	// BlockCount total number of records in the file (include all headers and trailer) divided
-	// by 10 (This number must be evenly divisible by 10. If not, additional records consisting of all 9’s are added to the file after the initial ‘9’ record to fill out the block 10.)
+	// by 10 (This number must be evenly divisible by 10. If not, additional records consisting of all 9's are added to the file after the initial '9' record to fill out the block 10.)
 	BlockCount int `json:"blockCount,omitempty"`
 
 	// EntryAddendaCount total detail and addenda records in the file

@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Generated on 2019-08-29T10:11:53Z by adam, any modifications will be overwritten
+// Generated on 2020-02-26T02:00:21Z by adam, any modifications will be overwritten
 package iso3166
 
 var countryCodes = map[string]bool{

@@ -25,11 +25,11 @@ import (
 // IATBatch holds the Batch Header and Batch Control and all Entry Records for an IAT batch
 //
 // An IAT entry is a credit or debit ACH entry that is part of a payment transaction involving
-// a financial agency’s office (i.e., depository financial institution or business issuing money
+// a financial agency's office (i.e., depository financial institution or business issuing money
 // orders) that is not located in the territorial jurisdiction of the United States. IAT entries
 // can be made to or from a corporate or consumer account and must be accompanied by seven (7)
 // mandatory addenda records identifying the name and physical address of the Originator, name
-// and physical address of the Receiver, Receiver’s account number, Receiver’s bank identity and
+// and physical address of the Receiver, Receiver's account number, Receiver's bank identity and
 // reason for the payment.
 type IATBatch struct {
 	// ID is a client defined string used as a reference to this record.
