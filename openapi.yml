@@ -550,6 +550,12 @@ components:
             $ref: '#/components/schemas/IATBatch'
         fileControl:
           $ref: '#/components/schemas/FileControl'
+        advEntryDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/ADVEntryDetail'
+        advBatchControl:
+          $ref: '#/components/schemas/ADVBatchControl'
       required:
         - fileHeader
     File:
@@ -570,8 +576,14 @@ components:
             $ref: '#/components/schemas/IATBatch'
         fileControl:
           $ref: '#/components/schemas/FileControl'
-        # NotificationOfChange: # TODO(adam)
-        # ReturnEntries: # TODO(adam)
+        NotificationOfChange:
+          type: array
+          items:
+            $ref: '#/components/schemas/Batch'
+        ReturnEntries:
+          type: array
+          items:
+            $ref: '#/components/schemas/Batch'
     FileHeader:
       properties:
         immediateOrigin:
@@ -625,7 +637,7 @@ components:
           example: 1
         blockCount:
           description: |
-            BlockCount total number of records in the file (include all headers and trailer) divided by 10 (This number must be evenly divisible by 10. If not, additional records consisting of all 9’s are added to the file after the initial ‘9’ record to fill out the block 10.)
+            BlockCount total number of records in the file (include all headers and trailer) divided by 10 (This number must be evenly divisible by 10. If not, additional records consisting of all 9's are added to the file after the initial '9' record to fill out the block 10.)
           type: integer
           example: 1
         entryAddendaCount:
@@ -662,6 +674,8 @@ components:
             $ref: '#/components/schemas/EntryDetail'
         batchControl:
           $ref: '#/components/schemas/BatchControl'
+        offset:
+          $ref: '#/components/schemas/Offset'
     BatchHeader:
       required:
         - serviceClassCode
@@ -841,23 +855,509 @@ components:
             TraceNumber assigned by the ODFI in ascending sequence, is included in each Entry Detail Record, Corporate Entry Detail Record, and addenda Record.
             Trace Numbers uniquely identify each entry within a batch in an ACH input file. In association with the Batch Number, transmission (File Creation) Date, and File ID Modifier, the Trace Number uniquely identifies an entry within a given file.
             For addenda Records, the Trace Number will be identical to the Trace Number in the associated Entry Detail Record, since the Trace Number is associated with an entry or item rather than a physical record.
-        addendum:
+        addenda02:
+          $ref: '#/components/schemas/Addenda02'
+        addenda05:
           type: array
-          description: List of Addenda for the Entry Detail
+          description: List of Addenda05 records
           items:
-            $ref: '#/components/schemas/Addendum'
+            $ref: '#/components/schemas/Addenda05'
+        addenda98:
+          $ref: '#/components/schemas/Addenda98'
+        addenda99:
+          $ref: '#/components/schemas/Addenda99'
         category:
           type: string
           description: Category defines if the entry is a Forward, Return, or NOC
           example: Forward
-    Addendum:
-      required:
-        - typeCode
+    Addenda02:
       properties:
+        id:
+          type: string
+          description: Client defined string used as a reference to this record.
+          example: 5ca8d25a
         typeCode:
           type: string
-          description: TODO
-          example: '02'
+          description: 02 - NACHA regulations
+          example: "02"
+        referenceInformationOne:
+          type: string
+          description: |
+            ReferenceInformationOne may be used for additional reference numbers, identification numbers,
+            or codes that the merchant needs to identify the particular transaction or customer.
+          example: ''
+        referenceInformationTwo:
+          type: string
+          description: |
+            ReferenceInformationTwo  may be used for additional reference numbers, identification numbers,
+            or codes that the merchant needs to identify the particular transaction or customer.
+          example: ''
+        terminalIdentificationCode:
+          type: string
+          description: |
+            TerminalIdentificationCode identifies an Electronic terminal with a unique code that allows
+            a terminal owner and/or switching network to identify the terminal at which an Entry originated.
+          example: ''
+        transactionSerialNumber:
+          type: string
+          description: |
+            TransactionSerialNumber is assigned by the terminal at the time the transaction is originated.  The
+            number, with the Terminal Identification Code, serves as an audit trail for the transaction and is
+            usually assigned in ascending sequence.
+          example: ''
+        transactionDate:
+          type: string
+          description: MMDD formatted timestamp identifies the date on which the transaction occurred.
+          example: ''
+        authorizationCodeOrExpireDate:
+          type: string
+          description: Indicates the code that a card authorization center has furnished to the merchant.
+          example: ''
+        terminalLocation:
+          type: string
+          description: Identifies the specific location of a terminal (i.e., street names of an intersection, address, etc.) in accordance with the requirements of Regulation E.
+          example: 2nd St
+        terminalCity:
+          type: string
+          description: Identifies the city in which the electronic terminal is located.
+          example: Anytown
+        terminalState:
+          type: string
+          description: Identifies the state in which the electronic terminal is located
+          example: CA
+        traceNumber:
+          type: string
+          description: Entry Detail Trace Number
+          example: 124782618117
+    Addenda05:
+      properties:
+        id:
+          type: string
+          description: Client defined string used as a reference to this record.
+          example: 5ca8d25a
+        typeCode:
+          type: string
+          description: 05 - NACHA regulations
+          example: "05"
+        paymentRelatedInformation:
+          type: string
+          description: Text for describing the related payment
+          example: "Car Payment"
+        sequenceNumber:
+          type: number
+          description: SequenceNumber is consecutively assigned to each Addenda05 Record following an Entry Detail Record. The first addenda05 sequence number must always be a 1.
+          example: 1
+        entryDetailSequenceNumber:
+          type: number
+          description: |
+            EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
+            Detail or Corporate Entry Detail Record's trace number This number is
+            the same as the last seven digits of the trace number of the related
+            Entry Detail Record or Corporate Entry Detail Record.
+          example: 1
+    Addenda10:
+      properties:
+        id:
+          type: string
+          description: Client defined string used as a reference to this record.
+          example: 5ca8d25a
+        typeCode:
+          type: string
+          description: 10 - NACHA regulations
+          example: "10"
+        transactionTypeCode:
+          type: string
+          description: |
+            Transaction Type Code Describes the type of payment
+            ANN = Annuity
+            BUS = Business/Commercial
+            DEP = Deposit
+            LOA = Loan
+            MIS = Miscellaneous
+            MOR = Mortgage
+            PEN = Pension
+            RLS = Rent/Lease
+            REM = Remittance2
+            SAL = Salary/Payroll
+            TAX = Tax
+            TEL = Telephone-Initiated Transaction
+            WEB = Internet-Initiated Transaction
+            ARC = Accounts Receivable Entry
+            BOC = Back Office Conversion Entry
+            POP = Point of Purchase Entry
+            RCK = Re-presented Check Entry
+          example: TEL
+        foreignPaymentAmount:
+          type: number
+          description: For inbound IAT payments this field should contain the USD amount or may be blank.
+          example: 1021441
+        foreignTraceNumber:
+          type: string
+          description: Trace number
+          example: 19846249812
+        name:
+          type: string
+          description: Receiving Company Name/Individual Name
+          example: Jane Smith
+        entryDetailSequenceNumber:
+          type: number
+          description: |
+            EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
+            Detail or Corporate Entry Detail Record's trace number This number is
+            the same as the last seven digits of the trace number of the related
+            Entry Detail Record or Corporate Entry Detail Record.
+          example: 1
+    Addenda11:
+      properties:
+        id:
+          type: string
+          description: Client defined string used as a reference to this record.
+          example: 5ca8d25a
+        typeCode:
+          type: string
+          description: 10 - NACHA regulations
+          example: "10"
+        originatorName:
+          type: string
+          description: Originators name (your company name / name)
+          example: Acme Corp
+        originatorStreetAddress:
+          type: string
+          description: Originators street address
+          example: 111 1st St
+        entryDetailSequenceNumber:
+          type: number
+          description: |
+            EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
+            Detail or Corporate Entry Detail Record's trace number This number is
+            the same as the last seven digits of the trace number of the related
+            Entry Detail Record or Corporate Entry Detail Record.
+          example: 1
+    Addenda12:
+      properties:
+        id:
+          type: string
+          description: Client defined string used as a reference to this record.
+          example: 5ca8d25a
+        typeCode:
+          type: string
+          description: 10 - NACHA regulations
+          example: "10"
+        originatorCityStateProvince:
+          type: string
+          description: |
+            Originator City & State / Province
+            Data elements City and State / Province  should be separated with an asterisk (*) as a delimiter and the field should end with a backslash (\).
+          example: |
+            San Francisco*CA\
+        originatorCountryPostalCode:
+          type: string
+          description: |
+            Originator Country & Postal Code
+            Data elements must be separated by an asterisk (*) and must end with a backslash (\)
+          example: |
+            US*10036\
+        entryDetailSequenceNumber:
+          type: number
+          description: |
+            EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
+            Detail or Corporate Entry Detail Record's trace number This number is
+            the same as the last seven digits of the trace number of the related
+            Entry Detail Record or Corporate Entry Detail Record.
+          example: 1
+    Addenda13:
+      properties:
+        id:
+          type: string
+          description: Client defined string used as a reference to this record.
+          example: 5ca8d25a
+        typeCode:
+          type: string
+          description: 10 - NACHA regulations
+          example: "10"
+        ODFIName:
+          type: string
+          description: |
+            Originating DFI Name
+            For Outbound IAT Entries, this field must contain the name of the U.S. ODFI.
+            For Inbound IATs: Name of the foreign bank providing funding for the payment transaction
+          example: My Bank
+        ODFIIDNumberQualifier:
+          type: string
+          description: |
+            Originating DFI Identification Number Qualifier
+            For Inbound IATs: The 2-digit code that identifies the numbering scheme used in the
+            Foreign DFI Identification Number field
+            01 = National Clearing System
+            02 = BIC Code
+            03 = IBAN Code
+          example: '01'
+        ODFIBranchCountryCode:
+          type: string
+          description: |
+            Originating DFI Branch Country Code
+            USb = United States
+            //("b" indicates a blank space)
+            For Inbound IATs: This 3 position field contains a 2-character code as approved by the
+            International Organization for Standardization (ISO) used to identify the country in which
+            the branch of the bank that originated the entry is located. Values for other countries can
+            be found on the International Organization for Standardization website: www.iso.org.
+          example: "US "
+        entryDetailSequenceNumber:
+          type: number
+          description: |
+            EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
+            Detail or Corporate Entry Detail Record's trace number This number is
+            the same as the last seven digits of the trace number of the related
+            Entry Detail Record or Corporate Entry Detail Record.
+          example: 1
+    Addenda14:
+      properties:
+        id:
+          type: string
+          description: Client defined string used as a reference to this record.
+          example: 5ca8d25a
+        typeCode:
+          type: string
+          description: 10 - NACHA regulations
+          example: "10"
+        RDFIName:
+          type: string
+          description: Name of the Receiver bank
+        RDFIIDNumberQualifier:
+          type: string
+          description: |
+            Receiving DFI Identification Number Qualifier
+            The 2-digit code that identifies the numbering scheme used in the
+            Receiving DFI Identification Number field
+            01 = National Clearing System
+            02 = BIC Code
+            03 = IBAN Code
+          example: '01'
+        RDFIIdentification:
+          type: string
+          description: This field contains the bank identification number of the DFI at which the Receiver maintains his account.
+          example: 98765432
+        RDFIBranchCountryCode:
+          type: string
+          description: |
+            Receiving DFI Branch Country Code
+            USb" = United States
+            ("b" indicates a blank space)
+            This 3 position field contains a 2-character code as approved by the International
+            Organization for Standardization (ISO) used to identify the country in which the
+            branch of the bank that receives the entry is located. Values for other countries can
+            be found on the International Organization for Standardization website: www.iso.org
+          example: 'US '
+        entryDetailSequenceNumber:
+          type: number
+          description: |
+            EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
+            Detail or Corporate Entry Detail Record's trace number This number is
+            the same as the last seven digits of the trace number of the related
+            Entry Detail Record or Corporate Entry Detail Record.
+          example: 1
+    Addenda15:
+      properties:
+        id:
+          type: string
+          description: Client defined string used as a reference to this record.
+          example: 5ca8d25a
+        typeCode:
+          type: string
+          description: 10 - NACHA regulations
+          example: "10"
+        receiverIDNumber:
+          type: string
+          description: |
+            Receiver Identification Number contains the accounting number by which the Originator is known to the Receiver for descriptive purposes. NACHA Rules recommend but do not require the RDFI to print the contents of this field on the receiver's statement.
+          example: 98765432
+        receiverStreetAddress:
+          type: string
+          description: Receiver's physical address
+          example: 123 1st St
+        entryDetailSequenceNumber:
+          type: number
+          description: |
+            EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
+            Detail or Corporate Entry Detail Record's trace number This number is
+            the same as the last seven digits of the trace number of the related
+            Entry Detail Record or Corporate Entry Detail Record.
+          example: 1
+    Addenda16:
+      properties:
+        id:
+          type: string
+          description: Client defined string used as a reference to this record.
+          example: 5ca8d25a
+        typeCode:
+          type: string
+          description: 10 - NACHA regulations
+          example: "10"
+        receiverCityStateProvince:
+          type: string
+          description: |
+            Receiver City & State / Province
+            Data elements City and State / Province  should be separated with an asterisk (*) as a delimiter
+            and the field should end with a backslash (\).
+          example: |
+            San Francisco*CA\
+        receiverCountryPostalCode:
+          type: string
+          description: |
+            Receiver Country & Postal Code
+            Data elements must be separated by an asterisk (*) and must end with a backslash (\)
+          example: |
+            US*10036\
+        entryDetailSequenceNumber:
+          type: number
+          description: |
+            EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
+            Detail or Corporate Entry Detail Record's trace number This number is
+            the same as the last seven digits of the trace number of the related
+            Entry Detail Record or Corporate Entry Detail Record.
+          example: 1
+    Addenda17:
+      properties:
+        id:
+          type: string
+          description: Client defined string used as a reference to this record.
+          example: 5ca8d25a
+        typeCode:
+          type: string
+          description: 10 - NACHA regulations
+          example: "10"
+        paymentRelatedInformation:
+          type: string
+          description: Additional information related to the payment
+          example: Test data
+        sequenceNumber:
+          type: number
+          description: |
+            SequenceNumber is consecutively assigned to each Addenda17 Record following an Entry Detail Record. The first addenda17 sequence number must always be a 1.
+          example: 1
+        entryDetailSequenceNumber:
+          type: number
+          description: |
+            EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
+            Detail or Corporate Entry Detail Record's trace number This number is
+            the same as the last seven digits of the trace number of the related
+            Entry Detail Record or Corporate Entry Detail Record.
+          example: 1
+    Addenda18:
+      properties:
+        id:
+          type: string
+          description: Client defined string used as a reference to this record.
+          example: 5ca8d25a
+        typeCode:
+          type: string
+          description: 10 - NACHA regulations
+          example: "10"
+        foreignCorrespondentBankName:
+          type: string
+          description: Name of the Foreign Correspondent Bank
+          example: Other Bank
+        foreignCorrespondentBankIDNumberQualifier:
+          type: string
+          description: |
+            Foreign Correspondent Bank Identification Number Qualifier contains a 2-digit code that identifies the numbering scheme used in the Foreign Correspondent Bank Identification Number field. Code values for this field are
+              "01" = National Clearing System
+              "02" = BIC Code
+              "03" = IBAN Code
+          example: '01'
+        foreignCorrespondentBankIDNumber:
+          type: string
+          description: Foreign Correspondent Bank Identification Number contains the bank ID number of the Foreign Correspondent Bank
+          example: 98765432
+        foreignCorrespondentBankBranchCountryCode:
+          type: string
+          description: |
+            Foreign Correspondent Bank Branch Country Code contains the two-character code, as approved by the International Organization for Standardization (ISO), to identify the country in which the branch of the Foreign Correspondent Bank is located. Values can be found on the International Organization for Standardization website: www.iso.org
+          example: US
+        sequenceNumber:
+          type: number
+          description: |
+            SequenceNumber is consecutively assigned to each Addenda17 Record following an Entry Detail Record. The first addenda17 sequence number must always be a 1.
+          example: 1
+        entryDetailSequenceNumber:
+          type: number
+          description: |
+            EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
+            Detail or Corporate Entry Detail Record's trace number This number is
+            the same as the last seven digits of the trace number of the related
+            Entry Detail Record or Corporate Entry Detail Record.
+          example: 1
+    Addenda98:
+      properties:
+        id:
+          type: string
+          description: Client defined string used as a reference to this record.
+          example: 5ca8d25a
+        typeCode:
+          type: string
+          description: 98 - NACHA regulations
+          example: "98"
+        changeCode:
+          type: string
+          description: ChangeCode field contains a standard code used by an ACH Operator or RDFI to describe the reason for a change Entry.
+          example: C01
+        originalTrace:
+          type: string
+          description: |
+            OriginalTrace This field contains the Trace Number as originally included on the forward Entry or Prenotification.
+            The RDFI must include the Original Entry Trace Number in the Addenda Record of an Entry being returned to an ODFI,
+            in the Addenda Record of an 98, within an Acknowledgment Entry, or with an RDFI request for a copy of an authorization.
+          example: 214874812
+        originalDFI:
+          type: string
+          description: The Receiving DFI Identification (addenda.RDFIIdentification) as originally included on the forward Entry or Prenotification that the RDFI is returning or correcting.
+          example: 98765432
+        correctedData:
+          type: string
+          description: Correct field value of what ChangeCode references
+          example: "198424892"
+        traceNumber:
+          type: string
+          description: Entry Detail Trace Number
+          example: 124782618117
+    Addenda99:
+      properties:
+        id:
+          type: string
+          description: Client defined string used as a reference to this record.
+          example: 5ca8d25a
+        typeCode:
+          type: string
+          description: 99 - NACHA regulations
+          example: "99"
+        returnCode:
+          type: string
+          description: Standard code used by an ACH Operator or RDFI to describe the reason for returning an Entry.
+          example: "R01"
+        originalTrace:
+          type: string
+          description: |
+            OriginalTrace This field contains the Trace Number as originally included on the forward Entry or Prenotification.
+            The RDFI must include the Original Entry Trace Number in the Addenda Record of an Entry being returned to an ODFI,
+            in the Addenda Record of an 98, within an Acknowledgment Entry, or with an RDFI request for a copy of an authorization.
+          example: 214874812
+        dateOfDeath:
+          type: string
+          description: DateOfDeath The field date of death is to be supplied on Entries being returned for reason of death (return reason codes R14 and R15). Format YYMMDD (Y=Year, M=Month, D=Day)
+          example: 200102
+        originalDFI:
+          type: string
+          description: OriginalDFI field contains the Receiving DFI Identification (addenda.RDFIIdentification) as originally included on the forward Entry or Prenotification that the RDFI is returning or correcting.
+          example: 98765432
+        addendaInformation:
+          type: string
+          description: Information related to the return
+          example: text
+        traceNumber:
+          type: string
+          description: Matches the Entry Detail Trace Number of the entry being returned.
+          example: 214874812
     IATBatch:
       properties:
         ID:
@@ -866,6 +1366,12 @@ components:
           example: a747e53f
         IATBatchHeader:
           $ref: '#/components/schemas/IATBatchHeader'
+        IATEntryDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/IATEntryDetail'
+        batchControl:
+          $ref: '#/components/schemas/BatchControl'
     IATBatchHeader:
       properties:
         ID:
@@ -874,9 +1380,9 @@ components:
           example: a747e53f
         serviceClassCode:
           description: |
-            ServiceClassCode ACH Mixed Debits and Credits ‘200’
-            ACH Credits Only ‘220’
-            ACH Debits Only ‘225'
+            ServiceClassCode ACH Mixed Debits and Credits '200'
+            ACH Credits Only '220'
+            ACH Debits Only '225'
           type: integer
           example: 220
         IATIndicator:
@@ -940,7 +1446,7 @@ components:
           example: USD
         ISODestinationCurrencyCode:
           description: |
-            ISODestinationCurrencyCode is the three-character code, as approved by the International Organization for Standardization (ISO), to identify the currency denomination in which the entry will ultimately be settled. If the final destination of funds is within the territorial jurisdiction of the U.S., enter “USD”, otherwise refer to International Organization for Standardization website for value: www.iso.org
+            ISODestinationCurrencyCode is the three-character code, as approved by the International Organization for Standardization (ISO), to identify the currency denomination in which the entry will ultimately be settled. If the final destination of funds is within the territorial jurisdiction of the U.S., enter "USD", otherwise refer to International Organization for Standardization website for value: www.iso.org
           type: string
           example: USD
         effectiveEntryDate:
@@ -966,3 +1472,235 @@ components:
             BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
           type: integer
           example: 1
+    IATEntryDetail:
+      properties:
+        ID:
+          type: string
+          description: Entry Detail ID
+          example: 842a2261
+        transactionCode:
+          type: integer
+          description: |
+            TransactionCode if the receivers account is
+            Credit (deposit) to checking account '22'
+            Prenote for credit to checking account '23'
+            Debit (withdrawal) to checking account '27'
+            Prenote for debit to checking account '28'
+            Credit to savings account '32'
+            Prenote for credit to savings account '33'
+            Debit to savings account '37'
+            Prenote for debit to savings account '38'
+          example: 22
+        RDFIIdentification:
+          type: string
+          description: RDFI's routing number without the last digit.
+          example: 12345678
+        checkDigit:
+          type: string
+          description: Last digit in RDFI routing number.
+          example: "0"
+        AddendaRecords:
+          type: number
+          description: Number of Addenda Records
+          example: 1
+        amount:
+          type: integer
+          description: Number of cents you are debiting/crediting this account
+          example: 1235
+        DFIAccountNumber:
+          type: string
+          description: |
+            The receiver's bank account number you are crediting/debiting. It important to note that this is an alphanumeric field, so its space padded, no zero padded
+          example: 181141847
+        OFACScreeningIndicator:
+          type: string
+          description: Signifies if the record has been screened against OFAC records
+          example: 'Y'
+        SecondaryOFACScreeningIndicator:
+          type: string
+          description: Signifies if the record has been screened against OFAC records by a secondary entry
+          example: 'Y'
+        addendaRecordIndicator:
+          type: integer
+          description: |
+            AddendaRecordIndicator indicates the existence of an Addenda Record. A value of "1" indicates that one ore more addenda records follow, and "0" means no such record is present.
+          example: 1
+        traceNumber:
+          type: string
+          description: Matches the Entry Detail Trace Number of the entry being returned.
+          example: 214874812
+        addenda10:
+          $ref: '#/components/schemas/Addenda10'
+        addenda11:
+          $ref: '#/components/schemas/Addenda11'
+        addenda12:
+          $ref: '#/components/schemas/Addenda12'
+        addenda13:
+          $ref: '#/components/schemas/Addenda13'
+        addenda14:
+          $ref: '#/components/schemas/Addenda14'
+        addenda15:
+          $ref: '#/components/schemas/Addenda15'
+        addenda16:
+          $ref: '#/components/schemas/Addenda16'
+        addenda17:
+          $ref: '#/components/schemas/Addenda17'
+        addenda18:
+          $ref: '#/components/schemas/Addenda18'
+        addenda98:
+          $ref: '#/components/schemas/Addenda98'
+        addenda99:
+          $ref: '#/components/schemas/Addenda99'
+        category:
+          type: string
+          description: Category defines if the entry is a Forward, Return, or NOC
+          example: Forward
+    ADVEntryDetail:
+      required:
+        - id
+        - transactionCode
+        - RDFIIdentification
+        - checkDigit
+        - DFIAccountNumber
+        - amount
+        - individualName
+      properties:
+        ID:
+          type: string
+          description: Entry Detail ID
+          example: 842a2261
+        transactionCode:
+          type: integer
+          description: |
+            TransactionCode representing Accounting Entries
+            Credit for ACH debits originated - 81
+            Debit for ACH credits originated - 82
+            Credit for ACH credits received 83
+            Debit for ACH debits received 84
+            Credit for ACH credits in rejected batches 85
+            Debit for ACH debits in rejected batches - 86
+            Summary credit for respondent ACH activity - 87
+            Summary debit for respondent ACH activity - 88
+          example: 81
+        RDFIIdentification:
+          type: string
+          description: RDFI's routing number without the last digit.
+          example: 12345678
+        checkDigit:
+          type: string
+          description: Last digit in RDFI routing number.
+          example: "0"
+        DFIAccountNumber:
+          type: string
+          description: |
+            The receiver's bank account number you are crediting/debiting. It important to note that this is an alphanumeric field, so its space padded, no zero padded
+          example: 181141847
+        amount:
+          type: integer
+          description: Number of cents you are debiting/crediting this account
+          example: 1235
+        adviceRoutingNumber:
+          type: string
+          description: Suggested routing number to use
+          example: 987654320
+        fileIdentification:
+          type: string
+          description: Unique identifier for the File
+          example: 22c24006
+        achOperatorData:
+          type: string
+          description: Information related to the ACH opreator
+          example: text
+        individualName:
+          type: string
+          description: The name of the receiver, usually the name on the bank account
+          example: Taylor Swift
+        discretionaryData:
+          type: string
+          description: |
+            DiscretionaryData allows ODFIs to include codes, of significance only to them, to enable specialized handling of the entry. There will be no standardized interpretation for the value of this field. It can either be a single two-character code, or two distinct one-character codes, according to the needs of the ODFI and/or Originator involved. This field must be returned intact for any returned entry.
+            WEB uses the Discretionary Data Field as the Payment Type Code
+          example: AB
+        addendaRecordIndicator:
+          type: integer
+          description: |
+            AddendaRecordIndicator indicates the existence of an Addenda Record. A value of "1" indicates that one ore more addenda records follow, and "0" means no such record is present.
+          example: 1
+        achOperatorRoutingNumber:
+          type: string
+          description: Routing number for ACH operator
+          example: 987654320
+        julianDay:
+          type: number
+          description: Julian Day of the year
+          example: 12
+        sequenceNumber:
+          type: number
+          description: SequenceNumber is consecutively assigned to each Addenda05 Record following an Entry Detail Record. The first addenda05 sequence number must always be a 1.
+          example: 1
+        addenda99:
+          description: Addenda99 record for the Entry Detail
+          items:
+            $ref: '#/components/schemas/Addenda99'
+        category:
+          type: string
+          description: Category defines if the entry is a Forward, Return, or NOC
+          example: Forward
+    ADVBatchControl:
+      properties:
+        ID:
+          description: Batch ID
+          type: string
+          example: 62d8f0cd
+        serviceClassCode:
+          description: Same as ServiceClassCode in BatchHeader record
+          type: integer
+          example: 220
+        entryAddendaCount:
+          description: EntryAddendaCount is a tally of each Entry Detail Record and each Addenda Record processed, within either the batch or file as appropriate.
+          type: integer
+          example: 1
+        entryHash:
+          description: |
+            Validate the Receiving DFI Identification in each Entry Detail Record is hashed to provide a check against inadvertent alteration of data contents due to hardware failure or program error.
+            In this context the Entry Hash is the sum of the corresponding fields in the Entry Detail Records on the file.
+          type: integer
+          example: 0
+        totalDebit:
+          description: Contains accumulated Entry debit totals within the batch.
+          type: integer
+          example: 100
+        totalCredit:
+          description: Contains accumulated Entry credit totals within the batch.
+          type: integer
+          example: 100
+        achOperatorData:
+          description: Alphanumeric code used to identify an ACH Operator
+          type: string
+          example: user
+        ODFIIdentification:
+          description: The routing number is used to identify the DFI originating entries within a given branch.
+          type: string
+          example: 98765432
+        batchNumber:
+          type: string
+          description: BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
+    Offset:
+      properties:
+        routingNumber:
+          type: string
+          description: ABA routing number
+          example: 987654320
+        accountNumber:
+          type: string
+          description: Account number used to offset records
+        accountType:
+          type: string
+          description: Account type used in offset record
+          enum:
+            - checking
+            - savings
+        description:
+          type: string
+          description: Memo for Offset EntryDetail record
+          example: OFFSET
