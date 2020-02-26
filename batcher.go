@@ -45,6 +45,7 @@ type Batcher interface {
 	Error(string, error, ...interface{}) error
 	Equal(other Batcher) bool
 	WithOffset(off *Offset)
+	SetValidation(*ValidateOpts)
 }
 
 // Offset contains the associated information to append an 'Offset Record' on an ACH batch during Create.

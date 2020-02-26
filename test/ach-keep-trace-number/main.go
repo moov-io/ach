@@ -48,7 +48,13 @@ func main() {
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
 	bh.ODFIIdentification = "121042882"
 
-	batch, _ := ach.NewBatch(bh)
+	batch, err := ach.NewBatch(bh)
+	if err != nil {
+		log.Fatalf("%T: %v", err, err)
+	}
+	batch.SetValidation(&ach.ValidateOpts{
+		BypassOriginValidation: true,
+	})
 
 	// To create an entry
 	entry := ach.NewEntryDetail()
@@ -75,7 +81,7 @@ func main() {
 	// When all of the Entries are added to the batch we must create it.
 
 	if err := batch.Create(); err != nil {
-		fmt.Printf("%T: %s", err, err)
+		log.Fatalf("%T: %v", err, err)
 	}
 
 	// And batches are added to files much the same way:
@@ -93,7 +99,13 @@ func main() {
 	bh2.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
 	bh2.ODFIIdentification = "121042882"
 
-	batch2, _ := ach.NewBatch(bh2)
+	batch2, err := ach.NewBatch(bh2)
+	if err != nil {
+		log.Fatalf("%T: %v", err, err)
+	}
+	batch2.SetValidation(&ach.ValidateOpts{
+		BypassOriginValidation: true,
+	})
 
 	// Add an entry and define if it is a single or recurring payment
 	// The following is a recurring payment for $7.99
@@ -120,14 +132,14 @@ func main() {
 
 	// Create and add the second batch
 	if err := batch2.Create(); err != nil {
-		fmt.Printf("%T: %s", err, err)
+		fmt.Printf("%T: %v", err, err)
 	}
 	file.AddBatch(batch2)
 
 	// Once we added all our batches we must create the file
 
 	if err := file.Create(); err != nil {
-		fmt.Printf("%T: %s", err, err)
+		fmt.Printf("%T: %v", err, err)
 	}
 	// Check if the trace number was kept
 	batch1Entries := file.Batches[0].GetEntries()
@@ -145,7 +157,7 @@ func main() {
 	// Finally we wnt to write the file to an io.Writer
 	w := ach.NewWriter(os.Stdout)
 	if err := w.Write(file); err != nil {
-		fmt.Printf("%T: %s", err, err)
+		fmt.Printf("%T: %v", err, err)
 	}
 	w.Flush()
 }
