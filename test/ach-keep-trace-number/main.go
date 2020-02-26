@@ -133,15 +133,14 @@ func main() {
 	batch1Entries := file.Batches[0].GetEntries()
 
 	if batch1Entries[0].TraceNumber != "123456780000001" {
-		log.Fatal("TraceNumber was not kept " + batch1Entries[0].TraceNumber )
+		log.Fatal("TraceNumber was not kept " + batch1Entries[0].TraceNumber)
 	}
 
 	batch2Entries := file.Batches[1].GetEntries()
 
-	if batch2Entries[0].TraceNumber != "876543210000001" {
-		log.Fatal("TraceNumber was not kept " + batch1Entries[0].TraceNumber )
+	if batch2Entries[0].TraceNumber != "876543210000002" {
+		log.Fatal("TraceNumber was not kept " + batch2Entries[0].TraceNumber)
 	}
-	
 
 	// Finally we wnt to write the file to an io.Writer
 	w := ach.NewWriter(os.Stdout)
