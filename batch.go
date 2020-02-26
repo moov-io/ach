@@ -38,7 +38,7 @@ type Batch struct {
 
 	// offset holds the information to build an EntryDetail record which
 	// balances the batch by debiting or crediting the sum of amounts in the batch.
-	offset *Offset
+	offset *Offset `json:"offset"`
 
 	// category defines if the entry is a Forward, Return, or NOC
 	category string

@@ -63,9 +63,10 @@ type File struct {
 	ADVControl ADVFileControl `json:"fileADVControl"`
 
 	// NotificationOfChange (Notification of change) is a slice of references to BatchCOR in file.Batches
-	NotificationOfChange []Batcher
+	NotificationOfChange []Batcher `json:"NotificationOfChange"`
+
 	// ReturnEntries is a slice of references to file.Batches that contain return entries
-	ReturnEntries []Batcher
+	ReturnEntries []Batcher `json:"ReturnEntries"`
 }
 
 // NewFile constructs a file template.
