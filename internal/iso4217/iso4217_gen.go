@@ -40,12 +40,15 @@ import (
 	"os/user"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"time"
 )
 
 var (
 	downloadUrl    = "https://datahub.io/core/currency-codes/r/codes-all.json"
 	outputFilename = filepath.Join("internal", "iso4217", "iso4217.go")
+
+	windowsQuoteReplacer = strings.NewReplacer(`’`, `'`, `’`, `'`, `“`, `"`, `”`, `"`)
 )
 
 // {"AlphabeticCode": "AFN", "Currency": "Afghani", ... }
@@ -104,9 +107,10 @@ package iso4217
 	for i := range currencies {
 		code, name := currencies[i].Code, currencies[i].Name
 		if code == "" || name == "" {
-			fmt.Printf("SKIPPING: code=%s currency=%s\n", code, name)
+			fmt.Printf("SKIPPING: code=%q currency=%q\n", code, name)
 			continue
 		}
+		name = windowsQuoteReplacer.Replace(name)
 		if _, exists := cs[code]; !exists {
 			cs[code] = true // mark as seen
 			fmt.Fprintf(&buf, fmt.Sprintf(`"%s": true, // %s`+"\n", code, name))

@@ -35,12 +35,12 @@ import (
 // settlement date field is not entered as it is determined by the ACH operator.
 //
 // An IAT entry is a credit or debit ACH entry that is part of a payment transaction
-// involving a financial agency’s office (i.e., depository financial institution or
+// involving a financial agency's office (i.e., depository financial institution or
 // business issuing money orders) that is not located in the territorial jurisdiction
 // of the United States. IAT entries can be made to or from a corporate or consumer
 // account and must be accompanied by seven (7) mandatory addenda records identifying
 // the name and physical address of the Originator, name and physical address of the
-// Receiver, Receiver’s account number, Receiver’s bank identity and reason for the payment.
+// Receiver, Receiver's account number, Receiver's bank identity and reason for the payment.
 type IATBatchHeader struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
@@ -48,9 +48,9 @@ type IATBatchHeader struct {
 	// RecordType defines the type of record in the block. 5
 	recordType string
 
-	// ServiceClassCode ACH Mixed Debits and Credits ‘200’
-	// ACH Credits Only ‘220’
-	// ACH Debits Only ‘225'
+	// ServiceClassCode ACH Mixed Debits and Credits '200'
+	// ACH Credits Only '220'
+	// ACH Debits Only '225'
 	ServiceClassCode int `json:"serviceClassCode"`
 
 	// IATIndicator - Leave Blank - It is only used for corrected IAT entries
@@ -217,7 +217,7 @@ func (iatBh *IATBatchHeader) Parse(record string) {
 	// reference to the foreign exchange transaction.
 	iatBh.ForeignExchangeReference = iatBh.parseStringField(record[23:38])
 	// 39-40  Receiver ISO Country Code - For entries
-	// destined to account holder in the U.S., this would be ‘US’.
+	// destined to account holder in the U.S., this would be 'US'.
 	iatBh.ISODestinationCountryCode = iatBh.parseStringField(record[38:40])
 	// 41-50 For U.S. entities: the number assigned will be your tax ID
 	// For non-U.S. entities: the number assigned will be your DDA number,
@@ -225,14 +225,14 @@ func (iatBh *IATBatchHeader) Parse(record string) {
 	iatBh.OriginatorIdentification = iatBh.parseStringField(record[40:50])
 	// 51-53 IAT for both consumer and non consumer international payments
 	iatBh.StandardEntryClassCode = record[50:53]
-	// 54-63 Your description of the transaction. This text will appear on the receivers’ bank statement.
+	// 54-63 Your description of the transaction. This text will appear on the receivers' bank statement.
 	// For example: "Payroll   "
 	iatBh.CompanyEntryDescription = strings.TrimSpace(record[53:63])
 	// 64-66 Originator ISO Currency Code
 	iatBh.ISOOriginatingCurrencyCode = iatBh.parseStringField(record[63:66])
 	// 67-69 Receiver ISO Currency Code
 	iatBh.ISODestinationCurrencyCode = iatBh.parseStringField(record[66:69])
-	// 70-75 Date transactions are to be posted to the receivers’ account.
+	// 70-75 Date transactions are to be posted to the receivers' account.
 	// You almost always want the transaction to post as soon as possible, so put tomorrow's date in YYMMDD format
 	iatBh.EffectiveEntryDate = iatBh.validateSimpleDate(record[69:75])
 	// 76-79 Always blank (just fill with spaces)

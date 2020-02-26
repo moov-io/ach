@@ -31,10 +31,10 @@ import (
 // of a merchant-issued plastic card to pay an obligation at the point-of-sale. Much
 // like a financial institution issued debit card, the merchant- issued debit card is
 // swiped at the point-of-sale and approved for use; however, the authorization only
-// verifies the card is open, active and within the card’s limits—it does not verify
-// the Receiver’s account balance or debit the account at the time of the purchase.
+// verifies the card is open, active and within the card's limits—it does not verify
+// the Receiver's account balance or debit the account at the time of the purchase.
 // Settlement of the transaction moves from the card network to the ACH Network through
-// the creation of a POS entry by the card issuer to debit the Receiver’s account.
+// the creation of a POS entry by the card issuer to debit the Receiver's account.
 type BatchPOS struct {
 	Batch
 }

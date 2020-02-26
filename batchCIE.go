@@ -24,8 +24,8 @@ package ach
 // CIE entries are usually transmitted to a company for payment of funds that the consumer
 // owes to that company and are initiated by the consumer through some type of online
 // banking product or bill payment service provider. With CIEs, funds owed by the consumer
-// are “pushed” to the biller in the form of an ACH credit, as opposed to the biller’s use of
-// a debit application (e.g., PPD, WEB) to “pull” the funds from a customer’s account.
+// are “pushed” to the biller in the form of an ACH credit, as opposed to the biller's use of
+// a debit application (e.g., PPD, WEB) to “pull” the funds from a customer's account.
 type BatchCIE struct {
 	Batch
 }

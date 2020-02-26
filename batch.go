@@ -84,11 +84,11 @@ const (
 	// for a depository financial institution.
 	ENR = "ENR"
 	// IAT International ACH Transaction - A code IAT indicating a  credit or debit ACH entry that is part of a payment
-	// transaction involving a financial agency’s office (i.e., depository financial institution or business issuing
+	// transaction involving a financial agency's office (i.e., depository financial institution or business issuing
 	// money orders) that is not located in the territorial jurisdiction of the United States. IAT entries can be made
 	// to or from a corporate or consumer account and must be accompanied by seven (7) mandatory addenda records
 	// identifying the name and physical address of the Originator, name and physical address of the Receiver,
-	// Receiver’s account number, Receiver’s bank identity and reason for the payment.
+	// Receiver's account number, Receiver's bank identity and reason for the payment.
 	IAT = "IAT"
 	// MTE Machine Transfer Entry - A code that indicates when a consumer uses their debit card at an Automated Teller
 	// Machine (ATM) to withdraw cash.  MTE transactions cannot be aggregated together under a single Entry.
@@ -113,8 +113,8 @@ const (
 	// shared network where the ODFI and RDFI have an agreement in addition to these Rules to process such Entries.
 	SHR = "SHR"
 	// TEL Telephone Initiated Entry - A code indicating a Telephone-Initiated consumer debit transactions. The NACHA
-	// Operating Rules permit TEL entries when the originator obtains the Receiver’s authorization for the debit entry
-	// orally via the telephone.  An entry based upon a Receiver’s oral authorization must utilize the TEL
+	// Operating Rules permit TEL entries when the originator obtains the Receiver's authorization for the debit entry
+	// orally via the telephone.  An entry based upon a Receiver's oral authorization must utilize the TEL
 	// Standard Entry Class (SEC) Code.
 	TEL = "TEL"
 	// TRC Check Truncation Entry - is a code used to identify a debit entry of a truncated check.

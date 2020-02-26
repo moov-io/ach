@@ -26,7 +26,7 @@ import (
 
 // IATEntryDetail contains the actual transaction data for an individual entry.
 // Fields include those designating the entry as a deposit (credit) or
-// withdrawal (debit), the transit routing number for the entry recipient’s financial
+// withdrawal (debit), the transit routing number for the entry recipient's financial
 // institution, the account number (left justify,no zero fill), name, and dollar amount.
 type IATEntryDetail struct {
 	// ID is a client defined string used as a reference to this record.
@@ -34,14 +34,14 @@ type IATEntryDetail struct {
 	// RecordType defines the type of record in the block. 6
 	recordType string
 	// TransactionCode if the receivers account is:
-	// Credit (deposit) to checking account ‘22’
-	// Prenote for credit to checking account ‘23’
-	// Debit (withdrawal) to checking account ‘27’
-	// Prenote for debit to checking account ‘28’
-	// Credit to savings account ‘32’
-	// Prenote for credit to savings account ‘33’
-	// Debit to savings account ‘37’
-	// Prenote for debit to savings account ‘38’
+	// Credit (deposit) to checking account '22'
+	// Prenote for credit to checking account '23'
+	// Debit (withdrawal) to checking account '27'
+	// Prenote for debit to checking account '28'
+	// Credit to savings account '32'
+	// Prenote for credit to savings account '33'
+	// Debit to savings account '37'
+	// Prenote for debit to savings account '38'
 	TransactionCode int `json:"transactionCode"`
 	// RDFIIdentification is the RDFI's routing number without the last digit.
 	// Receiving Depository Financial Institution

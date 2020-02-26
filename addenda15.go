@@ -39,7 +39,7 @@ type Addenda15 struct {
 	// the Receiver for descriptive purposes. NACHA Rules recommend but do not require the RDFI to print
 	// the contents of this field on the receiver's statement.
 	ReceiverIDNumber string `json:"receiverIDNumber,omitempty"`
-	// Receiver Street Address contains the Receiver‟s physical address
+	// Receiver Street Address contains the Receiver's physical address
 	ReceiverStreetAddress string `json:"receiverStreetAddress"`
 	// reserved - Leave blank
 	reserved string

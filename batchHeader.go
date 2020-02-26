@@ -38,9 +38,9 @@ type BatchHeader struct {
 	// RecordType defines the type of record in the block. 5
 	recordType string
 
-	// ServiceClassCode ACH Mixed Debits and Credits ‘200’
-	// ACH Credits Only ‘220’
-	// ACH Debits Only ‘225'
+	// ServiceClassCode ACH Mixed Debits and Credits '200'
+	// ACH Credits Only '220'
+	// ACH Debits Only '225'
 	ServiceClassCode int `json:"serviceClassCode"`
 
 	// CompanyName the company originating the entries in the batch
@@ -159,7 +159,7 @@ func (bh *BatchHeader) Parse(record string) {
 	bh.recordType = "5"
 	// 2-4 MixedCreditsAnDebits (200), CreditsOnly (220), DebitsOnly (225)
 	bh.ServiceClassCode = bh.parseNumField(record[1:4])
-	// 5-20 Your company's name. This name may appear on the receivers’ statements prepared by the RDFI.
+	// 5-20 Your company's name. This name may appear on the receivers' statements prepared by the RDFI.
 	bh.CompanyName = strings.TrimSpace(record[4:20])
 	// 21-40 Optional field you may use to describe the batch for internal accounting purposes
 	bh.CompanyDiscretionaryData = strings.TrimSpace(record[20:40])
@@ -170,13 +170,13 @@ func (bh *BatchHeader) Parse(record string) {
 	// If the entries are CCD (credits/debits towards corporate account), use CCD.
 	// The difference between the 2 SEC codes are outside of the scope of this post.
 	bh.StandardEntryClassCode = record[50:53]
-	// 54-63 Your description of the transaction. This text will appear on the receivers’ bank statement.
+	// 54-63 Your description of the transaction. This text will appear on the receivers' bank statement.
 	// For example: "Payroll   "
 	bh.CompanyEntryDescription = strings.TrimSpace(record[53:63])
 	// 64-69 The date you choose to identify the transactions in YYMMDD format.
-	// This date may be printed on the receivers’ bank statement by the RDFI
+	// This date may be printed on the receivers' bank statement by the RDFI
 	bh.CompanyDescriptiveDate = strings.TrimSpace(record[63:69])
-	// 70-75 Date transactions are to be posted to the receivers’ account.
+	// 70-75 Date transactions are to be posted to the receivers' account.
 	// You almost always want the transaction to post as soon as possible, so put tomorrow's date in YYMMDD format
 	bh.EffectiveEntryDate = bh.validateSimpleDate(record[69:75])
 	// 76-79 Always blank (just fill with spaces)

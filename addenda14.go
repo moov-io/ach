@@ -40,7 +40,7 @@ type Addenda14 struct {
 	RDFIName string `json:"RDFIName"`
 	// Receiving DFI Identification Number Qualifier
 	// The 2-digit code that identifies the numbering scheme used in the
-	// Receiving DFI Identification Number field::
+	// Receiving DFI Identification Number field:
 	// 01 = National Clearing System
 	// 02 = BIC Code
 	// 03 = IBAN Code

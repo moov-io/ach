@@ -27,9 +27,9 @@ package ach
 // to electronically convert checks received at the point-of-purchase as well as at a
 // manned bill payment location into a single-entry ACH debit. The authorization to
 // convert the check will be obtained through a notice at the checkout or manned bill
-// payment location (e.g., loan payment at financial institution’s teller window) and the
-// receipt of the Receiver’s check. The decision to process the check item as an ACH debit
-// will be made in the “back office” instead of at the point-of-purchase. The customer’s
+// payment location (e.g., loan payment at financial institution's teller window) and the
+// receipt of the Receiver's check. The decision to process the check item as an ACH debit
+// will be made in the “back office” instead of at the point-of-purchase. The customer's
 // check will solely be used as a source document to obtain the routing number, account
 // number and check serial number.
 //

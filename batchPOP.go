@@ -28,8 +28,8 @@ package ach
 // account information drawn from the source document (a check) obtained from the
 // consumer at the point-of-purchase. The source document, which is voided by the
 // merchant and returned to the consumer at the point-of-purchase, is used to
-// collect the consumer’s routing number, account number and check serial number that
-// will be used to generate the debit entry to the consumer’s account.
+// collect the consumer's routing number, account number and check serial number that
+// will be used to generate the debit entry to the consumer's account.
 //
 // The difference between POP and ARC is that ARC can result from a check mailed in whereas POP is in-person.
 type BatchPOP struct {

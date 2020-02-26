@@ -24,9 +24,9 @@ package ach
 // debits to customer accounts by converting checks at the point of receipt through the U.S. mail, at
 // a drop box location or in-person for payment of a bill at a manned location. The biller is required
 // to provide the customer with notice prior to the acceptance of the check that states the receipt of
-// the customer’s check will be deemed as the authorization for an ARC debit entry to the customer’s
+// the customer's check will be deemed as the authorization for an ARC debit entry to the customer's
 // account. The provision of the notice and the receipt of the check together constitute authorization
-// for the ARC entry. The customer’s check is solely be used as a source document to obtain the routing
+// for the ARC entry. The customer's check is solely be used as a source document to obtain the routing
 // number, account number and check serial number.
 //
 // The difference between ARC and POP is that ARC can result from a check mailed in whereas POP is in-person.
