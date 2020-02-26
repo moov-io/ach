@@ -1174,7 +1174,8 @@ components:
           example: 98765432
         receiverStreetAddress:
           type: string
-          descriptive: Receiver's physical address
+          description: Receiver's physical address
+          example: 123 1st St
         entryDetailSequenceNumber:
           type: number
           description: |
@@ -1351,8 +1352,8 @@ components:
           example: 98765432
         addendaInformation:
           type: string
-          description: TODO
-          example: ''
+          description: Information related to the return
+          example: text
         traceNumber:
           type: string
           description: Matches the Entry Detail Trace Number of the entry being returned.
@@ -1366,7 +1367,7 @@ components:
         IATBatchHeader:
           $ref: '#/components/schemas/IATBatchHeader'
         IATEntryDetails:
-          type: arary
+          type: array
           items:
             $ref: '#/components/schemas/IATEntryDetail'
         batchControl:
@@ -1604,12 +1605,12 @@ components:
           example: 987654320
         fileIdentification:
           type: string
-          description: TODO(adam)
-          example: ""
+          description: Unique identifier for the File
+          example: 22c24006
         achOperatorData:
           type: string
-          description: TODO(adam)
-          example: ""
+          description: Information related to the ACH opreator
+          example: text
         individualName:
           type: string
           description: The name of the receiver, usually the name on the bank account
@@ -1627,16 +1628,16 @@ components:
           example: 1
         achOperatorRoutingNumber:
           type: string
-          description: TODO
-          example: ''
+          description: Routing number for ACH operator
+          example: 987654320
         julianDay:
-          type: int
-          description: TODO
-          example: ''
+          type: number
+          description: Julian Day of the year
+          example: 12
         sequenceNumber:
-          type: int
-          description: TODO
-          example: ''
+          type: number
+          description: SequenceNumber is consecutively assigned to each Addenda05 Record following an Entry Detail Record. The first addenda05 sequence number must always be a 1.
+          example: 1
         addenda99:
           description: Addenda99 record for the Entry Detail
           items:
