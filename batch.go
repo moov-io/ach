@@ -276,6 +276,8 @@ func (batch *Batch) Validate() error {
 	return errors.New("use an implementation of batch or NewBatch")
 }
 
+// SetValidation stores ValidateOpts on the Batch which are to be used to override
+// the default NACHA validation rules.
 func (batch *Batch) SetValidation(opts *ValidateOpts) {
 	batch.validateOpts = opts
 }
