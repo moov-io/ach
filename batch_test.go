@@ -1382,3 +1382,44 @@ func TestBatch__upsertOffsetsErr(t *testing.T) {
 		t.Errorf("unexpected error: %v", err)
 	}
 }
+
+func TestBatch__isTraceNumberODFI(t *testing.T) {
+	file := mockFilePPD()
+	batch := file.Batches[0]
+
+	// Set invalid TraceNumber and ensure it's rejected
+	if b, ok := batch.(*BatchPPD); ok {
+		b.Entries[0].TraceNumber = "333333333333333" // invalid
+
+		if err := b.isTraceNumberODFI(); err == nil {
+			t.Error("expected error")
+		}
+	} else {
+		t.Fatalf("%T %#v", batch, batch)
+	}
+	if err := file.Validate(); err == nil {
+		t.Error("expected error")
+	}
+	if err := batch.Validate(); err == nil {
+		t.Error("expected error")
+	}
+
+	// Set a shorter trace number (0's for routing number) and
+	// ensure it's rejected as well.
+	if b, ok := batch.(*BatchPPD); ok {
+		b.Entries[0].TraceNumber = "3" // invalid
+
+		if err := b.isTraceNumberODFI(); err == nil {
+			t.Error("expected error")
+		}
+	}
+
+	// Allow the failure with an invalid TraceNumber
+	batch.SetValidation(&ValidateOpts{
+		BypassOriginValidation: true,
+	})
+
+	if err := batch.Validate(); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+}

@@ -517,6 +517,9 @@ type ValidateOpts struct {
 
 	// BypassOriginValidation can be set to skip validation for the
 	// ImmediateOrigin file header field.
+	//
+	// This also allows for custom TraceNumbers which aren't prefixed with
+	// a routing number as required by the NACHA specification.
 	BypassOriginValidation bool
 }
 
