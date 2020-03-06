@@ -15,8 +15,7 @@ generate: clean
 	@go run internal/iso4217/iso4217_gen.go
 
 clean:
-	@rm -rf tmp/
-	@rm -rf bin/
+	@rm -rf ./bin/ ./tmp/
 
 dist: clean generate build
 ifeq ($(OS),Windows_NT)

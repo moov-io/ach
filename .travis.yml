@@ -11,19 +11,19 @@ matrix:
   include:
     # Linux
     - os: linux
-      go: 1.13.x
+      go: 1.14.x
       cache:
         directories: ["$HOME/.cache/go-build", "$GOPATH/pkg/mod"]
     - os: linux
       go: master
     # macOS
     - os: osx
-      go: 1.13.x
+      go: 1.14.x
       cache:
         directories: ["$HOME/Library/Caches/go-build", "$GOPATH/pkg/mod"]
     # Windows
     - os: windows
-      go: 1.13.x
+      go: 1.14.x
       cache:
         directories: ["C:\\Users\\travis\\AppData\\Local\\go-build"]
 
@@ -84,7 +84,7 @@ deploy:
   on:
     tags: true
     repo: moov-io/ach
-    go: 1.13.x
+    go: 1.14.x
   skip_cleanup: true
 
 after_deploy:
