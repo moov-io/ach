@@ -440,7 +440,7 @@ func TestFiles__segmentFileEndpoint(t *testing.T) {
 
 // TestFiles__decodeSegmentFileRequest tests segmentFileEndpoints
 func TestFiles__decodeSegmentFileRequest(t *testing.T) {
-	req := httptest.NewRequest("POST", fmt.Sprintf("/files/segment"), nil)
+	req := httptest.NewRequest("POST", "/files/segment", nil)
 	req.Header.Set("Origin", "https://moov.io")
 	req.Header.Set("X-Request-Id", "11111")
 
@@ -500,7 +500,7 @@ func TestFilesError__flattenFileEndpoint(t *testing.T) {
 
 // TestFiles__decodeFlattenFileRequest tests segmentFileEndpoints
 func TestFiles__decodeFlattenFileRequest(t *testing.T) {
-	req := httptest.NewRequest("POST", fmt.Sprintf("/files/flatten"), nil)
+	req := httptest.NewRequest("POST", "/files/flatten", nil)
 	req.Header.Set("Origin", "https://moov.io")
 	req.Header.Set("X-Request-Id", "11111")
 
@@ -641,7 +641,7 @@ func TestFiles__CreateFileEndpoint(t *testing.T) {
 
 	// test status code
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest("POST", fmt.Sprintf("/files/create"), fd)
+	req := httptest.NewRequest("POST", "/files/create", fd)
 	req.Header.Set("Origin", "https://moov.io")
 	req.Header.Set("X-Request-Id", "11114")
 
