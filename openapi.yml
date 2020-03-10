@@ -270,6 +270,12 @@ paths:
           schema:
             type: string
             example: 3f2d23ee214
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidateOpts'
       responses:
         '200':
           description: File validated successfully without errors.
@@ -1704,3 +1710,13 @@ components:
           type: string
           description: Memo for Offset EntryDetail record
           example: OFFSET
+    ValidateOpts:
+      properties:
+        requireABAOrigin:
+          type: boolean
+          default: false
+          description: Require that the FileHeader ImmediateOrigin routing number which checksum matches.
+        bypassOriginValidation:
+          type: boolean
+          default: false
+          description: Skip ImmediateOrigin validation steps.

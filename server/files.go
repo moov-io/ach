@@ -301,9 +301,10 @@ func decodeGetFileContentsRequest(_ context.Context, r *http.Request) (interface
 }
 
 type validateFileRequest struct {
-	ID string
-
+	ID        string
 	requestID string
+
+	opts *ach.ValidateOpts
 }
 
 type validateFileResponse struct {
@@ -322,7 +323,7 @@ func validateFileEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 			}, err
 		}
 
-		err := s.ValidateFile(req.ID)
+		err := s.ValidateFile(req.ID, req.opts)
 		if logger != nil {
 			logger.Log("files", "validateFile", "requestID", req.requestID, "error", err)
 		}
@@ -339,10 +340,18 @@ func decodeValidateFileRequest(_ context.Context, r *http.Request) (interface{},
 	if !ok {
 		return nil, ErrBadRouting
 	}
-	return validateFileRequest{
+
+	req := validateFileRequest{
 		ID:        id,
 		requestID: moovhttp.GetRequestID(r),
-	}, nil
+	}
+
+	var opts ach.ValidateOpts
+	if err := json.NewDecoder(r.Body).Decode(&opts); err == nil {
+		req.opts = &opts
+	}
+
+	return req, nil
 }
 
 type balanceFileRequest struct {

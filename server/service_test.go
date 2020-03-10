@@ -18,7 +18,6 @@
 package server
 
 import (
-	"github.com/moov-io/base"
 	"io/ioutil"
 	"log"
 	"os"
@@ -26,6 +25,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/moov-io/base"
 
 	"github.com/moov-io/ach"
 )
@@ -146,7 +147,7 @@ func TestValidateFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	if err := s.ValidateFile(id); err != nil {
+	if err := s.ValidateFile(id, nil); err != nil {
 		if !strings.Contains(err.Error(), "mandatory ") {
 			t.Fatal(err.Error())
 		}
@@ -155,7 +156,7 @@ func TestValidateFile(t *testing.T) {
 
 func TestValidateFileMissing(t *testing.T) {
 	s := mockServiceInMemory()
-	err := s.ValidateFile("missing")
+	err := s.ValidateFile("missing", nil)
 	if err == nil {
 		t.Fatal("expected error")
 	}
@@ -186,8 +187,24 @@ func TestValidateFileBad(t *testing.T) {
 	}
 
 	// validate
-	if err := s.ValidateFile(fId); err == nil {
+	if err := s.ValidateFile(fId, nil); err == nil {
 		t.Fatal("expected error")
+	}
+}
+
+func TestValidateFileOpts(t *testing.T) {
+	s := mockServiceInMemory()
+	fh := mockFileHeader()
+	fh.ImmediateOrigin = "00000000"
+	id, err := s.CreateFile(fh)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if err := s.ValidateFile(id, &ach.ValidateOpts{RequireABAOrigin: false}); err != nil {
+		if !strings.Contains(err.Error(), "mandatory ") {
+			t.Fatal(err.Error())
+		}
 	}
 }
 

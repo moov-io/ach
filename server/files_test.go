@@ -254,6 +254,57 @@ func TestFiles__validateFileEndpoint(t *testing.T) {
 	}
 }
 
+func TestFiles__ValidateOpts(t *testing.T) {
+	logger := log.NewLogfmtLogger(ioutil.Discard)
+	repo := NewRepositoryInMemory(testTTLDuration, logger)
+	svc := NewService(repo)
+
+	// Write file into storage
+	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-valid.json"))
+	if fd == nil {
+		t.Fatalf("empty ACH file: %v", err)
+	}
+	defer fd.Close()
+
+	bs, _ := ioutil.ReadAll(fd)
+	file, _ := ach.FileFromJSON(bs)
+	file.Header.ImmediateOrigin = "123456789" // invalid routing number
+	repo.StoreFile(file)
+
+	// validate, expect failure
+	w := httptest.NewRecorder()
+	body := strings.NewReader(`{"requireABAOrigin": true}`)
+	req := httptest.NewRequest("GET", fmt.Sprintf("/files/%s/validate", file.ID), body)
+
+	router := mux.NewRouter()
+	router.Methods("GET").Path("/files/{id}/validate").Handler(
+		httptransport.NewServer(validateFileEndpoint(svc, logger), decodeValidateFileRequest, encodeResponse),
+	)
+
+	req.Header.Set("X-Request-Id", "55555")
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+
+	// correct file
+	file.Header.ImmediateOrigin = "987654320" // routing number
+	repo.StoreFile(file)
+
+	// retry, but with different ValidateOpts
+	w = httptest.NewRecorder()
+	body = strings.NewReader(`{"requireABAOrigin": true}`)
+	req = httptest.NewRequest("GET", fmt.Sprintf("/files/%s/validate", file.ID), body)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status: %d: %s", w.Code, w.Body.String())
+	}
+}
+
 func TestFilesErr__balanceFileEndpoint(t *testing.T) {
 	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)

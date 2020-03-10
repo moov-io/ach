@@ -514,14 +514,14 @@ func (f *File) Validate() error {
 type ValidateOpts struct {
 	// RequireABAOrigin can be set to enable routing number validation
 	// over the ImmediateOrigin file header field.
-	RequireABAOrigin bool
+	RequireABAOrigin bool `json:"requireABAOrigin"`
 
 	// BypassOriginValidation can be set to skip validation for the
 	// ImmediateOrigin file header field.
 	//
 	// This also allows for custom TraceNumbers which aren't prefixed with
 	// a routing number as required by the NACHA specification.
-	BypassOriginValidation bool
+	BypassOriginValidation bool `json:"bypassOriginValidation"`
 }
 
 // ValidateWith performs NACHA format rule checks on each record according to their specification
