@@ -72,8 +72,8 @@ after_success:
   - make test-integration && make clean-integration
 
 before_deploy:
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then choco install -y make; fi
   - make dist
-
 deploy:
   provider: releases
   api_key:
@@ -81,6 +81,7 @@ deploy:
   file_glob: true
   file:
     - bin/ach-*
+    - bin/ach.exe
   on:
     tags: true
     repo: moov-io/ach
