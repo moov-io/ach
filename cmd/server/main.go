@@ -121,6 +121,7 @@ func main() {
 
 	// Admin server (metrics and debugging)
 	adminServer := admin.NewServer(*adminAddr)
+	adminServer.AddVersionHandler(ach.Version) // Setup 'GET /version'
 	go func() {
 		logger.Log("admin", fmt.Sprintf("listening on %s", adminServer.BindAddr()))
 		if err := adminServer.Listen(); err != nil {
