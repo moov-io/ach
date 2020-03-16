@@ -46,7 +46,7 @@ type Service interface {
 	// GetFileContents creates a valid plaintext file in memory assuming it has a FileHeader and at least one Batch record.
 	GetFileContents(id string) (io.Reader, error)
 	// ValidateFile
-	ValidateFile(id string) error
+	ValidateFile(id string, opts *ach.ValidateOpts) error
 	// BalanceFile will apply a given offset record to the file
 	BalanceFile(fileID string, off *ach.Offset) (*ach.File, error)
 	// SegmentFile segments an ach file
@@ -139,12 +139,12 @@ func (s *service) GetFileContents(id string) (io.Reader, error) {
 	return &buf, nil
 }
 
-func (s *service) ValidateFile(id string) error {
+func (s *service) ValidateFile(id string, opts *ach.ValidateOpts) error {
 	f, err := s.GetFile(id)
 	if err != nil {
 		return fmt.Errorf("problem reading file %s: %v", id, err)
 	}
-	return f.Validate()
+	return f.ValidateWith(opts)
 }
 
 func (s *service) CreateBatch(fileID string, batch ach.Batcher) (string, error) {
