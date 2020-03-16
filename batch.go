@@ -44,6 +44,8 @@ type Batch struct {
 	category string
 	// Converters is composed for ACH to GoLang Converters
 	converters
+
+	validateOpts *ValidateOpts
 }
 
 const (
@@ -274,6 +276,12 @@ func (batch *Batch) Validate() error {
 	return errors.New("use an implementation of batch or NewBatch")
 }
 
+// SetValidation stores ValidateOpts on the Batch which are to be used to override
+// the default NACHA validation rules.
+func (batch *Batch) SetValidation(opts *ValidateOpts) {
+	batch.validateOpts = opts
+}
+
 // verify checks basic valid NACHA batch rules. Assumes properly parsed records. This does not mean it is a valid batch as validity is tied to each batch type
 func (batch *Batch) verify() error {
 	// No entries in batch
@@ -381,7 +389,9 @@ func (batch *Batch) build() error {
 
 			// Add a sequenced TraceNumber if one is not already set. Have to keep original trance number Return and NOC entries
 			if currentTraceNumberODFI != batchHeaderODFI {
-				entry.SetTraceNumber(batch.Header.ODFIIdentification, seq)
+				if batch.validateOpts == nil || !batch.validateOpts.BypassOriginValidation {
+					entry.SetTraceNumber(batch.Header.ODFIIdentification, seq)
+				}
 			}
 			seq++
 			addendaSeq := 1
@@ -753,6 +763,9 @@ func (batch *Batch) isOriginatorDNE() error {
 // isTraceNumberODFI checks if the first 8 positions of the entry detail trace number
 // match the batch header ODFI
 func (batch *Batch) isTraceNumberODFI() error {
+	if batch.validateOpts != nil && batch.validateOpts.BypassOriginValidation {
+		return nil
+	}
 	for _, entry := range batch.Entries {
 		if batch.Header.ODFIIdentificationField() != entry.TraceNumberField()[:8] {
 			return batch.Error("ODFIIdentificationField",
@@ -1066,7 +1079,7 @@ func (b *Batch) upsertOffsets() error {
 
 	// Create our debit offset EntryDetail
 	debitED := createOffsetEntryDetail(b.offset, b)
-	debitED.TraceNumber = strconv.Itoa(largestTraceNumber(b.Entries) + 1)
+	debitED.TraceNumber = strconv.Itoa(lastTraceNumber(b.Entries) + 1)
 	debitED.Amount = b.Control.TotalCreditEntryDollarAmount
 	switch b.offset.AccountType {
 	case OffsetChecking:
@@ -1080,7 +1093,7 @@ func (b *Batch) upsertOffsets() error {
 
 	// Create our credit offset EntryDetail
 	creditED := createOffsetEntryDetail(b.offset, b)
-	creditED.TraceNumber = strconv.Itoa(largestTraceNumber(b.Entries) + 2)
+	creditED.TraceNumber = strconv.Itoa(lastTraceNumber(b.Entries) + 2)
 	creditED.Amount = b.Control.TotalDebitEntryDollarAmount
 	switch b.offset.AccountType {
 	case OffsetChecking:
@@ -1144,7 +1157,7 @@ func aba8(rtn string) string {
 	}
 }
 
-func largestTraceNumber(entries []*EntryDetail) int {
+func lastTraceNumber(entries []*EntryDetail) int {
 	if len(entries) == 0 {
 		return 0
 	}

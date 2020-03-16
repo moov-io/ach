@@ -1107,9 +1107,9 @@ func TestBatchABA8(t *testing.T) {
 	}
 }
 
-func TestBatch__largestTraceNumber(t *testing.T) {
-	if n := largestTraceNumber(nil); n != 0 {
-		t.Errorf("largestTraceNumber=%d", n)
+func TestBatch__lastTraceNumber(t *testing.T) {
+	if n := lastTraceNumber(nil); n != 0 {
+		t.Errorf("lastTraceNumber=%d", n)
 	}
 
 	var entries []*EntryDetail
@@ -1119,8 +1119,8 @@ func TestBatch__largestTraceNumber(t *testing.T) {
 	entries = append(entries, &EntryDetail{
 		TraceNumber: "1244",
 	})
-	if n := largestTraceNumber(entries); n != 1244 {
-		t.Errorf("largestTraceNumber=%d", n)
+	if n := lastTraceNumber(entries); n != 1244 {
+		t.Errorf("lastTraceNumber=%d", n)
 	}
 
 	// invalid TraceNumber
@@ -1129,8 +1129,8 @@ func TestBatch__largestTraceNumber(t *testing.T) {
 			TraceNumber: "AA",
 		},
 	}
-	if n := largestTraceNumber(entries); n != 0 {
-		t.Errorf("largestTraceNumber=%d", n)
+	if n := lastTraceNumber(entries); n != 0 {
+		t.Errorf("lastTraceNumber=%d", n)
 	}
 }
 
@@ -1230,7 +1230,7 @@ func TestBatch__CalculateBalancedOffsetDebitAndCredit(t *testing.T) {
 	// Add another EntryDetail
 	ed := mockEntryDetail()
 	ed.Amount = 500
-	ed.TraceNumber = strconv.Itoa(largestTraceNumber([]*EntryDetail{ed}) + 1)
+	ed.TraceNumber = strconv.Itoa(lastTraceNumber([]*EntryDetail{ed}) + 1)
 	b.AddEntry(ed)
 
 	if err := b.Create(); err != nil {
@@ -1378,6 +1378,47 @@ func TestBatch__upsertOffsetsErr(t *testing.T) {
 	if err := f.Batches[0].Create(); err == nil {
 		t.Error("expected error")
 	} else if !strings.Contains(err.Error(), "offset: invalid routing number") {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+func TestBatch__isTraceNumberODFI(t *testing.T) {
+	file := mockFilePPD()
+	batch := file.Batches[0]
+
+	// Set invalid TraceNumber and ensure it's rejected
+	if b, ok := batch.(*BatchPPD); ok {
+		b.Entries[0].TraceNumber = "333333333333333" // invalid
+
+		if err := b.isTraceNumberODFI(); err == nil {
+			t.Error("expected error")
+		}
+	} else {
+		t.Fatalf("%T %#v", batch, batch)
+	}
+	if err := file.Validate(); err == nil {
+		t.Error("expected error")
+	}
+	if err := batch.Validate(); err == nil {
+		t.Error("expected error")
+	}
+
+	// Set a shorter trace number (0's for routing number) and
+	// ensure it's rejected as well.
+	if b, ok := batch.(*BatchPPD); ok {
+		b.Entries[0].TraceNumber = "3" // invalid
+
+		if err := b.isTraceNumberODFI(); err == nil {
+			t.Error("expected error")
+		}
+	}
+
+	// Allow the failure with an invalid TraceNumber
+	batch.SetValidation(&ValidateOpts{
+		BypassOriginValidation: true,
+	})
+
+	if err := batch.Validate(); err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
 }

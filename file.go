@@ -518,6 +518,9 @@ type ValidateOpts struct {
 
 	// BypassOriginValidation can be set to skip validation for the
 	// ImmediateOrigin file header field.
+	//
+	// This also allows for custom TraceNumbers which aren't prefixed with
+	// a routing number as required by the NACHA specification.
 	BypassOriginValidation bool
 }
 
@@ -847,7 +850,6 @@ func (f *File) segmentFileBatches(creditFile, debitFile *File) {
 
 				entries := batch.GetEntries()
 				for _, entry := range entries {
-					entry.TraceNumber = "" // unset so Batch.build generates a TraceNumber
 					segmentFileBatchAddEntry(creditBatch, debitBatch, entry)
 				}
 
@@ -970,8 +972,6 @@ func (f *File) addFileHeaderData(file *File) *File {
 // segmentFileBatchAddEntry adds entries to batches in a segmented file
 // Applies to All SEC Codes except ADV (Automated Accounting Advice)
 func segmentFileBatchAddEntry(creditBatch, debitBatch Batcher, entry *EntryDetail) {
-
-	entry.TraceNumber = "" // unset so Batch.build generates a TraceNumber
 	switch entry.TransactionCode {
 	case CheckingCredit, CheckingReturnNOCCredit, CheckingPrenoteCredit, CheckingZeroDollarRemittanceCredit,
 		SavingsCredit, SavingsReturnNOCCredit, SavingsPrenoteCredit, SavingsZeroDollarRemittanceCredit,
@@ -1034,8 +1034,6 @@ func (f *File) FlattenBatches() (*File, error) {
 					} else {
 						entries := batch.GetEntries()
 						for _, entry := range entries {
-							// Reset TraceNumber
-							entry.TraceNumber = ""
 							of.Batches[i].AddEntry(entry)
 						}
 					}

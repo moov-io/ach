@@ -19,10 +19,11 @@ package examples
 
 import (
 	"fmt"
-	"github.com/moov-io/ach"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/moov-io/ach"
 )
 
 func Example_ppdWriteSegmentFile() {
@@ -37,6 +38,16 @@ func Example_ppdWriteSegmentFile() {
 		fmt.Printf("Issue reading file: %+v \n", err)
 	}
 
+	// verify a TraceNumber is set
+	for i := range achFile.Batches {
+		ed := achFile.Batches[i].GetEntries()
+		for j := range ed {
+			if ed[j].TraceNumber == "" {
+				log.Fatalf("Batch[%d].Entries[%d] is missing a TraceNumber", i, j)
+			}
+		}
+	}
+
 	// ensure we have a validated file structure
 	if achFile.Validate(); err != nil {
 		fmt.Printf("Could not validate entire read file: %v", err)
@@ -49,11 +60,26 @@ func Example_ppdWriteSegmentFile() {
 		fmt.Printf("Could not segment the file: %v", err)
 	}
 
-	fmt.Printf("%s", creditFile.Batches[0].GetEntries()[0].String()+"\n")
-	fmt.Printf("%s", debitFile.Batches[0].GetEntries()[0].String()+"\n")
+	if err := creditFile.Validate(); err != nil {
+		log.Fatal(err)
+	}
+	if err := debitFile.Validate(); err != nil {
+		log.Fatal(err)
+	}
+
+	ed := creditFile.Batches[0].GetEntries()
+	for i := range ed {
+		fmt.Printf("credit %d: %s\n", i, ed[i].String())
+	}
+
+	ed = debitFile.Batches[0].GetEntries()
+	for i := range ed {
+		fmt.Printf("debit %d: %s\n", i, ed[i].String())
+	}
 
 	// Output:
-	// 622231380104987654321        0100000000               Credit Account 1        0121042880000001
-	// 627231380104123456789        0200000000               Debit Account           0121042880000001
+	// credit 0: 622231380104987654321        0100000000               Credit Account 1        0121042880000002
+	// credit 1: 622231380104837098765        0100000000               Credit Account 2        0121042880000003
+	// debit 0: 627231380104123456789        0200000000               Debit Account           0121042880000001
 
 }
