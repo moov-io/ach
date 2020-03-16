@@ -3,6 +3,26 @@
 ADDITIONS
 
 - batches: Add `LiftEffectiveEntryDate()` to offer parsed `time.Time` values of `EffectiveEntryDate`
+- file: add ValidateWith to override specific default validations
+- cmd/server: add version handler to admin HTTP server
+- server: read ValidateOpts in HTTP validate route
+
+BUG FIXEs
+
+- all: replace `Ç` with `C` across the project
+- file: keep TraceNumbers when segmenting files
+
+IMPROVEMENTS
+
+- api: used shared Error model
+- api: include AddendaXX, ADV, and IAT records that were missing from OpenAPI spec
+- chore(deps): update module prometheus/client_golang to v1.4.1
+- chore(deps): update module gorilla/mux to v1.7.4
+
+BUILD
+
+- chore(deps): update golang docker tag to v1.14
+- build: run sonatype-nexus-community/nancy in CI
 
 ## v1.3.1 (Released 2020-01-22)
 
