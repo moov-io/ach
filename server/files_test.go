@@ -464,9 +464,11 @@ func TestFiles__segmentFileEndpoint(t *testing.T) {
 	file, _ := ach.FileFromJSON(bs)
 	repo.StoreFile(file)
 
+	body := strings.NewReader(`{}`)
+
 	// test status code
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest("POST", fmt.Sprintf("/files/%s/segment", file.ID), nil)
+	req := httptest.NewRequest("POST", fmt.Sprintf("/files/%s/segment", file.ID), body)
 	req.Header.Set("Origin", "https://moov.io")
 	req.Header.Set("X-Request-Id", "11111")
 

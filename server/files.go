@@ -413,6 +413,8 @@ func decodeBalanceFileRequest(_ context.Context, r *http.Request) (interface{}, 
 type segmentFileRequest struct {
 	fileID    string
 	requestID string
+
+	opts *ach.SegmentFileConfiguration
 }
 
 type segmentFileResponse struct {
@@ -431,7 +433,7 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 			}, err
 		}
 
-		creditFile, debitFile, err := s.SegmentFile(req.fileID)
+		creditFile, debitFile, err := s.SegmentFile(req.fileID, req.opts)
 
 		if logger != nil {
 			logger.Log("files", "segmentFile", "requestID", req.requestID, "error", err)
@@ -467,10 +469,18 @@ func decodeSegmentFileRequest(_ context.Context, r *http.Request) (interface{}, 
 	if !ok {
 		return nil, ErrBadRouting
 	}
-	return segmentFileRequest{
+
+	req := segmentFileRequest{
 		fileID:    fileID,
 		requestID: moovhttp.GetRequestID(r),
-	}, nil
+	}
+
+	var opts ach.SegmentFileConfiguration
+	if err := json.NewDecoder(r.Body).Decode(&opts); err == nil {
+		req.opts = &opts
+	}
+
+	return req, nil
 }
 
 type flattenBatchesRequest struct {
