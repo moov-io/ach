@@ -337,7 +337,7 @@ paths:
   /files/{fileID}/flatten:
     post:
       tags: ['ACH Files']
-      summary: Create a new file object
+      summary: Consolidate batches and entries into the minimum number of batches needed.
       operationId: flattenFile
       security:
         - bearerAuth: []
@@ -363,31 +363,19 @@ paths:
           schema:
             type: string
             example: 3f2d23ee214
-      requestBody:
-        description: Content of the ACH file (in json or raw text)
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateFile'
-          text/plain:
-            schema:
-              description: A plaintext ACH file
-              type: string
-              example: 101 222380104 1210428821805100000A094101Citadel                Bank Name
       responses:
-        '201':
-          description: A JSOn objeect containing the File ID associated with a Flattened ACH file.
-          headers:
-            Location:
-              description: The location of the new resource
-              schema:
-                type: string
-                format: uri
+        '200':
+          description: An ID of the new ACH file
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/File'
+                $ref: '#/components/schemas/FileID'
+        '400':
+          description: See error in response body
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
   /files/{fileID}/batches:
     get:
       tags: ['ACH Files']
@@ -559,6 +547,12 @@ components:
           $ref: '#/components/schemas/ADVBatchControl'
       required:
         - fileHeader
+    FileID:
+      properties:
+        ID:
+          type: string
+          description: File ID
+          example: 1e522dc8
     File:
       properties:
         ID:
