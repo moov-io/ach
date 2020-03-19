@@ -771,7 +771,7 @@ func (f *File) createFileADV() error {
 //
 // The File returned may not be valid and callers should confirm with Validate(). Invalid files may
 // be rejected by other Financial Institutions or ACH tools.
-func (f *File) SegmentFile(sfc *SegmentFileConfiguration) (*File, *File, error) {
+func (f *File) SegmentFile(_ *SegmentFileConfiguration) (*File, *File, error) {
 	if err := f.Validate(); err != nil {
 		return nil, nil, err
 	}

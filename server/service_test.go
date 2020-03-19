@@ -444,7 +444,7 @@ func TestSegmentFile(t *testing.T) {
 		t.Fatal("No Batch ID")
 	}
 
-	creditFile, debitFile, err := s.SegmentFile(fileID)
+	creditFile, debitFile, err := s.SegmentFile(fileID, nil)
 
 	if err != nil {
 		t.Fatalf("could not segment file w/ error %v", err)
@@ -462,7 +462,7 @@ func TestSegmentFile(t *testing.T) {
 // TestSegmentFile_FileValidateError return an error on file Validation
 func TestSegmentFileError(t *testing.T) {
 	s := mockServiceInMemory()
-	_, _, err := s.SegmentFile("98765")
+	_, _, err := s.SegmentFile("98765", nil)
 
 	if err != nil {
 		if !base.Match(err, ach.ErrConstructor) {
@@ -529,7 +529,7 @@ func TestSegmentFileDebitsOnly(t *testing.T) {
 		t.Fatal("No Batch ID")
 	}
 
-	creditFile, debitFile, err := s.SegmentFile(fileID)
+	creditFile, debitFile, err := s.SegmentFile(fileID, nil)
 
 	if err != nil {
 		t.Fatalf("could not segment file w/ error %v", err)
@@ -603,7 +603,7 @@ func TestSegmentFileDebitsOnlyBatchID(t *testing.T) {
 		t.Fatal("No Batch ID")
 	}
 
-	_, debitFile, err := s.SegmentFile(fileID)
+	_, debitFile, err := s.SegmentFile(fileID, nil)
 
 	if err != nil {
 		t.Fatalf("could not segment file w/ error %v", err)
@@ -668,7 +668,7 @@ func TestSegmentFile_NoFileID(t *testing.T) {
 
 func TestFlattenBatches_NoFileID(t *testing.T) {
 	s := mockServiceInMemory()
-	_, _, err := s.SegmentFile("")
+	_, _, err := s.SegmentFile("", nil)
 
 	if err != nil {
 		if !strings.Contains(err.Error(), "not found") {

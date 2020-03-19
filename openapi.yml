@@ -288,7 +288,7 @@ paths:
   /files/{fileID}/segment:
     post:
       tags: ['ACH Files']
-      summary: Create a new file object
+      summary: Split one file into two. One with only debits and one with only credits.
       operationId: segmentFile
       security:
         - bearerAuth: []
@@ -315,30 +315,25 @@ paths:
             type: string
             example: 3f2d23ee214
       requestBody:
-        description: Content of the ACH file (in json or raw text)
-        required: true
+        description: Optional configuration for segmenting files
+        required: false
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateFile'
-          text/plain:
-            schema:
-              description: A plaintext ACH file
-              type: string
-              example: 101 222380104 1210428821805100000A094101Citadel                Bank Name
+              $ref: '#/components/schemas/SegmentFileConfiguration'
       responses:
-        '201':
-          description: A JSON object containing the credit File ID and debit File ID
-          headers:
-            Location:
-              description: The location of the new resource
-              schema:
-                type: string
-                format: uri
+        '200':
+          description: An ID of the new ACH file
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/File'
+                $ref: '#/components/schemas/SegmentedFiles'
+        '400':
+          description: See error in response body
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
   /files/{fileID}/flatten:
     post:
       tags: ['ACH Files']
@@ -1710,6 +1705,19 @@ components:
           type: string
           description: Memo for Offset EntryDetail record
           example: OFFSET
+    SegmentedFiles:
+      properties:
+        creditFileID:
+          type: string
+          description: File ID
+          example: 058960d8
+        debitFileID:
+          type: string
+          description: File ID
+          example: 3cac5447
+    SegmentFileConfiguration:
+      # There are no options here currently, but this object exists to read them in the future
+      properties: {}
     ValidateOpts:
       properties:
         requireABAOrigin:

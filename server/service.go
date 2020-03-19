@@ -50,7 +50,7 @@ type Service interface {
 	// BalanceFile will apply a given offset record to the file
 	BalanceFile(fileID string, off *ach.Offset) (*ach.File, error)
 	// SegmentFile segments an ach file
-	SegmentFile(id string) (*ach.File, *ach.File, error)
+	SegmentFile(id string, opts *ach.SegmentFileConfiguration) (*ach.File, *ach.File, error)
 	// FlattenBatches will minimize the ach.Batch objects in a file by consolidating EntryDetails under distinct batch headers
 	FlattenBatches(id string) (*ach.File, error)
 	// CreateBatch creates a new batch within and ach file and returns its resource ID
@@ -209,7 +209,7 @@ func (s *service) BalanceFile(fileID string, off *ach.Offset) (*ach.File, error)
 }
 
 // SegmentFile takes an ACH File and segments the files into a credit ACH File and debit ACH File and adds to in memory storage.
-func (s *service) SegmentFile(fileID string) (*ach.File, *ach.File, error) {
+func (s *service) SegmentFile(fileID string, opts *ach.SegmentFileConfiguration) (*ach.File, *ach.File, error) {
 	f, err := s.GetFile(fileID)
 	if err != nil {
 		return nil, nil, err
@@ -218,8 +218,8 @@ func (s *service) SegmentFile(fileID string) (*ach.File, *ach.File, error) {
 	if err := f.Create(); err != nil {
 		return nil, nil, err
 	}
-	sfc := ach.NewSegmentFileConfiguration()
-	creditFile, debitFile, err := f.SegmentFile(sfc)
+
+	creditFile, debitFile, err := f.SegmentFile(opts)
 	if err != nil {
 		return nil, nil, err
 	}
