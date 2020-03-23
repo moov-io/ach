@@ -279,6 +279,9 @@ func (batch *Batch) Validate() error {
 // SetValidation stores ValidateOpts on the Batch which are to be used to override
 // the default NACHA validation rules.
 func (batch *Batch) SetValidation(opts *ValidateOpts) {
+	if batch == nil {
+		return
+	}
 	batch.validateOpts = opts
 }
 
