@@ -6,11 +6,15 @@ ADDITIONS
 - file: add ValidateWith to override specific default validations
 - cmd/server: add version handler to admin HTTP server
 - server: read ValidateOpts in HTTP validate route
+- file: support setting ValidateOpts on struct for calling Create()
 
 BUG FIXEs
 
 - all: replace `Ç` with `C` across the project
 - file: keep TraceNumbers when segmenting files
+- server: fix segment OpenAPI spec and accept config body
+- server: read empty SegmentFileConfiguration
+- api: fixup flatten files OpenAPI spec
 
 IMPROVEMENTS
 
