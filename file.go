@@ -67,6 +67,8 @@ type File struct {
 
 	// ReturnEntries is a slice of references to file.Batches that contain return entries
 	ReturnEntries []Batcher `json:"ReturnEntries"`
+
+	validateOpts *ValidateOpts
 }
 
 // NewFile constructs a file template.
@@ -506,7 +508,18 @@ func (f *File) SetHeader(h FileHeader) *File {
 //
 // Validate will never modify the file.
 func (f *File) Validate() error {
-	return f.ValidateWith(nil)
+	return f.ValidateWith(f.validateOpts)
+}
+
+// SetValidation stores ValidateOpts on the Batch which are to be used to override
+// the default NACHA validation rules.
+func (f *File) SetValidation(opts *ValidateOpts) {
+	if f == nil {
+		return
+	}
+
+	f.validateOpts = opts
+	f.Header.SetValidation(opts)
 }
 
 // ValidateOpts contains specific overrides from the default set of validations
@@ -525,7 +538,8 @@ type ValidateOpts struct {
 }
 
 // ValidateWith performs NACHA format rule checks on each record according to their specification
-// overlayed with any custom flags.
+// overlayed with any custom flags. Any ValidateOpts on the File are ignored, use Validate() instead.
+//
 // The first error encountered is returned and stops the parsing.
 func (f *File) ValidateWith(opts *ValidateOpts) error {
 	if opts == nil {

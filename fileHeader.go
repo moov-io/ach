@@ -100,6 +100,8 @@ type FileHeader struct {
 	validator
 	// converters is composed for ACH to GoLang Converters
 	converters
+
+	validateOpts *ValidateOpts
 }
 
 // NewFileHeader returns a new FileHeader with default values for none exported fields
@@ -180,10 +182,19 @@ func (fh *FileHeader) String() string {
 	return buf.String()
 }
 
+// SetValidation stores ValidateOpts on the Batch which are to be used to override
+// the default NACHA validation rules.
+func (fh *FileHeader) SetValidation(opts *ValidateOpts) {
+	if fh == nil {
+		return
+	}
+	fh.validateOpts = opts
+}
+
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops the parsing.
 func (fh *FileHeader) Validate() error {
-	return fh.ValidateWith(nil)
+	return fh.ValidateWith(fh.validateOpts)
 }
 
 // ValidateWith performs NACHA format rule checks on each record according to their specification

@@ -738,3 +738,9 @@ func TestFileHeader__ValidateOrigin(t *testing.T) {
 		t.Errorf("unexpected error: %v", err)
 	}
 }
+
+func TestFileHeader__SetValidation(t *testing.T) {
+	fh := mockFileHeader()
+	fh.SetValidation(nil)
+	fh.SetValidation(&ValidateOpts{})
+}

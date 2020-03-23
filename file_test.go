@@ -1862,3 +1862,36 @@ func TestFileFlattenFileMultipleADVTBatchHeaders(t *testing.T) {
 		t.Fatalf("Flattend file did not validate: %+v \n", err)
 	}
 }
+
+func TestFile__SetValidation(t *testing.T) {
+	file, err := readACHFilepath(filepath.Join("test", "testdata", "web-debit.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Check before any modifications
+	if err := file.Create(); err != nil {
+		t.Fatal(err)
+	}
+
+	// modify Header
+	file.Header.ImmediateOrigin = "123456789" // invalid routing number
+	file.SetValidation(&ValidateOpts{
+		BypassOriginValidation: true,
+	})
+	// Check we don't error
+	if err := file.Create(); err != nil {
+		t.Fatal(err)
+	}
+
+	// Override
+	if err := file.Header.ValidateWith(&ValidateOpts{RequireABAOrigin: true}); err == nil {
+		t.Error("expected error")
+	}
+
+	t.Logf("file.validateOpts=%#v", file.validateOpts)
+
+	// nil File and set
+	file = nil
+	file.SetValidation(nil)
+	file.SetValidation(&ValidateOpts{})
+}
