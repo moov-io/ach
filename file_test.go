@@ -1863,6 +1863,35 @@ func TestFileFlattenFileMultipleADVTBatchHeaders(t *testing.T) {
 	}
 }
 
+func TestFile__FlattenMicroDeposits(t *testing.T) {
+	in, err := readACHFilepath(filepath.Join("test", "testdata", "two-micro-deposits.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(in.Batches) != 2 {
+		t.Fatalf("got %d batches", len(in.Batches))
+	}
+	if len(in.Batches[0].GetEntries()) != 3 || len(in.Batches[1].GetEntries()) != 3 {
+		t.Fatal("unexpected EntryDetails in Batches")
+	}
+
+	out, err := in.FlattenBatches()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(out.Batches) != 1 {
+		t.Fatalf("got %d batches", len(out.Batches))
+	}
+
+	entries := out.Batches[0].GetEntries()
+	if len(entries) != 6 {
+		t.Errorf("got %d entries", len(entries))
+	}
+	if err := out.Validate(); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestFile__SetValidation(t *testing.T) {
 	file, err := readACHFilepath(filepath.Join("test", "testdata", "web-debit.ach"))
 	if err != nil {

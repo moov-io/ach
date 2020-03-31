@@ -1012,9 +1012,6 @@ func segmentFileBatchAddADVEntry(creditBatch Batcher, debitBatch Batcher, entry 
 
 // FlattenBatches flattens File Batches by consolidating batches with the same BatchHeader data into one Batch.
 func (f *File) FlattenBatches() (*File, error) {
-	if err := f.Validate(); err != nil {
-		return nil, err
-	}
 	of := NewFile()
 
 	if f.Batches != nil {
