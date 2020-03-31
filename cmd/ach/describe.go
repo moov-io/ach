@@ -1,4 +1,4 @@
-// Copyright 2019 The Moov Authors
+// Copyright 2020 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -20,7 +20,7 @@ func dumpFiles(paths []string) error {
 		fmt.Printf("Describing ACH file '%s'\n\n", paths[i])
 		file, err := readACHFile(paths[i])
 		if err != nil {
-			return fmt.Errorf("problem reading %s: %v", paths[i], err)
+			fmt.Printf("WARN: problem reading %s:\n %v\n\n", paths[i], err)
 		}
 		dumpFile(file)
 	}
@@ -28,6 +28,10 @@ func dumpFiles(paths []string) error {
 }
 
 func dumpFile(file *ach.File) {
+	if file == nil {
+		return
+	}
+
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	defer w.Flush()
 
