@@ -51,7 +51,11 @@ func dumpFile(file *ach.File) {
 
 		bh := file.Batches[i].GetHeader()
 		bc := file.Batches[i].GetControl()
-		fmt.Fprintf(w, "  %d\t%s\t%d\t%d\t%d\t%d\n", bh.BatchNumber, bh.StandardEntryClassCode, bh.ServiceClassCode, bc.EntryAddendaCount, bc.TotalDebitEntryDollarAmount, bc.TotalCreditEntryDollarAmount)
+		if bh != nil && bc != nil {
+			fmt.Fprintf(w, "  %d\t%s\t%d\t%d\t%d\t%d\n",
+				bh.BatchNumber, bh.StandardEntryClassCode, bh.ServiceClassCode,
+				bc.EntryAddendaCount, bc.TotalDebitEntryDollarAmount, bc.TotalCreditEntryDollarAmount)
+		}
 
 		entries := file.Batches[i].GetEntries()
 		for j := range entries {
