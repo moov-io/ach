@@ -142,7 +142,7 @@ func TestParser__errorJSON(t *testing.T) {
 
 // testPPDDebitRead validates reading a PPD debit
 func testPPDDebitRead(t testing.TB) {
-	f, err := os.Open("./test/testdata/ppd-debit.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "ppd-debit.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -171,7 +171,7 @@ func BenchmarkPPDDebitRead(b *testing.B) {
 
 // testWEBDebitRead validates reading a WEB debit
 func testWEBDebitRead(t testing.TB) {
-	f, err := os.Open("./test/testdata/web-debit.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "web-debit.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -201,7 +201,7 @@ func BenchmarkWEBDebitRead(b *testing.B) {
 
 // testPPDDebitFixedLengthRead validates reading a PPD debit fixed width length
 func testPPDDebitFixedLengthRead(t testing.TB) {
-	f, err := os.Open("./test/testdata/ppd-debit-fixedLength.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "ppd-debit-fixedLength.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -969,7 +969,7 @@ func BenchmarkFileFHImmediateOrigin(b *testing.B) {
 
 // testACHFileRead validates reading a file with PPD and IAT entries
 func testACHFileRead(t testing.TB) {
-	f, err := os.Open("./test/testdata/20110805A.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "20110805A.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1003,7 +1003,7 @@ func BenchmarkACHFileRead(b *testing.B) {
 
 // testACHFileRead2 validates reading a file with PPD and IAT entries
 func testACHFileRead2(t testing.TB) {
-	f, err := os.Open("./test/testdata/20110805A.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "20110805A.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1037,7 +1037,7 @@ func BenchmarkACHFileRead2(b *testing.B) {
 
 // testACHFileRead3 validates reading a file with IAT entries only
 func testACHFileRead3(t testing.TB) {
-	f, err := os.Open("./test/testdata/20180713-IAT.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "20180713-IAT.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1067,7 +1067,7 @@ func BenchmarkACHFileRead3(b *testing.B) {
 
 // testACHIATAddenda17 validates reading a file with IAT and Addenda17 entries
 func testACHIATAddenda17(t testing.TB) {
-	f, err := os.Open("./test/testdata/20180716-IAT-A17.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "20180716-IAT-A17.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1100,7 +1100,7 @@ func BenchmarkACHIATAddenda17(b *testing.B) {
 
 // testACHIATAddenda1718 validates reading a file with IAT and Addenda17 and Addenda18 entries
 func testACHIATAddenda1718(t testing.TB) {
-	f, err := os.Open("./test/testdata/20180716-IAT-A17-A18.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "20180716-IAT-A17-A18.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1133,7 +1133,7 @@ func BenchmarkACHIATAddenda1718(b *testing.B) {
 
 // testACHFileIATBatchHeader validates error when reading an invalid IATBatchHeader
 func testACHFileIATBatchHeader(t testing.TB) {
-	f, err := os.Open("./test/testdata/iat-invalidBatchHeader.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "iat-invalidBatchHeader.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1161,7 +1161,7 @@ func BenchmarkACHFileIATBatchHeader(b *testing.B) {
 
 // testACHFileIATEntryDetail validates error when reading an invalid IATEntryDetail
 func testACHFileIATEntryDetail(t testing.TB) {
-	f, err := os.Open("./test/testdata/iat-invalidEntryDetail.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "iat-invalidEntryDetail.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1189,7 +1189,7 @@ func BenchmarkACHFileIATEntryDetail(b *testing.B) {
 
 // TestIATAddendaRecordIndicator validates error when reading an invalid IATEntryDetail
 func TestIATAddendaRecordIndicator(t *testing.T) {
-	f, err := os.Open("./test/testdata/iat-invalidAddendaRecordIndicator.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "iat-invalidAddendaRecordIndicator.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1204,7 +1204,7 @@ func TestIATAddendaRecordIndicator(t *testing.T) {
 
 // TestACHFileIATAddenda10 validates error when reading an invalid IATAddenda10
 func TestACHFileIATAddenda10(t *testing.T) {
-	f, err := os.Open("./test/testdata/iat-invalidAddenda10.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "iat-invalidAddenda10.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1219,7 +1219,7 @@ func TestACHFileIATAddenda10(t *testing.T) {
 
 // TestACHFileIATAddenda11 validates error when reading an invalid IATAddenda10
 func TestACHFileIATAddenda11(t *testing.T) {
-	f, err := os.Open("./test/testdata/iat-invalidAddenda11.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "iat-invalidAddenda11.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1234,7 +1234,7 @@ func TestACHFileIATAddenda11(t *testing.T) {
 
 // TestACHFileIATAddenda12 validates error when reading an invalid IATAddenda10
 func TestACHFileIATAddenda12(t *testing.T) {
-	f, err := os.Open("./test/testdata/iat-invalidAddenda12.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "iat-invalidAddenda12.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1249,7 +1249,7 @@ func TestACHFileIATAddenda12(t *testing.T) {
 
 // TestACHFileIATAddenda13 validates error when reading an invalid IATAddenda13
 func TestACHFileIATAddenda13(t *testing.T) {
-	f, err := os.Open("./test/testdata/Iat-invalidAddenda13.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "Iat-invalidAddenda13.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1264,7 +1264,7 @@ func TestACHFileIATAddenda13(t *testing.T) {
 
 // TestACHFileIATAddenda14 validates error when reading an invalid IATAddenda14
 func TestACHFileIATAddenda14(t *testing.T) {
-	f, err := os.Open("./test/testdata/iat-invalidAddenda14.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "iat-invalidAddenda14.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1279,7 +1279,7 @@ func TestACHFileIATAddenda14(t *testing.T) {
 
 // TestACHFileIATAddenda15 validates error when reading an invalid IATAddenda15
 func TestACHFileIATAddenda15(t *testing.T) {
-	f, err := os.Open("./test/testdata/iat-invalidAddenda15.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "iat-invalidAddenda15.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1294,7 +1294,7 @@ func TestACHFileIATAddenda15(t *testing.T) {
 
 // TestACHFileIATAddenda16 validates error when reading an invalid IATAddenda16
 func TestACHFileIATAddenda16(t *testing.T) {
-	f, err := os.Open("./test/testdata/iat-invalidAddenda16.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "iat-invalidAddenda16.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1309,7 +1309,7 @@ func TestACHFileIATAddenda16(t *testing.T) {
 
 // TestACHFileIATAddenda17 validates error when reading an invalid IATAddenda17
 func TestACHFileIATAddenda17(t *testing.T) {
-	f, err := os.Open("./test/testdata/iat-invalidAddenda17.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "iat-invalidAddenda17.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1324,7 +1324,7 @@ func TestACHFileIATAddenda17(t *testing.T) {
 
 // TestACHFileIATAddenda18 validates error when reading an invalid IATAddenda18
 func TestACHFileIATAddenda18(t *testing.T) {
-	f, err := os.Open("./test/testdata/iat-invalidAddenda18.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "iat-invalidAddenda18.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1339,7 +1339,7 @@ func TestACHFileIATAddenda18(t *testing.T) {
 
 // TestACHFileIATAddenda98 validates error when reading an invalid IATAddenda98
 func TestACHFileIATAddenda98(t *testing.T) {
-	f, err := os.Open("./test/testdata/iat-invalidAddenda98.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "iat-invalidAddenda98.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1354,7 +1354,7 @@ func TestACHFileIATAddenda98(t *testing.T) {
 
 // TestACHFileIATAddenda99 validates error when reading an invalid IATAddenda99
 func TestACHFileIATAddenda99(t *testing.T) {
-	f, err := os.Open("./test/testdata/iat-invalidAddenda99.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "iat-invalidAddenda99.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1369,7 +1369,7 @@ func TestACHFileIATAddenda99(t *testing.T) {
 
 // TestPOSInvalidReturnFile validates error when reading an invalid POS Return
 func TestPOSInvalidReturnFile(t *testing.T) {
-	f, err := os.Open("./test/testdata/pos-invalidReturnFile.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "pos-invalidReturnFile.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1384,7 +1384,7 @@ func TestPOSInvalidReturnFile(t *testing.T) {
 
 // TestWEBInvalidNOCFile validates error when reading an invalid WEB NOC
 func TestWEBInvalidNOCFile(t *testing.T) {
-	f, err := os.Open("./test/testdata/web-invalidNOCFile.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "web-invalidNOCFile.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1399,7 +1399,7 @@ func TestWEBInvalidNOCFile(t *testing.T) {
 
 // TestPOSInvalidEntryDetail validates error when reading an invalid POS EntryDetail
 func TestPOSInvalidEntryDetail(t *testing.T) {
-	f, err := os.Open("./test/testdata/pos-invalidEntryDetail.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "pos-invalidEntryDetail.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1414,7 +1414,7 @@ func TestPOSInvalidEntryDetail(t *testing.T) {
 
 // TestADVInvalidBatchEntries validates error when reading an invalid ADV file with no entries in a batch
 func TestADVInvalidBatchEntries(t *testing.T) {
-	f, err := os.Open("./test/testdata/adv-invalidBatchEntries.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "adv-invalidBatchEntries.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1429,7 +1429,7 @@ func TestADVInvalidBatchEntries(t *testing.T) {
 
 // TestADVNoFileControl validates error when reading an invalid ADV file with no FileControl
 func TestADVNoFileControl(t *testing.T) {
-	f, err := os.Open("./test/testdata/adv-noFileControl.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "adv-noFileControl.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1466,7 +1466,7 @@ func TestADVCategoryReturn(t *testing.T) {
 
 // testACHFileIATBC validates error when reading an invalid IAT Batch Control
 func testACHFileIATBC(t testing.TB) {
-	f, err := os.Open("./test/testdata/iat-invalidBatchControl.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "iat-invalidBatchControl.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1494,7 +1494,7 @@ func BenchmarkACHFileIATBC(b *testing.B) {
 
 // testACHFileIATBH validates error when reading an invalid IAT Batch Header
 func testACHFileIATBH(t testing.TB) {
-	f, err := os.Open("./test/testdata/iat-batchHeaderErr.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "iat-batchHeaderErr.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1522,7 +1522,7 @@ func BenchmarkACHFileIATBH(b *testing.B) {
 
 // TestReturnACHFile test loading WEB return file
 func TestReturnACHFile(t *testing.T) {
-	f, err := os.Open("./test/testdata/return-WEB.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "return-WEB.ach"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1576,7 +1576,7 @@ func TestADVReturnError(t *testing.T) {
 
 // TestADVFileControl validates error when reading an invalid ADV File Control
 func TestADVFileControl(t *testing.T) {
-	f, err := os.Open("./test/testdata/adv-invalidFileControl.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "adv-invalidFileControl.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1614,7 +1614,7 @@ func testACHFileTooLongErr(t testing.TB) {
 	// To make testing this more manageable, we'll artificially cap the size of the file to 200 lines
 	maxLines = 200
 
-	f, err := os.Open("./test/testdata/20110729A.ach")
+	f, err := os.Open(filepath.Join("test", "testdata", "20110729A.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}

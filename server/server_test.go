@@ -40,6 +40,7 @@ func TestServer__CreateFileEndpoint(t *testing.T) {
 	if len(files) == 0 {
 		t.Fatal("got no test ACH files to process")
 	}
+	t.Logf("read %d test files", len(files))
 
 	for _, file := range files {
 		f, err := os.Open(file.ACHFilepath)
@@ -123,7 +124,7 @@ type testFile struct {
 }
 
 func getTestFiles() []testFile {
-	matches, err := filepath.Glob("../test/ach-*-read/*.ach")
+	matches, err := filepath.Glob(filepath.Join("..", "test", "ach-*-read", "*.ach"))
 	if err != nil {
 		return nil
 	}
