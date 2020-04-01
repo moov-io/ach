@@ -1666,3 +1666,39 @@ func TestReader__LongLine(t *testing.T) {
 		t.Errorf("got %d batches: %#v", n, file.Batches)
 	}
 }
+
+func TestReader__morphing(t *testing.T) {
+	out := trimSpacesFromLongLine(strings.Repeat("a", 94) + "    ")
+	if len(out) != 94 {
+		t.Errorf("out=%q (%d)", out, len(out))
+	}
+
+	out = trimSpacesFromLongLine(strings.Repeat("a", 94))
+	if len(out) != 94 {
+		t.Errorf("out=%q (%d)", out, len(out))
+	}
+
+	out, err := rightPadShortLine("")
+	if err != nil {
+		t.Error(err)
+	}
+	if len(out) != 94 {
+		t.Errorf("out=%q (%d)", out, len(out))
+	}
+
+	out, err = rightPadShortLine("aaaaaaaaaa")
+	if err != nil {
+		t.Error(err)
+	}
+	if len(out) != 94 {
+		t.Errorf("out=%q (%d)", out, len(out))
+	}
+
+	out, err = rightPadShortLine(strings.Repeat("a", 95))
+	if err == nil {
+		t.Error("expected error")
+	}
+	if len(out) != 95 {
+		t.Errorf("out=%q (%d)", out, len(out))
+	}
+}
