@@ -54,15 +54,65 @@ func dumpFile(file *ach.File) {
 		fmt.Fprintf(w, "  %d\t%s\t%d\t%d\t%d\t%d\n", bh.BatchNumber, bh.StandardEntryClassCode, bh.ServiceClassCode, bc.EntryAddendaCount, bc.TotalDebitEntryDollarAmount, bc.TotalCreditEntryDollarAmount)
 
 		entries := file.Batches[i].GetEntries()
-		if len(entries) > 0 {
-			fmt.Fprintln(w, "\n    TxCode\tAccountNumber\tAmount\tName\tTraceNumber")
-		}
 		for j := range entries {
+			fmt.Fprintln(w, "\n    TxCode\tAccountNumber\tAmount\tName\tTraceNumber\tCategory")
+
 			e := entries[j]
-			fmt.Fprintf(w, "    %d\t%s\t%d\t%s\t%s\n", e.TransactionCode, e.DFIAccountNumber, e.Amount, e.IndividualName, e.TraceNumber)
+			fmt.Fprintf(w, "    %d\t%s\t%d\t%s\t%s\t%s\n", e.TransactionCode, e.DFIAccountNumber, e.Amount, e.IndividualName, e.TraceNumber, e.Category)
+
+			dumpAddenda02(w, e.Addenda02)
+			for i := range e.Addenda05 {
+				if i == 0 {
+					fmt.Fprintln(w, "\n      Addenda05")
+				}
+				dumpAddenda05(w, e.Addenda05[i])
+			}
+			dumpAddenda98(w, e.Addenda98)
+			dumpAddenda99(w, e.Addenda99)
 		}
 	}
 	// TODO(adam): Do different stuff with -v enabeld
+}
+
+func dumpAddenda02(w *tabwriter.Writer, a *ach.Addenda02) {
+	if a == nil {
+		return
+	}
+
+	fmt.Fprintln(w, "\n      Addenda02")
+	fmt.Fprintln(w, "      ReferenceInfoOne\tReferenceInfoTwo\tTerminalIdentification\tTransactionSerial\tDate\tAuthCodeOrExires\tLocation\tCity\tState\tTraceNumber")
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+		a.ReferenceInformationOne, a.ReferenceInformationTwo, a.TerminalIdentificationCode, a.TransactionSerialNumber,
+		a.TransactionDate, a.AuthorizationCodeOrExpireDate, a.TerminalLocation, a.TerminalCity, a.TerminalState, a.TraceNumber)
+}
+
+func dumpAddenda05(w *tabwriter.Writer, a *ach.Addenda05) {
+	if a == nil {
+		return
+	}
+
+	fmt.Fprintln(w, "      PaymentRelatedInformation\tSequenceNumber\tEntryDetailSequenceNumber")
+	fmt.Fprintf(w, "      %s\t%d\t%d\n", a.PaymentRelatedInformation, a.SequenceNumber, a.EntryDetailSequenceNumber)
+}
+
+func dumpAddenda98(w *tabwriter.Writer, a *ach.Addenda98) {
+	if a == nil {
+		return
+	}
+
+	fmt.Fprintln(w, "\n      Addenda98")
+	fmt.Fprintln(w, "      ChangeCode\tOriginalTrace\tOriginalDFI\tCorrectedData\tTraceNumber")
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\n", a.ChangeCode, a.OriginalTrace, a.OriginalDFI, a.CorrectedData, a.TraceNumber)
+}
+
+func dumpAddenda99(w *tabwriter.Writer, a *ach.Addenda99) {
+	if a == nil {
+		return
+	}
+
+	fmt.Fprintln(w, "\n      Addenda99")
+	fmt.Fprintln(w, "      ReturnCode\tOriginalTrace\tDateOfDeath\tOriginalDFI\tAddendaInformation\tTraceNumber")
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%s\n", a.ReturnCode, a.OriginalTrace, a.DateOfDeath, a.OriginalDFI, a.AddendaInformation, a.TraceNumber)
 }
 
 func readACHFile(path string) (*ach.File, error) {
