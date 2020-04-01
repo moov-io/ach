@@ -1651,3 +1651,23 @@ func TestReader_AddendaParse(t *testing.T) {
 		}
 	}
 }
+
+func TestReader__ShortLines(t *testing.T) {
+	file, err := readACHFilepath(filepath.Join("test", "testdata", "short-line.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n := len(file.Batches); n != 1 {
+		t.Errorf("got %d batches: %#v", n, file.Batches)
+	}
+}
+
+func TestReader__LongLine(t *testing.T) {
+	file, err := readACHFilepath(filepath.Join("test", "testdata", "long-line.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n := len(file.Batches); n != 1 {
+		t.Errorf("got %d batches: %#v", n, file.Batches)
+	}
+}

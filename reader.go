@@ -118,8 +118,20 @@ func (r *Reader) Read() (File, error) {
 			if err := r.processFixedWidthFile(&line); err != nil {
 				r.errors.Add(err)
 			}
+
 		case lineLength != RecordLength:
-			r.errors.Add(r.parseError(NewRecordWrongLengthErr(lineLength)))
+			if lineLength > RecordLength {
+				// take the first 94 characters
+				r.line = line[:94]
+			} else {
+				// right-pad the line with spaces
+				r.line = line + strings.Repeat(" ", 94-len(line))
+			}
+			if err := r.parseLine(); err != nil {
+				r.errors.Add(r.parseError(NewRecordWrongLengthErr(lineLength)))
+				r.errors.Add(err)
+			}
+
 		default:
 			r.line = line
 			if err := r.parseLine(); err != nil {
