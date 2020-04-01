@@ -239,11 +239,13 @@ func (fh *FileHeader) ValidateWith(opts *ValidateOpts) error {
 			}
 		}
 	}
-	if fh.ImmediateDestination == "000000000" {
-		return fieldError("ImmediateDestination", ErrConstructor, fh.ImmediateDestination)
-	}
-	if err := CheckRoutingNumber(fh.ImmediateDestination); err != nil {
-		return fieldError("ImmediateDestination", err, fh.ImmediateDestination)
+	if !opts.BypassDestinationValidation {
+		if fh.ImmediateDestination == "000000000" {
+			return fieldError("ImmediateDestination", ErrConstructor, fh.ImmediateDestination)
+		}
+		if err := CheckRoutingNumber(fh.ImmediateDestination); err != nil {
+			return fieldError("ImmediateDestination", err, fh.ImmediateDestination)
+		}
 	}
 	if err := fh.isAlphanumeric(fh.ImmediateOriginName); err != nil {
 		return fieldError("ImmediateOriginName", err, fh.ImmediateOriginName)

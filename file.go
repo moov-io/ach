@@ -535,6 +535,13 @@ type ValidateOpts struct {
 	// This also allows for custom TraceNumbers which aren't prefixed with
 	// a routing number as required by the NACHA specification.
 	BypassOriginValidation bool `json:"bypassOriginValidation"`
+
+	// BypassDestinationValidation can be set to skip validation for the
+	// ImmediateDestination file header field.
+	//
+	// This also allows for custom TraceNumbers which aren't prefixed with
+	// a routing number as required by the NACHA specification.
+	BypassDestinationValidation bool `json:"bypassDestinationValidation"`
 }
 
 // ValidateWith performs NACHA format rule checks on each record according to their specification

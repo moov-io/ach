@@ -1722,3 +1722,7 @@ components:
           type: boolean
           default: false
           description: Skip ImmediateOrigin validation steps.
+        bypassDestinationValidation:
+          type: boolean
+          default: false
+          description: Skip ImmediateDestination validation steps.
