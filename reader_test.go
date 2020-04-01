@@ -37,11 +37,8 @@ func readACHFilepath(path string) (*File, error) {
 	}
 	defer fd.Close()
 
-	file, err := NewReader(fd).Read()
-	if err != nil {
-		return nil, err
-	}
-	return &file, nil
+	f, err := NewReader(fd).Read()
+	return &f, err
 }
 
 func TestReader__crashers(t *testing.T) {
@@ -1700,5 +1697,30 @@ func TestReader__morphing(t *testing.T) {
 	}
 	if len(out) != 95 {
 		t.Errorf("out=%q (%d)", out, len(out))
+	}
+}
+
+func TestReader__partial(t *testing.T) {
+	file, err := readACHFilepath(filepath.Join("test", "testdata", "invalid-two-micro-deposits.ach"))
+	if err == nil {
+		t.Error("expected error")
+	}
+	if file == nil {
+		t.Fatal("nil File")
+	}
+
+	// Under our current parser setup we won't add the Batch to the resulting file
+	// if an EntryDetail fails to parse. A partial File is returend with records that
+	// did parse. This test shows a mismatch between BatchCount and file.Batches
+
+	if n := file.Control.BatchCount; n != 2 {
+		t.Errorf("got FileControl.BatchCount=%d", n)
+	}
+	if len(file.Batches) != 1 {
+		t.Fatalf("got %d Batches", len(file.Batches))
+	}
+	entries := file.Batches[0].GetEntries()
+	if len(entries) != 3 {
+		t.Errorf("got %d entries", len(entries))
 	}
 }
