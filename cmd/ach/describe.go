@@ -39,11 +39,11 @@ func dumpFile(file *ach.File) {
 
 	// FileHeader
 	fmt.Fprintln(w, "  Origin\tOriginName\tDestination\tDestinationName\tFileCreationDate\tFileCreationTime")
-	fmt.Fprintln(w, fmt.Sprintf("  %s\t%s\t%s\t%s\t%s\t%s", fh.ImmediateOrigin, fh.ImmediateOriginName, fh.ImmediateDestination, fh.ImmediateDestinationName, fh.FileCreationDate, fh.FileCreationTime))
+	fmt.Fprintf(w, "  %s\t%s\t%s\t%s\t%s\t%s\n", fh.ImmediateOrigin, fh.ImmediateOriginName, fh.ImmediateDestination, fh.ImmediateDestinationName, fh.FileCreationDate, fh.FileCreationTime)
 
 	// FileControl
 	fmt.Fprintln(w, "\n  BatchCount\tBlockCount\tEntryAddendaCount\tTotalDebitAmount\tTotalCreditAmount")
-	fmt.Fprintln(w, fmt.Sprintf("  %d\t%d\t%d\t%d\t%d", fc.BatchCount, fc.BlockCount, fc.EntryAddendaCount, fc.TotalDebitEntryDollarAmountInFile, fc.TotalCreditEntryDollarAmountInFile))
+	fmt.Fprintf(w, "  %d\t%d\t%d\t%d\t%d\n", fc.BatchCount, fc.BlockCount, fc.EntryAddendaCount, fc.TotalDebitEntryDollarAmountInFile, fc.TotalCreditEntryDollarAmountInFile)
 
 	// Batches
 	for i := range file.Batches {
@@ -51,7 +51,7 @@ func dumpFile(file *ach.File) {
 
 		bh := file.Batches[i].GetHeader()
 		bc := file.Batches[i].GetControl()
-		fmt.Fprintln(w, fmt.Sprintf("  %d\t%s\t%d\t%d\t%d\t%d", bh.BatchNumber, bh.StandardEntryClassCode, bh.ServiceClassCode, bc.EntryAddendaCount, bc.TotalDebitEntryDollarAmount, bc.TotalCreditEntryDollarAmount))
+		fmt.Fprintf(w, "  %d\t%s\t%d\t%d\t%d\t%d\n", bh.BatchNumber, bh.StandardEntryClassCode, bh.ServiceClassCode, bc.EntryAddendaCount, bc.TotalDebitEntryDollarAmount, bc.TotalCreditEntryDollarAmount)
 
 		entries := file.Batches[i].GetEntries()
 		if len(entries) > 0 {
@@ -59,7 +59,7 @@ func dumpFile(file *ach.File) {
 		}
 		for j := range entries {
 			e := entries[j]
-			fmt.Fprintln(w, fmt.Sprintf("    %d\t%s\t%d\t%s\t%s", e.TransactionCode, e.DFIAccountNumber, e.Amount, e.IndividualName, e.TraceNumber))
+			fmt.Fprintf(w, "    %d\t%s\t%d\t%s\t%s\n", e.TransactionCode, e.DFIAccountNumber, e.Amount, e.IndividualName, e.TraceNumber)
 		}
 	}
 	// TODO(adam): Do different stuff with -v enabeld
