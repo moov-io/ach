@@ -1042,18 +1042,13 @@ func testACHFileRead3(t testing.TB) {
 		t.Errorf("%T: %s", err, err)
 	}
 	defer f.Close()
-	r := NewReader(f)
-	_, err = r.Read()
 
-	// TODO: is this supposed to return an error?
-	if !base.Has(err, NewRecordWrongLengthErr(94)) {
-		t.Errorf("%T: %s", err, err)
-	}
-
-	err2 := r.File.Validate()
-	// TODO: shouldn't this not be giving an error since 0 == 0?
-	if !base.Match(err2, NewErrFileCalculatedControlEquality("BatchCount", 0, 0)) {
-		t.Errorf("%T: %s", err2, err2)
+	if file, err := NewReader(f).Read(); err != nil {
+		t.Error(err)
+	} else {
+		if err := file.Validate(); err != nil {
+			t.Error(err)
+		}
 	}
 }
 
