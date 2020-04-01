@@ -744,3 +744,19 @@ func TestFileHeader__SetValidation(t *testing.T) {
 	fh.SetValidation(nil)
 	fh.SetValidation(&ValidateOpts{})
 }
+
+func TestFileHeader__ValidateDestination(t *testing.T) {
+	fh := mockFileHeader()
+	fh.ImmediateDestination = "123456789" // invalid routing number
+
+	if err := fh.ValidateWith(&ValidateOpts{}); err != nil {
+		if !strings.Contains(err.Error(), "routing number checksum mismatch") {
+			t.Error(err)
+		}
+	}
+
+	// skip ImmediateDestination validation
+	if err := fh.ValidateWith(&ValidateOpts{BypassDestinationValidation: true}); err != nil {
+		t.Error(err)
+	}
+}
