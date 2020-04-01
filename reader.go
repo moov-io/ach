@@ -118,8 +118,23 @@ func (r *Reader) Read() (File, error) {
 			if err := r.processFixedWidthFile(&line); err != nil {
 				r.errors.Add(err)
 			}
+
 		case lineLength != RecordLength:
-			r.errors.Add(r.parseError(NewRecordWrongLengthErr(lineLength)))
+			if lineLength > RecordLength {
+				line = trimSpacesFromLongLine(line)
+			}
+			// right-pad the line with spaces
+			line, err := rightPadShortLine(line)
+			if err != nil {
+				r.errors.Add(r.parseError(err))
+			}
+			r.line = line
+			// parse the line
+			if err := r.parseLine(); err != nil {
+				r.errors.Add(r.parseError(NewRecordWrongLengthErr(lineLength)))
+				r.errors.Add(err)
+			}
+
 		default:
 			r.line = line
 			if err := r.parseLine(); err != nil {
@@ -150,6 +165,17 @@ func (r *Reader) Read() (File, error) {
 		return r.File, nil
 	}
 	return r.File, r.errors
+}
+
+func trimSpacesFromLongLine(s string) string {
+	return strings.TrimSuffix(s[:94], " ")
+}
+
+func rightPadShortLine(s string) (string, error) {
+	if n := len(s); n > RecordLength {
+		return s, NewRecordWrongLengthErr(n)
+	}
+	return s + strings.Repeat(" ", 94-len(s)), nil
 }
 
 func (r *Reader) processFixedWidthFile(line *string) error {

@@ -1042,18 +1042,13 @@ func testACHFileRead3(t testing.TB) {
 		t.Errorf("%T: %s", err, err)
 	}
 	defer f.Close()
-	r := NewReader(f)
-	_, err = r.Read()
 
-	// TODO: is this supposed to return an error?
-	if !base.Has(err, NewRecordWrongLengthErr(94)) {
-		t.Errorf("%T: %s", err, err)
-	}
-
-	err2 := r.File.Validate()
-	// TODO: shouldn't this not be giving an error since 0 == 0?
-	if !base.Match(err2, NewErrFileCalculatedControlEquality("BatchCount", 0, 0)) {
-		t.Errorf("%T: %s", err2, err2)
+	if file, err := NewReader(f).Read(); err != nil {
+		t.Error(err)
+	} else {
+		if err := file.Validate(); err != nil {
+			t.Error(err)
+		}
 	}
 }
 
@@ -1649,5 +1644,61 @@ func TestReader_AddendaParse(t *testing.T) {
 		if !base.Match(err, ErrFileAddendaOutsideBatch) {
 			t.Errorf("%T: %s", err, err)
 		}
+	}
+}
+
+func TestReader__ShortLines(t *testing.T) {
+	file, err := readACHFilepath(filepath.Join("test", "testdata", "short-line.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n := len(file.Batches); n != 1 {
+		t.Errorf("got %d batches: %#v", n, file.Batches)
+	}
+}
+
+func TestReader__LongLine(t *testing.T) {
+	file, err := readACHFilepath(filepath.Join("test", "testdata", "long-line.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n := len(file.Batches); n != 1 {
+		t.Errorf("got %d batches: %#v", n, file.Batches)
+	}
+}
+
+func TestReader__morphing(t *testing.T) {
+	out := trimSpacesFromLongLine(strings.Repeat("a", 94) + "    ")
+	if len(out) != 94 {
+		t.Errorf("out=%q (%d)", out, len(out))
+	}
+
+	out = trimSpacesFromLongLine(strings.Repeat("a", 94))
+	if len(out) != 94 {
+		t.Errorf("out=%q (%d)", out, len(out))
+	}
+
+	out, err := rightPadShortLine("")
+	if err != nil {
+		t.Error(err)
+	}
+	if len(out) != 94 {
+		t.Errorf("out=%q (%d)", out, len(out))
+	}
+
+	out, err = rightPadShortLine("aaaaaaaaaa")
+	if err != nil {
+		t.Error(err)
+	}
+	if len(out) != 94 {
+		t.Errorf("out=%q (%d)", out, len(out))
+	}
+
+	out, err = rightPadShortLine(strings.Repeat("a", 95))
+	if err == nil {
+		t.Error("expected error")
+	}
+	if len(out) != 95 {
+		t.Errorf("out=%q (%d)", out, len(out))
 	}
 }
