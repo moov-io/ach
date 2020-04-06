@@ -140,59 +140,6 @@ paths:
                 $ref: '#/components/schemas/File'
         '404':
           description: A resource with the specified ID was not found
-    post:
-      tags: ['ACH Files']
-      summary: Updates the specified File Header by setting the values of the parameters passed. Any parameters not provided will be left unchanged.
-      operationId: updateFile
-      security:
-        - bearerAuth: []
-        - cookieAuth: []
-      parameters:
-        - name: X-Request-ID
-          in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
-          example: rs4f9915
-          schema:
-            type: string
-        - name: X-Idempotency-Key
-          in: header
-          description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy for to not collide with each other in your requests.
-          example: a4f88150
-          required: false
-          schema:
-            type: string
-        - name: fileID
-          in: path
-          description: File ID
-          required: true
-          schema:
-            type: string
-            example: 3f2d23ee214
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateFile'
-      responses:
-        '201':
-          description: A JSON object containing a new File
-          headers:
-            Location:
-              description: The location of the new resource
-              schema:
-                type: string
-                format: uri
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/File'
-        '400':
-          description: "Invalid File Header Object"
-          content:
-            application/json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
     delete:
       tags: ['ACH Files']
       summary: Permanently deletes a File and associated Batches. It cannot be undone.
