@@ -24,7 +24,8 @@ paths:
     get:
       tags:
         - Files
-      summary: Ping the ACH service to check if running
+      summary: Ping ACH service
+      description: Check the ACH service to check if running
       operationId: ping
       responses:
         '200':
@@ -32,7 +33,8 @@ paths:
   /files:
     get:
       tags: ['ACH Files']
-      summary: Gets a list of Files
+      summary: Get ACH files
+      description: List all ACH files created with the ACH service. These files are not persisted through multiple runs of the service.
       operationId: getFiles
       security:
         - bearerAuth: []
@@ -59,7 +61,8 @@ paths:
   /files/create:
     post:
       tags: ['ACH Files']
-      summary: Create a new File object
+      summary: Create File
+      description: Create a new File object from either the plaintext or JSON representation.
       operationId: createFile
       security:
         - bearerAuth: []
@@ -112,7 +115,8 @@ paths:
   /files/{fileID}:
     get:
       tags: ['ACH Files']
-      summary: Retrieves the details of an existing File. You need only supply the unique File identifier that was returned upon creation.
+      summary: Retrieve a file
+      description: Get the details of an existing File using the unique File identifier that was returned upon creation.
       operationId: getFileByID
       security:
         - bearerAuth: []
@@ -195,7 +199,8 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
     delete:
       tags: ['ACH Files']
-      summary: Permanently deletes a File and associated Batches. It cannot be undone.
+      summary: Delete file
+      description: Permanently deletes a File and associated Batches. It cannot be undone.
       operationId: deleteACHFile
       security:
         - bearerAuth: []
@@ -222,7 +227,9 @@ paths:
   /files/{fileID}/contents:
     get:
       tags: ['ACH Files']
-      summary: Assembles the existing file (batches and controls) records, computes sequence numbers and totals. Returns plaintext file.
+      summary: Get file contents
+      description: |
+        Assembles the existing file (batches and controls) records, computes sequence numbers and totals. Returns plaintext file.
       operationId: getFileContents
       security:
         - bearerAuth: []
@@ -251,7 +258,8 @@ paths:
   /files/{fileID}/validate:
     get:
       tags: ['ACH Files']
-      summary: Validates the existing file. You need only supply the unique File identifier that was returned upon creation.
+      summary: Validate file
+      description: Validates the existing file. You need only supply the unique File identifier that was returned upon creation.
       operationId: validateFile
       security:
         - bearerAuth: []
@@ -288,7 +296,8 @@ paths:
   /files/{fileID}/segment:
     post:
       tags: ['ACH Files']
-      summary: Split one file into two. One with only debits and one with only credits.
+      summary: Segment file
+      description: Split one file into two. One with only debits and one with only credits.
       operationId: segmentFile
       security:
         - bearerAuth: []
@@ -337,7 +346,8 @@ paths:
   /files/{fileID}/flatten:
     post:
       tags: ['ACH Files']
-      summary: Consolidate batches and entries into the minimum number of batches needed.
+      summary: Flatten batches
+      description: Consolidate batches and entries into the minimum number of batches needed.
       operationId: flattenFile
       security:
         - bearerAuth: []
@@ -379,7 +389,8 @@ paths:
   /files/{fileID}/batches:
     get:
       tags: ['ACH Files']
-      summary: Get the batches on a File.
+      summary: Get batches
+      description: Get the batches on a File.
       operationId: getFileBatches
       security:
         - bearerAuth: []
@@ -413,6 +424,7 @@ paths:
     post:
       tags: ['ACH Files']
       summary: Add Batch to File
+      description: Append a Batch record to the specified file
       operationId: addBatchToFile
       security:
         - bearerAuth: []
@@ -450,7 +462,8 @@ paths:
   /files/{fileID}/batches/{batchID}:
     get:
       tags: ['ACH Files']
-      summary: Get a specific Batch on a FIle
+      summary: Get Batch
+      description: Get a specific Batch on a File
       operationId: getFileBatch
       security:
         - bearerAuth: []
@@ -487,7 +500,8 @@ paths:
           description: Batch or File not found
     delete:
       tags: ['ACH Files']
-      summary: Delete a Batch from a File
+      summary: Delete batch
+      description: Delete a Batch from a File
       operationId: deleteFileBatch
       security:
         - bearerAuth: []
