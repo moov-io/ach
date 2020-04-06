@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -28,14 +29,21 @@ import (
 func TestIssue702(t *testing.T) {
 	// A vendor gave issue702.ach to a customer of ours as a return but didn't properly
 	// format the line lengths and included a non-routing number in the ImmediateDestination
-	file, err := readACHFilepath(filepath.Join("..", "testdata", "issue702.ach"))
-	if !strings.Contains(err.Error(), "ImmediateDestination YYYYYYYYY routing number checksum mismatch") {
-		t.Errorf("unexpected error: %v", err)
+	fd, err := os.Open(filepath.Join("..", "testdata", "issue702.ach"))
+	if err != nil {
+		t.Fatal(err)
 	}
+	defer fd.Close()
 
-	file.SetValidation(&ach.ValidateOpts{
+	r := ach.NewReader(fd)
+	r.SetValidation(&ach.ValidateOpts{
 		BypassDestinationValidation: true,
 	})
+
+	file, err := r.Read()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	if err := file.Validate(); err != nil {
 		t.Error(err)
@@ -55,10 +63,23 @@ func TestIssue702(t *testing.T) {
 func TestIssue702_1(t *testing.T) {
 	// This file was returned as a receipt from uploading an ACH file, but this file is
 	// pretty useless as it contains zero EntryDetail's.
-	file, _ := readACHFilepath(filepath.Join("..", "testdata", "issue702-1.ach"))
-	file.SetValidation(&ach.ValidateOpts{
+	fd, err := os.Open(filepath.Join("..", "testdata", "issue702-1.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer fd.Close()
+
+	r := ach.NewReader(fd)
+	r.SetValidation(&ach.ValidateOpts{
 		BypassDestinationValidation: true,
 	})
+
+	file, err := r.Read()
+	if err != nil {
+		if !strings.Contains(err.Error(), "BatchCount 000000 is a mandatory field") {
+			t.Error(err)
+		}
+	}
 	if err := file.Validate(); err != nil {
 		if !strings.Contains(err.Error(), "BatchCount 000000 is a mandatory field") {
 			t.Error(err)
@@ -68,11 +89,9 @@ func TestIssue702_1(t *testing.T) {
 	if file.Header.ImmediateOrigin != "182327390" {
 		t.Errorf("ImmediateOrigin=%s", file.Header.ImmediateOrigin)
 	}
-
 	if file.Header.ImmediateDestination != "10006XXXX" {
 		t.Errorf("ImmediateDestination=%s", file.Header.ImmediateDestination)
 	}
-
 	if file.Header.ImmediateDestinationName != "PIMRET825324" {
 		t.Errorf("ImmediateDestinationName=%s", file.Header.ImmediateDestinationName)
 	}
