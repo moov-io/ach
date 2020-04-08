@@ -7,6 +7,8 @@ ADDITIONS
 - cmd/server: add version handler to admin HTTP server
 - server: read ValidateOpts in HTTP validate route
 - file: support setting ValidateOpts on struct for calling Create()
+- reader: morph lines to 94 characters if they end in spaces
+- file: add BypassDestinationValidation to ValidateOpts
 
 BUG FIXEs
 
@@ -15,6 +17,8 @@ BUG FIXEs
 - server: fix segment OpenAPI spec and accept config body
 - server: read empty SegmentFileConfiguration
 - api: fixup flatten files OpenAPI spec
+- file: don't validate before flattening batches
+- all: use filepath.Join instead of unix paths
 
 IMPROVEMENTS
 
@@ -22,6 +26,9 @@ IMPROVEMENTS
 - api: include AddendaXX, ADV, and IAT records that were missing from OpenAPI spec
 - chore(deps): update module prometheus/client_golang to v1.4.1
 - chore(deps): update module gorilla/mux to v1.7.4
+- validators: ensure alpha routing number check digit is invalid
+- api: use shorter summaries
+- reader: write a test for what partial file comes back from invalid EntryDetails
 
 BUILD
 
