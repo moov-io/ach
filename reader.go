@@ -88,6 +88,15 @@ func (r *Reader) addIATCurrentBatch(iatBatch IATBatch) {
 	r.IATCurrentBatch = iatBatch
 }
 
+// SetValidation stores ValidateOpts on the Reader's underlying File which are to be used
+// to override the default NACHA validation rules.
+func (r *Reader) SetValidation(opts *ValidateOpts) {
+	if r == nil || opts == nil {
+		return
+	}
+	r.File.SetValidation(opts)
+}
+
 // NewReader returns a new ACH Reader that reads from r.
 func NewReader(r io.Reader) *Reader {
 	return &Reader{
@@ -142,7 +151,8 @@ func (r *Reader) Read() (File, error) {
 			}
 		}
 	}
-	if (FileHeader{}) == r.File.Header {
+	// Carry through any ValidateOpts for this comparison
+	if (FileHeader{validateOpts: r.File.validateOpts}) == r.File.Header {
 		// There must be at least one File Header
 		r.recordName = "FileHeader"
 		r.errors.Add(ErrFileHeader)
@@ -291,7 +301,9 @@ func (r *Reader) parseEDAddenda() error {
 // parseFileHeader takes the input record string and parses the FileHeaderRecord values
 func (r *Reader) parseFileHeader() error {
 	r.recordName = "FileHeader"
-	if (FileHeader{}) != r.File.Header {
+	// Pass through any ValidateOpts from the Reader for this comparison
+	// as we need to compare the other struct fields (e.g. origin, destination)
+	if (FileHeader{validateOpts: r.File.validateOpts}) != r.File.Header {
 		// There can only be one File Header per File exit
 		return ErrFileHeader
 	}
