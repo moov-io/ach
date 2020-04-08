@@ -19,7 +19,9 @@ package ach
 
 import (
 	"bufio"
+	"fmt"
 	"io"
+	"os"
 	"strings"
 
 	"github.com/moov-io/base"
@@ -95,6 +97,19 @@ func (r *Reader) SetValidation(opts *ValidateOpts) {
 		return
 	}
 	r.File.SetValidation(opts)
+}
+
+// ReadFile attempts to open an os.File at path and read the entire file
+// before closing it and returning the parse result.
+func ReadFile(path string) (*File, error) {
+	fd, err := os.Open(path)
+	if err != nil {
+		return nil, fmt.Errorf("problem reading %s: %v", path, err)
+	}
+	defer fd.Close()
+
+	file, err := NewReader(fd).Read()
+	return &file, err
 }
 
 // NewReader returns a new ACH Reader that reads from r.

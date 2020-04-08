@@ -41,6 +41,16 @@ func readACHFilepath(path string) (*File, error) {
 	return &f, err
 }
 
+func TestReadFile(t *testing.T) {
+	file, err := ReadFile(filepath.Join("test", "testdata", "web-debit.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if origin := file.Header.ImmediateOrigin; origin != "231380104" {
+		t.Errorf("origin=%s", origin)
+	}
+}
+
 func TestReader__crashers(t *testing.T) {
 	dir := filepath.Join("test", "testdata", "crashers")
 	fds, err := ioutil.ReadDir(dir)
