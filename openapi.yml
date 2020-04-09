@@ -270,13 +270,13 @@ paths:
           schema:
             type: string
             example: 3f2d23ee214
-      requestBody:
-        description: Optional configuration for segmenting files
-        required: false
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SegmentFileConfiguration'
+      # requestBody:
+      #   description: Optional configuration for segmenting files
+      #   required: false
+      #   content:
+      #     application/json:
+      #       schema:
+      #         $ref: '#/components/schemas/SegmentFileConfiguration'
       responses:
         '200':
           description: An ID of the new ACH file
@@ -1670,9 +1670,9 @@ components:
           type: string
           description: File ID
           example: 3cac5447
-    SegmentFileConfiguration:
-      # There are no options here currently, but this object exists to read them in the future
-      properties: {}
+    # There are no options here currently, but this object exists to read them in the future
+    # SegmentFileConfiguration:
+    #   properties: {}
     ValidateOpts:
       properties:
         requireABAOrigin:
