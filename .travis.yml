@@ -80,8 +80,7 @@ deploy:
     secure: S/CFrglarZ42a3crv+GgWSPZrPjIJglk1exzjbcP5KoPVinuucRxfQW/+92pfOSGTK2XZA1N20ZZE7+ba7HlWXkJDiICew8hCKHkDMW1Rj+E89zwzJMURXxDPTUkecE3h7BwSv72+XqQiezBo2HW5cPecQo3bmuhlmJO0ja9ntzhSpXTr1lcpBDIWvxHGzLR/Dcoceki3PI/nbv4i9ZVoUFtx9f/bbCQ7S/7qX6Dn5WKSjoEIvMgwtuAptYbEeDZ51mmudAuMAduNQpXJKiUUeryokP3sEP6FcwP7oKy6b7Dk92l1Q7MJ7lLj0xRcWIty5YCx1jKy5L/EKPLFinYdCJVyI1e11sF2YLvlzC3tsbOJHDgA2W4brt3hBfTW23FXgVJBAfKsCmwzcMrtR3WC0ukcwdTBva/oCIZUBkw0M2d4rDBgWLQ6vKtuCrn2WOlDTEVSyfzSxOSBdcLCgTeDELwdCW8nniuW9ldVUYotwDy/v9RljzOsb+dUwBtbagtXeQ2nraPWJnj8zHAkMQS11/FxxOQ53W5BQQGAEbeUIbwi5P4EJCHip70IqVKPkkWtPo3iVUyR7C4m0TkgA3L47PV/t8o4alvdHbhyP+DKYalQkdLiZSlFTMjavmXVO4ofhTHNAfz2LkemF8gcBiXQxpsBrUc5j+gi+nG3mfAgrE=
   file_glob: true
   file:
-    - bin/ach-*
-    - bin/ach.exe
+    - bin/ach*
   on:
     tags: true
     repo: moov-io/ach
