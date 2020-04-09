@@ -173,6 +173,7 @@ func BenchmarkValidateFCRecordType(b *testing.B) {
 func testFCFieldInclusion(t testing.TB) {
 	fc := mockFileControl()
 	fc.BatchCount = 0
+	fc.TotalDebitEntryDollarAmountInFile = 100
 	err := fc.Validate()
 	if !base.Match(err, ErrConstructor) {
 		t.Errorf("%T: %s", err, err)
@@ -242,6 +243,7 @@ func BenchmarkFCFieldInclusionBlockCount(b *testing.B) {
 func testFCFieldInclusionEntryAddendaCount(t testing.TB) {
 	fc := mockFileControl()
 	fc.EntryAddendaCount = 0
+	fc.TotalDebitEntryDollarAmountInFile = 100
 	err := fc.Validate()
 	if !base.Match(err, ErrConstructor) {
 		t.Errorf("%T: %s", err, err)
@@ -265,6 +267,7 @@ func BenchmarkFCFieldInclusionEntryAddendaCount(b *testing.B) {
 func testFCFieldInclusionEntryHash(t testing.TB) {
 	fc := mockFileControl()
 	fc.EntryHash = 0
+	fc.TotalCreditEntryDollarAmountInFile = 100
 	err := fc.Validate()
 	if !base.Match(err, ErrConstructor) {
 		t.Errorf("%T: %s", err, err)

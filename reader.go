@@ -152,11 +152,17 @@ func (r *Reader) Read() (File, error) {
 			if err != nil {
 				r.errors.Add(r.parseError(err))
 			}
+
+			lineLength = len(line) // len(line) may have changed
 			r.line = line
-			// parse the line
-			if err := r.parseLine(); err != nil {
+
+			if lineLength != RecordLength {
 				r.errors.Add(r.parseError(NewRecordWrongLengthErr(lineLength)))
-				r.errors.Add(err)
+			} else {
+				// parse the line
+				if err := r.parseLine(); err != nil {
+					r.errors.Add(err)
+				}
 			}
 
 		default:
