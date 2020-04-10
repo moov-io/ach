@@ -116,16 +116,13 @@ func (fc *FileControl) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (fc *FileControl) fieldInclusion() error {
-
 	if fc.recordType == "" {
 		return fieldError("recordType", ErrConstructor, fc.recordType)
 	}
 	if fc.BlockCount == 0 {
 		return fieldError("BlockCount", ErrConstructor, fc.BlockCountField())
 	}
-
 	if fc.TotalCreditEntryDollarAmountInFile != 0 || fc.TotalDebitEntryDollarAmountInFile != 0 {
-
 		if fc.BatchCount == 0 {
 			return fieldError("BatchCount", ErrConstructor, fc.BatchCountField())
 		}
@@ -136,7 +133,6 @@ func (fc *FileControl) fieldInclusion() error {
 			return fieldError("EntryHash", ErrConstructor, fc.EntryAddendaCountField())
 		}
 	}
-
 	return nil
 }
 
