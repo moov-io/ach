@@ -24,9 +24,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"reflect"
 	"strconv"
 	"strings"
 
+	"github.com/moov-io/base"
 	moovhttp "github.com/moov-io/base/http"
 
 	"github.com/go-kit/kit/endpoint"
@@ -205,16 +207,40 @@ type counter interface {
 	count() int
 }
 
+// marshalStructWithError converts a struct into a JSON response with all fields of the struct
+// with our expected error formats.
+//
+// There are a few reasons we need to do this.
+//  1. base.ErrorList marshals to an object which breaks the string format our API declares
+//     and isn't caught when we pass around interface{} values.
+//  2. We want to return additional fields of structs (such as in createFileEndpoint)
+func marshalStructWithError(in interface{}, w http.ResponseWriter) error {
+	v := reflect.ValueOf(in)
+	out := make(map[string]interface{}, v.NumField())
+
+	for i := 0; i < v.NumField(); i++ {
+		name := v.Type().Field(i).Name
+		value := v.Field(i).Interface()
+
+		if err, ok := value.(error); ok {
+			out["error"] = err.Error()
+		} else {
+			out[name] = value
+		}
+	}
+
+	return json.NewEncoder(w).Encode(out)
+}
+
 // encodeResponse is the common method to encode all response types to the
 // client. I chose to do it this way because, since we're using JSON, there's no
 // reason to provide anything more specific. It's certainly possible to
 // specialize on a per-response (per-method) basis.
 func encodeResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
 	if e, ok := response.(errorer); ok && e.error() != nil {
-		// Not a Go kit transport error, but a business-logic error.
-		// Provide those as HTTP errors.
-		encodeError(ctx, e.error(), w)
-		return nil
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(codeFrom(e.error()))
+		return marshalStructWithError(response, w)
 	}
 
 	// Used for pagination
@@ -260,10 +286,22 @@ func codeFrom(err error) int {
 	if err == nil {
 		return http.StatusOK
 	}
-	if strings.Contains(err.Error(), errInvalidFile.Error()) {
-		// This branch comes from validateFileEndpoint
+
+	errString := fmt.Sprintf("%#v", err)
+	if el, ok := err.(base.ErrorList); ok {
+		errString = el.Error()
+	}
+	switch {
+	case
+		strings.Contains(errString, errInvalidFile.Error()), // This branch comes from validateFileEndpoint
+		strings.Contains(errString, "*ach.FieldError"),
+		strings.Contains(errString, "*ach.BatchError"),
+		strings.Contains(errString, "*ach.ErrFile"),
+		strings.Contains(errString, "ach.RecordWrongLengthErr"),
+		strings.Contains(errString, "FieldName"): // FileFromJSON
 		return http.StatusBadRequest
 	}
+
 	switch err {
 	case ErrNotFound:
 		return http.StatusNotFound
