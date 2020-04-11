@@ -94,7 +94,7 @@ paths:
               type: string
               example: 101 222380104 1210428821805100000A094101Citadel                Bank Name
       responses:
-        '201':
+        '200':
           description: A JSON object containing a new File
           headers:
             Location:
@@ -105,7 +105,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/File'
+                $ref: '#/components/schemas/FileID'
         '400':
           description: "Invalid File Header Object"
           content:
@@ -514,6 +514,10 @@ components:
           type: string
           description: File ID
           example: 1e522dc8
+        error:
+          type: string
+          description: An error message describing the problem intended for humans.
+          example: Validation error(s) present.
     File:
       properties:
         ID:
