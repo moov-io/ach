@@ -68,10 +68,7 @@ func createFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.End
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req, ok := request.(createFileRequest)
 		if !ok {
-			err := errors.New("invalid request")
-			return createFileResponse{
-				Err: err,
-			}, err
+			return createFileResponse{Err: ErrFoundABug}, ErrFoundABug
 		}
 
 		// record a metric for files created
@@ -176,10 +173,7 @@ func getFileEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req, ok := request.(getFileRequest)
 		if !ok {
-			err := errors.New("invalid request")
-			return getFileResponse{
-				Err: err,
-			}, err
+			return getFileResponse{Err: ErrFoundABug}, ErrFoundABug
 		}
 
 		f, err := s.GetFile(req.ID)
@@ -223,10 +217,7 @@ func deleteFileEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req, ok := request.(deleteFileRequest)
 		if !ok {
-			err := errors.New("invalid request")
-			return deleteFileResponse{
-				Err: err,
-			}, err
+			return deleteFileResponse{Err: ErrFoundABug}, ErrFoundABug
 		}
 
 		filesDeleted.Add(1)
@@ -271,10 +262,7 @@ func getFileContentsEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req, ok := request.(getFileContentsRequest)
 		if !ok {
-			err := errors.New("invalid request")
-			return getFileContentsResponse{
-				Err: err,
-			}, err
+			return getFileContentsResponse{Err: ErrFoundABug}, ErrFoundABug
 		}
 
 		r, err := s.GetFileContents(req.ID)
@@ -319,10 +307,7 @@ func validateFileEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req, ok := request.(validateFileRequest)
 		if !ok {
-			err := errors.New("invalid request")
-			return validateFileResponse{
-				Err: err,
-			}, err
+			return validateFileResponse{Err: ErrFoundABug}, ErrFoundABug
 		}
 
 		err := s.ValidateFile(req.ID, req.opts)
@@ -371,8 +356,7 @@ func balanceFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req, ok := request.(balanceFileRequest)
 		if !ok {
-			err := errors.New("invalid request")
-			return balanceFileResponse{Err: err}, err
+			return balanceFileResponse{Err: ErrFoundABug}, ErrFoundABug
 		}
 
 		balancedFile, err := s.BalanceFile(req.fileID, req.offset)
@@ -429,10 +413,7 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req, ok := request.(segmentFileRequest)
 		if !ok {
-			err := errors.New("invalid request")
-			return segmentFileResponse{
-				Err: err,
-			}, err
+			return segmentFileResponse{Err: ErrFoundABug}, ErrFoundABug
 		}
 
 		creditFile, debitFile, err := s.SegmentFile(req.fileID, req.opts)
@@ -499,10 +480,7 @@ func flattenBatchesEndpoint(s Service, r Repository, logger log.Logger) endpoint
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req, ok := request.(flattenBatchesRequest)
 		if !ok {
-			err := errors.New("invalid request")
-			return flattenBatchesResponse{
-				Err: err,
-			}, err
+			return flattenBatchesResponse{Err: ErrFoundABug}, ErrFoundABug
 		}
 		flattenFile, err := s.FlattenBatches(req.fileID)
 		if logger != nil {
