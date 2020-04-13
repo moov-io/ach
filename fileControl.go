@@ -119,17 +119,19 @@ func (fc *FileControl) fieldInclusion() error {
 	if fc.recordType == "" {
 		return fieldError("recordType", ErrConstructor, fc.recordType)
 	}
-	if fc.BatchCount == 0 {
-		return fieldError("BatchCount", ErrConstructor, fc.BatchCountField())
-	}
 	if fc.BlockCount == 0 {
 		return fieldError("BlockCount", ErrConstructor, fc.BlockCountField())
 	}
-	if fc.EntryAddendaCount == 0 {
-		return fieldError("EntryAddendaCount", ErrConstructor, fc.EntryAddendaCountField())
-	}
-	if fc.EntryHash == 0 {
-		return fieldError("EntryHash", ErrConstructor, fc.EntryAddendaCountField())
+	if fc.TotalCreditEntryDollarAmountInFile != 0 || fc.TotalDebitEntryDollarAmountInFile != 0 {
+		if fc.BatchCount == 0 {
+			return fieldError("BatchCount", ErrConstructor, fc.BatchCountField())
+		}
+		if fc.EntryAddendaCount == 0 {
+			return fieldError("EntryAddendaCount", ErrConstructor, fc.EntryAddendaCountField())
+		}
+		if fc.EntryHash == 0 {
+			return fieldError("EntryHash", ErrConstructor, fc.EntryAddendaCountField())
+		}
 	}
 	return nil
 }

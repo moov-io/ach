@@ -31,6 +31,7 @@ func mockFileControl() FileControl {
 	fc.BlockCount = 1
 	fc.EntryAddendaCount = 1
 	fc.EntryHash = 5320001
+	fc.TotalDebitEntryDollarAmountInFile = 100
 	return fc
 }
 
