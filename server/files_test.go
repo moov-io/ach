@@ -68,6 +68,14 @@ func TestFiles__decodeCreateFileRequest(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Errorf("bogus HTTP status code: %d: %s", w.Code, w.Body.String())
 	}
+
+	var resp createFileResponse
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatal(err)
+	}
+	if resp.ID == "" || resp.Err != nil {
+		t.Errorf("id=%q error=%v", resp.ID, resp.Err)
+	}
 }
 
 func TestFiles__createFileEndpoint(t *testing.T) {
@@ -250,7 +258,7 @@ func TestFiles__validateFileEndpoint(t *testing.T) {
 		t.Errorf("bogus HTTP status: %d", w.Code)
 	}
 	if !strings.HasPrefix(w.Body.String(), `{"error":"invalid ACH file: ImmediateDestination`) {
-		t.Errorf("unknown error: %v", err)
+		t.Errorf("unknown error: %v\n%v", err, w.Body.String())
 	}
 }
 
@@ -383,8 +391,18 @@ func TestFilesErr__balanceInvalidFile(t *testing.T) {
 	router.ServeHTTP(w, req)
 	w.Flush()
 
-	if w.Code != http.StatusInternalServerError {
+	if w.Code != http.StatusBadRequest {
 		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+
+	var resp struct {
+		Err string `json:"error"`
+	}
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatal(err)
+	}
+	if resp.Err == "" {
+		t.Errorf("resp.Err=%q", resp.Err)
 	}
 }
 
@@ -416,6 +434,16 @@ func TestFilesErr__balanceFileEndpointJSON(t *testing.T) {
 
 	if w.Code != http.StatusInternalServerError {
 		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+
+	var resp struct {
+		Err string `json:"error"`
+	}
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatal(err)
+	}
+	if resp.Err == "" {
+		t.Errorf("resp.Err=%q", resp.Err)
 	}
 
 	// send totally invalid JSON
@@ -706,6 +734,83 @@ func TestFiles__CreateFileEndpoint(t *testing.T) {
 	}
 }
 
+func TestFiles__CreateFileEndpointErr(t *testing.T) {
+	logger := log.NewNopLogger()
+	repo := NewRepositoryInMemory(testTTLDuration, logger)
+	svc := NewService(repo)
+	router := MakeHTTPHandler(svc, repo, logger)
+
+	// write an ACH file into repository
+	fd, err := os.Open(filepath.Join("..", "test", "testdata", "issue702.ach"))
+	if fd == nil {
+		t.Fatalf("empty ACH file: %v", err)
+	}
+	defer fd.Close()
+
+	// test status code
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", "/files/create", fd)
+	req.Header.Set("Origin", "https://moov.io")
+	req.Header.Set("X-Request-Id", "11114")
+
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("bogus HTTP status: %d: %s", w.Code, w.Body.String())
+	}
+
+	var resp struct {
+		ID  string `json:"id"`
+		Err string `json:"error"`
+	}
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatal(err)
+	}
+	if resp.ID == "" || resp.Err == "" {
+		t.Errorf("resp.ID=%q resp.Err=%q", resp.ID, resp.Err)
+	}
+}
+
+func TestFiles__CreateFileEndpointJSONErr(t *testing.T) {
+	logger := log.NewNopLogger()
+	repo := NewRepositoryInMemory(testTTLDuration, logger)
+	svc := NewService(repo)
+	router := MakeHTTPHandler(svc, repo, logger)
+
+	// write an ACH file into repository
+	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-noBatches.json"))
+	if fd == nil {
+		t.Fatalf("empty ACH file: %v", err)
+	}
+	defer fd.Close()
+
+	// test status code
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", "/files/create", fd)
+	req.Header.Set("Origin", "https://moov.io")
+	req.Header.Set("X-Request-Id", "11114")
+	req.Header.Set("Content-Type", "application/json")
+
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("bogus HTTP status: %d: %s", w.Code, w.Body.String())
+	}
+
+	var resp struct {
+		ID  string `json:"id"`
+		Err string `json:"error"`
+	}
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatal(err)
+	}
+	if resp.ID == "" || resp.Err == "" {
+		t.Errorf("resp.ID=%q resp.Err=%q", resp.ID, resp.Err)
+	}
+}
+
 // TestFiles_segmentFileEndpointError tests segmentFileEndpoints
 func TestFiles__segmentFileEndpointError(t *testing.T) {
 	logger := log.NewNopLogger()
@@ -733,8 +838,18 @@ func TestFiles__segmentFileEndpointError(t *testing.T) {
 	router.ServeHTTP(w, req)
 	w.Flush()
 
-	if w.Code != http.StatusInternalServerError {
+	if w.Code != http.StatusBadRequest {
 		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+
+	var resp struct {
+		Err string `json:"error"`
+	}
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatal(err)
+	}
+	if resp.Err == "" {
+		t.Errorf("resp.Err=%q", resp.Err)
 	}
 }
 
@@ -765,7 +880,17 @@ func TestFiles__flattenFileEndpointError(t *testing.T) {
 	router.ServeHTTP(w, req)
 	w.Flush()
 
-	if w.Code != http.StatusInternalServerError {
+	if w.Code != http.StatusBadRequest {
 		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+
+	var resp struct {
+		Err string `json:"error"`
+	}
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatal(err)
+	}
+	if resp.Err == "" {
+		t.Errorf("resp.Err=%q", resp.Err)
 	}
 }

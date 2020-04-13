@@ -52,9 +52,9 @@ var (
 )
 
 type createFileRequest struct {
-	File *ach.File
-
-	requestID string
+	File       *ach.File
+	parseError error
+	requestID  string
 }
 
 type createFileResponse struct {
@@ -89,42 +89,44 @@ func createFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.End
 			logger.Log("files", "createFile", "requestID", req.requestID, "error", err)
 		}
 
-		return createFileResponse{
+		resp := createFileResponse{
 			ID:  req.File.ID,
 			Err: err,
-		}, nil
+		}
+		if req.parseError != nil {
+			resp.Err = req.parseError
+		}
+
+		return resp, nil
 	}
 }
 
 func decodeCreateFileRequest(_ context.Context, request *http.Request) (interface{}, error) {
 	var r io.Reader
-	var req createFileRequest
+	req := createFileRequest{
+		File:      ach.NewFile(),
+		requestID: moovhttp.GetRequestID(request),
+	}
 
-	req.requestID = moovhttp.GetRequestID(request)
-
-	// Sets default values
-	req.File = ach.NewFile()
 	bs, err := ioutil.ReadAll(request.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	h := request.Header.Get("Content-Type")
+	h := strings.ToLower(request.Header.Get("Content-Type"))
 	if strings.Contains(h, "application/json") {
 		// Read body as ACH file in JSON
 		f, err := ach.FileFromJSON(bs)
-		if err != nil {
-			return nil, err
+		if f != nil {
+			req.File = f
 		}
-		req.File = f
+		req.parseError = err
 	} else {
 		// Attempt parsing body as an ACH File
 		r = bytes.NewReader(bs)
 		f, err := ach.NewReader(r).Read()
-		if err != nil {
-			return nil, err
-		}
 		req.File = &f
+		req.parseError = err
 	}
 	return req, nil
 }
