@@ -206,6 +206,37 @@ paths:
       tags: ['ACH Files']
       summary: Validate file
       description: Validates the existing file. You need only supply the unique File identifier that was returned upon creation.
+      operationId: checkFile
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: fileID
+          in: path
+          description: File ID
+          required: true
+          schema:
+            type: string
+            example: 3f2d23ee214
+      responses:
+        '200':
+          description: File validated successfully without errors.
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+        '400':
+          description: Validation failed. Check response for errors
+    post:
+      tags: ['ACH Files']
+      summary: Validate file
+      description: Validates the existing file. You need only supply the unique File identifier that was returned upon creation.
       operationId: validateFile
       security:
         - bearerAuth: []
@@ -236,7 +267,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/File'
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
         '400':
           description: Validation failed. Check response for errors
   /files/{fileID}/segment:

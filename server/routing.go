@@ -142,6 +142,12 @@ func MakeHTTPHandler(s Service, repo Repository, logger log.Logger) http.Handler
 		encodeResponse,
 		options...,
 	))
+	r.Methods("POST").Path("/files/{id}/validate").Handler(httptransport.NewServer(
+		validateFileEndpoint(s, logger),
+		decodeValidateFileRequest,
+		encodeResponse,
+		options...,
+	))
 	r.Methods("DELETE").Path("/files/{id}").Handler(httptransport.NewServer(
 		deleteFileEndpoint(s, logger),
 		decodeDeleteFileRequest,
