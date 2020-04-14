@@ -3,25 +3,36 @@
 ADDITIONS
 
 - batches: Add `LiftEffectiveEntryDate()` to offer parsed `time.Time` values of `EffectiveEntryDate`
-- file: add ValidateWith to override specific default validations
 - cmd/server: add version handler to admin HTTP server
-- server: read ValidateOpts in HTTP validate route
+- file: add BypassDestinationValidation to ValidateOpts
+- file: add ValidateWith to override specific default validations
 - file: support setting ValidateOpts on struct for calling Create()
+- reader: morph lines to 94 characters if they end in spaces
+- server: read ValidateOpts in HTTP validate route
+- server: return fileID on create errors, enforce marshaled errors as strings
 
-BUG FIXEs
+BUG FIXES
 
 - all: replace `Ç` with `C` across the project
+- all: use filepath.Join instead of unix paths
+- api: fixup flatten files OpenAPI spec
+- api: note POST /files/create can return an error
+- file: don't validate before flattening batches
 - file: keep TraceNumbers when segmenting files
 - server: fix segment OpenAPI spec and accept config body
 - server: read empty SegmentFileConfiguration
-- api: fixup flatten files OpenAPI spec
 
 IMPROVEMENTS
 
 - api: used shared Error model
+- api: use shorter summaries
 - api: include AddendaXX, ADV, and IAT records that were missing from OpenAPI spec
 - chore(deps): update module prometheus/client_golang to v1.4.1
 - chore(deps): update module gorilla/mux to v1.7.4
+- reader: write a test for what partial file comes back from invalid EntryDetails
+- reader: allow zero-entry files if their controls signify as such
+- server: use FoundABug error with mismatched routing
+- validators: ensure alpha routing number check digit is invalid
 
 BUILD
 
