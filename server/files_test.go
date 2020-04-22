@@ -282,10 +282,10 @@ func TestFiles__ValidateOpts(t *testing.T) {
 	// validate, expect failure
 	w := httptest.NewRecorder()
 	body := strings.NewReader(`{"requireABAOrigin": true}`)
-	req := httptest.NewRequest("GET", fmt.Sprintf("/files/%s/validate", file.ID), body)
+	req := httptest.NewRequest("POST", fmt.Sprintf("/files/%s/validate", file.ID), body)
 
 	router := mux.NewRouter()
-	router.Methods("GET").Path("/files/{id}/validate").Handler(
+	router.Methods("POST").Path("/files/{id}/validate").Handler(
 		httptransport.NewServer(validateFileEndpoint(svc, logger), decodeValidateFileRequest, encodeResponse),
 	)
 
@@ -304,7 +304,7 @@ func TestFiles__ValidateOpts(t *testing.T) {
 	// retry, but with different ValidateOpts
 	w = httptest.NewRecorder()
 	body = strings.NewReader(`{"requireABAOrigin": true}`)
-	req = httptest.NewRequest("GET", fmt.Sprintf("/files/%s/validate", file.ID), body)
+	req = httptest.NewRequest("POST", fmt.Sprintf("/files/%s/validate", file.ID), body)
 	router.ServeHTTP(w, req)
 	w.Flush()
 

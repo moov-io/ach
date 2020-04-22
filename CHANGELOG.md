@@ -5,11 +5,12 @@ ADDITIONS
 - batches: Add `LiftEffectiveEntryDate()` to offer parsed `time.Time` values of `EffectiveEntryDate`
 - cmd/server: add version handler to admin HTTP server
 - file: add BypassDestinationValidation to ValidateOpts
-- file: add ValidateWith to override specific default validations
+- file: add `ValidateWith` to override specific default validations
 - file: support setting ValidateOpts on struct for calling Create()
 - reader: morph lines to 94 characters if they end in spaces
-- server: read ValidateOpts in HTTP validate route
+- server: read `ValidateOpts` in HTTP validate route
 - server: return fileID on create errors, enforce marshaled errors as strings
+- file: support setting `ValidateOpts` on struct for calling `Create()`
 
 BUG FIXES
 
