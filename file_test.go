@@ -484,9 +484,14 @@ func TestFile__readFromJson(t *testing.T) {
 
 	// ensure we error on struct tag unmarshal
 	var f File
-	err = json.Unmarshal(bs, &f)
-	if !strings.Contains(err.Error(), "use ach.FileFromJSON instead") {
-		t.Error("expected error, see FileFromJson definition")
+	if err := json.Unmarshal(bs, &f); err != nil {
+		t.Error(err)
+	}
+	if f.Header.ImmediateOrigin != "121042882" || f.Header.ImmediateDestination != "231380104" {
+		t.Errorf("FileHeader=%#v", f.Header)
+	}
+	if err := f.Validate(); err != nil {
+		t.Error(err)
 	}
 
 	if err := file.Validate(); err != nil {
@@ -952,9 +957,14 @@ func TestFileADV__readFromJson(t *testing.T) {
 
 	// ensure we error on struct tag unmarshal
 	var f File
-	err = json.Unmarshal(bs, &f)
-	if !strings.Contains(err.Error(), "use ach.FileFromJSON instead") {
-		t.Error("expected error, see FileFromJson definition")
+	if err := json.Unmarshal(bs, &f); err != nil {
+		t.Error(err)
+	}
+	if f.Header.ImmediateOrigin != "121042882" || f.Header.ImmediateDestination != "231380104" {
+		t.Errorf("FileHeader=%#v", f.Header)
+	}
+	if err := f.Validate(); err != nil {
+		t.Error(err)
 	}
 
 	if err := file.Validate(); err != nil {

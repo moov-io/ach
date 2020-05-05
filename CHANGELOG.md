@@ -11,6 +11,7 @@ ADDITIONS
 - server: read `ValidateOpts` in HTTP validate route
 - server: return fileID on create errors, enforce marshaled errors as strings
 - file: support setting `ValidateOpts` on struct for calling `Create()`
+- file: struct unmarshaling works again, it was depreciated for a couple releases
 
 BUG FIXES
 
