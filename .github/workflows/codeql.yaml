@@ -22,5 +22,6 @@ jobs:
       # Build the project
       - run: make
 
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v1
+      # TODO(adam): This scanning is in beta right now
+      # - name: Perform CodeQL Analysis
+      #   uses: github/codeql-action/analyze@v1
