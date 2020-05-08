@@ -18,6 +18,8 @@
 package ach
 
 import (
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/moov-io/base"
@@ -359,5 +361,30 @@ func TestAddenda99RuneCountInString(t *testing.T) {
 
 	if addenda99.DateOfDeath != "" {
 		t.Error("Parsed with an invalid RuneCountInString not equal to 94")
+	}
+}
+
+func TestAddenda99__MissingFileHeaderControl(t *testing.T) {
+	// We have a usecase where returned files don't contain the FileHeader
+	// or FileControl records. Our parser can handle this, but returns
+	// errors are they're expected per the NACHA spec.
+	//
+	// This test just checks we can parse the file and get the expected errors.
+	file, err := ReadFile(filepath.Join("test", "testdata", "return-no-file-header-control.ach"))
+	if err == nil {
+		t.Error("expected an error")
+	}
+	if !strings.Contains(err.Error(), ErrFileHeader.Error()) {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if !strings.Contains(err.Error(), ErrFileControl.Error()) {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	if len(file.Batches) != 1 {
+		t.Errorf("got %d batches", len(file.Batches))
+	}
+	if entries := file.Batches[0].GetEntries(); len(entries) != 1 {
+		t.Errorf("got %d entries", len(entries))
 	}
 }
