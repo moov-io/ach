@@ -302,6 +302,9 @@ func (fh *FileHeader) ImmediateOriginField() string {
 	if fh.ImmediateOrigin == "" {
 		return strings.Repeat(" ", 10)
 	}
+	if fh.validateOpts != nil && fh.validateOpts.BypassOriginValidation {
+		return fh.stringField(strings.TrimSpace(fh.ImmediateOrigin), 10)
+	}
 	return " " + fh.stringField(strings.TrimSpace(fh.ImmediateOrigin), 9)
 }
 
