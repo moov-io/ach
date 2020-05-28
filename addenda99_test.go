@@ -74,6 +74,9 @@ func testAddenda99Parse(t testing.TB) {
 }
 
 func TestAddenda99__LookupReturnCode(t *testing.T) {
+	if code := LookupReturnCode(""); code != nil {
+		t.Error("expected nil ReturnCode")
+	}
 	if code := LookupReturnCode("R02"); code == nil {
 		t.Error("expected ReturnCode")
 	} else {
