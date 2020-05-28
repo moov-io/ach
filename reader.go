@@ -132,7 +132,7 @@ func (r *Reader) Read() (File, error) {
 		r.lineNum++
 		if r.lineNum > maxLines {
 			r.errors.Add(ErrFileTooLong)
-			break
+			return r.File, r.errors
 		}
 
 		lineLength := len(line)
