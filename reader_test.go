@@ -51,6 +51,70 @@ func TestReadFile(t *testing.T) {
 	}
 }
 
+func TestReadPartial(t *testing.T) {
+	file, err := ReadFile(filepath.Join("test", "testdata", "bh-ed-ad-bh-ed-ad-ed-ad.ach"))
+	if err != nil {
+		t.Log(err) // we expect errors -- display them
+	}
+	if len(file.Batches) != 1 {
+		t.Fatalf("unexpected batches: %#v", file.Batches)
+	}
+	entries := file.Batches[0].GetEntries()
+	if len(entries) != 3 {
+		t.Error("unexpected entry details")
+		for i := range entries {
+			t.Errorf("  %#v", entries[i])
+		}
+		t.Fatal("")
+	}
+
+	// batch
+	bh := file.Batches[0].GetHeader()
+	if bh.ServiceClassCode != DebitsOnly {
+		t.Errorf("ServiceClassCode=%d", bh.ServiceClassCode)
+	}
+	if bh.CompanyName != "Adam Shannon" {
+		t.Errorf("CompanyName=%s", bh.CompanyName)
+	}
+	if bh.CompanyIdentification != "MOOVYYYYYY" {
+		t.Errorf("CompanyIdentification=%s", bh.CompanyIdentification)
+	}
+	if bh.StandardEntryClassCode != "PPD" {
+		t.Errorf("StandardEntryClassCode=%s", bh.StandardEntryClassCode)
+	}
+
+	// entries
+	entry := entries[0]
+	if entry.TransactionCode != CheckingReturnNOCDebit {
+		t.Errorf("TransactionCode=%d", entry.TransactionCode)
+	}
+	if num := strings.TrimSpace(entry.DFIAccountNumber); num != "15XXXXXXXXXX1" {
+		t.Errorf("DFIAccountNumber=%q", num)
+	}
+	if entry.Addenda99 != nil {
+		if code := entry.Addenda99.ReturnCode; code != "R02" {
+			t.Errorf("ReturnCode=%s", code)
+		}
+	} else {
+		t.Errorf("nil Addenda99")
+	}
+
+	entry = entries[1]
+	if entry.TransactionCode != CheckingReturnNOCCredit {
+		t.Errorf("TransactionCode=%d", entry.TransactionCode)
+	}
+	if num := strings.TrimSpace(entry.DFIAccountNumber); num != "1XXXXXXXXXXX2" {
+		t.Errorf("DFIAccountNumber=%q", num)
+	}
+	if entry.Addenda99 != nil {
+		if code := entry.Addenda99.ReturnCode; code != "R03" {
+			t.Errorf("ReturnCode=%s", code)
+		}
+	} else {
+		t.Errorf("nil Addenda99")
+	}
+}
+
 func TestReader__crashers(t *testing.T) {
 	dir := filepath.Join("test", "testdata", "crashers")
 	fds, err := ioutil.ReadDir(dir)
@@ -1719,17 +1783,22 @@ func TestReader__partial(t *testing.T) {
 		t.Fatal("nil File")
 	}
 
-	// Under our current parser setup we won't add the Batch to the resulting file
-	// if an EntryDetail fails to parse. A partial File is returend with records that
-	// did parse. This test shows a mismatch between BatchCount and file.Batches
+	// Under our current parser setup we append a lingering Batch to the resulting file
+	// if an EntryDetail fails to parse or BatchControl record is missing. A partial File
+	// is returend with any records that did parse. This test checks we don't silently break
+	// this behavior.
 
 	if n := file.Control.BatchCount; n != 2 {
 		t.Errorf("got FileControl.BatchCount=%d", n)
 	}
-	if len(file.Batches) != 1 {
+	if len(file.Batches) != 2 {
 		t.Fatalf("got %d Batches", len(file.Batches))
 	}
 	entries := file.Batches[0].GetEntries()
+	if len(entries) != 3 {
+		t.Errorf("got %d entries", len(entries))
+	}
+	entries = file.Batches[1].GetEntries()
 	if len(entries) != 3 {
 		t.Errorf("got %d entries", len(entries))
 	}
