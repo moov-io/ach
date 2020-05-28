@@ -18,7 +18,10 @@ var (
 	flagVersion = flag.Bool("version", false, "Print moov-io/ach cli version")
 
 	flagDiff     = flag.Bool("diff", false, "Compare two files against each other")
+	flagMerge    = flag.Bool("merge", false, "Merge files before describing")
 	flagReformat = flag.String("reformat", "", "Reformat an incoming ACH file to another format")
+
+	flagMask = flag.Bool("mask", false, "Mask/hide full account numbers")
 )
 
 func init() {
