@@ -166,6 +166,14 @@ func (r *Reader) Read() (File, error) {
 			}
 		}
 	}
+
+	// Add a lingering Batch to the file if there was no BatchControl record.
+	// This is common when files just contain a BatchHeader and EntryDetail records.
+	if r.currentBatch != nil {
+		r.File.AddBatch(r.currentBatch)
+		r.currentBatch = nil
+	}
+
 	// Carry through any ValidateOpts for this comparison
 	if (FileHeader{validateOpts: r.File.validateOpts}) == r.File.Header {
 		// There must be at least one File Header
