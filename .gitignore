@@ -41,8 +41,10 @@ _testmain.go
 # code coverage
 coverage.html
 cover.out
-
-
+coverage.txt
+misspell*
+staticcheck*
+/lint-project.sh
 bin/
 tmp/
 
