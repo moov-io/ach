@@ -38,7 +38,7 @@ type Batch struct {
 
 	// offset holds the information to build an EntryDetail record which
 	// balances the batch by debiting or crediting the sum of amounts in the batch.
-	offset *Offset `json:"offset"`
+	offset *Offset
 
 	// category defines if the entry is a Forward, Return, or NOC
 	category string
@@ -129,6 +129,18 @@ const (
 	// XCK Destroyed Check Entry - A code indicating a debit entry initiated for a a destroyed check eligible items
 	XCK = "XCK"
 )
+
+func (batch *Batch) MarshalJSON() ([]byte, error) {
+	type Alias Batch
+	aux := struct {
+		*Alias
+		Offset *Offset `json:"offset"`
+	}{
+		(*Alias)(batch),
+		batch.offset,
+	}
+	return json.Marshal(aux)
+}
 
 func (batch *Batch) UnmarshalJSON(p []byte) error {
 	if batch != nil {
