@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"bytes"
 	"encoding/json"
 	"os"
 	"path/filepath"
@@ -81,6 +82,21 @@ func mockBatchInvalidSECHeader() *BatchHeader {
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
 	bh.ODFIIdentification = "123456789"
 	return bh
+}
+
+func TestBatch__MarshalJSON(t *testing.T) {
+	b := mockBatch()
+	b.WithOffset(&Offset{
+		RoutingNumber: "987654320",
+	})
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(b); err != nil {
+		t.Fatal(err)
+	}
+	if s := buf.String(); !strings.Contains(s, `"offset":{"routingNumber":"987654320"`) {
+		t.Errorf("unexpected JSON: %v", s)
+	}
 }
 
 // TestBatch__UnmarshalJSON reads an example File (with Batches) and attempts to unmarshal it as JSON

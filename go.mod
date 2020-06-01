@@ -10,6 +10,7 @@ require (
 	github.com/mattn/go-isatty v0.0.12
 	github.com/moov-io/base v0.11.0
 	github.com/prometheus/client_golang v1.3.0
+	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37 // indirect
 )
 
 go 1.13
