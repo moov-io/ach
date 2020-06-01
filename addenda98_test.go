@@ -35,6 +35,9 @@ func mockAddenda98() *Addenda98 {
 }
 
 func TestAddenda98_LookupChangecode(t *testing.T) {
+	if code := LookupChangeCode(""); code != nil {
+		t.Error("expected nil ChangeCode")
+	}
 	if code := LookupChangeCode("C05"); code == nil {
 		t.Error("expected ReturnCode")
 	} else {
