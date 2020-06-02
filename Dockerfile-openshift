@@ -1,0 +1,16 @@
+# Step one: build scapresults
+FROM registry.access.redhat.com/ubi8/go-toolset as builder
+COPY . .
+RUN make build
+ARG VERSION=unknown
+LABEL maintainer="Moov <support@moov.io>"
+LABEL name="ach"
+LABEL version=$VERSION
+
+
+FROM registry.access.redhat.com/ubi8/ubi-minimal
+MAINTAINER Moov <support@moov.io>
+COPY --from=builder /opt/app-root/src/bin/server /bin/server
+EXPOSE 8080
+EXPOSE 9090
+ENTRYPOINT ["/bin/server"]

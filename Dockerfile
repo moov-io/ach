@@ -3,7 +3,6 @@ WORKDIR /go/src/github.com/moov-io/ach
 RUN apk add -U make
 RUN adduser -D -g '' --shell /bin/false moov
 COPY . .
-RUN go mod download
 RUN make build
 USER moov
 
