@@ -1,5 +1,48 @@
 ## v1.4.0 (Unreleased)
 
+Version v1.4.0 of ACH adds several notable features such as custom validation, a command-line tool `achcli` to describe files, and improvements for verifying NACHA compatibility on slightly malformed files. This release also contains enhanced testing and documentation improvements.
+
+**Custom Validation**
+
+The ACH library (and HTTP server) now supports custom validation with the [`ValidateOpts`](https://godoc.org/github.com/moov-io/ach#ValidateOpts) struct by calling `File.SetValidation(..)` and `Reader.SetValidation(...)`. This offers various options:
+
+- `RequireABAOrigin bool`: Enable or disable routing number validation over the `ImmediateOrigin` file header field
+- `BypassOriginValidation`: Skip validation for the `ImmediateOrigin` file header field and allow custom `TraceNumber` values
+- `BypassDestinationValidation`: Skip validation for the `ImmediateDestination` file header field and allow custom `TraceNumber` values
+
+The HTTP server also supports reading this struct with camel-cased names when calling the validation route.
+
+**achcli**
+
+`achcli` is a command-line utility for viewing ACH files in a more human readable format. This tool also allows masking `DFIAccountNumber` values with the `-mask` flag.
+
+```
+$ achcli -mask 20200601-1002-01.ach
+Describing ACH file '20200601-1002-01.ach'
+
+  Origin     OriginName               Destination  DestinationName     FileCreationDate  FileCreationTime
+  691000134  ASF APPLICATION SUPERVI  091400606    FIRST BANK & TRUST  181017            0306
+
+  BatchNumber  SECCode  ServiceClassCode  CompanyName  CompanyDiscretionaryData  CompanyIdentification  CompanyEntryDescription
+  1            WEB      200               CoinLion                               123456789              TRANSFER
+
+    TransactionCode  RDFIIdentification  AccountNumber  Amount  Name                    TraceNumber      Category
+    26               09140060            *******89      12354   Paul Jones              091000017611242  Return
+
+      Addenda99
+      ReturnCode  OriginalTrace    DateOfDeath  OriginalDFI  AddendaInformation  TraceNumber
+      R01         091400600000001               09100001                         091000017611242
+
+  BatchCount  BlockCount  EntryAddendaCount  TotalDebitAmount  TotalCreditAmount
+  1           1           1                  12354             0
+```
+
+**Malformed Files**
+
+ACH files with lines that are not 94 characters are now adjusted in-memory (missing or extra spaces) in an attempt to comply with NACHA standards. The underlying file on disk is not modified during this reading.
+
+-----
+
 ADDITIONS
 
 - batches: Add `LiftEffectiveEntryDate()` to offer parsed `time.Time` values of `EffectiveEntryDate`
@@ -12,6 +55,9 @@ ADDITIONS
 - server: return fileID on create errors, enforce marshaled errors as strings
 - file: support setting `ValidateOpts` on struct for calling `Create()`
 - file: struct unmarshaling works again, it was depreciated for a couple releases
+- reader: morph lines to 94 characters with spaces if they are some other length
+- reader: allow setting ValidateOpts
+- cmd/ach: initial setup of CLI tool to pretty print ACH files
 
 BUG FIXES
 
@@ -23,6 +69,7 @@ BUG FIXES
 - file: keep TraceNumbers when segmenting files
 - server: fix segment OpenAPI spec and accept config body
 - server: read empty SegmentFileConfiguration
+- file: don't validate before flattening batches
 
 IMPROVEMENTS
 
@@ -35,11 +82,14 @@ IMPROVEMENTS
 - reader: allow zero-entry files if their controls signify as such
 - server: use FoundABug error with mismatched routing
 - validators: ensure alpha routing number check digit is invalid
+- all: use filepath.Join instead of unix paths
+- reader: append a lingering batch even if there's no batch control
 
 BUILD
 
 - chore(deps): update golang docker tag to v1.14
 - build: run sonatype-nexus-community/nancy in CI
+- build: leverage moov-io/infra's Go linter script
 
 ## v1.3.1 (Released 2020-01-22)
 
