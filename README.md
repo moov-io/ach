@@ -65,6 +65,12 @@ The ACH project implements a Go library and HTTP server for creating and modifyi
 
 </details>
 
+### Other Languages
+
+Below are some SDK's generated from the API documentation:
+
+- [Node SDK](https://www.npmjs.com/package/ach-node-sdk) | [GitHub](https://github.com/moov-io/ach-node-sdk)
+
 ### HTTP API
 
 `github.com/moov-io/ach/server` offers a HTTP and JSON API for creating and editing files. If you're using Go the `ach.File` type can be used, otherwise just send properly formatted JSON. We have an [example JSON file](test/testdata/ppd-valid.json), but each SEC type will generate different JSON.
