@@ -68,14 +68,14 @@ func dumpFile(file *ach.File) {
 
 	// Batches
 	for i := range file.Batches {
-		fmt.Fprintln(w, "\n  BatchNumber\tSECCode\tServiceClassCode\tCompanyName\tCompanyDiscretionaryData\tCompanyIdentification\tCompanyEntryDescription")
+		fmt.Fprintln(w, "\n  BatchNumber\tSECCode\tServiceClassCode\tCompanyName\tDiscretionaryData\tIdentification\tEntryDescription\tDescriptiveDate")
 
 		bh := file.Batches[i].GetHeader()
 		bc := file.Batches[i].GetControl()
 		if bh != nil && bc != nil {
-			fmt.Fprintf(w, "  %d\t%s\t%d\t%s\t%s\t%s\t%s\n",
+			fmt.Fprintf(w, "  %d\t%s\t%d\t%s\t%s\t%s\t%s\t%s\n",
 				bh.BatchNumber, bh.StandardEntryClassCode, bh.ServiceClassCode, bh.CompanyName,
-				bh.CompanyDiscretionaryData, bh.CompanyIdentification, bh.CompanyEntryDescription)
+				bh.CompanyDiscretionaryData, bh.CompanyIdentification, bh.CompanyEntryDescription, bh.CompanyDescriptiveDate)
 		}
 
 		entries := file.Batches[i].GetEntries()
