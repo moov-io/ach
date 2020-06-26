@@ -1382,7 +1382,7 @@ func TestBatch__upsertOffsetsErr(t *testing.T) {
 	b.WithOffset(&Offset{
 		RoutingNumber: "121042882",
 		AccountNumber: "123456789",
-		AccountType:   OffsetAccountType(0),
+		AccountType:   OffsetAccountType("invalid"),
 		Description:   "test offset",
 	})
 	if err := b.Create(); err == nil {

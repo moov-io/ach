@@ -1092,6 +1092,11 @@ func (b *Batch) upsertOffsets() error {
 		}
 	}
 
+	// Make sure the offset account type is valid
+	if err := b.offset.AccountType.validate(); err != nil {
+		return err
+	}
+
 	// Create our debit offset EntryDetail
 	debitED := createOffsetEntryDetail(b.offset, b)
 	debitED.TraceNumber = strconv.Itoa(lastTraceNumber(b.Entries) + 1)
