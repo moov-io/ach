@@ -10,7 +10,7 @@ Package `github.com/moov-io/ach` implements a file reader and writer written in 
 
 If you're looking for a complete implementation of ACH origination (file creation), OFAC checks, micro-deposits, SFTP uploading, and other featues the [moov-io/paygate](https://github.com/moov-io/paygate) project aims to be a full system for ACH transfers.
 
-Docs: [docs.moov.io](https://docs.moov.io/ach/) | [api docs](https://moov-io.github.io/ach/)
+Docs: [Project](./docs/#moov-ach) | [API Endpoints](https://moov-io.github.io/ach/api/)
 
 ## Project Status
 
@@ -104,16 +104,16 @@ Describing ACH file 'test/testdata/ppd-debit.ach'
 
 ## Getting Started
 
-- [Running ACH Server](https://docs.moov.io/ach/#running-moov-ach-server)
-- [Intro to ACH](https://docs.moov.io/ach/intro/)
-- [Create an ACH File](https://docs.moov.io/ach/create-file/)
+- [Running ACH Server](./docs/index.md#running-moov-ach-server)
+- [Intro to ACH](./docs/intro.md)
+- [Create an ACH File](./docs/create-file.md)
 
 ## Guides
 
-- [ACH File Structure](https://docs.moov.io/ach/file-structure/)
-- [Balaced offset files](https://docs.moov.io/ach/balanced-offset/)
-- [Merging ACH files](https://docs.moov.io/ach/merging-files/)
-- [ACH Server metrics](docs/metrics.md)
+- [ACH File Structure](./docs/file-structure.md)
+- [Balaced offset files](./docs/balanced-offset.md)
+- [Merging ACH files](./docs/merging-files.md)
+- [ACH Server metrics](./docs/metrics.md)
 
 ### Docker
 
@@ -162,7 +162,7 @@ If you have ACH specific questions NACHA (National Automated Clearing House Asso
 
  channel | info
  ------- | -------
- [Project Documentation](https://docs.moov.io/ach/) | Our project documentation available online.
+ [Project Documentation](./docs/#moov-ach) | Our project documentation available online.
  Google Group [moov-users](https://groups.google.com/forum/#!forum/moov-users)| The Moov users Google group is for contributors other people contributing to the Moov project. You can join them without a google account by sending an email to [moov-users+subscribe@googlegroups.com](mailto:moov-users+subscribe@googlegroups.com). After receiving the join-request message, you can simply reply to that to confirm the subscription.
 Twitter [@moov_io](https://twitter.com/moov_io)	| You can follow Moov.IO's Twitter feed to get updates on our project(s). You can also tweet us questions or just share blogs or stories.
 [GitHub Issue](https://github.com/moov-io/ach/issues/new) | If you are able to reproduce a problem please open a GitHub Issue under the specific project that caused the error.
