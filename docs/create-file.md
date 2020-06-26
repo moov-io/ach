@@ -1,6 +1,6 @@
 ## API documentation
 
-See our [API documentation](https://moov-io.github.io/ach/) for Moov ACH endpoints.
+See our [API documentation](https://moov-io.github.io/ach/api/) for Moov ACH endpoints.
 
 ## Setup our ACH file
 

@@ -130,9 +130,9 @@ BUG FIXES
 ADDITIONS
 
 - Add `FlattenBatches() (*File, error)` to `ach.File`
-   - FlattenBatches [minimizes File Batches by consolidating them](https://docs.moov.io/ach/flatten-batches/) with the same BatchHeader data into one batch.
+   - FlattenBatches [minimizes File Batches by consolidating them](./docs/flatten-batches.md) with the same BatchHeader data into one batch.
 - Add `POST /files/:id/flatten` which calls `FlattenBatches()` on a specific ACH file
-- Add `POST /files/:id/balance` to [add Offset records](https://docs.moov.io/ach/balanced-offset/) onto each Batch in an ACH File.
+- Add `POST /files/:id/balance` to [add Offset records](./docs/balanced-offset.md) onto each Batch in an ACH File.
 - Addenda98: Add `ChangeCodeField()` for detailed information about a NOC/COR change file ([`ChangeCode`](https://godoc.org/github.com/moov-io/ach#ChangeCode))
 - Addenda99: Add `ReturnCodeField()` for detailed information about file returns ([`ReturnCode`](https://godoc.org/github.com/moov-io/ach#ReturnCode))
 

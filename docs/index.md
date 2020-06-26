@@ -4,6 +4,8 @@
 <a href="https://godoc.org/github.com/moov-io/ach"><img src="https://godoc.org/github.com/moov-io/ach?status.svg" /></a>
 <a href="https://raw.githubusercontent.com/moov-io/ach/master/LICENSE"><img src="https://img.shields.io/badge/license-Apache2-blue.svg" /></a>
 
+**[GitHub](https://github.com/moov-io/ach)** | **Running** | **[Configuration](https://github.com/moov-io/ach#configuration)**
+
 Moov ACH implements a low level Automated Clearing House (ACH) interface for parsing, creating, validating, and merging ACH files. Moov ACH exposes an HTTP API for REST based interaction. Any language which can use HTTP and JSON can leverage the ACH Server. The API's endpoints expose both text and JSON to easily ingest or export either format.
 
 ## Running Moov ACH Server
@@ -99,7 +101,7 @@ You can also send [an example PPD ACH file we have](https://github.com/moov-io/a
 
 ### API documentation
 
-See our [API documentation](https://moov-io.github.io/ach/) for Moov ACH endpoints.
+See our [API documentation](https://moov-io.github.io/ach/api/) for Moov ACH endpoints.
 
 ### ACH Admin Port
 
@@ -109,7 +111,7 @@ The port `9090` is bound by ACH for our admin service. This HTTP server has endp
 
  channel | info
  ------- | -------
- [Project Documentation](https://docs.moov.io/) | Our project documentation available online.
+ [GitHub Project](https://github.com/moov-io/ach) | Our project documentation available online.
  Google Group [moov-users](https://groups.google.com/forum/#!forum/moov-users)| The Moov users Google group is for contributors other people contributing to the Moov project. You can join them without a google account by sending an email to [moov-users+subscribe@googlegroups.com](mailto:moov-users+subscribe@googlegroups.com). After receiving the join-request message, you can simply reply to that to confirm the subscription.
 Twitter [@moov_io](https://twitter.com/moov_io)	| You can follow Moov.IO's Twitter feed to get updates on our project(s). You can also tweet us questions or just share blogs or stories.
 [GitHub Issue](https://github.com/moov-io) | If you are able to reproduce a problem please open a GitHub Issue under the specific project that caused the error.
