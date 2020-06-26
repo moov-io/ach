@@ -1,6 +1,6 @@
 ## Moov ACH
 
-**GitHub** | **Running** | **[Configuration](https://github.com/moov-io/ach#configuration)**
+**GitHub** | **[Running](./index.md#running-moov-ach-server)** | **[Configuration](https://github.com/moov-io/ach#configuration)**
 
 ### Purpose
 
