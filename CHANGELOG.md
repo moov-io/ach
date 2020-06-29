@@ -1,4 +1,6 @@
-## v1.4.0 (Unreleased)
+## v1.5.0 (Unreleased)
+
+## v1.4.0 (Released 2020-06-29)
 
 Version v1.4.0 of ACH adds several notable features such as custom validation, a command-line tool `achcli` to describe files, and improvements for verifying NACHA compatibility on slightly malformed files. This release also contains enhanced testing and documentation improvements.
 
