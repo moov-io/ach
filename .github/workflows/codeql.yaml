@@ -2,6 +2,7 @@ name: CodeQL Analysis
 
 on:
   push:
+  pull_request:
   schedule:
     - cron: '0 10 * * 0'
 
@@ -14,14 +15,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # - name: Initialize CodeQL
-      #   uses: github/codeql-action/init@v1
-      #   with:
-      #     languages: go
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v1
+        with:
+          languages: go
 
-      # Build the project
       - run: make
 
-      # TODO(adam): This scanning is in beta right now
-      # - name: Perform CodeQL Analysis
-      #   uses: github/codeql-action/analyze@v1
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
