@@ -32,7 +32,7 @@ func init() {
 		fmt.Println("Commands: ")
 		fmt.Println("  ach -diff first.ach second.ach")
 		fmt.Println("    Show the difference between two ACH files")
-		fmt.Println("  ach -reforamt=json first.ach")
+		fmt.Println("  ach -reformat=json first.ach")
 		fmt.Println("    Convert an incoming ACH file into another format (options: ach, json)")
 		fmt.Println("  ach 20060102.ach")
 		fmt.Println("    Summarize an ACH file for human readability")
