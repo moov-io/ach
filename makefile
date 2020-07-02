@@ -37,10 +37,13 @@ else
 endif
 
 docker: clean
-# ACH docker image
+# ACH Docker image
 	docker build --pull -t moov/ach:$(VERSION) -f Dockerfile .
 	docker tag moov/ach:$(VERSION) moov/ach:latest
-# ACH Fuzzing docker image
+# ACH OpenShift Docker image
+	docker build --pull -t quay.io/moov/ach:$(VERSION) -f Dockerfile-openshift --build-arg VERSION=$(VERSION) .
+	docker tag quay.io/moov/ach:$(VERSION) quay.io/moov/ach:latest
+# ACH Fuzzing Docker image
 	docker build --pull -t moov/achfuzz:$(VERSION) . -f Dockerfile-fuzz
 	docker tag moov/achfuzz:$(VERSION) moov/achfuzz:latest
 

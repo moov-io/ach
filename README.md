@@ -119,6 +119,8 @@ Describing ACH file 'test/testdata/ppd-debit.ach'
 
 We publish a [public docker image `moov/ach`](https://hub.docker.com/r/moov/ach/tags) on Docker Hub with each tagged release of ACH. No configuration is required to serve on `:8080` and metrics at `:9090/metrics` in Prometheus format.
 
+Also, we have [a container for OpenShift](https://quay.io/repository/moov/ach?tab=info) published as `quay.io/moov/ach`.
+
 ```
 $ docker run -p 8080:8080 -p 9090:9090 moov/ach:latest
 ts=2019-06-20T23:58:44.4931106Z caller=main.go:75 startup="Starting ach server version v1.0.2"
