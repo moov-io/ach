@@ -65,6 +65,8 @@ release: docker generate AUTHORS
 release-push:
 	docker push moov/ach:$(VERSION)
 	docker push moov/ach:latest
+	docker push quay.io/moov/ach:$(VERSION)
+	docker push quay.io/moov/ach:latest
 	docker push moov/achfuzz:$(VERSION)
 
 .PHONY: cover-test cover-web
