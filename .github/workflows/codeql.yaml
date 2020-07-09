@@ -20,7 +20,5 @@ jobs:
         with:
           languages: go
 
-      - run: make
-
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
