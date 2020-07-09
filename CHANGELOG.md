@@ -1,4 +1,14 @@
-## v1.5.0 (Unreleased)
+## v1.4.1 (Released 2020-07-09)
+
+BUG FIXES
+
+- batch: error if our offset account type is unknown
+
+BUILD
+
+- build: add openshift docker image
+- build: enable codeql via github actions
+- build: release via Actions, not TravisCI
 
 ## v1.4.0 (Released 2020-06-29)
 
