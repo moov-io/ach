@@ -14,7 +14,7 @@ Docs: [Project](./docs/#moov-ach) | [API Endpoints](https://moov-io.github.io/ac
 
 ## Project Status
 
-Moov ACH is under active development and in production for multiple companies. Please star the project if you are interested in its progress. We've built an HTTP API for ACH file creation and validation. Currently we support generating and parsing all Standard Entry Class (SEC) codes. If you have layers above ACH to simplify tasks or found bugs we would appreciate an issue or pull request. Thanks!
+Moov ACH is actively used in multiple production environments. Please star the project if you are interested in its progress. The project supports generating and parsing all Standard Entry Class (SEC) codes. If you have layers above ACH to simplify tasks, perform business operations, or found bugs we would appreciate an issue or pull request. Thanks!
 
 ## Usage
 
