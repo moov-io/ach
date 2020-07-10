@@ -6,7 +6,7 @@ moov-io/ach
 [![Go Report Card](https://goreportcard.com/badge/github.com/moov-io/ach)](https://goreportcard.com/report/github.com/moov-io/ach)
 [![Apache 2 licensed](https://img.shields.io/badge/license-Apache2-blue.svg)](https://raw.githubusercontent.com/moov-io/ach/master/LICENSE)
 
-Package `github.com/moov-io/ach` implements a file reader and writer written in Go along with a HTTP API for creating, parsing and validating Automated Clearing House ([ACH](https://en.wikipedia.org/wiki/Automated_Clearing_House)) files. ACH is the primary method of electronic money movement throughout the United States.
+ACH implements a reader, writer, and validator for Automated Clearing House ([ACH](https://en.wikipedia.org/wiki/Automated_Clearing_House)) files. ACH is the primary method of electronic money movement throughout the United States. The HTTP server is available in a [Docker image](#docker) and the Go package `github.com/moov-io/ach` is available.
 
 If you're looking for a complete implementation of ACH origination (file creation), OFAC checks, micro-deposits, SFTP uploading, and other featues the [moov-io/paygate](https://github.com/moov-io/paygate) project aims to be a full system for ACH transfers.
 
@@ -19,6 +19,39 @@ Moov ACH is under active development and in production for multiple companies. P
 ## Usage
 
 The ACH project implements a Go library and HTTP server for creating and modifying ACH files. For a complete ACH origination service checkout [moov-io/paygate](https://github.com/moov-io/paygate).
+
+### Docker
+
+We publish a [public Docker image `moov/ach`](https://hub.docker.com/r/moov/ach/) from Docker Hub or use this repository. No configuration is required to serve on `:8080` and metrics at `:9090/metrics` in Prometheus format. We also have docker images for [OpenShift](https://quay.io/repository/moov/ach?tab=tags) published as `quay.io/moov/ach`.
+
+Start the Docker image:
+```
+docker run -p 8080:8080 -p 9090:9090 moov/ach:latest
+```
+
+List files stored in-memory
+```
+curl localhost:8080/files
+```
+```
+{"files":[],"error":null}
+```
+
+Create a file on the HTTP server
+```
+curl -XPOST --data-binary "@./test/testdata/ppd-debit.ach" http://localhost:8080/files/create
+```
+```
+{"id":"c58b75610ac1b8b85fef0d923a3bc0909bf06b93","error":null}
+```
+
+Read the ACH file (in JSON form)
+```
+curl http://localhost:8080/files/c58b75610ac1b8b85fef0d923a3bc0909bf06b93
+```
+```
+{"file":{"id":"c58b75610ac1b8b85fef0d923a3bc0909bf06b93","fileHeader":{"id":"","immediateDestination":"231380104","immediateOrigin":"121042882", ...
+```
 
 ### Go library
 
@@ -114,20 +147,6 @@ Describing ACH file 'test/testdata/ppd-debit.ach'
 - [Balaced offset files](./docs/balanced-offset.md)
 - [Merging ACH files](./docs/merging-files.md)
 - [ACH Server metrics](./docs/metrics.md)
-
-### Docker
-
-We publish a [public docker image `moov/ach`](https://hub.docker.com/r/moov/ach/tags) on Docker Hub with each tagged release of ACH. No configuration is required to serve on `:8080` and metrics at `:9090/metrics` in Prometheus format. Also, we have [a container for OpenShift](https://quay.io/repository/moov/ach?tab=info) published as `quay.io/moov/ach`.
-
-```
-$ docker run -p 8080:8080 -p 9090:9090 moov/ach:latest
-ts=2019-06-20T23:58:44.4931106Z caller=main.go:75 startup="Starting ach server version v1.0.2"
-ts=2019-06-20T23:58:44.5010238Z caller=main.go:135 transport=HTTP addr=:8080
-ts=2019-06-20T23:58:44.5018409Z caller=main.go:125 admin="listening on :9090"
-
-$ curl localhost:8080/files
-{"files":[],"error":null}
-```
 
 ### From Source
 
