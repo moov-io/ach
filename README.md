@@ -18,7 +18,7 @@ Moov ACH is actively used in multiple production environments. Please star the p
 
 ## Usage
 
-The ACH project implements a Go library and HTTP server for creating and modifying ACH files. For a complete ACH origination service checkout [moov-io/paygate](https://github.com/moov-io/paygate).
+The ACH project implements an HTTP server and Go library for creating and modifying ACH files. There are client libraries available for [Go](..) and [Node/JavaScript](https://github.com/moov-io/ach-node-sdk). The reader and writer are written in Go and [available as a library](https://pkg.go.dev/github.com/moov-io/ach) ([Examples](https://pkg.go.dev/github.com/moov-io/ach@v1.4.1/examples)).
 
 ### Docker
 
@@ -55,7 +55,7 @@ curl http://localhost:8080/files/c58b75610ac1b8b85fef0d923a3bc0909bf06b93
 
 ### Go library
 
-`github.com/moov-io/ach` offers a Go based ACH file reader and writer. To get started checkout a specific example:
+The package [`github.com/moov-io/ach`](https://pkg.go.dev/github.com/moov-io/ach) offers a Go based ACH file reader and writer. To get started checkout a specific example:
 
 <details>
 <summary>Supported Standard Entry Class (SEC) codes</summary>
@@ -106,7 +106,7 @@ Below are some SDK's generated from the API documentation:
 
 ### HTTP API
 
-`github.com/moov-io/ach/server` offers a HTTP and JSON API for creating and editing files. If you're using Go the `ach.File` type can be used, otherwise just send properly formatted JSON. We have an [example JSON file](test/testdata/ppd-valid.json), but each SEC type will generate different JSON.
+The package [`github.com/moov-io/ach/server`](https://pkg.go.dev/github.com/moov-io/ach/server) offers a HTTP and JSON API for creating and editing files. If you're using Go the `ach.File` type can be used, otherwise just send properly formatted JSON. We have an [example JSON file](test/testdata/ppd-valid.json), but each SEC type will generate different JSON.
 
 Examples: [Go](examples/http/main.go) | [Ruby](https://github.com/moov-io/ruby-ach-demo)
 
