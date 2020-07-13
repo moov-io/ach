@@ -84,14 +84,24 @@ paths:
         description: Content of the ACH file (in json or raw text)
         required: true
         content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateFile'
           text/plain:
             schema:
               description: A plaintext ACH file
               type: string
-              example: "101 222380104 1210428821805100000A094101Citadel                Bank Name"
+              example: |
+                  101 23138010401210428821906240000A094101Federal Reserve Bank   My Bank Name
+                  5225Name on Account                     121042882 PPDREG.SALARY      190625   1121042880000001
+                  62723138010412345678         0100000000               Receiver Account Name   0121042880000001
+                  82250000010023138010000100000000000000000000121042882                          121042880000001
+                  9000001000001000000010023138010000100000000000000000000
+                  9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+                  9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+                  9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+                  9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+                  9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFile'
       responses:
         '200':
           description: A JSON object containing a new File
