@@ -42,7 +42,7 @@ paths:
         - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
-          example: rs4f9915
+          example: "rs4f9915"
           schema:
             type: string
       responses:
@@ -70,13 +70,13 @@ paths:
         - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
-          example: rs4f9915
+          example: "rs4f9915"
           schema:
             type: string
         - name: X-Idempotency-Key
           in: header
           description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy for to not collide with each other in your requests.
-          example: a4f88150
+          example: "a4f88150"
           required: false
           schema:
             type: string
@@ -84,14 +84,24 @@ paths:
         description: Content of the ACH file (in json or raw text)
         required: true
         content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateFile'
           text/plain:
             schema:
               description: A plaintext ACH file
               type: string
-              example: 101 222380104 1210428821805100000A094101Citadel                Bank Name
+              example: |
+                  101 23138010401210428821906240000A094101Federal Reserve Bank   My Bank Name
+                  5225Name on Account                     121042882 PPDREG.SALARY      190625   1121042880000001
+                  62723138010412345678         0100000000               Receiver Account Name   0121042880000001
+                  82250000010023138010000100000000000000000000121042882                          121042880000001
+                  9000001000001000000010023138010000100000000000000000000
+                  9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+                  9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+                  9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+                  9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+                  9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFile'
       responses:
         '200':
           description: A JSON object containing a new File
@@ -124,7 +134,7 @@ paths:
         - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
-          example: rs4f9915
+          example: "rs4f9915"
           schema:
             type: string
         - name: fileID
@@ -133,7 +143,7 @@ paths:
           required: true
           schema:
             type: string
-            example: 3f2d23ee214
+            example: "3f2d23ee214"
       responses:
         '200':
           description: A File object for the supplied ID
@@ -158,11 +168,11 @@ paths:
           required: true
           schema:
             type: string
-            example: 3f2d23ee214
+            example: "3f2d23ee214"
         - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
-          example: rs4f9915
+          example: "rs4f9915"
           schema:
             type: string
       responses:
@@ -184,7 +194,7 @@ paths:
         - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
-          example: rs4f9915
+          example: "rs4f9915"
           schema:
             type: string
         - name: fileID
@@ -193,7 +203,7 @@ paths:
           required: true
           schema:
             type: string
-            example: 3f2d23ee214
+            example: "3f2d23ee214"
       responses:
         '200':
           description: File built successfully without errors.
@@ -214,7 +224,7 @@ paths:
         - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
-          example: rs4f9915
+          example: "rs4f9915"
           schema:
             type: string
         - name: fileID
@@ -223,7 +233,7 @@ paths:
           required: true
           schema:
             type: string
-            example: 3f2d23ee214
+            example: "3f2d23ee214"
       responses:
         '200':
           description: File validated successfully without errors.
@@ -245,7 +255,7 @@ paths:
         - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
-          example: rs4f9915
+          example: "rs4f9915"
           schema:
             type: string
         - name: fileID
@@ -254,7 +264,7 @@ paths:
           required: true
           schema:
             type: string
-            example: 3f2d23ee214
+            example: "3f2d23ee214"
       requestBody:
         required: false
         content:
@@ -283,13 +293,13 @@ paths:
         - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
-          example: rs4f9915
+          example: "rs4f9915"
           schema:
             type: string
         - name: X-Idempotency-Key
           in: header
           description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy for to not collide with each other in your requests.
-          example: a4f88150
+          example: "a4f88150"
           required: false
           schema:
             type: string
@@ -299,7 +309,7 @@ paths:
           required: true
           schema:
             type: string
-            example: 3f2d23ee214
+            example: "3f2d23ee214"
       # requestBody:
       #   description: Optional configuration for segmenting files
       #   required: false
@@ -333,13 +343,13 @@ paths:
         - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
-          example: rs4f9915
+          example: "rs4f9915"
           schema:
             type: string
         - name: X-Idempotency-Key
           in: header
           description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy for to not collide with each other in your requests.
-          example: a4f88150
+          example: "a4f88150"
           required: false
           schema:
             type: string
@@ -349,7 +359,7 @@ paths:
           required: true
           schema:
             type: string
-            example: 3f2d23ee214
+            example: "3f2d23ee214"
       responses:
         '200':
           description: An ID of the new ACH file
@@ -376,7 +386,7 @@ paths:
         - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
-          example: rs4f9915
+          example: "rs4f9915"
           schema:
             type: string
         - name: fileID
@@ -385,7 +395,7 @@ paths:
           required: true
           schema:
             type: string
-            example: 3f2d23ee214
+            example: "3f2d23ee214"
       responses:
         '200':
           description: A list of Batch objects
@@ -410,13 +420,13 @@ paths:
         - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
-          example: rs4f9915
+          example: "rs4f9915"
           schema:
             type: string
         - name: X-Idempotency-Key
           in: header
           description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy for to not collide with each other in your requests.
-          example: a4f88150
+          example: "a4f88150"
           required: false
           schema:
             type: string
@@ -426,7 +436,7 @@ paths:
           required: true
           schema:
             type: string
-            example: 3f2d23ee214
+            example: "3f2d23ee214"
       requestBody:
         required: true
         content:
@@ -449,7 +459,7 @@ paths:
         - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
-          example: rs4f9915
+          example: "rs4f9915"
           schema:
             type: string
         - name: fileID
@@ -458,14 +468,14 @@ paths:
           required: true
           schema:
             type: string
-            example: 3f2d23ee214
+            example: "3f2d23ee214"
         - name: batchID
           in: path
           description: Batch ID
           required: true
           schema:
             type: string
-            example: 45758063
+            example: "45758063"
       responses:
         '200':
           description: Batch object
@@ -487,7 +497,7 @@ paths:
         - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
-          example: rs4f9915
+          example: "rs4f9915"
           schema:
             type: string
         - name: fileID
@@ -496,14 +506,14 @@ paths:
           required: true
           schema:
             type: string
-            example: 3f2d23ee214
+            example: "3f2d23ee214"
         - name: batchID
           in: path
           description: Batch ID
           required: true
           schema:
             type: string
-            example: 45758063
+            example: "45758063"
       responses:
         '200':
           description: Batch deleted
@@ -517,7 +527,7 @@ components:
         ID:
           type: string
           description: File ID
-          example: 3f2d23ee214
+          example: "3f2d23ee214"
         fileHeader:
           $ref: '#/components/schemas/FileHeader'
         batches:
@@ -543,7 +553,7 @@ components:
         ID:
           type: string
           description: File ID
-          example: 1e522dc8
+          example: "1e522dc8"
         error:
           type: string
           description: An error message describing the problem intended for humans.
@@ -553,7 +563,7 @@ components:
         ID:
           type: string
           description: File ID
-          example: 3f2d23ee214
+          example: "3f2d23ee214"
         fileHeader:
           $ref: '#/components/schemas/FileHeader'
         batches:
@@ -586,7 +596,7 @@ components:
           type: string
           description: The name of the ACH operator or sending point that is sending the file.
           maxLength: 23
-          example: My Bank Name
+          example: "My Bank Name"
         immediateDestination:
           type: string
           maxLength: 10
@@ -597,19 +607,19 @@ components:
           type: string
           description: The name of the ACH or receiving point for which that file is destined.
           maxLength: 23
-          example: Federal Reserve Bank
+          example: "Federal Reserve Bank"
         fileCreationTime:
           description: 'The File Creation Date is the date when the file was prepared by an ODFI. (Format HHmm - H=Hour, m=Minute)'
           type: string
-          example: 1504
+          example: "1504"
         fileCreationDate:
           description: 'The File Creation Time is the time when the file was prepared by an ODFI. (Format YYMMDD - Y=Year, M=Month, D=Day)'
           type: string
-          example: 190102
+          example: "190102"
         fileIDModifier:
           type: string
           description: Incremented value for each file for RDFI's.
-          example: 0
+          example: "0"
       required:
         - immediateOrigin
         - immediateOriginName
@@ -620,7 +630,7 @@ components:
         ID:
           description: Moov API File ID
           type: string
-          example: d1e26288
+          example: "d1e26288"
         batchCount:
           description: Count of Batches in the File
           type: integer
@@ -676,7 +686,7 @@ components:
         ID:
           type: string
           description: Batch Header ID
-          example: 913b5742
+          example: "913b5742"
         serviceClassCode:
           type: integer
           description: Service Class Code - ACH Credits Only 220 and ACH Debits Only 225
@@ -688,11 +698,11 @@ components:
         companyDiscretionaryData:
           type: string
           description: The 9 digit FEIN number (proceeded by a predetermined alpha or numeric character) of the entity in the company name field
-          example: 123456789
+          example: "123456789"
         standardEntryClassCode:
           type: string
           description: Identifies the payment type (product) found within an ACH batch-using a 3-character code.
-          example: PPD
+          example: "PPD"
         companyEntryDescription:
           type: string
           description: |
@@ -701,7 +711,7 @@ components:
             This field must contain the word "REVERSAL" (left justified) when the batch contains reversing entries.
             This field must contain the word "RECLAIM" (left justified) when the batch contains reclamation entries.
             This field must contain the word "NONSETTLED" (left justified) when the batch contains entries which could not settle.
-          example: PURCHASE
+          example: "PURCHASE"
         companyDescriptiveDate:
           type: string
           description: |
@@ -709,7 +719,7 @@ components:
         effectiveEntryDate:
           description: 'Date on which the entries are to settle. Format YYMMDD (Y=Year, M=Month, D=Day)'
           type: string
-          example: 190102
+          example: "190102"
         originatorStatusCode:
           type: integer
           description: |
@@ -720,7 +730,7 @@ components:
         ODFIIdentification:
           description: First 8 digits of the originating DFI transit routing number
           type: string
-          example: 12345678
+          example: "12345678"
         batchNumber:
           type: string
           description: |
@@ -730,7 +740,7 @@ components:
         ID:
           description: Batch ID
           type: string
-          example: 62d8f0cd
+          example: "62d8f0cd"
         serviceClassCode:
           description: Same as ServiceClassCode in BatchHeaderRecord
           type: integer
@@ -760,15 +770,15 @@ components:
             Data Universal Numbering Systems (DUNS) "3"
             User Assigned Number "9"
           type: string
-          example: 1
+          example: "1"
         messageAuthentication:
           description: MAC is an eight character code derived from a special key used in conjunction with the DES algorithm. The purpose of the MAC is to validate the authenticity of ACH entries. The DES algorithm and key message standards must be in accordance with standards adopted by the American National Standards Institute. The remaining eleven characters of this field are blank.
           type: string
-          example: 3fe106cf
+          example: "3fe106cf"
         ODFIIdentification:
           description: The routing number is used to identify the DFI originating entries within a given branch.
           type: string
-          example: 123456789
+          example: "123456789"
         batchNumber:
           type: string
           description: BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
@@ -789,7 +799,7 @@ components:
         ID:
           type: string
           description: Entry Detail ID
-          example: 842a2261
+          example: "842a2261"
         transactionCode:
           type: integer
           description: |
@@ -806,7 +816,7 @@ components:
         RDFIIdentification:
           type: string
           description: RDFI's routing number without the last digit.
-          example: 12345678
+          example: "12345678"
         checkDigit:
           type: string
           description: Last digit in RDFI routing number.
@@ -815,7 +825,7 @@ components:
           type: string
           description: |
             The receiver's bank account number you are crediting/debiting. It important to note that this is an alphanumeric field, so its space padded, no zero padded
-          example: 181141847
+          example: "181141847"
         amount:
           type: integer
           description: Number of cents you are debiting/crediting this account
@@ -823,7 +833,7 @@ components:
         identificationNumber:
           type: string
           description: Internal identification (alphanumeric) that you use to uniquely identify this Entry Detail Record
-          example: 8aa786
+          example: "8aa786"
         individualName:
           type: string
           description: The name of the receiver, usually the name on the bank account
@@ -833,18 +843,19 @@ components:
           description: |
             DiscretionaryData allows ODFIs to include codes, of significance only to them, to enable specialized handling of the entry. There will be no standardized interpretation for the value of this field. It can either be a single two-character code, or two distinct one-character codes, according to the needs of the ODFI and/or Originator involved. This field must be returned intact for any returned entry.
             WEB uses the Discretionary Data Field as the Payment Type Code
-          example: AB
+          example: "AB"
         addendaRecordIndicator:
           type: integer
           description: |
             AddendaRecordIndicator indicates the existence of an Addenda Record. A value of "1" indicates that one ore more addenda records follow, and "0" means no such record is present.
           example: 1
         traceNumber:
-          type: integer
+          type: string
           description: |
             TraceNumber assigned by the ODFI in ascending sequence, is included in each Entry Detail Record, Corporate Entry Detail Record, and addenda Record.
             Trace Numbers uniquely identify each entry within a batch in an ACH input file. In association with the Batch Number, transmission (File Creation) Date, and File ID Modifier, the Trace Number uniquely identifies an entry within a given file.
             For addenda Records, the Trace Number will be identical to the Trace Number in the associated Entry Detail Record, since the Trace Number is associated with an entry or item rather than a physical record.
+          example: "124782618117"
         addenda02:
           $ref: '#/components/schemas/Addenda02'
         addenda05:
@@ -859,13 +870,13 @@ components:
         category:
           type: string
           description: Category defines if the entry is a Forward, Return, or NOC
-          example: Forward
+          example: "Forward"
     Addenda02:
       properties:
         id:
           type: string
           description: Client defined string used as a reference to this record.
-          example: 5ca8d25a
+          example: "5ca8d25a"
         typeCode:
           type: string
           description: 02 - NACHA regulations
@@ -918,7 +929,7 @@ components:
         traceNumber:
           type: string
           description: Entry Detail Trace Number
-          example: 124782618117
+          example: "124782618117"
     Addenda05:
       properties:
         id:
@@ -1501,7 +1512,7 @@ components:
           type: string
           description: |
             The receiver's bank account number you are crediting/debiting. It important to note that this is an alphanumeric field, so its space padded, no zero padded
-          example: 181141847
+          example: "181141847"
         OFACScreeningIndicator:
           type: string
           description: Signifies if the record has been screened against OFAC records
@@ -1575,7 +1586,7 @@ components:
         RDFIIdentification:
           type: string
           description: RDFI's routing number without the last digit.
-          example: 12345678
+          example: "12345678"
         checkDigit:
           type: string
           description: Last digit in RDFI routing number.
@@ -1584,7 +1595,7 @@ components:
           type: string
           description: |
             The receiver's bank account number you are crediting/debiting. It important to note that this is an alphanumeric field, so its space padded, no zero padded
-          example: 181141847
+          example: "181141847"
         amount:
           type: integer
           description: Number of cents you are debiting/crediting this account
@@ -1592,7 +1603,7 @@ components:
         adviceRoutingNumber:
           type: string
           description: Suggested routing number to use
-          example: 987654320
+          example: "987654320"
         fileIdentification:
           type: string
           description: Unique identifier for the File
@@ -1619,7 +1630,7 @@ components:
         achOperatorRoutingNumber:
           type: string
           description: Routing number for ACH operator
-          example: 987654320
+          example: "987654320"
         julianDay:
           type: number
           description: Julian Day of the year
@@ -1671,7 +1682,7 @@ components:
         ODFIIdentification:
           description: The routing number is used to identify the DFI originating entries within a given branch.
           type: string
-          example: 98765432
+          example: "98765432"
         batchNumber:
           type: string
           description: BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
@@ -1680,7 +1691,7 @@ components:
         routingNumber:
           type: string
           description: ABA routing number
-          example: 987654320
+          example: "987654320"
         accountNumber:
           type: string
           description: Account number used to offset records
@@ -1699,11 +1710,11 @@ components:
         creditFileID:
           type: string
           description: File ID
-          example: 058960d8
+          example: "058960d8"
         debitFileID:
           type: string
           description: File ID
-          example: 3cac5447
+          example: "3cac5447"
     # There are no options here currently, but this object exists to read them in the future
     # SegmentFileConfiguration:
     #   properties: {}
