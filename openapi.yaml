@@ -732,7 +732,7 @@ components:
           type: string
           example: "12345678"
         batchNumber:
-          type: string
+          type: integer
           description: |
             BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
     BatchControl:
