@@ -156,6 +156,9 @@ func (batch *Batch) UnmarshalJSON(p []byte) error {
 		(*Alias)(batch),
 	}
 	if err := json.Unmarshal(p, &aux); err != nil {
+		if e, ok := err.(*json.UnmarshalTypeError); ok {
+			return fmt.Errorf("%s: %v", e.Field, err)
+		}
 		return err
 	}
 	return nil

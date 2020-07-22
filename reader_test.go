@@ -1803,3 +1803,21 @@ func TestReader__partial(t *testing.T) {
 		t.Errorf("got %d entries", len(entries))
 	}
 }
+
+func TestJSONReader__IncludeFieldName(t *testing.T) {
+	// Write a test so that we verify the field name is included in the error message so
+	// it's easier to debug. Otherwise we get generic error messages that just include
+	// "cannot unmarshal %T into %T"
+	bs, err := ioutil.ReadFile(filepath.Join("test", "testdata", "invalid-batchNumber.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := FileFromJSON(bs); err == nil {
+		t.Fatal("expected error")
+	} else {
+		if !strings.Contains(err.Error(), `batchHeader.batchNumber: json: cannot unmarshal string into Go struct field BatchHeader.batchHeader.batchNumber of type int`) {
+			t.Fatalf("unexpected error:\n  %v", err)
+		}
+	}
+}
