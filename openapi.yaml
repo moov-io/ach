@@ -699,6 +699,14 @@ components:
           type: string
           description: The 9 digit FEIN number (proceeded by a predetermined alpha or numeric character) of the entity in the company name field
           example: "123456789"
+        companyIdentification:
+          description: |
+            Alphanumeric code used to identify an Originator The Company Identification Field must be included on all prenotification records and on each entry initiated pursuant to such prenotification. The Company ID may begin with the ANSI one-digit Identification Code Designator (ICD), followed by the identification number The ANSI Identification Numbers and related Identification Code
+            IRS Employer Identification Number (EIN) "1"
+            Data Universal Numbering Systems (DUNS) "3"
+            User Assigned Number "9"
+          type: string
+          example: "1"
         standardEntryClassCode:
           type: string
           description: Identifies the payment type (product) found within an ACH batch-using a 3-character code.
