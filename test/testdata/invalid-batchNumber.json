@@ -1,0 +1,72 @@
+{
+    "ID": "3f2d23ee214",
+    "fileHeader": {
+        "immediateOrigin": "211370529",
+        "immediateOriginName": "AVIDIA BANK",
+        "immediateDestination": "011000015",
+        "immediateDestinationName": "FRB BOSTON",
+        "fileCreationTime": "1504",
+        "fileCreationDate": "200722",
+        "fileIDModifier": "0"
+    },
+    "batches": [
+        {
+            "batchHeader": {
+                "ID": "913b5742",
+                "serviceClassCode": 220,
+                "companyName": "Moov Corp",
+                "companyDiscretionaryData": "Payment",
+                "companyIdentification": "P812345",
+                "standardEntryClassCode": "PPD",
+                "companyEntryDescription": "DISB",
+                "companyDescriptiveDate": "200722",
+                "effectiveEntryDate": "200723",
+                "originatorStatusCode": 1,
+                "ODFIIdentification": "21137052",
+                "batchNumber": "1234567"
+            },
+            "entryDetails": [
+                {
+                    "ID": "842a2261",
+                    "transactionCode": 22,
+                    "RDFIIdentification": "06310751",
+                    "checkDigit": "3",
+                    "DFIAccountNumber": "7289457611",
+                    "amount": 100,
+                    "individualName": "JANE DOE",
+                    "addendaRecordIndicator": 1,
+                    "traceNumber": "2113705290000001",
+                    "addenda05": [
+                        {
+                            "id": "5ca8d25a",
+                            "typeCode": "05",
+                            "paymentRelatedInformation": "Car Payment",
+                            "sequenceNumber": 1,
+                            "entryDetailSequenceNumber": 1
+                        }
+                    ]
+                }
+            ],
+            "batchControl": {
+                "id": "5ca8d25b",
+                "serviceClassCode": 220,
+                "entryAddendaCount": 1,
+                "entryHash": 12621502,
+                "totalDebit": 0,
+                "totalCredit": 100,
+                "companyIdentification": "P812345",
+                "ODFIIdentification": "21137052",
+                "batchNumber": 1
+            }
+        }
+    ],
+    "fileControl":{
+        "id":"5ca8d25c",
+        "batchCount": 1,
+        "blockCount": 1,
+        "entryAddendaCount": 2,
+        "entryHash": 12621502,
+        "totalDebit": 0,
+        "totalCredit": 100
+    }
+}
