@@ -1,3 +1,9 @@
+## v1.4.2 (Unreleased)
+
+BUG FIXES
+
+- api: include missing `CompanyIdentification` field on `BatchHeader` docs
+
 ## v1.4.1 (Released 2020-07-09)
 
 BUG FIXES
