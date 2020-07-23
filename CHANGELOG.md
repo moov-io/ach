@@ -1,8 +1,17 @@
-## v1.4.2 (Unreleased)
+## v1.4.2 (Released 2020-07-23)
+
+IMPROVEMENTS
+
+- api: add example plaintext file for create route
+- docs: flip Usage section priority, link to godocs and examples
+- file: include the struct field in Unmarshal errors
 
 BUG FIXES
 
+- api: clarify batchNumber in BatchHeader is an integer
+- api: include missing CompanyIdentification field on BatchHeader docs
 - api: include missing `CompanyIdentification` field on `BatchHeader` docs
+- api: quote number-looking example values
 
 ## v1.4.1 (Released 2020-07-09)
 
