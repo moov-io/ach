@@ -1,3 +1,9 @@
+## v1.4.3 (Released 2020-07-23)
+
+BUILD
+
+- build: upload achcli binaries on each release
+
 ## v1.4.2 (Released 2020-07-23)
 
 IMPROVEMENTS
