@@ -54,6 +54,7 @@ curl http://localhost:8080/files/c58b75610ac1b8b85fef0d923a3bc0909bf06b93
 ```
 
 ### Google Cloud Platform Deploy
+To get started in a hosted environment you can deploy this project to google cloud platform. 
 
 From your Google cloud dashboard create a new project and call it 
 ```
@@ -86,6 +87,11 @@ Choose a region to deploy this application:
 Upon a successful build you will be given a URL where the API has been deployed:
 ```
 https://YOUR-ACH-APP-URL.a.run.app
+```
+
+From the cloud shell you need to cd into the ```ach``` folder 
+```
+cd ach
 ```
 
 
