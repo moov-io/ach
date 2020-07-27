@@ -53,6 +53,63 @@ curl http://localhost:8080/files/c58b75610ac1b8b85fef0d923a3bc0909bf06b93
 {"file":{"id":"c58b75610ac1b8b85fef0d923a3bc0909bf06b93","fileHeader":{"id":"","immediateDestination":"231380104","immediateOrigin":"121042882", ...
 ```
 
+### Google Cloud Platform Deploy
+
+From your Google cloud dashboard create a new project and call it 
+```
+moov-ach-demo
+```
+
+Click the button below to deploy this project to Google Cloud
+
+[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run)
+
+
+In the cloud shell you should be prompted with 
+```
+Choose a project to deploy this application:
+``` 
+
+Using the arrow keys select 
+```
+moov-ach-demo
+```
+
+
+You'll then be prompted to choose a region, use the arrow keys to select the region closest to you and hit enter.
+```
+Choose a region to deploy this application:
+```
+
+
+
+Upon a successful build you will be given a URL where the API has been deployed:
+```
+https://YOUR-ACH-APP-URL.a.run.app
+```
+
+
+Now you can create a file on the server:
+```
+curl -XPOST --data-binary "@./test/testdata/ppd-debit.ach" https://YOUR-ACH-APP-URL.a.run.app/files/create
+```
+You should get this response:
+```
+{"id":"c58b75610ac-YOUR-UNIQUE-FILE-ID-9239bf06b93","error":null}
+```
+
+
+Finally read the contents of the file you've just posted:
+```
+curl https://YOUR-ACH-APP-URL.a.run.app/files/c58b75610ac-YOUR-UNIQUE-FILE-ID-9239bf06b93
+```
+
+You should get this response:
+```
+{"file":{"id":"c58b75610ac-YOUR-UNIQUE-FILE-ID-9239bf06b93","fileHeader":{"id":"","immediateDestination":"231380104","immediateOrigin":"121042882", ...  
+```
+
+
 ### Go library
 
 The package [`github.com/moov-io/ach`](https://pkg.go.dev/github.com/moov-io/ach) offers a Go based ACH file reader and writer. To get started checkout a specific example:
