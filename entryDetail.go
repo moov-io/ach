@@ -88,6 +88,8 @@ type EntryDetail struct {
 	validator
 	// converters is composed for ACH to golang Converters
 	converters
+
+	validateOpts *ValidateOpts
 }
 
 const (
@@ -241,6 +243,15 @@ func (ed *EntryDetail) String() string {
 	return buf.String()
 }
 
+// SetValidation stores ValidateOpts on the Batch which are to be used to override
+// the default NACHA validation rules.
+func (ed *EntryDetail) SetValidation(opts *ValidateOpts) {
+	if ed == nil {
+		return
+	}
+	ed.validateOpts = opts
+}
+
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops that parsing.
 func (ed *EntryDetail) Validate() error {
@@ -250,8 +261,14 @@ func (ed *EntryDetail) Validate() error {
 	if ed.recordType != "6" {
 		return fieldError("recordType", NewErrRecordType(6), ed.recordType)
 	}
-	if err := ed.isTransactionCode(ed.TransactionCode); err != nil {
-		return fieldError("TransactionCode", err, strconv.Itoa(ed.TransactionCode))
+	if ed.validateOpts != nil && ed.validateOpts.CheckTransactionCode != nil {
+		if err := ed.validateOpts.CheckTransactionCode(ed.TransactionCode); err != nil {
+			return fieldError("TransactionCode", err, strconv.Itoa(ed.TransactionCode))
+		}
+	} else {
+		if err := ed.isTransactionCode(ed.TransactionCode); err != nil {
+			return fieldError("TransactionCode", err, strconv.Itoa(ed.TransactionCode))
+		}
 	}
 	if err := ed.isAlphanumeric(ed.DFIAccountNumber); err != nil {
 		return fieldError("DFIAccountNumber", err, ed.DFIAccountNumber)

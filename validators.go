@@ -285,6 +285,11 @@ func (v *validator) isTypeCode(code string) error {
 //		"3" designates a credit, or
 //		"8" designates a debit.
 func (v *validator) isTransactionCode(code int) error {
+	return StandardTransactionCode(code)
+}
+
+// StandardTransactionCode checks the provided TransactionCode to verify it is a valid NACHA value.
+func StandardTransactionCode(code int) error {
 	switch code {
 	// TransactionCode if the receivers account is:
 	case

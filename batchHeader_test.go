@@ -563,3 +563,12 @@ func TestBatchHeader__LiftEffectiveEntryDate(t *testing.T) {
 		t.Error("expected error")
 	}
 }
+
+func TestBatchHeader__SetValidation(t *testing.T) {
+	bh := NewBatchHeader()
+	bh.SetValidation(&ValidateOpts{})
+
+	// nil out
+	bh = nil
+	bh.SetValidation(&ValidateOpts{})
+}

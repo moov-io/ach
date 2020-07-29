@@ -20,6 +20,7 @@ package ach
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -736,4 +737,24 @@ func TestEntryDetail__ParseNOC(t *testing.T) {
 	if entries[0].Category != CategoryNOC {
 		t.Errorf("EntryDetail.Category=%s\n  %#v", entries[0].Category, entries[0])
 	}
+}
+
+func TestEntryDetail__SetValidation(t *testing.T) {
+	ed := mockEntryDetail()
+	ed.SetValidation(&ValidateOpts{
+		CheckTransactionCode: func(code int) error {
+			if code == 999 {
+				return nil
+			}
+			return fmt.Errorf("unexpected TransactionCode: %d", code)
+		},
+	})
+	ed.TransactionCode = 999
+	if err := ed.Validate(); err != nil {
+		t.Fatal(err)
+	}
+
+	// nil out
+	ed = nil
+	ed.SetValidation(&ValidateOpts{})
 }

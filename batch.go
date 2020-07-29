@@ -979,11 +979,18 @@ func (batch *Batch) ValidTranCodeForServiceClassCode(entry *EntryDetail) error {
 		return batch.Error("TransactionCode", ErrBatchTransactionCode, entry.TransactionCode)
 	}
 
+	if entry.validateOpts != nil && entry.validateOpts.CheckTransactionCode != nil {
+		// We're unable to validate the ServiceClassCode with custom TransactionCode validation.
+		return nil
+	}
+
 	switch batch.Header.ServiceClassCode {
 	case AutomatedAccountingAdvices:
 		return batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode)
 
 	case MixedDebitsAndCredits:
+		return nil
+
 	case CreditsOnly:
 		if entry.CreditOrDebit() != "C" {
 			return batch.Error("TransactionCode", NewErrBatchServiceClassTranCode(batch.Header.ServiceClassCode, entry.TransactionCode))

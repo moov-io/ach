@@ -549,6 +549,9 @@ type ValidateOpts struct {
 	// This also allows for custom TraceNumbers which aren't prefixed with
 	// a routing number as required by the NACHA specification.
 	BypassDestinationValidation bool `json:"bypassDestinationValidation"`
+
+	// CheckTransactionCode allows for custom validation of TransactionCode values
+	CheckTransactionCode func(code int) error
 }
 
 // ValidateWith performs NACHA format rule checks on each record according to their specification

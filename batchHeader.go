@@ -122,6 +122,8 @@ type BatchHeader struct {
 
 	// converters is composed for ACH to golang Converters
 	converters
+
+	validateOpts *ValidateOpts
 }
 
 const (
@@ -211,6 +213,15 @@ func (bh *BatchHeader) String() string {
 	return buf.String()
 }
 
+// SetValidation stores ValidateOpts on the Batch which are to be used to override
+// the default NACHA validation rules.
+func (bh *BatchHeader) SetValidation(opts *ValidateOpts) {
+	if bh == nil {
+		return
+	}
+	bh.validateOpts = opts
+}
+
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops that parsing.
 func (bh *BatchHeader) Validate() error {
@@ -220,8 +231,12 @@ func (bh *BatchHeader) Validate() error {
 	if bh.recordType != "5" {
 		return fieldError("recordType", NewErrRecordType(5), bh.recordType)
 	}
-	if err := bh.isServiceClass(bh.ServiceClassCode); err != nil {
-		return fieldError("ServiceClassCode", err, bh.ServiceClassCode)
+	if bh.validateOpts == nil || bh.validateOpts.CheckTransactionCode == nil {
+		// Ensure the ServiceClassCode follows NACHA standards if we have no TransactionCode
+		// validation overrides. Custom TransactionCode's don't allow for standard validation.
+		if err := bh.isServiceClass(bh.ServiceClassCode); err != nil {
+			return fieldError("ServiceClassCode", err, bh.ServiceClassCode)
+		}
 	}
 	if err := bh.isSECCode(bh.StandardEntryClassCode); err != nil {
 		return fieldError("StandardEntryClassCode", err, bh.StandardEntryClassCode)
