@@ -63,7 +63,7 @@ moov-ach-demo
 
 Click the button below to deploy this project to Google Cloud
 
-[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run/?git_repo=https://github.com/moov-io/ach&revision=master)
+[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run/?git_repo=https://github.com/moov-io/ach&revision=latest)
 
 
 In the cloud shell you should be prompted with 
