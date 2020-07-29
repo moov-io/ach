@@ -54,24 +54,24 @@ curl http://localhost:8080/files/c58b75610ac1b8b85fef0d923a3bc0909bf06b93
 ```
 
 ### Google Cloud Platform Deploy
-To get started in a hosted environment you can deploy this project to google cloud platform. 
+To get started in a hosted environment you can deploy this project to google cloud platform.
 
-From your [Google cloud dashboard](https://console.cloud.google.com/home/dashboard) create a new project and call it 
+From your [Google cloud dashboard](https://console.cloud.google.com/home/dashboard) create a new project and call it
 ```
 moov-ach-demo
 ```
 
 Click the button below to deploy this project to Google Cloud
 
-[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run/?git_repo=https://github.com/moov-io/ach&revision=latest)
+[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run/?git_repo=https://github.com/moov-io/ach&revision=master)
 
 
-In the cloud shell you should be prompted with 
+In the cloud shell you should be prompted with
 ```
 Choose a project to deploy this application:
-``` 
+```
 
-Using the arrow keys select 
+Using the arrow keys select
 ```
 moov-ach-demo
 ```
@@ -89,7 +89,7 @@ Upon a successful build you will be given a URL where the API has been deployed:
 https://YOUR-ACH-APP-URL.a.run.app
 ```
 
-From the cloud shell you need to cd into the ```ach``` folder 
+From the cloud shell you need to cd into the ```ach``` folder
 ```
 cd ach
 ```
@@ -112,7 +112,7 @@ curl https://YOUR-ACH-APP-URL.a.run.app/files/c58b75610ac-YOUR-UNIQUE-FILE-ID-92
 
 You should get this response:
 ```
-{"file":{"id":"c58b75610ac-YOUR-UNIQUE-FILE-ID-9239bf06b93","fileHeader":{"id":"","immediateDestination":"231380104","immediateOrigin":"121042882", ...  
+{"file":{"id":"c58b75610ac-YOUR-UNIQUE-FILE-ID-9239bf06b93","fileHeader":{"id":"","immediateDestination":"231380104","immediateOrigin":"121042882", ...
 ```
 
 
