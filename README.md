@@ -100,6 +100,8 @@ go run ./cmd/serverr
 Connect to the web preview (e.g. `https://YOUR-ACH-APP-URL.a.run.app:8080/files`)
 ![](./docs/images/gcp-run-button/3-web-preview.png)
 
+<hr /> <!-- end the details section -->
+
 </details>
 
 
