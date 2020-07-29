@@ -56,7 +56,7 @@ curl http://localhost:8080/files/c58b75610ac1b8b85fef0d923a3bc0909bf06b93
 ### Google Cloud Platform Deploy
 To get started in a hosted environment you can deploy this project to google cloud platform. 
 
-From your Google cloud dashboard create a new project and call it 
+From your [Google cloud dashboard](https://console.cloud.google.com/home/dashboard) create a new project and call it 
 ```
 moov-ach-demo
 ```
