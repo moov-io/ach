@@ -53,10 +53,10 @@ curl http://localhost:8080/files/c58b75610ac1b8b85fef0d923a3bc0909bf06b93
 {"file":{"id":"c58b75610ac1b8b85fef0d923a3bc0909bf06b93","fileHeader":{"id":"","immediateDestination":"231380104","immediateOrigin":"121042882", ...
 ```
 
-### Google Cloud Platform Deploy
-To get started in a hosted environment you can deploy this project to google cloud platform.
+### Google Cloud Run Button
+To get started in a hosted environment you can deploy this project to the Google Cloud Platform.
 
-From your [Google cloud dashboard](https://console.cloud.google.com/home/dashboard) create a new project and call it
+From your [Google Cloud dashboard](https://console.cloud.google.com/home/dashboard) create a new project and call it
 ```
 moov-ach-demo
 ```
@@ -64,6 +64,43 @@ moov-ach-demo
 Click the button below to deploy this project to Google Cloud
 
 [![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run/?git_repo=https://github.com/moov-io/ach&revision=master)
+
+> **Note**: If you get an error about the image being marked as "Do Not Trust" follow the below steps.
+
+<details>
+<summary>Error: You launched this custom Cloud Shell image as "Do not trust"</summary>
+
+```
+$ cloudshell_open --repo_url "https://github.com/moov-io/ach" --page "shell" --git_branch "master"
+Error: You launched this custom Cloud Shell image as "Do not trust".
+In this mode, your credentials are not available and this experience
+cannot deploy to Cloud Run. Start over and "Trust" the image.
+Error: aborting due to untrusted cloud shell environment
+```
+
+This error occurs when some security settings on your account / cloud shell are locked down. To run ACH you need to trust the image, so in the top-right click to restart this image as Trusted.
+
+![](./docs/images/gcp-run-button/1-image-trust-settings.png)
+
+Click to "Return to default"
+
+![](./docs/images/gcp-run-button/2-confirm-prompt.png)
+
+Then you'll need to clone down and launch ACH. Pick option #3 to clone this project.
+
+```
+cloudshell_open --repo_url "https://github.com/moov-io/ach" --page "shell" --git_branch "master"
+```
+
+Start the ACH server inside the cloned repository.
+```
+go run ./cmd/serverr
+```
+
+Connect to the web preview (e.g. `https://YOUR-ACH-APP-URL.a.run.app:8080/files`)
+![](./docs/images/gcp-run-button/3-web-preview.png)
+
+</details>
 
 
 In the cloud shell you should be prompted with
