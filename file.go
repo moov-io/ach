@@ -552,6 +552,9 @@ type ValidateOpts struct {
 
 	// CheckTransactionCode allows for custom validation of TransactionCode values
 	CheckTransactionCode func(code int) error
+
+	// CustomTraceNumbers disables validation of TraceNumbers
+	CustomTraceNumbers bool `json:"customTraceNumbers"`
 }
 
 // ValidateWith performs NACHA format rule checks on each record according to their specification

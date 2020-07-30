@@ -1438,3 +1438,29 @@ func TestBatch__isTraceNumberODFI(t *testing.T) {
 		t.Errorf("unexpected error: %v", err)
 	}
 }
+
+func TestBatch__CustomTraceNumbers(t *testing.T) {
+	file := mockFilePPD()
+
+	file.Batches[0].SetValidation(&ValidateOpts{
+		BypassOriginValidation: false,
+		CustomTraceNumbers:     false,
+	})
+
+	batch, ok := file.Batches[0].(*BatchPPD)
+	if !ok {
+		t.Fatalf("unexpected batch: %T", file.Batches[0])
+	}
+
+	for i := range batch.Entries {
+		batch.Entries[i].TraceNumber = "333344445"
+	}
+
+	if err := batch.build(); err != nil {
+		t.Fatal(err)
+	}
+
+	if batch.Entries[0].TraceNumber != "121042880000001" {
+		t.Errorf("unexpected trace number: %v", batch.Entries[0].TraceNumber)
+	}
+}

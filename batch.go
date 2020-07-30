@@ -353,8 +353,10 @@ func (batch *Batch) verify() error {
 	if err := batch.isBatchEntryCount(); err != nil {
 		return err
 	}
-	if err := batch.isSequenceAscending(); err != nil {
-		return err
+	if batch.validateOpts == nil || !batch.validateOpts.CustomTraceNumbers {
+		if err := batch.isSequenceAscending(); err != nil {
+			return err
+		}
 	}
 	if err := batch.isBatchAmount(); err != nil {
 		return err
@@ -365,11 +367,13 @@ func (batch *Batch) verify() error {
 	if err := batch.isOriginatorDNE(); err != nil {
 		return err
 	}
-	if err := batch.isTraceNumberODFI(); err != nil {
-		return err
-	}
-	if err := batch.isAddendaSequence(); err != nil {
-		return err
+	if batch.validateOpts == nil || !batch.validateOpts.CustomTraceNumbers {
+		if err := batch.isTraceNumberODFI(); err != nil {
+			return err
+		}
+		if err := batch.isAddendaSequence(); err != nil {
+			return err
+		}
 	}
 	if err := batch.isCategory(); err != nil {
 		return err
@@ -407,8 +411,13 @@ func (batch *Batch) build() error {
 
 			// Add a sequenced TraceNumber if one is not already set. Have to keep original trance number Return and NOC entries
 			if currentTraceNumberODFI != batchHeaderODFI {
-				if batch.validateOpts == nil || !batch.validateOpts.BypassOriginValidation {
+				if opts := batch.validateOpts; opts == nil {
 					entry.SetTraceNumber(batch.Header.ODFIIdentification, seq)
+				} else {
+					// Automatically set the TraceNumber if we are validating Origin and don't have custom trace numbers
+					if !opts.BypassOriginValidation && !opts.CustomTraceNumbers {
+						entry.SetTraceNumber(batch.Header.ODFIIdentification, seq)
+					}
 				}
 			}
 			seq++
