@@ -1,3 +1,10 @@
+## v1.5.0 (Unreleased)
+
+ADDITIONS
+
+- entries: allow custom `TransactionCode` validation
+- entries: allow custom `TraceNumber` values
+
 ## v1.4.4 (Released 2020-08-04)
 
 BUG FIXES
