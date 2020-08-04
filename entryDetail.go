@@ -259,6 +259,9 @@ func (ed *EntryDetail) Validate() error {
 	if ed.Amount < 0 {
 		return fieldError("Amount", ErrNegativeAmount, ed.Amount)
 	}
+	if err := ed.amountOverflowsField(); err != nil {
+		return fieldError("Amount", err, ed.Amount)
+	}
 	if err := ed.isAlphanumeric(ed.IdentificationNumber); err != nil {
 		return fieldError("IdentificationNumber", err, ed.IdentificationNumber)
 	}
@@ -302,6 +305,18 @@ func (ed *EntryDetail) fieldInclusion() error {
 	}
 	if ed.TraceNumber == "" {
 		return fieldError("TraceNumber", ErrConstructor, ed.TraceNumberField())
+	}
+	return nil
+}
+
+func (ed *EntryDetail) amountOverflowsField() error {
+	intstr := strconv.Itoa(ed.Amount)
+	strstr := ed.AmountField()
+	if intstr == "0" && strstr == "0000000000" {
+		return nil // both are empty values
+	}
+	if len(intstr) > len(strstr) {
+		return fmt.Errorf("does not match formatted value %s", strstr)
 	}
 	return nil
 }
