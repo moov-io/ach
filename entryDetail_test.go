@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"math"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -757,4 +758,17 @@ func TestEntryDetail__SetValidation(t *testing.T) {
 	// nil out
 	ed = nil
 	ed.SetValidation(&ValidateOpts{})
+}
+
+func TestEntryDetail__LargeAmountStrings(t *testing.T) {
+	ed := mockEntryDetail()
+	ed.Amount = math.MaxInt64
+
+	if err := ed.Validate(); err == nil {
+		t.Error("expected error")
+	} else {
+		if !strings.Contains(err.Error(), "Amount 9223372036854775807 does not match formatted value 6854775807") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
 }
