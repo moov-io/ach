@@ -741,7 +741,7 @@ func TestFiles__CreateFileEndpointErr(t *testing.T) {
 	router := MakeHTTPHandler(svc, repo, logger)
 
 	// write an ACH file into repository
-	fd, err := os.Open(filepath.Join("..", "test", "testdata", "issue702.ach"))
+	fd, err := os.Open(filepath.Join("..", "test", "issues", "testdata", "issue702.ach"))
 	if fd == nil {
 		t.Fatalf("empty ACH file: %v", err)
 	}
