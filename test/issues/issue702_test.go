@@ -29,7 +29,7 @@ import (
 func TestIssue702(t *testing.T) {
 	// A vendor gave issue702.ach to a customer of ours as a return but didn't properly
 	// format the line lengths and included a non-routing number in the ImmediateDestination
-	fd, err := os.Open(filepath.Join("..", "testdata", "issue702.ach"))
+	fd, err := os.Open(filepath.Join("testdata", "issue702.ach"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -63,7 +63,7 @@ func TestIssue702(t *testing.T) {
 func TestIssue702_1(t *testing.T) {
 	// This file was returned as a receipt from uploading an ACH file, but this file is
 	// pretty useless as it contains zero EntryDetail's.
-	fd, err := os.Open(filepath.Join("..", "testdata", "issue702-1.ach"))
+	fd, err := os.Open(filepath.Join("testdata", "issue702-1.ach"))
 	if err != nil {
 		t.Fatal(err)
 	}

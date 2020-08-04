@@ -294,8 +294,7 @@ func (r *Reader) parseBH() error {
 
 // parseEd parses determines whether to parse an IATEntryDetail or EntryDetail
 func (r *Reader) parseED() error {
-	// IAT Indicator field
-	if r.line[16:29] == "             " {
+	if r.IATCurrentBatch.Header != nil {
 		if err := r.parseIATEntryDetail(); err != nil {
 			return err
 		}
