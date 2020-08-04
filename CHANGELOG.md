@@ -1,3 +1,15 @@
+## v1.4.4 (Released 2020-08-04)
+
+BUG FIXES
+
+- entries: detect overflow when printing large amounts
+- reader: only parse IAT entries when we're accumulating an IAT batch
+
+IMPROVEMENTS
+
+- achcli: print BatchControl records as well
+- achcli: update help/usage text
+
 ## v1.4.3 (Released 2020-07-23)
 
 BUILD
