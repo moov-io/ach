@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/moov-io/ach"
@@ -22,20 +23,24 @@ var (
 	flagReformat = flag.String("reformat", "", "Reformat an incoming ACH file to another format")
 
 	flagMask = flag.Bool("mask", false, "Mask/hide full account numbers")
+
+	programName = filepath.Base(os.Args[0])
 )
 
 func init() {
 	flag.Usage = func() {
 		fmt.Printf("Usage of ach (%s):\n", ach.Version)
-		fmt.Println("   usage: ach [<flags>] <files>")
+		fmt.Printf("   usage: %s [<flags>] <files>", programName)
 		fmt.Println("")
 		fmt.Println("Commands: ")
-		fmt.Println("  ach -diff first.ach second.ach")
+		fmt.Printf("  %s -diff first.ach second.ach", programName)
 		fmt.Println("    Show the difference between two ACH files")
-		fmt.Println("  ach -reformat=json first.ach")
-		fmt.Println("    Convert an incoming ACH file into another format (options: ach, json)")
-		fmt.Println("  ach 20060102.ach")
-		fmt.Println("    Summarize an ACH file for human readability")
+		fmt.Printf("  %s -mask file.ach", programName)
+		fmt.Println("                Print file details with personally identifiable information partially removed")
+		fmt.Printf("  %s -reformat=json first.ach", programName)
+		fmt.Println("      Convert an incoming ACH file into another format (options: ach, json)")
+		fmt.Printf("  %s 20060102.ach", programName)
+		fmt.Println("                  Summarize an ACH file for human readability")
 		fmt.Println("")
 		fmt.Println("Flags: ")
 		flag.PrintDefaults()
