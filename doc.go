@@ -20,7 +20,7 @@
 //
 // https://en.wikipedia.org/wiki/Automated_Clearing_House
 //
-// https://github.com/moov-io/ach/tree/master/docs
+// https://moov-io.github.io/ach/
 //
 // Read an ACH File
 //     fd, err := os.Open("name-of-your-ach-file.ach")
