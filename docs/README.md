@@ -23,7 +23,8 @@ See our [API documentation](https://moov-io.github.io/ach/api/) for Moov ACH end
 1. [Balanced Offset](./balanced-offset.md)
 1. [Flatten Batches](./flatten-batches.md)
 1. [Merging Files](./merging-files.md)
-1. [Segment-File](./segment-file.md)
+1. [Segment a File](./segment-file.md)
+1. [Return Files](./returns.md)
 
 **Production and Monitoring**
 
