@@ -10,7 +10,7 @@ ACH implements a reader, writer, and validator for Automated Clearing House ([AC
 
 If you're looking for a complete implementation of ACH origination (file creation), OFAC checks, micro-deposits, SFTP uploading, and other featues the [moov-io/paygate](https://github.com/moov-io/paygate) project aims to be a full system for ACH transfers.
 
-Docs: [Project](./docs/#moov-ach) | [API Endpoints](https://moov-io.github.io/ach/api/)
+Docs: [Project](https://moov-io.github.io/ach/) | [API Endpoints](https://moov-io.github.io/ach/api/)
 
 ## Project Status
 
