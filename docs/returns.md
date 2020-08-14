@@ -26,18 +26,16 @@ addenda99.OriginalDFI = "9101298"
 // entry.Addenda99 = addenda99
 ```
 
-### Available return codes
+### Return codes
 
-| Code | Reason | Description|
+| Code | Reason | Description |
 |----|-----|------|
 | `R01` | Insufficient Funds | Available balance is not sufficient to cover the dollar value of the debit entry |
 | `R02` | Account Closed | Previously active account has been closed by customer or RDFI |
-		// R03 may not be used to return ARC, BOC or POP entries solely because they do not contain an Individual Name.
 | `R03` | No Account/Unable to Locate Account | Account number structure is valid and passes editing process, but does not correspond to individual or is not an open account |
 | `R04` | Invalid Account Number | Account number structure not valid; entry may fail check digit validation or may contain an incorrect number of digits. |
 | `R05` | Improper Debit to Consumer Account | A CCD, CTX, or CBR debit entry was transmitted to a Consumer Account of the Receiver and was not authorized by the Receiver |
 | `R06` | Returned per ODFI's Request | ODFI has requested RDFI to return the ACH entry (optional to RDFI - ODFI indemnifies RDFI)} |
-		// R07 Prohibited use for ARC, BOC, POP and RCK.
 | `R07` | Authorization Revoked by Customer | Consumer, who previously authorized ACH payment, has revoked authorization from Originator (must be returned no later than 60 days from settlement date and customer must sign affidavit) |
 | `R08` | Payment Stopped | Receiver of a recurring debit transaction has stopped payment to a specific ACH debit. RDFI should verify the Receiver's intent when a request for stop payment is made to insure this is not intended to be a revocation of authorization |
 | `R09` | Uncollected Funds | Sufficient book or ledger balance exists to satisfy dollar value of the transaction, but the dollar value of transaction is in process of collection (i.e., uncollected checks) or cash reserve balance below dollar value of the debit entry. |
@@ -70,7 +68,11 @@ addenda99.OriginalDFI = "9101298"
 | `R37` | Source Document Presented for Payment (Adjustment Entry) | The source document to which an ARC, BOC or POP entry relates has been presented for payment. RDFI must obtain a Written Statement and return the entry within 60 days following Settlement Date |
 | `R38` | Stop Payment on Source Document (Adjustment Entry) | A stop payment has been placed on the source document to which the ARC or BOC entry relates. RDFI must return no later than 60 days following Settlement Date. No Written Statement is required as the original stop payment form covers the return |
 | `R39` | Improper Source Document | The RDFI has determined the source document used for the ARC, BOC or POP entry to its Receiver's account is improper. |
-		// Return Codes to be used for ENR entries and are initiated by a Federal Government Agency
+
+#### Used for ENR entries and are initiated by a Federal Government Agency
+
+| Code | Reason | Description |
+|----|-----|------|
 | `R40` | Return of ENR Entry by Federal Government Agency (ENR Only) | This return reason code may only be used to return ENR entries and is at the federal Government Agency's Sole discretion |
 | `R41` | Invalid Transaction Code (ENR only) | Either the Transaction Code included in Field 3 of the Addenda Record does not conform to the ACH Record Format Specifications contained in Appendix Three (ACH Record Format Specifications) or it is not appropriate with regard to an Automated Enrollment Entry. |
 | `R42` | Routing Number/Check Digit Error (ENR Only) | The Routing Number and the Check Digit included in Field 3 of the Addenda Record is either not a valid number or it does not conform to the Modulus 10 formula. |
@@ -79,25 +81,41 @@ addenda99.OriginalDFI = "9101298"
 | `R45` | Invalid Individual Name/Company Name (ENR only) | The name of the consumer or company provided in Field 3 of the Addenda Record either does not match a corresponding name in the Federal Government Agency's records or fails to include at least one alphameric character. |
 | `R46` | Invalid Representative Payee Indicator (ENR Only) | The Representative Payee Indicator Code included in Field 3 of the Addenda Record has been omitted or it is not consistent with the Federal Government Agency's records. |
 | `R47` | Duplicate Enrollment (ENR Only) | The Entry is a duplicate of an Automated Enrollment Entry previously initiated by a DFI. |
-		// Return Codes to be used for RCK entries only and are initiated by a RDFI
+
+#### Used for RCK entries only and are initiated by a RDFI
+
+| Code | Reason | Description |
+|----|-----|------|
 | `R50` | State Law Affecting RCK Acceptance | RDFI is located in a state that has not adopted Revised Article 4 of the UCC or the RDFI is located in a state that requires all canceled checks to be returned within the periodic statement |
 | `R51` | Item Related to RCK Entry is Ineligible or RCK Entry is Improper | The item to which the RCK entry relates was not eligible, Originator did not provide notice of the RCK policy, signature on the item was not genuine, the item has been altered or amount of the entry was not accurately obtained from the item. RDFI must obtain a Written Statement and return the entry within 60 days following Settlement Date |
 | `R52` | Stop Payment on Item (Adjustment Entry) | A stop payment has been placed on the item to which the RCK entry relates. RDFI must return no later than 60 days following Settlement Date. No Written Statement is required as the original stop payment form covers the return. |
 | `R53` | Item and RCK Entry Presented for Payment (Adjustment Entry) | Both the RCK entry and check have been presented for payment. RDFI must obtain a Written Statement and return the entry within 60 days following Settlement Date |
-		// Return Codes to be used by the ODFI for dishonored return entries
+
+#### Used by the ODFI for dishonored return entries
+
+| Code | Reason | Description |
+|----|-----|------|
 | `R61` | Misrouted Return | The financial institution preparing the Return Entry (the RDFI of the original Entry) has placed the incorrect Routing Number in the Receiving DFI Identification field. |
 | `R67` | Duplicate Return | The ODFI has received more than one Return for the same Entry. |
 | `R68` | Untimely Return | The Return Entry has not been sent within the time frame established by these Rules. |
 | `R69` | Field Error(s) | One or more of the field requirements are incorrect. |
 | `R70` | Permissible Return Entry Not Accepted/Return Not Requested by ODFI | The ODFI has received a Return Entry identified by the RDFI as being returned with the permission of, or at the request of, the ODFI, but the ODFI has not agreed to accept the Entry or has not requested the return of the Entry. |
-		// Return Codes to be used by the RDFI for contested dishonored return entries
+
+#### Used by the RDFI for contested dishonored return entries
+
+| Code | Reason | Description |
+|----|-----|------|
 | `R71` | Misrouted Dishonored Return | The financial institution preparing the dishonored Return Entry (the ODFI of the original Entry) has placed the incorrect Routing Number in the Receiving DFI Identification field. |
 | `R72` | Untimely Dishonored Return | The dishonored Return Entry has not been sent within the designated time frame. |
 | `R73` | Timely Original Return | The RDFI is certifying that the original Return Entry was sent within the time frame designated in these Rules. |
 | `R74` | Corrected Return | The RDFI is correcting a previous Return Entry that was dishonored using Return Reason Code R69 (Field Error(s)) because it contained incomplete or incorrect information. |
 | `R75` | Return Not a Duplicate | The Return Entry was not a duplicate of an Entry previously returned by the RDFI. |
 | `R76` | No Errors Found | The original Return Entry did not contain the errors indicated by the ODFI in the dishonored Return Entry. |
-		//Return Codes to be used by Gateways for the return of international payments
+
+#### Used by Gateways for the return of international payments
+
+| Code | Reason | Description |
+|----|-----|------|
 | `R80` | IAT Entry Coding Error | The IAT Entry is being returned due to one or more of the following conditions: Invalid DFI/Bank Branch Country Code, invalid DFI/Bank Identification Number Qualifier, invalid Foreign Exchange Indicator, invalid ISO Originating Currency Code, invalid ISO Destination Currency Code, invalid ISO Destination Country Code, invalid Transaction Type Code |
 | `R81` | Non-Participant in IAT Program | The IAT Entry is being returned because the Gateway does not have an agreement with either the ODFI or the Gateway's customer to transmit Outbound IAT Entries. |
 | `R82` | Invalid Foreign Receiving DFI Identification | The reference used to identify the Foreign Receiving DFI of an Outbound IAT Entry is invalid. |
