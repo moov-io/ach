@@ -11,9 +11,8 @@ Note: Segmented files (via `SegmentFile()`) are only in ACH v1.1.0 and later.
 An ACH [File](https://godoc.org/github.com/moov-io/ach#File) supports calling [SegmentFile](https://godoc.org/github.com/moov-io/ach#File.SegmentFile) to create a debit ach file and credit ach file from an ach file that contains mixed debits and credits.
 
 ```go
-
-// open an ACH file
-f, err := os.Open(filepath.Join("examples", "ach-ppd-read-mixedDebitCredit", "ppd-mixedDebitCredit.ach"))
+// open an ACH file(from the ./examples/ directory)
+f, err := os.Open(filepath.Join("testdata", "ppd-mixedDebitCredit.ach"))
 if err != nil {
 	log.Fatal(err)
 }
