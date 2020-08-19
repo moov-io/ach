@@ -26,10 +26,10 @@ We use GitHub to manage reviews of pull requests.
 
 We recommend using additional git remote's for pushing/pulling code. Go cares about where the `ach` project lives relative to `GOPATH`.
 
-To pull our source code run:
+First, pull down our source code:
 
 ```
-$ go get github.com/moov-io/ach
+$ git clone git@github.com:moov-io/ach.git
 ```
 
 Then, add your (or another user's) fork.
