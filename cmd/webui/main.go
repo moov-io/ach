@@ -10,7 +10,6 @@ import (
 	"github.com/moov-io/base/admin"
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/base/http/bind"
-	"github.com/moov-io/imagecashletter"
 	"github.com/moov-io/paygate/pkg/util"
 	"log"
 	"net/http"
@@ -44,7 +43,7 @@ func main() {
 
 	// Start Admin server (with Prometheus metrics)
 	adminServer := admin.NewServer(*adminAddr)
-	adminServer.AddVersionHandler(imagecashletter.Version) // Setup 'GET /version'
+	adminServer.AddVersionHandler(ach.Version) // Setup 'GET /version'
 	go func() {
 		log.Printf("listening on %s", adminServer.BindAddr())
 		if err := adminServer.Listen(); err != nil {
