@@ -1,6 +1,6 @@
 ## Moov ACH
 
-**GitHub** | **[Running](./index.md#running-moov-ach-server)** | **[Configuration](https://github.com/moov-io/ach#configuration)**
+**GitHub** | **[Running](https://github.com/moov-io/ach#usage)** | **[Configuration](https://github.com/moov-io/ach#configuration)**
 
 ### Purpose
 
@@ -25,6 +25,15 @@ See our [API documentation](https://moov-io.github.io/ach/api/) for Moov ACH end
 1. [Merging Files](./merging-files.md)
 1. [Segment a File](./segment-file.md)
 1. [Return Files](./returns.md)
+
+**Running ACH**
+
+1. Functions as a Service
+   1. [Building for AWS Lambda](./aws/lambda/building-go-for-lambda.md)
+      1. [Convert JSON to NACHA format](./aws/lambda/json_to_nacha/lambda_json_to_nacha.md)
+      1. [Convert NACHA To JSON format](./aws/lambda/nacha_to_json/lambda_nacha_to_json.md)
+   1. [Docker image](https://github.com/moov-io/ach#docker)
+   1. [Google Cloud Run Button](https://github.com/moov-io/ach#google-cloud-run-button)
 
 **Production and Monitoring**
 
