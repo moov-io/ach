@@ -29,7 +29,7 @@ ifeq ($(OS),Windows_NT)
 else
 	@wget -O lint-project.sh https://raw.githubusercontent.com/moov-io/infra/master/go/lint-project.sh
 	@chmod +x ./lint-project.sh
-	GOCYCLO_LIMIT=26 time ./lint-project.sh
+	GOOS=js GOARCH=wasm GOCYCLO_LIMIT=26 time ./lint-project.sh
 endif
 
 dist: clean generate build

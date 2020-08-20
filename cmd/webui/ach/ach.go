@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/moov-io/ach"
 	"strings"
 	"syscall/js"
+
+	"github.com/moov-io/ach"
 )
 
 func parseContents(input string) (string, error) {
@@ -46,7 +47,7 @@ func jsonWrapper() js.Func {
 		parsed, err := parseContents(inputJSON)
 		if err != nil {
 			msg := "unable to parse ach file"
-			fmt.Printf(msg)
+			fmt.Print(msg)
 			return msg
 		}
 		pretty, err := prettyJson(parsed)
