@@ -212,6 +212,7 @@ github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1/go.mod h1:wJfORR
 github.com/gorilla/context v1.1.1/go.mod h1:kBGZzfjB9CEq2AlWe17Uuf7NDRt0dE0s8S51q0aT7Yg=
 github.com/gorilla/mux v1.6.2/go.mod h1:1lud6UwP+6orDFRuTfBEV8e9/aOM/c4fVVCaMa2zaAs=
 github.com/gorilla/mux v1.7.3/go.mod h1:1lud6UwP+6orDFRuTfBEV8e9/aOM/c4fVVCaMa2zaAs=
+github.com/gorilla/mux v1.7.4 h1:VuZ8uybHlWmqV03+zRzdwKL4tUnIp1MAQtp1mIFE1bc=
 github.com/gorilla/mux v1.7.4/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
 github.com/gorilla/websocket v0.0.0-20170926233335-4201258b820c/go.mod h1:E7qHFY5m1UJ88s3WnNqhKjPHQ0heANvMoAMk2YaljkQ=
 github.com/gorilla/websocket v1.4.2/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
@@ -360,8 +361,11 @@ github.com/moov-io/customers v0.4.0-rc5.0.20200605165738-057f20d4d580/go.mod h1:
 github.com/moov-io/customers v0.4.1 h1:/nCK1MvWQPz6wqvw1vcDpxCT1EFX81bGnMpdPDBN5Gk=
 github.com/moov-io/customers v0.4.1/go.mod h1:YYpD3WdP4u6tujf7yE4vQ8o5apMDvPsbO7ai52UaPnA=
 github.com/moov-io/fed v0.5.0/go.mod h1:dvWhJv0X7xYixKuJ9JnfVL+AHfG5YDmLRBxQkwJ0958=
+github.com/moov-io/imagecashletter v0.4.3 h1:UlbZO30XxdMVqs/DNdUgvM1N3EODltE2P2xdJhcOY94=
+github.com/moov-io/imagecashletter v0.4.3/go.mod h1:7CZlI4dT1GjjPeEP9ldJ3rvsH1IjGyU95XU8mf3NEJo=
 github.com/moov-io/ofac v0.12.0/go.mod h1:WEJCy1cN57rcaIBO63kHQyu/1eSEJNN7Rh1lSRgJ6s0=
 github.com/moov-io/paygate v0.8.0-rc6.0.20200520001659-d9ac068978be/go.mod h1:MelgQuJl86HfGYPRogj4OAM7EFA2xNb3eQxfr6nwIg8=
+github.com/moov-io/paygate v0.8.0 h1:BW0QZ3/ysaEIz/2IExVZR6DZJLouIY1iLnpueeteVPE=
 github.com/moov-io/paygate v0.8.0/go.mod h1:uILR/57ihGBfBx1+ltKtE29Q5zfUSE5XDwZtmgLu0H4=
 github.com/moov-io/watchman v0.14.0/go.mod h1:sZ3m3uL87WFImgS/SNDB0Sf0q9190HPyw94j0PUBV2A=
 github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=

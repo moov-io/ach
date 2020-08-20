@@ -8,6 +8,8 @@ require (
 	github.com/mattn/go-isatty v0.0.12
 	github.com/moov-io/base v0.11.0
 	github.com/moov-io/customers v0.4.1
+	github.com/moov-io/imagecashletter v0.4.3
+	github.com/moov-io/paygate v0.8.0
 	github.com/prometheus/client_golang v1.7.1
 )
 

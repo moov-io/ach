@@ -10,6 +10,11 @@ build:
 	go build -o bin/examples-http github.com/moov-io/ach/examples/http
 	CGO_ENABLED=0 go build -o ./bin/server github.com/moov-io/ach/cmd/server
 
+build-webui:
+	cp $(shell go env GOROOT)/misc/wasm/wasm_exec.js ./cmd/webui/assets/wasm_exec.js
+	GOOS=js GOARCH=wasm go build -o ./cmd/webui/assets/ach.wasm github.com/moov-io/ach/cmd/webui/ach/
+	CGO_ENABLED=0 go build -o ./bin/webui ./cmd/webui
+
 generate: clean
 	@go run internal/iso3166/iso3166_gen.go
 	@go run internal/iso4217/iso4217_gen.go
@@ -24,7 +29,7 @@ ifeq ($(OS),Windows_NT)
 else
 	@wget -O lint-project.sh https://raw.githubusercontent.com/moov-io/infra/master/go/lint-project.sh
 	@chmod +x ./lint-project.sh
-	GOCYCLO_LIMIT=26 time ./lint-project.sh
+	GOOS=js GOARCH=wasm GOCYCLO_LIMIT=26 time ./lint-project.sh
 endif
 
 dist: clean generate build
@@ -46,6 +51,9 @@ docker: clean
 # ACH Fuzzing Docker image
 	docker build --pull -t moov/achfuzz:$(VERSION) . -f Dockerfile-fuzz
 	docker tag moov/achfuzz:$(VERSION) moov/achfuzz:latest
+# webui Docker image
+	docker build --pull -t moov/ach-webui:$(VERSION) -f Dockerfile-webui .
+	docker tag moov/ach-webui:$(VERSION) moov/ach-webui:latest
 
 .PHONY: clean-integration test-integration
 
