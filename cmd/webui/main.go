@@ -5,12 +5,6 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
-	"github.com/gorilla/mux"
-	"github.com/moov-io/ach"
-	"github.com/moov-io/base/admin"
-	moovhttp "github.com/moov-io/base/http"
-	"github.com/moov-io/base/http/bind"
-	"github.com/moov-io/paygate/pkg/util"
 	"log"
 	"net/http"
 	"os"
@@ -18,13 +12,19 @@ import (
 	"path/filepath"
 	"syscall"
 	"time"
+
+	"github.com/moov-io/ach"
+	"github.com/moov-io/base/admin"
+	moovhttp "github.com/moov-io/base/http"
+	"github.com/moov-io/base/http/bind"
+	"github.com/moov-io/paygate/pkg/util"
+
+	"github.com/gorilla/mux"
 )
 
 var (
 	httpAddr  = flag.String("http.addr", bind.HTTP("ACH"), "HTTP listen address")
 	adminAddr = flag.String("admin.addr", bind.Admin("ACH"), "Admin HTTP listen address")
-
-	flagLogFormat = flag.String("log.format", "", "Format for log lines (Options: json, plain")
 )
 
 func main() {
