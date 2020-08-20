@@ -39,7 +39,7 @@ func main() {
 // logic to be executed when lambda starts goes here
 func HandleRequest(ctx context.Context, event JsonParseEvent) (string, error) {
 
-	// get file from lambda event, it has already been marshalled from json to ach.File by Go
+	// get file from lambda event, it has already been marshaled from json to ach.File by Go
 	file := event.Json
 
 	// set file ID
