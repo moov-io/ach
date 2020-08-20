@@ -34,3 +34,8 @@ set CGO_ENABLED=0
 go build -o main main.go
 %USERPROFILE%\Go\bin\build-lambda-zip.exe -o main.zip main
 ```
+
+## Next Steps
+
+- [Convert JSON to NACHA format](./aws/lambda/json_to_nacha/lambda_json_to_nacha.md)
+- [Convert NACHA To JSON format](./aws/lambda/nacha_to_json/lambda_nacha_to_json.md)

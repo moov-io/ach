@@ -1,13 +1,15 @@
 # Use AWS Lambda to parse JSON to a NACHA-formatted string
-This walkthrough provides instructions on how to use the [`github.com/moov-io/ach`](https://pkg.go.dev/github.com/moov-io/ach) Go library to 
+This walkthrough provides instructions on how to use the [`github.com/moov-io/ach`](https://pkg.go.dev/github.com/moov-io/ach) Go library to
 parse a JSON object in a Lambda event and return the resulting NACHA-formatted string.
 
 The Lambda event could be triggered by a variety of sources: upload to S3 bucket, API Gateway HTTP request, SQS message, another Lambda, etc. Likewise, the response can be sent to a variety of destinations. This walkthrough doesn't demonstrate a particular trigger or destination, but it can easily be adapted for the use cases mentioned.
 
+Make sure you've built [your project](../building-go-for-lambda.md) for AWS Lambda.
+
 <br/><br/>
 ## 1. Create the Go file
 Create a new Go file named `main.go` and replace it's contents with the following:
-```
+```go
 package main
 
 import (
@@ -103,13 +105,13 @@ The first event will be used to confirm the JSON is parsed correctly. Click the 
 
 <img src="configure-function-create-parseEvent.PNG" alt="Create parseEvent" width="700px"><br /><br />
 
-Leave the `hello-world` template selected and enter a name for your event (e.g. `parseEvent`). 
+Leave the `hello-world` template selected and enter a name for your event (e.g. `parseEvent`).
 
 <img src="configure-function-configure-parseEvent.PNG" alt="Configure parseEvent" width="700px"><br /><br />
 
 Replace the contents of the code editor with the following:
 
-```
+```json
 {
   "data": {
     "id": "",

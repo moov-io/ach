@@ -1,13 +1,15 @@
 # Use AWS Lambda to parse a NACHA-formatted string to JSON
-This walkthrough provides instructions on how to use the [`github.com/moov-io/ach`](https://pkg.go.dev/github.com/moov-io/ach) Go library to 
+This walkthrough provides instructions on how to use the [`github.com/moov-io/ach`](https://pkg.go.dev/github.com/moov-io/ach) Go library to
 parse a NACHA-formatted string in a Lambda event and return the resulting JSON response.
 
 The Lambda event could be triggered by a variety of sources: upload to S3 bucket, API Gateway HTTP request, SQS message, another Lambda, etc. Likewise, the response can be sent to a variety of destinations. This walkthrough doesn't demonstrate a particular trigger or destination, but it can easily be adapted for the use cases mentioned.
 
+Make sure you've built [your project](../building-go-for-lambda.md) for AWS Lambda.
+
 <br/><br/>
 ## 1. Create the Go file
 Create a new Go file named `main.go` and replace it's contents with the following:
-```
+```go
 package main
 
 import (
@@ -103,13 +105,13 @@ The first event will be used to confirm the NACHA-formatted string is parsed cor
 
 <img src="configure-function-create-parseEvent.PNG" alt="Create parseEvent" width="700px"><br /><br />
 
-Leave the `hello-world` template selected and enter a name for your event (e.g. `parseEvent`). 
+Leave the `hello-world` template selected and enter a name for your event (e.g. `parseEvent`).
 
 <img src="configure-function-configure-parseEvent.PNG" alt="Configure parseEvent" width="700px"><br /><br />
 
 Replace the contents of the code editor with the following:
 
-```
+```json
 {
   "data": "101 03130001202313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678\n5225Name on Account                     231380104 PPDREG.SALARY      190816   1121042880000001\n627231380104123456789        0200000000               Debit Account           0121042880000001\n82250000010023138010000200000000000000000000231380104                          121042880000001\n9000001000001000000010023138010000200000000000000000000                                       \n9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999\n9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999\n9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999\n9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999\n9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999"
 }
