@@ -242,7 +242,7 @@ Describing ACH file 'test/testdata/ppd-debit.ach'
 
 ## Getting Started
 
-- [Running ACH Server](./docs/index.md#running-moov-ach-server)
+- [Running ACH Server](./docs/README.md#running-moov-ach-server)
 - [Intro to ACH](./docs/intro.md)
 - [Create an ACH File](./docs/create-file.md)
 
