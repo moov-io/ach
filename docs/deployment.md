@@ -93,3 +93,11 @@ spec:
           periodSeconds: 10
       restartPolicy: Always
 ```
+
+### Custom Timezone
+
+ACH can be ran with a custom timezone, which can be set with an environmental variable.
+
+```
+docker run -p 8080:8080 -e 'TZ=Asia/Tokyo' moov/ach:latest
+```
