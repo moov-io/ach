@@ -29,14 +29,16 @@ import (
 // NACHA formatted files.
 //
 type Writer struct {
-	w       *bufio.Writer
-	lineNum int //current line being written
+	w          *bufio.Writer
+	lineNum    int    //current line being written
+	LineEnding string // configurable line ending to support different consumer requirements
 }
 
 // NewWriter returns a new Writer that writes to w.
 func NewWriter(w io.Writer) *Writer {
 	return &Writer{
-		w: bufio.NewWriter(w),
+		w:          bufio.NewWriter(w),
+		LineEnding: "\n", //set default line ending
 	}
 }
 
@@ -48,7 +50,7 @@ func (w *Writer) Write(file *File) error {
 
 	w.lineNum = 0
 	// Iterate over all records in the file
-	if _, err := w.w.WriteString(file.Header.String() + "\n"); err != nil {
+	if _, err := w.w.WriteString(file.Header.String() + w.LineEnding); err != nil {
 		return err
 	}
 	w.lineNum++
@@ -62,11 +64,11 @@ func (w *Writer) Write(file *File) error {
 	}
 
 	if !file.IsADV() {
-		if _, err := w.w.WriteString(file.Control.String() + "\n"); err != nil {
+		if _, err := w.w.WriteString(file.Control.String() + w.LineEnding); err != nil {
 			return err
 		}
 	} else {
-		if _, err := w.w.WriteString(file.ADVControl.String() + "\n"); err != nil {
+		if _, err := w.w.WriteString(file.ADVControl.String() + w.LineEnding); err != nil {
 			return err
 		}
 	}
@@ -74,7 +76,7 @@ func (w *Writer) Write(file *File) error {
 
 	// pad the final block
 	for i := 0; i < (10-(w.lineNum%10)) && w.lineNum%10 != 0; i++ {
-		if _, err := w.w.WriteString(strings.Repeat("9", 94) + "\n"); err != nil {
+		if _, err := w.w.WriteString(strings.Repeat("9", 94) + w.LineEnding); err != nil {
 			return err
 		}
 	}
@@ -89,37 +91,37 @@ func (w *Writer) Flush() error {
 
 func (w *Writer) writeBatch(file *File) error {
 	for _, batch := range file.Batches {
-		if _, err := w.w.WriteString(batch.GetHeader().String() + "\n"); err != nil {
+		if _, err := w.w.WriteString(batch.GetHeader().String() + w.LineEnding); err != nil {
 			return err
 		}
 		w.lineNum++
 		if !file.IsADV() {
 			for _, entry := range batch.GetEntries() {
-				if _, err := w.w.WriteString(entry.String() + "\n"); err != nil {
+				if _, err := w.w.WriteString(entry.String() + w.LineEnding); err != nil {
 					return err
 				}
 				w.lineNum++
 
 				if entry.Addenda02 != nil {
-					if _, err := w.w.WriteString(entry.Addenda02.String() + "\n"); err != nil {
+					if _, err := w.w.WriteString(entry.Addenda02.String() + w.LineEnding); err != nil {
 						return err
 					}
 					w.lineNum++
 				}
 				for _, addenda05 := range entry.Addenda05 {
-					if _, err := w.w.WriteString(addenda05.String() + "\n"); err != nil {
+					if _, err := w.w.WriteString(addenda05.String() + w.LineEnding); err != nil {
 						return err
 					}
 					w.lineNum++
 				}
 				if entry.Addenda98 != nil {
-					if _, err := w.w.WriteString(entry.Addenda98.String() + "\n"); err != nil {
+					if _, err := w.w.WriteString(entry.Addenda98.String() + w.LineEnding); err != nil {
 						return err
 					}
 					w.lineNum++
 				}
 				if entry.Addenda99 != nil {
-					if _, err := w.w.WriteString(entry.Addenda99.String() + "\n"); err != nil {
+					if _, err := w.w.WriteString(entry.Addenda99.String() + w.LineEnding); err != nil {
 						return err
 					}
 					w.lineNum++
@@ -127,12 +129,12 @@ func (w *Writer) writeBatch(file *File) error {
 			}
 		} else {
 			for _, entry := range batch.GetADVEntries() {
-				if _, err := w.w.WriteString(entry.String() + "\n"); err != nil {
+				if _, err := w.w.WriteString(entry.String() + w.LineEnding); err != nil {
 					return err
 				}
 				w.lineNum++
 				if entry.Addenda99 != nil {
-					if _, err := w.w.WriteString(entry.Addenda99.String() + "\n"); err != nil {
+					if _, err := w.w.WriteString(entry.Addenda99.String() + w.LineEnding); err != nil {
 						return err
 					}
 					w.lineNum++
@@ -141,11 +143,11 @@ func (w *Writer) writeBatch(file *File) error {
 		}
 
 		if batch.GetHeader().StandardEntryClassCode != ADV {
-			if _, err := w.w.WriteString(batch.GetControl().String() + "\n"); err != nil {
+			if _, err := w.w.WriteString(batch.GetControl().String() + w.LineEnding); err != nil {
 				return err
 			}
 		} else {
-			if _, err := w.w.WriteString(batch.GetADVControl().String() + "\n"); err != nil {
+			if _, err := w.w.WriteString(batch.GetADVControl().String() + w.LineEnding); err != nil {
 				return err
 			}
 		}
@@ -156,71 +158,71 @@ func (w *Writer) writeBatch(file *File) error {
 
 func (w *Writer) writeIATBatch(file *File) error {
 	for _, iatBatch := range file.IATBatches {
-		if _, err := w.w.WriteString(iatBatch.GetHeader().String() + "\n"); err != nil {
+		if _, err := w.w.WriteString(iatBatch.GetHeader().String() + w.LineEnding); err != nil {
 			return err
 		}
 		w.lineNum++
 		for _, entry := range iatBatch.GetEntries() {
-			if _, err := w.w.WriteString(entry.String() + "\n"); err != nil {
+			if _, err := w.w.WriteString(entry.String() + w.LineEnding); err != nil {
 				return err
 			}
 			w.lineNum++
-			if _, err := w.w.WriteString(entry.Addenda10.String() + "\n"); err != nil {
+			if _, err := w.w.WriteString(entry.Addenda10.String() + w.LineEnding); err != nil {
 				return err
 			}
 			w.lineNum++
-			if _, err := w.w.WriteString(entry.Addenda11.String() + "\n"); err != nil {
+			if _, err := w.w.WriteString(entry.Addenda11.String() + w.LineEnding); err != nil {
 				return err
 			}
 			w.lineNum++
-			if _, err := w.w.WriteString(entry.Addenda12.String() + "\n"); err != nil {
+			if _, err := w.w.WriteString(entry.Addenda12.String() + w.LineEnding); err != nil {
 				return err
 			}
 			w.lineNum++
-			if _, err := w.w.WriteString(entry.Addenda13.String() + "\n"); err != nil {
+			if _, err := w.w.WriteString(entry.Addenda13.String() + w.LineEnding); err != nil {
 				return err
 			}
 			w.lineNum++
-			if _, err := w.w.WriteString(entry.Addenda14.String() + "\n"); err != nil {
+			if _, err := w.w.WriteString(entry.Addenda14.String() + w.LineEnding); err != nil {
 				return err
 			}
 			w.lineNum++
-			if _, err := w.w.WriteString(entry.Addenda15.String() + "\n"); err != nil {
+			if _, err := w.w.WriteString(entry.Addenda15.String() + w.LineEnding); err != nil {
 				return err
 			}
 			w.lineNum++
-			if _, err := w.w.WriteString(entry.Addenda16.String() + "\n"); err != nil {
+			if _, err := w.w.WriteString(entry.Addenda16.String() + w.LineEnding); err != nil {
 				return err
 			}
 			w.lineNum++
 			// IAT Addenda17
 			for _, addenda17 := range entry.Addenda17 {
-				if _, err := w.w.WriteString(addenda17.String() + "\n"); err != nil {
+				if _, err := w.w.WriteString(addenda17.String() + w.LineEnding); err != nil {
 					return err
 				}
 				w.lineNum++
 			}
 			// IAT Addenda18
 			for _, addenda18 := range entry.Addenda18 {
-				if _, err := w.w.WriteString(addenda18.String() + "\n"); err != nil {
+				if _, err := w.w.WriteString(addenda18.String() + w.LineEnding); err != nil {
 					return err
 				}
 				w.lineNum++
 			}
 			if entry.Addenda98 != nil {
-				if _, err := w.w.WriteString(entry.Addenda98.String() + "\n"); err != nil {
+				if _, err := w.w.WriteString(entry.Addenda98.String() + w.LineEnding); err != nil {
 					return err
 				}
 				w.lineNum++
 			}
 			if entry.Addenda99 != nil {
-				if _, err := w.w.WriteString(entry.Addenda99.String() + "\n"); err != nil {
+				if _, err := w.w.WriteString(entry.Addenda99.String() + w.LineEnding); err != nil {
 					return err
 				}
 				w.lineNum++
 			}
 		}
-		if _, err := w.w.WriteString(iatBatch.GetControl().String() + "\n"); err != nil {
+		if _, err := w.w.WriteString(iatBatch.GetControl().String() + w.LineEnding); err != nil {
 			return err
 		}
 		w.lineNum++

@@ -681,3 +681,48 @@ func TestADVReturnWrite(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
+
+// testWriteWithCustomLineEnding writes an ACH file with a custom line ending
+func testWriteWithCustomLineEnding(t testing.TB) {
+	file := NewFile().SetHeader(mockFileHeader())
+	entry := mockEntryDetail()
+	entry.AddendaRecordIndicator = 1
+	entry.AddAddenda05(mockAddenda05())
+	batch := NewBatchPPD(mockBatchPPDHeader())
+	batch.SetHeader(mockBatchHeader())
+	batch.AddEntry(entry)
+	if err := batch.Create(); err != nil {
+		t.Fatal(err)
+	}
+	file.AddBatch(batch)
+
+	if err := file.Create(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err := file.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	b := &bytes.Buffer{}
+	f := NewWriter(b)
+	// use crlf as line ending
+	f.LineEnding = "\r\n"
+
+	if err := f.Write(file); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	r := NewReader(strings.NewReader(b.String()))
+	_, err := r.Read()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err = r.File.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestWriteWithCustomLineEnding tests writing an ACH file with a custom line ending
+func TestWriteWithCustomLineEnding(t *testing.T) {
+	testWriteWithCustomLineEnding(t)
+}
