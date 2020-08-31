@@ -2,8 +2,15 @@
 
 ADDITIONS
 
+- cmd/webui: initial setup for client-side ACH file parsing to their JSON forms
 - entries: allow custom `TransactionCode` validation
 - entries: allow custom `TraceNumber` values
+- writer: Allow setting `Writer.LineEnding` to use custom values for ending each outputted
+
+IMPROVEMENTS
+
+- chore(deps): update golang docker tag to v1.15
+- docs: Update content for moov-io.github.io/ach/
 
 ## v1.4.4 (Released 2020-08-04)
 
