@@ -4,10 +4,10 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>ACH | Moov</title>
-    <script src="wasm_exec.js"></script>
+    <script src="./wasm_exec.js"></script>
     <script>
         const go = new Go();
-        WebAssembly.instantiateStreaming(fetch("ach.wasm"), go.importObject).then((result) => {
+        WebAssembly.instantiateStreaming(fetch("./ach.wasm"), go.importObject).then((result) => {
             go.run(result.instance);
         });
     </script>
