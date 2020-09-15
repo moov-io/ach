@@ -24,8 +24,9 @@ The ACH project implements an HTTP server and Go library for creating and modify
 
 We publish a [public Docker image `moov/ach`](https://hub.docker.com/r/moov/ach/) from Docker Hub or use this repository. No configuration is required to serve on `:8080` and metrics at `:9090/metrics` in Prometheus format. We also have docker images for [OpenShift](https://quay.io/repository/moov/ach?tab=tags) published as `quay.io/moov/ach`.
 
-Start the Docker image:
+Pull & start the Docker image:
 ```
+docker pull moov/ach:latest
 docker run -p 8080:8080 -p 9090:9090 moov/ach:latest
 ```
 
@@ -42,15 +43,15 @@ Create a file on the HTTP server
 curl -XPOST --data-binary "@./test/testdata/ppd-debit.ach" http://localhost:8080/files/create
 ```
 ```
-{"id":"c58b75610ac1b8b85fef0d923a3bc0909bf06b93","error":null}
+{"id":"<YOUR-UNIQUE-FILE-ID>","error":null}
 ```
 
 Read the ACH file (in JSON form)
 ```
-curl http://localhost:8080/files/c58b75610ac1b8b85fef0d923a3bc0909bf06b93
+curl http://localhost:8080/files/<YOUR-UNIQUE-FILE-ID>
 ```
 ```
-{"file":{"id":"c58b75610ac1b8b85fef0d923a3bc0909bf06b93","fileHeader":{"id":"","immediateDestination":"231380104","immediateOrigin":"121042882", ...
+{"file":{"id":"<YOUR-UNIQUE-FILE-ID>","fileHeader":{"id":"","immediateDestination":"231380104","immediateOrigin":"121042882", ...
 ```
 
 ### Google Cloud Run Button
@@ -151,7 +152,7 @@ curl https://YOUR-ACH-APP-URL.a.run.app/files/c58b75610ac-YOUR-UNIQUE-FILE-ID-92
 
 You should get this response:
 ```
-{"file":{"id":"c58b75610ac-YOUR-UNIQUE-FILE-ID-9239bf06b93","fileHeader":{"id":"","immediateDestination":"231380104","immediateOrigin":"121042882", ...
+{"file":{"id":"c58b75610ac-YOUR-UNIQUE-FILE-ID-9239bf06b93","fileHeader":{"id":"...","immediateDestination":"231380104","immediateOrigin":"121042882", ...
 ```
 
 
