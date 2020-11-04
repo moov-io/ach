@@ -19,8 +19,9 @@ package server
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/moov-io/ach"
@@ -33,7 +34,7 @@ import (
 
 type createBatchRequest struct {
 	FileID string
-	Batch  *ach.Batch
+	Batch  ach.Batcher
 
 	requestID string
 }
@@ -78,11 +79,36 @@ func decodeCreateBatchRequest(_ context.Context, r *http.Request) (interface{}, 
 		return nil, ErrBadRouting
 	}
 	req.FileID = id
-	if err := json.NewDecoder(r.Body).Decode(&req.Batch); err != nil {
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
 		return nil, err
+	}
+	// In order to use FileFromJSON we need a populated JSON structure that can be parsed.
+	// We're going to copy the body into this shim to parse the Batch, otherwise we'd have
+	// to copy/export the logic of reading batches from their JSON representation.
+	fileContentsShim := `{"fileHeader": {
+  "immediateOriginName": "Test Sender",
+  "immediateDestinationName": "Test Dest",
+  "fileIDModifier": "1",
+  "fileCreationTime": "0437",
+  "fileCreationDate": "200217",
+  "immediateOrigin": "123456780",
+  "immediateDestination": "987654320",
+  "id": ""
+}, "batches":[%v] }`
+	file, err := ach.FileFromJSON([]byte(fmt.Sprintf(fileContentsShim, string(body))))
+	if err != nil {
+		return nil, err
+	}
+	if len(file.Batches) == 1 {
+		req.Batch = file.Batches[0]
 	}
 	if req.Batch == nil {
 		return nil, errors.New("no Batch provided")
+	}
+	if err := req.Batch.Validate(); err != nil {
+		return nil, err
 	}
 	return req, nil
 }

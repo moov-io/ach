@@ -143,11 +143,13 @@ func (batch *Batch) MarshalJSON() ([]byte, error) {
 }
 
 func (batch *Batch) UnmarshalJSON(p []byte) error {
-	if batch != nil {
-		batch.Header = NewBatchHeader()
-		batch.Control = NewBatchControl()
-		batch.ADVControl = NewADVBatchControl()
+	if batch == nil {
+		batch = &Batch{}
 	}
+	// blank out the fields of our Batch before reading
+	batch.Header = NewBatchHeader()
+	batch.Control = NewBatchControl()
+	batch.ADVControl = NewADVBatchControl()
 
 	type Alias Batch
 	aux := struct {

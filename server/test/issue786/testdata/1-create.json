@@ -1,0 +1,44 @@
+{
+  "batches": [
+    {
+      "entryDetails": [
+        {
+          "traceNumber": "121042887841793",
+          "addendaRecordIndicator": 1,
+          "discretionaryData": "ap",
+          "individualName": "Wrong debit",
+          "identificationNumber": "7813fde9df675a0",
+          "amount": 2500,
+          "DFIAccountNumber": "000000099",
+          "checkDigit": "2",
+          "RDFIIdentification": "12104288",
+          "transactionCode": 37,
+          "id": ""
+        }
+      ],
+      "batchHeader": {
+        "batchNumber": 1,
+        "ODFIIdentification": "12104288",
+        "originatorStatusCode": 1,
+        "effectiveEntryDate": "200218",
+        "companyDescriptiveDate": "200217",
+        "companyEntryDescription": "test xfer",
+        "standardEntryClassCode": "PPD",
+        "companyIdentification": "123456789",
+        "companyName": "Friendly Corp",
+        "serviceClassCode": 200,
+        "id": ""
+      }
+    }
+  ],
+  "fileHeader": {
+    "immediateOriginName": "Moov Bank",
+    "immediateDestinationName": "Moov Bank",
+    "fileIDModifier": "1",
+    "fileCreationTime": "0437",
+    "fileCreationDate": "200217",
+    "immediateOrigin": "121042882",
+    "immediateDestination": "121042882",
+    "id": ""
+  }
+}
