@@ -26,11 +26,13 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 
-	"github.com/moov-io/ach"
 	"github.com/moov-io/base"
 	moovhttp "github.com/moov-io/base/http"
+
+	"github.com/moov-io/ach"
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/log"
@@ -52,9 +54,10 @@ var (
 )
 
 type createFileRequest struct {
-	File       *ach.File
-	parseError error
-	requestID  string
+	File         *ach.File
+	parseError   error
+	requestID    string
+	validateOpts *ach.ValidateOpts
 }
 
 type createFileResponse struct {
@@ -81,6 +84,10 @@ func createFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.End
 			req.File.ID = base.ID()
 		}
 
+		if req.validateOpts != nil {
+			req.File.SetValidation(req.validateOpts)
+		}
+
 		err := r.StoreFile(req.File)
 		if logger != nil {
 			logger.Log("files", "createFile", "requestID", req.requestID, "error", err)
@@ -101,8 +108,9 @@ func createFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.End
 func decodeCreateFileRequest(_ context.Context, request *http.Request) (interface{}, error) {
 	var r io.Reader
 	req := createFileRequest{
-		File:      ach.NewFile(),
-		requestID: moovhttp.GetRequestID(request),
+		File:         ach.NewFile(),
+		requestID:    moovhttp.GetRequestID(request),
+		validateOpts: &ach.ValidateOpts{},
 	}
 
 	bs, err := ioutil.ReadAll(request.Body)
@@ -125,6 +133,43 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 		req.File = &f
 		req.parseError = err
 	}
+
+	const (
+		requireABAOrigin  = "requireABAOrigin"
+		bypassOrigin      = "bypassOrigin"
+		bypassDestination = "bypassDestination"
+	)
+
+	validationNames := []string{
+		requireABAOrigin,
+		bypassOrigin,
+		bypassDestination,
+	}
+
+	for _, name := range validationNames {
+		input := request.URL.Query().Get(name)
+		if input == "" {
+			continue
+		}
+
+		ok, err := strconv.ParseBool(input)
+		if err != nil {
+			return nil, fmt.Errorf("invalid bool: %v", err)
+		}
+		if !ok {
+			continue
+		}
+
+		switch name {
+		case requireABAOrigin:
+			req.validateOpts.RequireABAOrigin = true
+		case bypassOrigin:
+			req.validateOpts.BypassOriginValidation = true
+		case bypassDestination:
+			req.validateOpts.BypassDestinationValidation = true
+		}
+	}
+
 	return req, nil
 }
 

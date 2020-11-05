@@ -27,11 +27,13 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 
-	"github.com/moov-io/ach"
 	"github.com/moov-io/base"
+
+	"github.com/moov-io/ach"
 
 	"github.com/go-kit/kit/log"
 	httptransport "github.com/go-kit/kit/transport/http"
@@ -91,6 +93,61 @@ func TestFiles__createFileEndpoint(t *testing.T) {
 	}
 	if err == nil || r.Err == nil {
 		t.Errorf("expected error: err=%v resp.Err=%v", err, r.Err)
+	}
+}
+
+func TestFiles__decodeCreateFileRequest__validateOpts(t *testing.T) {
+	f := ach.NewFile()
+	f.ID = "foo"
+	f.Header = *mockFileHeader()
+	f.AddBatch(mockBatchWEB())
+
+	var body bytes.Buffer
+	if err := json.NewEncoder(&body).Encode(f); err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		query  string
+		expect ach.ValidateOpts
+	}{
+		{
+			query: "?bypassOrigin=true&requireABAOrigin=true",
+			expect: ach.ValidateOpts{
+				RequireABAOrigin:       true,
+				BypassOriginValidation: true,
+			},
+		},
+		{
+			query: "?bypassDestination=1&requireABAOrigin=0",
+			expect: ach.ValidateOpts{
+				BypassDestinationValidation: true,
+			},
+		},
+		{
+			query: "?requireABAOrigin=TRUE&bypassOrigin=true&bypassDestination=1",
+			expect: ach.ValidateOpts{
+				RequireABAOrigin:            true,
+				BypassOriginValidation:      true,
+				BypassDestinationValidation: true,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.query, func(t *testing.T) {
+			httpRequest := httptest.NewRequest("POST", "/files/create"+tc.query, &body)
+			httpRequest.Header.Set("x-request-id", "test")
+
+			decodedReq, err := decodeCreateFileRequest(context.TODO(), httpRequest)
+			if err != nil {
+				t.Fatal(err)
+			}
+			req := decodedReq.(createFileRequest)
+			if !reflect.DeepEqual(tc.expect, *req.validateOpts) {
+				t.Fatalf("validateOpts: want %v, got %v", tc.expect, *req.validateOpts)
+			}
+		})
 	}
 }
 
