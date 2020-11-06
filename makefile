@@ -28,6 +28,11 @@ else
 	GOOS=js GOARCH=wasm GOCYCLO_LIMIT=26 time ./lint-project.sh
 endif
 
+check-openapi:
+	docker run \
+	-v ${PWD}/openapi.yaml:/projects/openapi.yaml \
+	wework/speccy lint --verbose /projects/openapi.yaml
+
 dist: clean build
 ifeq ($(OS),Windows_NT)
 	CGO_ENABLED=1 GOOS=windows go build -o bin/achcli.exe github.com/moov-io/ach/cmd/achcli

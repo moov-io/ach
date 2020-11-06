@@ -27,6 +27,10 @@ jobs:
       if: runner.os == 'Windows'
       run: choco install -y make mingw
 
+    - name: Check OpenAPI
+      if: runner.os == 'Linux'
+      run: make check-openapi
+
     - name: Check
       run: make check
 
