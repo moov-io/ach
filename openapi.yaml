@@ -74,6 +74,15 @@ paths:
           required: false
           schema:
             type: string
+        - name: requireABAOrigin
+          in: query
+          $ref: '#/components/schemas/ValidateOpts/properties/requireABAOrigin'
+        - name: bypassOrigin
+          in: query
+          $ref: '#/components/schemas/ValidateOpts/properties/bypassOriginValidation'
+        - name: bypassDestination
+          in: query
+          $ref: '#/components/schemas/ValidateOpts/properties/bypassDestinationValidation'
       requestBody:
         description: Content of the ACH file (in json or raw text)
         required: true
@@ -83,16 +92,16 @@ paths:
               description: A plaintext ACH file
               type: string
               example: |
-                  101 23138010401210428821906240000A094101Federal Reserve Bank   My Bank Name
-                  5225Name on Account                     121042882 PPDREG.SALARY      190625   1121042880000001
-                  62723138010412345678         0100000000               Receiver Account Name   0121042880000001
-                  82250000010023138010000100000000000000000000121042882                          121042880000001
-                  9000001000001000000010023138010000100000000000000000000
-                  9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
-                  9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
-                  9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
-                  9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
-                  9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+                101 23138010401210428821906240000A094101Federal Reserve Bank   My Bank Name
+                5225Name on Account                     121042882 PPDREG.SALARY      190625   1121042880000001
+                62723138010412345678         0100000000               Receiver Account Name   0121042880000001
+                82250000010023138010000100000000000000000000121042882                          121042880000001
+                9000001000001000000010023138010000100000000000000000000
+                9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+                9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+                9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+                9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+                9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
           application/json:
             schema:
               $ref: '#/components/schemas/CreateFile'
@@ -164,10 +173,10 @@ paths:
           schema:
             type: string
       responses:
-          '200':
-            description: Permanently deleted File.
-          '404':
-            description: A File with the specified ID was not found.
+        '200':
+          description: Permanently deleted File.
+        '404':
+          description: A File with the specified ID was not found.
   /files/{fileID}/contents:
     get:
       tags: ['ACH Files']
@@ -1684,6 +1693,7 @@ components:
           type: string
           description: File ID
           example: "3cac5447"
+
     # There are no options here currently, but this object exists to read them in the future
     # SegmentFileConfiguration:
     #   properties: {}
