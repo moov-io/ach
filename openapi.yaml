@@ -35,9 +35,6 @@ paths:
       summary: List Files
       description: List all ACH files created with the ACH service. These files are not persisted through multiple runs of the service.
       operationId: getFiles
-      security:
-        - bearerAuth: []
-        - cookieAuth: []
       parameters:
         - name: X-Request-ID
           in: header
@@ -63,9 +60,6 @@ paths:
       summary: Create File
       description: Create a new File object from either the plaintext or JSON representation.
       operationId: createFile
-      security:
-        - bearerAuth: []
-        - cookieAuth: []
       parameters:
         - name: X-Request-ID
           in: header
@@ -120,16 +114,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /files/{fileID}:
     get:
       tags: ['ACH Files']
       summary: Retrieve File
       description: Get the details of an existing File using the unique File identifier that was returned upon creation.
       operationId: getFileByID
-      security:
-        - bearerAuth: []
-        - cookieAuth: []
       parameters:
         - name: X-Request-ID
           in: header
@@ -158,9 +149,6 @@ paths:
       summary: Delete File
       description: Permanently deletes a File and associated Batches. It cannot be undone.
       operationId: deleteACHFile
-      security:
-        - bearerAuth: []
-        - cookieAuth: []
       parameters:
         - name: fileID
           in: path
@@ -187,9 +175,6 @@ paths:
       description: |
         Assembles the existing file (batches and controls) records, computes sequence numbers and totals. Returns plaintext file.
       operationId: getFileContents
-      security:
-        - bearerAuth: []
-        - cookieAuth: []
       parameters:
         - name: X-Request-ID
           in: header
@@ -217,9 +202,6 @@ paths:
       summary: Validate File
       description: Validates the existing file. You need only supply the unique File identifier that was returned upon creation.
       operationId: checkFile
-      security:
-        - bearerAuth: []
-        - cookieAuth: []
       parameters:
         - name: X-Request-ID
           in: header
@@ -240,7 +222,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
         '400':
           description: Validation failed. Check response for errors
     post:
@@ -248,9 +230,6 @@ paths:
       summary: Validate File (Custom)
       description: Validates the existing file. You need only supply the unique File identifier that was returned upon creation.
       operationId: validateFile
-      security:
-        - bearerAuth: []
-        - cookieAuth: []
       parameters:
         - name: X-Request-ID
           in: header
@@ -277,7 +256,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
         '400':
           description: Validation failed. Check response for errors
   /files/{fileID}/segment:
@@ -286,9 +265,6 @@ paths:
       summary: Segment File
       description: Split one file into two. One with only debits and one with only credits.
       operationId: segmentFile
-      security:
-        - bearerAuth: []
-        - cookieAuth: []
       parameters:
         - name: X-Request-ID
           in: header
@@ -329,16 +305,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /files/{fileID}/flatten:
     post:
       tags: ['ACH Files']
       summary: Flatten Batches
       description: Consolidate batches and entries into the minimum number of batches needed.
       operationId: flattenFile
-      security:
-        - bearerAuth: []
-        - cookieAuth: []
       parameters:
         - name: X-Request-ID
           in: header
@@ -372,16 +345,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /files/{fileID}/batches:
     get:
       tags: ['ACH Files']
       summary: Get Batches
       description: Get the batches on a File.
       operationId: getFileBatches
-      security:
-        - bearerAuth: []
-        - cookieAuth: []
       parameters:
         - name: X-Request-ID
           in: header
@@ -413,9 +383,6 @@ paths:
       summary: Append Batch to File
       description: Append a Batch record to the specified file
       operationId: addBatchToFile
-      security:
-        - bearerAuth: []
-        - cookieAuth: []
       parameters:
         - name: X-Request-ID
           in: header
@@ -452,9 +419,6 @@ paths:
       summary: Get Batch
       description: Get a specific Batch on a File
       operationId: getFileBatch
-      security:
-        - bearerAuth: []
-        - cookieAuth: []
       parameters:
         - name: X-Request-ID
           in: header
@@ -490,9 +454,6 @@ paths:
       summary: Delete Batch
       description: Delete a Batch from a File
       operationId: deleteFileBatch
-      security:
-        - bearerAuth: []
-        - cookieAuth: []
       parameters:
         - name: X-Request-ID
           in: header
