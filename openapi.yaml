@@ -76,13 +76,19 @@ paths:
             type: string
         - name: requireABAOrigin
           in: query
-          $ref: '#/components/schemas/ValidateOpts/properties/requireABAOrigin'
+          description: Optional parameter to enable routing number validation over ImmediateOrigin
+          schema:
+            $ref: '#/components/schemas/ValidateOpts/properties/requireABAOrigin'
         - name: bypassOrigin
           in: query
-          $ref: '#/components/schemas/ValidateOpts/properties/bypassOriginValidation'
+          description: Optional parameter to disable ImmediateOrigin validation
+          schema:
+            $ref: '#/components/schemas/ValidateOpts/properties/bypassOriginValidation'
         - name: bypassDestination
           in: query
-          $ref: '#/components/schemas/ValidateOpts/properties/bypassDestinationValidation'
+          description: Optional parameter to disable ImmediateDestination validation
+          schema:
+            $ref: '#/components/schemas/ValidateOpts/properties/bypassDestinationValidation'
       requestBody:
         description: Content of the ACH file (in json or raw text)
         required: true
