@@ -1,16 +1,29 @@
-## v1.5.0 (Unreleased)
+## v1.5.0 (Released 2020-11-12)
 
 ADDITIONS
 
 - cmd/webui: initial setup for client-side ACH file parsing to their JSON forms
 - entries: allow custom `TransactionCode` validation
 - entries: allow custom `TraceNumber` values
-- writer: Allow setting `Writer.LineEnding` to use custom values for ending each outputted
+- writer: allow setting `Writer.LineEnding` to use custom values for ending each outputted
+- server: allow `ValidateOpts` to be set through HTTP query parameters
 
 IMPROVEMENTS
 
+- build: check and lint OpenAPI spec in CI
+- api: update summaries of endpoints
+- api: clean up OpenAPI spec after running Speccy
+- docs: update content for moov-io.github.io/ach/
+- docs: add page on return files
+- docs: add link to Moov's ACH blog post
+- docs: fix filepath example in segmented files
+- github: request version in bug reports
+- github: add codeowners
 - chore(deps): update golang docker tag to v1.15
-- docs: Update content for moov-io.github.io/ach/
+
+BUG FIXES
+
+- server: fix batch additions by shimming JSON reading
 
 ## v1.4.4 (Released 2020-08-04)
 
