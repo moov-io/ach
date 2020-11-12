@@ -1,3 +1,7 @@
+## v1.5.1 (Released 2020-11-12)
+
+There are no changes from v1.5.0. This release fixes issues during the release process.
+
 ## v1.5.0 (Released 2020-11-12)
 
 ADDITIONS
