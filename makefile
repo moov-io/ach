@@ -42,17 +42,21 @@ else
 	CGO_ENABLED=0 GOOS=$(PLATFORM) go build -o bin/ach-$(PLATFORM)-amd64 github.com/moov-io/ach/cmd/server
 endif
 
-docker: clean
-# ACH Docker image
+docker: clean docker-hub docker-openshift docker-fuzz docker-webui
+
+docker-hub:
 	docker build --pull -t moov/ach:$(VERSION) -f Dockerfile .
 	docker tag moov/ach:$(VERSION) moov/ach:latest
-# ACH OpenShift Docker image
+
+docker-openshift:
 	docker build --pull -t quay.io/moov/ach:$(VERSION) -f Dockerfile-openshift --build-arg VERSION=$(VERSION) .
 	docker tag quay.io/moov/ach:$(VERSION) quay.io/moov/ach:latest
-# ACH Fuzzing Docker image
+
+docker-fuzz:
 	docker build --pull -t moov/achfuzz:$(VERSION) . -f Dockerfile-fuzz
 	docker tag moov/achfuzz:$(VERSION) moov/achfuzz:latest
-# webui Docker image
+
+docker-webui:
 	docker build --pull -t moov/ach-webui:$(VERSION) -f Dockerfile-webui .
 	docker tag moov/ach-webui:$(VERSION) moov/ach-webui:latest
 
@@ -75,6 +79,7 @@ release-push:
 	docker push moov/ach:$(VERSION)
 	docker push moov/ach:latest
 	docker push moov/achfuzz:$(VERSION)
+	docker push moov/ach-webui:$(VERSION)
 
 quay-push:
 	docker push quay.io/moov/ach:$(VERSION)
