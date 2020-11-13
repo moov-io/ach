@@ -79,6 +79,7 @@ release-push:
 	docker push moov/ach:$(VERSION)
 	docker push moov/ach:latest
 	docker push moov/achfuzz:$(VERSION)
+	docker push moov/ach-webui:$(VERSION)
 
 quay-push:
 	docker push quay.io/moov/ach:$(VERSION)
