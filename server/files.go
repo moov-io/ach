@@ -167,7 +167,7 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 		r = bytes.NewReader(bs)
 		achReader := ach.NewReader(r)
 		achReader.SetValidation(req.validateOpts)
-	
+
 		f, err := achReader.Read()
 		req.File = &f
 		req.parseError = err
