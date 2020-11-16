@@ -1,3 +1,13 @@
+## v1.5.2 (Released 2020-11-16)
+
+BUG FIXES
+
+- server: pass validation options through to ACH reader and underlying batch
+
+IMPROVEMENTS
+
+- build: push ach-webui image and split up commands for each docker build
+
 ## v1.5.1 (Released 2020-11-12)
 
 There are no changes from v1.5.0. This release fixes issues during the release process.
