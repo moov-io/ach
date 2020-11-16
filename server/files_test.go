@@ -132,6 +132,14 @@ func TestFiles__decodeCreateFileRequest__validateOpts(t *testing.T) {
 				BypassDestinationValidation: true,
 			},
 		},
+		{
+			query: "?requireABAOrigin=false&bypassOrigin=true&bypassDestination=true",
+			expect: ach.ValidateOpts{
+				RequireABAOrigin:            false,
+				BypassOriginValidation:      true,
+				BypassDestinationValidation: true,
+			},
+		},
 	}
 
 	for _, tc := range tests {
@@ -770,24 +778,48 @@ func TestFiles__CreateFileEndpoint(t *testing.T) {
 	svc := NewService(repo)
 	router := MakeHTTPHandler(svc, repo, logger)
 
-	// write an ACH file into repository
-	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-debit.ach"))
-	if fd == nil {
-		t.Fatalf("empty ACH file: %v", err)
+	testCases := []struct {
+		filename           string
+		queryParams        string
+		expectedStatusCode int
+	}{
+		{
+			filename:           "ppd-debit.ach",
+			queryParams:        "",
+			expectedStatusCode: http.StatusOK,
+		},
+		{
+			filename:           "ppd-debit-customTraceNumber.ach",
+			queryParams:        "?bypassOrigin=true",
+			expectedStatusCode: http.StatusOK,
+		},
+		{
+			filename:           "ppd-debit-customTraceNumber.ach",
+			queryParams:        "?bypassOrigin=false",
+			expectedStatusCode: http.StatusBadRequest,
+		},
 	}
-	defer fd.Close()
 
-	// test status code
-	w := httptest.NewRecorder()
-	req := httptest.NewRequest("POST", "/files/create", fd)
-	req.Header.Set("Origin", "https://moov.io")
-	req.Header.Set("X-Request-Id", "11114")
+	for _, tc := range testCases {
+		// write an ACH file into repository
+		fd, err := os.Open(filepath.Join("..", "test", "testdata", tc.filename))
+		if fd == nil {
+			t.Fatalf("empty ACH file: %v", err)
+		}
+		defer fd.Close()
 
-	router.ServeHTTP(w, req)
-	w.Flush()
+		// test status code
+		w := httptest.NewRecorder()
+		req := httptest.NewRequest("POST", fmt.Sprintf("/files/create%s", tc.queryParams), fd)
+		req.Header.Set("Origin", "https://moov.io")
+		req.Header.Set("X-Request-Id", "11114")
 
-	if w.Code != http.StatusOK {
-		t.Errorf("bogus HTTP status: %d", w.Code)
+		router.ServeHTTP(w, req)
+		w.Flush()
+
+		if w.Code != tc.expectedStatusCode {
+			t.Errorf("HTTP status code: want %d, got %d", tc.expectedStatusCode, w.Code)
+		}
 	}
 }
 

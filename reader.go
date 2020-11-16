@@ -250,6 +250,7 @@ func (r *Reader) parseLine() error {
 			return err
 		}
 		if r.currentBatch != nil {
+			r.currentBatch.SetValidation(r.File.validateOpts)
 			if err := r.currentBatch.Validate(); err != nil {
 				r.recordName = "Batches"
 				return r.parseError(err)

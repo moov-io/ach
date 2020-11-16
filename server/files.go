@@ -113,27 +113,6 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 		validateOpts: &ach.ValidateOpts{},
 	}
 
-	bs, err := ioutil.ReadAll(request.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	h := strings.ToLower(request.Header.Get("Content-Type"))
-	if strings.Contains(h, "application/json") {
-		// Read body as ACH file in JSON
-		f, err := ach.FileFromJSON(bs)
-		if f != nil {
-			req.File = f
-		}
-		req.parseError = err
-	} else {
-		// Attempt parsing body as an ACH File
-		r = bytes.NewReader(bs)
-		f, err := ach.NewReader(r).Read()
-		req.File = &f
-		req.parseError = err
-	}
-
 	const (
 		requireABAOrigin  = "requireABAOrigin"
 		bypassOrigin      = "bypassOrigin"
@@ -168,6 +147,30 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 		case bypassDestination:
 			req.validateOpts.BypassDestinationValidation = true
 		}
+	}
+
+	bs, err := ioutil.ReadAll(request.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	h := strings.ToLower(request.Header.Get("Content-Type"))
+	if strings.Contains(h, "application/json") {
+		// Read body as ACH file in JSON
+		f, err := ach.FileFromJSON(bs)
+		if f != nil {
+			req.File = f
+		}
+		req.parseError = err
+	} else {
+		// Attempt parsing body as an ACH File
+		r = bytes.NewReader(bs)
+		achReader := ach.NewReader(r)
+		achReader.SetValidation(req.validateOpts)
+	
+		f, err := achReader.Read()
+		req.File = &f
+		req.parseError = err
 	}
 
 	return req, nil
