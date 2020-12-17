@@ -7,10 +7,10 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/juju/ansiterm v0.0.0-20180109212912-720a0952cc2a
 	github.com/mattn/go-isatty v0.0.12
-	github.com/moov-io/base v0.14.2
+	github.com/moov-io/base v0.15.2
 	github.com/moov-io/customers v0.5.0
-	github.com/moov-io/paygate v0.9.1
-	github.com/prometheus/client_golang v1.8.0
+	github.com/moov-io/paygate v0.9.2
+	github.com/prometheus/client_golang v1.9.0
 )
 
 go 1.13
