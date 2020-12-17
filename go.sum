@@ -548,6 +548,7 @@ github.com/mattn/go-sqlite3 v1.10.0/go.mod h1:FPy6KqzDD04eiIsT53CuJW3U88zkxoIYsO
 github.com/mattn/go-sqlite3 v1.11.0/go.mod h1:FPy6KqzDD04eiIsT53CuJW3U88zkxoIYsOqkbpncsNc=
 github.com/mattn/go-sqlite3 v1.13.0/go.mod h1:FPy6KqzDD04eiIsT53CuJW3U88zkxoIYsOqkbpncsNc=
 github.com/mattn/go-sqlite3 v1.14.3/go.mod h1:WVKg1VTActs4Qso6iwGbiFih2UIHo0ENGwNd0Lj+XmI=
+github.com/mattn/go-sqlite3 v1.14.5/go.mod h1:WVKg1VTActs4Qso6iwGbiFih2UIHo0ENGwNd0Lj+XmI=
 github.com/mattn/go-sqlite3 v2.0.3+incompatible/go.mod h1:FPy6KqzDD04eiIsT53CuJW3U88zkxoIYsOqkbpncsNc=
 github.com/matttproud/golang_protobuf_extensions v1.0.1 h1:4hp9jkHxhMHkqkrB3Ix0jegS5sx/RkqARlsWZ6pIwiU=
 github.com/matttproud/golang_protobuf_extensions v1.0.1/go.mod h1:D8He9yQNgCq6Z5Ld7szi9bcBfOoFv/3dc6xSMkL2PC0=
@@ -593,6 +594,7 @@ github.com/moov-io/base v0.14.0 h1:bSzCJdraxOie2jWjY7ijArNeXmhgRA2NBEgyoFwRk7I=
 github.com/moov-io/base v0.14.0/go.mod h1:X3Rkm6lKCODm8zF7s43aawbyRDFyBdmEzO+NteVTj+A=
 github.com/moov-io/base v0.14.2 h1:nx2j//0EGIF7lEvkv6IjHt/AFWeihOTS/NrhIeH1cIg=
 github.com/moov-io/base v0.14.2/go.mod h1:js+AG2zR0oav34W+mZ2JCrMYEpKdJ9t6t5xMXkpnkfI=
+github.com/moov-io/base v0.15.2/go.mod h1:7esHtjXNfvnu3KJ0HIJYUWu7W95fKvzSqo07xb8ACfg=
 github.com/moov-io/customers v0.4.0-rc4/go.mod h1:wNz/qIiG24rJrjnK3VOvzj0MbdfGznj6INO/uyntgNM=
 github.com/moov-io/customers v0.4.0-rc4.0.20200519011716-05c4c319c49b/go.mod h1:wmBTMaZ7OzoXhDtLqGngNrEaRlsk7VFLxY0kl3HzoHc=
 github.com/moov-io/customers v0.4.0-rc5.0.20200605165738-057f20d4d580/go.mod h1:2viqzwFr1cp5gXL9lhOIXl7KE1pDIA8Z4I5smZBRUSo=
@@ -619,6 +621,7 @@ github.com/moov-io/paygate v0.9.0-dev1.0.20201022020358-75870ae7acfc h1:JHof9FYs
 github.com/moov-io/paygate v0.9.0-dev1.0.20201022020358-75870ae7acfc/go.mod h1:mutrtSP2mUm22SeynlSr/DWcYXzc2NQgnk4zZmovnAQ=
 github.com/moov-io/paygate v0.9.1 h1:aXtCG7Wqtw7mdXNs6JQjiPC8mt/EsaJN6S/BalarkLk=
 github.com/moov-io/paygate v0.9.1/go.mod h1:RgQLI7w/SlAwg69j+1IPeLBly7425tBFszC9IWTlNho=
+github.com/moov-io/paygate v0.9.2/go.mod h1:RgQLI7w/SlAwg69j+1IPeLBly7425tBFszC9IWTlNho=
 github.com/moov-io/tumbler v0.0.0-20200617212523-2a85ad22d0a9/go.mod h1:NmMeFW5pxs9+UXWRdykFOBq0vywh1s//VPzReT72W0s=
 github.com/moov-io/tumbler v0.0.0-20200617215154-5dcc2086b159/go.mod h1:DygEzjd1S/5WoTOYhDyP3tqXQNae/yRx4Vywy20oA9g=
 github.com/moov-io/tumbler v0.0.0-20200617223608-90d44979500f/go.mod h1:DygEzjd1S/5WoTOYhDyP3tqXQNae/yRx4Vywy20oA9g=
@@ -719,6 +722,7 @@ github.com/prometheus/client_golang v1.7.1 h1:NTGy1Ja9pByO+xAeH/qiWnLrKtr3hJPNja
 github.com/prometheus/client_golang v1.7.1/go.mod h1:PY5Wy2awLA44sXw4AOSfFBetzPP4j5+D6mVACh+pe2M=
 github.com/prometheus/client_golang v1.8.0 h1:zvJNkoCFAnYFNC24FV8nW4JdRJ3GIFcLbg65lL/JDcw=
 github.com/prometheus/client_golang v1.8.0/go.mod h1:O9VU6huf47PktckDQfMTX0Y8tY0/7TSWwj+ITvv0TnM=
+github.com/prometheus/client_golang v1.9.0/go.mod h1:FqZLKOZnGdFAhOK4nqGHa7D66IdsO+O441Eve7ptJDU=
 github.com/prometheus/client_model v0.0.0-20180712105110-5c3871d89910/go.mod h1:MbSGuTsp3dbXC40dX6PRTWyKYBIrTGTE9sqQNg2J8bo=
 github.com/prometheus/client_model v0.0.0-20190115171406-56726106282f/go.mod h1:MbSGuTsp3dbXC40dX6PRTWyKYBIrTGTE9sqQNg2J8bo=
 github.com/prometheus/client_model v0.0.0-20190129233127-fd36f4220a90/go.mod h1:xMI15A0UPsDsEKsMN9yxemIoYk6Tm2C1GtYGdfGttqA=
@@ -738,6 +742,7 @@ github.com/prometheus/common v0.10.0/go.mod h1:Tlit/dnDKsSWFlCLTWaA1cyBgKHSMdTB8
 github.com/prometheus/common v0.11.1/go.mod h1:U+gB1OBLb1lF3O42bTCL+FK18tX9Oar16Clt/msog/s=
 github.com/prometheus/common v0.14.0 h1:RHRyE8UocrbjU+6UvRzwi6HjiDfxrrBU91TtbKzkGp4=
 github.com/prometheus/common v0.14.0/go.mod h1:U+gB1OBLb1lF3O42bTCL+FK18tX9Oar16Clt/msog/s=
+github.com/prometheus/common v0.15.0/go.mod h1:U+gB1OBLb1lF3O42bTCL+FK18tX9Oar16Clt/msog/s=
 github.com/prometheus/procfs v0.0.0-20181005140218-185b4288413d/go.mod h1:c3At6R/oaqEKCNdg8wHV1ftS6bRYblBhIjjI8uT2IGk=
 github.com/prometheus/procfs v0.0.0-20190117184657-bf6a532e95b1/go.mod h1:c3At6R/oaqEKCNdg8wHV1ftS6bRYblBhIjjI8uT2IGk=
 github.com/prometheus/procfs v0.0.0-20190507164030-5867b95ac084/go.mod h1:TjEm7ze935MbeOT/UhFTIMYKhuLP4wbCsTZCD3I8kEA=
@@ -1069,6 +1074,7 @@ golang.org/x/sys v0.0.0-20200930185726-fdedc70b468f/go.mod h1:h1NjWce9XRLGQEsW7w
 golang.org/x/sys v0.0.0-20201013132646-2da7054afaeb/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20201015000850-e3ed0017c211 h1:9UQO31fZ+0aKQOFldThf7BKPMJTiBfWycGh/u3UoO88=
 golang.org/x/sys v0.0.0-20201015000850-e3ed0017c211/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20201214210602-f9fddec55a1e/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/text v0.0.0-20170915032832-14c0d48ead0c/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.1-0.20180807135948-17ff2d5776d2/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
