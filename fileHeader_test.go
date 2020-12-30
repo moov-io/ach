@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -69,76 +70,68 @@ func BenchmarkMockFileHeader(b *testing.B) {
 	}
 }
 
-func TestFileHeader__ImmediateOrigin(t *testing.T) {
-	// From https://github.com/moov-io/ach/issues/510
-	// We should allow a blank space or '1' followed by a 9 digit routing number and 9 digits
-	header := NewFileHeader()
-	header.ImmediateOrigin = " 123456789" // ' ' + routing number
-	if v := header.ImmediateOriginField(); v != " 123456789" {
-		t.Errorf("got %q", v)
-	}
-	header.ImmediateOrigin = "123456789" // 9 digit routing number
-	if v := header.ImmediateOriginField(); v != " 123456789" {
-		t.Errorf("got %q", v)
-	}
-	header.ImmediateOrigin = trimRoutingNumberLeadingZero("0123456789") // 0 + routing number
-	if v := header.ImmediateOriginField(); v != " 123456789" {
-		t.Errorf("got %q", v)
-	}
-	header.ImmediateOrigin = trimRoutingNumberLeadingZero("1123456789") // 1 + routing number
-	if v := header.ImmediateOriginField(); v != " 112345678" {
-		t.Errorf("got %q", v)
-	}
-
-	// Test with BypassOriginValidation
-	header.SetValidation(&ValidateOpts{BypassOriginValidation: true})
-	header.ImmediateOrigin = "1234567899"
-	if v := header.ImmediateOriginField(); v != header.ImmediateOrigin {
-		t.Errorf("got %q", v)
-	}
-}
-
 func TestFileHeader__ImmediateDestination(t *testing.T) {
 	tests := []struct {
-		name                        string
-		destinationNumber           string
-		expected                    string
-		bypassDestinationValidation bool
+		name             string
+		routingNumber    string
+		expected         string
+		bypassValidation bool
 	}{
 		{
-			name:              "no change",
-			destinationNumber: " 123456789",
-			expected:          " 123456789",
+			name:          "no change",
+			routingNumber: " 123456789",
+			expected:      " 123456789",
 		},
 		{
-			name:              "should append a space",
-			destinationNumber: "123456789",
-			expected:          " 123456789",
+			name:          "should append a space",
+			routingNumber: "123456789",
+			expected:      " 123456789",
 		},
 		{
-			name:              "0 + routing number",
-			destinationNumber: trimRoutingNumberLeadingZero("0123456789"),
-			expected:          " 123456789",
+			name:          "0 + routing number",
+			routingNumber: trimRoutingNumberLeadingZero("0123456789"),
+			expected:      " 123456789",
 		},
 		{
-			name:              "1 + routing number",
-			destinationNumber: "1123456789",
-			expected:          " 112345678",
+			name:          "1 + routing number",
+			routingNumber: "1123456789",
+			expected:      " 112345678",
 		},
 		{
-			name:                        "bypass destination validation",
-			destinationNumber:           "1234567899",
-			expected:                    "1234567899",
-			bypassDestinationValidation: true,
+			name:             "bypass validation",
+			routingNumber:    "1234567899",
+			expected:         "1234567899",
+			bypassValidation: true,
 		},
 	}
 
+	// ImmediateOrigin tests
+	// From https://github.com/moov-io/ach/issues/510
+	// We should allow a blank space or '1' followed by a 9 digit routing number and 9 digits
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		name := fmt.Sprintf("%s %s", "origin", tt.name)
+		t.Run(name, func(t *testing.T) {
 			header := NewFileHeader()
-			header.ImmediateDestination = tt.destinationNumber
+			header.ImmediateOrigin = tt.routingNumber
 
-			if tt.bypassDestinationValidation {
+			if tt.bypassValidation {
+				header.SetValidation(&ValidateOpts{BypassOriginValidation: true})
+			}
+
+			if v := header.ImmediateOriginField(); v != tt.expected {
+				t.Errorf("want \"%v\", got \"%v\"", tt.expected, v)
+			}
+		})
+	}
+
+	// ImmediateDestination tests
+	for _, tt := range tests {
+		name := fmt.Sprintf("%s %s", "destination", tt.name)
+		t.Run(name, func(t *testing.T) {
+			header := NewFileHeader()
+			header.ImmediateDestination = tt.routingNumber
+
+			if tt.bypassValidation {
 				header.SetValidation(&ValidateOpts{BypassDestinationValidation: true})
 			}
 
