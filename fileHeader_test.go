@@ -149,7 +149,7 @@ func TestFileHeader__ImmediateDestination(t *testing.T) {
 	}
 }
 
-func Test__trimRoutingNumberLeadingZero(t *testing.T) {
+func TestFileHeader__trimRoutingNumberLeadingZero(t *testing.T) {
 	tests := []struct {
 		input string
 		want  string
