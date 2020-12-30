@@ -623,6 +623,7 @@ github.com/moov-io/paygate v0.9.0-dev1.0.20201022020358-75870ae7acfc h1:JHof9FYs
 github.com/moov-io/paygate v0.9.0-dev1.0.20201022020358-75870ae7acfc/go.mod h1:mutrtSP2mUm22SeynlSr/DWcYXzc2NQgnk4zZmovnAQ=
 github.com/moov-io/paygate v0.9.1 h1:aXtCG7Wqtw7mdXNs6JQjiPC8mt/EsaJN6S/BalarkLk=
 github.com/moov-io/paygate v0.9.1/go.mod h1:RgQLI7w/SlAwg69j+1IPeLBly7425tBFszC9IWTlNho=
+github.com/moov-io/paygate v0.9.2 h1:aYMoo711R/kEaJpSgzphlvjub1rE9GF2cwWdjL6sNCA=
 github.com/moov-io/paygate v0.9.2/go.mod h1:RgQLI7w/SlAwg69j+1IPeLBly7425tBFszC9IWTlNho=
 github.com/moov-io/tumbler v0.0.0-20200617212523-2a85ad22d0a9/go.mod h1:NmMeFW5pxs9+UXWRdykFOBq0vywh1s//VPzReT72W0s=
 github.com/moov-io/tumbler v0.0.0-20200617215154-5dcc2086b159/go.mod h1:DygEzjd1S/5WoTOYhDyP3tqXQNae/yRx4Vywy20oA9g=

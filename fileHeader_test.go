@@ -81,11 +81,11 @@ func TestFileHeader__ImmediateOrigin(t *testing.T) {
 	if v := header.ImmediateOriginField(); v != " 123456789" {
 		t.Errorf("got %q", v)
 	}
-	header.ImmediateOrigin = trimImmediateOriginLeadingZero("0123456789") // 0 + routing number
+	header.ImmediateOrigin = trimRoutingNumberLeadingZero("0123456789") // 0 + routing number
 	if v := header.ImmediateOriginField(); v != " 123456789" {
 		t.Errorf("got %q", v)
 	}
-	header.ImmediateOrigin = trimImmediateOriginLeadingZero("1123456789") // 1 + routing number
+	header.ImmediateOrigin = trimRoutingNumberLeadingZero("1123456789") // 1 + routing number
 	if v := header.ImmediateOriginField(); v != " 112345678" {
 		t.Errorf("got %q", v)
 	}
@@ -96,17 +96,81 @@ func TestFileHeader__ImmediateOrigin(t *testing.T) {
 	if v := header.ImmediateOriginField(); v != header.ImmediateOrigin {
 		t.Errorf("got %q", v)
 	}
+}
 
-	// make sure our trim works that we hook into FileHeader.Parse(..)
-	if v := trimImmediateOriginLeadingZero("0123456789"); v != "123456789" {
-		t.Errorf("got %q", v)
+func TestFileHeader__ImmediateDestination(t *testing.T) {
+	tests := []struct {
+		name                        string
+		destinationNumber           string
+		expected                    string
+		bypassDestinationValidation bool
+	}{
+		{
+			name:              "no change",
+			destinationNumber: " 123456789",
+			expected:          " 123456789",
+		},
+		{
+			name:              "should append a space",
+			destinationNumber: "123456789",
+			expected:          " 123456789",
+		},
+		{
+			name:              "0 + routing number",
+			destinationNumber: trimRoutingNumberLeadingZero("0123456789"),
+			expected:          " 123456789",
+		},
+		{
+			name:              "1 + routing number",
+			destinationNumber: "1123456789",
+			expected:          " 112345678",
+		},
+		{
+			name:                        "bypass destination validation",
+			destinationNumber:           "1234567899",
+			expected:                    "1234567899",
+			bypassDestinationValidation: true,
+		},
 	}
-	if v := trimImmediateOriginLeadingZero("0012345678"); v != "012345678" {
-		t.Errorf("got %q", v)
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			header := NewFileHeader()
+			header.ImmediateDestination = tt.destinationNumber
+
+			if tt.bypassDestinationValidation {
+				header.SetValidation(&ValidateOpts{BypassDestinationValidation: true})
+			}
+
+			if v := header.ImmediateDestinationField(); v != tt.expected {
+				t.Errorf("want \"%v\", got \"%v\"", tt.expected, v)
+			}
+		})
 	}
-	zeros := strings.Repeat("0", 10)
-	if v := trimImmediateOriginLeadingZero(zeros); v != zeros {
-		t.Errorf("got %q", v)
+}
+
+func TestFileHeader__trimRoutingNumberLeadingZero(t *testing.T) {
+	tests := []struct {
+		input string
+		want  string
+	}{
+		{
+			input: "0123456789",
+			want:  "123456789",
+		},
+		{
+			input: "0012345678",
+			want:  "012345678",
+		},
+		{
+			input: strings.Repeat("0", 10),
+			want:  strings.Repeat("0", 10),
+		},
+	}
+	for _, tt := range tests {
+		if got := trimRoutingNumberLeadingZero(tt.input); got != tt.want {
+			t.Errorf("want \"%v\", got \"%v\"", tt.want, got)
+		}
 	}
 }
 

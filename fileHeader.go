@@ -130,9 +130,9 @@ func (fh *FileHeader) Parse(record string) {
 	// (2-3) Always "01"
 	fh.priorityCode = "01"
 	// (4-13) A blank space followed by your ODFI's routing number. For example: " 121140399"
-	fh.ImmediateDestination = fh.parseStringField(record[3:13])
+	fh.ImmediateDestination = trimRoutingNumberLeadingZero(fh.parseStringField(record[3:13]))
 	// (14-23) A 10-digit number assigned to you by the ODFI once they approve you to originate ACH files through them
-	fh.ImmediateOrigin = trimImmediateOriginLeadingZero(fh.parseStringField(record[13:23]))
+	fh.ImmediateOrigin = trimRoutingNumberLeadingZero(fh.parseStringField(record[13:23]))
 	// 24-29 Today's date in YYMMDD format
 	// must be after today's date.
 	fh.FileCreationDate = fh.validateSimpleDate(record[23:29])
@@ -142,21 +142,21 @@ func (fh *FileHeader) Parse(record string) {
 	fh.FileIDModifier = record[33:34]
 	// 35-37 always "094"
 	fh.recordSize = "094"
-	//38-39 always "10"
+	// 38-39 always "10"
 	fh.blockingFactor = "10"
-	//40 always "1"
+	// 40 always "1"
 	fh.formatCode = "1"
-	//41-63 The name of the ODFI. example "SILICON VALLEY BANK    "
+	// 41-63 The name of the ODFI. example "SILICON VALLEY BANK    "
 	fh.ImmediateDestinationName = strings.TrimSpace(record[40:63])
-	//64-86 ACH operator or sending point that is sending the file
+	// 64-86 ACH operator or sending point that is sending the file
 	fh.ImmediateOriginName = strings.TrimSpace(record[63:86])
-	//97-94 Optional field that may be used to describe the ACH file for internal accounting purposes
+	// 97-94 Optional field that may be used to describe the ACH file for internal accounting purposes
 	fh.ReferenceCode = strings.TrimSpace(record[86:94])
 }
 
-func trimImmediateOriginLeadingZero(s string) string {
+func trimRoutingNumberLeadingZero(s string) string {
 	if utf8.RuneCountInString(s) == 10 && s[0] == '0' && s != "0000000000" {
-		// trim off a leading 0 as ImmediateOriginField() will pad it back
+		// trim off a leading 0 as ImmediateOriginField() or ImmediateDestinationField() will pad it back
 		return strings.TrimSpace(s[1:])
 	}
 	return strings.TrimSpace(s)
@@ -294,7 +294,13 @@ func (fh *FileHeader) fieldInclusion() error {
 
 // ImmediateDestinationField gets the immediate destination number with zero padding
 func (fh *FileHeader) ImmediateDestinationField() string {
-	return " " + fh.stringField(fh.ImmediateDestination, 9)
+	if fh.ImmediateDestination == "" {
+		return strings.Repeat(" ", 10)
+	}
+	if fh.validateOpts != nil && fh.validateOpts.BypassDestinationValidation {
+		return fh.stringField(strings.TrimSpace(fh.ImmediateDestination), 10)
+	}
+	return " " + fh.stringField(strings.TrimSpace(fh.ImmediateDestination), 9)
 }
 
 // ImmediateOriginField gets the immediate origin number with 0 padding
