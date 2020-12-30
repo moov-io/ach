@@ -13,11 +13,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/moov-io/ach"
 	"github.com/moov-io/base/admin"
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/base/http/bind"
-	"github.com/moov-io/paygate/pkg/util"
+	"github.com/moov-io/base/strx"
+
+	"github.com/moov-io/ach"
 
 	"github.com/gorilla/mux"
 )
@@ -61,7 +62,7 @@ func main() {
 	addPingRoute(router)
 
 	// Register our assets route
-	assetsPath := util.Or(os.Getenv("ASSETS_PATH"), filepath.Join("cmd", "webui", "assets"))
+	assetsPath := strx.Or(os.Getenv("ASSETS_PATH"), filepath.Join("cmd", "webui", "assets"))
 	log.Printf("serving assets from %s", assetsPath)
 	addAssetsPath(router, assetsPath)
 

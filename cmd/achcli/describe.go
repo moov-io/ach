@@ -9,9 +9,9 @@ import (
 	"os"
 	"strings"
 	"text/tabwriter"
+	"unicode/utf8"
 
 	"github.com/moov-io/ach"
-	"github.com/moov-io/customers/pkg/secrets/mask"
 )
 
 func dumpFiles(paths []string) error {
@@ -84,7 +84,7 @@ func dumpFile(file *ach.File) {
 			e := entries[j]
 			accountNumber := e.DFIAccountNumber
 			if *flagMask {
-				accountNumber = mask.AccountNumber(strings.TrimSpace(accountNumber))
+				accountNumber = maskAccountNumber(strings.TrimSpace(accountNumber))
 			}
 			fmt.Fprintf(w, "    %d\t%s\t%s\t%d\t%s\t%s\t%s\n", e.TransactionCode, e.RDFIIdentification, accountNumber, e.Amount, e.IndividualName, e.TraceNumber, e.Category)
 
@@ -161,4 +161,12 @@ func readACHFile(path string) (*ach.File, error) {
 
 	f, err := ach.NewReader(fd).Read()
 	return &f, err
+}
+
+func maskAccountNumber(s string) string {
+	length := utf8.RuneCountInString(s)
+	if length < 5 {
+		return "****" // too short, we can't keep anything
+	}
+	return strings.Repeat("*", length-4) + s[length-4:]
 }
