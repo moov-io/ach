@@ -138,11 +138,13 @@ func (r *Reader) Read() (File, error) {
 		lineLength := len(line)
 
 		switch {
-		case r.lineNum == 1 && lineLength > RecordLength && lineLength%RecordLength == 0:
-			if err := r.processFixedWidthFile(&line); err != nil {
+		case r.lineNum == 1 && lineLength > RecordLength:
+			extraChars := lineLength % RecordLength
+			if extraChars != 0 {
+				r.errors.Add(fmt.Errorf("%d extra characters in ACH file", extraChars))
+			} else if err := r.processFixedWidthFile(&line); err != nil {
 				r.errors.Add(err)
 			}
-
 		case lineLength != RecordLength:
 			if lineLength > RecordLength {
 				line = trimSpacesFromLongLine(line)

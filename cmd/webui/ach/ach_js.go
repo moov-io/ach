@@ -46,8 +46,8 @@ func jsonWrapper() js.Func {
 
 		parsed, err := parseContents(inputJSON)
 		if err != nil {
-			msg := "unable to parse ach file"
-			fmt.Print(msg)
+			msg := fmt.Sprintf("unable to parse ach file: %v", err)
+			fmt.Println(msg)
 			return msg
 		}
 		pretty, err := prettyJson(parsed)
