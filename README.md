@@ -8,7 +8,7 @@ moov-io/ach
 
 ACH implements a reader, writer, and validator for Automated Clearing House ([ACH](https://en.wikipedia.org/wiki/Automated_Clearing_House)) files. ACH is the primary method of electronic money movement throughout the United States. The HTTP server is available in a [Docker image](#docker) and the Go package `github.com/moov-io/ach` is available.
 
-If you're looking for a complete implementation of ACH origination (file creation), OFAC checks, micro-deposits, SFTP uploading, and other features the [moov-io/paygate](https://github.com/moov-io/paygate) project aims to be a full system for ACH transfers. Otherwise check out our article on [How and When to use the Moov ACH Library](https://moov.io/blog/tutorials/how-and-when-to-use-the-moov-ach-library/).
+If you're looking for a complete implementation of ACH origination (file creation), OFAC checks, micro-deposits, SFTP uploading, and other features the [moov-io/paygate](https://github.com/moov-io/paygate) project aims to be a full system for ACH transfers. Otherwise, check out our article on [How and When to use the Moov ACH Library](https://moov.io/blog/tutorials/how-and-when-to-use-the-moov-ach-library/).
 
 Docs: [Project](https://moov-io.github.io/ach/) | [API Endpoints](https://moov-io.github.io/ach/api/)
 
@@ -22,7 +22,7 @@ The ACH project implements an HTTP server and Go library for creating and modify
 
 ### Docker
 
-We publish a [public Docker image `moov/ach`](https://hub.docker.com/r/moov/ach/) from Docker Hub or use this repository. No configuration is required to serve on `:8080` and metrics at `:9090/metrics` in Prometheus format. We also have docker images for [OpenShift](https://quay.io/repository/moov/ach?tab=tags) published as `quay.io/moov/ach`.
+We publish a [public Docker image `moov/ach`](https://hub.docker.com/r/moov/ach/) from Docker Hub or use this repository. No configuration is required to serve on `:8080` and metrics at `:9090/metrics` in Prometheus format. We also have Docker images for [OpenShift](https://quay.io/repository/moov/ach?tab=tags) published as `quay.io/moov/ach`.
 
 Pull & start the Docker image:
 ```
@@ -30,7 +30,7 @@ docker pull moov/ach:latest
 docker run -p 8080:8080 -p 9090:9090 moov/ach:latest
 ```
 
-List files stored in-memory
+List files stored in-memory:
 ```
 curl localhost:8080/files
 ```
@@ -38,7 +38,7 @@ curl localhost:8080/files
 {"files":[],"error":null}
 ```
 
-Create a file on the HTTP server
+Create a file on the HTTP server:
 ```
 curl -XPOST --data-binary "@./test/testdata/ppd-debit.ach" http://localhost:8080/files/create
 ```
@@ -46,7 +46,7 @@ curl -XPOST --data-binary "@./test/testdata/ppd-debit.ach" http://localhost:8080
 {"id":"<YOUR-UNIQUE-FILE-ID>","error":null}
 ```
 
-Read the ACH file (in JSON form)
+Read the ACH file (in JSON form):
 ```
 curl http://localhost:8080/files/<YOUR-UNIQUE-FILE-ID>
 ```
@@ -57,12 +57,12 @@ curl http://localhost:8080/files/<YOUR-UNIQUE-FILE-ID>
 ### Google Cloud Run Button
 To get started in a hosted environment you can deploy this project to the Google Cloud Platform.
 
-From your [Google Cloud dashboard](https://console.cloud.google.com/home/dashboard) create a new project and call it
+From your [Google Cloud dashboard](https://console.cloud.google.com/home/dashboard) create a new project and call it:
 ```
 moov-ach-demo
 ```
 
-Click the button below to deploy this project to Google Cloud
+Click the button below to deploy this project to Google Cloud.
 
 [![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run/?git_repo=https://github.com/moov-io/ach&revision=master)
 
@@ -106,12 +106,12 @@ Connect to the web preview (e.g. `https://YOUR-ACH-APP-URL.a.run.app:8080/files`
 </details>
 
 
-In the cloud shell you should be prompted with
+In the cloud shell you should be prompted with:
 ```
 Choose a project to deploy this application:
 ```
 
-Using the arrow keys select
+Using the arrow keys select:
 ```
 moov-ach-demo
 ```
@@ -129,36 +129,45 @@ Upon a successful build you will be given a URL where the API has been deployed:
 https://YOUR-ACH-APP-URL.a.run.app
 ```
 
-From the cloud shell you need to cd into the ```ach``` folder
+From the cloud shell you need to cd into the `ach` folder:
 ```
 cd ach
 ```
 
+Now you can list files stored in-memory:
+```
+curl https://YOUR-ACH-APP-URL.a.run.app/files
+```
+You should get this response:
+```
+{"files":[],"error":null}
+```
 
-Now you can create a file on the server:
+
+Create a file on the server:
 ```
 curl -XPOST --data-binary "@./test/testdata/ppd-debit.ach" https://YOUR-ACH-APP-URL.a.run.app/files/create
 ```
 You should get this response:
 ```
-{"id":"c58b75610ac-YOUR-UNIQUE-FILE-ID-9239bf06b93","error":null}
+{"id":"<YOUR-UNIQUE-FILE-ID>","error":null}
 ```
 
 
-Finally read the contents of the file you've just posted:
+Finally, read the contents of the file you've just posted:
 ```
-curl https://YOUR-ACH-APP-URL.a.run.app/files/c58b75610ac-YOUR-UNIQUE-FILE-ID-9239bf06b93
+curl https://YOUR-ACH-APP-URL.a.run.app/files/<YOUR-UNIQUE-FILE-ID>
 ```
 
 You should get this response:
 ```
-{"file":{"id":"c58b75610ac-YOUR-UNIQUE-FILE-ID-9239bf06b93","fileHeader":{"id":"...","immediateDestination":"231380104","immediateOrigin":"121042882", ...
+{"file":{"id":"<YOUR-UNIQUE-FILE-ID>","fileHeader":{"id":"...","immediateDestination":"231380104","immediateOrigin":"121042882", ...
 ```
 
 
-### Go library
+### Go Library
 
-The package [`github.com/moov-io/ach`](https://pkg.go.dev/github.com/moov-io/ach) offers a Go based ACH file reader and writer. To get started checkout a specific example:
+The package [`github.com/moov-io/ach`](https://pkg.go.dev/github.com/moov-io/ach) offers a Go-based ACH file reader and writer. To get started, check out a specific example:
 
 <details>
 <summary>Supported Standard Entry Class (SEC) codes</summary>
@@ -203,13 +212,13 @@ The package [`github.com/moov-io/ach`](https://pkg.go.dev/github.com/moov-io/ach
 
 ### Other Languages
 
-Below are some SDK's generated from the API documentation:
+Below are some SDKs generated from the API documentation:
 
 - [Node SDK](https://www.npmjs.com/package/ach-node-sdk) | [GitHub](https://github.com/moov-io/ach-node-sdk)
 
 ### HTTP API
 
-The package [`github.com/moov-io/ach/server`](https://pkg.go.dev/github.com/moov-io/ach/server) offers a HTTP and JSON API for creating and editing files. If you're using Go the `ach.File` type can be used, otherwise just send properly formatted JSON. We have an [example JSON file](test/testdata/ppd-valid.json), but each SEC type will generate different JSON.
+The package [`github.com/moov-io/ach/server`](https://pkg.go.dev/github.com/moov-io/ach/server) offers an HTTP and JSON API for creating and editing files. If you're using Go the `ach.File` type can be used, otherwise just send properly formatted JSON. We have an [example JSON file](test/testdata/ppd-valid.json), but each SEC type will generate different JSON.
 
 Examples: [Go](examples/http/main.go) | [Ruby](https://github.com/moov-io/ruby-ach-demo)
 
@@ -250,13 +259,13 @@ Describing ACH file 'test/testdata/ppd-debit.ach'
 ## Guides
 
 - [ACH File Structure](./docs/file-structure.md)
-- [Balaced offset files](./docs/balanced-offset.md)
+- [Balanced offset files](./docs/balanced-offset.md)
 - [Merging ACH files](./docs/merging-files.md)
 - [ACH Server metrics](./docs/metrics.md)
 
 ### From Source
 
-This project uses [Go Modules](https://github.com/golang/go/wiki/Modules) and uses Go 1.14 or higher. See [Golang's install instructions](https://golang.org/doc/install) for help setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/ach/releases/latest) as well. We highly recommend you use a tagged release for production.
+This project uses [Go Modules](https://github.com/golang/go/wiki/Modules) and Go 1.14 or higher. See [Golang's install instructions](https://golang.org/doc/install) for help in setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/ach/releases/latest) as well. We highly recommend you use a tagged release for production.
 
 ```
 $ git@github.com:moov-io/ach.git
@@ -279,11 +288,11 @@ $ go doc github.com/moov-io/ach BatchHeader
 | `HTTPS_KEY_FILE`  | Filepath of a private key matching the leaf certificate from `HTTPS_CERT_FILE`. | Empty |
 
 
-Note: By design ACH **does not persist** (save) any data about the files, batches or entry details created. The only storage occurs in memory of the process and upon restart ACH will have no files, batches, or data saved. Also, no in memory encryption of the data is performed.
+Note: By design ACH **does not persist** (save) any data about the files, batches, or entry details created. The only storage occurs in memory of the process and upon restart ACH will have no files, batches, or data saved. Also, no in memory encryption of the data is performed.
 
 ## Getting Help
 
-If you have ACH specific questions NACHA (National Automated Clearing House Association) has their [complete specification](docs/2013-Corporate-Rules-and-Guidelines.pdf) for all file formats and message types.
+If you have ACH-specific questions, NACHA (National Automated Clearing House Association) has their [complete specification](docs/2013-Corporate-Rules-and-Guidelines.pdf) for all file formats and message types.
 
  channel | info
  ------- | -------
@@ -296,13 +305,13 @@ Twitter [@moov_io](https://twitter.com/moov_io)	| You can follow Moov.IO's Twitt
 ## Supported and Tested Platforms
 
 - 64-bit Linux (Ubuntu, Debian), macOS, and Windows
-- Rasberry Pi
+- Raspberry Pi
 
 Note: 32-bit platforms have known issues and are not supported.
 
 ## Contributing
 
-Yes please! Please review our [Contributing guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) to get started! Checkout our [issues for first time contributors](https://github.com/moov-io/ach/contribute) for something to help out with.
+Yes please! Please review our [Contributing guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) to get started! Check out our [issues for first time contributors](https://github.com/moov-io/ach/contribute) for something to help out with.
 
 This project uses [Go Modules](https://github.com/golang/go/wiki/Modules) and uses Go 1.14 or higher. See [Golang's install instructions](https://golang.org/doc/install) for help setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/ach/releases/latest) as well. We highly recommend you use a tagged release for production.
 
@@ -316,4 +325,4 @@ We currently run fuzzing over ACH in the form of a [`moov/achfuzz`](https://hub.
 
 ## License
 
-Apache License 2.0 See [LICENSE](LICENSE) for details.
+Apache License 2.0 - See [LICENSE](LICENSE) for details.
