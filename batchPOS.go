@@ -63,17 +63,7 @@ func (batch *BatchPOS) Validate() error {
 		return batch.Error("StandardEntryClassCode", ErrBatchSECType, POS)
 	}
 
-	// POS detail entries can only be a debit, ServiceClassCode must allow debits
-	switch batch.Header.ServiceClassCode {
-	case MixedDebitsAndCredits, CreditsOnly:
-		return batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode)
-	}
-
 	for _, entry := range batch.Entries {
-		// POS detail entries must be a debit
-		if entry.CreditOrDebit() != "D" {
-			return batch.Error("TransactionCode", ErrBatchDebitOnly, entry.TransactionCode)
-		}
 		if err := entry.isCardTransactionType(entry.DiscretionaryData); err != nil {
 			return batch.Error("CardTransactionType", ErrBatchInvalidCardTransactionType, entry.DiscretionaryData)
 		}
