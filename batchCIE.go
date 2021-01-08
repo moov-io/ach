@@ -66,9 +66,9 @@ func (batch *BatchCIE) Validate() error {
 		if entry.CreditOrDebit() != "C" {
 			return batch.Error("TransactionCode", ErrBatchDebitOnly, entry.TransactionCode)
 		}
-		// CIE must have one Addenda05 record
-		if len(entry.Addenda05) != 1 {
-			return batch.Error("AddendaCount", NewErrBatchRequiredAddendaCount(len(entry.Addenda05), 1))
+		// CIE must have a maximum of one Addenda05 record
+		if len(entry.Addenda05) > 1 {
+			return batch.Error("AddendaCount", NewErrBatchAddendaCount(len(entry.Addenda05), 1))
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {
