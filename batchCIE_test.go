@@ -248,7 +248,7 @@ func testBatchCIEAddendaCount(t testing.TB) {
 	mockBatch := mockBatchCIE()
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Create()
-	if !base.Match(err, NewErrBatchRequiredAddendaCount(2, 1)) {
+	if !base.Match(err, NewErrBatchAddendaCount(2, 1)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -271,7 +271,7 @@ func testBatchCIEAddendaCountZero(t testing.TB) {
 	mockBatch := NewBatchCIE(mockBatchCIEHeader())
 	mockBatch.AddEntry(mockCIEEntryDetail())
 	err := mockBatch.Create()
-	if !base.Match(err, NewErrBatchRequiredAddendaCount(0, 1)) {
+	if !base.Match(err, nil) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -296,7 +296,7 @@ func testBatchCIEInvalidAddendum(t testing.TB) {
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	err := mockBatch.Create()
-	if !base.Match(err, NewErrBatchRequiredAddendaCount(0, 1)) {
+	if !base.Match(err, ErrBatchAddendaCategory) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -422,7 +422,7 @@ func TestBatchCIEAddenda(t *testing.T) {
 	// mock batch already has one addenda. Creating two addenda should error
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Create()
-	if !base.Match(err, NewErrBatchRequiredAddendaCount(2, 1)) {
+	if !base.Match(err, NewErrBatchAddendaCount(2, 1)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
