@@ -23,6 +23,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/moov-io/base"
 )
@@ -135,7 +136,7 @@ func (r *Reader) Read() (File, error) {
 			return r.File, r.errors
 		}
 
-		lineLength := len(line)
+		lineLength := utf8.RuneCountInString(line)
 
 		switch {
 		case r.lineNum == 1 && lineLength > RecordLength && lineLength%RecordLength == 0:
