@@ -119,3 +119,42 @@ func TestValidators__validateSimpleTime(t *testing.T) {
 		}
 	}
 }
+
+// Ensure that ASCII characters from 0x20 to 0x7E are considered alphanumeric.
+func TestValidators__isAlphanumeric(t *testing.T) {
+	v := validator{}
+
+	for i := 0; i < 255; i++ {
+		err := v.isAlphanumeric(string(rune(i)))
+
+		if i < 0x20 || i > 0x7E {
+			if err == nil {
+				t.Errorf("expected rune %x to be non-alphanumeric", i)
+			}
+		} else {
+			if err != nil {
+				t.Errorf("expected rune %x to be alphanumeric: %v", i, err)
+			}
+		}
+	}
+}
+
+// Ensure that ASCII characters from 0x20 to 0x60 and 0x7B to 0x7E are considered upper case alphanumeric.
+func TestValidators__isUpperAlphanumeric(t *testing.T) {
+	v := validator{}
+
+	for i := 0; i < 255; i++ {
+		chr := string(rune(i))
+		err := v.isUpperAlphanumeric(chr)
+
+		if i < 0x20 || i > 0x7E || (i > 0x60 && i < 0x7B) {
+			if err == nil {
+				t.Errorf("expected rune %x (%s) to be non-alphanumeric", i, chr)
+			}
+		} else {
+			if err != nil {
+				t.Errorf("expected rune %x (%s) to be alphanumeric: %v", i, chr, err)
+			}
+		}
+	}
+}
