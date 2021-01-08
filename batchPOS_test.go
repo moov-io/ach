@@ -50,12 +50,49 @@ func mockPOSEntryDetail() *EntryDetail {
 	return entry
 }
 
+// mockPOSEntryDetailCredit creates a BatchPOS EntryDetail with a credit entry
+func mockPOSEntryDetailCredit() *EntryDetail {
+	entry := NewEntryDetail()
+	entry.TransactionCode = CheckingCredit
+	entry.SetRDFI("231380104")
+	entry.DFIAccountNumber = "744-5678-99"
+	entry.Amount = 25000
+	entry.IdentificationNumber = "45689033"
+	entry.IndividualName = "Wade Arnold"
+	entry.SetTraceNumber(mockBatchPOSHeader().ODFIIdentification, 2)
+	entry.DiscretionaryData = "01"
+	entry.Category = CategoryForward
+	return entry
+}
+
 // mockBatchPOS creates a BatchPOS
 func mockBatchPOS() *BatchPOS {
 	mockBatch := NewBatchPOS(mockBatchPOSHeader())
 	mockBatch.AddEntry(mockPOSEntryDetail())
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
+	if err := mockBatch.Create(); err != nil {
+		panic(err)
+	}
+	return mockBatch
+}
+
+// mockBatchPOSMixedDebitsAndCredits creates a BatchPOS with mixed debits and credits
+func mockBatchPOSMixedDebitsAndCredits() *BatchPOS {
+	bh := mockBatchPOSHeader()
+	bh.ServiceClassCode = MixedDebitsAndCredits
+
+	mockBatch := NewBatchPOS(bh)
+	mockBatch.AddEntry(mockPOSEntryDetail())
+	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
+
+	mockBatch.AddEntry(mockPOSEntryDetailCredit())
+	mockBatch.GetEntries()[1].Addenda02 = mockAddenda02()
+	mockBatch.Entries[1].AddendaRecordIndicator = 1
+
+	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
+
 	if err := mockBatch.Create(); err != nil {
 		panic(err)
 	}
@@ -217,29 +254,6 @@ func BenchmarkBatchPOSAutomatedAccountingAdvices(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchPOSAutomatedAccountingAdvices(b)
-	}
-}
-
-// testBatchPOSTransactionCode validates BatchPOS TransactionCode is not a credit
-func testBatchPOSTransactionCode(t testing.TB) {
-	mockBatch := mockBatchPOS()
-	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
-	err := mockBatch.Create()
-	if !base.Match(err, ErrBatchDebitOnly) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestBatchPOSTransactionCode tests validating BatchPOS TransactionCode is not a credit
-func TestBatchPOSTransactionCode(t *testing.T) {
-	testBatchPOSTransactionCode(t)
-}
-
-// BenchmarkBatchPOSTransactionCode benchmarks validating BatchPOS TransactionCode is not a credit
-func BenchmarkBatchPOSTransactionCode(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testBatchPOSTransactionCode(b)
 	}
 }
 
@@ -472,5 +486,34 @@ func TestBatchPOSTerminalState(t *testing.T) {
 	err := mockBatch.Create()
 	if !base.Match(err, ErrValidState) {
 		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// testBatchPOSMixedDebitsAndCredits validates BatchPOS with mixed debits and credits
+func testBatchPOSMixedDebitsAndCredits(t testing.TB) {
+	mockBatch := mockBatchPOSMixedDebitsAndCredits()
+	err := mockBatch.Create()
+
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	err = mockBatch.Validate()
+
+	if !base.Match(err, nil) {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestBatchPOSMixedDebitsAndCredits tests validating BatchPOS with mixed debits and credits
+func TestBatchPOSMixedDebitsAndCredits(t *testing.T) {
+	testBatchPOSMixedDebitsAndCredits(t)
+}
+
+// BenchmarkBatchPOSMixedDebitsAndCredits benchmarks validating BatchPOS with mixed debits and credits
+func BenchmarkBatchPOSMixedDebitsAndCredits(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		testBatchPOSMixedDebitsAndCredits(b)
 	}
 }
