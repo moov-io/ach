@@ -36,11 +36,13 @@ If you're looking for a complete implementation of ACH origination (file creatio
   - [Go](#go-library)
   - [HTTP API](#http-api)
   - [Command Line Utility](#command-line)
+  - [In-Browser Parser](#in-browser-ach-file-parser)
   - [Other Languages](#other-languages)
 - [Installation and Configuration](#installation-and-configuration)
 - [Getting Help](#getting-help)
 - [Supported and Tested Platforms](#supported-and-tested-platforms)
 - [Contributing](#contributing)
+- [Related Projects](#related-projects)
 
 
 ## Project Status
@@ -352,6 +354,11 @@ To make a release of ach simply open a pull request with `CHANGELOG.md` and `ver
 ### Fuzzing
 
 We currently run fuzzing over ACH in the form of a [`moov/achfuzz`](https://hub.docker.com/r/moov/achfuzz) Docker image. You can [read more](./test/fuzz-reader/README.md) or run the image and report crasher examples to [`security@moov.io`](mailto:security@moov.io). Thanks!
+
+
+## Related Projects
+As part of Moov's initiative to offer open source fintech infrastructure, we have a large collection of active projects you may find useful. Among many others, [Moov Watchman](https://github.com/moov-io/watchman) is actively being used in many production environments. Also, [FEDWire](https://github.com/moov-io/wire), [Image Cash Letter](https://github.com/moov-io/imagecashletter), and [Metro 2](https://github.com/moov-io/metro2) provide similar functions to this one.
+
 
 ## License
 
