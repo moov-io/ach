@@ -321,7 +321,6 @@ func testRecordTypeUnknown(t testing.TB) {
 	var line = "301 076401251 0764012510807291511A094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
-
 	if !base.Has(err, NewErrUnknownRecordType("3")) {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1821,21 +1820,6 @@ func TestReader__partial(t *testing.T) {
 	entries = file.Batches[1].GetEntries()
 	if len(entries) != 3 {
 		t.Errorf("got %d entries", len(entries))
-	}
-}
-
-func TestReader__OneLineFile(t *testing.T) {
-	f, err := os.Open(filepath.Join("test", "testdata", "ppd-debit.ach"))
-	if err != nil {
-		t.Errorf("%T: %s", err, err)
-	}
-	defer f.Close()
-	r := NewReader(f)
-	if _, err := r.Read(); err != nil {
-		t.Errorf("%T: %s", err, err)
-	}
-	if err = r.File.Validate(); err != nil {
-		t.Errorf("%T: %s", err, err)
 	}
 }
 
