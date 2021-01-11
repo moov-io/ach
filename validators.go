@@ -27,8 +27,10 @@ import (
 )
 
 var (
-	upperAlphanumericRegex = regexp.MustCompile(`[^ A-Z0-9!"#$%&'()*+,-.\\/:;<>=?@\[\]^_{}|~]+`)
-	alphanumericRegex      = regexp.MustCompile(`[^ \w!"#$%&'()*+,-.\\/:;<>=?@\[\]^_{}|~]+`)
+	upperAlphanumericRegex = regexp.MustCompile(fmt.Sprintf(
+		`[^ A-Z0-9!"#$%%&'()*+,-.\\/:;<>=?@\[\]^_{}|~%s]+`, "`"))
+	alphanumericRegex = regexp.MustCompile(fmt.Sprintf(
+		`[^ \w!"#$%%&'()*+,-.\\/:;<>=?@\[\]^_{}|~%s]+`, "`"))
 )
 
 // validator is common validation and formatting of golang types to ach type strings
