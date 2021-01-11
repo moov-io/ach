@@ -29,6 +29,23 @@ ACH implements a reader, writer, and validator for Automated Clearing House ([AC
 
 If you're looking for a complete implementation of ACH origination (file creation), OFAC checks, micro-deposits, SFTP uploading, and other features the [moov-io/paygate](https://github.com/moov-io/paygate) project aims to be a full system for ACH transfers. Otherwise, check out our article on [How and When to use the Moov ACH Library](https://moov.io/blog/tutorials/how-and-when-to-use-the-moov-ach-library/).
 
+---
+
+## Table of Contents
+- [Project Status](#project-status)
+- [Usage](#usage)
+  - [Docker](#docker)
+  - [Google Cloud](#google-cloud-run-button)
+  - [Go](#go-library)
+  - [HTTP API](#http-api)
+  - [Command Line Utility](#command-line)
+  - [Other Languages](#other-languages)
+- [Installation and Configuration](#installation-and-configuration)
+- [Getting Help](#getting-help)
+- [Supported and Tested Platforms](#supported-and-tested-platforms)
+- [Contributing](#contributing)
+
+
 ## Project Status
 
 Moov ACH is actively used in multiple production environments. Please star the project if you are interested in its progress. The project supports generating and parsing all Standard Entry Class (SEC) codes. If you have layers above ACH to simplify tasks, perform business operations, or found bugs we would appreciate an issue or pull request. Thanks!
@@ -228,12 +245,6 @@ The package [`github.com/moov-io/ach`](https://pkg.go.dev/github.com/moov-io/ach
 
 </details>
 
-### Other Languages
-
-Below are some SDKs generated from the API documentation:
-
-- [Node SDK](https://www.npmjs.com/package/ach-node-sdk) | [GitHub](https://github.com/moov-io/ach-node-sdk)
-
 ### HTTP API
 
 The package [`github.com/moov-io/ach/server`](https://pkg.go.dev/github.com/moov-io/ach/server) offers an HTTP and JSON API for creating and editing files. If you're using Go the `ach.File` type can be used, otherwise just send properly formatted JSON. We have an [example JSON file](test/testdata/ppd-valid.json), but each SEC type will generate different JSON.
@@ -268,18 +279,20 @@ Describing ACH file 'test/testdata/ppd-debit.ach'
   1           1           1                  100000000         0
 ```
 
-## Getting Started
+### Other Languages
 
-- [Running ACH Server](./docs/README.md#running-moov-ach-server)
+Below are some SDKs generated from the API documentation:
+
+- [Node SDK](https://www.npmjs.com/package/ach-node-sdk) | [GitHub](https://github.com/moov-io/ach-node-sdk)
+
+## Installation and Configuration
+
 - [Intro to ACH](./docs/intro.md)
 - [Create an ACH File](./docs/create-file.md)
-
-## Guides
-
 - [ACH File Structure](./docs/file-structure.md)
-- [Balanced offset files](./docs/balanced-offset.md)
-- [Merging ACH files](./docs/merging-files.md)
-- [ACH Server metrics](./docs/metrics.md)
+- [Balanced Offset Files](./docs/balanced-offset.md)
+- [Merging ACH Files](./docs/merging-files.md)
+- [ACH Server Metrics](./docs/metrics.md)
 
 ### From Source
 
