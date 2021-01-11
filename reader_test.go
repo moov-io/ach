@@ -499,7 +499,7 @@ func BenchmarkFileFileHeaderErr(b *testing.B) {
 // testFileBatchHeaderErr validates error flows back from the parser
 func testFileBatchHeaderErr(t testing.TB) {
 	bh := mockBatchHeader()
-	// bh.ODFIIdentification = 0
+	//bh.ODFIIdentification = 0
 	bh.ODFIIdentification = ""
 	r := NewReader(strings.NewReader(bh.String()))
 	_, err := r.Read()
