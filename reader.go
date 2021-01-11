@@ -141,8 +141,13 @@ func (r *Reader) Read() (File, error) {
 		case r.lineNum == 1 && lineLength > RecordLength:
 			extraChars := lineLength % RecordLength
 			if extraChars != 0 {
-				r.errors.Add(r.parseError(NewRecordWrongLengthErr(lineLength)))
-				r.errors.Add(fmt.Errorf("%d extra characters in ACH file", extraChars))
+				err := fmt.Errorf(
+					"%d extra character(s) in ACH file: must be %d but found %d",
+					extraChars,
+					lineLength-extraChars,
+					lineLength,
+				)
+				r.errors.Add(r.parseError(err))
 			} else if err := r.processFixedWidthFile(&line); err != nil {
 				r.errors.Add(err)
 			}
