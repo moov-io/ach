@@ -1,16 +1,33 @@
-moov-io/ach
-===
+[![Moov Banner Logo](https://user-images.githubusercontent.com/20115216/104214617-885b3c80-53ec-11eb-8ce0-9fc745fb5bfc.png)](https://github.com/moov-io)
+
+<p align="center">
+  <a href="https://moov-io.github.io/ach/">Project Documentation</a>
+  ·
+  <a href="https://moov-io.github.io/ach/api/#get-/files">API Endpoints</a>
+  ·
+  <a href="https://moov.io/blog/">Blog</a>
+  <br>
+  <br>
+</p>
+
 [![GoDoc](https://godoc.org/github.com/moov-io/ach?status.svg)](https://godoc.org/github.com/moov-io/ach)
 [![Build Status](https://github.com/moov-io/ach/workflows/Go/badge.svg)](https://github.com/moov-io/ach/actions)
 [![Coverage Status](https://codecov.io/gh/moov-io/ach/branch/master/graph/badge.svg)](https://codecov.io/gh/moov-io/ach)
 [![Go Report Card](https://goreportcard.com/badge/github.com/moov-io/ach)](https://goreportcard.com/report/github.com/moov-io/ach)
-[![Apache 2 licensed](https://img.shields.io/badge/license-Apache2-blue.svg)](https://raw.githubusercontent.com/moov-io/ach/master/LICENSE)
+[![Repo Size](https://img.shields.io/github/languages/code-size/moov-io/ach?label=project%20size)](https://github.com/moov-io/ach)
+[![Apache 2 License](https://img.shields.io/badge/license-Apache2-blue.svg)](https://raw.githubusercontent.com/moov-io/ach/master/LICENSE)
+[![Slack Channel](https://slack.moov.io/badge.svg?bg=e01563&fgColor=fffff)](https://slack.moov.io/)
+[![npm Version](https://img.shields.io/npm/v/ach-node-sdk)](https://www.npmjs.com/package/ach-node-sdk)
+[![Docker Pulls](https://img.shields.io/docker/pulls/moov/ach)](https://hub.docker.com/r/moov/ach)
+[![GitHub Stars](https://img.shields.io/github/stars/moov-io/ach)](https://github.com/moov-io/ach/stargazers)
+[![Twitter](https://img.shields.io/twitter/follow/moov_io?style=social)](https://twitter.com/moov_io?lang=en)
 
+</br>
+
+# moov-io/ach
 ACH implements a reader, writer, and validator for Automated Clearing House ([ACH](https://en.wikipedia.org/wiki/Automated_Clearing_House)) files. ACH is the primary method of electronic money movement throughout the United States. The HTTP server is available in a [Docker image](#docker) and the Go package `github.com/moov-io/ach` is available.
 
 If you're looking for a complete implementation of ACH origination (file creation), OFAC checks, micro-deposits, SFTP uploading, and other features the [moov-io/paygate](https://github.com/moov-io/paygate) project aims to be a full system for ACH transfers. Otherwise, check out our article on [How and When to use the Moov ACH Library](https://moov.io/blog/tutorials/how-and-when-to-use-the-moov-ach-library/).
-
-Docs: [Project](https://moov-io.github.io/ach/) | [API Endpoints](https://moov-io.github.io/ach/api/)
 
 ## Project Status
 
