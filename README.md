@@ -276,6 +276,9 @@ Describing ACH file 'test/testdata/ppd-debit.ach'
   1           1           1                  100000000         0
 ```
 
+### In-Browser ACH File Parser
+Using our [in-browser utility](http://oss.moov.io/ach/), you can instantly convert ACH files into JSON. Either paste in ACH file content directly or choose a file from your local machine. This tool is particulary useful if you're handling sensitive PII or want perform some quick tests, as operations are fully client-side with nothing stored in memory. We plan to support bidirectional conversion in the near future.
+
 ### Other Languages
 
 Below are some SDKs generated from the API documentation:
