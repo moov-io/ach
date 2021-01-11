@@ -446,7 +446,7 @@ func BenchmarkFileLineShort(b *testing.B) {
 
 // testFileLineLong validates file line is long
 func testFileLineLong(t testing.TB) {
-	var line = "1 line is 100 characters ..........................................................................!"
+	var line = "1 line is 100 characters ..........................................................................!\n2 line is 94 characters ....................................................................!\n"
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
 
