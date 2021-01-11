@@ -127,14 +127,12 @@ func TestValidators__isAlphanumeric(t *testing.T) {
 	for i := 0; i < 255; i++ {
 		err := v.isAlphanumeric(string(rune(i)))
 
-		if i < 0x20 || i > 0x7E {
-			if err == nil {
-				t.Errorf("expected rune %x to be non-alphanumeric", i)
-			}
-		} else {
-			if err != nil {
-				t.Errorf("expected rune %x to be alphanumeric: %v", i, err)
-			}
+		shouldError := i < 0x20 || i > 0x7E
+
+		if shouldError && err == nil {
+			t.Errorf("expected rune %x to be non-alphanumeric", i)
+		} else if !shouldError && err != nil {
+			t.Errorf("expected rune %x to be alphanumeric: %v", i, err)
 		}
 	}
 }
@@ -147,14 +145,12 @@ func TestValidators__isUpperAlphanumeric(t *testing.T) {
 		chr := string(rune(i))
 		err := v.isUpperAlphanumeric(chr)
 
-		if i < 0x20 || i > 0x7E || (i > 0x60 && i < 0x7B) {
-			if err == nil {
-				t.Errorf("expected rune %x (%s) to be non-alphanumeric", i, chr)
-			}
-		} else {
-			if err != nil {
-				t.Errorf("expected rune %x (%s) to be alphanumeric: %v", i, chr, err)
-			}
+		shouldError := i < 0x20 || i > 0x7E || (i > 0x60 && i < 0x7B)
+
+		if shouldError && err == nil {
+			t.Errorf("expected rune %x (%s) to be non-alphanumeric", i, chr)
+		} else if !shouldError && err != nil {
+			t.Errorf("expected rune %x (%s) to be alphanumeric: %v", i, chr, err)
 		}
 	}
 }
