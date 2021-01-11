@@ -297,6 +297,25 @@ func BenchmarkPPDDebitFixedLengthRead(b *testing.B) {
 	}
 }
 
+func TestPPDDebitFixedLengthRead__InvalidLength(t *testing.T) {
+	f, err := os.Open(filepath.Join("test", "testdata", "ppd-debit-fixedLengthInvalid.ach"))
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+
+	r := NewReader(f)
+	_, err = r.Read()
+	if err == nil {
+		t.Errorf("expected error")
+	}
+
+	wantErr := "1 extra character(s) in ACH file: must be 470 but found 471"
+	if err != nil && !strings.Contains(err.Error(), wantErr) {
+		t.Errorf("want: %v, got: %v", wantErr, err)
+	}
+}
+
 // testRecordTypeUnknown validates record type unknown
 func testRecordTypeUnknown(t testing.TB) {
 	var line = "301 076401251 0764012510807291511A094101achdestname            companyname                    "
@@ -427,7 +446,7 @@ func BenchmarkFileLineShort(b *testing.B) {
 
 // testFileLineLong validates file line is long
 func testFileLineLong(t testing.TB) {
-	var line = "1 line is 100 characters ..........................................................................!"
+	var line = "1 line is 100 characters ..........................................................................!\n2 line is 94 characters ....................................................................!\n"
 	r := NewReader(strings.NewReader(line))
 	_, err := r.Read()
 

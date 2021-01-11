@@ -139,11 +139,19 @@ func (r *Reader) Read() (File, error) {
 		lineLength := utf8.RuneCountInString(line)
 
 		switch {
-		case r.lineNum == 1 && lineLength > RecordLength && lineLength%RecordLength == 0:
-			if err := r.processFixedWidthFile(&line); err != nil {
+		case r.lineNum == 1 && lineLength > RecordLength:
+			extraChars := lineLength % RecordLength
+			if extraChars != 0 {
+				err := fmt.Errorf(
+					"%d extra character(s) in ACH file: must be %d but found %d",
+					extraChars,
+					lineLength-extraChars,
+					lineLength,
+				)
+				r.errors.Add(r.parseError(err))
+			} else if err := r.processFixedWidthFile(&line); err != nil {
 				r.errors.Add(err)
 			}
-
 		case lineLength != RecordLength:
 			if lineLength > RecordLength {
 				line = trimSpacesFromLongLine(line)
