@@ -98,6 +98,10 @@ AUTHORS:
 	@$(file >>$@,# For how it is generated, see `make AUTHORS`.)
 	@echo "$(shell git log --format='\n%aN <%aE>' | LC_ALL=C.UTF-8 sort -uf)" >> $@
 
+.PHONY: tagged-release
+tagged-release:
+	@./tagged-release.sh $(VERSION) 
+
 .PHONY: fuzz
 fuzz:
 	docker run moov/achfuzz:latest
