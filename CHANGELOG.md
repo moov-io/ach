@@ -106,28 +106,21 @@ BUILD
 
 ## v1.4.0 (Released 2020-06-29)
 
-Version v1.4.0 of ACH adds several notable features such as custom validation, a command-line tool `achcli` to describe
-files, and improvements for verifying NACHA compatibility on slightly malformed files. This release also contains
-enhanced testing and documentation improvements.
+Version v1.4.0 of ACH adds several notable features such as custom validation, a command-line tool `achcli` to describe files, and improvements for verifying NACHA compatibility on slightly malformed files. This release also contains enhanced testing and documentation improvements.
 
 **Custom Validation**
 
-The ACH library (and HTTP server) now supports custom validation with
-the [`ValidateOpts`](https://godoc.org/github.com/moov-io/ach#ValidateOpts) struct by calling `File.SetValidation(..)`
-and `Reader.SetValidation(...)`. This offers various options:
+The ACH library (and HTTP server) now supports custom validation with the [`ValidateOpts`](https://godoc.org/github.com/moov-io/ach#ValidateOpts) struct by calling `File.SetValidation(..)` and `Reader.SetValidation(...)`. This offers various options:
 
 - `RequireABAOrigin bool`: Enable or disable routing number validation over the `ImmediateOrigin` file header field
-- `BypassOriginValidation`: Skip validation for the `ImmediateOrigin` file header field and allow custom `TraceNumber`
-  values
-- `BypassDestinationValidation`: Skip validation for the `ImmediateDestination` file header field and allow
-  custom `TraceNumber` values
+- `BypassOriginValidation`: Skip validation for the `ImmediateOrigin` file header field and allow custom `TraceNumber` values
+- `BypassDestinationValidation`: Skip validation for the `ImmediateDestination` file header field and allow custom `TraceNumber` values
 
 The HTTP server also supports reading this struct with camel-cased names when calling the validation route.
 
 **achcli**
 
-`achcli` is a command-line utility for viewing ACH files in a more human readable format. This tool also allows
-masking `DFIAccountNumber` values with the `-mask` flag.
+`achcli` is a command-line utility for viewing ACH files in a more human readable format. This tool also allows masking `DFIAccountNumber` values with the `-mask` flag.
 
 ```
 $ achcli -mask 20200601-1002-01.ach
@@ -152,8 +145,7 @@ Describing ACH file '20200601-1002-01.ach'
 
 **Malformed Files**
 
-ACH files with lines that are not 94 characters are now adjusted in-memory (missing or extra spaces) in an attempt to
-comply with NACHA standards. The underlying file on disk is not modified during this reading.
+ACH files with lines that are not 94 characters are now adjusted in-memory (missing or extra spaces) in an attempt to comply with NACHA standards. The underlying file on disk is not modified during this reading.
 
 -----
 
@@ -244,14 +236,11 @@ BUG FIXES
 ADDITIONS
 
 - Add `FlattenBatches() (*File, error)` to `ach.File`
-    - FlattenBatches [minimizes File Batches by consolidating them](./docs/flatten-batches.md) with the same BatchHeader
-      data into one batch.
+   - FlattenBatches [minimizes File Batches by consolidating them](./docs/flatten-batches.md) with the same BatchHeader data into one batch.
 - Add `POST /files/:id/flatten` which calls `FlattenBatches()` on a specific ACH file
 - Add `POST /files/:id/balance` to [add Offset records](./docs/balanced-offset.md) onto each Batch in an ACH File.
-- Addenda98: Add `ChangeCodeField()` for detailed information about a NOC/COR change
-  file ([`ChangeCode`](https://godoc.org/github.com/moov-io/ach#ChangeCode))
-- Addenda99: Add `ReturnCodeField()` for detailed information about file
-  returns ([`ReturnCode`](https://godoc.org/github.com/moov-io/ach#ReturnCode))
+- Addenda98: Add `ChangeCodeField()` for detailed information about a NOC/COR change file ([`ChangeCode`](https://godoc.org/github.com/moov-io/ach#ChangeCode))
+- Addenda99: Add `ReturnCodeField()` for detailed information about file returns ([`ReturnCode`](https://godoc.org/github.com/moov-io/ach#ReturnCode))
 
 BUG FIXES
 
@@ -281,8 +270,7 @@ In our OpenAPI we've renamed fields generated as `Id` to `ID`, which is more in-
 
 BUG FIXES
 
-- fileHeader: allow immediate origin to be a 10 digit value (See: [#513](https://github.com/moov-io/ach/pull/513)
-  by [@eduardev](https://github.com/eduardev))
+- fileHeader: allow immediate origin to be a 10 digit value (See: [#513](https://github.com/moov-io/ach/pull/513) by [@eduardev](https://github.com/eduardev))
 - Fix JSON omitempty typo in `ADVEntryDetail`
 - fileHeader: trim padded 0's from ImmediateOriginField() and fixup docs
 - batch: only check DNE specifics if the SEC code is DNE
@@ -298,8 +286,7 @@ ADDITIONS
 - entryDetail: validate that Amount is non-negative
 - batch: create Debit and Credit EntryDetail offset records if needed (via `WithOffset`)
 - addenda types: Add RuneCountInString check to Parse(record string) function
-- file: create debit ach file and credit ach file from a mixed debit and credit ach file (via `SegmentFile`) (
-  see [#528](https://github.com/moov-io/ach/issues/528))
+- file: create debit ach file and credit ach file from a mixed debit and credit ach file (via `SegmentFile`) (see [#528](https://github.com/moov-io/ach/issues/528))
 - cmd/server: add environment variables to override command line flags (`-http.addr` and `-log.format`)
 - file: support ADV and IAT files in (*File).SegmentFile(...)
 - cmd/server: bind HTTP server with TLS if HTTPS_* variables are defined
@@ -326,8 +313,7 @@ BREAKING CHANGES
 ADDITIONS
 
 - Add const values for `BatchHeader.StandardEntryClassCode` (See [#392](https://github.com/moov-io/ach/issues/392))
-- Add const values for `BatchHeader.ServiceClassCode` and `BatchControl.ServiceClassCode`. (
-  See [#391](https://github.com/moov-io/ach/issues/391))
+- Add const values for `BatchHeader.ServiceClassCode` and `BatchControl.ServiceClassCode`. (See [#391](https://github.com/moov-io/ach/issues/391))
 - Add const values for `EntryDetail.TransactionCode` (See [#363](https://github.com/moov-io/ach/issues/363))
 - server: Record `ach_files_deleted` metric. (See: [#408](https://github.com/moov-io/ach/pull/408))
 - server: log x-request-id header if present. (See: [#407](https://github.com/moov-io/ach/pull/407))
@@ -354,7 +340,7 @@ BUILD
 BREAKING CHANGES
 
 - `TraceNumber` has been changed from `int` to a `string`. (See [#366](https://github.com/moov-io/ach/issues/366))
-    - Previously zero-prefixed ABA routing numbers would have their leading zero truncated.
+   - Previously zero-prefixed ABA routing numbers would have their leading zero truncated.
 - `OriginalTrace` has been changed from `int` to a `string`. (See [#366](https://github.com/moov-io/ach/issues/366))
 
 ADDITIONS
@@ -375,21 +361,19 @@ REMOVALS
 
 BREAKING CHANGES
 
-- `EntryDetail.Addendum` has been broken out into `Addenda02`, `Addenda05`, `Addenda98`, and `Addenda99` fields
-  on `EntryDetail`.
+- `EntryDetail.Addendum` has been broken out into `Addenda02`, `Addenda05`, `Addenda98`, and `Addenda99` fields on `EntryDetail`.
 - IAT `EntryDetail.Addendum` has been broken out into Addenda 10-18, 98 and 99.
 
 ADDITIONS
 
 - Support `StandardEntryClassCode` (Batch types):
-    - ACK (See [#327](https://github.com/moov-io/ach/issues/327))
-    - ATX (See [#327](https://github.com/moov-io/ach/issues/327))
-    - DNE (See [#342](https://github.com/moov-io/ach/issues/342))
-    - ENR (See [#343](https://github.com/moov-io/ach/issues/343))
+  - ACK (See [#327](https://github.com/moov-io/ach/issues/327))
+  - ATX (See [#327](https://github.com/moov-io/ach/issues/327))
+  - DNE (See [#342](https://github.com/moov-io/ach/issues/342))
+  - ENR (See [#343](https://github.com/moov-io/ach/issues/343))
 - Support NOC for IAT Entries (See [#328](https://github.com/moov-io/ach/issues/328))
 - Add `FileFromJson` for reading `File` objects as JSON.
-- Add `X-Total-Count` response headers on `GET /files/:id/batches` (
-  See [#280](https://github.com/moov-io/ach/issues/280))
+- Add `X-Total-Count` response headers on `GET /files/:id/batches` (See [#280](https://github.com/moov-io/ach/issues/280))
 
 IMPROVEMENTS
 
@@ -400,7 +384,6 @@ IMPROVEMENTS
 - Verify record lengths in [IAT] BatchHeader, [IAT] BatchControl, FileControl, FileHeader, and [IAT] EntryDetail.
 
 BUG FIXES
-
 - `cmd/server`: don't expect trailing slash on endpoints
 - `cmd/server`: Grab write lock on delete requests
 - Several panics are fixed from fuzzing
