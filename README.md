@@ -38,7 +38,8 @@ If you're looking for a complete implementation of ACH origination (file creatio
   - [Command Line Utility](#command-line)
   - [In-Browser Parser](#in-browser-ach-file-parser)
   - [Other Languages](#other-languages)
-- [Installation and Configuration](#installation-and-configuration)
+- [Installation and Configuration (From Source)](#installation-and-configuration-from-source)
+- [Useful Links](#useful-links)
 - [Getting Help](#getting-help)
 - [Supported and Tested Platforms](#supported-and-tested-platforms)
 - [Contributing](#contributing)
@@ -287,18 +288,9 @@ Below are some SDKs generated from the API documentation:
 
 - [Node SDK](https://www.npmjs.com/package/ach-node-sdk) | [GitHub](https://github.com/moov-io/ach-node-sdk)
 
-## Installation and Configuration
+## Installation and Configuration From Source
 
-- [Intro to ACH](./docs/intro.md)
-- [Create an ACH File](./docs/create-file.md)
-- [ACH File Structure](./docs/file-structure.md)
-- [Balanced Offset Files](./docs/balanced-offset.md)
-- [Merging ACH Files](./docs/merging-files.md)
-- [ACH Server Metrics](./docs/metrics.md)
-
-### From Source
-
-This project uses [Go Modules](https://github.com/golang/go/wiki/Modules) and Go 1.14 or higher. See [Golang's install instructions](https://golang.org/doc/install) for help in setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/ach/releases/latest) as well. We highly recommend you use a tagged release for production.
+This project uses [Go Modules](https://github.com/golang/go/wiki/Modules) and Go v1.14 or higher. See [Golang's install instructions](https://golang.org/doc/install) for help in setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/ach/releases/latest) as well. We highly recommend you use a tagged release for production.
 
 ```
 $ git@github.com:moov-io/ach.git
@@ -320,8 +312,16 @@ $ go doc github.com/moov-io/ach BatchHeader
 | `HTTPS_CERT_FILE` | Filepath containing a certificate (or intermediate chain) to be served by the HTTP server. Requires all traffic be over secure HTTP. | Empty |
 | `HTTPS_KEY_FILE`  | Filepath of a private key matching the leaf certificate from `HTTPS_CERT_FILE`. | Empty |
 
-
 Note: By design ACH **does not persist** (save) any data about the files, batches, or entry details created. The only storage occurs in memory of the process and upon restart ACH will have no files, batches, or data saved. Also, no in memory encryption of the data is performed.
+
+## Useful Links
+
+- [Intro to ACH](./docs/intro.md)
+- [Create an ACH File](./docs/create-file.md)
+- [ACH File Structure](./docs/file-structure.md)
+- [Balanced Offset Files](./docs/balanced-offset.md)
+- [Merging ACH Files](./docs/merging-files.md)
+- [ACH Server Metrics](./docs/metrics.md)
 
 ## Getting Help
 
@@ -345,7 +345,7 @@ Note: 32-bit platforms have known issues and are not supported.
 
 Yes please! Please review our [Contributing guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) to get started! Check out our [issues for first time contributors](https://github.com/moov-io/ach/contribute) for something to help out with.
 
-This project uses [Go Modules](https://github.com/golang/go/wiki/Modules) and uses Go 1.14 or higher. See [Golang's install instructions](https://golang.org/doc/install) for help setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/ach/releases/latest) as well. We highly recommend you use a tagged release for production.
+This project uses [Go Modules](https://github.com/golang/go/wiki/Modules) and uses Go v1.14 or higher. See [Golang's install instructions](https://golang.org/doc/install) for help setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/ach/releases/latest) as well. We highly recommend you use a tagged release for production.
 
 ### Releasing
 
