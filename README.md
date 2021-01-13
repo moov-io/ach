@@ -330,15 +330,15 @@ Below are some SDKs generated from the API documentation:
 - [ACH Server Metrics](./docs/metrics.md)
 
 ## FAQ
-<details>
-<summary><b>Is there an in-browser tool for converting ACH files into JSON?</b></summary>
+<details open="true">
+<summary ><b>Is there an in-browser tool for converting ACH files into JSON?</b></summary>
 Yes! You can find our browser utility at http://oss.moov.io/ach/.
 </details>
-<details>
+<details open="true">
 <summary><b>Is my data being saved somewhere?</b></summary>
-No, we do not save any data about the files, batches, or entry details created. The only storage occurs in memory of the process and upon restart, no files, batches, or data are saved.
+No, we do not save any data related to files, batch, or entry details. All processing is done in-memory.
 </details>
-<details>
+<details open="true">
 <summary><b>What ACH transaction types are supported?</b></summary>
 We support generating and parsing all Standard Entry Class (SEC) codes.
 </details>
