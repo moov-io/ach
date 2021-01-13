@@ -1,3 +1,23 @@
+## v1.6.0 (Released 2021-01-13)
+
+BUG FIXES
+
+- fileHeader: fix `ImmediateDestination` formatting when `BypassDestinationValidation` is set
+
+ADDITIONS
+
+- batch: allow addenda in CIE batches to be optional
+- batch: allow POS batches to contain credits
+- reader: allow backtick in the valid character set
+- build: add tagged-release script to automate the release process
+
+IMPROVEMENTS
+
+- reader: report error when extra characters are found in one-line ACH files
+- webui: display error when parsing fails
+- deps: remove moov-io/customers and moov-io/paygate as dependencies
+- docs: improvements to README by fixing typos, dead links, and formatting
+
 ## v1.5.2 (Released 2020-11-16)
 
 BUG FIXES
