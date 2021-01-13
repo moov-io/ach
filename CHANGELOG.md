@@ -1,8 +1,8 @@
-## v1.6.0 (Released 2021-01-12)
+## v1.6.0 (Released 2021-01-13)
 
 BUG FIXES
 
-- fileHeader: fix ImmediateDestination formatting when BypassDestinationValidation is set
+- fileHeader: fix `ImmediateDestination` formatting when `BypassDestinationValidation` is set
 
 ADDITIONS
 
