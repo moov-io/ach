@@ -36,9 +36,9 @@ If you're looking for a complete implementation of ACH origination (file creatio
 - [Usage](#usage)
   - As an API
     - [Docker](#docker)
-    - [Configuration Settings](#configuration-settings)
     - [Google Cloud](#google-cloud-run-button)
     - [HTTP API](#http-api)
+    - [Configuration Settings](#configuration-settings)
   - [As a Go Module](#go-library)
   - [As a Command Line Tool](#command-line)
   - [As an In-Browser Parser](##in-browser-ach-file-parser)
@@ -57,7 +57,7 @@ Moov ACH is actively used in multiple production environments. Please star the p
 
 The ACH project implements an HTTP server and Go library for creating and modifying ACH files. There are client libraries available for both [Go](https://pkg.go.dev/github.com/moov-io/ach) and [Node/JavaScript](https://github.com/moov-io/ach-node-sdk). We also have an extensive list of [examples](https://pkg.go.dev/github.com/moov-io/ach/examples) of the reader and writer applied to various ACH transaction types.
 
-### Docker
+### Docker [(Config)](#configuration-settings)
 
 We publish a [public Docker image `moov/ach`](https://hub.docker.com/r/moov/ach/) from Docker Hub or use this repository. No configuration is required to serve on `:8080` and metrics at `:9090/metrics` in Prometheus format. We also have Docker images for [OpenShift](https://quay.io/repository/moov/ach?tab=tags) published as `quay.io/moov/ach`.
 
@@ -91,20 +91,7 @@ curl http://localhost:8080/files/<YOUR-UNIQUE-FILE-ID>
 {"file":{"id":"<YOUR-UNIQUE-FILE-ID>","fileHeader":{"id":"","immediateDestination":"231380104","immediateOrigin":"121042882", ...
 ```
 
-### Configuration Settings
-
-| Environmental Variable | Description | Default |
-|-----|-----|-----|
-| `ACH_FILE_TTL` | Time to live (TTL) for `*ach.File` objects stored in the in-memory repository. | 0 = No TTL / Never delete files (Example: `240m`) |
-| `LOG_FORMAT` | Format for logging lines to be written as. | Options: `json`, `plain` - Default: `plain` |
-| `HTTP_BIND_ADDRESS` | Address for paygate to bind its HTTP server on. This overrides the command-line flag `-http.addr`. | Default: `:8080` |
-| `HTTP_ADMIN_BIND_ADDRESS` | Address for paygate to bind its admin HTTP server on. This overrides the command-line flag `-admin.addr`. | Default: `:9090` |
-| `HTTPS_CERT_FILE` | Filepath containing a certificate (or intermediate chain) to be served by the HTTP server. Requires all traffic be over secure HTTP. | Empty |
-| `HTTPS_KEY_FILE`  | Filepath of a private key matching the leaf certificate from `HTTPS_CERT_FILE`. | Empty |
-
-Note: By design ACH **does not persist** (save) any data about the files, batches, or entry details created. The only storage occurs in memory of the process and upon restart ACH will have no files, batches, or data saved. Also, no in memory encryption of the data is performed.
-
-### Google Cloud Run Button
+### Google Cloud Run Button [(Config)](#configuration-settings)
 
 To get started in a hosted environment you can deploy this project to the Google Cloud Platform.
 
@@ -215,13 +202,28 @@ You should get this response:
 {"file":{"id":"<YOUR-UNIQUE-FILE-ID>","fileHeader":{"id":"...","immediateDestination":"231380104","immediateOrigin":"121042882", ...
 ```
 
-### HTTP API
+### HTTP API [(Config)](#configuration-settings)
 
 The package [`github.com/moov-io/ach/server`](https://pkg.go.dev/github.com/moov-io/ach/server) offers an HTTP and JSON API for creating and editing files. If you're using Go the `ach.File` type can be used, otherwise just send properly formatted JSON. We have an [example JSON file](test/testdata/ppd-valid.json), but each SEC type will generate different JSON.
 
 Examples: [Go](examples/http/main.go) | [Ruby](https://github.com/moov-io/ruby-ach-demo)
 
 - [Create an ACH file for a payment and get the raw file](https://github.com/moov-io/ruby-ach-demo)
+
+
+### Configuration Settings
+
+| Environmental Variable | Description | Default |
+|-----|-----|-----|
+| `ACH_FILE_TTL` | Time to live (TTL) for `*ach.File` objects stored in the in-memory repository. | 0 = No TTL / Never delete files (Example: `240m`) |
+| `LOG_FORMAT` | Format for logging lines to be written as. | Options: `json`, `plain` - Default: `plain` |
+| `HTTP_BIND_ADDRESS` | Address for paygate to bind its HTTP server on. This overrides the command-line flag `-http.addr`. | Default: `:8080` |
+| `HTTP_ADMIN_BIND_ADDRESS` | Address for paygate to bind its admin HTTP server on. This overrides the command-line flag `-admin.addr`. | Default: `:9090` |
+| `HTTPS_CERT_FILE` | Filepath containing a certificate (or intermediate chain) to be served by the HTTP server. Requires all traffic be over secure HTTP. | Empty |
+| `HTTPS_KEY_FILE`  | Filepath of a private key matching the leaf certificate from `HTTPS_CERT_FILE`. | Empty |
+
+Note: By design ACH **does not persist** (save) any data about the files, batches, or entry details created. The only storage occurs in memory of the process and upon restart ACH will have no files, batches, or data saved. Also, no in memory encryption of the data is performed.
+
 
 ### Go Library
 
@@ -367,13 +369,13 @@ As part of Moov's initiative to offer open source fintech infrastructure, we hav
 
 - [Moov Watchman](https://github.com/moov-io/watchman) offers search functions over numerous trade sanction lists from the United States and European Union.
 
-- [Moov Fed](https://github.com/moov-io/fed) implements utility services for searching the United States Federal Reserve System such as ABA routing numbers, financial institution name lookup, and Fedwire routing information.
+- [Moov Fed](https://github.com/moov-io/fed) implements utility services for searching the United States Federal Reserve System such as ABA routing numbers, financial institution name lookup, and FedACH and Fedwire routing information.
 
 - [Moov Wire](https://github.com/moov-io/wire) implements an interface to write files for the Fedwire Funds Service, a real-time gross settlement funds transfer system operated by the United States Federal Reserve Banks.
 
-- [Moov Image Cash Letter](https://github.com/moov-io/imagecashletter) implements Image Cash Letter (ICL) files used for Check21 or check truncation files for exchange and remote deposit in the U.S.
+- [Moov Image Cash Letter](https://github.com/moov-io/imagecashletter) implements Image Cash Letter (ICL) files used for Check21, X.9 or check truncation files for exchange and remote deposit in the U.S.
 
-- [Moov Metro 2](https://github.com/moov-io/metro2) provides a way to easily read, create, and validate Metro 2 format, which is used for consumer credit history reporting.
+- [Moov Metro 2](https://github.com/moov-io/metro2) provides a way to easily read, create, and validate Metro 2 format, which is used for consumer credit history reporting by the United States credit bureaus.
 
 
 ## License
