@@ -38,11 +38,13 @@ If you're looking for a complete implementation of ACH origination (file creatio
     - [Docker](#docker) ([Config](#configuration-settings))
     - [Google Cloud](#google-cloud-run-button) ([Config](#configuration-settings))
     - [HTTP API](#http-api) ([Config](#configuration-settings))
+    - [Data Persistence](#data-persistence)
   - [As a Go Module](#go-library)
   - [As a Command Line Tool](#command-line)
   - [As an In-Browser Parser](##in-browser-ach-file-parser)
 - [SDKs (OpenAPI)](#sdks)
 - [Learn About ACH](#useful-links)
+- [FAQ](#faqs)
 - [Getting Help](#getting-help)
 - [Supported and Tested Platforms](#supported-and-tested-platforms)
 - [Contributing](#contributing)
@@ -203,7 +205,7 @@ You should get this response:
 
 ### HTTP API
 
-The package [`github.com/moov-io/ach/server`](https://pkg.go.dev/github.com/moov-io/ach/server) offers an HTTP and JSON API for creating and editing files. If you're using Go the `ach.File` type can be used, otherwise just send properly formatted JSON. We have an [example JSON file](test/testdata/ppd-valid.json), but each SEC type will generate different JSON.
+The package [`github.com/moov-io/ach/server`](https://pkg.go.dev/github.com/moov-io/ach/server) offers an HTTP and JSON API for creating and editing files. If you're using Go the `ach.File` type can be used, otherwise you can send properly formatted JSON. We have an [example JSON file](test/testdata/ppd-valid.json), but each SEC type will generate different JSON.
 
 Examples: [Go](examples/http/main.go) | [Ruby](https://github.com/moov-io/ruby-ach-demo)
 
@@ -216,12 +218,13 @@ Examples: [Go](examples/http/main.go) | [Ruby](https://github.com/moov-io/ruby-a
 |-----|-----|-----|
 | `ACH_FILE_TTL` | Time to live (TTL) for `*ach.File` objects stored in the in-memory repository. | 0 = No TTL / Never delete files (Example: `240m`) |
 | `LOG_FORMAT` | Format for logging lines to be written as. | Options: `json`, `plain` - Default: `plain` |
-| `HTTP_BIND_ADDRESS` | Address for paygate to bind its HTTP server on. This overrides the command-line flag `-http.addr`. | Default: `:8080` |
-| `HTTP_ADMIN_BIND_ADDRESS` | Address for paygate to bind its admin HTTP server on. This overrides the command-line flag `-admin.addr`. | Default: `:9090` |
+| `HTTP_BIND_ADDRESS` | Address for ACH to bind its HTTP server on. This overrides the command-line flag `-http.addr`. | Default: `:8080` |
+| `HTTP_ADMIN_BIND_ADDRESS` | Address for ACH to bind its admin HTTP server on. This overrides the command-line flag `-admin.addr`. | Default: `:9090` |
 | `HTTPS_CERT_FILE` | Filepath containing a certificate (or intermediate chain) to be served by the HTTP server. Requires all traffic be over secure HTTP. | Empty |
 | `HTTPS_KEY_FILE`  | Filepath of a private key matching the leaf certificate from `HTTPS_CERT_FILE`. | Empty |
 
-Note: By design ACH **does not persist** (save) any data about the files, batches, or entry details created. The only storage occurs in memory of the process and upon restart ACH will have no files, batches, or data saved. Also, no in memory encryption of the data is performed.
+### Data Persistence
+By design ACH **does not persist** (save) any data about the files, batches, or entry details created. The only storage occurs in memory of the process and upon restart ACH will have no files, batches, or data saved. Also, no in memory encryption of the data is performed.
 
 
 ### Go Library
@@ -325,6 +328,21 @@ Below are some SDKs generated from the API documentation:
 - [Balanced Offset Files](./docs/balanced-offset.md)
 - [Merging ACH Files](./docs/merging-files.md)
 - [ACH Server Metrics](./docs/metrics.md)
+
+## FAQ
+<details>
+<summary><b>Is there an in-browser tool for converting ACH files into JSON?</b></summary>
+Yes! You can find our browser utility at http://oss.moov.io/ach/.
+</details>
+<details>
+<summary><b>Is my data being saved somewhere?</b></summary>
+No, we do not save any data about the files, batches, or entry details created. The only storage occurs in memory of the process and upon restart, no files, batches, or data are saved.
+</details>
+<details>
+<summary><b>What ACH transaction types are supported?</b></summary>
+We support generating and parsing all Standard Entry Class (SEC) codes.
+</details>
+
 
 ## Getting Help
 
