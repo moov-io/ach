@@ -35,10 +35,9 @@ If you're looking for a complete implementation of ACH origination (file creatio
 - [Project Status](#project-status)
 - [Usage](#usage)
   - As an API
-    - [Docker](#docker)
-    - [Google Cloud](#google-cloud-run-button)
-    - [HTTP API](#http-api)
-    - [Configuration Settings](#configuration-settings)
+    - [Docker](#docker) ([Config](#configuration-settings))
+    - [Google Cloud](#google-cloud-run-button) ([Config](#configuration-settings))
+    - [HTTP API](#http-api) ([Config](#configuration-settings))
   - [As a Go Module](#go-library)
   - [As a Command Line Tool](#command-line)
   - [As an In-Browser Parser](##in-browser-ach-file-parser)
@@ -57,7 +56,7 @@ Moov ACH is actively used in multiple production environments. Please star the p
 
 The ACH project implements an HTTP server and Go library for creating and modifying ACH files. There are client libraries available for both [Go](https://pkg.go.dev/github.com/moov-io/ach) and [Node/JavaScript](https://github.com/moov-io/ach-node-sdk). We also have an extensive list of [examples](https://pkg.go.dev/github.com/moov-io/ach/examples) of the reader and writer applied to various ACH transaction types.
 
-### Docker [(Config)](#configuration-settings)
+### Docker
 
 We publish a [public Docker image `moov/ach`](https://hub.docker.com/r/moov/ach/) from Docker Hub or use this repository. No configuration is required to serve on `:8080` and metrics at `:9090/metrics` in Prometheus format. We also have Docker images for [OpenShift](https://quay.io/repository/moov/ach?tab=tags) published as `quay.io/moov/ach`.
 
@@ -91,7 +90,7 @@ curl http://localhost:8080/files/<YOUR-UNIQUE-FILE-ID>
 {"file":{"id":"<YOUR-UNIQUE-FILE-ID>","fileHeader":{"id":"","immediateDestination":"231380104","immediateOrigin":"121042882", ...
 ```
 
-### Google Cloud Run Button [(Config)](#configuration-settings)
+### Google Cloud Run Button
 
 To get started in a hosted environment you can deploy this project to the Google Cloud Platform.
 
@@ -202,7 +201,7 @@ You should get this response:
 {"file":{"id":"<YOUR-UNIQUE-FILE-ID>","fileHeader":{"id":"...","immediateDestination":"231380104","immediateOrigin":"121042882", ...
 ```
 
-### HTTP API [(Config)](#configuration-settings)
+### HTTP API
 
 The package [`github.com/moov-io/ach/server`](https://pkg.go.dev/github.com/moov-io/ach/server) offers an HTTP and JSON API for creating and editing files. If you're using Go the `ach.File` type can be used, otherwise just send properly formatted JSON. We have an [example JSON file](test/testdata/ppd-valid.json), but each SEC type will generate different JSON.
 
