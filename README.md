@@ -1,16 +1,54 @@
-moov-io/ach
-===
+[![Moov Banner Logo](https://user-images.githubusercontent.com/20115216/104214617-885b3c80-53ec-11eb-8ce0-9fc745fb5bfc.png)](https://github.com/moov-io)
+
+<p align="center">
+  <a href="https://moov-io.github.io/ach/">Project Documentation</a>
+  ·
+  <a href="https://moov-io.github.io/ach/api/#get-/files">API Endpoints</a>
+  ·
+  <a href="https://slack.moov.io/">Community</a>
+  ·
+  <a href="https://moov.io/blog/">Blog</a>
+  <br>
+  <br>
+</p>
+
 [![GoDoc](https://godoc.org/github.com/moov-io/ach?status.svg)](https://godoc.org/github.com/moov-io/ach)
 [![Build Status](https://github.com/moov-io/ach/workflows/Go/badge.svg)](https://github.com/moov-io/ach/actions)
 [![Coverage Status](https://codecov.io/gh/moov-io/ach/branch/master/graph/badge.svg)](https://codecov.io/gh/moov-io/ach)
 [![Go Report Card](https://goreportcard.com/badge/github.com/moov-io/ach)](https://goreportcard.com/report/github.com/moov-io/ach)
-[![Apache 2 licensed](https://img.shields.io/badge/license-Apache2-blue.svg)](https://raw.githubusercontent.com/moov-io/ach/master/LICENSE)
+[![Repo Size](https://img.shields.io/github/languages/code-size/moov-io/ach?label=project%20size)](https://github.com/moov-io/ach)
+[![Apache 2 License](https://img.shields.io/badge/license-Apache2-blue.svg)](https://raw.githubusercontent.com/moov-io/ach/master/LICENSE)
+[![Slack Channel](https://slack.moov.io/badge.svg?bg=e01563&fgColor=fffff)](https://slack.moov.io/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/moov/ach)](https://hub.docker.com/r/moov/ach)
+[![GitHub Stars](https://img.shields.io/github/stars/moov-io/ach)](https://github.com/moov-io/ach)
+[![Twitter](https://img.shields.io/twitter/follow/moov_io?style=social)](https://twitter.com/moov_io?lang=en)
+
+# moov-io/ach
+Moov's mission is to give developers an easy way to create and integrate bank processing into their own software products. Our open source projects are each focused on solving a single responsibility in financial services and designed around performance, scalability, and ease-of-use.
 
 ACH implements a reader, writer, and validator for Automated Clearing House ([ACH](https://en.wikipedia.org/wiki/Automated_Clearing_House)) files. ACH is the primary method of electronic money movement throughout the United States. The HTTP server is available in a [Docker image](#docker) and the Go package `github.com/moov-io/ach` is available.
 
 If you're looking for a complete implementation of ACH origination (file creation), OFAC checks, micro-deposits, SFTP uploading, and other features the [moov-io/paygate](https://github.com/moov-io/paygate) project aims to be a full system for ACH transfers. Otherwise, check out our article on [How and When to use the Moov ACH Library](https://moov.io/blog/tutorials/how-and-when-to-use-the-moov-ach-library/).
 
-Docs: [Project](https://moov-io.github.io/ach/) | [API Endpoints](https://moov-io.github.io/ach/api/)
+## Table of Contents
+
+- [Project Status](#project-status)
+- [Usage](#usage)
+  - As an API
+    - [Docker](#docker) ([Config](#configuration-settings))
+    - [Google Cloud](#google-cloud-run-button) ([Config](#configuration-settings))
+    - [HTTP API](#http-api) ([Config](#configuration-settings))
+    - [Data Persistence](#data-persistence)
+  - [As a Go Module](#go-library)
+  - [As a Command Line Tool](#command-line)
+  - [As an In-Browser Parser](##in-browser-ach-file-parser)
+- [SDKs (OpenAPI)](#sdks)
+- [Learn About ACH](#useful-links)
+- [FAQ](#faqs)
+- [Getting Help](#getting-help)
+- [Supported and Tested Platforms](#supported-and-tested-platforms)
+- [Contributing](#contributing)
+- [Related Projects](#related-projects)
 
 ## Project Status
 
@@ -18,7 +56,7 @@ Moov ACH is actively used in multiple production environments. Please star the p
 
 ## Usage
 
-The ACH project implements an HTTP server and Go library for creating and modifying ACH files. There are client libraries available for [Go](..) and [Node/JavaScript](https://github.com/moov-io/ach-node-sdk). The reader and writer are written in Go and [available as a library](https://pkg.go.dev/github.com/moov-io/ach) ([Examples](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples)).
+The ACH project implements an HTTP server and Go library for creating and modifying ACH files. There are client libraries available for both [Go](https://pkg.go.dev/github.com/moov-io/ach) and [Node/JavaScript](https://github.com/moov-io/ach-node-sdk). We also have an extensive list of [examples](https://pkg.go.dev/github.com/moov-io/ach/examples) of the reader and writer applied to various ACH transaction types.
 
 ### Docker
 
@@ -55,6 +93,7 @@ curl http://localhost:8080/files/<YOUR-UNIQUE-FILE-ID>
 ```
 
 ### Google Cloud Run Button
+
 To get started in a hosted environment you can deploy this project to the Google Cloud Platform.
 
 From your [Google Cloud dashboard](https://console.cloud.google.com/home/dashboard) create a new project and call it:
@@ -164,8 +203,42 @@ You should get this response:
 {"file":{"id":"<YOUR-UNIQUE-FILE-ID>","fileHeader":{"id":"...","immediateDestination":"231380104","immediateOrigin":"121042882", ...
 ```
 
+### HTTP API
+
+The package [`github.com/moov-io/ach/server`](https://pkg.go.dev/github.com/moov-io/ach/server) offers an HTTP and JSON API for creating and editing files. If you're using Go the `ach.File` type can be used, otherwise you can send properly formatted JSON. We have an [example JSON file](test/testdata/ppd-valid.json), but each SEC type will generate different JSON.
+
+Examples: [Go](examples/http/main.go) | [Ruby](https://github.com/moov-io/ruby-ach-demo)
+
+- [Create an ACH file for a payment and get the raw file](https://github.com/moov-io/ruby-ach-demo)
+
+
+### Configuration Settings
+
+| Environmental Variable | Description | Default |
+|-----|-----|-----|
+| `ACH_FILE_TTL` | Time to live (TTL) for `*ach.File` objects stored in the in-memory repository. | 0 = No TTL / Never delete files (Example: `240m`) |
+| `LOG_FORMAT` | Format for logging lines to be written as. | Options: `json`, `plain` - Default: `plain` |
+| `HTTP_BIND_ADDRESS` | Address for ACH to bind its HTTP server on. This overrides the command-line flag `-http.addr`. | Default: `:8080` |
+| `HTTP_ADMIN_BIND_ADDRESS` | Address for ACH to bind its admin HTTP server on. This overrides the command-line flag `-admin.addr`. | Default: `:9090` |
+| `HTTPS_CERT_FILE` | Filepath containing a certificate (or intermediate chain) to be served by the HTTP server. Requires all traffic be over secure HTTP. | Empty |
+| `HTTPS_KEY_FILE`  | Filepath of a private key matching the leaf certificate from `HTTPS_CERT_FILE`. | Empty |
+
+### Data Persistence
+By design ACH **does not persist** (save) any data about the files, batches, or entry details created. The only storage occurs in memory of the process and upon restart ACH will have no files, batches, or data saved. Also, no in memory encryption of the data is performed.
+
 
 ### Go Library
+
+This project uses [Go Modules](https://github.com/golang/go/wiki/Modules) and Go v1.14 or higher. See [Golang's install instructions](https://golang.org/doc/install) for help in setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/ach/releases/latest) as well. We highly recommend you use a tagged release for production.
+
+```
+$ git@github.com:moov-io/ach.git
+
+# Pull down into the Go Module cache
+$ go get -u github.com/moov-io/ach
+
+$ go doc github.com/moov-io/ach BatchHeader
+```
 
 The package [`github.com/moov-io/ach`](https://pkg.go.dev/github.com/moov-io/ach) offers a Go-based ACH file reader and writer. To get started, check out a specific example:
 
@@ -174,29 +247,29 @@ The package [`github.com/moov-io/ach`](https://pkg.go.dev/github.com/moov-io/ach
 
 | SEC Code | Description                                  | Example                                  | Read                | Write                                            |
 |----------|---------------------------------------|------------------------------------------|-----------------------------------|------------------------------------|
-| ACK      | Acknowledgment Entry for CCD          | [Credit](examples/testdata/ack-read.ach) | [ACK Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-AckRead) | [ACK Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-AckWrite) |
-| ADV      | Automated Accounting Advice           | [Prenote Debit](test/ach-adv-read/adv-read.ach) | [ADV Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-AdvRead) | [ADV Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-AdvWrite) |
-| ARC      | Accounts Receivable Entry             | [Debit](test/ach-arc-read/arc-debit.ach) | [ARC Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-ArcReadDebit) | [ARC Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-ArcWriteDebit) |
-| ATX      | Acknowledgment Entry for CTX          | [Credit](test/ach-atx-read/atx-read.ach)  | [ATX Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-AtxRead) | [ATX Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-AtxWrite) |
-| BOC      | Back Office Conversion                | [Debit](test/ach-boc-read/boc-debit.ach) | [BOC Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-BocReadDebit) | [BOC Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-BocWriteDebit) |
-| CCD      | Corporate credit or debit             | [Debit](test/ach-ccd-read/ccd-debit.ach) | [CCD Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-CcdReadDebit) | [CCD Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-CcdWriteDebit) |
-| CIE      | Customer-Initiated Entry              | [Credit](test/ach-cie-read/cie-credit.ach) | [CIE Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-CieRead) | [CIE Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-CieWrite) |
-| COR      | Automated Notification of Change(NOC) | [NOC](test/ach-cor-read/cor-read.ach)   | [COR Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-CorReadCredit) | [COR Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-CorWriteCredit) |
-| CTX      | Corporate Trade Exchange              | [Debit](test/ach-ctx-read/ctx-debit.ach) | [CTX Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-CtxReadDebit) | [CTX Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-CtxWriteDebit) |
-| DNE      | Death Notification Entry              | [DNE](test/ach-dne-read/dne-read.ach)   | [DNE Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-DneRead) | [DNE Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-DneWrite) |
-| ENR      | Automatic Enrollment Entry            | [ENR](test/ach-enr-read/enr-read.ach)   | [ENR Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-EnrRead) | [ENR Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-EnrWrite) |
-| IAT      | International ACH Transactions        | [Credit](test/ach-iat-read/iat-credit.ach) | [IAT Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-IatReadMixedCreditDebit) | [IAT Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-IatWriteMixedCreditDebit) |
-| MTE      | Machine Transfer Entry                | [Credit](test/ach-mte-read/mte-read.ach)   | [MTE Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-MteReadDebit) | [MTE Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-MteWriteDebit) |
-| POP      | Point of Purchase                     | [Debit](test/ach-pop-read/pop-debit.ach) | [POP Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-PopReadDebit) | [POP Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-PopWriteDebit) |
-| POS      | Point of Sale                         | [Debit](test/ach-pos-read/pos-debit.ach) | [POS Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-PosReadDebit) | [POS Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-PosWriteDebit) |
-| PPD      | Prearranged payment and deposits      | [Debit](test/ach-ppd-read/ppd-debit.ach) [Credit](test/ach-ppd-read/ppd-credit.ach) | [PPD Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-PpdReadCredit) | [PPD Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-PpdWriteCredit) |
-| RCK      | Represented Check Entries             | [Debit](test/ach-rck-read/rck-debit.ach) | [RCK Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-RckReadDebit) | [RCK Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-RckWriteDebit) |
-| SHR      | Shared Network Entry                  | [Debit](test/ach-shr-read/shr-debit.ach) | [SHR Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-ShrReadDebit) | [SHR Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-ShrWrite) |
-| TEL      | Telephone-Initiated Entry             | [Debit](test/ach-tel-read/tel-debit.ach) | [TEL Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-TelReadDebit) | [TEL Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-TelWriteDebit) |
-| TRC      | Truncated Check Entry                 | [Debit](test/ach-trc-read/trc-debit.ach) | [TRC Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-TrcReadDebit) | [TRC Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-TrcWriteDebit) |
-| TRX      | Check Truncation Entries Exchange     | [Debit](test/ach-trx-read/trx-debit.ach) | [TRX Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-TrxReadDebit) | [TRX Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-TrxWriteDebit) |
-| WEB      | Internet-initiated Entries            | [Credit](test/ach-web-read/web-credit.ach) | [WEB Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-WebReadCredit) | [WEB Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-WebWriteCredit) |
-| XCK      | Destroyed Check Entry                 | [Debit](test/ach-xck-read/xck-debit.ach)  | [XCK Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-XckReadDebit) | [XCK Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-XckWriteDebit) |
+| ACK      | Acknowledgment Entry for CCD          | [Credit](examples/testdata/ack-read.ach) | [ACK Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-AckRead) | [ACK Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-AckWrite) |
+| ADV      | Automated Accounting Advice           | [Prenote Debit](test/ach-adv-read/adv-read.ach) | [ADV Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-AdvRead) | [ADV Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-AdvWrite) |
+| ARC      | Accounts Receivable Entry             | [Debit](test/ach-arc-read/arc-debit.ach) | [ARC Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-ArcReadDebit) | [ARC Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-ArcWriteDebit) |
+| ATX      | Acknowledgment Entry for CTX          | [Credit](test/ach-atx-read/atx-read.ach)  | [ATX Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-AtxRead) | [ATX Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-AtxWrite) |
+| BOC      | Back Office Conversion                | [Debit](test/ach-boc-read/boc-debit.ach) | [BOC Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-BocReadDebit) | [BOC Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-BocWriteDebit) |
+| CCD      | Corporate credit or debit             | [Debit](test/ach-ccd-read/ccd-debit.ach) | [CCD Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-CcdReadDebit) | [CCD Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-CcdWriteDebit) |
+| CIE      | Customer-Initiated Entry              | [Credit](test/ach-cie-read/cie-credit.ach) | [CIE Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-CieRead) | [CIE Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-CieWrite) |
+| COR      | Automated Notification of Change(NOC) | [NOC](test/ach-cor-read/cor-read.ach)   | [COR Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-CorReadCredit) | [COR Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-CorWriteCredit) |
+| CTX      | Corporate Trade Exchange              | [Debit](test/ach-ctx-read/ctx-debit.ach) | [CTX Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-CtxReadDebit) | [CTX Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-CtxWriteDebit) |
+| DNE      | Death Notification Entry              | [DNE](test/ach-dne-read/dne-read.ach)   | [DNE Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-DneRead) | [DNE Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-DneWrite) |
+| ENR      | Automatic Enrollment Entry            | [ENR](test/ach-enr-read/enr-read.ach)   | [ENR Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-EnrRead) | [ENR Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-EnrWrite) |
+| IAT      | International ACH Transactions        | [Credit](test/ach-iat-read/iat-credit.ach) | [IAT Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-IatReadMixedCreditDebit) | [IAT Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-IatWriteMixedCreditDebit) |
+| MTE      | Machine Transfer Entry                | [Credit](test/ach-mte-read/mte-read.ach)   | [MTE Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-MteReadDebit) | [MTE Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-MteWriteDebit) |
+| POP      | Point of Purchase                     | [Debit](test/ach-pop-read/pop-debit.ach) | [POP Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-PopReadDebit) | [POP Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-PopWriteDebit) |
+| POS      | Point of Sale                         | [Debit](test/ach-pos-read/pos-debit.ach) | [POS Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-PosReadDebit) | [POS Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-PosWriteDebit) |
+| PPD      | Prearranged payment and deposits      | [Debit](test/ach-ppd-read/ppd-debit.ach) [Credit](test/ach-ppd-read/ppd-credit.ach) | [PPD Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-PpdReadCredit) | [PPD Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-PpdWriteCredit) |
+| RCK      | Represented Check Entries             | [Debit](test/ach-rck-read/rck-debit.ach) | [RCK Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-RckReadDebit) | [RCK Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-RckWriteDebit) |
+| SHR      | Shared Network Entry                  | [Debit](test/ach-shr-read/shr-debit.ach) | [SHR Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-ShrReadDebit) | [SHR Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-ShrWrite) |
+| TEL      | Telephone-Initiated Entry             | [Debit](test/ach-tel-read/tel-debit.ach) | [TEL Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-TelReadDebit) | [TEL Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-TelWriteDebit) |
+| TRC      | Truncated Check Entry                 | [Debit](test/ach-trc-read/trc-debit.ach) | [TRC Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-TrcReadDebit) | [TRC Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-TrcWriteDebit) |
+| TRX      | Check Truncation Entries Exchange     | [Debit](test/ach-trx-read/trx-debit.ach) | [TRX Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-TrxReadDebit) | [TRX Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-TrxWriteDebit) |
+| WEB      | Internet-initiated Entries            | [Credit](test/ach-web-read/web-credit.ach) | [WEB Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-WebReadCredit) | [WEB Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-WebWriteCredit) |
+| XCK      | Destroyed Check Entry                 | [Debit](test/ach-xck-read/xck-debit.ach)  | [XCK Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-XckReadDebit) | [XCK Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-XckWriteDebit) |
 
 </details>
 
@@ -205,25 +278,10 @@ The package [`github.com/moov-io/ach`](https://pkg.go.dev/github.com/moov-io/ach
 
 | SEC Code | Name                                  | Example                                  | Read                | Write                                            |
 |----------|---------------------------------------|------------------------------------------|-----------------------------------|------------------------------------|
-| IAT      | International ACH Transactions        | [Credit](test/ach-iat-read/iat-credit.ach) | [IAT Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-IatReadMixedCreditDebit) | [IAT Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-IatWriteMixedCreditDebit) |
-| PPD      | Prearranged payment and deposits      | [Debit](test/ach-ppd-read/ppd-debit.ach) [Credit](test/ach-ppd-read/ppd-credit.ach) | [PPD Read](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-PpdReadSegmentFile) | [PPD Write](https://pkg.go.dev/github.com/moov-io/ach@v1.5.2/examples#example-package-PpdWriteSegmentFile) |
-
+| IAT      | International ACH Transactions        | [Credit](test/ach-iat-read/iat-credit.ach) | [IAT Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-IatReadMixedCreditDebit) | [IAT Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-IatWriteMixedCreditDebit) |
+| PPD      | Prearranged payment and deposits      | [Debit](test/ach-ppd-read/ppd-debit.ach) [Credit](test/ach-ppd-read/ppd-credit.ach) | [PPD Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-PpdReadSegmentFile) | [PPD Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-PpdWriteSegmentFile) |
 
 </details>
-
-### Other Languages
-
-Below are some SDKs generated from the API documentation:
-
-- [Node SDK](https://www.npmjs.com/package/ach-node-sdk) | [GitHub](https://github.com/moov-io/ach-node-sdk)
-
-### HTTP API
-
-The package [`github.com/moov-io/ach/server`](https://pkg.go.dev/github.com/moov-io/ach/server) offers an HTTP and JSON API for creating and editing files. If you're using Go the `ach.File` type can be used, otherwise just send properly formatted JSON. We have an [example JSON file](test/testdata/ppd-valid.json), but each SEC type will generate different JSON.
-
-Examples: [Go](examples/http/main.go) | [Ruby](https://github.com/moov-io/ruby-ach-demo)
-
-- [Create an ACH file for a payment and get the raw file](https://github.com/moov-io/ruby-ach-demo)
 
 ### Command Line
 
@@ -251,45 +309,40 @@ Describing ACH file 'test/testdata/ppd-debit.ach'
   1           1           1                  100000000         0
 ```
 
-## Getting Started
+### In-Browser ACH File Parser
+Using our [in-browser utility](http://oss.moov.io/ach/), you can instantly convert ACH files into JSON. Either paste in ACH file content directly or choose a file from your local machine. This tool is particulary useful if you're handling sensitive PII or want perform some quick tests, as operations are fully client-side with nothing stored in memory. We plan to support bidirectional conversion in the near future.
 
-- [Running ACH Server](./docs/README.md#running-moov-ach-server)
+### SDKs
+
+Below are some SDKs generated from the API documentation:
+
+- [Node SDK](https://www.npmjs.com/package/ach-node-sdk) | [GitHub](https://github.com/moov-io/ach-node-sdk)
+
+- TODO - OpenAPI Guide
+
+## Learn About ACH
+
 - [Intro to ACH](./docs/intro.md)
 - [Create an ACH File](./docs/create-file.md)
-
-## Guides
-
 - [ACH File Structure](./docs/file-structure.md)
-- [Balanced offset files](./docs/balanced-offset.md)
-- [Merging ACH files](./docs/merging-files.md)
-- [ACH Server metrics](./docs/metrics.md)
+- [Balanced Offset Files](./docs/balanced-offset.md)
+- [Merging ACH Files](./docs/merging-files.md)
+- [ACH Server Metrics](./docs/metrics.md)
 
-### From Source
+## FAQ
+<details open="true">
+<summary ><b>Is there an in-browser tool for converting ACH files into JSON?</b></summary>
+Yes! You can find our browser utility at http://oss.moov.io/ach/.
+</details>
+<details open="true">
+<summary><b>Is my data being saved somewhere?</b></summary>
+No, we do not save any data related to files, batch, or entry details. All processing is done in-memory.
+</details>
+<details open="true">
+<summary><b>What ACH transaction types are supported?</b></summary>
+We support generating and parsing all Standard Entry Class (SEC) codes.
+</details>
 
-This project uses [Go Modules](https://github.com/golang/go/wiki/Modules) and Go 1.14 or higher. See [Golang's install instructions](https://golang.org/doc/install) for help in setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/ach/releases/latest) as well. We highly recommend you use a tagged release for production.
-
-```
-$ git@github.com:moov-io/ach.git
-
-# Pull down into the Go Module cache
-$ go get -u github.com/moov-io/ach
-
-$ go doc github.com/moov-io/ach BatchHeader
-```
-
-### Configuration
-
-| Environmental Variable | Description | Default |
-|-----|-----|-----|
-| `ACH_FILE_TTL` | Time to live (TTL) for `*ach.File` objects stored in the in-memory repository. | 0 = No TTL / Never delete files (Example: `240m`) |
-| `LOG_FORMAT` | Format for logging lines to be written as. | Options: `json`, `plain` - Default: `plain` |
-| `HTTP_BIND_ADDRESS` | Address for paygate to bind its HTTP server on. This overrides the command-line flag `-http.addr`. | Default: `:8080` |
-| `HTTP_ADMIN_BIND_ADDRESS` | Address for paygate to bind its admin HTTP server on. This overrides the command-line flag `-admin.addr`. | Default: `:9090` |
-| `HTTPS_CERT_FILE` | Filepath containing a certificate (or intermediate chain) to be served by the HTTP server. Requires all traffic be over secure HTTP. | Empty |
-| `HTTPS_KEY_FILE`  | Filepath of a private key matching the leaf certificate from `HTTPS_CERT_FILE`. | Empty |
-
-
-Note: By design ACH **does not persist** (save) any data about the files, batches, or entry details created. The only storage occurs in memory of the process and upon restart ACH will have no files, batches, or data saved. Also, no in memory encryption of the data is performed.
 
 ## Getting Help
 
@@ -313,15 +366,34 @@ Note: 32-bit platforms have known issues and are not supported.
 
 Yes please! Please review our [Contributing guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) to get started! Check out our [issues for first time contributors](https://github.com/moov-io/ach/contribute) for something to help out with.
 
-This project uses [Go Modules](https://github.com/golang/go/wiki/Modules) and uses Go 1.14 or higher. See [Golang's install instructions](https://golang.org/doc/install) for help setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/ach/releases/latest) as well. We highly recommend you use a tagged release for production.
+This project uses [Go Modules](https://github.com/golang/go/wiki/Modules) and uses Go v1.14 or higher. See [Golang's install instructions](https://golang.org/doc/install) for help setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/ach/releases/latest) as well. We highly recommend you use a tagged release for production.
 
 ### Releasing
 
 To make a release of ach simply open a pull request with `CHANGELOG.md` and `version.go` updated with the next version number and details. You'll also need to push the tag (i.e. `git push origin v1.0.0`) to origin in order for CI to make the release.
 
+### Testing
+
+We maintain a comprehensive suite of unit tests and recommend table-driven testing when a particular function warrants several very similar test cases. To run all test files in the current directory, use `go test`. Current overall coverage can be found on [Codecov](https://app.codecov.io/gh/moov-io/ach/).
+
 ### Fuzzing
 
 We currently run fuzzing over ACH in the form of a [`moov/achfuzz`](https://hub.docker.com/r/moov/achfuzz) Docker image. You can [read more](./test/fuzz-reader/README.md) or run the image and report crasher examples to [`security@moov.io`](mailto:security@moov.io). Thanks!
+
+
+## Related Projects
+As part of Moov's initiative to offer open source fintech infrastructure, we have a large collection of active projects you may find useful:
+
+- [Moov Watchman](https://github.com/moov-io/watchman) offers search functions over numerous trade sanction lists from the United States and European Union.
+
+- [Moov Fed](https://github.com/moov-io/fed) implements utility services for searching the United States Federal Reserve System such as ABA routing numbers, financial institution name lookup, and FedACH and Fedwire routing information.
+
+- [Moov Wire](https://github.com/moov-io/wire) implements an interface to write files for the Fedwire Funds Service, a real-time gross settlement funds transfer system operated by the United States Federal Reserve Banks.
+
+- [Moov Image Cash Letter](https://github.com/moov-io/imagecashletter) implements Image Cash Letter (ICL) files used for Check21, X.9 or check truncation files for exchange and remote deposit in the U.S.
+
+- [Moov Metro 2](https://github.com/moov-io/metro2) provides a way to easily read, create, and validate Metro 2 format, which is used for consumer credit history reporting by the United States credit bureaus.
+
 
 ## License
 
