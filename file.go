@@ -561,7 +561,7 @@ type ValidateOpts struct {
 // overlayed with any custom flags.
 //
 // ValidateOpts set with SetValidation() are ignored, use Validate() instead.
-// ValidationOpts will only be applied to the FileHeader.
+// ValidateOpts will only be applied to the FileHeader.
 // The underlying Batches and Entries on this File will use their own ValidateOpts if they are set.
 //
 // The first error encountered is returned and stops the parsing.
