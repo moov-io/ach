@@ -243,7 +243,7 @@ func (ed *EntryDetail) String() string {
 	return buf.String()
 }
 
-// SetValidation stores ValidateOpts on the Batch which are to be used to override
+// SetValidation stores ValidateOpts on the EntryDetail which are to be used to override
 // the default NACHA validation rules.
 func (ed *EntryDetail) SetValidation(opts *ValidateOpts) {
 	if ed == nil {
