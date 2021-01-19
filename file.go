@@ -558,11 +558,11 @@ type ValidateOpts struct {
 }
 
 // ValidateWith performs NACHA format rule checks on each record according to their specification
-// overlayed with any custom flags.  
+// overlayed with any custom flags.
 //
 // ValidateOpts set with SetValidation() are ignored, use Validate() instead.
 // ValidationOpts will only be applied to the FileHeader.
-// The underlying Batches and Entries on this File will use their own ValidateOpts if they are set. 
+// The underlying Batches and Entries on this File will use their own ValidateOpts if they are set.
 //
 // The first error encountered is returned and stops the parsing.
 func (f *File) ValidateWith(opts *ValidateOpts) error {
