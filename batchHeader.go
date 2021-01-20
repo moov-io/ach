@@ -213,7 +213,7 @@ func (bh *BatchHeader) String() string {
 	return buf.String()
 }
 
-// SetValidation stores ValidateOpts on the Batch which are to be used to override
+// SetValidation stores ValidateOpts on the BatchHeader which are to be used to override
 // the default NACHA validation rules.
 func (bh *BatchHeader) SetValidation(opts *ValidateOpts) {
 	if bh == nil {

@@ -518,7 +518,7 @@ func (f *File) Validate() error {
 	return f.ValidateWith(f.validateOpts)
 }
 
-// SetValidation stores ValidateOpts on the Batch which are to be used to override
+// SetValidation stores ValidateOpts on the File which are to be used to override
 // the default NACHA validation rules.
 func (f *File) SetValidation(opts *ValidateOpts) {
 	if f == nil {
@@ -558,7 +558,11 @@ type ValidateOpts struct {
 }
 
 // ValidateWith performs NACHA format rule checks on each record according to their specification
-// overlayed with any custom flags. Any ValidateOpts on the File are ignored, use Validate() instead.
+// overlayed with any custom flags.
+//
+// ValidateOpts set with SetValidation() are ignored, use Validate() instead.
+// ValidateOpts will only be applied to the FileHeader.
+// The underlying Batches and Entries on this File will use their own ValidateOpts if they are set.
 //
 // The first error encountered is returned and stops the parsing.
 func (f *File) ValidateWith(opts *ValidateOpts) error {
