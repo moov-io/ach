@@ -22,12 +22,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/moov-io/ach"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/moov-io/ach"
 
 	"github.com/go-kit/kit/log"
 	httptransport "github.com/go-kit/kit/transport/http"
@@ -70,7 +71,10 @@ func TestRouting_ping(t *testing.T) {
 	if v := w.Body.String(); v != "PONG" {
 		t.Errorf("body: %s", v)
 	}
-	if v := w.Result().Header.Get("Access-Control-Allow-Origin"); v != "https://moov.io" {
+
+	resp := w.Result()
+	defer resp.Body.Close()
+	if v := resp.Header.Get("Access-Control-Allow-Origin"); v != "https://moov.io" {
 		t.Errorf("Access-Control-Allow-Origin: %s", v)
 	}
 }
@@ -120,8 +124,10 @@ func TestFilesXTotalCountHeader(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	encodeResponse(context.Background(), w, counter)
+	resp := w.Result()
+	defer resp.Body.Close()
 
-	actual, ok := w.Result().Header["X-Total-Count"]
+	actual, ok := resp.Header["X-Total-Count"]
 	if !ok {
 		t.Fatal("should have count")
 	}
@@ -145,8 +151,10 @@ func TestBatchesXTotalCountHeader(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	encodeResponse(context.Background(), w, counter)
+	resp := w.Result()
+	defer resp.Body.Close()
 
-	actual, ok := w.Result().Header["X-Total-Count"]
+	actual, ok := resp.Header["X-Total-Count"]
 	if !ok {
 		t.Fatal("should have count")
 	}
