@@ -297,10 +297,11 @@ func (fh *FileHeader) ImmediateDestinationField() string {
 	if fh.ImmediateDestination == "" {
 		return strings.Repeat(" ", 10)
 	}
-	if fh.validateOpts != nil && fh.validateOpts.BypassDestinationValidation {
-		return fh.stringField(strings.TrimSpace(fh.ImmediateDestination), 10)
+	fh.ImmediateDestination = strings.TrimSpace(fh.ImmediateDestination)
+	if fh.validateOpts != nil && fh.validateOpts.BypassDestinationValidation && len(fh.ImmediateDestination) == 10 {
+		return fh.ImmediateDestination
 	}
-	return " " + fh.stringField(strings.TrimSpace(fh.ImmediateDestination), 9)
+	return " " + fh.stringField(fh.ImmediateDestination, 9)
 }
 
 // ImmediateOriginField gets the immediate origin number with 0 padding
@@ -308,10 +309,11 @@ func (fh *FileHeader) ImmediateOriginField() string {
 	if fh.ImmediateOrigin == "" {
 		return strings.Repeat(" ", 10)
 	}
-	if fh.validateOpts != nil && fh.validateOpts.BypassOriginValidation {
-		return fh.stringField(strings.TrimSpace(fh.ImmediateOrigin), 10)
+	fh.ImmediateOrigin = strings.TrimSpace(fh.ImmediateOrigin)
+	if fh.validateOpts != nil && fh.validateOpts.BypassOriginValidation && len(fh.ImmediateOrigin) == 10 {
+		return fh.ImmediateOrigin
 	}
-	return " " + fh.stringField(strings.TrimSpace(fh.ImmediateOrigin), 9)
+	return " " + fh.stringField(fh.ImmediateOrigin, 9)
 }
 
 // FileCreationDateField gets the file creation date in YYMMDD (year, month, day) format

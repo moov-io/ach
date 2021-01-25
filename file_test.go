@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -1933,4 +1934,34 @@ func TestFile__SetValidation(t *testing.T) {
 	file = nil
 	file.SetValidation(nil)
 	file.SetValidation(&ValidateOpts{})
+}
+
+func TestFile__FileHeaderFormattingWithValidation(t *testing.T) {
+	f := NewFile()
+	f.ID = "foo"
+	f.Header = mockFileHeader()
+	f.AddBatch(mockBatchPPD())
+	f.SetValidation(&ValidateOpts{
+		BypassOriginValidation:      true,
+		BypassDestinationValidation: true,
+	})
+	if err := f.Create(); err != nil {
+		t.Fatal(err)
+	}
+
+	var b bytes.Buffer
+	writer := NewWriter(&b)
+	if err := writer.Write(f); err != nil {
+		t.Fatal(err)
+	}
+
+	s, err := b.ReadString('\n')
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	want := fmt.Sprintf("101 %s %s", f.Header.ImmediateDestination, f.Header.ImmediateOrigin)
+	if !strings.HasPrefix(s, want) {
+		t.Fatalf("want \"%v\", got \"%v\"", want, s[:len(want)])
+	}
 }
