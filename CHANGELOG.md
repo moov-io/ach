@@ -1,3 +1,14 @@
+## v1.6.1 (Released 2021-01-25)
+
+BUG FIXES
+
+- fileHeader: `ImmediateDestination` and `ImmediateOrigin` should be separated by a space unless bypass validation is set and the routing number is 10 digits
+
+IMPROVEMENTS
+
+- docs: improvements to README by adding a new header, table of contents, related projects, and FAQ 
+- docs: clarified code comments related to `File.ValidateWith(..)` and fixed minor documentation errors
+
 ## v1.6.0 (Released 2021-01-13)
 
 BUG FIXES
