@@ -24,11 +24,11 @@
 [![Twitter](https://img.shields.io/twitter/follow/moov_io?style=social)](https://twitter.com/moov_io?lang=en)
 
 # moov-io/ach
-Moov's mission is to give developers an easy way to create and integrate bank processing into their own software products. Our open source projects are each focused on solving a single responsibility in financial services and designed around performance, scalability, and ease-of-use.
+Moov's mission is to give developers an easy way to create and integrate bank processing into their own software products. Our open source projects are each focused on solving a single responsibility in financial services and designed around performance, scalability, and ease of use.
 
 ACH implements a reader, writer, and validator for Automated Clearing House ([ACH](https://en.wikipedia.org/wiki/Automated_Clearing_House)) files. ACH is the primary method of electronic money movement throughout the United States. The HTTP server is available in a [Docker image](#docker) and the Go package `github.com/moov-io/ach` is available.
 
-If you're looking for a complete implementation of ACH origination (file creation), OFAC checks, micro-deposits, SFTP uploading, and other features the [moov-io/paygate](https://github.com/moov-io/paygate) project aims to be a full system for ACH transfers. Otherwise, check out our article on [How and When to use the Moov ACH Library](https://moov.io/blog/tutorials/how-and-when-to-use-the-moov-ach-library/).
+If you're looking for a complete implementation of ACH origination (file creation), OFAC checks, micro-deposits, SFTP uploading, and other features, the [moov-io/paygate](https://github.com/moov-io/paygate) project aims to be a full system for ACH transfers. Otherwise, check out our article on [How and When to use the Moov ACH Library](https://moov.io/blog/tutorials/how-and-when-to-use-the-moov-ach-library/).
 
 ## Table of Contents
 
@@ -43,8 +43,8 @@ If you're looking for a complete implementation of ACH origination (file creatio
   - [As a Command Line Tool](#command-line)
   - [As an In-Browser Parser](##in-browser-ach-file-parser)
 - [SDKs (OpenAPI)](#sdks)
-- [Learn About ACH](#useful-links)
-- [FAQ](#faqs)
+- [Learn About ACH](#learn-about-ach)
+- [FAQ](#faq)
 - [Getting Help](#getting-help)
 - [Supported and Tested Platforms](#supported-and-tested-platforms)
 - [Contributing](#contributing)
@@ -78,7 +78,7 @@ curl localhost:8080/files
 
 Create a file on the HTTP server:
 ```
-curl -XPOST --data-binary "@./test/testdata/ppd-debit.ach" http://localhost:8080/files/create
+curl -X POST --data-binary "@./test/testdata/ppd-debit.ach" http://localhost:8080/files/create
 ```
 ```
 {"id":"<YOUR-UNIQUE-FILE-ID>","error":null}
@@ -185,7 +185,7 @@ You should get this response:
 
 Create a file on the server:
 ```
-curl -XPOST --data-binary "@./test/testdata/ppd-debit.ach" https://YOUR-ACH-APP-URL.a.run.app/files/create
+curl -X POST --data-binary "@./test/testdata/ppd-debit.ach" https://YOUR-ACH-APP-URL.a.run.app/files/create
 ```
 You should get this response:
 ```
@@ -285,10 +285,10 @@ The package [`github.com/moov-io/ach`](https://pkg.go.dev/github.com/moov-io/ach
 
 ### Command Line
 
-On each release there's a `achcli` utility released. This tool can display ACH files in a human-readable format which is easier to read than their plaintext format.
+On each release there's an `achcli` utility released. This tool can display ACH files in a human-readable format which is easier to read than their plaintext format.
 
 ```
-$ wget -O achcli https://github.com/moov-io/ach/releases/download/v1.4.4/achcli-darwin-amd64 && chmod +x achcli
+$ wget -O achcli https://github.com/moov-io/ach/releases/download/v1.6.1/achcli-darwin-amd64 && chmod +x achcli
 
 $ achcli test/testdata/ppd-debit.ach
 Describing ACH file 'test/testdata/ppd-debit.ach'
