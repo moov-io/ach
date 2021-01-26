@@ -2,16 +2,16 @@
 
 File creation honors the order and number of Batch's that are created by the client. This is not optimized for the smallest file size and cost, that could be sent to the Federal Reserve for processing.
 
-Flattening batches is a post file creation process that takes an input of an ACH.File and returns an ACH.File which have optimized the file by flattening (merging) Batch Headers that have the same information and appending all Entries into a single Batch.
+Flattening batches is a post file creation process that takes an input of an ACH.File and returns an ACH.File which has been optimized by flattening (merging) Batch Headers that have the same information and appending all Entries into a single Batch.
 
-Note: FlattenBatches (via `FlattenBatches()`) are only in ACH v1.2.0 and later.
+Note: FlattenBatches (via `FlattenBatches()`) is only in ACH v1.2.0 and later.
 
 ## Creating Flattened Batches
 
-An ACH [File](https://godoc.org/github.com/moov-io/ach#File) supports calling [FlattenBatches](https://godoc.org/github.com/moov-io/ach#File.FlattenBatches)
+An ACH [File](https://godoc.org/github.com/moov-io/ach#File) supports calling [FlattenBatches](https://godoc.org/github.com/moov-io/ach#File.FlattenBatches):
 
 ```go
-// open a file for reading. Any io.Reader Can be used
+// Open a file for reading. Any io.Reader can be used.
 f, err := os.Open(filepath.Join("test", "testdata", "flattenBatchesOneBatchHeader.ach"))
 
 if err != nil {
@@ -33,7 +33,7 @@ if err := of.Validate(); err != nil {
 	t.Fatalf("Flattened file did not validate: %+v \n", err)
 }
 
-// write the file to std out. Anything io.Writer
+// Write the file to stdout. Any io.Writer can be used.
 w := ach.NewWriter(os.Stdout)
 if err := w.Write(of); err != nil {
 	log.Fatalf("Unexpected error: %s\n", err)

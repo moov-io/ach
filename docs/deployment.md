@@ -1,4 +1,4 @@
-### Kubernetes
+## Kubernetes
 
 The following snippet runs the ACH Server on [Kubernetes](https://kubernetes.io/docs/tutorials/kubernetes-basics/) in the `apps` namespace. You could reach the ach instance at the following URL from inside the cluster.
 

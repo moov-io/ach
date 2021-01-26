@@ -7,10 +7,10 @@ Each NACHA formatted file you originate consists of the following records:
 * Entry Detail Record(s)
 * Addenda Record(s), if allowed and you choose to include them, or if required
 * One or more Company/Batch Control Record(s)
-* A File Control Record.
+* A File Control Record
 
 Each file begins with a File Header record. Following the File Header Record may be any number of batches. Each batch is identified by a Batch Header Record and contains one or more Entry Detail Records. At the end of each batch is a Batch Control Record. Each file is ended with a File Control Record.
-The diagram on the following page illustrates the Sequence of Records for ACH entries. The sequence of records will always be the same, regardless of SEC code. Out-of- sequence records or lack of a mandatory record will cause all or portions of the file to reject. Padding with “9” records at the end of the file is optional.
+This [diagram](https://raw.githubusercontent.com/moov-io/ach/master/docs/ach_file_structure_shg.gif) illustrates the Sequence of Records for ACH entries. The sequence of records will always be the same, regardless of SEC code. Out-of-sequence records or lack of a mandatory record will cause all or portions of the file to reject. Padding with “9” records at the end of the file is optional.
 
 ## Input File Descriptions
 
@@ -21,13 +21,13 @@ The File Header Record designates physical file characteristics and identifies t
 ### Company/Batch Header Record
 
 The Company/Batch Header Record identifies the Originator and briefly describes the purpose of the entries that are contained within the batch. For example, “GAS BILL” or “REG SALARY” indicates the reason for the transaction originated by the Originator. It also indicates the intended effective entry date of all transactions within the batch. The information contained in the Company/Batch Header Record applies uniformly to all subsequent Entry Detail Records in the batch.
-If you wish to vary any of this information, you must create a separate batch. For example, if you are making regular payroll payments and bonus payments then you should create one batch described as “REG SALARY” and another as “BONUS.”
+If you wish to vary any of this information, you must create a separate batch. For example, if you are making regular payroll payments and bonus payments then you should create one batch described as “REG SALARY” and another as “BONUS”.
 
 ### Entry Detail Record
 
-Entry Detail Records contain information that relate the specific entry to the Receiver, such as the Receiving Depository Financial Institution account and routing transit number and the debit or credit amount.
+Entry Detail Records contain information that relate the specific entry to the Receiver, such as the Receiving Depository Financial Institution account, routing transit number, and the debit or credit amount.
 Prenotifications (prenotes) are special zero-dollar entries used to test the validity of the account number and transit routing number provided by the Receiver. Prenotes are identical to the basic Entry Detail format but contain appropriate Transaction Codes and zeroes in the amount field. Prenotes can be batched with other dollar entries or batched separately.
-Zero-dollar entries used in corporate trade payments to deliver remittance information contain appropriate Transaction Codes and zeros in the Amount field but otherwise are formatted the same as other entries. Zero-dollar entries can be batched with other CCD dollar entries or batched separately. One Addenda Record must accompany a CCD zero- dollar entry.
+Zero-dollar entries used in corporate trade payments to deliver remittance information contain appropriate Transaction Codes and zeros in the Amount field but otherwise are formatted the same as other entries. Zero-dollar entries can be batched with other CCD dollar entries or batched separately. One Addenda Record must accompany a CCD zero-dollar entry.
 
 ### Addenda Records
 
