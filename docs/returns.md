@@ -6,7 +6,7 @@ Returns are identified by an [Addenda99](https://pkg.go.dev/github.com/moov-io/a
 
 ### Processing
 
-An Originator must have a process setup with their ODFI to handle returns. This may involve manual verification of actions to take, retrying entries (only in the case of an `R01` or `R09`), or revocation of future transfers for the customer (`R07` - Authorization revoked).
+An Originator must have a process set up with their ODFI to handle returns. This may involve manual verification of actions to take, retrying entries (only in the case of an `R01` or `R09`), or revocation of future transfers for the customer (`R07` - Authorization revoked).
 
 Fees may be applied by the ODFI/RDFI as a result of returned files. Written authorization may be requested as a result of returned files as well. Such authorization requests may be prompted if the description, amount, or effective date is different than what the customer had authorized.
 

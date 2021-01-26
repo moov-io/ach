@@ -1,7 +1,7 @@
 ## What is ACH
 Automated Clearing House (ACH) is an electronic network for financial transactions in the United States. ACH processes large volumes of credit and debit transactions in batches. ACH credit transfers include direct deposit, payroll and vendor payments. ACH direct debit transfers include consumer payments on insurance premiums, mortgage loans, and other kinds of bills. Debit transfers also include new applications such as the point-of-purchase (POP) check conversion pilot program sponsored by the National Automated Clearing House Association (NACHA). Both the government and the commercial sectors use ACH payments. Businesses increasingly use ACH online to have customers pay, rather than via credit or debit cards.
 
-[source: Automated Clearing House](https://en.wikipedia.org/wiki/Automated_Clearing_House)
+[Source: Wikipedia - Automated Clearing House](https://en.wikipedia.org/wiki/Automated_Clearing_House)
 
 ## How does ACH work?
 NACHA includes Members in the process of establishing Rules for the ACH Network, working collaboratively to create a clear picture of participant roles and responsibilities in the following ACH transaction process.
@@ -16,11 +16,11 @@ NACHA includes Members in the process of establishing Rules for the ACH Network,
 7. The Receiver’s account is debited or credited by the RDFI, according to the type of ACH entry. Individuals, businesses and other entities can all be Receivers.
 8. Each ACH credit transaction settles in one to two business days, and each debit transaction settles in just one business day, as per the Rules.
 
-[source: ACH Network: How it Works](https://www.nacha.org/ach-network)
+[Source: ACH Network: How it Works](https://www.nacha.org/ach-network)
 
 ## Developer Overview
 
-Gusto has provided a great technical overview of how ACH works for developers
+Gusto has provided a great technical overview of how ACH works for developers:
 
 - [How ACH works: A developer perspective - Part 1](http://engineering.gusto.com/how-ach-works-a-developer-perspective-part-1/)
 - [How ACH works: A developer perspective - Part 2](http://engineering.gusto.com/how-ach-works-a-developer-perspective-part-2/)
