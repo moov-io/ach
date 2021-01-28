@@ -403,13 +403,10 @@ func (f *File) Create() error {
 		// add 2 for FileHeader/control and reset if build was called twice do to error
 		totalRecordsInFile := 2
 		batchSeq := 1
-
 		fileEntryAddendaCount := 0
 		fileEntryHashSum := 0
 		totalDebitAmount := 0
 		totalCreditAmount := 0
-
-		//if opts := f..validateOpts; opts == nil {
 
 		for i, batch := range f.Batches {
 			// create ascending batch numbers unless batch number has been provided
@@ -605,7 +602,6 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 		if err := f.isSequenceAscending(); err != nil {
 			return err
 		}
-
 		return f.isEntryHash(false)
 	}
 
