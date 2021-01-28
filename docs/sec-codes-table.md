@@ -1,3 +1,12 @@
+---
+layout: page
+title: SEC Codes Table
+description: fill
+hide_hero: true
+show_sidebar: false
+menubar: getting-started-menu
+---
+
 ## Picking which Standard Entry Class Code code to use
 
 The [NACHA Corporate Rules and Guidelines](https://github.com/moov-io/ach/blob/master/docs/2013-Corporate-Rules-and-Guidelines.pdf) offer a helpful table for choosing the correct Standard Entry Class (SEC) Code to use for a given enrollment and transaction. The table has been re-written below:

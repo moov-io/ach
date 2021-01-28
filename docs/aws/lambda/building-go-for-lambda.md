@@ -1,3 +1,12 @@
+---
+layout: page
+title: AWS
+description: fill
+hide_hero: true
+show_sidebar: false
+menubar: getting-started-menu
+---
+
 # Build a Go file for use in AWS Lambda
 
 Lambdas require a Linux executable packaged in a zip folder. The following commands can be used to build a compatible executable (see [Lambda Packaging Docs](https://docs.aws.amazon.com/lambda/latest/dg/golang-package.html) for more info):

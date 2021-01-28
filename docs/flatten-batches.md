@@ -1,3 +1,12 @@
+---
+layout: page
+title: Flatten Batches
+description: fill
+hide_hero: true
+show_sidebar: false
+menubar: getting-started-menu
+---
+
 ## Flatten Batches
 
 File creation honors the order and number of Batch's that are created by the client. This is not optimized for the smallest file size and cost, that could be sent to the Federal Reserve for processing.

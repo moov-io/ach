@@ -1,3 +1,14 @@
+---
+layout: page
+title: Prometheus Metrics
+description: fill
+hide_hero: true
+show_sidebar: false
+menubar: getting-started-menu
+---
+
+# Metrics
+
 The Moov ACH HTTP server reports Prometheus metrics when running. These are available on the admin server at `:9090/metrics` in the Prometheus metric format.
 
 ## Files

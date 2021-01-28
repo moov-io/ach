@@ -1,0 +1,51 @@
+- label: Getting Started
+  items:
+    - name: Overview
+      link: /overview/
+    - name: What is ACH?
+      link: /intro/
+
+- label: Usage
+  items:
+    - name: Docker
+      link: /usage-docker/
+    - name: Google Cloud Run
+      link: /usage-google-cloud/
+    - name: Building for AWS Lambda
+      link: /aws/lambda/building-go-for-lambda/
+      items:
+        - name: Convert JSON to NACHA
+          link: /aws/lambda/json_to_nacha/lambda_json_to_nacha/
+        - name: Convert NACHA to JSON
+          link: /aws/lambda/nacha_to_json/lambda_nacha_to_json/
+
+- label: ACH File Setup
+  items:
+    - name: Create File
+      link: /create-file/
+    - name: File Structure
+      link: /file-structure/
+    - name: SEC Codes Table
+      link: /sec-codes-table/
+
+- label: File Operations
+  items:
+    - name: Custom Validation
+      link: /custom-validation/
+    - name: Balanced Offset
+      link: /balanced-offset/
+    - name: Flatten Batches
+      link: /flatten-batches/
+    - name: Merging Files
+      link: /merging-files/
+    - name: Segmenting Files
+      link: /segment-file/
+    - name: Return Files
+      link: /returns/
+
+- label: Production and Monitoring
+  items:
+    - name: Kubernetes
+      link: /deployment/
+    - name: Prometheus Metrics
+      link: /metrics/

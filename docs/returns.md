@@ -1,3 +1,12 @@
+---
+layout: page
+title: Return Files
+description: fill
+hide_hero: true
+show_sidebar: false
+menubar: getting-started-menu
+---
+
 ## Return Files
 
 ACH files and their EntryDetail records may be returned for a variety of reasons defined by "return codes". Either the originating (ODFI) or receiving (RDFI) financial institution can issue a return. Some of the most common reasons include: insufficient funds (`R01`) and account information not found (`R03`).

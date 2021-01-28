@@ -1,3 +1,12 @@
+---
+layout: page
+title: Balanced Offset
+description: fill
+hide_hero: true
+show_sidebar: false
+menubar: getting-started-menu
+---
+
 ## Balanced Offsets
 
 ACH files can have "offset records" which are [EntryDetail](https://godoc.org/github.com/moov-io/ach#EntryDetail) records that balance a file's debits and credits. This means if there are debits, there is a credit offset matching the sum of the debits. If there are credits, there is a debit offset matching the sum of the credits. They are mutually exclusive.

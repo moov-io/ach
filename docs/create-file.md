@@ -1,8 +1,13 @@
-## API Documentation
+---
+layout: page
+title: ACH File Setup
+description: fill
+hide_hero: true
+show_sidebar: false
+menubar: getting-started-menu
+---
 
-See our [API documentation](https://moov-io.github.io/ach/api/) for Moov ACH endpoints.
-
-## ACH File Setup
+## Create a File
 
 Creating an Automated Clearing House (ACH) file can be done several ways:
 
