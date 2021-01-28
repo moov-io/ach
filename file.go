@@ -403,15 +403,20 @@ func (f *File) Create() error {
 		// add 2 for FileHeader/control and reset if build was called twice do to error
 		totalRecordsInFile := 2
 		batchSeq := 1
+
 		fileEntryAddendaCount := 0
 		fileEntryHashSum := 0
 		totalDebitAmount := 0
 		totalCreditAmount := 0
 
+		//if opts := f..validateOpts; opts == nil {
+
 		for i, batch := range f.Batches {
-			// create ascending batch numbers
-			f.Batches[i].GetHeader().BatchNumber = batchSeq
-			f.Batches[i].GetControl().BatchNumber = batchSeq
+			// create ascending batch numbers unless batch number has been provided
+			if f.Batches[i].GetHeader().BatchNumber == 1 {
+				f.Batches[i].GetHeader().BatchNumber = batchSeq
+				f.Batches[i].GetControl().BatchNumber = batchSeq
+			}
 			batchSeq++
 			// sum file entry and addenda records. Assume batch.Create() batch properly calculated control
 			fileEntryAddendaCount = fileEntryAddendaCount + batch.GetControl().EntryAddendaCount
@@ -424,8 +429,10 @@ func (f *File) Create() error {
 		}
 		for i, iatBatch := range f.IATBatches {
 			// create ascending batch numbers
-			f.IATBatches[i].GetHeader().BatchNumber = batchSeq
-			f.IATBatches[i].GetControl().BatchNumber = batchSeq
+			if f.Batches[i].GetHeader().BatchNumber <= batchSeq {
+				f.Batches[i].GetHeader().BatchNumber = batchSeq
+				f.Batches[i].GetControl().BatchNumber = batchSeq
+			}
 			batchSeq++
 			// sum file entry and addenda records. Assume batch.Create() batch properly calculated control
 			fileEntryAddendaCount = fileEntryAddendaCount + iatBatch.GetControl().EntryAddendaCount
@@ -595,6 +602,10 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 		if err := f.isFileAmount(false); err != nil {
 			return err
 		}
+		if err := f.isSequenceAscending(); err != nil {
+			return err
+		}
+
 		return f.isEntryHash(false)
 	}
 
@@ -1123,6 +1134,20 @@ func (f *File) FlattenBatches() (*File, error) {
 		return nil, err
 	}
 	return of, nil
+}
+
+//Validates that the batch numbers are ascending
+func (f *File) isSequenceAscending() error {
+
+	lastSeq := 0
+	for _, batch := range f.Batches {
+		current := batch.GetHeader().BatchNumber
+		if current <= lastSeq {
+			return NewErrFileBatchNumberAscending("BatchNumber", lastSeq, current)
+		}
+		lastSeq = current
+	}
+	return nil
 }
 
 // removeDuplicateBatchHeaders removes duplicate batch header
