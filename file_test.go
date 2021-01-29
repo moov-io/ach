@@ -1965,3 +1965,23 @@ func TestFile__FileHeaderFormattingWithValidation(t *testing.T) {
 		t.Fatalf("want \"%v\", got \"%v\"", want, s[:len(want)])
 	}
 }
+
+// testFileEntryHash validates entry hash
+func TestFileiSequenceAscending(t *testing.T) {
+	file := mockFilePPD()
+	file.Batches[0].GetHeader().BatchNumber = 3
+	file.Batches[0].GetControl().BatchNumber = 3
+	mockBatch := mockBatchPPD()
+	mockBatch.GetHeader().BatchNumber = 3
+	mockBatch.GetControl().BatchNumber = 3
+
+	file.AddBatch(mockBatch)
+	if err := file.Create(); err != nil {
+		t.Fatal(err)
+	}
+
+	err := file.Validate()
+	if err != NewErrFileBatchNumberAscending("BatchNumber", 3, 3) {
+		t.Errorf("%T: %s", err, err)
+	}
+}

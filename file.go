@@ -410,7 +410,7 @@ func (f *File) Create() error {
 
 		for i, batch := range f.Batches {
 			// create ascending batch numbers unless batch number has been provided
-			if f.Batches[i].GetHeader().BatchNumber == 1 {
+			if f.Batches[i].GetHeader().BatchNumber <= 1 {
 				f.Batches[i].GetHeader().BatchNumber = batchSeq
 				f.Batches[i].GetControl().BatchNumber = batchSeq
 			}
@@ -426,7 +426,7 @@ func (f *File) Create() error {
 		}
 		for i, iatBatch := range f.IATBatches {
 			// create ascending batch numbers
-			if f.IATBatches[i].GetHeader().BatchNumber == 1 {
+			if f.IATBatches[i].GetHeader().BatchNumber <= 1 {
 				f.IATBatches[i].GetHeader().BatchNumber = batchSeq
 				f.IATBatches[i].GetControl().BatchNumber = batchSeq
 			}
@@ -776,9 +776,9 @@ func (f *File) createFileADV() error {
 			return ErrFileADVOnly
 		}
 
-		if f.Batches[i].GetHeader().BatchNumber == 1 {
+		if f.Batches[i].GetHeader().BatchNumber <= 1 {
 			f.Batches[i].GetHeader().BatchNumber = batchSeq
-			f.Batches[i].GetControl().BatchNumber = batchSeq
+			f.Batches[i].GetADVControl().BatchNumber = batchSeq
 		}
 		batchSeq++
 		// sum file entry and addenda records. Assume batch.Create() batch properly calculated control
