@@ -1,4 +1,12 @@
-## Segmenting Files
+---
+layout: page
+title: Segmenting Files
+hide_hero: true
+show_sidebar: false
+menubar: docs-menu
+---
+
+# Segmenting Files
 
 ACH File creation should default to NACHA rules by supporting both credits and debits in the same ACH file.  Some legacy systems require the file to be segmented and contain only debits or only credits in a file.
 

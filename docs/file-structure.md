@@ -1,3 +1,11 @@
+---
+layout: page
+title: File Structure
+hide_hero: true
+show_sidebar: false
+menubar: docs-menu
+---
+
 ## Sequence of Records and Description
 
 Each NACHA formatted file you originate consists of the following records:
