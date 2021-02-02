@@ -1136,15 +1136,16 @@ func (f *File) FlattenBatches() (*File, error) {
 
 //Validates that the batch numbers are ascending
 func (f *File) isSequenceAscending() error {
-
 	lastSeq := 0
 	for _, batch := range f.Batches {
 		current := batch.GetHeader().BatchNumber
 		if current <= lastSeq {
 			return NewErrFileBatchNumberAscending("BatchNumber", lastSeq, current)
 		}
+		
 		lastSeq = current
 	}
+	
 	return nil
 }
 
