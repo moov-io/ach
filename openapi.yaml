@@ -546,20 +546,28 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Batch'
+          nullable: true
         IATBatches:
           type: array
           items:
             $ref: '#/components/schemas/IATBatch'
+          nullable: true
         fileControl:
           $ref: '#/components/schemas/FileControl'
         NotificationOfChange:
           type: array
           items:
             $ref: '#/components/schemas/Batch'
+          nullable: true
         ReturnEntries:
           type: array
           items:
             $ref: '#/components/schemas/Batch'
+          nullable: true
+      required:
+      - ID
+      - fileHeader
+      - fileControl
     FileHeader:
       properties:
         immediateOrigin:
@@ -596,11 +604,14 @@ components:
           type: string
           description: Incremented value for each file for RDFI's.
           example: "0"
+          nullable: true
       required:
         - immediateOrigin
         - immediateOriginName
         - immediateDestination
         - immediateDestinationName
+        - fileCreationTime
+        - fileCreationDate
     FileControl:
       properties:
         ID:

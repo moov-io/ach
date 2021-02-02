@@ -421,6 +421,14 @@ func BenchmarkFileReturnEntries(b *testing.B) {
 	}
 }
 
+// vince tester todo: delete
+func TestX(t *testing.T) {
+	f := NewFile()
+	b, _ := json.MarshalIndent(&f, "", " ")
+	fmt.Printf("%s", b)
+
+}
+
 func TestFile__readFromJson(t *testing.T) {
 	path := filepath.Join("test", "testdata", "ppd-valid.json")
 	bs, err := ioutil.ReadFile(path)
