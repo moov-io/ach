@@ -284,7 +284,11 @@ func populateFileWithMockBatches(t *testing.T, numBatches int, file *File) {
 		batch.AddEntry(entryDetail)
 		batch.GetHeader().BatchNumber = i
 		batch.GetControl().BatchNumber = i
-		batch.Create()
+
+		if err := batch.Create(); err != nil {
+			t.Fatal(err)
+		}
+
 		file.AddBatch(batch)
 	}
 }
