@@ -1967,7 +1967,7 @@ func TestFile__FileHeaderFormattingWithValidation(t *testing.T) {
 }
 
 // testFileEntryHash validates entry hash
-func TestFileiSequenceAscending(t *testing.T) {
+func TestFile__AscendingBatchSequence(t *testing.T) {
 	file := mockFilePPD()
 	file.Batches[0].GetHeader().BatchNumber = 3
 	file.Batches[0].GetControl().BatchNumber = 3

@@ -131,9 +131,9 @@ type ErrFileBatchNumberAscending struct {
 }
 
 // NewErrFileBatchNumberAscending creates a new error of the ErrFileBatchNumberAscending type
-func NewErrFileBatchNumberAscending(field string, previous, current int) ErrFileBatchNumberAscending {
+func NewErrFileBatchNumberAscending(previous, current int) ErrFileBatchNumberAscending {
 	return ErrFileBatchNumberAscending{
-		Message:       fmt.Sprintf("%v must be in ascending order, %v is less than or equal to last number %v", field, current, previous),
+		Message:       fmt.Sprintf("Batch numbers must be in ascending order, batch %v is less than or equal to the previous batch: %v", current, previous),
 		PreviousBatch: previous,
 		CurrentBatch:  current,
 	}

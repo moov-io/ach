@@ -264,10 +264,11 @@ func TestMergeFiles__invalid(t *testing.T) {
 	}
 }
 
-func populateFileWithMockBatches(noOfBatches int, file *File) {
-	var startSeq = file.Batches[0].GetHeader().BatchNumber + 1
+func populateFileWithMockBatches(numBatches int, file *File) {
+	lastBatchIdx := len(file.Batches) - 1
+	var startSeq = file.Batches[lastBatchIdx].GetHeader().BatchNumber + 1
 	var entryDetail = file.Batches[0].GetEntries()[0]
-	for i := startSeq; i < (noOfBatches + startSeq); i++ {
+	for i := startSeq; i < (numBatches + startSeq); i++ {
 		header := mockBatchHeader()
 		header.StandardEntryClassCode = "PPD"
 		header.ServiceClassCode = 225
