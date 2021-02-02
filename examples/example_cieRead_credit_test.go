@@ -19,36 +19,37 @@ package examples
 
 import (
 	"fmt"
-	"github.com/moov-io/ach"
 	"log"
 	"os"
 	"path/filepath"
 	"strconv"
+
+	"github.com/moov-io/ach"
 )
 
 func Example_cieReadCredit() {
 	f, err := os.Open(filepath.Join("testdata", "cie-credit.ach"))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 	r := ach.NewReader(f)
 	achFile, err := r.Read()
 	if err != nil {
-		fmt.Printf("Issue reading file: %+v \n", err)
+		log.Fatalf("reading file: %v\n", err)
 	}
-	// ensure we have a validated file structure
+	// Validate the ACH file
 	if achFile.Validate(); err != nil {
-		fmt.Printf("Could not validate entire read file: %v", err)
+		log.Fatalf("validating file: %v\n", err)
 	}
 	// If you trust the file but it's formatting is off building will probably resolve the malformed file.
 	if err := achFile.Create(); err != nil {
-		fmt.Printf("Could not create file with read properties: %v", err)
+		log.Fatalf("creating file: %v\n", err)
 	}
 
-	fmt.Printf("Total Amount Debit: %s", strconv.Itoa(achFile.Control.TotalDebitEntryDollarAmountInFile)+"\n")
-	fmt.Printf("Total Amount Credit: %s", strconv.Itoa(achFile.Control.TotalCreditEntryDollarAmountInFile)+"\n")
-	fmt.Printf("SEC Code: %s", achFile.Batches[0].GetHeader().StandardEntryClassCode+"\n")
-	fmt.Printf("Addenda05: %s", achFile.Batches[0].GetEntries()[0].Addenda05[0].String()+"\n")
+	fmt.Printf("Total Amount Debit: %s\n", strconv.Itoa(achFile.Control.TotalDebitEntryDollarAmountInFile))
+	fmt.Printf("Total Amount Credit: %s\n", strconv.Itoa(achFile.Control.TotalCreditEntryDollarAmountInFile))
+	fmt.Printf("SEC Code: %s\n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
+	fmt.Printf("Addenda05: %s\n", achFile.Batches[0].GetEntries()[0].Addenda05[0].String())
 
 	// Output:
 	// Total Amount Debit: 0

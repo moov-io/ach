@@ -67,12 +67,12 @@ func Example_cieWriteCredit() {
 		log.Fatalf("Unexpected error building file: %s\n", err)
 	}
 
-	fmt.Printf("%s", file.Header.String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetHeader().String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetEntries()[0].String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetEntries()[0].Addenda05[0].String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetControl().String()+"\n")
-	fmt.Printf("%s", file.Control.String()+"\n")
+	fmt.Println(file.Header.String())
+	fmt.Println(file.Batches[0].GetHeader().String())
+	fmt.Println(file.Batches[0].GetEntries()[0].String())
+	fmt.Println(file.Batches[0].GetEntries()[0].Addenda05[0].String())
+	fmt.Println(file.Batches[0].GetControl().String())
+	fmt.Println(file.Control.String())
 
 	// Output:
 	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
