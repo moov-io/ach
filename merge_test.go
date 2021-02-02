@@ -171,9 +171,8 @@ func TestMergeFiles__lineCount(t *testing.T) {
 	}
 
 	// Add 100 batches to file and get a real line count
-	for i := 0; i < 100; i++ {
-		file.AddBatch(file.Batches[0])
-	}
+	populateFileWithMockBatches(t, 100, file)
+
 	if err := file.Create(); err != nil {
 		t.Fatal(err)
 	}
@@ -205,9 +204,8 @@ func TestMergeFiles__splitFiles(t *testing.T) {
 
 	// Add a bunch of batches so it's over the line limit
 	// somewhere between 3-4k Batches exceed the 10k line limit
-	for i := 0; i < 4000; i++ {
-		file.AddBatch(file.Batches[0])
-	}
+	populateFileWithMockBatches(t, 4000, file)
+
 	if err := file.Create(); err != nil {
 		t.Fatal(err)
 	}
@@ -263,5 +261,34 @@ func TestMergeFiles__invalid(t *testing.T) {
 	out, err := MergeFiles([]*File{f1, f2})
 	if len(out) != 0 || err == nil {
 		t.Errorf("expected error: len(out)=%d error=%v", len(out), err)
+	}
+}
+
+func populateFileWithMockBatches(t *testing.T, numBatches int, file *File) {
+	lastBatchIdx := len(file.Batches) - 1
+	var startSeq = file.Batches[lastBatchIdx].GetHeader().BatchNumber + 1
+	var entryDetail = file.Batches[0].GetEntries()[0]
+	for i := startSeq; i < (numBatches + startSeq); i++ {
+		header := mockBatchHeader()
+		header.StandardEntryClassCode = "PPD"
+		header.ServiceClassCode = 225
+		header.CompanyName = "Example Company"
+		header.CompanyIdentification = "132465"
+		header.CompanyEntryDescription = "Example Description"
+		header.ODFIIdentification = "12104288"
+		batch, err := NewBatch(header)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		batch.AddEntry(entryDetail)
+		batch.GetHeader().BatchNumber = i
+		batch.GetControl().BatchNumber = i
+
+		if err := batch.Create(); err != nil {
+			t.Fatal(err)
+		}
+
+		file.AddBatch(batch)
 	}
 }

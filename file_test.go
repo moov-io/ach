@@ -1965,3 +1965,55 @@ func TestFile__FileHeaderFormattingWithValidation(t *testing.T) {
 		t.Fatalf("want \"%v\", got \"%v\"", want, s[:len(want)])
 	}
 }
+
+// testFileEntryHash validates entry hash
+func TestFile__AscendingBatchSequence(t *testing.T) {
+	tests := []struct {
+		desc        string
+		sequence    []int
+		expectedErr error
+	}{
+		{
+			desc:        "success: strictly ascending",
+			sequence:    []int{2, 5, 7, 9},
+			expectedErr: nil,
+		},
+		{
+			desc:        "descending then ascending",
+			sequence:    []int{3, 2, 4},
+			expectedErr: NewErrFileBatchNumberAscending(3, 2),
+		},
+		{
+			desc:        "ascending then descending",
+			sequence:    []int{2, 3, 2},
+			expectedErr: NewErrFileBatchNumberAscending(3, 2),
+		},
+		{
+			desc:        "equal values",
+			sequence:    []int{2, 3, 3, 4},
+			expectedErr: NewErrFileBatchNumberAscending(3, 3),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			file := mockFilePPD()
+
+			for _, num := range tt.sequence {
+				mockBatch := mockBatchPPD()
+				mockBatch.GetHeader().BatchNumber = num
+				mockBatch.GetControl().BatchNumber = num
+				file.AddBatch(mockBatch)
+			}
+
+			if err := file.Create(); err != nil {
+				t.Fatal(err)
+			}
+
+			err := file.Validate()
+			if err != tt.expectedErr {
+				t.Errorf("got: %v, want: %v", err, tt.expectedErr)
+			}
+		})
+	}
+}

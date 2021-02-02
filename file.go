@@ -409,9 +409,11 @@ func (f *File) Create() error {
 		totalCreditAmount := 0
 
 		for i, batch := range f.Batches {
-			// create ascending batch numbers
-			f.Batches[i].GetHeader().BatchNumber = batchSeq
-			f.Batches[i].GetControl().BatchNumber = batchSeq
+			// create ascending batch numbers unless batch number has been provided
+			if f.Batches[i].GetHeader().BatchNumber <= 1 {
+				f.Batches[i].GetHeader().BatchNumber = batchSeq
+				f.Batches[i].GetControl().BatchNumber = batchSeq
+			}
 			batchSeq++
 			// sum file entry and addenda records. Assume batch.Create() batch properly calculated control
 			fileEntryAddendaCount = fileEntryAddendaCount + batch.GetControl().EntryAddendaCount
@@ -424,8 +426,10 @@ func (f *File) Create() error {
 		}
 		for i, iatBatch := range f.IATBatches {
 			// create ascending batch numbers
-			f.IATBatches[i].GetHeader().BatchNumber = batchSeq
-			f.IATBatches[i].GetControl().BatchNumber = batchSeq
+			if f.IATBatches[i].GetHeader().BatchNumber <= 1 {
+				f.IATBatches[i].GetHeader().BatchNumber = batchSeq
+				f.IATBatches[i].GetControl().BatchNumber = batchSeq
+			}
 			batchSeq++
 			// sum file entry and addenda records. Assume batch.Create() batch properly calculated control
 			fileEntryAddendaCount = fileEntryAddendaCount + iatBatch.GetControl().EntryAddendaCount
@@ -593,6 +597,9 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 			return err
 		}
 		if err := f.isFileAmount(false); err != nil {
+			return err
+		}
+		if err := f.isSequenceAscending(); err != nil {
 			return err
 		}
 		return f.isEntryHash(false)
@@ -769,8 +776,10 @@ func (f *File) createFileADV() error {
 			return ErrFileADVOnly
 		}
 
-		f.Batches[i].GetHeader().BatchNumber = batchSeq
-		f.Batches[i].GetADVControl().BatchNumber = batchSeq
+		if f.Batches[i].GetHeader().BatchNumber <= 1 {
+			f.Batches[i].GetHeader().BatchNumber = batchSeq
+			f.Batches[i].GetADVControl().BatchNumber = batchSeq
+		}
 		batchSeq++
 		// sum file entry and addenda records. Assume batch.Create() batch properly calculated control
 		fileEntryAddendaCount = fileEntryAddendaCount + batch.GetADVControl().EntryAddendaCount
@@ -1123,6 +1132,21 @@ func (f *File) FlattenBatches() (*File, error) {
 		return nil, err
 	}
 	return of, nil
+}
+
+//Validates that the batch numbers are ascending
+func (f *File) isSequenceAscending() error {
+	lastSeq := 0
+	for _, batch := range f.Batches {
+		current := batch.GetHeader().BatchNumber
+		if current <= lastSeq {
+			return NewErrFileBatchNumberAscending(lastSeq, current)
+		}
+
+		lastSeq = current
+	}
+
+	return nil
 }
 
 // removeDuplicateBatchHeaders removes duplicate batch header

@@ -122,3 +122,23 @@ func NewErrFileCalculatedControlEquality(field string, calculated, control int) 
 func (e ErrFileCalculatedControlEquality) Error() string {
 	return e.Message
 }
+
+// ErrFileBatchNumberAscending is the error given when the batch numbers in a file are not in ascending order
+type ErrFileBatchNumberAscending struct {
+	Message       string
+	PreviousBatch int
+	CurrentBatch  int
+}
+
+// NewErrFileBatchNumberAscending creates a new error of the ErrFileBatchNumberAscending type
+func NewErrFileBatchNumberAscending(previous, current int) ErrFileBatchNumberAscending {
+	return ErrFileBatchNumberAscending{
+		Message:       fmt.Sprintf("Batch numbers must be in ascending order, batch %v is less than or equal to the previous batch: %v", current, previous),
+		PreviousBatch: previous,
+		CurrentBatch:  current,
+	}
+}
+
+func (e ErrFileBatchNumberAscending) Error() string {
+	return e.Message
+}
