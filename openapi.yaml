@@ -526,7 +526,7 @@ components:
         - fileHeader
     FileID:
       properties:
-        ID:
+        id:
           type: string
           description: File ID
           example: "1e522dc8"
@@ -536,7 +536,7 @@ components:
           example: Validation error(s) present.
     File:
       properties:
-        ID:
+        id:
           type: string
           description: File ID
           example: "3f2d23ee214"
@@ -595,10 +595,12 @@ components:
         fileCreationTime:
           description: 'The File Creation Date is the date when the file was prepared by an ODFI. (Format HHmm - H=Hour, m=Minute)'
           type: string
+          format: "HHmm"
           example: "1504"
         fileCreationDate:
           description: 'The File Creation Time is the time when the file was prepared by an ODFI. (Format YYMMDD - Y=Year, M=Month, D=Day)'
           type: string
+          format: "YYMMDD"
           example: "190102"
         fileIDModifier:
           type: string
@@ -614,35 +616,49 @@ components:
         - fileCreationDate
     FileControl:
       properties:
-        ID:
+        id:
           description: Moov API File ID
           type: string
           example: "d1e26288"
         batchCount:
           description: Count of Batches in the File
           type: integer
+          minimum: 0
           example: 1
         blockCount:
           description: |
             BlockCount total number of records in the file (include all headers and trailer) divided by 10 (This number must be evenly divisible by 10. If not, additional records consisting of all 9's are added to the file after the initial '9' record to fill out the block 10.)
           type: integer
+          minimum: 0
           example: 1
         entryAddendaCount:
           description: Total detail and addenda records in the file
           type: integer
+          minimum: 0
           example: 0
         entryHash:
-          description: EntryHash calculated in the same manner as the batch has total but includes total from entire file
+          description: EntryHash calculated in the same manner as the batch total but includes total from entire file
           type: integer
+          minimum: 0
           example: 0
         totalDebit:
           description: Accumulated Batch debit totals within the file.
           type: integer
+          minimum: 0
           example: 100
         totalCredit:
           description: Accumulated Batch credit totals within the file.
           type: integer
+          minimum: 0
           example: 20
+      required:
+        - id 
+        - batchCount
+        - blockCount
+        - entryAddendaCount
+        - entryHash
+        - totalDebit
+        - totalCredit
     RawFile:
       type: string
       description: Plaintext ACH file
