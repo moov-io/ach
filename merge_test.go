@@ -171,7 +171,7 @@ func TestMergeFiles__lineCount(t *testing.T) {
 	}
 
 	// Add 100 batches to file and get a real line count
-	populateFileWithMockBatches(100, file)
+	populateFileWithMockBatches(t, 100, file)
 
 	if err := file.Create(); err != nil {
 		t.Fatal(err)
@@ -204,7 +204,7 @@ func TestMergeFiles__splitFiles(t *testing.T) {
 
 	// Add a bunch of batches so it's over the line limit
 	// somewhere between 3-4k Batches exceed the 10k line limit
-	populateFileWithMockBatches(4000, file)
+	populateFileWithMockBatches(t, 4000, file)
 
 	if err := file.Create(); err != nil {
 		t.Fatal(err)
@@ -264,7 +264,7 @@ func TestMergeFiles__invalid(t *testing.T) {
 	}
 }
 
-func populateFileWithMockBatches(numBatches int, file *File) {
+func populateFileWithMockBatches(t *testing.T, numBatches int, file *File) {
 	lastBatchIdx := len(file.Batches) - 1
 	var startSeq = file.Batches[lastBatchIdx].GetHeader().BatchNumber + 1
 	var entryDetail = file.Batches[0].GetEntries()[0]
@@ -276,7 +276,11 @@ func populateFileWithMockBatches(numBatches int, file *File) {
 		header.CompanyIdentification = "132465"
 		header.CompanyEntryDescription = "Example Description"
 		header.ODFIIdentification = "12104288"
-		batch, _ := NewBatch(header)
+		batch, err := NewBatch(header)
+		if err != nil {
+			t.Fatal(err)
+		}
+
 		batch.AddEntry(entryDetail)
 		batch.GetHeader().BatchNumber = i
 		batch.GetControl().BatchNumber = i
