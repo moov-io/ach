@@ -29,20 +29,20 @@ func Example_cieWriteCredit() {
 
 	bh := ach.NewBatchHeader()
 	bh.ServiceClassCode = ach.CreditsOnly
-	bh.CompanyName = "Name on Account" 
+	bh.CompanyName = "Name on Account"
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = ach.CIE
-	bh.CompanyEntryDescription = "Payment"                               
+	bh.CompanyEntryDescription = "Payment"
 	bh.EffectiveEntryDate = "190816"
-	bh.ODFIIdentification = "121042882" 
+	bh.ODFIIdentification = "121042882"
 
 	entry := ach.NewEntryDetail()
 	entry.TransactionCode = ach.CheckingCredit
-	entry.SetRDFI("231380104")          
-	entry.DFIAccountNumber = "12345678" 
-	entry.Amount = 100000000            
+	entry.SetRDFI("231380104")
+	entry.DFIAccountNumber = "12345678"
+	entry.Amount = 100000000
 	entry.SetTraceNumber(bh.ODFIIdentification, 1)
-	entry.IndividualName = "Receiver Account Name" 
+	entry.IndividualName = "Receiver Account Name"
 	entry.DiscretionaryData = "01"
 	entry.AddendaRecordIndicator = 1
 
@@ -74,7 +74,7 @@ func Example_cieWriteCredit() {
 	fmt.Printf("%s", file.Batches[0].GetControl().String()+"\n")
 	fmt.Printf("%s", file.Control.String()+"\n")
 
-	// Output: 
+	// Output:
 	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
 	// 5220Name on Account                     231380104 CIEPayment         190816   1121042880000001
 	// 62223138010412345678         0100000000               Receiver Account Name 011121042880000001

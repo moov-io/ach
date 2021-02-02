@@ -19,11 +19,11 @@ package examples
 
 import (
 	"fmt"
+	"github.com/moov-io/ach"
 	"log"
 	"os"
-	"strconv"
 	"path/filepath"
-	"github.com/moov-io/ach"
+	"strconv"
 )
 
 func Example_cieReadCredit() {
