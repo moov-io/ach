@@ -1981,7 +1981,7 @@ func TestFile__AscendingBatchSequence(t *testing.T) {
 	}
 
 	err := file.Validate()
-	if err != NewErrFileBatchNumberAscending("BatchNumber", 3, 3) {
+	if err != NewErrFileBatchNumberAscending(3, 3) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

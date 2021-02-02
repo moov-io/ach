@@ -1142,10 +1142,10 @@ func (f *File) isSequenceAscending() error {
 		if current <= lastSeq {
 			return NewErrFileBatchNumberAscending(lastSeq, current)
 		}
-		
+
 		lastSeq = current
 	}
-	
+
 	return nil
 }
 
