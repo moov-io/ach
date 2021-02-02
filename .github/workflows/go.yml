@@ -33,6 +33,8 @@ jobs:
 
     - name: Check
       run: make check
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Upload Code Coverage
       if: runner.os == 'Linux'
