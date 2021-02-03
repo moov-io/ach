@@ -23,7 +23,7 @@ email: security@moov.io
 description: >- # this means to ignore newlines until "baseurl:"
   ACH implements a reader, writer, and validator for Automated Clearing House (ACH) files. 
   The HTTP server is available in a Docker image and the Go package is available.
-url: "https://nlakritz.github.io" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://moov-io.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 baseurl: "/ach" # the subpath of your site, e.g. /blog
 twitter_username: jekyllrb
 github_username:  jekyll
