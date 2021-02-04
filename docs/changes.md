@@ -26,7 +26,8 @@ The ODFI is responsible for forwarding an NOC to the Originator within two banki
 - Effective Entry date
 - DFI account number
 - Individual name/receiving company name
-- Individual identification number/identification number
+- Individual identification number
+
 - Change code
 - Original Entry trace number
 - Original RDFI indentification
