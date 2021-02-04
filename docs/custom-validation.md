@@ -1,4 +1,12 @@
-## Custom Validation
+---
+layout: page
+title: Custom Validation
+hide_hero: true
+show_sidebar: false
+menubar: docs-menu
+---
+
+# Custom Validation
 
 ACH files can vary sometimes from the official NACHA guidelines due to vendor changes. Moov ACH defaults to NACHA guidelines, so to handle this there's an exported `ValidateWith(opts)` method on some structures (`File`, `FileHeader`, etc).
 

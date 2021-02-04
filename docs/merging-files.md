@@ -1,4 +1,12 @@
-## Merging ACH Files
+---
+layout: page
+title: Merging Files
+hide_hero: true
+show_sidebar: false
+menubar: docs-menu
+---
+
+# Merging Files
 
 Moov ACH supports merging an arbitrary set of ACH files together. This is useful for optimizing cost and network efficiency. NACHA files are limited to 10,000 lines (in their text format) and so Moov ACH merges valid files together where the FileHeaders match the same ABA routing numbers.
 

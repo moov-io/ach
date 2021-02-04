@@ -1,4 +1,12 @@
-## What is ACH
+---
+layout: page
+title: What is ACH?
+hide_hero: true
+show_sidebar: false
+menubar: docs-menu
+---
+
+# What is ACH?
 Automated Clearing House (ACH) is an electronic network for financial transactions in the United States. ACH processes large volumes of credit and debit transactions in batches. ACH credit transfers include direct deposit, payroll and vendor payments. ACH direct debit transfers include consumer payments on insurance premiums, mortgage loans, and other kinds of bills. Debit transfers also include new applications such as the point-of-purchase (POP) check conversion pilot program sponsored by the National Automated Clearing House Association (NACHA). Both the government and the commercial sectors use ACH payments. Businesses increasingly use ACH online to have customers pay, rather than via credit or debit cards.
 
 [Source: Wikipedia - Automated Clearing House](https://en.wikipedia.org/wiki/Automated_Clearing_House)
