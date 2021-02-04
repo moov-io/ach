@@ -8,9 +8,9 @@ menubar: docs-menu
 
 # Change Files
 
-A Notification of Change (NOC) is a non-dollar entry transmitted from a receiving (RDFI) to originating (ODFI) financial institution. These are sent in response to outdated or erroneous information in an initial entry. An NOC often occurs due to bank mergers or acquisitions that change account and/or routing numbers. If an RDFI sends an NOC, the ODFI will need to inform their originator promptly.
+A Notification of Change (NOC) is a non-dollar entry transmitted from a receiving depository financial institution (RDFI) to the originating depository financial institution (ODFI). These are sent in response to outdated or erroneous information in an initial entry. An NOC often occurs due to bank mergers or acquisitions that change account and/or routing numbers. If an RDFI sends an NOC, the ODFI will need to inform their originator promptly.
 
-The Standard Entry Class code for an NOC is "COR". There are a few possible reasons for an NOC, each defined by a "change code". The most common codes are `C01` for an incorrect account number and `C02` for an outdated routing number.
+The Standard Entry Class code for an NOC is "COR". There are a few possible reasons for an NOC, each defined by a "change code". The most common codes are `C01` for an incorrect account number and `C02` for an outdated routing number. We have [a list of supported change codes](#change-codes) below.
 
 NOCs are identified by an [Addenda98](https://pkg.go.dev/github.com/moov-io/ach?tab=doc#Addenda98) record on the EntryDetail with a [ChangeCode](https://pkg.go.dev/github.com/moov-io/ach?tab=doc#ChangeCode) that can be processed.
 
@@ -26,7 +26,7 @@ The ODFI is responsible for forwarding an NOC to the Originator within two banki
 - Effective Entry date
 - DFI account number
 - Individual name/receiving company name
-- Individual indentification number/identification number
+- Individual identification number/identification number
 - Change code
 - Original Entry trace number
 - Original RDFI indentification
