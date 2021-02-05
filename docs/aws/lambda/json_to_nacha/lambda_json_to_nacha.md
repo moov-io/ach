@@ -89,34 +89,34 @@ Sign into the AWS Console and head over to the Lambdas section and create a new 
 
 Select *Author From Scratch*
 
-<img src="create-function-author-options.PNG" alt="Authorship Details" width="700px"><br /><br />
+<img src="/ach/aws/lambda/json_to_nacha/create-function-author-options.PNG" alt="Authorship Details" width="700px"><br /><br />
 
 Under Basic Information, enter a name for your function (e.g. `parse-json-to-nacha`) and select Go as the Runtime
 
-<img src="create-function-basic-info.PNG" alt="Basic Info" width="700px"><br /><br />
+<img src="/ach/aws/lambda/json_to_nacha/create-function-basic-info.PNG" alt="Basic Info" width="700px"><br /><br />
 
 By default, AWS will create a new permissions role for your function with all lambda permissions. This is adequate for this tutorial, but if you plan to access other AWS services from this function you will need to add permissions. Click *Create Function* in the bottom right after you've selected your desired role.
 
-<img src="create-function-permissions-role.PNG" alt="Permissions Role Selection" width="700px"><br /><br />
+<img src="/ach/aws/lambda/json_to_nacha/create-function-permissions-role.PNG" alt="Permissions Role Selection" width="700px"><br /><br />
 
 ## 4. Configure function and upload executable
 AWS Lambdas don't currently support inline editing of Go files so you will need to upload the zip file you created in step 2. Click the *Actions* dropdown in the Function Code section, select *Upload a .zip file*, upload your zip and click *Save*.
 
-<img src="configure-function-upload-zip.PNG" alt="Upload Zip" width="700px"><br /><br />
+<img src="/ach/aws/lambda/json_to_nacha/configure-function-upload-zip.PNG" alt="Upload Zip" width="700px"><br /><br />
 
 Now scroll down to the Basic Settings section. Handler needs to be set to the name of your executable file from step 2. In our case, the executable name is `main`. Click *Edit* and change the Handler from `hello` to `main`.
 
-<img src="configure-function-basic-settings.PNG" alt="Edit Basic Settings" width="700px"><br /><br />
+<img src="/ach/aws/lambda/json_to_nacha/configure-function-basic-settings.PNG" alt="Edit Basic Settings" width="700px"><br /><br />
 
 Finally, we will create two test events to confirm our function is working as expected.
 
 The first event will be used to confirm the JSON is parsed correctly. Click the dropdown to the left of the Test button at the top of the page and select *Configure test events*.
 
-<img src="configure-function-create-parseEvent.PNG" alt="Create parseEvent" width="700px"><br /><br />
+<img src="/ach/aws/lambda/json_to_nacha/configure-function-create-parseEvent.PNG" alt="Create parseEvent" width="700px"><br /><br />
 
 Leave the `hello-world` template selected and enter a name for your event (e.g. `parseEvent`).
 
-<img src="configure-function-configure-parseEvent.PNG" alt="Configure parseEvent" width="700px"><br /><br />
+<img src="/ach/aws/lambda/json_to_nacha/configure-function-configure-parseEvent.PNG" alt="Configure parseEvent" width="700px"><br /><br />
 
 Replace the contents of the code editor with the following:
 
@@ -223,10 +223,10 @@ Now you can finally test your function.
 
 Go to the top of the page, select your successful test event (e.g. `parseEvent`) and click *Test*. You should receive a succcessful response similar to the following:
 
-<img src="test-function-success-parseEvent.PNG" alt="Test parseEvent" width="700px"><br /><br />
+<img src="/ach/aws/lambda/json_to_nacha/test-function-success-parseEvent.PNG" alt="Test parseEvent" width="700px"><br /><br />
 
 Now test your error event (e.g. `parseEventError`). You should receive an error response similar to the following:
 
-<img src="test-function-error-parseEventError.PNG" alt="Test parseEventError" width="700px"><br /><br />
+<img src="/ach/aws/lambda/json_to_nacha/test-function-error-parseEventError.PNG" alt="Test parseEventError" width="700px"><br /><br />
 
 And that's it! You've successfully created and tested a lambda function that parses JSON into a NACHA-formatted string.

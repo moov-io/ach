@@ -28,9 +28,10 @@ baseurl: "/ach" # the subpath of your site, e.g. /blog
 twitter_username: jekyllrb
 github_username:  jekyll
 source_code: https://github.com/moov-io/ach
+permalink: pretty
 
 # Build settings
-remote_theme: nlakritz/bulma-clean-theme
+remote_theme: moov-io/bulma-clean-theme
 plugins:
   - jekyll-feed
   - github-pages

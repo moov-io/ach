@@ -1,57 +1,57 @@
 - label: Getting Started
   items:
     - name: Overview
-      link: /index
+      link: /
     - name: What is ACH?
-      link: /intro
+      link: /intro/
 
 - label: Usage
   items:
     - name: Docker
-      link: /usage-docker
+      link: /usage-docker/
     - name: Google Cloud Run
-      link: /usage-google-cloud
+      link: /usage-google-cloud/
     - name: API Configuration
-      link: /usage-configuration
+      link: /usage-configuration/
     - name: Go Library
-      link: /usage-go
+      link: /usage-go/
     - name: Command Line
-      link: /usage-command-line
+      link: /usage-command-line/
 
 - label: ACH File Setup
   items:
     - name: Create File
-      link: /create-file
+      link: /create-file/
     - name: File Structure
-      link: /file-structure
+      link: /file-structure/
     - name: SEC Codes Table
-      link: /sec-codes-table
+      link: /sec-codes-table/
 
 - label: File Operations
   items:
     - name: Custom Validation
-      link: /custom-validation
+      link: /custom-validation/
     - name: Balanced Offset
-      link: /balanced-offset
+      link: /balanced-offset/
     - name: Flatten Batches
-      link: /flatten-batches
+      link: /flatten-batches/
     - name: Merging Files
-      link: /merging-files
+      link: /merging-files/
     - name: Segmenting Files
-      link: /segment-file
+      link: /segment-file/
     - name: Return Files
-      link: /returns
+      link: /returns/
 
 - label: Production and Monitoring
   items:
     - name: Kubernetes
-      link: /deployment
+      link: /deployment/
     - name: Prometheus Metrics
-      link: /metrics
+      link: /metrics/
     - name: Building for AWS Lambda
-      link: /aws/lambda/building-go-for-lambda
+      link: /aws/lambda/building-go-for-lambda/
       items:
       - name: Convert JSON to NACHA
-        link: /aws/lambda/json_to_nacha/lambda_json_to_nacha
+        link: /aws/lambda/json_to_nacha/lambda_json_to_nacha/
       - name: Convert NACHA to JSON
-        link: /aws/lambda/nacha_to_json/lambda_nacha_to_json
+        link: /aws/lambda/nacha_to_json/lambda_nacha_to_json/
