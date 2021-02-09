@@ -424,6 +424,9 @@ func BenchmarkFileReturnEntries(b *testing.B) {
 // vince tester todo: delete
 func TestX(t *testing.T) {
 	f := NewFile()
+	f.Header.ImmediateOrigin = "123456789"
+	f.Header.ImmediateDestination = "123456789"
+
 	if err := f.Create(); err != nil {
 		fmt.Println(err)
 	}
@@ -447,11 +450,38 @@ func TestX(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	err = fileFromJson.Create()
+	if err != nil {
+		t.Fatal(err)
+	}
 	b, err = json.MarshalIndent(&fileFromJson, "", " ")
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("new file:\n %s", b)
+	fh := mockFileHeader()
+	bh := mockBatchADVHeader()
+
+	entryOne := mockADVEntryDetail()
+	entryTwo := mockADVEntryDetail()
+	entryTwo.SequenceNumber = 2
+
+	// build the batch
+	batch := NewBatchADV(bh)
+	batch.AddADVEntry(entryOne)
+	batch.AddADVEntry(entryTwo)
+	if err := batch.Create(); err != nil {
+		t.Fatalf("Unexpected error building batch: %s\n", err)
+	}
+
+	// build the file
+	file := NewFile()
+	file.SetHeader(fh)
+	file.AddBatch(batch)
+	if err := file.Create(); err != nil {
+		t.Fatalf("Unexpected error building file: %s\n", err)
+	}
+	fmt.Println(file)
 }
 
 func TestFile__readFromJson(t *testing.T) {

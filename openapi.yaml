@@ -526,7 +526,7 @@ components:
         - fileHeader
     FileID:
       properties:
-        id:
+        ID:
           type: string
           description: File ID
           example: "1e522dc8"
@@ -536,7 +536,7 @@ components:
           example: Validation error(s) present.
     File:
       properties:
-        id:
+        ID:
           type: string
           description: File ID
           example: "3f2d23ee214"
@@ -546,12 +546,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Batch'
-          nullable: true
         IATBatches:
           type: array
           items:
             $ref: '#/components/schemas/IATBatch'
-          nullable: true
         fileControl:
           $ref: '#/components/schemas/FileControl'
         NotificationOfChange:
@@ -616,40 +614,36 @@ components:
         - fileCreationDate
     FileControl:
       properties:
-        id:
+        ID:
           description: Moov API File ID
           type: string
           example: "d1e26288"
         batchCount:
           description: Count of Batches in the File
           type: integer
-          minimum: 0
+          minimum: 1
           example: 1
         blockCount:
           description: |
             BlockCount total number of records in the file (include all headers and trailer) divided by 10 (This number must be evenly divisible by 10. If not, additional records consisting of all 9's are added to the file after the initial '9' record to fill out the block 10.)
           type: integer
-          minimum: 0
           example: 1
         entryAddendaCount:
           description: Total detail and addenda records in the file
           type: integer
-          minimum: 0
-          example: 0
+          minimum: 1
+          example: 1
         entryHash:
           description: EntryHash calculated in the same manner as the batch total but includes total from entire file
           type: integer
-          minimum: 0
           example: 0
         totalDebit:
           description: Accumulated Batch debit totals within the file.
           type: integer
-          minimum: 0
           example: 100
         totalCredit:
           description: Accumulated Batch credit totals within the file.
           type: integer
-          minimum: 0
           example: 20
       required:
         - id 
@@ -675,10 +669,16 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EntryDetail'
+          minLength: 1
         batchControl:
           $ref: '#/components/schemas/BatchControl'
         offset:
           $ref: '#/components/schemas/Offset'
+      required:
+        - batchHeader
+        - entryDetails
+        - batchControl
+        - offset
     BatchHeader:
       required:
         - serviceClassCode
@@ -688,11 +688,11 @@ components:
       properties:
         ID:
           type: string
-          description: Batch Header ID
+          description: A client defined ID used as a reference to this batch
           example: "913b5742"
         serviceClassCode:
           type: integer
-          description: Service Class Code - ACH Credits Only 220 and ACH Debits Only 225
+          description: Service Class Code - Mixed Debit and Credits '200', ACH Credits Only '220', or ACH Debits Only '225'
           example: 220
         companyName:
           type: string
@@ -793,10 +793,20 @@ components:
         batchNumber:
           type: string
           description: BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
+      required:
+        - serviceClassCode 
+        - entryAddendaCount
+        - entryHash
+        - totalDebit
+        - totalCredit
+        - companyIdentification
+        - ODFIIdentification
+        - batchNumber
     Batches:
       type: array
       items:
         $ref: '#/components/schemas/Batch'
+      nullable: true
     EntryDetail:
       required:
         - id
@@ -1716,6 +1726,11 @@ components:
           type: string
           description: Memo for Offset EntryDetail record
           example: OFFSET
+      required:
+        - routingNumber 
+        - accountNumber
+        - accountType
+        - description
     SegmentedFiles:
       properties:
         creditFileID:
