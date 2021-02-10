@@ -563,9 +563,9 @@ components:
             $ref: '#/components/schemas/Batch'
           nullable: true
       required:
-      - ID
-      - fileHeader
-      - fileControl
+        - ID
+        - fileHeader
+        - fileControl
     FileHeader:
       properties:
         immediateOrigin:
@@ -604,7 +604,6 @@ components:
           type: string
           description: Incremented value for each file for RDFI's.
           example: "0"
-          nullable: true
       required:
         - immediateOrigin
         - immediateOriginName
@@ -806,7 +805,6 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Batch'
-      nullable: true
     EntryDetail:
       required:
         - id
@@ -1075,10 +1073,10 @@ components:
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
       required:
-      - typeCode
-      - originatorName
-      - originatorStreetAddress
-      - entryDetailSequenceNumber
+        - typeCode
+        - originatorName
+        - originatorStreetAddress
+        - entryDetailSequenceNumber
     Addenda12:
       properties:
         id:
@@ -1112,10 +1110,10 @@ components:
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
       required:
-      - typeCode
-      - originatorCityStateProvince
-      - originatorCountryPostalCode
-      - entryDetailSequenceNumber
+        - typeCode
+        - originatorCityStateProvince
+        - originatorCountryPostalCode
+        - entryDetailSequenceNumber
     Addenda13:
       properties:
         id:
@@ -1163,11 +1161,11 @@ components:
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
       required:
-      - typeCode
-      - ODFIName
-      - ODFIIDNumberQualifier 
-      - ODFIBranchCountryCode   
-      - entryDetailSequenceNumber
+        - typeCode
+        - ODFIName
+        - ODFIIDNumberQualifier 
+        - ODFIBranchCountryCode   
+        - entryDetailSequenceNumber
     Addenda14:
       properties:
         id:
@@ -1450,11 +1448,11 @@ components:
           description: Matches the Entry Detail Trace Number of the entry being returned.
           example: 214874812
       required:
-      - typeCode
-      - returnCode
-      - originalTrace
-      - dateOfDeath
-      - originalDFI
+        - typeCode
+        - returnCode
+        - originalTrace
+        - dateOfDeath
+        - originalDFI
     IATBatch:
       properties:
         ID:
@@ -1470,10 +1468,10 @@ components:
           minItems: 1
         batchControl:
           $ref: '#/components/schemas/BatchControl'
-     required:   
-       - IATBatchHeader
-       - IATEntryDetails
-       - batchControl
+      required:
+         - IATBatchHeader
+         - IATEntryDetails
+         - batchControl
     IATBatchHeader:
       properties:
         ID:
@@ -1667,7 +1665,7 @@ components:
           type: string
           description: Category defines if the entry is a Forward, Return, or NOC
           example: Forward
-     required: 
+      required:
        - transactionCode
        - RDFIIdentification
        - checkDigit
@@ -1813,7 +1811,7 @@ components:
         batchNumber:
           type: string
           description: BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
-     required: 
+      required: 
        - serviceClassCode
        - entryAddendaCount
        - entryHash
