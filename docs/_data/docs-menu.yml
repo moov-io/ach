@@ -41,6 +41,8 @@
       link: /segment-file/
     - name: Return Files
       link: /returns/
+    - name: Change Files
+      link: /changes/
 
 - label: Production and Monitoring
   items:
