@@ -646,7 +646,7 @@ components:
           type: integer
           example: 20
       required:
-        - id 
+        - ID 
         - batchCount
         - blockCount
         - entryAddendaCount
@@ -951,6 +951,14 @@ components:
           type: string
           description: Entry Detail Trace Number
           example: "124782618117"
+      required:
+        - typeCode
+        - terminalIdentificationCode
+        - transactionSerialNumber
+        - transactionDate
+        - terminalLocation
+        - terminalCity
+        - terminalState
     Addenda05:
       properties:
         id:
@@ -977,6 +985,11 @@ components:
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
+      required:
+        - typeCode 
+        - paymentRelatedInformation
+        - sequenceNumber
+        - entryDetailSequenceNumber
     Addenda10:
       properties:
         id:
@@ -1029,6 +1042,12 @@ components:
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
+      required:
+        - typeCode 
+        - transactionCode
+        - foreignPaymentAmount
+        - name
+        - entryDetailSequenceNumber
     Addenda11:
       properties:
         id:
@@ -1055,6 +1074,11 @@ components:
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
+      required:
+      - typeCode
+      - originatorName
+      - originatorStreetAddress
+      - entryDetailSequenceNumber
     Addenda12:
       properties:
         id:
@@ -1087,6 +1111,11 @@ components:
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
+      required:
+      - typeCode
+      - originatorCityStateProvince
+      - originatorCountryPostalCode
+      - entryDetailSequenceNumber
     Addenda13:
       properties:
         id:
@@ -1133,6 +1162,12 @@ components:
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
+      required:
+      - typeCode
+      - ODFIName
+      - ODFIIDNumberQualifier 
+      - ODFIBranchCountryCode   
+      - entryDetailSequenceNumber
     Addenda14:
       properties:
         id:
@@ -1179,6 +1214,13 @@ components:
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
+      required:
+        - typeCode
+        - RDFIName        
+        - RDFIIDNumberQualifier        
+        - RDFIIdentification        
+        - RDFIBranchCountryCode
+        - entryDetailSequenceNumber
     Addenda15:
       properties:
         id:
@@ -1206,6 +1248,10 @@ components:
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
+      required:
+        - typeCode
+        - receiverStreetAddress
+        - entryDetailSequenceNumber
     Addenda16:
       properties:
         id:
@@ -1239,6 +1285,11 @@ components:
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
+      required:
+        - typeCode
+        - receiverCityStateProvince
+        - receiverCountryPostalCode
+        - entryDetailSequenceNumber
     Addenda17:
       properties:
         id:
@@ -1266,6 +1317,11 @@ components:
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
+      required:
+        - typeCode
+        - paymentRelatedInformation
+        - sequenceNumber
+        - entryDetailSequenceNumber
     Addenda18:
       properties:
         id:
@@ -1310,6 +1366,13 @@ components:
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
+      required:
+        - typeCode
+        - foreignCorrespondentBankName
+        - foreignCorrespondentBankIDNumber
+        - foreignCorrespondentBankBranchCountryCode   
+        - sequenceNumber
+        - entryDetailSequenceNumber
     Addenda98:
       properties:
         id:
@@ -1343,6 +1406,12 @@ components:
           type: string
           description: Entry Detail Trace Number
           example: 124782618117
+      required:
+      - typeCode
+      - changeCode
+      - originalTrace
+      - originalDFI
+      - correctedData
     Addenda99:
       properties:
         id:
@@ -1380,6 +1449,12 @@ components:
           type: string
           description: Matches the Entry Detail Trace Number of the entry being returned.
           example: 214874812
+      required:
+      - typeCode
+      - returnCode
+      - originalTrace
+      - dateOfDeath
+      - originalDFI
     IATBatch:
       properties:
         ID:
@@ -1392,8 +1467,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/IATEntryDetail'
+          minItems: 1
         batchControl:
           $ref: '#/components/schemas/BatchControl'
+     required:   
+       - IATBatchHeader
+       - IATEntryDetails
+       - batchControl
     IATBatchHeader:
       properties:
         ID:
@@ -1494,6 +1574,16 @@ components:
             BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
           type: integer
           example: 1
+      required:
+        - serviceClassCode 
+        - foreignExchangeIndicator
+        - foreignExchangeReferenceIndicator
+        - foreignExchangeReference
+        - ISODestinationCountryCode
+        - originatorIdentification
+        - ISOOriginatingCurrencyCode
+        - ISODestinationCurrencyCode
+        - ODFIIdentification
     IATEntryDetail:
       properties:
         ID:
@@ -1577,9 +1667,25 @@ components:
           type: string
           description: Category defines if the entry is a Forward, Return, or NOC
           example: Forward
+     required: 
+       - transactionCode
+       - RDFIIdentification
+       - checkDigit
+       - AddendaRecords
+       - amount
+       - DFIAccountNumber
+       - OFACScreeningIndicator
+       - SecondaryOFACScreeningIndicator
+       - addendaRecordIndicator
+       - addenda10
+       - addenda11
+       - addenda12
+       - addenda13
+       - addenda14
+       - addenda15
+       - addenda16
     ADVEntryDetail:
       required:
-        - id
         - transactionCode
         - RDFIIdentification
         - checkDigit
@@ -1707,6 +1813,15 @@ components:
         batchNumber:
           type: string
           description: BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
+     required: 
+       - serviceClassCode
+       - entryAddendaCount
+       - entryHash
+       - totalDebit
+       - totalCredit
+       - achOperatorData
+       - ODFIIdentification
+       - batchNumber
     Offset:
       properties:
         routingNumber:
