@@ -1,3 +1,15 @@
+## v1.6.2 (Released 2021-02-11)
+
+IMPROVEMENTS
+
+- api: update OpenAPI spec to include more details about data types
+- file: ability to set custom batch sequence numbers
+- docs: new [project documentation site](https://moov-io.github.io/) with updated styles and navigation
+- docs: add page about Notification of Changee (NOC) files
+- docs: add read and write examples for CIE batches
+- docs: update R10 and R11 return code descriptions
+- docs: additional fixes and improvements to the README
+
 ## v1.6.1 (Released 2021-01-25)
 
 BUG FIXES
