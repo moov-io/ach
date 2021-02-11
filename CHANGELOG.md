@@ -4,8 +4,8 @@ IMPROVEMENTS
 
 - api: update OpenAPI spec to include more details about data types
 - file: ability to set custom batch sequence numbers
-- docs: new [project documentation site](https://moov-io.github.io/) with updated styles and navigation
-- docs: add page about Notification of Changee (NOC) files
+- docs: new [project documentation site](https://moov-io.github.io/ach) with updated styles and navigation
+- docs: add page about Notification of Change (NOC) files
 - docs: add read and write examples for CIE batches
 - docs: update R10 and R11 return code descriptions
 - docs: additional fixes and improvements to the README
