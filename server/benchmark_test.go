@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	numTransactions = 80_000
-	numBatches      = 2000
+	numTransactions = 75000
+	numBatches      = 1000
 )
 
 func init() {
