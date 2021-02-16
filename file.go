@@ -1081,14 +1081,14 @@ func (f *File) FlattenBatches() (*File, error) {
 		}
 	}
 
-	IATBatchesByHeader := make(map[string]IATBatch)
+	IATBatchesByHeader := make(map[string]*IATBatch)
 	if f.IATBatches != nil {
 		for _, b := range f.IATBatches {
 			bhKey := getHeader(b.GetHeader())
 			_, found := IATBatchesByHeader[bhKey]
 			if !found {
 				newBatch := NewIATBatch(b.GetHeader())
-				IATBatchesByHeader[bhKey] = newBatch
+				IATBatchesByHeader[bhKey] = &newBatch
 				out.AddIATBatch(newBatch)
 			}
 
@@ -1117,7 +1117,7 @@ func (f *File) FlattenBatches() (*File, error) {
 		go func(b IATBatch) {
 			defer wg.Done()
 			_ = b.Create()
-		}(b)
+		}(*b)
 	}
 
 	wg.Wait()
