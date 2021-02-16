@@ -1103,12 +1103,16 @@ func (f *File) FlattenBatches() (*File, error) {
 
 	// Set batches to valid state
 	wg := sync.WaitGroup{}
+	doneCh := make(chan struct{}, 1)
+	errCh := make(chan error, 1)
 
 	wg.Add(len(batchesByHeader))
 	for _, b := range batchesByHeader {
 		go func(b Batcher) {
 			defer wg.Done()
-			_ = b.Create()
+			if err := b.Create(); err != nil {
+				errCh <- err
+			}
 		}(b)
 	}
 
@@ -1116,11 +1120,24 @@ func (f *File) FlattenBatches() (*File, error) {
 	for _, b := range IATBatchesByHeader {
 		go func(b IATBatch) {
 			defer wg.Done()
-			_ = b.Create()
+			if err := b.Create(); err != nil {
+				errCh <- err
+			}
 		}(b)
 	}
 
-	wg.Wait()
+	go func() {
+		wg.Wait()
+		close(doneCh)
+	}()
+
+	// Block til we're done creating batches or an error occurs
+	select {
+	case <-doneCh:
+		break
+	case err := <-errCh:
+		return nil, fmt.Errorf("creating batch: %w", err)
+	}
 
 	// Add FileHeaderData.
 	f.addFileHeaderData(out)
