@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/moov-io/base"
@@ -1043,95 +1044,94 @@ func segmentFileBatchAddADVEntry(creditBatch Batcher, debitBatch Batcher, entry 
 	}
 }
 
-// FlattenBatches flattens File Batches by consolidating batches with the same BatchHeader data into one Batch.
+// FlattenBatches flattens the file's batches by consolidating batches with the same BatchHeader data into one Batch.
 func (f *File) FlattenBatches() (*File, error) {
-	of := NewFile()
+	out := NewFile()
 
+	// Helper method to fetch the batch header without the trace number
+	getHeader := func(batchHeader fmt.Stringer) string {
+		return batchHeader.String()[:87]
+	}
+
+	batchesByHeader := make(map[string]Batcher)
 	if f.Batches != nil {
-		// Slice of BatchHeaders
-		sbh := make([]string, 0)
 		for _, b := range f.Batches {
-			bh := b.GetHeader()
-			bh.BatchNumber = 0
-			sbh = append(sbh, bh.String())
-		}
-		// Remove duplicate BatchHeader entries
-		sbh = removeDuplicateBatchHeaders(sbh)
-		// Add new batches for flattened file
-		for _, record := range sbh {
-			bh := &BatchHeader{}
-			bh.Parse(record)
+			bhKey := getHeader(b.GetHeader())
+			_, found := batchesByHeader[bhKey]
+			if !found {
+				newBatch, err := NewBatch(b.GetHeader())
+				if err != nil {
+					return nil, err
+				}
 
-			b, _ := NewBatch(bh)
-			of.AddBatch(b)
-		}
-		for _, batch := range f.Batches {
-			fbh := batch.GetHeader().String()[:87]
-			// Add entries for batches
-			for i, ofBatch := range of.Batches {
-				if strings.EqualFold(fbh, ofBatch.GetHeader().String()[:87]) {
-					if ofBatch.GetHeader().StandardEntryClassCode == "ADV" {
-						entries := batch.GetADVEntries()
-						for _, advEntry := range entries {
-							of.Batches[i].AddADVEntry(advEntry)
-						}
-					} else {
-						entries := batch.GetEntries()
-						for _, entry := range entries {
-							of.Batches[i].AddEntry(entry)
-						}
-					}
-					_ = of.Batches[i].Create()
+				batchesByHeader[bhKey] = newBatch
+				out.AddBatch(newBatch)
+			}
+
+			newBatch := batchesByHeader[bhKey]
+			if newBatch.GetHeader().StandardEntryClassCode == "ADV" {
+				for _, e := range b.GetADVEntries() {
+					newBatch.AddADVEntry(e)
+				}
+			} else {
+				for _, e := range b.GetEntries() {
+					newBatch.AddEntry(e)
 				}
 			}
 		}
 	}
 
+	IATBatchesByHeader := make(map[string]*IATBatch)
 	if f.IATBatches != nil {
-		// Slice of IATBatchHeaders
-		sIATBh := make([]string, 0)
-		for _, iatB := range f.IATBatches {
-			bh := iatB.GetHeader()
-			bh.BatchNumber = 0
-			sIATBh = append(sIATBh, bh.String())
-		}
-		// Remove duplicate IATBatchHeader entries
-		sIATBh = removeDuplicateBatchHeaders(sIATBh)
-		// Add new IATBatches for flattened file
-		for _, record := range sIATBh {
-			iatBh := &IATBatchHeader{}
-			iatBh.Parse(record)
+		for _, b := range f.IATBatches {
+			bhKey := getHeader(b.GetHeader())
+			_, found := IATBatchesByHeader[bhKey]
+			if !found {
+				newBatch := NewIATBatch(b.GetHeader())
+				IATBatchesByHeader[bhKey] = &newBatch
+				out.AddIATBatch(newBatch)
+			}
 
-			b := NewIATBatch(iatBh)
-			of.AddIATBatch(b)
-		}
-		for _, iatBatch := range f.IATBatches {
-			fbh := iatBatch.GetHeader().String()[:87]
-			// Add entries for IATBatches
-			for i, ofBatch := range of.IATBatches {
-				if strings.EqualFold(fbh, ofBatch.GetHeader().String()[:87]) {
-					iatEntries := iatBatch.GetEntries()
-					for _, iatEntry := range iatEntries {
-						// reset TraceNumber
-						iatEntry.TraceNumber = ""
-						of.IATBatches[i].AddEntry(iatEntry)
-					}
-				}
-				_ = of.IATBatches[i].Create()
+			newBatch := IATBatchesByHeader[bhKey]
+			for _, e := range b.GetEntries() {
+				// reset TraceNumber
+				e.TraceNumber = ""
+				newBatch.AddEntry(e)
 			}
 		}
 	}
+
+	// Set batches to valid state
+	wg := sync.WaitGroup{}
+
+	wg.Add(len(batchesByHeader))
+	for _, b := range batchesByHeader {
+		go func(b Batcher) {
+			defer wg.Done()
+			_ = b.Create()
+		}(b)
+	}
+
+	wg.Add(len(IATBatchesByHeader))
+	for _, b := range IATBatchesByHeader {
+		go func(b IATBatch) {
+			defer wg.Done()
+			_ = b.Create()
+		}(*b)
+	}
+
+	wg.Wait()
 
 	// Add FileHeaderData.
-	f.addFileHeaderData(of)
+	f.addFileHeaderData(out)
 
-	if err := of.Create(); err != nil {
+	if err := out.Create(); err != nil {
 		return nil, err
 	}
-	if err := of.Validate(); err != nil {
+	if err := out.Validate(); err != nil {
 		return nil, err
 	}
-	return of, nil
+	return out, nil
 }
 
 //Validates that the batch numbers are ascending
@@ -1147,21 +1147,4 @@ func (f *File) isSequenceAscending() error {
 	}
 
 	return nil
-}
-
-// removeDuplicateBatchHeaders removes duplicate batch header
-func removeDuplicateBatchHeaders(s []string) []string {
-	encountered := map[string]bool{}
-
-	// Create a map of all unique elements.
-	for v := range s {
-		encountered[s[v]] = true
-	}
-
-	// Place all keys from the map into a slice.
-	result := make([]string, 0)
-	for key := range encountered {
-		result = append(result, key)
-	}
-	return result
 }
