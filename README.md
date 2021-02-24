@@ -322,17 +322,17 @@ Below are some SDKs generated from the API documentation:
 
 ## Learn About ACH
 
-- [Intro to ACH](./docs/intro.md)
-- [Create an ACH File](./docs/create-file.md)
-- [ACH File Structure](./docs/file-structure.md)
-- [Balanced Offset Files](./docs/balanced-offset.md)
-- [Merging ACH Files](./docs/merging-files.md)
-- [ACH Server Metrics](./docs/metrics.md)
+- [Official Nacha ACH Guide for Developers](https://dev-ach-guide.pantheonsite.io/)
+- [Intro to ACH](https://moov-io.github.io/ach/intro/)
+- [Create an ACH File](https://moov-io.github.io/ach/create-file/)
+- [ACH File Structure](https://moov-io.github.io/ach/file-structure/)
+- [Balanced Offset Files](https://moov-io.github.io/ach/balanced-offset/)
+- [Merging Files](https://moov-io.github.io/ach/merging-files/)
 
 ## FAQ
 <details open="true">
 <summary ><b>Is there an in-browser tool for converting ACH files into JSON?</b></summary>
-Yes! You can find our browser utility at http://oss.moov.io/ach/.
+Yes! You can find our browser utility at <a href="http://oss.moov.io/ach/">http://oss.moov.io/ach/</a>.
 </details>
 <details open="true">
 <summary><b>Is my data being saved somewhere?</b></summary>
@@ -342,7 +342,10 @@ No, we do not save any data related to files, batch, or entry details. All proce
 <summary><b>What ACH transaction types are supported?</b></summary>
 We support generating and parsing all Standard Entry Class (SEC) codes.
 </details>
-
+<details open="true">
+<summary><b>Where can I find the official Nacha Operating Rules?</b></summary>
+You can purchase the most recent Nacha Operating Rules and Guidelines resource directly from their <a href="https://www.nacha.org/store">webstore</a>. Additionally, Nacha has published a <a href="https://dev-ach-guide.pantheonsite.io/">free ACH guide for developers</a>.
+</details>
 
 ## Getting Help
 

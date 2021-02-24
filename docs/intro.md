@@ -28,7 +28,9 @@ NACHA includes Members in the process of establishing Rules for the ACH Network,
 
 ## Developer Overview
 
-Gusto has provided a great technical overview of how ACH works for developers:
+Nacha has published an [ACH Guide for Developers](https://dev-ach-guide.pantheonsite.io/) that covers the basics of ACH payment flow, entry types, and file structure.
+
+Additionally, Gusto has provided a great technical overview of how ACH works for developers:
 
 - [How ACH works: A developer perspective - Part 1](http://engineering.gusto.com/how-ach-works-a-developer-perspective-part-1/)
 - [How ACH works: A developer perspective - Part 2](http://engineering.gusto.com/how-ach-works-a-developer-perspective-part-2/)
