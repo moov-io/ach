@@ -10,7 +10,7 @@ require (
 	github.com/mattn/go-isatty v0.0.12
 	github.com/moov-io/base v0.15.4
 	github.com/prometheus/client_golang v1.9.0
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.7.0 // indirect
 )
 
 go 1.13
