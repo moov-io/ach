@@ -45,6 +45,7 @@ func main() {
 	bh.CompanyIdentification = "121042882"
 	bh.CompanyEntryDescription = "Vendor Pay"
 	bh.ODFIIdentification = "121042882" // Originating Routing Number
+	bh.EffectiveEntryDate = "210412"
 
 	// Identifies the receivers account information
 	// can be multiple entry's per batch
