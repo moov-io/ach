@@ -95,12 +95,21 @@ func TestMergeFiles__identity(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	if len(out) != 1 {
 		t.Errorf("got %d merged ACH files", len(out))
 	}
+
 	if err := filesAreEqual(file, out[0]); err != nil {
 		t.Errorf("unequal files:%v", err)
 	}
+
+	for _, f := range out {
+		if err := f.Validate(); err != nil {
+			t.Fatalf("invalid file: %v", err)
+		}
+	}
+
 }
 
 func TestMergeFiles__together(t *testing.T) {
@@ -122,12 +131,20 @@ func TestMergeFiles__together(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	if len(out) != 1 {
 		t.Errorf("got %d merged ACH files", len(out))
 	}
 	if len(out[0].Batches) != 4 {
 		t.Errorf("got %d batches", len(out[0].Batches))
 	}
+
+	for _, f := range out {
+		if err := f.Validate(); err != nil {
+			t.Fatalf("invalid file: %v", err)
+		}
+	}
+
 }
 
 func TestMergeFiles__apart(t *testing.T) {
@@ -144,6 +161,7 @@ func TestMergeFiles__apart(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	if len(out) != 2 {
 		t.Errorf("got %d merged ACH files", len(out))
 	}
@@ -152,6 +170,12 @@ func TestMergeFiles__apart(t *testing.T) {
 	}
 	if len(out[1].Batches) != 3 {
 		t.Errorf("got %d batches", len(out[1].Batches))
+	}
+
+	for _, f := range out {
+		if err := f.Validate(); err != nil {
+			t.Fatalf("invalid file: %v", err)
+		}
 	}
 }
 
@@ -242,6 +266,12 @@ func TestMergeFiles__splitFiles(t *testing.T) {
 		// These batch counts will change when we recurse back through out[0]
 		// so it doesn't exceed the 10k line limit.
 		t.Errorf("out[0].Batches:%d out[1].Batches:%d", len(out[0].Batches), len(out[1].Batches))
+	}
+
+	for _, f := range out {
+		if err := f.Validate(); err != nil {
+			t.Fatalf("invalid file: %v", err)
+		}
 	}
 }
 
