@@ -28,6 +28,7 @@ const NACHAFileLineLimit = 10000
 
 // MergeFiles is a helper function for consolidating an array of ACH Files into as few files
 // as possible. This is useful for optimizing cost and network efficiency.
+// This operation will override batch numbers in each file to ensure they do not collide. The ascending batch numbers will start at 1. 
 //
 // Per NACHA rules files must remain under 10,000 lines (when rendered in their ASCII encoding)
 //
@@ -71,9 +72,18 @@ func MergeFiles(files []*File) ([]*File, error) {
 		}
 	}
 
-	// TODO(adam): We should also look at consolidating EntryDetail records inside Batches
+	// Return LOC-maxed files and merged files
+	out := append(fs.locMaxed, fs.outfiles...)
 
-	return append(fs.locMaxed, fs.outfiles...), nil // return LOC-maxed files and merged files
+	// Override batch numbers to ensure they don't collide
+	for _, f := range out {
+		for i, b := range f.Batches {
+			b.GetHeader().BatchNumber = i + 1
+			b.GetControl().BatchNumber = i + 1
+		}
+	}
+
+	return out, nil
 }
 
 type mergableFiles struct {
