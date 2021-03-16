@@ -33,7 +33,7 @@ type FileControl struct {
 	BatchCount int `json:"batchCount"`
 	// BlockCount total number of records in the file (include all headers and trailer) divided
 	// by 10 (This number must be evenly divisible by 10. If not, additional records consisting of all 9's are added to the file after the initial '9' record to fill out the block 10.)
-	BlockCount int `json:"blockCount,omitempty"`
+	BlockCount int `json:"blockCount"`
 	// EntryAddendaCount is a tally of each Entry Detail Record and each Addenda
 	// Record processed, within either the batch or file as appropriate.
 	EntryAddendaCount int `json:"entryAddendaCount"`

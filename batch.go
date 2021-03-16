@@ -30,9 +30,9 @@ import (
 type Batch struct {
 	// id is a client defined string used as a reference to this record. accessed via ID/SetID
 	id         string
-	Header     *BatchHeader      `json:"batchHeader,omitempty"`
-	Entries    []*EntryDetail    `json:"entryDetails,omitempty"`
-	Control    *BatchControl     `json:"batchControl,omitempty"`
+	Header     *BatchHeader      `json:"batchHeader"`
+	Entries    []*EntryDetail    `json:"entryDetails"`
+	Control    *BatchControl     `json:"batchControl"`
 	ADVEntries []*ADVEntryDetail `json:"advEntryDetails,omitempty"`
 	ADVControl *ADVBatchControl  `json:"advBatchControl,omitempty"`
 

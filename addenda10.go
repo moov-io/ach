@@ -55,7 +55,7 @@ type Addenda10 struct {
 	// Detail or Corporate Entry Detail Record's trace number This number is
 	// the same as the last seven digits of the trace number of the related
 	// Entry Detail Record or Corporate Entry Detail Record.
-	EntryDetailSequenceNumber int `json:"entryDetailSequenceNumber,omitempty"`
+	EntryDetailSequenceNumber int `json:"entryDetailSequenceNumber"`
 	// validator is composed for data validation
 	validator
 	// converters is composed for ACH to GoLang Converters

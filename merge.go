@@ -28,7 +28,7 @@ const NACHAFileLineLimit = 10000
 
 // MergeFiles is a helper function for consolidating an array of ACH Files into as few files
 // as possible. This is useful for optimizing cost and network efficiency.
-// This operation will override batch numbers in each file to ensure they do not collide. The ascending batch numbers will start at 1. 
+// This operation will override batch numbers in each file to ensure they do not collide. The ascending batch numbers will start at 1.
 //
 // Per NACHA rules files must remain under 10,000 lines (when rendered in their ASCII encoding)
 //

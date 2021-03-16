@@ -64,7 +64,7 @@ type BatchHeader struct {
 	// Determines addenda records (required or optional PLUS one or up to 9,999 records).
 	// Determines rules to follow (return time frames).
 	// Some SEC codes require specific data in predetermined fields within the ACH record
-	StandardEntryClassCode string `json:"standardEntryClassCode,omitempty"`
+	StandardEntryClassCode string `json:"standardEntryClassCode"`
 
 	// CompanyEntryDescription A description of the entries contained in the batch
 	//
@@ -115,7 +115,7 @@ type BatchHeader struct {
 	// in the Batch Header Record and the Batch Control Record is the same,
 	// the ascending sequence number should be assigned by batch and not by
 	// record.
-	BatchNumber int `json:"batchNumber,omitempty"`
+	BatchNumber int `json:"batchNumber"`
 
 	// validator is composed for data validation
 	validator

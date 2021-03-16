@@ -34,9 +34,9 @@ import (
 type IATBatch struct {
 	// ID is a client defined string used as a reference to this record.
 	ID      string            `json:"id"`
-	Header  *IATBatchHeader   `json:"IATBatchHeader,omitempty"`
-	Entries []*IATEntryDetail `json:"IATEntryDetails,omitempty"`
-	Control *BatchControl     `json:"batchControl,omitempty"`
+	Header  *IATBatchHeader   `json:"IATBatchHeader"`
+	Entries []*IATEntryDetail `json:"IATEntryDetails"`
+	Control *BatchControl     `json:"batchControl"`
 
 	// category defines if the entry is a Forward, Return, or NOC
 	category string
