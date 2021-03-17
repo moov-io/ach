@@ -66,7 +66,7 @@ type IATEntryDetail struct {
 	// AddendaRecordIndicator indicates the existence of an Addenda Record.
 	// A value of "1" indicates that one or more addenda records follow,
 	// and "0" means no such record is present.
-	AddendaRecordIndicator int `json:"addendaRecordIndicator,omitempty"`
+	AddendaRecordIndicator int `json:"addendaRecordIndicator"`
 	// TraceNumber assigned by the ODFI in ascending sequence, is included in each
 	// Entry Detail Record, Corporate Entry Detail Record, and addenda Record.
 	// Trace Numbers uniquely identify each entry within a batch in an ACH input file.
@@ -82,36 +82,36 @@ type IATEntryDetail struct {
 	//
 	// The Addenda10 Record identifies the Receiver of the transaction and the dollar amount of
 	// the payment.
-	Addenda10 *Addenda10 `json:"addenda10,omitempty"`
+	Addenda10 *Addenda10 `json:"addenda10"`
 	// Addenda11 is mandatory for IAT entries
 	//
 	// The Addenda11 record identifies key information related to the Originator of
 	// the entry.
-	Addenda11 *Addenda11 `json:"addenda11,omitempty"`
+	Addenda11 *Addenda11 `json:"addenda11"`
 	// Addenda12 is mandatory for IAT entries
 	//
 	// The Addenda12 record identifies key information related to the Originator of
 	// the entry.
-	Addenda12 *Addenda12 `json:"addenda12,omitempty"`
+	Addenda12 *Addenda12 `json:"addenda12"`
 	// Addenda13 is mandatory for IAT entries
 	//
 	// The Addenda13 contains information related to the financial institution originating the entry.
 	// For inbound IAT entries, the Fourth Addenda Record must contain information to identify the
 	// foreign financial institution that is providing the funding and payment instruction for
 	// the IAT entry.
-	Addenda13 *Addenda13 `json:"addenda13,omitempty"`
+	Addenda13 *Addenda13 `json:"addenda13"`
 	// Addenda14 is mandatory for IAT entries
 	//
 	// The Addenda14 identifies the Receiving financial institution holding the Receiver's account.
-	Addenda14 *Addenda14 `json:"addenda14,omitempty"`
+	Addenda14 *Addenda14 `json:"addenda14"`
 	// Addenda15 is mandatory for IAT entries
 	//
 	// The Addenda15 record identifies key information related to the Receiver.
-	Addenda15 *Addenda15 `json:"addenda15,omitempty"`
+	Addenda15 *Addenda15 `json:"addenda15"`
 	// Addenda16 is mandatory for IAt entries
 	//
 	// Addenda16 record identifies additional key information related to the Receiver.
-	Addenda16 *Addenda16 `json:"addenda16,omitempty"`
+	Addenda16 *Addenda16 `json:"addenda16"`
 	// Addenda17 is optional for IAT entries
 	//
 	// This is an optional Addenda Record used to provide payment-related data. There i a maximum of up to two of these

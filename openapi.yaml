@@ -681,9 +681,11 @@ components:
     BatchHeader:
       required:
         - serviceClassCode
+        - standardEntryClassCode
         - companyName
         - companyIdentification
         - ODFIIdentification
+        - batchNumber
       properties:
         ID:
           type: string
@@ -1574,6 +1576,7 @@ components:
           example: 1
       required:
         - serviceClassCode 
+        - standardEntryClassCode
         - foreignExchangeIndicator
         - foreignExchangeReferenceIndicator
         - foreignExchangeReference
@@ -1582,6 +1585,7 @@ components:
         - ISOOriginatingCurrencyCode
         - ISODestinationCurrencyCode
         - ODFIIdentification
+        - batchNumber
     IATEntryDetail:
       properties:
         ID:
@@ -1609,7 +1613,7 @@ components:
           type: string
           description: Last digit in RDFI routing number.
           example: "0"
-        AddendaRecords:
+        addendaRecords:
           type: number
           description: Number of Addenda Records
           example: 1
@@ -1626,7 +1630,7 @@ components:
           type: string
           description: Signifies if the record has been screened against OFAC records
           example: 'Y'
-        SecondaryOFACScreeningIndicator:
+        secondaryOFACScreeningIndicator:
           type: string
           description: Signifies if the record has been screened against OFAC records by a secondary entry
           example: 'Y'
@@ -1669,11 +1673,11 @@ components:
        - transactionCode
        - RDFIIdentification
        - checkDigit
-       - AddendaRecords
+       - addendaRecords
        - amount
        - DFIAccountNumber
        - OFACScreeningIndicator
-       - SecondaryOFACScreeningIndicator
+       - secondaryOFACScreeningIndicator
        - addendaRecordIndicator
        - addenda10
        - addenda11
@@ -1688,8 +1692,11 @@ components:
         - RDFIIdentification
         - checkDigit
         - DFIAccountNumber
+        - adviceRoutingNumber
         - amount
         - individualName
+        - achOperatorRoutingNumber
+        - sequenceNumber
       properties:
         ID:
           type: string

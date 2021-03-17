@@ -41,12 +41,12 @@ type Addenda17 struct {
 	// SequenceNumber is consecutively assigned to each Addenda17 Record following
 	// an Entry Detail Record. The first addenda17 sequence number must always
 	// be a "1".
-	SequenceNumber int `json:"sequenceNumber,omitempty"`
+	SequenceNumber int `json:"sequenceNumber"`
 	// EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
 	// Detail or Corporate Entry Detail Record's trace number This number is
 	// the same as the last seven digits of the trace number of the related
 	// Entry Detail Record or Corporate Entry Detail Record.
-	EntryDetailSequenceNumber int `json:"entryDetailSequenceNumber,omitempty"`
+	EntryDetailSequenceNumber int `json:"entryDetailSequenceNumber"`
 	// validator is composed for data validation
 	validator
 	// converters is composed for ACH to GoLang Converters
