@@ -1,4 +1,4 @@
-## v1.6.3 (Released 2021-03-17)
+## v1.6.3 (Released 2021-03-19)
 
 BUG FIXES
 
@@ -8,7 +8,7 @@ IMPROVEMENTS
 
 - file: optimized and refactored `File.FlattenBatches(..)` and added benchmarks
 - api: added missing required fields in models in the OpenAPI spec and removed unnecessary `omitempty` tags for required fields in Go models
-- docs: removed extra spaces in request body for creating a file to fix broken example
+- docs: removed extra spaces in the request body for creating a file to fix broken example
 - docs: added a section about where to find Nacha Operating Rules and Nacha's ACH guide for developers
 - docs: updated links in README to point to [project documentation site](https://moov-io.github.io/ach)
 
