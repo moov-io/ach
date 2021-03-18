@@ -33,7 +33,7 @@ func Example_telWriteDebit() {
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = ach.TEL
 	bh.CompanyEntryDescription = "Payment"
-	bh.EffectiveEntryDate = "190816"
+	bh.EffectiveEntryDate = "190816" // need EffectiveEntryDate to be fixed so it can match output
 	bh.ODFIIdentification = "121042882"
 
 	entry := ach.NewEntryDetail()
@@ -59,11 +59,11 @@ func Example_telWriteDebit() {
 		log.Fatalf("Unexpected error building file: %s\n", err)
 	}
 
-	fmt.Printf("%s", file.Header.String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetHeader().String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetEntries()[0].String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetControl().String()+"\n")
-	fmt.Printf("%s", file.Control.String()+"\n")
+	fmt.Println(file.Header.String())
+	fmt.Println(file.Batches[0].GetHeader().String())
+	fmt.Println(file.Batches[0].GetEntries()[0].String())
+	fmt.Println(file.Batches[0].GetControl().String())
+	fmt.Println(file.Control.String())
 
 	// Output:
 	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
@@ -71,5 +71,4 @@ func Example_telWriteDebit() {
 	// 62723138010412345678         0000050000               Receiver Account Name   0121042880000001
 	// 82250000010023138010000000050000000000000000231380104                          121042880000001
 	// 9000001000001000000010023138010000000050000000000000000
-
 }

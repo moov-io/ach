@@ -24,10 +24,7 @@ import (
 	"github.com/moov-io/ach"
 )
 
-// Example_corWriteCredit writes a COR file
 func Example_corWriteCredit() {
-	// Example transfer to write a COR File
-
 	fh := mockFileHeader()
 
 	bh := ach.NewBatchHeader()
@@ -61,7 +58,6 @@ func Example_corWriteCredit() {
 	// build the batch
 	batch := ach.NewBatchCOR(bh)
 	batch.AddEntry(entry)
-
 	if err := batch.Create(); err != nil {
 		log.Fatalf("Unexpected error building batch: %s\n", err)
 	}
@@ -74,12 +70,12 @@ func Example_corWriteCredit() {
 		log.Fatalf("Unexpected error building file: %s\n", err)
 	}
 
-	fmt.Printf("%s", file.Header.String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetHeader().String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetEntries()[0].String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetEntries()[0].Addenda98.String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetControl().String()+"\n")
-	fmt.Printf("%s", file.Control.String()+"\n")
+	fmt.Println(file.Header.String())
+	fmt.Println(file.Batches[0].GetHeader().String())
+	fmt.Println(file.Batches[0].GetEntries()[0].String())
+	fmt.Println(file.Batches[0].GetEntries()[0].Addenda98.String())
+	fmt.Println(file.Batches[0].GetControl().String())
+	fmt.Println(file.Control.String())
 
 	// Output:
 	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
@@ -88,5 +84,4 @@ func Example_corWriteCredit() {
 	// 798C01121042880000001      121042881918171614                                  091012980000088
 	// 82200000020023138010000000000000000000000000121042882                          121042880000001
 	// 9000001000001000000020023138010000000000000000000000000
-
 }

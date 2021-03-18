@@ -26,7 +26,6 @@ import (
 
 // Example_ctxWriteDebit writes a CTX debit file
 func Example_ctxWriteDebit() {
-
 	fh := mockFileHeader()
 
 	bh := ach.NewBatchHeader()
@@ -35,11 +34,10 @@ func Example_ctxWriteDebit() {
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = ach.CTX
 	bh.CompanyEntryDescription = "ACH CTX"
-	bh.EffectiveEntryDate = "190816"
+	bh.EffectiveEntryDate = "190816" // need EffectiveEntryDate to be fixed so it can match output
 	bh.ODFIIdentification = "121042882"
 
 	entry := ach.NewEntryDetail()
-
 	entry.TransactionCode = ach.CheckingDebit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "12345678"
@@ -78,13 +76,13 @@ func Example_ctxWriteDebit() {
 		log.Fatalf("Unexpected error building file: %s\n", err)
 	}
 
-	fmt.Printf("%s", file.Header.String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetHeader().String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetEntries()[0].String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetEntries()[0].Addenda05[0].String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetEntries()[0].Addenda05[1].String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetControl().String()+"\n")
-	fmt.Printf("%s", file.Control.String()+"\n")
+	fmt.Println(file.Header.String())
+	fmt.Println(file.Batches[0].GetHeader().String())
+	fmt.Println(file.Batches[0].GetEntries()[0].String())
+	fmt.Println(file.Batches[0].GetEntries()[0].Addenda05[0].String())
+	fmt.Println(file.Batches[0].GetEntries()[0].Addenda05[1].String())
+	fmt.Println(file.Batches[0].GetControl().String())
+	fmt.Println(file.Control.String())
 
 	// Output:
 	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
@@ -94,5 +92,4 @@ func Example_ctxWriteDebit() {
 	// 705Debit Second Account                                                            00020000001
 	// 82250000030023138010000100000000000000000000231380104                          121042880000001
 	// 9000001000001000000030023138010000100000000000000000000
-
 }

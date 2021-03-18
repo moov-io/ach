@@ -33,7 +33,7 @@ func Example_trcWriteDebit() {
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = ach.TRC
 	bh.CompanyEntryDescription = "ACH TRC"
-	bh.EffectiveEntryDate = "190816"
+	bh.EffectiveEntryDate = "190816" // need EffectiveEntryDate to be fixed so it can match output
 	bh.ODFIIdentification = "121042882"
 
 	entry := ach.NewEntryDetail()
@@ -62,16 +62,16 @@ func Example_trcWriteDebit() {
 		log.Fatalf("Unexpected error building file: %s\n", err)
 	}
 
-	fmt.Printf("%s", file.Header.String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetHeader().String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetEntries()[0].String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetControl().String()+"\n")
-	fmt.Printf("%s", file.Control.String()+"\n")
+	fmt.Println(file.Header.String())
+	fmt.Println(file.Batches[0].GetHeader().String())
+	fmt.Println(file.Batches[0].GetEntries()[0].String())
+	fmt.Println(file.Batches[0].GetControl().String())
+	fmt.Println(file.Control.String())
 
-	// Output: 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
+	// Output:
+	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
 	// 5225Payee Name                          231380104 TRCACH TRC         190816   1121042880000001
 	// 62723138010412345678         0000250000123456789012345CHECK11234567890123456010121042880000001
 	// 82250000010023138010000000250000000000000000231380104                          121042880000001
 	// 9000001000001000000010023138010000000250000000000000000
-
 }
