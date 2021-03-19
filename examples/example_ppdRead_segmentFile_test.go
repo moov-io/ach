@@ -19,56 +19,57 @@ package examples
 
 import (
 	"fmt"
-	"github.com/moov-io/ach"
 	"log"
 	"os"
 	"path/filepath"
 	"strconv"
+
+	"github.com/moov-io/ach"
 )
 
 func Example_ppdReadSegmentFile() {
-	// open a file for reading. Any io.Reader Can be used
+	// Open a file for reading, any io.Reader can be used
 	fCredit, err := os.Open(filepath.Join("testdata", "segmentFile-ppd-credit.ach"))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
-	r := ach.NewReader(fCredit)
-	achFile, err := r.Read()
+	rCredit := ach.NewReader(fCredit)
+	achFileCredit, err := rCredit.Read()
 	if err != nil {
-		fmt.Printf("Issue reading file: %+v \n", err)
+		log.Fatalf("reading file: %v\n", err)
 	}
-	// ensure we have a validated file structure
-	if achFile.Validate(); err != nil {
-		fmt.Printf("Could not validate entire read file: %v", err)
+	// If you trust the file but its formatting is off, building will probably resolve the malformed file
+	if err := achFileCredit.Create(); err != nil {
+		log.Fatalf("creating file: %v\n", err)
 	}
-	// If you trust the file but it's formatting is off building will probably resolve the malformed file.
-	if err := achFile.Create(); err != nil {
-		fmt.Printf("Could not create file with read properties: %v", err)
+	// Validate the ACH file
+	if err := achFileCredit.Validate(); err != nil {
+		log.Fatalf("validating file: %v\n", err)
 	}
 
-	// open a file for reading. Any io.Reader Can be used
+	// Open a file for reading, any io.Reader can be used
 	fDebit, err := os.Open(filepath.Join("testdata", "segmentFile-ppd-debit.ach"))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 	rDebit := ach.NewReader(fDebit)
 	achFileDebit, err := rDebit.Read()
 	if err != nil {
-		fmt.Printf("Issue reading file: %+v \n", err)
+		log.Fatalf("reading file: %v\n", err)
 	}
-	// ensure we have a validated file structure
-	if achFileDebit.Validate(); err != nil {
-		fmt.Printf("Could not validate entire read file: %v", err)
+	// If you trust the file but its formatting is off, building will probably resolve the malformed file
+	if err := achFileDebit.Create(); err != nil {
+		log.Fatalf("creating file: %v\n", err)
 	}
-	// If you trust the file but it's formatting is off building will probably resolve the malformed file.
-	if achFileDebit.Create(); err != nil {
-		fmt.Printf("Could not create file with read properties: %v", err)
+	// Validate the ACH file
+	if err := achFileDebit.Validate(); err != nil {
+		log.Fatalf("validating file: %v\n", err)
 	}
 
-	fmt.Printf("Total Credit Amount: %s", strconv.Itoa(achFile.Control.TotalCreditEntryDollarAmountInFile)+"\n")
-	fmt.Printf("SEC Code: %s", achFile.Batches[0].GetHeader().StandardEntryClassCode+"\n")
-	fmt.Printf("Total Debit Amount: %s", strconv.Itoa(achFileDebit.Control.TotalDebitEntryDollarAmountInFile)+"\n")
-	fmt.Printf("SEC Code: %s", achFileDebit.Batches[0].GetHeader().StandardEntryClassCode+"\n")
+	fmt.Printf("Total Credit Amount: %s\n", strconv.Itoa(achFileCredit.Control.TotalCreditEntryDollarAmountInFile))
+	fmt.Printf("SEC Code: %s\n", achFileCredit.Batches[0].GetHeader().StandardEntryClassCode)
+	fmt.Printf("Total Debit Amount: %s\n", strconv.Itoa(achFileDebit.Control.TotalDebitEntryDollarAmountInFile))
+	fmt.Printf("SEC Code: %s\n", achFileDebit.Batches[0].GetHeader().StandardEntryClassCode)
 
 	// Output:
 	// Total Credit Amount: 200000000

@@ -28,33 +28,34 @@ import (
 )
 
 func Example_ccdReadDebit() {
+	// Open a file for reading, any io.Reader can be used
 	f, err := os.Open(filepath.Join("testdata", "ccd-debit.ach"))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 	r := ach.NewReader(f)
 	achFile, err := r.Read()
 	if err != nil {
-		fmt.Printf("Issue reading file: %+v \n", err)
+		log.Fatalf("reading file: %v\n", err)
 	}
-	// ensure we have a validated file structure
-	if achFile.Validate(); err != nil {
-		fmt.Printf("Could not validate entire read file: %v", err)
-	}
-	// If you trust the file but it's formatting is off building will probably resolve the malformed file.
+	// If you trust the file but its formatting is off, building will probably resolve the malformed file
 	if err := achFile.Create(); err != nil {
-		fmt.Printf("Could not create file with read properties: %v", err)
+		log.Fatalf("creating file: %v\n", err)
+	}
+	// Validate the ACH file
+	if err := achFile.Validate(); err != nil {
+		log.Fatalf("validating file: %v\n", err)
 	}
 
-	fmt.Printf("Total Amount Debit: %s", strconv.Itoa(achFile.Control.TotalDebitEntryDollarAmountInFile)+"\n")
-	fmt.Printf("Total Amount Credit: %s", strconv.Itoa(achFile.Control.TotalCreditEntryDollarAmountInFile)+"\n")
-	fmt.Printf("SEC Code: %s", achFile.Batches[0].GetHeader().StandardEntryClassCode+"\n")
-	fmt.Printf("CCD Entry Identification Number: %s", achFile.Batches[0].GetEntries()[0].IdentificationNumber+"\n")
-	fmt.Printf("CCD Entry Receiving Company: %s", achFile.Batches[0].GetEntries()[0].IndividualName+"\n")
-	fmt.Printf("CCD Entry Trace Number: %s", achFile.Batches[0].GetEntries()[0].TraceNumberField()+"\n")
-	fmt.Printf("CCD Fee Identification Number: %s", achFile.Batches[0].GetEntries()[1].IdentificationNumber+"\n")
-	fmt.Printf("CCD Fee Receiving Company: %s", achFile.Batches[0].GetEntries()[1].IndividualName+"\n")
-	fmt.Printf("CCD Fee Trace Number: %s", achFile.Batches[0].GetEntries()[1].TraceNumberField()+"\n")
+	fmt.Printf("Total Amount Debit: %s\n", strconv.Itoa(achFile.Control.TotalDebitEntryDollarAmountInFile))
+	fmt.Printf("Total Amount Credit: %s\n", strconv.Itoa(achFile.Control.TotalCreditEntryDollarAmountInFile))
+	fmt.Printf("SEC Code: %s\n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
+	fmt.Printf("CCD Entry Identification Number: %s\n", achFile.Batches[0].GetEntries()[0].IdentificationNumber)
+	fmt.Printf("CCD Entry Receiving Company: %s\n", achFile.Batches[0].GetEntries()[0].IndividualName)
+	fmt.Printf("CCD Entry Trace Number: %s\n", achFile.Batches[0].GetEntries()[0].TraceNumberField())
+	fmt.Printf("CCD Fee Identification Number: %s\n", achFile.Batches[0].GetEntries()[1].IdentificationNumber)
+	fmt.Printf("CCD Fee Receiving Company: %s\n", achFile.Batches[0].GetEntries()[1].IndividualName)
+	fmt.Printf("CCD Fee Trace Number: %s\n", achFile.Batches[0].GetEntries()[1].TraceNumberField())
 
 	// Output:
 	// Total Amount Debit: 500125

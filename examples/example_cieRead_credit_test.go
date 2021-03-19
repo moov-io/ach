@@ -28,6 +28,7 @@ import (
 )
 
 func Example_cieReadCredit() {
+	// Open a file for reading, any io.Reader can be used
 	f, err := os.Open(filepath.Join("testdata", "cie-credit.ach"))
 	if err != nil {
 		log.Fatalln(err)
@@ -37,13 +38,13 @@ func Example_cieReadCredit() {
 	if err != nil {
 		log.Fatalf("reading file: %v\n", err)
 	}
-	// Validate the ACH file
-	if achFile.Validate(); err != nil {
-		log.Fatalf("validating file: %v\n", err)
-	}
-	// If you trust the file but it's formatting is off building will probably resolve the malformed file.
+	// If you trust the file but its formatting is off, building will probably resolve the malformed file
 	if err := achFile.Create(); err != nil {
 		log.Fatalf("creating file: %v\n", err)
+	}
+	// Validate the ACH file
+	if err := achFile.Validate(); err != nil {
+		log.Fatalf("validating file: %v\n", err)
 	}
 
 	fmt.Printf("Total Amount Debit: %s\n", strconv.Itoa(achFile.Control.TotalDebitEntryDollarAmountInFile))
