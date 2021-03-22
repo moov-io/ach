@@ -33,13 +33,12 @@ func Example_advWrite() {
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = ach.ADV
 	bh.CompanyEntryDescription = "Accounting"
-	bh.EffectiveEntryDate = "190816"
+	bh.EffectiveEntryDate = "190816" // need EffectiveEntryDate to be fixed so it can match output
 	bh.ODFIIdentification = "121042882"
 	bh.OriginatorStatusCode = 0
 
 	entry := ach.NewADVEntryDetail()
-
-	entry.TransactionCode = ach.CreditForDebitsOriginated //
+	entry.TransactionCode = ach.CreditForDebitsOriginated
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 50000
@@ -54,7 +53,7 @@ func Example_advWrite() {
 	entry.SequenceNumber = 1
 
 	entryOne := ach.NewADVEntryDetail()
-	entryOne.TransactionCode = ach.DebitForCreditsOriginated //
+	entryOne.TransactionCode = ach.DebitForCreditsOriginated
 	entryOne.SetRDFI("231380104")
 	entryOne.DFIAccountNumber = "744-5678-99"
 	entryOne.Amount = 250000
@@ -84,12 +83,12 @@ func Example_advWrite() {
 		log.Fatalf("Unexpected error building file: %s\n", err)
 	}
 
-	fmt.Printf("%s", file.Header.String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetHeader().String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetADVEntries()[0].String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetADVEntries()[1].String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetADVControl().String()+"\n")
-	fmt.Printf("%s", file.Control.String()+"\n")
+	fmt.Println(file.Header.String())
+	fmt.Println(file.Batches[0].GetHeader().String())
+	fmt.Println(file.Batches[0].GetADVEntries()[0].String())
+	fmt.Println(file.Batches[0].GetADVEntries()[1].String())
+	fmt.Println(file.Batches[0].GetADVControl().String())
+	fmt.Println(file.Control.String())
 
 	// Output:
 	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
@@ -98,5 +97,4 @@ func Example_advWrite() {
 	// 682231380104744-5678-99    00000025000012104288211139 Name                    0011000010500002
 	// 828000000200462760200000000000000025000000000000000000050000Company Name, Inc  121042880000001
 	// 9000000000000000000000000000000000000000000000000000000
-
 }

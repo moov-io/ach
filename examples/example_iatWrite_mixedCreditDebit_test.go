@@ -40,7 +40,7 @@ func Example_iatWriteMixedCreditDebit() {
 	bh.ISOOriginatingCurrencyCode = "CAD"
 	bh.ISODestinationCurrencyCode = "USD"
 	bh.ODFIIdentification = "23138010"
-	bh.EffectiveEntryDate = "190816"
+	bh.EffectiveEntryDate = "190816" // need EffectiveEntryDate to be fixed so it can match output
 
 	entry := ach.NewIATEntryDetail()
 	entry.TransactionCode = ach.CheckingDebit
@@ -123,8 +123,6 @@ func Example_iatWriteMixedCreditDebit() {
 	entryTwo.SetTraceNumber("23138010", 2)
 	entryTwo.Category = ach.CategoryForward
 
-	//addenda
-
 	addenda10Two := ach.NewAddenda10()
 	addenda10Two.TransactionTypeCode = "ANN"
 	addenda10Two.ForeignPaymentAmount = 100000
@@ -204,29 +202,29 @@ func Example_iatWriteMixedCreditDebit() {
 		log.Fatalf("Unexpected error building file: %s\n", err)
 	}
 
-	fmt.Printf("SEC Code: %s", achFile.IATBatches[0].GetHeader().StandardEntryClassCode+"\n")
-	fmt.Printf("Debit Entry: %s", achFile.IATBatches[0].Entries[0].String()+"\n")
-	fmt.Printf("Addenda10: %s", achFile.IATBatches[0].Entries[0].Addenda10.String()+"\n")
-	fmt.Printf("Addenda11: %s", achFile.IATBatches[0].Entries[0].Addenda11.String()+"\n")
-	fmt.Printf("Addenda12: %s", achFile.IATBatches[0].Entries[0].Addenda12.String()+"\n")
-	fmt.Printf("Addenda13: %s", achFile.IATBatches[0].Entries[0].Addenda13.String()+"\n")
-	fmt.Printf("Addenda14: %s", achFile.IATBatches[0].Entries[0].Addenda14.String()+"\n")
-	fmt.Printf("Addenda15: %s", achFile.IATBatches[0].Entries[0].Addenda15.String()+"\n")
-	fmt.Printf("Addenda16: %s", achFile.IATBatches[0].Entries[0].Addenda16.String()+"\n")
-	fmt.Printf("Addenda17: %s", achFile.IATBatches[0].Entries[0].Addenda17[0].String()+"\n")
-	fmt.Printf("Addenda18: %s", achFile.IATBatches[0].Entries[0].Addenda18[0].String()+"\n")
-	fmt.Printf("Total File Debit Amount: %s", strconv.Itoa(achFile.Control.TotalDebitEntryDollarAmountInFile)+"\n")
-	fmt.Printf("Credit Entry: %s", achFile.IATBatches[0].Entries[1].String()+"\n")
-	fmt.Printf("Addenda10: %s", achFile.IATBatches[0].Entries[1].Addenda10.String()+"\n")
-	fmt.Printf("Addenda11: %s", achFile.IATBatches[0].Entries[1].Addenda11.String()+"\n")
-	fmt.Printf("Addenda12: %s", achFile.IATBatches[0].Entries[1].Addenda12.String()+"\n")
-	fmt.Printf("Addenda13: %s", achFile.IATBatches[0].Entries[1].Addenda13.String()+"\n")
-	fmt.Printf("Addenda14: %s", achFile.IATBatches[0].Entries[1].Addenda14.String()+"\n")
-	fmt.Printf("Addenda15: %s", achFile.IATBatches[0].Entries[1].Addenda15.String()+"\n")
-	fmt.Printf("Addenda16: %s", achFile.IATBatches[0].Entries[1].Addenda16.String()+"\n")
-	fmt.Printf("Addenda17: %s", achFile.IATBatches[0].Entries[1].Addenda17[0].String()+"\n")
-	fmt.Printf("Addenda18: %s", achFile.IATBatches[0].Entries[1].Addenda18[0].String()+"\n")
-	fmt.Printf("Total File Credit Amount: %s", strconv.Itoa(achFile.Control.TotalCreditEntryDollarAmountInFile)+"\n")
+	fmt.Printf("SEC Code: %s\n", achFile.IATBatches[0].GetHeader().StandardEntryClassCode)
+	fmt.Printf("Debit Entry: %s\n", achFile.IATBatches[0].Entries[0].String())
+	fmt.Printf("Addenda10: %s\n", achFile.IATBatches[0].Entries[0].Addenda10.String())
+	fmt.Printf("Addenda11: %s\n", achFile.IATBatches[0].Entries[0].Addenda11.String())
+	fmt.Printf("Addenda12: %s\n", achFile.IATBatches[0].Entries[0].Addenda12.String())
+	fmt.Printf("Addenda13: %s\n", achFile.IATBatches[0].Entries[0].Addenda13.String())
+	fmt.Printf("Addenda14: %s\n", achFile.IATBatches[0].Entries[0].Addenda14.String())
+	fmt.Printf("Addenda15: %s\n", achFile.IATBatches[0].Entries[0].Addenda15.String())
+	fmt.Printf("Addenda16: %s\n", achFile.IATBatches[0].Entries[0].Addenda16.String())
+	fmt.Printf("Addenda17: %s\n", achFile.IATBatches[0].Entries[0].Addenda17[0].String())
+	fmt.Printf("Addenda18: %s\n", achFile.IATBatches[0].Entries[0].Addenda18[0].String())
+	fmt.Printf("Total File Debit Amount: %s\n", strconv.Itoa(achFile.Control.TotalDebitEntryDollarAmountInFile))
+	fmt.Printf("Credit Entry: %s\n", achFile.IATBatches[0].Entries[1].String())
+	fmt.Printf("Addenda10: %s\n", achFile.IATBatches[0].Entries[1].Addenda10.String())
+	fmt.Printf("Addenda11: %s\n", achFile.IATBatches[0].Entries[1].Addenda11.String())
+	fmt.Printf("Addenda12: %s\n", achFile.IATBatches[0].Entries[1].Addenda12.String())
+	fmt.Printf("Addenda13: %s\n", achFile.IATBatches[0].Entries[1].Addenda13.String())
+	fmt.Printf("Addenda14: %s\n", achFile.IATBatches[0].Entries[1].Addenda14.String())
+	fmt.Printf("Addenda15: %s\n", achFile.IATBatches[0].Entries[1].Addenda15.String())
+	fmt.Printf("Addenda16: %s\n", achFile.IATBatches[0].Entries[1].Addenda16.String())
+	fmt.Printf("Addenda17: %s\n", achFile.IATBatches[0].Entries[1].Addenda17[0].String())
+	fmt.Printf("Addenda18: %s\n", achFile.IATBatches[0].Entries[1].Addenda18[0].String())
+	fmt.Printf("Total File Credit Amount: %s\n", strconv.Itoa(achFile.Control.TotalCreditEntryDollarAmountInFile))
 
 	// Output:
 	// SEC Code: IAT

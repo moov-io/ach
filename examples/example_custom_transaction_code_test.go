@@ -47,8 +47,7 @@ func Example_customTransactionCode() {
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = ach.PPD
 	bh.CompanyEntryDescription = "Cash Back"
-	// fix EffectiveEntryDate for consistent output
-	bh.EffectiveEntryDate = "190816"
+	bh.EffectiveEntryDate = "190816" // need EffectiveEntryDate to be fixed so it can match output
 	bh.ODFIIdentification = "987654320"
 	bh.SetValidation(validationOpts)
 
@@ -64,7 +63,6 @@ func Example_customTransactionCode() {
 	// build the batch
 	batch := ach.NewBatchPPD(bh)
 	batch.AddEntry(entry)
-
 	if err := batch.Create(); err != nil {
 		log.Fatalf("Unexpected error building batch: %s\n", err)
 	}
@@ -78,10 +76,9 @@ func Example_customTransactionCode() {
 	}
 
 	fmt.Printf("TransactionCode=%d\n", file.Batches[0].GetEntries()[0].TransactionCode)
-	fmt.Printf("%s\n", file.Batches[0].GetEntries()[0].String())
+	fmt.Println(file.Batches[0].GetEntries()[0].String())
 
 	// Output:
 	// TransactionCode=78
 	// 67812345678012567            0100000000               Jane Smith              0987654320000002
-
 }

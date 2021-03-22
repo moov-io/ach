@@ -22,12 +22,12 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 
 	"github.com/moov-io/ach"
 )
 
 func Example_cieReadCredit() {
+	// Open a file for reading, any io.Reader can be used
 	f, err := os.Open(filepath.Join("testdata", "cie-credit.ach"))
 	if err != nil {
 		log.Fatalln(err)
@@ -37,17 +37,17 @@ func Example_cieReadCredit() {
 	if err != nil {
 		log.Fatalf("reading file: %v\n", err)
 	}
-	// Validate the ACH file
-	if achFile.Validate(); err != nil {
-		log.Fatalf("validating file: %v\n", err)
-	}
-	// If you trust the file but it's formatting is off building will probably resolve the malformed file.
+	// If you trust the file but its formatting is off, building will probably resolve the malformed file
 	if err := achFile.Create(); err != nil {
 		log.Fatalf("creating file: %v\n", err)
 	}
+	// Validate the ACH file
+	if err := achFile.Validate(); err != nil {
+		log.Fatalf("validating file: %v\n", err)
+	}
 
-	fmt.Printf("Total Amount Debit: %s\n", strconv.Itoa(achFile.Control.TotalDebitEntryDollarAmountInFile))
-	fmt.Printf("Total Amount Credit: %s\n", strconv.Itoa(achFile.Control.TotalCreditEntryDollarAmountInFile))
+	fmt.Printf("Total Amount Debit: %d\n", achFile.Control.TotalDebitEntryDollarAmountInFile)
+	fmt.Printf("Total Amount Credit: %d\n", achFile.Control.TotalCreditEntryDollarAmountInFile)
 	fmt.Printf("SEC Code: %s\n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
 	fmt.Printf("Addenda05: %s\n", achFile.Batches[0].GetEntries()[0].Addenda05[0].String())
 

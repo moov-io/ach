@@ -37,7 +37,6 @@ func Example_enrWrite() {
 	bh.ODFIIdentification = "23138010"
 
 	entry := ach.NewEntryDetail()
-
 	entry.TransactionCode = ach.CheckingDebit
 	entry.SetRDFI("031300012")
 	entry.DFIAccountNumber = "744-5678-99"
@@ -66,14 +65,15 @@ func Example_enrWrite() {
 		log.Fatalf("Unexpected error building file: %s\n", err)
 	}
 
-	fmt.Printf("%s", file.Header.String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetHeader().String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetEntries()[0].String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetEntries()[0].Addenda05[0].String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetControl().String()+"\n")
-	fmt.Printf("%s", file.Control.String()+"\n")
+	fmt.Println(file.Header.String())
+	fmt.Println(file.Batches[0].GetHeader().String())
+	fmt.Println(file.Batches[0].GetEntries()[0].String())
+	fmt.Println(file.Batches[0].GetEntries()[0].Addenda05[0].String())
+	fmt.Println(file.Batches[0].GetControl().String())
+	fmt.Println(file.Control.String())
 
-	// Output: 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
+	// Output:
+	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
 	// 5225Name on Account                     231380104 ENRAUTOENROLL               1231380100000001
 	// 627031300012744-5678-99      0000000000031300010000001Best. #1                1231380100000001
 	// 70522*12200004*3*123987654321*777777777*DOE*JOHN*1\                                00010000001

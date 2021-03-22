@@ -33,7 +33,7 @@ func Example_ccdWriteDebit() {
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = ach.CCD
 	bh.CompanyEntryDescription = "Vndr Pay"
-	bh.EffectiveEntryDate = "190816"
+	bh.EffectiveEntryDate = "190816" // need EffectiveEntryDate to be fixed so it can match output
 	bh.ODFIIdentification = "031300012"
 
 	entry := ach.NewEntryDetail()
@@ -72,14 +72,15 @@ func Example_ccdWriteDebit() {
 		log.Fatalf("Unexpected error building file: %s\n", err)
 	}
 
-	fmt.Printf("%s", file.Header.String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetHeader().String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetEntries()[0].String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetEntries()[1].String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetControl().String()+"\n")
-	fmt.Printf("%s", file.Control.String()+"\n")
+	fmt.Println(file.Header.String())
+	fmt.Println(file.Batches[0].GetHeader().String())
+	fmt.Println(file.Batches[0].GetEntries()[0].String())
+	fmt.Println(file.Batches[0].GetEntries()[1].String())
+	fmt.Println(file.Batches[0].GetControl().String())
+	fmt.Println(file.Control.String())
 
-	// Output: 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
+	// Output:
+	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
 	// 5225Name on Account                     231380104 CCDVndr Pay        190816   1031300010000001
 	// 627231380104744-5678-99      0000500000location #1234 Best Co. #1           S 0031300010000001
 	// 627231380104744-5678-99      0000000125Fee #1         Best Co. #1           S 0031300010000002

@@ -24,17 +24,16 @@ import (
 	"github.com/moov-io/ach"
 )
 
-// Example_ackWrite writes an ACK File
 func Example_ackWrite() {
 	fh := mockFileHeader()
+
 	bh := ach.NewBatchHeader()
 	bh.ServiceClassCode = ach.CreditsOnly
 	bh.CompanyName = "Name on Account"
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = ach.ACK
 	bh.CompanyEntryDescription = "Vndr Pay"
-	// need EffectiveEntryDate to be fixed so it can match output
-	bh.EffectiveEntryDate = "190816"
+	bh.EffectiveEntryDate = "190816" // need EffectiveEntryDate to be fixed so it can match output
 	bh.ODFIIdentification = "23138010"
 
 	entry := ach.NewEntryDetail()
@@ -71,12 +70,12 @@ func Example_ackWrite() {
 		log.Fatalf("Unexpected error building file: %s\n", err)
 	}
 
-	fmt.Printf("%s", file.Header.String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetHeader().String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetEntries()[0].String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetEntries()[1].String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetControl().String()+"\n")
-	fmt.Printf("%s", file.Control.String()+"\n")
+	fmt.Println(file.Header.String())
+	fmt.Println(file.Batches[0].GetHeader().String())
+	fmt.Println(file.Batches[0].GetEntries()[0].String())
+	fmt.Println(file.Batches[0].GetEntries()[1].String())
+	fmt.Println(file.Batches[0].GetControl().String())
+	fmt.Println(file.Control.String())
 
 	// Output:
 	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678

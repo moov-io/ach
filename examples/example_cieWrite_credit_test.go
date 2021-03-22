@@ -33,7 +33,7 @@ func Example_cieWriteCredit() {
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = ach.CIE
 	bh.CompanyEntryDescription = "Payment"
-	bh.EffectiveEntryDate = "190816"
+	bh.EffectiveEntryDate = "190816" // need EffectiveEntryDate to be fixed so it can match output
 	bh.ODFIIdentification = "121042882"
 
 	entry := ach.NewEntryDetail()

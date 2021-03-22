@@ -33,7 +33,7 @@ func Example_mteWriteDebit() {
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = ach.MTE
 	bh.CompanyEntryDescription = "CASH WITHDRAW"
-	bh.EffectiveEntryDate = "190816"
+	bh.EffectiveEntryDate = "190816" // need EffectiveEntryDate to be fixed so it can match output
 	bh.ODFIIdentification = "23138010"
 
 	entry := ach.NewEntryDetail()
@@ -72,11 +72,11 @@ func Example_mteWriteDebit() {
 		log.Fatalf("Unexpected error building file: %s\n", err)
 	}
 
-	fmt.Printf("%s", file.Header.String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetHeader().String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetEntries()[0].String()+"\n")
-	fmt.Printf("%s", file.Batches[0].GetControl().String()+"\n")
-	fmt.Printf("%s", file.Control.String()+"\n")
+	fmt.Println(file.Header.String())
+	fmt.Println(file.Batches[0].GetHeader().String())
+	fmt.Println(file.Batches[0].GetEntries()[0].String())
+	fmt.Println(file.Batches[0].GetControl().String())
+	fmt.Println(file.Control.String())
 
 	// Output:
 	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
@@ -84,5 +84,4 @@ func Example_mteWriteDebit() {
 	// 627031300012744-5678-99      0000010000031300010000001JANE DOE                1231380100000001
 	// 82250000020003130001000000010000000000000000231380104                          231380100000001
 	// 9000001000001000000020003130001000000010000000000000000
-
 }
