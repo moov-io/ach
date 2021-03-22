@@ -53,7 +53,8 @@ func Example_popReadDebit() {
 	fmt.Printf("POP Terminal City: %s\n", achFile.Batches[0].GetEntries()[0].IdentificationNumber[9:13])
 	fmt.Printf("POP Terminal State: %s\n", achFile.Batches[0].GetEntries()[0].IdentificationNumber[13:15])
 
-	// Output: Total Amount Debit: 250500
+	// Output:
+	// Total Amount Debit: 250500
 	// SEC Code: POP
 	// POP Check Serial Number: 123456789
 	// POP Terminal City: PHIL

@@ -81,5 +81,4 @@ func Example_ppdWriteSegmentFile() {
 	// credit 0: 622231380104987654321        0100000000               Credit Account 1        0121042880000002
 	// credit 1: 622231380104837098765        0100000000               Credit Account 2        0121042880000003
 	// debit 0: 627231380104123456789        0200000000               Debit Account           0121042880000001
-
 }
