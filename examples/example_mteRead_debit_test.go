@@ -22,7 +22,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 
 	"github.com/moov-io/ach"
 )
@@ -47,7 +46,7 @@ func Example_mteReadDebit() {
 		log.Fatalf("validating file: %v\n", err)
 	}
 
-	fmt.Printf("Total Amount: %s\n", strconv.Itoa(achFile.Batches[0].GetEntries()[0].Amount))
+	fmt.Printf("Total Amount: %d\n", achFile.Batches[0].GetEntries()[0].Amount)
 	fmt.Printf("SEC Code: %s\n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
 	fmt.Printf("Addenda02: %s\n", achFile.Batches[0].GetEntries()[0].Addenda02.String())
 

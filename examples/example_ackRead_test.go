@@ -22,7 +22,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 
 	"github.com/moov-io/ach"
 )
@@ -47,8 +46,8 @@ func Example_ackRead() {
 		log.Fatalf("validating file: %v\n", err)
 	}
 
-	fmt.Printf("Credit Total Amount: %s\n", strconv.Itoa(achFile.Control.TotalCreditEntryDollarAmountInFile))
-	fmt.Printf("Batch Credit Total Amount: %s\n", strconv.Itoa(achFile.Batches[0].GetEntries()[0].Amount))
+	fmt.Printf("Credit Total Amount: %d\n", achFile.Control.TotalCreditEntryDollarAmountInFile)
+	fmt.Printf("Batch Credit Total Amount: %d\n", achFile.Batches[0].GetEntries()[0].Amount)
 	fmt.Printf("SEC Code: %s\n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
 	fmt.Printf("Original Trace Number: %s\n", achFile.Batches[0].GetEntries()[0].OriginalTraceNumberField())
 

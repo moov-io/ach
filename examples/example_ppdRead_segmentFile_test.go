@@ -22,7 +22,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 
 	"github.com/moov-io/ach"
 )
@@ -66,9 +65,9 @@ func Example_ppdReadSegmentFile() {
 		log.Fatalf("validating file: %v\n", err)
 	}
 
-	fmt.Printf("Total Credit Amount: %s\n", strconv.Itoa(achFileCredit.Control.TotalCreditEntryDollarAmountInFile))
+	fmt.Printf("Total Credit Amount: %d\n", achFileCredit.Control.TotalCreditEntryDollarAmountInFile)
 	fmt.Printf("SEC Code: %s\n", achFileCredit.Batches[0].GetHeader().StandardEntryClassCode)
-	fmt.Printf("Total Debit Amount: %s\n", strconv.Itoa(achFileDebit.Control.TotalDebitEntryDollarAmountInFile))
+	fmt.Printf("Total Debit Amount: %d\n", achFileDebit.Control.TotalDebitEntryDollarAmountInFile)
 	fmt.Printf("SEC Code: %s\n", achFileDebit.Batches[0].GetHeader().StandardEntryClassCode)
 
 	// Output:

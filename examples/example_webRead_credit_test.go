@@ -22,7 +22,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 
 	"github.com/moov-io/ach"
 )
@@ -48,8 +47,8 @@ func Example_webReadCredit() {
 	}
 
 	fmt.Printf("SEC Code: %s\n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
-	fmt.Printf("Total File Debit Amount: %s\n", strconv.Itoa(achFile.Control.TotalDebitEntryDollarAmountInFile))
-	fmt.Printf("Total File Credit Amount: %s\n", strconv.Itoa(achFile.Control.TotalCreditEntryDollarAmountInFile))
+	fmt.Printf("Total File Debit Amount: %d\n", achFile.Control.TotalDebitEntryDollarAmountInFile)
+	fmt.Printf("Total File Credit Amount: %d\n", achFile.Control.TotalCreditEntryDollarAmountInFile)
 
 	// Output:
 	// SEC Code: WEB

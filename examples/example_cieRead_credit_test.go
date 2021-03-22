@@ -22,7 +22,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 
 	"github.com/moov-io/ach"
 )
@@ -47,8 +46,8 @@ func Example_cieReadCredit() {
 		log.Fatalf("validating file: %v\n", err)
 	}
 
-	fmt.Printf("Total Amount Debit: %s\n", strconv.Itoa(achFile.Control.TotalDebitEntryDollarAmountInFile))
-	fmt.Printf("Total Amount Credit: %s\n", strconv.Itoa(achFile.Control.TotalCreditEntryDollarAmountInFile))
+	fmt.Printf("Total Amount Debit: %d\n", achFile.Control.TotalDebitEntryDollarAmountInFile)
+	fmt.Printf("Total Amount Credit: %d\n", achFile.Control.TotalCreditEntryDollarAmountInFile)
 	fmt.Printf("SEC Code: %s\n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
 	fmt.Printf("Addenda05: %s\n", achFile.Batches[0].GetEntries()[0].Addenda05[0].String())
 

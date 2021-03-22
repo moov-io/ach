@@ -22,7 +22,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 
 	"github.com/moov-io/ach"
 )
@@ -47,7 +46,7 @@ func Example_xckReadDebit() {
 		log.Fatalf("validating file: %v\n", err)
 	}
 
-	fmt.Printf("Total Amount Debit: %s\n", strconv.Itoa(achFile.Control.TotalDebitEntryDollarAmountInFile))
+	fmt.Printf("Total Amount Debit: %d\n", achFile.Control.TotalDebitEntryDollarAmountInFile)
 	fmt.Printf("SEC Code: %s\n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
 	fmt.Printf("Check Serial Number: %s\n", achFile.Batches[0].GetEntries()[0].IdentificationNumber)
 	fmt.Printf("Process Control Field: %s\n", achFile.Batches[0].GetEntries()[0].IndividualName[0:6])

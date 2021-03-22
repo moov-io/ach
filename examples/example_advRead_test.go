@@ -22,7 +22,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 
 	"github.com/moov-io/ach"
 )
@@ -47,16 +46,16 @@ func Example_advRead() {
 		log.Fatalf("validating file: %v\n", err)
 	}
 
-	fmt.Printf("Credit Total Amount: %s\n", strconv.Itoa(achFile.ADVControl.TotalCreditEntryDollarAmountInFile))
-	fmt.Printf("Debit Total Amount: %s\n", strconv.Itoa(achFile.ADVControl.TotalDebitEntryDollarAmountInFile))
-	fmt.Printf("OriginatorStatusCode: %s\n", strconv.Itoa(achFile.Batches[0].GetHeader().OriginatorStatusCode))
-	fmt.Printf("Batch Credit Total Amount: %s\n", strconv.Itoa(achFile.Batches[0].GetADVControl().TotalCreditEntryDollarAmount))
-	fmt.Printf("Batch Debit Total Amount: %s\n", strconv.Itoa(achFile.Batches[0].GetADVControl().TotalDebitEntryDollarAmount))
+	fmt.Printf("Credit Total Amount: %d\n", achFile.ADVControl.TotalCreditEntryDollarAmountInFile)
+	fmt.Printf("Debit Total Amount: %d\n", achFile.ADVControl.TotalDebitEntryDollarAmountInFile)
+	fmt.Printf("OriginatorStatusCode: %d\n", achFile.Batches[0].GetHeader().OriginatorStatusCode)
+	fmt.Printf("Batch Credit Total Amount: %d\n", achFile.Batches[0].GetADVControl().TotalCreditEntryDollarAmount)
+	fmt.Printf("Batch Debit Total Amount: %d\n", achFile.Batches[0].GetADVControl().TotalDebitEntryDollarAmount)
 	fmt.Printf("SEC Code: %s\n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
-	fmt.Printf("Entry Amount: %s\n", strconv.Itoa(achFile.Batches[0].GetADVEntries()[0].Amount))
-	fmt.Printf("Sequence Number: %s\n", strconv.Itoa(achFile.Batches[0].GetADVEntries()[0].SequenceNumber))
-	fmt.Printf("EntryOne Amount: %s\n", strconv.Itoa(achFile.Batches[0].GetADVEntries()[1].Amount))
-	fmt.Printf("EntryOne Sequence Number: %s\n", strconv.Itoa(achFile.Batches[0].GetADVEntries()[1].SequenceNumber))
+	fmt.Printf("Entry Amount: %d\n", achFile.Batches[0].GetADVEntries()[0].Amount)
+	fmt.Printf("Sequence Number: %d\n", achFile.Batches[0].GetADVEntries()[0].SequenceNumber)
+	fmt.Printf("EntryOne Amount: %d\n", achFile.Batches[0].GetADVEntries()[1].Amount)
+	fmt.Printf("EntryOne Sequence Number: %d\n", achFile.Batches[0].GetADVEntries()[1].SequenceNumber)
 
 	// Output:
 	// Credit Total Amount: 50000

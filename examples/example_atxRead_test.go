@@ -22,7 +22,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 
 	"github.com/moov-io/ach"
 )
@@ -47,14 +46,14 @@ func Example_atxRead() {
 		log.Fatalf("validating file: %v\n", err)
 	}
 
-	fmt.Printf("Total Amount Debit: %s\n", strconv.Itoa(achFile.Control.TotalDebitEntryDollarAmountInFile))
-	fmt.Printf("Total Amount Credit: %s\n", strconv.Itoa(achFile.Control.TotalCreditEntryDollarAmountInFile))
+	fmt.Printf("Total Amount Debit: %d\n", achFile.Control.TotalDebitEntryDollarAmountInFile)
+	fmt.Printf("Total Amount Credit: %d\n", achFile.Control.TotalCreditEntryDollarAmountInFile)
 	fmt.Printf("SEC Code: %s\n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
-	fmt.Printf("Total Amount: %s\n", strconv.Itoa(achFile.Batches[0].GetEntries()[0].Amount))
+	fmt.Printf("Total Amount: %d\n", achFile.Batches[0].GetEntries()[0].Amount)
 	fmt.Printf("Original Trace Number: %s\n", achFile.Batches[0].GetEntries()[0].OriginalTraceNumberField())
 	fmt.Printf("Addenda1: %s\n", achFile.Batches[0].GetEntries()[0].Addenda05[0].String())
 	fmt.Printf("Addenda2: %s\n", achFile.Batches[0].GetEntries()[0].Addenda05[1].String())
-	fmt.Printf("Total Amount: %s\n", strconv.Itoa(achFile.Batches[0].GetEntries()[1].Amount))
+	fmt.Printf("Total Amount: %d\n", achFile.Batches[0].GetEntries()[1].Amount)
 	fmt.Printf("Original Trace Number: %s\n", achFile.Batches[0].GetEntries()[1].OriginalTraceNumberField())
 	fmt.Printf("Addenda1: %s\n", achFile.Batches[0].GetEntries()[1].Addenda05[0].String())
 	fmt.Printf("Addenda2: %s\n", achFile.Batches[0].GetEntries()[1].Addenda05[1].String())

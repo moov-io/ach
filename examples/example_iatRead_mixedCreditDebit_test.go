@@ -22,7 +22,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 
 	"github.com/moov-io/ach"
 )
@@ -58,7 +57,7 @@ func Example_iatReadMixedCreditDebit() {
 	fmt.Printf("Addenda16: %s\n", achFile.IATBatches[0].Entries[0].Addenda16.String())
 	fmt.Printf("Addenda17: %s\n", achFile.IATBatches[0].Entries[0].Addenda17[0].String())
 	fmt.Printf("Addenda18: %s\n", achFile.IATBatches[0].Entries[0].Addenda18[0].String())
-	fmt.Printf("Total File Debit Amount: %s\n", strconv.Itoa(achFile.Control.TotalDebitEntryDollarAmountInFile))
+	fmt.Printf("Total File Debit Amount: %d\n", achFile.Control.TotalDebitEntryDollarAmountInFile)
 	fmt.Printf("Credit Entry: %s\n", achFile.IATBatches[0].Entries[1].String())
 	fmt.Printf("Addenda10: %s\n", achFile.IATBatches[0].Entries[1].Addenda10.String())
 	fmt.Printf("Addenda11: %s\n", achFile.IATBatches[0].Entries[1].Addenda11.String())
@@ -69,7 +68,7 @@ func Example_iatReadMixedCreditDebit() {
 	fmt.Printf("Addenda16: %s\n", achFile.IATBatches[0].Entries[1].Addenda16.String())
 	fmt.Printf("Addenda17: %s\n", achFile.IATBatches[0].Entries[1].Addenda17[0].String())
 	fmt.Printf("Addenda18: %s\n", achFile.IATBatches[0].Entries[1].Addenda18[0].String())
-	fmt.Printf("Total File Credit Amount: %s\n", strconv.Itoa(achFile.Control.TotalCreditEntryDollarAmountInFile))
+	fmt.Printf("Total File Credit Amount: %d\n", achFile.Control.TotalCreditEntryDollarAmountInFile)
 
 	// Output:
 	// SEC Code: IAT
