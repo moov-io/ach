@@ -69,27 +69,22 @@ func main() {
 	entry.AddendaRecordIndicator = 1
 
 	// To add one or more optional addenda records for an entry
-
 	addenda := ach.NewAddenda05()
 	addenda.PaymentRelatedInformation = "bonus pay for amazing work on #OSS"
 	entry.AddAddenda05(addenda)
 
 	// Entries are added to batches like so:
-
 	batch.AddEntry(entry)
 
 	// When all of the Entries are added to the batch we must create it.
-
 	if err := batch.Create(); err != nil {
 		log.Fatalf("%T: %v", err, err)
 	}
 
 	// And batches are added to files much the same way:
-
 	file.AddBatch(batch)
 
 	// Now add a new batch for accepting payments on the web
-
 	bh2 := ach.NewBatchHeader()
 	bh2.ServiceClassCode = ach.CreditsOnly
 	bh2.CompanyName = "Your Company"
@@ -109,7 +104,6 @@ func main() {
 
 	// Add an entry and define if it is a single or recurring payment
 	// The following is a recurring payment for $7.99
-
 	entry2 := ach.NewEntryDetail()
 	entry2.TransactionCode = ach.CheckingCredit
 	entry2.SetRDFI("231380104")
@@ -122,12 +116,12 @@ func main() {
 	entry2.Category = ach.CategoryForward
 	entry2.AddendaRecordIndicator = 1
 
-	// To add one or more optional addenda records for an entry
+	// Add one or more optional addenda records for an entry
 	addenda2 := ach.NewAddenda05()
 	addenda2.PaymentRelatedInformation = "Monthly Membership Subscription"
 	entry2.AddAddenda05(addenda2)
 
-	// add the entry to the batch
+	// Add the entry to the batch
 	batch2.AddEntry(entry2)
 
 	// Create and add the second batch
@@ -136,8 +130,7 @@ func main() {
 	}
 	file.AddBatch(batch2)
 
-	// Once we added all our batches we must create the file
-
+	// Once we've added all our batches we must create the file
 	if err := file.Create(); err != nil {
 		fmt.Printf("%T: %v", err, err)
 	}
@@ -154,7 +147,7 @@ func main() {
 		log.Fatal("TraceNumber was not kept " + batch2Entries[0].TraceNumber)
 	}
 
-	// Finally we wnt to write the file to an io.Writer
+	// Finally we want to write the file to an io.Writer
 	w := ach.NewWriter(os.Stdout)
 	if err := w.Write(file); err != nil {
 		fmt.Printf("%T: %v", err, err)

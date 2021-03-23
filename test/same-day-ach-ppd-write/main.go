@@ -26,7 +26,7 @@ import (
 )
 
 func main() {
-	// Example transfer to write an ACH PPD file to send/credit a external institutions account
+	// Example transfer to write an ACH PPD file to send/credit a external institution's account
 	// Important: All financial institutions are different and will require registration and exact field values.
 
 	// Set originator bank ODFI and destination Operator for the financial institution
@@ -44,7 +44,7 @@ func main() {
 	bh.CompanyName = "Name on Account" // The name of the company/person that has relationship with receiver
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = ach.PPD
-	bh.CompanyEntryDescription = "REG.SALARY" // will be on receiving accounts statement
+	bh.CompanyEntryDescription = "REG.SALARY" // will be on receiving account's statement
 	// Same Day ACH
 	bh.EffectiveEntryDate = time.Now().Format("060102")
 	// CompanyDescriptiveDate ODFIs at their discretion may require their Originators to further show intent for
@@ -54,13 +54,13 @@ func main() {
 	bh.CompanyDescriptiveDate = "SD1300"
 	bh.ODFIIdentification = "121042882" // Originating Routing Number
 
-	// Identifies the receivers account information
-	// can be multiple entry's per batch
+	// Identifies the receiver's account information
+	// can be multiple entries per batch
 	entry := ach.NewEntryDetail()
 	// Identifies the entry as a debit and credit entry AND to what type of account (Savings, DDA, Loan, GL)
 	entry.TransactionCode = ach.CheckingCredit
-	entry.SetRDFI("231380104")          // Receivers bank transit routing number
-	entry.DFIAccountNumber = "12345678" // Receivers bank account number
+	entry.SetRDFI("231380104")          // Receiver's bank transit routing number
+	entry.DFIAccountNumber = "12345678" // Receiver's bank account number
 	entry.Amount = 100000000            // Amount of transaction with no decimal. One dollar and eleven cents = 111
 	entry.SetTraceNumber(bh.ODFIIdentification, 1)
 	entry.IndividualName = "Receiver Account Name" // Identifies the receiver of the transaction
@@ -80,10 +80,10 @@ func main() {
 		log.Fatalf("Unexpected error building file: %s\n", err)
 	}
 
-	// write the file to std out. Anything io.Writer
+	// Write the file to stdout, any io.Writer can be used
 	w := ach.NewWriter(os.Stdout)
 	if err := w.Write(file); err != nil {
-		log.Fatalf("Unexpected error: %s\n", err)
+		log.Fatalf("Unexpected error writing file: %s\n", err)
 	}
 	w.Flush()
 }

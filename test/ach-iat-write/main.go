@@ -26,7 +26,7 @@ import (
 )
 
 func main() {
-	// Example transfer to write an ACH IAT file to debit a external institutions account
+	// Example transfer to write an ACH IAT file to debit a external institution's account
 	// Important: All financial institutions are different and will require registration and exact field values.
 
 	// Set originator bank ODFI and destination Operator for the financial institution
@@ -52,8 +52,8 @@ func main() {
 	bh.ODFIIdentification = "23138010"
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
 
-	// Identifies the receivers account information
-	// can be multiple entry's per batch
+	// Identifies the receiver's account information
+	// can be multiple entries per batch
 	entry := ach.NewIATEntryDetail()
 	entry.TransactionCode = ach.CheckingDebit
 	entry.SetRDFI("121042882")
@@ -128,8 +128,8 @@ func main() {
 	addenda18.EntryDetailSequenceNumber = 0000001
 	entry.AddAddenda18(addenda18)
 
-	// Identifies the receivers account information
-	// can be multiple entry's per batch
+	// Identifies the receiver's account information
+	// can be multiple entries per batch
 	entryTwo := ach.NewIATEntryDetail()
 	entryTwo.TransactionCode = ach.CheckingCredit
 	entryTwo.SetRDFI("121042882")
@@ -220,10 +220,10 @@ func main() {
 		log.Fatalf("Unexpected error building file: %s\n", err)
 	}
 
-	// write the file to std out. Anything io.Writer
+	// Write the file to stdout, any io.Writer can be used
 	w := ach.NewWriter(os.Stdout)
 	if err := w.Write(file); err != nil {
-		log.Fatalf("Unexpected error: %s\n", err)
+		log.Fatalf("Unexpected error writing file: %s\n", err)
 	}
 	w.Flush()
 }

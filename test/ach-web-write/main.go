@@ -26,7 +26,7 @@ import (
 )
 
 func main() {
-	// Example transfer to write an ACH WEB file to send/credit a external institutions account
+	// Example transfer to write an ACH WEB file to send/credit a external institution's account
 	// Important: All financial institutions are different and will require registration and exact field values.
 
 	// Set originator bank ODFI and destination Operator for the financial institution
@@ -44,7 +44,7 @@ func main() {
 	bh.CompanyName = "Name on Account" // The name of the company/person that has relationship with receiver
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = ach.WEB
-	bh.CompanyEntryDescription = "Subscribe"                             // will be on receiving accounts statement
+	bh.CompanyEntryDescription = "Subscribe"                             // will be on receiving account's statement
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
 	bh.ODFIIdentification = "121042882"                                  // Originating Routing Number
 
@@ -98,10 +98,10 @@ func main() {
 		log.Fatalf("Unexpected error building file: %s\n", err)
 	}
 
-	// write the file to std out. Anything io.Writer
+	// Write the file to stdout, any io.Writer can be used
 	w := ach.NewWriter(os.Stdout)
 	if err := w.Write(file); err != nil {
-		log.Fatalf("Unexpected error: %s\n", err)
+		log.Fatalf("Unexpected error writing file: %s\n", err)
 	}
 	w.Flush()
 }

@@ -26,7 +26,7 @@ import (
 )
 
 func main() {
-	// Example transfer to write an ACH ADV file to debit an external institutions account
+	// Example transfer to write an ACH ADV file to debit an external institution's account
 	// Important: All financial institutions are different and will require registration and exact field values.
 
 	fh := ach.NewFileHeader()
@@ -42,17 +42,17 @@ func main() {
 	bh.CompanyName = "Company Name, Inc" // The name of the company/person that has relationship with receiver
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = ach.ADV
-	bh.CompanyEntryDescription = "Accounting"                            // will be on receiving accounts statement
+	bh.CompanyEntryDescription = "Accounting"                            // will be on receiving account's statement
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
 	bh.ODFIIdentification = "121042882"                                  // Originating Routing Number
 	bh.OriginatorStatusCode = 0
 
-	// Identifies the receivers account information
-	// can be multiple entry's per batch
+	// Identifies the receiver's account information
+	// can be multiple entries per batch
 	entry := ach.NewADVEntryDetail()
 	// Credit for ACH debits originated
 	entry.TransactionCode = ach.CreditForDebitsOriginated //
-	entry.SetRDFI("231380104")                            // Receivers bank transit routing number
+	entry.SetRDFI("231380104")                            // Receiver's bank transit routing number
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 50000
 	entry.AdviceRoutingNumber = "121042882"
@@ -67,8 +67,8 @@ func main() {
 
 	entryOne := ach.NewADVEntryDetail()
 	// Debit for ACH credits originated
-	entryOne.TransactionCode = ach.DebitForCreditsOriginated //
-	entryOne.SetRDFI("231380104")                            // Receivers bank transit routing number
+	entryOne.TransactionCode = ach.DebitForCreditsOriginated
+	entryOne.SetRDFI("231380104") // Receiver's bank transit routing number
 	entryOne.DFIAccountNumber = "744-5678-99"
 	entryOne.Amount = 250000
 	entryOne.AdviceRoutingNumber = "121042882"
@@ -97,10 +97,10 @@ func main() {
 		log.Fatalf("Unexpected error building file: %s\n", err)
 	}
 
-	// write the file to std out. Anything io.Writer
+	// Write the file to stdout, any io.Writer can be used
 	w := ach.NewWriter(os.Stdout)
 	if err := w.Write(file); err != nil {
-		log.Fatalf("Unexpected error: %s\n", err)
+		log.Fatalf("Unexpected error writing file: %s\n", err)
 	}
 	w.Flush()
 }

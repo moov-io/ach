@@ -47,13 +47,13 @@ func main() {
 	bh.CompanyEntryDescription = "AUTOENROLL"
 	bh.ODFIIdentification = "23138010" // Originating Routing Number
 
-	// Identifies the receivers account information
-	// can be multiple entry's per batch
+	// Identifies the receiver's account information
+	// can be multiple entries per batch
 	entry := ach.NewEntryDetail()
 	// Identifies the entry as a debit and credit entry AND to what type of account (Savings, DDA, Loan, GL)
 	entry.TransactionCode = ach.CheckingDebit
-	entry.SetRDFI("031300012")             // Receivers bank transit routing number
-	entry.DFIAccountNumber = "744-5678-99" // Receivers bank account number
+	entry.SetRDFI("031300012")             // Receiver's bank transit routing number
+	entry.DFIAccountNumber = "744-5678-99" // Receiver's bank account number
 	entry.Amount = 0                       // Amount of transaction with no decimal. One dollar and eleven cents = 111
 	entry.SetOriginalTraceNumber("031300010000001")
 	entry.SetReceivingCompany("Best. #1")
@@ -79,10 +79,10 @@ func main() {
 		log.Fatalf("Unexpected error building file: %s\n", err)
 	}
 
-	// write the file to std out. Anything io.Writer
+	// Write the file to stdout, any io.Writer can be used
 	w := ach.NewWriter(os.Stdout)
 	if err := w.Write(file); err != nil {
-		log.Fatalf("Unexpected error: %s\n", err)
+		log.Fatalf("Unexpected error writing file: %s\n", err)
 	}
 	w.Flush()
 }
