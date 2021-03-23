@@ -26,27 +26,27 @@ import (
 )
 
 func main() {
-	// open a file for reading. Any io.Reader Can be used
+	// Open a file for reading, any io.Reader can be used
 	f, err := os.Open("same-day-ach-ppd-credit.ach")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 	r := ach.NewReader(f)
 	achFile, err := r.Read()
 	if err != nil {
-		fmt.Printf("Issue reading file: %+v \n", err)
+		log.Fatalf("reading file: %v\n", err)
 	}
-	// ensure we have a validated file structure
-	if achFile.Validate(); err != nil {
-		fmt.Printf("Could not validate entire read file: %v", err)
-	}
-	// If you trust the file but it's formatting is off building will probably resolve the malformed file.
+	// If you trust the file but its formatting is off, building will probably resolve the malformed file
 	if err := achFile.Create(); err != nil {
-		fmt.Printf("Could not create file with read properties: %v", err)
+		log.Fatalf("creating file: %v\n", err)
+	}
+	// Validate the ACH file
+	if err := achFile.Validate(); err != nil {
+		log.Fatalf("validating file: %v\n", err)
 	}
 
-	fmt.Printf("File Name: %s \n\n", "ppd-credit.ach")
-	fmt.Printf("Total Credit Amount: %v \n", achFile.Control.TotalCreditEntryDollarAmountInFile)
-	fmt.Printf("SEC Code: %v \n\n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
+	fmt.Printf("File Name: %s\n\n", f.Name())
+	fmt.Printf("Total Credit Amount: %d\n", achFile.Control.TotalCreditEntryDollarAmountInFile)
+	fmt.Printf("SEC Code: %s\n\n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
 
 }

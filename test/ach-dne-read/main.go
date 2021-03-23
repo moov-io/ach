@@ -26,7 +26,7 @@ import (
 )
 
 func main() {
-	// open a file for reading. Any io.Reader Can be used
+	// Open a file for reading, any io.Reader can be used
 	f, err := os.Open("dne-read.ach")
 	if err != nil {
 		log.Fatal(err)
@@ -45,7 +45,7 @@ func main() {
 		fmt.Printf("Could not create file with read properties: %v", err)
 	}
 
-	fmt.Printf("Total Amount: %v \n", achFile.Batches[0].GetEntries()[0].Amount)
-	fmt.Printf("SEC Code: %v \n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
-	fmt.Printf("Payment Related Information: %v \n", achFile.Batches[0].GetEntries()[0].Addenda05[0].PaymentRelatedInformation)
+	fmt.Printf("Total Amount: %d\n", achFile.Batches[0].GetEntries()[0].Amount)
+	fmt.Printf("SEC Code: %s\n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
+	fmt.Printf("Payment Related Information: %s\n", achFile.Batches[0].GetEntries()[0].Addenda05[0].PaymentRelatedInformation)
 }
