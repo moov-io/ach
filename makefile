@@ -1,7 +1,7 @@
 PLATFORM=$(shell uname -s | tr '[:upper:]' '[:lower:]')
 VERSION := $(shell grep -Eo '(v[0-9]+[\.][0-9]+[\.][0-9]+([-a-zA-Z0-9]*)?)' version.go)
 
-.PHONY: build docker release
+.PHONY: build generate docker release
 
 build:
 	go fmt ./...
@@ -14,6 +14,10 @@ build-webui:
 	cp $(shell go env GOROOT)/misc/wasm/wasm_exec.js ./cmd/webui/assets/wasm_exec.js
 	GOOS=js GOARCH=wasm go build -o ./cmd/webui/assets/ach.wasm github.com/moov-io/ach/cmd/webui/ach/
 	CGO_ENABLED=0 go build -o ./bin/webui ./cmd/webui
+
+generate: clean
+	@go run internal/iso3166/iso3166_gen.go
+	@go run internal/iso4217/iso4217_gen.go
 
 clean:
 	@rm -rf ./bin/ ./tmp/ coverage.txt misspell* staticcheck lint-project.sh
@@ -33,7 +37,7 @@ check-openapi:
 	-v ${PWD}/openapi.yaml:/projects/openapi.yaml \
 	wework/speccy lint --verbose /projects/openapi.yaml
 
-dist: clean build
+dist: clean generate build
 ifeq ($(OS),Windows_NT)
 	CGO_ENABLED=1 GOOS=windows go build -o bin/achcli.exe github.com/moov-io/ach/cmd/achcli
 	CGO_ENABLED=1 GOOS=windows go build -o bin/ach.exe github.com/moov-io/ach/cmd/server
@@ -71,7 +75,7 @@ test-integration: clean-integration
 	sleep 5
 	curl -v http://localhost:8080/files
 
-release: docker AUTHORS
+release: docker generate AUTHORS
 	go test ./...
 	git tag -f $(VERSION)
 
@@ -100,7 +104,7 @@ AUTHORS:
 
 .PHONY: tagged-release
 tagged-release:
-	@./tagged-release.sh $(VERSION) 
+	@./tagged-release.sh $(VERSION)
 
 .PHONY: fuzz
 fuzz:
