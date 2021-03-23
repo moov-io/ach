@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Generated on 2020-02-26T02:00:23Z by adam, any modifications will be overwritten
+// Generated on 2021-03-23T11:08:18Z by adam, any modifications will be overwritten
 package iso4217
 
 var currencyCodes = map[string]bool{
@@ -30,7 +30,7 @@ var currencyCodes = map[string]bool{
 	"AMD": true, // Armenian Dram
 	"AWG": true, // Aruban Florin
 	"AUD": true, // Australian Dollar
-	"AZN": true, // Azerbaijanian Manat
+	"AZN": true, // Azerbaijan Manat
 	"BSD": true, // Bahamian Dollar
 	"BHD": true, // Bahraini Dinar
 	"BDT": true, // Taka
@@ -60,7 +60,7 @@ var currencyCodes = map[string]bool{
 	"CNY": true, // Yuan Renminbi
 	"COP": true, // Colombian Peso
 	"COU": true, // Unidad de Valor Real
-	"KMF": true, // Comoro Franc
+	"KMF": true, // Comorian Franc
 	"CDF": true, // Congolese Franc
 	"NZD": true, // New Zealand Dollar
 	"CRC": true, // Costa Rican Colon
@@ -75,6 +75,7 @@ var currencyCodes = map[string]bool{
 	"EGP": true, // Egyptian Pound
 	"SVC": true, // El Salvador Colon
 	"ERN": true, // Nakfa
+	"SZL": true, // Lilangeni
 	"ETB": true, // Ethiopian Birr
 	"FKP": true, // Falkland Islands Pound
 	"FJD": true, // Fiji Dollar
@@ -85,7 +86,7 @@ var currencyCodes = map[string]bool{
 	"GIP": true, // Gibraltar Pound
 	"GTQ": true, // Quetzal
 	"GBP": true, // Pound Sterling
-	"GNF": true, // Guinea Franc
+	"GNF": true, // Guinean Franc
 	"GYD": true, // Guyana Dollar
 	"HTG": true, // Gourde
 	"HNL": true, // Lempira
@@ -106,7 +107,7 @@ var currencyCodes = map[string]bool{
 	"KRW": true, // Won
 	"KWD": true, // Kuwaiti Dinar
 	"KGS": true, // Som
-	"LAK": true, // Kip
+	"LAK": true, // Lao Kip
 	"LBP": true, // Lebanese Pound
 	"LSL": true, // Loti
 	"ZAR": true, // Rand
@@ -119,7 +120,7 @@ var currencyCodes = map[string]bool{
 	"MWK": true, // Malawi Kwacha
 	"MYR": true, // Malaysian Ringgit
 	"MVR": true, // Rufiyaa
-	"MRO": true, // Ouguiya
+	"MRU": true, // Ouguiya
 	"MUR": true, // Mauritius Rupee
 	"XUA": true, // ADB Unit of Account
 	"MXN": true, // Mexican Peso
@@ -147,7 +148,7 @@ var currencyCodes = map[string]bool{
 	"RWF": true, // Rwanda Franc
 	"SHP": true, // Saint Helena Pound
 	"WST": true, // Tala
-	"STD": true, // Dobra
+	"STN": true, // Dobra
 	"SAR": true, // Saudi Riyal
 	"RSD": true, // Serbian Dinar
 	"SCR": true, // Seychelles Rupee
@@ -160,7 +161,6 @@ var currencyCodes = map[string]bool{
 	"LKR": true, // Sri Lanka Rupee
 	"SDG": true, // Sudanese Pound
 	"SRD": true, // Surinam Dollar
-	"SZL": true, // Lilangeni
 	"SEK": true, // Swedish Krona
 	"CHE": true, // WIR Euro
 	"CHW": true, // WIR Franc
@@ -179,10 +179,11 @@ var currencyCodes = map[string]bool{
 	"AED": true, // UAE Dirham
 	"USN": true, // US Dollar (Next day)
 	"UYU": true, // Peso Uruguayo
-	"UYI": true, // Uruguay Peso en Unidades Indexadas (URUIURUI)
+	"UYI": true, // Uruguay Peso en Unidades Indexadas (UI)
+	"UYW": true, // Unidad Previsional
 	"UZS": true, // Uzbekistan Sum
 	"VUV": true, // Vatu
-	"VEF": true, // Bolívar
+	"VES": true, // Bolívar Soberano
 	"VND": true, // Dong
 	"YER": true, // Yemeni Rial
 	"ZMW": true, // Zambian Kwacha
@@ -213,8 +214,8 @@ var currencyCodes = map[string]bool{
 	"ATS": true, // Schilling
 	"AYM": true, // Azerbaijan Manat
 	"AZM": true, // Azerbaijanian Manat
-	"BYR": true, // Belarusian Ruble
 	"BYB": true, // Belarusian Ruble
+	"BYR": true, // Belarusian Ruble
 	"BEC": true, // Convertible Franc
 	"BEF": true, // Belgian Franc
 	"BEL": true, // Financial Franc
@@ -228,8 +229,7 @@ var currencyCodes = map[string]bool{
 	"BGJ": true, // Lev A/52
 	"BGK": true, // Lev A/62
 	"BGL": true, // Lev
-	"BUK": true, // -
-	"CNX": true, // Peoples Bank Dollar
+	"BUK": true, // Kyat
 	"HRD": true, // Croatian Dinar
 	"CYP": true, // Cyprus Pound
 	"CSJ": true, // Krona A/53
@@ -254,10 +254,10 @@ var currencyCodes = map[string]bool{
 	"IEP": true, // Irish Pound
 	"ILP": true, // Pound
 	"ILR": true, // Old Shekel
-	"LAJ": true, // Kip Pot Pol
+	"LAJ": true, // Pathet Lao Kip
 	"LVL": true, // Latvian Lats
 	"LVR": true, // Latvian Ruble
-	"LSM": true, // Maloti
+	"LSM": true, // Loti
 	"ZAL": true, // Financial Rand
 	"LTL": true, // Lithuanian Litas
 	"LTT": true, // Talonas
@@ -269,6 +269,7 @@ var currencyCodes = map[string]bool{
 	"MLF": true, // Mali Franc
 	"MTL": true, // Maltese Lira
 	"MTP": true, // Maltese Pound
+	"MRO": true, // Ouguiya
 	"MXP": true, // Mexican Peso
 	"MZE": true, // Mozambique Escudo
 	"MZM": true, // Mozambique Metical
@@ -281,6 +282,7 @@ var currencyCodes = map[string]bool{
 	"PTE": true, // Portuguese Escudo
 	"ROK": true, // Leu A/52
 	"ROL": true, // Old Leu
+	"STD": true, // Dobra
 	"CSD": true, // Serbian Dinar
 	"SKK": true, // Slovak Koruna
 	"SIT": true, // Tolar
@@ -303,6 +305,7 @@ var currencyCodes = map[string]bool{
 	"UYN": true, // Old Uruguay Peso
 	"UYP": true, // Uruguayan Peso
 	"VEB": true, // Bolivar
+	"VEF": true, // Bolivar Fuerte
 	"VNC": true, // Old Dong
 	"YDD": true, // Yemeni Dinar
 	"YUD": true, // New Yugoslavian Dinar
