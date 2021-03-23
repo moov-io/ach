@@ -50,7 +50,7 @@ func main() {
 	fmt.Printf("SEC Code: %s\n", achFile.IATBatches[0].GetHeader().StandardEntryClassCode)
 	fmt.Printf("Entry: %s\n", achFile.IATBatches[0].GetEntries()[0])
 	fmt.Printf("Entry Amount: %d\n", achFile.IATBatches[0].GetEntries()[0].Amount)
-	fmt.Printf("Addenda Record Indicator: %s\n", achFile.IATBatches[0].GetEntries()[0].AddendaRecordIndicator)
+	fmt.Printf("Addenda Record Indicator: %d\n", achFile.IATBatches[0].GetEntries()[0].AddendaRecordIndicator)
 	fmt.Printf("Addenda10: %s\n", achFile.IATBatches[0].GetEntries()[0].Addenda10)
 	fmt.Printf("Addenda11: %s\n", achFile.IATBatches[0].GetEntries()[0].Addenda11)
 	fmt.Printf("Addenda12: %s\n", achFile.IATBatches[0].GetEntries()[0].Addenda12)
