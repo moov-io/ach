@@ -71,9 +71,21 @@ func dumpFile(file *ach.File) {
 		fmt.Fprintln(w, "\n  BatchNumber\tSECCode\tServiceClassCode\tCompanyName\tDiscretionaryData\tIdentification\tEntryDescription\tDescriptiveDate")
 
 		bh := file.Batches[i].GetHeader()
+		serviceClassCodeDescription := ""
 		if bh != nil {
-			fmt.Fprintf(w, "  %d\t%s\t%d\t%s\t%s\t%s\t%s\t%s\n",
-				bh.BatchNumber, bh.StandardEntryClassCode, bh.ServiceClassCode, bh.CompanyName,
+			switch bh.ServiceClassCode {
+			case 200:
+				serviceClassCodeDescription = "(MixedDebitsAndCredits)"
+			case 220:
+				serviceClassCodeDescription = "(CreditsOnly)"
+			case 225:
+				serviceClassCodeDescription = "(DebitsOnly)"
+			case 280:
+				serviceClassCodeDescription = "(AutomatedAccountingAdvices)"
+			}
+
+			fmt.Fprintf(w, "  %d\t%s\t%d %s\t%s\t%s\t%s\t%s\t%s\n",
+				bh.BatchNumber, bh.StandardEntryClassCode, bh.ServiceClassCode, serviceClassCodeDescription, bh.CompanyName,
 				bh.CompanyDiscretionaryData, bh.CompanyIdentification, bh.CompanyEntryDescription, bh.CompanyDescriptiveDate)
 		}
 
@@ -86,7 +98,20 @@ func dumpFile(file *ach.File) {
 			if *flagMask {
 				accountNumber = maskAccountNumber(strings.TrimSpace(accountNumber))
 			}
-			fmt.Fprintf(w, "    %d\t%s\t%s\t%d\t%s\t%s\t%s\n", e.TransactionCode, e.RDFIIdentification, accountNumber, e.Amount, e.IndividualName, e.TraceNumber, e.Category)
+
+			transactionCodeDescription := ""
+			switch e.TransactionCode {
+			case 22:
+				transactionCodeDescription = "(DemandCredit)"
+			case 27:
+				transactionCodeDescription = "(DemandDebit)"
+			case 32:
+				transactionCodeDescription = "(SavingsCredit)"
+			case 37:
+				transactionCodeDescription = "(SavingsDebit)"
+			}
+
+			fmt.Fprintf(w, "    %d %s\t%s\t%s\t%d\t%s\t%s\t%s\n", e.TransactionCode, transactionCodeDescription, e.RDFIIdentification, accountNumber, e.Amount, e.IndividualName, e.TraceNumber, e.Category)
 
 			dumpAddenda02(w, e.Addenda02)
 			for i := range e.Addenda05 {
@@ -102,7 +127,7 @@ func dumpFile(file *ach.File) {
 		bc := file.Batches[i].GetControl()
 		if bc != nil {
 			fmt.Fprintln(w, "\n  ServiceClassCode\tEntryAddendaCount\tEntryHash\tTotalDebits\tTotalCredits\tMACCode\tODFIIdentification\tBatchNumber")
-			fmt.Fprintf(w, "  %d\t%d\t%d\t%d\t%d\t%s\t%s\t%d\n", bc.ServiceClassCode, bc.EntryAddendaCount, bc.EntryHash, bc.TotalDebitEntryDollarAmount, bc.TotalCreditEntryDollarAmount, bc.MessageAuthenticationCode, bc.ODFIIdentification, bc.BatchNumber)
+			fmt.Fprintf(w, "  %d %s\t%d\t%d\t%d\t%d\t%s\t%s\t%d\n", bc.ServiceClassCode, serviceClassCodeDescription, bc.EntryAddendaCount, bc.EntryHash, bc.TotalDebitEntryDollarAmount, bc.TotalCreditEntryDollarAmount, bc.MessageAuthenticationCode, bc.ODFIIdentification, bc.BatchNumber)
 		}
 	}
 
