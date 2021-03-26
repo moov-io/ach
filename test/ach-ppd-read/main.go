@@ -26,49 +26,49 @@ import (
 )
 
 func main() {
-	// open a file for reading. Any io.Reader Can be used
-	f, err := os.Open("ppd-credit.ach")
+	// Open a file for reading, any io.Reader can be used
+	fCredit, err := os.Open("ppd-credit.ach")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
-	r := ach.NewReader(f)
-	achFile, err := r.Read()
+	rCredit := ach.NewReader(fCredit)
+	achFileCredit, err := rCredit.Read()
 	if err != nil {
-		fmt.Printf("Issue reading file: %+v \n", err)
+		log.Fatalf("reading file: %v\n", err)
 	}
-	// ensure we have a validated file structure
-	if achFile.Validate(); err != nil {
-		fmt.Printf("Could not validate entire read file: %v", err)
+	// If you trust the file but its formatting is off, building will probably resolve the malformed file
+	if err := achFileCredit.Create(); err != nil {
+		log.Fatalf("creating file: %v\n", err)
 	}
-	// If you trust the file but it's formatting is off building will probably resolve the malformed file.
-	if err := achFile.Create(); err != nil {
-		fmt.Printf("Could not create file with read properties: %v", err)
+	// Validate the ACH file
+	if err := achFileCredit.Validate(); err != nil {
+		log.Fatalf("validating file: %v\n", err)
 	}
 
-	fmt.Printf("File Name: %s \n\n", f.Name())
-	fmt.Printf("Total Credit Amount: %v \n", achFile.Control.TotalCreditEntryDollarAmountInFile)
-	fmt.Printf("SEC Code: %v \n\n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
+	fmt.Printf("File Name: %s\n\n", fCredit.Name())
+	fmt.Printf("Total Credit Amount: %d\n", achFileCredit.Control.TotalCreditEntryDollarAmountInFile)
+	fmt.Printf("SEC Code: %s\n\n", achFileCredit.Batches[0].GetHeader().StandardEntryClassCode)
 
-	// open a file for reading. Any io.Reader Can be used
+	// Open a file for reading, any io.Reader can be used
 	fDebit, err := os.Open("ppd-debit.ach")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 	rDebit := ach.NewReader(fDebit)
 	achFileDebit, err := rDebit.Read()
 	if err != nil {
-		fmt.Printf("Issue reading file: %+v \n", err)
+		log.Fatalf("reading file: %v\n", err)
 	}
-	// ensure we have a validated file structure
-	if achFileDebit.Validate(); err != nil {
-		fmt.Printf("Could not validate entire read file: %v", err)
+	// If you trust the file but its formatting is off, building will probably resolve the malformed file
+	if err := achFileDebit.Create(); err != nil {
+		log.Fatalf("creating file: %v\n", err)
 	}
-	// If you trust the file but it's formatting is off building will probably resolve the malformed file.
-	if achFileDebit.Create(); err != nil {
-		fmt.Printf("Could not create file with read properties: %v", err)
+	// Validate the ACH file
+	if err := achFileDebit.Validate(); err != nil {
+		log.Fatalf("validating file: %v\n", err)
 	}
 
-	fmt.Printf("File Name: %s \n\n", fDebit.Name())
-	fmt.Printf("Total Debit Amount: %v \n", achFileDebit.Control.TotalDebitEntryDollarAmountInFile)
-	fmt.Printf("SEC Code: %v \n", achFileDebit.Batches[0].GetHeader().StandardEntryClassCode)
+	fmt.Printf("File Name: %s\n\n", fDebit.Name())
+	fmt.Printf("Total Debit Amount: %d\n", achFileDebit.Control.TotalDebitEntryDollarAmountInFile)
+	fmt.Printf("SEC Code: %s\n", achFileDebit.Batches[0].GetHeader().StandardEntryClassCode)
 }

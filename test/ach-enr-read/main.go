@@ -26,38 +26,38 @@ import (
 )
 
 func main() {
-	// open a file for reading. Any io.Reader Can be used
+	// Open a file for reading, any io.Reader can be used
 	f, err := os.Open("enr-read.ach")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 	r := ach.NewReader(f)
 	achFile, err := r.Read()
 	if err != nil {
-		panic(fmt.Sprintf("Issue reading file: %+v \n", err))
+		log.Fatalf("reading file: %v\n", err)
 	}
-	// ensure we have a validated file structure
-	if achFile.Validate(); err != nil {
-		fmt.Printf("Could not validate entire read file: %v", err)
-	}
-	// If you trust the file but it's formatting is off building will probably resolve the malformed file.
+	// If you trust the file but its formatting is off, building will probably resolve the malformed file
 	if err := achFile.Create(); err != nil {
-		fmt.Printf("Could not create file with read properties: %v", err)
+		log.Fatalf("creating file: %v\n", err)
+	}
+	// Validate the ACH file
+	if err := achFile.Validate(); err != nil {
+		log.Fatalf("validating file: %v\n", err)
 	}
 
-	fmt.Printf("Total Amount: %v \n", achFile.Batches[0].GetEntries()[0].Amount)
-	fmt.Printf("SEC Code: %v \n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
+	fmt.Printf("Total Amount: %d\n", achFile.Batches[0].GetEntries()[0].Amount)
+	fmt.Printf("SEC Code: %s\n", achFile.Batches[0].GetHeader().StandardEntryClassCode)
 
 	batch, ok := achFile.Batches[0].(*ach.BatchENR)
 	if !ok {
-		log.Fatalf("Batch not ENR, got %T %#v", achFile.Batches[0], achFile.Batches[0])
+		log.Fatalf("Batch not ENR, got %T %#v\n", achFile.Batches[0], achFile.Batches[0])
 	}
 	add := batch.GetEntries()[0].Addenda05[0]
 
-	fmt.Printf("Payment Related Information: %v \n", add.PaymentRelatedInformation)
+	fmt.Printf("Payment Related Information: %s\n", add.PaymentRelatedInformation)
 	info, err := batch.ParsePaymentInformation(add)
 	if err != nil {
-		log.Fatalf("Problem Parsing ENR Addenda05 PaymentRelatedInformation: %v", err)
+		log.Fatalf("Problem Parsing ENR Addenda05 PaymentRelatedInformation: %v\n", err)
 	}
 	fmt.Println(info.String())
 }

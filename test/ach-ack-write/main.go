@@ -44,17 +44,17 @@ func main() {
 	bh.CompanyName = "Name on Account" // The name of the company/person that has relationship with receiver
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = ach.ACK
-	bh.CompanyEntryDescription = "Vndr Pay"                              // will be on receiving accounts statement
+	bh.CompanyEntryDescription = "Vndr Pay"                              // will be on receiving account's statement
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
 	bh.ODFIIdentification = "23138010"                                   // Originating Routing Number
 
-	// Identifies the receivers account information
-	// can be multiple entry's per batch
+	// Identifies the receiver's account information
+	// can be multiple entries per batch
 	entry := ach.NewEntryDetail()
 	// Identifies the entry as a debit and credit entry AND to what type of account (Savings, DDA, Loan, GL)
 	entry.TransactionCode = ach.CheckingZeroDollarRemittanceCredit
-	entry.SetRDFI("031300012")             // Receivers bank transit routing number
-	entry.DFIAccountNumber = "744-5678-99" // Receivers bank account number
+	entry.SetRDFI("031300012")             // Receiver's bank transit routing number
+	entry.DFIAccountNumber = "744-5678-99" // Receiver's bank account number
 	entry.Amount = 0                       // Amount of transaction with no decimal. Zero Dollar Amount
 	entry.SetOriginalTraceNumber("031300010000001")
 	entry.SetReceivingCompany("Best. #1")
@@ -62,9 +62,9 @@ func main() {
 
 	entryOne := ach.NewEntryDetail() // Fee Entry
 	entryOne.TransactionCode = ach.CheckingZeroDollarRemittanceCredit
-	entryOne.SetRDFI("031300012")             // Receivers bank transit routing number
-	entryOne.DFIAccountNumber = "744-5678-99" // Receivers bank account number
-	entryOne.Amount = 0                       // Amount of transaction with no decimal.  Zero Dollar Amount
+	entryOne.SetRDFI("031300012")             // Receiver's bank transit routing number
+	entryOne.DFIAccountNumber = "744-5678-99" // Receiver's bank account number
+	entryOne.Amount = 0                       // Amount of transaction with no decimal. Zero Dollar Amount
 	entryOne.SetOriginalTraceNumber("031300010000002")
 	entryOne.SetReceivingCompany("Best. #1")
 	entryOne.SetTraceNumber(bh.ODFIIdentification, 2)
@@ -85,10 +85,10 @@ func main() {
 		log.Fatalf("Unexpected error building file: %s\n", err)
 	}
 
-	// write the file to std out. Anything io.Writer
+	// Write the file to stdout, any io.Writer can be used
 	w := ach.NewWriter(os.Stdout)
 	if err := w.Write(file); err != nil {
-		log.Fatalf("Unexpected error: %s\n", err)
+		log.Fatalf("Unexpected error writing file: %s\n", err)
 	}
 	w.Flush()
 }

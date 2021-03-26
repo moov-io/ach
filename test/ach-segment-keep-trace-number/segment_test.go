@@ -66,28 +66,23 @@ func TestSegmentKeepTraceNumber(t *testing.T) {
 	entry.Category = ach.CategoryForward
 	entry.AddendaRecordIndicator = 1
 
-	// To add one or more optional addenda records for an entry
-
+	// Add one or more optional addenda records for an entry
 	addenda := ach.NewAddenda05()
 	addenda.PaymentRelatedInformation = "bonus pay for amazing work on #OSS"
 	entry.AddAddenda05(addenda)
 
 	// Entries are added to batches like so:
-
 	batch.AddEntry(entry)
 
 	// When all of the Entries are added to the batch we must create it.
-
 	if err := batch.Create(); err != nil {
 		t.Fatalf("%T: %v", err, err)
 	}
 
 	// And batches are added to files much the same way:
-
 	file.AddBatch(batch)
 
 	// Now add a new batch for accepting payments on the web
-
 	bh2 := ach.NewBatchHeader()
 	bh2.ServiceClassCode = ach.DebitsOnly
 	bh2.CompanyName = "Your Company"
@@ -107,7 +102,6 @@ func TestSegmentKeepTraceNumber(t *testing.T) {
 
 	// Add an entry and define if it is a single or recurring payment
 	// The following is a recurring payment for $7.99
-
 	entry2 := ach.NewEntryDetail()
 	entry2.TransactionCode = ach.CheckingDebit
 	entry2.SetRDFI("231380104")
@@ -125,7 +119,7 @@ func TestSegmentKeepTraceNumber(t *testing.T) {
 	addenda2.PaymentRelatedInformation = "Monthly Membership Subscription"
 	entry2.AddAddenda05(addenda2)
 
-	// add the entry to the batch
+	// Add the entry to the batch
 	batch2.AddEntry(entry2)
 
 	// Create and add the second batch
@@ -134,8 +128,7 @@ func TestSegmentKeepTraceNumber(t *testing.T) {
 	}
 	file.AddBatch(batch2)
 
-	// Once we added all our batches we must create the file
-
+	// Once we've added all our batches we must create the file
 	if err := file.Create(); err != nil {
 		t.Fatalf("%T: %v", err, err)
 	}
@@ -152,7 +145,7 @@ func TestSegmentKeepTraceNumber(t *testing.T) {
 		t.Fatalf("TraceNumber before=%v after=%v", entry.TraceNumber, entries[0].TraceNumber)
 	}
 
-	// blank out TraceNumbers and let sequential ones be created
+	// Blank out TraceNumbers and let sequential ones be created
 	batch.SetValidation(nil)
 	entry.TraceNumber = ""
 	if err := batch.Create(); err != nil {
@@ -180,5 +173,4 @@ func TestSegmentKeepTraceNumber(t *testing.T) {
 	if entries := debitFile.Batches[0].GetEntries(); entries[0].TraceNumber == "" || entries[0].TraceNumber != "121042880000001" {
 		t.Fatalf("TraceNumber before=%v after=%v", entry.TraceNumber, entries[0].TraceNumber)
 	}
-
 }
