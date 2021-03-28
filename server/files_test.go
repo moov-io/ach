@@ -823,6 +823,42 @@ func TestFiles__CreateFileEndpoint(t *testing.T) {
 	}
 }
 
+func TestFiles__CreateFileWithZeroBatches(t *testing.T) {
+	repo := NewRepositoryInMemory(testTTLDuration, log.NewNopLogger())
+	svc := NewService(repo)
+	handler := MakeHTTPHandler(svc, repo, log.NewNopLogger())
+
+	f := ach.NewFile()
+	f.ID = "foo"
+	f.Header = *mockFileHeader()
+
+	var body bytes.Buffer
+	if err := json.NewEncoder(&body).Encode(f); err != nil {
+		t.Fatal(err)
+	}
+
+	req := httptest.NewRequest("POST", "/files/create?allowZeroBatches=true", &body)
+	req.Header.Set("content-type", "application/json")
+
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	w.Flush()
+
+	// Get contents back
+	req = httptest.NewRequest("GET", fmt.Sprintf("/files/%s/contents", f.ID), nil)
+	w = httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	w.Flush()
+
+	got, err := ach.NewReader(w.Body).Read()
+	if err != nil {
+		t.Fatalf("reading file: %v", err)
+	}
+	if err := got.Validate(); err != nil {
+		t.Fatalf("validating file: %v", err)
+	}
+}
+
 func TestFiles__CreateFileEndpointErr(t *testing.T) {
 	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)

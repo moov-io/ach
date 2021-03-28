@@ -117,12 +117,14 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 		requireABAOrigin  = "requireABAOrigin"
 		bypassOrigin      = "bypassOrigin"
 		bypassDestination = "bypassDestination"
+		allowZeroBatches  = "allowZeroBatches"
 	)
 
 	validationNames := []string{
 		requireABAOrigin,
 		bypassOrigin,
 		bypassDestination,
+		allowZeroBatches,
 	}
 
 	for _, name := range validationNames {
@@ -146,6 +148,8 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 			req.validateOpts.BypassOriginValidation = true
 		case bypassDestination:
 			req.validateOpts.BypassDestinationValidation = true
+		case allowZeroBatches:
+			req.validateOpts.AllowZeroBatches = true
 		}
 	}
 
