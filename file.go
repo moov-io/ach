@@ -562,6 +562,7 @@ type ValidateOpts struct {
 	// CustomTraceNumbers disables validation of TraceNumbers
 	CustomTraceNumbers bool `json:"customTraceNumbers"`
 
+	// AllowZeroBatches allows the file to have zero batches
 	AllowZeroBatches bool `json:"allowZeroBatches"`
 }
 
