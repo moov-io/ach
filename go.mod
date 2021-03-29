@@ -9,7 +9,7 @@ require (
 	github.com/lunixbochs/vtclean v1.0.0 // indirect
 	github.com/mattn/go-isatty v0.0.12
 	github.com/moov-io/base v0.17.0
-	github.com/prometheus/client_golang v1.9.0
+	github.com/prometheus/client_golang v1.10.0
 )
 
 go 1.13
