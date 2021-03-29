@@ -19,10 +19,6 @@ const (
 	numBatches      = 1000
 )
 
-func init() {
-	fmt.Printf("Benchmarks for ACH file with %d transactions split up in %d batches\n", numTransactions, numBatches)
-}
-
 // Benchmark creating a large ACH file through the Go library
 func BenchmarkCreateBigFile__Library(b *testing.B) {
 	for i := 0; i < b.N; i++ {
@@ -119,6 +115,8 @@ func Benchmark__FlattenBigFile(b *testing.B) {
 }
 
 func createBigFile(b *testing.B, numTransactions int, numBatches int) *ach.File {
+	fmt.Printf("Benchmarks for ACH file with %d transactions split up in %d batches\n", numTransactions, numBatches)
+
 	f := ach.NewFile()
 	f.ID = "foo"
 	f.Header = *mockFileHeader()
