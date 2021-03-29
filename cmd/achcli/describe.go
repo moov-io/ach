@@ -73,20 +73,17 @@ func dumpFile(file *ach.File) {
 		bh := file.Batches[i].GetHeader()
 		serviceClassCodeDescription := ""
 		if bh != nil {
-			switch bh.ServiceClassCode {
-			case 200:
-				serviceClassCodeDescription = "(MixedDebitsAndCredits)"
-			case 220:
-				serviceClassCodeDescription = "(CreditsOnly)"
-			case 225:
-				serviceClassCodeDescription = "(DebitsOnly)"
-			case 280:
-				serviceClassCodeDescription = "(AutomatedAccountingAdvices)"
-			}
-
 			fmt.Fprintf(w, "  %d\t%s\t%d %s\t%s\t%s\t%s\t%s\t%s\n",
-				bh.BatchNumber, bh.StandardEntryClassCode, bh.ServiceClassCode, serviceClassCodeDescription, bh.CompanyName,
-				bh.CompanyDiscretionaryData, bh.CompanyIdentification, bh.CompanyEntryDescription, bh.CompanyDescriptiveDate)
+				bh.BatchNumber,
+				bh.StandardEntryClassCode,
+				bh.ServiceClassCode,
+				serviceClassCodes[bh.ServiceClassCode],
+				bh.CompanyName,
+				bh.CompanyDiscretionaryData,
+				bh.CompanyIdentification,
+				bh.CompanyEntryDescription,
+				bh.CompanyDescriptiveDate,
+			)
 		}
 
 		entries := file.Batches[i].GetEntries()
@@ -99,19 +96,7 @@ func dumpFile(file *ach.File) {
 				accountNumber = maskAccountNumber(strings.TrimSpace(accountNumber))
 			}
 
-			transactionCodeDescription := ""
-			switch e.TransactionCode {
-			case 22:
-				transactionCodeDescription = "(DemandCredit)"
-			case 27:
-				transactionCodeDescription = "(DemandDebit)"
-			case 32:
-				transactionCodeDescription = "(SavingsCredit)"
-			case 37:
-				transactionCodeDescription = "(SavingsDebit)"
-			}
-
-			fmt.Fprintf(w, "    %d %s\t%s\t%s\t%d\t%s\t%s\t%s\n", e.TransactionCode, transactionCodeDescription, e.RDFIIdentification, accountNumber, e.Amount, e.IndividualName, e.TraceNumber, e.Category)
+			fmt.Fprintf(w, "    %d %s\t%s\t%s\t%d\t%s\t%s\t%s\n", e.TransactionCode, transactionCodes[e.TransactionCode], e.RDFIIdentification, accountNumber, e.Amount, e.IndividualName, e.TraceNumber, e.Category)
 
 			dumpAddenda02(w, e.Addenda02)
 			for i := range e.Addenda05 {
