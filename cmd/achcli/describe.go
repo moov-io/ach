@@ -71,7 +71,6 @@ func dumpFile(file *ach.File) {
 		fmt.Fprintln(w, "\n  BatchNumber\tSECCode\tServiceClassCode\tCompanyName\tDiscretionaryData\tIdentification\tEntryDescription\tDescriptiveDate")
 
 		bh := file.Batches[i].GetHeader()
-		serviceClassCodeDescription := ""
 		if bh != nil {
 			fmt.Fprintf(w, "  %d\t%s\t%d %s\t%s\t%s\t%s\t%s\t%s\n",
 				bh.BatchNumber,
@@ -112,7 +111,7 @@ func dumpFile(file *ach.File) {
 		bc := file.Batches[i].GetControl()
 		if bc != nil {
 			fmt.Fprintln(w, "\n  ServiceClassCode\tEntryAddendaCount\tEntryHash\tTotalDebits\tTotalCredits\tMACCode\tODFIIdentification\tBatchNumber")
-			fmt.Fprintf(w, "  %d %s\t%d\t%d\t%d\t%d\t%s\t%s\t%d\n", bc.ServiceClassCode, serviceClassCodeDescription, bc.EntryAddendaCount, bc.EntryHash, bc.TotalDebitEntryDollarAmount, bc.TotalCreditEntryDollarAmount, bc.MessageAuthenticationCode, bc.ODFIIdentification, bc.BatchNumber)
+			fmt.Fprintf(w, "  %d %s\t%d\t%d\t%d\t%d\t%s\t%s\t%d\n", bc.ServiceClassCode, serviceClassCodes[bh.ServiceClassCode], bc.EntryAddendaCount, bc.EntryHash, bc.TotalDebitEntryDollarAmount, bc.TotalCreditEntryDollarAmount, bc.MessageAuthenticationCode, bc.ODFIIdentification, bc.BatchNumber)
 		}
 	}
 
