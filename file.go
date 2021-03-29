@@ -385,7 +385,7 @@ func datetimeParse(v string) (time.Time, error) {
 // Create will tabulate and assemble an ACH file into a valid state. This includes
 // setting any posting dates, sequence numbers, counts, and sums.
 //
-// Create requires that the FileHeader and at least one Batch be added to the File.
+// Create requires a FileHeader and at least one Batch if AllowZeroBatches is false.
 //
 // Create implementations are free to modify computable fields in a file and should
 // call the Batch's Validate() function at the end of their execution.
@@ -395,8 +395,9 @@ func (f *File) Create() error {
 		return err
 	}
 
-	// Requires at least one Batch in the new file.
-	if len(f.Batches) <= 0 && len(f.IATBatches) <= 0 {
+	// If AllowZeroBatches is false, require at least one Batch in the new file.
+	if (f.validateOpts == nil || !f.validateOpts.AllowZeroBatches) &&
+		len(f.Batches) <= 0 && len(f.IATBatches) <= 0 {
 		return ErrFileNoBatches
 	}
 
@@ -560,6 +561,9 @@ type ValidateOpts struct {
 
 	// CustomTraceNumbers disables validation of TraceNumbers
 	CustomTraceNumbers bool `json:"customTraceNumbers"`
+
+	// AllowZeroBatches allows the file to have zero batches
+	AllowZeroBatches bool `json:"allowZeroBatches"`
 }
 
 // ValidateWith performs NACHA format rule checks on each record according to their specification
