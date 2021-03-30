@@ -72,9 +72,17 @@ func dumpFile(file *ach.File) {
 
 		bh := file.Batches[i].GetHeader()
 		if bh != nil {
-			fmt.Fprintf(w, "  %d\t%s\t%d\t%s\t%s\t%s\t%s\t%s\n",
-				bh.BatchNumber, bh.StandardEntryClassCode, bh.ServiceClassCode, bh.CompanyName,
-				bh.CompanyDiscretionaryData, bh.CompanyIdentification, bh.CompanyEntryDescription, bh.CompanyDescriptiveDate)
+			fmt.Fprintf(w, "  %d\t%s\t%d %s\t%s\t%s\t%s\t%s\t%s\n",
+				bh.BatchNumber,
+				bh.StandardEntryClassCode,
+				bh.ServiceClassCode,
+				serviceClassCodes[bh.ServiceClassCode],
+				bh.CompanyName,
+				bh.CompanyDiscretionaryData,
+				bh.CompanyIdentification,
+				bh.CompanyEntryDescription,
+				bh.CompanyDescriptiveDate,
+			)
 		}
 
 		entries := file.Batches[i].GetEntries()
@@ -86,7 +94,8 @@ func dumpFile(file *ach.File) {
 			if *flagMask {
 				accountNumber = maskAccountNumber(strings.TrimSpace(accountNumber))
 			}
-			fmt.Fprintf(w, "    %d\t%s\t%s\t%d\t%s\t%s\t%s\n", e.TransactionCode, e.RDFIIdentification, accountNumber, e.Amount, e.IndividualName, e.TraceNumber, e.Category)
+
+			fmt.Fprintf(w, "    %d %s\t%s\t%s\t%d\t%s\t%s\t%s\n", e.TransactionCode, transactionCodes[e.TransactionCode], e.RDFIIdentification, accountNumber, e.Amount, e.IndividualName, e.TraceNumber, e.Category)
 
 			dumpAddenda02(w, e.Addenda02)
 			for i := range e.Addenda05 {
@@ -102,7 +111,7 @@ func dumpFile(file *ach.File) {
 		bc := file.Batches[i].GetControl()
 		if bc != nil {
 			fmt.Fprintln(w, "\n  ServiceClassCode\tEntryAddendaCount\tEntryHash\tTotalDebits\tTotalCredits\tMACCode\tODFIIdentification\tBatchNumber")
-			fmt.Fprintf(w, "  %d\t%d\t%d\t%d\t%d\t%s\t%s\t%d\n", bc.ServiceClassCode, bc.EntryAddendaCount, bc.EntryHash, bc.TotalDebitEntryDollarAmount, bc.TotalCreditEntryDollarAmount, bc.MessageAuthenticationCode, bc.ODFIIdentification, bc.BatchNumber)
+			fmt.Fprintf(w, "  %d %s\t%d\t%d\t%d\t%d\t%s\t%s\t%d\n", bc.ServiceClassCode, serviceClassCodes[bh.ServiceClassCode], bc.EntryAddendaCount, bc.EntryHash, bc.TotalDebitEntryDollarAmount, bc.TotalCreditEntryDollarAmount, bc.MessageAuthenticationCode, bc.ODFIIdentification, bc.BatchNumber)
 		}
 	}
 
