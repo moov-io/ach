@@ -8,7 +8,7 @@ menubar: docs-menu
 
 # Command Line
 
-On each release there's an `achcli` utility released. This tool can display ACH files in a human-readable format which is easier to read than their plaintext format.
+On each release there's an `achcli` utility released. This tool can display ACH files in a human-readable format which is easier to read than their plaintext format. It also allows masking `DFIAccountNumber` values with the `-mask` flag.
 
 ```
 $ wget -O achcli https://github.com/moov-io/ach/releases/download/v1.6.1/achcli-darwin-amd64 && chmod +x achcli
