@@ -22,7 +22,9 @@ var (
 	flagMerge    = flag.Bool("merge", false, "Merge files before describing")
 	flagReformat = flag.String("reformat", "", "Reformat an incoming ACH file to another format")
 
-	flagMask = flag.Bool("mask", false, "Mask/hide full account numbers")
+	flagMask = flag.Bool("maskString", false, "Mask/mask full account numbers")
+
+	//flagHide = flag.Bool("mask", false, "Mask/mask full account numbers")
 
 	programName = filepath.Base(os.Args[0])
 )
@@ -35,7 +37,7 @@ func init() {
 		fmt.Println("Commands: ")
 		fmt.Printf("  %s -diff first.ach second.ach", programName)
 		fmt.Println("    Show the difference between two ACH files")
-		fmt.Printf("  %s -mask file.ach", programName)
+		fmt.Printf("  %s -maskString file.ach", programName)
 		fmt.Println("                Print file details with personally identifiable information partially removed")
 		fmt.Printf("  %s -reformat=json first.ach", programName)
 		fmt.Println("      Convert an incoming ACH file into another format (options: ach, json)")
@@ -87,6 +89,11 @@ func main() {
 		}
 
 	default:
+		err := mask(args)
+		if err != nil {
+			panic(err)
+		}
+
 		if err := dumpFiles(args); err != nil {
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)
