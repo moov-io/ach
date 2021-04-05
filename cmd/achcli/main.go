@@ -20,11 +20,13 @@ var (
 
 	flagDiff     = flag.Bool("diff", false, "Compare two files against each other")
 	flagMerge    = flag.Bool("merge", false, "Merge files before describing")
+	flagMask     = flag.Bool("mask", false, "Mask/redact full account numbers")
 	flagReformat = flag.String("reformat", "", "Reformat an incoming ACH file to another format")
 
-	flagMask = flag.Bool("maskString", false, "Mask/mask full account numbers")
-
-	//flagHide = flag.Bool("mask", false, "Mask/mask full account numbers")
+	// todo: add dry-run option to print to stdout
+	// todo: add file output option; flagOutput = flag.String("output", "", "output file")
+	flagRedact = flag.Bool("redact", false, "redact stuff")
+	flagDryRun = flag.Bool("dry-run", false, "dry run to print to stdout")
 
 	programName = filepath.Base(os.Args[0])
 )
@@ -37,7 +39,7 @@ func init() {
 		fmt.Println("Commands: ")
 		fmt.Printf("  %s -diff first.ach second.ach", programName)
 		fmt.Println("    Show the difference between two ACH files")
-		fmt.Printf("  %s -maskString file.ach", programName)
+		fmt.Printf("  %s -mask file.ach", programName)
 		fmt.Println("                Print file details with personally identifiable information partially removed")
 		fmt.Printf("  %s -reformat=json first.ach", programName)
 		fmt.Println("      Convert an incoming ACH file into another format (options: ach, json)")
@@ -67,6 +69,7 @@ func main() {
 	case *flagDiff && len(args) != 2:
 		fmt.Printf("with -diff exactly two files are expected, found %d files\n", len(args))
 		os.Exit(1)
+		//todo: add redact here
 	}
 
 	// minor debugging
@@ -88,12 +91,13 @@ func main() {
 			os.Exit(1)
 		}
 
-	default:
-		err := mask(args)
-		if err != nil {
-			panic(err)
+	case *flagRedact:
+		if err := redact(args, *flagDryRun); err != nil {
+			fmt.Printf("ERROR: %v\n", err)
+			os.Exit(1)
 		}
 
+	default:
 		if err := dumpFiles(args); err != nil {
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)

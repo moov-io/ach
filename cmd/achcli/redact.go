@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"io"
@@ -13,33 +12,19 @@ import (
 	"github.com/moov-io/ach"
 )
 
-/*
-What should this command do?
-- mask all PII data
-- verify number of lines are the same
-- write to stdOut if no output is specified
-- run this against a file with 10K Lines to see if it's fast
-*/
-func mask(args []string) error {
-	m := &Masker{
+func redact(args []string, dryRun bool) error {
+	m := &Redactor{
 		maskDigit:     9,
 		maskCharacter: '*',
 	}
 
-	args = []string{""}
-	args[0] = filepath.Join("test", "testdata", "ppd-debit.ach")
 	filename := args[0]
 	f, err := os.Open(filename)
 	if err != nil {
 		return fmt.Errorf("problem opening %s: %v", filename, err)
 	}
 
-	var buf bytes.Buffer
-
-	var reader io.Reader = f
-	reader = io.TeeReader(reader, &buf)
-
-	file, err := ach.NewReader(reader).Read()
+	file, err := ach.NewReader(f).Read()
 	if err != nil {
 		return fmt.Errorf("reading file: %v", err)
 	}
@@ -79,61 +64,46 @@ func mask(args []string) error {
 	m.maskBatches(file.ReturnEntries)
 	m.maskIATBatches(file.IATBatches)
 
-	// Write to new file
-	//ext := filepath.Ext(filename)
-	//newFilename := fmt.Sprintf("%s_masked%s", strings.TrimSuffix(filename, filepath.Ext(filename)), ext)
-	//newFile, err := os.Create(newFilename)
-	//if err != nil {
-	//	return fmt.Errorf("creating new file %s: %v", newFilename, err)
-	//}
-
-	var buff bytes.Buffer
-	w := ach.NewWriter(&buff)
-	w.BypassValidation = true
-	err = w.Write(&file)
-	if err != nil {
+	var buf bytes.Buffer
+	achWriter := ach.NewWriter(&buf)
+	achWriter.BypassValidation = true
+	if err := achWriter.Write(&file); err != nil {
 		return fmt.Errorf("writing file: %v", err)
 	}
 
-	// Open the file again to count the number of lines
-	//newFile, err = os.Open(newFilename)
-	//if err != nil {
-	//	return fmt.Errorf("opening file: %v", err)
-	//}
+	var w io.Writer
+	if dryRun {
+		w = os.Stdout
+	} else { // Write to new file
+		ext := filepath.Ext(filename)
+		newFilename := fmt.Sprintf("%s-redacted%s", strings.TrimSuffix(filename, filepath.Ext(filename)), ext)
 
-	// todo: print to standard out if dry run
-	oldCount := countLines(&buf)
-	newCount := countLines(io.TeeReader(&buff, os.Stdout))
-	if oldCount != newCount {
-		return fmt.Errorf("masked file does not have the same number of lines as the original, expected %d but got %d lines", oldCount, newCount)
+		w, err = os.Create(newFilename)
+		if err != nil {
+			return fmt.Errorf("creating new file %s: %v", newFilename, err)
+		}
+	}
+
+	_, err = buf.WriteTo(w)
+	if err != nil {
+		return fmt.Errorf("writing data: %v", err)
 	}
 
 	return nil
 }
 
-func countLines(r io.Reader) int {
-	scanner := bufio.NewScanner(r)
-	count := 0
-
-	for scanner.Scan() {
-		count += 1
-	}
-
-	return count
-}
-
-type Masker struct {
+type Redactor struct {
 	maskDigit     int
 	maskCharacter rune
 }
 
-func (m *Masker) maskStrings(strs ...*string) {
+func (r *Redactor) maskStrings(strs ...*string) {
 	for _, s := range strs {
-		m.maskString(s)
+		r.maskString(s)
 	}
 }
 
-func (m *Masker) maskString(s *string) {
+func (r *Redactor) maskString(s *string) {
 	*s = strings.TrimSpace(*s)
 
 	if len(*s) == 0 {
@@ -144,20 +114,20 @@ func (m *Masker) maskString(s *string) {
 	allowed := 0 // todo: How many characters do we want to expose? 0, 1 or 2?
 	length := utf8.RuneCountInString(tmp)
 	if length < allowed {
-		*s = strings.Repeat(string(m.maskCharacter), allowed)
+		*s = strings.Repeat(string(r.maskCharacter), allowed)
 	}
-	*s = strings.Repeat(string(m.maskCharacter), length-allowed) + tmp[length-allowed:]
+	*s = strings.Repeat(string(r.maskCharacter), length-allowed) + tmp[length-allowed:]
 }
 
-func (m *Masker) maskInts(nums ...*int) {
+func (r *Redactor) maskInts(nums ...*int) {
 	for _, n := range nums {
-		m.maskInt(n)
+		r.maskInt(n)
 	}
 }
 
-func (m *Masker) maskInt(n *int) {
+func (r *Redactor) maskInt(n *int) {
 	if *n == 0 {
-		*n = m.maskDigit
+		*n = r.maskDigit
 	}
 
 	// Get number of digits
@@ -173,16 +143,16 @@ func (m *Masker) maskInt(n *int) {
 	tmp := 0
 	for i := 0; i < numDigits; i++ {
 		tmp *= 10
-		tmp += m.maskDigit
+		tmp += r.maskDigit
 	}
 
 	*n = tmp
 }
 
-func (m *Masker) maskBatches(batches []ach.Batcher) {
+func (r *Redactor) maskBatches(batches []ach.Batcher) {
 	for _, b := range batches {
 		if header := b.GetHeader(); header != nil {
-			m.maskStrings(
+			r.maskStrings(
 				&header.ID,
 				&header.CompanyName,
 				&header.CompanyDiscretionaryData,
@@ -194,7 +164,7 @@ func (m *Masker) maskBatches(batches []ach.Batcher) {
 				&header.ODFIIdentification,
 			)
 
-			m.maskInts(
+			r.maskInts(
 				//&header.ServiceClassCode, //todo: PII?
 				//&header.OriginatorStatusCode, //todo: PII?
 				&header.BatchNumber,
@@ -203,7 +173,7 @@ func (m *Masker) maskBatches(batches []ach.Batcher) {
 
 		// Entries
 		for _, e := range b.GetEntries() {
-			m.maskStrings(
+			r.maskStrings(
 				&e.ID,
 				&e.RDFIIdentification,
 				&e.CheckDigit,
@@ -214,12 +184,12 @@ func (m *Masker) maskBatches(batches []ach.Batcher) {
 				&e.TraceNumber,
 				&e.Category,
 			)
-			m.maskInts(
+			r.maskInts(
 				&e.Amount,
 			)
 
 			if a := e.Addenda02; a != nil {
-				m.maskStrings(
+				r.maskStrings(
 					&a.ID,
 					&a.ReferenceInformationOne,
 					&a.ReferenceInformationTwo,
@@ -235,17 +205,17 @@ func (m *Masker) maskBatches(batches []ach.Batcher) {
 			}
 
 			for _, a := range e.Addenda05 {
-				m.maskStrings(
+				r.maskStrings(
 					&a.ID,
 					&a.PaymentRelatedInformation,
 				)
-				m.maskInts(
+				r.maskInts(
 					&a.EntryDetailSequenceNumber,
 				)
 			}
 
 			if a := e.Addenda98; a != nil {
-				m.maskStrings(
+				r.maskStrings(
 					&a.ID,
 					//&a.ChangeCode, //todo: PII?
 					&a.OriginalTrace,
@@ -255,12 +225,12 @@ func (m *Masker) maskBatches(batches []ach.Batcher) {
 				)
 			}
 
-			m.maskAddenda99(e.Addenda99)
+			r.maskAddenda99(e.Addenda99)
 		}
 
 		// ADVEntries
 		for _, e := range b.GetADVEntries() {
-			m.maskStrings(
+			r.maskStrings(
 				&e.ID,
 				&e.RDFIIdentification,
 				&e.CheckDigit,
@@ -273,22 +243,22 @@ func (m *Masker) maskBatches(batches []ach.Batcher) {
 				&e.DiscretionaryData,
 				&e.Category,
 			)
-			m.maskInts(
+			r.maskInts(
 				&e.Amount,
 				&e.JulianDay,
 			)
 
-			m.maskAddenda99(e.Addenda99)
+			r.maskAddenda99(e.Addenda99)
 		}
 
-		m.maskBatchControl(b.GetControl())
+		r.maskBatchControl(b.GetControl())
 
 		if control := b.GetADVControl(); control != nil {
-			m.maskStrings(
+			r.maskStrings(
 				&control.ID,
 				&control.ODFIIdentification,
 			)
-			m.maskInts(
+			r.maskInts(
 				&control.EntryHash,
 				&control.TotalDebitEntryDollarAmount,
 				&control.TotalCreditEntryDollarAmount,
@@ -298,12 +268,12 @@ func (m *Masker) maskBatches(batches []ach.Batcher) {
 	}
 }
 
-func (m *Masker) maskIATBatches(batches []ach.IATBatch) {
+func (r *Redactor) maskIATBatches(batches []ach.IATBatch) {
 	for _, b := range batches {
-		m.maskStrings(&b.ID)
+		r.maskStrings(&b.ID)
 
 		if h := b.Header; h != nil {
-			m.maskStrings(
+			r.maskStrings(
 				&h.ID,
 				&h.OriginatorIdentification,
 				//&h.StandardEntryClassCode, // todo: PII?
@@ -312,16 +282,16 @@ func (m *Masker) maskIATBatches(batches []ach.IATBatch) {
 				&h.ODFIIdentification,
 			)
 
-			m.maskInts(
+			r.maskInts(
 				// todo: add additional PII fields here
 				&h.BatchNumber,
 			)
 		}
 
-		m.maskBatchControl(b.GetControl())
+		r.maskBatchControl(b.GetControl())
 
 		for _, e := range b.GetEntries() {
-			m.maskStrings(
+			r.maskStrings(
 				&e.ID,
 				&e.RDFIIdentification,
 				&e.CheckDigit,
@@ -329,103 +299,103 @@ func (m *Masker) maskIATBatches(batches []ach.IATBatch) {
 				&e.TraceNumber,
 				&e.Category,
 			)
-			m.maskInts(
+			r.maskInts(
 				&e.Amount,
 				&e.TransactionCode,
 			)
 
 			if a := e.Addenda10; a != nil {
-				m.maskStrings(
+				r.maskStrings(
 					&a.ID,
 					//&a.TransactionTypeCode, // todo: PII?
 					&a.ForeignTraceNumber,
 					&a.Name,
 				)
-				m.maskInts(
+				r.maskInts(
 					&a.ForeignPaymentAmount,
 					&a.EntryDetailSequenceNumber,
 				)
 			}
 
 			if a := e.Addenda11; a != nil {
-				m.maskStrings(
+				r.maskStrings(
 					&a.ID,
 					&a.OriginatorName,
 					&a.OriginatorStreetAddress,
 				)
-				m.maskInts(&a.EntryDetailSequenceNumber)
+				r.maskInts(&a.EntryDetailSequenceNumber)
 			}
 
 			if a := e.Addenda12; a != nil {
-				m.maskStrings(
+				r.maskStrings(
 					&a.ID,
 					&a.OriginatorCityStateProvince,
 					&a.OriginatorCountryPostalCode,
 				)
-				m.maskInts(&a.EntryDetailSequenceNumber)
+				r.maskInts(&a.EntryDetailSequenceNumber)
 			}
 
 			if a := e.Addenda13; a != nil {
-				m.maskStrings(
+				r.maskStrings(
 					&a.ID,
 					&a.ODFIName,
 					&a.ODFIIDNumberQualifier,
 					&a.ODFIIdentification,
 					&a.ODFIBranchCountryCode,
 				)
-				m.maskInts(&a.EntryDetailSequenceNumber)
+				r.maskInts(&a.EntryDetailSequenceNumber)
 			}
 
 			if a := e.Addenda14; a != nil {
-				m.maskStrings(
+				r.maskStrings(
 					&a.ID,
 					&a.RDFIName,
 					&a.RDFIIDNumberQualifier,
 					&a.RDFIIdentification,
 					&a.RDFIBranchCountryCode,
 				)
-				m.maskInts(&a.EntryDetailSequenceNumber)
+				r.maskInts(&a.EntryDetailSequenceNumber)
 			}
 
 			if a := e.Addenda15; a != nil {
-				m.maskStrings(
+				r.maskStrings(
 					&a.ID,
 					&a.ReceiverIDNumber,
 					&a.ReceiverStreetAddress,
 				)
-				m.maskInts(&a.EntryDetailSequenceNumber)
+				r.maskInts(&a.EntryDetailSequenceNumber)
 			}
 
 			if a := e.Addenda16; a != nil {
-				m.maskStrings(
+				r.maskStrings(
 					&a.ID,
 					&a.ReceiverCityStateProvince,
 					&a.ReceiverCountryPostalCode,
 				)
-				m.maskInts(&a.EntryDetailSequenceNumber)
+				r.maskInts(&a.EntryDetailSequenceNumber)
 			}
 
 			for _, a := range e.Addenda17 {
-				m.maskStrings(
+				r.maskStrings(
 					&a.ID,
 					&a.PaymentRelatedInformation,
 				)
-				m.maskInts(&a.EntryDetailSequenceNumber)
+				r.maskInts(&a.EntryDetailSequenceNumber)
 			}
 
 			for _, a := range e.Addenda18 {
-				m.maskStrings(
+				r.maskStrings(
 					&a.ID,
 					&a.ForeignCorrespondentBankName,
 					//&a.ForeignCorrespondentBankIDNumberQualifier,
 					&a.ForeignCorrespondentBankIDNumber,
 					&a.ForeignCorrespondentBankBranchCountryCode,
 				)
-				m.maskInts(&a.EntryDetailSequenceNumber)
+				r.maskInts(&a.EntryDetailSequenceNumber)
 			}
 
 			if a := e.Addenda98; a != nil {
-				m.maskStrings(
+				r.maskStrings(
 					&a.ID,
 					&a.ChangeCode,
 					&a.OriginalTrace,
@@ -437,7 +407,7 @@ func (m *Masker) maskIATBatches(batches []ach.IATBatch) {
 			}
 
 			if a := e.Addenda99; a != nil {
-				m.maskStrings(
+				r.maskStrings(
 					&a.ID,
 					&a.OriginalTrace,
 					&a.DateOfDeath,
@@ -450,18 +420,18 @@ func (m *Masker) maskIATBatches(batches []ach.IATBatch) {
 	}
 }
 
-func (m *Masker) maskBatchControl(c *ach.BatchControl) {
+func (r *Redactor) maskBatchControl(c *ach.BatchControl) {
 	if c == nil {
 		return
 	}
 
-	m.maskStrings(
+	r.maskStrings(
 		&c.ID,
 		&c.CompanyIdentification,
 		&c.MessageAuthenticationCode,
 		&c.ODFIIdentification,
 	)
-	m.maskInts(
+	r.maskInts(
 		&c.EntryHash,
 		&c.TotalDebitEntryDollarAmount,
 		&c.TotalCreditEntryDollarAmount,
@@ -469,12 +439,12 @@ func (m *Masker) maskBatchControl(c *ach.BatchControl) {
 	)
 }
 
-func (m *Masker) maskAddenda99(a *ach.Addenda99) {
+func (r *Redactor) maskAddenda99(a *ach.Addenda99) {
 	if a == nil {
 		return
 	}
 
-	m.maskStrings(
+	r.maskStrings(
 		&a.ID,
 		//&a.ReturnCode, //todo: PII?
 		&a.OriginalTrace,
