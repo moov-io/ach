@@ -1084,6 +1084,20 @@ func (f *File) FlattenBatches() (*File, error) {
 			}
 		}
 	}
+	for i := range out.Batches {
+		bh := out.Batches[i].GetHeader()
+		if bh.StandardEntryClassCode != "ADV" {
+			batch, _ := NewBatch(bh)
+			entries := sortEntries(out.Batches[i].GetEntries())
+			for i := range entries {
+				batch.AddEntry(entries[i])
+			}
+			out.Batches[i] = batch
+			if err := batch.Create(); err != nil {
+				return nil, err
+			}
+		}
+	}
 
 	IATBatchesByHeader := make(map[string]*IATBatch)
 	if f.IATBatches != nil {
@@ -1098,8 +1112,6 @@ func (f *File) FlattenBatches() (*File, error) {
 
 			newBatch := IATBatchesByHeader[bhKey]
 			for _, e := range b.GetEntries() {
-				// reset TraceNumber
-				e.TraceNumber = ""
 				newBatch.AddEntry(e)
 			}
 		}
