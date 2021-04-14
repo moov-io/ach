@@ -1049,6 +1049,7 @@ func segmentFileBatchAddADVEntry(creditBatch Batcher, debitBatch Batcher, entry 
 }
 
 // FlattenBatches flattens the file's batches by consolidating batches with the same BatchHeader data into one Batch.
+// Entries within each flattened batch will be sorted by their TraceNumber field.
 func (f *File) FlattenBatches() (*File, error) {
 	out := NewFile()
 
@@ -1088,7 +1089,7 @@ func (f *File) FlattenBatches() (*File, error) {
 		bh := out.Batches[i].GetHeader()
 		if bh.StandardEntryClassCode != "ADV" {
 			batch, _ := NewBatch(bh)
-			entries := sortEntries(out.Batches[i].GetEntries())
+			entries := sortEntriesByTraceNumber(out.Batches[i].GetEntries())
 			for i := range entries {
 				batch.AddEntry(entries[i])
 			}

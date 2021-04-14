@@ -606,7 +606,7 @@ func (ed *EntryDetail) addendaCount() (n int) {
 	return n
 }
 
-func sortEntries(entries []*EntryDetail) []*EntryDetail {
+func sortEntriesByTraceNumber(entries []*EntryDetail) []*EntryDetail {
 	sort.Slice(entries[:], func(i, j int) bool {
 		return entries[i].TraceNumber < entries[j].TraceNumber
 	})
