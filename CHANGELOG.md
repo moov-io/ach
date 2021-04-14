@@ -1,3 +1,22 @@
+## v1.6.4 (Released 2021-04-14)
+
+ADDITIONS
+
+- Add option to create a file with zero batches (#884)
+
+IMPROVEMENTS
+
+- iso3166,iso4217: generate lists again after long hiatus
+
+BUG FIXES
+
+- file: sort EntryDetail records when flattening batches
+
+BUILD
+
+- fix(deps): update module github.com/prometheus/client_golang to v1.10.0 (#875)
+- fix(deps): update module github.com/moov-io/base to v0.18.2
+
 ## v1.6.3 (Released 2021-03-19)
 
 BUG FIXES
@@ -32,7 +51,7 @@ BUG FIXES
 
 IMPROVEMENTS
 
-- docs: improvements to README by adding a new header, table of contents, related projects, and FAQ 
+- docs: improvements to README by adding a new header, table of contents, related projects, and FAQ
 - docs: clarified code comments related to `File.ValidateWith(..)` and fixed minor documentation errors
 
 ## v1.6.0 (Released 2021-01-13)
