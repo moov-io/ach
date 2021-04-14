@@ -19,9 +19,15 @@ package ach
 
 import (
 	"fmt"
+	"math/rand"
 	"path/filepath"
 	"testing"
+	"time"
 )
+
+func init() {
+	rand.Seed(time.Now().Unix())
+}
 
 func filesAreEqual(f1, f2 *File) error {
 	// File Header
@@ -176,6 +182,35 @@ func TestMergeFiles__apart(t *testing.T) {
 		if err := f.Validate(); err != nil {
 			t.Fatalf("invalid file: %v", err)
 		}
+	}
+}
+
+func BenchmarkMergeFiles__lineCount(b *testing.B) {
+	newACHFile := func() *File {
+		// Nacha files have a max of 10,000 lines and a batch is
+		// a header, entries, and control.
+		batches := int(rand.Int31n(3000) + 1)
+
+		file := NewFile()
+		file.SetHeader(mockFileHeader())
+		file.Control = mockFileControl()
+
+		for i := 0; i < batches; i++ {
+			file.AddBatch(mockBatchPPD())
+		}
+		if err := file.Create(); err != nil {
+			b.Fatal(err)
+		}
+		return file
+	}
+
+	for i := 0; i < b.N; i++ {
+		b.StopTimer() // pause timer so we can init our ACH file
+		file := newACHFile()
+		b.StartTimer() // resume benchmark
+
+		// Count lines in our file
+		lineCount(file)
 	}
 }
 
