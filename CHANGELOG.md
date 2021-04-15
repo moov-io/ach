@@ -1,3 +1,9 @@
+## v1.6.5 (Released 2021-04-15)
+
+IMPROVEMENTS
+
+- merge: optimize performance of `lineCount(..)` and reduce errors returned
+
 ## v1.6.4 (Released 2021-04-14)
 
 ADDITIONS
