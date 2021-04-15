@@ -19,6 +19,7 @@ var (
 	flagVersion = flag.Bool("version", false, "Print moov-io/ach cli version")
 
 	flagDiff     = flag.Bool("diff", false, "Compare two files against each other")
+	flagFlatten  = flag.Bool("flatten", false, "Flatten batches in each file")
 	flagMerge    = flag.Bool("merge", false, "Merge files before describing")
 	flagReformat = flag.String("reformat", "", "Reformat an incoming ACH file to another format")
 
