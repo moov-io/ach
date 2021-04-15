@@ -1480,7 +1480,7 @@ func TestBatch__CompanyIdentificationMismatch(t *testing.T) {
 
 	err := batcher.Validate()
 	if err != nil {
-		t.Fatalf("unexpected validation error: %v")
+		t.Fatalf("unexpected validation error: %v", err)
 	}
 
 }
