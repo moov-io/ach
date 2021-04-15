@@ -7,11 +7,9 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
-	"text/tabwriter"
-	"unicode/utf8"
 
 	"github.com/moov-io/ach"
+	"github.com/moov-io/ach/cmd/achcli/describe"
 )
 
 func dumpFiles(paths []string) error {
@@ -28,137 +26,45 @@ func dumpFiles(paths []string) error {
 				fmt.Println("") // extra newline between multiple ACH files
 			}
 			fmt.Printf("Describing ACH file '%s'\n\n", paths[i])
-			dumpFile(f)
+			describe.File(os.Stdout, f, &describe.Opts{
+				MaskAccountNumbers: *flagMask,
+			})
 		}
 	}
 
 	if *flagMerge {
-		files, err := ach.MergeFiles(files)
+		merged, err := ach.MergeFiles(files)
 		if err != nil {
-			fmt.Printf("ERROR: merging files: %v", err)
+			fmt.Printf("ERROR: merging files: %v\n", err)
 		}
 		fmt.Printf("Describing %d file(s) merged into %d file(s)\n", len(paths), len(files))
-		for i := range files {
-			if i > 0 && len(files) > 1 {
-				fmt.Println("") // extra newline between multiple ACH files
-			}
-			dumpFile(files[i])
-		}
+		files = merged
+	}
 
-		// fmt.Println("")
-		// ach.NewWriter(os.Stdout).Write(files[0])
+	if *flagFlatten {
+		for i := range files {
+			file, err := files[i].FlattenBatches()
+			if err != nil {
+				fmt.Printf("ERROR: problem flattening file: %v\n", err)
+			}
+			files[i] = file
+		}
+	}
+
+	for i := range files {
+		if i > 0 && len(files) > 1 {
+			fmt.Println("") // extra newline between multiple ACH files
+		}
+		if files[i] != nil {
+			describe.File(os.Stdout, files[i], &describe.Opts{
+				MaskAccountNumbers: *flagMask,
+			})
+		} else {
+			fmt.Printf("nil ACH file in position %d\n", i)
+		}
 	}
 
 	return nil
-}
-
-func dumpFile(file *ach.File) {
-	if file == nil {
-		return
-	}
-
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	defer w.Flush()
-
-	fh, fc := file.Header, file.Control
-
-	// FileHeader
-	fmt.Fprintln(w, "  Origin\tOriginName\tDestination\tDestinationName\tFileCreationDate\tFileCreationTime")
-	fmt.Fprintf(w, "  %s\t%s\t%s\t%s\t%s\t%s\n", fh.ImmediateOrigin, fh.ImmediateOriginName, fh.ImmediateDestination, fh.ImmediateDestinationName, fh.FileCreationDate, fh.FileCreationTime)
-
-	// Batches
-	for i := range file.Batches {
-		fmt.Fprintln(w, "\n  BatchNumber\tSECCode\tServiceClassCode\tCompanyName\tDiscretionaryData\tIdentification\tEntryDescription\tDescriptiveDate")
-
-		bh := file.Batches[i].GetHeader()
-		if bh != nil {
-			fmt.Fprintf(w, "  %d\t%s\t%d %s\t%s\t%s\t%s\t%s\t%s\n",
-				bh.BatchNumber,
-				bh.StandardEntryClassCode,
-				bh.ServiceClassCode,
-				serviceClassCodes[bh.ServiceClassCode],
-				bh.CompanyName,
-				bh.CompanyDiscretionaryData,
-				bh.CompanyIdentification,
-				bh.CompanyEntryDescription,
-				bh.CompanyDescriptiveDate,
-			)
-		}
-
-		entries := file.Batches[i].GetEntries()
-		for j := range entries {
-			fmt.Fprintln(w, "\n    TransactionCode\tRDFIIdentification\tAccountNumber\tAmount\tName\tTraceNumber\tCategory")
-
-			e := entries[j]
-			accountNumber := e.DFIAccountNumber
-			if *flagMask {
-				accountNumber = maskAccountNumber(strings.TrimSpace(accountNumber))
-			}
-
-			fmt.Fprintf(w, "    %d %s\t%s\t%s\t%d\t%s\t%s\t%s\n", e.TransactionCode, transactionCodes[e.TransactionCode], e.RDFIIdentification, accountNumber, e.Amount, e.IndividualName, e.TraceNumber, e.Category)
-
-			dumpAddenda02(w, e.Addenda02)
-			for i := range e.Addenda05 {
-				if i == 0 {
-					fmt.Fprintln(w, "\n      Addenda05")
-				}
-				dumpAddenda05(w, e.Addenda05[i])
-			}
-			dumpAddenda98(w, e.Addenda98)
-			dumpAddenda99(w, e.Addenda99)
-		}
-
-		bc := file.Batches[i].GetControl()
-		if bc != nil {
-			fmt.Fprintln(w, "\n  ServiceClassCode\tEntryAddendaCount\tEntryHash\tTotalDebits\tTotalCredits\tMACCode\tODFIIdentification\tBatchNumber")
-			fmt.Fprintf(w, "  %d %s\t%d\t%d\t%d\t%d\t%s\t%s\t%d\n", bc.ServiceClassCode, serviceClassCodes[bh.ServiceClassCode], bc.EntryAddendaCount, bc.EntryHash, bc.TotalDebitEntryDollarAmount, bc.TotalCreditEntryDollarAmount, bc.MessageAuthenticationCode, bc.ODFIIdentification, bc.BatchNumber)
-		}
-	}
-
-	// FileControl
-	fmt.Fprintln(w, "\n  BatchCount\tBlockCount\tEntryAddendaCount\tTotalDebitAmount\tTotalCreditAmount")
-	fmt.Fprintf(w, "  %d\t%d\t%d\t%d\t%d\n", fc.BatchCount, fc.BlockCount, fc.EntryAddendaCount, fc.TotalDebitEntryDollarAmountInFile, fc.TotalCreditEntryDollarAmountInFile)
-}
-
-func dumpAddenda02(w *tabwriter.Writer, a *ach.Addenda02) {
-	if a == nil {
-		return
-	}
-
-	fmt.Fprintln(w, "\n      Addenda02")
-	fmt.Fprintln(w, "      ReferenceInfoOne\tReferenceInfoTwo\tTerminalIdentification\tTransactionSerial\tDate\tAuthCodeOrExires\tLocation\tCity\tState\tTraceNumber")
-	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
-		a.ReferenceInformationOne, a.ReferenceInformationTwo, a.TerminalIdentificationCode, a.TransactionSerialNumber,
-		a.TransactionDate, a.AuthorizationCodeOrExpireDate, a.TerminalLocation, a.TerminalCity, a.TerminalState, a.TraceNumber)
-}
-
-func dumpAddenda05(w *tabwriter.Writer, a *ach.Addenda05) {
-	if a == nil {
-		return
-	}
-
-	fmt.Fprintln(w, "      PaymentRelatedInformation\tSequenceNumber\tEntryDetailSequenceNumber")
-	fmt.Fprintf(w, "      %s\t%d\t%d\n", a.PaymentRelatedInformation, a.SequenceNumber, a.EntryDetailSequenceNumber)
-}
-
-func dumpAddenda98(w *tabwriter.Writer, a *ach.Addenda98) {
-	if a == nil {
-		return
-	}
-
-	fmt.Fprintln(w, "\n      Addenda98")
-	fmt.Fprintln(w, "      ChangeCode\tOriginalTrace\tOriginalDFI\tCorrectedData\tTraceNumber")
-	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\n", a.ChangeCode, a.OriginalTrace, a.OriginalDFI, a.CorrectedData, a.TraceNumber)
-}
-
-func dumpAddenda99(w *tabwriter.Writer, a *ach.Addenda99) {
-	if a == nil {
-		return
-	}
-
-	fmt.Fprintln(w, "\n      Addenda99")
-	fmt.Fprintln(w, "      ReturnCode\tOriginalTrace\tDateOfDeath\tOriginalDFI\tAddendaInformation\tTraceNumber")
-	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%s\n", a.ReturnCode, a.OriginalTrace, a.DateOfDeath, a.OriginalDFI, a.AddendaInformation, a.TraceNumber)
 }
 
 func readACHFile(path string) (*ach.File, error) {
@@ -170,12 +76,4 @@ func readACHFile(path string) (*ach.File, error) {
 
 	f, err := ach.NewReader(fd).Read()
 	return &f, err
-}
-
-func maskAccountNumber(s string) string {
-	length := utf8.RuneCountInString(s)
-	if length < 5 {
-		return "****" // too short, we can't keep anything
-	}
-	return strings.Repeat("*", length-4) + s[length-4:]
 }
