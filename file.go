@@ -564,6 +564,10 @@ type ValidateOpts struct {
 
 	// AllowZeroBatches allows the file to have zero batches
 	AllowZeroBatches bool `json:"allowZeroBatches"`
+
+	// BypassCompanyIdentificationMatch allows batches in which the Company Identification field
+	// in the batch header and control do not match.
+	BypassCompanyIdentificationMatch bool `json:"bypassCompanyIdentificationMatch"`
 }
 
 // ValidateWith performs NACHA format rule checks on each record according to their specification
