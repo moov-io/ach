@@ -1,3 +1,11 @@
+## v1.7.0 (Released 2021-04-15)
+
+ADDITIONS
+
+- webui: add button to support JSON to ACH conversions
+- achcli: add `describe` package to allow human-readable printing to be reused in other tools
+- batch: add validation option, `bypassCompanyIdentificationMatch`, to allow batches in which the `CompanyIdentification` field in the batch header and control do not match
+
 ## v1.6.5 (Released 2021-04-15)
 
 IMPROVEMENTS
