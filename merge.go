@@ -18,8 +18,6 @@
 package ach
 
 import (
-	"bufio"
-	"bytes"
 	"fmt"
 	"time"
 )
@@ -133,21 +131,59 @@ func (fs *mergableFiles) lookupByHeader(f *File) *File {
 }
 
 func lineCount(f *File) (int, error) {
-	if len(f.Batches) < 100 {
-		// Ignore Files with low batch counts by returning a valid count.
-		// Calling Writer.Write() is costly and so we're going to ignore it in easy cases.
-		return 1, nil
-	}
-
-	var buf bytes.Buffer
-	if err := NewWriter(&buf).Write(f); err != nil {
-		return 0, err
-	}
-	lines := 0
-	s := bufio.NewScanner(&buf)
-	for s.Scan() {
-		if v := s.Text(); v != "" {
+	lines := 2 // FileHeader, FileControl
+	for i := range f.Batches {
+		lines += 2 // BatchHeader, BatchControl
+		entries := f.Batches[i].GetEntries()
+		for j := range entries {
 			lines++
+			if entries[j].Addenda02 != nil {
+				lines++
+			}
+			lines += len(entries[j].Addenda05)
+			if entries[j].Addenda98 != nil {
+				lines++
+			}
+			if entries[j].Addenda99 != nil {
+				lines++
+			}
+		}
+	}
+	for i := range f.IATBatches {
+		lines += 2 // IATBatchHeader, BatchControl
+		for j := range f.IATBatches[i].Entries {
+			lines++
+			if f.IATBatches[i].Entries[j].Addenda10 != nil {
+				lines++
+			}
+			if f.IATBatches[i].Entries[j].Addenda11 != nil {
+				lines++
+			}
+			if f.IATBatches[i].Entries[j].Addenda12 != nil {
+				lines++
+			}
+			if f.IATBatches[i].Entries[j].Addenda13 != nil {
+				lines++
+			}
+			if f.IATBatches[i].Entries[j].Addenda14 != nil {
+				lines++
+			}
+			if f.IATBatches[i].Entries[j].Addenda15 != nil {
+				lines++
+			}
+			if f.IATBatches[i].Entries[j].Addenda16 != nil {
+				lines++
+			}
+
+			lines += len(f.IATBatches[i].Entries[j].Addenda17)
+			lines += len(f.IATBatches[i].Entries[j].Addenda18)
+
+			if f.IATBatches[i].Entries[j].Addenda98 != nil {
+				lines++
+			}
+			if f.IATBatches[i].Entries[j].Addenda99 != nil {
+				lines++
+			}
 		}
 	}
 	return lines, nil

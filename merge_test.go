@@ -19,9 +19,15 @@ package ach
 
 import (
 	"fmt"
+	"math/rand"
 	"path/filepath"
 	"testing"
+	"time"
 )
+
+func init() {
+	rand.Seed(time.Now().Unix())
+}
 
 func filesAreEqual(f1, f2 *File) error {
 	// File Header
@@ -179,6 +185,35 @@ func TestMergeFiles__apart(t *testing.T) {
 	}
 }
 
+func BenchmarkMergeFiles__lineCount(b *testing.B) {
+	newACHFile := func() *File {
+		// Nacha files have a max of 10,000 lines and a batch is
+		// a header, entries, and control.
+		batches := int(rand.Int31n(3000) + 1)
+
+		file := NewFile()
+		file.SetHeader(mockFileHeader())
+		file.Control = mockFileControl()
+
+		for i := 0; i < batches; i++ {
+			file.AddBatch(mockBatchPPD())
+		}
+		if err := file.Create(); err != nil {
+			b.Fatal(err)
+		}
+		return file
+	}
+
+	for i := 0; i < b.N; i++ {
+		b.StopTimer() // pause timer so we can init our ACH file
+		file := newACHFile()
+		b.StartTimer() // resume benchmark
+
+		// Count lines in our file
+		lineCount(file)
+	}
+}
+
 func TestMergeFiles__lineCount(t *testing.T) {
 	file, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
 	if err != nil {
@@ -188,7 +223,7 @@ func TestMergeFiles__lineCount(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if n, err := lineCount(file); n != 1 || err != nil {
+	if n, err := lineCount(file); n != 5 || err != nil {
 		// We've optimized small file line counts to bypass writing out the file
 		// into plain text as it's costly.
 		t.Errorf("did we change optimizations? n=%d error=%v", n, err)
@@ -200,14 +235,14 @@ func TestMergeFiles__lineCount(t *testing.T) {
 	if err := file.Create(); err != nil {
 		t.Fatal(err)
 	}
-	if n, err := lineCount(file); n != 310 || err != nil {
+	if n, err := lineCount(file); n != 305 || err != nil {
 		t.Errorf("unexpected line count of %d: %v", n, err)
 	}
 
-	// make the file invalid and ensure we error
+	// Remove BatchCount and still properly count lines
 	file.Control.BatchCount = 0
-	if n, err := lineCount(file); n != 0 || err == nil {
-		t.Errorf("expected error n=%d error=%v", n, err)
+	if n, err := lineCount(file); n != 305 || err != nil {
+		t.Errorf("unexpected error n=%d error=%v", n, err)
 	}
 }
 
