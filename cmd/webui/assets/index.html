@@ -102,7 +102,8 @@
     <textarea id="jsoninput" name="jsoninput" cols="80" rows="40" placeholder="Paste your ACH file contents here..." required></textarea>
     <textarea id="jsonoutput" name="jsonoutput" cols="80" rows="40" readonly></textarea>
     <div id="buttons">
-        <button type="submit" onclick="json(jsoninput.value)">Parse ACH file</button>
+        <button type="submit" onclick="convertToJson(jsoninput.value)">Parse ACH file</button>
+        <button type="button" onclick="convertToAch(jsoninput.value)">Parse JSON contents</button>
         <button type="submit" onclick="clearForms()">Clear Forms</button>
     </div>
     <div>
@@ -112,8 +113,14 @@
 </form>
 </body>
 <script>
-    const json = function(input) {
-        jsonoutput.value = parseContents(input)
+    const convertToJson = function(input) {
+        jsonoutput.value = parseACH(input)
+        jsonoutput.setSelectionRange(0,0)
+        jsonoutput.focus()
+    }
+
+    const convertToAch = function(input) {
+        jsonoutput.value = parseJSON(input)
         jsonoutput.setSelectionRange(0,0)
         jsonoutput.focus()
     }
@@ -125,7 +132,6 @@
     }
     achform.addEventListener('submit', (event) => {
         event.preventDefault();
-        json(jsoninput.value)
     })
 
     document.getElementById('input-file')
@@ -142,7 +148,7 @@
 
     function placeFileContent(target, file) {
         readFileContent(file).then(content => {
-            json(content)
+            convertToJson(content)
         }).catch(error => console.log(error))
     }
 
