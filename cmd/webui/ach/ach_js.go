@@ -10,7 +10,7 @@ import (
 	"github.com/moov-io/ach"
 )
 
-func parseContents(input string) (string, error) {
+func parseACH(input string) (string, error) {
 	r := strings.NewReader(input)
 	file, err := ach.NewReader(r).Read()
 	if err != nil {
@@ -36,15 +36,12 @@ func prettyJson(input string) (string, error) {
 	return string(pretty), nil
 }
 
-func jsonWrapper() js.Func {
-	jsonFunc := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+func prettyPrintJSON() js.Func {
+	return js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
 		if len(args) != 1 {
 			return "Invalid no of arguments passed"
 		}
-
-		inputJSON := args[0].String()
-
-		parsed, err := parseContents(inputJSON)
+		parsed, err := parseACH(args[0].String())
 		if err != nil {
 			msg := fmt.Sprintf("unable to parse ach file: %v", err)
 			fmt.Println(msg)
@@ -58,10 +55,31 @@ func jsonWrapper() js.Func {
 
 		return pretty
 	})
-	return jsonFunc
+}
+
+func printACH() js.Func {
+	return js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+		if len(args) != 1 {
+			return "Invalid no of arguments passed"
+		}
+		file, err := ach.FileFromJSON([]byte(args[0].String()))
+		if err != nil {
+			msg := fmt.Sprintf("unable to parse json ACH file: %v", err)
+			fmt.Println(msg)
+			return msg
+		}
+		var buf bytes.Buffer
+		if err := ach.NewWriter(&buf).Write(file); err != nil {
+			msg := fmt.Sprintf("problem writing ACH file: %v", err)
+			fmt.Println(msg)
+			return msg
+		}
+		return buf.String()
+	})
 }
 
 func main() {
-	js.Global().Set("parseContents", jsonWrapper())
+	js.Global().Set("parseACH", prettyPrintJSON())
+	js.Global().Set("parseJSON", printACH())
 	<-make(chan bool)
 }
