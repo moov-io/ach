@@ -1,3 +1,7 @@
+## v1.7.1 (Released 2020-04-16)
+
+There are no changes from v1.7.0. This release fixes issues during the release process.
+
 ## v1.7.0 (Released 2021-04-16)
 
 ADDITIONS
