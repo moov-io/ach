@@ -320,11 +320,13 @@ func (batch *Batch) verify() error {
 			return batch.Error("ServiceClassCode",
 				NewErrBatchHeaderControlEquality(batch.Header.ServiceClassCode, batch.Control.ServiceClassCode))
 		}
-		// Company Identification must match the Company ID from the batch header record
-		if batch.Header.CompanyIdentification != batch.Control.CompanyIdentification {
+		// Company Identification in the batch header and control must match if bypassCompanyIdentificationMatch is not enabled.
+		if batch.Header.CompanyIdentification != batch.Control.CompanyIdentification &&
+			!(batch.validateOpts != nil && batch.validateOpts.BypassCompanyIdentificationMatch) {
 			return batch.Error("CompanyIdentification",
 				NewErrBatchHeaderControlEquality(batch.Header.CompanyIdentification, batch.Control.CompanyIdentification))
 		}
+
 		// Control ODFIIdentification must be the same as batch header
 		if batch.Header.ODFIIdentification != batch.Control.ODFIIdentification {
 			return batch.Error("ODFIIdentification",

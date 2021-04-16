@@ -1464,3 +1464,23 @@ func TestBatch__CustomTraceNumbers(t *testing.T) {
 		t.Errorf("unexpected trace number: %v", batch.Entries[0].TraceNumber)
 	}
 }
+
+func TestBatch__CompanyIdentificationMismatch(t *testing.T) {
+	file := mockFilePPD()
+	batcher := file.Batches[0]
+	batcher.SetValidation(&ValidateOpts{
+		BypassCompanyIdentificationMatch: true,
+	})
+
+	bh := batcher.GetHeader()
+	bh.CompanyIdentification = "121042882"
+
+	bc := batcher.GetControl()
+	bc.CompanyIdentification = "111111111"
+
+	err := batcher.Validate()
+	if err != nil {
+		t.Fatalf("unexpected validation error: %v", err)
+	}
+
+}

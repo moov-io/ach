@@ -112,6 +112,12 @@ func TestFiles__decodeCreateFileRequest__validateOpts(t *testing.T) {
 		expect ach.ValidateOpts
 	}{
 		{
+			query: "?bypassCompanyIdentificationMatch=true",
+			expect: ach.ValidateOpts{
+				BypassCompanyIdentificationMatch: true,
+			},
+		},
+		{
 			query: "?bypassOrigin=true&requireABAOrigin=true",
 			expect: ach.ValidateOpts{
 				RequireABAOrigin:       true,
