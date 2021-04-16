@@ -1,4 +1,4 @@
-## v1.7.0 (Released 2021-04-15)
+## v1.7.0 (Released 2021-04-16)
 
 ADDITIONS
 
