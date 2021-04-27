@@ -56,20 +56,19 @@ func main() {
 		log.Panicf("Can not open file: %s: \n", err)
 	}
 
-	r := ach.NewReader(f)
-	achFile, err := r.Read()
+	achFile, err := ach.NewReader(f).Read()
 	if err != nil {
 		fmt.Printf("Issue reading file: %+v \n", err)
-	}
-
-	// ensure we have a validated file structure
-	if achFile.Validate(); err != nil {
-		fmt.Printf("Could not validate entire read file: %v", err)
 	}
 
 	// If you trust the file but it's formating is off building will probably resolve the malformed file.
 	if err := achFile.Create(); err != nil {
 		fmt.Printf("Could not create file with read properties: %v", err)
+	}
+
+	// ensure we have a validated file structure
+	if err := achFile.Validate(); err != nil {
+		fmt.Printf("Could not validate entire read file: %v", err)
 	}
 
 	// Output file contents
