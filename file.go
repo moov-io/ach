@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"strings"
 	"sync"
 	"time"
@@ -454,7 +455,10 @@ func (f *File) Create() error {
 			fc.BlockCount = totalRecordsInFile / 10
 		}
 		fc.EntryAddendaCount = fileEntryAddendaCount
-		fc.EntryHash = fileEntryHashSum
+
+		// If greater than 10 digits, truncate
+		fc.EntryHash = fileEntryHashSum % int(math.Pow(10, 10))
+
 		fc.TotalDebitEntryDollarAmountInFile = totalDebitAmount
 		fc.TotalCreditEntryDollarAmountInFile = totalCreditAmount
 		f.Control = fc
@@ -750,7 +754,9 @@ func (f *File) calculateEntryHash(IsADV bool) int {
 			hash = hash + batch.GetADVControl().EntryHash
 		}
 	}
-	return hash
+
+	// Ensure the entry hash cannot exceed 10 digits
+	return hash % int(math.Pow(10, 10))
 }
 
 // IsADV determines if the File is a File containing ADV batches
