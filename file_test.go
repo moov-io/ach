@@ -236,6 +236,35 @@ func BenchmarkFileEntryHash(b *testing.B) {
 	}
 }
 
+func TestFileEntryHashOverflow(t *testing.T) {
+	t.Run("Create should force a 10 digit entry hash", func(t *testing.T) {
+		invalidEntryHash := 12345678912 // 11 digits
+		validEntryHash := 2345678912    // 10 digits
+
+		file := mockFilePPD()
+		file.Batches[0].GetControl().EntryHash = invalidEntryHash
+		if err := file.Create(); err != nil {
+			t.Fatal(err)
+		}
+
+		if file.Control.EntryHash != validEntryHash {
+			t.Fatalf("file control's entry hash: want %d, got %d", validEntryHash, invalidEntryHash)
+		}
+	})
+
+	t.Run("Validate should not error on entry hash overflow", func(t *testing.T) {
+		// Read a file where the calculated entry hash will overflow to 11 digits
+		file, err := readACHFilepath(filepath.Join("cmd", "readACH", "201805101354.ach"))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if err := file.Validate(); err != nil {
+			t.Fatal(err)
+		}
+	})
+}
+
 // testFileBlockCount10 validates file block count
 func testFileBlockCount10(t testing.TB) {
 	file := NewFile().SetHeader(mockFileHeader())
