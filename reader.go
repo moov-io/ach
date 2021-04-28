@@ -37,7 +37,7 @@ var (
 	maxLines = 2 + 2000000 + 100000000 + 8
 )
 
-// Reader reads records from a ACH-encoded file.
+// Reader reads records from an ACH-encoded file.
 type Reader struct {
 	// file is ach.file model being built as r is parsed.
 	File File
@@ -120,11 +120,14 @@ func NewReader(r io.Reader) *Reader {
 	}
 }
 
-// Read reads each line of the ACH file and defines which parser to use based on the first character
-// of each line. It also enforces ACH formatting rules and returns the appropriate error if issues are found.
+// Read reads each line in the underlying io.Reader and returns a File and any errors encountered.
 //
-// A parsed file may not be valid and callers should ensure the file is validate with Validate()
-// and tabulate the file with Create(). Invalid files may be rejected by other Financial Institutions or ACH tools.
+// Read enforces ACH formatting rules and the first character of each line determines which parser is used.
+//
+// The returned File may not be valid. Callers should tabulate the File with File.Create followed by
+// File.Validate to ensure it is Nacha compliant.
+//
+// Invalid files may be rejected by other financial institutions or ACH tools.
 func (r *Reader) Read() (File, error) {
 	r.lineNum = 0
 	// read through the entire file
@@ -221,7 +224,7 @@ func rightPadShortLine(s string) (string, error) {
 }
 
 func (r *Reader) processFixedWidthFile(line *string) error {
-	// it should be safe to parse this byte by byte since ACH files are ascii only
+	// It should be safe to parse this byte by byte since ACH files are ASCII only.
 	record := ""
 	for i, c := range *line {
 		record = record + string(c)

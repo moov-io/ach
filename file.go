@@ -383,13 +383,15 @@ func datetimeParse(v string) (time.Time, error) {
 	return time.Time{}, fmt.Errorf("unknown format: %s", v)
 }
 
-// Create will tabulate and assemble an ACH file into a valid state. This includes
-// setting any posting dates, sequence numbers, counts, and sums.
+// Create will modify the File to tabulate and assemble it into a valid state.
+// This includes setting any posting dates, sequence numbers, counts, and sums.
 //
-// Create requires a FileHeader and at least one Batch if AllowZeroBatches is false.
+// Create requires a FileHeader and at least one Batch if validateOpts.AllowZeroBatches is false.
 //
-// Create implementations are free to modify computable fields in a file and should
-// call the Batch's Validate() function at the end of their execution.
+// Since each Batch may modify computable fields in the File, any calls to
+// Batch.Create should be done before Create.
+//
+// To check if the File is Nacha compliant, call Validate or ValidateWith.
 func (f *File) Create() error {
 	// Requires a valid FileHeader to build FileControl
 	if err := f.Header.Validate(); err != nil {
@@ -521,10 +523,13 @@ func (f *File) SetHeader(h FileHeader) *File {
 	return f
 }
 
-// Validate checks properties of the ACH file to ensure they match NACHA guidelines.
-// This includes computing checksums, totals, and sequence orderings.
+// Validate performs checks on each record according to Nacha guidelines.
+// Validate will never modify the File.
 //
-// Validate will never modify the file.
+// ValidateOpts may be set to bypass certain rules and will only be applied to the FileHeader.
+// The underlying Batches and Entries on this File will use their own ValidateOpts if they are set.
+//
+// The first error encountered is returned.
 func (f *File) Validate() error {
 	return f.ValidateWith(f.validateOpts)
 }
@@ -575,14 +580,14 @@ type ValidateOpts struct {
 	BypassCompanyIdentificationMatch bool `json:"bypassCompanyIdentificationMatch"`
 }
 
-// ValidateWith performs NACHA format rule checks on each record according to their specification
-// overlayed with any custom flags.
+// ValidateWith performs checks on each record according to Nacha guidelines.
+// ValidateWith will never modify the File.
 //
-// ValidateOpts set with SetValidation() are ignored, use Validate() instead.
-// ValidateOpts will only be applied to the FileHeader.
+// ValidateOpts may be set to bypass certain rules and will only be applied to the FileHeader.
+// opts passed in will override ValidateOpts set by SetValidation.
 // The underlying Batches and Entries on this File will use their own ValidateOpts if they are set.
 //
-// The first error encountered is returned and stops the parsing.
+// The first error encountered is returned.
 func (f *File) ValidateWith(opts *ValidateOpts) error {
 	if opts == nil {
 		opts = &ValidateOpts{}
