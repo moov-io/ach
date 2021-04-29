@@ -216,3 +216,44 @@ func BenchmarkRTNFieldExact(b *testing.B) {
 		testRTNFieldExact(b)
 	}
 }
+
+func TestLeastSignificantDigits(t *testing.T) {
+	tests := []struct {
+		input int
+		max   uint
+		want  int
+	}{
+		{
+			input: 123,
+			max:   2,
+			want:  23,
+		},
+		{
+			input: 123,
+			max:   3,
+			want:  123,
+		},
+		{
+			input: 123,
+			max:   5,
+			want:  123,
+		},
+		{
+			input: 12345678912,
+			max:   10,
+			want:  2345678912,
+		},
+		{
+			input: 99,
+			max:   0,
+			want:  0,
+		},
+	}
+
+	c := converters{}
+	for _, tt := range tests {
+		if got := c.leastSignificantDigits(tt.input, tt.max); got != tt.want {
+			t.Errorf("rightmost digits: want %d, got %d", tt.want, got)
+		}
+	}
+}

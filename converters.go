@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"math"
 	"strconv"
 	"strings"
 )
@@ -80,4 +81,9 @@ func (c *converters) stringField(s string, max uint) string {
 	}
 	s = strings.Repeat("0", int(max-ln)) + s
 	return s
+}
+
+// leastSignificantDigits returns the least significant digits of v limited by maxDigits.
+func (c *converters) leastSignificantDigits(v int, maxDigits uint) int {
+	return v % int(math.Pow10(int(maxDigits)))
 }
