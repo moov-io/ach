@@ -23,15 +23,14 @@ import (
 	"strings"
 )
 
-// A Writer writes an ach.file to a NACHA encoded file.
-//
-// As returned by NewWriter, a Writer writes ach.file structs into
-// NACHA formatted files.
-//
+// Writer writes a File to an io.Writer.
+// The File is validated against Nacha guidelines unless BypassValidation is enabled.
 type Writer struct {
 	w          *bufio.Writer
 	lineNum    int    //current line being written
 	LineEnding string // configurable line ending to support different consumer requirements
+	// BypassValidation can be set to skip file validation and will allow non-compliant Nacha files to be written.
+	BypassValidation bool
 }
 
 // NewWriter returns a new Writer that writes to w.
@@ -44,8 +43,10 @@ func NewWriter(w io.Writer) *Writer {
 
 // Writer writes a single ach.file record to w
 func (w *Writer) Write(file *File) error {
-	if err := file.Validate(); err != nil {
-		return err
+	if !w.BypassValidation {
+		if err := file.Validate(); err != nil {
+			return err
+		}
 	}
 
 	w.lineNum = 0
