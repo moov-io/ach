@@ -34,7 +34,22 @@ In Ruby we have an example of [creating an ACH file from JSON](https://github.co
 
 We have [example ACH files](https://github.com/moov-io/ach/blob/master/test/testdata/ppd-valid.json) in JSON.
 
-Note: The header `Content-Type: application/json` must be set.
+Note: The header `Content-Type: application/json` must be set to parse the file as JSON, otherwise Nacha's format will be assumed.
+
+### Validate Options
+
+When creating a file the server supports query parameters for setting `ValidateOpts` values.
+
+Example: `POST /files/create?requireABAOrigin=true&bypassDestination=true`
+
+| Query Param | Validation Option |
+|-----|-----|
+| `allowZeroBatches` | `AllowZeroBatches`
+| `bypassCompanyIdentificationMatch` | `BypassCompanyIdentificationMatch` |
+| `bypassDestination` | `BypassDestinationValidation` |
+| `bypassOrigin` | `BypassOriginValidation` |
+| `customTraceNumbers` | `CustomTraceNumbers` |
+| `requireABAOrigin` | `RequireABAOrigin` |
 
 ## Upload a raw ACH file
 
