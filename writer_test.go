@@ -726,3 +726,15 @@ func testWriteWithCustomLineEnding(t testing.TB) {
 func TestWriteWithCustomLineEnding(t *testing.T) {
 	testWriteWithCustomLineEnding(t)
 }
+
+func TestWriteBypassValidation(t *testing.T) {
+	file := mockFilePPD()
+	file.Header.recordType = "" // make the file fail Nacha validation
+
+	writer := NewWriter(&bytes.Buffer{})
+	writer.BypassValidation = true
+
+	if err := writer.Write(file); err != nil {
+		t.Fatal(err)
+	}
+}
