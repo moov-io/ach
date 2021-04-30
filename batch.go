@@ -280,7 +280,7 @@ func ConvertBatchType(b Batch) Batcher {
 // setting any posting dates, sequence numbers, counts, and sums.
 //
 // Create implementations are free to modify computable fields in a file and should
-// call the Batch's Validate() function at the end of their execution.
+// call the Batch's Validate function at the end of their execution.
 func (batch *Batch) Create() error {
 	return errors.New("use an implementation of batch or NewBatch")
 }
@@ -767,7 +767,7 @@ func (batch *Batch) calculateEntryHash() int {
 		}
 	}
 
-	// This follows what is done in BatchControl.Parse()
+	// This follows what is done in BatchControl.Parse
 	// EntryHash is essentially the sum of all the RDFI routing numbers in the batch. If the sum exceeds 10 digits
 	// (because you have lots of Entry Detail Records), lop off the most significant digits of the sum until there
 	// are only 10.

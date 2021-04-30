@@ -64,7 +64,7 @@ func NewAddenda15() *Addenda15 {
 
 // Parse takes the input record string and parses the Addenda15 values
 //
-// Parse provides no guarantee about all fields being filled in. Callers should make a Validate() call to confirm successful parsing and data validity.
+// Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
 func (addenda15 *Addenda15) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return

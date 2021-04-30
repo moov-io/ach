@@ -53,7 +53,7 @@ type FileControl struct {
 
 // Parse takes the input record string and parses the FileControl values
 //
-// Parse provides no guarantee about all fields being filled in. Callers should make a Validate() call to confirm successful parsing and data validity.
+// Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
 func (fc *FileControl) Parse(record string) {
 	if utf8.RuneCountInString(record) < 55 {
 		return

@@ -121,7 +121,7 @@ func NewADVEntryDetail() *ADVEntryDetail {
 }
 
 // Parse takes the input record string and parses the ADVEntryDetail values
-// Parse provides no guarantee about all fields being filled in. Callers should make a Validate() call to confirm
+// Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm
 // successful parsing and data validity.
 
 // Parse ADVEntryDetail

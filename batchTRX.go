@@ -88,7 +88,7 @@ func (batch *BatchTRX) Validate() error {
 // setting any posting dates, sequence numbers, counts, and sums.
 //
 // Create implementations are free to modify computable fields in a file and should
-// call the Batch's Validate() function at the end of their execution.
+// call the Batch's Validate function at the end of their execution.
 func (batch *BatchTRX) Create() error {
 	// generates sequence numbers and batch control
 	if err := batch.build(); err != nil {

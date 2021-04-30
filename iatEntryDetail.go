@@ -76,7 +76,7 @@ type IATEntryDetail struct {
 	// in the associated Entry Detail Record, since the Trace Number is associated
 	// with an entry or item rather than a physical record.
 	//
-	// Use TraceNumberField() for a properly formatted string representation.
+	// Use TraceNumberField for a properly formatted string representation.
 	TraceNumber string `json:"traceNumber,omitempty"`
 	// Addenda10 is mandatory for IAT entries
 	//
@@ -147,7 +147,7 @@ func NewIATEntryDetail() *IATEntryDetail {
 
 // Parse takes the input record string and parses the EntryDetail values
 //
-// Parse provides no guarantee about all fields being filled in. Callers should make a Validate() call to confirm successful parsing and data validity.
+// Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
 func (iatEd *IATEntryDetail) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
