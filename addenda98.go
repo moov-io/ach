@@ -46,7 +46,7 @@ type Addenda98 struct {
 	CorrectedData string `json:"correctedData"`
 	// TraceNumber matches the Entry Detail Trace Number of the entry being returned.
 	//
-	// Use TraceNumberField() for a properly formatted string representation.
+	// Use TraceNumberField for a properly formatted string representation.
 	TraceNumber string `json:"traceNumber,omitempty"`
 
 	// validator is composed for data validation
@@ -83,7 +83,7 @@ func NewAddenda98() *Addenda98 {
 
 // Parse takes the input record string and parses the Addenda98 values
 //
-// Parse provides no guarantee about all fields being filled in. Callers should make a Validate() call to confirm successful parsing and data validity.
+// Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
 func (addenda98 *Addenda98) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return

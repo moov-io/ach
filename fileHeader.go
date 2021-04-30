@@ -41,7 +41,7 @@ type FileHeader struct {
 	// point to which the file is being sent. The ach file format specifies a 10 character
 	// field begins with a blank space in the first position, followed by the four digit
 	// Federal Reserve Routing Symbol, the four digit ABA Institution Identifier, and the Check
-	// Digit (bTTTTAAAAC). ImmediateDestinationField() will append the blank space to the
+	// Digit (bTTTTAAAAC). ImmediateDestinationField will append the blank space to the
 	// routing number.
 	ImmediateDestination string `json:"immediateDestination"`
 
@@ -49,7 +49,7 @@ type FileHeader struct {
 	// point that is sending the file. The ach file format specifies a 10 character
 	// field begins with a blank space in the first position, followed by the four digit
 	// Federal Reserve Routing Symbol, the four digit ABA Institution Identifier, and the Check
-	// Digit (bTTTTAAAAC). ImmediateOriginField() will append the blank space to the
+	// Digit (bTTTTAAAAC). ImmediateOriginField will append the blank space to the
 	// routing number.
 	ImmediateOrigin string `json:"immediateOrigin"`
 
@@ -119,7 +119,7 @@ func NewFileHeader() FileHeader {
 
 // Parse takes the input record string and parses the FileHeader values
 //
-// Parse provides no guarantee about all fields being filled in. Callers should make a Validate() call to confirm successful parsing and data validity.
+// Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
 func (fh *FileHeader) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
@@ -156,7 +156,7 @@ func (fh *FileHeader) Parse(record string) {
 
 func trimRoutingNumberLeadingZero(s string) string {
 	if utf8.RuneCountInString(s) == 10 && s[0] == '0' && s != "0000000000" {
-		// trim off a leading 0 as ImmediateOriginField() or ImmediateDestinationField() will pad it back
+		// trim off a leading 0 as ImmediateOriginField or ImmediateDestinationField will pad it back
 		return strings.TrimSpace(s[1:])
 	}
 	return strings.TrimSpace(s)

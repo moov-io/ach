@@ -59,7 +59,7 @@ type Addenda02 struct {
 	TerminalState string `json:"terminalState"`
 	// TraceNumber Standard Entry Detail Trace Number
 	//
-	// Use TraceNumberField() for a properly formatted string representation.
+	// Use TraceNumberField for a properly formatted string representation.
 	TraceNumber string `json:"traceNumber,omitempty"`
 	// validator is composed for data validation
 	validator
@@ -77,7 +77,7 @@ func NewAddenda02() *Addenda02 {
 
 // Parse takes the input record string and parses the Addenda02 values
 //
-// Parse provides no guarantee about all fields being filled in. Callers should make a Validate() call to confirm successful parsing and data validity.
+// Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
 func (addenda02 *Addenda02) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return

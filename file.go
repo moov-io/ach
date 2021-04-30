@@ -100,7 +100,7 @@ type advFileControl struct {
 //
 // Callers should always check for a nil-error before using the returned file.
 //
-// The File returned may not be valid and callers should confirm with Validate().
+// The File returned may not be valid and callers should confirm with Validate.
 // Invalid files may be rejected by other Financial Institutions or ACH tools.
 //
 // Date and Time fields in formats: RFC 3339 and ISO 8601 will be parsed and rewritten
@@ -419,7 +419,7 @@ func (f *File) Create() error {
 				f.Batches[i].GetControl().BatchNumber = batchSeq
 			}
 			batchSeq++
-			// sum file entry and addenda records. Assume batch.Create() batch properly calculated control
+			// sum file entry and addenda records. Assume batch.Create batch properly calculated control
 			fileEntryAddendaCount = fileEntryAddendaCount + batch.GetControl().EntryAddendaCount
 			// add 2 for Batch header/control + entry added count
 			totalRecordsInFile = totalRecordsInFile + 2 + batch.GetControl().EntryAddendaCount
@@ -435,7 +435,7 @@ func (f *File) Create() error {
 				f.IATBatches[i].GetControl().BatchNumber = batchSeq
 			}
 			batchSeq++
-			// sum file entry and addenda records. Assume batch.Create() batch properly calculated control
+			// sum file entry and addenda records. Assume batch.Create batch properly calculated control
 			fileEntryAddendaCount = fileEntryAddendaCount + iatBatch.GetControl().EntryAddendaCount
 			// add 2 for Batch header/control + entry added count
 			totalRecordsInFile = totalRecordsInFile + 2 + iatBatch.GetControl().EntryAddendaCount
@@ -801,7 +801,7 @@ func (f *File) createFileADV() error {
 			f.Batches[i].GetADVControl().BatchNumber = batchSeq
 		}
 		batchSeq++
-		// sum file entry and addenda records. Assume batch.Create() batch properly calculated control
+		// sum file entry and addenda records. Assume batch.Create batch properly calculated control
 		fileEntryAddendaCount = fileEntryAddendaCount + batch.GetADVControl().EntryAddendaCount
 		// add 2 for Batch header/control + entry added count
 		totalRecordsInFile = totalRecordsInFile + 2 + batch.GetADVControl().EntryAddendaCount
@@ -836,7 +836,7 @@ func (f *File) createFileADV() error {
 // Error - Error or Nil
 // Callers should always check for a nil-error before using the returned file.
 //
-// The File returned may not be valid and callers should confirm with Validate(). Invalid files may
+// The File returned may not be valid and callers should confirm with Validate. Invalid files may
 // be rejected by other Financial Institutions or ACH tools.
 func (f *File) SegmentFile(_ *SegmentFileConfiguration) (*File, *File, error) {
 	if err := f.Validate(); err != nil {

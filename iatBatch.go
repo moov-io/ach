@@ -534,7 +534,7 @@ func (iatBatch *IATBatch) addendaFieldInclusion(entry *IATEntryDetail) error {
 // setting any posting dates, sequence numbers, counts, and sums.
 //
 // Create implementations are free to modify computable fields in a file and should
-// call the Batch's Validate() function at the end of their execution.
+// call the Batch's Validate function at the end of their execution.
 func (iatBatch *IATBatch) Create() error {
 	// generates sequence numbers and batch control
 	if err := iatBatch.build(); err != nil {
