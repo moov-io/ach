@@ -35,7 +35,7 @@ func TestIssue915(t *testing.T) {
 	for i := range file.Batches {
 		entries := file.Batches[i].GetEntries()
 		if n := len(entries); n != 1 {
-			t.Errorf("Batch[%d] has %d batches", i, n)
+			t.Errorf("Batch[%d] has %d entries", i, n)
 		}
 	}
 }
