@@ -21,9 +21,13 @@ var (
 	flagDiff     = flag.Bool("diff", false, "Compare two files against each other")
 	flagFlatten  = flag.Bool("flatten", false, "Flatten batches in each file")
 	flagMerge    = flag.Bool("merge", false, "Merge files before describing")
+	flagMask     = flag.Bool("mask", false, "Mask/redact full account numbers")
 	flagReformat = flag.String("reformat", "", "Reformat an incoming ACH file to another format")
 
-	flagMask = flag.Bool("mask", false, "Mask/hide full account numbers")
+	// todo: add dry-run option to print to stdout
+	// todo: add file output option; flagOutput = flag.String("output", "", "output file")
+	flagRedact = flag.Bool("redact", false, "redact stuff")
+	flagDryRun = flag.Bool("dry-run", false, "dry run to print to stdout")
 
 	programName = filepath.Base(os.Args[0])
 )
@@ -66,6 +70,7 @@ func main() {
 	case *flagDiff && len(args) != 2:
 		fmt.Printf("with -diff exactly two files are expected, found %d files\n", len(args))
 		os.Exit(1)
+		//todo: add redact here
 	}
 
 	// minor debugging
@@ -83,6 +88,12 @@ func main() {
 
 	case *flagReformat != "" && len(args) == 1:
 		if err := reformat(*flagReformat, args[0]); err != nil {
+			fmt.Printf("ERROR: %v\n", err)
+			os.Exit(1)
+		}
+
+	case *flagRedact:
+		if err := redact(args, *flagDryRun); err != nil {
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)
 		}

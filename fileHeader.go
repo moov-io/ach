@@ -86,7 +86,7 @@ type FileHeader struct {
 	// currently defined, this field will contain a value of "1".
 	formatCode string
 
-	// ImmediateDestinationName us the name of the ACH or receiving point for which that
+	// ImmediateDestinationName is the name of the ACH or receiving point for which that
 	// file is destined. Name corresponding to the ImmediateDestination
 	ImmediateDestinationName string `json:"immediateDestinationName"`
 

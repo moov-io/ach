@@ -29,9 +29,10 @@ import (
 // NACHA formatted files.
 //
 type Writer struct {
-	w          *bufio.Writer
-	lineNum    int    //current line being written
-	LineEnding string // configurable line ending to support different consumer requirements
+	w                *bufio.Writer
+	lineNum          int    //current line being written
+	LineEnding       string // configurable line ending to support different consumer requirements
+	BypassValidation bool
 }
 
 // NewWriter returns a new Writer that writes to w.
@@ -44,8 +45,10 @@ func NewWriter(w io.Writer) *Writer {
 
 // Writer writes a single ach.file record to w
 func (w *Writer) Write(file *File) error {
-	if err := file.Validate(); err != nil {
-		return err
+	if !w.BypassValidation {
+		if err := file.Validate(); err != nil {
+			return err
+		}
 	}
 
 	w.lineNum = 0
