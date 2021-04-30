@@ -789,9 +789,9 @@ func TestFiles__CreateFileEndpoint(t *testing.T) {
 	f.SetHeader(*mockFileHeader())
 	f.SetValidation(&ach.ValidateOpts{CustomTraceNumbers: true})
 
-	for i := 0; i < 3; i++ {
+	for i := 0; i < 12; i++ {
 		b := mockBatchWEB()
-		b.SetValidation(&ach.ValidateOpts{CustomTraceNumbers: true})
+		//b.SetValidation(&ach.ValidateOpts{CustomTraceNumbers: true})
 		b.Entries[0].SetTraceNumber("12345678", i+1)
 		if err := b.Create(); err != nil {
 			panic(err)

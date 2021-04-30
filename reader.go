@@ -263,11 +263,12 @@ func (r *Reader) parseLine() error {
 		}
 		if r.currentBatch != nil {
 			r.currentBatch.SetValidation(r.File.validateOpts)
+			r.File.AddBatch(r.currentBatch)
 			if err := r.currentBatch.Validate(); err != nil {
 				r.recordName = "Batches"
+				r.currentBatch = nil
 				return r.parseError(err)
 			}
-			r.File.AddBatch(r.currentBatch)
 			r.currentBatch = nil
 		} else {
 			if err := r.IATCurrentBatch.Validate(); err != nil {
