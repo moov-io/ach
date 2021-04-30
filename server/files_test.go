@@ -784,49 +784,40 @@ func TestFiles__CreateFileEndpoint(t *testing.T) {
 	svc := NewService(repo)
 	router := MakeHTTPHandler(svc, repo, logger)
 
-	testCases := []struct {
-		filename           string
-		queryParams        string
-		expectedStatusCode int
-	}{
-		{
-			filename:           "ppd-debit.ach",
-			queryParams:        "",
-			expectedStatusCode: http.StatusOK,
-		},
-		{
-			filename:           "ppd-debit-customTraceNumber.ach",
-			queryParams:        "?bypassOrigin=true",
-			expectedStatusCode: http.StatusOK,
-		},
-		{
-			filename:           "ppd-debit-customTraceNumber.ach",
-			queryParams:        "?bypassOrigin=false",
-			expectedStatusCode: http.StatusBadRequest,
-		},
+	// write an ACH file into repository
+	f := ach.NewFile()
+	f.SetHeader(*mockFileHeader())
+	f.SetValidation(&ach.ValidateOpts{CustomTraceNumbers: true})
+
+	for i := 0; i < 3; i++ {
+		b := mockBatchWEB()
+		b.SetValidation(&ach.ValidateOpts{CustomTraceNumbers: true})
+		b.Entries[0].SetTraceNumber("12345678", i+1)
+		if err := b.Create(); err != nil {
+			panic(err)
+		}
+		f.AddBatch(b)
 	}
 
-	for _, tc := range testCases {
-		// write an ACH file into repository
-		fd, err := os.Open(filepath.Join("..", "test", "testdata", tc.filename))
-		if fd == nil {
-			t.Fatalf("empty ACH file: %v", err)
-		}
-		defer fd.Close()
-
-		// test status code
-		w := httptest.NewRecorder()
-		req := httptest.NewRequest("POST", fmt.Sprintf("/files/create%s", tc.queryParams), fd)
-		req.Header.Set("Origin", "https://moov.io")
-		req.Header.Set("X-Request-Id", "11114")
-
-		router.ServeHTTP(w, req)
-		w.Flush()
-
-		if w.Code != tc.expectedStatusCode {
-			t.Errorf("HTTP status code: want %d, got %d", tc.expectedStatusCode, w.Code)
-		}
+	if err := f.Create(); err != nil {
+		panic(err)
 	}
+
+	var buf bytes.Buffer
+	r := ach.NewWriter(&buf)
+	err := r.Write(f)
+	if err != nil {
+		panic(err)
+	}
+
+	// test status code
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", fmt.Sprintf("/files/create"), &buf)
+	req.Header.Set("Origin", "https://moov.io")
+	req.Header.Set("X-Request-Id", "11114")
+
+	router.ServeHTTP(w, req)
+	w.Flush()
 }
 
 func TestFiles__CreateFileWithZeroBatches(t *testing.T) {
