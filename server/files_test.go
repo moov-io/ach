@@ -146,6 +146,12 @@ func TestFiles__decodeCreateFileRequest__validateOpts(t *testing.T) {
 				BypassDestinationValidation: true,
 			},
 		},
+		{
+			query: "?customTraceNumbers=true",
+			expect: ach.ValidateOpts{
+				CustomTraceNumbers: true,
+			},
+		},
 	}
 
 	for _, tc := range tests {
