@@ -262,20 +262,22 @@ func (r *Reader) parseLine() error {
 			return err
 		}
 		if r.currentBatch != nil {
-			r.currentBatch.SetValidation(r.File.validateOpts)
-			if err := r.currentBatch.Validate(); err != nil {
-				r.recordName = "Batches"
-				return r.parseError(err)
-			}
-			r.File.AddBatch(r.currentBatch)
+			batch := r.currentBatch
 			r.currentBatch = nil
-		} else {
-			if err := r.IATCurrentBatch.Validate(); err != nil {
+			batch.SetValidation(r.File.validateOpts)
+			r.File.AddBatch(batch)
+			if err := batch.Validate(); err != nil {
 				r.recordName = "Batches"
 				return r.parseError(err)
 			}
-			r.File.AddIATBatch(r.IATCurrentBatch)
+		} else {
+			batch := r.IATCurrentBatch
 			r.IATCurrentBatch = IATBatch{}
+			r.File.AddIATBatch(batch)
+			if err := batch.Validate(); err != nil {
+				r.recordName = "Batches"
+				return r.parseError(err)
+			}
 		}
 	case fileControlPos:
 		if r.line[:2] == "99" {
