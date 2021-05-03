@@ -1,4 +1,24 @@
-## v1.7.1 (Released 2020-04-16)
+## v1.8.0 (Released 2021-05-03)
+
+BUG FIXES
+
+- reader: reset the `currentBatch` when a `BatchControl` is read to avoid setting EntryDetail records in the wrong batch
+- file: force a 10-digit entry hash in `File.Create` and `File.calculateEntryHash` to ensure the file assembled into a valid state
+
+ADDITIONS
+
+- writer: add `BypassValidation` option
+- converters: add method to return the least significant digits of a number
+- server: accept `customTraceNumbers` as a query param to set the corresponding validation option
+
+IMPROVEMENTS
+
+- file: update documentation for `Read`, `Create`, and `Validate/ValidateWith` to clarify behavior
+- docs: describe validation query params on the HTTP request to create a file
+- docs: remove function parentheses from code comments
+- tests: add a regression test for issue #915
+
+## v1.7.1 (Released 2021-04-16)
 
 There are no changes from v1.7.0. This release fixes issues during the release process.
 
