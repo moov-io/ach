@@ -1,3 +1,9 @@
+## v1.8.1 (Released 2021-05-06)
+
+IMPROVEMENTS
+
+- cmd/achcli: include last error message in -reformat
+
 ## v1.8.0 (Released 2021-05-03)
 
 BUG FIXES
