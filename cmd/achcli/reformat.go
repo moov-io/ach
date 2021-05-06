@@ -42,13 +42,15 @@ func reformat(as string, filepath string) error {
 }
 
 func readIncomingFile(path string) (*ach.File, error) {
-	if file, err := readJsonFile(path); file != nil && err == nil {
+	file, err := readJsonFile(path)
+	if file != nil && err == nil {
 		return file, nil
 	}
-	if file, err := readACHFile(path); file != nil && err == nil {
+	file, err = readACHFile(path)
+	if file != nil && err == nil {
 		return file, nil
 	}
-	return nil, fmt.Errorf("unable to read %s", path)
+	return nil, fmt.Errorf("unable to read %s:\n %v", path, err)
 }
 
 func readJsonFile(path string) (*ach.File, error) {
