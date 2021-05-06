@@ -583,7 +583,7 @@ components:
           type: string
           maxLength: 10
           minLength: 9
-          example: "69100013"
+          example: "691000134"
           description: contains the Routing Number of the ACH Operator or receiving point to which the file is being sent
         immediateDestinationName:
           type: string
@@ -739,6 +739,7 @@ components:
             0 ADV File prepared by an ACH Operator.
             1 This code identifies the Originator as a depository financial institution.
             2 This code identifies the Originator as a Federal Government entity or agency.
+          example: 1
         ODFIIdentification:
           description: First 8 digits of the originating DFI transit routing number
           type: string
@@ -747,6 +748,7 @@ components:
           type: integer
           description: |
             BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
+          example: 0
     BatchControl:
       properties:
         ID:
@@ -792,8 +794,9 @@ components:
           type: string
           example: "123456789"
         batchNumber:
-          type: string
+          type: integer
           description: BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
+          example: 0
       required:
         - serviceClassCode 
         - entryAddendaCount
@@ -919,18 +922,18 @@ components:
           description: |
             TerminalIdentificationCode identifies an Electronic terminal with a unique code that allows
             a terminal owner and/or switching network to identify the terminal at which an Entry originated.
-          example: ''
+          example: '200509'
         transactionSerialNumber:
           type: string
           description: |
             TransactionSerialNumber is assigned by the terminal at the time the transaction is originated.  The
             number, with the Terminal Identification Code, serves as an audit trail for the transaction and is
             usually assigned in ascending sequence.
-          example: ''
+          example: '100049'
         transactionDate:
           type: string
           description: MMDD formatted timestamp identifies the date on which the transaction occurred.
-          example: ''
+          example: '1224'
         authorizationCodeOrExpireDate:
           type: string
           description: Indicates the code that a card authorization center has furnished to the merchant.
@@ -1029,7 +1032,7 @@ components:
         foreignTraceNumber:
           type: string
           description: Trace number
-          example: 19846249812
+          example: "19846249812"
         name:
           type: string
           description: Receiving Company Name/Individual Name
@@ -1056,8 +1059,8 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
-          description: 10 - NACHA regulations
-          example: "10"
+          description: 11 - NACHA regulations
+          example: "11"
         originatorName:
           type: string
           description: Originators name (your company name / name)
@@ -1087,8 +1090,8 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
-          description: 10 - NACHA regulations
-          example: "10"
+          description: 12 - NACHA regulations
+          example: "12"
         originatorCityStateProvince:
           type: string
           description: |
@@ -1124,8 +1127,8 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
-          description: 10 - NACHA regulations
-          example: "10"
+          description: 13 - NACHA regulations
+          example: "13"
         ODFIName:
           type: string
           description: |
@@ -1176,8 +1179,8 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
-          description: 10 - NACHA regulations
-          example: "10"
+          description: 14 - NACHA regulations
+          example: "14"
         RDFIName:
           type: string
           description: Name of the Receiver bank
@@ -1229,8 +1232,8 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
-          description: 10 - NACHA regulations
-          example: "10"
+          description: 15 - NACHA regulations
+          example: "15"
         receiverIDNumber:
           type: string
           description: |
@@ -1260,8 +1263,8 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
-          description: 10 - NACHA regulations
-          example: "10"
+          description: 16 - NACHA regulations
+          example: "16"
         receiverCityStateProvince:
           type: string
           description: |
@@ -1298,8 +1301,8 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
-          description: 10 - NACHA regulations
-          example: "10"
+          description: 17 - NACHA regulations
+          example: "17"
         paymentRelatedInformation:
           type: string
           description: Additional information related to the payment
@@ -1330,8 +1333,8 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
-          description: 10 - NACHA regulations
-          example: "10"
+          description: 18 - NACHA regulations
+          example: "18"
         foreignCorrespondentBankName:
           type: string
           description: Name of the Foreign Correspondent Bank
@@ -1393,11 +1396,11 @@ components:
             OriginalTrace This field contains the Trace Number as originally included on the forward Entry or Prenotification.
             The RDFI must include the Original Entry Trace Number in the Addenda Record of an Entry being returned to an ODFI,
             in the Addenda Record of an 98, within an Acknowledgment Entry, or with an RDFI request for a copy of an authorization.
-          example: 214874812
+          example: "214874812"
         originalDFI:
           type: string
           description: The Receiving DFI Identification (addenda.RDFIIdentification) as originally included on the forward Entry or Prenotification that the RDFI is returning or correcting.
-          example: 98765432
+          example: "98765432"
         correctedData:
           type: string
           description: Correct field value of what ChangeCode references
@@ -1405,7 +1408,7 @@ components:
         traceNumber:
           type: string
           description: Entry Detail Trace Number
-          example: 124782618117
+          example: "124782618117"
       required:
       - typeCode
       - changeCode
@@ -1432,15 +1435,15 @@ components:
             OriginalTrace This field contains the Trace Number as originally included on the forward Entry or Prenotification.
             The RDFI must include the Original Entry Trace Number in the Addenda Record of an Entry being returned to an ODFI,
             in the Addenda Record of an 98, within an Acknowledgment Entry, or with an RDFI request for a copy of an authorization.
-          example: 214874812
+          example: "214874812"
         dateOfDeath:
           type: string
           description: DateOfDeath The field date of death is to be supplied on Entries being returned for reason of death (return reason codes R14 and R15). Format YYMMDD (Y=Year, M=Month, D=Day)
-          example: 200102
+          example: "200102"
         originalDFI:
           type: string
           description: OriginalDFI field contains the Receiving DFI Identification (addenda.RDFIIdentification) as originally included on the forward Entry or Prenotification that the RDFI is returning or correcting.
-          example: 98765432
+          example: "98765432"
         addendaInformation:
           type: string
           description: Information related to the return
@@ -1448,7 +1451,7 @@ components:
         traceNumber:
           type: string
           description: Matches the Entry Detail Trace Number of the entry being returned.
-          example: 214874812
+          example: "214874812"
       required:
         - typeCode
         - returnCode
@@ -1573,7 +1576,7 @@ components:
           description: |
             BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
           type: integer
-          example: 1
+          example: 0
       required:
         - serviceClassCode 
         - standardEntryClassCode
@@ -1642,7 +1645,7 @@ components:
         traceNumber:
           type: string
           description: Matches the Entry Detail Trace Number of the entry being returned.
-          example: 214874812
+          example: "214874812"
         addenda10:
           $ref: '#/components/schemas/Addenda10'
         addenda11:
@@ -1816,8 +1819,9 @@ components:
           type: string
           example: "98765432"
         batchNumber:
-          type: string
+          type: integer
           description: BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
+          example: 0
       required: 
        - serviceClassCode
        - entryAddendaCount
