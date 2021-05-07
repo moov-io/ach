@@ -44,7 +44,8 @@ func TestFiles__decodeCreateFileRequest(t *testing.T) {
 	f := ach.NewFile()
 	f.ID = "foo"
 	f.Header = *mockFileHeader()
-	f.AddBatch(mockBatchWEB())
+	batch := mockBatchWEB()
+	f.AddBatch(batch)
 
 	// Setup our persistence
 	repo := NewRepositoryInMemory(testTTLDuration, log.NewNopLogger())
@@ -77,6 +78,12 @@ func TestFiles__decodeCreateFileRequest(t *testing.T) {
 	}
 	if resp.ID == "" || resp.Err != nil {
 		t.Errorf("id=%q error=%v", resp.ID, resp.Err)
+	}
+
+	// Check stored file state
+	got, _ := svc.GetFile(f.ID)
+	if got.Batches[0].ID() != batch.ID() {
+		t.Fatal(fmt.Sprintf("batch ID: got %v, want %v", got.Batches[0].ID(), batch.ID()))
 	}
 }
 

@@ -36,6 +36,7 @@ func NewBatchENR(bh *BatchHeader) *BatchENR {
 	batch := new(BatchENR)
 	batch.SetControl(NewBatchControl())
 	batch.SetHeader(bh)
+	batch.SetID(bh.ID)
 	return batch
 }
 

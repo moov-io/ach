@@ -27,6 +27,7 @@ func NewBatchPPD(bh *BatchHeader) *BatchPPD {
 	batch := new(BatchPPD)
 	batch.SetControl(NewBatchControl())
 	batch.SetHeader(bh)
+	batch.SetID(bh.ID)
 	return batch
 }
 

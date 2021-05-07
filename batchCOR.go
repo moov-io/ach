@@ -29,6 +29,7 @@ func NewBatchCOR(bh *BatchHeader) *BatchCOR {
 	batch := new(BatchCOR)
 	batch.SetControl(NewBatchControl())
 	batch.SetHeader(bh)
+	batch.SetID(bh.ID)
 	return batch
 }
 

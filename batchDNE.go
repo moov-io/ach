@@ -38,6 +38,7 @@ func NewBatchDNE(bh *BatchHeader) *BatchDNE {
 	batch := new(BatchDNE)
 	batch.SetControl(NewBatchControl())
 	batch.SetHeader(bh)
+	batch.SetID(bh.ID)
 	return batch
 }
 

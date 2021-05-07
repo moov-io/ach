@@ -35,6 +35,7 @@ func NewBatchATX(bh *BatchHeader) *BatchATX {
 	batch := new(BatchATX)
 	batch.SetControl(NewBatchControl())
 	batch.SetHeader(bh)
+	batch.SetID(bh.ID)
 	return batch
 }
 

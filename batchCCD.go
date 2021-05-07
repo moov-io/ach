@@ -29,6 +29,7 @@ func NewBatchCCD(bh *BatchHeader) *BatchCCD {
 	batch := new(BatchCCD)
 	batch.SetControl(NewBatchControl())
 	batch.SetHeader(bh)
+	batch.SetID(bh.ID)
 	return batch
 }
 

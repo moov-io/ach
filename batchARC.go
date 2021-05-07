@@ -39,6 +39,7 @@ func NewBatchARC(bh *BatchHeader) *BatchARC {
 	batch := new(BatchARC)
 	batch.SetControl(NewBatchControl())
 	batch.SetHeader(bh)
+	batch.SetID(bh.ID)
 	return batch
 }
 

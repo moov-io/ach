@@ -29,6 +29,7 @@ func NewBatchTRC(bh *BatchHeader) *BatchTRC {
 	batch := new(BatchTRC)
 	batch.SetControl(NewBatchControl())
 	batch.SetHeader(bh)
+	batch.SetID(bh.ID)
 	return batch
 }
 

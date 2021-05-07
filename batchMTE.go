@@ -36,6 +36,7 @@ func NewBatchMTE(bh *BatchHeader) *BatchMTE {
 	batch := new(BatchMTE)
 	batch.SetControl(NewBatchControl())
 	batch.SetHeader(bh)
+	batch.SetID(bh.ID)
 	return batch
 }
 
