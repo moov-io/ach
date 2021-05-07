@@ -31,6 +31,7 @@ func NewBatchADV(bh *BatchHeader) *BatchADV {
 	batch := new(BatchADV)
 	batch.SetADVControl(NewADVBatchControl())
 	batch.SetHeader(bh)
+	batch.SetID(bh.ID)
 	return batch
 }
 

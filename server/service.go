@@ -91,6 +91,7 @@ func (s *service) CreateFile(fh *ach.FileHeader) (string, error) {
 		f.ID = fh.ID
 		f.Control.ID = fh.ID
 	}
+
 	if err := s.store.StoreFile(f); err != nil {
 		return "", err
 	}

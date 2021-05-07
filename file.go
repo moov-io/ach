@@ -289,6 +289,7 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 			continue
 		}
 		batch := *batches.Batches[i]
+		batch.SetID(batch.Header.ID)
 		batch.Header.recordType = batchHeaderPos
 
 		for _, e := range batch.Entries {
@@ -318,6 +319,7 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 		}
 
 		iatBatch := iatBatches.IATBatches[i]
+		iatBatch.ID = iatBatch.Header.ID
 		iatBatch.Header.recordType = "5"
 		for _, e := range iatBatch.Entries {
 			setIATEntryRecordType(e)

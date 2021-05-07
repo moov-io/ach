@@ -53,6 +53,7 @@ func NewIATBatch(bh *IATBatchHeader) IATBatch {
 	iatBatch := IATBatch{}
 	iatBatch.SetControl(NewBatchControl())
 	iatBatch.SetHeader(bh)
+	iatBatch.ID = bh.ID
 	return iatBatch
 }
 

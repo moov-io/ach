@@ -33,6 +33,7 @@ func NewBatchTRX(bh *BatchHeader) *BatchTRX {
 	batch := new(BatchTRX)
 	batch.SetControl(NewBatchControl())
 	batch.SetHeader(bh)
+	batch.SetID(bh.ID)
 	return batch
 }
 

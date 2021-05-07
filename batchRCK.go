@@ -30,6 +30,7 @@ func NewBatchRCK(bh *BatchHeader) *BatchRCK {
 	batch := new(BatchRCK)
 	batch.SetControl(NewBatchControl())
 	batch.SetHeader(bh)
+	batch.SetID(bh.ID)
 	return batch
 }
 

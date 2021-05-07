@@ -29,6 +29,7 @@ func NewBatchWEB(bh *BatchHeader) *BatchWEB {
 	batch := new(BatchWEB)
 	batch.SetControl(NewBatchControl())
 	batch.SetHeader(bh)
+	batch.SetID(bh.ID)
 	return batch
 }
 

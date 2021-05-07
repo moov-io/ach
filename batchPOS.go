@@ -44,6 +44,7 @@ func NewBatchPOS(bh *BatchHeader) *BatchPOS {
 	batch := new(BatchPOS)
 	batch.SetControl(NewBatchControl())
 	batch.SetHeader(bh)
+	batch.SetID(bh.ID)
 	return batch
 }
 

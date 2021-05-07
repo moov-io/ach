@@ -35,6 +35,7 @@ func NewBatchCIE(bh *BatchHeader) *BatchCIE {
 	batch := new(BatchCIE)
 	batch.SetControl(NewBatchControl())
 	batch.SetHeader(bh)
+	batch.SetID(bh.ID)
 	return batch
 }
 

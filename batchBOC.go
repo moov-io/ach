@@ -44,6 +44,7 @@ func NewBatchBOC(bh *BatchHeader) *BatchBOC {
 	batch := new(BatchBOC)
 	batch.SetControl(NewBatchControl())
 	batch.SetHeader(bh)
+	batch.SetID(bh.ID)
 	return batch
 }
 
