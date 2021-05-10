@@ -26,7 +26,11 @@ const NACHAFileLineLimit = 10000
 
 // MergeFiles is a helper function for consolidating an array of ACH Files into as few files
 // as possible. This is useful for optimizing cost and network efficiency.
-// This operation will override batch numbers in each file to ensure they do not collide. The ascending batch numbers will start at 1.
+//
+// This operation will override batch numbers in each file to ensure they do not collide.
+// The ascending batch numbers will start at 1.
+//
+// Duplicate TraceNumbers will not be allowed in the same file. Multiple files will be created.
 //
 // Per NACHA rules files must remain under 10,000 lines (when rendered in their ASCII encoding)
 //
@@ -34,8 +38,9 @@ const NACHAFileLineLimit = 10000
 func MergeFiles(files []*File) ([]*File, error) {
 	fs := &mergableFiles{infiles: files}
 	for i := range fs.infiles {
-		outf := fs.lookupByHeader(fs.infiles[i])
 		for j := range fs.infiles[i].Batches {
+			outf := fs.findOutfile(fs.infiles[i])
+
 			batchExistsInMerged := false
 			for k := range outf.Batches {
 				if fs.infiles[i].Batches[j].Equal(outf.Batches[k]) {
@@ -114,20 +119,41 @@ next:
 	return out
 }
 
-// lookupByHeader optionally returns a File from fs.files if the FileHeaders match.
+// findOutfile optionally returns a File from fs.files if the FileHeaders match.
 // This is done because we append batches into files to minimize the count of output files.
 //
-// lookupByHeader will return the existing file (stored in outfiles) if no matching file exists.
-func (fs *mergableFiles) lookupByHeader(f *File) *File {
-	for i := range fs.outfiles {
-		if fs.outfiles[i].Header.ImmediateDestination == f.Header.ImmediateDestination &&
-			fs.outfiles[i].Header.ImmediateOrigin == f.Header.ImmediateOrigin {
-			// found a matching file, so return it
-			return fs.outfiles[i]
+// findOutfile will return the existing file (stored in outfiles) if no matching file exists.
+func (fs *mergableFiles) findOutfile(f *File) *File {
+	var lookup func(int) *File
+	lookup = func(start int) *File {
+		// To allow recursive lookups we need to memorize the current index so deeper calls
+		// will bypass files with conflicting trace numbers.
+		for i := start; i < len(fs.outfiles); i++ {
+			if fs.outfiles[i].Header.ImmediateDestination == f.Header.ImmediateDestination &&
+				fs.outfiles[i].Header.ImmediateOrigin == f.Header.ImmediateOrigin {
+
+				// found a matching file, so verify the TraceNumber isn't alreay inside
+				outTraceNumbers := getTraceNumbers(fs.outfiles[i])
+				inTraceNumbers := getTraceNumbers(f)
+
+				for j := range inTraceNumbers {
+					// If any of our incoming trace numbers match the existing merged file
+					// return the entire file as separate. This keeps partially overlapping
+					// batches self-contained.
+					if outTraceNumbers.contains(inTraceNumbers[j]) {
+						return lookup(i + 1)
+					}
+				}
+
+				// No conflicting TraceNumber was found, so return current merge file
+				return fs.outfiles[i]
+			}
 		}
+		// Record a newly mergable file we can use in future merge attempts
+		fs.outfiles = append(fs.outfiles, f)
+		return f
 	}
-	fs.outfiles = append(fs.outfiles, f)
-	return f
+	return lookup(0)
 }
 
 func lineCount(f *File) (int, error) {
