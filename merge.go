@@ -41,9 +41,8 @@ func MergeFiles(files []*File) ([]*File, error) {
 		if fs.infiles[i] == nil {
 			continue // skip nil Files
 		}
+		outf := fs.findOutfile(fs.infiles[i])
 		for j := range fs.infiles[i].Batches {
-			outf := fs.findOutfile(fs.infiles[i])
-
 			batchExistsInMerged := false
 			for k := range outf.Batches {
 				if fs.infiles[i].Batches[j].Equal(outf.Batches[k]) {
