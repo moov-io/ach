@@ -613,23 +613,21 @@ func sortEntriesByTraceNumber(entries []*EntryDetail) []*EntryDetail {
 	return entries
 }
 
-type traceNumbers []string
+type traceNumbers map[string]struct{}
+
+var traceNumberValue = struct{}{}
 
 func (nums traceNumbers) contains(num string) bool {
-	for i := range nums {
-		if nums[i] == num {
-			return true
-		}
-	}
-	return false
+	_, exists := nums[num]
+	return exists
 }
 
 func getTraceNumbers(f *File) traceNumbers {
-	var out traceNumbers
+	out := make(traceNumbers)
 	for i := range f.Batches {
 		entries := f.Batches[i].GetEntries()
 		for j := range entries {
-			out = append(out, entries[j].TraceNumber)
+			out[entries[j].TraceNumber] = traceNumberValue
 		}
 	}
 	return out

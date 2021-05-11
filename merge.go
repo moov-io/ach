@@ -126,6 +126,8 @@ next:
 //
 // findOutfile will return the existing file (stored in outfiles) if no matching file exists.
 func (fs *mergableFiles) findOutfile(f *File) *File {
+	inTraceNumbers := getTraceNumbers(f)
+
 	var lookup func(int) *File
 	lookup = func(start int) *File {
 		// To allow recursive lookups we need to memorize the current index so deeper calls
@@ -136,13 +138,11 @@ func (fs *mergableFiles) findOutfile(f *File) *File {
 
 				// found a matching file, so verify the TraceNumber isn't alreay inside
 				outTraceNumbers := getTraceNumbers(fs.outfiles[i])
-				inTraceNumbers := getTraceNumbers(f)
-
-				for j := range inTraceNumbers {
+				for trace := range inTraceNumbers {
 					// If any of our incoming trace numbers match the existing merged file
 					// return the entire file as separate. This keeps partially overlapping
 					// batches self-contained.
-					if outTraceNumbers.contains(inTraceNumbers[j]) {
+					if outTraceNumbers.contains(trace) {
 						return lookup(i + 1)
 					}
 				}
