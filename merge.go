@@ -38,6 +38,9 @@ const NACHAFileLineLimit = 10000
 func MergeFiles(files []*File) ([]*File, error) {
 	fs := &mergableFiles{infiles: files}
 	for i := range fs.infiles {
+		if fs.infiles[i] == nil {
+			continue // skip nil Files
+		}
 		for j := range fs.infiles[i].Batches {
 			outf := fs.findOutfile(fs.infiles[i])
 
