@@ -25,8 +25,6 @@ import (
 	"unicode/utf8"
 )
 
-// msgServiceClass
-
 // BatchHeader identifies the originating entity and the type of transactions
 // contained in the batch (i.e., the standard entry class, PPD for consumer, CCD
 // or CTX for corporate). This record also contains the effective date, or desired
@@ -211,6 +209,30 @@ func (bh *BatchHeader) String() string {
 	buf.WriteString(bh.ODFIIdentificationField())
 	buf.WriteString(bh.BatchNumberField())
 	return buf.String()
+}
+
+// Equal returns true only if two BatchHeaders are equal.
+// Equality is determined by the Nacha defined fields of each record.
+func (bh *BatchHeader) Equal(other *BatchHeader) bool {
+	if bh.ServiceClassCode != other.ServiceClassCode {
+		return false
+	}
+	if !strings.EqualFold(bh.CompanyName, other.CompanyName) {
+		return false
+	}
+	if bh.CompanyIdentification != other.CompanyIdentification {
+		return false
+	}
+	if bh.StandardEntryClassCode != other.StandardEntryClassCode {
+		return false
+	}
+	if bh.EffectiveEntryDate != other.EffectiveEntryDate {
+		return false
+	}
+	if bh.ODFIIdentification != other.ODFIIdentification {
+		return false
+	}
+	return true
 }
 
 // SetValidation stores ValidateOpts on the BatchHeader which are to be used to override

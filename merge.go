@@ -47,6 +47,13 @@ func MergeFiles(files []*File) ([]*File, error) {
 			for k := range outf.Batches {
 				if fs.infiles[i].Batches[j].Equal(outf.Batches[k]) {
 					batchExistsInMerged = true
+
+					batch, err := mergeEntries(outf.Batches[k], fs.infiles[i].Batches[j])
+					if err != nil {
+						return nil, err
+					}
+					outf.Batches[k] = batch
+					break
 				}
 			}
 			if !batchExistsInMerged {
@@ -66,7 +73,7 @@ func MergeFiles(files []*File) ([]*File, error) {
 					f := *outf
 					fs.locMaxed = append(fs.locMaxed, &f)
 
-					outf = fs.create(outf) // replace output file with the one we just created
+					outf = fs.swapLocMaxedFile(outf) // replace output file with the one we just created
 
 					outf.AddBatch(fs.infiles[i].Batches[j])
 					if err := outf.Create(); err != nil {
@@ -85,9 +92,16 @@ func MergeFiles(files []*File) ([]*File, error) {
 		for i, b := range f.Batches {
 			b.GetHeader().BatchNumber = i + 1
 			b.GetControl().BatchNumber = i + 1
+			// Tabulate each Batch after combining them
+			if err := b.Create(); err != nil {
+				return out, err
+			}
+		}
+		// Tabulate the files before returning them
+		if err := f.Create(); err != nil {
+			return out, err
 		}
 	}
-
 	return out, nil
 }
 
@@ -97,8 +111,9 @@ type mergableFiles struct {
 	locMaxed []*File
 }
 
-// create returns the index of a newly created file in fs.outfiles given the details from f.Header
-func (fs *mergableFiles) create(f *File) *File { // returns the outfiles index of the created file
+// swapLocMaxedFile replaces an ACH file that is over the Nacha line limit with an empty file containing
+// a matching FileHeader record. This allows future iterations inside of MergeFiles to append
+func (fs *mergableFiles) swapLocMaxedFile(f *File) *File {
 	now := time.Now()
 
 	// remove the current file from outfiles
@@ -151,11 +166,27 @@ func (fs *mergableFiles) findOutfile(f *File) *File {
 				return fs.outfiles[i]
 			}
 		}
-		// Record a newly mergable file we can use in future merge attempts
-		fs.outfiles = append(fs.outfiles, f)
-		return f
+		// Record a newly mergable File/FileHeader we can use in future merge attempts
+		outf := NewFile()
+		outf.Header = f.Header
+		outf.Control = f.Control
+		fs.outfiles = append(fs.outfiles, outf)
+		return outf
 	}
 	return lookup(0)
+}
+
+func mergeEntries(b1, b2 Batcher) (Batcher, error) {
+	b, _ := NewBatch(b1.GetHeader())
+	entries := sortEntriesByTraceNumber(append(b1.GetEntries(), b2.GetEntries()...))
+	for i := range entries {
+		b.AddEntry(entries[i])
+	}
+	b.SetControl(b1.GetControl())
+	if err := b.Create(); err != nil {
+		return nil, err
+	}
+	return b, nil
 }
 
 func lineCount(f *File) (int, error) {

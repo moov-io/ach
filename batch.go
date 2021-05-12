@@ -1021,23 +1021,7 @@ func (batch *Batch) Equal(other Batcher) bool {
 	if batch == nil || other == nil || batch.Header == nil || other.GetHeader() == nil {
 		return false
 	}
-	ohead := other.GetHeader()
-	if batch.Header.ServiceClassCode != ohead.ServiceClassCode {
-		return false
-	}
-	if !strings.EqualFold(batch.Header.CompanyName, ohead.CompanyName) {
-		return false
-	}
-	if batch.Header.CompanyIdentification != ohead.CompanyIdentification {
-		return false
-	}
-	if batch.Header.StandardEntryClassCode != ohead.StandardEntryClassCode {
-		return false
-	}
-	if batch.Header.EffectiveEntryDate != ohead.EffectiveEntryDate {
-		return false
-	}
-	if batch.Header.ODFIIdentification != ohead.ODFIIdentification {
+	if !batch.Header.Equal(other.GetHeader()) {
 		return false
 	}
 	oentries := other.GetEntries()
