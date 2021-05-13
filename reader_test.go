@@ -51,6 +51,20 @@ func TestReadFile(t *testing.T) {
 	}
 }
 
+func TestReadFiles(t *testing.T) {
+	paths := []string{
+		filepath.Join("test", "testdata", "return-WEB.ach"),
+		filepath.Join("test", "testdata", "web-debit.ach"),
+	}
+	files, err := ReadFiles(paths)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n := len(files); n != 2 {
+		t.Fatalf("read %d files", n)
+	}
+}
+
 func TestReadPartial(t *testing.T) {
 	file, err := ReadFile(filepath.Join("test", "testdata", "bh-ed-ad-bh-ed-ad-ed-ad.ach"))
 	if err != nil {
