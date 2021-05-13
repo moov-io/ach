@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"math/rand"
 	"path/filepath"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -289,25 +290,41 @@ func TestMergeFiles__splitFiles(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Merge our big file into another file and verify we get two back
-	// TODO(adam): We should probably recurse back on `file` to ensure we don't exceed the
-	// 10k line limit. That shouldn't happen as MergeFiles processes one batch at a time, but
-	// an incoming file might be invalid in that way.
+	traceNumbersBefore := countTraceNumbers(file, f2, f3)
+
 	out, err := MergeFiles([]*File{file, f2, f3})
-	if err != nil || len(out) != 2 {
+	if err != nil || len(out) != 1 {
 		t.Fatalf("got %d files, error=%v", len(out), err)
 	}
-	if len(out[0].Batches) != 4001 || len(out[1].Batches) != 5 {
-		// These batch counts will change when we recurse back through out[0]
-		// so it doesn't exceed the 10k line limit.
-		t.Errorf("out[0].Batches:%d out[1].Batches:%d", len(out[0].Batches), len(out[1].Batches))
+	if n := len(out[0].Batches); n != 2006 {
+		t.Fatalf("out[0] has %d batches", n)
+	}
+
+	traceNumbersAfter := countTraceNumbers(out...)
+	if traceNumbersBefore != traceNumbersAfter {
+		t.Fatalf("found %d of %d trace numbers", traceNumbersBefore, traceNumbersAfter)
 	}
 
 	for _, f := range out {
 		if err := f.Validate(); err != nil {
 			t.Fatalf("invalid file: %v", err)
 		}
+		min, err := f.FlattenBatches()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := min.Validate(); err != nil {
+			t.Fatal(err)
+		}
 	}
+}
+
+func countTraceNumbers(files ...*File) int {
+	var total int
+	for i := range files {
+		total += len(getTraceNumbers(files[i]))
+	}
+	return total
 }
 
 func TestMergeFiles__invalid(t *testing.T) {
@@ -333,6 +350,7 @@ func populateFileWithMockBatches(t *testing.T, numBatches int, file *File) {
 	lastBatchIdx := len(file.Batches) - 1
 	var startSeq = file.Batches[lastBatchIdx].GetHeader().BatchNumber + 1
 	var entryDetail = file.Batches[0].GetEntries()[0]
+
 	for i := startSeq; i < (numBatches + startSeq); i++ {
 		header := mockBatchHeader()
 		header.StandardEntryClassCode = "PPD"
@@ -346,7 +364,11 @@ func populateFileWithMockBatches(t *testing.T, numBatches int, file *File) {
 			t.Fatal(err)
 		}
 
-		batch.AddEntry(entryDetail)
+		ed := *entryDetail
+		n, _ := strconv.Atoi(ed.TraceNumber)
+		ed.TraceNumber = strconv.Itoa(n + i + 1e5)
+		batch.AddEntry(&ed)
+
 		batch.GetHeader().BatchNumber = i
 		batch.GetControl().BatchNumber = i
 
