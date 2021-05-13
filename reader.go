@@ -114,7 +114,7 @@ func ReadFile(path string) (*File, error) {
 }
 
 // ReadFiles attempts to open files at the given paths and read the contents
-// of each before closing and returning the parsed ACH File.
+// of each before closing and returning the parsed ACH Files.
 func ReadFiles(paths []string) ([]*File, error) {
 	var out []*File
 	for i := range paths {
