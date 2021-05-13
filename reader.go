@@ -100,8 +100,8 @@ func (r *Reader) SetValidation(opts *ValidateOpts) {
 	r.File.SetValidation(opts)
 }
 
-// ReadFile attempts to open an os.File at path and read the entire file
-// before closing it and returning the parse result.
+// ReadFile attempts to open a file at path and read the contents before closing
+// and returning the parsed ACH File.
 func ReadFile(path string) (*File, error) {
 	fd, err := os.Open(path)
 	if err != nil {
@@ -111,6 +111,22 @@ func ReadFile(path string) (*File, error) {
 
 	file, err := NewReader(fd).Read()
 	return &file, err
+}
+
+// ReadFiles attempts to open files at the given paths and read the contents
+// of each before closing and returning the parsed ACH Files.
+func ReadFiles(paths []string) ([]*File, error) {
+	var out []*File
+	for i := range paths {
+		file, err := ReadFile(paths[i])
+		if err != nil {
+			return nil, err
+		}
+		if file != nil {
+			out = append(out, file)
+		}
+	}
+	return out, nil
 }
 
 // NewReader returns a new ACH Reader that reads from r.
