@@ -1,3 +1,23 @@
+## v1.9.0 (Released 2021-05-13)
+
+ADDITIONS
+
+- reader: add `ReadFiles(...)` method for consuming a slice of filepaths (#932)
+
+BUG FIXES
+
+- set batchID from header on POST to create file (#926)
+
+IMPROVEMENTS
+
+- merge: combine entries together when Batch Headers match
+- merge: don't include TraceNumbers that collide in merged files
+
+BUILD
+
+- build(deps): bump kramdown from 2.3.0 to 2.3.1 in /docs
+- fix(deps): update module github.com/moov-io/base to v0.19.0 (#929)
+
 ## v1.8.1 (Released 2021-05-06)
 
 IMPROVEMENTS
