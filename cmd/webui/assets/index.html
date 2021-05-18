@@ -48,10 +48,10 @@
             gap: 1rem;
             height: 100%;
         }
-        [id="jsoninput"] {
+        [id="contentinput"] {
             grid-area: input;
         }
-        [id="jsonoutput"] {
+        [id="contentoutput"] {
             grid-area: output;
         }
         header {
@@ -95,15 +95,18 @@
         <svg class="logo" viewBox="0 0 113 33" xmlns="http://www.w3.org/2000/svg"><title>Moov</title><path d="m30.5593 4.18774h-29.71722c-.454013 0-.8254784.36365-.8254784.8081v23.05086c0 .5455.3508294.9091.8461174.9091h8.977081c.454 0 .8255-.3636.8255-.8081v-18.18208c0-.16162.1444-.30304.3095-.30304h1.8574c.1651 0 .3095.14142.3095.30304v18.18208c0 .4445.3715.8081.8255.8081h6.3768c.454 0 .8255-.3636.8255-.8081v-18.18208c0-.16162.1445-.30304.3095-.30304h1.878c.1651 0 .3096.14142.3096.30304v18.18208c0 .4445.3714.8081.8254.8081h9.0184c.454 0 .8255-.3636.8255-.8081v-19.89928c.0619-2.42429-1.4446-4.06068-3.7766-4.06068z"/><path d="m112.055 4.18774h-9.019c-.454 0-.825.36365-.825.8081v18.18216c0 .1616-.145.303-.31.303h-1.857c-.1652 0-.3096-.1414-.3096-.303v-18.18216c0-.44445-.3715-.8081-.8255-.8081h-9.0184c-.5159 0-.8461.36365-.8461.90911v8.06075c0 .0808 0 .1616.0207.2424l2.5177 12.8487c.3095 1.5758.9905 2.7071 2.559 2.7071h13.7032c1.568 0 2.249-1.1313 2.559-2.7071l2.517-12.8487c.021-.0808.021-.1616.021-.2424v-8.06075c-.041-.54546-.392-.90911-.887-.90911z"/><path d="m56.7682 4.18774h-16.2c-2.3526 0-3.8385 1.61619-3.8385 4.06068v16.64678c0 2.4444 1.4859 4.0606 3.8385 4.0606h16.2c2.3526 0 3.8385-1.6162 3.8385-4.0606v-16.64678c0-2.42429-1.4859-4.06068-3.8385-4.06068zm-6.8515 19.01046c0 .1616-.1444.303-.3095.303h-1.8573c-.1651 0-.3096-.1414-.3096-.303v-13.23258c0-.16162.1445-.30304.3096-.30304h1.8573c.1651 0 .3095.14142.3095.30304z"/><path d="m82.9979 4.18774h-16.2c-2.3526 0-3.8384 1.61619-3.8384 4.06068v16.64678c0 2.4444 1.4858 4.0606 3.8384 4.0606h16.2c2.3527 0 3.8385-1.6162 3.8385-4.0606v-16.64678c0-2.42429-1.4858-4.06068-3.8385-4.06068zm-6.8514 19.01046c0 .1616-.1445.303-.3096.303h-1.8573c-.1651 0-.3095-.1414-.3095-.303v-13.23258c0-.16162.1444-.30304.3095-.30304h1.8573c.1651 0 .3096.14142.3096.30304z"/></svg>
         <h1>ACH File Parser</h3>
             <p>
-                This tool converts ACH files into their JSON definition using Moov's <a href="https://github.com/moov-io/ach">ACH library</a>. Paste an ACH file on the left and the equivalent JSON will be generated to the right.
+                This tool converts ACH files into their JSON definition or a human-readable format using Moov's <a href="https://github.com/moov-io/ach">ACH library</a>. Paste an ACH file on the left and the formatted version will be generated to the right.
+            </p>
+            <p>
                 For an example, try some of our <a href="https://github.com/moov-io/ach/tree/master/test/testdata">test files</a>.
             </p>
     </header>
-    <textarea id="jsoninput" name="jsoninput" cols="80" rows="40" placeholder="Paste your ACH file contents here..." required></textarea>
-    <textarea id="jsonoutput" name="jsonoutput" cols="80" rows="40" readonly></textarea>
+    <textarea id="contentinput" name="contentinput" cols="80" rows="40" placeholder="Paste your ACH file contents here..." required></textarea>
+    <textarea id="contentoutput" name="contentoutput" cols="80" rows="40" readonly></textarea>
     <div id="buttons">
-        <button type="submit" onclick="convertToJson(jsoninput.value)">Parse ACH file</button>
-        <button type="button" onclick="convertToAch(jsoninput.value)">Parse JSON contents</button>
+        <button type="submit" onclick="convertToJson(contentinput.value)">Parse ACH file to JSON</button>
+        <button type="button" onclick="convertToReadable(contentinput.value)">Parse ACH file to human-readable</button>
+        <button type="button" onclick="convertToAch(contentinput.value)">Parse JSON to ACH file</button>
         <button type="submit" onclick="clearForms()">Clear Forms</button>
     </div>
     <div>
@@ -114,22 +117,29 @@
 </body>
 <script>
     const convertToJson = function(input) {
-        jsonoutput.value = parseACH(input)
-        jsonoutput.setSelectionRange(0,0)
-        jsonoutput.focus()
+        contentoutput.value = parseACH(input)
+        contentoutput.setSelectionRange(0,0)
+        contentoutput.focus()
     }
 
     const convertToAch = function(input) {
-        jsonoutput.value = parseJSON(input)
-        jsonoutput.setSelectionRange(0,0)
-        jsonoutput.focus()
+        contentoutput.value = parseJSON(input)
+        contentoutput.setSelectionRange(0,0)
+        contentoutput.focus()
+    }
+
+    const convertToReadable = function(input) {
+        contentoutput.value = parseReadable(input)
+        contentoutput.setSelectionRange(0,0)
+        contentoutput.focus()
     }
 
     const clearForms = function() {
-        jsoninput.value = ""
-        jsonoutput.value = ""
+        contentinput.value = ""
+        contentoutput.value = ""
         document.getElementById('input-file').value = ''
     }
+
     achform.addEventListener('submit', (event) => {
         event.preventDefault();
     })
@@ -141,7 +151,7 @@
         const input = event.target
         if ('files' in input && input.files.length > 0) {
             placeFileContent(
-                document.getElementById('jsonoutput'),
+                document.getElementById('contentoutput'),
                 input.files[0])
         }
     }
