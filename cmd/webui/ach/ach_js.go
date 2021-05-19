@@ -27,9 +27,8 @@ func parseACH(input string) (string, error) {
 
 func parseReadable(file *ach.File) (string, error) {
 	var buf bytes.Buffer
-	// passing nil for the masking Opts to be
-	// consistent with the JSON output that is not masked
-	describe.File(&buf, file, nil)
+	opts := describe.Opts{MaskNames: false, MaskAccountNumbers: false}
+	describe.File(&buf, file, &opts)
 	return buf.String(), nil
 }
 
@@ -48,7 +47,7 @@ func prettyJson(input string) (string, error) {
 func prettyPrintJSON() js.Func {
 	return js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
 		if len(args) != 1 {
-			return "Invalid no of arguments passed"
+			return "Invalid number of arguments passed"
 		}
 		parsed, err := parseACH(args[0].String())
 		if err != nil {
@@ -69,7 +68,7 @@ func prettyPrintJSON() js.Func {
 func printACH() js.Func {
 	return js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
 		if len(args) != 1 {
-			return "Invalid no of arguments passed"
+			return "Invalid number of arguments passed"
 		}
 		file, err := ach.FileFromJSON([]byte(args[0].String()))
 		if err != nil {
@@ -90,7 +89,7 @@ func printACH() js.Func {
 func printReadable() js.Func {
 	return js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
 		if len(args) != 1 {
-			return "Invalid no of arguments passed"
+			return "Invalid number of arguments passed"
 		}
 		r := strings.NewReader(args[0].String())
 		file, err := ach.NewReader(r).Read()
@@ -101,7 +100,7 @@ func printReadable() js.Func {
 		}
 		parsed, err := parseReadable(&file)
 		if err != nil {
-			fmt.Printf("unable to convert ach file to readable format %s\n", err)
+			fmt.Printf("unable to convert ach file to human-readable format %s\n", err)
 			return "There was an error formatting the output"
 		}
 
