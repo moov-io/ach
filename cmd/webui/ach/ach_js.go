@@ -49,6 +49,11 @@ func prettyPrintJSON() js.Func {
 		if len(args) != 1 {
 			return "Invalid number of arguments passed"
 		}
+
+		if json.Valid([]byte(args[0].String())) {
+			return args[0].String()
+		}
+
 		parsed, err := parseACH(args[0].String())
 		if err != nil {
 			msg := fmt.Sprintf("unable to parse ach file: %v", err)
@@ -70,6 +75,11 @@ func printACH() js.Func {
 		if len(args) != 1 {
 			return "Invalid number of arguments passed"
 		}
+
+		if !json.Valid([]byte(args[0].String())) {
+			return args[0].String()
+		}
+
 		file, err := ach.FileFromJSON([]byte(args[0].String()))
 		if err != nil {
 			msg := fmt.Sprintf("unable to parse json ACH file: %v", err)
@@ -91,14 +101,15 @@ func printReadable() js.Func {
 		if len(args) != 1 {
 			return "Invalid number of arguments passed"
 		}
-		r := strings.NewReader(args[0].String())
-		file, err := ach.NewReader(r).Read()
+
+		file, err := parseFile(args[0].String())
 		if err != nil {
 			msg := fmt.Sprintf("unable to parse ach file: %v", err)
 			fmt.Println(msg)
 			return msg
 		}
-		parsed, err := parseReadable(&file)
+
+		parsed, err := parseReadable(file)
 		if err != nil {
 			fmt.Printf("unable to convert ach file to human-readable format %s\n", err)
 			return "There was an error formatting the output"
@@ -106,6 +117,23 @@ func printReadable() js.Func {
 
 		return parsed
 	})
+}
+
+// Parses input, either JSON or Nacha format to an ach.File
+func parseFile(input string) (*ach.File, error) {
+	if json.Valid([]byte(input)) {
+		file, err := ach.FileFromJSON([]byte(input))
+		if err != nil {
+			return nil, err
+		}
+		return file, nil
+	}
+
+	file, err := ach.NewReader(strings.NewReader(input)).Read()
+	if err != nil {
+		return nil, err
+	}
+	return &file, nil
 }
 
 func main() {
