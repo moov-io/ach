@@ -1,3 +1,13 @@
+## v1.9.1 (Released 2021-05-20)
+
+ADDITIONS
+
+- webui: Add human-readable ACH parsing (#933)
+
+BUILD
+
+- build(deps): bump nokogiri from 1.11.3 to 1.11.5 in /docs (#934)
+
 ## v1.9.0 (Released 2021-05-13)
 
 ADDITIONS
