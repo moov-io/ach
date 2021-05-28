@@ -321,6 +321,8 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+        '404':
+          description: A resource with the specified ID was not found
   /files/{fileID}/flatten:
     post:
       tags: ['ACH Files']
@@ -361,6 +363,8 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+        '404':
+          description: A resource with the specified ID was not found
   /files/{fileID}/batches:
     get:
       tags: ['ACH Files']
@@ -428,6 +432,14 @@ paths:
       responses:
         '200':
           description: Batch added to File
+        '400':
+          description: See error in response body
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+        '404':
+          description: A resource with the specified ID was not found
   /files/{fileID}/batches/{batchID}:
     get:
       tags: ['ACH Files']
@@ -689,7 +701,7 @@ components:
       properties:
         ID:
           type: string
-          description: A Client-defined ID used as a reference to this batch
+          description: A client-defined ID used as a reference to this batch
           example: "913b5742"
         serviceClassCode:
           type: integer
