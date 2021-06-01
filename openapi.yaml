@@ -1,6 +1,6 @@
 openapi: 3.0.2
 info:
-  description: Moov ACH ([Automated Clearing House](https://en.wikipedia.org/wiki/Automated_Clearing_House)) implements an HTTP API for creating, parsing and validating ACH files. ACH is the primary method of electronic money movement throughout the United States.
+  description: Moov ACH ([Automated Clearing House](https://en.wikipedia.org/wiki/Automated_Clearing_House)) implements an HTTP API for creating, parsing, and validating ACH files. ACH is the primary method of electronic money movement throughout the United States.
   version: v1
   title: ACH API
   contact:
@@ -16,15 +16,15 @@ servers:
 tags:
   - name: 'ACH Files'
     description: |
-      File contains the structures of a ACH File. It contains one and only one File Header and File Control with at least one Batch.
-      Batch objects within Files hold the Batch Header and Batch Control and all Entry Records and Addenda records for the Batch.
+      File contains the structures of an ACH File. It contains one and only one File Header and File Control with at least one Batch.
+      Batch objects within Files hold the Batch Header and Batch Control and all Entry Records and Addenda Records for the Batch.
 
 paths:
   /ping:
     get:
       tags: ['ACH Files']
       summary: Ping ACH service
-      description: Check the ACH service to check if running
+      description: Check if the ACH service is running.
       operationId: ping
       responses:
         '200':
@@ -33,12 +33,12 @@ paths:
     get:
       tags: ['ACH Files']
       summary: List Files
-      description: List all ACH files created with the ACH service. These files are not persisted through multiple runs of the service.
+      description: List all ACH Files created with the ACH service. These Files are not persisted through multiple runs of the service.
       operationId: getFiles
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional Request ID allows application developer to trace requests through the system's logs
           example: "rs4f9915"
           schema:
             type: string
@@ -63,13 +63,13 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional Request ID allows application developer to trace requests through the system's logs
           example: "rs4f9915"
           schema:
             type: string
         - name: X-Idempotency-Key
           in: header
-          description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy for to not collide with each other in your requests.
+          description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy to not collide with each other in your requests.
           example: "a4f88150"
           required: false
           schema:
@@ -139,7 +139,7 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional Request ID allows application developer to trace requests through the system's logs
           example: "rs4f9915"
           schema:
             type: string
@@ -174,7 +174,7 @@ paths:
             example: "3f2d23ee214"
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional Request ID allows application developer to trace requests through the system's logs
           example: "rs4f9915"
           schema:
             type: string
@@ -188,12 +188,12 @@ paths:
       tags: ['ACH Files']
       summary: Get File Contents
       description: |
-        Assembles the existing file (batches and controls) records, computes sequence numbers and totals. Returns plaintext file.
+        Assembles the existing File (batches and controls) records, computes sequence numbers and totals. Returns plaintext file.
       operationId: getFileContents
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional Request ID allows application developer to trace requests through the system's logs
           example: "rs4f9915"
           schema:
             type: string
@@ -215,12 +215,12 @@ paths:
     get:
       tags: ['ACH Files']
       summary: Validate File
-      description: Validates the existing file. You need only supply the unique File identifier that was returned upon creation.
+      description: Validates the existing File. You need only supply the unique File identifier that was returned upon creation.
       operationId: checkFile
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional Request ID allows application developer to trace requests through the system's logs
           example: "rs4f9915"
           schema:
             type: string
@@ -243,12 +243,12 @@ paths:
     post:
       tags: ['ACH Files']
       summary: Validate File (Custom)
-      description: Validates the existing file. You need only supply the unique File identifier that was returned upon creation.
+      description: Validates the existing File. You need only supply the unique File identifier that was returned upon creation.
       operationId: validateFile
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional Request ID allows application developer to trace requests through the system's logs
           example: "rs4f9915"
           schema:
             type: string
@@ -278,18 +278,18 @@ paths:
     post:
       tags: ['ACH Files']
       summary: Segment File
-      description: Split one file into two. One with only debits and one with only credits.
+      description: Split one File into two. One with only debits and one with only credits.
       operationId: segmentFile
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional Request ID allows application developer to trace requests through the system's logs
           example: "rs4f9915"
           schema:
             type: string
         - name: X-Idempotency-Key
           in: header
-          description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy for to not collide with each other in your requests.
+          description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy to not collide with each other in your requests.
           example: "a4f88150"
           required: false
           schema:
@@ -310,7 +310,7 @@ paths:
       #         $ref: '#/components/schemas/SegmentFileConfiguration'
       responses:
         '200':
-          description: An ID of the new ACH file
+          description: An ID of each new ACH file
           content:
             application/json:
               schema:
@@ -321,22 +321,24 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+        '404':
+          description: A resource with the specified ID was not found
   /files/{fileID}/flatten:
     post:
       tags: ['ACH Files']
       summary: Flatten Batches
-      description: Consolidate batches and entries into the minimum number of batches needed.
+      description: Consolidate Batches and Entries into the minimum number of Batches needed.
       operationId: flattenFile
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional Request ID allows application developer to trace requests through the system's logs
           example: "rs4f9915"
           schema:
             type: string
         - name: X-Idempotency-Key
           in: header
-          description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy for to not collide with each other in your requests.
+          description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy to not collide with each other in your requests.
           example: "a4f88150"
           required: false
           schema:
@@ -361,16 +363,18 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+        '404':
+          description: A resource with the specified ID was not found
   /files/{fileID}/batches:
     get:
       tags: ['ACH Files']
       summary: Get Batches
-      description: Get the batches on a File.
+      description: Get the Batches on a File.
       operationId: getFileBatches
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional Request ID allows application developer to trace requests through the system's logs
           example: "rs4f9915"
           schema:
             type: string
@@ -396,18 +400,18 @@ paths:
     post:
       tags: ['ACH Files']
       summary: Append Batch to File
-      description: Append a Batch record to the specified file
+      description: Append a Batch record to the specified File.
       operationId: addBatchToFile
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional Request ID allows application developer to trace requests through the system's logs
           example: "rs4f9915"
           schema:
             type: string
         - name: X-Idempotency-Key
           in: header
-          description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy for to not collide with each other in your requests.
+          description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy to not collide with each other in your requests.
           example: "a4f88150"
           required: false
           schema:
@@ -428,16 +432,24 @@ paths:
       responses:
         '200':
           description: Batch added to File
+        '400':
+          description: See error in response body
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+        '404':
+          description: A resource with the specified ID was not found
   /files/{fileID}/batches/{batchID}:
     get:
       tags: ['ACH Files']
       summary: Get Batch
-      description: Get a specific Batch on a File
+      description: Get a specific Batch on a File.
       operationId: getFileBatch
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional Request ID allows application developer to trace requests through the system's logs
           example: "rs4f9915"
           schema:
             type: string
@@ -467,12 +479,12 @@ paths:
     delete:
       tags: ['ACH Files']
       summary: Delete Batch
-      description: Delete a Batch from a File
+      description: Delete a Batch from a File.
       operationId: deleteFileBatch
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional Request ID allows application developer to trace requests through the system's logs
           example: "rs4f9915"
           schema:
             type: string
@@ -570,13 +582,13 @@ components:
       properties:
         immediateOrigin:
           type: string
-          description: contains the Routing Number of the ACH Operator or sending point that is sending the file.
+          description: Contains the Routing Number of the ACH Operator or sending point that is sending the file.
           minLength: 9
           maxLength: 10
-          example: "99991234"
+          example: "999912342"
         immediateOriginName:
           type: string
-          description: The name of the ACH operator or sending point that is sending the file.
+          description: The name of the ACH Operator or sending point that is sending the file.
           maxLength: 23
           example: "My Bank Name"
         immediateDestination:
@@ -584,25 +596,25 @@ components:
           maxLength: 10
           minLength: 9
           example: "691000134"
-          description: contains the Routing Number of the ACH Operator or receiving point to which the file is being sent
+          description: Contains the Routing Number of the ACH Operator or receiving point to which the file is being sent.
         immediateDestinationName:
           type: string
-          description: The name of the ACH or receiving point for which that file is destined.
+          description: The name of the ACH Operator or receiving point to which the file is being sent.
           maxLength: 23
           example: "Federal Reserve Bank"
         fileCreationTime:
-          description: 'The File Creation Date is the date when the file was prepared by an ODFI. (Format HHmm - H=Hour, m=Minute)'
+          description: 'The File Creation Time is the time when the file was prepared by an ODFI. (Format HHmm - H=Hour, m=Minute)'
           type: string
           format: "HHmm"
           example: "1504"
         fileCreationDate:
-          description: 'The File Creation Time is the time when the file was prepared by an ODFI. (Format YYMMDD - Y=Year, M=Month, D=Day)'
+          description: 'The File Creation Date is the date when the file was prepared by an ODFI. (Format YYMMDD - Y=Year, M=Month, D=Day)'
           type: string
           format: "YYMMDD"
           example: "190102"
         fileIDModifier:
           type: string
-          description: Incremented value for each file for RDFI's.
+          description: Incremented value for each file for RDFIs.
           example: "0"
       required:
         - immediateOrigin
@@ -614,7 +626,7 @@ components:
     FileControl:
       properties:
         ID:
-          description: Moov API File ID
+          description: File ID
           type: string
           example: "d1e26288"
         batchCount:
@@ -624,7 +636,7 @@ components:
           example: 1
         blockCount:
           description: |
-            BlockCount total number of records in the file (include all headers and trailer) divided by 10 (This number must be evenly divisible by 10. If not, additional records consisting of all 9's are added to the file after the initial '9' record to fill out the block 10.)
+            Total number of records in the file (include all headers and trailer) divided by 10 (This number must be evenly divisible by 10. If not, additional records consisting of all 9's are added to the file after the initial '9' record to fill out the block 10.)
           type: integer
           example: 1
         entryAddendaCount:
@@ -633,7 +645,7 @@ components:
           minimum: 1
           example: 1
         entryHash:
-          description: EntryHash calculated in the same manner as the batch total but includes total from entire file
+          description: Calculated in the same manner as the batch total but includes total from entire file
           type: integer
           example: 0
         totalDebit:
@@ -689,11 +701,11 @@ components:
       properties:
         ID:
           type: string
-          description: A client defined ID used as a reference to this batch
+          description: A client-defined ID used as a reference to this batch
           example: "913b5742"
         serviceClassCode:
           type: integer
-          description: Service Class Code - Mixed Debit and Credits '200', ACH Credits Only '220', or ACH Debits Only '225'
+          description: Service Class Code - Mixed Debits and Credits '200', ACH Credits Only '220', or ACH Debits Only '225'
           example: 220
         companyName:
           type: string
@@ -705,21 +717,19 @@ components:
           example: "123456789"
         companyIdentification:
           description: |
-            Alphanumeric code used to identify an Originator The Company Identification Field must be included on all prenotification records and on each entry initiated pursuant to such prenotification. The Company ID may begin with the ANSI one-digit Identification Code Designator (ICD), followed by the identification number The ANSI Identification Numbers and related Identification Code
-            IRS Employer Identification Number (EIN) "1"
-            Data Universal Numbering Systems (DUNS) "3"
-            User Assigned Number "9"
+            Alphanumeric code used to identify an Originator. The Company Identification Field must be included on all prenotification records and on each entry initiated pursuant to such prenotification. The Company ID may begin with the ANSI one-digit Identification Code Designator (ICD), followed by the identification number.
+            Possible ICDs are the IRS Employer Identification Number (EIN) "1", Data Universal Numbering Systems (DUNS) "3", or User Assigned Number "9".
           type: string
-          example: "1"
+          example: "121042882"
         standardEntryClassCode:
           type: string
-          description: Identifies the payment type (product) found within an ACH batch-using a 3-character code.
+          description: Identifies the payment type (product) found within an ACH batch using a 3-character code.
           example: "PPD"
         companyEntryDescription:
           type: string
           description: |
             A description of the entries contained in the batch.
-            The Originator establishes the value of this field to provide a description of the purpose of the entry to be displayed back to the receive For example, "GAS BILL," "REG. SALARY," "INS. PREM,", "SOC. SEC.," "DTC," "TRADE PAY," "PURCHASE," etc.
+            The Originator establishes the value of this field to provide a description of the purpose of the entry to be displayed back to the receiver. For example, "GAS BILL," "REG. SALARY," "INS. PREM,", "SOC. SEC.," "DTC," "TRADE PAY," "PURCHASE," etc.
             This field must contain the word "REVERSAL" (left justified) when the batch contains reversing entries.
             This field must contain the word "RECLAIM" (left justified) when the batch contains reclamation entries.
             This field must contain the word "NONSETTLED" (left justified) when the batch contains entries which could not settle.
@@ -729,16 +739,17 @@ components:
           description: |
             The Originator establishes this field as the date it would like to see displayed to the receiver for descriptive purposes. This field is never used to control timing of any computer or manual operation. It is solely for descriptive purposes. The RDFI should not assume any specific format.
         effectiveEntryDate:
-          description: 'Date on which the entries are to settle. Format YYMMDD (Y=Year, M=Month, D=Day)'
+          description: Date on which the entries are to settle. (Format YYMMDD - Y=Year, M=Month, D=Day)
           type: string
+          format: "YYMMDD"
           example: "190102"
         originatorStatusCode:
           type: integer
           description: |
-            ODFI initiating the Entry.
-            0 ADV File prepared by an ACH Operator.
-            1 This code identifies the Originator as a depository financial institution.
-            2 This code identifies the Originator as a Federal Government entity or agency.
+            ODFI initiating the Entry. |
+            0 - ADV File prepared by an ACH Operator. |
+            1 - This code identifies the Originator as a depository financial institution. |
+            2 - This code identifies the Originator as a Federal Government entity or agency.
           example: 1
         ODFIIdentification:
           description: First 8 digits of the originating DFI transit routing number
@@ -779,12 +790,10 @@ components:
           example: 100
         companyIdentification:
           description: |
-            Alphanumeric code used to identify an Originator The Company Identification Field must be included on all prenotification records and on each entry initiated pursuant to such prenotification. The Company ID may begin with the ANSI one-digit Identification Code Designator (ICD), followed by the identification number The ANSI Identification Numbers and related Identification Code
-            IRS Employer Identification Number (EIN) "1"
-            Data Universal Numbering Systems (DUNS) "3"
-            User Assigned Number "9"
+            Alphanumeric code used to identify an Originator. The Company Identification Field must be included on all prenotification records and on each entry initiated pursuant to such prenotification. The Company ID may begin with the ANSI one-digit Identification Code Designator (ICD), followed by the identification number.
+            Possible ICDs are the IRS Employer Identification Number (EIN) "1", Data Universal Numbering Systems (DUNS) "3", and User Assigned Number "9".
           type: string
-          example: "1"
+          example: "121042882"
         messageAuthentication:
           description: MAC is an eight character code derived from a special key used in conjunction with the DES algorithm. The purpose of the MAC is to validate the authenticity of ACH entries. The DES algorithm and key message standards must be in accordance with standards adopted by the American National Standards Institute. The remaining eleven characters of this field are blank.
           type: string
@@ -827,15 +836,15 @@ components:
         transactionCode:
           type: integer
           description: |
-            transactionCode if the receivers account is:
-            Credit (deposit) to checking account 22
-            Prenote for credit to checking account 23
-            Debit (withdrawal) to checking account 27
-            Prenote for debit to checking account 28
-            Credit to savings account 32
-            Prenote for credit to savings account 33
-            Debit to savings account 37
-            Prenote for debit to savings account 38
+            Based on transaction type:
+            22 - Credit (deposit) to checking account |
+            23 - Prenote for credit to checking account |
+            27 - Debit (withdrawal) to checking account |
+            28 - Prenote for debit to checking account |
+            32 - Credit to savings account |
+            33 - Prenote for credit to savings account |
+            37 - Debit to savings account |
+            38 - Prenote for debit to savings account
           example: 22
         RDFIIdentification:
           type: string
@@ -848,7 +857,7 @@ components:
         DFIAccountNumber:
           type: string
           description: |
-            The receiver's bank account number you are crediting/debiting. It important to note that this is an alphanumeric field, so its space padded, no zero padded
+            The receiver's bank account number you are crediting/debiting. It important to note that this is an alphanumeric field, so it's space padded, not zero padded
           example: "181141847"
         amount:
           type: integer
@@ -866,19 +875,19 @@ components:
           type: string
           description: |
             DiscretionaryData allows ODFIs to include codes, of significance only to them, to enable specialized handling of the entry. There will be no standardized interpretation for the value of this field. It can either be a single two-character code, or two distinct one-character codes, according to the needs of the ODFI and/or Originator involved. This field must be returned intact for any returned entry.
-            WEB uses the Discretionary Data Field as the Payment Type Code
+            WEB uses the Discretionary Data Field as the Payment Type Code.
           example: "AB"
         addendaRecordIndicator:
           type: integer
           description: |
-            AddendaRecordIndicator indicates the existence of an Addenda Record. A value of "1" indicates that one ore more addenda records follow, and "0" means no such record is present.
+            AddendaRecordIndicator indicates the existence of an Addenda Record. A value of "1" indicates that one or more addenda records follow, and "0" means no such record is present.
           example: 1
         traceNumber:
           type: string
           description: |
-            TraceNumber assigned by the ODFI in ascending sequence, is included in each Entry Detail Record, Corporate Entry Detail Record, and addenda Record.
+            TraceNumber assigned by the ODFI in ascending sequence, is included in each Entry Detail Record, Corporate Entry Detail Record, and Addenda Record.
             Trace Numbers uniquely identify each entry within a batch in an ACH input file. In association with the Batch Number, transmission (File Creation) Date, and File ID Modifier, the Trace Number uniquely identifies an entry within a given file.
-            For addenda Records, the Trace Number will be identical to the Trace Number in the associated Entry Detail Record, since the Trace Number is associated with an entry or item rather than a physical record.
+            For Addenda Records, the Trace Number will be identical to the Trace Number in the associated Entry Detail Record, since the Trace Number is associated with an entry or item rather than a physical record.
           example: "124782618117"
         addenda02:
           $ref: '#/components/schemas/Addenda02'
@@ -899,7 +908,7 @@ components:
       properties:
         id:
           type: string
-          description: Client defined string used as a reference to this record.
+          description: Client-defined string used as a reference to this record.
           example: "5ca8d25a"
         typeCode:
           type: string
@@ -932,7 +941,8 @@ components:
           example: '100049'
         transactionDate:
           type: string
-          description: MMDD formatted timestamp identifies the date on which the transaction occurred.
+          format: "MMDD"
+          description: Timestamp identifies the date on which the transaction occurred. (Format MMDD - M=Month, D=Day)
           example: '1224'
         authorizationCodeOrExpireDate:
           type: string
@@ -948,7 +958,7 @@ components:
           example: Anytown
         terminalState:
           type: string
-          description: Identifies the state in which the electronic terminal is located
+          description: Identifies the state in which the electronic terminal is located.
           example: CA
         traceNumber:
           type: string
@@ -966,7 +976,7 @@ components:
       properties:
         id:
           type: string
-          description: Client defined string used as a reference to this record.
+          description: Client-defined string used as a reference to this record.
           example: 5ca8d25a
         typeCode:
           type: string
@@ -978,13 +988,13 @@ components:
           example: "Car Payment"
         sequenceNumber:
           type: number
-          description: SequenceNumber is consecutively assigned to each Addenda05 Record following an Entry Detail Record. The first addenda05 sequence number must always be a 1.
+          description: SequenceNumber is consecutively assigned to each Addenda05 Record following an Entry Detail Record. The first Addenda05 sequence number must always be a 1.
           example: 1
         entryDetailSequenceNumber:
           type: number
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
-            Detail or Corporate Entry Detail Record's trace number This number is
+            Detail or Corporate Entry Detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
@@ -997,7 +1007,7 @@ components:
       properties:
         id:
           type: string
-          description: Client defined string used as a reference to this record.
+          description: Client-defined string used as a reference to this record.
           example: 5ca8d25a
         typeCode:
           type: string
@@ -1006,24 +1016,24 @@ components:
         transactionTypeCode:
           type: string
           description: |
-            Transaction Type Code Describes the type of payment
-            ANN = Annuity
-            BUS = Business/Commercial
-            DEP = Deposit
-            LOA = Loan
-            MIS = Miscellaneous
-            MOR = Mortgage
-            PEN = Pension
-            RLS = Rent/Lease
-            REM = Remittance2
-            SAL = Salary/Payroll
-            TAX = Tax
-            TEL = Telephone-Initiated Transaction
-            WEB = Internet-Initiated Transaction
-            ARC = Accounts Receivable Entry
-            BOC = Back Office Conversion Entry
-            POP = Point of Purchase Entry
-            RCK = Re-presented Check Entry
+            Describes the type of payment:
+            'ANN' = Annuity |
+            'BUS' = Business/Commercial |
+            'DEP' = Deposit |
+            'LOA' = Loan |
+            'MIS' = Miscellaneous |
+            'MOR' = Mortgage |
+            'PEN' = Pension |
+            'RLS' = Rent/Lease |
+            'REM' = Remittance2 |
+            'SAL' = Salary/Payroll |
+            'TAX' = Tax |
+            'TEL' = Telephone-Initiated Transaction |
+            'WEB' = Internet-Initiated Transaction |
+            'ARC' = Accounts Receivable Entry |
+            'BOC' = Back Office Conversion Entry |
+            'POP' = Point of Purchase Entry |
+            'RCK' = Re-presented Check Entry
           example: TEL
         foreignPaymentAmount:
           type: number
@@ -1041,7 +1051,7 @@ components:
           type: number
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
-            Detail or Corporate Entry Detail Record's trace number This number is
+            Detail or Corporate Entry Detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
@@ -1055,7 +1065,7 @@ components:
       properties:
         id:
           type: string
-          description: Client defined string used as a reference to this record.
+          description: Client-defined string used as a reference to this record.
           example: 5ca8d25a
         typeCode:
           type: string
@@ -1063,17 +1073,17 @@ components:
           example: "11"
         originatorName:
           type: string
-          description: Originators name (your company name / name)
+          description: Originator's name (your company name / name)
           example: Acme Corp
         originatorStreetAddress:
           type: string
-          description: Originators street address
+          description: Originator's street address
           example: 111 1st St
         entryDetailSequenceNumber:
           type: number
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
-            Detail or Corporate Entry Detail Record's trace number This number is
+            Detail or Corporate Entry Detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
@@ -1086,7 +1096,7 @@ components:
       properties:
         id:
           type: string
-          description: Client defined string used as a reference to this record.
+          description: Client-defined string used as a reference to this record.
           example: 5ca8d25a
         typeCode:
           type: string
@@ -1096,21 +1106,21 @@ components:
           type: string
           description: |
             Originator City & State / Province
-            Data elements City and State / Province  should be separated with an asterisk (*) as a delimiter and the field should end with a backslash (\).
+            Data elements City and State / Province  should be separated with an asterisk (*) as a delimiter and the field should end with a backslash (\\).
           example: |
             San Francisco*CA\
         originatorCountryPostalCode:
           type: string
           description: |
             Originator Country & Postal Code
-            Data elements must be separated by an asterisk (*) and must end with a backslash (\)
+            Data elements must be separated by an asterisk (*) and must end with a backslash (\\).
           example: |
             US*10036\
         entryDetailSequenceNumber:
           type: number
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
-            Detail or Corporate Entry Detail Record's trace number This number is
+            Detail or Corporate Entry Detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
@@ -1123,7 +1133,7 @@ components:
       properties:
         id:
           type: string
-          description: Client defined string used as a reference to this record.
+          description: Client-defined string used as a reference to this record.
           example: 5ca8d25a
         typeCode:
           type: string
@@ -1139,17 +1149,17 @@ components:
         ODFIIDNumberQualifier:
           type: string
           description: |
-            Originating DFI Identification Number Qualifier
+            Originating DFI Identification Number Qualifier.
             For Inbound IATs: The 2-digit code that identifies the numbering scheme used in the
-            Foreign DFI Identification Number field
-            01 = National Clearing System
-            02 = BIC Code
-            03 = IBAN Code
+            Foreign DFI Identification Number field:
+            '01' = National Clearing System |
+            '02' = BIC Code |
+            '03' = IBAN Code
           example: '01'
         ODFIBranchCountryCode:
           type: string
           description: |
-            Originating DFI Branch Country Code
+            Originating DFI Branch Country Code:
             USb = United States
             //("b" indicates a blank space)
             For Inbound IATs: This 3 position field contains a 2-character code as approved by the
@@ -1161,7 +1171,7 @@ components:
           type: number
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
-            Detail or Corporate Entry Detail Record's trace number This number is
+            Detail or Corporate Entry Detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
@@ -1175,7 +1185,7 @@ components:
       properties:
         id:
           type: string
-          description: Client defined string used as a reference to this record.
+          description: Client-defined string used as a reference to this record.
           example: 5ca8d25a
         typeCode:
           type: string
@@ -1187,17 +1197,17 @@ components:
         RDFIIDNumberQualifier:
           type: string
           description: |
-            Receiving DFI Identification Number Qualifier
+            Receiving DFI Identification Number Qualifier.
             The 2-digit code that identifies the numbering scheme used in the
-            Receiving DFI Identification Number field
-            01 = National Clearing System
-            02 = BIC Code
-            03 = IBAN Code
+            Receiving DFI Identification Number field:
+            '01' = National Clearing System |
+            '02' = BIC Code |
+            '03' = IBAN Code
           example: '01'
         RDFIIdentification:
           type: string
           description: This field contains the bank identification number of the DFI at which the Receiver maintains his account.
-          example: 98765432
+          example: '98765432'
         RDFIBranchCountryCode:
           type: string
           description: |
@@ -1213,7 +1223,7 @@ components:
           type: number
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
-            Detail or Corporate Entry Detail Record's trace number This number is
+            Detail or Corporate Entry Detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
@@ -1228,7 +1238,7 @@ components:
       properties:
         id:
           type: string
-          description: Client defined string used as a reference to this record.
+          description: Client-defined string used as a reference to this record.
           example: 5ca8d25a
         typeCode:
           type: string
@@ -1238,7 +1248,7 @@ components:
           type: string
           description: |
             Receiver Identification Number contains the accounting number by which the Originator is known to the Receiver for descriptive purposes. NACHA Rules recommend but do not require the RDFI to print the contents of this field on the receiver's statement.
-          example: 98765432
+          example: "98765432"
         receiverStreetAddress:
           type: string
           description: Receiver's physical address
@@ -1247,7 +1257,7 @@ components:
           type: number
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
-            Detail or Corporate Entry Detail Record's trace number This number is
+            Detail or Corporate Entry Detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
@@ -1259,7 +1269,7 @@ components:
       properties:
         id:
           type: string
-          description: Client defined string used as a reference to this record.
+          description: Client-defined string used as a reference to this record.
           example: 5ca8d25a
         typeCode:
           type: string
@@ -1270,21 +1280,21 @@ components:
           description: |
             Receiver City & State / Province
             Data elements City and State / Province  should be separated with an asterisk (*) as a delimiter
-            and the field should end with a backslash (\).
+            and the field should end with a backslash (\\).
           example: |
             San Francisco*CA\
         receiverCountryPostalCode:
           type: string
           description: |
             Receiver Country & Postal Code
-            Data elements must be separated by an asterisk (*) and must end with a backslash (\)
+            Data elements must be separated by an asterisk (*) and must end with a backslash (\\).
           example: |
             US*10036\
         entryDetailSequenceNumber:
           type: number
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
-            Detail or Corporate Entry Detail Record's trace number This number is
+            Detail or Corporate Entry Detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
@@ -1297,7 +1307,7 @@ components:
       properties:
         id:
           type: string
-          description: Client defined string used as a reference to this record.
+          description: Client-defined string used as a reference to this record.
           example: 5ca8d25a
         typeCode:
           type: string
@@ -1310,13 +1320,13 @@ components:
         sequenceNumber:
           type: number
           description: |
-            SequenceNumber is consecutively assigned to each Addenda17 Record following an Entry Detail Record. The first addenda17 sequence number must always be a 1.
+            SequenceNumber is consecutively assigned to each Addenda17 Record following an Entry Detail Record. The first Addenda17 sequence number must always be a 1.
           example: 1
         entryDetailSequenceNumber:
           type: number
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
-            Detail or Corporate Entry Detail Record's trace number This number is
+            Detail or Corporate Entry Detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
@@ -1329,7 +1339,7 @@ components:
       properties:
         id:
           type: string
-          description: Client defined string used as a reference to this record.
+          description: Client-defined string used as a reference to this record.
           example: 5ca8d25a
         typeCode:
           type: string
@@ -1342,15 +1352,15 @@ components:
         foreignCorrespondentBankIDNumberQualifier:
           type: string
           description: |
-            Foreign Correspondent Bank Identification Number Qualifier contains a 2-digit code that identifies the numbering scheme used in the Foreign Correspondent Bank Identification Number field. Code values for this field are
-              "01" = National Clearing System
-              "02" = BIC Code
+            Foreign Correspondent Bank Identification Number Qualifier contains a 2-digit code that identifies the numbering scheme used in the Foreign Correspondent Bank Identification Number field. Code values for this field are:
+              "01" = National Clearing System |
+              "02" = BIC Code |
               "03" = IBAN Code
           example: '01'
         foreignCorrespondentBankIDNumber:
           type: string
           description: Foreign Correspondent Bank Identification Number contains the bank ID number of the Foreign Correspondent Bank
-          example: 98765432
+          example: '98765432'
         foreignCorrespondentBankBranchCountryCode:
           type: string
           description: |
@@ -1359,13 +1369,13 @@ components:
         sequenceNumber:
           type: number
           description: |
-            SequenceNumber is consecutively assigned to each Addenda17 Record following an Entry Detail Record. The first addenda17 sequence number must always be a 1.
+            SequenceNumber is consecutively assigned to each Addenda17 Record following an Entry Detail Record. The first Addenda17 sequence number must always be a 1.
           example: 1
         entryDetailSequenceNumber:
           type: number
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
-            Detail or Corporate Entry Detail Record's trace number This number is
+            Detail or Corporate Entry Detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
@@ -1380,7 +1390,7 @@ components:
       properties:
         id:
           type: string
-          description: Client defined string used as a reference to this record.
+          description: Client-defined string used as a reference to this record.
           example: 5ca8d25a
         typeCode:
           type: string
@@ -1403,7 +1413,7 @@ components:
           example: "98765432"
         correctedData:
           type: string
-          description: Correct field value of what ChangeCode references
+          description: Correct field value of what changeCode references
           example: "198424892"
         traceNumber:
           type: string
@@ -1419,7 +1429,7 @@ components:
       properties:
         id:
           type: string
-          description: Client defined string used as a reference to this record.
+          description: Client-defined string used as a reference to this record.
           example: 5ca8d25a
         typeCode:
           type: string
@@ -1438,11 +1448,12 @@ components:
           example: "214874812"
         dateOfDeath:
           type: string
-          description: DateOfDeath The field date of death is to be supplied on Entries being returned for reason of death (return reason codes R14 and R15). Format YYMMDD (Y=Year, M=Month, D=Day)
+          format: "YYMMDD"
+          description: The field date of death is to be supplied on Entries being returned for reason of death (return reason codes R14 and R15). (Format YYMMDD - Y=Year, M=Month, D=Day)
           example: "200102"
         originalDFI:
           type: string
-          description: OriginalDFI field contains the Receiving DFI Identification (addenda.RDFIIdentification) as originally included on the forward Entry or Prenotification that the RDFI is returning or correcting.
+          description: Contains the Receiving DFI Identification (addenda.RDFIIdentification) as originally included on the forward Entry or Prenotification that the RDFI is returning or correcting.
           example: "98765432"
         addendaInformation:
           type: string
@@ -1461,7 +1472,7 @@ components:
     IATBatch:
       properties:
         ID:
-          description: Client defined string used as a reference to this record.
+          description: Client-defined string used as a reference to this record.
           type: string
           example: a747e53f
         IATBatchHeader:
@@ -1480,14 +1491,11 @@ components:
     IATBatchHeader:
       properties:
         ID:
-          description: ID is a client defined string used as a reference to this record.
+          description: ID is a client-defined string used as a reference to this record.
           type: string
           example: a747e53f
         serviceClassCode:
-          description: |
-            ServiceClassCode ACH Mixed Debits and Credits '200'
-            ACH Credits Only '220'
-            ACH Debits Only '225'
+          description: Service Class Code - Mixed Debits and Credits '200', ACH Credits Only '220', or ACH Debits Only '225'
           type: integer
           example: 220
         IATIndicator:
@@ -1496,23 +1504,22 @@ components:
           example: ""
         foreignExchangeIndicator:
           description: |
-            Code indicating currency conversion.
-            FV Fixed-to-Variable – Entry is originated in a fixed-value amount and is to be received in a variable amount resulting from the execution of the foreign exchange conversion.
-            VF Variable-to-Fixed – Entry is originated in a variable-value amount based on a specific foreign exchange rate for conversion to a fixed-value amount in which the entry is to be received.
-            FF Fixed-to-Fixed – Entry is originated in a fixed-value amount and is to be received in the same fixed-value amount in the same currency denomination. There is no foreign exchange conversion for entries transmitted using this code. For entries originated in a fixed value amount, the foreign Exchange Reference Field will be space filled.
+            Code indicating currency conversion:
+            'FV' (Fixed-to-Variable) – Entry is originated in a fixed-value amount and is to be received in a variable amount resulting from the execution of the foreign exchange conversion. |
+            'VF' (Variable-to-Fixed) – Entry is originated in a variable-value amount based on a specific foreign exchange rate for conversion to a fixed-value amount in which the entry is to be received. |
+            'FF' (Fixed-to-Fixed) – Entry is originated in a fixed-value amount and is to be received in the same fixed-value amount in the same currency denomination. There is no foreign exchange conversion for entries transmitted using this code. For entries originated in a fixed value amount, the foreign Exchange Reference Field will be space filled.
           type: string
           example: FF
         foreignExchangeReferenceIndicator:
           description: |
             Code used to indicate the content of the Foreign Exchange Reference Field and is filled by the gateway operator. Valid entries are
-            1 - Foreign Exchange Rate;
-            2 - Foreign Exchange Reference Number; or
+            1 - Foreign Exchange Rate |
+            2 - Foreign Exchange Reference Number |
             3 - Space Filled
           type: integer
           example: 2
         foreignExchangeReference:
-          description: |
-            Contains either the foreign exchange rate used to execute the foreign exchange conversion of a cross-border entry or another reference to the foreign exchange transaction.
+          description: Contains either the foreign exchange rate used to execute the foreign exchange conversion of a cross-border entry or another reference to the foreign exchange transaction.
           type: string
         ISODestinationCountryCode:
           description: Two-character code, as approved by the International Organization for Standardization (ISO), to identify the country in which the entry is to be received. For United States use US.
@@ -1523,22 +1530,22 @@ components:
             For U.S. entities: the number assigned will be your tax ID (often Social Security Number)
             For non-U.S. entities: the number assigned will be your DDA number, or the last 9 characters of your account number if it exceeds 9 characters
           type: string
-          example: 123456789
+          example: "123456789"
         standardEntryClassCode:
           description: |
             StandardEntryClassCode for consumer and non consumer international payments is IAT.
-            Identifies the payment type (product) found within an ACH batch-using a 3-character code.
+            Identifies the payment type (product) found within an ACH batch using a 3-character code.
             The SEC Code pertains to all items within batch.
             Determines format of the detail records.
             Determines addenda records (required or optional PLUS one or up to 9,999 records).
             Determines rules to follow (return time frames).
-            Some SEC codes require specific data in predetermined fields within the ACH record
+            Some SEC codes require specific data in predetermined fields within the ACH record.
           type: string
           example: IAT
         companyEntryDescription:
           description: |
             A description of the entries contained in the batch
-            The Originator establishes the value of this field to provide a description of the purpose of the entry to be displayed back to the receive For example, "GAS BILL," "REG. SALARY," "INS. PREM," "SOC. SEC.," "DTC," "TRADE PAY," "PURCHASE," etc.
+            The Originator establishes the value of this field to provide a description of the purpose of the entry to be displayed back to the receiver. For example, "GAS BILL," "REG. SALARY," "INS. PREM," "SOC. SEC.," "DTC," "TRADE PAY," "PURCHASE," etc.
             This field must contain the word "REVERSAL" (left justified) when the batch contains reversing entries.
             This field must contain the word "RECLAIM" (left justified) when the batch contains reclamation entries.
             This field must contain the word "NONSETTLED" (left justified) when the batch contains entries which could not settle.
@@ -1556,22 +1563,24 @@ components:
           example: USD
         effectiveEntryDate:
           description: |
-            EffectiveEntryDate the date on which the entries are to settle format YYMMDD (Y=Year, M=Month, D=Day)
+            EffectiveEntryDate the date on which the entries are to settle. Format YYMMDD (Y=Year, M=Month, D=Day)
           type: string
-          example: 181231
+          format: "YYMMDD"
+          example: '181231'
         originatorStatusCode:
           description: |
-            SettlementDate Leave blank, this field is inserted by the ACH operator settlementDate string OriginatorStatusCode refers to the ODFI initiating the Entry.
-            0 ADV File prepared by an ACH Operator.
-            1 This code identifies the Originator as a depository financial institution.
-            2 This code identifies the Originator as a Federal Government entity or agency.
+            ODFI initiating the Entry. |
+            0 - ADV File prepared by an ACH Operator. |
+            1 - This code identifies the Originator as a depository financial institution. |
+            2 - This code identifies the Originator as a Federal Government entity or agency.
           type: integer
           example: 1
         ODFIIdentification:
           description: |
-            ODFIIdentification First 8 digits of the originating DFI transit routing number for Inbound IAT Entries, this field contains the routing number of the U.S. Gateway Operator.  For Outbound IAT Entries, this field contains the standard routing number, as assigned by Accuity, that identifies the U.S. ODFI initiating the Entry. Format - TTTTAAAA
+            First 8 digits of the originating DFI transit routing number. For Inbound IAT Entries, this field contains the routing number of the U.S. Gateway Operator.  For Outbound IAT Entries, this field contains the standard routing number, as assigned by Accuity, that identifies the U.S. ODFI initiating the Entry. (Format TTTTAAAA - T=Federal Reserve Routing Symbol, A=ABA Institution Identifier)
           type: string
-          example: 12345678
+          format: 'TTTTAAAA'
+          example: '12345678'
         batchNumber:
           description: |
             BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
@@ -1598,20 +1607,20 @@ components:
         transactionCode:
           type: integer
           description: |
-            TransactionCode if the receivers account is
-            Credit (deposit) to checking account '22'
-            Prenote for credit to checking account '23'
-            Debit (withdrawal) to checking account '27'
-            Prenote for debit to checking account '28'
-            Credit to savings account '32'
-            Prenote for credit to savings account '33'
-            Debit to savings account '37'
-            Prenote for debit to savings account '38'
+            Based on transaction type:
+            22 - Credit (deposit) to checking account |
+            23 - Prenote for credit to checking account |
+            27 - Debit (withdrawal) to checking account |
+            28 - Prenote for debit to checking account |
+            32 - Credit to savings account |
+            33 - Prenote for credit to savings account |
+            37 - Debit to savings account |
+            38 - Prenote for debit to savings account
           example: 22
         RDFIIdentification:
           type: string
           description: RDFI's routing number without the last digit.
-          example: 12345678
+          example: "12345678"
         checkDigit:
           type: string
           description: Last digit in RDFI routing number.
@@ -1627,7 +1636,7 @@ components:
         DFIAccountNumber:
           type: string
           description: |
-            The receiver's bank account number you are crediting/debiting. It important to note that this is an alphanumeric field, so its space padded, no zero padded
+            The receiver's bank account number you are crediting/debiting. It important to note that this is an alphanumeric field, so it's space padded, not zero padded
           example: "181141847"
         OFACScreeningIndicator:
           type: string
@@ -1640,7 +1649,7 @@ components:
         addendaRecordIndicator:
           type: integer
           description: |
-            AddendaRecordIndicator indicates the existence of an Addenda Record. A value of "1" indicates that one ore more addenda records follow, and "0" means no such record is present.
+            AddendaRecordIndicator indicates the existence of an Addenda Record. A value of "1" indicates that one or more addenda records follow, and "0" means no such record is present.
           example: 1
         traceNumber:
           type: string
@@ -1708,15 +1717,15 @@ components:
         transactionCode:
           type: integer
           description: |
-            TransactionCode representing Accounting Entries
-            Credit for ACH debits originated - 81
-            Debit for ACH credits originated - 82
-            Credit for ACH credits received 83
-            Debit for ACH debits received 84
-            Credit for ACH credits in rejected batches 85
-            Debit for ACH debits in rejected batches - 86
-            Summary credit for respondent ACH activity - 87
-            Summary debit for respondent ACH activity - 88
+            TransactionCode representing Accounting Entries:
+            81 - Credit for ACH debits originated |
+            82 - Debit for ACH credits originated |
+            83 - Credit for ACH credits received |
+            84 - Debit for ACH debits received |
+            85 - Credit for ACH credits in rejected batches |
+            86 - Debit for ACH debits in rejected batches |
+            87 - Summary credit for respondent ACH activity |
+            88 - Summary debit for respondent ACH activity
           example: 81
         RDFIIdentification:
           type: string
@@ -1729,7 +1738,7 @@ components:
         DFIAccountNumber:
           type: string
           description: |
-            The receiver's bank account number you are crediting/debiting. It important to note that this is an alphanumeric field, so its space padded, no zero padded
+            The receiver's bank account number you are crediting/debiting. It important to note that this is an alphanumeric field, so it's space padded, not zero padded
           example: "181141847"
         amount:
           type: integer
@@ -1755,16 +1764,16 @@ components:
           type: string
           description: |
             DiscretionaryData allows ODFIs to include codes, of significance only to them, to enable specialized handling of the entry. There will be no standardized interpretation for the value of this field. It can either be a single two-character code, or two distinct one-character codes, according to the needs of the ODFI and/or Originator involved. This field must be returned intact for any returned entry.
-            WEB uses the Discretionary Data Field as the Payment Type Code
+            WEB uses the Discretionary Data Field as the Payment Type Code.
           example: AB
         addendaRecordIndicator:
           type: integer
           description: |
-            AddendaRecordIndicator indicates the existence of an Addenda Record. A value of "1" indicates that one ore more addenda records follow, and "0" means no such record is present.
+            AddendaRecordIndicator indicates the existence of an Addenda Record. A value of "1" indicates that one or more addenda records follow, and "0" means no such record is present.
           example: 1
         achOperatorRoutingNumber:
           type: string
-          description: Routing number for ACH operator
+          description: Routing number for ACH Operator
           example: "987654320"
         julianDay:
           type: number
@@ -1772,7 +1781,7 @@ components:
           example: 12
         sequenceNumber:
           type: number
-          description: SequenceNumber is consecutively assigned to each Addenda05 Record following an Entry Detail Record. The first addenda05 sequence number must always be a 1.
+          description: SequenceNumber is consecutively assigned to each Addenda05 Record following an Entry Detail Record. The first Addenda05 sequence number must always be a 1.
           example: 1
         addenda99:
           description: Addenda99 record for the Entry Detail
