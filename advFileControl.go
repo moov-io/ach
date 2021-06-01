@@ -134,7 +134,7 @@ func (fc *ADVFileControl) fieldInclusion() error {
 		return fieldError("EntryAddendaCount", ErrConstructor, fc.EntryAddendaCountField())
 	}
 	if fc.EntryHash == 0 {
-		return fieldError("EntryHash", ErrConstructor, fc.EntryAddendaCountField())
+		return fieldError("EntryHash", ErrConstructor, fc.EntryHashField())
 	}
 	return nil
 }
