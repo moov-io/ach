@@ -994,7 +994,7 @@ components:
           type: number
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
-            Detail or Corporate Entry Detail record's trace number. This number is
+            Detail or corporate entry detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
@@ -1051,7 +1051,7 @@ components:
           type: number
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
-            Detail or Corporate Entry Detail record's trace number. This number is
+            Detail or corporate entry detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
@@ -1083,7 +1083,7 @@ components:
           type: number
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
-            Detail or Corporate Entry Detail record's trace number. This number is
+            Detail or corporate entry detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
@@ -1120,7 +1120,7 @@ components:
           type: number
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
-            Detail or Corporate Entry Detail record's trace number. This number is
+            Detail or corporate entry detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
@@ -1171,7 +1171,7 @@ components:
           type: number
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
-            Detail or Corporate Entry Detail record's trace number. This number is
+            Detail or corporate entry detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
@@ -1223,7 +1223,7 @@ components:
           type: number
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
-            Detail or Corporate Entry Detail record's trace number. This number is
+            Detail or corporate entry detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
@@ -1257,7 +1257,7 @@ components:
           type: number
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
-            Detail or Corporate Entry Detail record's trace number. This number is
+            Detail or corporate entry detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
@@ -1294,7 +1294,7 @@ components:
           type: number
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
-            Detail or Corporate Entry Detail record's trace number. This number is
+            Detail or corporate entry detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
@@ -1326,7 +1326,7 @@ components:
           type: number
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
-            Detail or Corporate Entry Detail record's trace number. This number is
+            Detail or corporate entry detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
@@ -1375,7 +1375,7 @@ components:
           type: number
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
-            Detail or Corporate Entry Detail record's trace number. This number is
+            Detail or corporate entry detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 1
