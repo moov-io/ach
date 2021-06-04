@@ -738,6 +738,7 @@ components:
           type: string
           description: |
             The Originator establishes this field as the date it would like to see displayed to the receiver for descriptive purposes. This field is never used to control timing of any computer or manual operation. It is solely for descriptive purposes. The RDFI should not assume any specific format.
+          example: "SD1300"
         effectiveEntryDate:
           description: Date on which the entries are to settle. (Format YYMMDD - Y=Year, M=Month, D=Day)
           type: string
@@ -923,7 +924,7 @@ components:
         referenceInformationTwo:
           type: string
           description: |
-            ReferenceInformationTwo  may be used for additional reference numbers, identification numbers,
+            ReferenceInformationTwo may be used for additional reference numbers, identification numbers,
             or codes that the merchant needs to identify the particular transaction or customer.
           example: ''
         terminalIdentificationCode:
@@ -947,7 +948,7 @@ components:
         authorizationCodeOrExpireDate:
           type: string
           description: Indicates the code that a card authorization center has furnished to the merchant.
-          example: ''
+          example: '123456'
         terminalLocation:
           type: string
           description: Identifies the specific location of a terminal (i.e., street names of an intersection, address, etc.) in accordance with the requirements of Regulation E.
@@ -997,7 +998,7 @@ components:
             Detail or Corporate Entry Detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
-          example: 1
+          example: 2618117
       required:
         - typeCode 
         - paymentRelatedInformation
@@ -1054,7 +1055,7 @@ components:
             Detail or Corporate Entry Detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
-          example: 1
+          example: 2618117
       required:
         - typeCode 
         - transactionCode
@@ -1086,7 +1087,7 @@ components:
             Detail or Corporate Entry Detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
-          example: 1
+          example: 2618117
       required:
         - typeCode
         - originatorName
@@ -1123,7 +1124,7 @@ components:
             Detail or Corporate Entry Detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
-          example: 1
+          example: 2618117
       required:
         - typeCode
         - originatorCityStateProvince
@@ -1174,7 +1175,7 @@ components:
             Detail or Corporate Entry Detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
-          example: 1
+          example: 2618117
       required:
         - typeCode
         - ODFIName
@@ -1194,6 +1195,7 @@ components:
         RDFIName:
           type: string
           description: Name of the Receiver bank
+          example: 'Citadel Bank'
         RDFIIDNumberQualifier:
           type: string
           description: |
@@ -1226,7 +1228,7 @@ components:
             Detail or Corporate Entry Detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
-          example: 1
+          example: 2618117
       required:
         - typeCode
         - RDFIName        
@@ -1260,7 +1262,7 @@ components:
             Detail or Corporate Entry Detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
-          example: 1
+          example: 2618117
       required:
         - typeCode
         - receiverStreetAddress
@@ -1297,7 +1299,7 @@ components:
             Detail or Corporate Entry Detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
-          example: 1
+          example: 2618117
       required:
         - typeCode
         - receiverCityStateProvince
@@ -1329,7 +1331,7 @@ components:
             Detail or Corporate Entry Detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
-          example: 1
+          example: 2618117
       required:
         - typeCode
         - paymentRelatedInformation
@@ -1378,7 +1380,7 @@ components:
             Detail or Corporate Entry Detail Record's trace number. This number is
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
-          example: 1
+          example: 2618117
       required:
         - typeCode
         - foreignCorrespondentBankName
@@ -1849,6 +1851,7 @@ components:
         accountNumber:
           type: string
           description: Account number used to offset records
+          example: "216112"
         accountType:
           type: string
           description: Account type used in offset record
