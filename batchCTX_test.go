@@ -450,6 +450,44 @@ func testBatchCTXPrenoteAddendaRecords(t testing.TB) {
 	entry.TransactionCode = CheckingPrenoteCredit
 	entry.SetRDFI("231380104")
 	entry.DFIAccountNumber = "744-5678-99"
+	entry.Amount = 0
+	entry.IdentificationNumber = "45689033"
+	entry.SetCATXAddendaRecords(1)
+	entry.SetCATXReceivingCompany("Receiver Company")
+	entry.SetTraceNumber(mockBatchCTXHeader().ODFIIdentification, 1)
+	entry.DiscretionaryData = "01"
+	entry.Category = CategoryForward
+
+	mockBatch := NewBatchCTX(bh)
+	mockBatch.AddEntry(entry)
+	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
+	err := mockBatch.Create()
+	if err != nil {
+		t.Errorf("%T: %v", err, err)
+	}
+}
+
+// TestBatchCTXPrenoteAddendaRecords tests validating prenote addenda records
+func TestBatchCTXPrenoteAddendaRecords(t *testing.T) {
+	testBatchCTXPrenoteAddendaRecords(t)
+}
+
+// testBatchCTXPrenoteAddendaRecordsErr validates prenote addenda records
+func testBatchCTXPrenoteAddendaRecordsErr(t testing.TB) {
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = CreditsOnly
+	bh.StandardEntryClassCode = CTX
+	bh.CompanyName = "Payee Name"
+	bh.CompanyIdentification = "121042882"
+	bh.CompanyEntryDescription = "ACH CTX"
+	bh.ODFIIdentification = "12104288"
+	bh.OriginatorStatusCode = 2
+
+	entry := NewEntryDetail()
+	entry.TransactionCode = CheckingPrenoteCredit
+	entry.SetRDFI("231380104")
+	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 25000
 	entry.IdentificationNumber = "45689033"
 	entry.SetCATXAddendaRecords(1)
@@ -463,14 +501,14 @@ func testBatchCTXPrenoteAddendaRecords(t testing.TB) {
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	err := mockBatch.Create()
-	if !base.Match(err, ErrBatchTransactionCodeAddenda) {
-		t.Errorf("%T: %s", err, err)
+	if !base.Match(err, ErrBatchTransactionCode) {
+		t.Errorf("%T %s", err, err)
 	}
 }
 
-// TestBatchCTXPrenoteAddendaRecords tests validating prenote addenda records
-func TestBatchCTXPrenoteAddendaRecords(t *testing.T) {
-	testBatchCTXPrenoteAddendaRecords(t)
+// TestBatchCTXPrenoteAddendaRecordsErr tests validating prenote addenda records
+func TestBatchCTXPrenoteAddendaRecordsErr(t *testing.T) {
+	testBatchCTXPrenoteAddendaRecordsErr(t)
 }
 
 // BenchmarkBatchPrenoteAddendaRecords benchmarks validating prenote addenda records

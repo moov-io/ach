@@ -68,12 +68,14 @@ func (batch *BatchCTX) Validate() error {
 		if len(entry.Addenda05) != addendaRecords {
 			return batch.Error("AddendaCount", NewErrBatchExpectedAddendaCount(len(entry.Addenda05), addendaRecords))
 		}
-
+		// Verify TransactionCode for prenotes and regular entries
 		switch entry.TransactionCode {
-		case CheckingPrenoteCredit, CheckingPrenoteDebit, SavingsPrenoteCredit, SavingsReturnNOCDebit, GLPrenoteCredit,
-			GLPrenoteDebit, LoanPrenoteCredit:
-			return batch.Error("Addendum", ErrBatchTransactionCodeAddenda, entry.TransactionCode)
-		default:
+		case CheckingPrenoteCredit, CheckingPrenoteDebit,
+			SavingsPrenoteCredit, SavingsReturnNOCDebit,
+			GLPrenoteCredit, GLPrenoteDebit, LoanPrenoteCredit:
+			if entry.Amount != 0 {
+				return batch.Error("TransactionCode", ErrBatchTransactionCode, entry.TransactionCode)
+			}
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {
