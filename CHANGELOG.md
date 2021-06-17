@@ -1,3 +1,20 @@
+## v1.9.2 (Released 2021-06-17)
+
+BUG FIXES
+
+- ADV: fix entry hash err msg (#939)
+- CTX: allow batches to be pre-notifications
+
+IMPROVEMENTS
+
+- docs: clean up api documentation (#938)
+
+BUILD
+
+- fix(deps): update module github.com/aws/aws-lambda-go to v1.24.0 (#935)
+- fix(deps): update module github.com/mattn/go-isatty to v0.0.13 (#937)
+- fix(deps): update module github.com/prometheus/client_golang to v1.11.0 (#941)
+
 ## v1.9.1 (Released 2021-05-20)
 
 ADDITIONS
