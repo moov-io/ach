@@ -1,3 +1,13 @@
+## v1.9.3 (Released 2021-06-25)
+
+BUG FIXES
+
+- api: fixup openapi spec and generate client in CI
+
+BUILD
+
+- fix(deps): update module github.com/moov-io/base to v0.20.1 (#947)
+
 ## v1.9.2 (Released 2021-06-17)
 
 BUG FIXES
