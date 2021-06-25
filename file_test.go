@@ -30,6 +30,8 @@ import (
 	"time"
 
 	"github.com/moov-io/base"
+
+	"github.com/stretchr/testify/require"
 )
 
 // mockFilePPD creates an ACH file with PPD batch and entry
@@ -642,6 +644,39 @@ func TestFile__IATdatetimeParse(t *testing.T) {
 	if date := file.IATBatches[0].Header.EffectiveEntryDate; date != "190923" {
 		t.Errorf("file.IATBatches[0].Header.EffectiveEntryDate=%s", date)
 	}
+}
+
+func TestFile__JsonBypassOrigin(t *testing.T) {
+	bs, err := ioutil.ReadFile(filepath.Join("test", "testdata", "json-bypass-origin.json"))
+	require.NoError(t, err)
+
+	file, err := FileFromJSONWith(bs, &ValidateOpts{
+		BypassOriginValidation: true,
+	})
+	require.NoError(t, err)
+	require.NoError(t, file.Validate())
+
+	require.Equal(t, "adam-01", file.ID)
+	require.Equal(t, "000000000", file.Header.ImmediateOrigin)
+	require.Equal(t, "231380104", file.Header.ImmediateDestination)
+	require.Equal(t, "181008", file.Header.FileCreationDate)
+}
+
+func TestFile__JsonBypassDestination(t *testing.T) {
+	bs, err := ioutil.ReadFile(filepath.Join("test", "testdata", "json-bypass-destination.json"))
+	require.NoError(t, err)
+
+	file, err := FileFromJSONWith(bs, &ValidateOpts{
+		BypassOriginValidation:      true,
+		BypassDestinationValidation: true,
+	})
+	require.NoError(t, err)
+	require.NoError(t, file.Validate())
+
+	require.Equal(t, "adam-01", file.ID)
+	require.Equal(t, "000000000", file.Header.ImmediateOrigin)
+	require.Equal(t, "000000000", file.Header.ImmediateDestination)
+	require.Equal(t, "181008", file.Header.FileCreationDate)
 }
 
 func TestFile__datetimeParse(t *testing.T) {

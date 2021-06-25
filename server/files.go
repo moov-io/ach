@@ -169,7 +169,7 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 	h := strings.ToLower(request.Header.Get("Content-Type"))
 	if strings.Contains(h, "application/json") {
 		// Read body as ACH file in JSON
-		f, err := ach.FileFromJSON(bs)
+		f, err := ach.FileFromJSONWith(bs, req.validateOpts)
 		if f != nil {
 			req.File = f
 		}

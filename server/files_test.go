@@ -31,13 +31,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/moov-io/base"
-
 	"github.com/moov-io/ach"
+	"github.com/moov-io/base"
 
 	"github.com/go-kit/kit/log"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
+	"github.com/stretchr/testify/require"
 )
 
 func TestFiles__decodeCreateFileRequest(t *testing.T) {
@@ -101,6 +101,32 @@ func TestFiles__createFileEndpoint(t *testing.T) {
 	if err == nil || r.Err == nil {
 		t.Errorf("expected error: err=%v resp.Err=%v", err, r.Err)
 	}
+}
+
+func TestFiles__CustomJsonValidation(t *testing.T) {
+	repo := NewRepositoryInMemory(testTTLDuration, nil)
+	svc := NewService(repo)
+
+	body, err := os.Open(filepath.Join("..", "test", "testdata", "json-bypass-destination.json"))
+	require.NoError(t, err)
+
+	req := httptest.NewRequest("POST", "/files/create?bypassDestination=true&bypassOrigin=true", body)
+	req.Header.Set("content-type", "application/json")
+
+	// setup our HTTP handler
+	handler := MakeHTTPHandler(svc, repo, log.NewNopLogger())
+
+	// execute our HTTP request
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusOK, w.Code)
+
+	var resp createFileResponse
+	require.NoError(t, json.NewDecoder(w.Body).Decode(&resp))
+	require.Equal(t, "adam-01", resp.ID)
+	require.Equal(t, nil, resp.Err)
 }
 
 func TestFiles__decodeCreateFileRequest__validateOpts(t *testing.T) {
