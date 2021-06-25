@@ -60,3 +60,4 @@ go-licenser
 openapi-generator*.jar
 /cmd/webui/assets/ach.wasm
 /.idea/*
+/client/

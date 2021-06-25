@@ -76,19 +76,19 @@ paths:
             type: string
         - name: requireABAOrigin
           in: query
-          description: Optional parameter to enable routing number validation over ImmediateOrigin
+          description: Optional parameter to configure ImmediateOrigin validation
           schema:
-            $ref: '#/components/schemas/ValidateOpts/properties/requireABAOrigin'
+            type: boolean
         - name: bypassOrigin
           in: query
-          description: Optional parameter to disable ImmediateOrigin validation
+          description: Optional parameter to configure ImmediateOrigin validation
           schema:
-            $ref: '#/components/schemas/ValidateOpts/properties/bypassOriginValidation'
+            type: boolean
         - name: bypassDestination
           in: query
-          description: Optional parameter to disable ImmediateDestination validation
+          description: Optional parameter to configure ImmediateDestination validation
           schema:
-            $ref: '#/components/schemas/ValidateOpts/properties/bypassDestinationValidation'
+            type: boolean
       requestBody:
         description: Content of the ACH file (in json or raw text)
         required: true
@@ -574,12 +574,15 @@ components:
           items:
             $ref: '#/components/schemas/Batch'
           nullable: true
+        fileADVControl:
+          $ref: '#/components/schemas/ADVFileControl'
       required:
         - ID
         - fileHeader
         - fileControl
     FileHeader:
       properties:
+
         immediateOrigin:
           type: string
           description: Contains the Routing Number of the ACH Operator or sending point that is sending the file.
@@ -616,6 +619,9 @@ components:
           type: string
           description: Incremented value for each file for RDFIs.
           example: "0"
+        referenceCode:
+          type: string
+          description: Reserved field for information pertinent to the Originator.
       required:
         - immediateOrigin
         - immediateOriginName
@@ -657,7 +663,7 @@ components:
           type: integer
           example: 20
       required:
-        - ID 
+        - ID
         - batchCount
         - blockCount
         - entryAddendaCount
@@ -808,7 +814,7 @@ components:
           description: BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
           example: 0
       required:
-        - serviceClassCode 
+        - serviceClassCode
         - entryAddendaCount
         - entryHash
         - totalDebit
@@ -988,11 +994,11 @@ components:
           description: Text for describing the related payment
           example: "Car Payment"
         sequenceNumber:
-          type: number
+          type: integer
           description: SequenceNumber is consecutively assigned to each Addenda05 Record following an Entry Detail Record. The first Addenda05 sequence number must always be a 1.
           example: 1
         entryDetailSequenceNumber:
-          type: number
+          type: integer
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
             Detail or Corporate Entry Detail Record's trace number. This number is
@@ -1000,7 +1006,7 @@ components:
             Entry Detail Record or Corporate Entry Detail Record.
           example: 2618117
       required:
-        - typeCode 
+        - typeCode
         - paymentRelatedInformation
         - sequenceNumber
         - entryDetailSequenceNumber
@@ -1037,7 +1043,7 @@ components:
             'RCK' = Re-presented Check Entry
           example: TEL
         foreignPaymentAmount:
-          type: number
+          type: integer
           description: For inbound IAT payments this field should contain the USD amount or may be blank.
           example: 1021441
         foreignTraceNumber:
@@ -1049,7 +1055,7 @@ components:
           description: Receiving Company Name/Individual Name
           example: Jane Smith
         entryDetailSequenceNumber:
-          type: number
+          type: integer
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
             Detail or Corporate Entry Detail Record's trace number. This number is
@@ -1057,7 +1063,7 @@ components:
             Entry Detail Record or Corporate Entry Detail Record.
           example: 2618117
       required:
-        - typeCode 
+        - typeCode
         - transactionCode
         - foreignPaymentAmount
         - name
@@ -1081,7 +1087,7 @@ components:
           description: Originator's street address
           example: 111 1st St
         entryDetailSequenceNumber:
-          type: number
+          type: integer
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
             Detail or Corporate Entry Detail Record's trace number. This number is
@@ -1118,7 +1124,7 @@ components:
           example: |
             US*10036\
         entryDetailSequenceNumber:
-          type: number
+          type: integer
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
             Detail or Corporate Entry Detail Record's trace number. This number is
@@ -1169,7 +1175,7 @@ components:
             be found on the International Organization for Standardization website: www.iso.org.
           example: "US "
         entryDetailSequenceNumber:
-          type: number
+          type: integer
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
             Detail or Corporate Entry Detail Record's trace number. This number is
@@ -1179,8 +1185,8 @@ components:
       required:
         - typeCode
         - ODFIName
-        - ODFIIDNumberQualifier 
-        - ODFIBranchCountryCode   
+        - ODFIIDNumberQualifier
+        - ODFIBranchCountryCode
         - entryDetailSequenceNumber
     Addenda14:
       properties:
@@ -1222,7 +1228,7 @@ components:
             be found on the International Organization for Standardization website: www.iso.org
           example: 'US '
         entryDetailSequenceNumber:
-          type: number
+          type: integer
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
             Detail or Corporate Entry Detail Record's trace number. This number is
@@ -1231,9 +1237,9 @@ components:
           example: 2618117
       required:
         - typeCode
-        - RDFIName        
-        - RDFIIDNumberQualifier        
-        - RDFIIdentification        
+        - RDFIName
+        - RDFIIDNumberQualifier
+        - RDFIIdentification
         - RDFIBranchCountryCode
         - entryDetailSequenceNumber
     Addenda15:
@@ -1256,7 +1262,7 @@ components:
           description: Receiver's physical address
           example: 123 1st St
         entryDetailSequenceNumber:
-          type: number
+          type: integer
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
             Detail or Corporate Entry Detail Record's trace number. This number is
@@ -1293,7 +1299,7 @@ components:
           example: |
             US*10036\
         entryDetailSequenceNumber:
-          type: number
+          type: integer
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
             Detail or Corporate Entry Detail Record's trace number. This number is
@@ -1320,12 +1326,12 @@ components:
           description: Additional information related to the payment
           example: Test data
         sequenceNumber:
-          type: number
+          type: integer
           description: |
             SequenceNumber is consecutively assigned to each Addenda17 Record following an Entry Detail Record. The first Addenda17 sequence number must always be a 1.
           example: 1
         entryDetailSequenceNumber:
-          type: number
+          type: integer
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
             Detail or Corporate Entry Detail Record's trace number. This number is
@@ -1369,12 +1375,12 @@ components:
             Foreign Correspondent Bank Branch Country Code contains the two-character code, as approved by the International Organization for Standardization (ISO), to identify the country in which the branch of the Foreign Correspondent Bank is located. Values can be found on the International Organization for Standardization website: www.iso.org
           example: US
         sequenceNumber:
-          type: number
+          type: integer
           description: |
             SequenceNumber is consecutively assigned to each Addenda17 Record following an Entry Detail Record. The first Addenda17 sequence number must always be a 1.
           example: 1
         entryDetailSequenceNumber:
-          type: number
+          type: integer
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
             Detail or Corporate Entry Detail Record's trace number. This number is
@@ -1385,7 +1391,7 @@ components:
         - typeCode
         - foreignCorrespondentBankName
         - foreignCorrespondentBankIDNumber
-        - foreignCorrespondentBankBranchCountryCode   
+        - foreignCorrespondentBankBranchCountryCode
         - sequenceNumber
         - entryDetailSequenceNumber
     Addenda98:
@@ -1589,7 +1595,7 @@ components:
           type: integer
           example: 0
       required:
-        - serviceClassCode 
+        - serviceClassCode
         - standardEntryClassCode
         - foreignExchangeIndicator
         - foreignExchangeReferenceIndicator
@@ -1628,7 +1634,7 @@ components:
           description: Last digit in RDFI routing number.
           example: "0"
         addendaRecords:
-          type: number
+          type: integer
           description: Number of Addenda Records
           example: 1
         amount:
@@ -1778,11 +1784,11 @@ components:
           description: Routing number for ACH Operator
           example: "987654320"
         julianDay:
-          type: number
+          type: integer
           description: Julian Day of the year
           example: 12
         sequenceNumber:
-          type: number
+          type: integer
           description: SequenceNumber is consecutively assigned to each Addenda05 Record following an Entry Detail Record. The first Addenda05 sequence number must always be a 1.
           example: 1
         addenda99:
@@ -1833,7 +1839,7 @@ components:
           type: integer
           description: BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
           example: 0
-      required: 
+      required:
        - serviceClassCode
        - entryAddendaCount
        - entryHash
@@ -1842,6 +1848,47 @@ components:
        - achOperatorData
        - ODFIIdentification
        - batchNumber
+    ADVFileControl:
+      properties:
+        ID:
+          type: string
+          description: ADV File Control Record
+          example: 842a2261
+        batchCount:
+          description: Count of Batches in the File
+          type: integer
+          minimum: 1
+          example: 1
+        blockCount:
+          description: |
+            Total number of records in the file (include all headers and trailer) divided by 10 (This number must be evenly divisible by 10. If not, additional records consisting of all 9's are added to the file after the initial '9' record to fill out the block 10.)
+          type: integer
+          example: 1
+        entryAddendaCount:
+          description: Total detail and addenda records in the file
+          type: integer
+          minimum: 1
+          example: 1
+        entryHash:
+          description: Calculated in the same manner as the batch total but includes total from entire file
+          type: integer
+          example: 0
+        totalDebit:
+          description: Accumulated Batch debit totals within the file.
+          type: integer
+          example: 100
+        totalCredit:
+          description: Accumulated Batch credit totals within the file.
+          type: integer
+          example: 20
+      required:
+        - ID
+        - batchCount
+        - blockCount
+        - entryAddendaCount
+        - entryHash
+        - totalDebit
+        - totalCredit
     Offset:
       properties:
         routingNumber:
@@ -1863,7 +1910,7 @@ components:
           description: Memo for Offset EntryDetail record
           example: OFFSET
       required:
-        - routingNumber 
+        - routingNumber
         - accountNumber
         - accountType
         - description
@@ -1877,10 +1924,6 @@ components:
           type: string
           description: File ID
           example: "3cac5447"
-
-    # There are no options here currently, but this object exists to read them in the future
-    # SegmentFileConfiguration:
-    #   properties: {}
     ValidateOpts:
       properties:
         requireABAOrigin:
