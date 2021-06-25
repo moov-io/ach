@@ -582,7 +582,10 @@ components:
         - fileControl
     FileHeader:
       properties:
-
+        ID:
+          description: File ID
+          type: string
+          example: "d1e26288"
         immediateOrigin:
           type: string
           description: Contains the Routing Number of the ACH Operator or sending point that is sending the file.
