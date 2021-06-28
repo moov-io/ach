@@ -1,0 +1,67 @@
+{
+    "id": "adam-01",
+    "fileHeader": {
+        "id": "adam-01",
+        "immediateDestination": "231380104",
+        "immediateOrigin": "000000000",
+        "fileCreationDate": "181008",
+        "fileCreationTime": "",
+        "fileIDModifier": "A",
+        "immediateDestinationName": "Citadel",
+        "immediateOriginName": "Wells Fargo"
+    },
+    "batches": [
+        {
+            "batchHeader": {
+                "id": "adam-01",
+                "serviceClassCode": 200,
+                "companyName": "Wells Fargo",
+                "companyIdentification": "121042882",
+                "standardEntryClassCode": "PPD",
+                "companyEntryDescription": "Trans. Des",
+                "effectiveEntryDate": "2018-10-09T00:00:00Z",
+                "ODFIIdentification": "12104288",
+                "batchNumber": 1
+            },
+            "entryDetails": [
+                {
+                    "id": "adam-01",
+                    "transactionCode": 22,
+                    "RDFIIdentification": "23138010",
+                    "checkDigit": "4",
+                    "DFIAccountNumber": "81967038518      ",
+                    "amount": 100000,
+                    "identificationNumber": "#83738AB#      ",
+                    "individualName": "Steven Tander         ",
+                    "discretionaryData": "  ",
+                    "addendaRecordIndicator": 0,
+                    "traceNumber": "121042880000001",
+                    "category": "Forward"
+                }
+            ],
+            "batchControl": {
+                "id": "adam-01",
+                "serviceClassCode": 200,
+                "entryAddendaCount": 0,
+                "entryHash": 23138010,
+                "totalDebit": 0,
+                "totalCredit": 100000,
+                "companyIdentification": "121042882",
+                "ODFIIdentification": "12104288",
+                "batchNumber": 1
+            }
+        }
+    ],
+    "IATBatches": null,
+    "fileControl": {
+        "id": "adam-01",
+        "batchCount": 1,
+        "blockCount": 1,
+        "entryAddendaCount": 0,
+        "entryHash": 23138010,
+        "totalDebit": 0,
+        "totalCredit": 100000
+    },
+    "NotificationOfChange": null,
+    "ReturnEntries": null
+}

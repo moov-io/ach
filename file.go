@@ -101,11 +101,24 @@ type advFileControl struct {
 // Callers should always check for a nil-error before using the returned file.
 //
 // The File returned may not be valid and callers should confirm with Validate.
-// Invalid files may be rejected by other Financial Institutions or ACH tools.
+// Invalid files may be rejected by Financial Institutions or ACH tools.
 //
 // Date and Time fields in formats: RFC 3339 and ISO 8601 will be parsed and rewritten
 // as their YYMMDD (year, month, day) or hhmm (hour, minute) formats.
 func FileFromJSON(bs []byte) (*File, error) {
+	return FileFromJSONWith(bs, nil)
+}
+
+// FileFromJSONWith attempts to return a *File object assuming the input is valid JSON.
+//
+// It allows custom validation overrides, so the file may not be Nacha compliant
+// after parsing. Invalid files may be rejected by Financial Institutions or ACH tools.
+//
+// Callers should always check for a nil-error before using the returned file.
+//
+// Date and Time fields in formats: RFC 3339 and ISO 8601 will be parsed and rewritten
+// as their YYMMDD (year, month, day) or hhmm (hour, minute) formats.
+func FileFromJSONWith(bs []byte, opts *ValidateOpts) (*File, error) {
 	if len(bs) == 0 {
 		return nil, errors.New("no JSON data provided")
 	}
@@ -161,6 +174,9 @@ func FileFromJSON(bs []byte) (*File, error) {
 		file.ADVControl.BatchCount = len(file.Batches)
 	}
 
+	if opts != nil {
+		file.SetValidation(opts)
+	}
 	if err := file.Create(); err != nil {
 		return file, err
 	}
