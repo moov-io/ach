@@ -662,8 +662,8 @@ func TestFile__JsonBypassOrigin(t *testing.T) {
 	require.Equal(t, "181008", file.Header.FileCreationDate)
 }
 
-func TestFile__JsonBypassDestination(t *testing.T) {
-	bs, err := ioutil.ReadFile(filepath.Join("test", "testdata", "json-bypass-destination.json"))
+func TestFile__JsonBypassDestinationAndOrigin(t *testing.T) {
+	bs, err := ioutil.ReadFile(filepath.Join("test", "testdata", "json-bypass-origin-and-destination.json"))
 	require.NoError(t, err)
 
 	file, err := FileFromJSONWith(bs, &ValidateOpts{

@@ -107,7 +107,7 @@ func TestFiles__CustomJsonValidation(t *testing.T) {
 	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)
 
-	body, err := os.Open(filepath.Join("..", "test", "testdata", "json-bypass-destination.json"))
+	body, err := os.Open(filepath.Join("..", "test", "testdata", "json-bypass-origin-and-destination.json"))
 	require.NoError(t, err)
 
 	req := httptest.NewRequest("POST", "/files/create?bypassDestination=true&bypassOrigin=true", body)
