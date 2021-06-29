@@ -100,7 +100,7 @@ type advFileControl struct {
 //
 // Callers should always check for a nil-error before using the returned file.
 //
-// The File returned may not be valid and callers should confirm with Validate.
+// The File returned may not be valid and an error may be returned from validation.
 // Invalid files may be rejected by Financial Institutions or ACH tools.
 //
 // Date and Time fields in formats: RFC 3339 and ISO 8601 will be parsed and rewritten
