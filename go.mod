@@ -6,7 +6,7 @@ require (
 	github.com/go-kit/kit v0.11.0
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/gorilla/mux v1.8.0
-	github.com/juju/ansiterm v0.0.0-20180109212912-720a0952cc2a
+	github.com/juju/ansiterm v0.0.0-20210706145210-9283cdf370b5
 	github.com/lunixbochs/vtclean v1.0.0 // indirect
 	github.com/mattn/go-isatty v0.0.13
 	github.com/moov-io/base v0.20.1
