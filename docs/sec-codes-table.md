@@ -6,34 +6,34 @@ show_sidebar: false
 menubar: docs-menu
 ---
 
-## Picking which Standard Entry Class Code code to use
+## Picking which Standard Entry Class code to use
 
 The [NACHA Corporate Rules and Guidelines](https://github.com/moov-io/ach/blob/master/docs/2013-Corporate-Rules-and-Guidelines.pdf) offer a helpful table for choosing the correct Standard Entry Class (SEC) Code to use for a given enrollment and transaction. The table has been re-written below:
 
-### Point of Sale Transactions
+### Point of sale transactions
 
-#### Physical Enrollment
-
-- Customer uses their debit card at a POS terminal.
-
-<p>Proper SEC Code: <strong>POS</strong></p>
-
-#### Internet Enrollment
+#### Physical enrollment
 
 - Customer uses their debit card at a POS terminal.
 
 <p>Proper SEC Code: <strong>POS</strong></p>
 
-### Internet Transactions
+#### Internet enrollment
 
-#### Physical Enrollment
+- Customer uses their debit card at a POS terminal.
+
+<p>Proper SEC Code: <strong>POS</strong></p>
+
+### Internet transactions
+
+#### Physical enrollment
 
 - Customer initiates debits via the bank’s web site or individual bill payments at a merchant web site.
 - Customer uses their ACH-based debit card to make a purchase at a web site.
 
 <p>Proper SEC Code: <strong>PPD</strong></p>
 
-#### Internet Enrollment
+#### Internet enrollment
 
 - Customer authorizes a transfer of funds into a savings account.
 - Customer initiates bill payments at a merchant web site on their debit card.
@@ -41,15 +41,15 @@ The [NACHA Corporate Rules and Guidelines](https://github.com/moov-io/ach/blob/m
 
 <p>Proper SEC Code: <strong>WEB</strong></p>
 
-### ATM Transactions
+### ATM transactions
 
-#### Physical Enrollment
+#### Physical enrollment
 
 - Customer uses the card at an ATM to withdraw cash.
 
 <p>Proper SEC Code: <strong>MTE</strong></p>
 
-#### Internet Enrollment
+#### Internet enrollment
 
 - Customer uses an ATM to withdraw cash:
 

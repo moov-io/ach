@@ -26,7 +26,7 @@ NACHA includes Members in the process of establishing Rules for the ACH Network,
 
 [Source: ACH Network: How it Works](https://www.nacha.org/ach-network)
 
-## Developer Overview
+## Developer overview
 
 Nacha has published an [ACH Guide for Developers](https://dev-ach-guide.pantheonsite.io/) that covers the basics of ACH payment flow, entry types, and file structure.
 
