@@ -1,4 +1,4 @@
-- label: Getting Started
+- label: Getting started
   items:
     - name: Overview
       link: /
@@ -11,44 +11,44 @@
       link: /usage-docker/
     - name: Google Cloud Run
       link: /usage-google-cloud/
-    - name: API Configuration
+    - name: API configuration
       link: /usage-configuration/
-    - name: Go Library
+    - name: Go library
       link: /usage-go/
-    - name: Command Line
+    - name: Command line
       link: /usage-command-line/
 
-- label: ACH File Setup
+- label: ACH file setup
   items:
-    - name: Create File
+    - name: Create file
       link: /create-file/
-    - name: File Structure
+    - name: File structure
       link: /file-structure/
-    - name: SEC Codes Table
+    - name: SEC codes table
       link: /sec-codes-table/
 
-- label: File Operations
+- label: File operations
   items:
-    - name: Custom Validation
+    - name: Custom validation
       link: /custom-validation/
-    - name: Balanced Offset
+    - name: Balanced offset
       link: /balanced-offset/
-    - name: Flatten Batches
+    - name: Flatten batches
       link: /flatten-batches/
-    - name: Merging Files
+    - name: Merging files
       link: /merging-files/
-    - name: Segmenting Files
+    - name: Segmenting files
       link: /segment-file/
-    - name: Return Files
+    - name: Return files
       link: /returns/
-    - name: Change Files
+    - name: Change files
       link: /changes/
 
-- label: Production and Monitoring
+- label: Production and monitoring
   items:
     - name: Kubernetes
       link: /deployment/
-    - name: Prometheus Metrics
+    - name: Prometheus metrics
       link: /metrics/
     - name: Building for AWS Lambda
       link: /aws/lambda/building-go-for-lambda/
