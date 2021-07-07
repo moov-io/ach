@@ -21,7 +21,7 @@
 [![Slack Channel](https://slack.moov.io/badge.svg?bg=e01563&fgColor=fffff)](https://slack.moov.io/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/moov/ach)](https://hub.docker.com/r/moov/ach)
 [![GitHub Stars](https://img.shields.io/github/stars/moov-io/ach)](https://github.com/moov-io/ach)
-[![Twitter](https://img.shields.io/twitter/follow/moov_io?style=social)](https://twitter.com/moov_io?lang=en)
+[![Twitter](https://img.shields.io/twitter/follow/moov?style=social)](https://twitter.com/moov?lang=en)
 
 # moov-io/ach
 Moov's mission is to give developers an easy way to create and integrate bank processing into their own software products. Our open source projects are each focused on solving a single responsibility in financial services and designed around performance, scalability, and ease of use.
@@ -30,27 +30,27 @@ ACH implements a reader, writer, and validator for Automated Clearing House ([AC
 
 If you're looking for a complete implementation of ACH origination (file creation), OFAC checks, micro-deposits, SFTP uploading, and other features, the [moov-io/paygate](https://github.com/moov-io/paygate) project aims to be a full system for ACH transfers. Otherwise, check out our article on [How and When to use the Moov ACH Library](https://moov.io/blog/education/how-and-when-to-use-the-moov-ach-library/).
 
-## Table of Contents
+## Table of contents
 
-- [Project Status](#project-status)
+- [Project status](#project-status)
 - [Usage](#usage)
   - As an API
     - [Docker](#docker) ([Config](#configuration-settings))
     - [Google Cloud](#google-cloud-run-button) ([Config](#configuration-settings))
     - [HTTP API](#http-api) ([Config](#configuration-settings))
-    - [Data Persistence](#data-persistence)
-  - [As a Go Module](#go-library)
-  - [As a Command Line Tool](#command-line)
-  - [As an In-Browser Parser](##in-browser-ach-file-parser)
-- [SDKs (OpenAPI)](#sdks)
-- [Learn About ACH](#learn-about-ach)
+    - [Data persistence](#data-persistence)
+  - [As a Go module](#go-library)
+  - [As a command line tool](#command-line)
+  - [As an in-browser parser](##in-browser-ach-file-parser)
+- [OpenAPI SDKs](#sdks)
+- [Learn about ACH](#learn-about-ach)
 - [FAQ](#faq)
-- [Getting Help](#getting-help)
-- [Supported and Tested Platforms](#supported-and-tested-platforms)
+- [Getting help](#getting-help)
+- [Supported and tested platforms](#supported-and-tested-platforms)
 - [Contributing](#contributing)
-- [Related Projects](#related-projects)
+- [Related projects](#related-projects)
 
-## Project Status
+## Project status
 
 Moov ACH is actively used in multiple production environments. Please star the project if you are interested in its progress. The project supports generating and parsing all Standard Entry Class (SEC) codes. If you have layers above ACH to simplify tasks, perform business operations, or found bugs we would appreciate an issue or pull request. Thanks!
 
@@ -92,7 +92,7 @@ curl http://localhost:8080/files/<YOUR-UNIQUE-FILE-ID>
 {"file":{"id":"<YOUR-UNIQUE-FILE-ID>","fileHeader":{"id":"","immediateDestination":"231380104","immediateOrigin":"121042882", ...
 ```
 
-### Google Cloud Run Button
+### Google Cloud Run button
 
 To get started in a hosted environment you can deploy this project to the Google Cloud Platform.
 
@@ -212,7 +212,7 @@ Examples: [Go](examples/http/main.go) | [Ruby](https://github.com/moov-io/ruby-a
 - [Create an ACH file for a payment and get the raw file](https://github.com/moov-io/ruby-ach-demo)
 
 
-### Configuration Settings
+### Configuration settings
 
 | Environmental Variable | Description | Default |
 |-----|-----|-----|
@@ -223,11 +223,11 @@ Examples: [Go](examples/http/main.go) | [Ruby](https://github.com/moov-io/ruby-a
 | `HTTPS_CERT_FILE` | Filepath containing a certificate (or intermediate chain) to be served by the HTTP server. Requires all traffic be over secure HTTP. | Empty |
 | `HTTPS_KEY_FILE`  | Filepath of a private key matching the leaf certificate from `HTTPS_CERT_FILE`. | Empty |
 
-### Data Persistence
+### Data persistence
 By design ACH **does not persist** (save) any data about the files, batches, or entry details created. The only storage occurs in memory of the process and upon restart ACH will have no files, batches, or data saved. Also, no in memory encryption of the data is performed.
 
 
-### Go Library
+### Go library
 
 This project uses [Go Modules](https://github.com/golang/go/wiki/Modules) and Go v1.14 or higher. See [Golang's install instructions](https://golang.org/doc/install) for help in setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/ach/releases/latest) as well. We highly recommend you use a tagged release for production.
 
@@ -283,7 +283,7 @@ The package [`github.com/moov-io/ach`](https://pkg.go.dev/github.com/moov-io/ach
 
 </details>
 
-### Command Line
+### Command line
 
 On each release there's an `achcli` utility released. This tool can display ACH files in a human-readable format which is easier to read than their plaintext format. It also allows masking `DFIAccountNumber` values with the `-mask` flag.
 
@@ -309,7 +309,7 @@ Describing ACH file 'test/testdata/ppd-debit.ach'
   1           1           1                  100000000         0
 ```
 
-### In-Browser ACH File Parser
+### In-browser ACH file parser
 Using our [in-browser utility](http://oss.moov.io/ach/), you can instantly convert ACH files into JSON. Either paste in ACH file content directly or choose a file from your local machine. This tool is particulary useful if you're handling sensitive PII or want perform some quick tests, as operations are fully client-side with nothing stored in memory.
 
 ### SDKs
@@ -320,7 +320,7 @@ Below are some SDKs generated from the API documentation:
 
 - TODO - OpenAPI Guide
 
-## Learn About ACH
+## Learn about ACH
 
 - [Official Nacha ACH Guide for Developers](https://dev-ach-guide.pantheonsite.io/)
 - [Intro to ACH](https://moov-io.github.io/ach/intro/)
@@ -347,18 +347,18 @@ We support generating and parsing all Standard Entry Class (SEC) codes.
 You can purchase the most recent Nacha Operating Rules and Guidelines resource directly from their <a href="https://www.nacha.org/store">webstore</a>. Additionally, Nacha has published a <a href="https://dev-ach-guide.pantheonsite.io/">free ACH guide for developers</a>.
 </details>
 
-## Getting Help
+## Getting help
 
 If you have ACH-specific questions, NACHA (National Automated Clearing House Association) has their [complete specification](docs/2013-Corporate-Rules-and-Guidelines.pdf) for all file formats and message types.
 
  channel | info
  ------- | -------
  [Project Documentation](https://moov-io.github.io/ach/) | Our project documentation available online.
-Twitter [@moov_io](https://twitter.com/moov_io)	| You can follow Moov.IO's Twitter feed to get updates on our project(s). You can also tweet us questions or just share blogs or stories.
+Twitter [@moov](https://twitter.com/moov)	| You can follow Moov.io's Twitter feed to get updates on our project(s). You can also tweet us questions or just share blogs or stories.
 [GitHub Issue](https://github.com/moov-io/ach/issues/new) | If you are able to reproduce a problem please open a GitHub Issue under the specific project that caused the error.
 [moov-io slack](https://slack.moov.io/) | Join our slack channel to have an interactive discussion about the development of the project.
 
-## Supported and Tested Platforms
+## Supported and tested platforms
 
 - 64-bit Linux (Ubuntu, Debian), macOS, and Windows
 - Raspberry Pi
@@ -384,7 +384,7 @@ We maintain a comprehensive suite of unit tests and recommend table-driven testi
 We currently run fuzzing over ACH in the form of a [`moov/achfuzz`](https://hub.docker.com/r/moov/achfuzz) Docker image. You can [read more](./test/fuzz-reader/README.md) or run the image and report crasher examples to [`security@moov.io`](mailto:security@moov.io). Thanks!
 
 
-## Related Projects
+## Related projects
 As part of Moov's initiative to offer open source fintech infrastructure, we have a large collection of active projects you may find useful:
 
 - [Moov Watchman](https://github.com/moov-io/watchman) offers search functions over numerous trade sanction lists from the United States and European Union.

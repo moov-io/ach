@@ -1,12 +1,12 @@
 ---
 layout: page
-title: Go Library
+title: Go library
 hide_hero: true
 show_sidebar: false
 menubar: docs-menu
 ---
 
-# Go Library
+# Go library
 
 This project uses [Go Modules](https://github.com/golang/go/wiki/Modules) and Go v1.14 or higher. See [Golang's install instructions](https://golang.org/doc/install) for help in setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/ach/releases/latest) as well. We highly recommend you use a tagged release for production.
 
@@ -21,7 +21,7 @@ $ go doc github.com/moov-io/ach BatchHeader
 
 The package [`github.com/moov-io/ach`](https://pkg.go.dev/github.com/moov-io/ach) offers a Go-based ACH file reader and writer. To get started, check out a specific example:
 
-### Supported Standard Entry Class (SEC) Codes
+### Supported Standard Entry Class (SEC) codes
 
 | SEC Code | Description                                  | Example                                  | Read                | Write                                            |
 |----------|---------------------------------------|------------------------------------------|-----------------------------------|------------------------------------|
@@ -49,7 +49,7 @@ The package [`github.com/moov-io/ach`](https://pkg.go.dev/github.com/moov-io/ach
 | WEB      | Internet-initiated Entries            | [Credit](https://github.com/moov-io/ach/blob/master/test/ach-web-read/web-credit.ach) | [WEB Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-WebReadCredit) | [WEB Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-WebWriteCredit) |
 | XCK      | Destroyed Check Entry                 | [Debit](https://github.com/moov-io/ach/blob/master/test/ach-xck-read/xck-debit.ach)  | [XCK Read](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-XckReadDebit) | [XCK Write](https://pkg.go.dev/github.com/moov-io/ach/examples#example-package-XckWriteDebit) |
 
-### Segment Files
+### Segment files
 
 | SEC Code | Name                                  | Example                                  | Read                | Write                                            |
 |----------|---------------------------------------|------------------------------------------|-----------------------------------|------------------------------------|

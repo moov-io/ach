@@ -1,12 +1,12 @@
 ---
 layout: page
-title: ACH File Setup
+title: ACH file setup
 hide_hero: true
 show_sidebar: false
 menubar: docs-menu
 ---
 
-# Create a File
+# Create a file
 
 Creating an Automated Clearing House (ACH) file can be done several ways:
 
@@ -14,7 +14,7 @@ Creating an Automated Clearing House (ACH) file can be done several ways:
 - [Uploading a JSON representation](#upload-a-json-representation)
 - [Uploading a raw ACH file](#upload-a-json-representation)
 
-## Go Client
+## Go client
 
 We have an example of [using our Go client and uploading the JSON representation](https://github.com/moov-io/ach/blob/master/examples/http/main.go). The basic idea follows this structure:
 
@@ -36,7 +36,7 @@ We have [example ACH files](https://github.com/moov-io/ach/blob/master/test/test
 
 Note: The header `Content-Type: application/json` must be set to parse the file as JSON, otherwise Nacha's format will be assumed.
 
-### Validate Options
+### Validate options
 
 When creating a file the server supports query parameters for setting `ValidateOpts` values.
 

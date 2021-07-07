@@ -1,12 +1,12 @@
 ---
 layout: page
-title: Return Files
+title: Return files
 hide_hero: true
 show_sidebar: false
 menubar: docs-menu
 ---
 
-# Return Files
+# Return files
 
 ACH files and their EntryDetail records may be returned for a variety of reasons defined by "return codes". Either the originating (ODFI) or receiving (RDFI) financial institution can issue a return. Some of the most common reasons include: insufficient funds (`R01`) and account information not found (`R03`).
 
@@ -90,7 +90,7 @@ addenda99.OriginalDFI = "9101298"
 | `R46` | Invalid Representative Payee Indicator (ENR Only) | The Representative Payee Indicator Code included in Field 3 of the Addenda Record has been omitted or it is not consistent with the Federal Government Agency's records. |
 | `R47` | Duplicate Enrollment (ENR Only) | The Entry is a duplicate of an Automated Enrollment Entry previously initiated by a DFI. |
 
-#### Used for RCK entries only and are initiated by a RDFI
+#### Used for RCK entries only and are initiated by an RDFI
 
 | Code | Reason | Description |
 |----|-----|------|

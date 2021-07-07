@@ -1,12 +1,12 @@
 ---
 layout: page
-title: Command Line
+title: Command line
 hide_hero: true
 show_sidebar: false
 menubar: docs-menu
 ---
 
-# Command Line
+# Command line
 
 On each release there's an `achcli` utility released. This tool can display ACH files in a human-readable format which is easier to read than their plaintext format. It also allows masking `DFIAccountNumber` values with the `-mask` flag.
 

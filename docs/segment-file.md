@@ -1,12 +1,12 @@
 ---
 layout: page
-title: Segmenting Files
+title: Segmenting files
 hide_hero: true
 show_sidebar: false
 menubar: docs-menu
 ---
 
-# Segmenting Files
+# Segmenting files
 
 ACH File creation should default to NACHA rules by supporting both credits and debits in the same ACH file.  Some legacy systems require the file to be segmented and contain only debits or only credits in a file.
 
@@ -14,7 +14,7 @@ Segmenting files is a post file creation process that takes an input of an ACH.F
 
 Note: Segmented files (via `SegmentFile()`) are only in ACH v1.1.0 and later.
 
-## Creating Segmented Files
+## Creating segmented files
 
 An ACH [File](https://godoc.org/github.com/moov-io/ach#File) supports calling [SegmentFile](https://godoc.org/github.com/moov-io/ach#File.SegmentFile) to create a debit ach file and credit ach file from an ach file that contains mixed debits and credits.
 

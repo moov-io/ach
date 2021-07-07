@@ -1,12 +1,12 @@
 ---
 layout: page
-title: Flatten Batches
+title: Flatten batches
 hide_hero: true
 show_sidebar: false
 menubar: docs-menu
 ---
 
-# Flatten Batches
+# Flatten batches
 
 File creation honors the order and number of Batch's that are created by the client. This is not optimized for the smallest file size and cost, that could be sent to the Federal Reserve for processing.
 
@@ -14,7 +14,7 @@ Flattening batches is a post file creation process that takes an input of an ACH
 
 Note: FlattenBatches (via `FlattenBatches()`) is only in ACH v1.2.0 and later.
 
-## Creating Flattened Batches
+## Creating flattened batches
 
 An ACH [File](https://godoc.org/github.com/moov-io/ach#File) supports calling [FlattenBatches](https://godoc.org/github.com/moov-io/ach#File.FlattenBatches):
 

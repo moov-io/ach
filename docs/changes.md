@@ -1,12 +1,12 @@
 ---
 layout: page
-title: Change Files
+title: Change files
 hide_hero: true
 show_sidebar: false
 menubar: docs-menu
 ---
 
-# Change Files
+# Change files
 
 A Notification of Change (NOC) is a non-dollar entry transmitted from a receiving depository financial institution (RDFI) to the originating depository financial institution (ODFI). These are sent in response to outdated or erroneous information in an initial entry. An NOC often occurs due to bank mergers or acquisitions that change account and/or routing numbers. If an RDFI sends an NOC, the ODFI will need to inform their originator promptly.
 
@@ -50,7 +50,7 @@ addenda98.TraceNumber = "91012980000088"
 //entry.Addenda98 = addenda98
 ```
 
-### Change Codes
+### Change codes
 
 | Code | Reason | Description |
 |----|-----|------|
