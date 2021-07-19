@@ -162,3 +162,27 @@ func TestValidators__isAlphanumeric(t *testing.T) {
 		})
 	}
 }
+
+func TestValidators__validateJulianDay(t *testing.T) {
+	empty := "   "
+	cases := map[string]string{
+		// invalid
+		"":      empty,
+		"   ":   empty,
+		"01":    empty,
+		"01234": empty,
+		"XXX":   empty,
+		"000":   empty,
+		"367":   empty,
+		// valid
+		"001": "001",
+		"020": "020",
+		"366": "366",
+	}
+	v := validator{}
+	for input, valid := range cases {
+		if v.validateSettlementDate(input) != valid {
+			t.Errorf("julian day=%s failed", input)
+		}
+	}
+}

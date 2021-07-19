@@ -235,8 +235,8 @@ func (iatBh *IATBatchHeader) Parse(record string) {
 	// 70-75 Date transactions are to be posted to the receivers' account.
 	// You almost always want the transaction to post as soon as possible, so put tomorrow's date in YYMMDD format
 	iatBh.EffectiveEntryDate = iatBh.validateSimpleDate(record[69:75])
-	// 76-79 Always blank (just fill with spaces)
-	iatBh.settlementDate = "   "
+	// 76-78 Always blank (just fill with spaces)
+	iatBh.settlementDate = iatBh.validateSettlementDate(record[75:78])
 	// 79-79 Always 1
 	iatBh.OriginatorStatusCode = iatBh.parseNumField(record[78:79])
 	// 80-87 Your ODFI's routing number without the last digit. The last digit is simply a
