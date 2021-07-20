@@ -500,11 +500,7 @@ func (v *validator) roundUp10(n int) int {
 func (v *validator) validateSettlementDate(s string) string {
 	emptyField := "   "
 
-	if s == emptyField {
-		return s
-	}
-
-	if len(s) != len(emptyField) {
+	if s == emptyField || len(s) != len(emptyField) {
 		return emptyField
 	}
 
