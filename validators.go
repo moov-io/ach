@@ -509,7 +509,6 @@ func (v *validator) validateSettlementDate(s string) string {
 	}
 
 	day, err := strconv.Atoi(s)
-
 	if err != nil {
 		return emptyField
 	}
