@@ -179,8 +179,9 @@ func (bh *BatchHeader) Parse(record string) {
 	// 70-75 Date transactions are to be posted to the receivers' account.
 	// You almost always want the transaction to post as soon as possible, so put tomorrow's date in YYMMDD format
 	bh.EffectiveEntryDate = bh.validateSimpleDate(record[69:75])
-	// 76-79 Always blank (just fill with spaces)
-	bh.settlementDate = "   "
+	// 76-78 Always blank if creating batches (just fill with spaces).
+	// Set to file value when parsing. Julian day format.
+	bh.settlementDate = bh.validateSettlementDate(record[75:78])
 	// 79-79 Always 1
 	bh.OriginatorStatusCode = bh.parseNumField(record[78:79])
 	// 80-87 Your ODFI's routing number without the last digit. The last digit is simply a
@@ -204,7 +205,7 @@ func (bh *BatchHeader) String() string {
 	buf.WriteString(bh.CompanyEntryDescriptionField())
 	buf.WriteString(bh.CompanyDescriptiveDateField())
 	buf.WriteString(bh.EffectiveEntryDateField())
-	buf.WriteString(bh.settlementDateField())
+	buf.WriteString(bh.SettlementDateField())
 	buf.WriteString(fmt.Sprintf("%v", bh.OriginatorStatusCode))
 	buf.WriteString(bh.ODFIIdentificationField())
 	buf.WriteString(bh.BatchNumberField())
@@ -358,7 +359,7 @@ func (bh *BatchHeader) BatchNumberField() string {
 	return bh.numericField(bh.BatchNumber, 7)
 }
 
-func (bh *BatchHeader) settlementDateField() string {
+func (bh *BatchHeader) SettlementDateField() string {
 	return bh.alphaField(bh.settlementDate, 3)
 }
 

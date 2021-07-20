@@ -496,3 +496,23 @@ func CheckRoutingNumber(routingNumber string) error {
 func (v *validator) roundUp10(n int) int {
 	return int(math.Ceil(float64(n)/10.0)) * 10
 }
+
+func (v *validator) validateSettlementDate(s string) string {
+	emptyField := "   "
+
+	if s == emptyField || len(s) != len(emptyField) {
+		return emptyField
+	}
+
+	day, err := strconv.Atoi(s)
+	if err != nil {
+		return emptyField
+	}
+
+	if day < 1 || day > 366 {
+		return emptyField
+	}
+
+	return s
+
+}
