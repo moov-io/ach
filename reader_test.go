@@ -1642,6 +1642,27 @@ func TestReturnACHFile(t *testing.T) {
 	}
 }
 
+// TestReturnACHFile test loading PPD return file with a custom return code
+func TestReturnACHFileCustomReasonCode(t *testing.T) {
+	f, err := os.Open(filepath.Join("test", "testdata", "return-PPD-custom-reason-code.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+
+	r := NewReader(f)
+	r.SetValidation(&ValidateOpts{
+		CustomReturnCodes: true,
+	})
+	data, err := r.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := data.Validate(); err != nil {
+		t.Fatal(err)
+	}
+}
+
 // TestADVReturnError returns a Parse Error
 func TestADVReturnError(t *testing.T) {
 	file := NewFile().SetHeader(mockFileHeader())

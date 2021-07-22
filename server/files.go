@@ -120,6 +120,7 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 		customTraceNumbers               = "customTraceNumbers"
 		allowZeroBatches                 = "allowZeroBatches"
 		bypassCompanyIdentificationMatch = "bypassCompanyIdentificationMatch"
+		customReturnCodes                = "customReturnCodes"
 	)
 
 	validationNames := []string{
@@ -129,6 +130,7 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 		customTraceNumbers,
 		allowZeroBatches,
 		bypassCompanyIdentificationMatch,
+		customReturnCodes,
 	}
 
 	for _, name := range validationNames {
@@ -158,6 +160,8 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 			req.validateOpts.AllowZeroBatches = true
 		case bypassCompanyIdentificationMatch:
 			req.validateOpts.BypassCompanyIdentificationMatch = true
+		case customReturnCodes:
+			req.validateOpts.CustomReturnCodes = true
 		}
 	}
 

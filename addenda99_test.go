@@ -391,3 +391,49 @@ func TestAddenda99__MissingFileHeaderControl(t *testing.T) {
 		t.Errorf("got %d entries", len(entries))
 	}
 }
+
+func TestAddenda99__SetValidation(t *testing.T) {
+	addenda99 := NewAddenda99()
+	addenda99.SetValidation(&ValidateOpts{
+		CustomReturnCodes: true,
+	})
+
+	addenda99.ReturnCode = "@#$" // can safely say this will never be a real ReasonCode
+	if err := addenda99.Validate(); err != nil {
+		t.Fatal(err)
+	}
+
+	addenda99.SetValidation(&ValidateOpts{
+		CustomReturnCodes: false,
+	})
+	if err := addenda99.Validate(); err == nil {
+		t.Fatal("Did not flag invalid reason code")
+	}
+	addenda99 = nil
+	addenda99.SetValidation(&ValidateOpts{})
+}
+
+func TestAddenda99__CustomReturnCode(t *testing.T) {
+	mockBatch := mockBatch()
+	// Add a Addenda Return to the mock batch
+	if len(mockBatch.Entries) != 1 {
+		t.Fatal("Expected 1 batch entry")
+	}
+	addenda99 := NewAddenda99()
+	addenda99.SetValidation(&ValidateOpts{
+		CustomReturnCodes: true,
+	})
+
+	addenda99.ReturnCode = "@#$" // can safely say this will never be a real ReasonCode
+	mockBatch.Entries[0].Addenda99 = addenda99
+	mockBatch.Entries[0].Category = CategoryReturn
+	mockBatch.Entries[0].AddendaRecordIndicator = 1
+
+	// replace last 2 of TraceNumber
+	if err := mockBatch.build(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err := mockBatch.verify(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
