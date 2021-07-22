@@ -47,8 +47,8 @@ func TestServer__CreateFileEndpoint(t *testing.T) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		reader := ach.NewReader(f)
-		achFile, err := reader.Read()
+
+		achFile, err := ach.NewReader(f).Read()
 		if err != nil {
 			fmt.Printf("Issue reading file: %+v \n", err)
 		}
