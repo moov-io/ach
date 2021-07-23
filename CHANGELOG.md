@@ -1,3 +1,24 @@
+## v1.10.0 (Released 2021-07-23)
+
+ADDITIONS
+
+- Implementing CustomReturnCode validation (#966)
+- Keep settlement date when parsing files. (#960)
+- file,server: add method for parsing JSON with custom validation
+
+IMPROVEMENTS
+
+- file: update docs on FileFromJSON validation
+
+BUILD
+
+- build: use debian stable's slim image in webui
+- build(deps): bump addressable from 2.7.0 to 2.8.0 in /docs
+- fix(deps): update github.com/juju/ansiterm commit hash to 9283cdf (#952)
+- fix(deps): update module github.com/aws/aws-lambda-go to v1.25.0
+- fix(deps): update module github.com/go-kit/kit to v0.11.0
+- fix(deps): update module github.com/moov-io/base to v0.21.1
+
 ## v1.9.3 (Released 2021-06-25)
 
 BUG FIXES
