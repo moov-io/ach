@@ -69,6 +69,8 @@ type Addenda99 struct {
 	validator
 	// converters is composed for ACH to GoLang Converters
 	converters
+
+	validateOpts *ValidateOpts
 }
 
 // ReturnCode holds a return Code, Reason/Title, and Description
@@ -142,12 +144,24 @@ func (Addenda99 *Addenda99) Validate() error {
 		return fieldError("TypeCode", ErrAddendaTypeCode, Addenda99.TypeCode)
 	}
 
-	_, ok := returnCodeDict[Addenda99.ReturnCode]
-	if !ok {
-		// Return Addenda requires a valid ReturnCode
-		return fieldError("ReturnCode", ErrAddenda99ReturnCode, Addenda99.ReturnCode)
+	if Addenda99.validateOpts == nil || !Addenda99.validateOpts.CustomReturnCodes {
+		_, ok := returnCodeDict[Addenda99.ReturnCode]
+		if !ok {
+			// Return Addenda requires a valid ReturnCode
+			return fieldError("ReturnCode", ErrAddenda99ReturnCode, Addenda99.ReturnCode)
+		}
 	}
+
 	return nil
+}
+
+// SetValidation stores ValidateOpts on the Batch which are to be used to override
+// the default NACHA validation rules.
+func (Addenda99 *Addenda99) SetValidation(opts *ValidateOpts) {
+	if Addenda99 == nil {
+		return
+	}
+	Addenda99.validateOpts = opts
 }
 
 // OriginalTraceField returns a zero padded OriginalTrace string

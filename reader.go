@@ -459,6 +459,7 @@ func (r *Reader) parseAddenda() error {
 			case "99":
 				addenda99 := NewAddenda99()
 				addenda99.Parse(r.line)
+				addenda99.SetValidation(r.File.validateOpts)
 				if err := addenda99.Validate(); err != nil {
 					return r.parseError(err)
 				}
