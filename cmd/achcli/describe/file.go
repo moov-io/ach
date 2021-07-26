@@ -38,11 +38,11 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 
 	// Batches
 	for i := range file.Batches {
-		fmt.Fprintln(w, "\n  BatchNumber\tSECCode\tServiceClassCode\tCompanyName\tDiscretionaryData\tIdentification\tEntryDescription\tDescriptiveDate")
+		fmt.Fprintln(w, "\n  BatchNumber\tSECCode\tServiceClassCode\tCompanyName\tDiscretionaryData\tIdentification\tEntryDescription\tEffectiveEntryDate\tDescriptiveDate")
 
 		bh := file.Batches[i].GetHeader()
 		if bh != nil {
-			fmt.Fprintf(w, "  %d\t%s\t%d %s\t%s\t%s\t%s\t%s\t%s\n",
+			fmt.Fprintf(w, "  %d\t%s\t%d %s\t%s\t%s\t%s\t%s\t%s\t%s\n",
 				bh.BatchNumber,
 				bh.StandardEntryClassCode,
 				bh.ServiceClassCode,
@@ -51,6 +51,7 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 				bh.CompanyDiscretionaryData,
 				bh.CompanyIdentification,
 				bh.CompanyEntryDescription,
+				bh.EffectiveEntryDate,
 				bh.CompanyDescriptiveDate,
 			)
 		}
