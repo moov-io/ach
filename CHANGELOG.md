@@ -1,3 +1,9 @@
+## v1.10.1 (Released 2021-07-26)
+
+BUG FIXES
+
+- cmd/achcli/describe: include EffectiveEntryDate on human readable output (#967)
+
 ## v1.10.0 (Released 2021-07-23)
 
 ADDITIONS
