@@ -1,3 +1,13 @@
+## v1.10.2 (Unreleased)
+
+IMPROVEMENTS
+
+- addenda99: Use updated [R17 title / description from Nacha update](https://www.nacha.org/rules/reversals-and-enforcement) (#971)
+
+BUILD
+
+- fix(deps): update module github.com/aws/aws-lambda-go to v1.26.0 (#968)
+
 ## v1.10.1 (Released 2021-07-26)
 
 BUG FIXES
