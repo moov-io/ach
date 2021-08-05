@@ -39,6 +39,8 @@ jobs:
 
     - name: Check
       run: make check
+      env:
+        GOLANGCI_LINTERS: gosec
 
     - name: Upload Code Coverage
       if: runner.os == 'Linux'

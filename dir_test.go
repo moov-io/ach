@@ -56,7 +56,7 @@ func TestReadDirErr(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	// zzz- is a prefix as ioutil.ReadDir seems to return file descriptors ordered alphabetically by filename
-	if err := ioutil.WriteFile(filepath.Join(dir, "zzz-bad.ach"), []byte("bad data"), 0644); err != nil {
+	if err := ioutil.WriteFile(filepath.Join(dir, "zzz-bad.ach"), []byte("bad data"), 0600); err != nil {
 		t.Fatal(err)
 	}
 
