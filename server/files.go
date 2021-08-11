@@ -121,6 +121,7 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 		allowZeroBatches                 = "allowZeroBatches"
 		bypassCompanyIdentificationMatch = "bypassCompanyIdentificationMatch"
 		customReturnCodes                = "customReturnCodes"
+		unequalServiceClassCode          = "unequalServiceClassCode"
 	)
 
 	validationNames := []string{
@@ -131,6 +132,7 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 		allowZeroBatches,
 		bypassCompanyIdentificationMatch,
 		customReturnCodes,
+		unequalServiceClassCode,
 	}
 
 	for _, name := range validationNames {
@@ -162,6 +164,8 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 			req.validateOpts.BypassCompanyIdentificationMatch = true
 		case customReturnCodes:
 			req.validateOpts.CustomReturnCodes = true
+		case unequalServiceClassCode:
+			req.validateOpts.UnequalServiceClassCode = true
 		}
 	}
 
