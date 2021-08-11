@@ -316,7 +316,8 @@ func (batch *Batch) verify() error {
 
 	if !batch.IsADV() {
 		// validate batch header and control codes are the same
-		if batch.Header.ServiceClassCode != batch.Control.ServiceClassCode {
+		if (batch.validateOpts == nil || !batch.validateOpts.UnequalServiceClassCode) &&
+			batch.Header.ServiceClassCode != batch.Control.ServiceClassCode {
 			return batch.Error("ServiceClassCode",
 				NewErrBatchHeaderControlEquality(batch.Header.ServiceClassCode, batch.Control.ServiceClassCode))
 		}
@@ -338,7 +339,8 @@ func (batch *Batch) verify() error {
 				NewErrBatchHeaderControlEquality(batch.Header.BatchNumber, batch.Control.BatchNumber))
 		}
 	} else {
-		if batch.Header.ServiceClassCode != batch.ADVControl.ServiceClassCode {
+		if (batch.validateOpts == nil || !batch.validateOpts.UnequalServiceClassCode) &&
+			batch.Header.ServiceClassCode != batch.ADVControl.ServiceClassCode {
 			return batch.Error("ServiceClassCode",
 				NewErrBatchHeaderControlEquality(batch.Header.ServiceClassCode, batch.ADVControl.ServiceClassCode))
 		}

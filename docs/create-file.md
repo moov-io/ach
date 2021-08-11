@@ -48,8 +48,10 @@ Example: `POST /files/create?requireABAOrigin=true&bypassDestination=true`
 | `bypassCompanyIdentificationMatch` | `BypassCompanyIdentificationMatch` |
 | `bypassDestination` | `BypassDestinationValidation` |
 | `bypassOrigin` | `BypassOriginValidation` |
+| `customReturnCodes` | `CustomReturnCodes` |
 | `customTraceNumbers` | `CustomTraceNumbers` |
 | `requireABAOrigin` | `RequireABAOrigin` |
+| `unequalServiceClassCode` | `UnequalServiceClassCode` |
 
 ## Upload a raw ACH file
 
