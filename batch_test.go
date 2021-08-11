@@ -29,6 +29,8 @@ import (
 	"time"
 
 	"github.com/moov-io/base"
+
+	"github.com/stretchr/testify/require"
 )
 
 // batch should never be used directly.
@@ -678,6 +680,23 @@ func BenchmarkIATBatch(b *testing.B) {
 	}
 }
 
+func TestBatchInvalidServiceClassCode(t *testing.T) {
+	batch := mockBatch()
+	require.NoError(t, batch.build())
+
+	batch.Control.ServiceClassCode = DebitsOnly
+	err := batch.verify()
+	if !base.Match(err, NewErrBatchHeaderControlEquality("280", "220")) {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	batch.SetValidation(&ValidateOpts{
+		UnequalServiceClassCode: true,
+	})
+	err = batch.verify()
+	require.NoError(t, err)
+}
+
 // TestBatchADVInvalidServiceClassCode validates ServiceClassCode
 func TestBatchADVInvalidServiceClassCode(t *testing.T) {
 	mockBatch := mockBatchADV()
@@ -689,6 +708,12 @@ func TestBatchADVInvalidServiceClassCode(t *testing.T) {
 	if !base.Match(err, NewErrBatchHeaderControlEquality("280", "220")) {
 		t.Errorf("%T: %s", err, err)
 	}
+
+	mockBatch.SetValidation(&ValidateOpts{
+		UnequalServiceClassCode: true,
+	})
+	err = mockBatch.verify()
+	require.NoError(t, err)
 }
 
 // TestBatchADVInvalidODFIIdentification validates ODFIIdentification
