@@ -1,4 +1,9 @@
-## v1.10.2 (Unreleased)
+## v1.11.0 (Released 2021-08-11)
+
+ADDITIONS
+
+- batch: allow unequal ServiceClassCodes to be used
+- server: allow unequalServiceClassCode query param
 
 IMPROVEMENTS
 
@@ -6,7 +11,10 @@ IMPROVEMENTS
 
 BUILD
 
+- fix(deps): update golang.org/x/oauth2 commit hash to faf39c7
 - fix(deps): update module github.com/aws/aws-lambda-go to v1.26.0 (#968)
+- fix(deps): update module github.com/moov-io/base to v0.22.0
+- meta: fixup from gosec linter
 
 ## v1.10.1 (Released 2021-07-26)
 
