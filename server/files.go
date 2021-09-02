@@ -119,6 +119,8 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 		bypassDestination                = "bypassDestination"
 		customTraceNumbers               = "customTraceNumbers"
 		allowZeroBatches                 = "allowZeroBatches"
+		allowMissingFileHeader           = "allowMissingFileHeader"
+		allowMissingFileControl          = "allowMissingFileControl"
 		bypassCompanyIdentificationMatch = "bypassCompanyIdentificationMatch"
 		customReturnCodes                = "customReturnCodes"
 		unequalServiceClassCode          = "unequalServiceClassCode"
@@ -130,6 +132,8 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 		bypassDestination,
 		customTraceNumbers,
 		allowZeroBatches,
+		allowMissingFileHeader,
+		allowMissingFileControl,
 		bypassCompanyIdentificationMatch,
 		customReturnCodes,
 		unequalServiceClassCode,
@@ -160,6 +164,10 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 			req.validateOpts.CustomTraceNumbers = true
 		case allowZeroBatches:
 			req.validateOpts.AllowZeroBatches = true
+		case allowMissingFileHeader:
+			req.validateOpts.AllowMissingFileHeader = true
+		case allowMissingFileControl:
+			req.validateOpts.AllowMissingFileControl = true
 		case bypassCompanyIdentificationMatch:
 			req.validateOpts.BypassCompanyIdentificationMatch = true
 		case customReturnCodes:

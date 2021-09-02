@@ -598,10 +598,10 @@ type ValidateOpts struct {
 	// AllowZeroBatches allows the file to have zero batches
 	AllowZeroBatches bool `json:"allowZeroBatches"`
 
-	// AllowMissingFileHeader
+	// AllowMissingFileHeader allows a file to be read without a FileHeader record.
 	AllowMissingFileHeader bool `json:"allowMissingFileHeader"`
 
-	// AllowMissingFileControl
+	// AllowMissingFileControl allows a file to be read without a FileControl record.
 	AllowMissingFileControl bool `json:"allowMissingFileControl"`
 
 	// BypassCompanyIdentificationMatch allows batches in which the Company Identification field
