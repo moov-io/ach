@@ -410,9 +410,16 @@ func datetimeParse(v string) (time.Time, error) {
 //
 // To check if the File is Nacha compliant, call Validate or ValidateWith.
 func (f *File) Create() error {
+	opts := f.validateOpts
+	if opts == nil {
+		opts = &ValidateOpts{}
+	}
+
 	// Requires a valid FileHeader to build FileControl
-	if err := f.Header.Validate(); err != nil {
-		return err
+	if !opts.AllowMissingFileHeader {
+		if err := f.Header.Validate(); err != nil {
+			return err
+		}
 	}
 
 	// If AllowZeroBatches is false, require at least one Batch in the new file.
