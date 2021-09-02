@@ -1,3 +1,18 @@
+## v1.12.0 (Released 2021-09-02)
+
+ADDITIONS
+
+- file: during creation check ValidateOpts for allowing empty headers
+- server: include missing FileHeader and missing FileControl query params
+
+IMPROVEMENTS
+
+- file: allow for missing file header and control
+
+BUG FIXES
+
+- file: unmarshal with ValidateOpts if set
+
 ## v1.11.0 (Released 2021-08-11)
 
 ADDITIONS
