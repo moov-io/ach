@@ -591,6 +591,12 @@ type ValidateOpts struct {
 	// AllowZeroBatches allows the file to have zero batches
 	AllowZeroBatches bool `json:"allowZeroBatches"`
 
+	// AllowMissingFileHeader
+	AllowMissingFileHeader bool `json:"allowMissingFileHeader"`
+
+	// AllowMissingFileControl
+	AllowMissingFileControl bool `json:"allowMissingFileControl"`
+
 	// BypassCompanyIdentificationMatch allows batches in which the Company Identification field
 	// in the batch header and control do not match.
 	BypassCompanyIdentificationMatch bool `json:"bypassCompanyIdentificationMatch"`
@@ -617,8 +623,10 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 		opts = &ValidateOpts{}
 	}
 
-	if err := f.Header.ValidateWith(opts); err != nil {
-		return err
+	if !opts.AllowMissingFileHeader {
+		if err := f.Header.ValidateWith(opts); err != nil {
+			return err
+		}
 	}
 
 	if !f.IsADV() {
@@ -633,8 +641,10 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 			}
 		}
 
-		if err := f.Control.Validate(); err != nil {
-			return err
+		if !opts.AllowMissingFileControl {
+			if err := f.Control.Validate(); err != nil {
+				return err
+			}
 		}
 		if err := f.isEntryAddendaCount(false); err != nil {
 			return err
@@ -654,8 +664,10 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 	if f.ADVControl.BatchCount != len(f.Batches) {
 		return NewErrFileCalculatedControlEquality("BatchCount", len(f.Batches), f.ADVControl.BatchCount)
 	}
-	if err := f.ADVControl.Validate(); err != nil {
-		return err
+	if !opts.AllowMissingFileControl {
+		if err := f.ADVControl.Validate(); err != nil {
+			return err
+		}
 	}
 	if err := f.isEntryAddendaCount(true); err != nil {
 		return err
