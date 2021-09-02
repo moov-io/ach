@@ -188,7 +188,7 @@ func FileFromJSONWith(bs []byte, opts *ValidateOpts) (*File, error) {
 
 // UnmarshalJSON parses a JSON blob with ach.FileFromJSON
 func (f *File) UnmarshalJSON(p []byte) error {
-	file, err := FileFromJSON(p)
+	file, err := FileFromJSONWith(p, f.validateOpts)
 	if err != nil {
 		return err
 	}
