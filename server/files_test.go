@@ -185,6 +185,13 @@ func TestFiles__decodeCreateFileRequest__validateOpts(t *testing.T) {
 				CustomTraceNumbers: true,
 			},
 		},
+		{
+			query: "?allowMissingFileHeader=true&allowMissingFileControl=true",
+			expect: ach.ValidateOpts{
+				AllowMissingFileHeader:  true,
+				AllowMissingFileControl: true,
+			},
+		},
 	}
 
 	for _, tc := range tests {

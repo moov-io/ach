@@ -188,7 +188,7 @@ func FileFromJSONWith(bs []byte, opts *ValidateOpts) (*File, error) {
 
 // UnmarshalJSON parses a JSON blob with ach.FileFromJSON
 func (f *File) UnmarshalJSON(p []byte) error {
-	file, err := FileFromJSON(p)
+	file, err := FileFromJSONWith(p, f.validateOpts)
 	if err != nil {
 		return err
 	}
@@ -410,9 +410,16 @@ func datetimeParse(v string) (time.Time, error) {
 //
 // To check if the File is Nacha compliant, call Validate or ValidateWith.
 func (f *File) Create() error {
+	opts := f.validateOpts
+	if opts == nil {
+		opts = &ValidateOpts{}
+	}
+
 	// Requires a valid FileHeader to build FileControl
-	if err := f.Header.Validate(); err != nil {
-		return err
+	if !opts.AllowMissingFileHeader {
+		if err := f.Header.Validate(); err != nil {
+			return err
+		}
 	}
 
 	// If AllowZeroBatches is false, require at least one Batch in the new file.
@@ -591,6 +598,12 @@ type ValidateOpts struct {
 	// AllowZeroBatches allows the file to have zero batches
 	AllowZeroBatches bool `json:"allowZeroBatches"`
 
+	// AllowMissingFileHeader allows a file to be read without a FileHeader record.
+	AllowMissingFileHeader bool `json:"allowMissingFileHeader"`
+
+	// AllowMissingFileControl allows a file to be read without a FileControl record.
+	AllowMissingFileControl bool `json:"allowMissingFileControl"`
+
 	// BypassCompanyIdentificationMatch allows batches in which the Company Identification field
 	// in the batch header and control do not match.
 	BypassCompanyIdentificationMatch bool `json:"bypassCompanyIdentificationMatch"`
@@ -617,8 +630,10 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 		opts = &ValidateOpts{}
 	}
 
-	if err := f.Header.ValidateWith(opts); err != nil {
-		return err
+	if !opts.AllowMissingFileHeader {
+		if err := f.Header.ValidateWith(opts); err != nil {
+			return err
+		}
 	}
 
 	if !f.IsADV() {
@@ -633,8 +648,10 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 			}
 		}
 
-		if err := f.Control.Validate(); err != nil {
-			return err
+		if !opts.AllowMissingFileControl {
+			if err := f.Control.Validate(); err != nil {
+				return err
+			}
 		}
 		if err := f.isEntryAddendaCount(false); err != nil {
 			return err
@@ -654,8 +671,10 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 	if f.ADVControl.BatchCount != len(f.Batches) {
 		return NewErrFileCalculatedControlEquality("BatchCount", len(f.Batches), f.ADVControl.BatchCount)
 	}
-	if err := f.ADVControl.Validate(); err != nil {
-		return err
+	if !opts.AllowMissingFileControl {
+		if err := f.ADVControl.Validate(); err != nil {
+			return err
+		}
 	}
 	if err := f.isEntryAddendaCount(true); err != nil {
 		return err
