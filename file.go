@@ -1216,8 +1216,10 @@ func (f *File) isSequenceAscending() error {
 	lastSeq := 0
 	for _, batch := range f.Batches {
 		current := batch.GetHeader().BatchNumber
-		if current <= lastSeq {
-			return NewErrFileBatchNumberAscending(lastSeq, current)
+		if f.validateOpts == nil || !f.validateOpts.CustomTraceNumbers {
+			if current <= lastSeq {
+				return NewErrFileBatchNumberAscending(lastSeq, current)
+			}
 		}
 
 		lastSeq = current
