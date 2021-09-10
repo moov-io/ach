@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build ignore
 // +build ignore
 
 // Generates iso3166.go.
