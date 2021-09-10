@@ -1,3 +1,13 @@
+## v1.12.1 (Released 2021-09-10)
+
+BUG FIXES
+
+- batch: check ValidateOpts for bypassing trace number ordering requirement
+
+BUILD
+
+- fix(deps): update module github.com/mattn/go-isatty to v0.0.14
+
 ## v1.12.0 (Released 2021-09-02)
 
 ADDITIONS
