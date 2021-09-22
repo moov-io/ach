@@ -721,8 +721,10 @@ func (batch *Batch) isSequenceAscending() error {
 	if !batch.IsADV() {
 		lastSeq := "0"
 		for _, entry := range batch.Entries {
-			if entry.TraceNumber <= lastSeq {
-				return batch.Error("TraceNumber", NewErrBatchAscending(lastSeq, entry.TraceNumber))
+			if batch.validateOpts == nil || !batch.validateOpts.CustomTraceNumbers {
+				if entry.TraceNumber <= lastSeq {
+					return batch.Error("TraceNumber", NewErrBatchAscending(lastSeq, entry.TraceNumber))
+				}
 			}
 			lastSeq = entry.TraceNumber
 		}
