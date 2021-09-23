@@ -1,3 +1,14 @@
+## v1.12.2 (Released 2021-09-23)
+
+BUG FIXES
+
+- batch: check ValidateOpts prior to TraceNumber ascending verification
+- file: pass through ValidateOpts for inner JSON unmarshals
+
+BUILD
+
+- fix(deps): update module github.com/moov-io/base to v0.24.0
+
 ## v1.12.1 (Released 2021-09-10)
 
 BUG FIXES
