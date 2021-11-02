@@ -234,11 +234,10 @@ By design ACH **does not persist** (save) any data about the files, batches, or 
 This project uses [Go Modules](https://github.com/golang/go/wiki/Modules) and Go v1.14 or higher. See [Golang's install instructions](https://golang.org/doc/install) for help in setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/ach/releases/latest) as well. We highly recommend you use a tagged release for production.
 
 ```
-$ git@github.com:moov-io/ach.git
-
 # Pull down into the Go Module cache
 $ go get -u github.com/moov-io/ach
 
+# Show the documentation for the BatchHeader package
 $ go doc github.com/moov-io/ach BatchHeader
 ```
 
@@ -312,7 +311,7 @@ Describing ACH file 'test/testdata/ppd-debit.ach'
 ```
 
 ### In-browser ACH file parser
-Using our [in-browser utility](http://oss.moov.io/ach/), you can instantly convert ACH files into JSON. Either paste in ACH file content directly or choose a file from your local machine. This tool is particulary useful if you're handling sensitive PII or want perform some quick tests, as operations are fully client-side with nothing stored in memory.
+Using our [in-browser utility](http://oss.moov.io/ach/), you can instantly convert ACH files into JSON. Either paste in ACH file content directly or choose a file from your local machine. This tool is particularly useful if you're handling sensitive PII or want perform some quick tests, as operations are fully client-side with nothing stored in memory.
 
 ### SDKs
 
