@@ -26,9 +26,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/moov-io/ach"
 	"github.com/moov-io/base"
 
-	"github.com/moov-io/ach"
+	"github.com/stretchr/testify/require"
 )
 
 // test mocks are in mock_test.go
@@ -350,6 +351,8 @@ func TestBalanceFile(t *testing.T) {
 	if ed := balancedFile.Batches[0].GetEntries()[1]; ed.IndividualName != "OFFSET" {
 		t.Errorf("ed.IndividualName=%s", ed.IndividualName)
 	}
+
+	require.NoError(t, balancedFile.Validate())
 }
 
 func TestBalanceFileErrors(t *testing.T) {
