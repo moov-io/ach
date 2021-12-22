@@ -30,7 +30,7 @@ Moov's mission is to give developers an easy way to create and integrate bank pr
 
 ACH implements a reader, writer, and validator for Automated Clearing House ([ACH](https://en.wikipedia.org/wiki/Automated_Clearing_House)) files. ACH is the primary method of electronic money movement throughout the United States. The HTTP server is available in a [Docker image](#docker) and the Go package `github.com/moov-io/ach` is available.
 
-If you're looking for a complete implementation of ACH origination (file creation), OFAC checks, micro-deposits, SFTP uploading, and other features, the [moov-io/paygate](https://github.com/moov-io/paygate) project aims to be a full system for ACH transfers. Otherwise, check out our article on [How and When to use the Moov ACH Library](https://moov.io/blog/education/how-and-when-to-use-the-moov-ach-library/).
+If you're looking for an event driven ACH engine for uploading/downloading files and operations we have built [moov-io/achgateway](https://github.com/moov-io/achgateway) and run it in production. Our article [How and When to use the Moov ACH Library](https://moov.io/blog/education/how-and-when-to-use-the-moov-ach-library/) will help to generate ACH files for upload to your ODFI.
 
 ## Table of contents
 
@@ -298,10 +298,10 @@ Describing ACH file 'test/testdata/ppd-debit.ach'
   121042882  My Bank Name  231380104    Federal Reserve Bank  190624            0000
 
   BatchNumber  SECCode  ServiceClassCode  CompanyName      DiscretionaryData  Identification  EntryDescription  DescriptiveDate
-  1            PPD      225 (Debits Only)  Name on Account                     121042882       REG.SALARY        
+  1            PPD      225 (Debits Only)  Name on Account                     121042882       REG.SALARY
 
     TransactionCode   RDFIIdentification  AccountNumber      Amount     Name                    TraceNumber      Category
-    27 (Checking Debit)  23138010            12345678           100000000  Receiver Account Name   121042880000001  
+    27 (Checking Debit)  23138010            12345678           100000000  Receiver Account Name   121042880000001
 
   ServiceClassCode  EntryAddendaCount  EntryHash  TotalDebits  TotalCredits  MACCode  ODFIIdentification  BatchNumber
   225 (Debits Only)  1                  23138010   100000000    0                      12104288            1
