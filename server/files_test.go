@@ -32,6 +32,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/ach"
+	"github.com/moov-io/ach/cmd/achcli/describe"
 	"github.com/moov-io/base"
 
 	"github.com/go-kit/kit/log"
@@ -480,6 +481,15 @@ func TestFiles__balanceFileEndpoint(t *testing.T) {
 	if resp.FileID == "" {
 		t.Error("empty FileID")
 	}
+
+	file, err = repo.FindFile(resp.FileID)
+	if err != nil {
+		t.Errorf("error reading balanced file: %v", err)
+	}
+	if err := file.Validate(); err != nil {
+		t.Errorf("balanced file is not valid: %v", err)
+	}
+	describe.File(os.Stdout, file, nil)
 
 	// check for ErrBadRouting
 	if _, err := decodeBalanceFileRequest(context.TODO(), &http.Request{}); err != ErrBadRouting {

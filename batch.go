@@ -734,7 +734,6 @@ func (batch *Batch) isSequenceAscending() error {
 
 // isEntryHash validates the hash by recalculating the result
 func (batch *Batch) isEntryHash() error {
-
 	hashField := batch.calculateEntryHash()
 	if !batch.IsADV() {
 		if hashField != batch.Control.EntryHash {
@@ -757,15 +756,13 @@ func (batch *Batch) calculateEntryHash() int {
 
 	if !batch.IsADV() {
 		for _, entry := range batch.Entries {
-
-			entryRDFI, _ := strconv.Atoi(entry.RDFIIdentification)
+			entryRDFI, _ := strconv.Atoi(aba8(entry.RDFIIdentification))
 
 			hash = hash + entryRDFI
 		}
 	} else {
 		for _, entry := range batch.ADVEntries {
-
-			entryRDFI, _ := strconv.Atoi(entry.RDFIIdentification)
+			entryRDFI, _ := strconv.Atoi(aba8(entry.RDFIIdentification))
 
 			hash = hash + entryRDFI
 		}
@@ -1155,7 +1152,7 @@ func (b *Batch) upsertOffsets() error {
 
 func createOffsetEntryDetail(off *Offset, batch *Batch) *EntryDetail {
 	ed := NewEntryDetail()
-	ed.RDFIIdentification = batch.offset.RoutingNumber[:8]
+	ed.RDFIIdentification = aba8(batch.offset.RoutingNumber)
 	ed.CheckDigit = batch.offset.RoutingNumber[8:9]
 	ed.DFIAccountNumber = batch.offset.AccountNumber
 	ed.IdentificationNumber = "" // left empty
