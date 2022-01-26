@@ -452,6 +452,28 @@ func BenchmarkFileReturnEntries(b *testing.B) {
 	}
 }
 
+func TestFile__ValidateOptsJSON(t *testing.T) {
+	file, err := ReadFile(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+
+	file.SetValidation(&ValidateOpts{
+		BypassOriginValidation: true,
+	})
+
+	bs, err := file.MarshalJSON()
+	require.NoError(t, err)
+
+	// zero out the file and verify we can read it all back
+	file = NewFile()
+
+	err = json.Unmarshal(bs, file)
+	require.NoError(t, err)
+
+	opts := file.GetValidation()
+	require.True(t, opts.BypassOriginValidation)
+	require.False(t, opts.BypassDestinationValidation)
+}
+
 func TestFile__readFromJson(t *testing.T) {
 	path := filepath.Join("test", "testdata", "ppd-valid.json")
 	bs, err := ioutil.ReadFile(path)
@@ -463,6 +485,7 @@ func TestFile__readFromJson(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	require.Nil(t, file.GetValidation())
 
 	// Ensure the file is valid
 	if err := file.Create(); err != nil {

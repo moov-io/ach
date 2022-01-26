@@ -189,6 +189,18 @@ func FileFromJSONWith(bs []byte, opts *ValidateOpts) (*File, error) {
 	return file, nil
 }
 
+// MarshalJSON will produce a JSON blob with the ACH file's fields and validation settings.
+func (f *File) MarshalJSON() ([]byte, error) {
+	type Aux struct {
+		File
+		ValidateOpts *ValidateOpts `json:"validateOpts"`
+	}
+	return json.Marshal(Aux{
+		File:         *f,
+		ValidateOpts: f.validateOpts,
+	})
+}
+
 // UnmarshalJSON parses a JSON blob with ach.FileFromJSON
 func (f *File) UnmarshalJSON(p []byte) error {
 	file, err := FileFromJSONWith(p, f.validateOpts)
@@ -198,7 +210,24 @@ func (f *File) UnmarshalJSON(p []byte) error {
 	if file != nil {
 		*f = *file
 	}
+	opts, err := readValidateOpts(p)
+	if err != nil {
+		return err
+	}
+	f.SetValidation(opts)
 	return nil
+}
+
+func readValidateOpts(p []byte) (*ValidateOpts, error) {
+	type Aux struct {
+		ValidateOpts *ValidateOpts `json:"validateOpts"`
+	}
+	var opts Aux
+	err := json.Unmarshal(p, &opts)
+	if err != nil {
+		return nil, err
+	}
+	return opts.ValidateOpts, nil
 }
 
 type batchesJSON struct {
@@ -561,6 +590,13 @@ func (f *File) Validate() error {
 	return f.ValidateWith(f.validateOpts)
 }
 
+func (f *File) GetValidation() *ValidateOpts {
+	if f == nil {
+		return nil
+	}
+	return f.validateOpts
+}
+
 // SetValidation stores ValidateOpts on the File which are to be used to override
 // the default NACHA validation rules.
 func (f *File) SetValidation(opts *ValidateOpts) {
@@ -594,7 +630,7 @@ type ValidateOpts struct {
 	BypassDestinationValidation bool `json:"bypassDestinationValidation"`
 
 	// CheckTransactionCode allows for custom validation of TransactionCode values
-	CheckTransactionCode func(code int) error
+	CheckTransactionCode func(code int) error `json:"-"`
 
 	// CustomTraceNumbers disables validation of TraceNumbers
 	CustomTraceNumbers bool `json:"customTraceNumbers"`
