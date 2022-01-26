@@ -130,6 +130,7 @@ next:
 	out.Header = f.Header
 	out.Header.FileCreationDate = now.Format("060102") // YYMMDD
 	out.Header.FileCreationTime = now.Format("1504")   // HHmm
+	out.SetValidation(f.validateOpts)
 	out.Create()
 	fs.outfiles = append(fs.outfiles, out) // add the new outfile
 
@@ -169,6 +170,7 @@ func (fs *mergableFiles) findOutfile(f *File) *File {
 		// Record a newly mergable File/FileHeader we can use in future merge attempts
 		outf := NewFile()
 		outf.Header = f.Header
+		outf.SetValidation(f.validateOpts)
 		outf.Control = f.Control
 		fs.outfiles = append(fs.outfiles, outf)
 		return outf
