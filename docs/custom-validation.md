@@ -44,6 +44,57 @@ if err := file.Validate(); err != nil {
 
 `BypassDestinationValidation bool` can be set to skip validation for the `ImmediateDestination` file header field.
 
+### Transaction Codes
+
+```
+// CheckTransactionCode allows for custom validation of TransactionCode values
+CheckTransactionCode func(code int) error
+```
+
+### Trace Numbers
+
+```
+// CustomTraceNumbers disables validation of TraceNumbers
+CustomTraceNumbers bool `json:"customTraceNumbers"`
+```
+
+### Batches
+
+```
+// AllowZeroBatches allows the file to have zero batches
+AllowZeroBatches bool `json:"allowZeroBatches"`
+
+// BypassCompanyIdentificationMatch allows batches in which the Company Identification field
+// in the batch header and control do not match.
+BypassCompanyIdentificationMatch bool `json:"bypassCompanyIdentificationMatch"`
+
+// UnequalServiceClassCode skips equality checks for the ServiceClassCode in each pair of BatchHeader
+// and BatchControl records.
+UnequalServiceClassCode bool `json:"unequalServiceClassCode"`
+```
+
+### File Header
+
+```
+// AllowMissingFileHeader allows a file to be read without a FileHeader record.
+AllowMissingFileHeader bool `json:"allowMissingFileHeader"`
+```
+
+### File Control
+
+```
+// AllowMissingFileControl allows a file to be read without a FileControl record.
+AllowMissingFileControl bool `json:"allowMissingFileControl"`
+```
+
+### Returns
+
+```
+// CustomReturnCodes can be set to skip validation for the Return Code field in an Addenda99
+// This allows for non-standard/deprecated return codes (e.g. R97)
+CustomReturnCodes bool `json:"customReturnCodes"`
+```
+
 ## Reader
 
 An `ach.Reader` can have custom validation rules as well, simply set them prior to reading.
@@ -58,6 +109,10 @@ if err != nil {
     // do something...
 }
 ```
+
+## JSON Options
+
+The JSON representation includes the `ValidateOpts` if specified on the `*ach.File` instance.
 
 ## HTTP server
 
