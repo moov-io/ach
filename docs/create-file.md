@@ -42,16 +42,18 @@ When creating a file the server supports query parameters for setting `ValidateO
 
 Example: `POST /files/create?requireABAOrigin=true&bypassDestination=true`
 
-| Query Param | Validation Option |
-|-----|-----|
-| `allowZeroBatches` | `AllowZeroBatches`
+| Query Param                        | Validation Option                  |
+|------------------------------------|------------------------------------|
+| `allowMissingFileControl`          | `AllowMissingFileControl`          |
+| `allowMissingFileHeader`           | `AllowMissingFileHeader`           |
+| `allowZeroBatches`                 | `AllowZeroBatches`                 |
 | `bypassCompanyIdentificationMatch` | `BypassCompanyIdentificationMatch` |
-| `bypassDestination` | `BypassDestinationValidation` |
-| `bypassOrigin` | `BypassOriginValidation` |
-| `customReturnCodes` | `CustomReturnCodes` |
-| `customTraceNumbers` | `CustomTraceNumbers` |
-| `requireABAOrigin` | `RequireABAOrigin` |
-| `unequalServiceClassCode` | `UnequalServiceClassCode` |
+| `bypassDestination`                | `BypassDestinationValidation`      |
+| `bypassOrigin`                     | `BypassOriginValidation`           |
+| `customReturnCodes`                | `CustomReturnCodes`                |
+| `customTraceNumbers`               | `CustomTraceNumbers`               |
+| `requireABAOrigin`                 | `RequireABAOrigin`                 |
+| `unequalServiceClassCode`          | `UnequalServiceClassCode`          |
 
 ## Upload a raw ACH file
 
