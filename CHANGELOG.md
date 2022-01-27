@@ -1,3 +1,18 @@
+## v1.13.0 (Released 2022-01-27)
+
+ADDITIONS
+
+- file: include ValidateOpts with JSON representations
+
+IMPROVEMENTS
+
+- merge: carry through ValidateOpts from files
+- server: verify balanced file validates
+
+BUILD
+
+- build: enforce a coverage threshold
+
 ## v1.12.2 (Released 2021-09-23)
 
 BUG FIXES
