@@ -50,7 +50,7 @@ func TestValidators__checkDigit(t *testing.T) {
 
 func TestValidators__isCreditCardYear(t *testing.T) {
 	cases := map[string]bool{
-		// invalid (or out of range)
+		// invalid (or out of range until 2051 or 2100-2117)
 		"10": false,
 		"00": false,
 		"51": false,
@@ -80,12 +80,13 @@ func TestValidators__validateSimpleDate(t *testing.T) {
 		"001240": "", // no 40th Day
 		"190001": "", // no 0th month
 		"190100": "", // no 0th day
+		"230229": "", // Feb 29th 2023 is not a leap year
 		// valid
 		"190101": "190101", // Jan 1st
 		"201231": "201231", // Dec 31st
 		"220731": "220731", // July 31st
 		"350430": "350430", // April 30th
-		"500229": "500229", // Feb 29th
+		"240229": "240229", // Feb 29th 2024 (Leap Year)
 	}
 
 	v := validator{}
