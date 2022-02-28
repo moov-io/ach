@@ -1,3 +1,13 @@
+## v1.13.1 (Released 2022-02-28)
+
+IMPROVEMENTS
+
+- fix: better date validation
+
+BUILD
+
+- build(deps): bump nokogiri from 1.12.5 to 1.13.3 in /docs
+
 ## v1.13.0 (Released 2022-01-27)
 
 ADDITIONS
