@@ -23,6 +23,7 @@ import (
 	"math"
 	"regexp"
 	"strconv"
+	"time"
 	"unicode/utf8"
 )
 
@@ -61,14 +62,6 @@ func (v *validator) isCardTransactionType(code string) error {
 	return ErrCardTransactionType
 }
 
-// isYear validates a 2 digit year 00-99
-func (v *validator) isYear(s string) error {
-	if s < "00" || s > "99" {
-		return ErrValidYear
-	}
-	return nil
-}
-
 // isCreditCardYear validates a 2 digit year for credit cards, but
 // only accepts a range of years. 2018 to 2050
 func (v *validator) isCreditCardYear(s string) error {
@@ -92,7 +85,6 @@ func (v *validator) isMonth(s string) error {
 // isDay validates a 2 digit day based on a 2 digit month
 // month 01-12 day 01-31 based on month
 func (v *validator) isDay(m string, d string) error {
-	// ToDo: Future Consideration Leap Year - not sure if cards actually have 0229
 	switch m {
 	// February
 	case "02":
@@ -134,20 +126,11 @@ func (v *validator) isDay(m string, d string) error {
 // validateSimpleDate will return the incoming string only if it matches a valid YYMMDD
 // date format. (Y=Year, M=Month, D=Day)
 func (v *validator) validateSimpleDate(s string) string {
-	if length := utf8.RuneCountInString(s); length != 6 {
+	_, err := time.Parse("060102", s) // YYMMDD
+	if err != nil {
 		return ""
 	}
-	yy, mm, dd := s[:2], s[2:4], s[4:6]
-	if err := v.isYear(yy); err != nil {
-		return ""
-	}
-	if err := v.isMonth(mm); err != nil {
-		return ""
-	}
-	if err := v.isDay(mm, dd); err != nil {
-		return ""
-	}
-	return fmt.Sprintf("%s%s%s", yy, mm, dd)
+	return s
 }
 
 var (
