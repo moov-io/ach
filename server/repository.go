@@ -24,8 +24,7 @@ import (
 	"time"
 
 	"github.com/moov-io/ach"
-
-	"github.com/go-kit/kit/log"
+	"github.com/moov-io/base/log"
 )
 
 // Repository is the Service storage mechanism abstraction
@@ -211,6 +210,6 @@ func (r *repositoryInMemory) cleanupOldFiles() {
 	}
 
 	if r.logger != nil {
-		r.logger.Log("files", fmt.Sprintf("removed %d ACH files older than %v", removed, tooOld.Format(time.RFC3339)))
+		r.logger.Info().Logf("removed %d ACH files older than %v", removed, tooOld.Format(time.RFC3339))
 	}
 }

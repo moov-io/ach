@@ -29,14 +29,15 @@ import (
 
 	"github.com/moov-io/ach"
 	"github.com/moov-io/ach/server"
+	"github.com/moov-io/base/log"
 
-	"github.com/go-kit/kit/log"
+	kitlog "github.com/go-kit/log"
 )
 
 func TestIssue786(t *testing.T) {
 	repo := server.NewRepositoryInMemory(0*time.Second, log.NewNopLogger())
 	svc := server.NewService(repo)
-	handler := server.MakeHTTPHandler(svc, repo, log.NewNopLogger())
+	handler := server.MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	// create the file
 	fd, err := os.Open(filepath.Join("testdata", "1-create.json"))

@@ -23,8 +23,7 @@ import (
 
 	"github.com/moov-io/ach"
 	"github.com/moov-io/base"
-
-	"github.com/go-kit/kit/log"
+	"github.com/moov-io/base/log"
 )
 
 var (

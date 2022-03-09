@@ -29,13 +29,12 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/moov-io/ach"
 	"github.com/moov-io/base"
 	moovhttp "github.com/moov-io/base/http"
-
-	"github.com/moov-io/ach"
+	"github.com/moov-io/base/log"
 
 	"github.com/go-kit/kit/endpoint"
-	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/gorilla/mux"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
@@ -90,7 +89,15 @@ func createFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.End
 
 		err := r.StoreFile(req.File)
 		if logger != nil {
-			logger.Log("files", "createFile", "requestID", req.requestID, "error", err)
+			logger := logger.With(log.Fields{
+				"files":     log.String("createFile"),
+				"requestID": log.String(req.requestID),
+			})
+			if err != nil {
+				logger.Error().LogError(err)
+			} else {
+				logger.Info().Log("create file")
+			}
 		}
 
 		resp := createFileResponse{
@@ -255,7 +262,15 @@ func getFileEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 		f, err := s.GetFile(req.ID)
 
 		if logger != nil {
-			logger.Log("files", "getFile", "requestID", req.requestID, "error", err)
+			logger := logger.With(log.Fields{
+				"files":     log.String("getFile"),
+				"requestID": log.String(req.requestID),
+			})
+			if err != nil {
+				logger.Error().LogError(err)
+			} else {
+				logger.Info().Log("get file")
+			}
 		}
 
 		return getFileResponse{
@@ -301,7 +316,15 @@ func deleteFileEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 		err := s.DeleteFile(req.ID)
 
 		if logger != nil {
-			logger.Log("files", "deleteFile", "requestID", req.requestID, "error", err)
+			logger := logger.With(log.Fields{
+				"files":     log.String("deleteFile"),
+				"requestID": log.String(req.requestID),
+			})
+			if err != nil {
+				logger.Error().LogError(err)
+			} else {
+				logger.Info().Log("delete file")
+			}
 		}
 
 		return deleteFileResponse{
@@ -344,7 +367,15 @@ func getFileContentsEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 		r, err := s.GetFileContents(req.ID)
 
 		if logger != nil {
-			logger.Log("files", "getFileContents", "requestID", req.requestID, "error", err)
+			logger := logger.With(log.Fields{
+				"files":     log.String("getFileContents"),
+				"requestID": log.String(req.requestID),
+			})
+			if err != nil {
+				logger.Error().LogError(err)
+			} else {
+				logger.Info().Log("get file contents")
+			}
 		}
 		if err != nil {
 			return getFileContentsResponse{Err: err}, nil
@@ -388,7 +419,15 @@ func validateFileEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 
 		err := s.ValidateFile(req.ID, req.opts)
 		if logger != nil {
-			logger.Log("files", "validateFile", "requestID", req.requestID, "error", err)
+			logger := logger.With(log.Fields{
+				"files":     log.String("validateFile"),
+				"requestID": log.String(req.requestID),
+			})
+			if err != nil {
+				logger.Error().LogError(err)
+			} else {
+				logger.Info().Log("validate file")
+			}
 		}
 		if err != nil { // wrap err with context
 			err = fmt.Errorf("%v: %v", errInvalidFile, err)
@@ -434,14 +473,30 @@ func balanceFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 		if !ok {
 			return balanceFileResponse{Err: ErrFoundABug}, ErrFoundABug
 		}
-
 		balancedFile, err := s.BalanceFile(req.fileID, req.offset)
 		if balancedFile != nil && logger != nil {
-			logger.Log("files", fmt.Sprintf("balance file created %s", balancedFile.ID), "requestID", req.requestID, "error", err)
+			logger := logger.With(log.Fields{
+				"files":     log.String(fmt.Sprintf("balance file created %s", balancedFile.ID)),
+				"requestID": log.String(req.requestID),
+			})
+			if err != nil {
+				logger.Error().LogError(err)
+			} else {
+				logger.Info().Log("balance file")
+			}
 		}
 		if err != nil {
 			if logger != nil {
-				logger.Log("files", fmt.Sprintf("problem balancing %s: %v", req.fileID, err), "requestID", req.requestID, "error", err)
+				logger := logger.With(log.Fields{
+					"files":     log.String(fmt.Sprintf("problem balancing %s: %v", req.fileID, err)),
+					"requestID": log.String(req.requestID),
+				})
+				if err != nil {
+					logger.Error().LogError(err)
+				} else {
+					logger.Info().Log("balance file")
+				}
+
 			}
 			return balanceFileResponse{Err: err}, err
 		}
@@ -495,7 +550,15 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 		creditFile, debitFile, err := s.SegmentFile(req.fileID, req.opts)
 
 		if logger != nil {
-			logger.Log("files", "segmentFile", "requestID", req.requestID, "error", err)
+			logger.With(log.Fields{
+				"files":     log.String("segmentFile"),
+				"requestID": log.String(req.requestID),
+			})
+			if err != nil {
+				logger.Error().LogError(err)
+			} else {
+				logger.Info().Log("segment file")
+			}
 		}
 		if err != nil {
 			return segmentFileResponse{Err: err}, err
@@ -503,17 +566,24 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 
 		if creditFile.ID != "" {
 			err = r.StoreFile(creditFile)
-			if logger != nil {
-				logger.Log("files", "storeCreditFile", "requestID", req.requestID, "error", err)
+			if logger != nil && err != nil {
+				logger.With(log.Fields{
+					"files":     log.String("storeCreditFile"),
+					"requestID": log.String(req.requestID),
+				}).LogError(err)
 			}
 		}
 
 		if debitFile.ID != "" {
 			err = r.StoreFile(debitFile)
-			if logger != nil {
-				logger.Log("files", "storeDebitFile", "requestID", req.requestID, "error", err)
+			if logger != nil && err != nil {
+				logger.With(log.Fields{
+					"files":     log.String("storeDebitFile"),
+					"requestID": log.String(req.requestID),
+				}).LogError(err)
 			}
 		}
+
 		return segmentFileResponse{
 			CreditFileID: creditFile.ID,
 			DebitFileID:  debitFile.ID,
@@ -560,7 +630,15 @@ func flattenBatchesEndpoint(s Service, r Repository, logger log.Logger) endpoint
 		}
 		flattenFile, err := s.FlattenBatches(req.fileID)
 		if logger != nil {
-			logger.Log("files", "FlattenBatches", "requestID", req.requestID, "error", err)
+			logger := logger.With(log.Fields{
+				"files":     log.String("FlattenBatches"),
+				"requestID": log.String(req.requestID),
+			})
+			if err != nil {
+				logger.Error().LogError(err)
+			} else {
+				logger.Info().Log("flatten batches")
+			}
 		}
 		if err != nil {
 			return flattenBatchesResponse{Err: err}, err
@@ -568,7 +646,15 @@ func flattenBatchesEndpoint(s Service, r Repository, logger log.Logger) endpoint
 		if flattenFile.ID != "" {
 			err = r.StoreFile(flattenFile)
 			if logger != nil {
-				logger.Log("files", "storeFlattenFile", "requestID", req.requestID, "error", err)
+				logger := logger.With(log.Fields{
+					"files":     log.String("storeFlattenFile"),
+					"requestID": log.String(req.requestID),
+				})
+				if err != nil {
+					logger.Error().LogError(err)
+				} else {
+					logger.Info().Log("flatten batches")
+				}
 			}
 		}
 		return flattenBatchesResponse{
