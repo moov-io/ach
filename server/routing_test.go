@@ -29,9 +29,10 @@ import (
 	"time"
 
 	"github.com/moov-io/ach"
+	"github.com/moov-io/base/log"
 
-	"github.com/go-kit/kit/log"
 	httptransport "github.com/go-kit/kit/transport/http"
+	kitlog "github.com/go-kit/log"
 )
 
 func TestRouting_codeFrom(t *testing.T) {
@@ -56,7 +57,7 @@ func TestRouting_ping(t *testing.T) {
 	logger := log.NewNopLogger()
 	r := NewRepositoryInMemory(1*time.Minute, logger)
 	svc := NewService(r)
-	router := MakeHTTPHandler(svc, r, logger)
+	router := MakeHTTPHandler(svc, r, kitlog.NewNopLogger())
 
 	req := httptest.NewRequest("GET", "/ping", nil)
 	req.Header.Set("Origin", "https://moov.io")

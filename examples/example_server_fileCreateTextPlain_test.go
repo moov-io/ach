@@ -19,8 +19,6 @@ package examples
 
 import (
 	"fmt"
-	"github.com/go-kit/kit/log"
-	"github.com/moov-io/ach/server"
 	lg "log"
 	"net/http"
 	"net/http/httptest"
@@ -28,12 +26,16 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+
+	"github.com/moov-io/ach/server"
+
+	"github.com/go-kit/log"
 )
 
 func Example_serverFileCreate() {
 	repo := server.NewRepositoryInMemory(24*time.Hour, nil)
 	service := server.NewService(repo)
-	logger := log.NewLogfmtLogger(os.Stderr)
+	logger := log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
 	handler := server.MakeHTTPHandler(service, repo, logger)
 
 	// Spin up a local HTTP server

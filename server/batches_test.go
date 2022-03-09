@@ -27,8 +27,9 @@ import (
 	"testing"
 
 	"github.com/moov-io/ach"
+	"github.com/moov-io/base/log"
 
-	"github.com/go-kit/kit/log"
+	kitlog "github.com/go-kit/log"
 )
 
 func TestFiles__decodeCreateBatchRequest(t *testing.T) {
@@ -51,7 +52,7 @@ func TestFiles__decodeCreateBatchRequest(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	// setup our HTTP handler
-	handler := MakeHTTPHandler(svc, repo, log.NewNopLogger())
+	handler := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	// execute our HTTP request
 	w := httptest.NewRecorder()
@@ -129,7 +130,7 @@ func TestFiles__decodeGetBatchesRequest(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	// setup our HTTP handler
-	handler := MakeHTTPHandler(svc, repo, log.NewNopLogger())
+	handler := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	// execute our HTTP request
 	w := httptest.NewRecorder()
@@ -196,7 +197,7 @@ func TestFiles__decodeGetBatchRequest(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	// setup our HTTP handler
-	handler := MakeHTTPHandler(svc, repo, log.NewNopLogger())
+	handler := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	// execute our HTTP request
 	w := httptest.NewRecorder()
@@ -265,7 +266,7 @@ func TestFiles__decodeDeleteBatchRequest(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	// setup our HTTP handler
-	handler := MakeHTTPHandler(svc, repo, log.NewNopLogger())
+	handler := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	// execute our HTTP request
 	w := httptest.NewRecorder()

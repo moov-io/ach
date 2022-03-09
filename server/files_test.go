@@ -33,9 +33,10 @@ import (
 
 	"github.com/moov-io/ach"
 	"github.com/moov-io/base"
+	"github.com/moov-io/base/log"
 
-	"github.com/go-kit/kit/log"
 	httptransport "github.com/go-kit/kit/transport/http"
+	kitlog "github.com/go-kit/log"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/require"
 )
@@ -61,7 +62,7 @@ func TestFiles__decodeCreateFileRequest(t *testing.T) {
 	req.Header.Set("content-type", "application/json")
 
 	// setup our HTTP handler
-	handler := MakeHTTPHandler(svc, repo, log.NewNopLogger())
+	handler := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	// execute our HTTP request
 	w := httptest.NewRecorder()
@@ -114,7 +115,7 @@ func TestFiles__CustomJsonValidation(t *testing.T) {
 	req.Header.Set("content-type", "application/json")
 
 	// setup our HTTP handler
-	handler := MakeHTTPHandler(svc, repo, log.NewNopLogger())
+	handler := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	// execute our HTTP request
 	w := httptest.NewRecorder()
@@ -228,7 +229,7 @@ func TestFiles__getFilesEndpoint(t *testing.T) {
 	req.Header.Set("content-type", "application/json")
 
 	// setup our HTTP handler
-	handler := MakeHTTPHandler(svc, repo, log.NewNopLogger())
+	handler := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	// execute our HTTP request
 	w := httptest.NewRecorder()
@@ -265,7 +266,7 @@ func TestFiles__getFileEndpoint(t *testing.T) {
 	req.Header.Set("content-type", "application/json")
 
 	// setup our HTTP handler
-	handler := MakeHTTPHandler(svc, repo, log.NewNopLogger())
+	handler := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	// execute our HTTP request
 	w := httptest.NewRecorder()
@@ -304,7 +305,7 @@ func TestFiles__getFileContentsEndpoint(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	// setup our HTTP handler
-	handler := MakeHTTPHandler(svc, repo, log.NewNopLogger())
+	handler := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	// execute our HTTP request
 	w := httptest.NewRecorder()
@@ -380,7 +381,7 @@ func TestFiles__validateFileEndpoint(t *testing.T) {
 }
 
 func TestFiles__ValidateOpts(t *testing.T) {
-	logger := log.NewLogfmtLogger(ioutil.Discard)
+	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)
 	svc := NewService(repo)
 
@@ -448,7 +449,7 @@ func TestFiles__balanceFileEndpoint(t *testing.T) {
 	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)
 	svc := NewService(repo)
-	router := MakeHTTPHandler(svc, repo, logger)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	// write an ACH file into the repository
 	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-valid.json"))
@@ -491,7 +492,7 @@ func TestFilesErr__balanceInvalidFile(t *testing.T) {
 	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)
 	svc := NewService(repo)
-	router := MakeHTTPHandler(svc, repo, logger)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	// write an invalid (partial) file
 	fh := ach.NewFileHeader()
@@ -527,7 +528,7 @@ func TestFilesErr__balanceFileEndpointJSON(t *testing.T) {
 	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)
 	svc := NewService(repo)
-	router := MakeHTTPHandler(svc, repo, logger)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	// write an ACH file into the repository
 	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-valid.json"))
@@ -597,7 +598,7 @@ func TestFiles__segmentFileEndpoint(t *testing.T) {
 	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)
 	svc := NewService(repo)
-	router := MakeHTTPHandler(svc, repo, logger)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	// write an ACH file into repository
 	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-valid.json"))
@@ -654,7 +655,7 @@ func TestFiles__flattenFileEndpoint(t *testing.T) {
 	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)
 	svc := NewService(repo)
-	router := MakeHTTPHandler(svc, repo, logger)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	// write an ACH file into repository
 	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-valid.json"))
@@ -714,7 +715,7 @@ func TestFilesByID__getFileEndpoint(t *testing.T) {
 	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)
 	svc := NewService(repo)
-	router := MakeHTTPHandler(svc, repo, logger)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	// write an ACH file into repository
 	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-valid.json"))
@@ -746,7 +747,7 @@ func TestFileContentsByID__getFileContentsEndpoint(t *testing.T) {
 	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)
 	svc := NewService(repo)
-	router := MakeHTTPHandler(svc, repo, logger)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	// write an ACH file into repository
 	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-valid.json"))
@@ -778,7 +779,7 @@ func TestFilesByID__deleteFileEndpoint(t *testing.T) {
 	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)
 	svc := NewService(repo)
-	router := MakeHTTPHandler(svc, repo, logger)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	// write an ACH file into repository
 	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-valid.json"))
@@ -828,7 +829,7 @@ func TestFiles__CreateFileEndpoint(t *testing.T) {
 	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)
 	svc := NewService(repo)
-	router := MakeHTTPHandler(svc, repo, logger)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	testCases := []struct {
 		filename           string
@@ -878,7 +879,7 @@ func TestFiles__CreateFileEndpoint(t *testing.T) {
 func TestFiles__CreateFileWithZeroBatches(t *testing.T) {
 	repo := NewRepositoryInMemory(testTTLDuration, log.NewNopLogger())
 	svc := NewService(repo)
-	handler := MakeHTTPHandler(svc, repo, log.NewNopLogger())
+	handler := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	f := ach.NewFile()
 	f.ID = "foo"
@@ -915,7 +916,7 @@ func TestFiles__CreateFileEndpointErr(t *testing.T) {
 	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)
 	svc := NewService(repo)
-	router := MakeHTTPHandler(svc, repo, logger)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	// write an ACH file into repository
 	fd, err := os.Open(filepath.Join("..", "test", "issues", "testdata", "issue702.ach"))
@@ -953,7 +954,7 @@ func TestFiles__CreateFileEndpointJSONErr(t *testing.T) {
 	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)
 	svc := NewService(repo)
-	router := MakeHTTPHandler(svc, repo, logger)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	// write an ACH file into repository
 	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-noBatches.json"))
@@ -993,7 +994,7 @@ func TestFiles__segmentFileEndpointError(t *testing.T) {
 	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)
 	svc := NewService(repo)
-	router := MakeHTTPHandler(svc, repo, logger)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	// write an ACH file into repository
 	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-valid.json"))
@@ -1035,7 +1036,7 @@ func TestFiles__flattenFileEndpointError(t *testing.T) {
 	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)
 	svc := NewService(repo)
-	router := MakeHTTPHandler(svc, repo, logger)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	// write an ACH file into repository
 	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-valid.json"))

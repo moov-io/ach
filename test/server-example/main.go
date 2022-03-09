@@ -26,7 +26,7 @@ import (
 
 	"github.com/moov-io/ach/server"
 
-	"github.com/go-kit/kit/log"
+	"github.com/go-kit/log"
 )
 
 func TestServer__CreateFile(t *testing.T) {

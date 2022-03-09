@@ -32,8 +32,9 @@ import (
 	"github.com/moov-io/ach/server"
 	"github.com/moov-io/base/admin"
 	"github.com/moov-io/base/http/bind"
+	"github.com/moov-io/base/log"
 
-	"github.com/go-kit/kit/log"
+	kitlog "github.com/go-kit/log"
 )
 
 var (
@@ -41,8 +42,6 @@ var (
 	adminAddr = flag.String("admin.addr", bind.Admin("ach"), "Admin HTTP listen address")
 
 	flagLogFormat = flag.String("log.format", "", "Format for log lines (Options: json, plain")
-
-	logger log.Logger
 
 	svc     server.Service
 	handler http.Handler
@@ -52,17 +51,18 @@ func main() {
 	flag.Parse()
 
 	// Setup logging, default to stdout
+	var kitlogger kitlog.Logger
 	if v := os.Getenv("LOG_FORMAT"); v != "" {
 		*flagLogFormat = v
 	}
 	if *flagLogFormat == "json" {
-		logger = log.NewJSONLogger(os.Stdout)
+		kitlogger = kitlog.NewLogfmtLogger(kitlog.NewSyncWriter(os.Stdout))
 	} else {
-		logger = log.NewLogfmtLogger(os.Stdout)
+		kitlogger = kitlog.NewJSONLogger(kitlog.NewSyncWriter(os.Stdout))
 	}
-	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
-	logger = log.With(logger, "caller", log.DefaultCaller)
-	logger.Log("startup", fmt.Sprintf("Starting ach server version %s", ach.Version))
+
+	logger := log.NewLogger(kitlogger)
+	logger.Logf("Starting ach server version %s", ach.Version)
 
 	// Setup underlying ach service
 	var achFileTTL time.Duration
@@ -70,14 +70,14 @@ func main() {
 		dur, err := time.ParseDuration(v)
 		if err == nil {
 			achFileTTL = dur
-			logger.Log("main", fmt.Sprintf("Using %v as ach.File TTL", achFileTTL))
+			logger.Logf("Using %v as ach.File TTL", achFileTTL)
 		}
 	}
 	r := server.NewRepositoryInMemory(achFileTTL, logger)
 	svc = server.NewService(r)
 
 	// Create HTTP server
-	handler = server.MakeHTTPHandler(svc, r, log.With(logger, "component", "HTTP"))
+	handler = server.MakeHTTPHandler(svc, r, kitlog.With(kitlogger, "component", "HTTP"))
 
 	// Listen for application termination.
 	errs := make(chan error)
@@ -110,7 +110,7 @@ func main() {
 	}
 	shutdownServer := func() {
 		if err := serve.Shutdown(context.TODO()); err != nil {
-			logger.Log("shutdown", err)
+			logger.LogError(err)
 		}
 	}
 
@@ -123,10 +123,10 @@ func main() {
 	adminServer := admin.NewServer(*adminAddr)
 	adminServer.AddVersionHandler(ach.Version) // Setup 'GET /version'
 	go func() {
-		logger.Log("admin", fmt.Sprintf("listening on %s", adminServer.BindAddr()))
+		logger.Logf("admin listening on %s", adminServer.BindAddr())
 		if err := adminServer.Listen(); err != nil {
 			err = fmt.Errorf("problem starting admin http: %v", err)
-			logger.Log("admin", err)
+			logger.LogError(err)
 			errs <- err
 		}
 	}()
@@ -135,22 +135,22 @@ func main() {
 	// Start main HTTP server
 	go func() {
 		if certFile, keyFile := os.Getenv("HTTPS_CERT_FILE"), os.Getenv("HTTPS_KEY_FILE"); certFile != "" && keyFile != "" {
-			logger.Log("startup", fmt.Sprintf("binding to %s for secure HTTP server", *httpAddr))
+			logger.Logf("startup binding to %s for secure HTTP server", *httpAddr)
 			if err := serve.ListenAndServeTLS(certFile, keyFile); err != nil {
 				errs <- err
-				logger.Log("exit", err)
+				logger.LogError(err)
 			}
 		} else {
-			logger.Log("startup", fmt.Sprintf("binding to %s for HTTP server", *httpAddr))
+			logger.Logf("startup binding to %s for HTTP server", *httpAddr)
 			if err := serve.ListenAndServe(); err != nil {
 				errs <- err
-				logger.Log("exit", err)
+				logger.LogError(err)
 			}
 		}
 	}()
 
 	if err := <-errs; err != nil {
 		shutdownServer()
-		logger.Log("exit", err)
+		logger.LogError(err)
 	}
 }

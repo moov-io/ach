@@ -9,9 +9,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-kit/kit/log"
-
 	"github.com/moov-io/ach"
+	"github.com/moov-io/base/log"
+
+	kitlog "github.com/go-kit/log"
 )
 
 const (
@@ -32,7 +33,7 @@ func BenchmarkCreateBigFile__Server(b *testing.B) {
 	repo := NewRepositoryInMemory(24*time.Hour, logger)
 	service := NewService(repo)
 	// setup our HTTP handler
-	handler := MakeHTTPHandler(service, repo, logger)
+	handler := MakeHTTPHandler(service, repo, kitlog.NewNopLogger())
 	// Spin up a local HTTP server
 	server := httptest.NewServer(handler)
 	defer server.Close()
@@ -70,7 +71,7 @@ func Benchmark__FlattenBigFile(b *testing.B) {
 	repo := NewRepositoryInMemory(24*time.Hour, logger)
 	service := NewService(repo)
 	// setup our HTTP handler
-	handler := MakeHTTPHandler(service, repo, logger)
+	handler := MakeHTTPHandler(service, repo, kitlog.NewNopLogger())
 	// Spin up a local HTTP server
 	server := httptest.NewServer(handler)
 	defer server.Close()

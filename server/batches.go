@@ -26,9 +26,9 @@ import (
 
 	"github.com/moov-io/ach"
 	moovhttp "github.com/moov-io/base/http"
+	"github.com/moov-io/base/log"
 
 	"github.com/go-kit/kit/endpoint"
-	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 )
 
@@ -59,7 +59,16 @@ func createBatchEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 		id, err := s.CreateBatch(req.FileID, req.Batch)
 
 		if logger != nil {
-			logger.Log("batches", "createBatch", "file", req.FileID, "requestID", req.requestID, "error", err)
+			logger := logger.With(log.Fields{
+				"batches":   log.String("createBatch"),
+				"file":      log.String(req.FileID),
+				"requestID": log.String(req.requestID),
+			})
+			if err != nil {
+				logger.Error().LogError(err)
+			} else {
+				logger.Info().Log("creating batch")
+			}
 		}
 
 		return createBatchResponse{
@@ -154,8 +163,13 @@ func getBatchesEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 		}
 
 		if logger != nil {
-			logger.Log("batches", "getBatches", "file", req.fileID, "requestID", req.requestID)
+			logger.With(log.Fields{
+				"batches":   log.String("getBatches"),
+				"file":      log.String(req.fileID),
+				"requestID": log.String(req.requestID),
+			}).Log("get batches")
 		}
+
 		return getBatchesResponse{
 			Batches: s.GetBatches(req.fileID),
 			Err:     nil,
@@ -209,7 +223,16 @@ func getBatchEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 		batch, err := s.GetBatch(req.fileID, req.batchID)
 
 		if logger != nil {
-			logger.Log("batches", "getBatche", "file", req.fileID, "requestID", req.requestID, "error", err)
+			logger := logger.With(log.Fields{
+				"batches":   log.String("getBatch"),
+				"file":      log.String(req.fileID),
+				"requestID": log.String(req.requestID),
+			})
+			if err != nil {
+				logger.Error().LogError(err)
+			} else {
+				logger.Info().Log("get batch")
+			}
 		}
 
 		return getBatchResponse{
@@ -264,7 +287,16 @@ func deleteBatchEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 		err := s.DeleteBatch(req.fileID, req.batchID)
 
 		if logger != nil {
-			logger.Log("batches", "deleteBatch", "file", req.fileID, "requestID", req.requestID, "error", err)
+			logger := logger.With(log.Fields{
+				"batches":   log.String("deleteBatch"),
+				"file":      log.String(req.fileID),
+				"requestID": log.String(req.requestID),
+			})
+			if err != nil {
+				logger.Error().LogError(err)
+			} else {
+				logger.Info().Log("delete batch")
+			}
 		}
 
 		return deleteBatchResponse{
