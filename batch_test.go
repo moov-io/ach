@@ -20,6 +20,7 @@ package ach
 import (
 	"bytes"
 	"encoding/json"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -856,10 +857,8 @@ func TestBatchDishonoredReturnsCategory(t *testing.T) {
 	entry.AddendaRecordIndicator = 1
 	entry.Category = CategoryDishonoredReturn
 
-	addenda99 := mockAddenda99()
-	addenda99.ReturnCode = "R68"
-	addenda99.AddendaInformation = "Untimely Return"
-	entry.Addenda99 = addenda99
+	addenda99Dishonored := mockAddenda99Dishonored()
+	entry.Addenda99Dishonored = addenda99Dishonored
 
 	entryOne := NewEntryDetail()
 	entryOne.TransactionCode = CheckingDebit
@@ -873,10 +872,8 @@ func TestBatchDishonoredReturnsCategory(t *testing.T) {
 	entryOne.AddendaRecordIndicator = 1
 	entryOne.Category = CategoryReturn
 
-	addenda99One := mockAddenda99()
-	addenda99One.ReturnCode = "R68"
-	addenda99One.AddendaInformation = "Untimely Return"
-	entryOne.Addenda99 = addenda99One
+	addenda99DishonoredOne := mockAddenda99Dishonored()
+	entryOne.Addenda99Dishonored = addenda99DishonoredOne
 
 	posHeader := NewBatchHeader()
 	posHeader.ServiceClassCode = DebitsOnly
@@ -894,6 +891,29 @@ func TestBatchDishonoredReturnsCategory(t *testing.T) {
 	err := batch.Create()
 	if !base.Match(err, NewErrBatchCategory("Return", "DishonoredReturn")) {
 		t.Errorf("%T: %s", err, err)
+	}
+
+	// Fix the entry after ensuring validation works
+	entryOne.Category = CategoryDishonoredReturn
+
+	file := NewFile()
+	file.SetHeader(mockFileHeader())
+	file.Control = mockFileControl()
+	file.AddBatch(batch)
+
+	if err := file.Create(); err != nil {
+		t.Fatal(err)
+	}
+
+	var buf bytes.Buffer
+	if err := NewWriter(&buf).Write(file); err != nil {
+		t.Fatal(err)
+	}
+
+	path := filepath.Join("examples", "testdata", "dishonored-return.ach")
+	err = ioutil.WriteFile(path, buf.Bytes(), 0600)
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 

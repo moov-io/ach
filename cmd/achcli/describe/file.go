@@ -77,6 +77,7 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 			}
 			dumpAddenda98(w, e.Addenda98)
 			dumpAddenda99(w, e.Addenda99)
+			dumpAddenda99Dishonored(w, e.Addenda99Dishonored)
 		}
 
 		bc := file.Batches[i].GetControl()
@@ -101,6 +102,18 @@ func dumpAddenda02(w *tabwriter.Writer, a *ach.Addenda02) {
 	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
 		a.ReferenceInformationOne, a.ReferenceInformationTwo, a.TerminalIdentificationCode, a.TransactionSerialNumber,
 		a.TransactionDate, a.AuthorizationCodeOrExpireDate, a.TerminalLocation, a.TerminalCity, a.TerminalState, a.TraceNumber)
+}
+
+func dumpAddenda99Dishonored(w *tabwriter.Writer, a *ach.Addenda99Dishonored) {
+	if a == nil {
+		return
+	}
+
+	fmt.Fprintln(w, "\n      Dishonored Addenda99")
+	fmt.Fprintln(w, "      Dis. ReturnCode\tOrig. TraceNumber\tRDFI Identification\tTraceNumber\tSettlementDate\tReturnCode\tAddendaInformation\tTraceNumber")
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+		a.DishonoredReturnReasonCode, a.OriginalEntryTraceNumber, a.OriginalReceivingDFIIdentification, a.ReturnTraceNumber,
+		a.ReturnSettlementDate, a.ReturnReasonCode, a.AddendaInformation, a.TraceNumber)
 }
 
 func dumpAddenda05(w *tabwriter.Writer, a *ach.Addenda05) {

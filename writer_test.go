@@ -557,10 +557,8 @@ func TestPOSDishonoredReturnWrite(t *testing.T) {
 	entry.AddendaRecordIndicator = 1
 	entry.Category = CategoryDishonoredReturn
 
-	addenda99 := mockAddenda99()
-	addenda99.ReturnCode = "R68"
-	addenda99.AddendaInformation = "Untimely Return"
-	entry.Addenda99 = addenda99
+	addenda99Dishonored := mockAddenda99Dishonored()
+	entry.Addenda99Dishonored = addenda99Dishonored
 
 	posHeader := NewBatchHeader()
 	posHeader.ServiceClassCode = DebitsOnly

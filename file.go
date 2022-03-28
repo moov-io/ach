@@ -256,6 +256,10 @@ func setEntryRecordType(e *EntryDetail) {
 		e.Addenda99.recordType = "7"
 		e.Addenda99.TypeCode = "99"
 	}
+	if e.Addenda99Dishonored != nil {
+		e.Addenda99Dishonored.recordType = "7"
+		e.Addenda99Dishonored.TypeCode = "99"
+	}
 }
 
 func setADVEntryRecordType(e *ADVEntryDetail) {

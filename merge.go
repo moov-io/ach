@@ -208,6 +208,9 @@ func lineCount(f *File) (int, error) {
 			if entries[j].Addenda99 != nil {
 				lines++
 			}
+			if entries[j].Addenda99Dishonored != nil {
+				lines++
+			}
 		}
 	}
 	for i := range f.IATBatches {

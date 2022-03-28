@@ -83,6 +83,8 @@ type EntryDetail struct {
 	Addenda98 *Addenda98 `json:"addenda98,omitempty"`
 	// Addenda99 for use with Returns
 	Addenda99 *Addenda99 `json:"addenda99,omitempty"`
+	// Addenda99Dishonored for use with Dishonored Returns
+	Addenda99Dishonored *Addenda99Dishonored `json:"addenda99Dishonored,omitempty"`
 	// Category defines if the entry is a Forward, Return, or NOC
 	Category string `json:"category,omitempty"`
 	// validator is composed for data validation
@@ -601,6 +603,9 @@ func (ed *EntryDetail) addendaCount() (n int) {
 		n += 1
 	}
 	if ed.Addenda99 != nil {
+		n += 1
+	}
+	if ed.Addenda99Dishonored != nil {
 		n += 1
 	}
 	return n
