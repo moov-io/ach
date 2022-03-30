@@ -457,9 +457,10 @@ func (r *Reader) parseAddenda() error {
 				r.currentBatch.GetEntries()[entryIndex].Category = CategoryNOC
 				r.currentBatch.GetEntries()[entryIndex].Addenda98 = addenda98
 			case "99":
-				// Addenda99 and Addenda99Dishonored records both have their code in the same spot,
-				// so we need to determine which to parse by the value.
-				if IsDishonoredReturnCode(r.line[3:6]) {
+				// Addenda99, Addenda99Dishonored, Addenda99Contested records both have their code
+				// in the same spot, so we need to determine which to parse by the value.
+				switch {
+				case IsDishonoredReturnCode(r.line[3:6]):
 					addenda99Dishonored := NewAddenda99Dishonored()
 					addenda99Dishonored.Parse(r.line)
 					addenda99Dishonored.SetValidation(r.File.validateOpts)
@@ -467,7 +468,17 @@ func (r *Reader) parseAddenda() error {
 						return r.parseError(err)
 					}
 					r.currentBatch.GetEntries()[entryIndex].Addenda99Dishonored = addenda99Dishonored
-				} else {
+
+				case IsContestedReturnCode(r.line[3:6]):
+					addenda99Contested := NewAddenda99Contested()
+					addenda99Contested.Parse(r.line)
+					addenda99Contested.SetValidation(r.File.validateOpts)
+					if err := addenda99Contested.Validate(); err != nil {
+						return r.parseError(err)
+					}
+					r.currentBatch.GetEntries()[entryIndex].Addenda99Contested = addenda99Contested
+
+				default:
 					addenda99 := NewAddenda99()
 					addenda99.Parse(r.line)
 					addenda99.SetValidation(r.File.validateOpts)

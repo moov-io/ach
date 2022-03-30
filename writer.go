@@ -133,6 +133,12 @@ func (w *Writer) writeBatch(file *File) error {
 					}
 					w.lineNum++
 				}
+				if entry.Addenda99Contested != nil {
+					if _, err := w.w.WriteString(entry.Addenda99Contested.String() + w.LineEnding); err != nil {
+						return err
+					}
+					w.lineNum++
+				}
 			}
 		} else {
 			for _, entry := range batch.GetADVEntries() {

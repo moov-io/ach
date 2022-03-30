@@ -115,24 +115,12 @@ func (Addenda99Dishonored *Addenda99Dishonored) SetValidation(opts *ValidateOpts
 	Addenda99Dishonored.validateOpts = opts
 }
 
-func isODFIDishonoredReturn(code string) bool {
-	switch code {
-	case "R61", "R67", "R68", "R69", "R70": // Used by ODFI for Dishonored Returns
-		return true
-	}
-	return false
-}
-
-func isRDFIDishonoredReturn(code string) bool {
-	switch code {
-	case "R71", "R72", "R73", "R74", "R75", "R76": // Used by RDFI for Dishonored Returns
-		return true
-	}
-	return false
-}
-
 func IsDishonoredReturnCode(code string) bool {
-	return isODFIDishonoredReturn(code) || isRDFIDishonoredReturn(code)
+	switch code {
+	case "R61", "R67", "R68", "R69", "R70":
+		return true
+	}
+	return false
 }
 
 // Validate verifies NACHA rules for Addenda99Dishonored
