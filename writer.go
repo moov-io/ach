@@ -127,6 +127,12 @@ func (w *Writer) writeBatch(file *File) error {
 					}
 					w.lineNum++
 				}
+				if entry.Addenda99Dishonored != nil {
+					if _, err := w.w.WriteString(entry.Addenda99Dishonored.String() + w.LineEnding); err != nil {
+						return err
+					}
+					w.lineNum++
+				}
 			}
 		} else {
 			for _, entry := range batch.GetADVEntries() {

@@ -76,6 +76,8 @@ var (
 	ErrAddenda98CorrectedData = errors.New("must contain the corrected information corresponding to the Change Code")
 	// ErrAddenda99ReturnCode is given when there's an invalid return code
 	ErrAddenda99ReturnCode = errors.New("found is not a valid return code")
+	// ErrAddenda99DishonoredReturnCode is given when there's an invalid dishonored return code
+	ErrAddenda99DishonoredReturnCode = errors.New("found is not a valid dishonored return code")
 	// ErrBatchCORAddenda is given when an entry in a COR batch does not have an addenda98
 	ErrBatchCORAddenda = errors.New("one Addenda98 record is required for each entry in SEC Type COR")
 
