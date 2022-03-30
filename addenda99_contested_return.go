@@ -32,40 +32,40 @@ type Addenda99Contested struct {
 	TypeCode string `json:"typeCode"`
 
 	// ContestedReturnCode is the return code explaining the contested dishonorment
-	ContestedReturnCode string
+	ContestedReturnCode string `json:"contestedReturnCode"`
 
 	// OriginalEntryTraceNumber is the trace number specifieid in the initial entry
-	OriginalEntryTraceNumber string
+	OriginalEntryTraceNumber string `json:"originalEntryTraceNumber"`
 
 	// DateOriginalEntryReturned is the original entry's date
-	DateOriginalEntryReturned string
+	DateOriginalEntryReturned string `json:"dateOriginalEntryReturned"`
 
 	// OriginalReceivingDFIIdentification is the DFI Identification specifieid in the initial entry
-	OriginalReceivingDFIIdentification string
+	OriginalReceivingDFIIdentification string `json:"originalReceivingDFIIdentification"`
 
 	// OriginalSettlementDate is the initial date of settlement
-	OriginalSettlementDate string
+	OriginalSettlementDate string `json:"originalSettlementDate"`
 
 	// ReturnTraceNumber is the original returns trace number
-	ReturnTraceNumber string
+	ReturnTraceNumber string `json:"returnTraceNumber"`
 
 	// ReturnSettlementDate is the original return's settlement date
-	ReturnSettlementDate string
+	ReturnSettlementDate string `json:"returnSettlementDate"`
 
 	// ReturnReasonCode is the original return's code
-	ReturnReasonCode string
+	ReturnReasonCode string `json:"returnReasonCode"`
 
 	// DishonoredReturnTraceNumber is the dishonorment's trace number
-	DishonoredReturnTraceNumber string
+	DishonoredReturnTraceNumber string `json:"dishonoredReturnTraceNumber"`
 
 	// DishonoredReturnSettlementDate is the dishonorment's settlement date
-	DishonoredReturnSettlementDate string
+	DishonoredReturnSettlementDate string `json:"dishonoredReturnSettlementDate"`
 
 	// DishonoredReturnReasonCode is the dishonorment's return code
-	DishonoredReturnReasonCode string
+	DishonoredReturnReasonCode string `json:"dishonoredReturnReasonCode"`
 
 	// TraceNumber is the trace number for contesting
-	TraceNumber string
+	TraceNumber string `json:"traceNumber"`
 
 	// validator is composed for data validation
 	validator
