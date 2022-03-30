@@ -1,3 +1,15 @@
+## v1.14.0 (Released 2022-03-30)
+
+ADDITIONS
+
+- feat: add support for "Dishonored Returns" with addenda records
+- feat: support parsing out Contested Dishonored Returns
+
+BUILD
+
+- build: install git in builder image
+- meta: update moov-io/base and our logging library
+
 ## v1.13.1 (Released 2022-02-28)
 
 IMPROVEMENTS
