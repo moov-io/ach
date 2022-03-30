@@ -78,6 +78,7 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 			dumpAddenda98(w, e.Addenda98)
 			dumpAddenda99(w, e.Addenda99)
 			dumpAddenda99Dishonored(w, e.Addenda99Dishonored)
+			dumpAddenda99Contested(w, e.Addenda99Contested)
 		}
 
 		bc := file.Batches[i].GetControl()
@@ -114,6 +115,22 @@ func dumpAddenda99Dishonored(w *tabwriter.Writer, a *ach.Addenda99Dishonored) {
 	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
 		a.DishonoredReturnReasonCode, a.OriginalEntryTraceNumber, a.OriginalReceivingDFIIdentification, a.ReturnTraceNumber,
 		a.ReturnSettlementDate, a.ReturnReasonCode, a.AddendaInformation, a.TraceNumber)
+}
+
+func dumpAddenda99Contested(w *tabwriter.Writer, a *ach.Addenda99Contested) {
+	if a == nil {
+		return
+	}
+
+	fmt.Fprintln(w, "\n      Contested Dishonored Addenda99")
+	fmt.Fprintln(w, "      ContestedReturnCode\tOrig. TraceNumber\tOrig Date Returned\tOrig. RDFIIdentification\tOrig. SettlementDate\tReturnTraceNumber")
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%s\n",
+		a.ContestedReturnCode, a.OriginalEntryTraceNumber, a.DateOriginalEntryReturned, a.OriginalReceivingDFIIdentification,
+		a.OriginalSettlementDate, a.ReturnTraceNumber)
+
+	fmt.Fprintln(w, "      ReturnSettlementDate\tReturnReasonCode\tDishonoredTraceNumber\tDishonoredSettlementDate\tDishonoredReasonCode\tTraceNumber")
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%s\n",
+		a.ReturnSettlementDate, a.ReturnReasonCode, a.DishonoredReturnTraceNumber, a.DishonoredReturnSettlementDate, a.DishonoredReturnReasonCode, a.TraceNumber)
 }
 
 func dumpAddenda05(w *tabwriter.Writer, a *ach.Addenda05) {

@@ -31,28 +31,28 @@ type Addenda99Dishonored struct {
 	TypeCode string `json:"typeCode"`
 
 	// DishonoredReturnReasonCode is the return code explaining the dishonorment
-	DishonoredReturnReasonCode string
+	DishonoredReturnReasonCode string `json:"dishonoredReturnReasonCode"`
 
 	// OriginalEntryTraceNumber is the trace number specifieid in the initial entry
-	OriginalEntryTraceNumber string
+	OriginalEntryTraceNumber string `json:"originalEntryTraceNumber"`
 
 	// OriginalReceivingDFIIdentification is the DFI Identification specifieid in the initial entry
-	OriginalReceivingDFIIdentification string
+	OriginalReceivingDFIIdentification string `json:"originalReceivingDFIIdentification"`
 
 	// ReturnTraceNumber is the TraceNumber used when issuing the return
-	ReturnTraceNumber string
+	ReturnTraceNumber string `json:"returnTraceNumber"`
 
 	// ReturnSettlementDate is the date of return issuing
-	ReturnSettlementDate string
+	ReturnSettlementDate string `json:"returnSettlementDate"`
 
 	// ReturnReasonCode is the initial return code
-	ReturnReasonCode string
+	ReturnReasonCode string `json:"returnReasonCode"`
 
 	// AddendaInformation is additional data
-	AddendaInformation string
+	AddendaInformation string `json:"addendaInformation"`
 
 	// TraceNumber is the trace number for dishonorment
-	TraceNumber string
+	TraceNumber string `json:"traceNumber"`
 
 	// validator is composed for data validation
 	validator
@@ -115,24 +115,12 @@ func (Addenda99Dishonored *Addenda99Dishonored) SetValidation(opts *ValidateOpts
 	Addenda99Dishonored.validateOpts = opts
 }
 
-func isODFIDishonoredReturn(code string) bool {
-	switch code {
-	case "R61", "R67", "R68", "R69", "R70": // Used by ODFI for Dishonored Returns
-		return true
-	}
-	return false
-}
-
-func isRDFIDishonoredReturn(code string) bool {
-	switch code {
-	case "R71", "R72", "R73", "R74", "R75", "R76": // Used by RDFI for Dishonored Returns
-		return true
-	}
-	return false
-}
-
 func IsDishonoredReturnCode(code string) bool {
-	return isODFIDishonoredReturn(code) || isRDFIDishonoredReturn(code)
+	switch code {
+	case "R61", "R67", "R68", "R69", "R70":
+		return true
+	}
+	return false
 }
 
 // Validate verifies NACHA rules for Addenda99Dishonored

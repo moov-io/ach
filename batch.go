@@ -600,6 +600,11 @@ func (batch *Batch) isFieldInclusion() error {
 					return err
 				}
 			}
+			if entry.Addenda99Contested != nil {
+				if err := entry.Addenda99Contested.Validate(); err != nil {
+					return err
+				}
+			}
 
 		}
 		return batch.Control.Validate()
@@ -857,6 +862,11 @@ func (batch *Batch) isAddendaSequence() error {
 				return batch.Error("AddendaRecordIndicator", ErrBatchAddendaIndicator)
 			}
 		}
+		if entry.Addenda99Contested != nil {
+			if entry.AddendaRecordIndicator != 1 {
+				return batch.Error("AddendaRecordIndicator", ErrBatchAddendaIndicator)
+			}
+		}
 	}
 	return nil
 }
@@ -898,7 +908,7 @@ func (batch *Batch) isCategory() error {
 // Notification of Change:
 // COR and Addenda98
 // Return:
-// Addenda99, Addenda99Dishonored
+// Addenda99, Addenda99Dishonored, Addenda99Contested
 //
 func (batch *Batch) addendaFieldInclusion(entry *EntryDetail) error {
 	switch entry.Category {
@@ -982,7 +992,7 @@ func (batch *Batch) addendaFieldInclusionReturn(entry *EntryDetail) error {
 	if entry.Addenda98 != nil {
 		return batch.Error("Addenda98", ErrBatchAddendaCategory, entry.Category)
 	}
-	if entry.Addenda99 == nil && entry.Addenda99Dishonored == nil {
+	if entry.Addenda99 == nil && entry.Addenda99Dishonored == nil && entry.Addenda99Contested == nil {
 		return batch.Error("Addenda99", ErrFieldInclusion)
 	}
 	return nil
