@@ -53,6 +53,12 @@ CheckTransactionCode func(code int) error
 
 ### Trace Numbers
 
+The Nacha/ACH spec requires that trace numbers follow a few rules. This validation option disables them.
+
+- Ascending order of trace numbers within batches
+- Trace numbers beginning with their ODFI's routing number
+- `AddendaRecordIndicator` is set correctly
+
 ```
 // CustomTraceNumbers disables validation of TraceNumbers
 CustomTraceNumbers bool `json:"customTraceNumbers"`

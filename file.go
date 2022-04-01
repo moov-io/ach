@@ -640,7 +640,10 @@ type ValidateOpts struct {
 	// CheckTransactionCode allows for custom validation of TransactionCode values
 	CheckTransactionCode func(code int) error `json:"-"`
 
-	// CustomTraceNumbers disables validation of TraceNumbers
+	// CustomTraceNumbers disables Nacha specified checks of TraceNumbers:
+	// - Ascending order of trace numbers within batches
+	// - Trace numbers beginning with their ODFI's routing number
+	// - AddendaRecordIndicator is set correctly
 	CustomTraceNumbers bool `json:"customTraceNumbers"`
 
 	// AllowZeroBatches allows the file to have zero batches
