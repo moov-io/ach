@@ -18,7 +18,6 @@
 package ach
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -36,6 +35,24 @@ const NACHAFileLineLimit = 10000
 //
 // File Batches can only be merged if they are unique and routed to and from the same ABA routing numbers.
 func MergeFiles(files []*File) ([]*File, error) {
+	return mergeFilesHelper(files, Conditions{
+		MaxLines: NACHAFileLineLimit,
+	})
+}
+
+type Conditions struct {
+	// MaxLines will limit each merged files line count.
+	MaxLines int `json:"maxLines"`
+
+	// MaxDollarAmount will limit each merged file's total dollar amount.
+	MaxDollarAmount int64 `json:"maxDollarAmount"`
+}
+
+func MergeFilesWith(files []*File, conditions Conditions) ([]*File, error) {
+	return mergeFilesHelper(files, conditions)
+}
+
+func mergeFilesHelper(files []*File, conditions Conditions) ([]*File, error) {
 	fs := &mergableFiles{infiles: files}
 	for i := range fs.infiles {
 		if fs.infiles[i] == nil {
@@ -61,17 +78,21 @@ func MergeFiles(files []*File) ([]*File, error) {
 				if err := outf.Create(); err != nil {
 					return nil, err
 				}
-				n, err := lineCount(outf)
-				if n == 0 || err != nil {
-					return nil, fmt.Errorf("problem getting line count of File (header: %#v): %v", outf.Header, err)
-				}
-				if n > NACHAFileLineLimit {
-					outf.RemoveBatch(fs.infiles[i].Batches[j])
-					if err := outf.Create(); err != nil { // rebalance ACH file after removing the Batch
-						return nil, err
+
+				fileTooLong := (conditions.MaxLines > 0 && (lineCount(outf) > conditions.MaxLines))
+				fileTooExpensive := (conditions.MaxDollarAmount > 0 && (dollarAmount(outf) > conditions.MaxDollarAmount))
+
+				// Split into a new file if needed
+				if fileTooLong || fileTooExpensive {
+					// In the event of a file with one batch and one entry just keep it
+					if len(outf.Batches) > 1 || len(outf.Batches[0].GetEntries()) > 1 {
+						outf.RemoveBatch(fs.infiles[i].Batches[j])
+						if err := outf.Create(); err != nil { // rebalance ACH file after removing the Batch
+							return nil, err
+						}
+						f := *outf
+						fs.locMaxed = append(fs.locMaxed, &f)
 					}
-					f := *outf
-					fs.locMaxed = append(fs.locMaxed, &f)
 
 					outf = fs.swapLocMaxedFile(outf) // replace output file with the one we just created
 
@@ -191,7 +212,7 @@ func mergeEntries(b1, b2 Batcher) (Batcher, error) {
 	return b, nil
 }
 
-func lineCount(f *File) (int, error) {
+func lineCount(f *File) int {
 	lines := 2 // FileHeader, FileControl
 	for i := range f.Batches {
 		lines += 2 // BatchHeader, BatchControl
@@ -253,5 +274,16 @@ func lineCount(f *File) (int, error) {
 			}
 		}
 	}
-	return lines, nil
+	return lines
+}
+
+func dollarAmount(f *File) int64 {
+	var total int64
+	for i := range f.Batches {
+		entries := f.Batches[i].GetEntries()
+		for j := range entries {
+			total += int64(entries[j].Amount)
+		}
+	}
+	return total
 }

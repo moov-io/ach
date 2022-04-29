@@ -24,6 +24,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func filesAreEqual(f1, f2 *File) error {
@@ -223,10 +225,10 @@ func TestMergeFiles__lineCount(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if n, err := lineCount(file); n != 5 || err != nil {
+	if n := lineCount(file); n != 5 {
 		// We've optimized small file line counts to bypass writing out the file
 		// into plain text as it's costly.
-		t.Errorf("did we change optimizations? n=%d error=%v", n, err)
+		t.Errorf("did we change optimizations? n=%d", n)
 	}
 
 	// Add 100 batches to file and get a real line count
@@ -235,14 +237,14 @@ func TestMergeFiles__lineCount(t *testing.T) {
 	if err := file.Create(); err != nil {
 		t.Fatal(err)
 	}
-	if n, err := lineCount(file); n != 305 || err != nil {
-		t.Errorf("unexpected line count of %d: %v", n, err)
+	if n := lineCount(file); n != 305 {
+		t.Errorf("unexpected line count of %d", n)
 	}
 
 	// Remove BatchCount and still properly count lines
 	file.Control.BatchCount = 0
-	if n, err := lineCount(file); n != 305 || err != nil {
-		t.Errorf("unexpected error n=%d error=%v", n, err)
+	if n := lineCount(file); n != 305 {
+		t.Errorf("unexpected error n=%d", n)
 	}
 }
 
@@ -314,6 +316,84 @@ func TestMergeFiles__splitFiles(t *testing.T) {
 		}
 		if err := min.Validate(); err != nil {
 			t.Fatal(err)
+		}
+	}
+}
+
+func TestMergeFiles__dollarAmount(t *testing.T) {
+	file, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+	require.NoError(t, file.Create())
+
+	if n := lineCount(file); n != 5 {
+		// We've optimized small file line counts to bypass writing out the file
+		// into plain text as it's costly.
+		t.Errorf("did we change optimizations? n=%d", n)
+	}
+
+	// Add 100 batches to file and get a real line count
+	populateFileWithMockBatches(t, 100, file)
+
+	// Verify our file's contents
+	require.NoError(t, file.Create())
+	require.Equal(t, 305, lineCount(file))
+	require.Equal(t, 101, countTraceNumbers(file))
+
+	mergedFiles, err := MergeFilesWith([]*File{file}, Conditions{
+		MaxDollarAmount: 1000000, // $10,000.00
+	})
+	require.NoError(t, err)
+	require.Len(t, mergedFiles, 51)
+	require.Equal(t, 101, countTraceNumbers(mergedFiles...))
+
+	for i := range mergedFiles {
+		// With our static cases each file has one Batch
+		require.Equal(t, 1, len(mergedFiles[i].Batches))
+
+		entryCount := len(mergedFiles[i].Batches[0].GetEntries())
+		if i == 0 {
+			require.Equal(t, 1, entryCount)
+		} else {
+			require.Equal(t, 2, entryCount)
+		}
+	}
+}
+
+func TestMergeFiles__dollarAmount2(t *testing.T) {
+	file, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+	require.NoError(t, file.Create())
+
+	if n := lineCount(file); n != 5 {
+		// We've optimized small file line counts to bypass writing out the file
+		// into plain text as it's costly.
+		t.Errorf("did we change optimizations? n=%d", n)
+	}
+
+	// Add 100 batches to file and get a real line count
+	populateFileWithMockBatches(t, 100, file)
+
+	// Verify our file's contents
+	require.NoError(t, file.Create())
+	require.Equal(t, 305, lineCount(file))
+	require.Equal(t, 101, countTraceNumbers(file))
+
+	mergedFiles, err := MergeFilesWith([]*File{file}, Conditions{
+		MaxDollarAmount: 33_000_000_00,
+	})
+	require.NoError(t, err)
+	require.Len(t, mergedFiles, 3)
+	require.Equal(t, 101, countTraceNumbers(mergedFiles...))
+
+	for i := range mergedFiles {
+		// With our static cases each file has one Batch
+		require.Equal(t, 17, len(mergedFiles[i].Batches))
+
+		entryCount := len(mergedFiles[i].Batches[0].GetEntries())
+		if i == 0 {
+			require.Equal(t, 1, entryCount)
+		} else {
+			require.Equal(t, 2, entryCount)
 		}
 	}
 }
