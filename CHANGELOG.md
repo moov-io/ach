@@ -1,3 +1,14 @@
+## v1.15.0 (Released 2022-05-03)
+
+ADDITIONS
+
+- merge: allow splitting files on their maximum dollar amounts
+
+IMPROVEMENTS
+
+- docs: provide specific actions of CustomTraceNumbers
+- fix(deps): update module github.com/aws/aws-lambda-go to v1.31.1
+
 ## v1.14.0 (Released 2022-03-30)
 
 ADDITIONS
