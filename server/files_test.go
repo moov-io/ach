@@ -84,7 +84,7 @@ func TestFiles__decodeCreateFileRequest(t *testing.T) {
 	// Check stored file state
 	got, _ := svc.GetFile(f.ID)
 	if got.Batches[0].ID() != batch.ID() {
-		t.Fatal(fmt.Sprintf("batch ID: got %v, want %v", got.Batches[0].ID(), batch.ID()))
+		t.Fatalf("batch ID: got %v, want %v", got.Batches[0].ID(), batch.ID())
 	}
 }
 
