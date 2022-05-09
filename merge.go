@@ -175,7 +175,7 @@ func (fs *mergableFiles) findOutfile(f *File) *File {
 
 				// found a matching file, so verify the TraceNumber isn't alreay inside
 				outTraceNumbers := getTraceNumbers(fs.outfiles[i])
-				for trace := range inTraceNumbers {
+				for _, trace := range inTraceNumbers {
 					// If any of our incoming trace numbers match the existing merged file
 					// return the entire file as separate. This keeps partially overlapping
 					// batches self-contained.

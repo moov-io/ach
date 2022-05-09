@@ -28,6 +28,8 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+
+	"github.com/stretchr/testify/require"
 )
 
 // mockEntryDetail creates an entry detail
@@ -771,4 +773,21 @@ func TestEntryDetail__LargeAmountStrings(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 	}
+}
+
+func TestGetTraceNumbers(t *testing.T) {
+	file := mockFilePPD()
+	odfi := mockBatchHeader().ODFIIdentification
+
+	trials := 10000
+
+	for i := 1; i < trials; i++ {
+		ed := mockEntryDetail()
+		ed.SetTraceNumber(odfi, i)
+
+		file.Batches[0].AddEntry(ed)
+	}
+
+	numbers := getTraceNumbers(file)
+	require.Equal(t, trials, len(numbers))
 }
