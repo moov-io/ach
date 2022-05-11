@@ -89,6 +89,41 @@ paths:
           description: Optional parameter to configure ImmediateDestination validation
           schema:
             type: boolean
+        - name: customTraceNumbers
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+        - name: allowZeroBatches
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+        - name: allowMissingFileHeader
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+        - name: allowMissingFileControl
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+        - name: bypassCompanyIdentificationMatch
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+        - name: customReturnCodes
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+        - name: unequalServiceClassCode
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
       requestBody:
         description: Content of the ACH file (in json or raw text)
         required: true
@@ -910,6 +945,10 @@ components:
           $ref: '#/components/schemas/Addenda98'
         addenda99:
           $ref: '#/components/schemas/Addenda99'
+        addenda99Dishonored:
+          $ref: '#/components/schemas/Addenda99Dishonored'
+        addenda99Contested:
+          $ref: '#/components/schemas/Addenda99Contested'
         category:
           type: string
           description: Category defines if the entry is a Forward, Return, or NOC
@@ -1480,6 +1519,128 @@ components:
         - originalTrace
         - dateOfDeath
         - originalDFI
+    Addenda99Dishonored:
+      properties:
+        id:
+          type: string
+          description: Client-defined string used as a reference to this record.
+          example: 5ca8d25a
+        typeCode:
+          type: string
+          description: 99 - NACHA regulations
+          example: "99"
+        contestedReturnCode:
+          type: string
+          description: "return code explaining the contested dishonorment"
+          example: "R12"
+        originalEntryTraceNumber:
+          type: string
+          description: Trace Number of the original entry being returned.
+          example: "214874812"
+        dateOriginalEntryReturned:
+          type: string
+          description: Date original entry was returned
+          example: "200102"
+        originalReceivingDFIIdentification:
+          type: string
+          description: Identification of the Original Receiving Depository Institution (ODFI)
+          example: "12345678"
+        originalSettlementDate:
+          type: string
+          description: Original date of settlement
+          example: "200102"
+        returnTraceNumber:
+          type: string
+          description: Return trace number
+          example: "214874812"
+        returnSettlementDate:
+          type: string
+          description: Return settlement date
+          example: "200102"
+        returnReasonCode:
+          type: string
+          description: Return reason code
+          example: "R12"
+        dishonoredReturnTraceNumber:
+          type: string
+          description: Trace number from Dishonored Return
+          example: "214874812"
+        dishonoredReturnSettlementDate:
+          type: string
+          description: Settlement date of the Dishonored Return
+          example: "200102"
+        dishonoredReturnReasonCode:
+          type: string
+          description: Return reason code of the Dishonored Return
+          example: "R12"
+        traceNumber:
+          type: string
+          description: Matches the Entry Detail Trace Number of the entry being returned.
+          example: "214874812"
+      required:
+        - typeCode
+        - contestedReturnCode
+        - originalEntryTraceNumber
+        - dateOriginalEntryReturned
+        - originalReceivingDFIIdentification
+        - originalSettlementDate
+        - returnTraceNumber
+        - returnSettlementDate
+        - returnReasonCode
+        - dishonoredReturnTraceNumber
+        - dishonoredReturnSettlementDate
+        - dishonoredReturnReasonCode
+    Addenda99Contested:
+      properties:
+        id:
+          type: string
+          description: Client-defined string used as a reference to this record.
+          example: 5ca8d25a
+        typeCode:
+          type: string
+          description: 99 - NACHA regulations
+          example: "99"
+        dishonoredReturnReasonCode:
+          type: string
+          description: Return reason code of the Dishonored Return
+          example: "R12"
+        originalEntryTraceNumber:
+          type: string
+          description: Trace Number of the original entry being returned.
+          example: "214874812"
+        originalReceivingDFIIdentification:
+          type: string
+          description: Identification of the Original Receiving Depository Institution (ODFI)
+          example: "12345678"
+        returnTraceNumber:
+          type: string
+          description: Return trace number
+          example: "214874812"
+        returnSettlementDate:
+          type: string
+          description: Return settlement date
+          example: "200102"
+        returnReasonCode:
+          type: string
+          description: Return reason code
+          example: "R12"
+        addendaInformation:
+          type: string
+          description: Additional information of the Contested Dishonored Return
+        traceNumber:
+          type: string
+          description: Unique Trace Number for the contested dishonored return
+          example: "214874812"
+      required:
+        - typeCode
+        - dishonoredReturnReasonCode
+        - originalEntryTraceNumber
+        - originalReceivingDFIIdentification
+        - returnTraceNumber
+        - returnSettlementDate
+        - returnReasonCode
+        - addendaInformation
+        - traceNumber
     IATBatch:
       properties:
         ID:
@@ -1795,7 +1956,7 @@ components:
           description: SequenceNumber is consecutively assigned to each Addenda05 Record following an Entry Detail Record. The first Addenda05 sequence number must always be a 1.
           example: 1
         addenda99:
-          description: Addenda99 record for the Entry Detail
+          description: Addenda99 record for the ADV Entry Detail
           items:
             $ref: '#/components/schemas/Addenda99'
         category:
