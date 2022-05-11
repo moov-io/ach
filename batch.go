@@ -993,6 +993,13 @@ func (batch *Batch) addendaFieldInclusionReturn(entry *EntryDetail) error {
 		return batch.Error("Addenda98", ErrBatchAddendaCategory, entry.Category)
 	}
 	if entry.Addenda99 == nil && entry.Addenda99Dishonored == nil && entry.Addenda99Contested == nil {
+		// Offset entries within a Return batch will not have an Addenda99 record as they might be
+		// used to zero accounting entries.
+		//
+		// See: https://github.com/moov-io/ach/issues/1010
+		if entry.IndividualName == offsetIndividualName {
+			return nil
+		}
 		return batch.Error("Addenda99", ErrFieldInclusion)
 	}
 	return nil
@@ -1092,6 +1099,8 @@ func (b *Batch) WithOffset(off *Offset) {
 	b.offset = off
 }
 
+const offsetIndividualName = "OFFSET"
+
 func (b *Batch) upsertOffsets() error {
 	if b == nil || b.offset == nil {
 		return nil
@@ -1106,7 +1115,7 @@ func (b *Batch) upsertOffsets() error {
 		// debit/credit and sums to all the other elements (which are mutually exclusive to
 		// the last record being debit or credit)?
 		// See: https://github.com/moov-io/ach/issues/540
-		if strings.EqualFold(b.Entries[i].IndividualName, "OFFSET") {
+		if strings.EqualFold(b.Entries[i].IndividualName, offsetIndividualName) {
 			// fixup BatchControl records for our conditional after this for loop
 			if b.Entries[i].TransactionCode == CheckingCredit || b.Entries[i].TransactionCode == SavingsCredit {
 				b.Control.TotalCreditEntryDollarAmount -= b.Entries[i].Amount
@@ -1178,7 +1187,7 @@ func createOffsetEntryDetail(off *Offset, batch *Batch) *EntryDetail {
 	ed.CheckDigit = batch.offset.RoutingNumber[8:9]
 	ed.DFIAccountNumber = batch.offset.AccountNumber
 	ed.IdentificationNumber = "" // left empty
-	ed.IndividualName = "OFFSET"
+	ed.IndividualName = offsetIndividualName
 	ed.DiscretionaryData = batch.offset.Description
 	if len(batch.Entries) > 0 {
 		ed.Category = batch.Entries[0].Category
