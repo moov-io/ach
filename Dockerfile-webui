@@ -1,4 +1,4 @@
-FROM golang:1.15-buster as builder
+FROM golang:1.18-buster as builder
 WORKDIR /go/src/github.com/moov-io/ach
 RUN apt-get update && apt-get install make gcc g++
 COPY . .
