@@ -2053,7 +2053,6 @@ func TestFile__FileHeaderFormattingWithValidation(t *testing.T) {
 	}
 }
 
-// testFileEntryHash validates entry hash
 func TestFile__AscendingBatchSequence(t *testing.T) {
 	tests := []struct {
 		desc        string
@@ -2094,6 +2093,11 @@ func TestFile__AscendingBatchSequence(t *testing.T) {
 			}
 
 			if err := file.Create(); err != nil {
+				t.Fatal(err)
+			}
+
+			// None of the tests should error if unordered batch numbers are allowed
+			if err := file.ValidateWith(&ValidateOpts{AllowUnorderedBatchNumbers: true}); err != nil {
 				t.Fatal(err)
 			}
 

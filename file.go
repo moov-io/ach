@@ -666,6 +666,9 @@ type ValidateOpts struct {
 	// UnequalServiceClassCode skips equality checks for the ServiceClassCode in each pair of BatchHeader
 	// and BatchControl records.
 	UnequalServiceClassCode bool `json:"unequalServiceClassCode"`
+
+	// AllowUnorderedBatchNumebrs allows a file to be read with unordered batch numbers.
+	AllowUnorderedBatchNumbers bool `json:"allowUnorderedBatchNumbers"`
 }
 
 // ValidateWith performs checks on each record according to Nacha guidelines.
@@ -710,8 +713,10 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 		if err := f.isFileAmount(false); err != nil {
 			return err
 		}
-		if err := f.isSequenceAscending(); err != nil {
-			return err
+		if !opts.AllowUnorderedBatchNumbers {
+			if err := f.isSequenceAscending(); err != nil {
+				return err
+			}
 		}
 		return f.isEntryHash(false)
 	}
