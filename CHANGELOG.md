@@ -1,3 +1,9 @@
+## v1.16.1 (Released 2022-05-23)
+
+IMPROVEMENTS
+
+- server: read unorderedBatchNumbers query param
+
 ## v1.16.0 (Released 2022-05-23)
 
 ADDITIONS
