@@ -54,6 +54,7 @@ Example: `POST /files/create?requireABAOrigin=true&bypassDestination=true`
 | `customTraceNumbers`               | `CustomTraceNumbers`               |
 | `requireABAOrigin`                 | `RequireABAOrigin`                 |
 | `unequalServiceClassCode`          | `UnequalServiceClassCode`          |
+| `unorderedBatchNumbers`            | `AllowUnorderedBatchNumbers`       |
 
 ## Upload a raw ACH file
 

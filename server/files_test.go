@@ -193,6 +193,12 @@ func TestFiles__decodeCreateFileRequest__validateOpts(t *testing.T) {
 				AllowMissingFileControl: true,
 			},
 		},
+		{
+			query: "?unorderedBatchNumbers=true",
+			expect: ach.ValidateOpts{
+				AllowUnorderedBatchNumbers: true,
+			},
+		},
 	}
 
 	for _, tc := range tests {
