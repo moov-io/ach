@@ -1,3 +1,24 @@
+## v1.16.0 (Released 2022-05-23)
+
+ADDITIONS
+
+- Add `AllowUnorderedBatchNumbers` validate option to skip ascending batch sequence validation
+
+IMPROVEMENTS
+
+- api: add missing validate opts query params, Addenda99 Dishonored and Contested returns
+- batch: skip addendaFieldInclusion with Offset entries
+
+BUILD
+
+- build: update base images
+- build: update codeql action
+- build(deps): bump nokogiri from 1.13.4 to 1.13.6 in /docs
+- fix(deps): update module github.com/aws/aws-lambda-go to v1.32.0
+- fix(deps): update module github.com/go-kit/log to v0.2.1
+- fix(deps): update module github.com/moov-io/base to v0.29.2
+- fix(deps): update module github.com/prometheus/client_golang to v1.12.2
+
 ## v1.15.1 (Released 2022-05-09)
 
 IMPROVEMENTS
