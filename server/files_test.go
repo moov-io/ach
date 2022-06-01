@@ -295,6 +295,46 @@ func TestFiles__getFileEndpoint(t *testing.T) {
 	}
 }
 
+func TestFiles__buildFileEndpoint(t *testing.T) {
+	repo := NewRepositoryInMemory(testTTLDuration, nil)
+	svc := NewService(repo)
+
+	f := ach.NewFile()
+	f.ID = "foo"
+	f.Header = *mockFileHeader()
+	f.AddBatch(mockBatchWEB())
+	if err := repo.StoreFile(f); err != nil {
+		t.Fatal(err)
+	}
+
+	req := httptest.NewRequest("GET", "/files/foo/build", nil)
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("content-type", "application/json")
+
+	// setup our HTTP handler
+	handler := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
+
+	// execute our HTTP request
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusOK, w.Code)
+
+	var response struct {
+		File  ach.File `json:"file"`
+		Error error    `json:"error"`
+	}
+	err := json.NewDecoder(w.Body).Decode(&response)
+	require.NoError(t, err)
+
+	require.Len(t, response.File.Batches, 1)
+
+	entries := response.File.Batches[0].GetEntries()
+	require.Len(t, entries, 1)
+	require.Equal(t, "121042880000001", entries[0].TraceNumber)
+}
+
 func TestFiles__getFileContentsEndpoint(t *testing.T) {
 	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)

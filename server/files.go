@@ -349,6 +349,58 @@ func decodeDeleteFileRequest(_ context.Context, r *http.Request) (interface{}, e
 	}, nil
 }
 
+type buildFileRequest struct {
+	ID string
+
+	requestID string
+}
+
+type buildFileResponse struct {
+	File *ach.File `json:"file"`
+	Err  error     `json:"error"`
+}
+
+func (v buildFileResponse) error() error { return v.Err }
+
+func buildFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req, ok := request.(buildFileRequest)
+		if !ok {
+			return buildFileResponse{Err: ErrFoundABug}, ErrFoundABug
+		}
+
+		file, err := s.BuildFile(req.ID)
+
+		logger := logger.With(log.Fields{
+			"files":     log.String("buildFile"),
+			"fileID":    log.String(req.ID),
+			"requestID": log.String(req.requestID),
+		})
+		if err != nil {
+			logger.Error().LogError(err)
+		} else {
+			logger.Info().Log("build file")
+		}
+
+		return buildFileResponse{
+			File: file,
+			Err:  err,
+		}, nil
+	}
+}
+
+func decodeBuildFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	id, ok := vars["id"]
+	if !ok {
+		return nil, ErrBadRouting
+	}
+	return buildFileRequest{
+		ID:        id,
+		requestID: moovhttp.GetRequestID(r),
+	}, nil
+}
+
 type getFileContentsRequest struct {
 	ID string
 

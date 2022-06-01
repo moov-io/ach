@@ -121,6 +121,12 @@ func MakeHTTPHandler(s Service, repo Repository, kitlog gokitlog.Logger) http.Ha
 		encodeResponse,
 		options...,
 	))
+	r.Methods("GET").Path("/files/{id}/build").Handler(httptransport.NewServer(
+		buildFileEndpoint(s, repo, logger),
+		decodeBuildFileRequest,
+		encodeResponse,
+		options...,
+	))
 	r.Methods("POST").Path("/files/create").Handler(httptransport.NewServer(
 		createFileEndpoint(s, repo, logger),
 		decodeCreateFileRequest,
