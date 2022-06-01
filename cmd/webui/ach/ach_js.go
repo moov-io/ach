@@ -136,9 +136,17 @@ func parseFile(input string) (*ach.File, error) {
 	return &file, nil
 }
 
+func writeVersion() {
+	span := js.Global().Get("document").Call("querySelector", "#version")
+	span.Set("innerHTML", fmt.Sprintf("Version: %s", ach.Version))
+}
+
 func main() {
 	js.Global().Set("parseACH", prettyPrintJSON())
 	js.Global().Set("parseJSON", printACH())
 	js.Global().Set("parseReadable", printReadable())
+
+	writeVersion()
+
 	<-make(chan bool)
 }
