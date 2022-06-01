@@ -353,7 +353,19 @@ func (ed *EntryDetail) SetRDFI(rdfi string) *EntryDetail {
 
 // SetTraceNumber takes first 8 digits of ODFI and concatenates a sequence number onto the TraceNumber
 func (ed *EntryDetail) SetTraceNumber(ODFIIdentification string, seq int) {
-	ed.TraceNumber = ed.stringField(ODFIIdentification, 8) + ed.numericField(seq, 7)
+	traceNumber := ed.stringField(ODFIIdentification, 8) + ed.numericField(seq, 7)
+	ed.TraceNumber = traceNumber
+
+	// Populate TraceNumber of addenda records that should match the Entry's trace number
+	if ed.Addenda02 != nil {
+		ed.Addenda02.TraceNumber = traceNumber
+	}
+	if ed.Addenda98 != nil {
+		ed.Addenda98.TraceNumber = traceNumber
+	}
+	if ed.Addenda99 != nil {
+		ed.Addenda99.TraceNumber = traceNumber
+	}
 }
 
 // RDFIIdentificationField get the rdfiIdentification with zero padding

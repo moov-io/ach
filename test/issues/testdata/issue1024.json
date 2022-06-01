@@ -1,0 +1,47 @@
+{
+    "fileHeader": {
+        "immediateOrigin": "121042882",
+        "immediateOriginName": "Test",
+        "immediateDestination": "121042882",
+        "immediateDestinationName": "Test",
+        "fileCreationDate": "220527",
+        "fileCreationTime": "0312"
+    },
+    "batches": [
+        {
+            "batchHeader": {
+                "id": "",
+                "serviceClassCode": 200,
+                "companyName": "Test",
+                "companyIdentification": "Test",
+                "standardEntryClassCode": "CCD",
+                "companyEntryDescription": "Test",
+                "effectiveEntryDate": "220513",
+                "originatorStatusCode": 1,
+                "ODFIIdentification": "08410676",
+                "batchNumber": 1
+            },
+            "entryDetails": [
+                {
+                    "id": "",
+                    "transactionCode": 22,
+                    "RDFIIdentification": "06100014",
+                    "checkDigit": "6",
+                    "DFIAccountNumber": "01004019         ",
+                    "amount": 1238,
+                    "identificationNumber": "1589           ",
+                    "individualName": "A ROBERT ANDERSON     ",
+                    "discretionaryData": "  ",
+                    "addendaRecordIndicator": 1,
+                    "addenda99": {
+                        "typeCode": "99",
+                        "returnCode": "R03",
+                        "originalTrace": "061000140000001",
+                        "originalDFI": "12510456",
+                        "addendaInformation": "Testing"
+                    }
+                }
+            ]
+        }
+    ]
+}
