@@ -218,6 +218,34 @@ paths:
           description: Permanently deleted File.
         '404':
           description: A File with the specified ID was not found.
+  /files/{fileID}/build:
+    get:
+      tags: ['ACH Files']
+      summary: Build File
+      description: |
+        Assembles the existing File (batches and controls) records, computes sequence numbers and totals. Returns JSON formatted file.
+      operationId: buildFile
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the system's logs
+          example: "rs4f9915"
+          schema:
+            type: string
+        - name: fileID
+          in: path
+          description: File ID
+          required: true
+          schema:
+            type: string
+            example: "3f2d23ee214"
+      responses:
+        '200':
+          description: File built successfully without errors.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/File'
   /files/{fileID}/contents:
     get:
       tags: ['ACH Files']

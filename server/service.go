@@ -41,6 +41,8 @@ type Service interface {
 	GetFile(id string) (*ach.File, error)
 	// GetFiles retrieves all files accessible from the client.
 	GetFiles() []*ach.File
+	// BuildFile tabulates file values according to the Nacha spec
+	BuildFile(id string) (*ach.File, error)
 	// DeleteFile takes a file resource ID and deletes it from the store
 	DeleteFile(id string) error
 	// GetFileContents creates a valid plaintext file in memory assuming it has a FileHeader and at least one Batch record.
@@ -109,6 +111,16 @@ func (s *service) GetFile(id string) (*ach.File, error) {
 
 func (s *service) GetFiles() []*ach.File {
 	return s.store.FindAllFiles()
+}
+
+// BuildFile tabulates file values according to the Nacha spec
+func (s *service) BuildFile(id string) (*ach.File, error) {
+	file, err := s.GetFile(id)
+	if err != nil {
+		return nil, fmt.Errorf("build file: error reading file %s: %v", id, err)
+	}
+	err = file.Create()
+	return file, err
 }
 
 func (s *service) DeleteFile(id string) error {

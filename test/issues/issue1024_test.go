@@ -18,12 +18,21 @@
 package issues
 
 import (
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/moov-io/ach"
+	"github.com/moov-io/ach/server"
+	"github.com/moov-io/base/log"
 
+	kitlog "github.com/go-kit/log"
 	"github.com/stretchr/testify/require"
 )
 
@@ -36,6 +45,55 @@ func TestIssue1024__Read(t *testing.T) {
 	require.Len(t, file.Batches, 1)
 
 	entries := file.Batches[0].GetEntries()
+	require.Len(t, entries, 1)
+
+	// I expected the traceNumber field in addenda99 to be automatically
+	// populated equal to the traceNumber of the entry
+	ed := entries[0]
+	require.Equal(t, "084106760000001", ed.TraceNumber)
+	require.NotNil(t, ed.Addenda99)
+	require.Equal(t, "084106760000001", ed.Addenda99.TraceNumber)
+}
+
+func TestIssue1024__Server(t *testing.T) {
+	repo := server.NewRepositoryInMemory(0*time.Second, log.NewNopLogger())
+	svc := server.NewService(repo)
+	handler := server.MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
+
+	fd, err := os.Open(filepath.Join("testdata", "issue1024.json"))
+	require.NoError(t, err)
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", "/files/create", fd)
+	req.Header.Set("Content-Type", "application/json")
+	handler.ServeHTTP(w, req)
+	w.Flush()
+	require.Equal(t, http.StatusOK, w.Code)
+
+	var createResponse struct {
+		ID string `json:"id"`
+	}
+	err = json.NewDecoder(w.Body).Decode(&createResponse)
+	require.NoError(t, err)
+
+	// Read the full file in JSON format
+	w = httptest.NewRecorder()
+	req = httptest.NewRequest("GET", fmt.Sprintf("/files/%s/build", createResponse.ID), nil)
+	req.Header.Set("Content-Type", "application/json")
+	handler.ServeHTTP(w, req)
+	w.Flush()
+	require.Equal(t, http.StatusOK, w.Code)
+
+	var wrapper struct {
+		File ach.File `json:"file"`
+		Err  error    `json:"error"`
+	}
+	err = json.NewDecoder(w.Body).Decode(&wrapper)
+	require.NoError(t, err)
+
+	require.Len(t, wrapper.File.Batches, 1)
+
+	entries := wrapper.File.Batches[0].GetEntries()
 	require.Len(t, entries, 1)
 
 	// I expected the traceNumber field in addenda99 to be automatically
