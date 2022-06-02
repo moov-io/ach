@@ -1,3 +1,15 @@
+## v1.17.0 (Released 2022-06-02)
+
+ADDITIONS
+
+- feat: add build file endpoint
+
+IMPROVEMENTS
+
+- cmd/webui: update wasm_exec.js bundle
+- cmd/webui: write library version to page
+- feat: set Addenda trace numbers in (EntryDetail).SetTraceNumber
+
 ## v1.16.1 (Released 2022-05-23)
 
 IMPROVEMENTS
