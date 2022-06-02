@@ -77,6 +77,9 @@ BypassCompanyIdentificationMatch bool `json:"bypassCompanyIdentificationMatch"`
 // UnequalServiceClassCode skips equality checks for the ServiceClassCode in each pair of BatchHeader
 // and BatchControl records.
 UnequalServiceClassCode bool `json:"unequalServiceClassCode"`
+
+// AllowUnorderedBatchNumebrs allows a file to be read with unordered batch numbers.
+AllowUnorderedBatchNumbers bool `json:"allowUnorderedBatchNumbers"`
 ```
 
 ### File Header
