@@ -11,8 +11,8 @@
       link: /usage-docker/
     - name: Google Cloud Run
       link: /usage-google-cloud/
-    - name: API configuration
-      link: /usage-configuration/
+    - name: Server config
+      link: /server-config/
     - name: Go library
       link: /usage-go/
     - name: Command line
