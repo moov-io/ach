@@ -1,3 +1,14 @@
+## v1.18.0 (Released 2022-06-07)
+
+IMPROVEMENTS
+
+- Export the SettlementDate field in BatchHeader and IATBatchHeader
+
+BUILD
+
+- fix(deps): update module github.com/moov-io/base to v0.30.0
+- fix(deps): update module github.com/stretchr/testify to v1.7.2
+
 ## v1.17.0 (Released 2022-06-02)
 
 ADDITIONS
