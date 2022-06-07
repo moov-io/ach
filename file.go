@@ -1097,7 +1097,7 @@ func createSegmentFileBatchHeader(serviceClassCode int, bh *BatchHeader) *BatchH
 	nbh.CompanyEntryDescription = bh.CompanyEntryDescription
 	nbh.CompanyDescriptiveDate = bh.CompanyDescriptiveDate
 	nbh.EffectiveEntryDate = bh.EffectiveEntryDate
-	nbh.settlementDate = bh.settlementDate
+	nbh.SettlementDate = bh.SettlementDate
 	if serviceClassCode == AutomatedAccountingAdvices {
 		nbh.OriginatorStatusCode = 0 // ADV requires this be 0
 	} else {

@@ -143,7 +143,7 @@ type IATBatchHeader struct {
 	EffectiveEntryDate string `json:"effectiveEntryDate,omitempty"`
 
 	// SettlementDate Leave blank, this field is inserted by the ACH operator
-	settlementDate string
+	SettlementDate string `json:"settlementDate,omitempty"`
 
 	// OriginatorStatusCode refers to the ODFI initiating the Entry.
 	// 0 ADV File prepared by an ACH Operator.
@@ -236,7 +236,7 @@ func (iatBh *IATBatchHeader) Parse(record string) {
 	// You almost always want the transaction to post as soon as possible, so put tomorrow's date in YYMMDD format
 	iatBh.EffectiveEntryDate = iatBh.validateSimpleDate(record[69:75])
 	// 76-78 Always blank (just fill with spaces)
-	iatBh.settlementDate = iatBh.validateSettlementDate(record[75:78])
+	iatBh.SettlementDate = iatBh.validateSettlementDate(record[75:78])
 	// 79-79 Always 1
 	iatBh.OriginatorStatusCode = iatBh.parseNumField(record[78:79])
 	// 80-87 Your ODFI's routing number without the last digit. The last digit is simply a
@@ -264,7 +264,7 @@ func (iatBh *IATBatchHeader) String() string {
 	buf.WriteString(iatBh.ISOOriginatingCurrencyCodeField())
 	buf.WriteString(iatBh.ISODestinationCurrencyCodeField())
 	buf.WriteString(iatBh.EffectiveEntryDateField())
-	buf.WriteString(iatBh.settlementDateField())
+	buf.WriteString(iatBh.SettlementDateField())
 	buf.WriteString(fmt.Sprintf("%v", iatBh.OriginatorStatusCode))
 	buf.WriteString(iatBh.ODFIIdentificationField())
 	buf.WriteString(iatBh.BatchNumberField())
@@ -419,7 +419,7 @@ func (iatBh *IATBatchHeader) BatchNumberField() string {
 	return iatBh.numericField(iatBh.BatchNumber, 7)
 }
 
-// settlementDateField gets the settlementDate
-func (iatBh *IATBatchHeader) settlementDateField() string {
-	return iatBh.alphaField(iatBh.settlementDate, 3)
+// SettlementDateField gets the SettlementDate
+func (iatBh *IATBatchHeader) SettlementDateField() string {
+	return iatBh.alphaField(iatBh.SettlementDate, 3)
 }
