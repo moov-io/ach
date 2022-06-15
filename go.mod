@@ -10,7 +10,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/juju/ansiterm v0.0.0-20210929141451-8b71cc96ebdc
 	github.com/mattn/go-isatty v0.0.14
-	github.com/moov-io/base v0.30.0
+	github.com/moov-io/base v0.31.1
 	github.com/prometheus/client_golang v1.12.2
 	github.com/stretchr/testify v1.7.2
 )
@@ -28,7 +28,7 @@ require (
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.32.1 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
-	github.com/rickar/cal/v2 v2.1.4 // indirect
+	github.com/rickar/cal/v2 v2.1.5 // indirect
 	golang.org/x/net v0.0.0-20220520000938-2e3eb7b945c2 // indirect
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5 // indirect
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
