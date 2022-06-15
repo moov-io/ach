@@ -1,3 +1,13 @@
+## v1.18.1 (Released 2022-06-15)
+
+IMPROVEMENTS
+
+- feat: support Refused COR/NOC codes
+
+BUILD
+
+- fix(deps): update module github.com/moov-io/base to v0.31.1
+
 ## v1.18.0 (Released 2022-06-07)
 
 IMPROVEMENTS
