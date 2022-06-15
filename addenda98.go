@@ -200,6 +200,16 @@ func makeChangeCodeDict() map[string]*ChangeCode {
 		{"C10", "Incorrect company name", "Company name is no longer valid and should be changed."},
 		{"C11", "Incorrect company identification", "Company ID is no longer valid and should be changed"},
 		{"C12", "Incorrect company name and company ID", "Both the company name and company id are no longer valid and must be changed"},
+		// Change codes used when refusing a Notification of Change
+		{"C61", "Misrouted Notification of Change", ""},
+		{"C62", "Incorrect Trace Number", ""},
+		{"C63", "Incorrect Company Identification Number", ""},
+		{"C64", "Incorrect Individual Identification Number or Identification Number", ""},
+		{"C65", "Incorrectly Formatted Corrected Data", ""},
+		{"C66", "Incorrect Discretionary Data", ""},
+		{"C67", "Routing Number not from Original Entry Detail Record", ""},
+		{"C68", "DFI Account Number not from Original Entry Detail Record", ""},
+		{"C69", "Incorrect Transaction Code", ""},
 	}
 	// populate the map
 	for i := range codes {
