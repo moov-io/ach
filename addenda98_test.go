@@ -39,7 +39,7 @@ func TestAddenda98_LookupChangecode(t *testing.T) {
 		t.Error("expected nil ChangeCode")
 	}
 	if code := LookupChangeCode("C05"); code == nil {
-		t.Error("expected ReturnCode")
+		t.Error("expected ChangeCode")
 	} else {
 		if code.Code != "C05" {
 			t.Errorf("code.Code=%s", code.Code)
@@ -47,6 +47,9 @@ func TestAddenda98_LookupChangecode(t *testing.T) {
 		if code.Reason != "Incorrect payment code" {
 			t.Errorf("code.Reason=%s", code.Reason)
 		}
+	}
+	if code := LookupChangeCode("C64"); code == nil {
+		t.Error("expected ChangeCode")
 	}
 	if code := LookupChangeCode("C99"); code != nil {
 		t.Errorf("expected nil: %#v", code)
@@ -195,7 +198,7 @@ func BenchmarkAddenda98ValidateTrue(b *testing.B) {
 
 func testAddenda98ValidateChangeCodeFalse(t testing.TB) {
 	addenda98 := mockAddenda98()
-	addenda98.ChangeCode = "C63"
+	addenda98.ChangeCode = "C55"
 	err := addenda98.Validate()
 	if !base.Match(err, ErrAddenda98ChangeCode) {
 		t.Errorf("%T: %s", err, err)

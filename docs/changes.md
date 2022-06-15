@@ -65,3 +65,19 @@ addenda98.TraceNumber = "91012980000088"
 | `C10` | Incorrect company name | Company name is no longer valid and should be changed |
 | `C11` | Incorrect company identification | Company ID is no longer valid and should be changed |
 | `C12` | Incorrect company name and company ID | Both the company name and company id are no longer valid and must be changed |
+
+#### Refused Notification of Change
+
+When ODFIs cannot forward entries to the Originator or a NOC is malformed, invalid or otherwise unable to be processed a Refused NOC may be issued. This will indicate a Refused Change Code to be handled and must be initiated within 15 days of receipt of the NOC.
+
+| Code | Description |
+|----|-----|
+| `C61` | Misrouted Notification of Change |
+| `C62` | Incorrect Trace Number |
+| `C63` | Incorrect Company Identification Number |
+| `C64` | Incorrect Individual Identification Number or Identification Number |
+| `C65` | Incorrectly Formatted Corrected Data |
+| `C66` | Incorrect Discretionary Data |
+| `C67` | Routing Number not from Original Entry Detail Record |
+| `C68` | DFI Account Number not from Original Entry Detail Record |
+| `C69` | Incorrect Transaction Code |
