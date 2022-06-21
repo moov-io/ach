@@ -12,7 +12,7 @@ require (
 	github.com/mattn/go-isatty v0.0.14
 	github.com/moov-io/base v0.31.1
 	github.com/prometheus/client_golang v1.12.2
-	github.com/stretchr/testify v1.7.2
+	github.com/stretchr/testify v1.7.4
 )
 
 require (
