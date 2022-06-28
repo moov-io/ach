@@ -638,6 +638,8 @@ type ValidateOpts struct {
 	BypassDestinationValidation bool `json:"bypassDestinationValidation"`
 
 	// CheckTransactionCode allows for custom validation of TransactionCode values
+	//
+	// Note: Functions cannot be serialized into/from JSON, so this check cannot be used from config files.
 	CheckTransactionCode func(code int) error `json:"-"`
 
 	// CustomTraceNumbers disables Nacha specified checks of TraceNumbers:
