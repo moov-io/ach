@@ -8,7 +8,7 @@
 # For technical reasons, this file is *NOT* reloaded automatically when you use
 # 'bundle exec jekyll serve'. If you change this file, please restart the server process.
 #
-# If you need help with YAML syntax, here are some quick references for you: 
+# If you need help with YAML syntax, here are some quick references for you:
 # https://learn-the-web.algonquindesign.ca/topics/markdown-yaml-cheat-sheet/#yaml
 # https://learnxinyminutes.com/docs/yaml/
 #
@@ -21,12 +21,12 @@
 title: Moov ACH
 email: security@moov.io
 description: >- # this means to ignore newlines until "baseurl:"
-  ACH implements a reader, writer, and validator for Automated Clearing House (ACH) files. 
+  ACH implements a reader, writer, and validator for Automated Clearing House (ACH) files.
   The HTTP server is available in a Docker image and the Go package is available.
 url: "https://moov-io.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 baseurl: "/ach" # the subpath of your site, e.g. /blog
-twitter_username: jekyllrb
-github_username:  jekyll
+twitter_username: moov
+github_username:  moov-io
 source_code: https://github.com/moov-io/ach
 permalink: pretty
 
