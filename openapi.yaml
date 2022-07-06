@@ -758,9 +758,9 @@ components:
         advEntryDetails:
           type: array
           items:
-            $ref: '#/components/ADVEntryDetail'
+            $ref: '#/components/schemas/ADVEntryDetail'
         advBatchControl:
-            $ref: '#/components/ADVBatchControl'
+            $ref: '#/components/schemas/ADVBatchControl'
       required:
         - batchHeader
         - entryDetails
