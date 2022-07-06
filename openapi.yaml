@@ -755,13 +755,16 @@ components:
           minLength: 1
         batchControl:
           $ref: '#/components/schemas/BatchControl'
-        offset:
-          $ref: '#/components/schemas/Offset'
+        advEntryDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/ADVEntryDetail'
+        advBatchControl:
+            $ref: '#/components/schemas/ADVBatchControl'
       required:
         - batchHeader
         - entryDetails
         - batchControl
-        - offset
     BatchHeader:
       required:
         - serviceClassCode
@@ -833,6 +836,11 @@ components:
           description: |
             BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
           example: 0
+        settlementDate:
+          type: string
+          description: The date the entries actually settled (this is inserted by the ACH operator)
+          format: "YYMMDD"
+          example: "190102"
     BatchControl:
       properties:
         ID:
@@ -1233,6 +1241,14 @@ components:
             '02' = BIC Code |
             '03' = IBAN Code
           example: '01'
+        ODFIIdentification:
+          type: string
+          description: |
+            Originating DFI Identification.
+            This field contains the routing number that identifies the U.S. ODFI initiating the entry.
+            For Inbound IATs: This field contains the bank ID number of the Foreign Bank providing funding
+            for the payment transaction.
+          example: '04121503'
         ODFIBranchCountryCode:
           type: string
           description: |
@@ -1557,18 +1573,80 @@ components:
           type: string
           description: 99 - NACHA regulations
           example: "99"
-        contestedReturnCode:
-          type: string
-          description: "return code explaining the contested dishonorment"
-          example: "R12"
         originalEntryTraceNumber:
           type: string
           description: Trace Number of the original entry being returned.
           example: "214874812"
+        originalReceivingDFIIdentification:
+          type: string
+          description: Identification of the Original Receiving Depository Institution (ODFI)
+          example: "12345678"
+        returnTraceNumber:
+          type: string
+          description: Return trace number
+          example: "214874812"
+        returnSettlementDate:
+          type: string
+          description: Return settlement date
+          example: "200102"
+        returnReasonCode:
+          type: string
+          description: Return reason code
+          example: "R12"
+        dishonoredReturnReasonCode:
+          type: string
+          description: Return reason code of the Dishonored Return
+          example: "R12"
+        traceNumber:
+          type: string
+          description: Matches the Entry Detail Trace Number of the entry being returned.
+          example: "214874812"
+        addendaInformation:
+          type: string
+          description: Additional data
+          example: '00134                                       '
+      required:
+        - typeCode
+        - originalEntryTraceNumber
+        - originalReceivingDFIIdentification
+        - returnTraceNumber
+        - returnSettlementDate
+        - returnReasonCode
+        - dishonoredReturnReasonCode
+    Addenda99Contested:
+      properties:
+        id:
+          type: string
+          description: Client-defined string used as a reference to this record.
+          example: 5ca8d25a
+        typeCode:
+          type: string
+          description: 99 - NACHA regulations
+          example: "99"
+        contestedReturnCode:
+          type: string
+          description: "return code explaining the contested dishonorment"
+          example: "R12"
         dateOriginalEntryReturned:
           type: string
           description: Date original entry was returned
           example: "200102"
+        dishonoredReturnReasonCode:
+          type: string
+          description: Return reason code of the Dishonored Return
+          example: "R12"
+        dishonoredReturnTraceNumber:
+          type: string
+          description: Trace number from Dishonored Return
+          example: "214874812"
+        dishonoredReturnSettlementDate:
+          type: string
+          description: Settlement date of the Dishonored Return
+          example: "200102"
+        originalEntryTraceNumber:
+          type: string
+          description: Trace Number of the original entry being returned.
+          example: "214874812"
         originalReceivingDFIIdentification:
           type: string
           description: Identification of the Original Receiving Depository Institution (ODFI)
@@ -1589,72 +1667,6 @@ components:
           type: string
           description: Return reason code
           example: "R12"
-        dishonoredReturnTraceNumber:
-          type: string
-          description: Trace number from Dishonored Return
-          example: "214874812"
-        dishonoredReturnSettlementDate:
-          type: string
-          description: Settlement date of the Dishonored Return
-          example: "200102"
-        dishonoredReturnReasonCode:
-          type: string
-          description: Return reason code of the Dishonored Return
-          example: "R12"
-        traceNumber:
-          type: string
-          description: Matches the Entry Detail Trace Number of the entry being returned.
-          example: "214874812"
-      required:
-        - typeCode
-        - contestedReturnCode
-        - originalEntryTraceNumber
-        - dateOriginalEntryReturned
-        - originalReceivingDFIIdentification
-        - originalSettlementDate
-        - returnTraceNumber
-        - returnSettlementDate
-        - returnReasonCode
-        - dishonoredReturnTraceNumber
-        - dishonoredReturnSettlementDate
-        - dishonoredReturnReasonCode
-    Addenda99Contested:
-      properties:
-        id:
-          type: string
-          description: Client-defined string used as a reference to this record.
-          example: 5ca8d25a
-        typeCode:
-          type: string
-          description: 99 - NACHA regulations
-          example: "99"
-        dishonoredReturnReasonCode:
-          type: string
-          description: Return reason code of the Dishonored Return
-          example: "R12"
-        originalEntryTraceNumber:
-          type: string
-          description: Trace Number of the original entry being returned.
-          example: "214874812"
-        originalReceivingDFIIdentification:
-          type: string
-          description: Identification of the Original Receiving Depository Institution (ODFI)
-          example: "12345678"
-        returnTraceNumber:
-          type: string
-          description: Return trace number
-          example: "214874812"
-        returnSettlementDate:
-          type: string
-          description: Return settlement date
-          example: "200102"
-        returnReasonCode:
-          type: string
-          description: Return reason code
-          example: "R12"
-        addendaInformation:
-          type: string
-          description: Additional information of the Contested Dishonored Return
         traceNumber:
           type: string
           description: Unique Trace Number for the contested dishonored return
@@ -1667,8 +1679,12 @@ components:
         - returnTraceNumber
         - returnSettlementDate
         - returnReasonCode
-        - addendaInformation
         - traceNumber
+        - contestedReturnCode
+        - dateOriginalEntryReturned
+        - originalSettlementDate
+        - dishonoredReturnTraceNumber
+        - dishonoredReturnSettlementDate
     IATBatch:
       properties:
         ID:
@@ -1786,6 +1802,11 @@ components:
             BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
           type: integer
           example: 0
+        settlementDate:
+          type: string
+          description: The date the entries actually settled (this is inserted by the ACH operator)
+          format: "YYMMDD"
+          example: "190102"
       required:
         - serviceClassCode
         - standardEntryClassCode
@@ -2130,3 +2151,35 @@ components:
           type: boolean
           default: false
           description: Skip ImmediateDestination validation steps.
+        customTraceNumbers:
+          type: boolean
+          default: false
+          description: Disable Nacha specified checks of TraceNumbers.
+        allowZeroBatches:
+          type: boolean
+          default: false
+          description: Allow the file to have zero batches.
+        allowMissingFileHeader:
+          type: boolean
+          default: false
+          description: Allow the file to be read without a FileHeader record.
+        allowMissingFileControl:
+          type: boolean
+          default: false
+          description: Allow the file to be read without a FileControl record.
+        bypassCompanyIdentificationMatch:
+          type: boolean
+          default: false
+          description: Allow batches in which the Company Identification field in the batch header and control do not match.
+        customReturnCodes:
+          type: boolean
+          default: false
+          description: Allow for non-standard/deprecated return codes (e.g. R97)
+        unequalServiceClassCode:
+          type: boolean
+          default: false
+          description: Skip equality checks for the ServiceClassCode in each pair of BatchHeader and BatchControl records.
+        allowUnorderedBatchNumbers:
+          type: boolean
+          default: false
+          description: Allow a file to be read with unordered batch numbers.

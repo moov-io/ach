@@ -49,7 +49,7 @@ type IATEntryDetail struct {
 	// CheckDigit the last digit of the RDFI's routing number
 	CheckDigit string `json:"checkDigit"`
 	// AddendaRecords is the number of Addenda Records
-	AddendaRecords int `json:"AddendaRecords"`
+	AddendaRecords int `json:"addendaRecords"`
 	// reserved - Leave blank
 	reserved string
 	// Amount Number of cents you are debiting/crediting this account
@@ -62,7 +62,7 @@ type IATEntryDetail struct {
 	// OFACScreeningIndicator - Leave blank
 	OFACScreeningIndicator string `json:"OFACScreeningIndicator"`
 	// SecondaryOFACScreeningIndicator - Leave blank
-	SecondaryOFACScreeningIndicator string `json:"SecondaryOFACScreeningIndicator"`
+	SecondaryOFACScreeningIndicator string `json:"secondaryOFACScreeningIndicator"`
 	// AddendaRecordIndicator indicates the existence of an Addenda Record.
 	// A value of "1" indicates that one or more addenda records follow,
 	// and "0" means no such record is present.
