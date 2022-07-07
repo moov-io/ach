@@ -35,7 +35,7 @@ func TestIssue927(t *testing.T) {
 	}
 
 	if len(after) != 2 {
-		t.Errorf("merged %d files into %d", len(before), len(after))
+		t.Fatalf("merged %d files into %d files", len(before), len(after))
 	}
 
 	if n := len(after[0].Batches); n != 5 {
