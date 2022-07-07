@@ -1,3 +1,15 @@
+## v1.18.2 (Released 2022-07-07)
+
+IMPROVEMENTS
+
+- fix: reduce memory usage during MergeFiles
+
+BUILD
+
+- fix(deps): update module github.com/aws/aws-lambda-go to v1.32.1
+- fix(deps): update module github.com/moov-io/base to v0.32.0
+- fix(deps): update module github.com/stretchr/testify to v1.8.0
+
 ## v1.18.1 (Released 2022-06-15)
 
 IMPROVEMENTS
