@@ -400,8 +400,10 @@ func TestMergeFiles__dollarAmount2(t *testing.T) {
 
 func countTraceNumbers(files ...*File) int {
 	var total int
-	for i := range files {
-		total += len(getTraceNumbers(files[i]))
+	for f := range files {
+		for b := range files[f].Batches {
+			total += len(files[f].Batches[b].GetEntries())
+		}
 	}
 	return total
 }

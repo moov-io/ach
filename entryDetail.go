@@ -634,25 +634,3 @@ func sortEntriesByTraceNumber(entries []*EntryDetail) []*EntryDetail {
 	})
 	return entries
 }
-
-type traceNumbers []string
-
-func (nums traceNumbers) contains(num string) bool {
-	for i := range nums {
-		if num == nums[i] {
-			return true
-		}
-	}
-	return false
-}
-
-func getTraceNumbers(f *File) traceNumbers {
-	var out []string
-	for i := range f.Batches {
-		entries := f.Batches[i].GetEntries()
-		for j := range entries {
-			out = append(out, entries[j].TraceNumber)
-		}
-	}
-	return traceNumbers(out)
-}
