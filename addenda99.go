@@ -295,6 +295,7 @@ func makeReturnCodeDict() map[string]*ReturnCode {
 		{"R53", "Item and RCK Entry Presented for Payment (Adjustment Entry)", "Both the RCK entry and check have been presented for payment. RDFI must obtain a Written Statement and return the entry within 60 days following Settlement Date"},
 		// Return Codes to be used by the ODFI for dishonored return entries
 		{"R61", "Misrouted Return", "The financial institution preparing the Return Entry (the RDFI of the original Entry) has placed the incorrect Routing Number in the Receiving DFI Identification field."},
+		{"R62", "Return of Erroneous or Reversing Debt", "The Originator’s/ODFI’s use of the reversal process resulted in, or failed to correct, an unintended credit to the Receiver."},
 		{"R67", "Duplicate Return", "The ODFI has received more than one Return for the same Entry."},
 		{"R68", "Untimely Return", "The Return Entry has not been sent within the time frame established by these Rules."},
 		{"R69", "Field Error(s)", "One or more of the field requirements are incorrect."},
@@ -306,6 +307,7 @@ func makeReturnCodeDict() map[string]*ReturnCode {
 		{"R74", "Corrected Return", "The RDFI is correcting a previous Return Entry that was dishonored using Return Reason Code R69 (Field Error(s)) because it contained incomplete or incorrect information."},
 		{"R75", "Return Not a Duplicate", "The Return Entry was not a duplicate of an Entry previously returned by the RDFI."},
 		{"R76", "No Errors Found", "The original Return Entry did not contain the errors indicated by the ODFI in the dishonored Return Entry."},
+		{"R77", "Non-Acceptance of R62 Dishonored Return", "The RDFI returned the Erroneous Entry and the related Reversing Entry. Alternatively, the funds relating to the R62 dishonored Return are not recoverably from the Receiver."},
 		//Return Codes to be used by Gateways for the return of international payments
 		{"R80", "IAT Entry Coding Error", "The IAT Entry is being returned due to one or more of the following conditions: Invalid DFI/Bank Branch Country Code, invalid DFI/Bank Identification Number Qualifier, invalid Foreign Exchange Indicator, invalid ISO Originating Currency Code, invalid ISO Destination Currency Code, invalid ISO Destination Country Code, invalid Transaction Type Code"},
 		{"R81", "Non-Participant in IAT Program", "The IAT Entry is being returned because the Gateway does not have an agreement with either the ODFI or the Gateway's customer to transmit Outbound IAT Entries."},
