@@ -1,3 +1,13 @@
+## v1.18.3 (Released 2022-07-13)
+
+IMPROVEMENTS
+
+- feat: add R62 and R77 return codes
+
+BUILD
+
+- fix(deps): update module github.com/moov-io/base to v0.33.0
+
 ## v1.18.2 (Released 2022-07-07)
 
 IMPROVEMENTS
