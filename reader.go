@@ -401,14 +401,14 @@ func (r *Reader) parseEntryDetail() error {
 		return ErrFileEntryOutsideBatch
 	}
 	if r.currentBatch.GetHeader().StandardEntryClassCode != ADV {
-		ed := new(EntryDetail)
+		ed := NewEntryDetail()
 		ed.Parse(r.line)
 		if err := ed.Validate(); err != nil {
 			return r.parseError(err)
 		}
 		r.currentBatch.AddEntry(ed)
 	} else {
-		ed := new(ADVEntryDetail)
+		ed := NewADVEntryDetail()
 		ed.Parse(r.line)
 		if err := ed.Validate(); err != nil {
 			return r.parseError(err)
@@ -468,6 +468,7 @@ func (r *Reader) parseAddenda() error {
 						return r.parseError(err)
 					}
 					r.currentBatch.GetEntries()[entryIndex].Addenda99Dishonored = addenda99Dishonored
+					r.currentBatch.GetEntries()[entryIndex].Category = CategoryDishonoredReturn
 
 				case IsContestedReturnCode(r.line[3:6]):
 					addenda99Contested := NewAddenda99Contested()
@@ -477,6 +478,7 @@ func (r *Reader) parseAddenda() error {
 						return r.parseError(err)
 					}
 					r.currentBatch.GetEntries()[entryIndex].Addenda99Contested = addenda99Contested
+					r.currentBatch.GetEntries()[entryIndex].Category = CategoryDishonoredReturnContested
 
 				default:
 					addenda99 := NewAddenda99()
@@ -486,8 +488,8 @@ func (r *Reader) parseAddenda() error {
 						return r.parseError(err)
 					}
 					r.currentBatch.GetEntries()[entryIndex].Addenda99 = addenda99
+					r.currentBatch.GetEntries()[entryIndex].Category = CategoryReturn
 				}
-				r.currentBatch.GetEntries()[entryIndex].Category = CategoryReturn
 			}
 		} else {
 			return r.parseError(r.currentBatch.Error("AddendaRecordIndicator", ErrBatchAddendaIndicator))
