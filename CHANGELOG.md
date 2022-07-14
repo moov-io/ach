@@ -1,3 +1,9 @@
+## v1.18.4 (Released 2022-07-14)
+
+IMPROVEMENTS
+
+- Fix entry category assignment in Reader
+
 ## v1.18.3 (Released 2022-07-13)
 
 IMPROVEMENTS
