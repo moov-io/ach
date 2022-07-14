@@ -28,6 +28,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 func readACHFilepath(path string) (*File, error) {
@@ -1753,6 +1754,108 @@ func testACHFileTooLongErr(t testing.TB) {
 
 	// reset maxLines to its original value
 	maxLines = 2 + 2000000 + 100000000 + 8
+}
+
+// TestCategoryAssignment ensures entry categories are set correctly
+func TestCategoryAssignment(t *testing.T) {
+	// Create a file containing entries of each category.
+	file := NewFile().SetHeader(mockFileHeader())
+
+	// "Forward"
+	forwardEntry := mockEntryDetail()
+	forwardEntry.Category = CategoryForward
+	forwardEntry.DiscretionaryData = "01"
+	forwardBatch := NewBatchWEB(mockBatchWEBHeader())
+	forwardBatch.AddEntry(forwardEntry)
+	if err := forwardBatch.Create(); err != nil {
+		t.Fatal(err)
+	}
+	file.AddBatch(forwardBatch)
+
+	// "Return"
+	returnEntry := mockEntryDetail()
+	returnEntry.Addenda99 = mockAddenda99()
+	returnEntry.AddendaRecordIndicator = 1
+	returnEntry.Category = CategoryReturn
+	returnEntry.DiscretionaryData = "02"
+	returnBatch := NewBatchWEB(mockBatchWEBHeader())
+	returnBatch.AddEntry(returnEntry)
+	if err := returnBatch.Create(); err != nil {
+		t.Fatal(err)
+	}
+	file.AddBatch(returnBatch)
+
+	// "DishonoredReturn"
+	dishonoredReturnEntry := mockEntryDetail()
+	dishonoredReturnEntry.Addenda99Dishonored = mockAddenda99Dishonored()
+	dishonoredReturnEntry.AddendaRecordIndicator = 1
+	dishonoredReturnEntry.Category = CategoryDishonoredReturn
+	dishonoredReturnEntry.DiscretionaryData = "03"
+	dishonoredReturnBatch := NewBatchWEB(mockBatchWEBHeader())
+	dishonoredReturnBatch.AddEntry(dishonoredReturnEntry)
+	if err := dishonoredReturnBatch.Create(); err != nil {
+		t.Fatal(err)
+	}
+	file.AddBatch(dishonoredReturnBatch)
+
+	// "DishonoredReturnContested"
+	contestedDishonoredReturnEntry := mockEntryDetail()
+	contestedDishonoredReturnEntry.Addenda99Contested = mockAddenda99Contested()
+	contestedDishonoredReturnEntry.AddendaRecordIndicator = 1
+	contestedDishonoredReturnEntry.Category = CategoryDishonoredReturnContested
+	contestedDishonoredReturnEntry.DiscretionaryData = "04"
+	contestedDishonoredReturnBatch := NewBatchWEB(mockBatchWEBHeader())
+	contestedDishonoredReturnBatch.AddEntry(contestedDishonoredReturnEntry)
+	if err := contestedDishonoredReturnBatch.Create(); err != nil {
+		t.Fatal(err)
+	}
+	file.AddBatch(contestedDishonoredReturnBatch)
+
+	// "NOC"
+	nocEntry := mockCOREntryDetail()
+	nocEntry.Addenda98 = mockAddenda98()
+	nocEntry.AddendaRecordIndicator = 1
+	nocEntry.Category = CategoryNOC
+	nocEntry.DiscretionaryData = "05"
+	nocBatch := NewBatchCOR(mockBatchCORHeader())
+	nocBatch.AddEntry(nocEntry)
+	if err := nocBatch.Create(); err != nil {
+		t.Fatal(err)
+	}
+	file.AddBatch(nocBatch)
+
+	if err := file.Create(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	if err := file.Validate(); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	b := &bytes.Buffer{}
+	f := NewWriter(b)
+
+	if err := f.Write(file); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	r := NewReader(strings.NewReader(b.String()))
+	readFile, err := r.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	categoriesByDiscretionaryData := map[string]string{}
+	for _, batch := range readFile.Batches {
+		for _, entry := range batch.GetEntries() {
+			categoriesByDiscretionaryData[entry.DiscretionaryData] = entry.Category
+		}
+	}
+
+	require.Equal(t, CategoryForward, categoriesByDiscretionaryData["01"])
+	require.Equal(t, CategoryReturn, categoriesByDiscretionaryData["02"])
+	require.Equal(t, CategoryDishonoredReturn, categoriesByDiscretionaryData["03"])
+	require.Equal(t, CategoryDishonoredReturnContested, categoriesByDiscretionaryData["04"])
+	require.Equal(t, CategoryNOC, categoriesByDiscretionaryData["05"])
 }
 
 // TestACHFileTooLongErr checks that it errors on a file that is too long
