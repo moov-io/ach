@@ -276,6 +276,7 @@ func makeReturnCodeDict() map[string]*ReturnCode {
 		{"R33", "Return of XCK entry", "RDFI determines at its sole discretion to return an XCK entry; an XCK return entry may be initiated by midnight of the sixtieth day following the settlement date if the XCK entry"},
 		{"R34", "Limited participation RDFI", "RDFI participation has been limited by a federal or state supervisor"},
 		{"R35", "Return of improper debit entry", "ACH debit not permitted for use with the CIE standard entry class code (except for reversals)"},
+		{"R36", "Return of improper credit entry", "ACH credit entries (with the exception of reversing entries) are not permitted for use with ARC, BOC, POP, RCK, TEL, and XCK."},
 		{"R37", "Source Document Presented for Payment (Adjustment Entry)", "The source document to which an ARC, BOC or POP entry relates has been presented for payment. RDFI must obtain a Written Statement and return the entry within 60 days following Settlement Date"},
 		{"R38", "Stop Payment on Source Document (Adjustment Entry)", "A stop payment has been placed on the source document to which the ARC or BOC entry relates. RDFI must return no later than 60 days following Settlement Date. No Written Statement is required as the original stop payment form covers the return"},
 		{"R39", "Improper Source Document", "The RDFI has determined the source document used for the ARC, BOC or POP entry to its Receiver's account is improper."},
