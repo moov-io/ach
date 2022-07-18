@@ -495,9 +495,7 @@ func TestFile__readFromJson(t *testing.T) {
 		t.Error(err)
 	}
 
-	if file.ID != "adam-01" {
-		t.Errorf("file.ID: %s", file.ID)
-	}
+	require.Equal(t, "1f707c97-da19-49d0-a3c9-49eebc042e68", file.ID)
 
 	// Header
 	if file.Header.ImmediateOrigin != "121042882" || file.Header.ImmediateOriginName != "Wells Fargo" {
