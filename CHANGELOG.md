@@ -1,3 +1,10 @@
+## v1.18.5 (Released 2022-07-19)
+
+IMPROVEMENTS
+
+- docs: update ppd-valid.json ID values
+- feat: add R36 return code
+
 ## v1.18.4 (Released 2022-07-14)
 
 IMPROVEMENTS
