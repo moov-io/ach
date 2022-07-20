@@ -535,7 +535,8 @@ func (ed *EntryDetail) PaymentTypeField() string {
 	return ed.DiscretionaryData
 }
 
-// SetPaymentType as R (Recurring) all other values will result in S (single).  This is used for WEB and TEL batch files
+// SetPaymentType as R (Recurring) all other values will result in S (single).
+// This is used for WEB and TEL batch files in-place of DiscretionaryData.
 func (ed *EntryDetail) SetPaymentType(t string) {
 	t = strings.ToUpper(strings.TrimSpace(t))
 	if t == "R" {

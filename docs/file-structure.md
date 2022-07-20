@@ -640,6 +640,8 @@ Point-of-Sale Entries (POS) are ACH debit entries typically initiated by the use
 | *10* | 79-79 | 1 | Numeric | Addenda Record Indicator | "0" = no addenda <br>"1" = one addenda included. | M |
 | *11* | 80-94 | 15 | Numeric | Trace Number | Standard Entry Detail Trace Number | M |
 
+Note: Use [`SetPaymentType()`](https://pkg.go.dev/github.com/moov-io/ach#EntryDetail.SetPaymentType) and [`PaymentTypeField()`](https://pkg.go.dev/github.com/moov-io/ach#EntryDetail.PaymentTypeField) to update Payment Type Code. This code uses the `DiscretionaryData` field.
+
 ##  TRC/TRC Truncated Entries
 
 **Truncated Entries** This Standard Entry Class Code is used to identify a debit entry of a truncated check.
@@ -710,6 +712,8 @@ Up to 9,999 Addenda Records may be included with a TRX Entry Detail Record.
 | *9* | 77-78 | 2 | Alphameric| Payment Type Code | Input 'R' for Recurring payments, and 'S' for single-entry payment. | R |
 | *10* | 79-79 | 1 | Numeric | Addenda Record Indicator |  "0" = no addenda <br>"1" = one addenda included. | M |
 | *11* | 80-94 | 15 | Numeric | Trace Number | Standard Entry Detail Trace Number. | M |
+
+Note: Use [`SetPaymentType()`](https://pkg.go.dev/github.com/moov-io/ach#EntryDetail.SetPaymentType) and [`PaymentTypeField()`](https://pkg.go.dev/github.com/moov-io/ach#EntryDetail.PaymentTypeField) to update Payment Type Code. This code uses the `DiscretionaryData` field.
 
 ## XCK Destroyed Check Entry
 
