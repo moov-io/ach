@@ -104,9 +104,10 @@ func main() {
 			PreferServerCipherSuites: true,
 			MinVersion:               tls.VersionTLS12,
 		},
-		ReadTimeout:  readTimeout,
-		WriteTimeout: writTimeout,
-		IdleTimeout:  idleTimeout,
+		ReadTimeout:       readTimeout,
+		ReadHeaderTimeout: readTimeout,
+		WriteTimeout:      writTimeout,
+		IdleTimeout:       idleTimeout,
 	}
 	shutdownServer := func() {
 		if err := serve.Shutdown(context.TODO()); err != nil {
