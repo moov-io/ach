@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"encoding/json"
 	"fmt"
 	"sort"
 	"strconv"
@@ -340,6 +341,32 @@ func (ed *EntryDetail) amountOverflowsField() error {
 	if len(intstr) > len(strstr) {
 		return fmt.Errorf("does not match formatted value %s", strstr)
 	}
+	return nil
+}
+
+func (ed *EntryDetail) UnmarshalJSON(data []byte) error {
+	type Aux EntryDetail
+	var entry Aux
+	err := json.Unmarshal(data, &entry)
+	if err != nil {
+		return err
+	}
+
+	type Aux2 struct {
+		PaymentTypeCode string `json:"paymentTypeCode"`
+	}
+	var aux Aux2
+
+	err = json.Unmarshal(data, &aux)
+	if err != nil {
+		return err
+	}
+
+	if aux.PaymentTypeCode != "" {
+		entry.DiscretionaryData = aux.PaymentTypeCode
+	}
+
+	*ed = EntryDetail(entry)
 	return nil
 }
 

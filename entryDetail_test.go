@@ -28,6 +28,8 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+
+	"github.com/stretchr/testify/require"
 )
 
 // mockEntryDetail creates an entry detail
@@ -771,4 +773,34 @@ func TestEntryDetail__LargeAmountStrings(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 	}
+}
+
+func TestEntryDetail_UnmarshalPaymentTypeCode(t *testing.T) {
+	orig := mockEntryDetail()
+	orig.recordType = ""
+
+	// Convert the EntryDetail to a map[string]interface{} so we can
+	// add paymentTypeCode and read that back in DiscretionaryData.
+	bs, err := json.Marshal(orig)
+	require.NoError(t, err)
+
+	fields := make(map[string]interface{})
+	err = json.Unmarshal(bs, &fields)
+	require.NoError(t, err)
+
+	fields["paymentTypeCode"] = "S" // set Payment Type Code
+
+	// Convert map into json bytes
+	bs, err = json.Marshal(fields)
+	require.NoError(t, err)
+
+	var after EntryDetail
+	err = json.Unmarshal(bs, &after)
+	require.NoError(t, err)
+
+	require.Equal(t, "S", after.PaymentTypeField())
+	require.Equal(t, "S ", after.DiscretionaryDataField())
+
+	orig.DiscretionaryData = "S"
+	require.Equal(t, after, *orig)
 }
