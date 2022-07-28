@@ -211,6 +211,12 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 		req.parseError = err
 	}
 
+	// Set the fileID from the request
+	fileID, ok := mux.Vars(request)["fileID"]
+	if ok && fileID != "" && fileID != "create" {
+		req.File.ID = fileID
+	}
+
 	return req, nil
 }
 
