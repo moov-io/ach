@@ -53,9 +53,8 @@ func TestFiles__decodeCreateFileRequest(t *testing.T) {
 	svc := NewService(repo)
 
 	var body bytes.Buffer
-	if err := json.NewEncoder(&body).Encode(f); err != nil {
-		t.Fatal(err)
-	}
+	err := json.NewEncoder(&body).Encode(f)
+	require.NoError(t, err)
 
 	req := httptest.NewRequest("POST", "/files/create", &body)
 	req.Header.Set("x-request-id", "test")
@@ -80,6 +79,7 @@ func TestFiles__decodeCreateFileRequest(t *testing.T) {
 	if resp.ID == "" || resp.Err != nil {
 		t.Errorf("id=%q error=%v", resp.ID, resp.Err)
 	}
+	require.Equal(t, "foo", f.ID)
 
 	// Check stored file state
 	got, _ := svc.GetFile(f.ID)
