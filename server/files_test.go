@@ -127,6 +127,7 @@ func TestFiles__CustomJsonValidation(t *testing.T) {
 	var resp createFileResponse
 	require.NoError(t, json.NewDecoder(w.Body).Decode(&resp))
 	require.Equal(t, "adam-01", resp.ID)
+	require.NotNil(t, resp.File)
 	require.Equal(t, nil, resp.Err)
 }
 

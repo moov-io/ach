@@ -60,8 +60,9 @@ type createFileRequest struct {
 }
 
 type createFileResponse struct {
-	ID  string `json:"id"`
-	Err error  `json:"error"`
+	ID   string    `json:"id"`
+	File *ach.File `json:"file"`
+	Err  error     `json:"error"`
 }
 
 func (r createFileResponse) error() error { return r.Err }
@@ -100,9 +101,11 @@ func createFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.End
 			}
 		}
 
+		f, _ := r.FindFile(req.File.ID)
 		resp := createFileResponse{
-			ID:  req.File.ID,
-			Err: err,
+			ID:   req.File.ID,
+			File: f,
+			Err:  err,
 		}
 		if req.parseError != nil {
 			resp.Err = req.parseError
