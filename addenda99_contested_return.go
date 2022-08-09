@@ -99,8 +99,8 @@ func (Addenda99Contested *Addenda99Contested) Parse(record string) {
 	Addenda99Contested.ReturnTraceNumber = record[38:53]
 	Addenda99Contested.ReturnSettlementDate = record[53:56]
 	Addenda99Contested.ReturnReasonCode = record[56:58]
-	Addenda99Contested.DishonoredReturnTraceNumber = record[59:73]
-	Addenda99Contested.DishonoredReturnSettlementDate = record[74:76]
+	Addenda99Contested.DishonoredReturnTraceNumber = record[58:73]
+	Addenda99Contested.DishonoredReturnSettlementDate = record[73:76]
 	Addenda99Contested.DishonoredReturnReasonCode = record[76:78]
 	Addenda99Contested.TraceNumber = record[79:94]
 }
