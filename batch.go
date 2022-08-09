@@ -909,7 +909,6 @@ func (batch *Batch) isCategory() error {
 // COR and Addenda98
 // Return:
 // Addenda99, Addenda99Dishonored, Addenda99Contested
-//
 func (batch *Batch) addendaFieldInclusion(entry *EntryDetail) error {
 	switch entry.Category {
 	case CategoryForward:

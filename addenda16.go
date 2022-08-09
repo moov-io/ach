@@ -25,7 +25,7 @@ import (
 // Addenda16 is an addenda which provides business transaction information for Addenda Type
 // Code 16 in a machine readable format. It is usually formatted according to ANSI, ASC, X16 Standard.
 //
-// Addenda16 is mandatory for IAT entries
+// # Addenda16 is mandatory for IAT entries
 //
 // The Addenda16 record identifies key information related to the Receiver.
 type Addenda16 struct {

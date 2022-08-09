@@ -17,16 +17,18 @@
 
 // Package main is an example for creating an Automated Clearing House (ACH) file with Moov's HTTP service.
 // To run this example first start the ach service locally:
-//   $ go run ./cmd/server // from this project's root directory
+//
+//	$ go run ./cmd/server // from this project's root directory
 //
 // Then, in a second terminal you can run this example:
-//   $ go run ./examples/http // from project root
+//
+//	$ go run ./examples/http // from project root
 package main
 
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -110,7 +112,7 @@ func main() {
 	if resp.StatusCode == 200 {
 		log.Printf("File created!")
 	} else {
-		bs, _ := ioutil.ReadAll(resp.Body)
+		bs, _ := io.ReadAll(resp.Body)
 		log.Fatalf("error creating file: %v", string(bs))
 	}
 }

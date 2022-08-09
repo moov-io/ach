@@ -22,7 +22,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -399,7 +399,7 @@ func TestFiles__validateFileEndpoint(t *testing.T) {
 		t.Fatalf("empty ACH file: %v", err)
 	}
 	defer fd.Close()
-	bs, _ := ioutil.ReadAll(fd)
+	bs, _ := io.ReadAll(fd)
 	file, _ := ach.FileFromJSON(bs)
 	file.Header.ImmediateDestination = "" // invalid routing number
 	repo.StoreFile(file)
@@ -438,7 +438,7 @@ func TestFiles__ValidateOpts(t *testing.T) {
 	}
 	defer fd.Close()
 
-	bs, _ := ioutil.ReadAll(fd)
+	bs, _ := io.ReadAll(fd)
 	file, _ := ach.FileFromJSON(bs)
 	file.Header.ImmediateOrigin = "123456789" // invalid routing number
 	repo.StoreFile(file)
@@ -504,7 +504,7 @@ func TestFiles__balanceFileEndpoint(t *testing.T) {
 	}
 	defer fd.Close()
 
-	bs, _ := ioutil.ReadAll(fd)
+	bs, _ := io.ReadAll(fd)
 	file, _ := ach.FileFromJSON(bs)
 	repo.StoreFile(file)
 
@@ -583,7 +583,7 @@ func TestFilesErr__balanceFileEndpointJSON(t *testing.T) {
 	}
 	defer fd.Close()
 
-	bs, _ := ioutil.ReadAll(fd)
+	bs, _ := io.ReadAll(fd)
 	file, _ := ach.FileFromJSON(bs)
 	repo.StoreFile(file)
 
@@ -652,7 +652,7 @@ func TestFiles__segmentFileEndpoint(t *testing.T) {
 		t.Fatalf("empty ACH file: %v", err)
 	}
 	defer fd.Close()
-	bs, _ := ioutil.ReadAll(fd)
+	bs, _ := io.ReadAll(fd)
 	file, _ := ach.FileFromJSON(bs)
 	repo.StoreFile(file)
 
@@ -709,7 +709,7 @@ func TestFiles__flattenFileEndpoint(t *testing.T) {
 		t.Fatalf("empty ACH file: %v", err)
 	}
 	defer fd.Close()
-	bs, _ := ioutil.ReadAll(fd)
+	bs, _ := io.ReadAll(fd)
 	file, _ := ach.FileFromJSON(bs)
 	repo.StoreFile(file)
 
@@ -769,7 +769,7 @@ func TestFilesByID__getFileEndpoint(t *testing.T) {
 		t.Fatalf("empty ACH file: %v", err)
 	}
 	defer fd.Close()
-	bs, _ := ioutil.ReadAll(fd)
+	bs, _ := io.ReadAll(fd)
 	file, _ := ach.FileFromJSON(bs)
 	repo.StoreFile(file)
 
@@ -801,7 +801,7 @@ func TestFileContentsByID__getFileContentsEndpoint(t *testing.T) {
 		t.Fatalf("empty ACH file: %v", err)
 	}
 	defer fd.Close()
-	bs, _ := ioutil.ReadAll(fd)
+	bs, _ := io.ReadAll(fd)
 	file, _ := ach.FileFromJSON(bs)
 	repo.StoreFile(file)
 
@@ -833,7 +833,7 @@ func TestFilesByID__deleteFileEndpoint(t *testing.T) {
 		t.Fatalf("empty ACH file: %v", err)
 	}
 	defer fd.Close()
-	bs, _ := ioutil.ReadAll(fd)
+	bs, _ := io.ReadAll(fd)
 	file, _ := ach.FileFromJSON(bs)
 	repo.StoreFile(file)
 
@@ -1048,7 +1048,7 @@ func TestFiles__segmentFileEndpointError(t *testing.T) {
 		t.Fatalf("empty ACH file: %v", err)
 	}
 	defer fd.Close()
-	bs, _ := ioutil.ReadAll(fd)
+	bs, _ := io.ReadAll(fd)
 	file, _ := ach.FileFromJSON(bs)
 	file.Header.ImmediateDestination = "" // invalid routing number
 	repo.StoreFile(file)
@@ -1090,7 +1090,7 @@ func TestFiles__flattenFileEndpointError(t *testing.T) {
 		t.Fatalf("empty ACH file: %v", err)
 	}
 	defer fd.Close()
-	bs, _ := ioutil.ReadAll(fd)
+	bs, _ := io.ReadAll(fd)
 	file, _ := ach.FileFromJSON(bs)
 	file.Header.ImmediateDestination = "" // invalid routing number
 	repo.StoreFile(file)

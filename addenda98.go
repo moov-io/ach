@@ -158,7 +158,7 @@ func (addenda98 *Addenda98) OriginalDFIField() string {
 	return addenda98.stringField(addenda98.OriginalDFI, 8)
 }
 
-//CorrectedDataField returns a space padded CorrectedData string
+// CorrectedDataField returns a space padded CorrectedData string
 func (addenda98 *Addenda98) CorrectedDataField() string {
 	return addenda98.alphaField(addenda98.CorrectedData, 29)
 }

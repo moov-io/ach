@@ -25,7 +25,7 @@ import (
 // Addenda11 is an addenda which provides business transaction information for Addenda Type
 // Code 11 in a machine readable format. It is usually formatted according to ANSI, ASC, X12 Standard.
 //
-// Addenda11 is mandatory for IAT entries
+// # Addenda11 is mandatory for IAT entries
 //
 // The Addenda11 record identifies key information related to the Originator of
 // the entry.

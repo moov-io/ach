@@ -3,7 +3,7 @@ package server
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -103,7 +103,7 @@ func Benchmark__FlattenBigFile(b *testing.B) {
 		defer resp.Body.Close()
 
 		if resp.StatusCode != 200 {
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			if err != nil {
 				b.Fatal(err)
 			}

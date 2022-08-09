@@ -25,7 +25,7 @@ import (
 // Addenda13 is an addenda which provides business transaction information for Addenda Type
 // Code 13 in a machine readable format. It is usually formatted according to ANSI, ASC, X13 Standard.
 //
-// Addenda13 is mandatory for IAT entries
+// # Addenda13 is mandatory for IAT entries
 //
 // The Addenda13 contains information related to the financial institution originating the entry.
 // For inbound IAT entries, the Fourth Addenda Record must contain information to identify the

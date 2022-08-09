@@ -25,7 +25,7 @@ import (
 // Addenda14 is an addenda which provides business transaction information for Addenda Type
 // Code 14 in a machine readable format. It is usually formatted according to ANSI, ASC, X14 Standard.
 //
-// Addenda14 is mandatory for IAT entries
+// # Addenda14 is mandatory for IAT entries
 //
 // The Addenda14 identifies the Receiving financial institution holding the Receiver's account.
 type Addenda14 struct {

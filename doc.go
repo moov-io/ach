@@ -23,15 +23,16 @@
 // https://moov-io.github.io/ach/
 //
 // Read an ACH File
-//     fd, err := os.Open("name-of-your-ach-file.ach")
-//     if err != nil {
-//         log.Fatalf("problem opening file: %v", err)
-//     }
-//     file, err := ach.NewReader(fd).Read()
-//     if err != nil {
-//         log.Fatalf("problem parsing ACH file: %v", err)
-//     }
-//     if err := file.Validate(); err != nil {
-//         log.Fatalf("ACH file isn't valid: %v", err)
-//     }
+//
+//	fd, err := os.Open("name-of-your-ach-file.ach")
+//	if err != nil {
+//	    log.Fatalf("problem opening file: %v", err)
+//	}
+//	file, err := ach.NewReader(fd).Read()
+//	if err != nil {
+//	    log.Fatalf("problem parsing ACH file: %v", err)
+//	}
+//	if err := file.Validate(); err != nil {
+//	    log.Fatalf("ACH file isn't valid: %v", err)
+//	}
 package ach

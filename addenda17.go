@@ -25,7 +25,7 @@ import (
 // Addenda17 is an addenda which provides business transaction information for Addenda Type
 // Code 17 in a machine readable format. It is usually formatted according to ANSI, ASC, X12 Standard.
 //
-// Addenda17 is optional for IAT entries
+// # Addenda17 is optional for IAT entries
 //
 // The Addenda17 record identifies payment-related data. A maximum of two of these Addenda Records
 // may be included with each IAT entry.

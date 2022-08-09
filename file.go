@@ -1269,7 +1269,7 @@ func (f *File) FlattenBatches() (*File, error) {
 	return out, nil
 }
 
-//Validates that the batch numbers are ascending
+// Validates that the batch numbers are ascending
 func (f *File) isSequenceAscending() error {
 	lastSeq := 0
 	for _, batch := range f.Batches {

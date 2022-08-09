@@ -195,7 +195,7 @@ func (bc *BatchControl) EntryHashField() string {
 	return bc.numericField(bc.EntryHash, 10)
 }
 
-//TotalDebitEntryDollarAmountField get a zero padded Debit Entry Amount
+// TotalDebitEntryDollarAmountField get a zero padded Debit Entry Amount
 func (bc *BatchControl) TotalDebitEntryDollarAmountField() string {
 	return bc.numericField(bc.TotalDebitEntryDollarAmount, 12)
 }

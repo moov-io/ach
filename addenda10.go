@@ -25,7 +25,7 @@ import (
 // Addenda10 is an addenda which provides business transaction information for Addenda Type
 // Code 10 in a machine readable format. It is usually formatted according to ANSI, ASC, X12 Standard.
 //
-// Addenda10 is mandatory for IAT entries
+// # Addenda10 is mandatory for IAT entries
 //
 // The Addenda10 Record identifies the Receiver of the transaction and the dollar amount of
 // the payment.

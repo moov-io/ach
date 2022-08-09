@@ -21,7 +21,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -132,7 +132,7 @@ func TestReadPartial(t *testing.T) {
 
 func TestReader__crashers(t *testing.T) {
 	dir := filepath.Join("test", "testdata", "crashers")
-	fds, err := ioutil.ReadDir(dir)
+	fds, err := os.ReadDir(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1552,7 +1552,7 @@ func TestADVCategoryReturn(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	bs, err := ioutil.ReadAll(fd)
+	bs, err := io.ReadAll(fd)
 	if err != nil {
 		t.Error(err)
 	}
@@ -1965,7 +1965,7 @@ func TestJSONReader__IncludeFieldName(t *testing.T) {
 	// Write a test so that we verify the field name is included in the error message so
 	// it's easier to debug. Otherwise we get generic error messages that just include
 	// "cannot unmarshal %T into %T"
-	bs, err := ioutil.ReadFile(filepath.Join("test", "testdata", "invalid-batchNumber.json"))
+	bs, err := os.ReadFile(filepath.Join("test", "testdata", "invalid-batchNumber.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -19,7 +19,7 @@ package ach
 
 import (
 	"bytes"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -103,7 +103,7 @@ func TestAddenda99Contested(t *testing.T) {
 	}
 
 	path := filepath.Join("examples", "testdata", "contested-return.ach")
-	err = ioutil.WriteFile(path, buf.Bytes(), 0600)
+	err = os.WriteFile(path, buf.Bytes(), 0600)
 	if err != nil {
 		t.Fatal(err)
 	}

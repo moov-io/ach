@@ -26,9 +26,9 @@ import (
 // financial institutions that the recipient of government benefit payments has died.
 //
 // Notes:
-//  - Date of death always in positions 18-23
-//  - SSN (positions 38-46) are zero if no SSN
-//  - Beneficiary payment starts at position 55
+//   - Date of death always in positions 18-23
+//   - SSN (positions 38-46) are zero if no SSN
+//   - Beneficiary payment starts at position 55
 type BatchDNE struct {
 	Batch
 }

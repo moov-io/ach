@@ -255,11 +255,14 @@ func (v *validator) isTypeCode(code string) error {
 //
 // The Tran Code is a two-digit code in positions 2 - 3 of the Entry Detail Record (6 Record) within an ACH File.
 // The first digit of the Tran Code indicates the account type to which the entry will post, where the number:
+//
 //	"2" designates a Checking Account.
 //	"3" designates a Savings Account.
-// 	"4" designates a General Ledger Account.
-// 	"5" designates Loan Account.
-//The second digit of the Tran Code identifies the entry as:
+//	"4" designates a General Ledger Account.
+//	"5" designates Loan Account.
+//
+// The second digit of the Tran Code identifies the entry as:
+//
 //	an original forward entry, where the number:
 //		"2" designates a credit. or
 //		"7" designates a debit.

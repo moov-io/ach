@@ -25,7 +25,7 @@ import (
 // Addenda18 is an addenda which provides business transaction information for Addenda Type
 // Code 18 in a machine readable format. It is usually formatted according to ANSI, ASC, X12 Standard.
 //
-// Addenda18 is optional for IAT entries
+// # Addenda18 is optional for IAT entries
 //
 // The Addenda18 record identifies information on each Foreign Correspondent Bank involved in the
 // processing of the IAT entry. If no Foreign Correspondent Bank is involved,t he record should not be
