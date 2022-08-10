@@ -24,7 +24,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -188,7 +187,7 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 		}
 	}
 
-	bs, err := ioutil.ReadAll(request.Body)
+	bs, err := io.ReadAll(request.Body)
 	if err != nil {
 		return nil, err
 	}

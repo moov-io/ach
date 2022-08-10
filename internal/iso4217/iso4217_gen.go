@@ -35,9 +35,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"go/format"
-	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"os/user"
 	"path/filepath"
 	"runtime"
@@ -126,7 +126,7 @@ package iso4217
 		log.Fatalf("error formatting output code, err=%v", err)
 	}
 
-	err = ioutil.WriteFile(outputFilename, out, 0644)
+	err = os.WriteFile(outputFilename, out, 0644)
 	if err != nil {
 		log.Fatalf("error writing file, err=%v", err)
 	}

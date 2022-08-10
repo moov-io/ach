@@ -21,7 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/moov-io/ach"
@@ -89,7 +89,7 @@ func decodeCreateBatchRequest(_ context.Context, r *http.Request) (interface{}, 
 	}
 	req.FileID = id
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		return nil, err
 	}

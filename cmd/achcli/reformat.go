@@ -7,7 +7,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/moov-io/ach"
@@ -60,7 +60,7 @@ func readJsonFile(path string) (*ach.File, error) {
 	}
 	defer fd.Close()
 
-	bs, err := ioutil.ReadAll(fd)
+	bs, err := io.ReadAll(fd)
 	if err != nil {
 		return nil, fmt.Errorf("problem reading %s: %v", path, err)
 	}

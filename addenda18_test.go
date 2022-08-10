@@ -287,7 +287,7 @@ func BenchmarkAddenda18ForeignCorrespondentBankNameAlphaNumeric(b *testing.B) {
 	}
 }
 
-//testAddenda18ForeignCorrespondentBankIDQualifierAlphaNumeric validates ForeignCorrespondentBankIDNumberQualifier is alphanumeric
+// testAddenda18ForeignCorrespondentBankIDQualifierAlphaNumeric validates ForeignCorrespondentBankIDNumberQualifier is alphanumeric
 func testAddenda18ForeignCorrespondentBankIDQualifierAlphaNumeric(t testing.TB) {
 	addenda18 := mockAddenda18()
 	addenda18.ForeignCorrespondentBankIDNumberQualifier = "®©"
@@ -310,7 +310,7 @@ func BenchmarkAddenda18ForeignCorrespondentBankIDQualifierAlphaNumeric(b *testin
 	}
 }
 
-//testAddenda18ForeignCorrespondentBankBranchCountryCodeAlphaNumeric validates ForeignCorrespondentBankBranchCountryCode is alphanumeric
+// testAddenda18ForeignCorrespondentBankBranchCountryCodeAlphaNumeric validates ForeignCorrespondentBankBranchCountryCode is alphanumeric
 func testAddenda18ForeignCorrespondentBankBranchCountryCodeAlphaNumeric(t testing.TB) {
 	addenda18 := mockAddenda18()
 	addenda18.ForeignCorrespondentBankBranchCountryCode = "®©"
@@ -333,7 +333,7 @@ func BenchmarkAddenda18ForeignCorrespondentBankBranchCountryCodeAlphaNumeric(b *
 	}
 }
 
-//testAddenda18ForeignCorrespondentBankIDNumberAlphaNumeric validates ForeignCorrespondentBankIDNumber is alphanumeric
+// testAddenda18ForeignCorrespondentBankIDNumberAlphaNumeric validates ForeignCorrespondentBankIDNumber is alphanumeric
 func testAddenda18ForeignCorrespondentBankIDNumberAlphaNumeric(t testing.TB) {
 	addenda18 := mockAddenda18()
 	addenda18.ForeignCorrespondentBankIDNumber = "®©"

@@ -20,7 +20,6 @@ package issues
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -37,7 +36,7 @@ import (
 )
 
 func TestIssue1024__Read(t *testing.T) {
-	bs, err := ioutil.ReadFile(filepath.Join("testdata", "issue1024.json"))
+	bs, err := os.ReadFile(filepath.Join("testdata", "issue1024.json"))
 	require.NoError(t, err)
 
 	file, err := ach.FileFromJSON(bs)

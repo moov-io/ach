@@ -123,7 +123,7 @@ func BenchmarkEntryDetailPaymentType(b *testing.B) {
 	}
 }
 
-//  testEntryDetailReceivingCompany validates an entry detail record receiving company
+// testEntryDetailReceivingCompany validates an entry detail record receiving company
 func testEntryDetailReceivingCompany(t testing.TB) {
 	entry := mockEntryDetail()
 	//override mockEntryDetail

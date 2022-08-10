@@ -25,7 +25,7 @@ import (
 // Addenda15 is an addenda which provides business transaction information for Addenda Type
 // Code 15 in a machine readable format. It is usually formatted according to ANSI, ASC, X12 Standard.
 //
-// Addenda15 is mandatory for IAT entries
+// # Addenda15 is mandatory for IAT entries
 //
 // The Addenda15 record identifies key information related to the Receiver.
 type Addenda15 struct {

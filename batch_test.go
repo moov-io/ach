@@ -20,7 +20,6 @@ package ach
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -501,7 +500,7 @@ func BenchmarkBatchCategory(b *testing.B) {
 	}
 }
 
-//  testBatchCategoryForwardReturn validates Category based on EntryDetail
+// testBatchCategoryForwardReturn validates Category based on EntryDetail
 func testBatchCategoryForwardReturn(t testing.TB) {
 	mockBatch := mockBatch()
 	// Add a Addenda Return to the mock batch
@@ -526,7 +525,7 @@ func TestBatchCategoryForwardReturn(t *testing.T) {
 	testBatchCategoryForwardReturn(t)
 }
 
-//  BenchmarkBatchCategoryForwardReturn benchmarks validating Category based on EntryDetail
+// BenchmarkBatchCategoryForwardReturn benchmarks validating Category based on EntryDetail
 func BenchmarkBatchCategoryForwardReturn(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -911,7 +910,7 @@ func TestBatchDishonoredReturnsCategory(t *testing.T) {
 	}
 
 	path := filepath.Join("examples", "testdata", "dishonored-return.ach")
-	err = ioutil.WriteFile(path, buf.Bytes(), 0600)
+	err = os.WriteFile(path, buf.Bytes(), 0600)
 	if err != nil {
 		t.Fatal(err)
 	}

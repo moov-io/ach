@@ -245,17 +245,17 @@ func (addenda02 *Addenda02) AuthorizationCodeOrExpireDateField() string {
 	return addenda02.alphaField(addenda02.AuthorizationCodeOrExpireDate, 6)
 }
 
-//TerminalLocationField returns a space padded TerminalLocation string
+// TerminalLocationField returns a space padded TerminalLocation string
 func (addenda02 *Addenda02) TerminalLocationField() string {
 	return addenda02.alphaField(addenda02.TerminalLocation, 27)
 }
 
-//TerminalCityField returns a space padded TerminalCity string
+// TerminalCityField returns a space padded TerminalCity string
 func (addenda02 *Addenda02) TerminalCityField() string {
 	return addenda02.alphaField(addenda02.TerminalCity, 15)
 }
 
-//TerminalStateField returns a space padded TerminalState string
+// TerminalStateField returns a space padded TerminalState string
 func (addenda02 *Addenda02) TerminalStateField() string {
 	return addenda02.alphaField(addenda02.TerminalState, 2)
 }

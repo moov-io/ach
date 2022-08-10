@@ -21,7 +21,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -476,7 +476,7 @@ func TestFile__ValidateOptsJSON(t *testing.T) {
 
 func TestFile__readFromJson(t *testing.T) {
 	path := filepath.Join("test", "testdata", "ppd-valid.json")
-	bs, err := ioutil.ReadFile(path)
+	bs, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -556,7 +556,7 @@ func TestFile__readFromJson(t *testing.T) {
 // batchControl or fileControl sub-objects.
 func TestFile__jsonFileNoControlBlobs(t *testing.T) {
 	path := filepath.Join("test", "testdata", "ppd-no-control-blobs-valid.json")
-	bs, err := ioutil.ReadFile(path)
+	bs, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -579,7 +579,7 @@ func TestFile__jsonFileNoControlBlobs(t *testing.T) {
 }
 
 func TestFile__rfc3339JSON(t *testing.T) {
-	bs, err := ioutil.ReadFile(filepath.Join("test", "testdata", "rfc3339.json"))
+	bs, err := os.ReadFile(filepath.Join("test", "testdata", "rfc3339.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -613,7 +613,7 @@ func TestFile__rfc3339JSON(t *testing.T) {
 }
 
 func TestFile__iso8601JSON(t *testing.T) {
-	bs, err := ioutil.ReadFile(filepath.Join("test", "testdata", "iso8601.json"))
+	bs, err := os.ReadFile(filepath.Join("test", "testdata", "iso8601.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -647,7 +647,7 @@ func TestFile__iso8601JSON(t *testing.T) {
 }
 
 func TestFile__IATdatetimeParse(t *testing.T) {
-	bs, err := ioutil.ReadFile(filepath.Join("test", "testdata", "iat-debit.json"))
+	bs, err := os.ReadFile(filepath.Join("test", "testdata", "iat-debit.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -668,7 +668,7 @@ func TestFile__IATdatetimeParse(t *testing.T) {
 }
 
 func TestFile__JsonBypassOrigin(t *testing.T) {
-	bs, err := ioutil.ReadFile(filepath.Join("test", "testdata", "json-bypass-origin.json"))
+	bs, err := os.ReadFile(filepath.Join("test", "testdata", "json-bypass-origin.json"))
 	require.NoError(t, err)
 
 	file, err := FileFromJSONWith(bs, &ValidateOpts{
@@ -684,7 +684,7 @@ func TestFile__JsonBypassOrigin(t *testing.T) {
 }
 
 func TestFile__JsonBypassDestinationAndOrigin(t *testing.T) {
-	bs, err := ioutil.ReadFile(filepath.Join("test", "testdata", "json-bypass-origin-and-destination.json"))
+	bs, err := os.ReadFile(filepath.Join("test", "testdata", "json-bypass-origin-and-destination.json"))
 	require.NoError(t, err)
 
 	file, err := FileFromJSONWith(bs, &ValidateOpts{
@@ -987,7 +987,7 @@ func TestBatchControlNil(t *testing.T) {
 
 func TestFileADV__readFromJson(t *testing.T) {
 	path := filepath.Join("test", "testdata", "adv-valid.json")
-	bs, err := ioutil.ReadFile(path)
+	bs, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1060,7 +1060,7 @@ func TestFileADV__readFromJson(t *testing.T) {
 
 func TestFile__readInvalidJson(t *testing.T) {
 	path := filepath.Join("test", "testdata", "ppd-invalid.json")
-	bs, err := ioutil.ReadFile(path)
+	bs, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1074,7 +1074,7 @@ func TestFile__readInvalidJson(t *testing.T) {
 
 	// a file which fails .Validate()
 	path = filepath.Join("test", "testdata", "ppd-invalid-EntryDetail-checkDigit.json")
-	bs, err = ioutil.ReadFile(path)
+	bs, err = os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1101,7 +1101,7 @@ func TestFile__readEmptyJson(t *testing.T) {
 
 func TestFile__readNoBatchesJson(t *testing.T) {
 	path := filepath.Join("test", "testdata", "ppd-noBatches.json")
-	bs, err := ioutil.ReadFile(path)
+	bs, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1115,7 +1115,7 @@ func TestFile__readNoBatchesJson(t *testing.T) {
 
 func TestFile__readInvalidFilesJson(t *testing.T) {
 	path := filepath.Join("test", "testdata", "ppd-invalidFile.json")
-	bs, err := ioutil.ReadFile(path)
+	bs, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1381,7 +1381,7 @@ func TestFile__SegmentFileDebitOnly(t *testing.T) {
 }
 
 func TestFile__SegmentADVFile(t *testing.T) {
-	bs, err := ioutil.ReadFile(filepath.Join("test", "testdata", "adv-valid.json"))
+	bs, err := os.ReadFile(filepath.Join("test", "testdata", "adv-valid.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1428,7 +1428,7 @@ func TestFile__SegmentADVFile(t *testing.T) {
 }
 
 func TestFile__SegmentADVFileDebit(t *testing.T) {
-	bs, err := ioutil.ReadFile(filepath.Join("test", "testdata", "adv-valid.json"))
+	bs, err := os.ReadFile(filepath.Join("test", "testdata", "adv-valid.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1652,7 +1652,7 @@ func TestSegmentFileCreditOnly(t *testing.T) {
 		t.Fatalf("empty ACH file: %v", err)
 	}
 	defer fd.Close()
-	bs, _ := ioutil.ReadAll(fd)
+	bs, _ := io.ReadAll(fd)
 	file, _ := FileFromJSON(bs)
 
 	sfc := NewSegmentFileConfiguration()
@@ -1678,7 +1678,7 @@ func TestSegmentFileDebitOnly(t *testing.T) {
 		t.Fatalf("empty ACH file: %v", err)
 	}
 	defer fd.Close()
-	bs, _ := ioutil.ReadAll(fd)
+	bs, _ := io.ReadAll(fd)
 	file, _ := FileFromJSON(bs)
 
 	sfc := NewSegmentFileConfiguration()

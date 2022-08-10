@@ -18,7 +18,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 )
@@ -38,15 +37,15 @@ func BenchmarkTestFileWrite(b *testing.B) {
 
 // FileCreate creates an ACH File
 func testFileWrite(t testing.TB) {
-	tmp, err := ioutil.TempFile("", "ach-writeACH-test")
+	filename, err := os.MkdirTemp("", "ach-writeACH-test")
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	defer os.Remove(tmp.Name())
+	defer os.Remove(filename)
 
-	write(tmp.Name())
+	write(filename)
 
-	s, err := os.Stat(tmp.Name())
+	s, err := os.Stat(filename)
 	if err != nil {
 		t.Fatal(err.Error())
 	}

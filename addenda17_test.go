@@ -157,7 +157,7 @@ func TestAddenda17FieldInclusionRecordType(t *testing.T) {
 	}
 }
 
-//testAddenda17PaymentRelatedInformationAlphaNumeric validates PaymentRelatedInformation is alphanumeric
+// testAddenda17PaymentRelatedInformationAlphaNumeric validates PaymentRelatedInformation is alphanumeric
 func testAddenda17PaymentRelatedInformationAlphaNumeric(t testing.TB) {
 	addenda17 := mockAddenda17()
 	addenda17.PaymentRelatedInformation = "®©"

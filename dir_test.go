@@ -19,7 +19,6 @@ package ach
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -55,8 +54,8 @@ func TestReadDirErr(t *testing.T) {
 	dir := copyFilesToTempDir(t, filenames)
 	defer os.RemoveAll(dir)
 
-	// zzz- is a prefix as ioutil.ReadDir seems to return file descriptors ordered alphabetically by filename
-	if err := ioutil.WriteFile(filepath.Join(dir, "zzz-bad.ach"), []byte("bad data"), 0600); err != nil {
+	// zzz- is a prefix as os.ReadDir seems to return file descriptors ordered alphabetically by filename
+	if err := os.WriteFile(filepath.Join(dir, "zzz-bad.ach"), []byte("bad data"), 0600); err != nil {
 		t.Fatal(err)
 	}
 
@@ -75,7 +74,7 @@ func TestReadDirErr(t *testing.T) {
 }
 
 func TestReadDirSymlinkErr(t *testing.T) {
-	dir, err := ioutil.TempDir("", "readdir-symlink")
+	dir, err := os.MkdirTemp("", "readdir-symlink")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -96,7 +95,7 @@ func TestReadDirSymlinkErr(t *testing.T) {
 }
 
 func copyFilesToTempDir(t *testing.T, filenames []string) string {
-	dir, err := ioutil.TempDir("", "ach-readdir")
+	dir, err := os.MkdirTemp("", "ach-readdir")
 	if err != nil {
 		t.Fatal(err)
 	}

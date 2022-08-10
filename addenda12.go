@@ -25,7 +25,7 @@ import (
 // Addenda12 is an addenda which provides business transaction information for Addenda Type
 // Code 12 in a machine readable format. It is usually formatted according to ANSI, ASC, X12 Standard.
 //
-// Addenda12 is mandatory for IAT entries
+// # Addenda12 is mandatory for IAT entries
 //
 // The Addenda12 record identifies key information related to the Originator of
 // the entry.

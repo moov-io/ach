@@ -18,7 +18,7 @@
 package server
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -129,7 +129,7 @@ func TestGetFileContents(t *testing.T) {
 		}
 	}
 	if r != nil {
-		bs, err := ioutil.ReadAll(r)
+		bs, err := io.ReadAll(r)
 		if err != nil {
 			t.Fatal(err.Error())
 		}

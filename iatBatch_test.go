@@ -855,12 +855,12 @@ func testIATBatchisEntryHash(t testing.TB) {
 	}
 }
 
-//TestIATBatchisEntryHash tests validating IATBatch EntryHash
+// TestIATBatchisEntryHash tests validating IATBatch EntryHash
 func TestIATBatchisEntryHash(t *testing.T) {
 	testIATBatchisEntryHash(t)
 }
 
-//BenchmarkIATBatchisEntryHash benchmarks validating IATBatch EntryHash
+// BenchmarkIATBatchisEntryHash benchmarks validating IATBatch EntryHash
 func BenchmarkIATBatchisEntryHash(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -925,7 +925,7 @@ func BenchmarkIATBatchIsCategory(b *testing.B) {
 	}
 }
 
-//testIATBatchCategory tests IATBatch Category
+// testIATBatchCategory tests IATBatch Category
 func testIATBatchCategory(t testing.TB) {
 	mockBatch := mockIATBatch(t)
 

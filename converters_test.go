@@ -19,7 +19,7 @@ package ach
 
 import "testing"
 
-//testAlphaField ensures that padding and two long of strings get properly made
+// testAlphaField ensures that padding and two long of strings get properly made
 func testAlphaFieldShort(t testing.TB) {
 	c := converters{}
 	result := c.alphaField("ABC123", 10)

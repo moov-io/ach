@@ -19,7 +19,6 @@ package ach
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -42,14 +41,14 @@ func ReadDir(dir string) ([]*File, error) {
 	}
 
 	readJSON := func(path string) (*File, error) {
-		bs, err := ioutil.ReadFile(path)
+		bs, err := os.ReadFile(path)
 		if err != nil {
 			return nil, fmt.Errorf("opening %s failed: %v", path, err)
 		}
 		return FileFromJSON(bs)
 	}
 
-	infos, err := ioutil.ReadDir(dir)
+	infos, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, err
 	}

@@ -50,7 +50,7 @@ func mockCOREntryDetail() *EntryDetail {
 	return entry
 }
 
-//  mockBatchCOR creates a BatchCOR
+// mockBatchCOR creates a BatchCOR
 func mockBatchCOR() *BatchCOR {
 	mockBatch := NewBatchCOR(mockBatchCORHeader())
 	mockBatch.AddEntry(mockCOREntryDetail())
@@ -109,7 +109,7 @@ func BenchmarkBatchCORSEC(b *testing.B) {
 	}
 }
 
-//  testBatchCORAddendumCountTwo validates Addendum count of 2
+// testBatchCORAddendumCountTwo validates Addendum count of 2
 func testBatchCORAddendumCountTwo(t testing.TB) {
 	mockBatch := mockBatchCOR()
 	// Adding a second addenda to the mock entry
