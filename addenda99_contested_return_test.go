@@ -108,3 +108,30 @@ func TestAddenda99Contested(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestAddenda99Contested__Read(t *testing.T) {
+	file, err := ReadFile(filepath.Join("test", "testdata", "contested_addenda.txt"))
+	require.NoError(t, err)
+
+	require.Len(t, file.Batches, 1)
+
+	entries := file.Batches[0].GetEntries()
+	require.Len(t, entries, 1)
+
+	ed := entries[0]
+	require.NotNil(t, ed.Addenda99Contested)
+
+	addenda := ed.Addenda99Contested
+	require.Equal(t, "R72", addenda.ContestedReturnCode)
+	require.Equal(t, "123456780000069", addenda.OriginalEntryTraceNumber)
+	require.Equal(t, "      ", addenda.DateOriginalEntryReturned)
+	require.Equal(t, "75639218", addenda.OriginalReceivingDFIIdentification)
+	require.Equal(t, "   ", addenda.OriginalSettlementDate)
+	require.Equal(t, "756392180000001", addenda.ReturnTraceNumber)
+	require.Equal(t, "067", addenda.ReturnSettlementDate)
+	require.Equal(t, "01", addenda.ReturnReasonCode)
+	require.Equal(t, "123456780000070", addenda.DishonoredReturnTraceNumber)
+	require.Equal(t, "218", addenda.DishonoredReturnSettlementDate)
+	require.Equal(t, "68", addenda.DishonoredReturnReasonCode)
+	require.Equal(t, "364275034310088", addenda.TraceNumber)
+}
