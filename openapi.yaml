@@ -54,7 +54,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Files'
-  /files/create:
+  /files/{fileID}:
     post:
       tags: ['ACH Files']
       summary: Create File
@@ -74,6 +74,13 @@ paths:
           required: false
           schema:
             type: string
+        - name: fileID
+          in: path
+          description: File ID
+          required: true
+          schema:
+            type: string
+            example: "3f2d23ee214"
         - name: requireABAOrigin
           in: query
           description: Optional parameter to configure ImmediateOrigin validation
@@ -165,7 +172,6 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
-  /files/{fileID}:
     get:
       tags: ['ACH Files']
       summary: Retrieve File

@@ -104,6 +104,39 @@ func TestFiles__createFileEndpoint(t *testing.T) {
 	}
 }
 
+func TestFiles__CreateFileNacha(t *testing.T) {
+	repo := NewRepositoryInMemory(testTTLDuration, log.NewNopLogger())
+	svc := NewService(repo)
+
+	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+	defer fd.Close()
+
+	fileID := base.ID()
+	req := httptest.NewRequest("POST", fmt.Sprintf("/files/%s", fileID), fd)
+	req.Header.Set("content-type", "text/html")
+
+	handler := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
+
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+
+	require.Equal(t, http.StatusOK, w.Code)
+
+	var resp createFileResponse
+	err = json.NewDecoder(w.Body).Decode(&resp)
+	require.NoError(t, err)
+
+	require.Equal(t, fileID, resp.ID)
+
+	got, _ := svc.GetFile(fileID)
+	require.Len(t, got.Batches, 1)
+
+	entries := got.Batches[0].GetEntries()
+	require.Len(t, entries, 1)
+	require.Equal(t, "121042880000001", entries[0].TraceNumber)
+}
+
 func TestFiles__CustomJsonValidation(t *testing.T) {
 	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)
@@ -916,9 +949,16 @@ func TestFiles__CreateFileEndpoint(t *testing.T) {
 		router.ServeHTTP(w, req)
 		w.Flush()
 
-		if w.Code != tc.expectedStatusCode {
-			t.Errorf("HTTP status code: want %d, got %d", tc.expectedStatusCode, w.Code)
+		require.Equal(t, tc.expectedStatusCode, w.Code)
+
+		var resp struct {
+			ID string `json:"id"`
 		}
+		err = json.NewDecoder(w.Body).Decode(&resp)
+		require.NoError(t, err)
+
+		require.NotEmpty(t, resp.ID)
+		require.NotEqual(t, "create", resp.ID)
 	}
 }
 
