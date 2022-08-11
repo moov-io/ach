@@ -1,3 +1,17 @@
+## v1.18.6 (Released 2022-08-11)
+
+IMPROVEMENTS
+
+- docs: clarify TEL/WEB payment type code field
+- fix: contested return addenda parsing of dishonored returns
+- server: verify fileID specified in JSON is kept
+
+BUILD
+
+- build: remove deprecated ioutil functions, gofmt from go1.19
+- fix(deps): update golang.org/x/oauth2 digest to 128564f
+- fix(deps): update module github.com/aws/aws-lambda-go to v1.34.1
+
 ## v1.18.5 (Released 2022-07-19)
 
 IMPROVEMENTS
