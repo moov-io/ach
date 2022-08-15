@@ -59,8 +59,10 @@ type createFileRequest struct {
 }
 
 type createFileResponse struct {
-	ID  string `json:"id"`
-	Err error  `json:"error"`
+	ID   string    `json:"id"`
+	File *ach.File `json:"file"`
+
+	Err error `json:"error"`
 }
 
 func (r createFileResponse) error() error { return r.Err }
@@ -100,8 +102,9 @@ func createFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.End
 		}
 
 		resp := createFileResponse{
-			ID:  req.File.ID,
-			Err: err,
+			ID:   req.File.ID,
+			File: req.File,
+			Err:  err,
 		}
 		if req.parseError != nil {
 			resp.Err = req.parseError
@@ -596,9 +599,13 @@ type segmentFileRequest struct {
 }
 
 type segmentFileResponse struct {
-	CreditFileID string `json:"creditFileID"`
-	DebitFileID  string `json:"debitFileID"`
-	Err          error  `json:"error"`
+	CreditFileID string    `json:"creditFileID"`
+	CreditFile   *ach.File `json:"creditFile"`
+
+	DebitFileID string    `json:"debitFileID"`
+	DebitFile   *ach.File `json:"debitFile"`
+
+	Err error `json:"error"`
 }
 
 func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.Endpoint {
@@ -625,6 +632,8 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 			return segmentFileResponse{Err: err}, err
 		}
 
+		var resp segmentFileResponse
+
 		if creditFile.ID != "" {
 			err = r.StoreFile(creditFile)
 			if logger != nil && err != nil {
@@ -633,6 +642,8 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 					"requestID": log.String(req.requestID),
 				}).LogError(err)
 			}
+			resp.CreditFile = creditFile
+			resp.CreditFileID = creditFile.ID
 		}
 
 		if debitFile.ID != "" {
@@ -643,13 +654,13 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 					"requestID": log.String(req.requestID),
 				}).LogError(err)
 			}
+			resp.DebitFile = debitFile
+			resp.DebitFileID = debitFile.ID
 		}
 
-		return segmentFileResponse{
-			CreditFileID: creditFile.ID,
-			DebitFileID:  debitFile.ID,
-			Err:          err,
-		}, nil
+		resp.Err = err
+
+		return resp, nil
 	}
 }
 
@@ -679,8 +690,9 @@ type flattenBatchesRequest struct {
 }
 
 type flattenBatchesResponse struct {
-	ID  string `json:"id"`
-	Err error  `json:"error"`
+	ID   string    `json:"id"`
+	File *ach.File `json:"file"`
+	Err  error     `json:"error"`
 }
 
 func flattenBatchesEndpoint(s Service, r Repository, logger log.Logger) endpoint.Endpoint {
@@ -719,8 +731,9 @@ func flattenBatchesEndpoint(s Service, r Repository, logger log.Logger) endpoint
 			}
 		}
 		return flattenBatchesResponse{
-			ID:  flattenFile.ID,
-			Err: err,
+			ID:   flattenFile.ID,
+			File: flattenFile,
+			Err:  err,
 		}, nil
 	}
 }

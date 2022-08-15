@@ -80,6 +80,8 @@ func TestFiles__decodeCreateFileRequest(t *testing.T) {
 		t.Errorf("id=%q error=%v", resp.ID, resp.Err)
 	}
 	require.Equal(t, "foo", f.ID)
+	require.NotNil(t, resp.File)
+	require.Equal(t, "foo", resp.File.ID)
 
 	// Check stored file state
 	got, _ := svc.GetFile(f.ID)
@@ -126,8 +128,9 @@ func TestFiles__CreateFileNacha(t *testing.T) {
 	var resp createFileResponse
 	err = json.NewDecoder(w.Body).Decode(&resp)
 	require.NoError(t, err)
-
 	require.Equal(t, fileID, resp.ID)
+	require.NotNil(t, resp.File)
+	require.Equal(t, fileID, resp.File.ID)
 
 	got, _ := svc.GetFile(fileID)
 	require.Len(t, got.Batches, 1)
@@ -158,8 +161,10 @@ func TestFiles__CustomJsonValidation(t *testing.T) {
 	require.Equal(t, http.StatusOK, w.Code)
 
 	var resp createFileResponse
-	require.NoError(t, json.NewDecoder(w.Body).Decode(&resp))
+	err = json.NewDecoder(w.Body).Decode(&resp)
+	require.ErrorContains(t, err, "ImmediateDestination 000000000 is a mandatory field")
 	require.Equal(t, "adam-01", resp.ID)
+	require.NotNil(t, resp.File)
 	require.Equal(t, nil, resp.Err)
 }
 
@@ -708,12 +713,10 @@ func TestFiles__segmentFileEndpoint(t *testing.T) {
 	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
 		t.Fatal(err)
 	}
-	if resp.CreditFileID == "" {
-		t.Errorf("empty CreditFileID")
-	}
-	if resp.DebitFileID == "" {
-		t.Errorf("empty DebitFileID")
-	}
+	require.NotEmpty(t, resp.CreditFileID)
+	require.NotNil(t, resp.CreditFile)
+	require.NotEmpty(t, resp.DebitFileID)
+	require.NotNil(t, resp.DebitFile)
 }
 
 // TestFiles__decodeSegmentFileRequest tests segmentFileEndpoints
@@ -755,9 +758,14 @@ func TestFiles__flattenFileEndpoint(t *testing.T) {
 	router.ServeHTTP(w, req)
 	w.Flush()
 
-	if w.Code != http.StatusOK {
-		t.Errorf("bogus HTTP status: %d", w.Code)
-	}
+	require.Equal(t, http.StatusOK, w.Code)
+
+	var resp flattenBatchesResponse
+	err = json.NewDecoder(w.Body).Decode(&resp)
+	require.NoError(t, err)
+	require.NotEqual(t, file.ID, resp.ID)
+	require.NotNil(t, resp.File)
+	require.NotEqual(t, file.ID, resp.File.ID)
 }
 
 // TestFilesError__flattenFileEndpoint test an error returned from flattenFileEndpoint

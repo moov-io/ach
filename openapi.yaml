@@ -165,7 +165,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FileID'
+                $ref: '#/components/schemas/CreateFileResponse'
         '400':
           description: "Invalid File Header Object"
           content:
@@ -425,7 +425,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FileID'
+                $ref: '#/components/schemas/FlattenFileResponse'
         '400':
           description: See error in response body
           content:
@@ -605,12 +605,26 @@ components:
           $ref: '#/components/schemas/ADVBatchControl'
       required:
         - fileHeader
-    FileID:
+    CreateFileResponse:
       properties:
         ID:
           type: string
           description: File ID
           example: "1e522dc8"
+        file:
+          $ref: '#/components/schemas/File'
+        error:
+          type: string
+          description: An error message describing the problem intended for humans.
+          example: Validation error(s) present.
+    FlattenFileResponse:
+      properties:
+        ID:
+          type: string
+          description: File ID
+          example: "1e522dc8"
+        file:
+          $ref: '#/components/schemas/File'
         error:
           type: string
           description: An error message describing the problem intended for humans.
@@ -2139,10 +2153,18 @@ components:
           type: string
           description: File ID
           example: "058960d8"
+        creditFile:
+          $ref: '#/components/schemas/File'
         debitFileID:
           type: string
           description: File ID
           example: "3cac5447"
+        debitFile:
+          $ref: '#/components/schemas/File'
+        error:
+          type: string
+          description: An error message describing the problem intended for humans.
+          example: Validation error(s) present.
     ValidateOpts:
       properties:
         requireABAOrigin:
