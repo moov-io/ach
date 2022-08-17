@@ -31,8 +31,6 @@ import (
 type ADVEntryDetail struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
-	// RecordType defines the type of record in the block. 6
-	recordType string
 	// TransactionCode representing Accounting Entries
 	// Credit for ACH debits originated - 81
 	// Debit for ACH credits originated - 82
@@ -114,8 +112,7 @@ const (
 // NewADVEntryDetail returns a new ADVEntryDetail with default values for non exported fields
 func NewADVEntryDetail() *ADVEntryDetail {
 	entry := &ADVEntryDetail{
-		recordType: "6",
-		Category:   CategoryForward,
+		Category: CategoryForward,
 	}
 	return entry
 }
@@ -131,7 +128,6 @@ func (ed *ADVEntryDetail) Parse(record string) {
 	}
 
 	// 1-1 Always "6"
-	ed.recordType = "6"
 	// 2-3 is checking credit 22 debit 27 savings credit 32 debit 37
 	ed.TransactionCode = ed.parseNumField(record[1:3])
 	// 4-11 the RDFI's routing number without the last digit.
@@ -166,7 +162,7 @@ func (ed *ADVEntryDetail) Parse(record string) {
 func (ed *ADVEntryDetail) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
-	buf.WriteString(ed.recordType)
+	buf.WriteString(entryDetailPos)
 	buf.WriteString(fmt.Sprintf("%v", ed.TransactionCode))
 	buf.WriteString(ed.RDFIIdentificationField())
 	buf.WriteString(ed.CheckDigit)
@@ -189,9 +185,6 @@ func (ed *ADVEntryDetail) String() string {
 func (ed *ADVEntryDetail) Validate() error {
 	if err := ed.fieldInclusion(); err != nil {
 		return err
-	}
-	if ed.recordType != "6" {
-		return fieldError("recordType", NewErrRecordType(6), ed.recordType)
 	}
 	if err := ed.isTransactionCode(ed.TransactionCode); err != nil {
 		return fieldError("TransactionCode", err, strconv.Itoa(ed.TransactionCode))
@@ -224,9 +217,6 @@ func (ed *ADVEntryDetail) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (ed *ADVEntryDetail) fieldInclusion() error {
-	if ed.recordType == "" {
-		return fieldError("recordType", ErrConstructor, ed.recordType)
-	}
 	if ed.TransactionCode == 0 {
 		return fieldError("TransactionCode", ErrConstructor, strconv.Itoa(ed.TransactionCode))
 	}

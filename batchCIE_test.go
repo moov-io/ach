@@ -314,26 +314,26 @@ func BenchmarkBatchCIEInvalidAddendum(b *testing.B) {
 	}
 }
 
-// testBatchCIEInvalidAddenda validates Addendum must be Addenda05 with record type 7
+// testBatchCIEInvalidAddenda validates Addendum must be Addenda05 with type code 05
 func testBatchCIEInvalidAddenda(t testing.TB) {
 	mockBatch := NewBatchCIE(mockBatchCIEHeader())
 	mockBatch.AddEntry(mockCIEEntryDetail())
 	addenda05 := mockAddenda05()
-	addenda05.recordType = "63"
+	addenda05.TypeCode = "63"
 	mockBatch.GetEntries()[0].AddAddenda05(addenda05)
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	err := mockBatch.Create()
-	if !base.Match(err, NewErrRecordType(7)) {
+	if !base.Match(err, ErrAddendaTypeCode) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
 
-// TestBatchCIEInvalidAddenda tests validating Addendum must be Addenda05 with record type 7
+// TestBatchCIEInvalidAddenda tests validating Addendum must be Addenda05 with type code 05
 func TestBatchCIEInvalidAddenda(t *testing.T) {
 	testBatchCIEInvalidAddenda(t)
 }
 
-// BenchmarkBatchCIEInvalidAddenda benchmarks validating Addendum must be Addenda05 with record type 7
+// BenchmarkBatchCIEInvalidAddenda benchmarks validating Addendum must be Addenda05 with type code 05
 func BenchmarkBatchCIEInvalidAddenda(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -344,9 +344,9 @@ func BenchmarkBatchCIEInvalidAddenda(b *testing.B) {
 // testBatchCIEInvalidBuild validates an invalid batch build
 func testBatchCIEInvalidBuild(t testing.TB) {
 	mockBatch := mockBatchCIE()
-	mockBatch.GetHeader().recordType = "3"
+	mockBatch.GetHeader().ServiceClassCode = 3
 	err := mockBatch.Create()
-	if !base.Match(err, NewErrRecordType(5)) {
+	if !base.Match(err, ErrServiceClass) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

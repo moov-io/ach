@@ -134,9 +134,6 @@ func testParseIATBatchHeader(t testing.TB) {
 	}
 	record := r.IATCurrentBatch.GetHeader()
 
-	if record.recordType != "5" {
-		t.Errorf("RecordType Expected '5' got: %v", record.recordType)
-	}
 	if record.ServiceClassCode != CreditsOnly {
 		t.Errorf("ServiceClassCode Expected '220' got: %v", record.ServiceClassCode)
 	}
@@ -251,29 +248,6 @@ func BenchmarkIATBHFVString(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testIATBHFVString(b)
-	}
-}
-
-// testValidateIATBHRecordType validates error if IATBatchHeader recordType is invalid
-func testValidateIATBHRecordType(t testing.TB) {
-	bh := mockIATBatchHeaderFF()
-	bh.recordType = "2"
-	err := bh.Validate()
-	if !base.Match(err, NewErrRecordType(5)) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestValidateIATBHRecordType tests validating error if IATBatchHeader recordType is invalid
-func TestValidateIATBHRecordType(t *testing.T) {
-	testValidateIATBHRecordType(t)
-}
-
-// BenchmarkValidateIATBHRecordType benchmarks validating error if IATBatchHeader recordType is invalid
-func BenchmarkValidateIATBHRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testValidateIATBHRecordType(b)
 	}
 }
 
@@ -539,29 +513,6 @@ func BenchmarkValidateIATBHOriginatorStatusCode(b *testing.B) {
 }
 
 //FieldInclusion
-
-// testIATBHRecordType validates IATBatchHeader recordType fieldInclusion
-func testIATBHRecordType(t testing.TB) {
-	bh := mockIATBatchHeaderFF()
-	bh.recordType = ""
-	err := bh.Validate()
-	if !base.Match(err, ErrFieldInclusion) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestIATBHRecordType tests validating IATBatchHeader recordType fieldInclusion
-func TestIATBHRecordType(t *testing.T) {
-	testIATBHRecordType(t)
-}
-
-// BenchmarkIATBHRecordType benchmarks validating IATBatchHeader recordType fieldInclusion
-func BenchmarkIATBHRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testIATBHRecordType(b)
-	}
-}
 
 // testIATBHServiceClassCode validates IATBatchHeader ServiceClassCode fieldInclusion
 func testIATBHServiceClassCode(t testing.TB) {

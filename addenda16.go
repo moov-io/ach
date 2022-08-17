@@ -31,8 +31,6 @@ import (
 type Addenda16 struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
-	// RecordType defines the type of record in the block.
-	recordType string
 	// TypeCode Addenda16 types code '16'
 	TypeCode string `json:"typeCode"`
 	// Receiver City & State / Province
@@ -44,8 +42,6 @@ type Addenda16 struct {
 	// Data elements must be separated by an asterisk (*) and must end with a backslash (\)
 	// For example: US*10036\
 	ReceiverCountryPostalCode string `json:"receiverCountryPostalCode"`
-	// reserved - Leave blank
-	reserved string
 	// EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
 	// Detail or Corporate Entry Detail Record's trace number This number is
 	// the same as the last seven digits of the trace number of the related
@@ -60,7 +56,6 @@ type Addenda16 struct {
 // NewAddenda16 returns a new Addenda16 with default values for none exported fields
 func NewAddenda16() *Addenda16 {
 	addenda16 := new(Addenda16)
-	addenda16.recordType = "7"
 	addenda16.TypeCode = "16"
 	return addenda16
 }
@@ -73,8 +68,7 @@ func (addenda16 *Addenda16) Parse(record string) {
 		return
 	}
 
-	// 1-1 Always "7"
-	addenda16.recordType = "7"
+	// 1-1 Always 7
 	// 2-3 Always 16
 	addenda16.TypeCode = record[1:3]
 	// 4-38 ReceiverCityStateProvince
@@ -82,7 +76,6 @@ func (addenda16 *Addenda16) Parse(record string) {
 	// 39-73 ReceiverCountryPostalCode
 	addenda16.ReceiverCountryPostalCode = strings.TrimSpace(record[38:73])
 	// 74-87 reserved - Leave blank
-	addenda16.reserved = "              "
 	// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
 	addenda16.EntryDetailSequenceNumber = addenda16.parseNumField(record[87:94])
 }
@@ -91,11 +84,11 @@ func (addenda16 *Addenda16) Parse(record string) {
 func (addenda16 *Addenda16) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
-	buf.WriteString(addenda16.recordType)
+	buf.WriteString(entryAddendaPos)
 	buf.WriteString(addenda16.TypeCode)
 	buf.WriteString(addenda16.ReceiverCityStateProvinceField())
 	buf.WriteString(addenda16.ReceiverCountryPostalCodeField())
-	buf.WriteString(addenda16.reservedField())
+	buf.WriteString("              ")
 	buf.WriteString(addenda16.EntryDetailSequenceNumberField())
 	return buf.String()
 }
@@ -105,9 +98,6 @@ func (addenda16 *Addenda16) String() string {
 func (addenda16 *Addenda16) Validate() error {
 	if err := addenda16.fieldInclusion(); err != nil {
 		return err
-	}
-	if addenda16.recordType != "7" {
-		return fieldError("recordType", NewErrRecordType(7), addenda16.recordType)
 	}
 	if err := addenda16.isTypeCode(addenda16.TypeCode); err != nil {
 		return fieldError("TypeCode", err, addenda16.TypeCode)
@@ -128,9 +118,6 @@ func (addenda16 *Addenda16) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (addenda16 *Addenda16) fieldInclusion() error {
-	if addenda16.recordType == "" {
-		return fieldError("recordType", ErrConstructor, addenda16.recordType)
-	}
 	if addenda16.TypeCode == "" {
 		return fieldError("TypeCode", ErrConstructor, addenda16.TypeCode)
 	}
@@ -154,11 +141,6 @@ func (addenda16 *Addenda16) ReceiverCityStateProvinceField() string {
 // ReceiverCountryPostalCodeField gets the ReceiverCountryPostalCode field left padded
 func (addenda16 *Addenda16) ReceiverCountryPostalCodeField() string {
 	return addenda16.alphaField(addenda16.ReceiverCountryPostalCode, 35)
-}
-
-// reservedField gets reserved - blank space
-func (addenda16 *Addenda16) reservedField() string {
-	return addenda16.alphaField(addenda16.reserved, 14)
 }
 
 // EntryDetailSequenceNumberField returns a zero padded EntryDetailSequenceNumber string

@@ -31,8 +31,6 @@ import (
 type Addenda14 struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
-	// RecordType defines the type of record in the block.
-	recordType string
 	// TypeCode Addenda14 types code '14'
 	TypeCode string `json:"typeCode"`
 	// Receiving DFI Name
@@ -57,8 +55,6 @@ type Addenda14 struct {
 	// branch of the bank that receives the entry is located. Values for other countries can
 	// be found on the International Organization for Standardization website: www.iso.org
 	RDFIBranchCountryCode string `json:"RDFIBranchCountryCode"`
-	// reserved - Leave blank
-	reserved string
 	// EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
 	// Detail or Corporate Entry Detail Record's trace number This number is
 	// the same as the last seven digits of the trace number of the related
@@ -73,7 +69,6 @@ type Addenda14 struct {
 // NewAddenda14 returns a new Addenda14 with default values for none exported fields
 func NewAddenda14() *Addenda14 {
 	addenda14 := new(Addenda14)
-	addenda14.recordType = "7"
 	addenda14.TypeCode = "14"
 	return addenda14
 }
@@ -86,8 +81,7 @@ func (addenda14 *Addenda14) Parse(record string) {
 		return
 	}
 
-	// 1-1 Always "7"
-	addenda14.recordType = "7"
+	// 1-1 Always 7
 	// 2-3 Always 14
 	addenda14.TypeCode = record[1:3]
 	// 4-38 RDFIName
@@ -99,7 +93,6 @@ func (addenda14 *Addenda14) Parse(record string) {
 	// 75-77
 	addenda14.RDFIBranchCountryCode = strings.TrimSpace(record[74:77])
 	// 78-87 reserved - Leave blank
-	addenda14.reserved = "          "
 	// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
 	addenda14.EntryDetailSequenceNumber = addenda14.parseNumField(record[87:94])
 }
@@ -108,13 +101,13 @@ func (addenda14 *Addenda14) Parse(record string) {
 func (addenda14 *Addenda14) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
-	buf.WriteString(addenda14.recordType)
+	buf.WriteString(entryAddendaPos)
 	buf.WriteString(addenda14.TypeCode)
 	buf.WriteString(addenda14.RDFINameField())
 	buf.WriteString(addenda14.RDFIIDNumberQualifierField())
 	buf.WriteString(addenda14.RDFIIdentificationField())
 	buf.WriteString(addenda14.RDFIBranchCountryCodeField())
-	buf.WriteString(addenda14.reservedField())
+	buf.WriteString("          ")
 	buf.WriteString(addenda14.EntryDetailSequenceNumberField())
 	return buf.String()
 }
@@ -124,9 +117,6 @@ func (addenda14 *Addenda14) String() string {
 func (addenda14 *Addenda14) Validate() error {
 	if err := addenda14.fieldInclusion(); err != nil {
 		return err
-	}
-	if addenda14.recordType != "7" {
-		return fieldError("recordType", NewErrRecordType(7), addenda14.recordType)
 	}
 	if err := addenda14.isTypeCode(addenda14.TypeCode); err != nil {
 		return fieldError("TypeCode", err, addenda14.TypeCode)
@@ -154,9 +144,6 @@ func (addenda14 *Addenda14) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (addenda14 *Addenda14) fieldInclusion() error {
-	if addenda14.recordType == "" {
-		return fieldError("recordType", ErrConstructor, addenda14.recordType)
-	}
 	if addenda14.TypeCode == "" {
 		return fieldError("TypeCode", ErrConstructor, addenda14.TypeCode)
 	}
@@ -196,11 +183,6 @@ func (addenda14 *Addenda14) RDFIIdentificationField() string {
 // RDFIBranchCountryCodeField gets the RDFIBranchCountryCode field left padded
 func (addenda14 *Addenda14) RDFIBranchCountryCodeField() string {
 	return addenda14.alphaField(addenda14.RDFIBranchCountryCode, 3)
-}
-
-// reservedField gets reserved - blank space
-func (addenda14 *Addenda14) reservedField() string {
-	return addenda14.alphaField(addenda14.reserved, 10)
 }
 
 // EntryDetailSequenceNumberField returns a zero padded EntryDetailSequenceNumber string

@@ -61,9 +61,6 @@ func testAddenda98Parse(t testing.TB) {
 	line := "798C01099912340000015      091012981918171614                                  091012980000088"
 	addenda98.Parse(line)
 	// walk the Addenda98 struct
-	if addenda98.recordType != "7" {
-		t.Errorf("expected %v got %v", "7", addenda98.recordType)
-	}
 	if addenda98.TypeCode != "98" {
 		t.Errorf("expected %v got %v", "98", addenda98.TypeCode)
 	}
@@ -113,25 +110,6 @@ func BenchmarkAddenda98String(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testAddenda98String(b)
-	}
-}
-
-func testAddenda98ValidRecordType(t testing.TB) {
-	addenda98 := mockAddenda98()
-	addenda98.recordType = "63"
-	err := addenda98.Validate()
-	if !base.Match(err, NewErrRecordType(7)) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-func TestAddenda98ValidRecordType(t *testing.T) {
-	testAddenda98ValidRecordType(t)
-}
-
-func BenchmarkAddenda98ValidRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testAddenda98ValidRecordType(b)
 	}
 }
 

@@ -32,8 +32,6 @@ import (
 type Addenda17 struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
-	// RecordType defines the type of record in the block. entryAddenda17 Pos 7
-	recordType string
 	// TypeCode Addenda17 types code '17'
 	TypeCode string `json:"typeCode"`
 	// PaymentRelatedInformation
@@ -56,7 +54,6 @@ type Addenda17 struct {
 // NewAddenda17 returns a new Addenda17 with default values for none exported fields
 func NewAddenda17() *Addenda17 {
 	addenda17 := new(Addenda17)
-	addenda17.recordType = "7"
 	addenda17.TypeCode = "17"
 	return addenda17
 }
@@ -69,8 +66,7 @@ func (addenda17 *Addenda17) Parse(record string) {
 		return
 	}
 
-	// 1-1 Always "7"
-	addenda17.recordType = "7"
+	// 1-1 Always 7
 	// 2-3 Always 17
 	addenda17.TypeCode = record[1:3]
 	// 4-83 Based on the information entered (04-83) 80 alphanumeric
@@ -86,7 +82,7 @@ func (addenda17 *Addenda17) Parse(record string) {
 func (addenda17 *Addenda17) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
-	buf.WriteString(addenda17.recordType)
+	buf.WriteString(entryAddendaPos)
 	buf.WriteString(addenda17.TypeCode)
 	buf.WriteString(addenda17.PaymentRelatedInformationField())
 	buf.WriteString(addenda17.SequenceNumberField())
@@ -99,9 +95,6 @@ func (addenda17 *Addenda17) String() string {
 func (addenda17 *Addenda17) Validate() error {
 	if err := addenda17.fieldInclusion(); err != nil {
 		return err
-	}
-	if addenda17.recordType != "7" {
-		return fieldError("recordType", NewErrRecordType(7), addenda17.recordType)
 	}
 	if err := addenda17.isTypeCode(addenda17.TypeCode); err != nil {
 		return fieldError("TypeCode", err, addenda17.TypeCode)
@@ -120,9 +113,6 @@ func (addenda17 *Addenda17) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (addenda17 *Addenda17) fieldInclusion() error {
-	if addenda17.recordType == "" {
-		return fieldError("recordType", ErrConstructor, addenda17.recordType)
-	}
 	if addenda17.TypeCode == "" {
 		return fieldError("TypeCode", ErrConstructor, addenda17.TypeCode)
 	}

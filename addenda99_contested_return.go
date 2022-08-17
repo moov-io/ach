@@ -25,8 +25,6 @@ import (
 type Addenda99Contested struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
-	// RecordType defines the type of record in the block. entryAddendaPos 7
-	recordType string
 
 	// TypeCode Addenda types code '99'
 	TypeCode string `json:"typeCode"`
@@ -78,8 +76,7 @@ type Addenda99Contested struct {
 // NewAddenda99Contested returns a new Addenda99Contested with default values for none exported fields
 func NewAddenda99Contested() *Addenda99Contested {
 	Addenda99Contested := &Addenda99Contested{
-		recordType: "7",
-		TypeCode:   "99",
+		TypeCode: "99",
 	}
 	return Addenda99Contested
 }
@@ -89,7 +86,6 @@ func (Addenda99Contested *Addenda99Contested) Parse(record string) {
 		return
 	}
 
-	Addenda99Contested.recordType = "7"
 	Addenda99Contested.TypeCode = record[1:3]
 	Addenda99Contested.ContestedReturnCode = record[3:6]
 	Addenda99Contested.OriginalEntryTraceNumber = record[6:21]
@@ -109,7 +105,7 @@ func (Addenda99Contested *Addenda99Contested) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
 
-	buf.WriteString(Addenda99Contested.recordType)
+	buf.WriteString(entryAddendaPos)
 	buf.WriteString(Addenda99Contested.TypeCode)
 	buf.WriteString(Addenda99Contested.ContestedReturnCodeField())
 	buf.WriteString(Addenda99Contested.OriginalEntryTraceNumberField())
@@ -139,9 +135,6 @@ func (Addenda99Contested *Addenda99Contested) SetValidation(opts *ValidateOpts) 
 
 // Validate verifies NACHA rules for Addenda99Contested
 func (Addenda99Contested *Addenda99Contested) Validate() error {
-	if Addenda99Contested.recordType != "7" {
-		return fieldError("recordType", NewErrRecordType(7), Addenda99Contested.recordType)
-	}
 	if Addenda99Contested.TypeCode == "" {
 		return fieldError("TypeCode", ErrConstructor, Addenda99Contested.TypeCode)
 	}

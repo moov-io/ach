@@ -25,8 +25,7 @@ import (
 type Addenda99Dishonored struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
-	// RecordType defines the type of record in the block. entryAddendaPos 7
-	recordType string
+
 	// TypeCode Addenda types code '99'
 	TypeCode string `json:"typeCode"`
 
@@ -65,8 +64,7 @@ type Addenda99Dishonored struct {
 // NewAddenda99Dishonored returns a new Addenda99Dishonored with default values for none exported fields
 func NewAddenda99Dishonored() *Addenda99Dishonored {
 	Addenda99Dishonored := &Addenda99Dishonored{
-		recordType: "7",
-		TypeCode:   "99",
+		TypeCode: "99",
 	}
 	return Addenda99Dishonored
 }
@@ -76,7 +74,6 @@ func (Addenda99Dishonored *Addenda99Dishonored) Parse(record string) {
 		return
 	}
 
-	Addenda99Dishonored.recordType = "7"
 	Addenda99Dishonored.TypeCode = record[1:3]
 	Addenda99Dishonored.DishonoredReturnReasonCode = record[3:6]
 	Addenda99Dishonored.OriginalEntryTraceNumber = record[6:21]
@@ -91,7 +88,7 @@ func (Addenda99Dishonored *Addenda99Dishonored) Parse(record string) {
 func (Addenda99Dishonored *Addenda99Dishonored) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
-	buf.WriteString(Addenda99Dishonored.recordType)
+	buf.WriteString(entryAddendaPos)
 	buf.WriteString(Addenda99Dishonored.TypeCode)
 	buf.WriteString(Addenda99Dishonored.DishonoredReturnReasonCodeField())
 	buf.WriteString(Addenda99Dishonored.OriginalEntryTraceNumberField())
@@ -125,9 +122,6 @@ func IsDishonoredReturnCode(code string) bool {
 
 // Validate verifies NACHA rules for Addenda99Dishonored
 func (Addenda99Dishonored *Addenda99Dishonored) Validate() error {
-	if Addenda99Dishonored.recordType != "7" {
-		return fieldError("recordType", NewErrRecordType(7), Addenda99Dishonored.recordType)
-	}
 	if Addenda99Dishonored.TypeCode == "" {
 		return fieldError("TypeCode", ErrConstructor, Addenda99Dishonored.TypeCode)
 	}

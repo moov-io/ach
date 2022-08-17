@@ -184,9 +184,6 @@ func parseFileHeader(t testing.TB) {
 	}
 	record := r.File.Header
 
-	if record.recordType != "1" {
-		t.Errorf("RecordType Expected 1 got: %v", record.recordType)
-	}
 	if record.priorityCode != "01" {
 		t.Errorf("PriorityCode Expected 01 got: %v", record.priorityCode)
 	}
@@ -262,29 +259,6 @@ func BenchmarkFHString(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testFHString(b)
-	}
-}
-
-// testValidateFHRecordType validates error if record type is not 1
-func testValidateFHRecordType(t testing.TB) {
-	fh := mockFileHeader()
-	fh.recordType = "2"
-	err := fh.Validate()
-	if !base.Match(err, NewErrRecordType(1)) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestValidateFHRecordType tests validating error if record type is not 1
-func TestValidateFHRecordType(t *testing.T) {
-	testValidateFHRecordType(t)
-}
-
-// BenchmarkValidateFHRecordType benchmarks validating error if record type is not 1
-func BenchmarkValidateFHRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testValidateFHRecordType(b)
 	}
 }
 
@@ -504,29 +478,6 @@ func BenchmarkImmediateReferenceCodeAlphaNumeric(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testImmediateReferenceCodeAlphaNumeric(b)
-	}
-}
-
-// testFHFieldInclusionRecordType validates field inclusion
-func testFHFieldInclusionRecordType(t testing.TB) {
-	fh := mockFileHeader()
-	fh.recordType = ""
-	err := fh.Validate()
-	if !base.Match(err, ErrConstructor) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestFHFieldInclusionRecordType tests validating field inclusion
-func TestFHFieldInclusionRecordType(t *testing.T) {
-	testFHFieldInclusionRecordType(t)
-}
-
-// BenchmarkFHFieldInclusionRecordType benchmarks validating field inclusion
-func BenchmarkFHFieldInclusionRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testFHFieldInclusionRecordType(b)
 	}
 }
 

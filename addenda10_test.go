@@ -48,9 +48,6 @@ func testAddenda10Parse(t testing.TB) {
 	line := "710ANN000000000000100000928383-23938          BEK Enterprises                          0000001"
 	addenda10.Parse(line)
 	// walk the Addenda10 struct
-	if addenda10.recordType != "7" {
-		t.Errorf("expected %v got %v", "7", addenda10.recordType)
-	}
 	if addenda10.TypeCode != "10" {
 		t.Errorf("expected %v got %v", "10", addenda10.TypeCode)
 	}
@@ -65,9 +62,6 @@ func testAddenda10Parse(t testing.TB) {
 	}
 	if addenda10.Name != "BEK Enterprises" {
 		t.Errorf("expected: %s got: %s", "BEK Enterprises", addenda10.Name)
-	}
-	if addenda10.reserved != "      " {
-		t.Errorf("expected: %v got: %v", "      ", addenda10.reserved)
 	}
 	if addenda10.EntryDetailSequenceNumber != 0000001 {
 		t.Errorf("expected: %v got: %v", 0000001, addenda10.EntryDetailSequenceNumber)
@@ -84,29 +78,6 @@ func BenchmarkAddenda10Parse(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testAddenda10Parse(b)
-	}
-}
-
-// testAddenda10ValidRecordType validates Addenda10 recordType
-func testAddenda10ValidRecordType(t testing.TB) {
-	addenda10 := mockAddenda10()
-	addenda10.recordType = "63"
-	err := addenda10.Validate()
-	if !base.Match(err, NewErrRecordType(7)) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestAddenda10ValidRecordType tests validating Addenda10 recordType
-func TestAddenda10ValidRecordType(t *testing.T) {
-	testAddenda10ValidRecordType(t)
-}
-
-// BenchmarkAddenda10ValidRecordType benchmarks validating Addenda10 recordType
-func BenchmarkAddenda10ValidRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testAddenda10ValidRecordType(b)
 	}
 }
 
@@ -222,29 +193,6 @@ func BenchmarkNameAlphaNumeric(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testNameAlphaNumeric(b)
-	}
-}
-
-// testAddenda10FieldInclusionRecordType validates recordType fieldInclusion
-func testAddenda10FieldInclusionRecordType(t testing.TB) {
-	addenda10 := mockAddenda10()
-	addenda10.recordType = ""
-	err := addenda10.Validate()
-	if !base.Match(err, ErrConstructor) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestAddenda10FieldInclusionRecordType tests validating recordType fieldInclusion
-func TestAddenda10FieldInclusionRecordType(t *testing.T) {
-	testAddenda10FieldInclusionRecordType(t)
-}
-
-// BenchmarkAddenda10FieldInclusionRecordType benchmarks validating recordType fieldInclusion
-func BenchmarkAddenda10FieldInclusionRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testAddenda10FieldInclusionRecordType(b)
 	}
 }
 

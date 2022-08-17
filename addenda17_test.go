@@ -47,9 +47,6 @@ func testAddenda17Parse(t testing.TB) {
 	line := "717This is an international payment                                                00010000001"
 	Addenda17.Parse(line)
 	// walk the Addenda17 struct
-	if Addenda17.recordType != "7" {
-		t.Errorf("expected %v got %v", "7", Addenda17.recordType)
-	}
 	if Addenda17.TypeCode != "17" {
 		t.Errorf("expected %v got %v", "17", Addenda17.TypeCode)
 	}
@@ -112,15 +109,6 @@ func BenchmarkAddenda17String(b *testing.B) {
 	}
 }
 
-func TestValidateAddenda17RecordType(t *testing.T) {
-	addenda17 := mockAddenda17()
-	addenda17.recordType = "63"
-	err := addenda17.Validate()
-	if !base.Match(err, NewErrRecordType(7)) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
 func TestAddenda17FieldInclusionTypeCode(t *testing.T) {
 	addenda17 := mockAddenda17()
 	addenda17.TypeCode = ""
@@ -142,15 +130,6 @@ func TestAddenda17FieldInclusion(t *testing.T) {
 func TestAddenda17FieldInclusionSequenceNumber(t *testing.T) {
 	addenda17 := mockAddenda17()
 	addenda17.SequenceNumber = 0
-	err := addenda17.Validate()
-	if !base.Match(err, ErrConstructor) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-func TestAddenda17FieldInclusionRecordType(t *testing.T) {
-	addenda17 := mockAddenda17()
-	addenda17.recordType = ""
 	err := addenda17.Validate()
 	if !base.Match(err, ErrConstructor) {
 		t.Errorf("%T: %s", err, err)

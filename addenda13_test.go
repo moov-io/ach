@@ -40,9 +40,6 @@ func testAddenda13Parse(t testing.TB) {
 	line := "713Wells Fargo                        01121042882                         US           0000001"
 	Addenda13.Parse(line)
 	// walk the Addenda13 struct
-	if Addenda13.recordType != "7" {
-		t.Errorf("expected %v got %v", "7", Addenda13.recordType)
-	}
 	if Addenda13.TypeCode != "13" {
 		t.Errorf("expected %v got %v", "13", Addenda13.TypeCode)
 	}
@@ -57,9 +54,6 @@ func testAddenda13Parse(t testing.TB) {
 	}
 	if Addenda13.ODFIBranchCountryCode != "US" {
 		t.Errorf("expected: %s got: %s", "US", Addenda13.ODFIBranchCountryCode)
-	}
-	if Addenda13.reserved != "          " {
-		t.Errorf("expected: %v got: %v", "          ", Addenda13.reserved)
 	}
 	if Addenda13.EntryDetailSequenceNumber != 0000001 {
 		t.Errorf("expected: %v got: %v", 0000001, Addenda13.EntryDetailSequenceNumber)
@@ -84,29 +78,6 @@ func TestMockAddenda13(t *testing.T) {
 	addenda13 := mockAddenda13()
 	if err := addenda13.Validate(); err != nil {
 		t.Error("mockAddenda13 does not validate and will break other tests")
-	}
-}
-
-// testAddenda13ValidRecordType validates Addenda13 recordType
-func testAddenda13ValidRecordType(t testing.TB) {
-	addenda13 := mockAddenda13()
-	addenda13.recordType = "63"
-	err := addenda13.Validate()
-	if !base.Match(err, NewErrRecordType(7)) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestAddenda13ValidRecordType tests validating Addenda13 recordType
-func TestAddenda13ValidRecordType(t *testing.T) {
-	testAddenda13ValidRecordType(t)
-}
-
-// BenchmarkAddenda13ValidRecordType benchmarks validating Addenda13 recordType
-func BenchmarkAddenda13ValidRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testAddenda13ValidRecordType(b)
 	}
 }
 
@@ -245,29 +216,6 @@ func BenchmarkODFIBranchCountryCodeAlphaNumeric(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testODFIBranchCountryCodeAlphaNumeric(b)
-	}
-}
-
-// testAddenda13FieldInclusionRecordType validates recordType fieldInclusion
-func testAddenda13FieldInclusionRecordType(t testing.TB) {
-	addenda13 := mockAddenda13()
-	addenda13.recordType = ""
-	err := addenda13.Validate()
-	if !base.Match(err, ErrConstructor) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestAddenda13FieldInclusionRecordType tests validating recordType fieldInclusion
-func TestAddenda13FieldInclusionRecordType(t *testing.T) {
-	testAddenda13FieldInclusionRecordType(t)
-}
-
-// BenchmarkAddenda13FieldInclusionRecordType benchmarks validating recordType fieldInclusion
-func BenchmarkAddenda13FieldInclusionRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testAddenda13FieldInclusionRecordType(b)
 	}
 }
 

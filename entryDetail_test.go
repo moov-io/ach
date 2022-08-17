@@ -92,9 +92,6 @@ func testParseEntryDetail(t testing.TB) {
 	}
 	record := r.currentBatch.GetEntries()[0]
 
-	if record.recordType != "6" {
-		t.Errorf("RecordType Expected '6' got: %v", record.recordType)
-	}
 	if record.TransactionCode != CheckingDebit {
 		t.Errorf("TransactionCode Expected '27' got: %v", record.TransactionCode)
 	}
@@ -171,29 +168,6 @@ func BenchmarkEDString(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testEDString(b)
-	}
-}
-
-// testValidateEDRecordType validates error if recordType is not 6
-func testValidateEDRecordType(t testing.TB) {
-	ed := mockEntryDetail()
-	ed.recordType = "2"
-	err := ed.Validate()
-	if !base.Match(err, NewErrRecordType(6)) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestValidateEDRecordType tests validating error if recordType is not 6
-func TestValidateEDRecordType(t *testing.T) {
-	testValidateEDRecordType(t)
-}
-
-// BenchmarkValidateEDRecordType benchmarks validating error if recordType is not 6
-func BenchmarkValidateEDRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testValidateEDRecordType(b)
 	}
 }
 
@@ -388,29 +362,6 @@ func BenchmarkEDSetRDFI(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testEDSetRDFI(b)
-	}
-}
-
-// testEDFieldInclusionRecordType validates record type field inclusion
-func testEDFieldInclusionRecordType(t testing.TB) {
-	entry := mockEntryDetail()
-	entry.recordType = ""
-	err := entry.Validate()
-	if !base.Match(err, ErrConstructor) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestEDFieldInclusionRecordType tests validating record type field inclusion
-func TestEDFieldInclusionRecordType(t *testing.T) {
-	testEDFieldInclusionRecordType(t)
-}
-
-// BenchmarkEDFieldInclusionRecordType benchmarks validating record type field inclusion
-func BenchmarkEDFieldInclusionRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testEDFieldInclusionRecordType(b)
 	}
 }
 

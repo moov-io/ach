@@ -28,8 +28,6 @@ import (
 type Addenda02 struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
-	// RecordType defines the type of record in the block. entryAddenda02 Pos 7
-	recordType string
 	// TypeCode Addenda02 type code '02'
 	TypeCode string `json:"typeCode"`
 	// ReferenceInformationOne may be used for additional reference numbers, identification numbers,
@@ -70,7 +68,6 @@ type Addenda02 struct {
 // NewAddenda02 returns a new Addenda02 with default values for none exported fields
 func NewAddenda02() *Addenda02 {
 	addenda02 := new(Addenda02)
-	addenda02.recordType = "7"
 	addenda02.TypeCode = "02"
 	return addenda02
 }
@@ -83,8 +80,7 @@ func (addenda02 *Addenda02) Parse(record string) {
 		return
 	}
 
-	// 1-1 Always "7"
-	addenda02.recordType = "7"
+	// 1-1 Always 7
 	// 2-3 Always 02
 	addenda02.TypeCode = record[1:3]
 	// 4-10 Based on the information entered (04-10) 7 alphanumeric
@@ -113,7 +109,7 @@ func (addenda02 *Addenda02) Parse(record string) {
 func (addenda02 *Addenda02) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
-	buf.WriteString(addenda02.recordType)
+	buf.WriteString(entryAddendaPos)
 	buf.WriteString(addenda02.TypeCode)
 	buf.WriteString(addenda02.ReferenceInformationOneField())
 	buf.WriteString(addenda02.ReferenceInformationTwoField())
@@ -133,9 +129,6 @@ func (addenda02 *Addenda02) String() string {
 func (addenda02 *Addenda02) Validate() error {
 	if err := addenda02.fieldInclusion(); err != nil {
 		return err
-	}
-	if addenda02.recordType != "7" {
-		return fieldError("recordType", NewErrRecordType(7), addenda02.recordType)
 	}
 	if err := addenda02.isTypeCode(addenda02.TypeCode); err != nil {
 		return fieldError("TypeCode", err, addenda02.TypeCode)
@@ -187,9 +180,6 @@ func (addenda02 *Addenda02) Validate() error {
 // invalid the ACH transfer will be returned.
 
 func (addenda02 *Addenda02) fieldInclusion() error {
-	if addenda02.recordType == "" {
-		return fieldError("recordType", ErrConstructor, addenda02.recordType)
-	}
 	if addenda02.TypeCode == "" {
 		return fieldError("TypeCode", ErrConstructor, addenda02.TypeCode)
 	}

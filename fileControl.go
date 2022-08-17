@@ -27,8 +27,6 @@ import (
 type FileControl struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
-	// RecordType defines the type of record in the block. fileControlPos 9
-	recordType string
 	// BatchCount total number of batches (i.e., '5' records) in the file
 	BatchCount int `json:"batchCount"`
 	// BlockCount total number of records in the file (include all headers and trailer) divided
@@ -43,8 +41,6 @@ type FileControl struct {
 	TotalDebitEntryDollarAmountInFile int `json:"totalDebit"`
 	// TotalCreditEntryDollarAmountInFile contains accumulated Batch credit totals within the file.
 	TotalCreditEntryDollarAmountInFile int `json:"totalCredit"`
-	// Reserved should be blank.
-	reserved string
 	// validator is composed for data validation
 	validator
 	// converters is composed for ACH to golang Converters
@@ -60,7 +56,6 @@ func (fc *FileControl) Parse(record string) {
 	}
 
 	// 1-1 Always "9"
-	fc.recordType = "9"
 	// 2-7 The total number of Batch Header Record in the file. For example: "000003
 	fc.BatchCount = fc.parseNumField(record[1:7])
 	// 8-13 e total number of blocks on the file, including the File Header and File Control records. One block is 10 lines, so it's effectively the number of lines in the file divided by 10.
@@ -75,29 +70,25 @@ func (fc *FileControl) Parse(record string) {
 	// 44-55 Number of cents of credit entries within the file
 	fc.TotalCreditEntryDollarAmountInFile = fc.parseNumField(record[43:55])
 	// 56-94 Reserved Always blank (just fill with spaces)
-	fc.reserved = "                                       "
 }
 
 // NewFileControl returns a new FileControl with default values for none exported fields
 func NewFileControl() FileControl {
-	return FileControl{
-		recordType: "9",
-		reserved:   "                                       ",
-	}
+	return FileControl{}
 }
 
 // String writes the FileControl struct to a 94 character string.
 func (fc *FileControl) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
-	buf.WriteString(fc.recordType)
+	buf.WriteString(fileControlPos)
 	buf.WriteString(fc.BatchCountField())
 	buf.WriteString(fc.BlockCountField())
 	buf.WriteString(fc.EntryAddendaCountField())
 	buf.WriteString(fc.EntryHashField())
 	buf.WriteString(fc.TotalDebitEntryDollarAmountInFileField())
 	buf.WriteString(fc.TotalCreditEntryDollarAmountInFileField())
-	buf.WriteString(fc.reserved)
+	buf.WriteString("                                       ")
 	return buf.String()
 }
 
@@ -107,18 +98,12 @@ func (fc *FileControl) Validate() error {
 	if err := fc.fieldInclusion(); err != nil {
 		return err
 	}
-	if fc.recordType != "9" {
-		return fieldError("recordType", NewErrRecordType(9), fc.recordType)
-	}
 	return nil
 }
 
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (fc *FileControl) fieldInclusion() error {
-	if fc.recordType == "" {
-		return fieldError("recordType", ErrConstructor, fc.recordType)
-	}
 	if fc.BlockCount == 0 {
 		return fieldError("BlockCount", ErrConstructor, fc.BlockCountField())
 	}

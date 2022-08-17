@@ -138,16 +138,6 @@ func BenchmarkADVEDString(b *testing.B) {
 	}
 }
 
-// TestValidateADVEDRecordType validates error if recordType is not 6
-func TestValidateADVEDRecordType(t *testing.T) {
-	ed := mockADVEntryDetail()
-	ed.recordType = "2"
-	err := ed.Validate()
-	if !base.Match(err, NewErrRecordType(6)) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
 // TestValidateADVEDTransactionCode validates error if transaction code is not valid
 func TestValidateADVEDTransactionCode(t *testing.T) {
 	ed := mockADVEntryDetail()
@@ -214,16 +204,6 @@ func TestADVEDisCheckDigit(t *testing.T) {
 	ed.CheckDigit = "1"
 	err := ed.Validate()
 	if !base.Match(err, NewErrValidCheckDigit(7)) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestADVEDFieldInclusionRecordType validates recordType field inclusion
-func TestADVEDFieldInclusionRecordType(t *testing.T) {
-	entry := mockADVEntryDetail()
-	entry.recordType = ""
-	err := entry.Validate()
-	if !base.Match(err, ErrConstructor) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

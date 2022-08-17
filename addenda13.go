@@ -33,8 +33,6 @@ import (
 type Addenda13 struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
-	// RecordType defines the type of record in the block.
-	recordType string
 	// TypeCode Addenda13 types code '13'
 	TypeCode string `json:"typeCode"`
 	// Originating DFI Name
@@ -61,8 +59,6 @@ type Addenda13 struct {
 	// the branch of the bank that originated the entry is located. Values for other countries can
 	// be found on the International Organization for Standardization website: www.iso.org.
 	ODFIBranchCountryCode string `json:"ODFIBranchCountryCode"`
-	// reserved - Leave blank
-	reserved string
 	// EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
 	// Detail or Corporate Entry Detail Record's trace number This number is
 	// the same as the last seven digits of the trace number of the related
@@ -77,7 +73,6 @@ type Addenda13 struct {
 // NewAddenda13 returns a new Addenda13 with default values for none exported fields
 func NewAddenda13() *Addenda13 {
 	addenda13 := new(Addenda13)
-	addenda13.recordType = "7"
 	addenda13.TypeCode = "13"
 	return addenda13
 }
@@ -90,8 +85,7 @@ func (addenda13 *Addenda13) Parse(record string) {
 		return
 	}
 
-	// 1-1 Always "7"
-	addenda13.recordType = "7"
+	// 1-1 Always 7
 	// 2-3 Always 13
 	addenda13.TypeCode = record[1:3]
 	// 4-38 ODFIName
@@ -103,7 +97,6 @@ func (addenda13 *Addenda13) Parse(record string) {
 	// 75-77
 	addenda13.ODFIBranchCountryCode = strings.TrimSpace(record[74:77])
 	// 78-87 reserved - Leave blank
-	addenda13.reserved = "          "
 	// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
 	addenda13.EntryDetailSequenceNumber = addenda13.parseNumField(record[87:94])
 }
@@ -112,13 +105,13 @@ func (addenda13 *Addenda13) Parse(record string) {
 func (addenda13 *Addenda13) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
-	buf.WriteString(addenda13.recordType)
+	buf.WriteString(entryAddendaPos)
 	buf.WriteString(addenda13.TypeCode)
 	buf.WriteString(addenda13.ODFINameField())
 	buf.WriteString(addenda13.ODFIIDNumberQualifierField())
 	buf.WriteString(addenda13.ODFIIdentificationField())
 	buf.WriteString(addenda13.ODFIBranchCountryCodeField())
-	buf.WriteString(addenda13.reservedField())
+	buf.WriteString("          ")
 	buf.WriteString(addenda13.EntryDetailSequenceNumberField())
 	return buf.String()
 }
@@ -128,9 +121,6 @@ func (addenda13 *Addenda13) String() string {
 func (addenda13 *Addenda13) Validate() error {
 	if err := addenda13.fieldInclusion(); err != nil {
 		return err
-	}
-	if addenda13.recordType != "7" {
-		return fieldError("recordType", NewErrRecordType(7), addenda13.recordType)
 	}
 	if err := addenda13.isTypeCode(addenda13.TypeCode); err != nil {
 		return fieldError("TypeCode", err, addenda13.TypeCode)
@@ -158,9 +148,6 @@ func (addenda13 *Addenda13) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (addenda13 *Addenda13) fieldInclusion() error {
-	if addenda13.recordType == "" {
-		return fieldError("recordType", ErrConstructor, addenda13.recordType)
-	}
 	if addenda13.TypeCode == "" {
 		return fieldError("TypeCode", ErrConstructor, addenda13.TypeCode)
 	}
@@ -200,11 +187,6 @@ func (addenda13 *Addenda13) ODFIIdentificationField() string {
 // ODFIBranchCountryCodeField gets the ODFIBranchCountryCode field left padded
 func (addenda13 *Addenda13) ODFIBranchCountryCodeField() string {
 	return addenda13.alphaField(addenda13.ODFIBranchCountryCode, 3)
-}
-
-// reservedField gets reserved - blank space
-func (addenda13 *Addenda13) reservedField() string {
-	return addenda13.alphaField(addenda13.reserved, 10)
 }
 
 // EntryDetailSequenceNumberField returns a zero padded EntryDetailSequenceNumber string

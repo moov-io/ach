@@ -81,9 +81,6 @@ func testParseADVFileControl(t testing.TB) {
 	}
 	record := r.File.ADVControl
 
-	if record.recordType != "9" {
-		t.Errorf("RecordType Expected '9' got: %v", record.recordType)
-	}
 	if record.BatchCountField() != "000001" {
 		t.Errorf("BatchCount Expected '000001' got: %v", record.BatchCountField())
 	}
@@ -101,9 +98,6 @@ func testParseADVFileControl(t testing.TB) {
 	}
 	if record.TotalCreditEntryDollarAmountInFileField() != "00000000000000000000" {
 		t.Errorf("TotalCreditEntryDollarAmountInFile Expected '00000000000000000000' got: %v", record.TotalCreditEntryDollarAmountInFileField())
-	}
-	if record.reserved != "                       " {
-		t.Errorf("Reserved Expected '                       ' got: %v", record.reserved)
 	}
 }
 
@@ -151,30 +145,6 @@ func BenchmarkADVFCString(b *testing.B) {
 	}
 }
 
-// testValidateADVFCRecordType validates error if recordType is not 9
-func testValidateADVFCRecordType(t testing.TB) {
-	fc := mockADVFileControl()
-	fc.recordType = "2"
-
-	err := fc.Validate()
-	if !base.Match(err, NewErrRecordType(9)) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestValidateADVFCRecordType tests validating error if recordType is not 9
-func TestValidateADVFCRecordType(t *testing.T) {
-	testValidateADVFCRecordType(t)
-}
-
-// BenchmarkValidateADVFCRecordType benchmarks validating error if recordType is not 9
-func BenchmarkValidateADVFCRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testValidateADVFCRecordType(b)
-	}
-}
-
 // testADVFCFieldInclusion validates file control field inclusion
 func testADVFCFieldInclusion(t testing.TB) {
 	fc := mockADVFileControl()
@@ -195,29 +165,6 @@ func BenchmarkADVFCFieldInclusion(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testADVFCFieldInclusion(b)
-	}
-}
-
-// testADVFCFieldInclusionRecordType validates file control record type field inclusion
-func testADVFCFieldInclusionRecordType(t testing.TB) {
-	fc := mockADVFileControl()
-	fc.recordType = ""
-	err := fc.Validate()
-	if !base.Match(err, ErrConstructor) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestADVFCFieldInclusionRecordType tests validating file control record type field inclusion
-func TestADVFCFieldInclusionRecordType(t *testing.T) {
-	testADVFCFieldInclusionRecordType(t)
-}
-
-// BenchmarkADVFCFieldInclusionRecordType benchmarks tests validating file control record type field inclusion
-func BenchmarkADVFCFieldInclusionRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testADVFCFieldInclusionRecordType(b)
 	}
 }
 

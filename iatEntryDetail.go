@@ -31,8 +31,6 @@ import (
 type IATEntryDetail struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
-	// RecordType defines the type of record in the block. 6
-	recordType string
 	// TransactionCode if the receivers account is:
 	// Credit (deposit) to checking account '22'
 	// Prenote for credit to checking account '23'
@@ -50,15 +48,11 @@ type IATEntryDetail struct {
 	CheckDigit string `json:"checkDigit"`
 	// AddendaRecords is the number of Addenda Records
 	AddendaRecords int `json:"addendaRecords"`
-	// reserved - Leave blank
-	reserved string
 	// Amount Number of cents you are debiting/crediting this account
 	Amount int `json:"amount"`
 	// DFIAccountNumber is the receiver's bank account number you are crediting/debiting.
 	// It important to note that this is an alphanumeric field, so its space padded, no zero padded
 	DFIAccountNumber string `json:"DFIAccountNumber"`
-	// reservedTwo - Leave blank
-	reservedTwo string
 	// OFACScreeningIndicator - Leave blank
 	OFACScreeningIndicator string `json:"OFACScreeningIndicator"`
 	// SecondaryOFACScreeningIndicator - Leave blank
@@ -138,7 +132,6 @@ type IATEntryDetail struct {
 // NewIATEntryDetail returns a new IATEntryDetail with default values for non exported fields
 func NewIATEntryDetail() *IATEntryDetail {
 	iatEd := &IATEntryDetail{
-		recordType:             "6",
 		Category:               CategoryForward,
 		AddendaRecordIndicator: 1,
 	}
@@ -154,7 +147,6 @@ func (iatEd *IATEntryDetail) Parse(record string) {
 	}
 
 	// 1-1 Always "6"
-	iatEd.recordType = "6"
 	// 2-3 is checking credit 22 debit 27 savings credit 32 debit 37
 	iatEd.TransactionCode = iatEd.parseNumField(record[1:3])
 	// 4-11 the RDFI's routing number without the last digit.
@@ -164,13 +156,11 @@ func (iatEd *IATEntryDetail) Parse(record string) {
 	// 13-16 Number of addenda records
 	iatEd.AddendaRecords = iatEd.parseNumField(record[12:16])
 	// 17-29 reserved - Leave blank
-	iatEd.reserved = "             "
 	// 30-39 Number of cents you are debiting/crediting this account
 	iatEd.Amount = iatEd.parseNumField(record[29:39])
 	// 40-74 The foreign receiver's account number you are crediting/debiting
 	iatEd.DFIAccountNumber = record[39:74]
-	// 75-76 reserved2 Leave blank
-	iatEd.reservedTwo = "  "
+	// 75-76 reserved Leave blank
 	// 77 OFACScreeningIndicator
 	iatEd.OFACScreeningIndicator = " "
 	// 78-78 Secondary SecondaryOFACScreeningIndicator
@@ -187,15 +177,15 @@ func (iatEd *IATEntryDetail) Parse(record string) {
 func (iatEd *IATEntryDetail) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
-	buf.WriteString(iatEd.recordType)
+	buf.WriteString(entryDetailPos)
 	buf.WriteString(fmt.Sprintf("%v", iatEd.TransactionCode))
 	buf.WriteString(iatEd.RDFIIdentificationField())
 	buf.WriteString(iatEd.CheckDigit)
 	buf.WriteString(iatEd.AddendaRecordsField())
-	buf.WriteString(iatEd.reservedField())
+	buf.WriteString("             ")
 	buf.WriteString(iatEd.AmountField())
 	buf.WriteString(iatEd.DFIAccountNumberField())
-	buf.WriteString(iatEd.reservedTwoField())
+	buf.WriteString("  ")
 	buf.WriteString(iatEd.OFACScreeningIndicatorField())
 	buf.WriteString(iatEd.SecondaryOFACScreeningIndicatorField())
 	buf.WriteString(fmt.Sprintf("%v", iatEd.AddendaRecordIndicator))
@@ -208,9 +198,6 @@ func (iatEd *IATEntryDetail) String() string {
 func (iatEd *IATEntryDetail) Validate() error {
 	if err := iatEd.fieldInclusion(); err != nil {
 		return err
-	}
-	if iatEd.recordType != "6" {
-		return fieldError("recordType", NewErrRecordType(6), iatEd.recordType)
 	}
 	if err := iatEd.isTransactionCode(iatEd.TransactionCode); err != nil {
 		return fieldError("TransactionCode", err, strconv.Itoa(iatEd.TransactionCode))
@@ -234,9 +221,6 @@ func (iatEd *IATEntryDetail) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (iatEd *IATEntryDetail) fieldInclusion() error {
-	if iatEd.recordType == "" {
-		return fieldError("recordType", ErrConstructor, iatEd.recordType)
-	}
 	if iatEd.TransactionCode == 0 {
 		return fieldError("TransactionCode", ErrConstructor, strconv.Itoa(iatEd.TransactionCode))
 	}
@@ -281,10 +265,6 @@ func (iatEd *IATEntryDetail) AddendaRecordsField() string {
 	return iatEd.numericField(iatEd.AddendaRecords, 4)
 }
 
-func (iatEd *IATEntryDetail) reservedField() string {
-	return iatEd.alphaField(iatEd.reserved, 13)
-}
-
 // AmountField returns a zero padded string of amount
 func (iatEd *IATEntryDetail) AmountField() string {
 	return iatEd.numericField(iatEd.Amount, 10)
@@ -293,11 +273,6 @@ func (iatEd *IATEntryDetail) AmountField() string {
 // DFIAccountNumberField gets the DFIAccountNumber with space padding
 func (iatEd *IATEntryDetail) DFIAccountNumberField() string {
 	return iatEd.alphaField(iatEd.DFIAccountNumber, 35)
-}
-
-// reservedTwoField gets the reservedTwo
-func (iatEd *IATEntryDetail) reservedTwoField() string {
-	return iatEd.alphaField(iatEd.reservedTwo, 2)
 }
 
 // OFACScreeningIndicatorField gets the OFACScreeningIndicator
