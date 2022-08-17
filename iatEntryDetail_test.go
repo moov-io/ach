@@ -102,9 +102,6 @@ func testParseIATEntryDetail(t testing.TB) {
 	}
 	record := r.IATCurrentBatch.GetEntries()[0]
 
-	if record.recordType != "6" {
-		t.Errorf("RecordType Expected '6' got: %v", record.recordType)
-	}
 	if record.TransactionCode != CheckingCredit {
 		t.Errorf("TransactionCode Expected '22' got: %v", record.TransactionCode)
 	}
@@ -175,29 +172,6 @@ func BenchmarkIATEDString(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testIATEDString(b)
-	}
-}
-
-// testIATEDInvalidRecordType validates error for IATEntryDetail invalid recordType
-func testIATEDInvalidRecordType(t testing.TB) {
-	iatEd := mockIATEntryDetail()
-	iatEd.recordType = "2"
-	err := iatEd.Validate()
-	if !base.Match(err, NewErrRecordType(6)) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestIATEDInvalidRecordType  tests validating error for IATEntryDetail invalid recordType
-func TestIATEDInvalidRecordType(t *testing.T) {
-	testIATEDInvalidRecordType(t)
-}
-
-// BenchmarkIATEDRecordType benchmarks validating error for IATEntryDetail invalid recordType
-func BenchmarkIATEDInvalidRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testIATEDInvalidRecordType(b)
 	}
 }
 
@@ -315,29 +289,6 @@ func BenchmarkValidateEDIATCheckDigit(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testValidateEDIATCheckDigit(b)
-	}
-}
-
-// testIATEDRecordType validates IATEntryDetail recordType fieldInclusion
-func testIATEDRecordType(t testing.TB) {
-	iatEd := mockIATEntryDetail()
-	iatEd.recordType = ""
-	err := iatEd.Validate()
-	if !base.Match(err, ErrConstructor) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestIATEDRecordType tests validating IATEntryDetail recordType fieldInclusion
-func TestIATEDRecordType(t *testing.T) {
-	testIATEDRecordType(t)
-}
-
-// BenchmarkIATEDRecordType benchmarks validating IATEntryDetail recordType fieldInclusion
-func BenchmarkIATEDRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testIATEDRecordType(b)
 	}
 }
 

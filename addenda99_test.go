@@ -40,9 +40,6 @@ func testAddenda99Parse(t testing.TB) {
 	line := "799R07099912340000015      09101298Authorization revoked                       091012980000066"
 	addenda99.Parse(line)
 	// walk the Addenda99 struct
-	if addenda99.recordType != "7" {
-		t.Errorf("expected %v got %v", "7", addenda99.recordType)
-	}
 	if addenda99.TypeCode != "99" {
 		t.Errorf("expected %v got %v", "99", addenda99.TypeCode)
 	}
@@ -288,25 +285,6 @@ func BenchmarkAddenda99TraceNumberField(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testAddenda99TraceNumberField(b)
-	}
-}
-
-func testAddenda99ValidRecordType(t testing.TB) {
-	addenda99 := mockAddenda99()
-	addenda99.recordType = "63"
-	err := addenda99.Validate()
-	if !base.Match(err, NewErrRecordType(7)) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-func TestAddenda99ValidRecordType(t *testing.T) {
-	testAddenda99ValidRecordType(t)
-}
-
-func BenchmarkAddenda99ValidRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testAddenda99ValidRecordType(b)
 	}
 }
 

@@ -48,9 +48,6 @@ func testAddenda14Parse(t testing.TB) {
 	line := "714Citadel Bank                       01231380104                         US           0000001"
 	Addenda14.Parse(line)
 	// walk the Addenda14 struct
-	if Addenda14.recordType != "7" {
-		t.Errorf("expected %v got %v", "7", Addenda14.recordType)
-	}
 	if Addenda14.TypeCode != "14" {
 		t.Errorf("expected %v got %v", "14", Addenda14.TypeCode)
 	}
@@ -65,9 +62,6 @@ func testAddenda14Parse(t testing.TB) {
 	}
 	if Addenda14.RDFIBranchCountryCode != "US" {
 		t.Errorf("expected: %s got: %s", "US", Addenda14.RDFIBranchCountryCode)
-	}
-	if Addenda14.reserved != "          " {
-		t.Errorf("expected: %v got: %v", "          ", Addenda14.reserved)
 	}
 	if Addenda14.EntryDetailSequenceNumber != 0000001 {
 		t.Errorf("expected: %v got: %v", 0000001, Addenda14.EntryDetailSequenceNumber)
@@ -84,29 +78,6 @@ func BenchmarkAddenda14Parse(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testAddenda14Parse(b)
-	}
-}
-
-// testAddenda14ValidRecordType validates Addenda14 recordType
-func testAddenda14ValidRecordType(t testing.TB) {
-	addenda14 := mockAddenda14()
-	addenda14.recordType = "63"
-	err := addenda14.Validate()
-	if !base.Match(err, NewErrRecordType(7)) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestAddenda14ValidRecordType tests validating Addenda14 recordType
-func TestAddenda14ValidRecordType(t *testing.T) {
-	testAddenda14ValidRecordType(t)
-}
-
-// BenchmarkAddenda14ValidRecordType benchmarks validating Addenda14 recordType
-func BenchmarkAddenda14ValidRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testAddenda14ValidRecordType(b)
 	}
 }
 
@@ -245,29 +216,6 @@ func BenchmarkRDFIBranchCountryCodeAlphaNumeric(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testRDFIBranchCountryCodeAlphaNumeric(b)
-	}
-}
-
-// testAddenda14FieldInclusionRecordType validates recordType fieldInclusion
-func testAddenda14FieldInclusionRecordType(t testing.TB) {
-	addenda14 := mockAddenda14()
-	addenda14.recordType = ""
-	err := addenda14.Validate()
-	if !base.Match(err, ErrConstructor) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestAddenda14FieldInclusionRecordType tests validating recordType fieldInclusion
-func TestAddenda14FieldInclusionRecordType(t *testing.T) {
-	testAddenda14FieldInclusionRecordType(t)
-}
-
-// BenchmarkAddenda14FieldInclusionRecordType benchmarks validating recordType fieldInclusion
-func BenchmarkAddenda14FieldInclusionRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testAddenda14FieldInclusionRecordType(b)
 	}
 }
 

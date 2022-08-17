@@ -29,8 +29,6 @@ import (
 type ADVBatchControl struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
-	// RecordType defines the type of record in the block.
-	recordType string
 	// This should be the same as BatchHeader ServiceClassCode for ADV: AutomatedAccountingAdvices.
 	ServiceClassCode int `json:"serviceClassCode"`
 	// EntryAddendaCount is a tally of each Entry Detail Record and each Addenda
@@ -69,7 +67,6 @@ func (bc *ADVBatchControl) Parse(record string) {
 	}
 
 	// 1-1 Always "8"
-	bc.recordType = "8"
 	// 2-4 This is the same as the "Service code" field in previous Batch Header Record
 	bc.ServiceClassCode = bc.parseNumField(record[1:4])
 	// 5-10 Total number of Entry Detail Record in the batch
@@ -92,7 +89,6 @@ func (bc *ADVBatchControl) Parse(record string) {
 // NewADVBatchControl returns a new ADVBatchControl with default values for none exported fields
 func NewADVBatchControl() *ADVBatchControl {
 	return &ADVBatchControl{
-		recordType:       "8",
 		ServiceClassCode: AutomatedAccountingAdvices,
 		EntryHash:        1,
 		BatchNumber:      1,
@@ -103,7 +99,7 @@ func NewADVBatchControl() *ADVBatchControl {
 func (bc *ADVBatchControl) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
-	buf.WriteString(bc.recordType)
+	buf.WriteString(batchControlPos)
 	buf.WriteString(fmt.Sprintf("%v", bc.ServiceClassCode))
 	buf.WriteString(bc.EntryAddendaCountField())
 	buf.WriteString(bc.EntryHashField())
@@ -121,9 +117,6 @@ func (bc *ADVBatchControl) Validate() error {
 	if err := bc.fieldInclusion(); err != nil {
 		return err
 	}
-	if bc.recordType != "8" {
-		return fieldError("recordType", NewErrRecordType(7), bc.recordType)
-	}
 	if err := bc.isServiceClass(bc.ServiceClassCode); err != nil {
 		return fieldError("ServiceClassCode", err, strconv.Itoa(bc.ServiceClassCode))
 	}
@@ -137,9 +130,6 @@ func (bc *ADVBatchControl) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (bc *ADVBatchControl) fieldInclusion() error {
-	if bc.recordType == "" {
-		return fieldError("recordType", ErrConstructor, bc.recordType)
-	}
 	if bc.ServiceClassCode == 0 {
 		return fieldError("ServiceClassCode", ErrConstructor, strconv.Itoa(bc.ServiceClassCode))
 	}

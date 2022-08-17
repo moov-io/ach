@@ -367,11 +367,11 @@ func testBatchPOSInvalidAddenda(t testing.TB) {
 	mockBatch := NewBatchPOS(mockBatchPOSHeader())
 	mockBatch.AddEntry(mockPOSEntryDetail())
 	addenda02 := mockAddenda02()
-	addenda02.recordType = "63"
+	addenda02.TypeCode = "63"
 	mockBatch.GetEntries()[0].Addenda02 = addenda02
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	err := mockBatch.Create()
-	if !base.Match(err, NewErrRecordType(7)) {
+	if !base.Match(err, ErrAddendaTypeCode) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -392,9 +392,9 @@ func BenchmarkBatchPOSInvalidAddenda(b *testing.B) {
 // testBatchPOSInvalidBuild validates an invalid batch build
 func testBatchPOSInvalidBuild(t testing.TB) {
 	mockBatch := mockBatchPOS()
-	mockBatch.GetHeader().recordType = "3"
+	mockBatch.GetHeader().ServiceClassCode = 3
 	err := mockBatch.Create()
-	if !base.Match(err, NewErrRecordType(5)) {
+	if !base.Match(err, ErrServiceClass) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

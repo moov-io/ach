@@ -119,9 +119,6 @@ func testAddenda18Parse(t testing.TB) {
 	line := "718Bank of Germany                    01987987987654654                   DE       00010000001"
 	Addenda18.Parse(line)
 	// walk the Addenda18 struct
-	if Addenda18.recordType != "7" {
-		t.Errorf("expected %v got %v", "7", Addenda18.recordType)
-	}
 	if Addenda18.TypeCode != "18" {
 		t.Errorf("expected %v got %v", "18", Addenda18.TypeCode)
 	}
@@ -136,9 +133,6 @@ func testAddenda18Parse(t testing.TB) {
 	}
 	if Addenda18.ForeignCorrespondentBankBranchCountryCode != "DE" {
 		t.Errorf("expected: %s got: %s", "DE", Addenda18.ForeignCorrespondentBankBranchCountryCode)
-	}
-	if Addenda18.reserved != "      " {
-		t.Errorf("expected: %v got: %v", "      ", Addenda18.reserved)
 	}
 	if Addenda18.EntryDetailSequenceNumber != 0000001 {
 		t.Errorf("expected: %v got: %v", 0000001, Addenda18.EntryDetailSequenceNumber)
@@ -182,15 +176,6 @@ func BenchmarkAddenda18String(b *testing.B) {
 	}
 }
 
-func TestValidateAddenda18RecordType(t *testing.T) {
-	addenda18 := mockAddenda18()
-	addenda18.recordType = "63"
-	err := addenda18.Validate()
-	if !base.Match(err, NewErrRecordType(7)) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
 func TestAddenda18FieldInclusionTypeCode(t *testing.T) {
 	addenda18 := mockAddenda18()
 	addenda18.TypeCode = ""
@@ -212,15 +197,6 @@ func TestAddenda18FieldInclusion(t *testing.T) {
 func TestAddenda18FieldInclusionSequenceNumber(t *testing.T) {
 	addenda18 := mockAddenda18()
 	addenda18.SequenceNumber = 0
-	err := addenda18.Validate()
-	if !base.Match(err, ErrConstructor) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-func TestAddenda18FieldInclusionRecordType(t *testing.T) {
-	addenda18 := mockAddenda18()
-	addenda18.recordType = ""
 	err := addenda18.Validate()
 	if !base.Match(err, ErrConstructor) {
 		t.Errorf("%T: %s", err, err)

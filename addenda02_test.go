@@ -47,29 +47,6 @@ func TestMockAddenda02(t *testing.T) {
 	}
 }
 
-// testAddenda02ValidRecordType validates Addenda02 recordType
-func testAddenda02ValidRecordType(t testing.TB) {
-	addenda02 := mockAddenda02()
-	addenda02.recordType = "63"
-	err := addenda02.Validate()
-	if !base.Match(err, NewErrRecordType(7)) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestAddenda02ValidRecordType tests validating Addenda02 recordType
-func TestAddenda02ValidRecordType(t *testing.T) {
-	testAddenda02ValidRecordType(t)
-}
-
-// BenchmarkAddenda02ValidRecordType benchmarks validating Addenda02 recordType
-func BenchmarkAddenda02ValidRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testAddenda02ValidRecordType(b)
-	}
-}
-
 // testAddenda02ValidTypeCode validates Addenda02 TypeCode
 func testAddenda02ValidTypeCode(t testing.TB) {
 	addenda02 := mockAddenda02()
@@ -113,29 +90,6 @@ func BenchmarkAddenda02TypeCode02(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testAddenda02TypeCode02(b)
-	}
-}
-
-// testAddenda02FieldInclusionRecordType validates recordType fieldInclusion
-func testAddenda02FieldInclusionRecordType(t testing.TB) {
-	addenda02 := mockAddenda02()
-	addenda02.recordType = ""
-	err := addenda02.Validate()
-	if !base.Match(err, ErrConstructor) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestAddenda02FieldInclusionRecordType tests validating recordType fieldInclusion
-func TestAddenda02FieldInclusionRecordType(t *testing.T) {
-	testAddenda02FieldInclusionRecordType(t)
-}
-
-// BenchmarkAddenda02FieldInclusionRecordType benchmarks validating recordType fieldInclusion
-func BenchmarkAddenda02FieldInclusionRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testAddenda02FieldInclusionRecordType(b)
 	}
 }
 

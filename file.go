@@ -239,35 +239,27 @@ type iatBatchesJSON struct {
 }
 
 func setEntryRecordType(e *EntryDetail) {
-	e.recordType = "6"
 	if e.Addenda02 != nil {
-		e.Addenda02.recordType = "7"
 		e.Addenda02.TypeCode = "02"
 	}
 	for _, a := range e.Addenda05 {
-		a.recordType = "7"
 		a.TypeCode = "05"
 	}
 	if e.Addenda98 != nil {
-		e.Addenda98.recordType = "7"
 		e.Addenda98.TypeCode = "98"
 	}
 	if e.Addenda99 != nil {
-		e.Addenda99.recordType = "7"
 		e.Addenda99.TypeCode = "99"
 	}
 	if e.Addenda99Dishonored != nil {
-		e.Addenda99Dishonored.recordType = "7"
 		e.Addenda99Dishonored.TypeCode = "99"
 	}
 	if e.Addenda99Contested != nil {
-		e.Addenda99Contested.recordType = "7"
 		e.Addenda99Contested.TypeCode = "99"
 	}
 }
 
 func setADVEntryRecordType(e *ADVEntryDetail) {
-	e.recordType = "6"
 	if e.Addenda99 == nil {
 		e.Category = CategoryForward
 	}
@@ -275,49 +267,37 @@ func setADVEntryRecordType(e *ADVEntryDetail) {
 
 func setIATEntryRecordType(e *IATEntryDetail) {
 	// these values need to be inferred from the json field names
-	e.recordType = "6"
 	if e.Addenda10 != nil {
-		e.Addenda10.recordType = "7"
 		e.Addenda10.TypeCode = "10"
 	}
 	if e.Addenda11 != nil {
-		e.Addenda11.recordType = "7"
 		e.Addenda11.TypeCode = "11"
 	}
 	if e.Addenda12 != nil {
-		e.Addenda12.recordType = "7"
 		e.Addenda12.TypeCode = "12"
 	}
 	if e.Addenda13 != nil {
-		e.Addenda13.recordType = "7"
 		e.Addenda13.TypeCode = "13"
 	}
 	if e.Addenda14 != nil {
-		e.Addenda14.recordType = "7"
 		e.Addenda14.TypeCode = "14"
 	}
 	if e.Addenda15 != nil {
-		e.Addenda15.recordType = "7"
 		e.Addenda15.TypeCode = "15"
 	}
 	if e.Addenda16 != nil {
-		e.Addenda16.recordType = "7"
 		e.Addenda16.TypeCode = "16"
 	}
 	for _, a := range e.Addenda17 {
-		a.recordType = "7"
 		a.TypeCode = "17"
 	}
 	for _, a := range e.Addenda18 {
-		a.recordType = "7"
 		a.TypeCode = "18"
 	}
 	if e.Addenda98 != nil {
-		e.Addenda98.recordType = "7"
 		e.Addenda98.TypeCode = "98"
 	}
 	if e.Addenda99 != nil {
-		e.Addenda99.recordType = "7"
 		e.Addenda99.TypeCode = "99"
 	}
 }
@@ -346,7 +326,6 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 		}
 		batch := *batches.Batches[i]
 		batch.SetID(batch.Header.ID)
-		batch.Header.recordType = batchHeaderPos
 		batch.SetValidation(f.validateOpts)
 
 		for _, e := range batch.Entries {
@@ -377,7 +356,6 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 
 		iatBatch := iatBatches.IATBatches[i]
 		iatBatch.ID = iatBatch.Header.ID
-		iatBatch.Header.recordType = "5"
 		for _, e := range iatBatch.Entries {
 			setIATEntryRecordType(e)
 		}

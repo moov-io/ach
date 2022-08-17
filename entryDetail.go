@@ -32,8 +32,6 @@ import (
 type EntryDetail struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
-	// RecordType defines the type of record in the block. 6
-	recordType string
 	// TransactionCode if the receivers account is checking, savings, general ledger (GL) or loan.
 	TransactionCode int `json:"transactionCode"`
 	// RDFIIdentification is the RDFI's routing number without the last digit.
@@ -189,8 +187,7 @@ const (
 // NewEntryDetail returns a new EntryDetail with default values for non exported fields
 func NewEntryDetail() *EntryDetail {
 	entry := &EntryDetail{
-		recordType: "6",
-		Category:   CategoryForward,
+		Category: CategoryForward,
 	}
 	return entry
 }
@@ -204,7 +201,6 @@ func (ed *EntryDetail) Parse(record string) {
 	}
 
 	// 1-1 Always "6"
-	ed.recordType = "6"
 	// 2-3 is checking credit 22 debit 27 savings credit 32 debit 37
 	ed.TransactionCode = ed.parseNumField(record[1:3])
 	// 4-11 the RDFI's routing number without the last digit.
@@ -234,7 +230,7 @@ func (ed *EntryDetail) Parse(record string) {
 func (ed *EntryDetail) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
-	buf.WriteString(ed.recordType)
+	buf.WriteString(entryDetailPos)
 	buf.WriteString(fmt.Sprintf("%v", ed.TransactionCode))
 	buf.WriteString(ed.RDFIIdentificationField())
 	buf.WriteString(ed.CheckDigit)
@@ -262,9 +258,6 @@ func (ed *EntryDetail) SetValidation(opts *ValidateOpts) {
 func (ed *EntryDetail) Validate() error {
 	if err := ed.fieldInclusion(); err != nil {
 		return err
-	}
-	if ed.recordType != "6" {
-		return fieldError("recordType", NewErrRecordType(6), ed.recordType)
 	}
 	if ed.validateOpts != nil && ed.validateOpts.CheckTransactionCode != nil {
 		if err := ed.validateOpts.CheckTransactionCode(ed.TransactionCode); err != nil {
@@ -310,9 +303,6 @@ func (ed *EntryDetail) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (ed *EntryDetail) fieldInclusion() error {
-	if ed.recordType == "" {
-		return fieldError("recordType", ErrConstructor, ed.recordType)
-	}
 	if ed.TransactionCode == 0 {
 		return fieldError("TransactionCode", ErrConstructor, strconv.Itoa(ed.TransactionCode))
 	}

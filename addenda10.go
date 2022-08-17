@@ -32,8 +32,6 @@ import (
 type Addenda10 struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
-	// RecordType defines the type of record in the block.
-	recordType string
 	// TypeCode Addenda10 types code '10'
 	TypeCode string `json:"typeCode"`
 	// Transaction Type Code Describes the type of payment:
@@ -49,8 +47,6 @@ type Addenda10 struct {
 	ForeignTraceNumber string `json:"foreignTraceNumber,omitempty"`
 	// Receiving Company Name/Individual Name
 	Name string `json:"name"`
-	// reserved - Leave blank
-	reserved string
 	// EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
 	// Detail or Corporate Entry Detail Record's trace number This number is
 	// the same as the last seven digits of the trace number of the related
@@ -65,7 +61,6 @@ type Addenda10 struct {
 // NewAddenda10 returns a new Addenda10 with default values for none exported fields
 func NewAddenda10() *Addenda10 {
 	addenda10 := new(Addenda10)
-	addenda10.recordType = "7"
 	addenda10.TypeCode = "10"
 	return addenda10
 }
@@ -78,8 +73,7 @@ func (addenda10 *Addenda10) Parse(record string) {
 		return
 	}
 
-	// 1-1 Always "7"
-	addenda10.recordType = "7"
+	// 1-1 Always 7
 	// 2-3 Always 10
 	addenda10.TypeCode = record[1:3]
 	// 04-06 Describes the type of payment
@@ -91,7 +85,6 @@ func (addenda10 *Addenda10) Parse(record string) {
 	// 47-81 Receiving Company Name/Individual Name
 	addenda10.Name = strings.TrimSpace(record[46:81])
 	// 82-87 reserved - Leave blank
-	addenda10.reserved = "      "
 	// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
 	addenda10.EntryDetailSequenceNumber = addenda10.parseNumField(record[87:94])
 }
@@ -100,14 +93,14 @@ func (addenda10 *Addenda10) Parse(record string) {
 func (addenda10 *Addenda10) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
-	buf.WriteString(addenda10.recordType)
+	buf.WriteString(entryAddendaPos)
 	buf.WriteString(addenda10.TypeCode)
 	// TransactionTypeCode Validator
 	buf.WriteString(addenda10.TransactionTypeCode)
 	buf.WriteString(addenda10.ForeignPaymentAmountField())
 	buf.WriteString(addenda10.ForeignTraceNumberField())
 	buf.WriteString(addenda10.NameField())
-	buf.WriteString(addenda10.reservedField())
+	buf.WriteString("      ")
 	buf.WriteString(addenda10.EntryDetailSequenceNumberField())
 	return buf.String()
 }
@@ -117,9 +110,6 @@ func (addenda10 *Addenda10) String() string {
 func (addenda10 *Addenda10) Validate() error {
 	if err := addenda10.fieldInclusion(); err != nil {
 		return err
-	}
-	if addenda10.recordType != "7" {
-		return fieldError("recordType", NewErrRecordType(7), addenda10.recordType)
 	}
 	if err := addenda10.isTypeCode(addenda10.TypeCode); err != nil {
 		return fieldError("TypeCode", err, addenda10.TypeCode)
@@ -144,9 +134,6 @@ func (addenda10 *Addenda10) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (addenda10 *Addenda10) fieldInclusion() error {
-	if addenda10.recordType == "" {
-		return fieldError("recordType", ErrConstructor, addenda10.recordType)
-	}
 	if addenda10.TypeCode == "" {
 		return fieldError("TypeCode", ErrConstructor, addenda10.TypeCode)
 	}
@@ -180,11 +167,6 @@ func (addenda10 *Addenda10) ForeignTraceNumberField() string {
 // NameField gets the name field - Receiving Company Name/Individual Name left padded
 func (addenda10 *Addenda10) NameField() string {
 	return addenda10.alphaField(addenda10.Name, 35)
-}
-
-// reservedField gets reserved - blank space
-func (addenda10 *Addenda10) reservedField() string {
-	return addenda10.alphaField(addenda10.reserved, 6)
 }
 
 // EntryDetailSequenceNumberField returns a zero padded EntryDetailSequenceNumber string

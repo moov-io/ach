@@ -79,9 +79,6 @@ func testParseBatchControl(t testing.TB) {
 	}
 	record := r.currentBatch.GetControl()
 
-	if record.recordType != "8" {
-		t.Errorf("RecordType Expected '8' got: %v", record.recordType)
-	}
 	if record.ServiceClassCode != DebitsOnly {
 		t.Errorf("ServiceClassCode Expected '225' got: %v", record.ServiceClassCode)
 	}
@@ -102,9 +99,6 @@ func testParseBatchControl(t testing.TB) {
 	}
 	if record.MessageAuthenticationCodeField() != "                   " {
 		t.Errorf("MessageAuthenticationCode Expected '                   ' got: %v", record.MessageAuthenticationCodeField())
-	}
-	if record.reserved != "      " {
-		t.Errorf("Reserved Expected '      ' got: %v", record.reserved)
 	}
 	if record.ODFIIdentificationField() != "07640125" {
 		t.Errorf("OdfiIdentification Expected '07640125' got: %v", record.ODFIIdentificationField())
@@ -159,29 +153,6 @@ func BenchmarkBCString(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBCString(b)
-	}
-}
-
-// testValidateBCRecordType ensure error if recordType is not 8
-func testValidateBCRecordType(t testing.TB) {
-	bc := mockBatchControl()
-	bc.recordType = "2"
-	err := bc.Validate()
-	if !base.Match(err, NewErrRecordType(7)) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestValidateBCRecordType tests ensuring an error if recordType is not 8
-func TestValidateBCRecordType(t *testing.T) {
-	testValidateBCRecordType(t)
-}
-
-// BenchmarkValidateBCRecordType benchmarks ensuring an error if recordType is not 8
-func BenchmarkValidateBCRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testValidateBCRecordType(b)
 	}
 }
 
@@ -274,29 +245,6 @@ func BenchmarkBCMessageAuthenticationCodeAlphaNumeric(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBCMessageAuthenticationCodeAlphaNumeric(b)
-	}
-}
-
-// testBCFieldInclusionRecordType verifies Record Type is included
-func testBCFieldInclusionRecordType(t testing.TB) {
-	bc := mockBatchControl()
-	bc.recordType = ""
-	err := bc.Validate()
-	if !base.Match(err, ErrConstructor) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestBCFieldInclusionRecordType tests verifying Record Type is included
-func TestBCFieldInclusionRecordType(t *testing.T) {
-	testBCFieldInclusionRecordType(t)
-}
-
-// BenchmarkBCFieldInclusionRecordType benchmarks verifying Record Type is included
-func BenchmarkBCFieldInclusionRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testBCFieldInclusionRecordType(b)
 	}
 }
 

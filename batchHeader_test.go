@@ -85,9 +85,6 @@ func testParseBatchHeader(t testing.TB) {
 	}
 	record := r.currentBatch.GetHeader()
 
-	if record.recordType != "5" {
-		t.Errorf("RecordType Expected '5' got: %v", record.recordType)
-	}
 	if record.ServiceClassCode != DebitsOnly {
 		t.Errorf("ServiceClassCode Expected '225' got: %v", record.ServiceClassCode)
 	}
@@ -164,29 +161,6 @@ func BenchmarkBHString(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBHString(b)
-	}
-}
-
-// testValidateBHRecordType validates error if recordType is not 5
-func testValidateBHRecordType(t testing.TB) {
-	bh := mockBatchHeader()
-	bh.recordType = "2"
-	err := bh.Validate()
-	if !base.Match(err, NewErrRecordType(5)) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestValidateBHRecordType tests validating error if recordType is not 5
-func TestValidateBHRecordType(t *testing.T) {
-	testValidateBHRecordType(t)
-}
-
-// BenchmarkValidateBHRecordType benchmarks validating error if recordType is not 5
-func BenchmarkValidateBHRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testValidateBHRecordType(b)
 	}
 }
 
@@ -372,29 +346,6 @@ func BenchmarkBatchCompanyEntryDescriptionAlphaNumeric(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testBatchCompanyEntryDescriptionAlphaNumeric(b)
-	}
-}
-
-// testBHFieldInclusionRecordType validates record type field inclusion
-func testBHFieldInclusionRecordType(t testing.TB) {
-	bh := mockBatchHeader()
-	bh.recordType = ""
-	err := bh.Validate()
-	if !base.Match(err, ErrConstructor) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestBHFieldInclusionRecordType tests validating record type field inclusion
-func TestBHFieldInclusionRecordType(t *testing.T) {
-	testBHFieldInclusionRecordType(t)
-}
-
-// BenchmarkBHFieldInclusionRecordType benchmarks validating record type field inclusion
-func BenchmarkBHFieldInclusionRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testBHFieldInclusionRecordType(b)
 	}
 }
 

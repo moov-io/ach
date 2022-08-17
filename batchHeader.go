@@ -33,8 +33,6 @@ import (
 type BatchHeader struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
-	// RecordType defines the type of record in the block. 5
-	recordType string
 
 	// ServiceClassCode ACH Mixed Debits and Credits '200'
 	// ACH Credits Only '220'
@@ -140,7 +138,6 @@ const (
 // NewBatchHeader returns a new BatchHeader with default values for non exported fields
 func NewBatchHeader() *BatchHeader {
 	bh := &BatchHeader{
-		recordType:           "5",
 		OriginatorStatusCode: 1, // Prepared by a financial institution
 		BatchNumber:          1,
 	}
@@ -156,7 +153,6 @@ func (bh *BatchHeader) Parse(record string) {
 	}
 
 	// 1-1 Always "5"
-	bh.recordType = "5"
 	// 2-4 MixedCreditsAnDebits (200), CreditsOnly (220), DebitsOnly (225)
 	bh.ServiceClassCode = bh.parseNumField(record[1:4])
 	// 5-20 Your company's name. This name may appear on the receivers' statements prepared by the RDFI.
@@ -196,7 +192,7 @@ func (bh *BatchHeader) Parse(record string) {
 func (bh *BatchHeader) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
-	buf.WriteString(bh.recordType)
+	buf.WriteString(batchHeaderPos)
 	buf.WriteString(fmt.Sprintf("%v", bh.ServiceClassCode))
 	buf.WriteString(bh.CompanyNameField())
 	buf.WriteString(bh.CompanyDiscretionaryDataField())
@@ -251,9 +247,6 @@ func (bh *BatchHeader) Validate() error {
 	if err := bh.fieldInclusion(); err != nil {
 		return err
 	}
-	if bh.recordType != "5" {
-		return fieldError("recordType", NewErrRecordType(5), bh.recordType)
-	}
 	if bh.validateOpts == nil || bh.validateOpts.CheckTransactionCode == nil {
 		// Ensure the ServiceClassCode follows NACHA standards if we have no TransactionCode
 		// validation overrides. Custom TransactionCode's don't allow for standard validation.
@@ -291,9 +284,6 @@ func (bh *BatchHeader) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (bh *BatchHeader) fieldInclusion() error {
-	if bh.recordType == "" {
-		return fieldError("recordType", ErrConstructor, bh.recordType)
-	}
 	if bh.ServiceClassCode == 0 {
 		return fieldError("ServiceClassCode", ErrConstructor, strconv.Itoa(bh.ServiceClassCode))
 	}

@@ -29,8 +29,6 @@ import (
 type Addenda98 struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
-	// RecordType defines the type of record in the block. entryAddendaPos 7
-	recordType string
 	// TypeCode Addenda types code '98'
 	TypeCode string `json:"typeCode"`
 	// ChangeCode field contains a standard code used by an ACH Operator or RDFI to describe the reason for a change Entry.
@@ -75,8 +73,7 @@ type ChangeCode struct {
 // NewAddenda98 returns an reference to an instantiated Addenda98 with default values
 func NewAddenda98() *Addenda98 {
 	addenda98 := &Addenda98{
-		recordType: "7",
-		TypeCode:   "98",
+		TypeCode: "98",
 	}
 	return addenda98
 }
@@ -89,8 +86,7 @@ func (addenda98 *Addenda98) Parse(record string) {
 		return
 	}
 
-	// 1-1 Always "7"
-	addenda98.recordType = "7"
+	// 1-1 Always 7
 	// 2-3 Always "98"
 	addenda98.TypeCode = record[1:3]
 	// 4-6
@@ -109,7 +105,7 @@ func (addenda98 *Addenda98) Parse(record string) {
 func (addenda98 *Addenda98) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
-	buf.WriteString(addenda98.recordType)
+	buf.WriteString(entryAddendaPos)
 	buf.WriteString(addenda98.TypeCode)
 	buf.WriteString(addenda98.ChangeCode)
 	buf.WriteString(addenda98.OriginalTraceField())
@@ -123,9 +119,6 @@ func (addenda98 *Addenda98) String() string {
 
 // Validate verifies NACHA rules for Addenda98
 func (addenda98 *Addenda98) Validate() error {
-	if addenda98.recordType != "7" {
-		return fieldError("recordType", NewErrRecordType(7), addenda98.recordType)
-	}
 	if addenda98.TypeCode == "" {
 		return fieldError("TypeCode", ErrConstructor, addenda98.TypeCode)
 	}

@@ -329,9 +329,9 @@ func BenchmarkBatchTRCAddendaCount(b *testing.B) {
 // testBatchTRCInvalidBuild validates an invalid batch build
 func testBatchTRCInvalidBuild(t testing.TB) {
 	mockBatch := mockBatchTRC()
-	mockBatch.GetHeader().recordType = "3"
+	mockBatch.GetHeader().ServiceClassCode = 3
 	err := mockBatch.Create()
-	if !base.Match(err, NewErrRecordType(5)) {
+	if !base.Match(err, ErrServiceClass) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

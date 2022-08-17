@@ -29,8 +29,6 @@ import (
 type BatchControl struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
-	// RecordType defines the type of record in the block.
-	recordType string
 	// ServiceClassCode ACH Mixed Debits and Credits '200'
 	// ACH Credits Only '220'
 	// ACH Debits Only '225'
@@ -70,8 +68,6 @@ type BatchControl struct {
 	// American National Standards Institute. The remaining eleven characters
 	// of this field are blank.
 	MessageAuthenticationCode string `json:"messageAuthentication,omitempty"`
-	// Reserved for the future - Blank, 6 characters long
-	reserved string
 	// ODFIIdentification the routing number is used to identify the DFI originating entries within a given branch.
 	ODFIIdentification string `json:"ODFIIdentification"`
 	// BatchNumber this number is assigned in ascending sequence to each batch by the ODFI
@@ -94,7 +90,6 @@ func (bc *BatchControl) Parse(record string) {
 	}
 
 	// 1-1 Always "8"
-	bc.recordType = "8"
 	// 2-4 This is the same as the "Service code" field in previous Batch Header Record
 	bc.ServiceClassCode = bc.parseNumField(record[1:4])
 	// 5-10 Total number of Entry Detail Record in the batch
@@ -111,7 +106,6 @@ func (bc *BatchControl) Parse(record string) {
 	// 55-73 Seems to always be blank
 	bc.MessageAuthenticationCode = strings.TrimSpace(record[54:73])
 	// 74-79 Always blank (just fill with spaces)
-	bc.reserved = "      "
 	// 80-87 This is the same as the "ODFI identification" field in previous Batch Header Record
 	bc.ODFIIdentification = bc.parseStringField(record[79:87])
 	// 88-94 This is the same as the "Batch number" field in previous Batch Header Record
@@ -121,7 +115,6 @@ func (bc *BatchControl) Parse(record string) {
 // NewBatchControl returns a new BatchControl with default values for none exported fields
 func NewBatchControl() *BatchControl {
 	return &BatchControl{
-		recordType:       "8",
 		ServiceClassCode: MixedDebitsAndCredits,
 		EntryHash:        1,
 		BatchNumber:      1,
@@ -132,7 +125,7 @@ func NewBatchControl() *BatchControl {
 func (bc *BatchControl) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
-	buf.WriteString(bc.recordType)
+	buf.WriteString(batchControlPos)
 	buf.WriteString(fmt.Sprintf("%v", bc.ServiceClassCode))
 	buf.WriteString(bc.EntryAddendaCountField())
 	buf.WriteString(bc.EntryHashField())
@@ -152,9 +145,6 @@ func (bc *BatchControl) Validate() error {
 	if err := bc.fieldInclusion(); err != nil {
 		return err
 	}
-	if bc.recordType != "8" {
-		return fieldError("recordType", NewErrRecordType(8), bc.recordType)
-	}
 	if err := bc.isServiceClass(bc.ServiceClassCode); err != nil {
 		return fieldError("ServiceClassCode", err, strconv.Itoa(bc.ServiceClassCode))
 	}
@@ -173,9 +163,6 @@ func (bc *BatchControl) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (bc *BatchControl) fieldInclusion() error {
-	if bc.recordType == "" {
-		return fieldError("recordType", ErrConstructor, bc.recordType)
-	}
 	if bc.ServiceClassCode == 0 {
 		return fieldError("ServiceClassCode", ErrConstructor, strconv.Itoa(bc.ServiceClassCode))
 	}

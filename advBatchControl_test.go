@@ -80,9 +80,6 @@ func testParseADVBatchControl(t testing.TB) {
 	}
 	record := r.currentBatch.GetADVControl()
 
-	if record.recordType != "8" {
-		t.Errorf("RecordType Expected '8' got: %v", record.recordType)
-	}
 	if record.ServiceClassCode != AutomatedAccountingAdvices {
 		t.Errorf("ServiceClassCode Expected '280' got: %v", record.ServiceClassCode)
 	}
@@ -158,29 +155,6 @@ func BenchmarkADVBCString(b *testing.B) {
 	}
 }
 
-// testValidateADVBCRecordType ensure error if recordType is not 8
-func testValidateADVBCRecordType(t testing.TB) {
-	bc := mockADVBatchControl()
-	bc.recordType = "2"
-	err := bc.Validate()
-	if !base.Match(err, NewErrRecordType(7)) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestValidateADVBCRecordType tests ensuring an error if recordType is not 8
-func TestValidateADVBCRecordType(t *testing.T) {
-	testValidateADVBCRecordType(t)
-}
-
-// BenchmarkValidateADVBCRecordType benchmarks ensuring an error if recordType is not 8
-func BenchmarkValidateADVBCRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testValidateBCRecordType(b)
-	}
-}
-
 // testADVisServiceClassErr verifies service class code
 func testADVBCisServiceClassErr(t testing.TB) {
 	bc := mockADVBatchControl()
@@ -247,29 +221,6 @@ func BenchmarkADVACHOperatorDataAlphaNumeric(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testADVBCACHOperatorDataAlphaNumeric(b)
-	}
-}
-
-// testADVBCFieldInclusionRecordType verifies Record Type is included
-func testADVBCFieldInclusionRecordType(t testing.TB) {
-	bc := mockADVBatchControl()
-	bc.recordType = ""
-	err := bc.Validate()
-	if !base.Match(err, ErrConstructor) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestADVBCFieldInclusionRecordType tests verifying Record Type is included
-func TestADVBCFieldInclusionRecordType(t *testing.T) {
-	testADVBCFieldInclusionRecordType(t)
-}
-
-// BenchmarkADVBCFieldInclusionRecordType benchmarks verifying Record Type is included
-func BenchmarkADVBCFieldInclusionRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testADVBCFieldInclusionRecordType(b)
 	}
 }
 

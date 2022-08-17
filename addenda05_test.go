@@ -64,9 +64,6 @@ func testParseAddenda05(t testing.TB) {
 
 	record := r.currentBatch.GetEntries()[0].Addenda05[0]
 
-	if record.recordType != "7" {
-		t.Errorf("RecordType Expected '7' got: %v", record.recordType)
-	}
 	if record.TypeCode != "05" {
 		t.Errorf("TypeCode Expected 05 got: %v", record.TypeCode)
 	}
@@ -118,24 +115,6 @@ func BenchmarkAddenda05String(b *testing.B) {
 	}
 }
 
-func TestValidateAddenda05RecordType(t *testing.T) {
-	addenda05 := mockAddenda05()
-	addenda05.recordType = "63"
-	err := addenda05.Validate()
-	if !base.Match(err, NewErrRecordType(7)) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-func TestValidateAddenda05TypeCode(t *testing.T) {
-	addenda05 := mockAddenda05()
-	addenda05.TypeCode = "23"
-	err := addenda05.Validate()
-	if !base.Match(err, ErrAddendaTypeCode) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
 func TestAddenda05FieldInclusion(t *testing.T) {
 	addenda05 := mockAddenda05()
 	addenda05.EntryDetailSequenceNumber = 0
@@ -148,15 +127,6 @@ func TestAddenda05FieldInclusion(t *testing.T) {
 func TestAddenda05FieldInclusionSequenceNumber(t *testing.T) {
 	addenda05 := mockAddenda05()
 	addenda05.SequenceNumber = 0
-	err := addenda05.Validate()
-	if !base.Match(err, ErrConstructor) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-func TestAddenda05FieldInclusionRecordType(t *testing.T) {
-	addenda05 := mockAddenda05()
-	addenda05.recordType = ""
 	err := addenda05.Validate()
 	if !base.Match(err, ErrConstructor) {
 		t.Errorf("%T: %s", err, err)

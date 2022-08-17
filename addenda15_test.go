@@ -46,9 +46,6 @@ func testAddenda15Parse(t testing.TB) {
 	line := "7159874654932139872121 Front Street                                                    0000001"
 	Addenda15.Parse(line)
 	// walk the Addenda15 struct
-	if Addenda15.recordType != "7" {
-		t.Errorf("expected %v got %v", "7", Addenda15.recordType)
-	}
 	if Addenda15.TypeCode != "15" {
 		t.Errorf("expected %v got %v", "15", Addenda15.TypeCode)
 	}
@@ -57,9 +54,6 @@ func testAddenda15Parse(t testing.TB) {
 	}
 	if Addenda15.ReceiverStreetAddress != "2121 Front Street" {
 		t.Errorf("expected: %v got: %v", "2121 Front Street", Addenda15.ReceiverStreetAddress)
-	}
-	if Addenda15.reserved != "                                  " {
-		t.Errorf("expected: %v got: %v", "                                  ", Addenda15.reserved)
 	}
 	if Addenda15.EntryDetailSequenceNumber != 0000001 {
 		t.Errorf("expected: %v got: %v", 0000001, Addenda15.EntryDetailSequenceNumber)
@@ -76,29 +70,6 @@ func BenchmarkAddenda15Parse(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testAddenda15Parse(b)
-	}
-}
-
-// testAddenda15ValidRecordType validates Addenda15 recordType
-func testAddenda15ValidRecordType(t testing.TB) {
-	addenda15 := mockAddenda15()
-	addenda15.recordType = "63"
-	err := addenda15.Validate()
-	if !base.Match(err, NewErrRecordType(7)) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestAddenda15ValidRecordType tests validating Addenda15 recordType
-func TestAddenda15ValidRecordType(t *testing.T) {
-	testAddenda15ValidRecordType(t)
-}
-
-// BenchmarkAddenda15ValidRecordType benchmarks validating Addenda15 recordType
-func BenchmarkAddenda15ValidRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testAddenda15ValidRecordType(b)
 	}
 }
 
@@ -191,29 +162,6 @@ func BenchmarkReceiverStreetAddressAlphaNumeric(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testReceiverStreetAddressAlphaNumeric(b)
-	}
-}
-
-// testAddenda15FieldInclusionRecordType validates recordType fieldInclusion
-func testAddenda15FieldInclusionRecordType(t testing.TB) {
-	addenda15 := mockAddenda15()
-	addenda15.recordType = ""
-	err := addenda15.Validate()
-	if !base.Match(err, ErrConstructor) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestAddenda15FieldInclusionRecordType tests validating recordType fieldInclusion
-func TestAddenda15FieldInclusionRecordType(t *testing.T) {
-	testAddenda15FieldInclusionRecordType(t)
-}
-
-// BenchmarkAddenda15FieldInclusionRecordType benchmarks validating recordType fieldInclusion
-func BenchmarkAddenda15FieldInclusionRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testAddenda15FieldInclusionRecordType(b)
 	}
 }
 

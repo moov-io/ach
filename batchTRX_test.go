@@ -258,16 +258,16 @@ func BenchmarkBatchTRXInvalidAddendum(b *testing.B) {
 	}
 }
 
-// testBatchTRXInvalidAddenda validates Addendum must be Addenda05 with record type 7
+// testBatchTRXInvalidAddenda validates Addendum must be Addenda05 with type code 05
 func testBatchTRXInvalidAddenda(t testing.TB) {
 	mockBatch := NewBatchTRX(mockBatchTRXHeader())
 	mockBatch.AddEntry(mockTRXEntryDetail())
 	addenda05 := mockAddenda05()
-	addenda05.recordType = "63"
+	addenda05.TypeCode = "63"
 	mockBatch.GetEntries()[0].AddAddenda05(addenda05)
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	err := mockBatch.Create()
-	if !base.Match(err, NewErrRecordType(7)) {
+	if !base.Match(err, ErrAddendaTypeCode) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -288,9 +288,9 @@ func BenchmarkBatchTRXInvalidAddenda(b *testing.B) {
 // testBatchTRXInvalidBuild validates an invalid batch build
 func testBatchTRXInvalidBuild(t testing.TB) {
 	mockBatch := mockBatchTRX()
-	mockBatch.GetHeader().recordType = "3"
+	mockBatch.GetHeader().ServiceClassCode = 3
 	err := mockBatch.Create()
-	if !base.Match(err, NewErrRecordType(5)) {
+	if !base.Match(err, ErrServiceClass) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

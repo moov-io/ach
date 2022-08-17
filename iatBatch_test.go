@@ -670,7 +670,7 @@ func BenchmarkIATBatchDebitIsBatchAmount(b *testing.B) {
 func testIATBatchFieldInclusion(t testing.TB) {
 	mockBatch := mockIATBatch(t)
 	mockBatch2 := mockIATBatch(t)
-	mockBatch2.Header.recordType = "4"
+	mockBatch2.Header.ServiceClassCode = 4
 
 	err := mockBatch.verify()
 	// no errors expected
@@ -678,11 +678,11 @@ func testIATBatchFieldInclusion(t testing.TB) {
 		t.Errorf("%T: %s", err, err)
 	}
 	err = mockBatch2.verify()
-	if !base.Match(err, NewErrRecordType(5)) {
+	if !base.Match(err, ErrServiceClass) {
 		t.Errorf("%T: %s", err, err)
 	}
 	err = mockBatch2.build()
-	if !base.Match(err, NewErrRecordType(5)) {
+	if !base.Match(err, ErrServiceClass) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -954,10 +954,10 @@ func BenchmarkIATBatchCategory(b *testing.B) {
 // testIATBatchValidateEntry validates EntryDetail
 func testIATBatchValidateEntry(t testing.TB) {
 	mockBatch := mockIATBatch(t)
-	mockBatch.GetEntries()[0].recordType = "5"
+	mockBatch.GetEntries()[0].TransactionCode = 5
 
 	err := mockBatch.verify()
-	if !base.Match(err, NewErrRecordType(6)) {
+	if !base.Match(err, ErrTransactionCode) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -1170,10 +1170,10 @@ func BenchmarkIATBatchValidateAddenda17(b *testing.B) {
 func testIATBatchCreate(t testing.TB) {
 	file := NewFile().SetHeader(mockFileHeader())
 	mockBatch := mockIATBatch(t)
-	mockBatch.GetHeader().recordType = "7"
+	mockBatch.GetHeader().ServiceClassCode = 7
 
 	err := mockBatch.Create()
-	if !base.Match(err, NewErrRecordType(5)) {
+	if !base.Match(err, ErrServiceClass) {
 		t.Errorf("%T: %s", err, err)
 	}
 
@@ -1782,7 +1782,7 @@ func TestIATBatchAddenda98RecordType(t *testing.T) {
 	mockBatch.GetEntries()[0].TransactionCode = CheckingReturnNOCCredit
 	mockBatch.GetEntries()[0].AddendaRecords = 2
 	addenda98 := mockAddenda98()
-	addenda98.recordType = "00"
+	addenda98.TypeCode = "00"
 	mockBatch.GetEntries()[0].Addenda98 = addenda98
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 
@@ -1791,7 +1791,7 @@ func TestIATBatchAddenda98RecordType(t *testing.T) {
 	}
 
 	err := mockBatch.Validate()
-	if !base.Match(err, NewErrRecordType(7)) {
+	if !base.Match(err, ErrAddendaTypeCode) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -1802,7 +1802,7 @@ func TestIATBatchAddenda99RecordType(t *testing.T) {
 	mockBatch.SetHeader(mockIATReturnBatchHeaderFF())
 	mockBatch.GetEntries()[0].AddendaRecords = 1
 	addenda99 := mockAddenda99()
-	addenda99.recordType = "00"
+	addenda99.TypeCode = "00"
 	mockBatch.GetEntries()[0].Addenda99 = addenda99
 	mockBatch.GetEntries()[0].Category = CategoryReturn
 
@@ -1811,7 +1811,7 @@ func TestIATBatchAddenda99RecordType(t *testing.T) {
 	}
 
 	err := mockBatch.Validate()
-	if !base.Match(err, NewErrRecordType(7)) {
+	if !base.Match(err, ErrAddendaTypeCode) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -1821,7 +1821,7 @@ func TestIATBatchAddenda18RecordType(t *testing.T) {
 	mockBatch := mockIATBatch(t)
 	mockBatch.SetHeader(mockIATReturnBatchHeaderFF())
 	addenda18 := mockAddenda18()
-	addenda18.recordType = "00"
+	addenda18.TypeCode = "00"
 	mockBatch.GetEntries()[0].AddAddenda18(addenda18)
 
 	if err := mockBatch.build(); err != nil {
@@ -1829,7 +1829,7 @@ func TestIATBatchAddenda18RecordType(t *testing.T) {
 	}
 
 	err := mockBatch.Validate()
-	if !base.Match(err, NewErrRecordType(7)) {
+	if !base.Match(err, ErrAddendaTypeCode) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

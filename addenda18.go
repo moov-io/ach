@@ -33,8 +33,6 @@ import (
 type Addenda18 struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
-	// RecordType defines the type of record in the block. entryAddenda18 Pos 7
-	recordType string
 	// TypeCode Addenda18 types code '18'
 	TypeCode string `json:"typeCode"`
 	// ForeignCorrespondentBankName contains the name of the Foreign Correspondent Bank
@@ -54,8 +52,6 @@ type Addenda18 struct {
 	// branch of the Foreign Correspondent Bank is located. Values can be found on the International
 	// Organization for Standardization website: www.iso.org
 	ForeignCorrespondentBankBranchCountryCode string `json:"foreignCorrespondentBankBranchCountryCode"`
-	// reserved - Leave blank
-	reserved string
 	// SequenceNumber is consecutively assigned to each Addenda18 Record following
 	// an Entry Detail Record. The first addenda18 sequence number must always
 	// be a "1".
@@ -74,7 +70,6 @@ type Addenda18 struct {
 // NewAddenda18 returns a new Addenda18 with default values for none exported fields
 func NewAddenda18() *Addenda18 {
 	addenda18 := new(Addenda18)
-	addenda18.recordType = "7"
 	addenda18.TypeCode = "18"
 	return addenda18
 }
@@ -87,8 +82,7 @@ func (addenda18 *Addenda18) Parse(record string) {
 		return
 	}
 
-	// 1-1 Always "7"
-	addenda18.recordType = "7"
+	// 1-1 Always 7
 	// 2-3 Always 18
 	addenda18.TypeCode = record[1:3]
 	// 4-83 Based on the information entered (04-38) 35 alphanumeric
@@ -103,7 +97,6 @@ func (addenda18 *Addenda18) Parse(record string) {
 	// 75-77 Based on the information entered (75-77) 3 alphanumeric
 	addenda18.ForeignCorrespondentBankBranchCountryCode = strings.TrimSpace(record[74:77])
 	// 78-83 - Blank space
-	addenda18.reserved = "      "
 	// 84-87 SequenceNumber is consecutively assigned to each Addenda18 Record following
 	// an Entry Detail Record
 	addenda18.SequenceNumber = addenda18.parseNumField(record[83:87])
@@ -115,13 +108,13 @@ func (addenda18 *Addenda18) Parse(record string) {
 func (addenda18 *Addenda18) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
-	buf.WriteString(addenda18.recordType)
+	buf.WriteString(entryAddendaPos)
 	buf.WriteString(addenda18.TypeCode)
 	buf.WriteString(addenda18.ForeignCorrespondentBankNameField())
 	buf.WriteString(addenda18.ForeignCorrespondentBankIDNumberQualifierField())
 	buf.WriteString(addenda18.ForeignCorrespondentBankIDNumberField())
 	buf.WriteString(addenda18.ForeignCorrespondentBankBranchCountryCodeField())
-	buf.WriteString(addenda18.reservedField())
+	buf.WriteString("      ")
 	buf.WriteString(addenda18.SequenceNumberField())
 	buf.WriteString(addenda18.EntryDetailSequenceNumberField())
 	return buf.String()
@@ -132,9 +125,6 @@ func (addenda18 *Addenda18) String() string {
 func (addenda18 *Addenda18) Validate() error {
 	if err := addenda18.fieldInclusion(); err != nil {
 		return err
-	}
-	if addenda18.recordType != "7" {
-		return fieldError("recordType", NewErrRecordType(7), addenda18.recordType)
 	}
 	if err := addenda18.isTypeCode(addenda18.TypeCode); err != nil {
 		return fieldError("TypeCode", err, addenda18.TypeCode)
@@ -161,9 +151,6 @@ func (addenda18 *Addenda18) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (addenda18 *Addenda18) fieldInclusion() error {
-	if addenda18.recordType == "" {
-		return fieldError("recordType", ErrConstructor, addenda18.recordType)
-	}
 	if addenda18.TypeCode == "" {
 		return fieldError("TypeCode", ErrConstructor, addenda18.TypeCode)
 	}
@@ -211,11 +198,6 @@ func (addenda18 *Addenda18) ForeignCorrespondentBankBranchCountryCodeField() str
 // SequenceNumberField returns a zero padded SequenceNumber string
 func (addenda18 *Addenda18) SequenceNumberField() string {
 	return addenda18.numericField(addenda18.SequenceNumber, 4)
-}
-
-// reservedField gets reserved - blank space
-func (addenda18 *Addenda18) reservedField() string {
-	return addenda18.alphaField(addenda18.reserved, 6)
 }
 
 // EntryDetailSequenceNumberField returns a zero padded EntryDetailSequenceNumber string

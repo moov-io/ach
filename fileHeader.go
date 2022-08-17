@@ -32,8 +32,6 @@ import (
 type FileHeader struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
-	// RecordType defines the type of record in the block. headerPos
-	recordType string
 	// PriorityCode consists of the numerals 01
 	priorityCode string
 
@@ -107,7 +105,6 @@ type FileHeader struct {
 // NewFileHeader returns a new FileHeader with default values for none exported fields
 func NewFileHeader() FileHeader {
 	fh := FileHeader{
-		recordType:     "1",
 		priorityCode:   "01",
 		FileIDModifier: "A",
 		recordSize:     "094",
@@ -126,7 +123,6 @@ func (fh *FileHeader) Parse(record string) {
 	}
 
 	// (character position 1-1) Always "1"
-	fh.recordType = "1"
 	// (2-3) Always "01"
 	fh.priorityCode = "01"
 	// (4-13) A blank space followed by your ODFI's routing number. For example: " 121140399"
@@ -166,7 +162,7 @@ func trimRoutingNumberLeadingZero(s string) string {
 func (fh *FileHeader) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
-	buf.WriteString(fh.recordType)
+	buf.WriteString(fileHeaderPos)
 	buf.WriteString(fh.priorityCode)
 	buf.WriteString(fh.ImmediateDestinationField())
 	buf.WriteString(fh.ImmediateOriginField())
@@ -206,9 +202,6 @@ func (fh *FileHeader) ValidateWith(opts *ValidateOpts) error {
 	}
 	if err := fh.fieldInclusion(); err != nil {
 		return err
-	}
-	if fh.recordType != "1" {
-		return fieldError("recordType", NewErrRecordType(1), fh.recordType)
 	}
 	if err := fh.isUpperAlphanumeric(fh.FileIDModifier); err != nil {
 		return fieldError("FileIDModifier", err, fh.FileIDModifier)
@@ -265,9 +258,6 @@ func (fh *FileHeader) ValidateWith(opts *ValidateOpts) error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (fh *FileHeader) fieldInclusion() error {
-	if fh.recordType == "" {
-		return fieldError("recordType", ErrConstructor, fh.recordType)
-	}
 	if fh.ImmediateDestination == "" {
 		return fieldError("ImmediateDestination", ErrConstructor, fh.ImmediateDestinationField())
 	}

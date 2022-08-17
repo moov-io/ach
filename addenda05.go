@@ -28,8 +28,6 @@ import (
 type Addenda05 struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
-	// RecordType defines the type of record in the block. entryAddenda05 Pos 7
-	recordType string
 	// TypeCode Addenda05 types code '05'
 	TypeCode string `json:"typeCode"`
 	// PaymentRelatedInformation
@@ -52,7 +50,6 @@ type Addenda05 struct {
 // NewAddenda05 returns a new Addenda05 with default values for none exported fields
 func NewAddenda05() *Addenda05 {
 	addenda05 := new(Addenda05)
-	addenda05.recordType = "7"
 	addenda05.TypeCode = "05"
 	return addenda05
 }
@@ -65,8 +62,7 @@ func (addenda05 *Addenda05) Parse(record string) {
 		return
 	}
 
-	// 1-1 Always "7"
-	addenda05.recordType = "7"
+	// 1-1 Always 7
 	// 2-3 Always 05
 	addenda05.TypeCode = record[1:3]
 	// 4-83 Based on the information entered (04-83) 80 alphanumeric
@@ -82,7 +78,7 @@ func (addenda05 *Addenda05) Parse(record string) {
 func (addenda05 *Addenda05) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
-	buf.WriteString(addenda05.recordType)
+	buf.WriteString(entryAddendaPos)
 	buf.WriteString(addenda05.TypeCode)
 	buf.WriteString(addenda05.PaymentRelatedInformationField())
 	buf.WriteString(addenda05.SequenceNumberField())
@@ -97,9 +93,6 @@ func (addenda05 *Addenda05) Validate() error {
 		return err
 	}
 
-	if addenda05.recordType != "7" {
-		return fieldError("recordType", NewErrRecordType(7), addenda05.recordType)
-	}
 	if err := addenda05.isTypeCode(addenda05.TypeCode); err != nil {
 		return fieldError("TypeCode", err, addenda05.TypeCode)
 	}
@@ -117,9 +110,6 @@ func (addenda05 *Addenda05) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (addenda05 *Addenda05) fieldInclusion() error {
-	if addenda05.recordType == "" {
-		return fieldError("recordType", ErrConstructor, addenda05.recordType)
-	}
 	if addenda05.TypeCode == "" {
 		return fieldError("TypeCode", ErrConstructor, addenda05.TypeCode)
 	}

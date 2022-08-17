@@ -397,9 +397,9 @@ func BenchmarkBatchRCKParseCheckSerialNumber(b *testing.B) {
 // testBatchRCKInvalidBuild validates an invalid batch build
 func testBatchRCKInvalidBuild(t testing.TB) {
 	mockBatch := mockBatchRCK()
-	mockBatch.GetHeader().recordType = "3"
+	mockBatch.GetHeader().ServiceClassCode = 3
 	err := mockBatch.Create()
-	if !base.Match(err, NewErrRecordType(5)) {
+	if !base.Match(err, ErrServiceClass) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

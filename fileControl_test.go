@@ -79,9 +79,6 @@ func testParseFileControl(t testing.TB) {
 	}
 	record := r.File.Control
 
-	if record.recordType != "9" {
-		t.Errorf("RecordType Expected '9' got: %v", record.recordType)
-	}
 	if record.BatchCountField() != "000001" {
 		t.Errorf("BatchCount Expected '000001' got: %v", record.BatchCountField())
 	}
@@ -99,9 +96,6 @@ func testParseFileControl(t testing.TB) {
 	}
 	if record.TotalCreditEntryDollarAmountInFileField() != "000000000000" {
 		t.Errorf("TotalCreditEntryDollarAmountInFile Expected '000000000000' got: %v", record.TotalCreditEntryDollarAmountInFileField())
-	}
-	if record.reserved != "                                       " {
-		t.Errorf("Reserved Expected '                                       ' got: %v", record.reserved)
 	}
 }
 
@@ -146,30 +140,6 @@ func BenchmarkFCString(b *testing.B) {
 	}
 }
 
-// testValidateFCRecordType validates error if recordType is not 9
-func testValidateFCRecordType(t testing.TB) {
-	fc := mockFileControl()
-	fc.recordType = "2"
-
-	err := fc.Validate()
-	if !base.Match(err, NewErrRecordType(9)) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestValidateFCRecordType tests validating error if recordType is not 9
-func TestValidateFCRecordType(t *testing.T) {
-	testValidateFCRecordType(t)
-}
-
-// BenchmarkValidateFCRecordType benchmarks validating error if recordType is not 9
-func BenchmarkValidateFCRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testValidateFCRecordType(b)
-	}
-}
-
 // testFCFieldInclusion validates file control field inclusion
 func testFCFieldInclusion(t testing.TB) {
 	fc := mockFileControl()
@@ -190,29 +160,6 @@ func BenchmarkFCFieldInclusion(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testFCFieldInclusion(b)
-	}
-}
-
-// testFCFieldInclusionRecordType validates file control record type field inclusion
-func testFCFieldInclusionRecordType(t testing.TB) {
-	fc := mockFileControl()
-	fc.recordType = ""
-	err := fc.Validate()
-	if !base.Match(err, ErrConstructor) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestFCFieldInclusionRecordType tests validating file control record type field inclusion
-func TestFCFieldInclusionRecordType(t *testing.T) {
-	testFCFieldInclusionRecordType(t)
-}
-
-// BenchmarkFCFieldInclusionRecordType benchmarks tests validating file control record type field inclusion
-func BenchmarkFCFieldInclusionRecordType(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testFCFieldInclusionRecordType(b)
 	}
 }
 

@@ -45,9 +45,6 @@ type IATBatchHeader struct {
 	// ID is a client defined string used as a reference to this record.
 	ID string `json:"id"`
 
-	// RecordType defines the type of record in the block. 5
-	recordType string
-
 	// ServiceClassCode ACH Mixed Debits and Credits '200'
 	// ACH Credits Only '220'
 	// ACH Debits Only '225'
@@ -180,7 +177,6 @@ const (
 // NewIATBatchHeader returns a new BatchHeader with default values for non exported fields
 func NewIATBatchHeader() *IATBatchHeader {
 	iatBh := &IATBatchHeader{
-		recordType:           "5",
 		OriginatorStatusCode: 0, //Prepared by an Originator
 		BatchNumber:          1,
 	}
@@ -196,7 +192,6 @@ func (iatBh *IATBatchHeader) Parse(record string) {
 	}
 
 	// 1-1 Always "5"
-	iatBh.recordType = "5"
 	// 2-4 MixedCreditsAnDebits (220), CReditsOnly 9220), DebitsOnly (225)"
 	iatBh.ServiceClassCode = iatBh.parseNumField(record[1:4])
 	// 05-20  Blank except for corrected IAT entries
@@ -251,7 +246,7 @@ func (iatBh *IATBatchHeader) Parse(record string) {
 func (iatBh *IATBatchHeader) String() string {
 	var buf strings.Builder
 	buf.Grow(94)
-	buf.WriteString(iatBh.recordType)
+	buf.WriteString(batchHeaderPos)
 	buf.WriteString(fmt.Sprintf("%v", iatBh.ServiceClassCode))
 	buf.WriteString(iatBh.IATIndicatorField())
 	buf.WriteString(iatBh.ForeignExchangeIndicatorField())
@@ -276,9 +271,6 @@ func (iatBh *IATBatchHeader) String() string {
 func (iatBh *IATBatchHeader) Validate() error {
 	if err := iatBh.fieldInclusion(); err != nil {
 		return err
-	}
-	if iatBh.recordType != "5" {
-		return fieldError("recordType", NewErrRecordType(5), iatBh.recordType)
 	}
 	if err := iatBh.isServiceClass(iatBh.ServiceClassCode); err != nil {
 		return fieldError("ServiceClassCode", err, strconv.Itoa(iatBh.ServiceClassCode))
@@ -313,9 +305,6 @@ func (iatBh *IATBatchHeader) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (iatBh *IATBatchHeader) fieldInclusion() error {
-	if iatBh.recordType == "" {
-		return fieldError("recordType", ErrFieldInclusion, iatBh.recordType)
-	}
 	if iatBh.ServiceClassCode == 0 {
 		return fieldError("ServiceClassCode", ErrFieldInclusion, strconv.Itoa(iatBh.ServiceClassCode))
 	}

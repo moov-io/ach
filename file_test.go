@@ -106,7 +106,7 @@ func TestFileEmptyError(t *testing.T) {
 	}
 	err := file.Validate()
 	msg := err.Error()
-	if !strings.HasPrefix(msg, "recordType") || !strings.Contains(msg, "is a mandatory field") {
+	if !strings.HasPrefix(msg, "ImmediateDestination") || !strings.Contains(msg, "is a mandatory field") {
 		t.Errorf("got %q", err)
 	}
 }
@@ -913,9 +913,9 @@ func TestFileADVBlockCount10(t *testing.T) {
 func TestFileADVControlValidate(t *testing.T) {
 	file := mockFileADV()
 
-	file.ADVControl.recordType = "22"
+	file.ADVControl.TotalDebitEntryDollarAmountInFile = -100
 	err := file.Validate()
-	if !base.Match(err, NewErrRecordType(9)) {
+	if !base.Match(err, NewErrFileCalculatedControlEquality("TotalDebitEntryDollarAmountInFile", 0, 0)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -924,9 +924,9 @@ func TestFileADVControlValidate(t *testing.T) {
 func TestFileControlValidate(t *testing.T) {
 	file := mockFilePPD()
 
-	file.Control.recordType = "22"
+	file.Control.TotalDebitEntryDollarAmountInFile = 22
 	err := file.Validate()
-	if !base.Match(err, NewErrRecordType(9)) {
+	if !base.Match(err, NewErrFileCalculatedControlEquality("TotalDebitEntryDollarAmountInFile", 0, 22)) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

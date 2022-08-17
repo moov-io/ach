@@ -388,12 +388,12 @@ func TestBatchCORTestBatchCORInvalidAddenda98(t *testing.T) {
 	mockBatch.AddEntry(mockCOREntryDetail())
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 	addenda98 := mockAddenda98()
-	addenda98.recordType = "03"
+	addenda98.TypeCode = "63"
 	mockBatch.GetEntries()[0].Addenda98 = addenda98
 
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	err := mockBatch.Create()
-	if !base.Match(err, NewErrRecordType(7)) {
+	if !base.Match(err, ErrAddendaTypeCode) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
