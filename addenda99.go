@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"fmt"
 	"strings"
 	"unicode/utf8"
 )
@@ -242,6 +243,45 @@ func (Addenda99 *Addenda99) IATAddendaInformationField() string {
 // TraceNumberField returns a zero padded TraceNumber string
 func (Addenda99 *Addenda99) TraceNumberField() string {
 	return Addenda99.stringField(Addenda99.TraceNumber, 15)
+}
+
+// format: reserved (3), return trace number (15), return settlement date (3), return reason (2), addenda (21)
+// Ref: https://www.nachaoperatingrulesonline.org/2.16334/s020
+func (Addenda99 *Addenda99) SetDishonoredAddendaInformation(
+	returnTraceNumber string,
+	returnSettlementDate string,
+	returnReasonCode string,
+	addenda string,
+) {
+	addendaInformation := fmt.Sprintf("   %s%s%s%s",
+		Addenda99.alphaField(returnTraceNumber, 15),
+		Addenda99.alphaField(returnSettlementDate, 3),
+		Addenda99.alphaField(returnReasonCode, 2),
+		Addenda99.alphaField(addenda, 21),
+	)
+	Addenda99.AddendaInformation = Addenda99.alphaField(addendaInformation, 44)
+}
+
+// Ref: https://www.nachaoperatingrulesonline.org/2.16334/s020
+func (Addenda99 *Addenda99) SetContestedAddendaInformation(
+	originalSettlementDate string,
+	returnTraceNumber string,
+	returnSettlementDate string,
+	returnReasonCode string,
+	dishonoredReturnTraceNumber string,
+	dishonoredReturnSettlementDate string,
+	dishonoredReturnReasonCode string,
+) {
+	addendaInformation := fmt.Sprintf("%s%s%s%s%s%s%s ",
+		Addenda99.alphaField(originalSettlementDate, 3),
+		Addenda99.alphaField(returnTraceNumber, 15),
+		Addenda99.alphaField(returnSettlementDate, 3),
+		Addenda99.alphaField(returnReasonCode, 2),
+		Addenda99.alphaField(dishonoredReturnTraceNumber, 15),
+		Addenda99.alphaField(dishonoredReturnSettlementDate, 3),
+		Addenda99.alphaField(dishonoredReturnReasonCode, 2),
+	)
+	Addenda99.AddendaInformation = Addenda99.alphaField(addendaInformation, 44)
 }
 
 // ReturnCodeField gives the ReturnCode struct for the given Addenda99 record
