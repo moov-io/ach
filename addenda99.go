@@ -306,6 +306,14 @@ func (Addenda99 *Addenda99) AddendaInformationExtra() string {
 	return Addenda99.AddendaInformation[23:]
 }
 
+func (Addenda99 *Addenda99) SetOriginalEntryReturnDate(date string) {
+	Addenda99.DateOfDeath = Addenda99.stringField(date, 6)
+}
+
+func (Addenda99 *Addenda99) OriginalEntryReturnDate() string {
+	return Addenda99.DateOfDeath
+}
+
 // ReturnCodeField gives the ReturnCode struct for the given Addenda99 record
 func (Addenda99 *Addenda99) ReturnCodeField() *ReturnCode {
 	code, ok := returnCodeDict[Addenda99.ReturnCode]
