@@ -662,13 +662,13 @@ func TestFilesErr__balanceFileEndpointJSON(t *testing.T) {
 	}
 }
 
-// TestFilesError__segmentFileEndpoint test an error returned from segmentFileEndpoint
-func TestFilesError__segmentFileEndpoint(t *testing.T) {
+// TestFilesError__segmentFileIDEndpoint test an error returned from segmentFileIDEndpoint
+func TestFilesError__segmentFileIDEndpoint(t *testing.T) {
 	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)
 
-	resp, err := segmentFileEndpoint(svc, repo, nil)(context.TODO(), nil)
-	r, ok := resp.(segmentFileResponse)
+	resp, err := segmentFileIDEndpoint(svc, repo, nil)(context.TODO(), nil)
+	r, ok := resp.(segmentFileIDResponse)
 	if !ok {
 		t.Errorf("got %#v", resp)
 	}
@@ -677,8 +677,8 @@ func TestFilesError__segmentFileEndpoint(t *testing.T) {
 	}
 }
 
-// TestFiles__segmentFileEndpoint tests segmentFileEndpoints
-func TestFiles__segmentFileEndpoint(t *testing.T) {
+// TestFiles__segmentFileIDEndpoint tests segmentFileIDEndpoints
+func TestFiles__segmentFileIDEndpoint(t *testing.T) {
 	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)
 	svc := NewService(repo)
@@ -709,7 +709,7 @@ func TestFiles__segmentFileEndpoint(t *testing.T) {
 		t.Errorf("bogus HTTP status: %d", w.Code)
 	}
 
-	var resp segmentFileResponse
+	var resp segmentFileIDResponse
 	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
 		t.Fatal(err)
 	}
@@ -719,13 +719,13 @@ func TestFiles__segmentFileEndpoint(t *testing.T) {
 	require.NotNil(t, resp.DebitFile)
 }
 
-// TestFiles__decodeSegmentFileRequest tests segmentFileEndpoints
-func TestFiles__decodeSegmentFileRequest(t *testing.T) {
+// TestFiles__decodeSegmentFileIDRequest tests segmentFileIDEndpoints
+func TestFiles__decodeSegmentFileIDRequest(t *testing.T) {
 	req := httptest.NewRequest("POST", "/files/segment", nil)
 	req.Header.Set("Origin", "https://moov.io")
 	req.Header.Set("X-Request-Id", "11111")
 
-	_, err := decodeSegmentFileRequest(context.TODO(), req)
+	_, err := decodeSegmentFileIDRequest(context.TODO(), req)
 
 	if !base.Match(err, ErrBadRouting) {
 		t.Errorf("%T: %s", err, err)
@@ -784,7 +784,7 @@ func TestFilesError__flattenFileEndpoint(t *testing.T) {
 
 }
 
-// TestFiles__decodeFlattenFileRequest tests segmentFileEndpoints
+// TestFiles__decodeFlattenFileRequest tests segmentFileIDEndpoints
 func TestFiles__decodeFlattenFileRequest(t *testing.T) {
 	req := httptest.NewRequest("POST", "/files/flatten", nil)
 	req.Header.Set("Origin", "https://moov.io")
@@ -1083,8 +1083,8 @@ func TestFiles__CreateFileEndpointJSONErr(t *testing.T) {
 	}
 }
 
-// TestFiles_segmentFileEndpointError tests segmentFileEndpoints
-func TestFiles__segmentFileEndpointError(t *testing.T) {
+// TestFiles_segmentFileIDEndpointError tests segmentFileIDEndpoints
+func TestFiles__segmentFileIDEndpointError(t *testing.T) {
 	logger := log.NewNopLogger()
 	repo := NewRepositoryInMemory(testTTLDuration, logger)
 	svc := NewService(repo)

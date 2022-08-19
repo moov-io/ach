@@ -591,14 +591,14 @@ func decodeBalanceFileRequest(_ context.Context, r *http.Request) (interface{}, 
 	}, nil
 }
 
-type segmentFileRequest struct {
+type segmentFileIDRequest struct {
 	fileID    string
 	requestID string
 
 	opts *ach.SegmentFileConfiguration
 }
 
-type segmentFileResponse struct {
+type segmentFileIDResponse struct {
 	CreditFileID string    `json:"creditFileID"`
 	CreditFile   *ach.File `json:"creditFile"`
 
@@ -608,11 +608,11 @@ type segmentFileResponse struct {
 	Err error `json:"error"`
 }
 
-func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.Endpoint {
+func segmentFileIDEndpoint(s Service, r Repository, logger log.Logger) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req, ok := request.(segmentFileRequest)
+		req, ok := request.(segmentFileIDRequest)
 		if !ok {
-			return segmentFileResponse{Err: ErrFoundABug}, ErrFoundABug
+			return segmentFileIDResponse{Err: ErrFoundABug}, ErrFoundABug
 		}
 
 		creditFile, debitFile, err := s.SegmentFile(req.fileID, req.opts)
@@ -629,10 +629,10 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 			}
 		}
 		if err != nil {
-			return segmentFileResponse{Err: err}, err
+			return segmentFileIDResponse{Err: err}, err
 		}
 
-		var resp segmentFileResponse
+		var resp segmentFileIDResponse
 
 		if creditFile.ID != "" {
 			err = r.StoreFile(creditFile)
@@ -664,14 +664,14 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 	}
 }
 
-func decodeSegmentFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func decodeSegmentFileIDRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	vars := mux.Vars(r)
 	fileID, ok := vars["fileID"]
 	if !ok {
 		return nil, ErrBadRouting
 	}
 
-	req := segmentFileRequest{
+	req := segmentFileIDRequest{
 		fileID:    fileID,
 		requestID: moovhttp.GetRequestID(r),
 	}
