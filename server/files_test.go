@@ -668,7 +668,7 @@ func TestFilesError__segmentFileIDEndpoint(t *testing.T) {
 	svc := NewService(repo)
 
 	resp, err := segmentFileIDEndpoint(svc, repo, nil)(context.TODO(), nil)
-	r, ok := resp.(segmentFileIDResponse)
+	r, ok := resp.(segmentedFilesResponse)
 	if !ok {
 		t.Errorf("got %#v", resp)
 	}
@@ -709,7 +709,74 @@ func TestFiles__segmentFileIDEndpoint(t *testing.T) {
 		t.Errorf("bogus HTTP status: %d", w.Code)
 	}
 
-	var resp segmentFileIDResponse
+	var resp segmentedFilesResponse
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatal(err)
+	}
+	require.NotEmpty(t, resp.CreditFileID)
+	require.NotNil(t, resp.CreditFile)
+	require.NotEmpty(t, resp.DebitFileID)
+	require.NotNil(t, resp.DebitFile)
+}
+
+func TestFiles__segmentFileEndpoint(t *testing.T) {
+	logger := log.NewNopLogger()
+	repo := NewRepositoryInMemory(testTTLDuration, logger)
+	svc := NewService(repo)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
+
+	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit.ach"))
+	require.NoError(t, err)
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", "/segment", fd)
+	req.Header.Set("Origin", "https://moov.io")
+	req.Header.Set("X-Request-Id", "222222")
+
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusOK, w.Code)
+
+	var resp segmentedFilesResponse
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatal(err)
+	}
+	require.NotEmpty(t, resp.CreditFileID)
+	require.NotNil(t, resp.CreditFile)
+	require.NotEmpty(t, resp.DebitFileID)
+	require.NotNil(t, resp.DebitFile)
+}
+
+func TestFiles__segmentFileEndpointJSON(t *testing.T) {
+	logger := log.NewNopLogger()
+	repo := NewRepositoryInMemory(testTTLDuration, logger)
+	svc := NewService(repo)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
+
+	file, err := ach.ReadFile(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit.ach"))
+	require.NoError(t, err)
+
+	var buf bytes.Buffer
+	err = json.NewEncoder(&buf).Encode(struct {
+		File *ach.File `json:"file"`
+	}{
+		File: file,
+	})
+	require.NoError(t, err)
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", "/segment", &buf)
+	req.Header.Set("Origin", "https://moov.io")
+	req.Header.Set("X-Request-Id", "222222")
+	req.Header.Set("Content-Type", "application/json")
+
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusOK, w.Code)
+
+	var resp segmentedFilesResponse
 	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
 		t.Fatal(err)
 	}
