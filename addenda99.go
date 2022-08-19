@@ -290,6 +290,22 @@ func (Addenda99 *Addenda99) SetContestedAddendaInformation(
 	Addenda99.AddendaInformation = Addenda99.alphaField(addendaInformation, 44)
 }
 
+func (Addenda99 *Addenda99) AddendaInformationReturnTraceNumber() string {
+	return Addenda99.AddendaInformation[3:18]
+}
+
+func (Addenda99 *Addenda99) AddendaInformationReturnSettlementDate() string {
+	return Addenda99.AddendaInformation[18:21]
+}
+
+func (Addenda99 *Addenda99) AddendaInformationReturnReasonCode() string {
+	return fmt.Sprintf("R%s", Addenda99.AddendaInformation[21:23])
+}
+
+func (Addenda99 *Addenda99) AddendaInformationExtra() string {
+	return Addenda99.AddendaInformation[23:]
+}
+
 // ReturnCodeField gives the ReturnCode struct for the given Addenda99 record
 func (Addenda99 *Addenda99) ReturnCodeField() *ReturnCode {
 	code, ok := returnCodeDict[Addenda99.ReturnCode]

@@ -54,6 +54,11 @@ func TestAddenda99Dishonored(t *testing.T) {
 	addenda99.SetDishonoredAddendaInformation("121145300025120", "117", "R05", "06")
 	addenda99.TraceNumber = "091000011371432"
 	require.Equal(t, line, addenda99.String())
+
+	require.Equal(t, "121145300025120", addenda99.AddendaInformationReturnTraceNumber())
+	require.Equal(t, "117", addenda99.AddendaInformationReturnSettlementDate())
+	require.Equal(t, "R05", addenda99.AddendaInformationReturnReasonCode())
+	require.Equal(t, "06                   ", addenda99.AddendaInformationExtra())
 }
 
 func TestAddenda99Dishonored__Fields(t *testing.T) {
