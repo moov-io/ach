@@ -346,9 +346,9 @@ paths:
   /files/{fileID}/segment:
     post:
       tags: ['ACH Files']
-      summary: Segment File
-      description: Split one File into two. One with only debits and one with only credits.
-      operationId: segmentFile
+      summary: Segment FileID
+      description: Split one FileID into two. One with only debits and one with only credits.
+      operationId: segmentFileID
       parameters:
         - name: X-Request-ID
           in: header
@@ -370,13 +370,13 @@ paths:
           schema:
             type: string
             example: "3f2d23ee214"
-      # requestBody:
-      #   description: Optional configuration for segmenting files
-      #   required: false
-      #   content:
-      #     application/json:
-      #       schema:
-      #         $ref: '#/components/schemas/SegmentFileConfiguration'
+      requestBody:
+        description: Optional configuration for segmenting files
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SegmentFileConfiguration'
       responses:
         '200':
           description: An ID of each new ACH file
@@ -576,6 +576,63 @@ paths:
           description: Batch deleted
         '404':
           description: Batch or File not found
+  /segment:
+    post:
+      tags: ['ACH Files']
+      summary: Segment File
+      description: Split one File into two. One with only debits and one with only credits.
+      operationId: segmentFile
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the system's logs
+          example: "rs4f9915"
+          schema:
+            type: string
+        - name: X-Idempotency-Key
+          in: header
+          description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy to not collide with each other in your requests.
+          example: "a4f88150"
+          required: false
+          schema:
+            type: string
+      requestBody:
+        description: ACH file (in Nacha or JSON formatting) along with optional segment configuration
+        required: false
+        content:
+          text/plain:
+            schema:
+              description: A plaintext ACH file
+              type: string
+              example: |
+               101 23138010401210428821906240000A094101Federal Reserve Bank   My Bank Name
+               5225Name on Account                     121042882 PPDREG.SALARY      190625   1121042880000001
+               62723138010412345678         0100000000               Receiver Account Name   0121042880000001
+               82250000010023138010000100000000000000000000121042882                          121042880000001
+               9000001000001000000010023138010000100000000000000000000
+               9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+               9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+               9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+               9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+               9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SegmentFile'
+      responses:
+        '200':
+          description: An ID of each new ACH file
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SegmentedFiles'
+        '400':
+          description: See error in response body
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+        '404':
+          description: A resource with the specified ID was not found
 
 components:
   schemas:
@@ -2211,3 +2268,11 @@ components:
           type: boolean
           default: false
           description: Allow a file to be read with unordered batch numbers.
+    SegmentFileConfiguration:
+      properties: {} # TODO: Are there any config options people need?
+    SegmentFile:
+      properties:
+        file:
+          $ref: '#/components/schemas/File'
+        opts:
+          $ref: '#/components/schemas/SegmentFileConfiguration'
