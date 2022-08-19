@@ -137,7 +137,7 @@ func (Addenda99 *Addenda99) Parse(record string) {
 			Addenda99.OriginalDFI = Addenda99.parseStringField(reset())
 		case 79:
 			// 36-79
-			Addenda99.AddendaInformation = strings.TrimSpace(reset())
+			Addenda99.AddendaInformation = reset()
 		case 94:
 			// 80-94
 			Addenda99.TraceNumber = strings.TrimSpace(reset())
