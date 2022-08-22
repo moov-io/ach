@@ -194,6 +194,12 @@ func MakeHTTPHandler(s Service, repo Repository, kitlog gokitlog.Logger) http.Ha
 		options...,
 	))
 	r.Methods("POST").Path("/files/{fileID}/segment").Handler(httptransport.NewServer(
+		segmentFileIDEndpoint(s, repo, logger),
+		decodeSegmentFileIDRequest,
+		encodeResponse,
+		options...,
+	))
+	r.Methods("POST").Path("/segment").Handler(httptransport.NewServer(
 		segmentFileEndpoint(s, repo, logger),
 		decodeSegmentFileRequest,
 		encodeResponse,

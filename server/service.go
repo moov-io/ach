@@ -51,8 +51,10 @@ type Service interface {
 	ValidateFile(id string, opts *ach.ValidateOpts) error
 	// BalanceFile will apply a given offset record to the file
 	BalanceFile(fileID string, off *ach.Offset) (*ach.File, error)
+	// SegmentFileID segments an ach file
+	SegmentFileID(id string, opts *ach.SegmentFileConfiguration) (*ach.File, *ach.File, error)
 	// SegmentFile segments an ach file
-	SegmentFile(id string, opts *ach.SegmentFileConfiguration) (*ach.File, *ach.File, error)
+	SegmentFile(file *ach.File, opts *ach.SegmentFileConfiguration) (*ach.File, *ach.File, error)
 	// FlattenBatches will minimize the ach.Batch objects in a file by consolidating EntryDetails under distinct batch headers
 	FlattenBatches(id string) (*ach.File, error)
 	// CreateBatch creates a new batch within and ach file and returns its resource ID
@@ -221,18 +223,23 @@ func (s *service) BalanceFile(fileID string, off *ach.Offset) (*ach.File, error)
 	return f, nil
 }
 
-// SegmentFile takes an ACH File and segments the files into a credit ACH File and debit ACH File and adds to in memory storage.
-func (s *service) SegmentFile(fileID string, opts *ach.SegmentFileConfiguration) (*ach.File, *ach.File, error) {
+// SegmentFileID takes an ACH FileID and segments the files into a credit ACH File and debit ACH File and adds to in memory storage.
+func (s *service) SegmentFileID(fileID string, opts *ach.SegmentFileConfiguration) (*ach.File, *ach.File, error) {
 	f, err := s.GetFile(fileID)
 	if err != nil {
 		return nil, nil, err
 	}
-	// File Create in the case a file is malformed.
-	if err := f.Create(); err != nil {
+	return s.SegmentFile(f, opts)
+}
+
+// SegmentFile takes an ACH File and segments the files into a credit ACH File and debit ACH File and adds to in memory storage.
+func (s *service) SegmentFile(file *ach.File, opts *ach.SegmentFileConfiguration) (*ach.File, *ach.File, error) {
+	// Build/tabulate file in the case it is malformed.
+	if err := file.Create(); err != nil {
 		return nil, nil, err
 	}
 
-	creditFile, debitFile, err := f.SegmentFile(opts)
+	creditFile, debitFile, err := file.SegmentFile(opts)
 	if err != nil {
 		return nil, nil, err
 	}

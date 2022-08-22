@@ -591,14 +591,14 @@ func decodeBalanceFileRequest(_ context.Context, r *http.Request) (interface{}, 
 	}, nil
 }
 
-type segmentFileRequest struct {
+type segmentFileIDRequest struct {
 	fileID    string
 	requestID string
 
 	opts *ach.SegmentFileConfiguration
 }
 
-type segmentFileResponse struct {
+type segmentedFilesResponse struct {
 	CreditFileID string    `json:"creditFileID"`
 	CreditFile   *ach.File `json:"creditFile"`
 
@@ -608,15 +608,97 @@ type segmentFileResponse struct {
 	Err error `json:"error"`
 }
 
+func segmentFileIDEndpoint(s Service, r Repository, logger log.Logger) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req, ok := request.(segmentFileIDRequest)
+		if !ok {
+			return segmentedFilesResponse{Err: ErrFoundABug}, ErrFoundABug
+		}
+
+		creditFile, debitFile, err := s.SegmentFileID(req.fileID, req.opts)
+
+		if logger != nil {
+			logger.With(log.Fields{
+				"files":     log.String("segmentFileID"),
+				"requestID": log.String(req.requestID),
+			})
+			if err != nil {
+				logger.Error().LogError(err)
+			} else {
+				logger.Info().Log("segment fileID")
+			}
+		}
+		if err != nil {
+			return segmentedFilesResponse{Err: err}, err
+		}
+
+		var resp segmentedFilesResponse
+
+		if creditFile.ID != "" {
+			err = r.StoreFile(creditFile)
+			if logger != nil && err != nil {
+				logger.With(log.Fields{
+					"files":     log.String("storeCreditFile"),
+					"requestID": log.String(req.requestID),
+				}).LogError(err)
+			}
+			resp.CreditFile = creditFile
+			resp.CreditFileID = creditFile.ID
+		}
+
+		if debitFile.ID != "" {
+			err = r.StoreFile(debitFile)
+			if logger != nil && err != nil {
+				logger.With(log.Fields{
+					"files":     log.String("storeDebitFile"),
+					"requestID": log.String(req.requestID),
+				}).LogError(err)
+			}
+			resp.DebitFile = debitFile
+			resp.DebitFileID = debitFile.ID
+		}
+
+		resp.Err = err
+
+		return resp, nil
+	}
+}
+
+func decodeSegmentFileIDRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	fileID, ok := vars["fileID"]
+	if !ok {
+		return nil, ErrBadRouting
+	}
+
+	req := segmentFileIDRequest{
+		fileID:    fileID,
+		requestID: moovhttp.GetRequestID(r),
+	}
+
+	var opts ach.SegmentFileConfiguration
+	if err := json.NewDecoder(r.Body).Decode(&opts); err == nil {
+		req.opts = &opts
+	}
+
+	return req, nil
+}
+
+type segmentFileRequest struct {
+	File      *ach.File
+	requestID string
+
+	opts *ach.SegmentFileConfiguration
+}
+
 func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req, ok := request.(segmentFileRequest)
 		if !ok {
-			return segmentFileResponse{Err: ErrFoundABug}, ErrFoundABug
+			return segmentedFilesResponse{Err: ErrFoundABug}, ErrFoundABug
 		}
 
-		creditFile, debitFile, err := s.SegmentFile(req.fileID, req.opts)
-
+		creditFile, debitFile, err := s.SegmentFile(req.File, req.opts)
 		if logger != nil {
 			logger.With(log.Fields{
 				"files":     log.String("segmentFile"),
@@ -629,10 +711,10 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 			}
 		}
 		if err != nil {
-			return segmentFileResponse{Err: err}, err
+			return segmentedFilesResponse{Err: err}, err
 		}
 
-		var resp segmentFileResponse
+		var resp segmentedFilesResponse
 
 		if creditFile.ID != "" {
 			err = r.StoreFile(creditFile)
@@ -665,23 +747,30 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 }
 
 func decodeSegmentFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	vars := mux.Vars(r)
-	fileID, ok := vars["fileID"]
-	if !ok {
-		return nil, ErrBadRouting
+	var wrapper struct {
+		File *ach.File                     `json:"file"`
+		Opts *ach.SegmentFileConfiguration `json:"opts"`
 	}
 
-	req := segmentFileRequest{
-		fileID:    fileID,
+	header := strings.ToLower(r.Header.Get("content-type"))
+	if strings.Contains(header, "application/json") {
+		err := json.NewDecoder(r.Body).Decode(&wrapper)
+		if err != nil {
+			return segmentedFilesResponse{Err: err}, err
+		}
+	} else {
+		file, err := ach.NewReader(r.Body).Read()
+		if err != nil {
+			return segmentedFilesResponse{Err: err}, err
+		}
+		wrapper.File = &file
+	}
+
+	return segmentFileRequest{
+		File:      wrapper.File,
 		requestID: moovhttp.GetRequestID(r),
-	}
-
-	var opts ach.SegmentFileConfiguration
-	if err := json.NewDecoder(r.Body).Decode(&opts); err == nil {
-		req.opts = &opts
-	}
-
-	return req, nil
+		opts:      wrapper.Opts,
+	}, nil
 }
 
 type flattenBatchesRequest struct {
