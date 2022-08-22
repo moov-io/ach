@@ -1,3 +1,7 @@
+## v1.19.1 (Released 2022-08-22)
+
+This is the same release as v1.19.0 but with deployment issues fixed.
+
 ## v1.19.0 (Released 2022-08-22)
 
 IMPROVEMENTS
