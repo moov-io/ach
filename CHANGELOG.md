@@ -1,3 +1,13 @@
+## v1.19.0 (Released 2022-08-22)
+
+IMPROVEMENTS
+
+- Remove recordType and reserved fields from all models
+- docs: update OpenAPI spec with /segment endpoint
+- feat: add endpoint to segment files without a fileID
+- feat: read fileID path parameter on creation
+- feat: return ACH file with creation, flatten, and segment endpoints
+
 ## v1.18.6 (Released 2022-08-11)
 
 IMPROVEMENTS
