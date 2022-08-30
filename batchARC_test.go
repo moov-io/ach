@@ -408,3 +408,19 @@ func TestBatchARCAddendum99Category(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
+
+// testBatchARCMixedCreditsAndDebits validates BatchARC create for valid MixedCreditsAndDebits
+func testBatchARCMixedCreditsAndDebitsBatchControlMixedDebitsAndCredits(t testing.TB) {
+	mockBatch := mockBatchARC()
+	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
+	mockBatch.Batch.Control.ServiceClassCode = MixedDebitsAndCredits
+	err := mockBatch.Validate()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestBatchARCMixedCreditsAndDebitsBatchControlMixedDebitsAndCredits tests validating BatchARC create for valid MixedCreditsAndDebits
+func TestBatchARCMixedCreditsAndDebitsBatchControlMixedDebitsAndCredits(t *testing.T) {
+	testBatchARCMixedCreditsAndDebitsBatchControlMixedDebitsAndCredits(t)
+}

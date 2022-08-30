@@ -395,3 +395,19 @@ func TestBatchBOCAddendum99(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
+
+// testBatchBOCCreditsOnly validates BatchBOC create for Valid SCC MixedDebitsAndCredits with transCode Debit
+func testBatchBOCMixedDebitsAndCreditsWithCreditTransCode(t testing.TB) {
+	mockBatch := mockBatchBOC()
+	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
+	mockBatch.Batch.Control.ServiceClassCode = MixedDebitsAndCredits
+	err := mockBatch.Validate()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestBatchBOCCreditsOnly tests validating BatchBOC create for Valid SCC MixedDebitsAndCredits with transCode Debit
+func TestMixedDebitsAndCreditsWithCreditTransCode(t *testing.T) {
+	testBatchBOCMixedDebitsAndCreditsWithCreditTransCode(t)
+}

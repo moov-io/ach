@@ -474,3 +474,18 @@ func TestBatchPOPAddendum99(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
+
+func testBatchPOPMixedDebitsAndCredits(t testing.TB) {
+	mockBatch := mockBatchPOP()
+	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
+	mockBatch.Batch.Control.ServiceClassCode = MixedDebitsAndCredits
+	err := mockBatch.Validate()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestBatchPOPMixedDebitsAndCredits tests validating BatchPOP create for MixedDebitsAndCredits with debit transaction code
+func TestBatchPOPMixedDebitsAndCredits(t *testing.T) {
+	testBatchPOPMixedDebitsAndCredits(t)
+}
