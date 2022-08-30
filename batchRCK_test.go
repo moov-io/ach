@@ -444,3 +444,19 @@ func TestBatchRCKAddendum99(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
+
+// testBatchRCKServiceClassCodeEquality validates MixedDebitsAndCredits service class code
+func testBatchRCKMixedDebitsAndCreditsServiceClassCode(t testing.TB) {
+	mockBatch := mockBatchRCK()
+	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
+	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
+	err := mockBatch.Validate()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestBatchRCKServiceClassCodeEquality tests validating MixedDebitsAndCredits service class code
+func TestBatchRCKMixedDebitsAndCreditsServiceClassCode(t *testing.T) {
+	testBatchRCKMixedDebitsAndCreditsServiceClassCode(t)
+}

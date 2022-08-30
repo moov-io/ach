@@ -425,3 +425,19 @@ func TestBatchTRCItemTypeIndicator(t *testing.T) {
 		t.Error("ItemTypeIndicator does not validate")
 	}
 }
+
+// testBatchTRCMixedDebitsAndCreditsServiceClassCodeEquality validates service class code
+func testBatchTRCMixedDebitsAndCreditsServiceClassCode(t testing.TB) {
+	mockBatch := mockBatchTRC()
+	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
+	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
+	err := mockBatch.Validate()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestBatchTRCMixedDebitsAndCreditsServiceClassCodeEquality tests validating service class code
+func TestBatchTRCMixedDebitsAndCreditsServiceClassCode(t *testing.T) {
+	testBatchTRCMixedDebitsAndCreditsServiceClassCode(t)
+}

@@ -600,3 +600,19 @@ func TestBatchTRXAddenda02(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
+
+// testBatchTRXMixedDebitsAndCreditsServiceClassCode validates MixedDebitsAndCredits service class code
+func testBatchTRXMixedDebitsAndCreditsServiceClassCode(t testing.TB) {
+	mockBatch := mockBatchTRX()
+	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
+	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
+	err := mockBatch.Validate()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestBatchTRXMixedDebitsAndCreditsServiceClassCode tests validates MixedDebitsAndCredits service class code
+func TestBatchTRXMixedDebitsAndCreditsServiceClassCode(t *testing.T) {
+	testBatchTRXMixedDebitsAndCreditsServiceClassCode(t)
+}

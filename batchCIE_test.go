@@ -437,3 +437,19 @@ func TestBatchCIEAddenda02(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
+
+// testBatchCIEServiceClassCodeEquality validates service class code MixedDebitsAndCredits
+func testBatchCIEMixedDebitsAndCreditsServiceClassCode(t testing.TB) {
+	mockBatch := mockBatchCIE()
+	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
+	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
+	err := mockBatch.Validate()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestBatchCIEMixedDebitsAndCreditsServiceClassCode tests validating SCC MixedDebitsAndCredits
+func TestBatchCIEMixedDebitsAndCreditsServiceClassCode(t *testing.T) {
+	testBatchCIEMixedDebitsAndCreditsServiceClassCode(t)
+}

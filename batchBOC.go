@@ -65,7 +65,7 @@ func (batch *BatchBOC) Validate() error {
 
 	// BOC detail entries can only be a debit, ServiceClassCode must allow debits
 	switch batch.Header.ServiceClassCode {
-	case MixedDebitsAndCredits, CreditsOnly:
+	case CreditsOnly:
 		return batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode)
 	}
 

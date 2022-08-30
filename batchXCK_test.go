@@ -423,3 +423,19 @@ func TestBatchXCKAmount(t *testing.T) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
+
+// testBatchXCKMixedDebitsAndCreditsServiceClassCode validates MixedDebitsAndCredits service class code
+func testBatchXCKMixedDebitsAndCreditsServiceClassCode(t testing.TB) {
+	mockBatch := mockBatchXCK()
+	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
+	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
+	err := mockBatch.Validate()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestBatchXCKMixedDebitsAndCreditsServiceClassCode tests validates MixedDebitsAndCredits service class code
+func TestBatchXCKMixedDebitsAndCreditsServiceClassCode(t *testing.T) {
+	testBatchXCKMixedDebitsAndCreditsServiceClassCode(t)
+}
