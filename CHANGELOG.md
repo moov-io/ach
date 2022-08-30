@@ -1,3 +1,13 @@
+## v1.19.2 (Released 2022-08-30)
+
+IMPROVEMENTS
+
+- Allow MixedDebitsAndCredits in ARC, BOC, CIE, POP, RCK, TRC, TRC, XCK entries
+
+BUILD
+
+- fix(deps): update golang.org/x/oauth2 digest to 0ebed06
+
 ## v1.19.1 (Released 2022-08-22)
 
 This is the same release as v1.19.0 but with deployment issues fixed.
