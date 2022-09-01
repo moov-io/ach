@@ -767,21 +767,16 @@ func (batch *Batch) calculateEntryHash() int {
 
 	if !batch.IsADV() {
 		for _, entry := range batch.Entries {
-
-			entryRDFI, _ := strconv.Atoi(entry.RDFIIdentification)
-
-			hash = hash + entryRDFI
+			entryRDFI, _ := strconv.Atoi(aba8(entry.RDFIIdentification))
+			hash += entryRDFI
 		}
 	} else {
 		for _, entry := range batch.ADVEntries {
-
-			entryRDFI, _ := strconv.Atoi(entry.RDFIIdentification)
-
-			hash = hash + entryRDFI
+			entryRDFI, _ := strconv.Atoi(aba8(entry.RDFIIdentification))
+			hash += entryRDFI
 		}
 	}
 
-	// This follows what is done in BatchControl.Parse
 	// EntryHash is essentially the sum of all the RDFI routing numbers in the batch. If the sum exceeds 10 digits
 	// (because you have lots of Entry Detail Records), lop off the most significant digits of the sum until there
 	// are only 10.

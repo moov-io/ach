@@ -1528,3 +1528,23 @@ func TestBatch__CompanyIdentificationMismatch(t *testing.T) {
 	}
 
 }
+
+func TestBatch_calculateEntryHash(t *testing.T) {
+	b := &Batch{}
+	b.SetHeader(mockBatchHeader())
+
+	ed1 := mockEntryDetail()
+	ed1.RDFIIdentification = "05600507"
+	b.AddEntry(ed1)
+
+	ed2 := mockEntryDetail()
+	ed2.RDFIIdentification = "05140225"
+	b.AddEntry(ed2)
+
+	ed3 := mockEntryDetail()
+	ed3.RDFIIdentification = "11400065"
+	b.AddEntry(ed3)
+
+	hash := b.calculateEntryHash()
+	require.Equal(t, 22140797, hash)
+}
