@@ -23,6 +23,8 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+
+	"github.com/stretchr/testify/require"
 )
 
 // testPPDWrite writes a PPD ACH file
@@ -52,6 +54,9 @@ func testPPDWrite(t testing.TB) {
 	if err := f.Write(file); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
+
+	// Verify we output the expected number of lines
+	require.Equal(t, 10, strings.Count(b.String(), "\n"))
 
 	r := NewReader(strings.NewReader(b.String()))
 	_, err := r.Read()
