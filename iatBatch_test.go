@@ -25,24 +25,30 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 // mockIATBatch
 func mockIATBatch(t testing.TB) IATBatch {
 	mockBatch := IATBatch{}
 	mockBatch.SetHeader(mockIATBatchHeaderFF())
-	mockBatch.AddEntry(mockIATEntryDetail())
-	mockBatch.Entries[0].Addenda10 = mockAddenda10()
-	mockBatch.Entries[0].Addenda11 = mockAddenda11()
-	mockBatch.Entries[0].Addenda12 = mockAddenda12()
-	mockBatch.Entries[0].Addenda13 = mockAddenda13()
-	mockBatch.Entries[0].Addenda14 = mockAddenda14()
-	mockBatch.Entries[0].Addenda15 = mockAddenda15()
-	mockBatch.Entries[0].Addenda16 = mockAddenda16()
+	mockBatch.AddEntry(mockIATEntryDetailWithAddendas())
 	if err := mockBatch.build(); err != nil {
 		t.Fatal(err)
 	}
 	return mockBatch
+}
+
+func mockIATEntryDetailWithAddendas() *IATEntryDetail {
+	ed := mockIATEntryDetail()
+	ed.Addenda10 = mockAddenda10()
+	ed.Addenda11 = mockAddenda11()
+	ed.Addenda12 = mockAddenda12()
+	ed.Addenda13 = mockAddenda13()
+	ed.Addenda14 = mockAddenda14()
+	ed.Addenda15 = mockAddenda15()
+	ed.Addenda16 = mockAddenda16()
+	return ed
 }
 
 // mockIATBatchManyEntries
@@ -1937,4 +1943,54 @@ func TestParseRuneCountIATBatchHeader(t *testing.T) {
 	if !base.Match(err, ErrFieldInclusion) {
 		t.Errorf("%T: %s", err, err)
 	}
+}
+
+func TestIATBatch_calculateEntryHash(t *testing.T) {
+	b := &IATBatch{}
+	b.SetHeader(mockIATBatchHeaderFF())
+
+	ed1 := mockIATEntryDetailWithAddendas()
+	ed1.RDFIIdentification = "05600507"
+	b.AddEntry(ed1)
+
+	ed2 := mockIATEntryDetailWithAddendas()
+	ed2.RDFIIdentification = "05140225"
+	b.AddEntry(ed2)
+
+	ed3 := mockIATEntryDetailWithAddendas()
+	ed3.RDFIIdentification = "11400065"
+	b.AddEntry(ed3)
+
+	require.NoError(t, b.build())
+
+	hash := b.calculateEntryHash()
+	require.Equal(t, 22140797, hash)
+}
+
+func TestDiscussion1077(t *testing.T) {
+	b := IATBatch{}
+	b.SetHeader(mockIATBatchHeaderFF())
+
+	ed1 := mockIATEntryDetailWithAddendas()
+	ed1.RDFIIdentification = "101201863"
+	b.AddEntry(ed1)
+
+	ed2 := mockIATEntryDetailWithAddendas()
+	ed2.RDFIIdentification = "274973183"
+	b.AddEntry(ed2)
+
+	ed3 := mockIATEntryDetailWithAddendas()
+	ed3.RDFIIdentification = "111900659"
+	b.AddEntry(ed3)
+
+	ed4 := mockIATEntryDetailWithAddendas()
+	ed4.RDFIIdentification = "101918101"
+	b.AddEntry(ed4)
+
+	ed5 := mockIATEntryDetailWithAddendas()
+	ed5.RDFIIdentification = "044000037"
+	b.AddEntry(ed5)
+
+	require.NoError(t, b.build())
+	require.Equal(t, 63399382, b.calculateEntryHash())
 }

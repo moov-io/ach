@@ -206,7 +206,7 @@ func (iatBatch *IATBatch) build() error {
 	bc.ODFIIdentification = iatBatch.Header.ODFIIdentification
 	bc.BatchNumber = iatBatch.Header.BatchNumber
 	bc.EntryAddendaCount = entryCount
-	bc.EntryHash = iatBatch.parseNumField(iatBatch.calculateEntryHash())
+	bc.EntryHash = iatBatch.calculateEntryHash()
 	bc.TotalCreditEntryDollarAmount, bc.TotalDebitEntryDollarAmount = iatBatch.calculateBatchAmounts()
 	iatBatch.Control = bc
 
@@ -389,7 +389,7 @@ func (iatBatch *IATBatch) isSequenceAscending() error {
 // isEntryHash validates the hash by recalculating the result
 func (iatBatch *IATBatch) isEntryHash() error {
 	hashField := iatBatch.calculateEntryHash()
-	if hashField != iatBatch.Control.EntryHashField() {
+	if hashField != iatBatch.Control.EntryHash {
 		return iatBatch.Error("EntryHash",
 			NewErrBatchCalculatedControlEquality(hashField, iatBatch.Control.EntryHash))
 	}
@@ -398,15 +398,17 @@ func (iatBatch *IATBatch) isEntryHash() error {
 
 // calculateEntryHash This field is prepared by hashing the 8-digit Routing Number in each entry.
 // The Entry Hash provides a check against inadvertent alteration of data
-func (iatBatch *IATBatch) calculateEntryHash() string {
+func (iatBatch *IATBatch) calculateEntryHash() int {
 	hash := 0
 	for _, entry := range iatBatch.Entries {
-
-		entryRDFI, _ := strconv.Atoi(entry.RDFIIdentification)
-
-		hash = hash + entryRDFI
+		entryRDFI, _ := strconv.Atoi(aba8(entry.RDFIIdentification))
+		hash += entryRDFI
 	}
-	return iatBatch.numericField(hash, 10)
+
+	// EntryHash is essentially the sum of all the RDFI routing numbers in the batch. If the sum exceeds 10 digits
+	// (because you have lots of Entry Detail Records), lop off the most significant digits of the sum until there
+	// are only 10.
+	return iatBatch.leastSignificantDigits(hash, 10)
 }
 
 // isTraceNumberODFI checks if the first 8 positions of the entry detail trace number
