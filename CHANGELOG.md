@@ -1,3 +1,13 @@
+## v1.19.3 (Released 2022-09-01)
+
+Moov ACH v1.19.3 fixes an issue where Entry Hash values were not properly calculated.
+- IATBatch hash values would not overflow properly.
+- If `RDFIIdentification` was not properly trimmed to the "ABA 8" characters.
+
+IMPROVEMENTS
+
+- fix: calculate EntryHash from ABA8, properly format string value
+
 ## v1.19.2 (Released 2022-08-30)
 
 IMPROVEMENTS
