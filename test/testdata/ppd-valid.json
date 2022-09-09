@@ -1,0 +1,67 @@
+{
+    "id": "1f707c97-da19-49d0-a3c9-49eebc042e68",
+    "fileHeader": {
+        "id": "0a0b39ed-24be-4711-9a87-662d00372e90",
+        "immediateDestination": "231380104",
+        "immediateOrigin": "121042882",
+        "fileCreationDate": "181008",
+        "fileCreationTime": "",
+        "fileIDModifier": "A",
+        "immediateDestinationName": "Citadel",
+        "immediateOriginName": "Wells Fargo"
+    },
+    "batches": [
+        {
+            "batchHeader": {
+                "id": "45f0cc00-6228-4e50-bffa-aac0e1902df7",
+                "serviceClassCode": 200,
+                "companyName": "Wells Fargo",
+                "companyIdentification": "121042882",
+                "standardEntryClassCode": "PPD",
+                "companyEntryDescription": "Trans. Des",
+                "effectiveEntryDate": "2018-10-09T00:00:00Z",
+                "ODFIIdentification": "12104288",
+                "batchNumber": 1
+            },
+            "entryDetails": [
+                {
+                    "id": "2b5ab363-762c-4459-a8cf-9573fd69029c",
+                    "transactionCode": 22,
+                    "RDFIIdentification": "23138010",
+                    "checkDigit": "4",
+                    "DFIAccountNumber": "81967038518      ",
+                    "amount": 100000,
+                    "identificationNumber": "#83738AB#      ",
+                    "individualName": "Steven Tander         ",
+                    "discretionaryData": "  ",
+                    "addendaRecordIndicator": 0,
+                    "traceNumber": "121042880000001",
+                    "category": "Forward"
+                }
+            ],
+            "batchControl": {
+                "id": "a34c8873-50a2-4315-8d98-b9f84ccccc01",
+                "serviceClassCode": 200,
+                "entryAddendaCount": 0,
+                "entryHash": 23138010,
+                "totalDebit": 0,
+                "totalCredit": 100000,
+                "companyIdentification": "121042882",
+                "ODFIIdentification": "12104288",
+                "batchNumber": 1
+            }
+        }
+    ],
+    "IATBatches": null,
+    "fileControl": {
+        "id": "1fc34982-0510-4a33-ba0b-9748ea72a254",
+        "batchCount": 1,
+        "blockCount": 1,
+        "entryAddendaCount": 0,
+        "entryHash": 23138010,
+        "totalDebit": 0,
+        "totalCredit": 100000
+    },
+    "NotificationOfChange": null,
+    "ReturnEntries": null
+}

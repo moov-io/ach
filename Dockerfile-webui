@@ -1,0 +1,19 @@
+FROM golang:1.19 as builder
+WORKDIR /go/src/github.com/moov-io/ach
+RUN apt-get update && apt-get install make gcc g++
+COPY . .
+RUN make build-webui
+
+FROM debian:stable-slim
+LABEL maintainer="Moov <oss@moov.io>"
+RUN apt-get update && apt-get install -y ca-certificates
+
+COPY --from=builder /go/src/github.com/moov-io/ach/bin/webui /bin/webui
+COPY --from=builder /go/src/github.com/moov-io/ach/cmd/webui/assets/ /assets/
+# USER moov
+
+ENV ASSETS_PATH=../assets/
+
+EXPOSE 8083
+EXPOSE 9093
+ENTRYPOINT ["/bin/webui"]

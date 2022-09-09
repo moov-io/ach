@@ -1,30 +1,35 @@
+// Licensed to The Moov Authors under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. The Moov Authors licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package ach
 
-import (
-	"fmt"
-)
-
-// BatchCCD creates a batch file that handles SEC payment type CCD amd CCD+.
+// BatchCCD is a batch file that handles SEC payment type CCD and CCD+.
 // Corporate credit or debit. Identifies an Entry initiated by an Organization to transfer funds to or from an account of that Organization or another Organization.
 // For commercial accounts only.
 type BatchCCD struct {
-	batch
+	Batch
 }
 
 // NewBatchCCD returns a *BatchCCD
-func NewBatchCCD(params ...BatchParam) *BatchCCD {
+func NewBatchCCD(bh *BatchHeader) *BatchCCD {
 	batch := new(BatchCCD)
 	batch.SetControl(NewBatchControl())
-
-	if len(params) > 0 {
-		bh := NewBatchHeader(params[0])
-		bh.StandardEntryClassCode = "CCD"
-		batch.SetHeader(bh)
-		return batch
-	}
-	bh := NewBatchHeader()
-	bh.StandardEntryClassCode = "CCD"
 	batch.SetHeader(bh)
+	batch.SetID(bh.ID)
 	return batch
 }
 
@@ -34,33 +39,39 @@ func (batch *BatchCCD) Validate() error {
 	if err := batch.verify(); err != nil {
 		return err
 	}
-	// Add configuration based validation for this type.
-	// Web can have up to one addenda per entry record
-	if err := batch.isAddendaCount(1); err != nil {
-		return err
-	}
-	if err := batch.isTypeCode("05"); err != nil {
-		return err
+
+	// Add configuration and type specific validation.
+	if batch.Header.StandardEntryClassCode != CCD {
+		return batch.Error("StandardEntryClassCode", ErrBatchSECType, CCD)
 	}
 
-	// Add type specific validation.
-	if batch.header.StandardEntryClassCode != "CCD" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.header.StandardEntryClassCode, "CCD")
-		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
+	for _, entry := range batch.Entries {
+		// CCD can have up to one Addenda05 record,
+		if len(entry.Addenda05) > 1 {
+			return batch.Error("AddendaCount", NewErrBatchAddendaCount(len(entry.Addenda05), 1))
+		}
+		// Verify the TransactionCode is valid for a ServiceClassCode
+		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {
+			return err
+		}
+		// Verify Addenda* FieldInclusion based on entry.Category and batchHeader.StandardEntryClassCode
+		if err := batch.addendaFieldInclusion(entry); err != nil {
+			return err
+		}
 	}
-
 	return nil
 }
 
-// Create builds the batch sequence numbers and batch control. Additional creation
+// Create will tabulate and assemble an ACH batch into a valid state. This includes
+// setting any posting dates, sequence numbers, counts, and sums.
+//
+// Create implementations are free to modify computable fields in a file and should
+// call the Batch's Validate function at the end of their execution.
 func (batch *BatchCCD) Create() error {
 	// generates sequence numbers and batch control
 	if err := batch.build(); err != nil {
 		return err
 	}
 
-	if err := batch.Validate(); err != nil {
-		return err
-	}
-	return nil
+	return batch.Validate()
 }

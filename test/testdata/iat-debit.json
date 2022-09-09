@@ -1,0 +1,156 @@
+{
+  "id": "iat-datetime",
+  "fileHeader": {
+    "id": "iat-datetime",
+    "immediateDestination": "121042882",
+    "immediateOrigin": "231380104",
+    "fileCreationDate": "190807",
+    "fileCreationTime": "1513",
+    "fileIDModifier": "A",
+    "immediateDestinationName": "Bank",
+    "immediateOriginName": "My Bank Name"
+  },
+  "batches": null,
+  "IATBatches": [
+    {
+      "id": "iat-datetime",
+      "IATBatchHeader": {
+        "id": "iat-datetime",
+        "serviceClassCode": 225,
+        "foreignExchangeIndicator": "FF",
+        "foreignExchangeReferenceIndicator": 3,
+        "foreignExchangeReference": "",
+        "ISODestinationCountryCode": "US",
+        "originatorIdentification": "123456789",
+        "standardEntryClassCode": "IAT",
+        "companyEntryDescription": "TRADEPAYMT",
+        "ISOOriginatingCurrencyCode": "CAD",
+        "ISODestinationCurrencyCode": "USD",
+        "effectiveEntryDate": "2019-09-23T09:14:55.794Z",
+        "ODFIIdentification": "23138010",
+        "batchNumber": 1
+      },
+      "IATEntryDetails": [
+        {
+          "id": "iat-datetime",
+          "transactionCode": 27,
+          "RDFIIdentification": "12104288",
+          "checkDigit": "2",
+          "AddendaRecords": 7,
+          "amount": 100000,
+          "DFIAccountNumber": "123456789                          ",
+          "OFACScreeningIndicator": " ",
+          "SecondaryOFACScreeningIndicator": " ",
+          "addendaRecordIndicator": 1,
+          "traceNumber": "231380100000001",
+          "addenda10": {
+            "id": "iat-datetime",
+            "typeCode": "10",
+            "transactionTypeCode": "ANN",
+            "foreignPaymentAmount": 100000,
+            "foreignTraceNumber": "928383-23938",
+            "name": "BEK Enterprises",
+            "entryDetailSequenceNumber": 1
+          },
+          "addenda11": {
+            "id": "iat-datetime",
+            "typeCode": "11",
+            "originatorName": "BEK Solutions",
+            "originatorStreetAddress": "15 West Place Street",
+            "entryDetailSequenceNumber": 1
+          },
+          "addenda12": {
+            "id": "iat-datetime",
+            "typeCode": "12",
+            "originatorCityStateProvince": "JacobsTown*PA\\",
+            "originatorCountryPostalCode": "US*19305\\",
+            "entryDetailSequenceNumber": 1
+          },
+          "addenda13": {
+            "id": "iat-datetime",
+            "typeCode": "13",
+            "ODFIName": "Wells Fargo",
+            "ODFIIDNumberQualifier": "01",
+            "ODFIIdentification": "231380104",
+            "ODFIBranchCountryCode": "US",
+            "entryDetailSequenceNumber": 1
+          },
+          "addenda14": {
+            "id": "iat-datetime",
+            "typeCode": "14",
+            "RDFIName": "Citadel Bank",
+            "RDFIIDNumberQualifier": "01",
+            "RDFIIdentification": "121042882",
+            "RDFIBranchCountryCode": "CA",
+            "entryDetailSequenceNumber": 1
+          },
+          "addenda15": {
+            "id": "iat-datetime",
+            "typeCode": "15",
+            "receiverIDNumber": "987465493213987",
+            "receiverStreetAddress": "2121 Front Street",
+            "entryDetailSequenceNumber": 1
+          },
+          "addenda16": {
+            "id": "iat-datetime",
+            "typeCode": "16",
+            "receiverCityStateProvince": "LetterTown*AB\\",
+            "receiverCountryPostalCode": "CA*80014\\",
+            "entryDetailSequenceNumber": 1
+          },
+          "addenda17": [
+            {
+              "id": "iat-datetime",
+              "typeCode": "17",
+              "paymentRelatedInformation": "This is an international payment",
+              "sequenceNumber": 1,
+              "entryDetailSequenceNumber": 1
+            }
+          ],
+          "addenda18": [
+            {
+              "id": "iat-datetime",
+              "typeCode": "18",
+              "foreignCorrespondentBankName": "Bank of France",
+              "foreignCorrespondentBankIDNumberQualifier": "01",
+              "foreignCorrespondentBankIDNumber": "456456456987987",
+              "foreignCorrespondentBankBranchCountryCode": "FR",
+              "sequenceNumber": 1,
+              "entryDetailSequenceNumber": 1
+            }
+          ]
+        }
+      ],
+      "batchControl": {
+        "id": "iat-datetime",
+        "serviceClassCode": 225,
+        "entryAddendaCount": 10,
+        "entryHash": 12104288,
+        "totalDebit": 100000,
+        "totalCredit": 0,
+        "companyIdentification": "",
+        "ODFIIdentification": "23138010",
+        "batchNumber": 1
+      }
+    }
+  ],
+  "fileControl": {
+    "id": "iat-datetime",
+    "batchCount": 1,
+    "blockCount": 2,
+    "entryAddendaCount": 10,
+    "entryHash": 12104288,
+    "totalDebit": 100000,
+    "totalCredit": 0
+  },
+  "fileADVControl": {
+    "id": "iat-datetime",
+    "batchCount": 0,
+    "entryAddendaCount": 0,
+    "entryHash": 0,
+    "totalDebit": 0,
+    "totalCredit": 0
+  },
+  "NotificationOfChange": null,
+  "ReturnEntries": null
+}

@@ -1,0 +1,68 @@
+{
+    "id": "rfc3339",
+    "fileHeader": {
+        "id": "rfc3339",
+        "immediateDestination": "231380104",
+        "immediateOrigin": "121042882",
+        "fileCreationDate": "2009-11-10T23:00:00Z",
+        "fileCreationTime": "2009-11-10T23:00:00Z",
+        "fileIDModifier": "A",
+        "immediateDestinationName": "Citadel",
+        "immediateOriginName": "Wells Fargo"
+    },
+    "batches": [
+        {
+            "batchHeader": {
+                "id": "rfc3339",
+                "serviceClassCode": 200,
+                "companyName": "Wells Fargo",
+                "companyIdentification": "121042882",
+                "standardEntryClassCode": "PPD",
+                "companyEntryDescription": "Trans. Des",
+                "companyDescriptiveDate": "2009-11-10T23:00:00Z",
+                "effectiveEntryDate": "2009-11-10T23:00:00Z",
+                "ODFIIdentification": "12104288",
+                "batchNumber": 1
+            },
+            "entryDetails": [
+                {
+                    "id": "rfc3339",
+                    "transactionCode": 22,
+                    "RDFIIdentification": "23138010",
+                    "checkDigit": "4",
+                    "DFIAccountNumber": "81967038518      ",
+                    "amount": 100000,
+                    "identificationNumber": "#83738AB#      ",
+                    "individualName": "Steven Tander         ",
+                    "discretionaryData": "  ",
+                    "addendaRecordIndicator": 0,
+                    "traceNumber": "121042880000001",
+                    "category": "Forward"
+                }
+            ],
+            "batchControl": {
+                "id": "rfc3339",
+                "serviceClassCode": 200,
+                "entryAddendaCount": 0,
+                "entryHash": 23138010,
+                "totalDebit": 0,
+                "totalCredit": 100000,
+                "companyIdentification": "121042882",
+                "ODFIIdentification": "12104288",
+                "batchNumber": 1
+            }
+        }
+    ],
+    "IATBatches": null,
+    "fileControl": {
+        "id": "rfc3339",
+        "batchCount": 1,
+        "blockCount": 1,
+        "entryAddendaCount": 0,
+        "entryHash": 23138010,
+        "totalDebit": 0,
+        "totalCredit": 100000
+    },
+    "NotificationOfChange": null,
+    "ReturnEntries": null
+}

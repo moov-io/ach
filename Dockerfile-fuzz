@@ -1,0 +1,10 @@
+FROM golang:1.19 as builder
+LABEL maintainer="Moov <oss@moov.io>"
+RUN apt-get update -qq && apt-get install -y git make
+WORKDIR /go/src/github.com/moov-io/ach
+COPY . .
+RUN go mod download && go mod vendor
+WORKDIR /go/src/github.com/moov-io/ach/test/fuzz-reader
+RUN make install
+RUN make fuzz-build
+ENTRYPOINT make fuzz-run

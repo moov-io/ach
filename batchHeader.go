@@ -1,6 +1,19 @@
-// Copyright 2017 The ACH Authors
-// Use of this source code is governed by an Apache License
-// license that can be found in the LICENSE file.
+// Licensed to The Moov Authors under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. The Moov Authors licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 package ach
 
@@ -9,9 +22,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
-
-// msgServiceClass
 
 // BatchHeader identifies the originating entity and the type of transactions
 // contained in the batch (i.e., the standard entry class, PPD for consumer, CCD
@@ -19,30 +31,36 @@ import (
 // settlement date, for all entries contained in this batch. The settlement date
 // field is not entered as it is determined by the ACH operator
 type BatchHeader struct {
-	// RecordType defines the type of record in the block. 5
-	recordType string
+	// ID is a client defined string used as a reference to this record.
+	ID string `json:"id"`
 
-	// ServiceClassCode ACH Mixed Debits and Credits ‘200’
-	// ACH Credits Only ‘220’
-	// ACH Debits Only ‘225'
-	ServiceClassCode int
+	// ServiceClassCode ACH Mixed Debits and Credits '200'
+	// ACH Credits Only '220'
+	// ACH Debits Only '225'
+	ServiceClassCode int `json:"serviceClassCode"`
 
 	// CompanyName the company originating the entries in the batch
-	CompanyName string
+	CompanyName string `json:"companyName"`
 
 	// CompanyDiscretionaryData allows Originators and/or ODFIs to include codes (one or more),
 	// of significance only to them, to enable specialized handling of all
 	// subsequent entries in that batch. There will be no standardized
 	// interpretation for the value of the field. This field must be returned
 	// intact on any return entry.
-	CompanyDiscretionaryData string
+	CompanyDiscretionaryData string `json:"companyDiscretionaryData,omitempty"`
 
 	// CompanyIdentification The 9 digit FEIN number (proceeded by a predetermined
 	// alpha or numeric character) of the entity in the company name field
-	CompanyIdentification string
+	CompanyIdentification string `json:"companyIdentification"`
 
-	// StandardEntryClassCode PPD’ for consumer transactions, ‘CCD’ or ‘CTX’ for corporate
-	StandardEntryClassCode string
+	// StandardEntryClassCode
+	// Identifies the payment type (product) found within an ACH batch-using a 3-character code.
+	// The SEC Code pertains to all items within batch.
+	// Determines format of the detail records.
+	// Determines addenda records (required or optional PLUS one or up to 9,999 records).
+	// Determines rules to follow (return time frames).
+	// Some SEC codes require specific data in predetermined fields within the ACH record
+	StandardEntryClassCode string `json:"standardEntryClassCode"`
 
 	// CompanyEntryDescription A description of the entries contained in the batch
 	//
@@ -59,96 +77,112 @@ type BatchHeader struct {
 	//
 	// This field must contain the word "NONSETTLED" (left justified) when the
 	// batch contains entries which could not settle.
-	CompanyEntryDescription string
+	CompanyEntryDescription string `json:"companyEntryDescription,omitempty"`
+	// CompanyDescriptiveDate currently, the Rules provide that the “Originator establishes this field as the date it
+	// would like to see displayed to the Receiver for descriptive purposes.” NACHA recommends that, as desired,
+	// the content of this field be formatted using the convention “SDHHMM”, where the “SD” in positions 64- 65 denotes
+	// the intent for same-day settlement, and the hours and minutes in positions 66-69 denote the desired settlement
+	// time using a 24-hour clock. When electing to use this convention, the ODFI would validate that the field
+	// contains either.
+	//
+	// ODFIs at their discretion may require their Originators to further show intent for
+	// same-day settlement using an optional, yet standardized, same-day indicator in the Company Descriptive Date
+	// field. The Company Descriptive Date field (5 record, field 8) is an optional field with 6 positions available
+	// (positions 64-69).
+	CompanyDescriptiveDate string `json:"companyDescriptiveDate,omitempty"`
 
-	// CompanyDescriptiveDate except as otherwise noted below, the Originator establishes this field
-	// as the date it would like to see displayed to the receiver for
-	// descriptive purposes. This field is never used to control timing of any
-	// computer or manual operation. It is solely for descriptive purposes.
-	// The RDFI should not assume any specific format. Examples of possible
-	// entries in this field are "011392,", "01 92," "JAN 13," "JAN 92," etc.
-	CompanyDescriptiveDate string
-
-	// EffectiveEntryDate the date on which the entries are to settle
-	EffectiveEntryDate time.Time
+	// EffectiveEntryDate the date on which the entries are to settle. Format: YYMMDD (Y=Year, M=Month, D=Day)
+	EffectiveEntryDate string `json:"effectiveEntryDate,omitempty"`
 
 	// SettlementDate Leave blank, this field is inserted by the ACH operator
-	settlementDate string
+	SettlementDate string `json:"settlementDate,omitempty"`
 
-	// OriginatorStatusCode '1'
-	OriginatorStatusCode int
+	// OriginatorStatusCode refers to the ODFI initiating the Entry.
+	// 0 ADV File prepared by an ACH Operator.
+	// 1 This code identifies the Originator as a depository financial institution.
+	// 2 This code identifies the Originator as a Federal Government entity or agency.
+	OriginatorStatusCode int `json:"originatorStatusCode,omitempty"`
 
 	//ODFIIdentification First 8 digits of the originating DFI transit routing number
-	ODFIIdentification int
+	ODFIIdentification string `json:"ODFIIdentification"`
 
 	// BatchNumber is assigned in ascending sequence to each batch by the ODFI
 	// or its Sending Point in a given file of entries. Since the batch number
 	// in the Batch Header Record and the Batch Control Record is the same,
 	// the ascending sequence number should be assigned by batch and not by
 	// record.
-	BatchNumber int
+	BatchNumber int `json:"batchNumber"`
 
 	// validator is composed for data validation
 	validator
 
 	// converters is composed for ACH to golang Converters
 	converters
+
+	validateOpts *ValidateOpts
 }
 
-// NewBatchHeader returns a new BatchHeader with default values for none exported fields
-func NewBatchHeader(params ...BatchParam) *BatchHeader {
+const (
+	// BatchHeader.ServiceClassCode and BatchControl.ServiceClassCode
+
+	// MixedDebitsAndCredits indicates a batch can have debit and credit ACH entries
+	MixedDebitsAndCredits = 200
+	// CreditsOnly indicates a batch can only have credit ACH entries
+	CreditsOnly = 220
+	// DebitsOnly indicates a batch can only have debit ACH entries
+	DebitsOnly = 225
+	// AutomatedAccountingAdvices indicates a batch can only have Automated Accounting Advices (debit and credit)
+	AutomatedAccountingAdvices = 280
+)
+
+// NewBatchHeader returns a new BatchHeader with default values for non exported fields
+func NewBatchHeader() *BatchHeader {
 	bh := &BatchHeader{
-		recordType:           "5",
-		OriginatorStatusCode: 1,
+		OriginatorStatusCode: 1, // Prepared by a financial institution
 		BatchNumber:          1,
-	}
-	if len(params) > 0 {
-		bh.ServiceClassCode = bh.parseNumField(params[0].ServiceClassCode)
-		bh.CompanyName = params[0].CompanyName
-		bh.CompanyIdentification = params[0].CompanyIdentification
-		bh.StandardEntryClassCode = params[0].StandardEntryClass
-		bh.CompanyEntryDescription = params[0].CompanyEntryDescription
-		bh.CompanyDescriptiveDate = params[0].CompanyDescriptiveDate
-		bh.EffectiveEntryDate = bh.parseSimpleDate(params[0].EffectiveEntryDate)
-		bh.ODFIIdentification = bh.parseNumField(params[0].ODFIIdentification)
-		return bh
 	}
 	return bh
 }
 
 // Parse takes the input record string and parses the BatchHeader values
+//
+// Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
 func (bh *BatchHeader) Parse(record string) {
+	if utf8.RuneCountInString(record) != 94 {
+		return
+	}
+
 	// 1-1 Always "5"
-	bh.recordType = "5"
-	// 2-4 If the entries are credits, always "220". If the entries are debits, always "225"
+	// 2-4 MixedCreditsAnDebits (200), CreditsOnly (220), DebitsOnly (225)
 	bh.ServiceClassCode = bh.parseNumField(record[1:4])
-	// 5-20 Your company's name. This name may appear on the receivers’ statements prepared by the RDFI.
+	// 5-20 Your company's name. This name may appear on the receivers' statements prepared by the RDFI.
 	bh.CompanyName = strings.TrimSpace(record[4:20])
 	// 21-40 Optional field you may use to describe the batch for internal accounting purposes
 	bh.CompanyDiscretionaryData = strings.TrimSpace(record[20:40])
 	// 41-50 A 10-digit number assigned to you by the ODFI once they approve you to
 	// originate ACH files through them. This is the same as the "Immediate origin" field in File Header Record
 	bh.CompanyIdentification = strings.TrimSpace(record[40:50])
-	// 51-53 If the entries are PPD (credits/debits towards consumer account), use "PPD".
-	// If the entries are CCD (credits/debits towards corporate account), use "CCD".
-	// The difference between the 2 class codes are outside of the scope of this post, but generally most ACH transfers to consumer bank accounts should use "PPD"
+	// 51-53 If the entries are PPD (credits/debits towards consumer account), use PPD.
+	// If the entries are CCD (credits/debits towards corporate account), use CCD.
+	// The difference between the 2 SEC codes are outside of the scope of this post.
 	bh.StandardEntryClassCode = record[50:53]
-	// 54-63 Your description of the transaction. This text will appear on the receivers’ bank statement.
+	// 54-63 Your description of the transaction. This text will appear on the receivers' bank statement.
 	// For example: "Payroll   "
 	bh.CompanyEntryDescription = strings.TrimSpace(record[53:63])
 	// 64-69 The date you choose to identify the transactions in YYMMDD format.
-	// This date may be printed on the receivers’ bank statement by the RDFI
+	// This date may be printed on the receivers' bank statement by the RDFI
 	bh.CompanyDescriptiveDate = strings.TrimSpace(record[63:69])
-	// 70-75 Date transactions are to be posted to the receivers’ account.
+	// 70-75 Date transactions are to be posted to the receivers' account.
 	// You almost always want the transaction to post as soon as possible, so put tomorrow's date in YYMMDD format
-	bh.EffectiveEntryDate = bh.parseSimpleDate(record[69:75])
-	// 76-79 Always blank (just fill with spaces)
-	bh.settlementDate = "   "
+	bh.EffectiveEntryDate = bh.validateSimpleDate(record[69:75])
+	// 76-78 Always blank if creating batches (just fill with spaces).
+	// Set to file value when parsing. Julian day format.
+	bh.SettlementDate = bh.validateSettlementDate(record[75:78])
 	// 79-79 Always 1
 	bh.OriginatorStatusCode = bh.parseNumField(record[78:79])
 	// 80-87 Your ODFI's routing number without the last digit. The last digit is simply a
 	// checksum digit, which is why it is not necessary
-	bh.ODFIIdentification = bh.parseNumField(record[79:87])
+	bh.ODFIIdentification = bh.parseStringField(record[79:87])
 	// 88-94 Sequential number of this Batch Header Record
 	// For example, put "1" if this is the first Batch Header Record in the file
 	bh.BatchNumber = bh.parseNumField(record[87:94])
@@ -156,21 +190,55 @@ func (bh *BatchHeader) Parse(record string) {
 
 // String writes the BatchHeader struct to a 94 character string.
 func (bh *BatchHeader) String() string {
-	return fmt.Sprintf("%v%v%v%v%v%v%v%v%v%v%v%v%v",
-		bh.recordType,
-		bh.ServiceClassCode,
-		bh.CompanyNameField(),
-		bh.CompanyDiscretionaryDataField(),
-		bh.CompanyIdentificationField(),
-		bh.StandardEntryClassCode,
-		bh.CompanyEntryDescriptionField(),
-		bh.CompanyDescriptiveDateField(),
-		bh.EffectiveEntryDateField(),
-		bh.settlementDateField(),
-		bh.OriginatorStatusCode,
-		bh.ODFIIdentificationField(),
-		bh.BatchNumberField(),
-	)
+	var buf strings.Builder
+	buf.Grow(94)
+	buf.WriteString(batchHeaderPos)
+	buf.WriteString(fmt.Sprintf("%v", bh.ServiceClassCode))
+	buf.WriteString(bh.CompanyNameField())
+	buf.WriteString(bh.CompanyDiscretionaryDataField())
+	buf.WriteString(bh.CompanyIdentificationField())
+	buf.WriteString(bh.StandardEntryClassCode)
+	buf.WriteString(bh.CompanyEntryDescriptionField())
+	buf.WriteString(bh.CompanyDescriptiveDateField())
+	buf.WriteString(bh.EffectiveEntryDateField())
+	buf.WriteString(bh.SettlementDateField())
+	buf.WriteString(fmt.Sprintf("%v", bh.OriginatorStatusCode))
+	buf.WriteString(bh.ODFIIdentificationField())
+	buf.WriteString(bh.BatchNumberField())
+	return buf.String()
+}
+
+// Equal returns true only if two BatchHeaders are equal.
+// Equality is determined by the Nacha defined fields of each record.
+func (bh *BatchHeader) Equal(other *BatchHeader) bool {
+	if bh.ServiceClassCode != other.ServiceClassCode {
+		return false
+	}
+	if !strings.EqualFold(bh.CompanyName, other.CompanyName) {
+		return false
+	}
+	if bh.CompanyIdentification != other.CompanyIdentification {
+		return false
+	}
+	if bh.StandardEntryClassCode != other.StandardEntryClassCode {
+		return false
+	}
+	if bh.EffectiveEntryDate != other.EffectiveEntryDate {
+		return false
+	}
+	if bh.ODFIIdentification != other.ODFIIdentification {
+		return false
+	}
+	return true
+}
+
+// SetValidation stores ValidateOpts on the BatchHeader which are to be used to override
+// the default NACHA validation rules.
+func (bh *BatchHeader) SetValidation(opts *ValidateOpts) {
+	if bh == nil {
+		return
+	}
+	bh.validateOpts = opts
 }
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
@@ -179,63 +247,61 @@ func (bh *BatchHeader) Validate() error {
 	if err := bh.fieldInclusion(); err != nil {
 		return err
 	}
-	if bh.recordType != "5" {
-		msg := fmt.Sprintf(msgRecordType, 5)
-		return &FieldError{FieldName: "recordType", Value: bh.recordType, Msg: msg}
-	}
-	if err := bh.isServiceClass(bh.ServiceClassCode); err != nil {
-		return &FieldError{FieldName: "ServiceClassCode", Value: strconv.Itoa(bh.ServiceClassCode), Msg: err.Error()}
+	if bh.validateOpts == nil || bh.validateOpts.CheckTransactionCode == nil {
+		// Ensure the ServiceClassCode follows NACHA standards if we have no TransactionCode
+		// validation overrides. Custom TransactionCode's don't allow for standard validation.
+		if err := bh.isServiceClass(bh.ServiceClassCode); err != nil {
+			return fieldError("ServiceClassCode", err, bh.ServiceClassCode)
+		}
 	}
 	if err := bh.isSECCode(bh.StandardEntryClassCode); err != nil {
-		return &FieldError{FieldName: "StandardEntryClassCode", Value: bh.StandardEntryClassCode, Msg: err.Error()}
+		return fieldError("StandardEntryClassCode", err, bh.StandardEntryClassCode)
 	}
 	if err := bh.isOriginatorStatusCode(bh.OriginatorStatusCode); err != nil {
-		return &FieldError{FieldName: "OriginatorStatusCode", Value: strconv.Itoa(bh.OriginatorStatusCode), Msg: err.Error()}
-	}
-	if err := bh.isAlphanumeric(bh.CompanyName); err != nil {
-		return &FieldError{FieldName: "CompanyName", Value: bh.CompanyName, Msg: err.Error()}
-	}
-	if err := bh.isAlphanumeric(bh.CompanyDiscretionaryData); err != nil {
-		return &FieldError{FieldName: "CompanyDiscretionaryData", Value: bh.CompanyDiscretionaryData, Msg: err.Error()}
-	}
-	if err := bh.isAlphanumeric(bh.CompanyIdentification); err != nil {
-		return &FieldError{FieldName: "CompanyIdentification", Value: bh.CompanyIdentification, Msg: err.Error()}
-	}
-	if err := bh.isAlphanumeric(bh.CompanyEntryDescription); err != nil {
-		return &FieldError{FieldName: "CompanyEntryDescription", Value: bh.CompanyEntryDescription, Msg: err.Error()}
+		return fieldError("OriginatorStatusCode", err, bh.OriginatorStatusCode)
 	}
 
+	// Originator status code 0 is used for ADV batches only
+	if bh.StandardEntryClassCode != ADV && bh.OriginatorStatusCode == 0 {
+		return fieldError("OriginatorStatusCode", ErrOrigStatusCode, bh.OriginatorStatusCode)
+	}
+
+	if err := bh.isAlphanumeric(bh.CompanyName); err != nil {
+		return fieldError("CompanyName", err, bh.CompanyName)
+	}
+	if err := bh.isAlphanumeric(bh.CompanyDiscretionaryData); err != nil {
+		return fieldError("CompanyDiscretionaryData", err, bh.CompanyDiscretionaryData)
+	}
+	if err := bh.isAlphanumeric(bh.CompanyIdentification); err != nil {
+		return fieldError("CompanyIdentification", err, bh.CompanyIdentification)
+	}
+	if err := bh.isAlphanumeric(bh.CompanyEntryDescription); err != nil {
+		return fieldError("CompanyEntryDescription", err, bh.CompanyEntryDescription)
+	}
 	return nil
 }
 
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (bh *BatchHeader) fieldInclusion() error {
-	if bh.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: bh.recordType, Msg: msgFieldInclusion}
-	}
 	if bh.ServiceClassCode == 0 {
-		return &FieldError{FieldName: "ServiceClassCode", Value: strconv.Itoa(bh.ServiceClassCode), Msg: msgFieldInclusion}
+		return fieldError("ServiceClassCode", ErrConstructor, strconv.Itoa(bh.ServiceClassCode))
 	}
 	if bh.CompanyName == "" {
-		return &FieldError{FieldName: "CompanyName", Value: bh.CompanyName, Msg: msgFieldInclusion}
+		return fieldError("CompanyName", ErrConstructor, bh.CompanyName)
 	}
 	if bh.CompanyIdentification == "" {
-		return &FieldError{FieldName: "CompanyIdentification", Value: bh.CompanyIdentification, Msg: msgFieldInclusion}
+		return fieldError("CompanyIdentification", ErrConstructor, bh.CompanyIdentification)
 	}
 	if bh.StandardEntryClassCode == "" {
-		return &FieldError{FieldName: "StandardEntryClassCode", Value: bh.StandardEntryClassCode, Msg: msgFieldInclusion}
+		return fieldError("StandardEntryClassCode", ErrConstructor, bh.StandardEntryClassCode)
 	}
 	if bh.CompanyEntryDescription == "" {
-		return &FieldError{FieldName: "CompanyEntryDescription", Value: bh.CompanyEntryDescription, Msg: msgFieldInclusion}
+		return fieldError("CompanyEntryDescription", ErrConstructor, bh.CompanyEntryDescription)
 	}
-	if bh.OriginatorStatusCode == 0 {
-		return &FieldError{FieldName: "OriginatorStatusCode", Value: strconv.Itoa(bh.OriginatorStatusCode), Msg: msgFieldInclusion}
+	if bh.ODFIIdentification == "" {
+		return fieldError("ODFIIdentification", ErrConstructor, bh.ODFIIdentificationField())
 	}
-	if bh.ODFIIdentification == 0 {
-		return &FieldError{FieldName: "ODFIIdentification", Value: bh.ODFIIdentificationField(), Msg: msgFieldInclusion}
-	}
-
 	return nil
 }
 
@@ -266,12 +332,16 @@ func (bh *BatchHeader) CompanyDescriptiveDateField() string {
 
 // EffectiveEntryDateField get the EffectiveEntryDate in YYMMDD format
 func (bh *BatchHeader) EffectiveEntryDateField() string {
-	return bh.formatSimpleDate(bh.EffectiveEntryDate)
+	// ENR records require EffectiveEntryDate to be space filled. NACHA Page OR108
+	if bh.CompanyEntryDescription == "AUTOENROLL" {
+		return bh.alphaField("", 6)
+	}
+	return bh.stringField(bh.EffectiveEntryDate, 6) // YYMMDD
 }
 
 // ODFIIdentificationField get the odfi number zero padded
 func (bh *BatchHeader) ODFIIdentificationField() string {
-	return bh.numericField(bh.ODFIIdentification, 8)
+	return bh.stringField(bh.ODFIIdentification, 8)
 }
 
 // BatchNumberField get the batch number zero padded
@@ -279,6 +349,10 @@ func (bh *BatchHeader) BatchNumberField() string {
 	return bh.numericField(bh.BatchNumber, 7)
 }
 
-func (bh *BatchHeader) settlementDateField() string {
-	return bh.alphaField(bh.settlementDate, 3)
+func (bh *BatchHeader) SettlementDateField() string {
+	return bh.alphaField(bh.SettlementDate, 3)
+}
+
+func (bh *BatchHeader) LiftEffectiveEntryDate() (time.Time, error) {
+	return time.Parse("060102", bh.EffectiveEntryDate) // YYMMDD
 }

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ACH | Moov</title>
+    <script src="./wasm_exec.js"></script>
+    <script>
+        const go = new Go();
+        WebAssembly.instantiateStreaming(fetch("./ach.wasm"), go.importObject).then((result) => {
+            go.run(result.instance);
+        });
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%;
+            font-size: 16px;
+            line-height: 1.4;
+            font-family: system-ui, sans-serif;
+            color: #333;
+        }
+        a {
+            color: #0366d6;
+        }
+        body {
+            margin: 0;
+            padding: 1rem;
+        }
+        h1 {
+            font-size: 1.5rem;
+            padding: 0;
+            margin: 0;
+            color: #121212;
+            font-weight: 600;
+        }
+        p {
+            font-size: .875rem;
+            max-width: 45rem;
+        }
+        [id="achform"] {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto 1fr auto;
+            grid-template-areas: "header header" "input output" "button output";
+            gap: 1rem;
+            height: 100%;
+        }
+        [id="contentinput"] {
+            grid-area: input;
+        }
+        [id="contentoutput"] {
+            grid-area: output;
+        }
+        header {
+            grid-area: header;
+        }
+        .logo {
+            display: inline-block;
+            width: 7.25rem;
+            height: auto;
+            fill: #121212;
+            margin-bottom: .5rem;
+        }
+        button {
+            grid-area: button;
+            appearance: none;
+            padding: .75rem;
+            font-size: 1rem;
+            font-weight: 500;
+            background-color: #121212;
+            color: #fff;
+            border-radius: .4375rem;
+            border: 0;
+        }
+        textarea {
+            resize: none;
+            font-family: system-mono, monospace;
+            border: 1px solid #ddd;
+            border-radius: .4375rem;
+            padding: 1rem;
+        }
+        :focus {
+            outline: 0;
+            border-color: hsl(210, 90%, 50%);
+            box-shadow: 0 0 0 .25rem hsla(210, 90%, 50%, 0.3);
+        }
+    </style>
+</head>
+<body>
+<form id="achform">
+    <header>
+      <span style="float:right;" id="version"></span>
+        <svg class="logo" viewBox="0 0 113 33" xmlns="http://www.w3.org/2000/svg"><title>Moov</title><path d="m30.5593 4.18774h-29.71722c-.454013 0-.8254784.36365-.8254784.8081v23.05086c0 .5455.3508294.9091.8461174.9091h8.977081c.454 0 .8255-.3636.8255-.8081v-18.18208c0-.16162.1444-.30304.3095-.30304h1.8574c.1651 0 .3095.14142.3095.30304v18.18208c0 .4445.3715.8081.8255.8081h6.3768c.454 0 .8255-.3636.8255-.8081v-18.18208c0-.16162.1445-.30304.3095-.30304h1.878c.1651 0 .3096.14142.3096.30304v18.18208c0 .4445.3714.8081.8254.8081h9.0184c.454 0 .8255-.3636.8255-.8081v-19.89928c.0619-2.42429-1.4446-4.06068-3.7766-4.06068z"/><path d="m112.055 4.18774h-9.019c-.454 0-.825.36365-.825.8081v18.18216c0 .1616-.145.303-.31.303h-1.857c-.1652 0-.3096-.1414-.3096-.303v-18.18216c0-.44445-.3715-.8081-.8255-.8081h-9.0184c-.5159 0-.8461.36365-.8461.90911v8.06075c0 .0808 0 .1616.0207.2424l2.5177 12.8487c.3095 1.5758.9905 2.7071 2.559 2.7071h13.7032c1.568 0 2.249-1.1313 2.559-2.7071l2.517-12.8487c.021-.0808.021-.1616.021-.2424v-8.06075c-.041-.54546-.392-.90911-.887-.90911z"/><path d="m56.7682 4.18774h-16.2c-2.3526 0-3.8385 1.61619-3.8385 4.06068v16.64678c0 2.4444 1.4859 4.0606 3.8385 4.0606h16.2c2.3526 0 3.8385-1.6162 3.8385-4.0606v-16.64678c0-2.42429-1.4859-4.06068-3.8385-4.06068zm-6.8515 19.01046c0 .1616-.1444.303-.3095.303h-1.8573c-.1651 0-.3096-.1414-.3096-.303v-13.23258c0-.16162.1445-.30304.3096-.30304h1.8573c.1651 0 .3095.14142.3095.30304z"/><path d="m82.9979 4.18774h-16.2c-2.3526 0-3.8384 1.61619-3.8384 4.06068v16.64678c0 2.4444 1.4858 4.0606 3.8384 4.0606h16.2c2.3527 0 3.8385-1.6162 3.8385-4.0606v-16.64678c0-2.42429-1.4858-4.06068-3.8385-4.06068zm-6.8514 19.01046c0 .1616-.1445.303-.3096.303h-1.8573c-.1651 0-.3095-.1414-.3095-.303v-13.23258c0-.16162.1444-.30304.3095-.30304h1.8573c.1651 0 .3096.14142.3096.30304z"/></svg>
+        <h1>ACH File Parser</h3>
+            <p>
+                This tool converts ACH files into their JSON definition or a human-readable format using Moov's <a href="https://github.com/moov-io/ach">ACH library</a>. Paste an ACH file on the left, in Nacha or JSON format, and the formatted version will be generated to the right.
+            </p>
+            <p>
+                For an example, try some of our <a href="https://github.com/moov-io/ach/tree/master/test/testdata">test files</a>.
+            </p>
+    </header>
+    <textarea id="contentinput" name="contentinput" cols="80" rows="40" placeholder="Paste your ACH file contents here..." required></textarea>
+    <textarea id="contentoutput" name="contentoutput" cols="80" rows="40" readonly></textarea>
+
+    <div id="buttons">
+        <label for="buttons">View above content as:</label><br>
+        <button type="submit" onclick="convertToJson(contentinput.value)">JSON</button>
+        <button type="button" onclick="convertToAch(contentinput.value)">Nacha</button>
+        <button type="button" onclick="convertToReadable(contentinput.value)">Human-Readable</button>
+        <button type="submit" onclick="clearForms()">Clear Form</button>
+    </div>
+
+    <div>
+        <label for="input-file">Specify a file:</label><br>
+        <input type="file" id="input-file">
+    </div>
+</form>
+</body>
+<script>
+    const convertToJson = function(input) {
+        contentoutput.value = parseACH(input)
+        contentoutput.setSelectionRange(0,0)
+        contentoutput.focus()
+    }
+
+    const convertToAch = function(input) {
+        contentoutput.value = parseJSON(input)
+        contentoutput.setSelectionRange(0,0)
+        contentoutput.focus()
+    }
+
+    const convertToReadable = function(input) {
+        contentoutput.value = parseReadable(input)
+        contentoutput.setSelectionRange(0,0)
+        contentoutput.focus()
+    }
+
+    const clearForms = function() {
+        contentinput.value = ""
+        contentoutput.value = ""
+        document.getElementById('input-file').value = ''
+    }
+
+    achform.addEventListener('submit', (event) => {
+        event.preventDefault();
+    })
+
+    document.getElementById('input-file')
+        .addEventListener('change', parseFromFile)
+
+    function parseFromFile(event) {
+        const input = event.target
+        if ('files' in input && input.files.length > 0) {
+            placeFileContent(
+                document.getElementById('contentoutput'),
+                input.files[0])
+        }
+    }
+
+    function placeFileContent(target, file) {
+        readFileContent(file).then(content => {
+            convertToJson(content)
+        }).catch(error => console.log(error))
+    }
+
+    function readFileContent(file) {
+        const reader = new FileReader()
+        return new Promise((resolve, reject) => {
+            reader.onload = event => resolve(event.target.result)
+            reader.onerror = error => reject(error)
+            reader.readAsText(file)
+        })
+    }
+</script>
+</html>

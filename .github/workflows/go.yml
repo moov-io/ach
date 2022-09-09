@@ -1,0 +1,51 @@
+name: Go
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: Go Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.17
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Install make (Windows)
+      if: runner.os == 'Windows'
+      run: choco install -y make mingw
+
+    - name: Check OpenAPI
+      if: runner.os == 'Linux'
+      run: make check-openapi
+
+    - name: Generate OpenAPI
+      if: runner.os == 'Linux'
+      run: |
+        go get -u golang.org/x/oauth2
+        make client
+
+    - name: Check
+      run: make check
+      env:
+        GOLANGCI_LINTERS: gosec
+
+    - name: Upload Code Coverage
+      if: runner.os == 'Linux'
+      run: bash <(curl -s https://codecov.io/bash)
+
+    - name: Docker Build
+      if: runner.os == 'Linux'
+      run: make docker && make test-integration && make clean-integration

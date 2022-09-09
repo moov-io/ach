@@ -1,53 +1,73 @@
-// Copyright 2017 The ACH Authors
-// Use of this source code is governed by an Apache License
-// license that can be found in the LICENSE file.
+// Licensed to The Moov Authors under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. The Moov Authors licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 package ach
 
 // BatchPPD holds the Batch Header and Batch Control and all Entry Records for PPD Entries
 type BatchPPD struct {
-	batch
+	Batch
 }
 
 // NewBatchPPD returns a *BatchPPD
-func NewBatchPPD(params ...BatchParam) *BatchPPD {
+func NewBatchPPD(bh *BatchHeader) *BatchPPD {
 	batch := new(BatchPPD)
 	batch.SetControl(NewBatchControl())
-
-	if len(params) > 0 {
-		bh := NewBatchHeader(params[0])
-		bh.StandardEntryClassCode = ppd
-		batch.SetHeader(bh)
-		return batch
-	}
-	bh := NewBatchHeader()
-	bh.StandardEntryClassCode = ppd
 	batch.SetHeader(bh)
+	batch.SetID(bh.ID)
 	return batch
 }
 
-// Validate checks valid NACHA batch rules. Assumes properly parsed records.
+// Validate checks properties of the ACH batch to ensure they match NACHA guidelines.
+// This includes computing checksums, totals, and sequence orderings.
+//
+// Validate will never modify the batch.
 func (batch *BatchPPD) Validate() error {
 	// basic verification of the batch before we validate specific rules.
 	if err := batch.verify(); err != nil {
 		return err
 	}
-	// Add configuration based validation for this type.
+	// Add configuration and type specific validation for this type.
 
-	// Batch can have one addenda per entry record
-	if err := batch.isAddendaCount(1); err != nil {
-		return err
-	}
-	if err := batch.isTypeCode("05"); err != nil {
-		return err
+	if batch.Header.StandardEntryClassCode != PPD {
+		return batch.Error("StandardEntryClassCode", ErrBatchSECType, PPD)
 	}
 
-	// Add type specific validation.
-	// ...
+	for _, entry := range batch.Entries {
+		// PPD can have up to one Addenda05 record
+		if len(entry.Addenda05) > 1 {
+			return batch.Error("AddendaCount", NewErrBatchAddendaCount(len(entry.Addenda05), 1))
+		}
+		// Verify the TransactionCode is valid for a ServiceClassCode
+		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {
+			return err
+		}
+		// Verify Addenda* FieldInclusion based on entry.Category and batchHeader.StandardEntryClassCode
+		if err := batch.addendaFieldInclusion(entry); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
-// Create takes Batch Header and Entries and builds a valid batch
+// Create will tabulate and assemble an ACH batch into a valid state. This includes
+// setting any posting dates, sequence numbers, counts, and sums.
+//
+// Create implementations are free to modify computable fields in a file and should
+// call the Batch's Validate function at the end of their execution.
 func (batch *BatchPPD) Create() error {
 	// generates sequence numbers and batch control
 	if err := batch.build(); err != nil {
@@ -56,8 +76,5 @@ func (batch *BatchPPD) Create() error {
 	// Additional steps specific to batch type
 	// ...
 
-	if err := batch.Validate(); err != nil {
-		return err
-	}
-	return nil
+	return batch.Validate()
 }

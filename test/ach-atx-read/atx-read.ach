@@ -1,0 +1,10 @@
+101 031300012 2313801041810290000A094101Federal Reserve Bank   My Bank Name                   
+5220Name on Account                     231380104 ATXVndr Pay        181030   1231380100000001
+624031300012744-5678-99      00000000000313000100000010002Receiver Company  011231380100000001
+705Credit account 1 for service                                                    00010000001
+705Credit account 2 for service                                                    00020000001
+624031300012744-5678-99      00000000000313000100000020002Receiver Company  011231380100000002
+705Credit account 1 for leadership                                                 00010000002
+705Credit account 2 for leadership                                                 00020000002
+82200000060006260002000000000000000000000000231380104                          231380100000001
+9000001000001000000060006260002000000000000000000000000                                       

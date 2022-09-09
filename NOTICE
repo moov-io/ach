@@ -1,0 +1,17 @@
+ach
+Copyright 2018-2020 The Moov Authors
+
+This product includes software developed at The Moov Authors and
+third-party software developed by the licenses listed below.
+
+=========================================================================
+
+github.com/moov-io/base                Apache-2.0
+github.com/prometheus/client_golang    Apache-2.0
+github.com/gorilla/mux                 BSD-3-Clause
+github.com/rickar/cal                  BSD-3-Clause
+github.com/vividcortex/gohistogram     MIT
+github.com/go-kit/kit                  MIT
+github.com/hashicorp/golang-lru        MPL-2.0
+
+=========================================================================

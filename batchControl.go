@@ -1,6 +1,19 @@
-// Copyright 2017 The ACH Authors
-// Use of this source code is governed by an Apache License
-// license that can be found in the LICENSE file.
+// Licensed to The Moov Authors under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. The Moov Authors licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 package ach
 
@@ -8,60 +21,60 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 // BatchControl contains entry counts, dollar total and has totals for all
 // entries contained in the preceding batch
 type BatchControl struct {
-	// RecordType defines the type of record in the block. batchControlPos 8
-	recordType string
-	// ServiceClassCode ACH Mixed Debits and Credits ‘200’
-	// ACH Credits Only ‘220’
-	// ACH Debits Only ‘225'
+	// ID is a client defined string used as a reference to this record.
+	ID string `json:"id"`
+	// ServiceClassCode ACH Mixed Debits and Credits '200'
+	// ACH Credits Only '220'
+	// ACH Debits Only '225'
+	// Constants: MixedCreditsAnDebits (220), CReditsOnly 9220), DebitsOnly (225)
 	// Same as 'ServiceClassCode' in BatchHeaderRecord
-	ServiceClassCode int
+	ServiceClassCode int `json:"serviceClassCode"`
 	// EntryAddendaCount is a tally of each Entry Detail Record and each Addenda
 	// Record processed, within either the batch or file as appropriate.
-	EntryAddendaCount int
+	EntryAddendaCount int `json:"entryAddendaCount"`
 	// validate the Receiving DFI Identification in each Entry Detail Record is hashed
 	// to provide a check against inadvertent alteration of data contents due
-	// to hardware failure or program erro
+	// to hardware failure or program error
 	//
 	// In this context the Entry Hash is the sum of the corresponding fields in the
 	// Entry Detail Records on the file.
-	EntryHash int
+	EntryHash int `json:"entryHash"`
 	// TotalDebitEntryDollarAmount Contains accumulated Entry debit totals within the batch.
-	TotalDebitEntryDollarAmount int
+	TotalDebitEntryDollarAmount int `json:"totalDebit"`
 	// TotalCreditEntryDollarAmount Contains accumulated Entry credit totals within the batch.
-	TotalCreditEntryDollarAmount int
-	// CompanyIdentification is an alphameric code used to identify an Originato
+	TotalCreditEntryDollarAmount int `json:"totalCredit"`
+	// CompanyIdentification is an alphanumeric code used to identify an Originator
 	// The Company Identification Field must be included on all
-	// prenotification records and on each entry initiated puruant to such
+	// prenotification records and on each entry initiated pursuant to such
 	// prenotification. The Company ID may begin with the ANSI one-digit
-	// Identification Code Designators (ICD), followed by the identification
-	// numbe The ANSI Identification Numbers and related Identification Code
-	// Designators (ICD) are:
+	// Identification Code Designator (ICD), followed by the identification
+	// number The ANSI Identification Numbers and related Identification Code
+	// Designator (ICD) are:
 	//
 	// IRS Employer Identification Number (EIN) "1"
 	// Data Universal Numbering Systems (DUNS) "3"
 	// User Assigned Number "9"
-	CompanyIdentification string
+	CompanyIdentification string `json:"companyIdentification"`
 	// MessageAuthenticationCode the MAC is an eight character code derived from a special key used in
 	// conjunction with the DES algorithm. The purpose of the MAC is to
 	// validate the authenticity of ACH entries. The DES algorithm and key
 	// message standards must be in accordance with standards adopted by the
 	// American National Standards Institute. The remaining eleven characters
 	// of this field are blank.
-	MessageAuthenticationCode string
-	// Reserved for the future - Blank, 6 characters long
-	reserved string
-	// OdfiIdentification the routing number is used to identify the DFI originating entries within a given branch.
-	ODFIIdentification int
+	MessageAuthenticationCode string `json:"messageAuthentication,omitempty"`
+	// ODFIIdentification the routing number is used to identify the DFI originating entries within a given branch.
+	ODFIIdentification string `json:"ODFIIdentification"`
 	// BatchNumber this number is assigned in ascending sequence to each batch by the ODFI
 	// or its Sending Point in a given file of entries. Since the batch number
 	// in the Batch Header Record and the Batch Control Record is the same,
 	// the ascending sequence number should be assigned by batch and not by record.
-	BatchNumber int
+	BatchNumber int `json:"batchNumber"`
 	// validator is composed for data validation
 	validator
 	// converters is composed for ACH to golang Converters
@@ -69,9 +82,14 @@ type BatchControl struct {
 }
 
 // Parse takes the input record string and parses the EntryDetail values
+//
+// Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
 func (bc *BatchControl) Parse(record string) {
+	if utf8.RuneCountInString(record) != 94 {
+		return
+	}
+
 	// 1-1 Always "8"
-	bc.recordType = "8"
 	// 2-4 This is the same as the "Service code" field in previous Batch Header Record
 	bc.ServiceClassCode = bc.parseNumField(record[1:4])
 	// 5-10 Total number of Entry Detail Record in the batch
@@ -88,9 +106,8 @@ func (bc *BatchControl) Parse(record string) {
 	// 55-73 Seems to always be blank
 	bc.MessageAuthenticationCode = strings.TrimSpace(record[54:73])
 	// 74-79 Always blank (just fill with spaces)
-	bc.reserved = "      "
 	// 80-87 This is the same as the "ODFI identification" field in previous Batch Header Record
-	bc.ODFIIdentification = bc.parseNumField(record[79:87])
+	bc.ODFIIdentification = bc.parseStringField(record[79:87])
 	// 88-94 This is the same as the "Batch number" field in previous Batch Header Record
 	bc.BatchNumber = bc.parseNumField(record[87:94])
 }
@@ -98,27 +115,28 @@ func (bc *BatchControl) Parse(record string) {
 // NewBatchControl returns a new BatchControl with default values for none exported fields
 func NewBatchControl() *BatchControl {
 	return &BatchControl{
-		recordType:  "8",
-		EntryHash:   1,
-		BatchNumber: 1,
+		ServiceClassCode: MixedDebitsAndCredits,
+		EntryHash:        1,
+		BatchNumber:      1,
 	}
 }
 
 // String writes the BatchControl struct to a 94 character string.
 func (bc *BatchControl) String() string {
-	return fmt.Sprintf("%v%v%v%v%v%v%v%v%v%v%v",
-		bc.recordType,
-		bc.ServiceClassCode,
-		bc.EntryAddendaCountField(),
-		bc.EntryHashField(),
-		bc.TotalDebitEntryDollarAmountField(),
-		bc.TotalCreditEntryDollarAmountField(),
-		bc.CompanyIdentificationField(),
-		bc.MessageAuthenticationCodeField(),
-		"      ",
-		bc.ODFIIdentificationField(),
-		bc.BatchNumberField(),
-	)
+	var buf strings.Builder
+	buf.Grow(94)
+	buf.WriteString(batchControlPos)
+	buf.WriteString(fmt.Sprintf("%v", bc.ServiceClassCode))
+	buf.WriteString(bc.EntryAddendaCountField())
+	buf.WriteString(bc.EntryHashField())
+	buf.WriteString(bc.TotalDebitEntryDollarAmountField())
+	buf.WriteString(bc.TotalCreditEntryDollarAmountField())
+	buf.WriteString(bc.CompanyIdentificationField())
+	buf.WriteString(bc.MessageAuthenticationCodeField())
+	buf.WriteString("      ")
+	buf.WriteString(bc.ODFIIdentificationField())
+	buf.WriteString(bc.BatchNumberField())
+	return buf.String()
 }
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
@@ -127,20 +145,16 @@ func (bc *BatchControl) Validate() error {
 	if err := bc.fieldInclusion(); err != nil {
 		return err
 	}
-	if bc.recordType != "8" {
-		msg := fmt.Sprintf(msgRecordType, 7)
-		return &FieldError{FieldName: "recordType", Value: bc.recordType, Msg: msg}
-	}
 	if err := bc.isServiceClass(bc.ServiceClassCode); err != nil {
-		return &FieldError{FieldName: "ServiceClassCode", Value: strconv.Itoa(bc.ServiceClassCode), Msg: err.Error()}
+		return fieldError("ServiceClassCode", err, strconv.Itoa(bc.ServiceClassCode))
 	}
 
 	if err := bc.isAlphanumeric(bc.CompanyIdentification); err != nil {
-		return &FieldError{FieldName: "CompanyIdentification", Value: bc.CompanyIdentification, Msg: err.Error()}
+		return fieldError("CompanyIdentification", err, bc.CompanyIdentification)
 	}
 
 	if err := bc.isAlphanumeric(bc.MessageAuthenticationCode); err != nil {
-		return &FieldError{FieldName: "MessageAuthenticationCode", Value: bc.MessageAuthenticationCode, Msg: err.Error()}
+		return fieldError("MessageAuthenticationCode", err, bc.MessageAuthenticationCode)
 	}
 
 	return nil
@@ -149,14 +163,11 @@ func (bc *BatchControl) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (bc *BatchControl) fieldInclusion() error {
-	if bc.recordType == "" {
-		return &FieldError{FieldName: "recordType", Value: bc.recordType, Msg: msgFieldInclusion}
-	}
 	if bc.ServiceClassCode == 0 {
-		return &FieldError{FieldName: "ServiceClassCode", Value: strconv.Itoa(bc.ServiceClassCode), Msg: msgFieldInclusion}
+		return fieldError("ServiceClassCode", ErrConstructor, strconv.Itoa(bc.ServiceClassCode))
 	}
-	if bc.ODFIIdentification == 0 {
-		return &FieldError{FieldName: "ODFIIdentification", Value: bc.ODFIIdentificationField(), Msg: msgFieldInclusion}
+	if bc.ODFIIdentification == "000000000" {
+		return fieldError("ODFIIdentification", ErrConstructor, bc.ODFIIdentificationField())
 	}
 	return nil
 }
@@ -171,7 +182,7 @@ func (bc *BatchControl) EntryHashField() string {
 	return bc.numericField(bc.EntryHash, 10)
 }
 
-//TotalDebitEntryDollarAmountField get a zero padded Debity Entry Amount
+// TotalDebitEntryDollarAmountField get a zero padded Debit Entry Amount
 func (bc *BatchControl) TotalDebitEntryDollarAmountField() string {
 	return bc.numericField(bc.TotalDebitEntryDollarAmount, 12)
 }
@@ -181,7 +192,7 @@ func (bc *BatchControl) TotalCreditEntryDollarAmountField() string {
 	return bc.numericField(bc.TotalCreditEntryDollarAmount, 12)
 }
 
-// CompanyIdentificationField get the CompanyIdentification righ padded
+// CompanyIdentificationField get the CompanyIdentification right padded
 func (bc *BatchControl) CompanyIdentificationField() string {
 	return bc.alphaField(bc.CompanyIdentification, 10)
 }
@@ -193,7 +204,7 @@ func (bc *BatchControl) MessageAuthenticationCodeField() string {
 
 // ODFIIdentificationField get the odfi number zero padded
 func (bc *BatchControl) ODFIIdentificationField() string {
-	return bc.numericField(bc.ODFIIdentification, 8)
+	return bc.stringField(bc.ODFIIdentification, 8)
 }
 
 // BatchNumberField gets a string of the batch number zero padded

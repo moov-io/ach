@@ -1,0 +1,183 @@
+name: Create Release
+
+on:
+  push:
+    tags: [ "v*.*.*" ]
+
+jobs:
+  testing:
+    name: Testing
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.17
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Check
+      run: make check
+
+  create_release:
+    name: Create Release
+    needs: [testing]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        prerelease: true
+
+    - name: Output Release URL File
+      run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
+
+    - name: Save Release URL File for publish
+      uses: actions/upload-artifact@v1
+      with:
+        name: release_url
+        path: release_url.txt
+
+  publish:
+    name: Publish
+    needs: [testing, create_release]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.14
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Load Release URL File from release job
+      uses: actions/download-artifact@v1
+      with:
+        name: release_url
+
+    - name: Distribute
+      run: make dist
+
+    - name: Get Release File Name & Upload URL
+      id: get_release_info
+      shell: bash
+      run: |
+        value=`cat release_url/release_url.txt`
+        echo ::set-output name=upload_url::$value
+      env:
+        TAG_REF_NAME: ${{ github.ref }}
+        REPOSITORY_NAME: ${{ github.repository }}
+
+    - name: Upload Linux Server Binary
+      if: runner.os == 'Linux'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+        asset_path: ./bin/ach-linux-amd64
+        asset_name: ach-linux-amd64
+        asset_content_type: application/octet-stream
+
+    - name: Upload Linux achcli Binary
+      if: runner.os == 'Linux'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+        asset_path: ./bin/achcli-linux-amd64
+        asset_name: achcli-linux-amd64
+        asset_content_type: application/octet-stream
+
+    - name: Upload macOS Server Binary
+      if: runner.os == 'macOS'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+        asset_path: ./bin/ach-darwin-amd64
+        asset_name: ach-darwin-amd64
+        asset_content_type: application/octet-stream
+
+    - name: Upload macOS achcli Binary
+      if: runner.os == 'macOS'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+        asset_path: ./bin/achcli-darwin-amd64
+        asset_name: achcli-darwin-amd64
+        asset_content_type: application/octet-stream
+
+    - name: Upload Windows Server Binary
+      if: runner.os == 'Windows'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+        asset_path: ./bin/ach.exe
+        asset_name: ach.exe
+        asset_content_type: application/octet-stream
+
+    - name: Upload Windows achcli Binary
+      if: runner.os == 'Windows'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+        asset_path: ./bin/achcli.exe
+        asset_name: achcli.exe
+        asset_content_type: application/octet-stream
+
+  docker:
+    name: Docker
+    needs: [testing, create_release]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.14
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Docker
+      run: make docker
+
+    - name: Docker Push
+      run: |+
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+          make release-push
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Quay.io Push
+      run: |+
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin quay.io
+          make quay-push
+      env:
+        DOCKER_USERNAME: ${{ secrets.QUAY_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.QUAY_PASSWORD }}

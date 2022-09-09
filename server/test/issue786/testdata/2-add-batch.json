@@ -1,0 +1,20 @@
+{
+  "entryDetails": [
+    {
+      "individualName": "Taylor Swift",
+      "amount": 1235,
+      "DFIAccountNumber": "54321",
+      "checkDigit": "0",
+      "RDFIIdentification": "12345678",
+      "transactionCode": 22
+    }
+  ],
+  "batchHeader": {
+        "ODFIIdentification": "12345678",
+        "companyIdentification": "1",
+        "companyName": "Acme Corp",
+        "serviceClassCode": 220,
+        "standardEntryClassCode": "PPD",
+        "companyEntryDescription": "test"
+  }
+}

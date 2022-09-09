@@ -1,31 +1,35 @@
-package ach
+// Licensed to The Moov Authors under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. The Moov Authors licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
-import (
-	"fmt"
-	"strings"
-)
+package ach
 
 // BatchWEB creates a batch file that handles SEC payment type WEB.
 // Entry submitted pursuant to an authorization obtained solely via the Internet or a wireless network
 // For consumer accounts only.
 type BatchWEB struct {
-	batch
+	Batch
 }
 
 // NewBatchWEB returns a *BatchWEB
-func NewBatchWEB(params ...BatchParam) *BatchWEB {
+func NewBatchWEB(bh *BatchHeader) *BatchWEB {
 	batch := new(BatchWEB)
 	batch.SetControl(NewBatchControl())
-
-	if len(params) > 0 {
-		bh := NewBatchHeader(params[0])
-		bh.StandardEntryClassCode = "WEB"
-		batch.SetHeader(bh)
-		return batch
-	}
-	bh := NewBatchHeader()
-	bh.StandardEntryClassCode = "WEB"
 	batch.SetHeader(bh)
+	batch.SetID(bh.ID)
 	return batch
 }
 
@@ -35,50 +39,38 @@ func (batch *BatchWEB) Validate() error {
 	if err := batch.verify(); err != nil {
 		return err
 	}
-	// Add configuration based validation for this type.
-	// Web can have up to one addenda per entry record
-	if err := batch.isAddendaCount(1); err != nil {
-		return err
-	}
-	if err := batch.isTypeCode("05"); err != nil {
-		return err
+	// Add configuration and type specific validation for this type.
+	if batch.Header.StandardEntryClassCode != WEB {
+		return batch.Error("StandardEntryClassCode", ErrBatchSECType, WEB)
 	}
 
-	// Add type specific validation.
-	if batch.header.StandardEntryClassCode != "WEB" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.header.StandardEntryClassCode, "WEB")
-		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
+	for _, entry := range batch.Entries {
+		// WEB can have up to one Addenda05 record
+		if len(entry.Addenda05) > 1 {
+			return batch.Error("AddendaCount", NewErrBatchAddendaCount(len(entry.Addenda05), 1))
+		}
+		// Verify the TransactionCode is valid for a ServiceClassCode
+		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {
+			return err
+		}
+		// Verify Addenda* FieldInclusion based on entry.Category and batchHeader.StandardEntryClassCode
+		if err := batch.addendaFieldInclusion(entry); err != nil {
+			return err
+		}
 	}
-
-	if err := batch.isPaymentTypeCode(); err != nil {
-		return err
-	}
-
 	return nil
 }
 
-// Create builds the batch sequence numbers and batch control. Additional creation
+// Create will tabulate and assemble an ACH batch into a valid state. This includes
+// setting any posting dates, sequence numbers, counts, and sums.
+//
+// Create implementations are free to modify computable fields in a file and should
+// call the Batch's Validate function at the end of their execution.
 func (batch *BatchWEB) Create() error {
 	// generates sequence numbers and batch control
 	if err := batch.build(); err != nil {
 		return err
 	}
 
-	if err := batch.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-// isPaymentTypeCode checks that the Entry detail records have either:
-// "R" For a recurring WEB Entry
-// "S" For a Single-Entry WEB Entry
-func (batch *BatchWEB) isPaymentTypeCode() error {
-	for _, entry := range batch.entries {
-		if !strings.Contains(strings.ToUpper(entry.PaymentType()), "S") && !strings.Contains(strings.ToUpper(entry.PaymentType()), "R") {
-			msg := fmt.Sprintf(msgBatchWebPaymentType, entry.PaymentType())
-			return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "PaymentType", Msg: msg}
-		}
-	}
-	return nil
+	return batch.Validate()
 }

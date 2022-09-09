@@ -1,0 +1,79 @@
+{
+  "id": "ADVReturn",
+  "fileHeader": {
+    "id": "ADVReturn",
+    "immediateDestination": "231380104",
+    "immediateOrigin": "121042882",
+    "fileCreationDate": "2018-10-08T00:00:00Z",
+    "fileCreationTime": "0000-01-01T00:00:00Z",
+    "fileIDModifier": "A",
+    "immediateDestinationName": "Citadel",
+    "immediateOriginName": "Wells Fargo"
+  },
+  "batches": [
+    {
+      "batchHeader": {
+        "id": "ADVReturn",
+        "serviceClassCode": 280,
+        "companyName": "Wells Fargo",
+        "companyIdentification": "121042882",
+        "standardEntryClassCode": "ADV",
+        "companyEntryDescription": "Trans. Des",
+        "effectiveEntryDate": "2018-10-09T00:00:00Z",
+        "ODFIIdentification": "12104288",
+        "batchNumber": 1
+      },
+      "advEntryDetails": [
+        {
+          "id": "ADVReturn",
+          "transactionCode": 81,
+          "RDFIIdentification": "23138010",
+          "checkDigit": "4",
+          "DFIAccountNumber": "81967038518      ",
+          "amount": 100000,
+          "adviceRoutingNumber": "121042882",
+          "fileIdentification": "11131",
+          "achOperatorData": "",
+          "individualName": "Steven Tander         ",
+          "discretionaryData": "  ",
+          "addendaRecordIndicator": 1,
+          "achOperatorRoutingNumber": "01100001",
+          "julianDay": 2,
+          "sequenceNumber": 1,
+          "category": "Return",
+          "addenda99": {
+            "id": "ADVReturn",
+            "typeCode": "99",
+            "returnCode": "R14",
+            "originalTrace": "12312312",
+            "dateOfDeath": "190102",
+            "originalDFI": "98765432"
+          }
+        }
+      ],
+      "advBatchControl": {
+        "id": "ADVReturn",
+        "serviceClassCode": 280,
+        "entryAddendaCount": 1,
+        "entryHash": 23138010,
+        "totalDebit": 0,
+        "totalCredit": 100000,
+        "companyIdentification": "121042882",
+        "ODFIIdentification": "12104288",
+        "batchNumber": 1
+      }
+    }
+  ],
+  "IATBatches": null,
+  "fileADVControl": {
+    "id": "ADVReturn",
+    "batchCount": 1,
+    "blockCount": 1,
+    "entryAddendaCount": 1,
+    "entryHash": 23138010,
+    "totalDebit": 0,
+    "totalCredit": 100000
+  },
+  "NotificationOfChange": null,
+  "ReturnEntries": null
+}

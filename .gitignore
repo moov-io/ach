@@ -1,5 +1,7 @@
 #### joe made this: http://goel.io/joe
 
+.DS_Store
+
 #####=== Go ===#####
 
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
@@ -30,6 +32,33 @@ _cgo_export.*
 
 _testmain.go
 
+*.out
 *.exe
 *.test
 *.prof
+
+.vscode/launch.json
+
+# code coverage
+coverage.html
+cover.out
+coverage.txt
+misspell*
+staticcheck*
+/lint-project.sh
+bin/
+tmp/
+
+# fuzzing
+test/fuzz-reader/crashes
+test/fuzz-reader/suppressions
+test/fuzz-reader/*.zip
+test/fuzz-reader/corpus/*.tar.gz
+
+go-licenser*.tar.gz
+go-licenser
+
+openapi-generator*.jar
+/cmd/webui/assets/ach.wasm
+/.idea/*
+/client/
