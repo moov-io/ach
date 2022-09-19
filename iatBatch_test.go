@@ -1994,3 +1994,65 @@ func TestDiscussion1077(t *testing.T) {
 	require.NoError(t, b.build())
 	require.Equal(t, 63399382, b.calculateEntryHash())
 }
+
+func TestIATBatch__isTraceNumberODFI(t *testing.T) {
+	iatBatch := mockIATBatch(t)
+
+	// Set invalid TraceNumber and ensure it's rejected
+	iatBatch.Entries[0].TraceNumber = "333333333333333" // invalid
+	if err := iatBatch.isTraceNumberODFI(); err == nil {
+		t.Error("expected error")
+	}
+	require.Error(t, iatBatch.Validate())
+
+	// Set a shorter trace number (0's for routing number) and
+	// ensure it's rejected as well.
+	iatBatch.Entries[0].TraceNumber = "3" // invalid
+	if err := iatBatch.isTraceNumberODFI(); err == nil {
+		t.Error("expected error")
+	}
+
+	// Allow the failure with an invalid TraceNumber
+	iatBatch.SetValidation(&ValidateOpts{
+		BypassOriginValidation: true,
+	})
+	require.ErrorContains(t, iatBatch.Validate(),
+		`TraceNumber 0000001 does not match proceeding entry detail trace number 0000003`)
+}
+
+func TestIATBatch__CustomTraceNumbers(t *testing.T) {
+	iatBatch := mockIATBatch(t)
+	iatBatch.SetValidation(&ValidateOpts{
+		BypassOriginValidation: false,
+		CustomTraceNumbers:     false,
+	})
+
+	for i := range iatBatch.Entries {
+		iatBatch.Entries[i].TraceNumber = "333344445"
+	}
+
+	if err := iatBatch.build(); err != nil {
+		t.Fatal(err)
+	}
+
+	if iatBatch.Entries[0].TraceNumber != "231380100000001" {
+		t.Errorf("unexpected trace number: %v", iatBatch.Entries[0].TraceNumber)
+	}
+}
+
+func TestIATBatchInvalidServiceClassCode(t *testing.T) {
+	iatBatch := mockIATBatch(t)
+	require.NoError(t, iatBatch.build())
+
+	iatBatch.Control.ServiceClassCode = DebitsOnly
+	err := iatBatch.verify()
+	if !base.Match(err, NewErrBatchHeaderControlEquality("280", "220")) {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	iatBatch.SetValidation(&ValidateOpts{
+		UnequalServiceClassCode: true,
+	})
+	err = iatBatch.verify()
+	require.NoError(t, err)
+}

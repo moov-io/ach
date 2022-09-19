@@ -127,6 +127,8 @@ type IATEntryDetail struct {
 	validator
 	// converters is composed for ACH to golang Converters
 	converters
+
+	validateOpts *ValidateOpts
 }
 
 // NewIATEntryDetail returns a new IATEntryDetail with default values for non exported fields
@@ -193,14 +195,29 @@ func (iatEd *IATEntryDetail) String() string {
 	return buf.String()
 }
 
+// SetValidation stores ValidateOpts on the EntryDetail which are to be used to override
+// the default NACHA validation rules.
+func (iatEd *IATEntryDetail) SetValidation(opts *ValidateOpts) {
+	if iatEd == nil {
+		return
+	}
+	iatEd.validateOpts = opts
+}
+
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops that parsing.
 func (iatEd *IATEntryDetail) Validate() error {
 	if err := iatEd.fieldInclusion(); err != nil {
 		return err
 	}
-	if err := iatEd.isTransactionCode(iatEd.TransactionCode); err != nil {
-		return fieldError("TransactionCode", err, strconv.Itoa(iatEd.TransactionCode))
+	if iatEd.validateOpts != nil && iatEd.validateOpts.CheckTransactionCode != nil {
+		if err := iatEd.validateOpts.CheckTransactionCode(iatEd.TransactionCode); err != nil {
+			return fieldError("TransactionCode", err, strconv.Itoa(iatEd.TransactionCode))
+		}
+	} else {
+		if err := iatEd.isTransactionCode(iatEd.TransactionCode); err != nil {
+			return fieldError("TransactionCode", err, strconv.Itoa(iatEd.TransactionCode))
+		}
 	}
 	if err := iatEd.isAlphanumeric(iatEd.DFIAccountNumber); err != nil {
 		return fieldError("DFIAccountNumber", err, iatEd.DFIAccountNumber)

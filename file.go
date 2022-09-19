@@ -356,6 +356,8 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 
 		iatBatch := iatBatches.IATBatches[i]
 		iatBatch.ID = iatBatch.Header.ID
+		iatBatch.SetValidation(f.validateOpts)
+
 		for _, e := range iatBatch.Entries {
 			setIATEntryRecordType(e)
 		}

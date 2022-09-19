@@ -289,6 +289,7 @@ func (r *Reader) parseLine() error {
 		} else {
 			batch := r.IATCurrentBatch
 			r.IATCurrentBatch = IATBatch{}
+			batch.SetValidation(r.File.validateOpts)
 			r.File.AddIATBatch(batch)
 			if err := batch.Validate(); err != nil {
 				r.recordName = "Batches"
