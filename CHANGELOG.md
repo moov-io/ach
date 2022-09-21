@@ -1,3 +1,9 @@
+## v1.20.1 (Released 2022-09-21)
+
+IMPROVEMENTS
+
+- fix: lowercase `ID` in OpenAPI spec
+
 ## v1.20.0 (Released 2022-09-19)
 
 ADDITIONS
