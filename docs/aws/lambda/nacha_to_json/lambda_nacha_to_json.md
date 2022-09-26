@@ -61,7 +61,7 @@ func HandleRequest(ctx context.Context, event NachaParseEvent) (NachaParseRespon
 		return NachaParseResponse{File: file}, err
 	}
 
-	//create response object
+	// create response object
 	parseRes := NachaParseResponse{File: file}
 
 	return parseRes, err
