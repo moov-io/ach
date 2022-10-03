@@ -786,6 +786,50 @@ func TestFiles__segmentFileEndpointJSON(t *testing.T) {
 	require.NotNil(t, resp.DebitFile)
 }
 
+func TestFiles__segmentFileEndpointValidateOpts(t *testing.T) {
+	logger := log.NewNopLogger()
+	repo := NewRepositoryInMemory(testTTLDuration, logger)
+	svc := NewService(repo)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
+
+	opts := &ach.ValidateOpts{
+		BypassOriginValidation: true,
+	}
+
+	bs, err := os.ReadFile(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-invalid.json"))
+	require.NoError(t, err)
+
+	file, err := ach.FileFromJSONWith(bs, opts)
+	require.NoError(t, err)
+
+	var buf bytes.Buffer
+	err = json.NewEncoder(&buf).Encode(struct {
+		File         *ach.File         `json:"file"`
+		ValidateOpts *ach.ValidateOpts `json:"validateOpts"`
+	}{
+		File:         file,
+		ValidateOpts: opts,
+	})
+	require.NoError(t, err)
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", "/segment", &buf)
+	req.Header.Set("Origin", "https://moov.io")
+	req.Header.Set("X-Request-Id", "222222")
+	req.Header.Set("Content-Type", "application/json")
+
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	var resp segmentedFilesResponse
+	json.NewDecoder(w.Body).Decode(&resp)
+
+	require.NotEmpty(t, resp.CreditFileID)
+	require.NotNil(t, resp.CreditFile)
+	require.NotEmpty(t, resp.DebitFileID)
+	require.NotNil(t, resp.DebitFile)
+}
+
 // TestFiles__decodeSegmentFileIDRequest tests segmentFileIDEndpoints
 func TestFiles__decodeSegmentFileIDRequest(t *testing.T) {
 	req := httptest.NewRequest("POST", "/files/segment", nil)

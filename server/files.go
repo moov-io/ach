@@ -688,7 +688,8 @@ type segmentFileRequest struct {
 	File      *ach.File
 	requestID string
 
-	opts *ach.SegmentFileConfiguration
+	opts         *ach.SegmentFileConfiguration
+	validateOpts *ach.ValidateOpts
 }
 
 func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.Endpoint {
@@ -696,6 +697,10 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 		req, ok := request.(segmentFileRequest)
 		if !ok {
 			return segmentedFilesResponse{Err: ErrFoundABug}, ErrFoundABug
+		}
+
+		if req.File != nil && req.validateOpts != nil {
+			req.File.SetValidation(req.validateOpts)
 		}
 
 		creditFile, debitFile, err := s.SegmentFile(req.File, req.opts)
@@ -748,8 +753,9 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 
 func decodeSegmentFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var wrapper struct {
-		File *ach.File                     `json:"file"`
-		Opts *ach.SegmentFileConfiguration `json:"opts"`
+		File         *ach.File                     `json:"file"`
+		Opts         *ach.SegmentFileConfiguration `json:"opts"`
+		ValidateOpts *ach.ValidateOpts             `json:"validateOpts"`
 	}
 
 	header := strings.ToLower(r.Header.Get("content-type"))

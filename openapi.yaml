@@ -2276,3 +2276,5 @@ components:
           $ref: '#/components/schemas/File'
         opts:
           $ref: '#/components/schemas/SegmentFileConfiguration'
+        validateOpts:
+          $ref: '#/components/schemas/ValidateOpts'
