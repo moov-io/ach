@@ -1,3 +1,14 @@
+## v1.21.0 (Released 2022-10-03)
+
+IMPROVEMENTS
+
+- docs: clarified lambda_json_to_nacha example
+- server: read ValidateOpts in SegmentFile endpoints
+
+BUILD
+
+- build: require go1.19.1 in CI/CD
+
 ## v1.20.1 (Released 2022-09-21)
 
 IMPROVEMENTS
