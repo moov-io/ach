@@ -3,7 +3,7 @@ name: Report an issue
 description:
   Tell us about something that is not working the way we (probably) intend
 body:
-  - type: textarea
+  - type: input
     id: ach-version
     attributes:
       label: ACH Version
