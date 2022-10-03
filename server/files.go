@@ -685,8 +685,9 @@ func decodeSegmentFileIDRequest(_ context.Context, r *http.Request) (interface{}
 }
 
 type segmentFileRequest struct {
-	File      *ach.File
-	requestID string
+	File         *ach.File
+	requestID    string
+	validateOpts *ach.ValidateOpts
 
 	opts *ach.SegmentFileConfiguration
 }
@@ -697,7 +698,9 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 		if !ok {
 			return segmentedFilesResponse{Err: ErrFoundABug}, ErrFoundABug
 		}
-
+		if req.validateOpts != nil {
+			req.File.SetValidation(req.validateOpts)
+		}
 		creditFile, debitFile, err := s.SegmentFile(req.File, req.opts)
 		if logger != nil {
 			logger.With(log.Fields{
