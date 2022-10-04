@@ -23,15 +23,18 @@ package main
 
 import (
 	"bytes"
-	"context"
 
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/moov-io/ach"
 	"github.com/moov-io/base"
 )
 
-type JsonParseEvent struct {
-	Json ach.File `json:"data"`
+type JsonRequest struct {
+	Json ach.File `json:"input"`
+}
+
+type JsonResponse struct {
+	Message string `json:"output"`
 }
 
 func main() {
@@ -39,9 +42,9 @@ func main() {
 }
 
 // logic to be executed when lambda starts goes here
-func HandleRequest(ctx context.Context, event JsonParseEvent) (string, error) {
+func HandleRequest(event JsonRequest) (JsonResponse, error) {
 
-	// get file from lambda event, it has already been marshaled from json to ach.File by Go
+	// get file from lambda event, it has already been marshalled from json to ach.File by Go
 	file := event.Json
 
 	// set file ID
@@ -50,7 +53,7 @@ func HandleRequest(ctx context.Context, event JsonParseEvent) (string, error) {
 	// validate parsed file
 	err := file.Validate()
 	if err != nil {
-		return "", err
+		return JsonResponse{Message: ""}, err
 	}
 
 	// create buffer to contain NACHA text
@@ -58,26 +61,28 @@ func HandleRequest(ctx context.Context, event JsonParseEvent) (string, error) {
 
 	// write ach.File to buffer
 	err = ach.NewWriter(buf).Write(&file)
-	if err != nil {
-		return buf.String(), err
-	}
 
-	// get NACHA text from buffer
-	parseRes := buf.String()
-
-	return parseRes, err
+	// marshal response to lambda as json
+	return JsonResponse{Message: buf.String()}, err
 }
 ```
 
 *`main()`* is invoked when the lambda is triggered <br/>
 *`HandleRequest()`* is the callback containing the business logic and accepts a lambda event as a parameter with the shape:
-```
+```json
 {
-    "data": { ...JSON representing ACH file }
+    "input": { ...JSON representing ACH file }
 }
 ```
-`JsonParseEvent` mirrors this shape and makes the contents accessible in `HandleRequest()`. This event can be changed to fit
-your needs, all you need to do is update the `JsonParseEvent` struct and make sure the trigger for this lambda is passing in the expected event.
+`JsonRequest` mirrors this shape and makes the contents accessible in `HandleRequest()`. This event can be changed to fit
+your needs, all you need to do is update the `JsonRequest` struct and make sure the trigger for this lambda is passing in the expected event.
+
+`JsonResponse` is used to encode the response to the caller.  The ACH file's data (a string) is the value of the `output` field of the response.
+```json
+{
+    "output": "[TEXT OF THE ACH FILE]"
+}
+```
 
 <br/><br/>
 ## 2. Build your file for AWS Lambda
@@ -122,7 +127,7 @@ Replace the contents of the code editor with the following:
 
 ```json
 {
-  "data": {
+  "input": {
     "id": "",
     "fileHeader": {
       "id": "",
@@ -201,7 +206,7 @@ Replace the contents of the code editor with the following:
 }
 ```
 
-This JSON will be handled by `HandleRequest()`. Note the top level `data` field which matches the shape we covered in step 1. Click *Create* at the bottom when you're finished making changes.
+This JSON will be handled by `HandleRequest()`. Note the top level `input` field which matches the shape we covered in step 1. Click *Create* at the bottom when you're finished making changes.
 
 Now create your second event, which is designed to cause an error while parsing so you can see how the function returns errors from Go code.  Create a new event with a different name (e.g. `parseEventError`) and modify the JSON.
 
@@ -209,7 +214,7 @@ Change the JSON above by setting immediateDestination to be an empty string. Thi
 
 ```
 {
-  "data": {
+  "input": {
     "id": "",
     "fileHeader": {
       "id": "",

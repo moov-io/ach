@@ -42,6 +42,8 @@ type IATBatch struct {
 	category string
 	// Converters is composed for ACH to GoLang Converters
 	converters
+
+	validateOpts *ValidateOpts
 }
 
 // NewIATBatch takes a BatchHeader and returns a matching SEC code batch type that is a batcher. Returns an error if the SEC code is not supported.
@@ -90,11 +92,14 @@ func (iatBatch *IATBatch) verify() error {
 		// wrap the field error in to a batch error for a consistent api
 		return iatBatch.Error("FieldError", err)
 	}
+
 	// validate batch header and control codes are the same
-	if iatBatch.Header.ServiceClassCode != iatBatch.Control.ServiceClassCode {
+	if (iatBatch.validateOpts == nil || !iatBatch.validateOpts.UnequalServiceClassCode) &&
+		iatBatch.Header.ServiceClassCode != iatBatch.Control.ServiceClassCode {
 		return iatBatch.Error("ServiceClassCode",
 			NewErrBatchHeaderControlEquality(iatBatch.Header.ServiceClassCode, iatBatch.Control.ServiceClassCode))
 	}
+
 	// Control ODFIIdentification must be the same as batch header
 	if iatBatch.Header.ODFIIdentification != iatBatch.Control.ODFIIdentification {
 		return iatBatch.Error("ODFIIdentification",
@@ -108,8 +113,10 @@ func (iatBatch *IATBatch) verify() error {
 	if err := iatBatch.isBatchEntryCount(); err != nil {
 		return err
 	}
-	if err := iatBatch.isSequenceAscending(); err != nil {
-		return err
+	if iatBatch.validateOpts == nil || !iatBatch.validateOpts.CustomTraceNumbers {
+		if err := iatBatch.isSequenceAscending(); err != nil {
+			return err
+		}
 	}
 	if err := iatBatch.isBatchAmount(); err != nil {
 		return err
@@ -117,11 +124,13 @@ func (iatBatch *IATBatch) verify() error {
 	if err := iatBatch.isEntryHash(); err != nil {
 		return err
 	}
-	if err := iatBatch.isTraceNumberODFI(); err != nil {
-		return err
-	}
-	if err := iatBatch.isAddendaSequence(); err != nil {
-		return err
+	if iatBatch.validateOpts == nil || !iatBatch.validateOpts.CustomTraceNumbers {
+		if err := iatBatch.isTraceNumberODFI(); err != nil {
+			return err
+		}
+		if err := iatBatch.isAddendaSequence(); err != nil {
+			return err
+		}
 	}
 	if err := iatBatch.isCategory(); err != nil {
 		return err
@@ -169,7 +178,14 @@ func (iatBatch *IATBatch) build() error {
 
 		// Add a sequenced TraceNumber if one is not already set.
 		if currentTraceNumberODFI != batchHeaderODFI {
-			iatBatch.Entries[i].SetTraceNumber(iatBatch.Header.ODFIIdentification, seq)
+			if opts := iatBatch.validateOpts; opts == nil {
+				iatBatch.Entries[i].SetTraceNumber(iatBatch.Header.ODFIIdentification, seq)
+			} else {
+				// Automatically set the TraceNumber if we are validating Origin and don't have custom trace numbers
+				if !opts.BypassOriginValidation && !opts.CustomTraceNumbers {
+					iatBatch.Entries[i].SetTraceNumber(iatBatch.Header.ODFIIdentification, seq)
+				}
+			}
 		}
 
 		if entry.Category != CategoryNOC {
@@ -378,8 +394,10 @@ func (iatBatch *IATBatch) calculateBatchAmounts() (credit int, debit int) {
 func (iatBatch *IATBatch) isSequenceAscending() error {
 	lastSeq := "-1"
 	for _, entry := range iatBatch.Entries {
-		if entry.TraceNumber <= lastSeq {
-			return iatBatch.Error("TraceNumber", NewErrBatchAscending(lastSeq, entry.TraceNumber))
+		if iatBatch.validateOpts == nil || !iatBatch.validateOpts.CustomTraceNumbers {
+			if entry.TraceNumber <= lastSeq {
+				return iatBatch.Error("TraceNumber", NewErrBatchAscending(lastSeq, entry.TraceNumber))
+			}
 		}
 		lastSeq = entry.TraceNumber
 	}
@@ -414,13 +432,15 @@ func (iatBatch *IATBatch) calculateEntryHash() int {
 // isTraceNumberODFI checks if the first 8 positions of the entry detail trace number
 // match the batch header ODFI
 func (iatBatch *IATBatch) isTraceNumberODFI() error {
+	if iatBatch.validateOpts != nil && iatBatch.validateOpts.BypassOriginValidation {
+		return nil
+	}
 	for _, entry := range iatBatch.Entries {
 		if iatBatch.Header.ODFIIdentificationField() != entry.TraceNumberField()[:8] {
 			return iatBatch.Error("ODFIIdentificationField",
 				NewErrBatchTraceNumberNotODFI(iatBatch.Header.ODFIIdentificationField(), entry.TraceNumberField()[:8]))
 		}
 	}
-
 	return nil
 }
 
@@ -591,4 +611,13 @@ func (iatBatch *IATBatch) Validate() error {
 
 	}
 	return nil
+}
+
+// SetValidation stores ValidateOpts on the Batch which are to be used to override
+// the default NACHA validation rules.
+func (iatBatch *IATBatch) SetValidation(opts *ValidateOpts) {
+	if iatBatch == nil {
+		return
+	}
+	iatBatch.validateOpts = opts
 }

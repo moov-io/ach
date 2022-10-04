@@ -5,7 +5,7 @@ COPY . .
 RUN make build-webui
 
 FROM debian:stable-slim
-LABEL maintainer="Moov <support@moov.io>"
+LABEL maintainer="Moov <oss@moov.io>"
 RUN apt-get update && apt-get install -y ca-certificates
 
 COPY --from=builder /go/src/github.com/moov-io/ach/bin/webui /bin/webui

@@ -1,5 +1,5 @@
 FROM golang:1.19 as builder
-LABEL maintainer="Moov <support@moov.io>"
+LABEL maintainer="Moov <oss@moov.io>"
 RUN apt-get update -qq && apt-get install -y git make
 WORKDIR /go/src/github.com/moov-io/ach
 COPY . .

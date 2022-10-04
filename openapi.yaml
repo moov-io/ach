@@ -638,7 +638,7 @@ components:
   schemas:
     CreateFile:
       properties:
-        ID:
+        id:
           type: string
           description: File ID
           example: "3f2d23ee214"
@@ -664,7 +664,7 @@ components:
         - fileHeader
     CreateFileResponse:
       properties:
-        ID:
+        id:
           type: string
           description: File ID
           example: "1e522dc8"
@@ -676,7 +676,7 @@ components:
           example: Validation error(s) present.
     FlattenFileResponse:
       properties:
-        ID:
+        id:
           type: string
           description: File ID
           example: "1e522dc8"
@@ -688,7 +688,7 @@ components:
           example: Validation error(s) present.
     File:
       properties:
-        ID:
+        id:
           type: string
           description: File ID
           example: "3f2d23ee214"
@@ -722,7 +722,7 @@ components:
         - fileControl
     FileHeader:
       properties:
-        ID:
+        id:
           description: File ID
           type: string
           example: "d1e26288"
@@ -774,7 +774,7 @@ components:
         - fileCreationDate
     FileControl:
       properties:
-        ID:
+        id:
           description: File ID
           type: string
           example: "d1e26288"
@@ -851,7 +851,7 @@ components:
         - ODFIIdentification
         - batchNumber
       properties:
-        ID:
+        id:
           type: string
           description: A client-defined ID used as a reference to this batch
           example: "913b5742"
@@ -920,7 +920,7 @@ components:
           example: "190102"
     BatchControl:
       properties:
-        ID:
+        id:
           description: Batch ID
           type: string
           example: "62d8f0cd"
@@ -987,7 +987,7 @@ components:
         - amount
         - individualName
       properties:
-        ID:
+        id:
           type: string
           description: Entry Detail ID
           example: "842a2261"
@@ -1764,7 +1764,7 @@ components:
         - dishonoredReturnSettlementDate
     IATBatch:
       properties:
-        ID:
+        id:
           description: Client-defined string used as a reference to this record.
           type: string
           example: a747e53f
@@ -1783,7 +1783,7 @@ components:
          - batchControl
     IATBatchHeader:
       properties:
-        ID:
+        id:
           description: ID is a client-defined string used as a reference to this record.
           type: string
           example: a747e53f
@@ -1898,7 +1898,7 @@ components:
         - batchNumber
     IATEntryDetail:
       properties:
-        ID:
+        id:
           type: string
           description: Entry Detail ID
           example: 842a2261
@@ -2008,7 +2008,7 @@ components:
         - achOperatorRoutingNumber
         - sequenceNumber
       properties:
-        ID:
+        id:
           type: string
           description: Entry Detail ID
           example: 842a2261
@@ -2091,7 +2091,7 @@ components:
           example: Forward
     ADVBatchControl:
       properties:
-        ID:
+        id:
           description: Batch ID
           type: string
           example: 62d8f0cd
@@ -2140,7 +2140,7 @@ components:
        - batchNumber
     ADVFileControl:
       properties:
-        ID:
+        id:
           type: string
           description: ADV File Control Record
           example: 842a2261
@@ -2276,3 +2276,5 @@ components:
           $ref: '#/components/schemas/File'
         opts:
           $ref: '#/components/schemas/SegmentFileConfiguration'
+        validateOpts:
+          $ref: '#/components/schemas/ValidateOpts'

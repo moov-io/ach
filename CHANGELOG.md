@@ -1,3 +1,32 @@
+## v1.21.0 (Released 2022-10-03)
+
+IMPROVEMENTS
+
+- docs: clarified lambda_json_to_nacha example
+- server: read ValidateOpts in SegmentFile endpoints
+
+BUILD
+
+- build: require go1.19.1 in CI/CD
+
+## v1.20.1 (Released 2022-09-21)
+
+IMPROVEMENTS
+
+- fix: lowercase `ID` in OpenAPI spec
+
+## v1.20.0 (Released 2022-09-19)
+
+ADDITIONS
+
+- feat: add `ValidateOpts` for `IATBatch` and `IATEntryDetail`
+
+IMPROVEMENTS
+
+- fix(deps): update golang.org/x/oauth2 digest to f213421
+- fix(deps): update module github.com/moov-io/base to v0.35.0
+- test: verify we pad to 10 lines in writer
+
 ## v1.19.3 (Released 2022-09-01)
 
 Moov ACH v1.19.3 fixes an issue where Entry Hash values were not properly calculated.
