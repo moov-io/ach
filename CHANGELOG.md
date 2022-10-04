@@ -1,3 +1,15 @@
+## v1.21.2 (Released 2022-10-04)
+
+IMPROVEMENTS
+
+- fix: copy forward the validate options when segmenting a file
+- fix: passing validate opts to http handler
+- test: verify ValidateOpts are set in segment http response
+
+BUILD
+
+- meta: add feature request template
+
 ## v1.21.0 (Released 2022-10-03)
 
 IMPROVEMENTS
