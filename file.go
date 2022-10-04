@@ -929,6 +929,11 @@ func (f *File) SegmentFile(_ *SegmentFileConfiguration) (*File, *File, error) {
 	creditFile := NewFile()
 	debitFile := NewFile()
 
+	if f.validateOpts != nil {
+		creditFile.SetValidation(f.validateOpts)
+		debitFile.SetValidation(f.validateOpts)
+	}
+
 	if f.Batches != nil {
 		f.segmentFileBatches(creditFile, debitFile)
 	}
