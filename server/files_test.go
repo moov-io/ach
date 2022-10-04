@@ -793,7 +793,8 @@ func TestFiles__segmentFileEndpointValidateOpts(t *testing.T) {
 	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
 
 	opts := &ach.ValidateOpts{
-		BypassOriginValidation: true,
+		AllowUnorderedBatchNumbers: true,
+		CustomTraceNumbers:         true,
 	}
 
 	bs, err := os.ReadFile(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-invalid.json"))
