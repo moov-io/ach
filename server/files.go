@@ -773,9 +773,10 @@ func decodeSegmentFileRequest(_ context.Context, r *http.Request) (interface{}, 
 	}
 
 	return segmentFileRequest{
-		File:      wrapper.File,
-		requestID: moovhttp.GetRequestID(r),
-		opts:      wrapper.Opts,
+		File:         wrapper.File,
+		requestID:    moovhttp.GetRequestID(r),
+		opts:         wrapper.Opts,
+		validateOpts: wrapper.ValidateOpts,
 	}, nil
 }
 
