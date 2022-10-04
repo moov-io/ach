@@ -823,12 +823,15 @@ func TestFiles__segmentFileEndpointValidateOpts(t *testing.T) {
 	w.Flush()
 
 	var resp segmentedFilesResponse
-	json.NewDecoder(w.Body).Decode(&resp)
+	require.NoError(t, json.NewDecoder(w.Body).Decode(&resp))
 
 	require.NotEmpty(t, resp.CreditFileID)
 	require.NotNil(t, resp.CreditFile)
+	require.NotNil(t, resp.CreditFile.GetValidation())
+
 	require.NotEmpty(t, resp.DebitFileID)
 	require.NotNil(t, resp.DebitFile)
+	require.NotNil(t, resp.DebitFile.GetValidation())
 }
 
 // TestFiles__decodeSegmentFileIDRequest tests segmentFileIDEndpoints
