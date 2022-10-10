@@ -44,7 +44,7 @@ func TestAddenda98_LookupChangecode(t *testing.T) {
 		if code.Code != "C05" {
 			t.Errorf("code.Code=%s", code.Code)
 		}
-		if code.Reason != "Incorrect payment code" {
+		if code.Reason != "Incorrect transaction code" {
 			t.Errorf("code.Reason=%s", code.Reason)
 		}
 	}
