@@ -130,6 +130,27 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 
 			fmt.Fprintf(w, "    %d %s\t%s\t%s\t%d\t%d\t%s\t%s\n", e.TransactionCode, transactionCodes[e.TransactionCode], e.RDFIIdentification, accountNumber, e.Amount, e.AddendaRecords, e.TraceNumber, e.Category)
 
+			dumpAddenda10(w, e.Addenda10)
+			dumpAddenda11(w, e.Addenda11)
+			dumpAddenda12(w, e.Addenda12)
+			dumpAddenda13(w, e.Addenda13)
+			dumpAddenda14(w, e.Addenda14)
+			dumpAddenda15(w, e.Addenda15)
+			dumpAddenda16(w, e.Addenda16)
+
+			for i := range e.Addenda17 {
+				if i == 0 {
+					fmt.Fprintln(w, "\n      Addenda17")
+				}
+				dumpAddenda17(w, e.Addenda17[i])
+			}
+			for i := range e.Addenda18 {
+				if i == 0 {
+					fmt.Fprintln(w, "\n      Addenda18")
+				}
+				dumpAddenda18(w, e.Addenda18[i])
+			}
+
 			dumpAddenda98(w, e.Addenda98)
 			dumpAddenda99(w, e.Addenda99)
 		}
@@ -213,6 +234,94 @@ func dumpAddenda99(w *tabwriter.Writer, a *ach.Addenda99) {
 	fmt.Fprintln(w, "\n      Addenda99")
 	fmt.Fprintln(w, "      ReturnCode\tOriginalTrace\tDateOfDeath\tOriginalDFI\tAddendaInformation\tTraceNumber")
 	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%s\n", a.ReturnCode, a.OriginalTrace, a.DateOfDeath, a.OriginalDFI, a.AddendaInformation, a.TraceNumber)
+}
+
+func dumpAddenda10(w *tabwriter.Writer, a *ach.Addenda10) {
+	if a == nil {
+		return
+	}
+
+	fmt.Fprintln(w, "\n      Addenda10")
+	fmt.Fprintln(w, "      TypeCode\tTransactionTypeCode\tForeignPaymentAmount\tForeignTraceNumber\tName\tEntryDetailSequenceNumber")
+	fmt.Fprintf(w, "      %s\t%s\t%d\t%s\t%s\t%d\n", a.TypeCode, a.TransactionTypeCode, a.ForeignPaymentAmount, a.ForeignTraceNumber, a.Name, a.EntryDetailSequenceNumber)
+}
+
+func dumpAddenda11(w *tabwriter.Writer, a *ach.Addenda11) {
+	if a == nil {
+		return
+	}
+
+	fmt.Fprintln(w, "\n      Addenda11")
+	fmt.Fprintln(w, "      TypeCode\tOriginatorName\tOriginatorStreetAddress\tEntryDetailSequenceNumber")
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%d\n", a.TypeCode, a.OriginatorName, a.OriginatorStreetAddress, a.EntryDetailSequenceNumber)
+}
+
+func dumpAddenda12(w *tabwriter.Writer, a *ach.Addenda12) {
+	if a == nil {
+		return
+	}
+
+	fmt.Fprintln(w, "\n      Addenda12")
+	fmt.Fprintln(w, "      TypeCode\tOriginatorCityStateProvince\tOriginatorCountryPostalCode\tEntryDetailSequenceNumber")
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%d\n", a.TypeCode, a.OriginatorCityStateProvince, a.OriginatorCountryPostalCode, a.EntryDetailSequenceNumber)
+}
+
+func dumpAddenda13(w *tabwriter.Writer, a *ach.Addenda13) {
+	if a == nil {
+		return
+	}
+
+	fmt.Fprintln(w, "\n      Addenda13")
+	fmt.Fprintln(w, "      TypeCode\tODFIName\tODFIIDNumberQualifier\tODFIIdentification\tODFIBranchCountryCode\tEntryDetailSequenceNumber")
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%d\n", a.TypeCode, a.ODFIName, a.ODFIIDNumberQualifier, a.ODFIIdentification, a.ODFIBranchCountryCode, a.EntryDetailSequenceNumber)
+}
+
+func dumpAddenda14(w *tabwriter.Writer, a *ach.Addenda14) {
+	if a == nil {
+		return
+	}
+
+	fmt.Fprintln(w, "\n      Addenda14")
+	fmt.Fprintln(w, "      TypeCode\tRDFIName\tRDFIIDNumberQualifier\tRDFIIdentification\tRDFIBranchCountryCode\tEntryDetailSequenceNumber")
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%d\n", a.TypeCode, a.RDFIName, a.RDFIIDNumberQualifier, a.RDFIIdentification, a.RDFIBranchCountryCode, a.EntryDetailSequenceNumber)
+}
+
+func dumpAddenda15(w *tabwriter.Writer, a *ach.Addenda15) {
+	if a == nil {
+		return
+	}
+
+	fmt.Fprintln(w, "\n      Addenda15")
+	fmt.Fprintln(w, "      TypeCode\tReceiverIDNumber\tReceiverStreetAddress\tEntryDetailSequenceNumber")
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%d\n", a.TypeCode, a.ReceiverIDNumber, a.ReceiverStreetAddress, a.EntryDetailSequenceNumber)
+}
+
+func dumpAddenda16(w *tabwriter.Writer, a *ach.Addenda16) {
+	if a == nil {
+		return
+	}
+
+	fmt.Fprintln(w, "\n      Addenda16")
+	fmt.Fprintln(w, "      TypeCode\tReceiverCityStateProvince\tReceiverCountryPostalCode\tEntryDetailSequenceNumber")
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%d\n", a.TypeCode, a.ReceiverCityStateProvince, a.ReceiverCountryPostalCode, a.EntryDetailSequenceNumber)
+}
+
+func dumpAddenda17(w *tabwriter.Writer, a *ach.Addenda17) {
+	if a == nil {
+		return
+	}
+
+	fmt.Fprintln(w, "      TypeCode\tPaymentRelatedInformation\tSequenceNumber\tEntryDetailSequenceNumber")
+	fmt.Fprintf(w, "      %s\t%s\t%d\t%d\n", a.TypeCode, a.PaymentRelatedInformation, a.SequenceNumber, a.EntryDetailSequenceNumber)
+}
+
+func dumpAddenda18(w *tabwriter.Writer, a *ach.Addenda18) {
+	if a == nil {
+		return
+	}
+
+	fmt.Fprintln(w, "      TypeCode\tForeignCorrespondentBankName\tForeignCorrespondentBankIDNumberQualifier\tForeignCorrespondentBankIDNumber\tForeignCorrespondentBankBranchCountryCode\tSequenceNumber\tEntryDetailSequenceNumber")
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%d\t%d\n", a.TypeCode, a.ForeignCorrespondentBankName, a.ForeignCorrespondentBankIDNumberQualifier, a.ForeignCorrespondentBankIDNumber, a.ForeignCorrespondentBankBranchCountryCode, a.SequenceNumber, a.EntryDetailSequenceNumber)
 }
 
 func maskAccountNumber(s string) string {
