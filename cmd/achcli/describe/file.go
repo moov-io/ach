@@ -88,6 +88,59 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 		}
 	}
 
+	// IATBatches
+	for i := range file.IATBatches {
+		iatBatch := file.IATBatches[0]
+		bh := iatBatch.GetHeader()
+		if bh != nil {
+			fmt.Fprintln(w, "\n  BatchNumber\tSECCode\tServiceClassCode\tIATIndicator\tDestinationCountryCode\tFE Indicator\tFE ReferenceIndicator\tFE Reference\tCompanyEntryDescription")
+			fmt.Fprintf(w, "  %d\t%s\t%d %s\t%s\t%s\t%s\t%d\t%s\t%s\n",
+				bh.BatchNumber,
+				bh.StandardEntryClassCode,
+				bh.ServiceClassCode,
+				serviceClassCodes[bh.ServiceClassCode],
+				bh.IATIndicator,
+				bh.ISODestinationCountryCode,
+				bh.ForeignExchangeIndicator,
+				bh.ForeignExchangeReferenceIndicator,
+				bh.ForeignExchangeReference,
+				bh.CompanyEntryDescription,
+			)
+
+			fmt.Fprintln(w, "\n    OriginatorIdentification\tISOOriginatingCurrencyCode\tISODestinationCurrencyCode\tODFIIdentification\tEffectiveEntryDate\tOriginatorStatusCode")
+			fmt.Fprintf(w, "    %s\t%s\t%s\t%s\t%s\t%d\n",
+				bh.OriginatorIdentification,
+				bh.ISOOriginatingCurrencyCode,
+				bh.ISODestinationCurrencyCode,
+				bh.ODFIIdentification,
+				bh.EffectiveEntryDate,
+				bh.OriginatorStatusCode,
+			)
+		}
+
+		entries := iatBatch.GetEntries()
+		for j := range entries {
+			fmt.Fprintln(w, "\n    TransactionCode\tRDFIIdentification\tAccountNumber\tAmount\tAddendaRecords\tTraceNumber\tCategory")
+
+			e := entries[j]
+			accountNumber := e.DFIAccountNumber
+			if opts.MaskAccountNumbers {
+				accountNumber = maskAccountNumber(strings.TrimSpace(accountNumber))
+			}
+
+			fmt.Fprintf(w, "    %d %s\t%s\t%s\t%d\t%d\t%s\t%s\n", e.TransactionCode, transactionCodes[e.TransactionCode], e.RDFIIdentification, accountNumber, e.Amount, e.AddendaRecords, e.TraceNumber, e.Category)
+
+			dumpAddenda98(w, e.Addenda98)
+			dumpAddenda99(w, e.Addenda99)
+		}
+
+		bc := file.IATBatches[i].GetControl()
+		if bc != nil {
+			fmt.Fprintln(w, "\n  ServiceClassCode\tEntryAddendaCount\tEntryHash\tTotalDebits\tTotalCredits\tMACCode\tODFIIdentification\tBatchNumber")
+			fmt.Fprintf(w, "  %d %s\t%d\t%d\t%d\t%d\t%s\t%s\t%d\n", bc.ServiceClassCode, serviceClassCodes[bh.ServiceClassCode], bc.EntryAddendaCount, bc.EntryHash, bc.TotalDebitEntryDollarAmount, bc.TotalCreditEntryDollarAmount, bc.MessageAuthenticationCode, bc.ODFIIdentification, bc.BatchNumber)
+		}
+	}
+
 	// FileControl
 	fmt.Fprintln(w, "\n  BatchCount\tBlockCount\tEntryAddendaCount\tTotalDebitAmount\tTotalCreditAmount")
 	fmt.Fprintf(w, "  %d\t%d\t%d\t%d\t%d\n", fc.BatchCount, fc.BlockCount, fc.EntryAddendaCount, fc.TotalDebitEntryDollarAmountInFile, fc.TotalCreditEntryDollarAmountInFile)
