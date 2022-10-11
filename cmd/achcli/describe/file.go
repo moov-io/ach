@@ -89,8 +89,7 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 	}
 
 	// IATBatches
-	for i := range file.IATBatches {
-		iatBatch := file.IATBatches[0]
+	for _, iatBatch := range file.IATBatches {
 		bh := iatBatch.GetHeader()
 		if bh != nil {
 			fmt.Fprintln(w, "\n  BatchNumber\tSECCode\tServiceClassCode\tIATIndicator\tDestinationCountryCode\tFE Indicator\tFE ReferenceIndicator\tFE Reference\tCompanyEntryDescription")
