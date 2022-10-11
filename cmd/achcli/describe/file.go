@@ -155,7 +155,7 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 			dumpAddenda99(w, e.Addenda99)
 		}
 
-		bc := file.IATBatches[i].GetControl()
+		bc := iatBatch.GetControl()
 		if bc != nil {
 			fmt.Fprintln(w, "\n  ServiceClassCode\tEntryAddendaCount\tEntryHash\tTotalDebits\tTotalCredits\tMACCode\tODFIIdentification\tBatchNumber")
 			fmt.Fprintf(w, "  %d %s\t%d\t%d\t%d\t%d\t%s\t%s\t%d\n", bc.ServiceClassCode, serviceClassCodes[bh.ServiceClassCode], bc.EntryAddendaCount, bc.EntryHash, bc.TotalDebitEntryDollarAmount, bc.TotalCreditEntryDollarAmount, bc.MessageAuthenticationCode, bc.ODFIIdentification, bc.BatchNumber)
