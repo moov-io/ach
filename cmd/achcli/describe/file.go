@@ -89,7 +89,8 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 	}
 
 	// IATBatches
-	for _, iatBatch := range file.IATBatches {
+	for i := range file.IATBatches {
+		iatBatch := file.IATBatches[i]
 		bh := iatBatch.GetHeader()
 		if bh != nil {
 			fmt.Fprintln(w, "\n  BatchNumber\tSECCode\tServiceClassCode\tIATIndicator\tDestinationCountryCode\tFE Indicator\tFE ReferenceIndicator\tFE Reference\tCompanyEntryDescription")
@@ -138,15 +139,9 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 			dumpAddenda16(w, e.Addenda16)
 
 			for i := range e.Addenda17 {
-				if i == 0 {
-					fmt.Fprintln(w, "\n      Addenda17")
-				}
 				dumpAddenda17(w, e.Addenda17[i])
 			}
 			for i := range e.Addenda18 {
-				if i == 0 {
-					fmt.Fprintln(w, "\n      Addenda18")
-				}
 				dumpAddenda18(w, e.Addenda18[i])
 			}
 
@@ -240,7 +235,6 @@ func dumpAddenda10(w *tabwriter.Writer, a *ach.Addenda10) {
 		return
 	}
 
-	fmt.Fprintln(w, "\n      Addenda10")
 	fmt.Fprintln(w, "      TypeCode\tTransactionTypeCode\tForeignPaymentAmount\tForeignTraceNumber\tName\tEntryDetailSequenceNumber")
 	fmt.Fprintf(w, "      %s\t%s\t%d\t%s\t%s\t%d\n", a.TypeCode, a.TransactionTypeCode, a.ForeignPaymentAmount, a.ForeignTraceNumber, a.Name, a.EntryDetailSequenceNumber)
 }
@@ -250,7 +244,6 @@ func dumpAddenda11(w *tabwriter.Writer, a *ach.Addenda11) {
 		return
 	}
 
-	fmt.Fprintln(w, "\n      Addenda11")
 	fmt.Fprintln(w, "      TypeCode\tOriginatorName\tOriginatorStreetAddress\tEntryDetailSequenceNumber")
 	fmt.Fprintf(w, "      %s\t%s\t%s\t%d\n", a.TypeCode, a.OriginatorName, a.OriginatorStreetAddress, a.EntryDetailSequenceNumber)
 }
@@ -260,7 +253,6 @@ func dumpAddenda12(w *tabwriter.Writer, a *ach.Addenda12) {
 		return
 	}
 
-	fmt.Fprintln(w, "\n      Addenda12")
 	fmt.Fprintln(w, "      TypeCode\tOriginatorCityStateProvince\tOriginatorCountryPostalCode\tEntryDetailSequenceNumber")
 	fmt.Fprintf(w, "      %s\t%s\t%s\t%d\n", a.TypeCode, a.OriginatorCityStateProvince, a.OriginatorCountryPostalCode, a.EntryDetailSequenceNumber)
 }
@@ -270,7 +262,6 @@ func dumpAddenda13(w *tabwriter.Writer, a *ach.Addenda13) {
 		return
 	}
 
-	fmt.Fprintln(w, "\n      Addenda13")
 	fmt.Fprintln(w, "      TypeCode\tODFIName\tODFIIDNumberQualifier\tODFIIdentification\tODFIBranchCountryCode\tEntryDetailSequenceNumber")
 	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%d\n", a.TypeCode, a.ODFIName, a.ODFIIDNumberQualifier, a.ODFIIdentification, a.ODFIBranchCountryCode, a.EntryDetailSequenceNumber)
 }
@@ -280,7 +271,6 @@ func dumpAddenda14(w *tabwriter.Writer, a *ach.Addenda14) {
 		return
 	}
 
-	fmt.Fprintln(w, "\n      Addenda14")
 	fmt.Fprintln(w, "      TypeCode\tRDFIName\tRDFIIDNumberQualifier\tRDFIIdentification\tRDFIBranchCountryCode\tEntryDetailSequenceNumber")
 	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%d\n", a.TypeCode, a.RDFIName, a.RDFIIDNumberQualifier, a.RDFIIdentification, a.RDFIBranchCountryCode, a.EntryDetailSequenceNumber)
 }
@@ -290,7 +280,6 @@ func dumpAddenda15(w *tabwriter.Writer, a *ach.Addenda15) {
 		return
 	}
 
-	fmt.Fprintln(w, "\n      Addenda15")
 	fmt.Fprintln(w, "      TypeCode\tReceiverIDNumber\tReceiverStreetAddress\tEntryDetailSequenceNumber")
 	fmt.Fprintf(w, "      %s\t%s\t%s\t%d\n", a.TypeCode, a.ReceiverIDNumber, a.ReceiverStreetAddress, a.EntryDetailSequenceNumber)
 }
@@ -300,7 +289,6 @@ func dumpAddenda16(w *tabwriter.Writer, a *ach.Addenda16) {
 		return
 	}
 
-	fmt.Fprintln(w, "\n      Addenda16")
 	fmt.Fprintln(w, "      TypeCode\tReceiverCityStateProvince\tReceiverCountryPostalCode\tEntryDetailSequenceNumber")
 	fmt.Fprintf(w, "      %s\t%s\t%s\t%d\n", a.TypeCode, a.ReceiverCityStateProvince, a.ReceiverCountryPostalCode, a.EntryDetailSequenceNumber)
 }
