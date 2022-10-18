@@ -27,6 +27,15 @@
     - name: SEC codes table
       link: /sec-codes-table/
 
+- label: Examples
+  items:
+    - name: All SEC Codes
+      link: link: https://github.com/moov-io/ach/blob/master/examples/
+    - name: Create file via HTTP
+      link: https://github.com/moov-io/ach/blob/master/examples/http/main.go
+    - name: Micro Entries
+      link: https://github.com/moov-io/ach/blob/master/examples/micro-entries/main.go
+
 - label: File operations
   items:
     - name: Custom validation
