@@ -30,7 +30,7 @@
 - label: Examples
   items:
     - name: All SEC Codes
-      link: link: https://github.com/moov-io/ach/blob/master/examples/
+      link: https://github.com/moov-io/ach/blob/master/examples/
     - name: Create file via HTTP
       link: https://github.com/moov-io/ach/blob/master/examples/http/main.go
     - name: Micro Entries
