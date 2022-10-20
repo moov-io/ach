@@ -258,6 +258,10 @@ func (fh *FileHeader) ValidateWith(opts *ValidateOpts) error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (fh *FileHeader) fieldInclusion() error {
+	if fh.validateOpts != nil && fh.validateOpts.AllowMissingFileHeader {
+		return nil
+	}
+
 	if fh.ImmediateDestination == "" {
 		return fieldError("ImmediateDestination", ErrConstructor, fh.ImmediateDestinationField())
 	}

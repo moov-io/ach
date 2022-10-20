@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"github.com/stretchr/testify/require"
 	"strings"
 	"testing"
 	"time"
@@ -96,6 +97,16 @@ func TestFileHeader__ImmediateOrigin(t *testing.T) {
 	if v := header.ImmediateOriginField(); v != header.ImmediateOrigin {
 		t.Errorf("got %q", v)
 	}
+}
+
+func TestFileHeader__ByPassingFileHeaderValidation(t *testing.T) {
+	header := NewFileHeader()
+	header.ImmediateDestination = ""
+	header.ImmediateOrigin = ""
+	header.SetValidation(&ValidateOpts{AllowMissingFileHeader: true})
+
+	err := header.fieldInclusion()
+	require.NoError(t, err)
 }
 
 func TestFileHeader__ImmediateDestination(t *testing.T) {
