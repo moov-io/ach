@@ -38,10 +38,12 @@
 
 - label: File operations
   items:
-    - name: Custom validation
-      link: /custom-validation/
     - name: Balanced offset
       link: /balanced-offset/
+    - name: Change files
+      link: /changes/
+    - name: Custom validation
+      link: /custom-validation/
     - name: Flatten batches
       link: /flatten-batches/
     - name: Merging files
@@ -50,8 +52,8 @@
       link: /segment-file/
     - name: Return files
       link: /returns/
-    - name: Change files
-      link: /changes/
+    - name: Reversal Files
+      link: /reversals/
 
 - label: Production and monitoring
   items:
