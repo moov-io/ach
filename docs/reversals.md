@@ -38,3 +38,5 @@ if err != nil {
 
 // Now `file` has all Batches and Entries converted into Reversals
 ```
+
+See an [example in Go code](https://github.com/moov-io/ach/tree/master/examples/reversals/) of reversing files.
