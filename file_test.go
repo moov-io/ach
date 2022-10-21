@@ -474,17 +474,11 @@ func TestFile__ValidateOptsJSON(t *testing.T) {
 	require.False(t, opts.BypassDestinationValidation)
 }
 
-func TestFile__readFromJson(t *testing.T) {
+func TestFileReadJSONFile(t *testing.T) {
 	path := filepath.Join("test", "testdata", "ppd-valid.json")
-	bs, err := os.ReadFile(path)
-	if err != nil {
-		t.Fatal(err)
-	}
 
-	file, err := FileFromJSON(bs)
-	if err != nil {
-		t.Fatal(err)
-	}
+	file, err := ReadJSONFile(path)
+	require.NoError(t, err)
 	require.Nil(t, file.GetValidation())
 
 	// Ensure the file is valid
@@ -537,6 +531,8 @@ func TestFile__readFromJson(t *testing.T) {
 
 	// ensure we error on struct tag unmarshal
 	var f File
+	bs, err := os.ReadFile(path)
+	require.NoError(t, err)
 	if err := json.Unmarshal(bs, &f); err != nil {
 		t.Error(err)
 	}
@@ -647,11 +643,7 @@ func TestFile__iso8601JSON(t *testing.T) {
 }
 
 func TestFile__IATdatetimeParse(t *testing.T) {
-	bs, err := os.ReadFile(filepath.Join("test", "testdata", "iat-debit.json"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	file, err := FileFromJSON(bs)
+	file, err := ReadJSONFile(filepath.Join("test", "testdata", "iat-debit.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -668,12 +660,12 @@ func TestFile__IATdatetimeParse(t *testing.T) {
 }
 
 func TestFile__JsonBypassOrigin(t *testing.T) {
-	bs, err := os.ReadFile(filepath.Join("test", "testdata", "json-bypass-origin.json"))
-	require.NoError(t, err)
-
-	file, err := FileFromJSONWith(bs, &ValidateOpts{
+	path := filepath.Join("test", "testdata", "json-bypass-origin.json")
+	opts := &ValidateOpts{
 		BypassOriginValidation: true,
-	})
+	}
+
+	file, err := ReadJSONFileWith(path, opts)
 	require.NoError(t, err)
 	require.NoError(t, file.Validate())
 
@@ -684,13 +676,13 @@ func TestFile__JsonBypassOrigin(t *testing.T) {
 }
 
 func TestFile__JsonBypassDestinationAndOrigin(t *testing.T) {
-	bs, err := os.ReadFile(filepath.Join("test", "testdata", "json-bypass-origin-and-destination.json"))
-	require.NoError(t, err)
-
-	file, err := FileFromJSONWith(bs, &ValidateOpts{
+	path := filepath.Join("test", "testdata", "json-bypass-origin-and-destination.json")
+	opts := &ValidateOpts{
 		BypassOriginValidation:      true,
 		BypassDestinationValidation: true,
-	})
+	}
+
+	file, err := ReadJSONFileWith(path, opts)
 	require.NoError(t, err)
 	require.NoError(t, file.Validate())
 

@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -107,6 +108,25 @@ type advFileControl struct {
 // as their YYMMDD (year, month, day) or hhmm (hour, minute) formats.
 func FileFromJSON(bs []byte) (*File, error) {
 	return FileFromJSONWith(bs, nil)
+}
+
+// ReadJSONFile will consume the specified filepath and parse the contents as a JSON formatted ACH file.
+func ReadJSONFile(path string) (*File, error) {
+	bs, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	return FileFromJSON(bs)
+}
+
+// ReadJSONFileWith will consume the specified filepath and parse the contents
+// as a JSON formatted ACH file with custom ValidateOpts.
+func ReadJSONFileWith(path string, opts *ValidateOpts) (*File, error) {
+	bs, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	return FileFromJSONWith(bs, opts)
 }
 
 // FileFromJSONWith attempts to return a *File object assuming the input is valid JSON.
