@@ -48,8 +48,21 @@ func (f *File) Reversal(effectiveEntryDate time.Time) error {
 		// In EntryDetail records we need to update the TransactionCode fields to undo fund movement.
 		entries := f.Batches[i].GetEntries()
 		for j := range entries {
-			// 22 (CheckingCredit) -> 27 (CheckingDebit)
-			entries[j].TransactionCode += 5
+			switch entries[j].TransactionCode {
+			case
+				CheckingCredit, CheckingReturnNOCCredit, CheckingPrenoteCredit, CheckingZeroDollarRemittanceCredit,
+				GLCredit, GLPrenoteCredit, GLReturnNOCCredit, GLZeroDollarRemittanceCredit,
+				LoanCredit, LoanPrenoteCredit, LoanReturnNOCCredit, LoanZeroDollarRemittanceCredit,
+				SavingsCredit, SavingsPrenoteCredit, SavingsReturnNOCCredit, SavingsZeroDollarRemittanceCredit:
+				entries[j].TransactionCode += 5
+
+			case
+				CheckingDebit, CheckingPrenoteDebit, CheckingReturnNOCDebit, CheckingZeroDollarRemittanceDebit,
+				GLDebit, GLPrenoteDebit, GLReturnNOCDebit, GLZeroDollarRemittanceDebit,
+				LoanDebit, LoanReturnNOCDebit,
+				SavingsDebit, SavingsPrenoteDebit, SavingsReturnNOCDebit, SavingsZeroDollarRemittanceDebit:
+				entries[j].TransactionCode -= 5
+			}
 		}
 	}
 	return nil
