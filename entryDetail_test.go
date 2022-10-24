@@ -723,3 +723,46 @@ func TestEntryDetail__LargeAmountStrings(t *testing.T) {
 		}
 	}
 }
+
+func TestEntryDetail__InvalidCheckDigitAllowedWithOpt(t *testing.T) {
+	ed := mockEntryDetail()
+	ed.SetValidation(&ValidateOpts{
+		AllowInvalidCheckDigit: true,
+	})
+	ed.CheckDigit = "6"
+	if err := ed.Validate(); err != nil {
+		t.Fatal(err)
+	}
+
+	// nil out
+	ed = nil
+	ed.SetValidation(&ValidateOpts{})
+}
+
+func TestEntryDetail__InvalidCheckDigitNotAllowedWithoutOpt(t *testing.T) {
+	ed := mockEntryDetail()
+	ed.SetValidation(&ValidateOpts{
+		AllowInvalidCheckDigit: false,
+	})
+	ed.CheckDigit = "6"
+	if err := ed.Validate(); err == nil {
+		t.Fatal(err)
+	}
+
+	// nil out
+	ed = nil
+	ed.SetValidation(&ValidateOpts{})
+}
+
+func TestEntryDetail__InvalidCheckDigitNotAllowedWithNullValidateOpt(t *testing.T) {
+	ed := mockEntryDetail()
+	ed.SetValidation(nil)
+	ed.CheckDigit = "6"
+	if err := ed.Validate(); err == nil {
+		t.Fatal(err)
+	}
+
+	// nil out
+	ed = nil
+	ed.SetValidation(&ValidateOpts{})
+}

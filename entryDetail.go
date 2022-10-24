@@ -287,16 +287,19 @@ func (ed *EntryDetail) Validate() error {
 		return fieldError("DiscretionaryData", err, ed.DiscretionaryData)
 	}
 
-	calculated := ed.CalculateCheckDigit(ed.RDFIIdentificationField())
+	if ed.validateOpts == nil || ed.validateOpts.AllowInvalidCheckDigit == false {
+		calculated := ed.CalculateCheckDigit(ed.RDFIIdentificationField())
 
-	edCheckDigit, err := strconv.Atoi(ed.CheckDigit)
-	if err != nil {
-		return fieldError("CheckDigit", err, ed.CheckDigit)
+		edCheckDigit, err := strconv.Atoi(ed.CheckDigit)
+		if err != nil {
+			return fieldError("CheckDigit", err, ed.CheckDigit)
+		}
+
+		if calculated != edCheckDigit {
+			return fieldError("RDFIIdentification", NewErrValidCheckDigit(calculated), ed.CheckDigit)
+		}
 	}
 
-	if calculated != edCheckDigit {
-		return fieldError("RDFIIdentification", NewErrValidCheckDigit(calculated), ed.CheckDigit)
-	}
 	return nil
 }
 

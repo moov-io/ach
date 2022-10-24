@@ -671,6 +671,10 @@ type ValidateOpts struct {
 
 	// AllowUnorderedBatchNumebrs allows a file to be read with unordered batch numbers.
 	AllowUnorderedBatchNumbers bool `json:"allowUnorderedBatchNumbers"`
+
+	// AllowInvalidCheckDigit allows the CheckDigit field in EntryDetail to differ from
+	// the expected calculation
+	AllowInvalidCheckDigit bool `json:"allowInvalidCheckDigit"`
 }
 
 // ValidateWith performs checks on each record according to Nacha guidelines.
