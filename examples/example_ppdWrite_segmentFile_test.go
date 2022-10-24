@@ -19,9 +19,11 @@ package examples
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/require"
 	"log"
 	"os"
 	"path/filepath"
+	"testing"
 
 	"github.com/moov-io/ach"
 )
@@ -81,4 +83,14 @@ func Example_ppdWriteSegmentFile() {
 	// credit 0: 622231380104987654321        0100000000               Credit Account 1        0121042880000002
 	// credit 1: 622231380104837098765        0100000000               Credit Account 2        0121042880000003
 	// debit 0: 627231380104123456789        0200000000               Debit Account           0121042880000001
+}
+
+func Test_ppdMixedDebitCreditImmediateOrigin(t *testing.T) {
+	f, err := os.Open(filepath.Join("testdata", "ppd-mixedDebitCredit.ach"))
+	require.NoError(t, err)
+	r := ach.NewReader(f)
+	achFile, err := r.Read()
+	require.NoError(t, err)
+
+	require.Equal(t, achFile.Header.ImmediateOriginField(), "0121042882")
 }
