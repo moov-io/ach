@@ -1,3 +1,22 @@
+## v1.22.0 (Released 2022-10-25)
+
+IMPROVEMENTS
+
+- docs: rename 'payment code' to transaction code
+- examples: add micro-entries / micro-deposits (#1103)
+- feat: add `ReadJSONFile` and `ReadJSONFileWith` helpers
+- feat: add `Reversal()` to files
+- feat: add `AllowInvalidCheckDigit` validation option
+- feat: add achcli IAT Support (#1100)
+- feat: allow empty strings when allow missing file header opt is set
+
+BUILD
+
+- build(deps): bump nokogiri from 1.13.6 to 1.13.9 in /docs
+- fix(deps): update module github.com/moov-io/base to v0.36.1
+- fix(deps): update module github.com/stretchr/testify to v1.8.1
+- fix(deps): update module golang.org/x/oauth2 to v0.1.0
+
 ## v1.21.2 (Released 2022-10-04)
 
 IMPROVEMENTS
