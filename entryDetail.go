@@ -287,7 +287,7 @@ func (ed *EntryDetail) Validate() error {
 		return fieldError("DiscretionaryData", err, ed.DiscretionaryData)
 	}
 
-	if ed.validateOpts == nil || ed.validateOpts.AllowInvalidCheckDigit == false {
+	if ed.validateOpts == nil || !ed.validateOpts.AllowInvalidCheckDigit {
 		calculated := ed.CalculateCheckDigit(ed.RDFIIdentificationField())
 
 		edCheckDigit, err := strconv.Atoi(ed.CheckDigit)
