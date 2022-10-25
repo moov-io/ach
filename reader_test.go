@@ -331,6 +331,43 @@ func TestPPDDebitFixedLengthRead__InvalidLength(t *testing.T) {
 	}
 }
 
+func TestPPDInvalidEntryCheckDigit_NoErrorWithValidateOpt(t *testing.T) {
+	f, err := os.Open(filepath.Join("test", "testdata", "ppd-debit-invalid-entryDetail-checkDigit.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+
+	r := NewReader(f)
+	r.SetValidation(&ValidateOpts{
+		AllowInvalidCheckDigit: true,
+	})
+	file, err := r.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := file.Validate(); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestPPDInvalidEntryCheckDigit_ErrorWithoutValidateOpt(t *testing.T) {
+	f, err := os.Open(filepath.Join("test", "testdata", "ppd-debit-invalid-entryDetail-checkDigit.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+
+	r := NewReader(f)
+	file, err := r.Read()
+	if err == nil {
+		t.Fatal(err)
+	}
+	if err := file.Validate(); err == nil {
+		t.Fatal(err)
+	}
+}
+
 // testRecordTypeUnknown validates record type unknown
 func testRecordTypeUnknown(t testing.TB) {
 	var line = "301 076401251 0764012510807291511A094101achdestname            companyname                    "

@@ -404,6 +404,7 @@ func (r *Reader) parseEntryDetail() error {
 	if r.currentBatch.GetHeader().StandardEntryClassCode != ADV {
 		ed := NewEntryDetail()
 		ed.Parse(r.line)
+		ed.SetValidation(r.File.validateOpts)
 		if err := ed.Validate(); err != nil {
 			return r.parseError(err)
 		}
