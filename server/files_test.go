@@ -237,6 +237,12 @@ func TestFiles__decodeCreateFileRequest__validateOpts(t *testing.T) {
 				AllowUnorderedBatchNumbers: true,
 			},
 		},
+		{
+			query: "?allowInvalidCheckDigit=true",
+			expect: ach.ValidateOpts{
+				AllowInvalidCheckDigit: true,
+			},
+		},
 	}
 
 	for _, tc := range tests {
