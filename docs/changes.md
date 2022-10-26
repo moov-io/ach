@@ -30,7 +30,7 @@ The ODFI is responsible for forwarding an NOC to the Originator within two banki
 
 - Change code
 - Original Entry trace number
-- Original RDFI indentification
+- Original RDFI identification
 - Corrected data
 
 The Originator must make specified changes within six banking days of receiving the above information or prior to initiating another entry to the receiver's account (whichever is later).
