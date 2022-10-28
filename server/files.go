@@ -756,15 +756,30 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 }
 
 func decodeSegmentFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var wrapper struct {
-		File         *ach.File                     `json:"file"`
-		Opts         *ach.SegmentFileConfiguration `json:"opts"`
+	var options struct {
 		ValidateOpts *ach.ValidateOpts             `json:"validateOpts"`
+		Opts         *ach.SegmentFileConfiguration `json:"opts"`
+	}
+
+	var wrapper struct {
+		File *ach.File `json:"file"`
+	}
+
+	bodyBytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		return segmentedFilesResponse{Err: err}, err
 	}
 
 	header := strings.ToLower(r.Header.Get("content-type"))
 	if strings.Contains(header, "application/json") {
-		err := json.NewDecoder(r.Body).Decode(&wrapper)
+		err := json.Unmarshal(bodyBytes, &options)
+		if err != nil {
+			return segmentedFilesResponse{Err: err}, err
+		}
+		wrapper.File = ach.NewFile()
+		wrapper.File.SetValidation(options.ValidateOpts)
+
+		err = json.Unmarshal(bodyBytes, &wrapper)
 		if err != nil {
 			return segmentedFilesResponse{Err: err}, err
 		}
@@ -779,8 +794,8 @@ func decodeSegmentFileRequest(_ context.Context, r *http.Request) (interface{}, 
 	return segmentFileRequest{
 		File:         wrapper.File,
 		requestID:    moovhttp.GetRequestID(r),
-		opts:         wrapper.Opts,
-		validateOpts: wrapper.ValidateOpts,
+		opts:         options.Opts,
+		validateOpts: options.ValidateOpts,
 	}, nil
 }
 

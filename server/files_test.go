@@ -801,6 +801,7 @@ func TestFiles__segmentFileEndpointValidateOpts(t *testing.T) {
 	opts := &ach.ValidateOpts{
 		AllowUnorderedBatchNumbers: true,
 		CustomTraceNumbers:         true,
+		AllowMissingFileHeader:     true,
 	}
 
 	bs, err := os.ReadFile(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-invalid.json"))
@@ -808,6 +809,8 @@ func TestFiles__segmentFileEndpointValidateOpts(t *testing.T) {
 
 	file, err := ach.FileFromJSONWith(bs, opts)
 	require.NoError(t, err)
+
+	file.Header.ImmediateDestination = ""
 
 	var buf bytes.Buffer
 	err = json.NewEncoder(&buf).Encode(struct {
@@ -829,6 +832,13 @@ func TestFiles__segmentFileEndpointValidateOpts(t *testing.T) {
 	w.Flush()
 
 	var resp segmentedFilesResponse
+
+	resp.CreditFile = ach.NewFile()
+	resp.CreditFile.SetValidation(opts)
+
+	resp.DebitFile = ach.NewFile()
+	resp.DebitFile.SetValidation(opts)
+
 	require.NoError(t, json.NewDecoder(w.Body).Decode(&resp))
 
 	require.NotEmpty(t, resp.CreditFileID)

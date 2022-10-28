@@ -161,7 +161,7 @@ func FileFromJSONWith(bs []byte, opts *ValidateOpts) (*File, error) {
 	if err := json.NewDecoder(bytes.NewReader(bs)).Decode(&header); err != nil {
 		return nil, fmt.Errorf("problem reading FileHeader: %v", err)
 	}
-	file.Header = header.Header
+	file.SetHeader(header.Header)
 
 	// Build resulting file
 	if err := file.setBatchesFromJSON(bs); err != nil {
@@ -197,9 +197,6 @@ func FileFromJSONWith(bs []byte, opts *ValidateOpts) (*File, error) {
 		file.ADVControl.BatchCount = len(file.Batches)
 	}
 
-	if opts != nil {
-		file.SetValidation(opts)
-	}
 	if err := file.Create(); err != nil {
 		return file, err
 	}
@@ -584,6 +581,7 @@ func (f *File) AddIATBatch(iatBatch IATBatch) []IATBatch {
 // SetHeader allows for header to be built.
 func (f *File) SetHeader(h FileHeader) *File {
 	f.Header = h
+	f.Header.SetValidation(f.validateOpts)
 	return f
 }
 
