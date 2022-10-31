@@ -1,3 +1,10 @@
+## v1.22.1 (Released 2022-10-31)
+
+IMPROVEMENTS
+
+- docs: Fix spelling mistake in Original RDFI identification
+- server: read ValidateOpts before file to segment
+
 ## v1.22.0 (Released 2022-10-25)
 
 IMPROVEMENTS
