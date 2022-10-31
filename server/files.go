@@ -756,28 +756,50 @@ func segmentFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 }
 
 func decodeSegmentFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var file *ach.File
+
 	var wrapper struct {
-		File         *ach.File                     `json:"file"`
 		Opts         *ach.SegmentFileConfiguration `json:"opts"`
 		ValidateOpts *ach.ValidateOpts             `json:"validateOpts"`
 	}
 
 	header := strings.ToLower(r.Header.Get("content-type"))
 	if strings.Contains(header, "application/json") {
-		err := json.NewDecoder(r.Body).Decode(&wrapper)
+		kv := make(map[string]json.RawMessage, 0)
+
+		err := json.NewDecoder(r.Body).Decode(&kv)
 		if err != nil {
-			return segmentedFilesResponse{Err: err}, err
+			return segmentedFilesResponse{Err: err}, fmt.Errorf("A : %v", err)
+		}
+
+		if vv, exists := kv["opts"]; vv != nil && exists {
+			err = json.Unmarshal(vv, &wrapper.Opts)
+			if err != nil {
+				return segmentedFilesResponse{Err: err}, fmt.Errorf("B1 : %v", err)
+			}
+		}
+		if vv, exists := kv["validateOpts"]; vv != nil && exists {
+			err = json.Unmarshal(vv, &wrapper.ValidateOpts)
+			if err != nil {
+				return segmentedFilesResponse{Err: err}, fmt.Errorf("B2 : %v", err)
+			}
+		}
+		if vv, exists := kv["file"]; exists {
+			file, err = ach.FileFromJSONWith(vv, wrapper.ValidateOpts)
+			if err != nil {
+				return segmentedFilesResponse{Err: err}, fmt.Errorf("C : %v", err)
+			}
 		}
 	} else {
-		file, err := ach.NewReader(r.Body).Read()
+		ff, err := ach.NewReader(r.Body).Read()
 		if err != nil {
-			return segmentedFilesResponse{Err: err}, err
+			return segmentedFilesResponse{Err: err}, fmt.Errorf("D : %v", err)
 		}
-		wrapper.File = &file
+		file = &ff
 	}
 
 	return segmentFileRequest{
-		File:         wrapper.File,
+		File:         file,
 		requestID:    moovhttp.GetRequestID(r),
 		opts:         wrapper.Opts,
 		validateOpts: wrapper.ValidateOpts,
