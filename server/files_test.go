@@ -801,6 +801,7 @@ func TestFiles__segmentFileEndpointValidateOpts(t *testing.T) {
 	opts := &ach.ValidateOpts{
 		AllowUnorderedBatchNumbers: true,
 		CustomTraceNumbers:         true,
+		AllowMissingFileHeader:     true,
 	}
 
 	bs, err := os.ReadFile(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-invalid.json"))
@@ -808,6 +809,8 @@ func TestFiles__segmentFileEndpointValidateOpts(t *testing.T) {
 
 	file, err := ach.FileFromJSONWith(bs, opts)
 	require.NoError(t, err)
+
+	file.Header.ImmediateDestination = ""
 
 	var buf bytes.Buffer
 	err = json.NewEncoder(&buf).Encode(struct {
@@ -828,16 +831,33 @@ func TestFiles__segmentFileEndpointValidateOpts(t *testing.T) {
 	router.ServeHTTP(w, req)
 	w.Flush()
 
-	var resp segmentedFilesResponse
-	require.NoError(t, json.NewDecoder(w.Body).Decode(&resp))
+	objmap := make(map[string]json.RawMessage, 0)
+	err = json.NewDecoder(w.Body).Decode(&objmap)
+	require.NoError(t, err)
 
-	require.NotEmpty(t, resp.CreditFileID)
-	require.NotNil(t, resp.CreditFile)
-	require.NotNil(t, resp.CreditFile.GetValidation())
+	// Credit File
+	creditFileID, exists := objmap["creditFileID"]
+	require.True(t, exists)
+	require.NotEmpty(t, creditFileID)
 
-	require.NotEmpty(t, resp.DebitFileID)
-	require.NotNil(t, resp.DebitFile)
-	require.NotNil(t, resp.DebitFile.GetValidation())
+	creditFileJSON, exists := objmap["creditFile"]
+	require.True(t, exists)
+	require.NotNil(t, creditFileJSON)
+	creditFile, err := ach.FileFromJSONWith(creditFileJSON, opts)
+	require.NoError(t, err)
+	require.NotNil(t, creditFile.GetValidation())
+
+	// Debit File
+	debitFileID, exists := objmap["debitFileID"]
+	require.True(t, exists)
+	require.NotEmpty(t, debitFileID)
+
+	debitFileJSON, exists := objmap["debitFile"]
+	require.True(t, exists)
+	require.NotNil(t, debitFileJSON)
+	debitFile, err := ach.FileFromJSONWith(debitFileJSON, opts)
+	require.NoError(t, err)
+	require.NotNil(t, debitFile.GetValidation())
 }
 
 // TestFiles__decodeSegmentFileIDRequest tests segmentFileIDEndpoints
