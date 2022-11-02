@@ -11,7 +11,7 @@ require (
 	github.com/juju/ansiterm v0.0.0-20210929141451-8b71cc96ebdc
 	github.com/mattn/go-isatty v0.0.16
 	github.com/moov-io/base v0.36.1
-	github.com/prometheus/client_golang v1.13.0
+	github.com/prometheus/client_golang v1.13.1
 	github.com/stretchr/testify v1.8.1
 	golang.org/x/oauth2 v0.1.0
 )
