@@ -30,7 +30,7 @@ We have an example of [using our Go client and uploading the JSON representation
 
 ## Upload a JSON representation
 
-In Ruby we have an example of [creating an ACH file from JSON](https://github.com/moov-io/ruby-ach-demo/blob/master/main.rb). The JSON structure corresponds to our [API endpoint for creating files](https://api.moov.io/#operation/createFile) that the ACH HTTP server expects.
+In Ruby we have an example of [creating an ACH file from JSON](https://github.com/moov-io/ruby-ach-demo/blob/master/main.rb). The JSON structure corresponds to our [API endpoint for creating files](https://moov-io.github.io/ach/api/#post-/files/-fileID-) that the ACH HTTP server expects.
 
 We have [example ACH files](https://github.com/moov-io/ach/blob/master/test/testdata/ppd-valid.json) in JSON.
 
@@ -59,7 +59,7 @@ Example: `POST /files/create?requireABAOrigin=true&bypassDestination=true`
 
 ## Upload a raw ACH file
 
-Our ACH HTTP server also handles [uploading raw ACH files](https://api.moov.io/#operation/createFile) which is the NACHA text format.  We have example files in their NACHA format and example code for creating and reading the files.
+Our ACH HTTP server also handles [uploading raw ACH files](https://moov-io.github.io/ach/api/#post-/files/-fileID-) which is the NACHA text format.  We have example files in their NACHA format and example code for creating and reading the files.
 
 | SEC Code | Description                                  | Example ACH File                                 | Read                | Write                                            |
 |----------|---------------------------------------|------------------------------------------|-----------------------------------|------------------------------------|
