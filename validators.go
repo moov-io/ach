@@ -396,9 +396,10 @@ func StandardTransactionCode(code int) error {
 // POP = Point of Purchase Entry, RCK = Re-presented Check Entry
 func (v *validator) isTransactionTypeCode(s string) error {
 	switch strings.ToUpper(s) {
-	case "ANN", "BUS", "DEP", "LOA", "MIS", "MOR",
-		"PEN", "RLS", "REM", "SAL", "TAX", TEL, WEB,
-		ARC, BOC, POP, RCK:
+	case
+		"ANN", "BUS", "DEP", "LOA", "MIS", "MOR",
+		"PEN", "REM", "RLS", "SAL", "TAX",
+		ARC, BOC, MTE, POP, POS, RCK, SHR, TEL, WEB:
 		return nil
 	}
 	return ErrTransactionTypeCode
