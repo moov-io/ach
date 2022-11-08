@@ -23,6 +23,7 @@ import (
 	"math"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 	"unicode/utf8"
 )
@@ -394,10 +395,11 @@ func StandardTransactionCode(code int) error {
 // WEB = Internet-Initiated Transaction, ARC = Accounts Receivable Entry, BOC = Back Office Conversion Entry,
 // POP = Point of Purchase Entry, RCK = Re-presented Check Entry
 func (v *validator) isTransactionTypeCode(s string) error {
-	switch s {
-	case "ANN", "BUS", "DEP", "LOA", "MIS", "MOR",
-		"PEN", "RLS", "REM", "SAL", "TAX", TEL, WEB,
-		ARC, BOC, POP, RCK:
+	switch strings.ToUpper(s) {
+	case
+		"ANN", "BUS", "DEP", "LOA", "MIS", "MOR",
+		"PEN", "REM", "RLS", "SAL", "TAX",
+		ARC, BOC, MTE, POP, POS, RCK, SHR, TEL, WEB:
 		return nil
 	}
 	return ErrTransactionTypeCode
