@@ -20,6 +20,8 @@ package ach
 import (
 	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestValidators__checkDigit(t *testing.T) {
@@ -119,6 +121,16 @@ func TestValidators__validateSimpleTime(t *testing.T) {
 			t.Errorf("input=%q got=%q expected=%q", input, answer, expected)
 		}
 	}
+}
+
+func TestValidators__isTransactionTypeCode(t *testing.T) {
+	v := validator{}
+
+	require.NoError(t, v.isTransactionTypeCode("BUS"))
+	require.NoError(t, v.isTransactionTypeCode("tax"))
+
+	require.Error(t, v.isTransactionTypeCode("ZZZ"))
+	require.Error(t, v.isTransactionTypeCode("abc"))
 }
 
 func TestValidators__isAlphanumeric(t *testing.T) {
