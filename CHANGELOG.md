@@ -1,3 +1,15 @@
+## v1.22.2 (Released 2022-11-08)
+
+IMPROVEMENTS
+
+- docs: fix link to creating file over HTTP
+- fix: allow mixed-case Addenda10 TransactionType codes
+- validator: include missing secondary SEC codes for Addenda10
+
+BUILD
+
+- fix(deps): update module github.com/prometheus/client_golang to v1.14.0
+
 ## v1.22.1 (Released 2022-10-31)
 
 IMPROVEMENTS
