@@ -1,3 +1,14 @@
+## v1.23.0 (Released 2022-11-15)
+
+IMPROVEMENTS
+
+- cmd/achcli: support masking corrected data, option to prettify amounts
+
+BUILD
+
+- fix(deps): update module github.com/moov-io/base to v0.36.2
+- fix(deps): update module golang.org/x/oauth2 to v0.2.0
+
 ## v1.22.2 (Released 2022-11-08)
 
 IMPROVEMENTS
