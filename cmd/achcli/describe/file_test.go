@@ -5,10 +5,49 @@
 package describe
 
 import (
+	"bytes"
+	"path/filepath"
 	"testing"
 
+	"github.com/moov-io/ach"
 	"github.com/stretchr/testify/require"
 )
+
+func TestDescribeFile(t *testing.T) {
+	file, err := ach.ReadFile(filepath.Join("..", "..", "..", "test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+
+	var buf bytes.Buffer
+	File(&buf, file, nil) // No Options
+	require.Equal(t, 1092, buf.Len())
+}
+
+func TestDescribeIAT(t *testing.T) {
+	file, err := ach.ReadFile(filepath.Join("..", "..", "..", "test", "testdata", "iat-debit.ach"))
+	require.NoError(t, err)
+
+	var buf bytes.Buffer
+	File(&buf, file, nil) // No Options
+	require.Equal(t, 3967, buf.Len())
+}
+
+func TestDescribeReturn(t *testing.T) {
+	file, err := ach.ReadFile(filepath.Join("..", "..", "..", "test", "testdata", "return-WEB.ach"))
+	require.NoError(t, err)
+
+	var buf bytes.Buffer
+	File(&buf, file, nil) // No Options
+	require.Equal(t, 2410, buf.Len())
+}
+
+func TestDescribeCorrection(t *testing.T) {
+	file, err := ach.ReadFile(filepath.Join("..", "..", "..", "test", "testdata", "cor-example.ach"))
+	require.NoError(t, err)
+
+	var buf bytes.Buffer
+	File(&buf, file, nil) // No Options
+	require.Equal(t, 1283, buf.Len())
+}
 
 func TestFormatAmount(t *testing.T) {
 	require.Equal(t, "12345", formatAmount(false, 12345))
