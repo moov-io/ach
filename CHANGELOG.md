@@ -1,4 +1,4 @@
-## v1.23.0 (Released 2022-11-15)
+## v1.23.1 (Released 2022-11-15)
 
 IMPROVEMENTS
 

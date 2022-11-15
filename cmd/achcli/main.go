@@ -8,7 +8,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/moov-io/ach"
@@ -30,8 +29,6 @@ var (
 
 	flagPretty        = flag.Bool("pretty", false, "Display all values in their human readable format")
 	flagPrettyAmounts = flag.Bool("pretty.amounts", false, "Display human readable amounts instead of exact values")
-
-	programName = filepath.Base(os.Args[0])
 )
 
 func main() {
