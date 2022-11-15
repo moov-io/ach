@@ -12,11 +12,18 @@ import (
 	"unicode/utf8"
 
 	"github.com/moov-io/ach"
+
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
+	"golang.org/x/text/number"
 )
 
 type Opts struct {
 	MaskNames          bool
 	MaskAccountNumbers bool
+	MaskCorrectedData  bool
+
+	PrettyAmounts bool
 }
 
 func File(ww io.Writer, file *ach.File, opts *Opts) {
@@ -63,10 +70,17 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 			e := entries[j]
 			accountNumber := e.DFIAccountNumber
 			if opts.MaskAccountNumbers {
-				accountNumber = maskAccountNumber(strings.TrimSpace(accountNumber))
+				accountNumber = maskNumber(strings.TrimSpace(accountNumber))
 			}
 
-			fmt.Fprintf(w, "    %d %s\t%s\t%s\t%d\t%s\t%s\t%s\n", e.TransactionCode, transactionCodes[e.TransactionCode], e.RDFIIdentification, accountNumber, e.Amount, e.IndividualName, e.TraceNumber, e.Category)
+			amount := formatAmount(opts.PrettyAmounts, e.Amount)
+
+			name := e.IndividualName
+			if opts.MaskNames {
+				name = maskName(name)
+			}
+
+			fmt.Fprintf(w, "    %d %s\t%s\t%s\t%s\t%s\t%s\t%s\n", e.TransactionCode, transactionCodes[e.TransactionCode], e.RDFIIdentification, accountNumber, amount, name, e.TraceNumber, e.Category)
 
 			dumpAddenda02(w, e.Addenda02)
 			for i := range e.Addenda05 {
@@ -75,7 +89,7 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 				}
 				dumpAddenda05(w, e.Addenda05[i])
 			}
-			dumpAddenda98(w, e.Addenda98)
+			dumpAddenda98(w, opts, e.Addenda98)
 			dumpAddenda99(w, e.Addenda99)
 			dumpAddenda99Dishonored(w, e.Addenda99Dishonored)
 			dumpAddenda99Contested(w, e.Addenda99Contested)
@@ -84,7 +98,10 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 		bc := file.Batches[i].GetControl()
 		if bc != nil {
 			fmt.Fprintln(w, "\n  ServiceClassCode\tEntryAddendaCount\tEntryHash\tTotalDebits\tTotalCredits\tMACCode\tODFIIdentification\tBatchNumber")
-			fmt.Fprintf(w, "  %d %s\t%d\t%d\t%d\t%d\t%s\t%s\t%d\n", bc.ServiceClassCode, serviceClassCodes[bh.ServiceClassCode], bc.EntryAddendaCount, bc.EntryHash, bc.TotalDebitEntryDollarAmount, bc.TotalCreditEntryDollarAmount, bc.MessageAuthenticationCode, bc.ODFIIdentification, bc.BatchNumber)
+
+			debitTotal := formatAmount(opts.PrettyAmounts, bc.TotalDebitEntryDollarAmount)
+			creditTotal := formatAmount(opts.PrettyAmounts, bc.TotalCreditEntryDollarAmount)
+			fmt.Fprintf(w, "  %d %s\t%d\t%d\t%s\t%s\t%s\t%s\t%d\n", bc.ServiceClassCode, serviceClassCodes[bh.ServiceClassCode], bc.EntryAddendaCount, bc.EntryHash, debitTotal, creditTotal, bc.MessageAuthenticationCode, bc.ODFIIdentification, bc.BatchNumber)
 		}
 	}
 
@@ -125,10 +142,11 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 			e := entries[j]
 			accountNumber := e.DFIAccountNumber
 			if opts.MaskAccountNumbers {
-				accountNumber = maskAccountNumber(strings.TrimSpace(accountNumber))
+				accountNumber = maskNumber(strings.TrimSpace(accountNumber))
 			}
 
-			fmt.Fprintf(w, "    %d %s\t%s\t%s\t%d\t%d\t%s\t%s\n", e.TransactionCode, transactionCodes[e.TransactionCode], e.RDFIIdentification, accountNumber, e.Amount, e.AddendaRecords, e.TraceNumber, e.Category)
+			amount := formatAmount(opts.PrettyAmounts, e.Amount)
+			fmt.Fprintf(w, "    %d %s\t%s\t%s\t%s\t%d\t%s\t%s\n", e.TransactionCode, transactionCodes[e.TransactionCode], e.RDFIIdentification, accountNumber, amount, e.AddendaRecords, e.TraceNumber, e.Category)
 
 			dumpAddenda10(w, e.Addenda10)
 			dumpAddenda11(w, e.Addenda11)
@@ -145,20 +163,37 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 				dumpAddenda18(w, e.Addenda18[i])
 			}
 
-			dumpAddenda98(w, e.Addenda98)
+			dumpAddenda98(w, opts, e.Addenda98)
 			dumpAddenda99(w, e.Addenda99)
 		}
 
 		bc := iatBatch.GetControl()
 		if bc != nil {
 			fmt.Fprintln(w, "\n  ServiceClassCode\tEntryAddendaCount\tEntryHash\tTotalDebits\tTotalCredits\tMACCode\tODFIIdentification\tBatchNumber")
-			fmt.Fprintf(w, "  %d %s\t%d\t%d\t%d\t%d\t%s\t%s\t%d\n", bc.ServiceClassCode, serviceClassCodes[bh.ServiceClassCode], bc.EntryAddendaCount, bc.EntryHash, bc.TotalDebitEntryDollarAmount, bc.TotalCreditEntryDollarAmount, bc.MessageAuthenticationCode, bc.ODFIIdentification, bc.BatchNumber)
+
+			debitTotal := formatAmount(opts.PrettyAmounts, bc.TotalDebitEntryDollarAmount)
+			creditTotal := formatAmount(opts.PrettyAmounts, bc.TotalCreditEntryDollarAmount)
+			fmt.Fprintf(w, "  %d %s\t%d\t%d\t%s\t%s\t%s\t%s\t%d\n", bc.ServiceClassCode, serviceClassCodes[bh.ServiceClassCode], bc.EntryAddendaCount, bc.EntryHash, debitTotal, creditTotal, bc.MessageAuthenticationCode, bc.ODFIIdentification, bc.BatchNumber)
 		}
 	}
 
 	// FileControl
 	fmt.Fprintln(w, "\n  BatchCount\tBlockCount\tEntryAddendaCount\tTotalDebitAmount\tTotalCreditAmount")
-	fmt.Fprintf(w, "  %d\t%d\t%d\t%d\t%d\n", fc.BatchCount, fc.BlockCount, fc.EntryAddendaCount, fc.TotalDebitEntryDollarAmountInFile, fc.TotalCreditEntryDollarAmountInFile)
+
+	debitTotal := formatAmount(opts.PrettyAmounts, fc.TotalDebitEntryDollarAmountInFile)
+	creditTotal := formatAmount(opts.PrettyAmounts, fc.TotalCreditEntryDollarAmountInFile)
+	fmt.Fprintf(w, "  %d\t%d\t%d\t%s\t%s\n", fc.BatchCount, fc.BlockCount, fc.EntryAddendaCount, debitTotal, creditTotal)
+}
+
+// formatAmount can optionally convert an integer into a human readable amount
+func formatAmount(prettyAmounts bool, amt int) string {
+	if !prettyAmounts {
+		return fmt.Sprintf("%d", amt)
+	}
+
+	printer := message.NewPrinter(language.Und)
+	formatter := number.Decimal(float64(amt)/100.0, number.MinFractionDigits(2))
+	return printer.Sprint(formatter)
 }
 
 func dumpAddenda02(w *tabwriter.Writer, a *ach.Addenda02) {
@@ -210,14 +245,20 @@ func dumpAddenda05(w *tabwriter.Writer, a *ach.Addenda05) {
 	fmt.Fprintf(w, "      %s\t%d\t%d\n", a.PaymentRelatedInformation, a.SequenceNumber, a.EntryDetailSequenceNumber)
 }
 
-func dumpAddenda98(w *tabwriter.Writer, a *ach.Addenda98) {
+func dumpAddenda98(w *tabwriter.Writer, opts *Opts, a *ach.Addenda98) {
 	if a == nil {
 		return
 	}
 
 	fmt.Fprintln(w, "\n      Addenda98")
 	fmt.Fprintln(w, "      ChangeCode\tOriginalTrace\tOriginalDFI\tCorrectedData\tTraceNumber")
-	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\n", a.ChangeCode, a.OriginalTrace, a.OriginalDFI, a.CorrectedData, a.TraceNumber)
+
+	data := a.CorrectedData
+	if opts.MaskCorrectedData {
+		data = maskNumber(data)
+	}
+
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\n", a.ChangeCode, a.OriginalTrace, a.OriginalDFI, data, a.TraceNumber)
 }
 
 func dumpAddenda99(w *tabwriter.Writer, a *ach.Addenda99) {
@@ -311,10 +352,25 @@ func dumpAddenda18(w *tabwriter.Writer, a *ach.Addenda18) {
 	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%d\t%d\n", a.TypeCode, a.ForeignCorrespondentBankName, a.ForeignCorrespondentBankIDNumberQualifier, a.ForeignCorrespondentBankIDNumber, a.ForeignCorrespondentBankBranchCountryCode, a.SequenceNumber, a.EntryDetailSequenceNumber)
 }
 
-func maskAccountNumber(s string) string {
+func maskNumber(s string) string {
 	length := utf8.RuneCountInString(s)
 	if length < 5 {
 		return "****" // too short, we can't keep anything
 	}
 	return strings.Repeat("*", length-4) + s[length-4:]
+}
+
+func maskName(s string) string {
+	words := strings.Fields(s)
+
+	var out []string
+	for i := range words {
+		length := utf8.RuneCountInString(words[i])
+		if length > 3 {
+			out = append(out, words[i][0:2]+strings.Repeat("*", length-2))
+		} else {
+			out = append(out, strings.Repeat("*", length))
+		}
+	}
+	return strings.Join(out, " ")
 }

@@ -23,7 +23,13 @@ var (
 	flagMerge    = flag.Bool("merge", false, "Merge files before describing")
 	flagReformat = flag.String("reformat", "", "Reformat an incoming ACH file to another format")
 
-	flagMask = flag.Bool("mask", false, "Mask/hide full account numbers")
+	flagMask              = flag.Bool("mask", false, "Mask/hide full account numbers and individual names")
+	flagMaskAccounts      = flag.Bool("mask.accounts", false, "Mask/hide full account numbers")
+	flagMaskCorrectedData = flag.Bool("mask.corrections", false, "Mask/Hide Corrected Data in Addenda98 records")
+	flagMaskNames         = flag.Bool("mask.names", false, "Mask/hide full individual names")
+
+	flagPretty        = flag.Bool("pretty", false, "Display all values in their human readable format")
+	flagPrettyAmounts = flag.Bool("pretty.amounts", false, "Display human readable amounts instead of exact values")
 
 	programName = filepath.Base(os.Args[0])
 )

@@ -51,7 +51,10 @@ func dumpFiles(paths []string) error {
 		}
 		if files[i] != nil {
 			describe.File(os.Stdout, files[i], &describe.Opts{
-				MaskAccountNumbers: *flagMask,
+				MaskAccountNumbers: *flagMask || *flagMaskAccounts,
+				MaskCorrectedData:  *flagMask || *flagMaskCorrectedData,
+				MaskNames:          *flagMask || *flagMaskNames,
+				PrettyAmounts:      *flagPretty || *flagPrettyAmounts,
 			})
 		} else {
 			fmt.Printf("nil ACH file in position %d\n", i)
