@@ -34,27 +34,8 @@ var (
 	programName = filepath.Base(os.Args[0])
 )
 
-func init() {
-	flag.Usage = func() {
-		fmt.Printf("Usage of ach (%s):\n", ach.Version)
-		fmt.Printf("   usage: %s [<flags>] <files>", programName)
-		fmt.Println("")
-		fmt.Println("Commands: ")
-		fmt.Printf("  %s -diff first.ach second.ach", programName)
-		fmt.Println("    Show the difference between two ACH files")
-		fmt.Printf("  %s -mask file.ach", programName)
-		fmt.Println("                Print file details with personally identifiable information partially removed")
-		fmt.Printf("  %s -reformat=json first.ach", programName)
-		fmt.Println("      Convert an incoming ACH file into another format (options: ach, json)")
-		fmt.Printf("  %s 20060102.ach", programName)
-		fmt.Println("                  Summarize an ACH file for human readability")
-		fmt.Println("")
-		fmt.Println("Flags: ")
-		flag.PrintDefaults()
-	}
-}
-
 func main() {
+	flag.Usage = help
 	flag.Parse()
 
 	switch {
