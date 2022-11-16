@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/Pallinder/go-randomdata v1.2.0
-	github.com/aws/aws-lambda-go v1.34.1
+	github.com/aws/aws-lambda-go v1.35.0
 	github.com/go-kit/kit v0.12.0
 	github.com/go-kit/log v0.2.1
 	github.com/gorilla/mux v1.8.0
