@@ -223,7 +223,7 @@ func (iatEd *IATEntryDetail) Validate() error {
 		return fieldError("DFIAccountNumber", err, iatEd.DFIAccountNumber)
 	}
 	// CheckDigit calculations
-	calculated := iatEd.CalculateCheckDigit(iatEd.RDFIIdentificationField())
+	calculated := CalculateCheckDigit(iatEd.RDFIIdentificationField())
 
 	edCheckDigit, err := strconv.Atoi(iatEd.CheckDigit)
 	if err != nil {

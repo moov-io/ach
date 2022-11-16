@@ -204,7 +204,7 @@ func (ed *ADVEntryDetail) Validate() error {
 	if err := ed.isAlphanumeric(ed.ACHOperatorRoutingNumber); err != nil {
 		return fieldError("ACHOperatorRoutingNumber", err, ed.ACHOperatorRoutingNumber)
 	}
-	calculated := ed.CalculateCheckDigit(ed.RDFIIdentificationField())
+	calculated := CalculateCheckDigit(ed.RDFIIdentificationField())
 
 	edCheckDigit, _ := strconv.Atoi(ed.CheckDigit)
 

@@ -288,7 +288,7 @@ func (ed *EntryDetail) Validate() error {
 	}
 
 	if ed.validateOpts == nil || !ed.validateOpts.AllowInvalidCheckDigit {
-		calculated := ed.CalculateCheckDigit(ed.RDFIIdentificationField())
+		calculated := CalculateCheckDigit(ed.RDFIIdentificationField())
 
 		edCheckDigit, err := strconv.Atoi(ed.CheckDigit)
 		if err != nil {
