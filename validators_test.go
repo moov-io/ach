@@ -38,9 +38,8 @@ func TestValidators__checkDigit(t *testing.T) {
 		"10200007": 6, // Wells Fargo - Colorado
 	}
 
-	v := validator{}
 	for rtn, check := range cases {
-		answer := v.CalculateCheckDigit(rtn)
+		answer := CalculateCheckDigit(rtn)
 		if check != answer {
 			t.Errorf("input=%s answer=%d expected=%d", rtn, answer, check)
 		}

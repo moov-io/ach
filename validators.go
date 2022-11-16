@@ -429,7 +429,7 @@ func (v *validator) isAlphanumeric(s string) error {
 // Add the results of the eight multiplications
 // Subtract the sum from the next highest multiple of 10.
 // The result is the Check Digit
-func (v *validator) CalculateCheckDigit(routingNumber string) int {
+func CalculateCheckDigit(routingNumber string) int {
 	if n := utf8.RuneCountInString(routingNumber); n != 8 && n != 9 {
 		return -1
 	}
@@ -458,7 +458,11 @@ func (v *validator) CalculateCheckDigit(routingNumber string) int {
 	n, _ = strconv.Atoi(routeIndex[7])
 	sum = sum + (n * 7)
 
-	return v.roundUp10(sum) - sum
+	return roundUp10(sum) - sum
+}
+
+func (v *validator) CalculateCheckDigit(routingNumber string) int {
+	return CalculateCheckDigit(routingNumber)
 }
 
 // CheckRoutingNumber returns a nil error if the provided routingNumber is valid according to
@@ -471,8 +475,7 @@ func CheckRoutingNumber(routingNumber string) error {
 		return fmt.Errorf("invalid routing number length of %d", n)
 	}
 
-	v := new(validator)
-	check := fmt.Sprintf("%d", v.CalculateCheckDigit(routingNumber))
+	check := fmt.Sprintf("%d", CalculateCheckDigit(routingNumber))
 	last := string(routingNumber[len(routingNumber)-1])
 	if check != last {
 		return fmt.Errorf("routing number checksum mismatch: expected %s but got %s", check, last)
@@ -481,7 +484,7 @@ func CheckRoutingNumber(routingNumber string) error {
 }
 
 // roundUp10 round number up to the next ten spot.
-func (v *validator) roundUp10(n int) int {
+func roundUp10(n int) int {
 	return int(math.Ceil(float64(n)/10.0)) * 10
 }
 
