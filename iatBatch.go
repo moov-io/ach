@@ -349,6 +349,9 @@ func (iatBatch *IATBatch) isBatchEntryCount() error {
 		}
 	}
 	if entryCount != iatBatch.Control.EntryAddendaCount {
+		if iatBatch.validateOpts != nil && iatBatch.validateOpts.UnequalAddendaCounts {
+			return nil
+		}
 		return iatBatch.Error("EntryAddendaCount",
 			NewErrBatchCalculatedControlEquality(entryCount, iatBatch.Control.EntryAddendaCount))
 	}

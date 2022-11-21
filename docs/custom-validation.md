@@ -80,6 +80,9 @@ UnequalServiceClassCode bool `json:"unequalServiceClassCode"`
 
 // AllowUnorderedBatchNumebrs allows a file to be read with unordered batch numbers.
 AllowUnorderedBatchNumbers bool `json:"allowUnorderedBatchNumbers"`
+
+// UnequalAddendaCounts skips checking that Addenda Count fields match their expected and computed values.
+UnequalAddendaCounts bool `json:"unequalAddendaCounts"`
 ```
 
 ### File Header

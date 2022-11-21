@@ -338,6 +338,12 @@ func testBatchEntryCountEquality(t testing.TB) {
 	if !base.Match(err, NewErrBatchCalculatedControlEquality(3, 1)) {
 		t.Errorf("%T: %s", err, err)
 	}
+
+	mockBatch.SetValidation(&ValidateOpts{
+		CustomTraceNumbers:   true,
+		UnequalAddendaCounts: true,
+	})
+	require.NoError(t, mockBatch.verify())
 }
 
 func TestBatchEntryCountEquality(t *testing.T) {

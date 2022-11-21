@@ -675,6 +675,9 @@ type ValidateOpts struct {
 	// AllowInvalidCheckDigit allows the CheckDigit field in EntryDetail to differ from
 	// the expected calculation
 	AllowInvalidCheckDigit bool `json:"allowInvalidCheckDigit"`
+
+	// UnequalAddendaCounts skips checking that Addenda Count fields match their expected and computed values.
+	UnequalAddendaCounts bool `json:"unequalAddendaCounts"`
 }
 
 // ValidateWith performs checks on each record according to Nacha guidelines.
@@ -766,6 +769,9 @@ func (f *File) isEntryAddendaCount(IsADV bool) error {
 			count += iatBatch.GetControl().EntryAddendaCount
 		}
 		if f.Control.EntryAddendaCount != count {
+			if f.validateOpts != nil && f.validateOpts.UnequalAddendaCounts {
+				return nil
+			}
 			return NewErrFileCalculatedControlEquality("EntryAddendaCount", count, f.Control.EntryAddendaCount)
 		}
 	} else {
@@ -773,6 +779,9 @@ func (f *File) isEntryAddendaCount(IsADV bool) error {
 			count += batch.GetADVControl().EntryAddendaCount
 		}
 		if f.ADVControl.EntryAddendaCount != count {
+			if f.validateOpts != nil && f.validateOpts.UnequalAddendaCounts {
+				return nil
+			}
 			return NewErrFileCalculatedControlEquality("EntryAddendaCount", count, f.ADVControl.EntryAddendaCount)
 		}
 	}

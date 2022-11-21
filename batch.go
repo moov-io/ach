@@ -634,6 +634,9 @@ func (batch *Batch) isBatchEntryCount() error {
 			entryCount += 1 + entry.addendaCount()
 		}
 		if entryCount != batch.Control.EntryAddendaCount {
+			if batch.validateOpts != nil && batch.validateOpts.UnequalAddendaCounts {
+				return nil
+			}
 			return batch.Error("EntryAddendaCount",
 				NewErrBatchCalculatedControlEquality(entryCount, batch.Control.EntryAddendaCount))
 		}
@@ -645,6 +648,9 @@ func (batch *Batch) isBatchEntryCount() error {
 			}
 		}
 		if entryCount != batch.ADVControl.EntryAddendaCount {
+			if batch.validateOpts != nil && batch.validateOpts.UnequalAddendaCounts {
+				return nil
+			}
 			return batch.Error("EntryAddendaCount",
 				NewErrBatchCalculatedControlEquality(entryCount, batch.ADVControl.EntryAddendaCount))
 		}
