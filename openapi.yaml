@@ -131,6 +131,16 @@ paths:
           description: Optional parameter to configure ImmediateDestination validation
           schema:
             type: boolean
+        - name: unorderedBatchNumbers
+          in: query
+          description: Allow a file to be read with unordered batch numbers.
+          schema:
+            type: boolean
+        - name: allowInvalidCheckDigit
+          in: query
+          description: Allow the CheckDigit field in EntryDetail to differ from the expected calculation
+          schema:
+            type: boolean
       requestBody:
         description: Content of the ACH file (in json or raw text)
         required: true
@@ -2264,10 +2274,14 @@ components:
           type: boolean
           default: false
           description: Skip equality checks for the ServiceClassCode in each pair of BatchHeader and BatchControl records.
-        allowUnorderedBatchNumbers:
+        unorderedBatchNumbers:
           type: boolean
           default: false
           description: Allow a file to be read with unordered batch numbers.
+        allowInvalidCheckDigit:
+          type: boolean
+          default: false
+          description: Allow the CheckDigit field in EntryDetail to differ from the expected calculation
     SegmentFileConfiguration:
       properties: {} # TODO: Are there any config options people need?
     SegmentFile:
