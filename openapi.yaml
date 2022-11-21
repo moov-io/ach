@@ -141,6 +141,11 @@ paths:
           description: Allow the CheckDigit field in EntryDetail to differ from the expected calculation
           schema:
             type: boolean
+        - name: unequalAddendaCounts
+          in: query
+          description: Optional parameter to configure UnequalAddendaCounts validation
+          schema:
+            type: boolean
       requestBody:
         description: Content of the ACH file (in json or raw text)
         required: true
@@ -2282,6 +2287,10 @@ components:
           type: boolean
           default: false
           description: Allow the CheckDigit field in EntryDetail to differ from the expected calculation
+        unequalAddendaCounts:
+          type: boolean
+          default: false
+          description: Skip checking that Addenda Count fields match their expected and computed values.
     SegmentFileConfiguration:
       properties: {} # TODO: Are there any config options people need?
     SegmentFile:

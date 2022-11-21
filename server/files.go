@@ -135,6 +135,7 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 		unequalServiceClassCode          = "unequalServiceClassCode"
 		unorderedBatchNumbers            = "unorderedBatchNumbers"
 		allowInvalidCheckDigit           = "allowInvalidCheckDigit"
+		unequalAddendaCounts             = "unequalAddendaCounts"
 	)
 
 	validationNames := []string{
@@ -150,6 +151,7 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 		unequalServiceClassCode,
 		unorderedBatchNumbers,
 		allowInvalidCheckDigit,
+		unequalAddendaCounts,
 	}
 
 	for _, name := range validationNames {
@@ -191,6 +193,8 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 			req.validateOpts.AllowUnorderedBatchNumbers = true
 		case allowInvalidCheckDigit:
 			req.validateOpts.AllowInvalidCheckDigit = true
+		case unequalAddendaCounts:
+			req.validateOpts.UnequalAddendaCounts = true
 		}
 	}
 
