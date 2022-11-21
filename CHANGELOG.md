@@ -1,3 +1,19 @@
+## v1.24.0 (Released 2022-11-21)
+
+ADDITIONS
+
+- feat: add `CalculateCheckDigit`
+- feat: add `.SetMaxLines(int)` to Reader
+- feat: add `UnequalAddendaCounts` validation option
+
+IMPROVEMENTS
+
+- api: add missing unorderedBatchNumbers and allowInvalidCheckDigit
+
+BUILD
+
+- fix(deps): update module github.com/aws/aws-lambda-go to v1.35.0
+
 ## v1.23.1 (Released 2022-11-15)
 
 IMPROVEMENTS
