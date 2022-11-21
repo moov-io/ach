@@ -1774,23 +1774,20 @@ func TestTwoFileADVControls(t *testing.T) {
 
 // testACHFileTooLongErr checks that it errors on a file that is too long
 func testACHFileTooLongErr(t testing.TB) {
-	// To make testing this more manageable, we'll artificially cap the size of the file to 200 lines
-	maxLines = 200
-
 	f, err := os.Open(filepath.Join("test", "testdata", "20110729A.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 	defer f.Close()
+
 	r := NewReader(f)
+	// To make testing this more manageable, we'll artificially cap the size of the file to 200 lines
+	r.SetMaxLines(200)
 	_, err = r.Read()
 
 	if !base.Has(err, ErrFileTooLong) {
 		t.Errorf("%T: %s", err, err)
 	}
-
-	// reset maxLines to its original value
-	maxLines = 2 + 2000000 + 100000000 + 8
 }
 
 // TestCategoryAssignment ensures entry categories are set correctly

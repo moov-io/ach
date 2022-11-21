@@ -29,12 +29,12 @@ import (
 )
 
 var (
-	// maxLines is the maximum number of lines a file can have. It is limited by the
+	// defaultMaxLines is the maximum number of lines a file can have. It is limited by the
 	// EntryAddendaCount field which has 8 digits, and the BatchCount field which has
 	// 6 digits in the File Control Record. So we can have at most the 2 file records,
 	// 2 records for each of 10^6 batches, 10^8 entry and addenda records, and 8 lines
 	// of 9's to round up to the nearest multiple of 10.
-	maxLines = 2 + 2000000 + 100000000 + 8
+	defaultMaxLines int = 2 + 2_000_000 + 100_000_000 + 8
 )
 
 // Reader reads records from an ACH-encoded file.
@@ -56,6 +56,9 @@ type Reader struct {
 
 	// line number of the file being parsed
 	lineNum int
+
+	// maxLines is the maximum number of lines to be consumed
+	maxLines int
 
 	// recordName holds the current record name being parsed.
 	recordName string
@@ -132,8 +135,13 @@ func ReadFiles(paths []string) ([]*File, error) {
 // NewReader returns a new ACH Reader that reads from r.
 func NewReader(r io.Reader) *Reader {
 	return &Reader{
-		scanner: bufio.NewScanner(r),
+		maxLines: defaultMaxLines,
+		scanner:  bufio.NewScanner(r),
 	}
+}
+
+func (r *Reader) SetMaxLines(max int) {
+	r.maxLines = max
 }
 
 // Read reads each line in the underlying io.Reader and returns a File and any errors encountered.
@@ -150,7 +158,7 @@ func (r *Reader) Read() (File, error) {
 	for r.scanner.Scan() {
 		line := r.scanner.Text()
 		r.lineNum++
-		if r.lineNum > maxLines {
+		if r.lineNum > r.maxLines {
 			r.errors.Add(ErrFileTooLong)
 			return r.File, r.errors
 		}
