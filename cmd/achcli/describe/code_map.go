@@ -11,10 +11,10 @@ import (
 )
 
 var serviceClassCodes = map[int]string{
-	ach.MixedDebitsAndCredits:      "(Mixed Debits and Credits)",
+	ach.MixedDebitsAndCredits:      "(Mixed Debits/Credits)",
 	ach.CreditsOnly:                "(Credits Only)",
-	ach.DebitsOnly:                 "(Debits Only)",
-	ach.AutomatedAccountingAdvices: "(Automated Accounting Analysis)",
+	ach.DebitsOnly:                 "(Debits  Only)",
+	ach.AutomatedAccountingAdvices: "(Accounting Advice)",
 }
 
 type transactionType string
@@ -65,14 +65,17 @@ var transactionCodes = map[int]string{
 }
 
 func entry(s string, t transactionType) string {
-	return fmt.Sprintf("(%s %s)", s, t)
+	return fmt.Sprintf("(%8.8s %6.6s)", s, t)
 }
+
 func noc(s string, t transactionType) string {
-	return fmt.Sprintf("(%s Return NOC %s)", s, t)
+	return fmt.Sprintf("(%8.8s Return NOC %6.6s)", s, t)
 }
+
 func prenote(s string, t transactionType) string {
-	return fmt.Sprintf("(%s Prenote %s)", s, t)
+	return fmt.Sprintf("(%8.8s Prenote %6.6s)", s, t)
 }
+
 func remittance(s string, t transactionType) string {
-	return fmt.Sprintf("(%s Zero Dollar Remittance %s)", s, t)
+	return fmt.Sprintf("(%8.8s Zero Dollar Remittance %6.6s)", s, t)
 }

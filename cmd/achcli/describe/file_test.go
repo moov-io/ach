@@ -6,6 +6,7 @@ package describe
 
 import (
 	"bytes"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -19,7 +20,10 @@ func TestDescribeFile(t *testing.T) {
 
 	var buf bytes.Buffer
 	File(&buf, file, nil) // No Options
-	require.Equal(t, 1092, buf.Len())
+	if testing.Verbose() {
+		os.Stdout.Write(buf.Bytes())
+	}
+	require.Equal(t, 1174, buf.Len())
 }
 
 func TestDescribeIAT(t *testing.T) {
@@ -28,7 +32,10 @@ func TestDescribeIAT(t *testing.T) {
 
 	var buf bytes.Buffer
 	File(&buf, file, nil) // No Options
-	require.Equal(t, 3967, buf.Len())
+	if testing.Verbose() {
+		os.Stdout.Write(buf.Bytes())
+	}
+	require.Equal(t, 5255, buf.Len())
 }
 
 func TestDescribeReturn(t *testing.T) {
@@ -37,7 +44,10 @@ func TestDescribeReturn(t *testing.T) {
 
 	var buf bytes.Buffer
 	File(&buf, file, nil) // No Options
-	require.Equal(t, 2410, buf.Len())
+	if testing.Verbose() {
+		os.Stdout.Write(buf.Bytes())
+	}
+	require.Equal(t, 2604, buf.Len())
 }
 
 func TestDescribeCorrection(t *testing.T) {
@@ -46,7 +56,10 @@ func TestDescribeCorrection(t *testing.T) {
 
 	var buf bytes.Buffer
 	File(&buf, file, nil) // No Options
-	require.Equal(t, 1283, buf.Len())
+	if testing.Verbose() {
+		os.Stdout.Write(buf.Bytes())
+	}
+	require.Equal(t, 1357, buf.Len())
 }
 
 func TestFormatAmount(t *testing.T) {
