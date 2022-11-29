@@ -1,3 +1,9 @@
+## v1.25.0 (Released 2022-11-29)
+
+IMPROVEMENTS
+
+- cmd/achcli: align tabwriter columns better across batches
+
 ## v1.24.0 (Released 2022-11-21)
 
 ADDITIONS
