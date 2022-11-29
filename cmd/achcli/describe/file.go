@@ -41,7 +41,7 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 
 	// FileHeader
 	fmt.Fprintln(w, "  Origin\tOriginName\tDestination\tDestinationName\tFileCreationDate\tFileCreationTime")
-	fmt.Fprintf(w, "  %s\t%s\t%s\t%s\t%s\t%s\n", fh.ImmediateOrigin, fh.ImmediateOriginName, fh.ImmediateDestination, fh.ImmediateDestinationName, fh.FileCreationDate, fh.FileCreationTime)
+	fmt.Fprintf(w, "  %s\t%s\t%s\t%s\t%s\t%s\n", fh.ImmediateOriginField(), fh.ImmediateOriginNameField(), fh.ImmediateDestinationField(), fh.ImmediateDestinationNameField(), fh.FileCreationDateField(), fh.FileCreationTimeField())
 
 	// Batches
 	for i := range file.Batches {
@@ -49,17 +49,17 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 
 		bh := file.Batches[i].GetHeader()
 		if bh != nil {
-			fmt.Fprintf(w, "  %d\t%s\t%d %s\t%s\t%s\t%s\t%s\t%s\t%s\n",
-				bh.BatchNumber,
+			fmt.Fprintf(w, "  %s\t%s\t%d %s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+				bh.BatchNumberField(),
 				bh.StandardEntryClassCode,
 				bh.ServiceClassCode,
 				serviceClassCodes[bh.ServiceClassCode],
-				bh.CompanyName,
-				bh.CompanyDiscretionaryData,
-				bh.CompanyIdentification,
-				bh.CompanyEntryDescription,
-				bh.EffectiveEntryDate,
-				bh.CompanyDescriptiveDate,
+				bh.CompanyNameField(),
+				bh.CompanyDiscretionaryDataField(),
+				bh.CompanyIdentificationField(),
+				bh.CompanyEntryDescriptionField(),
+				bh.EffectiveEntryDateField(),
+				bh.CompanyDescriptiveDateField(),
 			)
 		}
 
@@ -68,19 +68,19 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 			fmt.Fprintln(w, "\n    TransactionCode\tRDFIIdentification\tAccountNumber\tAmount\tName\tTraceNumber\tCategory")
 
 			e := entries[j]
-			accountNumber := e.DFIAccountNumber
+			accountNumber := e.DFIAccountNumberField()
 			if opts.MaskAccountNumbers {
 				accountNumber = maskNumber(strings.TrimSpace(accountNumber))
 			}
 
 			amount := formatAmount(opts.PrettyAmounts, e.Amount)
 
-			name := e.IndividualName
+			name := e.IndividualNameField()
 			if opts.MaskNames {
 				name = maskName(name)
 			}
 
-			fmt.Fprintf(w, "    %d %s\t%s\t%s\t%s\t%s\t%s\t%s\n", e.TransactionCode, transactionCodes[e.TransactionCode], e.RDFIIdentification, accountNumber, amount, name, e.TraceNumber, e.Category)
+			fmt.Fprintf(w, "    %d %s\t%s\t%s\t%s\t%s\t%s\t%s\n", e.TransactionCode, transactionCodes[e.TransactionCode], e.RDFIIdentificationField(), accountNumber, amount, name, e.TraceNumberField(), e.Category)
 
 			dumpAddenda02(w, e.Addenda02)
 			for i := range e.Addenda05 {
@@ -101,7 +101,8 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 
 			debitTotal := formatAmount(opts.PrettyAmounts, bc.TotalDebitEntryDollarAmount)
 			creditTotal := formatAmount(opts.PrettyAmounts, bc.TotalCreditEntryDollarAmount)
-			fmt.Fprintf(w, "  %d %s\t%d\t%d\t%s\t%s\t%s\t%s\t%d\n", bc.ServiceClassCode, serviceClassCodes[bh.ServiceClassCode], bc.EntryAddendaCount, bc.EntryHash, debitTotal, creditTotal, bc.MessageAuthenticationCode, bc.ODFIIdentification, bc.BatchNumber)
+			fmt.Fprintf(w, "  %d %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+				bc.ServiceClassCode, serviceClassCodes[bh.ServiceClassCode], bc.EntryAddendaCountField(), bc.EntryHashField(), debitTotal, creditTotal, bc.MessageAuthenticationCodeField(), bc.ODFIIdentificationField(), bc.BatchNumberField())
 		}
 	}
 
@@ -111,26 +112,26 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 		bh := iatBatch.GetHeader()
 		if bh != nil {
 			fmt.Fprintln(w, "\n  BatchNumber\tSECCode\tServiceClassCode\tIATIndicator\tDestinationCountryCode\tFE Indicator\tFE ReferenceIndicator\tFE Reference\tCompanyEntryDescription")
-			fmt.Fprintf(w, "  %d\t%s\t%d %s\t%s\t%s\t%s\t%d\t%s\t%s\n",
-				bh.BatchNumber,
+			fmt.Fprintf(w, "  %s\t%s\t%d %s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+				bh.BatchNumberField(),
 				bh.StandardEntryClassCode,
 				bh.ServiceClassCode,
 				serviceClassCodes[bh.ServiceClassCode],
-				bh.IATIndicator,
-				bh.ISODestinationCountryCode,
-				bh.ForeignExchangeIndicator,
-				bh.ForeignExchangeReferenceIndicator,
-				bh.ForeignExchangeReference,
-				bh.CompanyEntryDescription,
+				bh.IATIndicatorField(),
+				bh.ISODestinationCountryCodeField(),
+				bh.ForeignExchangeIndicatorField(),
+				bh.ForeignExchangeReferenceIndicatorField(),
+				bh.ForeignExchangeReferenceField(),
+				bh.CompanyEntryDescriptionField(),
 			)
 
 			fmt.Fprintln(w, "\n    OriginatorIdentification\tISOOriginatingCurrencyCode\tISODestinationCurrencyCode\tODFIIdentification\tEffectiveEntryDate\tOriginatorStatusCode")
 			fmt.Fprintf(w, "    %s\t%s\t%s\t%s\t%s\t%d\n",
-				bh.OriginatorIdentification,
-				bh.ISOOriginatingCurrencyCode,
-				bh.ISODestinationCurrencyCode,
-				bh.ODFIIdentification,
-				bh.EffectiveEntryDate,
+				bh.OriginatorIdentificationField(),
+				bh.ISOOriginatingCurrencyCodeField(),
+				bh.ISODestinationCurrencyCodeField(),
+				bh.ODFIIdentificationField(),
+				bh.EffectiveEntryDateField(),
 				bh.OriginatorStatusCode,
 			)
 		}
@@ -140,13 +141,13 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 			fmt.Fprintln(w, "\n    TransactionCode\tRDFIIdentification\tAccountNumber\tAmount\tAddendaRecords\tTraceNumber\tCategory")
 
 			e := entries[j]
-			accountNumber := e.DFIAccountNumber
+			accountNumber := e.DFIAccountNumberField()
 			if opts.MaskAccountNumbers {
 				accountNumber = maskNumber(strings.TrimSpace(accountNumber))
 			}
 
 			amount := formatAmount(opts.PrettyAmounts, e.Amount)
-			fmt.Fprintf(w, "    %d %s\t%s\t%s\t%s\t%d\t%s\t%s\n", e.TransactionCode, transactionCodes[e.TransactionCode], e.RDFIIdentification, accountNumber, amount, e.AddendaRecords, e.TraceNumber, e.Category)
+			fmt.Fprintf(w, "    %d %s\t%s\t%s\t%s\t%s\t%s\t%s\n", e.TransactionCode, transactionCodes[e.TransactionCode], e.RDFIIdentificationField(), accountNumber, amount, e.AddendaRecordsField(), e.TraceNumberField(), e.Category)
 
 			dumpAddenda10(w, e.Addenda10)
 			dumpAddenda11(w, e.Addenda11)
@@ -173,7 +174,8 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 
 			debitTotal := formatAmount(opts.PrettyAmounts, bc.TotalDebitEntryDollarAmount)
 			creditTotal := formatAmount(opts.PrettyAmounts, bc.TotalCreditEntryDollarAmount)
-			fmt.Fprintf(w, "  %d %s\t%d\t%d\t%s\t%s\t%s\t%s\t%d\n", bc.ServiceClassCode, serviceClassCodes[bh.ServiceClassCode], bc.EntryAddendaCount, bc.EntryHash, debitTotal, creditTotal, bc.MessageAuthenticationCode, bc.ODFIIdentification, bc.BatchNumber)
+			fmt.Fprintf(w, "  %d %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+				bc.ServiceClassCode, serviceClassCodes[bh.ServiceClassCode], bc.EntryAddendaCountField(), bc.EntryHashField(), debitTotal, creditTotal, bc.MessageAuthenticationCodeField(), bc.ODFIIdentificationField(), bc.BatchNumberField())
 		}
 	}
 
@@ -182,7 +184,7 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 
 	debitTotal := formatAmount(opts.PrettyAmounts, fc.TotalDebitEntryDollarAmountInFile)
 	creditTotal := formatAmount(opts.PrettyAmounts, fc.TotalCreditEntryDollarAmountInFile)
-	fmt.Fprintf(w, "  %d\t%d\t%d\t%s\t%s\n", fc.BatchCount, fc.BlockCount, fc.EntryAddendaCount, debitTotal, creditTotal)
+	fmt.Fprintf(w, "  %s\t%s\t%s\t%s\t%s\n", fc.BatchCountField(), fc.BlockCountField(), fc.EntryAddendaCountField(), debitTotal, creditTotal)
 }
 
 // formatAmount can optionally convert an integer into a human readable amount
@@ -204,8 +206,8 @@ func dumpAddenda02(w *tabwriter.Writer, a *ach.Addenda02) {
 	fmt.Fprintln(w, "\n      Addenda02")
 	fmt.Fprintln(w, "      ReferenceInfoOne\tReferenceInfoTwo\tTerminalIdentification\tTransactionSerial\tDate\tAuthCodeOrExires\tLocation\tCity\tState\tTraceNumber")
 	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
-		a.ReferenceInformationOne, a.ReferenceInformationTwo, a.TerminalIdentificationCode, a.TransactionSerialNumber,
-		a.TransactionDate, a.AuthorizationCodeOrExpireDate, a.TerminalLocation, a.TerminalCity, a.TerminalState, a.TraceNumber)
+		a.ReferenceInformationOneField(), a.ReferenceInformationTwoField(), a.TerminalIdentificationCodeField(), a.TransactionSerialNumberField(),
+		a.TransactionDateField(), a.AuthorizationCodeOrExpireDateField(), a.TerminalLocationField(), a.TerminalCityField(), a.TerminalStateField(), a.TraceNumberField())
 }
 
 func dumpAddenda99Dishonored(w *tabwriter.Writer, a *ach.Addenda99Dishonored) {
@@ -216,8 +218,8 @@ func dumpAddenda99Dishonored(w *tabwriter.Writer, a *ach.Addenda99Dishonored) {
 	fmt.Fprintln(w, "\n      Dishonored Addenda99")
 	fmt.Fprintln(w, "      Dis. ReturnCode\tOrig. TraceNumber\tRDFI Identification\tTraceNumber\tSettlementDate\tReturnCode\tAddendaInformation\tTraceNumber")
 	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
-		a.DishonoredReturnReasonCode, a.OriginalEntryTraceNumber, a.OriginalReceivingDFIIdentification, a.ReturnTraceNumber,
-		a.ReturnSettlementDate, a.ReturnReasonCode, a.AddendaInformation, a.TraceNumber)
+		a.DishonoredReturnReasonCodeField(), a.OriginalEntryTraceNumberField(), a.OriginalReceivingDFIIdentificationField(), a.ReturnTraceNumberField(),
+		a.ReturnSettlementDateField(), a.ReturnReasonCodeField(), a.AddendaInformationField(), a.TraceNumberField())
 }
 
 func dumpAddenda99Contested(w *tabwriter.Writer, a *ach.Addenda99Contested) {
@@ -228,12 +230,12 @@ func dumpAddenda99Contested(w *tabwriter.Writer, a *ach.Addenda99Contested) {
 	fmt.Fprintln(w, "\n      Contested Dishonored Addenda99")
 	fmt.Fprintln(w, "      ContestedReturnCode\tOrig. TraceNumber\tOrig Date Returned\tOrig. RDFIIdentification\tOrig. SettlementDate\tReturnTraceNumber")
 	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%s\n",
-		a.ContestedReturnCode, a.OriginalEntryTraceNumber, a.DateOriginalEntryReturned, a.OriginalReceivingDFIIdentification,
-		a.OriginalSettlementDate, a.ReturnTraceNumber)
+		a.ContestedReturnCodeField(), a.OriginalEntryTraceNumberField(), a.DateOriginalEntryReturnedField(), a.OriginalReceivingDFIIdentificationField(),
+		a.OriginalSettlementDateField(), a.ReturnTraceNumberField())
 
 	fmt.Fprintln(w, "      ReturnSettlementDate\tReturnReasonCode\tDishonoredTraceNumber\tDishonoredSettlementDate\tDishonoredReasonCode\tTraceNumber")
 	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%s\n",
-		a.ReturnSettlementDate, a.ReturnReasonCode, a.DishonoredReturnTraceNumber, a.DishonoredReturnSettlementDate, a.DishonoredReturnReasonCode, a.TraceNumber)
+		a.ReturnSettlementDateField(), a.ReturnReasonCodeField(), a.DishonoredReturnTraceNumberField(), a.DishonoredReturnSettlementDateField(), a.DishonoredReturnReasonCodeField(), a.TraceNumberField())
 }
 
 func dumpAddenda05(w *tabwriter.Writer, a *ach.Addenda05) {
@@ -242,7 +244,7 @@ func dumpAddenda05(w *tabwriter.Writer, a *ach.Addenda05) {
 	}
 
 	fmt.Fprintln(w, "      PaymentRelatedInformation\tSequenceNumber\tEntryDetailSequenceNumber")
-	fmt.Fprintf(w, "      %s\t%d\t%d\n", a.PaymentRelatedInformation, a.SequenceNumber, a.EntryDetailSequenceNumber)
+	fmt.Fprintf(w, "      %s\t%s\t%s\n", a.PaymentRelatedInformationField(), a.SequenceNumberField(), a.EntryDetailSequenceNumberField())
 }
 
 func dumpAddenda98(w *tabwriter.Writer, opts *Opts, a *ach.Addenda98) {
@@ -258,7 +260,7 @@ func dumpAddenda98(w *tabwriter.Writer, opts *Opts, a *ach.Addenda98) {
 		data = maskNumber(data)
 	}
 
-	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\n", a.ChangeCode, a.OriginalTrace, a.OriginalDFI, data, a.TraceNumber)
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\n", a.ChangeCode, a.OriginalTraceField(), a.OriginalDFIField(), data, a.TraceNumberField())
 }
 
 func dumpAddenda99(w *tabwriter.Writer, a *ach.Addenda99) {
@@ -268,7 +270,7 @@ func dumpAddenda99(w *tabwriter.Writer, a *ach.Addenda99) {
 
 	fmt.Fprintln(w, "\n      Addenda99")
 	fmt.Fprintln(w, "      ReturnCode\tOriginalTrace\tDateOfDeath\tOriginalDFI\tAddendaInformation\tTraceNumber")
-	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%s\n", a.ReturnCode, a.OriginalTrace, a.DateOfDeath, a.OriginalDFI, a.AddendaInformation, a.TraceNumber)
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%s\n", a.ReturnCode, a.OriginalTraceField(), a.DateOfDeathField(), a.OriginalDFIField(), a.AddendaInformationField(), a.TraceNumberField())
 }
 
 func dumpAddenda10(w *tabwriter.Writer, a *ach.Addenda10) {
@@ -277,7 +279,7 @@ func dumpAddenda10(w *tabwriter.Writer, a *ach.Addenda10) {
 	}
 
 	fmt.Fprintln(w, "      TypeCode\tTransactionTypeCode\tForeignPaymentAmount\tForeignTraceNumber\tName\tEntryDetailSequenceNumber")
-	fmt.Fprintf(w, "      %s\t%s\t%d\t%s\t%s\t%d\n", a.TypeCode, a.TransactionTypeCode, a.ForeignPaymentAmount, a.ForeignTraceNumber, a.Name, a.EntryDetailSequenceNumber)
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%s\n", a.TypeCode, a.TransactionTypeCode, a.ForeignPaymentAmountField(), a.ForeignTraceNumberField(), a.NameField(), a.EntryDetailSequenceNumberField())
 }
 
 func dumpAddenda11(w *tabwriter.Writer, a *ach.Addenda11) {
@@ -286,7 +288,7 @@ func dumpAddenda11(w *tabwriter.Writer, a *ach.Addenda11) {
 	}
 
 	fmt.Fprintln(w, "      TypeCode\tOriginatorName\tOriginatorStreetAddress\tEntryDetailSequenceNumber")
-	fmt.Fprintf(w, "      %s\t%s\t%s\t%d\n", a.TypeCode, a.OriginatorName, a.OriginatorStreetAddress, a.EntryDetailSequenceNumber)
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\n", a.TypeCode, a.OriginatorNameField(), a.OriginatorStreetAddressField(), a.EntryDetailSequenceNumberField())
 }
 
 func dumpAddenda12(w *tabwriter.Writer, a *ach.Addenda12) {
@@ -295,7 +297,7 @@ func dumpAddenda12(w *tabwriter.Writer, a *ach.Addenda12) {
 	}
 
 	fmt.Fprintln(w, "      TypeCode\tOriginatorCityStateProvince\tOriginatorCountryPostalCode\tEntryDetailSequenceNumber")
-	fmt.Fprintf(w, "      %s\t%s\t%s\t%d\n", a.TypeCode, a.OriginatorCityStateProvince, a.OriginatorCountryPostalCode, a.EntryDetailSequenceNumber)
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\n", a.TypeCode, a.OriginatorCityStateProvinceField(), a.OriginatorCountryPostalCodeField(), a.EntryDetailSequenceNumberField())
 }
 
 func dumpAddenda13(w *tabwriter.Writer, a *ach.Addenda13) {
@@ -304,7 +306,7 @@ func dumpAddenda13(w *tabwriter.Writer, a *ach.Addenda13) {
 	}
 
 	fmt.Fprintln(w, "      TypeCode\tODFIName\tODFIIDNumberQualifier\tODFIIdentification\tODFIBranchCountryCode\tEntryDetailSequenceNumber")
-	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%d\n", a.TypeCode, a.ODFIName, a.ODFIIDNumberQualifier, a.ODFIIdentification, a.ODFIBranchCountryCode, a.EntryDetailSequenceNumber)
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%s\n", a.TypeCode, a.ODFINameField(), a.ODFIIDNumberQualifierField(), a.ODFIIdentificationField(), a.ODFIBranchCountryCodeField(), a.EntryDetailSequenceNumberField())
 }
 
 func dumpAddenda14(w *tabwriter.Writer, a *ach.Addenda14) {
@@ -313,7 +315,7 @@ func dumpAddenda14(w *tabwriter.Writer, a *ach.Addenda14) {
 	}
 
 	fmt.Fprintln(w, "      TypeCode\tRDFIName\tRDFIIDNumberQualifier\tRDFIIdentification\tRDFIBranchCountryCode\tEntryDetailSequenceNumber")
-	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%d\n", a.TypeCode, a.RDFIName, a.RDFIIDNumberQualifier, a.RDFIIdentification, a.RDFIBranchCountryCode, a.EntryDetailSequenceNumber)
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%s\n", a.TypeCode, a.RDFINameField(), a.RDFIIDNumberQualifierField(), a.RDFIIdentificationField(), a.RDFIBranchCountryCodeField(), a.EntryDetailSequenceNumberField())
 }
 
 func dumpAddenda15(w *tabwriter.Writer, a *ach.Addenda15) {
@@ -322,7 +324,7 @@ func dumpAddenda15(w *tabwriter.Writer, a *ach.Addenda15) {
 	}
 
 	fmt.Fprintln(w, "      TypeCode\tReceiverIDNumber\tReceiverStreetAddress\tEntryDetailSequenceNumber")
-	fmt.Fprintf(w, "      %s\t%s\t%s\t%d\n", a.TypeCode, a.ReceiverIDNumber, a.ReceiverStreetAddress, a.EntryDetailSequenceNumber)
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\n", a.TypeCode, a.ReceiverIDNumberField(), a.ReceiverStreetAddressField(), a.EntryDetailSequenceNumberField())
 }
 
 func dumpAddenda16(w *tabwriter.Writer, a *ach.Addenda16) {
@@ -331,7 +333,7 @@ func dumpAddenda16(w *tabwriter.Writer, a *ach.Addenda16) {
 	}
 
 	fmt.Fprintln(w, "      TypeCode\tReceiverCityStateProvince\tReceiverCountryPostalCode\tEntryDetailSequenceNumber")
-	fmt.Fprintf(w, "      %s\t%s\t%s\t%d\n", a.TypeCode, a.ReceiverCityStateProvince, a.ReceiverCountryPostalCode, a.EntryDetailSequenceNumber)
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\n", a.TypeCode, a.ReceiverCityStateProvinceField(), a.ReceiverCountryPostalCodeField(), a.EntryDetailSequenceNumberField())
 }
 
 func dumpAddenda17(w *tabwriter.Writer, a *ach.Addenda17) {
@@ -340,7 +342,7 @@ func dumpAddenda17(w *tabwriter.Writer, a *ach.Addenda17) {
 	}
 
 	fmt.Fprintln(w, "      TypeCode\tPaymentRelatedInformation\tSequenceNumber\tEntryDetailSequenceNumber")
-	fmt.Fprintf(w, "      %s\t%s\t%d\t%d\n", a.TypeCode, a.PaymentRelatedInformation, a.SequenceNumber, a.EntryDetailSequenceNumber)
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\n", a.TypeCode, a.PaymentRelatedInformationField(), a.SequenceNumberField(), a.EntryDetailSequenceNumberField())
 }
 
 func dumpAddenda18(w *tabwriter.Writer, a *ach.Addenda18) {
@@ -349,7 +351,9 @@ func dumpAddenda18(w *tabwriter.Writer, a *ach.Addenda18) {
 	}
 
 	fmt.Fprintln(w, "      TypeCode\tForeignCorrespondentBankName\tForeignCorrespondentBankIDNumberQualifier\tForeignCorrespondentBankIDNumber\tForeignCorrespondentBankBranchCountryCode\tSequenceNumber\tEntryDetailSequenceNumber")
-	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%d\t%d\n", a.TypeCode, a.ForeignCorrespondentBankName, a.ForeignCorrespondentBankIDNumberQualifier, a.ForeignCorrespondentBankIDNumber, a.ForeignCorrespondentBankBranchCountryCode, a.SequenceNumber, a.EntryDetailSequenceNumber)
+	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+		a.TypeCode, a.ForeignCorrespondentBankNameField(), a.ForeignCorrespondentBankIDNumberQualifierField(), a.ForeignCorrespondentBankIDNumberField(),
+		a.ForeignCorrespondentBankBranchCountryCodeField(), a.SequenceNumberField(), a.EntryDetailSequenceNumberField())
 }
 
 func maskNumber(s string) string {
