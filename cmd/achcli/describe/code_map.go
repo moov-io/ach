@@ -65,17 +65,17 @@ var transactionCodes = map[int]string{
 }
 
 func entry(s string, t transactionType) string {
-	return fmt.Sprintf("(%8.8s %6.6s)", s, t)
+	return fmt.Sprintf("%-17.17s", fmt.Sprintf("(%s %s)", s, t))
 }
 
 func noc(s string, t transactionType) string {
-	return fmt.Sprintf("(%8.8s Return NOC %6.6s)", s, t)
+	return fmt.Sprintf("%-28.28s", fmt.Sprintf("(%s Return NOC %s)", s, t))
 }
 
 func prenote(s string, t transactionType) string {
-	return fmt.Sprintf("(%8.8s Prenote %6.6s)", s, t)
+	return fmt.Sprintf("%-25.25s", fmt.Sprintf("(%s Prenote %s)", s, t))
 }
 
 func remittance(s string, t transactionType) string {
-	return fmt.Sprintf("(%8.8s Zero Dollar Remittance %6.6s)", s, t)
+	return fmt.Sprintf("%-40.40s", fmt.Sprintf("(%s Zero Dollar Remittance %s)", s, t))
 }
