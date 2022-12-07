@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 	"syscall/js"
+	"time"
 
 	"github.com/moov-io/ach"
 	"github.com/moov-io/ach/cmd/achcli/describe"
@@ -136,6 +137,42 @@ func parseFile(input string) (*ach.File, error) {
 	return &file, nil
 }
 
+func reverseFile() js.Func {
+	return js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+		if len(args) != 2 {
+			return fmt.Sprintf("Unexpected number of arguments, got %d", len(args))
+		}
+
+		input := args[0].String()
+		isodate := args[1].String()
+
+		if len(isodate) > len(time.RFC3339) {
+			isodate = isodate[:len(time.RFC3339)]
+		}
+
+		when, err := time.Parse(time.RFC3339, isodate)
+		if err != nil {
+			return fmt.Sprintf("parsing %s as RFC3339 failed: %v", isodate, err)
+		}
+
+		file, err := parseFile(input)
+		if err != nil {
+			return err.Error()
+		}
+
+		err = file.Reversal(when)
+		if err != nil {
+			return fmt.Sprintf("reversing file failed: %v", err)
+		}
+
+		var buf bytes.Buffer
+		if err := ach.NewWriter(&buf).Write(file); err != nil {
+			return fmt.Sprintf("problem writing ACH file: %v", err)
+		}
+		return buf.String()
+	})
+}
+
 func writeVersion() {
 	span := js.Global().Get("document").Call("querySelector", "#version")
 	span.Set("innerHTML", fmt.Sprintf("Version: %s", ach.Version))
@@ -145,6 +182,7 @@ func main() {
 	js.Global().Set("parseACH", prettyPrintJSON())
 	js.Global().Set("parseJSON", printACH())
 	js.Global().Set("parseReadable", printReadable())
+	js.Global().Set("reverseFile", reverseFile())
 
 	writeVersion()
 
