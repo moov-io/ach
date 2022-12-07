@@ -70,7 +70,7 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 			e := entries[j]
 			accountNumber := e.DFIAccountNumberField()
 			if opts.MaskAccountNumbers {
-				accountNumber = maskNumber(strings.TrimSpace(accountNumber))
+				accountNumber = maskNumber(accountNumber)
 			}
 
 			amount := formatAmount(opts.PrettyAmounts, e.Amount)
@@ -143,7 +143,7 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 			e := entries[j]
 			accountNumber := e.DFIAccountNumberField()
 			if opts.MaskAccountNumbers {
-				accountNumber = maskNumber(strings.TrimSpace(accountNumber))
+				accountNumber = maskNumber(accountNumber)
 			}
 
 			amount := formatAmount(opts.PrettyAmounts, e.Amount)
@@ -359,9 +359,18 @@ func dumpAddenda18(w *tabwriter.Writer, a *ach.Addenda18) {
 func maskNumber(s string) string {
 	length := utf8.RuneCountInString(s)
 	if length < 5 {
-		return "****" // too short, we can't keep anything
+		return strings.Repeat("*", 5) // too short, we can't show anything
 	}
-	return strings.Repeat("*", length-4) + s[length-4:]
+
+	var out string
+	for _, r := range s[:length-4] {
+		if r == ' ' {
+			out += " "
+		} else {
+			out += "*"
+		}
+	}
+	return fmt.Sprintf("%s%s", out, s[length-4:])
 }
 
 func maskName(s string) string {
