@@ -1,3 +1,18 @@
+## v1.26.0 (Released 2022-12-08)
+
+IMPROVEMENTS
+
+- cmd/achcli/describe: return masked account number length unchanged, show spaces
+- cmd/achcli: reunify entrydetail transaction type formatting
+- cmd/webui: add a Reversal button
+- fix: update fields required for reversed files to validate
+
+BUILD
+
+- build(deps): bump nokogiri from 1.13.9 to 1.13.10 in /docs
+- fix(deps): update module github.com/aws/aws-lambda-go to v1.36.0
+- fix(deps): update module github.com/moov-io/base to v0.37.0
+
 ## v1.25.0 (Released 2022-11-29)
 
 IMPROVEMENTS
