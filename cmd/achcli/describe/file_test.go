@@ -74,17 +74,24 @@ func TestMaskNumber(t *testing.T) {
 	require.Equal(t, "*****", maskNumber("12"))
 	require.Equal(t, "*****", maskNumber("123"))
 	require.Equal(t, "*****", maskNumber("1234"))
-	require.Equal(t, "*2345", maskNumber("12345"))
-	require.Equal(t, "  *2345", maskNumber("  12345"))
+	require.Equal(t, "**34 ", maskNumber("1234 "))
+	require.Equal(t, "**345", maskNumber("12345"))
+	require.Equal(t, "***2345", maskNumber("  12345"))
 	require.Equal(t, "**3456", maskNumber("123456"))
 	require.Equal(t, "***4567", maskNumber("1234567"))
 	require.Equal(t, "****5678", maskNumber("12345678"))
-	require.Equal(t, "   ****5678", maskNumber("   12345678"))
+	require.Equal(t, "** ****5678", maskNumber("   12345678"))
 	require.Equal(t, "*****6789", maskNumber("123456789"))
 	require.Equal(t, "******7890", maskNumber("1234567890"))
 	require.Equal(t, "  ******7890", maskNumber("  1234567890"))
-	require.Equal(t, "********90  ", maskNumber("1234567890  "))
-	require.Equal(t, " *******890 ", maskNumber(" 1234567890 "))
+	require.Equal(t, "******7890  ", maskNumber("1234567890  "))
+	require.Equal(t, " ******7890 ", maskNumber(" 1234567890 "))
+
+	// Verify we mask .DFIAccountNumberField() as expected
+	ed := &ach.EntryDetail{
+		DFIAccountNumber: "12345678",
+	}
+	require.Equal(t, "****5678         ", maskNumber(ed.DFIAccountNumberField()))
 }
 
 func TestMaskName(t *testing.T) {
@@ -94,4 +101,10 @@ func TestMaskName(t *testing.T) {
 	require.Equal(t, "Jo** ***", maskName("John Doe"))
 	require.Equal(t, "Jo** Sm*** **", maskName("John Smith Jr"))
 	require.Equal(t, "Al******* Lo********** ** ***", maskName("Alexander Longnameiton Jr III"))
+
+	// Verify we mask .IndividualNameField() as expected
+	ed := &ach.EntryDetail{
+		IndividualName: "Jane Smith Jr",
+	}
+	require.Equal(t, "Ja** Sm*** **", maskName(ed.IndividualNameField()))
 }

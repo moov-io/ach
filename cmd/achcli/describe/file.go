@@ -5,6 +5,7 @@
 package describe
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"strings"
@@ -362,15 +363,21 @@ func maskNumber(s string) string {
 		return strings.Repeat("*", 5) // too short, we can't show anything
 	}
 
-	var out string
-	for _, r := range s[:length-4] {
+	out := bytes.Repeat([]byte("*"), length)
+	var unmaskedDigits int
+	// Since we want the right-most digits unmasked start from the end of our string
+	for i := length - 1; i >= 2; i-- {
+		r := rune(s[i])
 		if r == ' ' {
-			out += " "
+			out[i] = byte(' ')
 		} else {
-			out += "*"
+			if unmaskedDigits < 4 {
+				unmaskedDigits += 1
+				out[i] = byte(r)
+			}
 		}
 	}
-	return fmt.Sprintf("%s%s", out, s[length-4:])
+	return string(out)
 }
 
 func maskName(s string) string {
