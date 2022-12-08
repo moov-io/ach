@@ -77,15 +77,16 @@ func TestMaskNumber(t *testing.T) {
 	require.Equal(t, "**34 ", maskNumber("1234 "))
 	require.Equal(t, "**345", maskNumber("12345"))
 	require.Equal(t, "***2345", maskNumber("  12345"))
+	require.Equal(t, "**2345 ", maskNumber(" 12345 "))
 	require.Equal(t, "**3456", maskNumber("123456"))
 	require.Equal(t, "***4567", maskNumber("1234567"))
 	require.Equal(t, "****5678", maskNumber("12345678"))
-	require.Equal(t, "** ****5678", maskNumber("   12345678"))
+	require.Equal(t, "*******5678", maskNumber("   12345678"))
 	require.Equal(t, "*****6789", maskNumber("123456789"))
 	require.Equal(t, "******7890", maskNumber("1234567890"))
-	require.Equal(t, "  ******7890", maskNumber("  1234567890"))
+	require.Equal(t, "********7890", maskNumber("  1234567890"))
 	require.Equal(t, "******7890  ", maskNumber("1234567890  "))
-	require.Equal(t, " ******7890 ", maskNumber(" 1234567890 "))
+	require.Equal(t, "*******7890 ", maskNumber(" 1234567890 "))
 
 	// Verify we mask .DFIAccountNumberField() as expected
 	ed := &ach.EntryDetail{

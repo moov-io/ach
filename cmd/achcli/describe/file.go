@@ -369,7 +369,12 @@ func maskNumber(s string) string {
 	for i := length - 1; i >= 2; i-- {
 		r := rune(s[i])
 		if r == ' ' {
-			out[i] = byte(' ')
+			// If the char to our right is masked then mask this left-aligned space as well.
+			if i+1 < length && out[i+1] == '*' {
+				out[i] = byte('*')
+			} else {
+				out[i] = byte(' ')
+			}
 		} else {
 			if unmaskedDigits < 4 {
 				unmaskedDigits += 1
