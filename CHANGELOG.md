@@ -1,3 +1,10 @@
+## v1.26.1 (Released 2022-12-08)
+
+IMPROVEMENTS
+
+- cmd/achcli/describe: mask left-aligned spaces
+- cmd/achcli/describe: fixup padding when fields are padded
+
 ## v1.26.0 (Released 2022-12-08)
 
 IMPROVEMENTS
