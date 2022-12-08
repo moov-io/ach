@@ -111,6 +111,7 @@
         <button type="button" onclick="convertToAch(contentinput.value)">Nacha</button>
         <button type="button" onclick="convertToReadable(contentinput.value)">Human-Readable</button>
         <button type="submit" onclick="clearForms()">Clear Form</button>
+        <button type="submit" onclick="reversal(contentinput.value)">Reversal</button>
     </div>
 
     <div>
@@ -134,6 +135,13 @@
 
     const convertToReadable = function(input) {
         contentoutput.value = parseReadable(input)
+        contentoutput.setSelectionRange(0,0)
+        contentoutput.focus()
+    }
+
+    const reversal = function(input) {
+        const now = new Date();
+        contentoutput.value = reverseFile(input, now.toISOString())
         contentoutput.setSelectionRange(0,0)
         contentoutput.focus()
     }

@@ -18,11 +18,15 @@
 package ach
 
 import (
+	"fmt"
 	"time"
 )
 
 // Reversal will transform a File into a Nacha compliant reversal which can be transmitted to undo fund movement.
 func (f *File) Reversal(effectiveEntryDate time.Time) error {
+	f.Header.FileCreationDate = effectiveEntryDate.Format("060102")
+	f.Header.FileCreationTime = effectiveEntryDate.Format("1504")
+
 	for i := range f.Batches {
 		bh := f.Batches[i].GetHeader()
 
@@ -43,7 +47,7 @@ func (f *File) Reversal(effectiveEntryDate time.Time) error {
 		// Adjust Effective Entry Date for same-day vs standard
 		bh.EffectiveEntryDate = effectiveEntryDate.Format("060102")
 
-		f.Batches[i].SetHeader(bh)
+		hasCredits, hasDebits := false, false
 
 		// In EntryDetail records we need to update the TransactionCode fields to undo fund movement.
 		entries := f.Batches[i].GetEntries()
@@ -54,6 +58,8 @@ func (f *File) Reversal(effectiveEntryDate time.Time) error {
 				GLCredit, GLPrenoteCredit, GLReturnNOCCredit, GLZeroDollarRemittanceCredit,
 				LoanCredit, LoanPrenoteCredit, LoanReturnNOCCredit, LoanZeroDollarRemittanceCredit,
 				SavingsCredit, SavingsPrenoteCredit, SavingsReturnNOCCredit, SavingsZeroDollarRemittanceCredit:
+				// Credit -> Debit
+				hasDebits = true
 				entries[j].TransactionCode += 5
 
 			case
@@ -61,9 +67,42 @@ func (f *File) Reversal(effectiveEntryDate time.Time) error {
 				GLDebit, GLPrenoteDebit, GLReturnNOCDebit, GLZeroDollarRemittanceDebit,
 				LoanDebit, LoanReturnNOCDebit,
 				SavingsDebit, SavingsPrenoteDebit, SavingsReturnNOCDebit, SavingsZeroDollarRemittanceDebit:
+				// Debit -> Credit
+				hasCredits = true
 				entries[j].TransactionCode -= 5
 			}
 		}
+
+		// Re-calculate control record
+		bc := f.Batches[i].GetControl()
+		// Swap debis and credits
+		prevDebits := bc.TotalDebitEntryDollarAmount
+		bc.TotalDebitEntryDollarAmount = bc.TotalCreditEntryDollarAmount
+		bc.TotalCreditEntryDollarAmount = prevDebits
+
+		// Fixup ServiceClassCode
+		if hasCredits {
+			bh.ServiceClassCode = CreditsOnly
+			bc.ServiceClassCode = CreditsOnly
+		}
+		if hasDebits {
+			bh.ServiceClassCode = DebitsOnly
+			bc.ServiceClassCode = DebitsOnly
+		}
+		if hasCredits && hasDebits {
+			bh.ServiceClassCode = MixedDebitsAndCredits
+			bc.ServiceClassCode = MixedDebitsAndCredits
+		}
+
+		// Update header and control
+		f.Batches[i].SetHeader(bh)
+		f.Batches[i].SetControl(bc)
+
+		if bb, ok := f.Batches[i].(*Batch); ok {
+			if err := bb.build(); err != nil {
+				return fmt.Errorf("rebuilding batch index %d failed: %v", i, err)
+			}
+		}
 	}
-	return nil
+	return f.Create()
 }
