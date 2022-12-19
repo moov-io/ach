@@ -184,9 +184,6 @@ func (addenda02 *Addenda02) fieldInclusion() error {
 		return fieldError("TypeCode", ErrConstructor, addenda02.TypeCode)
 	}
 	// Required Fields
-	if addenda02.TerminalIdentificationCode == "" {
-		return fieldError("TerminalIdentificationCode", ErrFieldRequired, addenda02.TerminalIdentificationCode)
-	}
 	if addenda02.TransactionSerialNumber == "" {
 		return fieldError("TransactionSerialNumber", ErrFieldRequired, addenda02.TransactionSerialNumber)
 	}
