@@ -1,3 +1,13 @@
+## v1.26.2 (Released 2022-12-19)
+
+IMPROVEMENTS
+
+- fix: remove unused x-idempotency-key from api docs
+
+BUILD
+
+- fix(deps): update module github.com/moov-io/base to v0.38.0
+
 ## v1.26.1 (Released 2022-12-08)
 
 IMPROVEMENTS
