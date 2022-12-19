@@ -1,3 +1,13 @@
+## v1.26.3 (Released 2022-12-19)
+
+IMPROVEMENTS
+
+- fix: don't re-check whether the file is ADV while writing each batch
+
+BUILD
+
+- build: update moov-io/base to v0.38.1 and tidy up
+
 ## v1.26.2 (Released 2022-12-19)
 
 IMPROVEMENTS
