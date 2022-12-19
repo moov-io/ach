@@ -1,3 +1,9 @@
+## v1.26.4 (Released 2022-12-19)
+
+IMPROVEMENTS
+
+- fix: allow missing TerminalIdentificationCode in Addenda02
+
 ## v1.26.3 (Released 2022-12-19)
 
 IMPROVEMENTS
