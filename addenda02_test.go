@@ -116,29 +116,6 @@ func BenchmarkAddenda02FieldInclusionTypeCode(b *testing.B) {
 	}
 }
 
-// testAddenda02TerminalIdentificationCode validates TerminalIdentificationCode is required
-func testAddenda02TerminalIdentificationCode(t testing.TB) {
-	addenda02 := mockAddenda02()
-	addenda02.TerminalIdentificationCode = ""
-	err := addenda02.Validate()
-	if !base.Match(err, ErrFieldRequired) {
-		t.Errorf("%T: %s", err, err)
-	}
-}
-
-// TestAddenda02TerminalIdentificationCode tests validating TerminalIdentificationCode is required
-func TestAddenda02TerminalIdentificationCode(t *testing.T) {
-	testAddenda02TerminalIdentificationCode(t)
-}
-
-// BenchmarkAddenda02TerminalIdentificationCode benchmarks validating TerminalIdentificationCode is required
-func BenchmarkAddenda02TerminalIdentificationCode(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testAddenda02TerminalIdentificationCode(b)
-	}
-}
-
 // testAddenda02TransactionSerialNumber validates TransactionSerialNumber is required
 func testAddenda02TransactionSerialNumber(t testing.TB) {
 	addenda02 := mockAddenda02()
