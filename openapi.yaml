@@ -67,13 +67,6 @@ paths:
           example: "rs4f9915"
           schema:
             type: string
-        - name: X-Idempotency-Key
-          in: header
-          description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy to not collide with each other in your requests.
-          example: "a4f88150"
-          required: false
-          schema:
-            type: string
         - name: fileID
           in: path
           description: File ID
@@ -371,13 +364,6 @@ paths:
           example: "rs4f9915"
           schema:
             type: string
-        - name: X-Idempotency-Key
-          in: header
-          description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy to not collide with each other in your requests.
-          example: "a4f88150"
-          required: false
-          schema:
-            type: string
         - name: fileID
           in: path
           description: File ID
@@ -418,13 +404,6 @@ paths:
           in: header
           description: Optional Request ID allows application developer to trace requests through the system's logs
           example: "rs4f9915"
-          schema:
-            type: string
-        - name: X-Idempotency-Key
-          in: header
-          description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy to not collide with each other in your requests.
-          example: "a4f88150"
-          required: false
           schema:
             type: string
         - name: fileID
@@ -491,13 +470,6 @@ paths:
           in: header
           description: Optional Request ID allows application developer to trace requests through the system's logs
           example: "rs4f9915"
-          schema:
-            type: string
-        - name: X-Idempotency-Key
-          in: header
-          description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy to not collide with each other in your requests.
-          example: "a4f88150"
-          required: false
           schema:
             type: string
         - name: fileID
@@ -602,13 +574,6 @@ paths:
           in: header
           description: Optional Request ID allows application developer to trace requests through the system's logs
           example: "rs4f9915"
-          schema:
-            type: string
-        - name: X-Idempotency-Key
-          in: header
-          description: Idempotent key in the header which expires after 24 hours. These strings should contain enough entropy to not collide with each other in your requests.
-          example: "a4f88150"
-          required: false
           schema:
             type: string
       requestBody:
