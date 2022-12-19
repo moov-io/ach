@@ -56,7 +56,9 @@ func (w *Writer) Write(file *File) error {
 	}
 	w.lineNum++
 
-	if err := w.writeBatch(file); err != nil {
+	isADV := file.IsADV()
+
+	if err := w.writeBatch(file, isADV); err != nil {
 		return err
 	}
 
@@ -64,7 +66,7 @@ func (w *Writer) Write(file *File) error {
 		return err
 	}
 
-	if !file.IsADV() {
+	if !isADV {
 		if _, err := w.w.WriteString(file.Control.String() + w.LineEnding); err != nil {
 			return err
 		}
@@ -90,13 +92,13 @@ func (w *Writer) Flush() error {
 	return w.w.Flush()
 }
 
-func (w *Writer) writeBatch(file *File) error {
+func (w *Writer) writeBatch(file *File, isADV bool) error {
 	for _, batch := range file.Batches {
 		if _, err := w.w.WriteString(batch.GetHeader().String() + w.LineEnding); err != nil {
 			return err
 		}
 		w.lineNum++
-		if !file.IsADV() {
+		if !isADV {
 			for _, entry := range batch.GetEntries() {
 				if _, err := w.w.WriteString(entry.String() + w.LineEnding); err != nil {
 					return err
