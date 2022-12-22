@@ -5,8 +5,10 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/moov-io/ach"
@@ -30,4 +32,11 @@ FLAGS
 `), ach.Version)
 	fmt.Println("")
 	flag.PrintDefaults()
+}
+
+func validationHelp() {
+	fmt.Fprintf(os.Stdout, "\nSpecify validation config file in json foramt to enable valiation opts.\n\nEXAMPLE:\n")
+	sampleJson, _ := json.MarshalIndent(ach.ValidateOpts{}, "", "  ")
+	fmt.Fprintf(os.Stdout, "%s \n", string(sampleJson))
+	fmt.Fprintf(os.Stdout, "\n")
 }

@@ -5,6 +5,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
@@ -29,6 +30,8 @@ var (
 
 	flagPretty        = flag.Bool("pretty", false, "Display all values in their human readable format")
 	flagPrettyAmounts = flag.Bool("pretty.amounts", false, "Display human readable amounts instead of exact values")
+
+	flagConfigFileName = flag.String("allow-validate-opts", "", "Path to config file in json format to enable validation opts")
 )
 
 func main() {
@@ -57,24 +60,56 @@ func main() {
 		fmt.Printf("found %d ACH files to describe: %s\n", len(args), strings.Join(args, ", "))
 	}
 
+	// checking input files
+	if len(args) == 0 {
+		flag.Usage()
+		os.Exit(1)
+	}
+
+	// getting validation opts
+	validateOpts := getValidationOpts()
+
 	// pick our command to do
 	switch {
 	case *flagDiff:
-		if err := diffFiles(args); err != nil {
+		if err := diffFiles(args, validateOpts); err != nil {
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)
 		}
 
 	case *flagReformat != "" && len(args) == 1:
-		if err := reformat(*flagReformat, args[0]); err != nil {
+		if err := reformat(*flagReformat, args[0], validateOpts); err != nil {
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)
 		}
 
 	default:
-		if err := dumpFiles(args); err != nil {
+		if err := dumpFiles(args, validateOpts); err != nil {
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)
 		}
 	}
+}
+
+func getValidationOpts() (opts *ach.ValidateOpts) {
+
+	if *flagConfigFileName == "" {
+		return
+	}
+
+	// read config file
+	buf, readErr := os.ReadFile(*flagConfigFileName)
+	if readErr == nil {
+		newOpts := ach.ValidateOpts{}
+		if readErr = json.Unmarshal(buf, &newOpts); readErr == nil {
+			opts = &newOpts
+		}
+	}
+
+	if readErr != nil {
+		validationHelp()
+		os.Exit(1)
+	}
+
+	return
 }
