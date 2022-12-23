@@ -44,7 +44,7 @@ var (
 	flagValidateAllowUnorderedBatchNumbers       = flag.Bool("validate.allowUnorderedBatchNumbers", false, "Allow a file to be read with unordered batch numbers")
 	flagValidateAllowInvalidCheckDigit           = flag.Bool("validate.allowInvalidCheckDigit", false, "Allow the CheckDigit field in EntryDetail to differ from the expected calculation")
 	flagValidateUnequalAddendaCounts             = flag.Bool("validate.unequalAddendaCounts", false, "Skip checking that Addenda Count fields match their expected and computed values")
-	flagValidateUnequalServiceClassCode          = flag.Bool("validate.unequalServiceClassCode", false, "Skips equality checks for the ServiceClassCode in each pair of BatchHeader\n")
+	flagValidateUnequalServiceClassCode          = flag.Bool("validate.unequalServiceClassCode", false, "Skip equality checks for the ServiceClassCode in each pair of BatchHeader\n")
 )
 
 func main() {
