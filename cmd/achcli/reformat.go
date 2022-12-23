@@ -65,14 +65,5 @@ func readJsonFile(path string, validateOpts *ach.ValidateOpts) (*ach.File, error
 		return nil, fmt.Errorf("problem reading %s: %v", path, err)
 	}
 
-	f, err := ach.FileFromJSON(bs)
-	if err != nil {
-		return nil, err
-	}
-
-	if validateErr := f.ValidateWith(validateOpts); validateErr != nil {
-		return nil, validateErr
-	}
-
-	return f, nil
+	return ach.FileFromJSONWith(bs, validateOpts)
 }

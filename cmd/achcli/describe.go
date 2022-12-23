@@ -65,21 +65,17 @@ func dumpFiles(paths []string, validateOpts *ach.ValidateOpts) error {
 }
 
 func readACHFile(path string, validateOpts *ach.ValidateOpts) (*ach.File, error) {
-	fd, err := os.Open(path)
-	if err != nil {
-		return nil, fmt.Errorf("problem opening %s: %v", path, err)
+	fd, readErr := os.Open(path)
+	if readErr != nil {
+		return nil, fmt.Errorf("problem opening %s: %v", path, readErr)
 	}
 	defer fd.Close()
 
-	f, err := ach.NewReader(fd).Read()
+	r := ach.NewReader(fd)
+	r.SetValidation(validateOpts)
+	f, err := r.Read()
 	if err != nil {
 		return nil, err
-	}
-
-	if validateOpts != nil {
-		if validateErr := f.ValidateWith(validateOpts); validateErr != nil {
-			return nil, validateErr
-		}
 	}
 
 	return &f, err
