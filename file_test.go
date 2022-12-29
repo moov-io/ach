@@ -2098,3 +2098,20 @@ func TestFile__AscendingBatchSequence(t *testing.T) {
 		})
 	}
 }
+
+func TestFile_SkipValidation(t *testing.T) {
+	file := mockFilePPD()
+	file.validateOpts = &ValidateOpts{
+		SkipAll: true,
+	}
+
+	file.Control.TotalDebitEntryDollarAmountInFile = 22
+	err := file.Validate()
+	require.NoError(t, err)
+
+	file.validateOpts = nil
+	err = file.ValidateWith(&ValidateOpts{
+		SkipAll: true,
+	})
+	require.NoError(t, err)
+}

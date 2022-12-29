@@ -619,6 +619,9 @@ func (f *File) SetValidation(opts *ValidateOpts) {
 // ValidateOpts contains specific overrides from the default set of validations
 // performed on a NACHA file, records and various fields within.
 type ValidateOpts struct {
+	// SkipAll will disable all validation checks of a File. It has no effect when set on records.
+	SkipAll bool `json:"skipAll"`
+
 	// RequireABAOrigin can be set to enable routing number validation
 	// over the ImmediateOrigin file header field.
 	RequireABAOrigin bool `json:"requireABAOrigin"`
@@ -691,6 +694,10 @@ type ValidateOpts struct {
 func (f *File) ValidateWith(opts *ValidateOpts) error {
 	if opts == nil {
 		opts = &ValidateOpts{}
+	}
+
+	if opts.SkipAll {
+		return nil
 	}
 
 	if !opts.AllowMissingFileHeader {
