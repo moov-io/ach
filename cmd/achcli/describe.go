@@ -12,10 +12,10 @@ import (
 	"github.com/moov-io/ach/cmd/achcli/describe"
 )
 
-func dumpFiles(paths []string) error {
+func dumpFiles(paths []string, validateOpts *ach.ValidateOpts) error {
 	var files []*ach.File
 	for i := range paths {
-		f, err := readACHFile(paths[i])
+		f, err := readACHFile(paths[i], validateOpts)
 		if err != nil {
 			fmt.Printf("WARN: problem reading %s:\n %v\n\n", paths[i], err)
 		}
@@ -64,13 +64,18 @@ func dumpFiles(paths []string) error {
 	return nil
 }
 
-func readACHFile(path string) (*ach.File, error) {
-	fd, err := os.Open(path)
-	if err != nil {
-		return nil, fmt.Errorf("problem opening %s: %v", path, err)
+func readACHFile(path string, validateOpts *ach.ValidateOpts) (*ach.File, error) {
+	fd, readErr := os.Open(path)
+	if readErr != nil {
+		return nil, fmt.Errorf("problem opening %s: %v", path, readErr)
 	}
 	defer fd.Close()
 
-	f, err := ach.NewReader(fd).Read()
+	r := ach.NewReader(fd)
+	r.SetValidation(validateOpts)
+	f, err := r.Read()
+	if err != nil {
+		return nil, err
+	}
 	return &f, err
 }

@@ -16,11 +16,11 @@ import (
 	"github.com/mattn/go-isatty"
 )
 
-func diffFiles(paths []string) error {
+func diffFiles(paths []string, validateOpts *ach.ValidateOpts) error {
 	if len(paths) != 2 {
 		return fmt.Errorf("expected 2 files, but got %d", len(paths))
 	}
-	f1, f2, err := readTwoFiles(paths)
+	f1, f2, err := readTwoFiles(paths, validateOpts)
 	if err != nil {
 		return err
 	}
@@ -46,12 +46,12 @@ func diffFiles(paths []string) error {
 	return nil
 }
 
-func readTwoFiles(paths []string) (*ach.File, *ach.File, error) {
-	f1, err := readACHFile(paths[0])
+func readTwoFiles(paths []string, validateOpts *ach.ValidateOpts) (*ach.File, *ach.File, error) {
+	f1, err := readACHFile(paths[0], validateOpts)
 	if err != nil {
 		return nil, nil, fmt.Errorf("problem reading %s: %v", paths[0], err)
 	}
-	f2, err := readACHFile(paths[1])
+	f2, err := readACHFile(paths[1], validateOpts)
 	if err != nil {
 		return nil, nil, fmt.Errorf("problem reading %s: %v", paths[1], err)
 	}

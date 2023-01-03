@@ -13,12 +13,12 @@ import (
 	"github.com/moov-io/ach"
 )
 
-func reformat(as string, filepath string) error {
+func reformat(as string, filepath string, validateOpts *ach.ValidateOpts) error {
 	if _, err := os.Stat(filepath); err != nil {
 		return err
 	}
 
-	file, err := readIncomingFile(filepath)
+	file, err := readIncomingFile(filepath, validateOpts)
 	if err != nil {
 		return err
 	}
@@ -41,19 +41,19 @@ func reformat(as string, filepath string) error {
 	return nil
 }
 
-func readIncomingFile(path string) (*ach.File, error) {
-	file, err := readJsonFile(path)
+func readIncomingFile(path string, validateOpts *ach.ValidateOpts) (*ach.File, error) {
+	file, err := readJsonFile(path, validateOpts)
 	if file != nil && err == nil {
 		return file, nil
 	}
-	file, err = readACHFile(path)
+	file, err = readACHFile(path, validateOpts)
 	if file != nil && err == nil {
 		return file, nil
 	}
 	return nil, fmt.Errorf("unable to read %s:\n %v", path, err)
 }
 
-func readJsonFile(path string) (*ach.File, error) {
+func readJsonFile(path string, validateOpts *ach.ValidateOpts) (*ach.File, error) {
 	fd, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf("problem opening %s: %v", path, err)
@@ -65,5 +65,5 @@ func readJsonFile(path string) (*ach.File, error) {
 		return nil, fmt.Errorf("problem reading %s: %v", path, err)
 	}
 
-	return ach.FileFromJSON(bs)
+	return ach.FileFromJSONWith(bs, validateOpts)
 }
