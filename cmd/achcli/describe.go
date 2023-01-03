@@ -77,6 +77,5 @@ func readACHFile(path string, validateOpts *ach.ValidateOpts) (*ach.File, error)
 	if err != nil {
 		return nil, err
 	}
-
 	return &f, err
 }

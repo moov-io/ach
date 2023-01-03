@@ -15,36 +15,23 @@ import (
 )
 
 var (
-	flagVerbose = flag.Bool("v", false, "Print verbose details about each ACH file\n")
-	flagVersion = flag.Bool("version", false, "Print moov-io/ach cli version\n")
+	flagVerbose = flag.Bool("v", false, "Print verbose details about each ACH file")
+	flagVersion = flag.Bool("version", false, "Print moov-io/ach cli version")
 
-	flagDiff     = flag.Bool("diff", false, "Compare two files against each other\n")
-	flagFlatten  = flag.Bool("flatten", false, "Flatten batches in each file\n")
-	flagMerge    = flag.Bool("merge", false, "Merge files before describing\n")
-	flagReformat = flag.String("reformat", "", "Reformat an incoming ACH file to another format\n")
+	flagDiff     = flag.Bool("diff", false, "Compare two files against each other")
+	flagFlatten  = flag.Bool("flatten", false, "Flatten batches in each file")
+	flagMerge    = flag.Bool("merge", false, "Merge files before describing")
+	flagReformat = flag.String("reformat", "", "Reformat an incoming ACH file to another format")
 
 	flagMask              = flag.Bool("mask", false, "Mask/hide full account numbers and individual names")
 	flagMaskAccounts      = flag.Bool("mask.accounts", false, "Mask/hide full account numbers")
 	flagMaskCorrectedData = flag.Bool("mask.corrections", false, "Mask/Hide Corrected Data in Addenda98 records")
-	flagMaskNames         = flag.Bool("mask.names", false, "Mask/hide full individual names\n")
+	flagMaskNames         = flag.Bool("mask.names", false, "Mask/hide full individual names")
 
 	flagPretty        = flag.Bool("pretty", false, "Display all values in their human readable format")
-	flagPrettyAmounts = flag.Bool("pretty.amounts", false, "Display human readable amounts instead of exact values\n")
+	flagPrettyAmounts = flag.Bool("pretty.amounts", false, "Display human readable amounts instead of exact values")
 
-	flagValidate                                 = flag.String("validate", "", "Path to config file in json format to enable validation opts")
-	flagValidateRequireABAOrigin                 = flag.Bool("validate.requireABAOrigin", false, "Enable routing number validation over the ImmediateOrigin file header field")
-	flagValidateBypassOriginValidation           = flag.Bool("validate.bypassOriginValidation", false, "Skip validation for the ImmediateOrigin file header field")
-	flagValidateBypassDestinationValidation      = flag.Bool("validate.bypassDestinationValidation", false, "Skip validation for the ImmediateDestination file header field")
-	flagValidateCustomTraceNumbers               = flag.Bool("validate.customTraceNumbers", false, "Disable Nacha specified checks of TraceNumbers")
-	flagValidateAllowZeroBatches                 = flag.Bool("validate.allowZeroBatches", false, "Allow the file to have zero batches")
-	flagValidateAllowMissingFileHeader           = flag.Bool("validate.allowMissingFileHeader", false, "Allow a file to be read without a FileHeader record")
-	flagValidateAllowMissingFileControl          = flag.Bool("validate.allowMissingFileControl", false, "Allow a file to be read without a FileControl record")
-	flagValidateBypassCompanyIdentificationMatch = flag.Bool("validate.bypassCompanyIdentificationMatch", false, "Allow batches in which the Company Identification field in the batch header and control do not match")
-	flagValidateCustomReturnCodes                = flag.Bool("validate.customReturnCodes", false, "Skip validation for the Return Code field in an Addenda99")
-	flagValidateAllowUnorderedBatchNumbers       = flag.Bool("validate.allowUnorderedBatchNumbers", false, "Allow a file to be read with unordered batch numbers")
-	flagValidateAllowInvalidCheckDigit           = flag.Bool("validate.allowInvalidCheckDigit", false, "Allow the CheckDigit field in EntryDetail to differ from the expected calculation")
-	flagValidateUnequalAddendaCounts             = flag.Bool("validate.unequalAddendaCounts", false, "Skip checking that Addenda Count fields match their expected and computed values")
-	flagValidateUnequalServiceClassCode          = flag.Bool("validate.unequalServiceClassCode", false, "Skip equality checks for the ServiceClassCode in each pair of BatchHeader\n")
+	flagValidateOpts = flag.String("validate", "", "Path to config file in json format to enable validation opts")
 )
 
 func main() {
@@ -79,8 +66,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	// getting validation opts
-	validateOpts := getValidationOpts()
+	// Read validation options from the command
+	validateOpts := readValidationOpts(*flagValidateOpts)
 
 	// pick our command to do
 	switch {
@@ -104,85 +91,21 @@ func main() {
 	}
 }
 
-func getValidationOpts() (opts *ach.ValidateOpts) {
-
-	var newOpts ach.ValidateOpts
-	var existFlg bool
-
-	if *flagValidate != "" {
+func readValidationOpts(path string) *ach.ValidateOpts {
+	if path != "" {
 		// read config file
-		buf, readErr := os.ReadFile(*flagValidate)
-		if readErr == nil {
-			if readErr = json.Unmarshal(buf, &newOpts); readErr == nil {
-				opts = &newOpts
-				return
-			}
-		}
-
+		bs, readErr := os.ReadFile(path)
 		if readErr != nil {
-			validationHelp()
+			fmt.Printf("ERROR: reading validate opts failed: %v\n", readErr)
 			os.Exit(1)
 		}
-	}
 
-	if *flagValidateRequireABAOrigin {
-		existFlg = true
-		newOpts.RequireABAOrigin = true
+		var opts ach.ValidateOpts
+		if err := json.Unmarshal(bs, &opts); err != nil {
+			fmt.Printf("ERROR: unmarshal of validate opts failed: %v\n", err)
+			os.Exit(1)
+		}
+		return &opts
 	}
-	if *flagValidateBypassOriginValidation {
-		existFlg = true
-		newOpts.BypassOriginValidation = true
-	}
-	if *flagValidateBypassDestinationValidation {
-		existFlg = true
-		newOpts.BypassDestinationValidation = true
-	}
-	if *flagValidateCustomTraceNumbers {
-		existFlg = true
-		newOpts.CustomTraceNumbers = true
-	}
-
-	if *flagValidateAllowZeroBatches {
-		existFlg = true
-		newOpts.AllowZeroBatches = true
-	}
-	if *flagValidateAllowMissingFileHeader {
-		existFlg = true
-		newOpts.AllowMissingFileHeader = true
-	}
-	if *flagValidateAllowMissingFileControl {
-		existFlg = true
-		newOpts.AllowMissingFileControl = true
-	}
-	if *flagValidateBypassCompanyIdentificationMatch {
-		existFlg = true
-		newOpts.BypassCompanyIdentificationMatch = true
-	}
-	if *flagValidateCustomReturnCodes {
-		existFlg = true
-		newOpts.CustomReturnCodes = true
-	}
-	if *flagValidateUnequalServiceClassCode {
-		existFlg = true
-		newOpts.UnequalServiceClassCode = true
-	}
-	if *flagValidateAllowUnorderedBatchNumbers {
-		existFlg = true
-		newOpts.AllowUnorderedBatchNumbers = true
-	}
-	if *flagValidateAllowInvalidCheckDigit {
-		existFlg = true
-		newOpts.AllowInvalidCheckDigit = true
-	}
-	if *flagValidateUnequalAddendaCounts {
-		existFlg = true
-		newOpts.UnequalAddendaCounts = true
-	}
-
-	if !existFlg {
-		return
-	}
-
-	opts = &newOpts
-	return
+	return nil
 }
