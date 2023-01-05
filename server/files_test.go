@@ -184,6 +184,12 @@ func TestFiles__decodeCreateFileRequest__validateOpts(t *testing.T) {
 		expect ach.ValidateOpts
 	}{
 		{
+			query: "?skipAll=true",
+			expect: ach.ValidateOpts{
+				SkipAll: true,
+			},
+		},
+		{
 			query: "?bypassCompanyIdentificationMatch=true",
 			expect: ach.ValidateOpts{
 				BypassCompanyIdentificationMatch: true,

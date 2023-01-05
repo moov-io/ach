@@ -74,6 +74,11 @@ paths:
           schema:
             type: string
             example: "3f2d23ee214"
+        - name: skipAll
+          in: query
+          description: Optional parameter to disable all validation checks for a File
+          schema:
+            type: boolean
         - name: requireABAOrigin
           in: query
           description: Optional parameter to configure ImmediateOrigin validation

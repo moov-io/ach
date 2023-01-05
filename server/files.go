@@ -123,6 +123,7 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 	}
 
 	const (
+		skipAll                          = "skipAll"
 		requireABAOrigin                 = "requireABAOrigin"
 		bypassOrigin                     = "bypassOrigin"
 		bypassDestination                = "bypassDestination"
@@ -139,6 +140,7 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 	)
 
 	validationNames := []string{
+		skipAll,
 		requireABAOrigin,
 		bypassOrigin,
 		bypassDestination,
@@ -169,6 +171,8 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 		}
 
 		switch name {
+		case skipAll:
+			req.validateOpts.SkipAll = true
 		case requireABAOrigin:
 			req.validateOpts.RequireABAOrigin = true
 		case bypassOrigin:
