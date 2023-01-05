@@ -31,7 +31,8 @@ var (
 	flagPretty        = flag.Bool("pretty", false, "Display all values in their human readable format")
 	flagPrettyAmounts = flag.Bool("pretty.amounts", false, "Display human readable amounts instead of exact values")
 
-	flagValidateOpts = flag.String("validate", "", "Path to config file in json format to enable validation opts")
+	flagSkipValidation = flag.Bool("skip-validation", false, "Skip all validation checks")
+	flagValidateOpts   = flag.String("validate", "", "Path to config file in json format to enable validation opts")
 )
 
 func main() {
@@ -104,6 +105,9 @@ func readValidationOpts(path string) *ach.ValidateOpts {
 		if err := json.Unmarshal(bs, &opts); err != nil {
 			fmt.Printf("ERROR: unmarshal of validate opts failed: %v\n", err)
 			os.Exit(1)
+		}
+		if *flagSkipValidation {
+			opts.SkipAll = true
 		}
 		return &opts
 	}

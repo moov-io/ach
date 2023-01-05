@@ -44,6 +44,7 @@ Example: `POST /files/create?requireABAOrigin=true&bypassDestination=true`
 
 | Query Param                        | Validation Option                  |
 |------------------------------------|------------------------------------|
+| `allowInvalidCheckDigit`           | `AllowInvalidCheckDigit`           |
 | `allowMissingFileControl`          | `AllowMissingFileControl`          |
 | `allowMissingFileHeader`           | `AllowMissingFileHeader`           |
 | `allowZeroBatches`                 | `AllowZeroBatches`                 |
@@ -53,10 +54,10 @@ Example: `POST /files/create?requireABAOrigin=true&bypassDestination=true`
 | `customReturnCodes`                | `CustomReturnCodes`                |
 | `customTraceNumbers`               | `CustomTraceNumbers`               |
 | `requireABAOrigin`                 | `RequireABAOrigin`                 |
+| `skipAll`                          | `SkipAll`                          |
+| `unequalAddendaCounts`             | `UnequalAddendaCounts`             |
 | `unequalServiceClassCode`          | `UnequalServiceClassCode`          |
 | `unorderedBatchNumbers`            | `AllowUnorderedBatchNumbers`       |
-| `allowInvalidCheckDigit`           | `AllowInvalidCheckDigit`           |
-| `unequalAddendaCounts`             | `UnequalAddendaCounts`             |
 
 ## Upload a raw ACH file
 

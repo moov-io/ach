@@ -2012,3 +2012,39 @@ func TestJSONReader__IncludeFieldName(t *testing.T) {
 		}
 	}
 }
+
+func TestReadFile_SkipValidation(t *testing.T) {
+	bs, err := os.ReadFile(filepath.Join("test", "testdata", "skip-validation.ach"))
+	require.NoError(t, err)
+	bs = bytes.TrimSpace(bs)
+
+	reader := bytes.NewReader(bs)
+	r := NewReader(reader)
+	r.SetValidation(&ValidateOpts{SkipAll: true})
+	f, err := r.Read()
+	require.NoError(t, err)
+
+	// Validate of file is true
+	require.NoError(t, f.Validate())
+
+	// Validate of record is false
+	if err := f.Header.Validate(); err == nil {
+		t.Errorf("got: %v, want: not nil", err)
+	}
+
+	if len(f.Batches) != 3 {
+		t.Errorf("got: %v, want: %v (batched length)", len(f.Batches), 3)
+	} else {
+		for _, batch := range f.Batches {
+			require.Error(t, batch.Validate())
+		}
+	}
+
+	// checking output
+	var buf bytes.Buffer
+	if err := NewWriter(&buf).Write(&f); err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	output := strings.TrimSpace(buf.String())
+	require.Equal(t, string(bs), output)
+}
