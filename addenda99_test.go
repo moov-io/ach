@@ -21,8 +21,11 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"unicode/utf8"
 
 	"github.com/moov-io/base"
+
+	"github.com/stretchr/testify/require"
 )
 
 func mockAddenda99() *Addenda99 {
@@ -118,6 +121,19 @@ func BenchmarkAddenda99String(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testAddenda99String(b)
+	}
+}
+
+func TestAddenda99AllReturnCodes(t *testing.T) {
+	for code, _ := range returnCodeDict {
+		addenda99 := mockAddenda99()
+		addenda99.ReturnCode = code
+
+		require.NoError(t, addenda99.Validate())
+
+		line := addenda99.String()
+		require.Equal(t, 94, len(line))
+		require.Equal(t, 94, utf8.RuneCountInString(line))
 	}
 }
 
