@@ -491,7 +491,7 @@ func roundUp10(n int) int {
 func (v *validator) validateSettlementDate(s string) string {
 	emptyField := "   "
 
-	if s == emptyField || len(s) != len(emptyField) {
+	if s == emptyField || utf8.RuneCountInString(s) != len(emptyField) {
 		return emptyField
 	}
 
