@@ -17,7 +17,12 @@
 
 package ach
 
-import "testing"
+import (
+	"testing"
+	"unicode/utf8"
+
+	"github.com/stretchr/testify/require"
+)
 
 // testAlphaField ensures that padding and two long of strings get properly made
 func testAlphaFieldShort(t testing.TB) {
@@ -26,6 +31,11 @@ func testAlphaFieldShort(t testing.TB) {
 	if result != "ABC123    " {
 		t.Errorf("Left justified space filled got:'%v'", result)
 	}
+
+	answer := c.alphaField("Returned per ODFI’s Request", 44)
+	expected := "Returned per ODFI’s Request                 "
+	require.Equal(t, 44, utf8.RuneCountInString(expected))
+	require.Equal(t, expected, answer)
 }
 
 // TestAlphaFieldShort test ensures that padding and two long of strings get properly made

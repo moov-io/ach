@@ -21,6 +21,7 @@ import (
 	"math"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 // converters handles golang to ACH type Converters
@@ -54,7 +55,7 @@ func (c *converters) formatSimpleTime(s string) string {
 
 // alphaField Alphanumeric and Alphabetic fields are left-justified and space filled.
 func (c *converters) alphaField(s string, max uint) string {
-	ln := uint(len(s))
+	ln := uint(utf8.RuneCountInString(s))
 	if ln > max {
 		return s[:max]
 	}
@@ -65,7 +66,7 @@ func (c *converters) alphaField(s string, max uint) string {
 // numericField right-justified, unsigned, and zero filled
 func (c *converters) numericField(n int, max uint) string {
 	s := strconv.Itoa(n)
-	ln := uint(len(s))
+	ln := uint(utf8.RuneCountInString(s))
 	if ln > max {
 		return s[ln-max:]
 	}
@@ -75,7 +76,7 @@ func (c *converters) numericField(n int, max uint) string {
 
 // stringField slices to max length and zero filled
 func (c *converters) stringField(s string, max uint) string {
-	ln := uint(len(s))
+	ln := uint(utf8.RuneCountInString(s))
 	if ln > max {
 		return s[:max]
 	}
