@@ -128,10 +128,20 @@ func TestAddenda99AllReturnCodes(t *testing.T) {
 	for code, _ := range returnCodeDict {
 		addenda99 := mockAddenda99()
 		addenda99.ReturnCode = code
-
 		require.NoError(t, addenda99.Validate())
 
 		line := addenda99.String()
+		require.Equal(t, 94, len(line))
+		require.Equal(t, 94, utf8.RuneCountInString(line))
+
+		// Set Addenda on EntryDetail record
+		ed := mockEntryDetail()
+		ed.Amount = 0
+		ed.IdentificationNumber = ""
+		ed.Addenda99 = addenda99
+		require.NoError(t, ed.Validate())
+
+		line = ed.String()
 		require.Equal(t, 94, len(line))
 		require.Equal(t, 94, utf8.RuneCountInString(line))
 	}
