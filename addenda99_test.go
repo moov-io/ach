@@ -125,7 +125,7 @@ func BenchmarkAddenda99String(b *testing.B) {
 }
 
 func TestAddenda99AllReturnCodes(t *testing.T) {
-	for code, _ := range returnCodeDict {
+	for code := range returnCodeDict {
 		addenda99 := mockAddenda99()
 		addenda99.ReturnCode = code
 		require.NoError(t, addenda99.Validate())
