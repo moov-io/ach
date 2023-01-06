@@ -1,3 +1,23 @@
+## v1.27.0 (Released 2023-01-06)
+
+ADDITIONS
+
+- Add `-pretty.amounts` CLI flag to show human readable amounts
+- Add `-skip-validation` add option to skip all validations
+- Add `-validate` CLI flag to read files with ValidateOpts
+- feat: add option to skip all validations
+
+IMPROVEMENTS
+
+- fix: properly count string lengths when padding fields
+- test: verify EntryDetail record lengths are valid for all return codes
+
+BUILD
+
+- build: enable Go test shuffle
+- fix(deps): update module golang.org/x/oauth2 to v0.4.0
+- fix(deps): update module golang.org/x/text to v0.6.0
+
 ## v1.26.4 (Released 2022-12-19)
 
 IMPROVEMENTS
