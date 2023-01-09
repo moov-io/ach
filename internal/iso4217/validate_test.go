@@ -15,26 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package iso4217
+package iso4217_test
 
 import (
+	"github.com/moov-io/ach/internal/iso4217"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestValidate(t *testing.T) {
-	if !Valid("USD") {
-		t.Error("expected valid")
-	}
-
-	if !Valid("eur") {
-		t.Error("expected valid")
-	}
-
-	if Valid("") {
-		t.Errorf("invalid")
-	}
-
-	if Valid("QZA") {
-		t.Errorf("invalid")
-	}
+	assert.True(t, iso4217.Valid("USD"))
+	assert.True(t, iso4217.Valid("eur"))
+	assert.False(t, iso4217.Valid(""))
+	assert.False(t, iso4217.Valid("QZA"))
 }

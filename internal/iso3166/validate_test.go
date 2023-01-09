@@ -15,26 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package iso3166
+package iso3166_test
 
 import (
+	"github.com/moov-io/ach/internal/iso3166"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestValidate(t *testing.T) {
-	if !Valid("US") {
-		t.Error("expected valid")
-	}
-
-	if !Valid("SS") {
-		t.Error("expected valid")
-	}
-
-	if Valid("") {
-		t.Errorf("invalid")
-	}
-
-	if Valid("QZ") {
-		t.Errorf("invalid")
-	}
+	assert.True(t, iso3166.Valid("US"))
+	assert.True(t, iso3166.Valid("SS"))
+	assert.False(t, iso3166.Valid(""))
+	assert.False(t, iso3166.Valid("QZ"))
 }
