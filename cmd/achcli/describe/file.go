@@ -14,9 +14,9 @@ import (
 
 	"github.com/moov-io/ach"
 
+	"golang.org/x/text/currency"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
-	"golang.org/x/text/number"
 )
 
 type Opts struct {
@@ -195,8 +195,8 @@ func formatAmount(prettyAmounts bool, amt int) string {
 	}
 
 	printer := message.NewPrinter(language.Und)
-	formatter := number.Decimal(float64(amt)/100.0, number.MinFractionDigits(2))
-	return printer.Sprint(formatter)
+	printedCurrency := printer.Sprint(currency.NarrowSymbol(currency.USD.Amount(float64(amt) / 100)))
+	return strings.ReplaceAll(printedCurrency, " ", "")
 }
 
 func dumpAddenda02(w *tabwriter.Writer, a *ach.Addenda02) {

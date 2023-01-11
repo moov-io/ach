@@ -64,8 +64,8 @@ func TestDescribeCorrection(t *testing.T) {
 
 func TestFormatAmount(t *testing.T) {
 	require.Equal(t, "12345", formatAmount(false, 12345))
-	require.Equal(t, "123.45", formatAmount(true, 12345))
-	require.Equal(t, "1,234,567.89", formatAmount(true, 123456789))
+	require.Equal(t, "$123.45", formatAmount(true, 12345))
+	require.Equal(t, "$1,234,567.89", formatAmount(true, 123456789))
 }
 
 func TestMaskNumber(t *testing.T) {
