@@ -79,6 +79,15 @@ type BatchControl struct {
 	validator
 	// converters is composed for ACH to golang Converters
 	converters
+
+	validateOpts *ValidateOpts
+}
+
+func (bc *BatchControl) SetValidation(opts *ValidateOpts) {
+	if bc == nil {
+		return
+	}
+	bc.validateOpts = opts
 }
 
 // Parse takes the input record string and parses the EntryDetail values
@@ -102,12 +111,12 @@ func (bc *BatchControl) Parse(record string) {
 	// 33-44 Number of cents of credit entries within the batch
 	bc.TotalCreditEntryDollarAmount = bc.parseNumField(record[32:44])
 	// 45-54 This is the same as the "Company identification" field in previous Batch Header Record
-	bc.CompanyIdentification = strings.TrimSpace(record[44:54])
+	bc.CompanyIdentification = bc.parseStringFieldWithOpts(record[44:54], bc.validateOpts)
 	// 55-73 Seems to always be blank
-	bc.MessageAuthenticationCode = strings.TrimSpace(record[54:73])
+	bc.MessageAuthenticationCode = bc.parseStringFieldWithOpts(record[54:73], bc.validateOpts)
 	// 74-79 Always blank (just fill with spaces)
 	// 80-87 This is the same as the "ODFI identification" field in previous Batch Header Record
-	bc.ODFIIdentification = bc.parseStringField(record[79:87])
+	bc.ODFIIdentification = bc.parseStringFieldWithOpts(record[79:87], bc.validateOpts)
 	// 88-94 This is the same as the "Batch number" field in previous Batch Header Record
 	bc.BatchNumber = bc.parseNumField(record[87:94])
 }

@@ -681,6 +681,9 @@ type ValidateOpts struct {
 
 	// UnequalAddendaCounts skips checking that Addenda Count fields match their expected and computed values.
 	UnequalAddendaCounts bool `json:"unequalAddendaCounts"`
+
+	// PreserveSpaces keeps the spacing when parsing elements that normally have spaces trimmed
+	PreserveSpaces bool `json:"preserveSpaces"`
 }
 
 // ValidateWith performs checks on each record according to Nacha guidelines.

@@ -766,3 +766,15 @@ func TestEntryDetail__InvalidCheckDigitNotAllowedWithNullValidateOpt(t *testing.
 	ed = nil
 	ed.SetValidation(&ValidateOpts{})
 }
+
+func TestEntryDetail__IsValidWithPreserveSpacesOpt(t *testing.T) {
+	var line = "627231380104744-5678-99      0000500000location #1234 Best Co. #1           S 0031300010000001"
+	ed := NewEntryDetail()
+	ed.SetValidation(&ValidateOpts{
+		PreserveSpaces: true,
+	})
+	ed.Parse(line)
+	if err := ed.Validate(); err != nil {
+		t.Error(err)
+	}
+}

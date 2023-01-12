@@ -37,6 +37,14 @@ func (c *converters) parseStringField(r string) (s string) {
 	return s
 }
 
+func (c *converters) parseStringFieldWithOpts(r string, opts *ValidateOpts) string {
+	if opts != nil && opts.PreserveSpaces {
+		return r
+	} else {
+		return c.parseStringField(r)
+	}
+}
+
 // formatSimpleDate takes a YYMMDD date and formats it for the fixed-width ACH file format
 func (c *converters) formatSimpleDate(s string) string {
 	if s == "" {

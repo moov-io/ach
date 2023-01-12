@@ -2048,3 +2048,33 @@ func TestReadFile_SkipValidation(t *testing.T) {
 	output := strings.TrimSpace(buf.String())
 	require.Equal(t, string(bs), output)
 }
+
+func TestReadFile_PreserveSpacesOptEnabled(t *testing.T) {
+	path := filepath.Join("test", "testdata", "preserve-spaces-test.ach")
+	fd, err := os.Open(path)
+	if err != nil {
+		t.Errorf("problem reading %s: %v", path, err)
+	}
+	defer fd.Close()
+
+	reader := NewReader(fd)
+	reader.SetValidation(&ValidateOpts{PreserveSpaces: true})
+	file, err := reader.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedCompanyId := "231380104 "
+
+	batch := file.Batches[0]
+
+	if batchHeaderCompanyId := batch.GetHeader().CompanyIdentification; batchHeaderCompanyId != expectedCompanyId {
+		t.Errorf("Expected company id: '%s', Actual: '%s'", expectedCompanyId, batchHeaderCompanyId)
+	}
+
+	expectedTraceNumber := "12104288000002 "
+
+	if entryDetailTraceNumber := batch.GetEntries()[0].TraceNumber; entryDetailTraceNumber != expectedTraceNumber {
+		t.Errorf("Expected company id: '%s', Actual: '%s'", expectedTraceNumber, entryDetailTraceNumber)
+	}
+}

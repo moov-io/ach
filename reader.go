@@ -387,6 +387,7 @@ func (r *Reader) parseBatchHeader() error {
 
 	// Ensure we have a valid batch header before building a batch.
 	bh := NewBatchHeader()
+	bh.SetValidation(r.File.validateOpts)
 	bh.Parse(r.line)
 	if err := maybeValidate(bh, r.File.validateOpts); err != nil {
 		return r.parseError(err)
@@ -411,8 +412,8 @@ func (r *Reader) parseEntryDetail() error {
 	}
 	if r.currentBatch.GetHeader().StandardEntryClassCode != ADV {
 		ed := NewEntryDetail()
-		ed.Parse(r.line)
 		ed.SetValidation(r.File.validateOpts)
+		ed.Parse(r.line)
 		if err := maybeValidate(ed, r.File.validateOpts); err != nil {
 			return r.parseError(err)
 		}
@@ -547,6 +548,7 @@ func (r *Reader) parseBatchControl() error {
 				return r.parseError(err)
 			}
 		} else {
+			r.currentBatch.GetControl().SetValidation(r.File.validateOpts)
 			r.currentBatch.GetControl().Parse(r.line)
 			if err := maybeValidate(r.currentBatch.GetControl(), r.File.validateOpts); err != nil {
 				return r.parseError(err)
