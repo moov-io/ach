@@ -793,3 +793,15 @@ func TestFileHeader__ValidateDestination(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestFileHeader__IsValidWithPreserveSpacesOpt(t *testing.T) {
+	var line = "101 076401251 0764012511807291511A094101achdestname            companyname                    "
+	fh := NewFileHeader()
+	fh.SetValidation(&ValidateOpts{
+		PreserveSpaces: true,
+	})
+	fh.Parse(line)
+	if err := fh.Validate(); err != nil {
+		t.Error(err)
+	}
+}

@@ -143,11 +143,11 @@ func (fh *FileHeader) Parse(record string) {
 	// 40 always "1"
 	fh.formatCode = "1"
 	// 41-63 The name of the ODFI. example "SILICON VALLEY BANK    "
-	fh.ImmediateDestinationName = strings.TrimSpace(record[40:63])
+	fh.ImmediateDestinationName = fh.parseStringFieldWithOpts(record[40:63], fh.validateOpts)
 	// 64-86 ACH operator or sending point that is sending the file
-	fh.ImmediateOriginName = strings.TrimSpace(record[63:86])
+	fh.ImmediateOriginName = fh.parseStringFieldWithOpts(record[63:86], fh.validateOpts)
 	// 97-94 Optional field that may be used to describe the ACH file for internal accounting purposes
-	fh.ReferenceCode = strings.TrimSpace(record[86:94])
+	fh.ReferenceCode = fh.parseStringFieldWithOpts(record[86:94], fh.validateOpts)
 }
 
 func trimRoutingNumberLeadingZero(s string) string {

@@ -2048,3 +2048,37 @@ func TestReadFile_SkipValidation(t *testing.T) {
 	output := strings.TrimSpace(buf.String())
 	require.Equal(t, string(bs), output)
 }
+
+func TestReadFile_PreserveSpacesOptEnabled(t *testing.T) {
+	path := filepath.Join("test", "testdata", "ppd-debit.ach")
+	fd, err := os.Open(path)
+	if err != nil {
+		t.Errorf("problem reading %s: %v", path, err)
+	}
+	defer fd.Close()
+
+	reader := NewReader(fd)
+	reader.SetValidation(&ValidateOpts{PreserveSpaces: true})
+	file, err := reader.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedImmediateDestinationName := "Federal Reserve Bank   "
+
+	if fileHeaderImmediateDestinationName := file.Header.ImmediateDestinationName; fileHeaderImmediateDestinationName != expectedImmediateDestinationName {
+		t.Errorf("Expected Immediate Destination Name: '%s', Actual: '%s'", expectedImmediateDestinationName, fileHeaderImmediateDestinationName)
+	}
+
+	expectedCompanyId := "121042882 "
+
+	batch := file.Batches[0]
+
+	if batchHeaderCompanyId := batch.GetHeader().CompanyIdentification; batchHeaderCompanyId != expectedCompanyId {
+		t.Errorf("Expected company id: '%s', Actual: '%s'", expectedCompanyId, batchHeaderCompanyId)
+	}
+
+	if batchControlCompanyId := batch.GetControl().CompanyIdentification; batchControlCompanyId != expectedCompanyId {
+		t.Errorf("Expected company id: '%s', Actual: '%s'", expectedCompanyId, batchControlCompanyId)
+	}
+}

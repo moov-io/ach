@@ -523,3 +523,15 @@ func TestBatchHeader__SetValidation(t *testing.T) {
 	bh = nil
 	bh.SetValidation(&ValidateOpts{})
 }
+
+func TestBatchHeader__IsValidWithPreserveSpacesOpt(t *testing.T) {
+	var line = "5220Name on Account                     231380104 CCDVndr Pay        190816   1031300010000001"
+	bh := NewBatchHeader()
+	bh.SetValidation(&ValidateOpts{
+		PreserveSpaces: true,
+	})
+	bh.Parse(line)
+	if err := bh.Validate(); err != nil {
+		t.Error(err)
+	}
+}

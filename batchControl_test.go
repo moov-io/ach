@@ -315,3 +315,24 @@ func BenchmarkBatchControlLength(b *testing.B) {
 		testBatchControlLength(b)
 	}
 }
+
+func TestBatchControl__SetValidation(t *testing.T) {
+	bh := NewBatchControl()
+	bh.SetValidation(&ValidateOpts{})
+
+	// nil out
+	bh = nil
+	bh.SetValidation(&ValidateOpts{})
+}
+
+func TestBatchControl__IsValidWithPreserveSpacesOpt(t *testing.T) {
+	var line = "82200000010023138010000000000000000100000000231380104                          121042880000001"
+	bc := NewBatchControl()
+	bc.SetValidation(&ValidateOpts{
+		PreserveSpaces: true,
+	})
+	bc.Parse(line)
+	if err := bc.Validate(); err != nil {
+		t.Error(err)
+	}
+}

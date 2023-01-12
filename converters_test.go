@@ -161,6 +161,34 @@ func BenchmarkParseStringField(b *testing.B) {
 	}
 }
 
+func TestParseStringFieldWithOpts__PreservesSpacesWithOptTrue(t *testing.T) {
+	c := converters{}
+	opts := ValidateOpts{
+		PreserveSpaces: true,
+	}
+
+	expected := " 012345"
+
+	result := c.parseStringFieldWithOpts(" 012345", &opts)
+	if result != expected {
+		t.Errorf("Expected: '%v', Actual: '%v'", expected, result)
+	}
+}
+
+func TestParseStringFieldWithOpts__DoesntPreserveSpacesWithOptFalse(t *testing.T) {
+	c := converters{}
+	opts := ValidateOpts{
+		PreserveSpaces: false,
+	}
+
+	expected := "012345"
+
+	result := c.parseStringFieldWithOpts(" 012345", &opts)
+	if result != expected {
+		t.Errorf("Expected: '%v', Actual: '%v'", expected, result)
+	}
+}
+
 // testRTNFieldShort ensures zero padding and right justified
 func testRTNFieldShort(t testing.TB) {
 	c := converters{}
