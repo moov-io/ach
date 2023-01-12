@@ -2064,7 +2064,7 @@ func TestReadFile_PreserveSpacesOptEnabled(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expectedImmediateDestinationName := "Federal Reserve Bank "
+	expectedImmediateDestinationName := "Federal Reserve Bank   "
 
 	if fileHeaderImmediateDestinationName := file.Header.ImmediateDestinationName; fileHeaderImmediateDestinationName != expectedImmediateDestinationName {
 		t.Errorf("Expected Immediate Destination Name: '%s', Actual: '%s'", expectedImmediateDestinationName, fileHeaderImmediateDestinationName)
