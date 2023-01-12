@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Generated on 2021-03-23T11:08:18Z by adam, any modifications will be overwritten
+// Generated on 2023-01-11T11:05:01Z by adam, any modifications will be overwritten
 package iso4217
 
 var currencyCodes = map[string]bool{
