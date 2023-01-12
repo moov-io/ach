@@ -53,12 +53,12 @@ Example: `POST /files/create?requireABAOrigin=true&bypassDestination=true`
 | `bypassOrigin`                     | `BypassOriginValidation`           |
 | `customReturnCodes`                | `CustomReturnCodes`                |
 | `customTraceNumbers`               | `CustomTraceNumbers`               |
+| `preserveSpaces`                   | `PreserveSpaces`                   |
 | `requireABAOrigin`                 | `RequireABAOrigin`                 |
 | `skipAll`                          | `SkipAll`                          |
 | `unequalAddendaCounts`             | `UnequalAddendaCounts`             |
 | `unequalServiceClassCode`          | `UnequalServiceClassCode`          |
 | `unorderedBatchNumbers`            | `AllowUnorderedBatchNumbers`       |
-| `preserveSpaces`                   | `PreserveSpaces`                   |
 
 ## Upload a raw ACH file
 

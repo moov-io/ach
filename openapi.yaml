@@ -144,6 +144,10 @@ paths:
           description: Optional parameter to configure UnequalAddendaCounts validation
           schema:
             type: boolean
+        - name: preserveSpaces
+          description: Optional parameter to save all padding spaces
+          schema:
+            type: boolean
       requestBody:
         description: Content of the ACH file (in json or raw text)
         required: true

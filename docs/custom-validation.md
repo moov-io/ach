@@ -16,6 +16,8 @@ The [`ValidateOpts`](https://godoc.org/github.com/moov-io/ach#ValidateOpts) stru
 
 The following options can be used with `File.ValidateWith` and `File.SetValidation` to alter the default NACHA validation rules.
 
+Note: There is a `SkipAll bool` validation option to bypass all validation checks.
+
 ### Origin
 
 `RequireABAOrigin bool` can be set to enable routing number validation over the `ImmediateOrigin` file header field. Often the origin can be another value which is significant to the Financial Institution you're uploading ACH Files to.
