@@ -249,6 +249,12 @@ func TestFiles__decodeCreateFileRequest__validateOpts(t *testing.T) {
 				AllowInvalidCheckDigit: true,
 			},
 		},
+		{
+			query: "?preserveSpaces=true",
+			expect: ach.ValidateOpts{
+				PreserveSpaces: true,
+			},
+		},
 	}
 
 	for _, tc := range tests {

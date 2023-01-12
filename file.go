@@ -682,7 +682,7 @@ type ValidateOpts struct {
 	// UnequalAddendaCounts skips checking that Addenda Count fields match their expected and computed values.
 	UnequalAddendaCounts bool `json:"unequalAddendaCounts"`
 
-	// PreserveSpaces keeps the spacing when parsing elements that normally have spaces trimmed
+	// PreserveSpaces keeps the spacing before and after values that normally have spaces trimmed during parsing.
 	PreserveSpaces bool `json:"preserveSpaces"`
 }
 
