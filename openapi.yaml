@@ -145,6 +145,7 @@ paths:
           schema:
             type: boolean
         - name: preserveSpaces
+          in: query
           description: Optional parameter to save all padding spaces
           schema:
             type: boolean
