@@ -23,14 +23,20 @@ import (
 	"testing"
 
 	"github.com/moov-io/ach"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestIssue751(t *testing.T) {
 	fd, err := os.Open(filepath.Join("testdata", "issue751.ach"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	file, err := ach.NewReader(fd).Read()
+	require.NoError(t, err)
+
+	r := ach.NewReader(fd)
+	r.SetValidation(&ach.ValidateOpts{
+		PreserveSpaces: true,
+	})
+
+	file, err := r.Read()
 	if err == nil {
 		t.Error("expected error")
 	}
@@ -43,10 +49,6 @@ func TestIssue751(t *testing.T) {
 		t.Fatalf("got %d Entries", len(entries))
 	}
 
-	if acct := entries[0].DFIAccountNumber; acct != "82111184         " {
-		t.Errorf("got %q", acct)
-	}
-	if acct := entries[1].DFIAccountNumber; acct != "0110             " {
-		t.Errorf("got %q", acct)
-	}
+	require.Equal(t, "82111184         ", entries[0].DFIAccountNumber)
+	require.Equal(t, "0110             ", entries[1].DFIAccountNumber)
 }
