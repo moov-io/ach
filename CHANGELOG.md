@@ -1,3 +1,20 @@
+## v1.28.0 (Released 2023-01-12)
+
+ADDITIONS
+
+- Add `ValidateOpts` to BatchControl.
+- Add use of `PreserveSpaces` validate opt in BatchControl, BatchHeader, and EntryDetail.
+
+IMPROVEMENTS
+
+- fix: trim DFIAccountNumber by default
+
+BUILD
+
+- chore: generate iso3166 and iso4217 code, no changes
+- fix(deps): update module github.com/aws/aws-lambda-go to v1.37.0
+- test: use testify assert package for Valid unit tests  change packages to *_test
+
 ## v1.27.0 (Released 2023-01-06)
 
 ADDITIONS
