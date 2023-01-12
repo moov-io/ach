@@ -208,7 +208,7 @@ func (ed *EntryDetail) Parse(record string) {
 	// 12-12 The last digit of the RDFI's routing number
 	ed.CheckDigit = record[11:12]
 	// 13-29 The receiver's bank account number you are crediting/debiting
-	ed.DFIAccountNumber = record[12:29]
+	ed.DFIAccountNumber = ed.parseStringFieldWithOpts(record[12:29], ed.validateOpts)
 	// 30-39 Number of cents you are debiting/crediting this account
 	ed.Amount = ed.parseNumField(record[29:39])
 	// 40-54 An internal identification (alphanumeric) that you use to uniquely identify this Entry Detail Record
