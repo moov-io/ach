@@ -2050,7 +2050,7 @@ func TestReadFile_SkipValidation(t *testing.T) {
 }
 
 func TestReadFile_PreserveSpacesOptEnabled(t *testing.T) {
-	path := filepath.Join("test", "testdata", "preserve-spaces-test.ach")
+	path := filepath.Join("test", "testdata", "ppd-debit.ach")
 	fd, err := os.Open(path)
 	if err != nil {
 		t.Errorf("problem reading %s: %v", path, err)
@@ -2064,7 +2064,13 @@ func TestReadFile_PreserveSpacesOptEnabled(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expectedCompanyId := "231380104 "
+	expectedImmediateDestinationName := "Federal Reserve Bank "
+
+	if fileHeaderImmediateDestinationName := file.Header.ImmediateDestinationName; fileHeaderImmediateDestinationName != expectedImmediateDestinationName {
+		t.Errorf("Expected Immediate Destination Name: '%s', Actual: '%s'", expectedImmediateDestinationName, fileHeaderImmediateDestinationName)
+	}
+
+	expectedCompanyId := "121042882 "
 
 	batch := file.Batches[0]
 
@@ -2072,9 +2078,7 @@ func TestReadFile_PreserveSpacesOptEnabled(t *testing.T) {
 		t.Errorf("Expected company id: '%s', Actual: '%s'", expectedCompanyId, batchHeaderCompanyId)
 	}
 
-	expectedTraceNumber := "12104288000002 "
-
-	if entryDetailTraceNumber := batch.GetEntries()[0].TraceNumber; entryDetailTraceNumber != expectedTraceNumber {
-		t.Errorf("Expected company id: '%s', Actual: '%s'", expectedTraceNumber, entryDetailTraceNumber)
+	if batchControlCompanyId := batch.GetControl().CompanyIdentification; batchControlCompanyId != expectedCompanyId {
+		t.Errorf("Expected company id: '%s', Actual: '%s'", expectedCompanyId, batchControlCompanyId)
 	}
 }
