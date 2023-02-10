@@ -65,7 +65,8 @@ func (batch *BatchENR) Validate() error {
 		}
 
 		switch entry.TransactionCode {
-		case CheckingCredit, CheckingDebit, SavingsCredit, SavingsDebit:
+		case CheckingPrenoteCredit, CheckingPrenoteDebit, SavingsPrenoteCredit, SavingsPrenoteDebit:
+			// nothing
 		default:
 			return batch.Error("TransactionCode", ErrBatchTransactionCode, entry.TransactionCode)
 		}
