@@ -50,6 +50,10 @@ func (batch *BatchTEL) Validate() error {
 		if entry.CreditOrDebit() != "D" {
 			return batch.Error("TransactionCode", ErrBatchDebitOnly, entry.TransactionCode)
 		}
+		// Verify the Amount is valid for SEC code and TransactionCode
+		if err := batch.ValidAmountForCodes(entry); err != nil {
+			return err
+		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {
 			return err

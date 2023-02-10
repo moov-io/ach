@@ -58,6 +58,10 @@ func (batch *BatchMTE) Validate() error {
 		if entry.Amount <= 0 {
 			return batch.Error("Amount", ErrBatchAmountZero, entry.Amount)
 		}
+		// Verify the Amount is valid for SEC code and TransactionCode
+		if err := batch.ValidAmountForCodes(entry); err != nil {
+			return err
+		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {
 			return err
