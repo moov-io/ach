@@ -18,7 +18,6 @@
 package ach
 
 import (
-	"log"
 	"testing"
 
 	"github.com/moov-io/base"
@@ -53,11 +52,11 @@ func mockACKEntryDetail() *EntryDetail {
 }
 
 // mockBatchACK creates a ACK batch
-func mockBatchACK() *BatchACK {
+func mockBatchACK(t testing.TB) *BatchACK {
 	mockBatch := NewBatchACK(mockBatchACKHeader())
 	mockBatch.AddEntry(mockACKEntryDetail())
 	if err := mockBatch.Create(); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	return mockBatch
 }
@@ -86,7 +85,7 @@ func BenchmarkBatchACKHeader(b *testing.B) {
 
 // testBatchACKAddendumCount batch control ACK can only have one addendum per entry detail
 func testBatchACKAddendumCount(t testing.TB) {
-	mockBatch := mockBatchACK()
+	mockBatch := mockBatchACK(t)
 	// Adding a second addenda to the mock entry
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Create()
@@ -138,7 +137,7 @@ func TestBatchACKAddendum99(t *testing.T) {
 
 // testBatchACKReceivingCompanyName validates Receiving company / Individual name is a mandatory field
 func testBatchACKReceivingCompanyName(t testing.TB) {
-	mockBatch := mockBatchACK()
+	mockBatch := mockBatchACK(t)
 	// modify the Individual name / receiving company to nothing
 	mockBatch.GetEntries()[0].SetReceivingCompany("")
 	err := mockBatch.Validate()
@@ -162,7 +161,7 @@ func BenchmarkBatchACKReceivingCompanyName(b *testing.B) {
 
 // testBatchACKAddendaTypeCode validates addenda type code is 05
 func testBatchACKAddendaTypeCode(t testing.TB) {
-	mockBatch := mockBatchACK()
+	mockBatch := mockBatchACK(t)
 	mockBatch.GetEntries()[0].Addenda05[0].TypeCode = "07"
 	err := mockBatch.Validate()
 	if !base.Match(err, ErrAddendaTypeCode) {
@@ -185,7 +184,7 @@ func BenchmarkBatchACKAddendaTypeCode(b *testing.B) {
 
 // testBatchACKSEC validates that the standard entry class code is ACK for batchACK
 func testBatchACKSEC(t testing.TB) {
-	mockBatch := mockBatchACK()
+	mockBatch := mockBatchACK(t)
 	mockBatch.Header.StandardEntryClassCode = RCK
 	err := mockBatch.Validate()
 	if !base.Match(err, ErrBatchSECType) {
@@ -208,7 +207,7 @@ func BenchmarkBatchACKSEC(b *testing.B) {
 
 // testBatchACKAddendaCount validates batch ACK addenda count
 func testBatchACKAddendaCount(t testing.TB) {
-	mockBatch := mockBatchACK()
+	mockBatch := mockBatchACK(t)
 	addenda05 := mockAddenda05()
 	mockBatch.GetEntries()[0].AddAddenda05(addenda05)
 	err := mockBatch.Create()
@@ -232,7 +231,7 @@ func BenchmarkBatchACKAddendaCount(b *testing.B) {
 
 // testBatchACKServiceClassCode validates ServiceClassCode
 func testBatchACKServiceClassCode(t testing.TB) {
-	mockBatch := mockBatchACK()
+	mockBatch := mockBatchACK(t)
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetHeader().ServiceClassCode = 0
 	err := mockBatch.Create()
@@ -257,7 +256,7 @@ func BenchmarkBatchACKServiceClassCode(b *testing.B) {
 // testBatchACKReceivingCompanyField validates ACKReceivingCompanyField
 // underlying IndividualName
 func testBatchACKReceivingCompanyField(t testing.TB) {
-	mockBatch := mockBatchACK()
+	mockBatch := mockBatchACK(t)
 	ts := mockBatch.Entries[0].ReceivingCompanyField()
 	if ts != "Best Co. #23          " {
 		t.Error("Receiving Company Field is invalid")
@@ -281,7 +280,7 @@ func BenchmarkBatchACKReceivingCompanyField(b *testing.B) {
 
 // TestBatchACKAmount validates Amount
 func TestBatchACKAmount(t *testing.T) {
-	mockBatch := mockBatchACK()
+	mockBatch := mockBatchACK(t)
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetEntries()[0].Amount = 25000
 	err := mockBatch.Create()
@@ -292,7 +291,7 @@ func TestBatchACKAmount(t *testing.T) {
 
 // TestBatchACKTransactionCode validates TransactionCode
 func TestBatchACKTransactionCode(t *testing.T) {
-	mockBatch := mockBatchACK()
+	mockBatch := mockBatchACK(t)
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
 	err := mockBatch.Create()
@@ -316,7 +315,7 @@ func TestBatchACKAddendum99Category(t *testing.T) {
 
 // TestBatchACKValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
 func TestBatchACKValidTranCodeForServiceClassCode(t *testing.T) {
-	mockBatch := mockBatchACK()
+	mockBatch := mockBatchACK(t)
 	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
 	err := mockBatch.Create()
 	if !base.Match(err, NewErrBatchServiceClassTranCode(DebitsOnly, 24)) {

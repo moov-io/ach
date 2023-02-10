@@ -803,7 +803,7 @@ func TestBatchADVInvalidEntryHash(t *testing.T) {
 
 // TestBatchAddenda98InvalidAddendaRecordIndicator validates AddendaRecordIndicator
 func TestBatchAddenda98InvalidAddendaRecordIndicator(t *testing.T) {
-	mockBatch := mockBatchCOR()
+	mockBatch := mockBatchCOR(t)
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 0
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchAddendaIndicator) {
@@ -924,7 +924,7 @@ func TestBatchDishonoredReturnsCategory(t *testing.T) {
 
 // TestBatchConvertBatchType validates ConvertBatchType
 func TestBatchConvertBatchType(t *testing.T) {
-	mockBatchACK := mockBatchACK()
+	mockBatchACK := mockBatchACK(t)
 	convertedACK := ConvertBatchType(mockBatchACK.Batch)
 	if reflect.TypeOf(convertedACK) != reflect.TypeOf(mockBatchACK) {
 		t.Error("ACK batch type is not converted correctly")
@@ -939,7 +939,7 @@ func TestBatchConvertBatchType(t *testing.T) {
 	if reflect.TypeOf(convertedARC) != reflect.TypeOf(mockBatchARC) {
 		t.Error("ARC batch type is not converted correctly")
 	}
-	mockBatchATX := mockBatchATX()
+	mockBatchATX := mockBatchATX(t)
 	convertedATX := ConvertBatchType(mockBatchATX.Batch)
 	if reflect.TypeOf(convertedATX) != reflect.TypeOf(mockBatchATX) {
 		t.Error("ATX batch type is not converted correctly")
@@ -959,27 +959,27 @@ func TestBatchConvertBatchType(t *testing.T) {
 	if reflect.TypeOf(convertedCIE) != reflect.TypeOf(mockBatchCIE) {
 		t.Error("CIE batch type is not converted correctly")
 	}
-	mockBatchCOR := mockBatchCOR()
+	mockBatchCOR := mockBatchCOR(t)
 	convertedCOR := ConvertBatchType(mockBatchCOR.Batch)
 	if reflect.TypeOf(convertedCOR) != reflect.TypeOf(mockBatchCOR) {
 		t.Error("COR batch type is not converted correctly")
 	}
-	mockBatchCTX := mockBatchCTX()
+	mockBatchCTX := mockBatchCTX(t)
 	convertedCTX := ConvertBatchType(mockBatchCTX.Batch)
 	if reflect.TypeOf(convertedCTX) != reflect.TypeOf(mockBatchCTX) {
 		t.Error("CTX batch type is not converted correctly")
 	}
-	mockBatchDNE := mockBatchDNE()
+	mockBatchDNE := mockBatchDNE(t)
 	convertedDNE := ConvertBatchType(mockBatchDNE.Batch)
 	if reflect.TypeOf(convertedDNE) != reflect.TypeOf(mockBatchDNE) {
 		t.Error("DNE batch type is not converted correctly")
 	}
-	mockBatchENR := mockBatchENR()
+	mockBatchENR := mockBatchENR(t)
 	convertedENR := ConvertBatchType(mockBatchENR.Batch)
 	if reflect.TypeOf(convertedENR) != reflect.TypeOf(mockBatchENR) {
 		t.Error("ENR batch type is not converted correctly")
 	}
-	mockBatchMTE := mockBatchMTE()
+	mockBatchMTE := mockBatchMTE(t)
 	convertedMTE := ConvertBatchType(mockBatchMTE.Batch)
 	if reflect.TypeOf(convertedMTE) != reflect.TypeOf(mockBatchMTE) {
 		t.Error("MTE batch type is not converted correctly")
@@ -1019,7 +1019,7 @@ func TestBatchConvertBatchType(t *testing.T) {
 	if reflect.TypeOf(convertedTRC) != reflect.TypeOf(mockBatchTRC) {
 		t.Error("TRC batch type is not converted correctly")
 	}
-	mockBatchTRX := mockBatchTRX()
+	mockBatchTRX := mockBatchTRX(t)
 	convertedTRX := ConvertBatchType(mockBatchTRX.Batch)
 	if reflect.TypeOf(convertedTRX) != reflect.TypeOf(mockBatchTRX) {
 		t.Error("TRX batch type is not converted correctly")

@@ -18,7 +18,6 @@
 package ach
 
 import (
-	"log"
 	"testing"
 
 	"github.com/moov-io/base"
@@ -55,11 +54,11 @@ func mockATXEntryDetail() *EntryDetail {
 }
 
 // mockBatchATX creates a BatchATX
-func mockBatchATX() *BatchATX {
+func mockBatchATX(t testing.TB) *BatchATX {
 	mockBatch := NewBatchATX(mockBatchATXHeader())
 	mockBatch.AddEntry(mockATXEntryDetail())
 	if err := mockBatch.Create(); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	return mockBatch
 }
@@ -88,7 +87,7 @@ func BenchmarkBatchATXHeader(b *testing.B) {
 
 // testBatchATXCreate validates BatchATX create
 func testBatchATXCreate(t testing.TB) {
-	mockBatch := mockBatchATX()
+	mockBatch := mockBatchATX(t)
 	if err := mockBatch.Validate(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -109,7 +108,7 @@ func BenchmarkBatchATXCreate(b *testing.B) {
 
 // testBatchATXStandardEntryClassCode validates BatchATX create for an invalid StandardEntryClassCode
 func testBatchATXStandardEntryClassCode(t testing.TB) {
-	mockBatch := mockBatchATX()
+	mockBatch := mockBatchATX(t)
 	mockBatch.Header.StandardEntryClassCode = WEB
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchSECType) {
@@ -132,7 +131,7 @@ func BenchmarkBatchATXStandardEntryClassCode(b *testing.B) {
 
 // testBatchATXServiceClassCodeEquality validates service class code equality
 func testBatchATXServiceClassCodeEquality(t testing.TB) {
-	mockBatch := mockBatchATX()
+	mockBatch := mockBatchATX(t)
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
@@ -155,7 +154,7 @@ func BenchmarkBatchATXServiceClassCodeEquality(b *testing.B) {
 
 // testBatchATXAddendaCount validates BatchATX Addenda05 count of 2
 func testBatchATXAddendaCount(t testing.TB) {
-	mockBatch := mockBatchATX()
+	mockBatch := mockBatchATX(t)
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Create()
@@ -242,7 +241,7 @@ func BenchmarkBatchATXInvalidAddenda(b *testing.B) {
 
 // testBatchATXInvalidBuild validates an invalid batch build
 func testBatchATXInvalidBuild(t testing.TB) {
-	mockBatch := mockBatchATX()
+	mockBatch := mockBatchATX(t)
 	mockBatch.GetHeader().ServiceClassCode = 3
 	err := mockBatch.Create()
 	if !base.Match(err, ErrServiceClass) {
@@ -366,7 +365,7 @@ func BenchmarkBatchATXAddendaRecords(b *testing.B) {
 
 // testBatchATXReceivingCompany validates ATXReceivingCompany
 func testBatchATXReceivingCompany(t testing.TB) {
-	mockBatch := mockBatchATX()
+	mockBatch := mockBatchATX(t)
 	//mockBatch.GetEntries()[0].SetCATXReceivingCompany("Receiver")
 
 	if mockBatch.GetEntries()[0].CATXReceivingCompanyField() != "Receiver Company" {
@@ -389,7 +388,7 @@ func BenchmarkBatchATXReceivingCompany(b *testing.B) {
 
 // testBatchATXReserved validates ATXReservedField
 func testBatchATXReserved(t testing.TB) {
-	mockBatch := mockBatchATX()
+	mockBatch := mockBatchATX(t)
 
 	if mockBatch.GetEntries()[0].CATXReservedField() != "  " {
 		t.Errorf("expected %v got %v", "  ", mockBatch.GetEntries()[0].CATXReservedField())
@@ -567,7 +566,7 @@ func TestBatchATXAddendum99(t *testing.T) {
 
 // TestBatchATXValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
 func TestBatchATXValidTranCodeForServiceClassCode(t *testing.T) {
-	mockBatch := mockBatchATX()
+	mockBatch := mockBatchATX(t)
 	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
 	err := mockBatch.Create()
 	if !base.Match(err, NewErrBatchServiceClassTranCode(DebitsOnly, 24)) {

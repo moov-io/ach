@@ -18,7 +18,6 @@
 package ach
 
 import (
-	"log"
 	"testing"
 	"time"
 
@@ -67,11 +66,12 @@ func mockMTEEntryDetail() *EntryDetail {
 }
 
 // mockBatchMTE creates a MTE batch
-func mockBatchMTE() *BatchMTE {
+func mockBatchMTE(t testing.TB) *BatchMTE {
+	t.Helper()
 	batch := NewBatchMTE(mockBatchMTEHeader())
 	batch.AddEntry(mockMTEEntryDetail())
 	if err := batch.Create(); err != nil {
-		log.Fatalf("Unexpected error building batch: %s\n", err)
+		t.Fatalf("Unexpected error building batch: %s\n", err)
 	}
 	return batch
 }
@@ -111,7 +111,7 @@ func TestBatchMTEAddendum02(t *testing.T) {
 
 // testBatchMTEReceivingCompanyName validates Receiving company / Individual name is a mandatory field
 func testBatchMTEReceivingCompanyName(t testing.TB) {
-	mockBatch := mockBatchMTE()
+	mockBatch := mockBatchMTE(t)
 	// modify the Individual name / receiving company to nothing
 	mockBatch.GetEntries()[0].SetReceivingCompany("")
 	err := mockBatch.Validate()
@@ -135,7 +135,7 @@ func BenchmarkBatchMTEReceivingCompanyName(b *testing.B) {
 
 // testBatchMTEAddendaTypeCode validates addenda type code is 05
 func testBatchMTEAddendaTypeCode(t testing.TB) {
-	mockBatch := mockBatchMTE()
+	mockBatch := mockBatchMTE(t)
 	mockBatch.GetEntries()[0].Addenda02.TypeCode = "05"
 	err := mockBatch.Validate()
 	if !base.Match(err, ErrAddendaTypeCode) {
@@ -158,7 +158,7 @@ func BenchmarkBatchMTEAddendaTypeCode(b *testing.B) {
 
 // testBatchMTESEC validates that the standard entry class code is MTE for batchMTE
 func testBatchMTESEC(t testing.TB) {
-	mockBatch := mockBatchMTE()
+	mockBatch := mockBatchMTE(t)
 	mockBatch.Header.StandardEntryClassCode = ACK
 	err := mockBatch.Validate()
 	if !base.Match(err, ErrBatchSECType) {
@@ -181,7 +181,7 @@ func BenchmarkBatchMTESEC(b *testing.B) {
 
 // testBatchMTEServiceClassCode validates ServiceClassCode
 func testBatchMTEServiceClassCode(t testing.TB) {
-	mockBatch := mockBatchMTE()
+	mockBatch := mockBatchMTE(t)
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetHeader().ServiceClassCode = 0
 	err := mockBatch.Create()
@@ -205,7 +205,7 @@ func BenchmarkBatchMTEServiceClassCode(b *testing.B) {
 
 // TestBatchMTEAmount validates Amount
 func TestBatchMTEAmount(t *testing.T) {
-	mockBatch := mockBatchMTE()
+	mockBatch := mockBatchMTE(t)
 	mockBatch.GetEntries()[0].Amount = 0
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchAmountZero) {
@@ -214,7 +214,7 @@ func TestBatchMTEAmount(t *testing.T) {
 }
 
 func TestBatchMTETerminalState(t *testing.T) {
-	mockBatch := mockBatchMTE()
+	mockBatch := mockBatchMTE(t)
 	mockBatch.GetEntries()[0].Addenda02.TerminalState = "XX"
 	err := mockBatch.Create()
 	if !base.Match(err, ErrValidState) {
@@ -224,7 +224,7 @@ func TestBatchMTETerminalState(t *testing.T) {
 
 // TestBatchMTEIndividualName validates IndividualName
 func TestBatchMTEIndividualName(t *testing.T) {
-	mockBatch := mockBatchMTE()
+	mockBatch := mockBatchMTE(t)
 	mockBatch.GetEntries()[0].IndividualName = ""
 	err := mockBatch.Create()
 	if !base.Match(err, ErrConstructor) {
@@ -234,7 +234,7 @@ func TestBatchMTEIndividualName(t *testing.T) {
 
 // TestBatchMTEIdentificationNumber validates IdentificationNumber
 func TestBatchMTEIdentificationNumber(t *testing.T) {
-	mockBatch := mockBatchMTE()
+	mockBatch := mockBatchMTE(t)
 
 	// NACHA rules state MTE records can't be all spaces or all zeros
 	mockBatch.GetEntries()[0].IdentificationNumber = "   "
@@ -252,7 +252,7 @@ func TestBatchMTEIdentificationNumber(t *testing.T) {
 
 // TestBatchMTEValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
 func TestBatchMTEValidTranCodeForServiceClassCode(t *testing.T) {
-	mockBatch := mockBatchMTE()
+	mockBatch := mockBatchMTE(t)
 	mockBatch.GetHeader().ServiceClassCode = CreditsOnly
 	err := mockBatch.Create()
 	if !base.Match(err, NewErrBatchServiceClassTranCode(CreditsOnly, 27)) {
@@ -262,7 +262,7 @@ func TestBatchMTEValidTranCodeForServiceClassCode(t *testing.T) {
 
 // TestBatchMTEAddenda05 validates BatchMTE cannot have Addenda05
 func TestBatchMTEAddenda05(t *testing.T) {
-	mockBatch := mockBatchMTE()
+	mockBatch := mockBatchMTE(t)
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Create()

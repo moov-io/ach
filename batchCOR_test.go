@@ -18,7 +18,6 @@
 package ach
 
 import (
-	"log"
 	"testing"
 
 	"github.com/moov-io/base"
@@ -51,13 +50,14 @@ func mockCOREntryDetail() *EntryDetail {
 }
 
 // mockBatchCOR creates a BatchCOR
-func mockBatchCOR() *BatchCOR {
+func mockBatchCOR(t testing.TB) *BatchCOR {
+	t.Helper()
 	mockBatch := NewBatchCOR(mockBatchCORHeader())
 	mockBatch.AddEntry(mockCOREntryDetail())
 	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	return mockBatch
 }
@@ -87,7 +87,7 @@ func BenchmarkBatchCORHeader(b *testing.B) {
 
 // testBatchCORSEC validates BatchCOR SEC code
 func testBatchCORSEC(t testing.TB) {
-	mockBatch := mockBatchCOR()
+	mockBatch := mockBatchCOR(t)
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 	mockBatch.Header.StandardEntryClassCode = WEB
 	err := mockBatch.Validate()
@@ -111,7 +111,7 @@ func BenchmarkBatchCORSEC(b *testing.B) {
 
 // testBatchCORAddendumCountTwo validates Addendum count of 2
 func testBatchCORAddendumCountTwo(t testing.TB) {
-	mockBatch := mockBatchCOR()
+	mockBatch := mockBatchCOR(t)
 	// Adding a second addenda to the mock entry
 	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98()
 	err := mockBatch.Create()
@@ -184,7 +184,7 @@ func BenchmarkBatchCORAddendaType(b *testing.B) {
 
 // testBatchCORAddendaTypeCode validates TypeCode
 func testBatchCORAddendaTypeCode(t testing.TB) {
-	mockBatch := mockBatchCOR()
+	mockBatch := mockBatchCOR(t)
 	mockBatch.GetEntries()[0].Addenda98.TypeCode = "07"
 	err := mockBatch.Validate()
 	if !base.Match(err, ErrAddendaTypeCode) {
@@ -207,7 +207,7 @@ func BenchmarkBatchCORAddendaTypeCode(b *testing.B) {
 
 // testBatchCORAmount validates BatchCOR Amount
 func testBatchCORAmount(t testing.TB) {
-	mockBatch := mockBatchCOR()
+	mockBatch := mockBatchCOR(t)
 	// test a nonzero credit amount
 	mockBatch.GetEntries()[0].Amount = 9999
 	err := mockBatch.Create()
@@ -238,7 +238,7 @@ func BenchmarkBatchCORAmount(b *testing.B) {
 
 // testBatchCORTransactionCode27 validates BatchCOR TransactionCode 27 returns an error
 func testBatchCORTransactionCode27(t testing.TB) {
-	mockBatch := mockBatchCOR()
+	mockBatch := mockBatchCOR(t)
 	mockBatch.GetEntries()[0].TransactionCode = CheckingDebit
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchTransactionCode) {
@@ -263,7 +263,7 @@ func BenchmarkBatchCORTransactionCode27(b *testing.B) {
 // testBatchCORTransactionCode21 validates BatchCOR TransactionCode 21 is a valid TransactionCode to be used for NOC
 // mockBatch.Create() should not return an error for this test
 func testBatchCORTransactionCode21(t testing.TB) {
-	mockBatch := mockBatchCOR()
+	mockBatch := mockBatchCOR(t)
 	mockBatch.GetEntries()[0].TransactionCode = CheckingReturnNOCCredit
 	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
@@ -285,7 +285,7 @@ func BenchmarkBatchCORTransactionCode21(b *testing.B) {
 
 // testBatchCORCreate creates BatchCOR
 func testBatchCORCreate(t testing.TB) {
-	mockBatch := mockBatchCOR()
+	mockBatch := mockBatchCOR(t)
 	// Must have valid batch header to create a Batch
 	mockBatch.GetHeader().ServiceClassCode = 63
 	err := mockBatch.Create()
@@ -309,7 +309,7 @@ func BenchmarkBatchCORCreate(b *testing.B) {
 
 // testBatchCORServiceClassCodeEquality validates service class code equality
 func testBatchCORServiceClassCodeEquality(t testing.TB) {
-	mockBatch := mockBatchCOR()
+	mockBatch := mockBatchCOR(t)
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
@@ -374,7 +374,7 @@ func TestBatchCORCategoryNOCAddenda98(t *testing.T) {
 
 // TestBatchCORValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
 func TestBatchCORValidTranCodeForServiceClassCode(t *testing.T) {
-	mockBatch := mockBatchCOR()
+	mockBatch := mockBatchCOR(t)
 	mockBatch.GetHeader().ServiceClassCode = AutomatedAccountingAdvices
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchServiceClassCode) {
@@ -400,7 +400,7 @@ func TestBatchCORTestBatchCORInvalidAddenda98(t *testing.T) {
 
 // TestBatchCORTransactionCodeInvalid validates BatchCOR returns an error for an invalid TransactionCode
 func TestBatchCORAutomatedAccountingAdvices(t *testing.T) {
-	mockBatch := mockBatchCOR()
+	mockBatch := mockBatchCOR(t)
 	mockBatch.GetEntries()[0].TransactionCode = 65
 	err := mockBatch.Create()
 	if !base.Match(err, ErrTransactionCode) {

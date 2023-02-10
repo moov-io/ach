@@ -19,6 +19,7 @@ package ach
 
 import (
 	"bytes"
+	"os"
 	"strings"
 	"testing"
 
@@ -299,12 +300,11 @@ func testPPDIATWrite(t testing.TB) {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	/*	// Write records to standard output. Anything io.Writer
-		w := NewWriter(os.Stdout)
-		if err := w.Write(file); err != nil {
-			log.Fatalf("Unexpected error: %s\n", err)
-		}
-		w.Flush()*/
+	w := NewWriter(os.Stdout)
+	if err := w.Write(file); err != nil {
+		t.Fatalf("Unexpected error: %s\n", err)
+	}
+	w.Flush()
 }
 
 // TestPPDIATWrite tests writing a IAT ACH file
@@ -363,12 +363,11 @@ func testIATReturn(t testing.TB) {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	/*		// Write IAT records to standard output. Anything io.Writer
-			w := NewWriter(os.Stdout)
-			if err := w.Write(file); err != nil {
-				log.Fatalf("Unexpected error: %s\n", err)
-			}
-			w.Flush()*/
+	w := NewWriter(os.Stdout)
+	if err := w.Write(file); err != nil {
+		t.Fatalf("Unexpected error: %s\n", err)
+	}
+	w.Flush()
 }
 
 // TestIATReturn tests writing a IAT ACH Return file

@@ -18,7 +18,6 @@
 package ach
 
 import (
-	"log"
 	"testing"
 	"time"
 
@@ -59,11 +58,12 @@ func mockDNEEntryDetail() *EntryDetail {
 }
 
 // mockBatchDNE creates a DNE batch
-func mockBatchDNE() *BatchDNE {
+func mockBatchDNE(t testing.TB) *BatchDNE {
+	t.Helper()
 	batch := NewBatchDNE(mockBatchDNEHeader())
 	batch.AddEntry(mockDNEEntryDetail())
 	if err := batch.Create(); err != nil {
-		log.Fatalf("Unexpected error building batch: %s\n", err)
+		t.Fatalf("Unexpected error building batch: %s\n", err)
 	}
 	return batch
 }
@@ -92,7 +92,7 @@ func BenchmarkBatchDNEHeader(b *testing.B) {
 
 // testBatchDNEAddendumCount batch control DNE can only have one addendum per entry detail
 func testBatchDNEAddendumCount(t testing.TB) {
-	mockBatch := mockBatchDNE()
+	mockBatch := mockBatchDNE(t)
 	// Adding a second addenda to the mock entry
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Validate()
@@ -127,7 +127,7 @@ func TestBatchDNEAddendum98(t *testing.T) {
 
 // testBatchDNEReceivingCompanyName validates Receiving company / Individual name is a mandatory field
 func testBatchDNEReceivingCompanyName(t testing.TB) {
-	mockBatch := mockBatchDNE()
+	mockBatch := mockBatchDNE(t)
 	// modify the Individual name / receiving company to nothing
 	mockBatch.GetEntries()[0].SetReceivingCompany("")
 	err := mockBatch.Validate()
@@ -151,7 +151,7 @@ func BenchmarkBatchDNEReceivingCompanyName(b *testing.B) {
 
 // testBatchDNEAddendaTypeCode validates addenda type code is 05
 func testBatchDNEAddendaTypeCode(t testing.TB) {
-	mockBatch := mockBatchDNE()
+	mockBatch := mockBatchDNE(t)
 	mockBatch.GetEntries()[0].Addenda05[0].TypeCode = "05"
 	err := mockBatch.Validate()
 	// no error expected
@@ -175,7 +175,7 @@ func BenchmarkBatchDNEAddendaTypeCode(b *testing.B) {
 
 // testBatchDNESEC validates that the standard entry class code is DNE for batchDNE
 func testBatchDNESEC(t testing.TB) {
-	mockBatch := mockBatchDNE()
+	mockBatch := mockBatchDNE(t)
 	mockBatch.Header.StandardEntryClassCode = ACK
 	err := mockBatch.Validate()
 	if !base.Match(err, ErrBatchSECType) {
@@ -198,7 +198,7 @@ func BenchmarkBatchDNESEC(b *testing.B) {
 
 // testBatchDNEAddendaCount validates batch DNE addenda count
 func testBatchDNEAddendaCount(t testing.TB) {
-	mockBatch := mockBatchDNE()
+	mockBatch := mockBatchDNE(t)
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Create()
 	if !base.Match(err, NewErrBatchAddendaCount(0, 1)) {
@@ -221,7 +221,7 @@ func BenchmarkBatchDNEAddendaCount(b *testing.B) {
 
 // testBatchDNEServiceClassCode validates ServiceClassCode
 func testBatchDNEServiceClassCode(t testing.TB) {
-	mockBatch := mockBatchDNE()
+	mockBatch := mockBatchDNE(t)
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetHeader().ServiceClassCode = 0
 	err := mockBatch.Create()
@@ -245,7 +245,7 @@ func BenchmarkBatchDNEServiceClassCode(b *testing.B) {
 
 // TestBatchDNEAmount validates Amount
 func TestBatchDNEAmount(t *testing.T) {
-	mockBatch := mockBatchDNE()
+	mockBatch := mockBatchDNE(t)
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetEntries()[0].Amount = 25000
 	err := mockBatch.Create()
@@ -256,7 +256,7 @@ func TestBatchDNEAmount(t *testing.T) {
 
 // TestBatchDNETransactionCode validates TransactionCode
 func TestBatchDNETransactionCode(t *testing.T) {
-	mockBatch := mockBatchDNE()
+	mockBatch := mockBatchDNE(t)
 	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchTransactionCode) {
@@ -265,7 +265,7 @@ func TestBatchDNETransactionCode(t *testing.T) {
 }
 
 func TestBatchDNE__Details(t *testing.T) {
-	mockBatch := mockBatchDNE()
+	mockBatch := mockBatchDNE(t)
 	date, ssn, amount := mockBatch.details()
 	if date != "010218" {
 		t.Errorf("Got %s", date)

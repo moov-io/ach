@@ -18,7 +18,6 @@
 package ach
 
 import (
-	"log"
 	"testing"
 
 	"github.com/moov-io/base"
@@ -53,13 +52,14 @@ func mockCTXEntryDetail() *EntryDetail {
 }
 
 // mockBatchCTX creates a BatchCTX
-func mockBatchCTX() *BatchCTX {
+func mockBatchCTX(t testing.TB) *BatchCTX {
+	t.Helper()
 	mockBatch := NewBatchCTX(mockBatchCTXHeader())
 	mockBatch.AddEntry(mockCTXEntryDetail())
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	return mockBatch
 }
@@ -88,7 +88,7 @@ func BenchmarkBatchCTXHeader(b *testing.B) {
 
 // testBatchCTXCreate validates BatchCTX create
 func testBatchCTXCreate(t testing.TB) {
-	mockBatch := mockBatchCTX()
+	mockBatch := mockBatchCTX(t)
 	if err := mockBatch.Validate(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -109,7 +109,7 @@ func BenchmarkBatchCTXCreate(b *testing.B) {
 
 // testBatchCTXStandardEntryClassCode validates BatchCTX create for an invalid StandardEntryClassCode
 func testBatchCTXStandardEntryClassCode(t testing.TB) {
-	mockBatch := mockBatchCTX()
+	mockBatch := mockBatchCTX(t)
 	mockBatch.Header.StandardEntryClassCode = WEB
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchSECType) {
@@ -132,7 +132,7 @@ func BenchmarkBatchCTXStandardEntryClassCode(b *testing.B) {
 
 // testBatchCTXServiceClassCodeEquality validates service class code equality
 func testBatchCTXServiceClassCodeEquality(t testing.TB) {
-	mockBatch := mockBatchCTX()
+	mockBatch := mockBatchCTX(t)
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
@@ -155,7 +155,7 @@ func BenchmarkBatchCTXServiceClassCodeEquality(b *testing.B) {
 
 // testBatchCTXAddendaCount validates BatchCTX Addendum count of 2
 func testBatchCTXAddendaCount(t testing.TB) {
-	mockBatch := mockBatchCTX()
+	mockBatch := mockBatchCTX(t)
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Create()
 	if !base.Match(err, NewErrBatchExpectedAddendaCount(0, 1)) {
@@ -228,7 +228,7 @@ func BenchmarkBatchCTXInvalidAddenda(b *testing.B) {
 
 // testBatchCTXInvalidBuild validates an invalid batch build
 func testBatchCTXInvalidBuild(t testing.TB) {
-	mockBatch := mockBatchCTX()
+	mockBatch := mockBatchCTX(t)
 	mockBatch.GetHeader().ServiceClassCode = 3
 	err := mockBatch.Create()
 	if !base.Match(err, ErrServiceClass) {
@@ -348,7 +348,7 @@ func BenchmarkBatchCTXAddendaRecords(b *testing.B) {
 
 // testBatchCTXReceivingCompany validates CTXReceivingCompany
 func testBatchCTXReceivingCompany(t testing.TB) {
-	mockBatch := mockBatchCTX()
+	mockBatch := mockBatchCTX(t)
 	//mockBatch.GetEntries()[0].SetCATXReceivingCompany("Receiver")
 
 	if mockBatch.GetEntries()[0].CATXReceivingCompanyField() != "Receiver Company" {
@@ -371,7 +371,7 @@ func BenchmarkBatchCTXReceivingCompany(b *testing.B) {
 
 // testBatchCTXReserved validates CTXReservedField
 func testBatchCTXReserved(t testing.TB) {
-	mockBatch := mockBatchCTX()
+	mockBatch := mockBatchCTX(t)
 
 	if mockBatch.GetEntries()[0].CATXReservedField() != "  " {
 		t.Errorf("expected %v got %v", "  ", mockBatch.GetEntries()[0].CATXReservedField())
@@ -549,7 +549,7 @@ func TestBatchCTXAddendum99(t *testing.T) {
 
 // TestBatchCTXValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
 func TestBatchCTXValidTranCodeForServiceClassCode(t *testing.T) {
-	mockBatch := mockBatchCTX()
+	mockBatch := mockBatchCTX(t)
 	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
 	err := mockBatch.Create()
 	if !base.Match(err, NewErrBatchServiceClassTranCode(DebitsOnly, 22)) {
@@ -559,7 +559,7 @@ func TestBatchCTXValidTranCodeForServiceClassCode(t *testing.T) {
 
 // TestBatchCTXAddenda02 validates BatchCTX cannot have Addenda02
 func TestBatchCTXAddenda02(t *testing.T) {
-	mockBatch := mockBatchCTX()
+	mockBatch := mockBatchCTX(t)
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	err := mockBatch.Create()

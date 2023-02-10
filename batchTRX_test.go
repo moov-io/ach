@@ -18,7 +18,6 @@
 package ach
 
 import (
-	"log"
 	"testing"
 
 	"github.com/moov-io/base"
@@ -53,13 +52,14 @@ func mockTRXEntryDetail() *EntryDetail {
 }
 
 // mockBatchTRX creates a BatchTRX
-func mockBatchTRX() *BatchTRX {
+func mockBatchTRX(t testing.TB) *BatchTRX {
+	t.Helper()
 	mockBatch := NewBatchTRX(mockBatchTRXHeader())
 	mockBatch.AddEntry(mockTRXEntryDetail())
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	if err := mockBatch.Create(); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	return mockBatch
 }
@@ -122,7 +122,7 @@ func BenchmarkBatchTRXHeader(b *testing.B) {
 
 // testBatchTRXCreate validates BatchTRX create
 func testBatchTRXCreate(t testing.TB) {
-	mockBatch := mockBatchTRX()
+	mockBatch := mockBatchTRX(t)
 	if err := mockBatch.Validate(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -143,7 +143,7 @@ func BenchmarkBatchTRXCreate(b *testing.B) {
 
 // testBatchTRXStandardEntryClassCode validates BatchTRX create for an invalid StandardEntryClassCode
 func testBatchTRXStandardEntryClassCode(t testing.TB) {
-	mockBatch := mockBatchTRX()
+	mockBatch := mockBatchTRX(t)
 	mockBatch.Header.StandardEntryClassCode = WEB
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchSECType) {
@@ -166,7 +166,7 @@ func BenchmarkBatchTRXStandardEntryClassCode(b *testing.B) {
 
 // testBatchTRXServiceClassCodeEquality validates service class code equality
 func testBatchTRXServiceClassCodeEquality(t testing.TB) {
-	mockBatch := mockBatchTRX()
+	mockBatch := mockBatchTRX(t)
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
@@ -189,7 +189,7 @@ func BenchmarkBatchTRXServiceClassCodeEquality(b *testing.B) {
 
 // testBatchTRXAddendaCount validates BatchTRX Addendum count of 2
 func testBatchTRXAddendaCount(t testing.TB) {
-	mockBatch := mockBatchTRX()
+	mockBatch := mockBatchTRX(t)
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Create()
 	if !base.Match(err, NewErrBatchExpectedAddendaCount(2, 1)) {
@@ -287,7 +287,7 @@ func BenchmarkBatchTRXInvalidAddenda(b *testing.B) {
 
 // testBatchTRXInvalidBuild validates an invalid batch build
 func testBatchTRXInvalidBuild(t testing.TB) {
-	mockBatch := mockBatchTRX()
+	mockBatch := mockBatchTRX(t)
 	mockBatch.GetHeader().ServiceClassCode = 3
 	err := mockBatch.Create()
 	if !base.Match(err, ErrServiceClass) {
@@ -407,7 +407,7 @@ func BenchmarkBatchTRXAddendaRecords(b *testing.B) {
 
 // testBatchTRXReceivingCompany validates TRXReceivingCompany
 func testBatchTRXReceivingCompany(t testing.TB) {
-	mockBatch := mockBatchTRX()
+	mockBatch := mockBatchTRX(t)
 	//mockBatch.GetEntries()[0].SetCATXReceivingCompany("Receiver")
 
 	if mockBatch.GetEntries()[0].CATXReceivingCompanyField() != "Receiver Company" {
@@ -430,7 +430,7 @@ func BenchmarkBatchTRXReceivingCompany(b *testing.B) {
 
 // testBatchTRXReserved validates TRXReservedField
 func testBatchTRXReserved(t testing.TB) {
-	mockBatch := mockBatchTRX()
+	mockBatch := mockBatchTRX(t)
 
 	if mockBatch.GetEntries()[0].CATXReservedField() != "  " {
 		t.Errorf("expected %v got %v", "  ", mockBatch.GetEntries()[0].CATXReservedField())
@@ -546,7 +546,7 @@ func TestBatchTRXAddendum99(t *testing.T) {
 
 // testBatchTRXCreditsOnly validates BatchTRX create for an invalid CreditsOnly
 func testBatchTRXCreditsOnly(t testing.TB) {
-	mockBatch := mockBatchTRX()
+	mockBatch := mockBatchTRX(t)
 	mockBatch.Header.ServiceClassCode = CreditsOnly
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
@@ -569,7 +569,7 @@ func BenchmarkBatchTRXCreditsOnly(b *testing.B) {
 
 // testBatchTRXAutomatedAccountingAdvices validates BatchTRX create for an invalid AutomatedAccountingAdvices
 func testBatchTRXAutomatedAccountingAdvices(t testing.TB) {
-	mockBatch := mockBatchTRX()
+	mockBatch := mockBatchTRX(t)
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(AutomatedAccountingAdvices, 225)) {
@@ -592,7 +592,7 @@ func BenchmarkBatchTRXAutomatedAccountingAdvices(b *testing.B) {
 
 // TestBatchTRXAddenda02 validates BatchTRX create for an invalid Addenda02
 func TestBatchTRXAddenda02(t *testing.T) {
-	mockBatch := mockBatchTRX()
+	mockBatch := mockBatchTRX(t)
 	mockBatch.Entries[0].Addenda02 = mockAddenda02()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	err := mockBatch.Create()
@@ -603,7 +603,7 @@ func TestBatchTRXAddenda02(t *testing.T) {
 
 // testBatchTRXMixedDebitsAndCreditsServiceClassCode validates MixedDebitsAndCredits service class code
 func testBatchTRXMixedDebitsAndCreditsServiceClassCode(t testing.TB) {
-	mockBatch := mockBatchTRX()
+	mockBatch := mockBatchTRX(t)
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()

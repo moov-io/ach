@@ -18,7 +18,6 @@
 package ach
 
 import (
-	"log"
 	"testing"
 
 	"github.com/moov-io/base"
@@ -56,11 +55,12 @@ func mockENREntryDetail() *EntryDetail {
 }
 
 // mockBatchENR creates a ENR batch
-func mockBatchENR() *BatchENR {
+func mockBatchENR(t testing.TB) *BatchENR {
+	t.Helper()
 	batch := NewBatchENR(mockBatchENRHeader())
 	batch.AddEntry(mockENREntryDetail())
 	if err := batch.Create(); err != nil {
-		log.Fatalf("Unexpected error building batch: %s\n", err)
+		t.Fatalf("Unexpected error building batch: %s\n", err)
 	}
 	return batch
 }
@@ -89,7 +89,7 @@ func BenchmarkBatchENRHeader(b *testing.B) {
 
 // testBatchENRAddendumCount batch control ENR must have 1-9999 Addenda05 records
 func testBatchENRAddendumCount(t testing.TB) {
-	mockBatch := mockBatchENR()
+	mockBatch := mockBatchENR(t)
 	// Adding a second addenda to the mock entry
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	if err := mockBatch.Create(); err != nil {
@@ -126,7 +126,7 @@ func TestBatchENRAddendum98(t *testing.T) {
 
 // testBatchENRCompanyEntryDescription validates CompanyEntryDescription
 func testBatchENRCompanyEntryDescription(t testing.TB) {
-	mockBatch := mockBatchENR()
+	mockBatch := mockBatchENR(t)
 	mockBatch.Header.CompanyEntryDescription = "bad"
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchCompanyEntryDescriptionAutoenroll) {
@@ -149,7 +149,7 @@ func BenchmarkBatchENRCompanyEntryDescription(b *testing.B) {
 
 // testBatchENRAddendaTypeCode validates addenda type code is 05
 func testBatchENRAddendaTypeCode(t testing.TB) {
-	mockBatch := mockBatchENR()
+	mockBatch := mockBatchENR(t)
 	mockBatch.GetEntries()[0].Addenda05[0].TypeCode = "98"
 	err := mockBatch.Validate()
 	if !base.Match(err, ErrAddendaTypeCode) {
@@ -172,7 +172,7 @@ func BenchmarkBatchENRAddendaTypeCode(b *testing.B) {
 
 // testBatchENRSEC validates that the standard entry class code is ENR for batchENR
 func testBatchENRSEC(t testing.TB) {
-	mockBatch := mockBatchENR()
+	mockBatch := mockBatchENR(t)
 	mockBatch.Header.StandardEntryClassCode = ACK
 	err := mockBatch.Validate()
 	if !base.Match(err, ErrBatchSECType) {
@@ -195,7 +195,7 @@ func BenchmarkBatchENRSEC(b *testing.B) {
 
 // testBatchENRAddendaCount validates batch ENR addenda count
 func testBatchENRAddendaCount(t testing.TB) {
-	mockBatch := mockBatchENR()
+	mockBatch := mockBatchENR(t)
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Create()
 	// TODO: are we expecting there to be no errors here?
@@ -219,7 +219,7 @@ func BenchmarkBatchENRAddendaCount(b *testing.B) {
 
 // testBatchENRServiceClassCode validates ServiceClassCode
 func testBatchENRServiceClassCode(t testing.TB) {
-	mockBatch := mockBatchENR()
+	mockBatch := mockBatchENR(t)
 	mockBatch.GetHeader().ServiceClassCode = 0
 	err := mockBatch.Create()
 	if !base.Match(err, ErrConstructor) {
@@ -242,7 +242,7 @@ func BenchmarkBatchENRServiceClassCode(b *testing.B) {
 
 // TestBatchENRAmount validates Amount
 func TestBatchENRAmount(t *testing.T) {
-	mockBatch := mockBatchENR()
+	mockBatch := mockBatchENR(t)
 	mockBatch.GetEntries()[0].Amount = 25000
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchAmountNonZero) {
@@ -252,8 +252,8 @@ func TestBatchENRAmount(t *testing.T) {
 
 // TestBatchENRTransactionCode validates TransactionCode
 func TestBatchENRTransactionCode(t *testing.T) {
-	mockBatch := mockBatchENR()
-	mockBatch.GetEntries()[0].TransactionCode = CheckingReturnNOCCredit
+	mockBatch := mockBatchENR(t)
+	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchTransactionCode) {
 		t.Errorf("%T: %s", err, err)
@@ -261,7 +261,7 @@ func TestBatchENRTransactionCode(t *testing.T) {
 }
 
 func TestBatchENR__PaymentInformation(t *testing.T) {
-	batch := mockBatchENR()
+	batch := mockBatchENR(t)
 	if err := batch.Validate(); err != nil {
 		t.Fatal(err)
 	}
@@ -296,7 +296,7 @@ func TestBatchENR__PaymentInformation(t *testing.T) {
 
 // TestBatchENRValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
 func TestBatchENRValidTranCodeForServiceClassCode(t *testing.T) {
-	mockBatch := mockBatchENR()
+	mockBatch := mockBatchENR(t)
 	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
 	err := mockBatch.Create()
 	if !base.Match(err, NewErrBatchServiceClassTranCode(DebitsOnly, 22)) {
@@ -306,7 +306,7 @@ func TestBatchENRValidTranCodeForServiceClassCode(t *testing.T) {
 
 // TestBatchENRAddenda02 validates BatchENR cannot have Addenda02
 func TestBatchENRAddenda02(t *testing.T) {
-	mockBatch := mockBatchENR()
+	mockBatch := mockBatchENR(t)
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	err := mockBatch.Create()
