@@ -8,12 +8,12 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+
 	// "text/tabwriter"
 
 	"github.com/moov-io/ach"
 
 	"github.com/juju/ansiterm"
-	"github.com/mattn/go-isatty"
 )
 
 func diffFiles(paths []string, validateOpts *ach.ValidateOpts) error {
@@ -91,9 +91,6 @@ func printColumn(minusBuf, plusBuf *bytes.Buffer, v1, v2 string) {
 		ctx.Fprintf(w, v2)
 		ctx.SetForeground(ansiterm.Default)
 		ctx.Fprintf(w, "\t")
-
-		fmt.Printf("%T %#v\n", w, w)
-		fmt.Printf("%T: %v\n", os.Stdout, isatty.IsTerminal(os.Stdout.Fd()))
 
 		w = ansiterm.NewWriter(plusBuf)
 		ctx = ansiterm.Foreground(ansiterm.Red)

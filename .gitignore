@@ -48,6 +48,7 @@ staticcheck*
 /lint-project.sh
 bin/
 tmp/
+gitleaks.tar.gz
 
 # fuzzing
 test/fuzz-reader/crashes
