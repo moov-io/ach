@@ -1,3 +1,20 @@
+## v1.28.1 (Released 2023-02-13)
+
+IMPROVEMENTS
+
+- chore: remove wasteful debug printf
+- fix: validate amounts in non-prenote entries
+- test: convert log.Fatal over to t.Fatal
+- test: verify ValidAmountForCodes works as expected
+
+BUILD
+
+- build: update golang.org/x/sys/unix
+- build(deps): bump activesupport from 6.0.3.7 to 6.0.6.1 in /docs
+- chore(deps): update golang docker tag to v1.20
+- fix(deps): update module github.com/moov-io/base to v0.39.0
+- fix(deps): update module golang.org/x/text to v0.7.0
+
 ## v1.28.0 (Released 2023-01-12)
 
 ADDITIONS
