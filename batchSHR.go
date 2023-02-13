@@ -82,6 +82,10 @@ func (batch *BatchSHR) Validate() error {
 		if err := entry.isCreditCardYear(year); err != nil {
 			return fieldError("CardExpirationDate", ErrValidYear, year)
 		}
+		// Verify the Amount is valid for SEC code and TransactionCode
+		if err := batch.ValidAmountForCodes(entry); err != nil {
+			return err
+		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {
 			return err

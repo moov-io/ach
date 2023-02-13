@@ -389,6 +389,16 @@ func StandardTransactionCode(code int) error {
 	return ErrTransactionCode
 }
 
+func (v *validator) isPrenote(code int) bool {
+	switch code {
+	case CheckingPrenoteCredit, CheckingPrenoteDebit,
+		SavingsPrenoteCredit, SavingsPrenoteDebit,
+		GLPrenoteCredit, GLPrenoteDebit, LoanPrenoteCredit:
+		return true
+	}
+	return false
+}
+
 // isTransactionTypeCode verifies Addenda10 TransactionTypeCode is a valid value
 // ANN = Annuity, BUS = Business/Commercial, DEP = Deposit, LOA = Loan, MIS = Miscellaneous, MOR = Mortgage
 // PEN = Pension, RLS = Rent/Lease, REM = Remittance2, SAL = Salary/Payroll, TAX = Tax, TEL = Telephone-Initiated Transaction

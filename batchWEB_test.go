@@ -300,6 +300,7 @@ func TestBatchWEBCategoryReturnAddenda98(t *testing.T) {
 	mockBatch := NewBatchWEB(mockBatchWEBHeader())
 	mockBatch.AddEntry(mockWEBEntryDetail())
 	mockAddenda98 := mockAddenda98()
+	mockBatch.GetEntries()[0].Amount = 0
 	mockBatch.GetEntries()[0].Category = CategoryReturn
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98

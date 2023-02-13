@@ -343,7 +343,7 @@ func TestBatchPOSAddendum98(t *testing.T) {
 	mockBatch.GetEntries()[0].Category = CategoryNOC
 	mockBatch.GetEntries()[0].Addenda98 = mockAddenda98
 	err := mockBatch.Create()
-	if !base.Match(err, ErrFieldInclusion) {
+	if !base.Match(err, ErrBatchAmountNonZero) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

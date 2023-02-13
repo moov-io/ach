@@ -1011,6 +1011,28 @@ func (batch *Batch) IsADV() bool {
 	return ok
 }
 
+func (batch *Batch) ValidAmountForCodes(entry *EntryDetail) error {
+	if entry != nil && entry.Addenda98 != nil {
+		// NOC entries will have a zero'd amount value
+		if entry.Amount != 0 {
+			return ErrBatchAmountNonZero
+		}
+		return nil
+	}
+	isPrenote := entry.isPrenote(entry.TransactionCode)
+	if isPrenote {
+		if entry.Amount == 0 {
+			return nil
+		}
+		return fieldError("Amount", ErrBatchAmountNonZero, entry.Amount)
+	} else {
+		if entry.Amount == 0 {
+			return fieldError("Amount", ErrBatchAmountZero, entry.Amount)
+		}
+	}
+	return nil
+}
+
 // ValidTranCodeForServiceClassCode validates a TransactionCode is valid for a ServiceClassCode
 func (batch *Batch) ValidTranCodeForServiceClassCode(entry *EntryDetail) error {
 	// ADV should use ADVEntryDetail
