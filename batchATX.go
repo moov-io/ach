@@ -78,7 +78,7 @@ func (batch *BatchATX) Validate() error {
 			return batch.Error("AddendaCount", NewErrBatchExpectedAddendaCount(len(entry.Addenda05), addendaRecords))
 		}
 		// // Verify the Amount is valid for SEC code and TransactionCode
-		// if err := batch.ValidAmountForCodes(entry); err != nil { // TODO(adam):
+		// if err := batch.ValidAmountForCodes(entry); err != nil { // TODO(adam): https://github.com/moov-io/ach/issues/1170
 		// 	return err
 		// }
 		// Verify the TransactionCode is valid for a ServiceClassCode

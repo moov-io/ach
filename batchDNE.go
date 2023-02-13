@@ -70,7 +70,7 @@ func (batch *BatchDNE) Validate() error {
 			return batch.Error("AddendaCount", NewErrBatchAddendaCount(len(entry.Addenda05), 1))
 		}
 		// // Verify the Amount is valid for SEC code and TransactionCode
-		// if err := batch.ValidAmountForCodes(entry); err != nil { // TODO(adam):
+		// if err := batch.ValidAmountForCodes(entry); err != nil { // TODO(adam): https://github.com/moov-io/ach/issues/1171
 		// 	return err
 		// }
 		// Verify the TransactionCode is valid for a ServiceClassCode
