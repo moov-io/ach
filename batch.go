@@ -1014,6 +1014,9 @@ func (batch *Batch) IsADV() bool {
 func (batch *Batch) ValidAmountForCodes(entry *EntryDetail) error {
 	if entry != nil && entry.Addenda98 != nil {
 		// NOC entries will have a zero'd amount value
+		if entry.Amount != 0 {
+			return ErrBatchAmountNonZero
+		}
 		return nil
 	}
 	isPrenote := entry.isPrenote(entry.TransactionCode)

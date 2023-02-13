@@ -54,6 +54,12 @@ func TestIssue1168(t *testing.T) {
 	// Require that Batches cannot have zero amounts
 	require.ErrorContains(t, b1.Create(), ach.ErrBatchAmountZero.Error())
 
+	// Use a pre-note transaction code and verify success
 	ed.TransactionCode = ach.SavingsPrenoteCredit
 	require.NoError(t, b1.Create())
+	require.NoError(t, b1.Validate())
+
+	// Set a non-zero amount and catch error
+	ed.Amount = 1223
+	require.ErrorContains(t, b1.Create(), ach.ErrBatchAmountNonZero.Error())
 }

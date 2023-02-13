@@ -1036,6 +1036,30 @@ func TestBatchConvertBatchType(t *testing.T) {
 	}
 }
 
+func TestBatch__ValidAmountForCodes(t *testing.T) {
+	b1 := mockBatchWEB()
+
+	// Standard EntryDetails should pass
+	require.NoError(t, b1.Create())
+
+	// Pre-note entries must have zero'd amounts
+	require.Equal(t, 100_000_000, b1.Entries[0].Amount)
+	b1.Entries[0].TransactionCode = CheckingPrenoteCredit
+	require.ErrorContains(t, b1.Create(), ErrBatchAmountNonZero.Error())
+	b1.Entries[0].Amount = 0
+	require.NoError(t, b1.Create())
+
+	// NOC entries must have zero amounts
+	file, err := ReadFile(filepath.Join("test", "testdata", "cor-example.ach"))
+	require.NoError(t, err)
+	require.NoError(t, file.Validate())
+
+	batch, ok := file.Batches[0].(*BatchCOR)
+	require.True(t, ok)
+	batch.Entries[0].Amount = 12345
+	require.ErrorContains(t, batch.Create(), ErrBatchAmountNonZero.Error())
+}
+
 func TestBatch__Equal(t *testing.T) {
 	testFile := func(t *testing.T) *File {
 		t.Helper()
