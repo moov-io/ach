@@ -4,6 +4,9 @@ on:
   push:
     tags: [ "v*.*.*" ]
 
+permissions:
+  contents: read
+
 jobs:
   testing:
     name: Testing
@@ -13,18 +16,20 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
     - name: Set up Go 1.x
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v3
       with:
-        go-version: '>= 1.19.1'
+        go-version: '>= 1.20.1'
       id: go
 
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Check
       run: make check
 
   create_release:
+    permissions:
+      contents: write
     name: Create Release
     needs: [testing]
     runs-on: ubuntu-latest
@@ -43,12 +48,14 @@ jobs:
       run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
 
     - name: Save Release URL File for publish
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v3
       with:
         name: release_url
         path: release_url.txt
 
   publish:
+    permissions:
+      contents: write
     name: Publish
     needs: [testing, create_release]
     runs-on: ${{ matrix.os }}
@@ -57,16 +64,16 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
     - name: Set up Go 1.x
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v3
       with:
-        go-version: '>= 1.19.1'
+        go-version: '>= 1.20.1'
       id: go
 
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Load Release URL File from release job
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v3
       with:
         name: release_url
 
@@ -155,13 +162,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Set up Go 1.x
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v3
       with:
-        go-version: '>= 1.19.1'
+        go-version: '>= 1.20.1'
       id: go
 
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Docker
       run: make docker
