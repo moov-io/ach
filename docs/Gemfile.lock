@@ -270,7 +270,7 @@ DEPENDENCIES
   bulma-clean-theme
   github-pages (>= 214)
   jekyll-feed (~> 0.12)
-  tzinfo (~> 1.2)
+  tzinfo (~> 2.0)
   tzinfo-data
   wdm (~> 0.1.1)
 
