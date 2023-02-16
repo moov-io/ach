@@ -12,8 +12,6 @@ ACH files can have "offset records" which are [EntryDetail](https://godoc.org/gi
 
 Offset files are used to offset transactions from a single account inside of the ODFI. The Offset is the last record which settles the funds into a single ODFI account.
 
-Note: Balanced offset files (via `WithOffset`) are only in ACH v1.1.0 and later.
-
 ## Setting offset metadata
 
 An ACH [Batch](https://godoc.org/github.com/moov-io/ach#Batch) supports calling [WithOffset](https://godoc.org/github.com/moov-io/ach#Batch.WithOffset) to set offset information such as routing number, account number, account type, and a description.

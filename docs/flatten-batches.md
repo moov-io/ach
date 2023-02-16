@@ -12,8 +12,6 @@ File creation honors the order and number of Batch's that are created by the cli
 
 Flattening batches is a post file creation process that takes an input of an ACH.File and returns an ACH.File which has been optimized by flattening (merging) Batch Headers that have the same information and appending all Entries into a single Batch.
 
-Note: FlattenBatches (via `FlattenBatches()`) is only in ACH v1.2.0 and later.
-
 ## Creating flattened batches
 
 An ACH [File](https://godoc.org/github.com/moov-io/ach#File) supports calling [FlattenBatches](https://godoc.org/github.com/moov-io/ach#File.FlattenBatches):
