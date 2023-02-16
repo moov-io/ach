@@ -1,3 +1,4 @@
+# Use https://app.stepsecurity.io/ to improve workflow security
 name: Create Release
 
 on:
