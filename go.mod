@@ -8,7 +8,7 @@ require (
 	github.com/go-kit/kit v0.12.0
 	github.com/go-kit/log v0.2.1
 	github.com/gorilla/mux v1.8.0
-	github.com/juju/ansiterm v0.0.0-20210929141451-8b71cc96ebdc
+	github.com/juju/ansiterm v1.0.0
 	github.com/moov-io/base v0.39.0
 	github.com/prometheus/client_golang v1.14.0
 	github.com/stretchr/testify v1.8.1
