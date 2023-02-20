@@ -27,7 +27,7 @@ import (
 	"testing"
 )
 
-func TestFileFlattener(t *testing.T) {
+func TestFlattenFile(t *testing.T) {
 	// Represent a file as groupings of trace numbers (or, hackily, amounts for ADV entries)
 	getFileStructure := func(file *File) [][]string {
 		var fileStructure [][]string
@@ -148,7 +148,7 @@ func TestFileFlattener(t *testing.T) {
 			inputRaw, _ := os.Open(filepath.Join("test", "testdata", testCase.inputFixtureName))
 			inputFile, _ := NewReader(inputRaw).Read()
 
-			flattenedFile, err := FlattenedFile(&inputFile)
+			flattenedFile, err := Flatten(&inputFile)
 			if err != nil {
 				panic(err)
 			}

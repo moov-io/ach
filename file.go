@@ -1193,12 +1193,6 @@ func segmentFileBatchAddADVEntry(creditBatch Batcher, debitBatch Batcher, entry 
 	}
 }
 
-// FlattenBatches flattens the file's batches by consolidating batches with the same BatchHeader data into one Batch.
-// Entries within each flattened batch will be sorted by their TraceNumber field.
-func (f *File) FlattenBatches() (*File, error) {
-	return FlattenedFile(f)
-}
-
 // Validates that the batch numbers are ascending
 func (f *File) isSequenceAscending() error {
 	lastSeq := 0

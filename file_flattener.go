@@ -19,26 +19,32 @@ package ach
 
 import (
 	"errors"
+	"fmt"
 	"sort"
 )
 
-// Return a flattened version of a File, where batches with similar batch headers are consolidated.
+var (
+	ErrFlattenChangedEntryCount   = errors.New("Flatten operation changed entry and addenda count")
+	ErrFlattenChangedDebitAmount  = errors.New("Flatten operation changed total debit entry amount")
+	ErrFlattenChangedCreditAmount = errors.New("Flatten operation changed total credit entry amount")
+)
+
+// Flatten returns a flattened version of a File, where batches with similar batch headers are consolidated.
 //
 // Two batches are eligible to be combined if:
 //   - their headers match, excluding the batch number (which isn't used in return matching and reflects
 //     the final composition of the file.)
 //   - they don't contain any entries with common trace numbers, since trace numbers must be unique
 //     within a batch.
-func FlattenedFile(originalFile *File) (*File, error) {
+func Flatten(originalFile *File) (*File, error) {
 	var originalBatches []mergeable
 
 	// Convert batches and IAT batches to "mergeables" for consistent flattening logic
-	for _, batch := range originalFile.Batches {
-		originalBatches = append(originalBatches, mergeableBatcher{batch, nil})
+	for i := range originalFile.Batches {
+		originalBatches = append(originalBatches, mergeableBatcher{originalFile.Batches[i], nil})
 	}
-	for _, iatBatch := range originalFile.IATBatches {
-		iab := iatBatch
-		originalBatches = append(originalBatches, mergeableIATBatch{&iab, nil})
+	for i := range originalFile.IATBatches {
+		originalBatches = append(originalBatches, mergeableIATBatch{&originalFile.IATBatches[i], nil})
 	}
 
 	// Considering bigger batches first allows for the least number of flattened batches
@@ -48,7 +54,9 @@ func FlattenedFile(originalFile *File) (*File, error) {
 
 	// Merge each original batch into a new batch
 	newBatchesByHeader := map[string][]mergeable{}
-	for _, batch := range originalBatches {
+	for i := range originalBatches {
+		batch := originalBatches[i]
+
 		var batchToMergeWith mergeable
 
 		batchesWithMatchingHeader, found := newBatchesByHeader[batch.GetHeaderSignature()]
@@ -71,15 +79,15 @@ func FlattenedFile(originalFile *File) (*File, error) {
 	// Create a new file containing each of our new batches
 	newFile := originalFile.addFileHeaderData(NewFile())
 	var allBatches []mergeable
-	for _, batches := range newBatchesByHeader {
-		allBatches = append(allBatches, batches...)
+	for i := range newBatchesByHeader {
+		allBatches = append(allBatches, newBatchesByHeader[i]...)
 	}
 
 	// Sort batches by original batch number to roughly maintain batch order in the flattened file
 	sort.Slice(allBatches, func(i int, j int) bool { return allBatches[i].GetBatchNumber() < allBatches[j].GetBatchNumber() })
 
-	for _, batch := range allBatches {
-		batch.AddToFile(newFile)
+	for i := range allBatches {
+		allBatches[i].AddToFile(newFile)
 	}
 
 	if err := newFile.Create(); err != nil {
@@ -91,16 +99,22 @@ func FlattenedFile(originalFile *File) (*File, error) {
 
 	// Sanity checks; this is kind of a scary operation!
 	if originalFile.Control.EntryAddendaCount != newFile.Control.EntryAddendaCount {
-		return nil, errors.New("Flatten operation changed entry + addenda count.")
+		return nil, askForBugReports(ErrFlattenChangedEntryCount)
 	}
 	if originalFile.Control.TotalDebitEntryDollarAmountInFile != newFile.Control.TotalDebitEntryDollarAmountInFile {
-		return nil, errors.New("Flatten operation changed total debit entry amount.")
+		return nil, askForBugReports(ErrFlattenChangedDebitAmount)
 	}
 	if originalFile.Control.TotalCreditEntryDollarAmountInFile != newFile.Control.TotalCreditEntryDollarAmountInFile {
-		return nil, errors.New("Flatten operation changed total credit entry amount.")
+		return nil, askForBugReports(ErrFlattenChangedCreditAmount)
 	}
 
 	return newFile, nil
+}
+
+// FlattenBatches flattens the file's batches by consolidating batches with the same BatchHeader data into one Batch.
+// Entries within each flattened batch will be sorted by their TraceNumber field.
+func (f *File) FlattenBatches() (*File, error) {
+	return Flatten(f)
 }
 
 // Determine if two batches can be combined (ie, have the same header and no common trace numbers)
@@ -155,7 +169,7 @@ func (b mergeableBatcher) GetTraceNumbers() map[string]bool {
 func (m mergeableBatcher) Consume(mergeableToConsume mergeable) {
 	batcherToConsume, ok := mergeableToConsume.GetBatch().(Batcher)
 	if !ok {
-		panic("Incompatible batch types")
+		panic(fmt.Sprintf("cannot consume %T - incompatible batch types", mergeableToConsume))
 	}
 
 	// Keep the lower of the two batch numbers, to roughly maintain batch order in the flattened file
@@ -163,11 +177,13 @@ func (m mergeableBatcher) Consume(mergeableToConsume mergeable) {
 		m.batcher.GetHeader().BatchNumber = batcherToConsume.GetHeader().BatchNumber
 	}
 
-	for _, entry := range batcherToConsume.GetEntries() {
-		m.batcher.AddEntry(entry)
+	entries := batcherToConsume.GetEntries()
+	for i := range entries {
+		m.batcher.AddEntry(entries[i])
 	}
-	for _, advEntry := range batcherToConsume.GetADVEntries() {
-		m.batcher.AddADVEntry(advEntry)
+	advEntries := batcherToConsume.GetADVEntries()
+	for i := range advEntries {
+		m.batcher.AddADVEntry(advEntries[i])
 	}
 }
 
@@ -187,7 +203,7 @@ func (m mergeableBatcher) AddToFile(file *File) {
 
 	err := m.batcher.Create()
 	if err != nil {
-		panic(err)
+		panic(askForBugReports(fmt.Errorf("mergeableBatcher - AddToFile: %v", err)))
 	}
 
 	m.batcher.GetHeader().BatchNumber = 0
@@ -222,7 +238,7 @@ func (b mergeableIATBatch) GetTraceNumbers() map[string]bool {
 func (m mergeableIATBatch) Consume(mergeableToConsume mergeable) {
 	batchToConsume, ok := mergeableToConsume.GetBatch().(IATBatch)
 	if !ok {
-		panic("Incompatible batch types")
+		panic(fmt.Sprintf("IAT cannot consume %T - incompatible batch types", mergeableToConsume))
 	}
 
 	// Keep the lower of the two batch numbers, to roughly maintain batch order in the flattened file
@@ -251,7 +267,7 @@ func (m mergeableIATBatch) AddToFile(file *File) {
 
 	err := m.iatBatch.Create()
 	if err != nil {
-		panic(err)
+		panic(askForBugReports(fmt.Errorf("mergeableIATBatch - AddToFile: %v", err)))
 	}
 	m.iatBatch.Header.BatchNumber = 0
 
