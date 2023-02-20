@@ -59,21 +59,14 @@ func (batch *BatchCOR) Validate() error {
 	}
 
 	for _, entry := range batch.Entries {
-		/* COR TransactionCode must be a Return or NOC transaction Code
-		   Return/NOC
-		   Credit:  21, 31, 41, 51
-		   Debit: 26, 36, 46, 56
-		*/
+		// COR TransactionCode must be a Return or NOC transaction Code
 		switch entry.TransactionCode {
-		case
-			CheckingCredit, CheckingDebit, CheckingPrenoteCredit, CheckingPrenoteDebit,
-			CheckingZeroDollarRemittanceCredit, CheckingZeroDollarRemittanceDebit,
-			SavingsCredit, SavingsDebit, SavingsPrenoteCredit, SavingsPrenoteDebit,
-			SavingsZeroDollarRemittanceCredit, SavingsZeroDollarRemittanceDebit,
-			GLCredit, GLDebit, GLPrenoteCredit, GLPrenoteDebit, GLZeroDollarRemittanceCredit,
-			GLZeroDollarRemittanceDebit, LoanCredit, LoanDebit, LoanPrenoteCredit,
-			LoanZeroDollarRemittanceCredit:
+		case CheckingCredit, CheckingZeroDollarRemittanceCredit, CheckingDebit, CheckingZeroDollarRemittanceDebit,
+			SavingsCredit, SavingsZeroDollarRemittanceCredit, SavingsDebit, SavingsZeroDollarRemittanceDebit,
+			GLCredit, GLZeroDollarRemittanceCredit, GLDebit, GLZeroDollarRemittanceDebit,
+			LoanCredit, LoanZeroDollarRemittanceCredit, LoanDebit:
 			return batch.Error("TransactionCode", ErrBatchTransactionCode, entry.TransactionCode)
+
 		}
 		// Verify the Amount is valid for SEC code and TransactionCode
 		if err := batch.ValidAmountForCodes(entry); err != nil {

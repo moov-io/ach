@@ -358,7 +358,7 @@ func TestBatchCORCategoryNOCAddenda02(t *testing.T) {
 	}
 }
 
-// TestBatchCORCategoryNOCAddenda98 validates that no error is returned if Addenda098 is defined for CategoryNOC
+// TestBatchCORCategoryNOCAddenda98 validates that no error is returned if Addenda98 is defined for CategoryNOC
 func TestBatchCORCategoryNOCAddenda98(t *testing.T) {
 	mockBatch := NewBatchCOR(mockBatchCORHeader())
 	mockBatch.AddEntry(mockCOREntryDetail())
