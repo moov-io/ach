@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/moov-io/base"
@@ -1197,104 +1196,7 @@ func segmentFileBatchAddADVEntry(creditBatch Batcher, debitBatch Batcher, entry 
 // FlattenBatches flattens the file's batches by consolidating batches with the same BatchHeader data into one Batch.
 // Entries within each flattened batch will be sorted by their TraceNumber field.
 func (f *File) FlattenBatches() (*File, error) {
-	out := NewFile()
-
-	// Helper method to fetch the batch header without the trace number
-	getHeader := func(batchHeader fmt.Stringer) string {
-		return batchHeader.String()[:87]
-	}
-
-	batchesByHeader := make(map[string]Batcher)
-	if f.Batches != nil {
-		for _, b := range f.Batches {
-			bhKey := getHeader(b.GetHeader())
-			_, found := batchesByHeader[bhKey]
-			if !found {
-				newBatch, err := NewBatch(b.GetHeader())
-				if err != nil {
-					return nil, err
-				}
-
-				batchesByHeader[bhKey] = newBatch
-				out.AddBatch(newBatch)
-			}
-
-			newBatch := batchesByHeader[bhKey]
-			if newBatch.GetHeader().StandardEntryClassCode == "ADV" {
-				for _, e := range b.GetADVEntries() {
-					newBatch.AddADVEntry(e)
-				}
-			} else {
-				for _, e := range b.GetEntries() {
-					newBatch.AddEntry(e)
-				}
-			}
-		}
-	}
-	for i := range out.Batches {
-		bh := out.Batches[i].GetHeader()
-		if bh.StandardEntryClassCode != "ADV" {
-			batch, _ := NewBatch(bh)
-			entries := sortEntriesByTraceNumber(out.Batches[i].GetEntries())
-			for i := range entries {
-				batch.AddEntry(entries[i])
-			}
-			out.Batches[i] = batch
-			if err := batch.Create(); err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	IATBatchesByHeader := make(map[string]*IATBatch)
-	if f.IATBatches != nil {
-		for _, b := range f.IATBatches {
-			bhKey := getHeader(b.GetHeader())
-			_, found := IATBatchesByHeader[bhKey]
-			if !found {
-				newBatch := NewIATBatch(b.GetHeader())
-				IATBatchesByHeader[bhKey] = &newBatch
-				out.AddIATBatch(newBatch)
-			}
-
-			newBatch := IATBatchesByHeader[bhKey]
-			for _, e := range b.GetEntries() {
-				newBatch.AddEntry(e)
-			}
-		}
-	}
-
-	// Set batches to valid state
-	wg := sync.WaitGroup{}
-
-	wg.Add(len(batchesByHeader))
-	for _, b := range batchesByHeader {
-		go func(b Batcher) {
-			defer wg.Done()
-			_ = b.Create()
-		}(b)
-	}
-
-	wg.Add(len(IATBatchesByHeader))
-	for _, b := range IATBatchesByHeader {
-		go func(b IATBatch) {
-			defer wg.Done()
-			_ = b.Create()
-		}(*b)
-	}
-
-	wg.Wait()
-
-	// Add FileHeaderData.
-	f.addFileHeaderData(out)
-
-	if err := out.Create(); err != nil {
-		return nil, err
-	}
-	if err := out.Validate(); err != nil {
-		return nil, err
-	}
-	return out, nil
+	return FlattenedFile(f)
 }
 
 // Validates that the batch numbers are ascending
