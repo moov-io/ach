@@ -1,4 +1,4 @@
-## v1.29.0 (Released 2023-02-21)
+## v1.29.2 (Released 2023-02-21)
 
 Shout-out to @ckbaum for contributing a [major improvement to File Flattening](https://github.com/moov-io/ach/pull/1178).
 
