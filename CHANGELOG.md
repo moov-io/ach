@@ -1,3 +1,21 @@
+## v1.29.0 (Released 2023-02-21)
+
+Shout-out to @ckbaum for contributing a [major improvement to File Flattening](https://github.com/moov-io/ach/pull/1178).
+
+IMPROVEMENTS
+
+- feat: Don't combine two batches if they share any trace numbers.
+- feat: Make an effort to preserve original batch ordering.
+- feat: expose named errors (and ask for bug reports) from FlattenFile
+
+BUILD
+
+- build: tighten up GITHUB_TOKEN permissions
+- build: Apply security best practices from StepSecurity
+- build(deps): bump ossf/scorecard-action from 2.0.6 to 2.1.2
+- chore(deps): update dependency tzinfo to "~> 2.0"
+- fix(deps): update module github.com/juju/ansiterm to v1
+
 ## v1.28.1 (Released 2023-02-13)
 
 IMPROVEMENTS
