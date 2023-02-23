@@ -266,7 +266,8 @@ func TestFiles__decodeCreateFileRequest__validateOpts(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			req := decodedReq.(createFileRequest)
+			req, ok := decodedReq.(createFileRequest)
+			require.True(t, ok)
 			if !reflect.DeepEqual(tc.expect, *req.validateOpts) {
 				t.Fatalf("validateOpts: want %v, got %v", tc.expect, *req.validateOpts)
 			}

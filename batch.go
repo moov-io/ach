@@ -662,10 +662,9 @@ func (batch *Batch) isBatchEntryCount() error {
 // The Total Debit and Credit Entry Dollar Amount fields contain accumulated
 // Entry Detail debit and credit totals within a given batch
 func (batch *Batch) isBatchAmount() error {
-	credit := 0
-	debit := 0
+	var credit, debit int
 
-	//ToDo: Consider going back to one function for calculating BatchAmounts, but I'm not sure I want to have
+	// ToDo: Consider going back to one function for calculating BatchAmounts, but I'm not sure I want to have
 	// calculateBatchAmounts with ADV TransactionCodes.  In addition the smaller functions help keep the -over for
 	// gocyclo lower, although since we are currently at 25 (originally it was 18 or 19) it probably won't matter now
 	// in this case.  Based on what I see in other github go code, I'm not sure 25 is a high enough number either.

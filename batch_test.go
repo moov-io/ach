@@ -1360,7 +1360,8 @@ func TestBatch__CalculateBalancedOffsetDebitAndCredit(t *testing.T) {
 	}
 
 	// Check first batch
-	b = f.Batches[0].(*BatchPPD)
+	b, ok = f.Batches[0].(*BatchPPD)
+	require.True(t, ok)
 	if len(b.Entries) != 4 {
 		t.Errorf("got %d batches, expected 4", len(b.Entries))
 	}
@@ -1380,7 +1381,8 @@ func TestBatch__CalculateBalancedOffsetDebitAndCredit(t *testing.T) {
 	}
 
 	// Second batch
-	b = f.Batches[1].(*BatchPPD)
+	b, ok = f.Batches[1].(*BatchPPD)
+	require.True(t, ok)
 	if len(b.Entries) != 2 {
 		t.Errorf("got %d batches, expected 2", len(b.Entries))
 	}
