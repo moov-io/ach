@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/Pallinder/go-randomdata v1.2.0
-	github.com/aws/aws-lambda-go v1.37.0
+	github.com/aws/aws-lambda-go v1.38.0
 	github.com/go-kit/kit v0.12.0
 	github.com/go-kit/log v0.2.1
 	github.com/gorilla/mux v1.8.0
@@ -12,7 +12,7 @@ require (
 	github.com/moov-io/base v0.39.0
 	github.com/prometheus/client_golang v1.14.0
 	github.com/stretchr/testify v1.8.2
-	golang.org/x/text v0.7.0
+	golang.org/x/text v0.8.0
 )
 
 require (
