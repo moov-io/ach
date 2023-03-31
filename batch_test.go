@@ -140,6 +140,24 @@ func TestBatch__UnmarshalJSON(t *testing.T) {
 	}
 }
 
+func TestBatch_UnmarshalOffset(t *testing.T) {
+	bs, err := os.ReadFile(filepath.Join("test", "testdata", "ppd-with-offset.json"))
+	require.NoError(t, err)
+
+	file, err := FileFromJSON(bs)
+	require.NoError(t, err)
+
+	require.Len(t, file.Batches, 1)
+	b, ok := file.Batches[0].(*BatchPPD)
+	require.True(t, ok)
+	require.NotNil(t, b.offset)
+
+	require.Equal(t, "987654320", b.offset.RoutingNumber)
+	require.Equal(t, "123123123", b.offset.AccountNumber)
+	require.Equal(t, OffsetAccountType("checking"), b.offset.AccountType)
+	require.Equal(t, "OFFSET", b.offset.Description)
+}
+
 // Test cases that apply to all batch types
 // testBatchNumberMismatch validates BatchNumber mismatch
 func testBatchNumberMismatch(t testing.TB) {

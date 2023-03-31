@@ -827,7 +827,9 @@ components:
           items:
             $ref: '#/components/schemas/ADVEntryDetail'
         advBatchControl:
-            $ref: '#/components/schemas/ADVBatchControl'
+          $ref: '#/components/schemas/ADVBatchControl'
+        offset:
+          $ref: '#/components/schemas/Offset'
       required:
         - batchHeader
         - entryDetails

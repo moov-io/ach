@@ -154,14 +154,19 @@ func (batch *Batch) UnmarshalJSON(p []byte) error {
 	type Alias Batch
 	aux := struct {
 		*Alias
+		Offset *Offset `json:"offset"`
 	}{
 		(*Alias)(batch),
+		nil,
 	}
 	if err := json.Unmarshal(p, &aux); err != nil {
 		if e, ok := err.(*json.UnmarshalTypeError); ok {
 			return fmt.Errorf("%s: %v", e.Field, err)
 		}
 		return err
+	}
+	if aux.Offset != nil {
+		batch.offset = aux.Offset
 	}
 	return nil
 }
