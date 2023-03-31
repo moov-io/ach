@@ -1,3 +1,17 @@
+## v1.29.3 (Released 2023-03-31)
+
+IMPROVEMENTS
+
+- fix: include Offset in API docs and read from JSON
+
+BUILD
+
+- build(deps): bump activesupport from 6.1.7.2 to 7.0.4.3 in /docs
+- build(deps): bump bulma-clean-theme from 0.13.1 to 0.13.2 in /docs
+- build(deps): bump github.com/aws/aws-lambda-go from 1.38.0 to 1.39.1
+- build(deps): bump github.com/stretchr/testify from 1.8.1 to 1.8.2
+- build(deps): bump ossf/scorecard-action from 2.1.2 to 2.1.3
+
 ## v1.29.2 (Released 2023-02-21)
 
 Shout-out to @ckbaum for contributing a [major improvement to File Flattening](https://github.com/moov-io/ach/pull/1178).
