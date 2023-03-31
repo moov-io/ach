@@ -140,6 +140,38 @@ func TestFiles__CreateFileNacha(t *testing.T) {
 	require.Equal(t, "121042880000001", entries[0].TraceNumber)
 }
 
+func TestFiles_CreateWithOffset(t *testing.T) {
+	repo := NewRepositoryInMemory(testTTLDuration, log.NewNopLogger())
+	svc := NewService(repo)
+
+	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-with-offset.json"))
+	require.NoError(t, err)
+	defer fd.Close()
+
+	fileID := base.ID()
+	req := httptest.NewRequest("POST", fmt.Sprintf("/files/%s", fileID), fd)
+	req.Header.Set("content-type", "application/json")
+
+	handler := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
+
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+
+	require.Equal(t, http.StatusOK, w.Code)
+
+	var resp createFileResponse
+	err = json.NewDecoder(w.Body).Decode(&resp)
+	require.NoError(t, err)
+	require.Len(t, resp.File.Batches, 1)
+
+	b, ok := resp.File.Batches[0].(*ach.BatchPPD)
+	require.True(t, ok)
+
+	offset := reflect.ValueOf(b).Elem().FieldByName("offset")
+	expected := `&ach.Offset{RoutingNumber:"987654320", AccountNumber:"123123123", AccountType:"checking", Description:"OFFSET"}`
+	require.Equal(t, expected, fmt.Sprintf("%#v", offset))
+}
+
 func TestFiles__CustomJsonValidation(t *testing.T) {
 	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)
