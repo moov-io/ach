@@ -400,16 +400,23 @@ func (v *validator) isPrenote(code int) bool {
 }
 
 // isTransactionTypeCode verifies Addenda10 TransactionTypeCode is a valid value
-// ANN = Annuity, BUS = Business/Commercial, DEP = Deposit, LOA = Loan, MIS = Miscellaneous, MOR = Mortgage
-// PEN = Pension, RLS = Rent/Lease, REM = Remittance2, SAL = Salary/Payroll, TAX = Tax, TEL = Telephone-Initiated Transaction
-// WEB = Internet-Initiated Transaction, ARC = Accounts Receivable Entry, BOC = Back Office Conversion Entry,
-// POP = Point of Purchase Entry, RCK = Re-presented Check Entry
+// This code is used as a Secondary SEC code to help identify the source and purpose of the transaction.
+//
+//	ANN = Annuity, BUS = Business/Commercial, DEP = Deposit, LOA = Loan, MIS = Miscellaneous, MOR = Mortgage
+//	PEN = Pension, REM = Remittance2, RLS = Rent/Lease, SAL = Salary/Payroll, TAX = Tax
+//
+//	ARC = Accounts Receivable Entry, BOC = Back Office Conversion Entry, IAT = International ACH Transaction,
+//	MTE = Machine Transfer Entry, POP = Point of Purchase Entry, POS Point of Sale, RCK = Re-presented Check Entry,
+//	SHR = Shared Network Transaction, TEL = Telephone-Initiated Transaction, WEB = Internet-Initiated Transaction
+//
+// Also, according to the Nacha rules, "There is no requirement to add Secondary SEC Codes for PPD, CCD, CTX, and
+// other SEC codes not included in the list above."
 func (v *validator) isTransactionTypeCode(s string) error {
 	switch strings.ToUpper(s) {
 	case
 		"ANN", "BUS", "DEP", "LOA", "MIS", "MOR",
 		"PEN", "REM", "RLS", "SAL", "TAX",
-		ARC, BOC, MTE, POP, POS, RCK, SHR, TEL, WEB:
+		ARC, BOC, IAT, MTE, POP, POS, RCK, SHR, TEL, WEB:
 		return nil
 	}
 	return ErrTransactionTypeCode
