@@ -3,7 +3,7 @@
     "fileHeader": {
         "id": "0a0b39ed-24be-4711-9a87-662d00372e90",
         "immediateDestination": "231380104",
-        "immediateOrigin": "121042882",
+        "immediateOrigin": "088888888",
         "fileCreationDate": "181008",
         "fileCreationTime": "",
         "fileIDModifier": "A",
@@ -20,7 +20,7 @@
                 "standardEntryClassCode": "PPD",
                 "companyEntryDescription": "Trans. Des",
                 "effectiveEntryDate": "2018-10-09T00:00:00Z",
-                "ODFIIdentification": "12104288",
+                "ODFIIdentification": "088888888",
                 "batchNumber": 1
             },
             "entryDetails": [
@@ -35,7 +35,7 @@
                     "individualName": "Steven Tander         ",
                     "discretionaryData": "  ",
                     "addendaRecordIndicator": 0,
-                    "traceNumber": "121042880000001",
+                    "traceNumber": "088888880123459",
                     "category": "Forward"
                 }
             ],
@@ -43,7 +43,7 @@
                 "id": "a34c8873-50a2-4315-8d98-b9f84ccccc01",
                 "serviceClassCode": 200,
                 "entryAddendaCount": 0,
-                "entryHash": 23138010,
+                "entryHash": 121903442,
                 "totalDebit": 0,
                 "totalCredit": 100000,
                 "companyIdentification": "121042882",

@@ -1160,9 +1160,11 @@ func (b *Batch) upsertOffsets() error {
 		return err
 	}
 
+	offsetCount := 1
+
 	// Create our debit offset EntryDetail
 	debitED := createOffsetEntryDetail(b.offset, b)
-	debitED.TraceNumber = strconv.Itoa(lastTraceNumber(b.Entries) + 1)
+	debitED.TraceNumber = fmt.Sprintf("%15.15d", lastTraceNumber(b.Entries)+offsetCount)
 	debitED.Amount = b.Control.TotalCreditEntryDollarAmount
 	switch b.offset.AccountType {
 	case OffsetChecking:
@@ -1172,11 +1174,13 @@ func (b *Batch) upsertOffsets() error {
 	}
 	if debitED.Amount == 0 {
 		debitED = nil // zero out so we don't add an empty OFFSET EntryDetail
+	} else {
+		offsetCount += 1
 	}
 
 	// Create our credit offset EntryDetail
 	creditED := createOffsetEntryDetail(b.offset, b)
-	creditED.TraceNumber = strconv.Itoa(lastTraceNumber(b.Entries) + 2)
+	creditED.TraceNumber = fmt.Sprintf("%15.15d", lastTraceNumber(b.Entries)+offsetCount)
 	creditED.Amount = b.Control.TotalDebitEntryDollarAmount
 	switch b.offset.AccountType {
 	case OffsetChecking:
