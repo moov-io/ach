@@ -156,7 +156,6 @@ func TestFiles_CreateWithOffset(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	handler.ServeHTTP(w, req)
-
 	require.Equal(t, http.StatusOK, w.Code)
 
 	var resp createFileResponse
@@ -166,6 +165,11 @@ func TestFiles_CreateWithOffset(t *testing.T) {
 
 	b, ok := resp.File.Batches[0].(*ach.BatchPPD)
 	require.True(t, ok)
+
+	entries := b.GetEntries()
+	require.Len(t, entries, 2)
+	require.Equal(t, "088888880123459", entries[0].TraceNumber)
+	require.Equal(t, "088888880123460", entries[1].TraceNumber)
 
 	offset := reflect.ValueOf(b).Elem().FieldByName("offset")
 	expected := `&ach.Offset{RoutingNumber:"987654320", AccountNumber:"123123123", AccountType:"checking", Description:"OFFSET"}`
