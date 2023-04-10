@@ -1,3 +1,11 @@
+## v1.30.0 (Released 2023-04-10)
+
+Version v1.30.0 of moov-io/ach introduces a new `ErrFileConsecutiveBatchHeaders` error which replaces `ErrFileBatchHeaderInsideBatch` to better reflect when file parsing failed. The library can now accept ACH files without Batch Control records.
+
+IMPROVEMENTS
+
+- fix: accumulate batches without BatchControl records
+
 ## v1.29.4 (Released 2023-04-10)
 
 IMPROVEMENTS
