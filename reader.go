@@ -270,6 +270,18 @@ func (r *Reader) parseLine() error {
 			return err
 		}
 	case batchHeaderPos:
+		// We can sometimes run into files that have (BH, ED, ED...) records
+		// without BatchControls. We need to still accumulate Batches.
+		if r.currentBatch != nil {
+			if len(r.currentBatch.GetEntries()) == 0 {
+				return ErrFileConsecutiveBatchHeaders
+			}
+			// Accumulate currentBatch before parsing another Batch
+			batch := r.currentBatch
+			r.currentBatch = nil
+			batch.SetValidation(r.File.validateOpts)
+			r.File.AddBatch(batch)
+		}
 		if err := r.parseBH(); err != nil {
 			return err
 		}
@@ -380,10 +392,6 @@ func (r *Reader) parseFileHeader() error {
 // parseBatchHeader takes the input record string and parses the FileHeaderRecord values
 func (r *Reader) parseBatchHeader() error {
 	r.recordName = "BatchHeader"
-	if r.currentBatch != nil {
-		// batch header inside of current batch
-		return ErrFileBatchHeaderInsideBatch
-	}
 
 	// Ensure we have a valid batch header before building a batch.
 	bh := NewBatchHeader()
@@ -595,10 +603,6 @@ func (r *Reader) parseFileControl() error {
 // parseIATBatchHeader takes the input record string and parses the FileHeaderRecord values
 func (r *Reader) parseIATBatchHeader() error {
 	r.recordName = "BatchHeader"
-	if r.IATCurrentBatch.Header != nil {
-		// batch header inside of current batch
-		return ErrFileBatchHeaderInsideBatch
-	}
 
 	// Ensure we have a valid IAT BatchHeader before building a batch.
 	bh := NewIATBatchHeader()
