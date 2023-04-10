@@ -1,3 +1,16 @@
+## v1.29.4 (Released 2023-04-10)
+
+IMPROVEMENTS
+
+- fix: allow IAT as transaction type code of addenda10 records
+- fix: keep zero-prefix trace numbers during offset creation
+
+BUILD
+
+- build(deps): bump github.com/moov-io/base from 0.39.0 to 0.40.1
+- build(deps): bump golang.org/x/text from v0.8.0 to v0.9.0
+- chore(deps): update dependency jekyll-feed to v0.17.0
+
 ## v1.29.3 (Released 2023-03-31)
 
 IMPROVEMENTS
