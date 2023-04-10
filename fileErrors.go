@@ -37,8 +37,8 @@ var (
 	ErrFileAddendaOutsideEntry = errors.New("addenda outside of entry")
 	// ErrFileBatchControlOutsideBatch is the error given if a batch control record is outside of a batch
 	ErrFileBatchControlOutsideBatch = errors.New("batch control outside of batch")
-	// ErrFileBatchHeaderInsideBatch is the error given if a batch header record is inside of a batch
-	ErrFileBatchHeaderInsideBatch = errors.New("batch header inside of batch")
+	// ErrFileConsecutiveBatchHeaders is the error given when multiple batch header records occur in sequence
+	ErrFileConsecutiveBatchHeaders = errors.New("consecutive Batch Headers in file")
 	// ErrFileADVOnly is the error given if an ADV only file has a non-ADV batch
 	ErrFileADVOnly = errors.New("file can only have ADV Batches")
 	// ErrFileIATSEC is the error given if an IAT batch uses the normal NewBatch

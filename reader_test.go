@@ -71,17 +71,12 @@ func TestReadPartial(t *testing.T) {
 	if err != nil {
 		t.Log(err) // we expect errors -- display them
 	}
-	if len(file.Batches) != 1 {
-		t.Fatalf("unexpected batches: %#v", file.Batches)
-	}
-	entries := file.Batches[0].GetEntries()
-	if len(entries) != 3 {
-		t.Error("unexpected entry details")
-		for i := range entries {
-			t.Errorf("  %#v", entries[i])
-		}
-		t.Fatal("")
-	}
+	require.Len(t, file.Batches, 2)
+
+	b1Entries := file.Batches[0].GetEntries()
+	require.Len(t, b1Entries, 1)
+	require.Nil(t, b1Entries[0].Addenda98)
+	require.NotNil(t, b1Entries[0].Addenda99)
 
 	// batch
 	bh := file.Batches[0].GetHeader()
@@ -99,7 +94,7 @@ func TestReadPartial(t *testing.T) {
 	}
 
 	// entries
-	entry := entries[0]
+	entry := b1Entries[0]
 	if entry.TransactionCode != CheckingReturnNOCDebit {
 		t.Errorf("TransactionCode=%d", entry.TransactionCode)
 	}
@@ -114,7 +109,15 @@ func TestReadPartial(t *testing.T) {
 		t.Errorf("nil Addenda99")
 	}
 
-	entry = entries[1]
+	b2Entries := file.Batches[1].GetEntries()
+	require.Len(t, b2Entries, 2)
+
+	for i := range b2Entries {
+		require.Nil(t, b2Entries[i].Addenda98)
+		require.NotNil(t, b2Entries[i].Addenda99)
+	}
+
+	entry = b2Entries[0]
 	if entry.TransactionCode != CheckingReturnNOCCredit {
 		t.Errorf("TransactionCode=%d", entry.TransactionCode)
 	}
@@ -583,7 +586,7 @@ func testFileBatchHeaderDuplicate(t testing.TB) {
 	r.addCurrentBatch(NewBatchPPD(bh))
 	// read should fail because it is parsing a second batch header and there can only be one.
 	_, err := r.Read()
-	if !base.Has(err, ErrFileBatchHeaderInsideBatch) {
+	if !base.Has(err, ErrFileConsecutiveBatchHeaders) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -1644,7 +1647,10 @@ func testACHFileIATBH(t testing.TB) {
 	r := NewReader(f)
 	_, err = r.Read()
 
-	if !base.Has(err, ErrFileBatchHeaderInsideBatch) {
+	if !base.Has(err, ErrFileAddendaOutsideEntry) {
+		t.Errorf("%T: %s", err, err)
+	}
+	if !base.Has(err, ErrFileBatchControlOutsideBatch) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
