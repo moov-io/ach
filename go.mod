@@ -9,7 +9,7 @@ require (
 	github.com/go-kit/log v0.2.1
 	github.com/gorilla/mux v1.8.0
 	github.com/juju/ansiterm v1.0.0
-	github.com/moov-io/base v0.40.1
+	github.com/moov-io/base v0.40.2
 	github.com/prometheus/client_golang v1.14.0
 	github.com/stretchr/testify v1.8.2
 	golang.org/x/text v0.9.0
