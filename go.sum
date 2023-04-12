@@ -53,8 +53,8 @@ github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd h1:TRLaZ9cD/w
 github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=
 github.com/modern-go/reflect2 v1.0.2 h1:xBagoLtFs94CBntxluKeaWgTMpvLxC4ur3nMaC9Gz0M=
 github.com/modern-go/reflect2 v1.0.2/go.mod h1:yWuevngMOJpCy52FWWMvUC8ws7m/LJsjYzDa0/r8luk=
-github.com/moov-io/base v0.40.1 h1:HS8yunbfCV9EQrCjmsE64Qxo8IZ/6khrafADzjZiKj4=
-github.com/moov-io/base v0.40.1/go.mod h1:iZCWSt+2fvldf5/l1yLF6fJQtyLQRO3+Hmrm/wk8bdc=
+github.com/moov-io/base v0.40.2 h1:CSTL/oDu7Cx8rnxbYFQlY96X08Bn0KXw/6riNbymIDA=
+github.com/moov-io/base v0.40.2/go.mod h1:iZCWSt+2fvldf5/l1yLF6fJQtyLQRO3+Hmrm/wk8bdc=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/prometheus/client_golang v1.14.0 h1:nJdhIvne2eSX/XRAFV9PcvFFRbrjbcTUj0VP62TMhnw=
