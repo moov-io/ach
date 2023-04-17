@@ -40,6 +40,29 @@ func MergeFiles(files []*File) ([]*File, error) {
 	})
 }
 
+// NewMerger returns a Merge which can have custom ValidateOpts
+func NewMerger(opts *ValidateOpts) Merger {
+	return &merger{opts: opts}
+}
+
+// Merge can merge ACH files with custom ValidateOpts
+type Merger interface {
+	MergeWith(files []*File, conditions Conditions) ([]*File, error)
+}
+
+type merger struct {
+	opts *ValidateOpts
+}
+
+func (m *merger) MergeWith(files []*File, conditions Conditions) ([]*File, error) {
+	if m.opts != nil {
+		for i := range files {
+			files[i].SetValidation(m.opts)
+		}
+	}
+	return MergeFilesWith(files, conditions)
+}
+
 type Conditions struct {
 	// MaxLines will limit each merged files line count.
 	MaxLines int `json:"maxLines"`
