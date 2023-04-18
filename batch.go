@@ -1016,6 +1016,9 @@ func (batch *Batch) IsADV() bool {
 }
 
 func (batch *Batch) ValidAmountForCodes(entry *EntryDetail) error {
+	if batch.validateOpts != nil && batch.validateOpts.AllowInvalidAmounts {
+		return nil
+	}
 	if entry != nil && entry.Addenda98 != nil {
 		// NOC entries will have a zero'd amount value
 		if entry.Amount != 0 {

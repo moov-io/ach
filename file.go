@@ -683,6 +683,9 @@ type ValidateOpts struct {
 
 	// PreserveSpaces keeps the spacing before and after values that normally have spaces trimmed during parsing.
 	PreserveSpaces bool `json:"preserveSpaces"`
+
+	// AllowInvalidAmounts will skip verifying the Amount is valid for the TransactionCode and entry type.
+	AllowInvalidAmounts bool `json:"allowInvalidAmounts"`
 }
 
 // ValidateWith performs checks on each record according to Nacha guidelines.
