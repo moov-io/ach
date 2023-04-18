@@ -1,3 +1,20 @@
+## v1.31.0 (Released 2023-04-18)
+
+IMPROVEMENTS
+
+- cmd/achcli: return whatever partial file was parsed
+- feat: add AllowInvalidAmounts validation option
+- feat: add Merge which can override ValidateOpts of files
+- server: support AllowInvalidAmounts validation option
+
+BUILD
+
+- build(deps): bump commonmarker from 0.23.8 to 0.23.9 in /docs
+- build(deps): bump github.com/aws/aws-lambda-go from 1.39.1 to 1.40.0
+- build(deps): bump github.com/moov-io/base from 0.40.1 to 0.40.2
+- build(deps): bump nokogiri from 1.13.10 to 1.14.3 in /docs
+- build(deps): update github.com/prometheus/client_golang to v1.15.0
+
 ## v1.30.0 (Released 2023-04-10)
 
 Version v1.30.0 of moov-io/ach introduces a new `ErrFileConsecutiveBatchHeaders` error which replaces `ErrFileBatchHeaderInsideBatch` to better reflect when file parsing failed. The library can now accept ACH files without Batch Control records.
