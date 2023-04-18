@@ -1078,6 +1078,54 @@ func TestBatch__ValidAmountForCodes(t *testing.T) {
 	require.ErrorContains(t, batch.Create(), ErrBatchAmountNonZero.Error())
 }
 
+func TestBatch_AllowInvalidAmounts(t *testing.T) {
+	bh := &BatchHeader{
+		OriginatorStatusCode:    1,
+		ServiceClassCode:        MixedDebitsAndCredits,
+		CompanyName:             "Test",
+		CompanyIdentification:   "TEST",
+		StandardEntryClassCode:  CCD,
+		CompanyEntryDescription: "PRENOTE",
+		EffectiveEntryDate:      "230417",
+		ODFIIdentification:      "12345678",
+		BatchNumber:             63472,
+	}
+	entry := &EntryDetail{
+		TransactionCode:        CheckingReturnNOCDebit,
+		RDFIIdentification:     "98765432",
+		CheckDigit:             "0",
+		DFIAccountNumber:       "4000000013",
+		Amount:                 0,
+		IndividualName:         "Jane Doe",
+		TraceNumber:            "123456781176120",
+		Category:               CategoryReturn,
+		AddendaRecordIndicator: 1,
+		Addenda99: &Addenda99{
+			TypeCode:           "99",
+			ReturnCode:         "R03",
+			OriginalTrace:      "987654327608587",
+			OriginalDFI:        "12345678",
+			AddendaInformation: "",
+			TraceNumber:        "123456781176120",
+		},
+	}
+	b, err := NewBatch(bh)
+	require.NoError(t, err)
+	b.AddEntry(entry)
+
+	err = b.Create()
+	require.ErrorIs(t, err, ErrBatchAmountZero)
+	err = b.Validate()
+	require.ErrorIs(t, err, ErrBatchAmountZero)
+
+	// Use ValidateOpts to override malformed file
+	b.SetValidation(&ValidateOpts{
+		AllowInvalidAmounts: true,
+	})
+	require.NoError(t, b.Create())
+	require.NoError(t, b.Validate())
+}
+
 func TestBatch__Equal(t *testing.T) {
 	testFile := func(t *testing.T) *File {
 		t.Helper()
