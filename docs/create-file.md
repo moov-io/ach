@@ -44,6 +44,7 @@ Example: `POST /files/create?requireABAOrigin=true&bypassDestination=true`
 
 | Query Param                        | Validation Option                  |
 |------------------------------------|------------------------------------|
+| `allowInvalidAmounts`              | `AllowInvalidAmounts`              |
 | `allowInvalidCheckDigit`           | `AllowInvalidCheckDigit`           |
 | `allowMissingFileControl`          | `AllowMissingFileControl`          |
 | `allowMissingFileHeader`           | `AllowMissingFileHeader`           |

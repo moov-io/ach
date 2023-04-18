@@ -87,6 +87,13 @@ AllowUnorderedBatchNumbers bool `json:"allowUnorderedBatchNumbers"`
 UnequalAddendaCounts bool `json:"unequalAddendaCounts"`
 ```
 
+### Entries
+
+```
+// AllowInvalidAmounts will skip verifying the Amount is valid for the TransactionCode and entry type.
+AllowInvalidAmounts bool `json:"allowInvalidAmounts"`
+```
+
 ### File Header
 
 ```
@@ -107,6 +114,13 @@ AllowMissingFileControl bool `json:"allowMissingFileControl"`
 // CustomReturnCodes can be set to skip validation for the Return Code field in an Addenda99
 // This allows for non-standard/deprecated return codes (e.g. R97)
 CustomReturnCodes bool `json:"customReturnCodes"`
+```
+
+### Parsing
+
+```
+// PreserveSpaces keeps the spacing before and after values that normally have spaces trimmed during parsing.
+PreserveSpaces bool `json:"preserveSpaces"`
 ```
 
 ## Reader

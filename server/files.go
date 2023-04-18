@@ -138,6 +138,7 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 		allowInvalidCheckDigit           = "allowInvalidCheckDigit"
 		unequalAddendaCounts             = "unequalAddendaCounts"
 		preserveSpaces                   = "preserveSpaces"
+		allowInvalidAmounts              = "allowInvalidAmounts"
 	)
 
 	validationNames := []string{
@@ -156,6 +157,7 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 		allowInvalidCheckDigit,
 		unequalAddendaCounts,
 		preserveSpaces,
+		allowInvalidAmounts,
 	}
 
 	for _, name := range validationNames {
@@ -203,6 +205,8 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 			req.validateOpts.UnequalAddendaCounts = true
 		case preserveSpaces:
 			req.validateOpts.PreserveSpaces = true
+		case allowInvalidAmounts:
+			req.validateOpts.AllowInvalidAmounts = true
 		}
 	}
 

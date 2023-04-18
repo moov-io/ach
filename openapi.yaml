@@ -149,6 +149,11 @@ paths:
           description: Optional parameter to save all padding spaces
           schema:
             type: boolean
+        - name: allowInvalidAmounts
+          in: query
+          description: Optional parameter to save all padding spaces
+          schema:
+            type: boolean
       requestBody:
         description: Content of the ACH file (in json or raw text)
         required: true

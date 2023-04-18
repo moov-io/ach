@@ -291,6 +291,12 @@ func TestFiles__decodeCreateFileRequest__validateOpts(t *testing.T) {
 				PreserveSpaces: true,
 			},
 		},
+		{
+			query: "?allowInvalidAmounts=true",
+			expect: ach.ValidateOpts{
+				AllowInvalidAmounts: true,
+			},
+		},
 	}
 
 	for _, tc := range tests {
