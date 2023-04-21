@@ -991,7 +991,12 @@ func (batch *Batch) addendaFieldInclusionReturn(entry *EntryDetail) error {
 		return batch.Error("Addenda02", ErrBatchAddendaCategory, entry.Category)
 	}
 	if entry.Addenda05 != nil {
-		return batch.Error("Addenda05", ErrBatchAddendaCategory, entry.Category)
+		switch batch.Header.StandardEntryClassCode {
+		case CTX:
+			// do nothing, CTX allows Addneda05 records
+		default:
+			return batch.Error("Addenda05", ErrBatchAddendaCategory, entry.Category)
+		}
 	}
 	if entry.Addenda98 != nil {
 		return batch.Error("Addenda98", ErrBatchAddendaCategory, entry.Category)

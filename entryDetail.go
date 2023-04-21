@@ -492,23 +492,41 @@ func (ed *EntryDetail) SetOriginalTraceNumber(s string) {
 
 // SetCATXAddendaRecords setter for CTX and ATX AddendaRecords characters 1-4 of underlying IndividualName
 func (ed *EntryDetail) SetCATXAddendaRecords(i int) {
-	ed.IndividualName = ed.numericField(i, 4)
+	count := ed.numericField(i, 4)
+	current := ed.IndividualName
+	if utf8.RuneCountInString(current) > 4 {
+		ed.IndividualName = count + current[4:]
+	} else {
+		ed.IndividualName = count + ed.alphaField(" ", 16) + "  "
+	}
 }
 
 // SetCATXReceivingCompany setter for CTX and ATX ReceivingCompany characters 5-20 underlying IndividualName
 // Position 21-22 of underlying Individual Name are reserved blank space for CTX "  "
 func (ed *EntryDetail) SetCATXReceivingCompany(s string) {
-	ed.IndividualName = ed.IndividualName + ed.alphaField(s, 16) + "  "
+	current := ed.IndividualName
+	if utf8.RuneCountInString(current) > 4 {
+		count := current[:4]
+		ed.IndividualName = count + ed.alphaField(s, 16) + "  "
+	} else {
+		ed.IndividualName = "0000" + ed.alphaField(s, 16) + "  "
+	}
 }
 
 // CATXAddendaRecordsField is used in CTX and ATX files, characters 1-4 of underlying IndividualName field
 func (ed *EntryDetail) CATXAddendaRecordsField() string {
-	return ed.parseStringField(ed.IndividualName[0:4])
+	if utf8.RuneCountInString(ed.IndividualName) < 5 {
+		return ed.IndividualName
+	}
+	return ed.parseStringField(ed.IndividualName[:4])
 }
 
 // CATXReceivingCompanyField is used in CTX and ATX files, characters 5-20 of underlying IndividualName field
 func (ed *EntryDetail) CATXReceivingCompanyField() string {
-	return ed.parseStringField(ed.IndividualName[4:20])
+	if utf8.RuneCountInString(ed.IndividualName) < 4 {
+		return ""
+	}
+	return ed.IndividualName[4:]
 }
 
 // CATXReservedField is used in CTX and ATX files, characters 21-22 of underlying IndividualName field

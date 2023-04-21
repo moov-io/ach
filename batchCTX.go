@@ -56,17 +56,26 @@ func (batch *BatchCTX) Validate() error {
 	}
 
 	for _, entry := range batch.Entries {
+		addendaCount := len(entry.Addenda05)
 
 		// Trapping this error, as entry.CTXAddendaRecordsField() can not be greater than 9999
-		if len(entry.Addenda05) > 9999 {
+		if addendaCount > 9999 {
 			return batch.Error("AddendaCount", NewErrBatchAddendaCount(len(entry.Addenda05), 9999))
+		}
+
+		// Add to addendaCount so Corrections and Returns compare AddendaRecordIndicator correctly
+		if entry.Addenda98 != nil {
+			addendaCount += 1
+		}
+		if entry.Addenda99 != nil {
+			addendaCount += 1
 		}
 
 		// validate CTXAddendaRecord Field is equal to the actual number of Addenda records
 		// use 0 value if there is no Addenda records
-		addendaRecords, _ := strconv.Atoi(entry.CATXAddendaRecordsField())
-		if len(entry.Addenda05) != addendaRecords {
-			return batch.Error("AddendaCount", NewErrBatchExpectedAddendaCount(len(entry.Addenda05), addendaRecords))
+		indicator, _ := strconv.Atoi(entry.CATXAddendaRecordsField())
+		if addendaCount != indicator {
+			return batch.Error("AddendaCount", NewErrBatchExpectedAddendaCount(addendaCount, indicator))
 		}
 		// Verify TransactionCode for prenotes and regular entries
 		switch entry.TransactionCode {

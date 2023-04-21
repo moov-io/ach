@@ -291,7 +291,7 @@ type ErrBatchExpectedAddendaCount struct {
 // NewErrBatchExpectedAddendaCount creates a new error of the ErrBatchExpectedAddendaCount type
 func NewErrBatchExpectedAddendaCount(found, expected int) ErrBatchExpectedAddendaCount {
 	return ErrBatchExpectedAddendaCount{
-		Message:       fmt.Sprintf("%v addendum found where %v are Expected for this batch type", found, expected),
+		Message:       fmt.Sprintf("%v addendum found where %v are expected for this batch type", found, expected),
 		FoundCount:    found,
 		ExpectedCount: expected,
 	}
