@@ -18,12 +18,13 @@
 package ach
 
 import (
-	"github.com/stretchr/testify/require"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/moov-io/base"
+
+	"github.com/stretchr/testify/require"
 )
 
 // mockFileHeader build a validate File Header for tests
@@ -34,6 +35,13 @@ func mockFileHeader() FileHeader {
 	fh.FileCreationDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
 	fh.ImmediateDestinationName = "Federal Reserve Bank"
 	fh.ImmediateOriginName = "My Bank Name"
+	return fh
+}
+
+func staticFileHeader() FileHeader {
+	fh := mockFileHeader()
+	fh.FileCreationDate = "230421" // YYMMDD
+	fh.FileCreationTime = "1201"   // HHMM
 	return fh
 }
 

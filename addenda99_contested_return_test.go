@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -67,7 +68,10 @@ func TestAddenda99Contested__Fields(t *testing.T) {
 
 func TestAddenda99Contested(t *testing.T) {
 	file := NewFile()
-	file.SetHeader(mockFileHeader())
+
+	fh := staticFileHeader()
+	fh.ReferenceCode = strings.Repeat("A", 8)
+	file.SetHeader(fh)
 	file.Control = mockFileControl()
 
 	batch, err := NewBatch(mockBatchHeader())
