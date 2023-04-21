@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 // mockBatchTRXHeader creates a BatchTRX BatchHeader
@@ -408,11 +409,8 @@ func BenchmarkBatchTRXAddendaRecords(b *testing.B) {
 // testBatchTRXReceivingCompany validates TRXReceivingCompany
 func testBatchTRXReceivingCompany(t testing.TB) {
 	mockBatch := mockBatchTRX(t)
-	//mockBatch.GetEntries()[0].SetCATXReceivingCompany("Receiver")
-
-	if mockBatch.GetEntries()[0].CATXReceivingCompanyField() != "Receiver Company" {
-		t.Errorf("expected %v got %v", "Receiver Company", mockBatch.GetEntries()[0].CATXReceivingCompanyField())
-	}
+	mockBatch.GetEntries()[0].SetCATXReceivingCompany("Receiver Company")
+	require.Equal(t, "Receiver Company  ", mockBatch.GetEntries()[0].CATXReceivingCompanyField())
 }
 
 // TestBatchTRXReceivingCompany tests validating TRXReceivingCompany

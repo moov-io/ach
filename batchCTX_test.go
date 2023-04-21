@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 // mockBatchCTXHeader creates a BatchCTX BatchHeader
@@ -349,11 +350,8 @@ func BenchmarkBatchCTXAddendaRecords(b *testing.B) {
 // testBatchCTXReceivingCompany validates CTXReceivingCompany
 func testBatchCTXReceivingCompany(t testing.TB) {
 	mockBatch := mockBatchCTX(t)
-	//mockBatch.GetEntries()[0].SetCATXReceivingCompany("Receiver")
-
-	if mockBatch.GetEntries()[0].CATXReceivingCompanyField() != "Receiver Company" {
-		t.Errorf("expected %v got %v", "Receiver Company", mockBatch.GetEntries()[0].CATXReceivingCompanyField())
-	}
+	mockBatch.GetEntries()[0].SetCATXReceivingCompany("Receiver Company")
+	require.Equal(t, "Receiver Company  ", mockBatch.GetEntries()[0].CATXReceivingCompanyField())
 }
 
 // TestBatchCTXReceivingCompany tests validating CTXReceivingCompany
