@@ -146,7 +146,7 @@ func (fh *FileHeader) Parse(record string) {
 	fh.ImmediateDestinationName = fh.parseStringFieldWithOpts(record[40:63], fh.validateOpts)
 	// 64-86 ACH operator or sending point that is sending the file
 	fh.ImmediateOriginName = fh.parseStringFieldWithOpts(record[63:86], fh.validateOpts)
-	// 97-94 Optional field that may be used to describe the ACH file for internal accounting purposes
+	// 87-94 Optional field that may be used to describe the ACH file for internal accounting purposes
 	fh.ReferenceCode = fh.parseStringFieldWithOpts(record[86:94], fh.validateOpts)
 }
 

@@ -919,8 +919,11 @@ func TestBatchDishonoredReturnsCategory(t *testing.T) {
 	// Fix the entry after ensuring validation works
 	entryOne.Category = CategoryDishonoredReturn
 
+	fh := staticFileHeader()
+	fh.ReferenceCode = strings.Repeat("A", 8)
+
 	file := NewFile()
-	file.SetHeader(mockFileHeader())
+	file.SetHeader(fh)
 	file.Control = mockFileControl()
 	file.AddBatch(batch)
 
