@@ -1088,7 +1088,7 @@ func TestBatch_AllowInvalidAmounts(t *testing.T) {
 		CompanyName:             "Test",
 		CompanyIdentification:   "TEST",
 		StandardEntryClassCode:  CCD,
-		CompanyEntryDescription: "PRENOTE",
+		CompanyEntryDescription: "OTHER",
 		EffectiveEntryDate:      "230417",
 		ODFIIdentification:      "12345678",
 		BatchNumber:             63472,

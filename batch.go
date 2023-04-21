@@ -1031,8 +1031,13 @@ func (batch *Batch) ValidAmountForCodes(entry *EntryDetail) error {
 		}
 		return nil
 	}
-	isPrenote := entry.isPrenote(entry.TransactionCode)
-	if isPrenote {
+
+	var isPrenoteDesc bool
+	if batch != nil && batch.Header != nil {
+		isPrenoteDesc = strings.EqualFold(batch.Header.CompanyEntryDescription, "PRENOTE")
+	}
+	isPrenoteTxCode := entry.isPrenote(entry.TransactionCode)
+	if isPrenoteDesc || isPrenoteTxCode {
 		if entry.Amount == 0 {
 			return nil
 		}
