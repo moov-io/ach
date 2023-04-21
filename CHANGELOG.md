@@ -1,3 +1,16 @@
+## v1.31.1 (Released 2023-04-21)
+
+IMPROVEMENTS
+
+- fix: Allow returned prenotes to have a zero'd Amount field
+- fix: make CTX setters/getters return correct results
+- fix: validate CTX addenda records and indicator correctly
+- test: use a static file header for Contested/Dishonored returns
+
+BUILD
+
+- build(deps): bump golang.org/x/oauth2 from 0.5.0 to 0.7.0
+
 ## v1.31.0 (Released 2023-04-18)
 
 IMPROVEMENTS
