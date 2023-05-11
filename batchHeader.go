@@ -78,6 +78,7 @@ type BatchHeader struct {
 	// This field must contain the word "NONSETTLED" (left justified) when the
 	// batch contains entries which could not settle.
 	CompanyEntryDescription string `json:"companyEntryDescription,omitempty"`
+
 	// CompanyDescriptiveDate currently, the Rules provide that the “Originator establishes this field as the date it
 	// would like to see displayed to the Receiver for descriptive purposes.” NACHA recommends that, as desired,
 	// the content of this field be formatted using the convention “SDHHMM”, where the “SD” in positions 64- 65 denotes
@@ -221,6 +222,9 @@ func (bh *BatchHeader) Equal(other *BatchHeader) bool {
 		return false
 	}
 	if bh.StandardEntryClassCode != other.StandardEntryClassCode {
+		return false
+	}
+	if bh.CompanyEntryDescription != other.CompanyEntryDescription {
 		return false
 	}
 	if bh.EffectiveEntryDate != other.EffectiveEntryDate {
