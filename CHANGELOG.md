@@ -1,3 +1,15 @@
+## v1.31.2 (Released 2023-05-11)
+
+IMPROVEMENTS
+
+- fix: BatchHeaders are different with mismatching CompanyEntryDescription values
+
+BUILD
+
+- build(deps): bump github.com/moov-io/base from 0.41.0 to 0.42.0
+- build(deps): bump github.com/aws/aws-lambda-go from 1.40.0 to 1.41.0
+- chore(deps): update dependency jekyll-feed to v0.17.0
+
 ## v1.31.1 (Released 2023-04-21)
 
 IMPROVEMENTS
