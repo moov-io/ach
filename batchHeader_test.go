@@ -22,6 +22,8 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+
+	"github.com/stretchr/testify/require"
 )
 
 // mockBatchHeader creates a batch header
@@ -162,6 +164,16 @@ func BenchmarkBHString(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		testBHString(b)
 	}
+}
+
+func TestBatchHeader_Equal(t *testing.T) {
+	bh1 := mockBatchHeader()
+	bh2 := mockBatchHeader()
+	require.True(t, bh1.Equal(bh2))
+
+	bh1.CompanyEntryDescription = "9697"
+	bh2.CompanyEntryDescription = "9669"
+	require.False(t, bh1.Equal(bh2))
 }
 
 // testInvalidServiceCode validates error if service code is not valid
