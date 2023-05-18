@@ -8,7 +8,7 @@ GEM
       tzinfo (~> 2.0)
     addressable (2.8.4)
       public_suffix (>= 2.0.2, < 6.0)
-    bulma-clean-theme (0.13.2)
+    bulma-clean-theme (0.13.3)
       jekyll (>= 3.9, < 5.0)
       jekyll-feed (~> 0.15)
       jekyll-paginate (~> 1.1)
