@@ -1,9 +1,18 @@
 # Step one: build scapresults
-FROM registry.access.redhat.com/ubi8/go-toolset as builder
-COPY . .
+FROM registry.access.redhat.com/ubi9/go-toolset as builder
+COPY go.mod go.mod
+COPY go.sum go.sum
+COPY *.go ./
+COPY ./cmd/server ./cmd/server
+COPY ./examples ./examples
+COPY ./internal ./internal
+COPY ./server ./server
+COPY ./test ./test
+COPY makefile makefile
+RUN ls -lR
 RUN make build
 
-FROM registry.access.redhat.com/ubi8/ubi-minimal
+FROM registry.access.redhat.com/ubi9/ubi-minimal
 
 ARG VERSION=unknown
 LABEL maintainer="Moov <oss@moov.io>"
