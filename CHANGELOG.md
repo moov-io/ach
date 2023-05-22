@@ -1,3 +1,15 @@
+## v1.31.3 (Released 2023-05-22)
+
+IMPROVEMENTS
+
+- build: fix openshift image, upgrade to ubi9
+- cmd/server: fix log format flag logic
+
+BUILD
+
+- build(deps): bump bulma-clean-theme from 0.13.2 to 0.13.3 in /docs
+- build(deps): bump github.com/stretchr/testify from 1.8.2 to 1.8.3
+
 ## v1.31.2 (Released 2023-05-11)
 
 IMPROVEMENTS
