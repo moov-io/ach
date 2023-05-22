@@ -9,7 +9,6 @@ COPY ./internal ./internal
 COPY ./server ./server
 COPY ./test ./test
 COPY makefile makefile
-RUN ls -lR
 RUN make build
 
 FROM registry.access.redhat.com/ubi9/ubi-minimal
