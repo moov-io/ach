@@ -56,9 +56,9 @@ func main() {
 		*flagLogFormat = v
 	}
 	if *flagLogFormat == "json" {
-		kitlogger = kitlog.NewLogfmtLogger(kitlog.NewSyncWriter(os.Stdout))
-	} else {
 		kitlogger = kitlog.NewJSONLogger(kitlog.NewSyncWriter(os.Stdout))
+	} else {
+		kitlogger = kitlog.NewLogfmtLogger(kitlog.NewSyncWriter(os.Stdout))
 	}
 
 	logger := log.NewLogger(kitlogger)
