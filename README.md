@@ -382,8 +382,7 @@ We maintain a comprehensive suite of unit tests and recommend table-driven testi
 
 ### Fuzzing
 
-We currently run fuzzing over ACH in the form of a [`moov/achfuzz`](https://hub.docker.com/r/moov/achfuzz) Docker image. You can [read more](./test/fuzz-reader/README.md) or run the image and report crasher examples to [`security@moov.io`](mailto:security@moov.io). Thanks!
-
+We currently run fuzzing over ACH in the form of a [Github Action](https://github.com/moov-io/ach/actions/workflows/fuzz.yml). Please report crashes examples to [`oss@moov.io`](mailto:oss@moov.io). Thanks!
 
 ## Related projects
 As part of Moov's initiative to offer open source fintech infrastructure, we have a large collection of active projects you may find useful:
