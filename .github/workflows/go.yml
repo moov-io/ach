@@ -55,7 +55,7 @@ jobs:
       run: make docker && make test-integration && make clean-integration
 
   docker:
-    name: Go Build
+    name: Docker
     runs-on: ubuntu-latest
     steps:
     - name: Set up Go 1.x
