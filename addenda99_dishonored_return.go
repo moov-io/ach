@@ -86,6 +86,10 @@ func (Addenda99Dishonored *Addenda99Dishonored) Parse(record string) {
 }
 
 func (Addenda99Dishonored *Addenda99Dishonored) String() string {
+	if Addenda99Dishonored == nil {
+		return ""
+	}
+
 	var buf strings.Builder
 	buf.Grow(94)
 	buf.WriteString(entryAddendaPos)

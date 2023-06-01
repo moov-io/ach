@@ -114,6 +114,10 @@ func (Addenda99 *Addenda99) Parse(record string) {
 
 // String writes the Addenda99 struct to a 94 character string
 func (Addenda99 *Addenda99) String() string {
+	if Addenda99 == nil {
+		return ""
+	}
+
 	var buf strings.Builder
 	buf.Grow(94)
 	buf.WriteString(entryAddendaPos)
