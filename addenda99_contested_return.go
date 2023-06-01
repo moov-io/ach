@@ -102,9 +102,12 @@ func (Addenda99Contested *Addenda99Contested) Parse(record string) {
 }
 
 func (Addenda99Contested *Addenda99Contested) String() string {
+	if Addenda99Contested == nil {
+		return ""
+	}
+
 	var buf strings.Builder
 	buf.Grow(94)
-
 	buf.WriteString(entryAddendaPos)
 	buf.WriteString(Addenda99Contested.TypeCode)
 	buf.WriteString(Addenda99Contested.ContestedReturnCodeField())
@@ -120,7 +123,6 @@ func (Addenda99Contested *Addenda99Contested) String() string {
 	buf.WriteString(Addenda99Contested.DishonoredReturnReasonCodeField())
 	buf.WriteString(" ")
 	buf.WriteString(Addenda99Contested.TraceNumberField())
-
 	return buf.String()
 }
 
