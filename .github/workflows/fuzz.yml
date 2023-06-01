@@ -8,6 +8,7 @@ jobs:
   fuzz-ach:
     name: Fuzz ACH
     runs-on: ubuntu-latest
+    timeout-minutes: 12
 
     steps:
     - name: Set up Go 1.x
@@ -33,3 +34,33 @@ jobs:
     - name: Fuzz
       run: |
         go test ./test/fuzz/... -fuzz ACH -fuzztime 10m
+
+  fuzz-json:
+    name: Fuzz JSON
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    steps:
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: '>= 1.20.4'
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Fuzz
+      run: |
+        go test ./test/fuzz/... -fuzz JSON -fuzztime 10m
