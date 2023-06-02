@@ -97,8 +97,8 @@ func TestMaskNumber(t *testing.T) {
 
 func TestMaskName(t *testing.T) {
 	require.Equal(t, "", maskName(""))
-	require.Equal(t, "* * *", maskName("a a a"))
-	require.Equal(t, "* * *", maskName(" a  a  a "))
+	require.Equal(t, "* * *", maskName(`a b c`))
+	require.Equal(t, "* * *", maskName(` a  b  c `))
 	require.Equal(t, "Jo** ***", maskName("John Doe"))
 	require.Equal(t, "Jo** Sm*** **", maskName("John Smith Jr"))
 	require.Equal(t, "Al******* Lo********** ** ***", maskName("Alexander Longnameiton Jr III"))

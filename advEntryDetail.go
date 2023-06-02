@@ -101,7 +101,7 @@ const (
 
 	// DebitForCreditsOriginated is an accounting entry debit for ACH credits originated
 	DebitForCreditsOriginated = 82
-	// DebitForDebitsReceived is an accounting entry debit for for ACH debits received
+	// DebitForDebitsReceived is an accounting entry debit for ACH debits received
 	DebitForDebitsReceived = 84
 	// DebitForDebitsRejectedBatches is an accounting entry debit for ACH debits in rejected batches
 	DebitForDebitsRejectedBatches = 86

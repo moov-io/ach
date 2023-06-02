@@ -957,15 +957,13 @@ func (f *File) createFileADV() error {
 	return nil
 }
 
-// SegmentFile takes a valid ACH File and returns 2 segmented ACH Files, one ACH File containing credit entries and one
-// ACH File containing debit entries.  The return is 2 Files a Credit File and Debit File, or an error.:
-// File - Credit File
-// File - Debit File
-// Error - Error or Nil
+// SegmentFile takes a valid ACH File and returns 2 segmented ACH Files, one ACH File containing credit entries
+// and one ACH File containing debit entries.  The return is 2 Files a Credit File and Debit File, or an error.
+//
 // Callers should always check for a nil-error before using the returned file.
 //
-// The File returned may not be valid and callers should confirm with Validate. Invalid files may
-// be rejected by other Financial Institutions or ACH tools.
+// The File returned may not be valid and callers should confirm with Validate. Invalid files may be rejected
+// by other Financial Institutions or ACH tools.
 func (f *File) SegmentFile(_ *SegmentFileConfiguration) (*File, *File, error) {
 	if err := f.Validate(); err != nil {
 		return nil, nil, err

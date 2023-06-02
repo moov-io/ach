@@ -84,7 +84,7 @@ func (v *validator) isMonth(s string) error {
 }
 
 // isDay validates a 2 digit day based on a 2 digit month
-// month 01-12 day 01-31 based on month
+// months are 01-12, days are 01-29, 01-30, or 01-31
 func (v *validator) isDay(m string, d string) error {
 	switch m {
 	// February

@@ -33,7 +33,6 @@ type Addenda14 struct {
 	ID string `json:"id"`
 	// TypeCode Addenda14 types code '14'
 	TypeCode string `json:"typeCode"`
-	// Receiving DFI Name
 	// Name of the Receiver's bank
 	RDFIName string `json:"RDFIName"`
 	// Receiving DFI Identification Number Qualifier

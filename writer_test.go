@@ -430,7 +430,7 @@ func TestIATNOC(t *testing.T) {
 	}
 }
 
-// TestADVWrite writes a ADV ACH file
+// TestADVWrite writes an ADV ACH file
 func TestADVWrite(t *testing.T) {
 	file := NewFile().SetHeader(mockFileHeader())
 	entry := mockADVEntryDetail()
@@ -644,7 +644,7 @@ func TestNOCWrite(t *testing.T) {
 	}
 }
 
-// TestADVReturnWrite writes a ADV Return Return ACH file
+// TestADVReturnWrite writes an ADV Return ACH file
 func TestADVReturnWrite(t *testing.T) {
 	file := NewFile().SetHeader(mockFileHeader())
 	entry := mockADVEntryDetail()

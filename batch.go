@@ -126,7 +126,7 @@ const (
 	// WEB Internet-Initiated/Mobile Entry - A code indicating an entry submitted pursuant to an authorization obtained
 	// solely via the Internet or a mobile network. For consumer accounts only.
 	WEB = "WEB"
-	// XCK Destroyed Check Entry - A code indicating a debit entry initiated for a a destroyed check eligible items
+	// XCK Destroyed Check Entry - A code indicating a debit entry initiated for a destroyed check eligible items
 	XCK = "XCK"
 )
 
@@ -392,7 +392,7 @@ func (batch *Batch) verify() error {
 	return nil
 }
 
-// Build creates valid batch by building sequence numbers and batch batch control. An error is returned if
+// Build creates valid batch by building sequence numbers and batch control. An error is returned if
 // the batch being built has invalid records.
 func (batch *Batch) build() error {
 	// Requires a valid BatchHeader

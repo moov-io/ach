@@ -298,9 +298,12 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(codeFrom(err))
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	err = json.NewEncoder(w).Encode(map[string]interface{}{
 		"error": err.Error(),
 	})
+	if err != nil {
+		w.Write([]byte(fmt.Sprintf("problem rendering json: %v", err)))
+	}
 }
 
 func codeFrom(err error) int {

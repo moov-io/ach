@@ -138,7 +138,7 @@ func (iatBatch *IATBatch) verify() error {
 	return nil
 }
 
-// Build creates valid batch by building sequence numbers and batch batch control. An error is returned if
+// Build creates valid batch by building sequence numbers and batch control. An error is returned if
 // the batch being built has invalid records.
 func (iatBatch *IATBatch) build() error {
 	// Requires a valid BatchHeader
