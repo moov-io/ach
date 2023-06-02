@@ -17,7 +17,6 @@ build-webui:
 
 generate: clean
 	@go run internal/iso3166/iso3166_gen.go
-	@go run internal/iso4217/iso4217_gen.go
 
 clean:
 	@rm -rf ./bin/ ./tmp/ coverage.txt misspell* staticcheck lint-project.sh

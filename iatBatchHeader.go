@@ -24,7 +24,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/moov-io/ach/internal/iso3166"
-	"github.com/moov-io/ach/internal/iso4217"
+	"github.com/moov-io/iso4217"
 )
 
 // msgServiceClass
@@ -290,10 +290,10 @@ func (iatBh *IATBatchHeader) Validate() error {
 	if err := iatBh.isAlphanumeric(iatBh.CompanyEntryDescription); err != nil {
 		return fieldError("CompanyEntryDescription", err, iatBh.CompanyEntryDescription)
 	}
-	if !iso4217.Valid(iatBh.ISOOriginatingCurrencyCode) {
+	if _, exists := iso4217.Lookup(iatBh.ISOOriginatingCurrencyCode); !exists {
 		return fieldError("ISOOriginatingCurrencyCode", ErrValidISO4217, iatBh.ISOOriginatingCurrencyCode)
 	}
-	if !iso4217.Valid(iatBh.ISODestinationCurrencyCode) {
+	if _, exists := iso4217.Lookup(iatBh.ISODestinationCurrencyCode); !exists {
 		return fieldError("ISODestinationCurrencyCode", ErrValidISO4217, iatBh.ISODestinationCurrencyCode)
 	}
 	if err := iatBh.isOriginatorStatusCode(iatBh.OriginatorStatusCode); err != nil {
