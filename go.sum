@@ -50,6 +50,8 @@ github.com/moov-io/iso4217 v0.1.0 h1:Uqe6Lv4hFs8GdTe3R1tMX1+rCfMVnYw2q+Sj8BO3R3o
 github.com/moov-io/iso4217 v0.1.0/go.mod h1:/pF1mBInDSJtwyWkLNr8EMdIn1zIl2cyjaVi4Xhpd44=
 github.com/moov-io/iso4217 v0.2.0 h1:8jPqQhn7kQKxhP8gvnKMqoxtljCCQxbQq/g2XVFSxqk=
 github.com/moov-io/iso4217 v0.2.0/go.mod h1:/pF1mBInDSJtwyWkLNr8EMdIn1zIl2cyjaVi4Xhpd44=
+github.com/moov-io/iso4217 v0.2.1 h1:rmkasHMKMJgtv8PjevpkYODhWT1tHBpsjedYT4nPizM=
+github.com/moov-io/iso4217 v0.2.1/go.mod h1:/pF1mBInDSJtwyWkLNr8EMdIn1zIl2cyjaVi4Xhpd44=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/prometheus/client_golang v1.15.1 h1:8tXpTmJbyH5lydzFPoxSIJ0J46jdh3tylbvM1xCv0LI=
