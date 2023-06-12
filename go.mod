@@ -13,7 +13,7 @@ require (
 	github.com/moov-io/iso4217 v0.2.1
 	github.com/prometheus/client_golang v1.15.1
 	github.com/stretchr/testify v1.8.4
-	golang.org/x/text v0.9.0
+	golang.org/x/text v0.10.0
 )
 
 require (
