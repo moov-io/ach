@@ -1,3 +1,21 @@
+## v1.31.4 (Released 2023-06-12)
+
+IMPROVEMENTS
+
+- fix: return empty strings when records are nil
+- build: split "make docker" into its own job
+- build: remove docker build and openapi generate from Linux CI
+- build: replace fuzzer library with Go standard library
+- build: switch to the new moov-io/iso4217 library
+- build: fix description of addenda99
+
+BUILD
+
+- fix(deps): update github.com/stretchr/testify to v1.8.4
+- build(deps): bump github.com/moov-io/base from 0.42.0 to 0.44.0
+- build(deps): bump actions/setup-go from 2 to 4
+- fix(deps): update github.com/moov-io/iso4217 to v0.2.1
+
 ## v1.31.3 (Released 2023-05-22)
 
 IMPROVEMENTS
