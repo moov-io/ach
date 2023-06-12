@@ -265,7 +265,7 @@ func makeReturnCodeDict() map[string]*ReturnCode {
 		{"R26", "Mandatory field error", "Improper information in one of the mandatory fields"},
 		{"R27", "Trace number error", "Original entry trace number is not valid for return entry; or addenda trace numbers do not correspond with entry detail record"},
 		{"R28", "Transit routing number check digit error", "Check digit for the transit routing number is incorrect"},
-		{"R29", "Corporate customer advises not authorized", "RDFI has bee notified by corporate receiver that debit entry of originator is not authorized"},
+		{"R29", "Corporate customer advises not authorized", "RDFI has been notified by corporate receiver that debit entry of originator is not authorized"},
 		{"R30", "RDFI not participant in check truncation program", "Financial institution not participating in automated check safekeeping application"},
 		{"R31", "Permissible return entry (CCD and CTX only)", "RDFI has been notified by the ODFI that it agrees to accept a CCD or CTX return entry"},
 		{"R32", "RDFI non-settlement", "RDFI is not able to settle the entry"},
