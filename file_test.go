@@ -77,6 +77,16 @@ func mockFileADV() *File {
 	return mockFile
 }
 
+func TestFile_CreateWithoutValidation(t *testing.T) {
+	file := NewFile()
+	require.ErrorContains(t, file.Create(), "ImmediateDestination")
+
+	file.SetValidation(&ValidateOpts{
+		SkipAll: true,
+	})
+	require.NoError(t, file.Validate())
+}
+
 // testFileError validates a file error
 func testFileError(t testing.TB) {
 	err := &FileError{FieldName: "mock", Msg: "test message"}

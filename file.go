@@ -454,18 +454,18 @@ func (f *File) Create() error {
 	if opts == nil {
 		opts = &ValidateOpts{}
 	}
-
-	// Requires a valid FileHeader to build FileControl
-	if !opts.AllowMissingFileHeader {
-		if err := f.Header.Validate(); err != nil {
-			return err
+	if !opts.SkipAll {
+		// Requires a valid FileHeader to build FileControl
+		if !opts.AllowMissingFileHeader {
+			if err := f.Header.Validate(); err != nil {
+				return err
+			}
 		}
-	}
 
-	// If AllowZeroBatches is false, require at least one Batch in the new file.
-	if (f.validateOpts == nil || !f.validateOpts.AllowZeroBatches) &&
-		len(f.Batches) <= 0 && len(f.IATBatches) <= 0 {
-		return ErrFileNoBatches
+		// If AllowZeroBatches is false, require at least one Batch in the new file.
+		if !opts.AllowZeroBatches && (len(f.Batches) <= 0 && len(f.IATBatches) <= 0) {
+			return ErrFileNoBatches
+		}
 	}
 
 	if !f.IsADV() {
