@@ -1,3 +1,15 @@
+## v1.31.5 (Released 2023-06-21)
+
+IMPROVEMENTS
+
+- fix: allow .Create() to skip validation when configured
+
+BUILD
+
+- build(deps): bump actions/checkout from 2 to 3
+- chore: update github.com/prometheus/client_golang to v1.16.0
+- chore: update golang.org/x/text to v0.10.0
+
 ## v1.31.4 (Released 2023-06-12)
 
 IMPROVEMENTS
