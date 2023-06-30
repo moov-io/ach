@@ -24,6 +24,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -2048,7 +2049,12 @@ func TestReadFile_SkipValidation(t *testing.T) {
 
 	// checking output
 	var buf bytes.Buffer
-	if err := NewWriter(&buf).Write(&f); err != nil {
+	w := NewWriter(&buf)
+	if runtime.GOOS == "windows" {
+		w.LineEnding = "\r\n"
+	}
+	err = w.Write(&f)
+	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
 	output := strings.TrimSpace(buf.String())

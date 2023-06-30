@@ -18,34 +18,24 @@
 package main
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 	"testing"
+	"time"
 )
 
-// TestFileCreate tests creating an ACH File
 func TestFileWrite(t *testing.T) {
-	testFileWrite(t)
-}
-
-/*//BenchmarkTestFileCreate benchmarks creating an ACH File
-func BenchmarkTestFileWrite(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testFileWrite(b)
-	}
-}*/
-
-// FileCreate creates an ACH File
-func testFileWrite(t testing.TB) {
-	filename, err := os.MkdirTemp("", "ach-writeACH-test")
+	dir, err := os.MkdirTemp("", "ach-writeACH-test")
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	defer os.Remove(filename)
+	defer os.RemoveAll(dir)
 
-	write(filename)
+	path := filepath.Join(dir, fmt.Sprintf("%s.ach", time.Now().UTC().Format("200601021504")))
+	write(path)
 
-	s, err := os.Stat(filename)
+	s, err := os.Stat(path)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
