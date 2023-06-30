@@ -98,23 +98,24 @@ func write(path string) {
 		for i := 0; i < 1250; i++ {
 			entrySeq = entrySeq + 1
 
-			entryEntrySeq := ach.NewEntryDetail()
-			entryEntrySeq.TransactionCode = ach.CheckingCredit
-			entryEntrySeq.SetRDFI("231380104")
-			entryEntrySeq.DFIAccountNumber = randomdata.StringNumber(10, "")
-			entryEntrySeq.IndividualName = randomdata.FullName(randomdata.RandomGender)
-			entryEntrySeq.SetTraceNumber(bh.ODFIIdentification, entrySeq)
-			entryEntrySeq.IdentificationNumber = "#" + randomdata.StringNumber(6, "") + "#"
-			entryEntrySeq.Category = ach.CategoryForward
-			entryEntrySeq.AddendaRecordIndicator = 1
+			entryDetail := ach.NewEntryDetail()
+			entryDetail.TransactionCode = ach.CheckingCredit
+			entryDetail.SetRDFI("231380104")
+			entryDetail.DFIAccountNumber = randomdata.StringNumber(10, "")
+			entryDetail.IndividualName = randomdata.FullName(randomdata.RandomGender)
+			entryDetail.SetTraceNumber(bh.ODFIIdentification, entrySeq)
+			entryDetail.IdentificationNumber = "#" + randomdata.StringNumber(6, "") + "#"
+			entryDetail.Category = ach.CategoryForward
+			entryDetail.AddendaRecordIndicator = 1
+			entryDetail.Amount = 10023
 
 			// Add addenda record for an entry
 			addendaEntrySeq := ach.NewAddenda05()
 			addendaEntrySeq.PaymentRelatedInformation = randomdata.SillyName() + " bonus pay for amazing work on #OSS"
-			entryEntrySeq.AddAddenda05(addendaEntrySeq)
+			entryDetail.AddAddenda05(addendaEntrySeq)
 
 			// Add entries
-			batch.AddEntry(entryEntrySeq)
+			batch.AddEntry(entryDetail)
 
 		}
 
