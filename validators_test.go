@@ -175,6 +175,22 @@ func TestValidators__isAlphanumeric(t *testing.T) {
 	}
 }
 
+func TestValidators__isAlphanumericExamples(t *testing.T) {
+	v := validator{}
+
+	validCases := []string{`|`}
+	for i := range validCases {
+		err := v.isAlphanumeric(validCases[i])
+		require.NoError(t, err, fmt.Sprintf("input: %q", validCases[i]))
+	}
+
+	invalidCases := []string{`¦`}
+	for i := range invalidCases {
+		err := v.isAlphanumeric(invalidCases[i])
+		require.ErrorIs(t, err, ErrNonAlphanumeric, fmt.Sprintf("input: %q", invalidCases[i]))
+	}
+}
+
 func TestValidators__validateJulianDay(t *testing.T) {
 	empty := "   "
 	cases := map[string]string{
