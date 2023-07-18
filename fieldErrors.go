@@ -72,6 +72,10 @@ var (
 
 	// ErrAddenda98ChangeCode is given when there's an invalid addenda change code
 	ErrAddenda98ChangeCode = errors.New("found is not a valid addenda Change Code")
+	// ErrAddenda98RefusedChangeCode is given when there's an invalid addenda refused change code
+	ErrAddenda98RefusedChangeCode = errors.New("found is not a valid addenda Refused Change Code")
+	// ErrAddenda98RefusedTraceSequenceNumber is given when there's an invalid addenda trace sequence number
+	ErrAddenda98RefusedTraceSequenceNumber = errors.New("found is not a valid addenda trace sequence number")
 	// ErrAddenda98CorrectedData is given when the corrected data does not corespond to the change code
 	ErrAddenda98CorrectedData = errors.New("must contain the corrected information corresponding to the Change Code")
 	// ErrAddenda99ReturnCode is given when there's an invalid return code
@@ -81,7 +85,7 @@ var (
 	// ErrAddenda99ContestedReturnCode is given when there's an invalid dishonored return code
 	ErrAddenda99ContestedReturnCode = errors.New("found is not a valid contested dishonored return code")
 	// ErrBatchCORAddenda is given when an entry in a COR batch does not have an addenda98
-	ErrBatchCORAddenda = errors.New("one Addenda98 record is required for each entry in SEC Type COR")
+	ErrBatchCORAddenda = errors.New("one Addenda98 or Addenda98Refused record is required for each entry in SEC Type COR")
 
 	// FileHeader errors
 

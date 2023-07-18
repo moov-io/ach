@@ -77,8 +77,10 @@ type EntryDetail struct {
 	Addenda02 *Addenda02 `json:"addenda02,omitempty"`
 	// Addenda05 for use with StandardEntryClassCode: ACK, ATX, CCD, CIE, CTX, DNE, ENR, WEB, PPD, TRX.
 	Addenda05 []*Addenda05 `json:"addenda05,omitempty"`
-	// Addenda98 for user with NOC
+	// Addenda98 for user with Notification of Change
 	Addenda98 *Addenda98 `json:"addenda98,omitempty"`
+	// Addenda98 for user with Refused Notification of Change
+	Addenda98Refused *Addenda98Refused `json:"addenda98Refused,omitempty"`
 	// Addenda99 for use with Returns
 	Addenda99 *Addenda99 `json:"addenda99,omitempty"`
 	// Addenda99Contested for use with Contested Dishonored Returns
@@ -356,6 +358,9 @@ func (ed *EntryDetail) SetTraceNumber(ODFIIdentification string, seq int) {
 	if ed.Addenda98 != nil {
 		ed.Addenda98.TraceNumber = traceNumber
 	}
+	if ed.Addenda98Refused != nil {
+		ed.Addenda98Refused.TraceNumber = traceNumber
+	}
 	if ed.Addenda99 != nil {
 		ed.Addenda99.TraceNumber = traceNumber
 	}
@@ -632,6 +637,9 @@ func (ed *EntryDetail) addendaCount() (n int) {
 		}
 	}
 	if ed.Addenda98 != nil {
+		n += 1
+	}
+	if ed.Addenda98Refused != nil {
 		n += 1
 	}
 	if ed.Addenda99 != nil {

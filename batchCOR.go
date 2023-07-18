@@ -108,7 +108,7 @@ func (batch *BatchCOR) Create() error {
 // isAddenda98 verifies that a Addenda98 exists for each EntryDetail and is Validated
 func (batch *BatchCOR) isAddenda98() error {
 	for _, entry := range batch.Entries {
-		if entry.Addenda98 == nil {
+		if entry.Addenda98 == nil && entry.Addenda98Refused == nil {
 			return batch.Error("Addenda98", ErrBatchCORAddenda)
 		}
 	}

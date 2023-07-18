@@ -595,6 +595,11 @@ func (batch *Batch) isFieldInclusion() error {
 					return err
 				}
 			}
+			if entry.Addenda98Refused != nil {
+				if err := entry.Addenda98Refused.Validate(); err != nil {
+					return err
+				}
+			}
 			if entry.Addenda99 != nil {
 				if err := entry.Addenda99.Validate(); err != nil {
 					return err
@@ -857,6 +862,11 @@ func (batch *Batch) isAddendaSequence() error {
 				return batch.Error("AddendaRecordIndicator", ErrBatchAddendaIndicator)
 			}
 		}
+		if entry.Addenda98Refused != nil {
+			if entry.AddendaRecordIndicator != 1 {
+				return batch.Error("AddendaRecordIndicator", ErrBatchAddendaIndicator)
+			}
+		}
 		if entry.Addenda99 != nil {
 			if entry.AddendaRecordIndicator != 1 {
 				return batch.Error("AddendaRecordIndicator", ErrBatchAddendaIndicator)
@@ -956,7 +966,7 @@ func (batch *Batch) addendaFieldInclusionForward(entry *EntryDetail) error {
 		}
 	}
 	if batch.Header.StandardEntryClassCode != COR {
-		if entry.Addenda98 != nil {
+		if entry.Addenda98 != nil || entry.Addenda98Refused != nil {
 			return batch.Error("Addenda98", ErrBatchAddendaCategory, entry.Category)
 		}
 	}
@@ -975,7 +985,7 @@ func (batch *Batch) addendaFieldInclusionNOC(entry *EntryDetail) error {
 		return batch.Error("Addenda05", ErrBatchAddendaCategory, entry.Category)
 	}
 	if batch.Header.StandardEntryClassCode != COR {
-		if entry.Addenda98 != nil {
+		if entry.Addenda98 != nil || entry.Addenda98Refused != nil {
 			return batch.Error("Addenda98", ErrFieldInclusion)
 		}
 	}
@@ -998,7 +1008,7 @@ func (batch *Batch) addendaFieldInclusionReturn(entry *EntryDetail) error {
 			return batch.Error("Addenda05", ErrBatchAddendaCategory, entry.Category)
 		}
 	}
-	if entry.Addenda98 != nil {
+	if entry.Addenda98 != nil || entry.Addenda98Refused != nil {
 		return batch.Error("Addenda98", ErrBatchAddendaCategory, entry.Category)
 	}
 	if entry.Addenda99 == nil && entry.Addenda99Dishonored == nil && entry.Addenda99Contested == nil {
@@ -1024,7 +1034,7 @@ func (batch *Batch) ValidAmountForCodes(entry *EntryDetail) error {
 	if batch.validateOpts != nil && batch.validateOpts.AllowInvalidAmounts {
 		return nil
 	}
-	if entry != nil && entry.Addenda98 != nil {
+	if entry != nil && (entry.Addenda98 != nil || entry.Addenda98Refused != nil) {
 		// NOC entries will have a zero'd amount value
 		if entry.Amount != 0 {
 			return ErrBatchAmountNonZero

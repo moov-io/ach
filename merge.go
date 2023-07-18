@@ -255,6 +255,9 @@ func lineCount(f *File) int {
 			if entries[j].Addenda98 != nil {
 				lines++
 			}
+			if entries[j].Addenda98Refused != nil {
+				lines++
+			}
 			if entries[j].Addenda99 != nil {
 				lines++
 			}

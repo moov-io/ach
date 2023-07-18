@@ -123,6 +123,12 @@ func (w *Writer) writeBatch(file *File, isADV bool) error {
 					}
 					w.lineNum++
 				}
+				if entry.Addenda98Refused != nil {
+					if _, err := w.w.WriteString(entry.Addenda98Refused.String() + w.LineEnding); err != nil {
+						return err
+					}
+					w.lineNum++
+				}
 				if entry.Addenda99 != nil {
 					if _, err := w.w.WriteString(entry.Addenda99.String() + w.LineEnding); err != nil {
 						return err
