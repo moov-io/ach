@@ -29,10 +29,13 @@ import (
 )
 
 var (
-	upperAlphanumericRegex = regexp.MustCompile(fmt.Sprintf(
-		`[^ A-Z0-9!"#$%%&'()*+,-.\\/:;<>=?@\[\]^_{}|~%s]+`, "`"))
-	alphanumericRegex = regexp.MustCompile(fmt.Sprintf(
-		`[^ \w!"#$%%&'()*+,-.\\/:;<>=?@\[\]^_{}|~%s]+`, "`"))
+	lowerAlphaCharacters  = "abcdefghijklmnopqrstuvwxyz"
+	numericCharacters     = "0123456789"
+	asciiCharacters       = ` !"#$%&'()*+,-./:;<=>?@[\]^_{|}~` + "`"
+	ebcdicExtraCharacters = `¢¬¦±`
+
+	validAlphaNumericCharacters          = lowerAlphaCharacters + strings.ToUpper(lowerAlphaCharacters) + numericCharacters + asciiCharacters + ebcdicExtraCharacters
+	validUppercaseAlphaNumericCharacters = strings.ToUpper(lowerAlphaCharacters) + numericCharacters + asciiCharacters + ebcdicExtraCharacters
 )
 
 // validator is common validation and formatting of golang types to ach type strings
@@ -422,19 +425,36 @@ func (v *validator) isTransactionTypeCode(s string) error {
 	return ErrTransactionTypeCode
 }
 
+func (v *validator) includesValidCharacters(input string, charset string) error {
+	for _, i := range input {
+		var found bool
+		for _, c := range charset {
+			if i == c {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return fmt.Errorf("invalid character: %v", i)
+		}
+	}
+	return nil
+}
+
 // isUpperAlphanumeric checks if string only contains ASCII alphanumeric upper case characters
 func (v *validator) isUpperAlphanumeric(s string) error {
-	if upperAlphanumericRegex.MatchString(s) {
-		return ErrUpperAlpha
+	err := v.includesValidCharacters(s, validUppercaseAlphaNumericCharacters)
+	if err != nil {
+		return fmt.Errorf("%w: %v", ErrUpperAlpha, err)
 	}
 	return nil
 }
 
 // isAlphanumeric checks if a string only contains ASCII alphanumeric characters
 func (v *validator) isAlphanumeric(s string) error {
-	if alphanumericRegex.MatchString(s) {
-		// ^[ A-Za-z0-9_@./#&+-]*$/
-		return ErrNonAlphanumeric
+	err := v.includesValidCharacters(s, validAlphaNumericCharacters)
+	if err != nil {
+		return fmt.Errorf("%w: %v", ErrNonAlphanumeric, err)
 	}
 	return nil
 }
