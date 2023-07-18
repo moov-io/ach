@@ -359,6 +359,12 @@ func (ed *EntryDetail) SetTraceNumber(ODFIIdentification string, seq int) {
 	if ed.Addenda99 != nil {
 		ed.Addenda99.TraceNumber = traceNumber
 	}
+	if ed.Addenda99Contested != nil {
+		ed.Addenda99Contested.TraceNumber = traceNumber
+	}
+	if ed.Addenda99Dishonored != nil {
+		ed.Addenda99Dishonored.TraceNumber = traceNumber
+	}
 }
 
 // RDFIIdentificationField get the rdfiIdentification with zero padding
