@@ -1053,6 +1053,8 @@ components:
             $ref: '#/components/schemas/Addenda05'
         addenda98:
           $ref: '#/components/schemas/Addenda98'
+        addenda98Refused:
+          $ref: '#/components/schemas/Addenda98Refused'
         addenda99:
           $ref: '#/components/schemas/Addenda99'
         addenda99Dishonored:
@@ -1593,6 +1595,54 @@ components:
       - originalTrace
       - originalDFI
       - correctedData
+    Addenda98Refused:
+      properties:
+        id:
+          type: string
+          description: Client-defined string used as a reference to this record.
+          example: 5ca8d25a
+        typeCode:
+          type: string
+          description: 98 - NACHA regulations
+          example: "98"
+        refusedChangeCode:
+          type: string
+          description: The code specifying why the Notification of Change is being refused.
+        originalTrace:
+          type: string
+          description: |
+            OriginalTrace This field contains the Trace Number as originally included on the forward Entry or Prenotification.
+            The RDFI must include the Original Entry Trace Number in the Addenda Record of an Entry being returned to an ODFI,
+            in the Addenda Record of an 98, within an Acknowledgment Entry, or with an RDFI request for a copy of an authorization.
+          example: "214874812"
+        originalDFI:
+          type: string
+          description: The Receiving DFI Identification (addenda.RDFIIdentification) as originally included on the forward Entry or Prenotification that the RDFI is returning or correcting.
+          example: "98765432"
+        correctedData:
+          type: string
+          description: Correct field value of what changeCode references
+          example: "198424892"
+        changeCode:
+          type: string
+          description: ChangeCode field contains a standard code used by an ACH Operator or RDFI to describe the reason for a change Entry.
+          example: C01
+        traceSequenceNumber:
+          type: string
+          description: The last seven digits of the TraceNumber in the original Notification of Change.
+        traceNumber:
+          type: string
+          description: Entry Detail Trace Number
+          example: "124782618117"
+      required:
+      - typeCode
+      - refusedChangeCode
+      - originalTrace
+      - originalDFI
+      - correctedData
+      - changeCode
+      - traceSequenceNumber
+      - traceNumber
     Addenda99:
       properties:
         id:
