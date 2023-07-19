@@ -267,6 +267,9 @@ func setEntryRecordType(e *EntryDetail) {
 	if e.Addenda98 != nil {
 		e.Addenda98.TypeCode = "98"
 	}
+	if e.Addenda98Refused != nil {
+		e.Addenda98Refused.TypeCode = "98"
+	}
 	if e.Addenda99 != nil {
 		e.Addenda99.TypeCode = "99"
 	}

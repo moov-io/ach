@@ -40,7 +40,7 @@ type Addenda98 struct {
 	OriginalTrace string `json:"originalTrace"`
 	// OriginalDFI field contains the Receiving DFI Identification (addenda.RDFIIdentification) as originally included on the forward Entry or Prenotification that the RDFI is returning or correcting.
 	OriginalDFI string `json:"originalDFI"`
-	// CorrectedData
+	// CorrectedData is the corrected data
 	CorrectedData string `json:"correctedData"`
 	// TraceNumber matches the Entry Detail Trace Number of the entry being returned.
 	//
@@ -213,6 +213,14 @@ func makeChangeCodeDict() map[string]*ChangeCode {
 		dict[codes[i].Code] = &codes[i]
 	}
 	return dict
+}
+
+func IsRefusedChangeCode(code string) bool {
+	switch strings.ToUpper(code) {
+	case "C61", "C62", "C63", "C64", "C65", "C66", "C67", "C68", "C69":
+		return true
+	}
+	return false
 }
 
 // CorrectedData is a struct returned from our helper method for parsing the NOC/COR

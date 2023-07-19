@@ -468,13 +468,27 @@ func (r *Reader) parseAddenda() error {
 				}
 				r.currentBatch.GetEntries()[entryIndex].AddAddenda05(addenda05)
 			case "98":
-				addenda98 := NewAddenda98()
-				addenda98.Parse(r.line)
-				if err := maybeValidate(addenda98, r.File.validateOpts); err != nil {
-					return r.parseError(err)
+				// The Addenda98 and Addenda98Refused records have their change code in the same spot,
+				// but refused records have a different set of values.
+				switch {
+				case IsRefusedChangeCode(r.line[3:6]):
+					addenda98Refused := NewAddenda98Refused()
+					addenda98Refused.Parse(r.line)
+					if err := maybeValidate(addenda98Refused, r.File.validateOpts); err != nil {
+						return r.parseError(err)
+					}
+					r.currentBatch.GetEntries()[entryIndex].Category = CategoryNOC
+					r.currentBatch.GetEntries()[entryIndex].Addenda98Refused = addenda98Refused
+
+				default:
+					addenda98 := NewAddenda98()
+					addenda98.Parse(r.line)
+					if err := maybeValidate(addenda98, r.File.validateOpts); err != nil {
+						return r.parseError(err)
+					}
+					r.currentBatch.GetEntries()[entryIndex].Category = CategoryNOC
+					r.currentBatch.GetEntries()[entryIndex].Addenda98 = addenda98
 				}
-				r.currentBatch.GetEntries()[entryIndex].Category = CategoryNOC
-				r.currentBatch.GetEntries()[entryIndex].Addenda98 = addenda98
 			case "99":
 				// Addenda99, Addenda99Dishonored, Addenda99Contested records both have their code
 				// in the same spot, so we need to determine which to parse by the value.
