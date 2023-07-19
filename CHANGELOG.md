@@ -1,3 +1,18 @@
+## v1.32.0 (Released 2023-07-19)
+
+IMPROVEMENTS
+
+- feat: add Addenda98Refused
+- fix: SetTraceNumber should populate contested and dishonored returns
+- fix: allow full range of ASCII and EBCDIC characters accepted by Nacha rules
+
+BUILD
+
+- build: run Go tests on Windows
+- build(deps): bump github.com/moov-io/base from 0.44.0 to 0.45.0
+- build(deps): bump golang.org/x/text from 0.10.0 to 0.11.0
+- chore(deps): update ossf/scorecard-action action to v2.2.0
+
 ## v1.31.5 (Released 2023-06-21)
 
 IMPROVEMENTS
