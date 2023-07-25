@@ -511,6 +511,7 @@ func TestBatchHeaderENR__EffectiveEntryDateField(t *testing.T) {
 	bh := mockBatchHeader()
 
 	// ENR batches require EffectiveEntryDate to be space filled
+	bh.StandardEntryClassCode = ENR
 	bh.CompanyEntryDescription = "AUTOENROLL"
 	if v, ans := bh.EffectiveEntryDateField(), "      "; v != ans {
 		t.Errorf("got %q (len=%d), expected space filled (len=6)", v, len(ans))
