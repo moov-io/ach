@@ -85,20 +85,21 @@ func (Addenda99Contested *Addenda99Contested) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
+	runes := []rune(record)
 
-	Addenda99Contested.TypeCode = record[1:3]
-	Addenda99Contested.ContestedReturnCode = record[3:6]
-	Addenda99Contested.OriginalEntryTraceNumber = record[6:21]
-	Addenda99Contested.DateOriginalEntryReturned = record[21:27]
-	Addenda99Contested.OriginalReceivingDFIIdentification = record[27:35]
-	Addenda99Contested.OriginalSettlementDate = record[35:38]
-	Addenda99Contested.ReturnTraceNumber = record[38:53]
-	Addenda99Contested.ReturnSettlementDate = record[53:56]
-	Addenda99Contested.ReturnReasonCode = record[56:58]
-	Addenda99Contested.DishonoredReturnTraceNumber = record[58:73]
-	Addenda99Contested.DishonoredReturnSettlementDate = record[73:76]
-	Addenda99Contested.DishonoredReturnReasonCode = record[76:78]
-	Addenda99Contested.TraceNumber = record[79:94]
+	Addenda99Contested.TypeCode = string(runes[1:3])
+	Addenda99Contested.ContestedReturnCode = string(runes[3:6])
+	Addenda99Contested.OriginalEntryTraceNumber = string(runes[6:21])
+	Addenda99Contested.DateOriginalEntryReturned = string(runes[21:27])
+	Addenda99Contested.OriginalReceivingDFIIdentification = string(runes[27:35])
+	Addenda99Contested.OriginalSettlementDate = string(runes[35:38])
+	Addenda99Contested.ReturnTraceNumber = string(runes[38:53])
+	Addenda99Contested.ReturnSettlementDate = string(runes[53:56])
+	Addenda99Contested.ReturnReasonCode = string(runes[56:58])
+	Addenda99Contested.DishonoredReturnTraceNumber = string(runes[58:73])
+	Addenda99Contested.DishonoredReturnSettlementDate = string(runes[73:76])
+	Addenda99Contested.DishonoredReturnReasonCode = string(runes[76:78])
+	Addenda99Contested.TraceNumber = string(runes[79:94])
 }
 
 func (Addenda99Contested *Addenda99Contested) String() string {

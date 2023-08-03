@@ -95,21 +95,22 @@ func (Addenda99 *Addenda99) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
+	runes := []rune(record)
 
 	// 2-3 Defines the specific explanation and format for the addenda information contained in the same record
-	Addenda99.TypeCode = record[1:3]
+	Addenda99.TypeCode = string(runes[1:3])
 	// 4-6
-	Addenda99.ReturnCode = record[3:6]
+	Addenda99.ReturnCode = string(runes[3:6])
 	// 7-21
-	Addenda99.OriginalTrace = strings.TrimSpace(record[6:21])
+	Addenda99.OriginalTrace = strings.TrimSpace(string(runes[6:21]))
 	// 22-27, might be a date or blank
-	Addenda99.DateOfDeath = Addenda99.validateSimpleDate(record[21:27])
+	Addenda99.DateOfDeath = Addenda99.validateSimpleDate(string(runes[21:27]))
 	// 28-35
-	Addenda99.OriginalDFI = Addenda99.parseStringField(record[27:35])
+	Addenda99.OriginalDFI = Addenda99.parseStringField(string(runes[27:35]))
 	// 36-79
-	Addenda99.AddendaInformation = strings.TrimSpace(record[35:79])
+	Addenda99.AddendaInformation = strings.TrimSpace(string(runes[35:79]))
 	// 80-94
-	Addenda99.TraceNumber = strings.TrimSpace(record[79:94])
+	Addenda99.TraceNumber = strings.TrimSpace(string(runes[79:94]))
 }
 
 // String writes the Addenda99 struct to a 94 character string

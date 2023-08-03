@@ -79,30 +79,31 @@ func (addenda02 *Addenda02) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
+	runes := []rune(record)
 
 	// 1-1 Always 7
 	// 2-3 Always 02
-	addenda02.TypeCode = record[1:3]
+	addenda02.TypeCode = string(runes[1:3])
 	// 4-10 Based on the information entered (04-10) 7 alphanumeric
-	addenda02.ReferenceInformationOne = strings.TrimSpace(record[3:10])
+	addenda02.ReferenceInformationOne = strings.TrimSpace(string(runes[3:10]))
 	// 11-13 Based on the information entered (11-13) 3 alphanumeric
-	addenda02.ReferenceInformationTwo = strings.TrimSpace(record[10:13])
+	addenda02.ReferenceInformationTwo = strings.TrimSpace(string(runes[10:13]))
 	// 14-19
-	addenda02.TerminalIdentificationCode = strings.TrimSpace(record[13:19])
+	addenda02.TerminalIdentificationCode = strings.TrimSpace(string(runes[13:19]))
 	// 20-25
-	addenda02.TransactionSerialNumber = strings.TrimSpace(record[19:25])
+	addenda02.TransactionSerialNumber = strings.TrimSpace(string(runes[19:25]))
 	// 26-29
-	addenda02.TransactionDate = strings.TrimSpace(record[25:29])
+	addenda02.TransactionDate = strings.TrimSpace(string(runes[25:29]))
 	// 30-35
-	addenda02.AuthorizationCodeOrExpireDate = strings.TrimSpace(record[29:35])
+	addenda02.AuthorizationCodeOrExpireDate = strings.TrimSpace(string(runes[29:35]))
 	// 36-62
-	addenda02.TerminalLocation = strings.TrimSpace(record[35:62])
+	addenda02.TerminalLocation = strings.TrimSpace(string(runes[35:62]))
 	// 63-77
-	addenda02.TerminalCity = strings.TrimSpace(record[62:77])
+	addenda02.TerminalCity = strings.TrimSpace(string(runes[62:77]))
 	// 78-79
-	addenda02.TerminalState = strings.TrimSpace(record[77:79])
+	addenda02.TerminalState = strings.TrimSpace(string(runes[77:79]))
 	// 80-94
-	addenda02.TraceNumber = strings.TrimSpace(record[79:94])
+	addenda02.TraceNumber = strings.TrimSpace(string(runes[79:94]))
 }
 
 // String writes the Addenda02 struct to a 94 character string.

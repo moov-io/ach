@@ -54,21 +54,22 @@ func (fc *FileControl) Parse(record string) {
 	if utf8.RuneCountInString(record) < 55 {
 		return
 	}
+	runes := []rune(record)
 
 	// 1-1 Always "9"
 	// 2-7 The total number of Batch Header Record in the file. For example: "000003
-	fc.BatchCount = fc.parseNumField(record[1:7])
+	fc.BatchCount = fc.parseNumField(string(runes[1:7]))
 	// 8-13 e total number of blocks on the file, including the File Header and File Control records. One block is 10 lines, so it's effectively the number of lines in the file divided by 10.
-	fc.BlockCount = fc.parseNumField(record[7:13])
+	fc.BlockCount = fc.parseNumField(string(runes[7:13]))
 	// 14-21 Total number of Entry Detail Record in the file
-	fc.EntryAddendaCount = fc.parseNumField(record[13:21])
+	fc.EntryAddendaCount = fc.parseNumField(string(runes[13:21]))
 	// 22-31 Total of all positions 4-11 on each Entry Detail Record in the file. This is essentially the sum of all the RDFI routing numbers in the file.
 	// If the sum exceeds 10 digits (because you have lots of Entry Detail Records), lop off the most significant digits of the sum until there are only 10
-	fc.EntryHash = fc.parseNumField(record[21:31])
+	fc.EntryHash = fc.parseNumField(string(runes[21:31]))
 	// 32-43 Number of cents of debit entries within the file
-	fc.TotalDebitEntryDollarAmountInFile = fc.parseNumField(record[31:43])
+	fc.TotalDebitEntryDollarAmountInFile = fc.parseNumField(string(runes[31:43]))
 	// 44-55 Number of cents of credit entries within the file
-	fc.TotalCreditEntryDollarAmountInFile = fc.parseNumField(record[43:55])
+	fc.TotalCreditEntryDollarAmountInFile = fc.parseNumField(string(runes[43:55]))
 	// 56-94 Reserved Always blank (just fill with spaces)
 }
 

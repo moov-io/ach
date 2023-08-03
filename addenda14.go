@@ -79,21 +79,22 @@ func (addenda14 *Addenda14) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
+	runes := []rune(record)
 
 	// 1-1 Always 7
 	// 2-3 Always 14
-	addenda14.TypeCode = record[1:3]
+	addenda14.TypeCode = string(runes[1:3])
 	// 4-38 RDFIName
-	addenda14.RDFIName = strings.TrimSpace(record[3:38])
+	addenda14.RDFIName = strings.TrimSpace(string(runes[3:38]))
 	// 39-40 RDFIIDNumberQualifier
-	addenda14.RDFIIDNumberQualifier = record[38:40]
+	addenda14.RDFIIDNumberQualifier = string(runes[38:40])
 	// 41-74 RDFIIdentification
-	addenda14.RDFIIdentification = addenda14.parseStringField(record[40:74])
+	addenda14.RDFIIdentification = addenda14.parseStringField(string(runes[40:74]))
 	// 75-77
-	addenda14.RDFIBranchCountryCode = strings.TrimSpace(record[74:77])
+	addenda14.RDFIBranchCountryCode = strings.TrimSpace(string(runes[74:77]))
 	// 78-87 reserved - Leave blank
 	// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
-	addenda14.EntryDetailSequenceNumber = addenda14.parseNumField(record[87:94])
+	addenda14.EntryDetailSequenceNumber = addenda14.parseNumField(string(runes[87:94]))
 }
 
 // String writes the Addenda14 struct to a 94 character string.

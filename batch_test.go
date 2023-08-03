@@ -881,6 +881,7 @@ func TestBatchDishonoredReturnsCategory(t *testing.T) {
 	entry.Category = CategoryDishonoredReturn
 
 	addenda99Dishonored := mockAddenda99Dishonored()
+	addenda99Dishonored.TraceNumber = "231380100000001"
 	entry.Addenda99Dishonored = addenda99Dishonored
 
 	entryOne := NewEntryDetail()
@@ -896,6 +897,7 @@ func TestBatchDishonoredReturnsCategory(t *testing.T) {
 	entryOne.Category = CategoryReturn
 
 	addenda99DishonoredOne := mockAddenda99Dishonored()
+	addenda99DishonoredOne.TraceNumber = "231380100000001"
 	entryOne.Addenda99Dishonored = addenda99DishonoredOne
 
 	posHeader := NewBatchHeader()

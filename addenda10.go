@@ -72,21 +72,22 @@ func (addenda10 *Addenda10) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
+	runes := []rune(record)
 
 	// 1-1 Always 7
 	// 2-3 Always 10
-	addenda10.TypeCode = record[1:3]
+	addenda10.TypeCode = string(runes[1:3])
 	// 04-06 Describes the type of payment
-	addenda10.TransactionTypeCode = record[3:6]
+	addenda10.TransactionTypeCode = string(runes[3:6])
 	// 07-24 Payment Amount	For inbound IAT payments this field should contain the USD amount or may be blank.
-	addenda10.ForeignPaymentAmount = addenda10.parseNumField(record[06:24])
+	addenda10.ForeignPaymentAmount = addenda10.parseNumField(string(runes[06:24]))
 	//  25-46 Insert blanks or zeros
-	addenda10.ForeignTraceNumber = strings.TrimSpace(record[24:46])
+	addenda10.ForeignTraceNumber = strings.TrimSpace(string(runes[24:46]))
 	// 47-81 Receiving Company Name/Individual Name
-	addenda10.Name = strings.TrimSpace(record[46:81])
+	addenda10.Name = strings.TrimSpace(string(runes[46:81]))
 	// 82-87 reserved - Leave blank
 	// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
-	addenda10.EntryDetailSequenceNumber = addenda10.parseNumField(record[87:94])
+	addenda10.EntryDetailSequenceNumber = addenda10.parseNumField(string(runes[87:94]))
 }
 
 // String writes the Addenda10 struct to a 94 character string.

@@ -65,17 +65,18 @@ func (addenda17 *Addenda17) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
+	runes := []rune(record)
 
 	// 1-1 Always 7
 	// 2-3 Always 17
-	addenda17.TypeCode = record[1:3]
+	addenda17.TypeCode = string(runes[1:3])
 	// 4-83 Based on the information entered (04-83) 80 alphanumeric
-	addenda17.PaymentRelatedInformation = strings.TrimSpace(record[3:83])
+	addenda17.PaymentRelatedInformation = strings.TrimSpace(string(runes[3:83]))
 	// 84-87 SequenceNumber is consecutively assigned to each Addenda17 Record following
 	// an Entry Detail Record
-	addenda17.SequenceNumber = addenda17.parseNumField(record[83:87])
+	addenda17.SequenceNumber = addenda17.parseNumField(string(runes[83:87]))
 	// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
-	addenda17.EntryDetailSequenceNumber = addenda17.parseNumField(record[87:94])
+	addenda17.EntryDetailSequenceNumber = addenda17.parseNumField(string(runes[87:94]))
 }
 
 // String writes the Addenda17 struct to a 94 character string.
