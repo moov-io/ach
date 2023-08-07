@@ -26,6 +26,8 @@ import (
 	"unicode/utf8"
 
 	"github.com/moov-io/base"
+
+	"golang.org/x/net/html/charset"
 )
 
 var (
@@ -134,10 +136,25 @@ func ReadFiles(paths []string) ([]*File, error) {
 
 // NewReader returns a new ACH Reader that reads from r.
 func NewReader(r io.Reader) *Reader {
-	return &Reader{
+	out := &Reader{
 		maxLines: defaultMaxLines,
-		scanner:  bufio.NewScanner(r),
 	}
+
+	// charset.Reader will decode windows-1252 strings into utf-8 automatically.
+	rr, err := charset.NewReader(r, "text/plain")
+	if err != nil {
+		// Fake an empty reader if we read nothing
+		if err == io.EOF || err == io.ErrUnexpectedEOF {
+			out.scanner = bufio.NewScanner(strings.NewReader(""))
+		} else {
+			out.errors.Add(err)
+		}
+	}
+	if rr != nil {
+		out.scanner = bufio.NewScanner(rr)
+	}
+
+	return out
 }
 
 func (r *Reader) SetMaxLines(max int) {
