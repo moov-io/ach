@@ -19,7 +19,11 @@ package ach
 
 import (
 	"bytes"
+	"os"
+	"path/filepath"
 	"testing"
+
+	"golang.org/x/net/html/charset"
 
 	"github.com/stretchr/testify/require"
 )
@@ -106,5 +110,38 @@ func TestExtendedCharacters(t *testing.T) {
 		entries := b1.GetEntries()
 		require.Equal(t, `My {Store}            `, entries[0].IndividualName)
 		require.Equal(t, `RF1¦RF2`, entries[0].Addenda02.ReferenceInformationOne)
+	})
+
+	t.Run("detect", func(t *testing.T) {
+		bs, err := os.ReadFile(filepath.Join("test", "testdata", "nonascii-utf8.ach"))
+		require.NoError(t, err)
+		_, name, _ := charset.DetermineEncoding(bs, "plain/text")
+		require.Equal(t, "utf-8", name)
+
+		bs, err = os.ReadFile(filepath.Join("test", "testdata", "nonascii-windows1252.ach"))
+		require.NoError(t, err)
+		_, name, _ = charset.DetermineEncoding(bs, "plain/text")
+		require.Equal(t, "windows-1252", name)
+
+		bs, err = os.ReadFile(filepath.Join("test", "testdata", "nonascii.ach"))
+		require.NoError(t, err)
+		_, name, _ = charset.DetermineEncoding(bs, "plain/text")
+		require.Equal(t, "windows-1252", name)
+	})
+
+	t.Run("parse windows-1252", func(t *testing.T) {
+		file, err := ReadFile(filepath.Join("test", "testdata", "nonascii.ach"))
+		require.NoError(t, err)
+
+		require.Len(t, file.Batches, 1)
+		bh := file.Batches[0].GetHeader()
+		require.Equal(t, "REG.SALARY", bh.CompanyEntryDescription)
+
+		entries := file.Batches[0].GetEntries()
+		require.Len(t, entries, 1)
+		require.Equal(t, "0012Receiver Acc Name ", entries[0].IndividualName)
+
+		require.Len(t, entries[0].Addenda05, 12)
+		require.Contains(t, entries[0].Addenda05[0].PaymentRelatedInformation, "¦ZZ¦PAYEXPENSEPAY")
 	})
 }

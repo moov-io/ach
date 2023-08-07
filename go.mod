@@ -13,6 +13,8 @@ require (
 	github.com/moov-io/iso4217 v0.3.0
 	github.com/prometheus/client_golang v1.16.0
 	github.com/stretchr/testify v1.8.4
+	golang.org/x/net v0.10.0
+	golang.org/x/oauth2 v0.8.0
 	golang.org/x/text v0.11.0
 )
 
@@ -33,6 +35,7 @@ require (
 	github.com/rickar/cal/v2 v2.1.13 // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
+	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
