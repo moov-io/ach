@@ -201,31 +201,32 @@ func (ed *EntryDetail) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
+	runes := []rune(record)
 
 	// 1-1 Always "6"
 	// 2-3 is checking credit 22 debit 27 savings credit 32 debit 37
-	ed.TransactionCode = ed.parseNumField(record[1:3])
+	ed.TransactionCode = ed.parseNumField(string(runes[1:3]))
 	// 4-11 the RDFI's routing number without the last digit.
-	ed.RDFIIdentification = record[3:11]
+	ed.RDFIIdentification = string(runes[3:11])
 	// 12-12 The last digit of the RDFI's routing number
-	ed.CheckDigit = record[11:12]
+	ed.CheckDigit = string(runes[11:12])
 	// 13-29 The receiver's bank account number you are crediting/debiting
-	ed.DFIAccountNumber = ed.parseStringFieldWithOpts(record[12:29], ed.validateOpts)
+	ed.DFIAccountNumber = ed.parseStringFieldWithOpts(string(runes[12:29]), ed.validateOpts)
 	// 30-39 Number of cents you are debiting/crediting this account
-	ed.Amount = ed.parseNumField(record[29:39])
+	ed.Amount = ed.parseNumField(string(runes[29:39]))
 	// 40-54 An internal identification (alphanumeric) that you use to uniquely identify this Entry Detail Record
-	ed.IdentificationNumber = record[39:54]
+	ed.IdentificationNumber = string(runes[39:54])
 	// 55-76 The name of the receiver, usually the name on the bank account
-	ed.IndividualName = record[54:76]
+	ed.IndividualName = string(runes[54:76])
 	// 77-78 allows ODFIs to include codes of significance only to them, normally blank
 
 	// For WEB and TEL batches this field is the PaymentType which is either R(reoccurring) or S(single)
-	ed.DiscretionaryData = record[76:78]
+	ed.DiscretionaryData = string(runes[76:78])
 	// 79-79 1 if addenda exists 0 if it does not
-	ed.AddendaRecordIndicator = ed.parseNumField(record[78:79])
+	ed.AddendaRecordIndicator = ed.parseNumField(string(runes[78:79]))
 	// 80-94 An internal identification (numeric) that you use to uniquely identify
 	// this Entry Detail Record This number should be unique to the transaction and will help identify the transaction in case of an inquiry
-	ed.TraceNumber = record[79:94]
+	ed.TraceNumber = string(runes[79:94])
 }
 
 // String writes the EntryDetail struct to a 94 character string.

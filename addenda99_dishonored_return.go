@@ -73,16 +73,17 @@ func (Addenda99Dishonored *Addenda99Dishonored) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
+	runes := []rune(record)
 
-	Addenda99Dishonored.TypeCode = record[1:3]
-	Addenda99Dishonored.DishonoredReturnReasonCode = record[3:6]
-	Addenda99Dishonored.OriginalEntryTraceNumber = record[6:21]
-	Addenda99Dishonored.OriginalReceivingDFIIdentification = record[27:35]
-	Addenda99Dishonored.ReturnTraceNumber = record[38:53]
-	Addenda99Dishonored.ReturnSettlementDate = record[53:56]
-	Addenda99Dishonored.ReturnReasonCode = record[56:58]
-	Addenda99Dishonored.AddendaInformation = record[58:79]
-	Addenda99Dishonored.TraceNumber = record[79:94]
+	Addenda99Dishonored.TypeCode = string(runes[1:3])
+	Addenda99Dishonored.DishonoredReturnReasonCode = string(runes[3:6])
+	Addenda99Dishonored.OriginalEntryTraceNumber = string(runes[6:21])
+	Addenda99Dishonored.OriginalReceivingDFIIdentification = string(runes[27:35])
+	Addenda99Dishonored.ReturnTraceNumber = string(runes[38:53])
+	Addenda99Dishonored.ReturnSettlementDate = string(runes[53:56])
+	Addenda99Dishonored.ReturnReasonCode = string(runes[56:58])
+	Addenda99Dishonored.AddendaInformation = string(runes[58:79])
+	Addenda99Dishonored.TraceNumber = string(runes[79:94])
 }
 
 func (Addenda99Dishonored *Addenda99Dishonored) String() string {

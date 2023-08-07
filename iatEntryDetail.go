@@ -147,21 +147,22 @@ func (iatEd *IATEntryDetail) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
+	runes := []rune(record)
 
 	// 1-1 Always "6"
 	// 2-3 is checking credit 22 debit 27 savings credit 32 debit 37
-	iatEd.TransactionCode = iatEd.parseNumField(record[1:3])
+	iatEd.TransactionCode = iatEd.parseNumField(string(runes[1:3]))
 	// 4-11 the RDFI's routing number without the last digit.
-	iatEd.RDFIIdentification = iatEd.parseStringField(record[3:11])
+	iatEd.RDFIIdentification = iatEd.parseStringField(string(runes[3:11]))
 	// 12-12 The last digit of the RDFI's routing number
-	iatEd.CheckDigit = iatEd.parseStringField(record[11:12])
+	iatEd.CheckDigit = iatEd.parseStringField(string(runes[11:12]))
 	// 13-16 Number of addenda records
-	iatEd.AddendaRecords = iatEd.parseNumField(record[12:16])
+	iatEd.AddendaRecords = iatEd.parseNumField(string(runes[12:16]))
 	// 17-29 reserved - Leave blank
 	// 30-39 Number of cents you are debiting/crediting this account
-	iatEd.Amount = iatEd.parseNumField(record[29:39])
+	iatEd.Amount = iatEd.parseNumField(string(runes[29:39]))
 	// 40-74 The foreign receiver's account number you are crediting/debiting
-	iatEd.DFIAccountNumber = record[39:74]
+	iatEd.DFIAccountNumber = string(runes[39:74])
 	// 75-76 reserved Leave blank
 	// 77 OFACScreeningIndicator
 	iatEd.OFACScreeningIndicator = " "
@@ -169,10 +170,10 @@ func (iatEd *IATEntryDetail) Parse(record string) {
 	iatEd.SecondaryOFACScreeningIndicator = " "
 	// 79-79 1 if addenda exists 0 if it does not
 	//iatEd.AddendaRecordIndicator = 1
-	iatEd.AddendaRecordIndicator = iatEd.parseNumField(record[78:79])
+	iatEd.AddendaRecordIndicator = iatEd.parseNumField(string(runes[78:79]))
 	// 80-94 An internal identification (alphanumeric) that you use to uniquely identify
 	// this Entry Detail Record This number should be unique to the transaction and will help identify the transaction in case of an inquiry
-	iatEd.TraceNumber = strings.TrimSpace(record[79:94])
+	iatEd.TraceNumber = strings.TrimSpace(string(runes[79:94]))
 }
 
 // String writes the EntryDetail struct to a 94 character string.

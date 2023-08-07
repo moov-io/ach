@@ -84,21 +84,22 @@ func (addenda13 *Addenda13) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
+	runes := []rune(record)
 
 	// 1-1 Always 7
 	// 2-3 Always 13
-	addenda13.TypeCode = record[1:3]
+	addenda13.TypeCode = string(runes[1:3])
 	// 4-38 ODFIName
-	addenda13.ODFIName = strings.TrimSpace(record[3:38])
+	addenda13.ODFIName = strings.TrimSpace(string(runes[3:38]))
 	// 39-40 ODFIIDNumberQualifier
-	addenda13.ODFIIDNumberQualifier = record[38:40]
+	addenda13.ODFIIDNumberQualifier = string(runes[38:40])
 	// 41-74 ODFIIdentification
-	addenda13.ODFIIdentification = addenda13.parseStringField(record[40:74])
+	addenda13.ODFIIdentification = addenda13.parseStringField(string(runes[40:74]))
 	// 75-77
-	addenda13.ODFIBranchCountryCode = strings.TrimSpace(record[74:77])
+	addenda13.ODFIBranchCountryCode = strings.TrimSpace(string(runes[74:77]))
 	// 78-87 reserved - Leave blank
 	// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
-	addenda13.EntryDetailSequenceNumber = addenda13.parseNumField(record[87:94])
+	addenda13.EntryDetailSequenceNumber = addenda13.parseNumField(string(runes[87:94]))
 }
 
 // String writes the Addenda13 struct to a 94 character string.

@@ -64,17 +64,18 @@ func (addenda15 *Addenda15) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
+	runes := []rune(record)
 
 	// 1-1 Always 7
 	// 2-3 Always 15
-	addenda15.TypeCode = record[1:3]
+	addenda15.TypeCode = string(runes[1:3])
 	// 4-18
-	addenda15.ReceiverIDNumber = addenda15.parseStringField(record[3:18])
+	addenda15.ReceiverIDNumber = addenda15.parseStringField(string(runes[3:18]))
 	// 19-53
-	addenda15.ReceiverStreetAddress = strings.TrimSpace(record[18:53])
+	addenda15.ReceiverStreetAddress = strings.TrimSpace(string(runes[18:53]))
 	// 54-87 reserved - Leave blank
 	// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
-	addenda15.EntryDetailSequenceNumber = addenda15.parseNumField(record[87:94])
+	addenda15.EntryDetailSequenceNumber = addenda15.parseNumField(string(runes[87:94]))
 }
 
 // String writes the Addenda15 struct to a 94 character string.

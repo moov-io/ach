@@ -121,21 +121,22 @@ func (fh *FileHeader) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
+	runes := []rune(record)
 
 	// (character position 1-1) Always "1"
 	// (2-3) Always "01"
 	fh.priorityCode = "01"
 	// (4-13) A blank space followed by your ODFI's routing number. For example: " 121140399"
-	fh.ImmediateDestination = trimRoutingNumberLeadingZero(fh.parseStringField(record[3:13]))
+	fh.ImmediateDestination = trimRoutingNumberLeadingZero(fh.parseStringField(string(runes[3:13])))
 	// (14-23) A 10-digit number assigned to you by the ODFI once they approve you to originate ACH files through them
-	fh.ImmediateOrigin = trimRoutingNumberLeadingZero(fh.parseStringField(record[13:23]))
+	fh.ImmediateOrigin = trimRoutingNumberLeadingZero(fh.parseStringField(string(runes[13:23])))
 	// 24-29 Today's date in YYMMDD format
 	// must be after today's date.
-	fh.FileCreationDate = fh.validateSimpleDate(record[23:29])
+	fh.FileCreationDate = fh.validateSimpleDate(string(runes[23:29]))
 	// 30-33 The current time in HHmm format
-	fh.FileCreationTime = fh.validateSimpleTime(record[29:33])
+	fh.FileCreationTime = fh.validateSimpleTime(string(runes[29:33]))
 	// 35-37 Always "A"
-	fh.FileIDModifier = record[33:34]
+	fh.FileIDModifier = string(runes[33:34])
 	// 35-37 always "094"
 	fh.recordSize = "094"
 	// 38-39 always "10"
@@ -143,11 +144,11 @@ func (fh *FileHeader) Parse(record string) {
 	// 40 always "1"
 	fh.formatCode = "1"
 	// 41-63 The name of the ODFI. example "SILICON VALLEY BANK    "
-	fh.ImmediateDestinationName = fh.parseStringFieldWithOpts(record[40:63], fh.validateOpts)
+	fh.ImmediateDestinationName = fh.parseStringFieldWithOpts(string(runes[40:63]), fh.validateOpts)
 	// 64-86 ACH operator or sending point that is sending the file
-	fh.ImmediateOriginName = fh.parseStringFieldWithOpts(record[63:86], fh.validateOpts)
+	fh.ImmediateOriginName = fh.parseStringFieldWithOpts(string(runes[63:86]), fh.validateOpts)
 	// 87-94 Optional field that may be used to describe the ACH file for internal accounting purposes
-	fh.ReferenceCode = fh.parseStringFieldWithOpts(record[86:94], fh.validateOpts)
+	fh.ReferenceCode = fh.parseStringFieldWithOpts(string(runes[86:94]), fh.validateOpts)
 }
 
 func trimRoutingNumberLeadingZero(s string) string {

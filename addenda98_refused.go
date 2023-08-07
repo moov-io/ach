@@ -76,19 +76,20 @@ func (addenda98Refused *Addenda98Refused) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
+	runes := []rune(record)
 
 	// 1-1 Always 7
 	// 2-3 Always "98"
-	addenda98Refused.TypeCode = strings.TrimSpace(record[1:3])
-	addenda98Refused.RefusedChangeCode = strings.TrimSpace(record[3:6])
-	addenda98Refused.OriginalTrace = strings.TrimSpace(record[6:21])
+	addenda98Refused.TypeCode = strings.TrimSpace(string(runes[1:3]))
+	addenda98Refused.RefusedChangeCode = strings.TrimSpace(string(runes[3:6]))
+	addenda98Refused.OriginalTrace = strings.TrimSpace(string(runes[6:21]))
 	// Positions 22-27 are Reserved
-	addenda98Refused.OriginalDFI = addenda98Refused.parseStringField(record[27:35])
-	addenda98Refused.CorrectedData = strings.TrimSpace(record[35:64])
-	addenda98Refused.ChangeCode = strings.TrimSpace(record[64:67])
-	addenda98Refused.TraceSequenceNumber = strings.TrimSpace(record[67:74])
+	addenda98Refused.OriginalDFI = addenda98Refused.parseStringField(string(runes[27:35]))
+	addenda98Refused.CorrectedData = strings.TrimSpace(string(runes[35:64]))
+	addenda98Refused.ChangeCode = strings.TrimSpace(string(runes[64:67]))
+	addenda98Refused.TraceSequenceNumber = strings.TrimSpace(string(runes[67:74]))
 	// Positions 75-79 are Reserved
-	addenda98Refused.TraceNumber = strings.TrimSpace(record[79:94])
+	addenda98Refused.TraceNumber = strings.TrimSpace(string(runes[79:94]))
 }
 
 // String writes the Addenda98 struct to a 94 character string

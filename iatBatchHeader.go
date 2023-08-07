@@ -190,56 +190,57 @@ func (iatBh *IATBatchHeader) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
+	runes := []rune(record)
 
 	// 1-1 Always "5"
 	// 2-4 MixedCreditsAnDebits (220), CReditsOnly 9220), DebitsOnly (225)"
-	iatBh.ServiceClassCode = iatBh.parseNumField(record[1:4])
+	iatBh.ServiceClassCode = iatBh.parseNumField(string(runes[1:4]))
 	// 05-20  Blank except for corrected IAT entries
-	iatBh.IATIndicator = iatBh.parseStringField(record[4:20])
+	iatBh.IATIndicator = iatBh.parseStringField(string(runes[4:20]))
 	// 21-22 A code indicating currency conversion
 	// “FV” Fixed-to-Variable
 	// “VF” Variable-to-Fixed
 	// “FF” Fixed-to-Fixed
-	iatBh.ForeignExchangeIndicator = iatBh.parseStringField(record[20:22])
+	iatBh.ForeignExchangeIndicator = iatBh.parseStringField(string(runes[20:22]))
 	// 23-23 Foreign Exchange Reference Indicator – Refers to “Foreign Exchange Reference”
 	// field and is filled by the gateway operator. Valid entries are:
 	// 1 - Foreign Exchange Rate;
 	// 2 - Foreign Exchange Reference Number; or
 	// 3 - Space Filled
-	iatBh.ForeignExchangeReferenceIndicator = iatBh.parseNumField(record[22:23])
+	iatBh.ForeignExchangeReferenceIndicator = iatBh.parseNumField(string(runes[22:23]))
 	// 24-38 Contains either the foreign exchange rate used to execute the
 	// foreign exchange conversion of a cross-border entry or another
 	// reference to the foreign exchange transaction.
-	iatBh.ForeignExchangeReference = iatBh.parseStringField(record[23:38])
+	iatBh.ForeignExchangeReference = iatBh.parseStringField(string(runes[23:38]))
 	// 39-40  Receiver ISO Country Code - For entries
 	// destined to account holder in the U.S., this would be 'US'.
-	iatBh.ISODestinationCountryCode = iatBh.parseStringField(record[38:40])
+	iatBh.ISODestinationCountryCode = iatBh.parseStringField(string(runes[38:40]))
 	// 41-50 For U.S. entities: the number assigned will be your tax ID
 	// For non-U.S. entities: the number assigned will be your DDA number,
 	// or the last 9 characters of your account number if it exceeds 9 characters
-	iatBh.OriginatorIdentification = iatBh.parseStringField(record[40:50])
+	iatBh.OriginatorIdentification = iatBh.parseStringField(string(runes[40:50]))
 	// 51-53 IAT for both consumer and non consumer international payments
-	iatBh.StandardEntryClassCode = record[50:53]
+	iatBh.StandardEntryClassCode = string(runes[50:53])
 	// 54-63 Your description of the transaction. This text will appear on the receivers' bank statement.
 	// For example: "Payroll   "
-	iatBh.CompanyEntryDescription = strings.TrimSpace(record[53:63])
+	iatBh.CompanyEntryDescription = strings.TrimSpace(string(runes[53:63]))
 	// 64-66 Originator ISO Currency Code
-	iatBh.ISOOriginatingCurrencyCode = iatBh.parseStringField(record[63:66])
+	iatBh.ISOOriginatingCurrencyCode = iatBh.parseStringField(string(runes[63:66]))
 	// 67-69 Receiver ISO Currency Code
-	iatBh.ISODestinationCurrencyCode = iatBh.parseStringField(record[66:69])
+	iatBh.ISODestinationCurrencyCode = iatBh.parseStringField(string(runes[66:69]))
 	// 70-75 Date transactions are to be posted to the receivers' account.
 	// You almost always want the transaction to post as soon as possible, so put tomorrow's date in YYMMDD format
-	iatBh.EffectiveEntryDate = iatBh.validateSimpleDate(record[69:75])
+	iatBh.EffectiveEntryDate = iatBh.validateSimpleDate(string(runes[69:75]))
 	// 76-78 Always blank (just fill with spaces)
-	iatBh.SettlementDate = iatBh.validateSettlementDate(record[75:78])
+	iatBh.SettlementDate = iatBh.validateSettlementDate(string(runes[75:78]))
 	// 79-79 Always 1
-	iatBh.OriginatorStatusCode = iatBh.parseNumField(record[78:79])
+	iatBh.OriginatorStatusCode = iatBh.parseNumField(string(runes[78:79]))
 	// 80-87 Your ODFI's routing number without the last digit. The last digit is simply a
 	// checksum digit, which is why it is not necessary
-	iatBh.ODFIIdentification = iatBh.parseStringField(record[79:87])
+	iatBh.ODFIIdentification = iatBh.parseStringField(string(runes[79:87]))
 	// 88-94 Sequential number of this Batch Header Record
 	// For example, put "1" if this is the first Batch Header Record in the file
-	iatBh.BatchNumber = iatBh.parseNumField(record[87:94])
+	iatBh.BatchNumber = iatBh.parseNumField(string(runes[87:94]))
 }
 
 // String writes the BatchHeader struct to a 94 character string.

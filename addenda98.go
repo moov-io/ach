@@ -85,20 +85,21 @@ func (addenda98 *Addenda98) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
+	runes := []rune(record)
 
 	// 1-1 Always 7
 	// 2-3 Always "98"
-	addenda98.TypeCode = record[1:3]
+	addenda98.TypeCode = string(runes[1:3])
 	// 4-6
-	addenda98.ChangeCode = record[3:6]
+	addenda98.ChangeCode = string(runes[3:6])
 	// 7-21
-	addenda98.OriginalTrace = strings.TrimSpace(record[6:21])
+	addenda98.OriginalTrace = strings.TrimSpace(string(runes[6:21]))
 	// 28-35
-	addenda98.OriginalDFI = addenda98.parseStringField(record[27:35])
+	addenda98.OriginalDFI = addenda98.parseStringField(string(runes[27:35]))
 	// 36-64
-	addenda98.CorrectedData = strings.TrimSpace(record[35:64])
+	addenda98.CorrectedData = strings.TrimSpace(string(runes[35:64]))
 	// 80-94
-	addenda98.TraceNumber = strings.TrimSpace(record[79:94])
+	addenda98.TraceNumber = strings.TrimSpace(string(runes[79:94]))
 }
 
 // String writes the Addenda98 struct to a 94 character string

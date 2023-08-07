@@ -152,41 +152,42 @@ func (bh *BatchHeader) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
+	runes := []rune(record)
 
 	// 1-1 Always "5"
 	// 2-4 MixedCreditsAnDebits (200), CreditsOnly (220), DebitsOnly (225)
-	bh.ServiceClassCode = bh.parseNumField(record[1:4])
+	bh.ServiceClassCode = bh.parseNumField(string(runes[1:4]))
 	// 5-20 Your company's name. This name may appear on the receivers' statements prepared by the RDFI.
-	bh.CompanyName = bh.parseStringFieldWithOpts(record[4:20], bh.validateOpts)
+	bh.CompanyName = bh.parseStringFieldWithOpts(string(runes[4:20]), bh.validateOpts)
 	// 21-40 Optional field you may use to describe the batch for internal accounting purposes
-	bh.CompanyDiscretionaryData = bh.parseStringFieldWithOpts(record[20:40], bh.validateOpts)
+	bh.CompanyDiscretionaryData = bh.parseStringFieldWithOpts(string(runes[20:40]), bh.validateOpts)
 	// 41-50 A 10-digit number assigned to you by the ODFI once they approve you to
 	// originate ACH files through them. This is the same as the "Immediate origin" field in File Header Record
-	bh.CompanyIdentification = bh.parseStringFieldWithOpts(record[40:50], bh.validateOpts)
+	bh.CompanyIdentification = bh.parseStringFieldWithOpts(string(runes[40:50]), bh.validateOpts)
 	// 51-53 If the entries are PPD (credits/debits towards consumer account), use PPD.
 	// If the entries are CCD (credits/debits towards corporate account), use CCD.
 	// The difference between the 2 SEC codes are outside of the scope of this post.
-	bh.StandardEntryClassCode = record[50:53]
+	bh.StandardEntryClassCode = string(runes[50:53])
 	// 54-63 Your description of the transaction. This text will appear on the receivers' bank statement.
 	// For example: "Payroll   "
-	bh.CompanyEntryDescription = bh.parseStringFieldWithOpts(record[53:63], bh.validateOpts)
+	bh.CompanyEntryDescription = bh.parseStringFieldWithOpts(string(runes[53:63]), bh.validateOpts)
 	// 64-69 The date you choose to identify the transactions in YYMMDD format.
 	// This date may be printed on the receivers' bank statement by the RDFI
-	bh.CompanyDescriptiveDate = bh.parseStringFieldWithOpts(record[63:69], bh.validateOpts)
+	bh.CompanyDescriptiveDate = bh.parseStringFieldWithOpts(string(runes[63:69]), bh.validateOpts)
 	// 70-75 Date transactions are to be posted to the receivers' account.
 	// You almost always want the transaction to post as soon as possible, so put tomorrow's date in YYMMDD format
-	bh.EffectiveEntryDate = bh.validateSimpleDate(record[69:75])
+	bh.EffectiveEntryDate = bh.validateSimpleDate(string(runes[69:75]))
 	// 76-78 Always blank if creating batches (just fill with spaces).
 	// Set to file value when parsing. Julian day format.
-	bh.SettlementDate = bh.validateSettlementDate(record[75:78])
+	bh.SettlementDate = bh.validateSettlementDate(string(runes[75:78]))
 	// 79-79 Always 1
-	bh.OriginatorStatusCode = bh.parseNumField(record[78:79])
+	bh.OriginatorStatusCode = bh.parseNumField(string(runes[78:79]))
 	// 80-87 Your ODFI's routing number without the last digit. The last digit is simply a
 	// checksum digit, which is why it is not necessary
-	bh.ODFIIdentification = bh.parseStringFieldWithOpts(record[79:87], bh.validateOpts)
+	bh.ODFIIdentification = bh.parseStringFieldWithOpts(string(runes[79:87]), bh.validateOpts)
 	// 88-94 Sequential number of this Batch Header Record
 	// For example, put "1" if this is the first Batch Header Record in the file
-	bh.BatchNumber = bh.parseNumField(record[87:94])
+	bh.BatchNumber = bh.parseNumField(string(runes[87:94]))
 }
 
 // String writes the BatchHeader struct to a 94 character string.

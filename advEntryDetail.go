@@ -126,36 +126,37 @@ func (ed *ADVEntryDetail) Parse(record string) {
 	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
+	runes := []rune(record)
 
 	// 1-1 Always "6"
 	// 2-3 is checking credit 22 debit 27 savings credit 32 debit 37
-	ed.TransactionCode = ed.parseNumField(record[1:3])
+	ed.TransactionCode = ed.parseNumField(string(runes[1:3]))
 	// 4-11 the RDFI's routing number without the last digit.
-	ed.RDFIIdentification = ed.parseStringField(record[3:11])
+	ed.RDFIIdentification = ed.parseStringField(string(runes[3:11]))
 	// 12-12 The last digit of the RDFI's routing number
-	ed.CheckDigit = ed.parseStringField(record[11:12])
+	ed.CheckDigit = ed.parseStringField(string(runes[11:12]))
 	// 13-27 The receiver's bank account number you are crediting/debiting
-	ed.DFIAccountNumber = record[12:27]
+	ed.DFIAccountNumber = string(runes[12:27])
 	// 28-39 Number of cents you are debiting/crediting this account
-	ed.Amount = ed.parseNumField(record[27:39])
+	ed.Amount = ed.parseNumField(string(runes[27:39]))
 	// 40-48 Advice Routing Number
-	ed.AdviceRoutingNumber = ed.parseStringField(record[39:48])
+	ed.AdviceRoutingNumber = ed.parseStringField(string(runes[39:48]))
 	// 49-53 File Identification
-	ed.FileIdentification = ed.parseStringField(record[48:53])
+	ed.FileIdentification = ed.parseStringField(string(runes[48:53]))
 	// 54-54 ACH Operator Data
-	ed.ACHOperatorData = ed.parseStringField(record[53:54])
+	ed.ACHOperatorData = ed.parseStringField(string(runes[53:54]))
 	// 55-76 Individual Name
-	ed.IndividualName = record[54:76]
+	ed.IndividualName = string(runes[54:76])
 	// 77-78 allows ODFIs to include codes of significance only to them, normally blank
-	ed.DiscretionaryData = record[76:78]
+	ed.DiscretionaryData = string(runes[76:78])
 	// 79-79 1 if addenda exists 0 if it does not
-	ed.AddendaRecordIndicator = ed.parseNumField(record[78:79])
+	ed.AddendaRecordIndicator = ed.parseNumField(string(runes[78:79]))
 	// 80-87
-	ed.ACHOperatorRoutingNumber = ed.parseStringField(record[79:87])
+	ed.ACHOperatorRoutingNumber = ed.parseStringField(string(runes[79:87]))
 	// 88-90
-	ed.JulianDay = ed.parseNumField(record[87:90])
+	ed.JulianDay = ed.parseNumField(string(runes[87:90]))
 	// 91-94
-	ed.SequenceNumber = ed.parseNumField(record[90:94])
+	ed.SequenceNumber = ed.parseNumField(string(runes[90:94]))
 }
 
 // String writes the ADVEntryDetail struct to a 94 character string.
