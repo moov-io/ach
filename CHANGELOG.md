@@ -1,3 +1,15 @@
+## v1.32.1 (Released 2023-08-07)
+
+IMPROVEMENTS
+
+- feat: detect Windows-1252 encoding and decode to utf-8
+- fix: parse field lengths according by runes instead of bytes
+
+BUILD
+
+- build(deps): bump github.com/moov-io/iso4217 from 0.2.1 to 0.3.0
+- fix(deps): update module github.com/moov-io/base to v0.45.1
+
 ## v1.32.0 (Released 2023-07-19)
 
 IMPROVEMENTS
