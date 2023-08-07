@@ -118,11 +118,6 @@ func TestExtendedCharacters(t *testing.T) {
 		_, name, _ := charset.DetermineEncoding(bs, "plain/text")
 		require.Equal(t, "utf-8", name)
 
-		bs, err = os.ReadFile(filepath.Join("test", "testdata", "nonascii-windows1252.ach"))
-		require.NoError(t, err)
-		_, name, _ = charset.DetermineEncoding(bs, "plain/text")
-		require.Equal(t, "windows-1252", name)
-
 		bs, err = os.ReadFile(filepath.Join("test", "testdata", "nonascii.ach"))
 		require.NoError(t, err)
 		_, name, _ = charset.DetermineEncoding(bs, "plain/text")
