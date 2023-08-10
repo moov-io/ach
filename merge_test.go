@@ -149,7 +149,6 @@ func TestMergeFiles__together(t *testing.T) {
 			t.Fatalf("invalid file: %v", err)
 		}
 	}
-
 }
 
 func TestMergeFiles__apart(t *testing.T) {
@@ -184,7 +183,7 @@ func TestMergeFiles__apart(t *testing.T) {
 	}
 }
 
-func BenchmarkMergeFiles__lineCount(b *testing.B) {
+func BenchmarkLineCount(b *testing.B) {
 	newACHFile := func() *File {
 		// Nacha files have a max of 10,000 lines and a batch is
 		// a header, entries, and control.
@@ -458,5 +457,40 @@ func populateFileWithMockBatches(t *testing.T, numBatches int, file *File) {
 		}
 
 		file.AddBatch(batch)
+	}
+}
+
+func TestMerger__MergeFile(t *testing.T) {
+	f1, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+
+	f2, err := readACHFilepath(filepath.Join("test", "testdata", "web-debit.ach"))
+	require.NoError(t, err)
+	f2.Header = f1.Header // replace Header so they're merged into one file
+
+	f3, err := readACHFilepath(filepath.Join("test", "testdata", "20110805A.ach"))
+	require.NoError(t, err)
+	f3.Header = f1.Header
+
+	require.Len(t, f1.Batches, 1)
+	require.Len(t, f2.Batches, 3)
+	require.Len(t, f3.Batches, 2)
+
+	var cond Conditions
+
+	m := NewMerger(nil)
+	err = m.MergeFile(f1, cond)
+	require.NoError(t, err)
+	err = m.MergeFile(f2, cond)
+	require.NoError(t, err)
+	err = m.MergeFile(f3, cond)
+	require.NoError(t, err)
+
+	out := m.Files()
+	require.Len(t, out, 1)
+	require.Len(t, out[0].Batches, 6)
+
+	for i := range out {
+		require.NoError(t, out[i].Validate(), fmt.Sprintf("batch[%d] is invalid", i))
 	}
 }
