@@ -47,28 +47,11 @@ func NewMerger(opts *ValidateOpts) Merger {
 
 // Merge can merge ACH files with custom ValidateOpts
 type Merger interface {
-	Files() []*File
-	MergeFile(file *File, conditions Conditions) error
-
 	MergeWith(files []*File, conditions Conditions) ([]*File, error)
 }
 
 type merger struct {
-	merged []*File
-	opts   *ValidateOpts
-}
-
-func (m *merger) Files() []*File {
-	return m.merged
-}
-
-func (m *merger) MergeFile(file *File, conditions Conditions) error {
-	result, err := m.MergeWith(append(m.merged, file), conditions)
-	if err != nil {
-		return err
-	}
-	m.merged = result
-	return nil
+	opts *ValidateOpts
 }
 
 func (m *merger) MergeWith(files []*File, conditions Conditions) ([]*File, error) {

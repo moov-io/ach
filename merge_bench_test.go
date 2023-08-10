@@ -79,24 +79,4 @@ func BenchmarkMergeFiles(b *testing.B) {
 			b.Error("no files merged")
 		}
 	})
-
-	b.Run("Merger.MergeFile", func(b *testing.B) {
-		files := randomFiles(b)
-		m := NewMerger(nil)
-		var cond Conditions
-		b.ReportAllocs()
-		b.ResetTimer()
-
-		for i := range files {
-			err := m.MergeFile(files[i], cond)
-			if err != nil {
-				b.Error(err)
-			}
-		}
-		b.StopTimer()
-
-		if n := len(m.Files()); n == 0 {
-			b.Error("no files merged")
-		}
-	})
 }
