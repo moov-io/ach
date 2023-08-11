@@ -1,3 +1,15 @@
+## v1.32.2 (Released 2023-08-11)
+
+IMPROVEMENTS
+
+- fix: Corrected Data is 29 characters, not 22
+- fix: don't print blank line for missing IAT addendas
+- test/issues: match IAT output byte-for-byte
+
+BUILD
+
+- build(deps): bump golang from 1.20-alpine to 1.21-alpine
+
 ## v1.32.1 (Released 2023-08-07)
 
 IMPROVEMENTS
