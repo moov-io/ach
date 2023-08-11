@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 func mockAddenda98() *Addenda98 {
@@ -372,6 +373,9 @@ func TestCorrectedData__ParseCorrectedData(t *testing.T) {
 	if v := run("C03", "987654320   123456"); v.AccountNumber != "123456" || v.RoutingNumber != "987654320" {
 		t.Errorf("%#v", v)
 	}
+	if v := run("C03", "987654320              123456"); v.AccountNumber != "123456" || v.RoutingNumber != "987654320" {
+		t.Errorf("%#v", v)
+	}
 	if v := run("C04", "Jane Doe"); v.Name != "Jane Doe" {
 		t.Errorf("%#v", v)
 	}
@@ -385,6 +389,9 @@ func TestCorrectedData__ParseCorrectedData(t *testing.T) {
 		t.Errorf("%#v", v)
 	}
 	if v := run("C07", "9876543201242415    22"); v.RoutingNumber != "987654320" || v.AccountNumber != "1242415" || v.TransactionCode != 22 {
+		t.Errorf("%#v", v)
+	}
+	if v := run("C07", "9876543201242415           22"); v.RoutingNumber != "987654320" || v.AccountNumber != "1242415" || v.TransactionCode != 22 {
 		t.Errorf("%#v", v)
 	}
 	if v := run("C07", "1234"); v != nil {
@@ -403,35 +410,27 @@ func TestCorrectedData__ParseCorrectedData(t *testing.T) {
 
 func TestCorrectedData__WriteCorrectionData(t *testing.T) {
 	data := &CorrectedData{AccountNumber: "12345"}
-	if v := WriteCorrectionData("C01", data); v != "12345                 " {
-		t.Errorf("C01 got %q (length=%d)", v, len(v))
-	}
+	require.Equal(t, "12345                        ", WriteCorrectionData("C01", data))
+
 	data = &CorrectedData{RoutingNumber: "987654320"}
-	if v := WriteCorrectionData("C02", data); v != "987654320             " {
-		t.Errorf("C02 got %q (length=%d)", v, len(v))
-	}
+	require.Equal(t, "987654320                    ", WriteCorrectionData("C02", data))
+
 	data = &CorrectedData{AccountNumber: "123", RoutingNumber: "987654320"}
-	if v := WriteCorrectionData("C03", data); v != "987654320          123" {
-		t.Errorf("C03 got %q (length=%d)", v, len(v))
-	}
+	require.Equal(t, "987654320                 123", WriteCorrectionData("C03", data))
+
 	data = &CorrectedData{Name: "Jane Doe"}
-	if v := WriteCorrectionData("C04", data); v != "Jane Doe              " {
-		t.Errorf("C04 got %q (length=%d)", v, len(v))
-	}
+	require.Equal(t, "Jane Doe                     ", WriteCorrectionData("C04", data))
+
 	data = &CorrectedData{TransactionCode: 22}
-	if v := WriteCorrectionData("C05", data); v != "22                    " {
-		t.Errorf("C05 got %q (length=%d)", v, len(v))
-	}
+	require.Equal(t, "22                           ", WriteCorrectionData("C05", data))
+
 	data = &CorrectedData{AccountNumber: "5421", TransactionCode: 27}
-	if v := WriteCorrectionData("C06", data); v != "5421                27" {
-		t.Errorf("C06 got %q (length=%d)", v, len(v))
-	}
+	require.Equal(t, "5421                       27", WriteCorrectionData("C06", data))
+
 	data = &CorrectedData{RoutingNumber: "987654320", AccountNumber: "5421", TransactionCode: 32}
-	if v := WriteCorrectionData("C07", data); v != "9876543205421       32" {
-		t.Errorf("C07 got %q (length=%d)", v, len(v))
-	}
+	require.Equal(t, "9876543205421              32", WriteCorrectionData("C07", data))
+
 	data = &CorrectedData{Identification: "FooBar"}
-	if v := WriteCorrectionData("C09", data); v != "FooBar                " {
-		t.Errorf("C09 got %q (length=%d)", v, len(v))
-	}
+	require.Equal(t, "FooBar                       ", WriteCorrectionData("C09", data))
+
 }

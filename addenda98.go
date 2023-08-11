@@ -318,32 +318,34 @@ func first(size int, data string) string {
 	return strings.TrimSpace(data[:size])
 }
 
+const correctedDataCharLength = 29
+
 // ParseCorrectedData returns the string properlty formatted and justified for an
 // Addenda98.CorrectedData field. The code must be an official NACHA change code.
 func WriteCorrectionData(code string, data *CorrectedData) string {
 	pad := &converters{}
 	switch strings.ToUpper(code) {
 	case "C01":
-		return pad.alphaField(data.AccountNumber, 22)
+		return pad.alphaField(data.AccountNumber, correctedDataCharLength)
 	case "C02":
-		return pad.alphaField(data.RoutingNumber, 22)
+		return pad.alphaField(data.RoutingNumber, correctedDataCharLength)
 	case "C03":
-		spaces := strings.Repeat(" ", 22-len(data.RoutingNumber)-len(data.AccountNumber))
+		spaces := strings.Repeat(" ", correctedDataCharLength-len(data.RoutingNumber)-len(data.AccountNumber))
 		return fmt.Sprintf("%s%s%s", data.RoutingNumber, spaces, data.AccountNumber)
 	case "C04":
-		return pad.alphaField(data.Name, 22)
+		return pad.alphaField(data.Name, correctedDataCharLength)
 	case "C05":
-		return pad.alphaField(strconv.Itoa(data.TransactionCode), 22)
+		return pad.alphaField(strconv.Itoa(data.TransactionCode), correctedDataCharLength)
 	case "C06":
 		txcode := strconv.Itoa(data.TransactionCode)
-		spaces := strings.Repeat(" ", 22-len(data.AccountNumber)-len(txcode))
+		spaces := strings.Repeat(" ", correctedDataCharLength-len(data.AccountNumber)-len(txcode))
 		return fmt.Sprintf("%s%s%s", data.AccountNumber, spaces, txcode)
 	case "C07":
 		txcode := strconv.Itoa(data.TransactionCode)
-		spaces := strings.Repeat(" ", 22-9-len(data.AccountNumber)-len(txcode))
+		spaces := strings.Repeat(" ", correctedDataCharLength-9-len(data.AccountNumber)-len(txcode))
 		return fmt.Sprintf("%s%s%s%s", data.RoutingNumber, data.AccountNumber, spaces, txcode)
 	case "C09":
-		return pad.alphaField(data.Identification, 22)
+		return pad.alphaField(data.Identification, correctedDataCharLength)
 	}
-	return pad.alphaField("", 22)
+	return pad.alphaField("", correctedDataCharLength)
 }
