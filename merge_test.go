@@ -149,7 +149,6 @@ func TestMergeFiles__together(t *testing.T) {
 			t.Fatalf("invalid file: %v", err)
 		}
 	}
-
 }
 
 func TestMergeFiles__apart(t *testing.T) {
@@ -184,7 +183,7 @@ func TestMergeFiles__apart(t *testing.T) {
 	}
 }
 
-func BenchmarkMergeFiles__lineCount(b *testing.B) {
+func BenchmarkLineCount(b *testing.B) {
 	newACHFile := func() *File {
 		// Nacha files have a max of 10,000 lines and a batch is
 		// a header, entries, and control.
