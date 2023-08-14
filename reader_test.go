@@ -1781,7 +1781,7 @@ func TestTwoFileADVControls(t *testing.T) {
 
 // testACHFileTooLongErr checks that it errors on a file that is too long
 func testACHFileTooLongErr(t testing.TB) {
-	f, err := os.Open(filepath.Join("test", "testdata", "20110729A.ach"))
+	f, err := os.Open(filepath.Join("test", "testdata", "20110729A-invalid.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
