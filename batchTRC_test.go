@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 // mockBatchTRCHeader creates a BatchTRC BatchHeader
@@ -52,12 +53,10 @@ func mockTRCEntryDetail() *EntryDetail {
 }
 
 // mockBatchTRC creates a BatchTRC
-func mockBatchTRC() *BatchTRC {
+func mockBatchTRC(t testing.TB) *BatchTRC {
 	mockBatch := NewBatchTRC(mockBatchTRCHeader())
 	mockBatch.AddEntry(mockTRCEntryDetail())
-	if err := mockBatch.Create(); err != nil {
-		panic(err)
-	}
+	require.NoError(t, mockBatch.Create())
 	return mockBatch
 }
 
@@ -119,7 +118,7 @@ func BenchmarkBatchTRCHeader(b *testing.B) {
 
 // testBatchTRCCreate validates BatchTRC create
 func testBatchTRCCreate(t testing.TB) {
-	mockBatch := mockBatchTRC()
+	mockBatch := mockBatchTRC(t)
 	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -140,7 +139,7 @@ func BenchmarkBatchTRCCreate(b *testing.B) {
 
 // testBatchTRCStandardEntryClassCode validates BatchTRC create for an invalid StandardEntryClassCode
 func testBatchTRCStandardEntryClassCode(t testing.TB) {
-	mockBatch := mockBatchTRC()
+	mockBatch := mockBatchTRC(t)
 	mockBatch.Header.StandardEntryClassCode = WEB
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchSECType) {
@@ -163,7 +162,7 @@ func BenchmarkBatchTRCStandardEntryClassCode(b *testing.B) {
 
 // testBatchTRCServiceClassCodeEquality validates service class code equality
 func testBatchTRCServiceClassCodeEquality(t testing.TB) {
-	mockBatch := mockBatchTRC()
+	mockBatch := mockBatchTRC(t)
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
@@ -186,7 +185,7 @@ func BenchmarkBatchTRCServiceClassCodeEquality(b *testing.B) {
 
 // testBatchTRCMixedCreditsAndDebits validates BatchTRC create for an invalid MixedCreditsAndDebits
 func testBatchTRCMixedCreditsAndDebits(t testing.TB) {
-	mockBatch := mockBatchTRC()
+	mockBatch := mockBatchTRC(t)
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
@@ -209,7 +208,7 @@ func BenchmarkBatchTRCMixedCreditsAndDebits(b *testing.B) {
 
 // testBatchTRCCreditsOnly validates BatchTRC create for an invalid CreditsOnly
 func testBatchTRCCreditsOnly(t testing.TB) {
-	mockBatch := mockBatchTRC()
+	mockBatch := mockBatchTRC(t)
 	mockBatch.Header.ServiceClassCode = CreditsOnly
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
@@ -232,7 +231,7 @@ func BenchmarkBatchTRCCreditsOnly(b *testing.B) {
 
 // testBatchTRCAutomatedAccountingAdvices validates BatchTRC create for an invalid AutomatedAccountingAdvices
 func testBatchTRCAutomatedAccountingAdvices(t testing.TB) {
-	mockBatch := mockBatchTRC()
+	mockBatch := mockBatchTRC(t)
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(AutomatedAccountingAdvices, 225)) {
@@ -255,7 +254,7 @@ func BenchmarkBatchTRCAutomatedAccountingAdvices(b *testing.B) {
 
 // testBatchTRCCheckSerialNumber validates BatchTRC CheckSerialNumber is not mandatory
 func testBatchTRCCheckSerialNumber(t testing.TB) {
-	mockBatch := mockBatchTRC()
+	mockBatch := mockBatchTRC(t)
 	// modify CheckSerialNumber / IdentificationNumber to nothing
 	mockBatch.GetEntries()[0].SetCheckSerialNumber("")
 	err := mockBatch.Validate()
@@ -304,7 +303,7 @@ func BenchmarkBatchTRCTransactionCode(b *testing.B) {
 
 // testBatchTRCAddendaCount validates BatchTRC Addenda count
 func testBatchTRCAddendaCount(t testing.TB) {
-	mockBatch := mockBatchTRC()
+	mockBatch := mockBatchTRC(t)
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Create()
@@ -328,7 +327,7 @@ func BenchmarkBatchTRCAddendaCount(b *testing.B) {
 
 // testBatchTRCInvalidBuild validates an invalid batch build
 func testBatchTRCInvalidBuild(t testing.TB) {
-	mockBatch := mockBatchTRC()
+	mockBatch := mockBatchTRC(t)
 	mockBatch.GetHeader().ServiceClassCode = 3
 	err := mockBatch.Create()
 	if !base.Match(err, ErrServiceClass) {
@@ -428,7 +427,7 @@ func TestBatchTRCItemTypeIndicator(t *testing.T) {
 
 // testBatchTRCMixedDebitsAndCreditsServiceClassCodeEquality validates service class code
 func testBatchTRCMixedDebitsAndCreditsServiceClassCode(t testing.TB) {
-	mockBatch := mockBatchTRC()
+	mockBatch := mockBatchTRC(t)
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()

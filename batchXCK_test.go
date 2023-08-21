@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 // mockBatchXCKHeader creates a BatchXCK BatchHeader
@@ -52,12 +53,10 @@ func mockXCKEntryDetail() *EntryDetail {
 }
 
 // mockBatchXCK creates a BatchXCK
-func mockBatchXCK() *BatchXCK {
+func mockBatchXCK(t testing.TB) *BatchXCK {
 	mockBatch := NewBatchXCK(mockBatchXCKHeader())
 	mockBatch.AddEntry(mockXCKEntryDetail())
-	if err := mockBatch.Create(); err != nil {
-		panic(err)
-	}
+	require.NoError(t, mockBatch.Create())
 	return mockBatch
 }
 
@@ -119,7 +118,7 @@ func BenchmarkBatchXCKHeader(b *testing.B) {
 
 // testBatchXCKCreate validates BatchXCK create
 func testBatchXCKCreate(t testing.TB) {
-	mockBatch := mockBatchXCK()
+	mockBatch := mockBatchXCK(t)
 	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -140,7 +139,7 @@ func BenchmarkBatchXCKCreate(b *testing.B) {
 
 // testBatchXCKStandardEntryClassCode validates BatchXCK create for an invalid StandardEntryClassCode
 func testBatchXCKStandardEntryClassCode(t testing.TB) {
-	mockBatch := mockBatchXCK()
+	mockBatch := mockBatchXCK(t)
 	mockBatch.Header.StandardEntryClassCode = WEB
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchSECType) {
@@ -163,7 +162,7 @@ func BenchmarkBatchXCKStandardEntryClassCode(b *testing.B) {
 
 // testBatchXCKServiceClassCodeEquality validates service class code equality
 func testBatchXCKServiceClassCodeEquality(t testing.TB) {
-	mockBatch := mockBatchXCK()
+	mockBatch := mockBatchXCK(t)
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
@@ -186,7 +185,7 @@ func BenchmarkBatchXCKServiceClassCodeEquality(b *testing.B) {
 
 // testBatchXCKMixedCreditsAndDebits validates BatchXCK create for an invalid MixedCreditsAndDebits
 func testBatchXCKMixedCreditsAndDebits(t testing.TB) {
-	mockBatch := mockBatchXCK()
+	mockBatch := mockBatchXCK(t)
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
@@ -209,7 +208,7 @@ func BenchmarkBatchXCKMixedCreditsAndDebits(b *testing.B) {
 
 // testBatchXCKCreditsOnly validates BatchXCK create for an invalid CreditsOnly
 func testBatchXCKCreditsOnly(t testing.TB) {
-	mockBatch := mockBatchXCK()
+	mockBatch := mockBatchXCK(t)
 	mockBatch.Header.ServiceClassCode = CreditsOnly
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
@@ -232,7 +231,7 @@ func BenchmarkBatchXCKCreditsOnly(b *testing.B) {
 
 // testBatchXCKAutomatedAccountingAdvices validates BatchXCK create for an invalid AutomatedAccountingAdvices
 func testBatchXCKAutomatedAccountingAdvices(t testing.TB) {
-	mockBatch := mockBatchXCK()
+	mockBatch := mockBatchXCK(t)
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(AutomatedAccountingAdvices, 225)) {
@@ -255,7 +254,7 @@ func BenchmarkBatchXCKAutomatedAccountingAdvices(b *testing.B) {
 
 // testBatchXCKCheckSerialNumber validates BatchXCK CheckSerialNumber is not mandatory
 func testBatchXCKCheckSerialNumber(t testing.TB) {
-	mockBatch := mockBatchXCK()
+	mockBatch := mockBatchXCK(t)
 	// modify CheckSerialNumber / IdentificationNumber to nothing
 	mockBatch.GetEntries()[0].SetCheckSerialNumber("")
 	err := mockBatch.Validate()
@@ -304,7 +303,7 @@ func BenchmarkBatchXCKTransactionCode(b *testing.B) {
 
 // testBatchXCKAddendaCount validates BatchXCK Addenda count
 func testBatchXCKAddendaCount(t testing.TB) {
-	mockBatch := mockBatchXCK()
+	mockBatch := mockBatchXCK(t)
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Create()
@@ -328,7 +327,7 @@ func BenchmarkBatchXCKAddendaCount(b *testing.B) {
 
 // testBatchXCKInvalidBuild validates an invalid batch build
 func testBatchXCKInvalidBuild(t testing.TB) {
-	mockBatch := mockBatchXCK()
+	mockBatch := mockBatchXCK(t)
 	mockBatch.GetHeader().ServiceClassCode = 3
 	err := mockBatch.Create()
 	if !base.Match(err, ErrServiceClass) {
@@ -416,7 +415,7 @@ func TestBatchXCKItemResearchNumber(t *testing.T) {
 
 // TestBatchXCKAmount validates BatchXCK create for an invalid Amount
 func TestBatchXCKAmount(t *testing.T) {
-	mockBatch := mockBatchXCK()
+	mockBatch := mockBatchXCK(t)
 	mockBatch.Entries[0].Amount = 260000
 	err := mockBatch.Create()
 	if !base.Match(err, NewErrBatchAmount(260000, 250000)) {
@@ -426,7 +425,7 @@ func TestBatchXCKAmount(t *testing.T) {
 
 // testBatchXCKMixedDebitsAndCreditsServiceClassCode validates MixedDebitsAndCredits service class code
 func testBatchXCKMixedDebitsAndCreditsServiceClassCode(t testing.TB) {
-	mockBatch := mockBatchXCK()
+	mockBatch := mockBatchXCK(t)
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()

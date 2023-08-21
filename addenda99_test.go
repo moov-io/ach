@@ -418,7 +418,7 @@ func TestAddenda99__SetValidation(t *testing.T) {
 }
 
 func TestAddenda99__CustomReturnCode(t *testing.T) {
-	mockBatch := mockBatch()
+	mockBatch := mockBatch(t)
 	// Add a Addenda Return to the mock batch
 	if len(mockBatch.Entries) != 1 {
 		t.Fatal("Expected 1 batch entry")

@@ -36,7 +36,7 @@ import (
 
 // CreateFile tests
 func TestCreateFile(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	id, err := s.CreateFile(mockFileHeader())
 	if err != nil {
 		t.Fatal(err.Error())
@@ -46,7 +46,7 @@ func TestCreateFile(t *testing.T) {
 	}
 }
 func TestCreateFileIDExists(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	h := ach.FileHeader{ID: "98765"}
 	id, err := s.CreateFile(&h)
 	if err != ErrAlreadyExists {
@@ -55,7 +55,7 @@ func TestCreateFileIDExists(t *testing.T) {
 }
 
 func TestCreateFileNoID(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	h := ach.NewFileHeader()
 	id, err := s.CreateFile(&h)
 	if len(id) < 3 {
@@ -69,7 +69,7 @@ func TestCreateFileNoID(t *testing.T) {
 // Service.GetFile tests
 
 func TestGetFile(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	f, err := s.GetFile("98765")
 	if err != nil {
 		t.Errorf("expected %s received %s w/ error %s", "98765", f.ID, err)
@@ -77,7 +77,7 @@ func TestGetFile(t *testing.T) {
 }
 
 func TestGetFileNotFound(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	f, err := s.GetFile("12345")
 	if err != ErrNotFound {
 		t.Errorf("expected %s received %s w/ error %s", "ErrNotFound", f.ID, err)
@@ -87,7 +87,7 @@ func TestGetFileNotFound(t *testing.T) {
 // Service.GetFiles tests
 
 func TestGetFiles(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	files := s.GetFiles()
 	if len(files) != 1 {
 		t.Errorf("expected %s received %v", "1", len(files))
@@ -97,7 +97,7 @@ func TestGetFiles(t *testing.T) {
 // Service.DeleteFile tests
 
 func TestDeleteFile(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	err := s.DeleteFile("98765")
 	if err != nil {
 		t.Errorf("expected %s received %s", "nil", err)
@@ -111,14 +111,14 @@ func TestDeleteFile(t *testing.T) {
 // Service.GetFileContents tests
 
 func TestGetFileContents(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	id, err := s.CreateFile(mockFileHeader())
 	if err != nil {
 		t.Fatal(err.Error())
 	}
 
 	// make the file valid
-	batch := mockBatchWEB()
+	batch := mockBatchWEB(t)
 	s.CreateBatch(id, batch)
 
 	// build file
@@ -143,7 +143,7 @@ func TestGetFileContents(t *testing.T) {
 // Service.ValidateFile tests
 
 func TestValidateFile(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	id, err := s.CreateFile(mockFileHeader())
 	if err != nil {
 		t.Fatal(err.Error())
@@ -156,7 +156,7 @@ func TestValidateFile(t *testing.T) {
 }
 
 func TestValidateFileMissing(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	err := s.ValidateFile("missing", nil)
 	if err == nil {
 		t.Fatal("expected error")
@@ -164,7 +164,7 @@ func TestValidateFileMissing(t *testing.T) {
 }
 
 func TestValidateFileBad(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 
 	fId, _ := s.CreateFile(mockFileHeader())
 
@@ -194,7 +194,7 @@ func TestValidateFileBad(t *testing.T) {
 }
 
 func TestValidateFileOpts(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	fh := mockFileHeader()
 	fh.ImmediateOrigin = "00000000"
 	id, err := s.CreateFile(fh)
@@ -213,7 +213,7 @@ func TestValidateFileOpts(t *testing.T) {
 
 // TestCreateBatch tests creating a new batch when file.ID exists and batch.id does not exist
 func TestCreateBatch(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	bh := mockBatchHeaderWeb()
 	bh.ID = "11111"
 	b, _ := ach.NewBatch(bh)
@@ -228,7 +228,7 @@ func TestCreateBatch(t *testing.T) {
 
 // TestCreateBatchIDExists Create a new batch with batch.id already present. Should fail.
 func TestCreateBatchIDExists(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	b, _ := ach.NewBatch(mockBatchHeaderWeb())
 	id, err := s.CreateBatch("98765", b)
 	if err != ErrAlreadyExists {
@@ -238,7 +238,7 @@ func TestCreateBatchIDExists(t *testing.T) {
 
 // TestCreateBatchFileIDExits create a batch when the file.id does not exist. Should fail.
 func TestCreateBatchFileIDExits(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	b, _ := ach.NewBatch(mockBatchHeaderWeb())
 	id, err := s.CreateBatch("55555", b)
 	if err != ErrNotFound {
@@ -248,7 +248,7 @@ func TestCreateBatchFileIDExits(t *testing.T) {
 
 // TestCreateBatchIDBank create a new batch when the batch.id is nil but file.id is valid. Should generate batch.id and save.
 func TestCreateBatchIDBlank(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	bh := mockBatchHeaderWeb()
 	bh.ID = ""
 	b, _ := ach.NewBatch(bh)
@@ -265,7 +265,7 @@ func TestCreateBatchIDBlank(t *testing.T) {
 
 // TestGetBatch return a batch for the existing file.id and batch.id
 func TestGetBatch(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	b, err := s.GetBatch("98765", "54321")
 	if err != nil {
 		t.Errorf("problem getting batch: %v", err)
@@ -277,7 +277,7 @@ func TestGetBatch(t *testing.T) {
 
 // TestGetBatchNotFound return a failure if the batch.id is not found
 func TestGetBatchNotFound(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	b, err := s.GetBatch("98765", "55555")
 	if err != ErrNotFound {
 		t.Errorf("expected %s received %#v w/ error %v", "ErrNotFound", b, err)
@@ -288,7 +288,7 @@ func TestGetBatchNotFound(t *testing.T) {
 
 // TestGetBatches return a list of batches for the supplied file.id
 func TestGetBatches(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	batches := s.GetBatches("98765")
 	if len(batches) != 1 {
 		t.Errorf("expected %s received %v", "1", len(batches))
@@ -299,7 +299,7 @@ func TestGetBatches(t *testing.T) {
 
 // TestDeleteBatch removes a batch with existing file and batch id.
 func TestDeleteBatch(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	err := s.DeleteBatch("98765", "54321")
 	if err != nil {
 		t.Errorf("expected %s received error %v", "nil", err)
@@ -307,7 +307,7 @@ func TestDeleteBatch(t *testing.T) {
 }
 
 func TestBalanceFile(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 
 	// store a file in the Service and balance it
 	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-debit.ach"))
@@ -356,7 +356,7 @@ func TestBalanceFile(t *testing.T) {
 }
 
 func TestBalanceFileErrors(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	if file, err := s.BalanceFile(base.ID(), &ach.Offset{}); err == nil {
 		t.Errorf("expected error file=%#v", file)
 	}
@@ -373,7 +373,7 @@ func TestBalanceFileErrors(t *testing.T) {
 
 // TestSegmentFile creates a Segmented File from an existing ACH File
 func TestSegmentFileID(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 
 	fh := ach.NewFileHeader()
 	fh.ID = "333339"
@@ -464,7 +464,7 @@ func TestSegmentFileID(t *testing.T) {
 
 // TestSegmentFile_FileValidateError return an error on file Validation
 func TestSegmentFileError(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	_, _, err := s.SegmentFileID("98765", nil)
 
 	if err != nil {
@@ -476,7 +476,7 @@ func TestSegmentFileError(t *testing.T) {
 
 // TestSegmentFileDebitsOnly creates a Segmented File from an existing ACH File
 func TestSegmentFileDebitsOnly(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 
 	fh := ach.NewFileHeader()
 	fh.ID = "333339"
@@ -550,7 +550,7 @@ func TestSegmentFileDebitsOnly(t *testing.T) {
 
 // TestSegmentFileDebitsOnlyBatchID creates a Segmented File from an existing ACH File
 func TestSegmentFileDebitsOnlyBatchID(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 
 	fh := ach.NewFileHeader()
 	fh.ID = "333339"
@@ -618,7 +618,7 @@ func TestSegmentFileDebitsOnlyBatchID(t *testing.T) {
 }
 
 func TestFlattenBatches(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 
 	f, err := os.Open(filepath.Join("..", "test", "testdata", "flattenBatchesMultipleBatchHeaders.ach"))
 
@@ -658,7 +658,7 @@ func TestFlattenBatches(t *testing.T) {
 }
 
 func TestSegmentFile_NoFileID(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	fileID := ""
 	_, err := s.FlattenBatches(fileID)
 
@@ -670,7 +670,7 @@ func TestSegmentFile_NoFileID(t *testing.T) {
 }
 
 func TestFlattenBatches_NoFileID(t *testing.T) {
-	s := mockServiceInMemory()
+	s := mockServiceInMemory(t)
 	_, _, err := s.SegmentFileID("", nil)
 
 	if err != nil {

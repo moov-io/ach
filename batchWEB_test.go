@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 // mockBatchWEBHeader creates a WEB batch header
@@ -49,21 +50,19 @@ func mockWEBEntryDetail() *EntryDetail {
 }
 
 // mockBatchWEB creates a WEB batch
-func mockBatchWEB() *BatchWEB {
+func mockBatchWEB(t testing.TB) *BatchWEB {
 	mockBatch := NewBatchWEB(mockBatchWEBHeader())
 	mockBatch.AddEntry(mockWEBEntryDetail())
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
-	if err := mockBatch.Create(); err != nil {
-		panic(err)
-	}
+	require.NoError(t, mockBatch.Create())
 	return mockBatch
 }
 
 // testBatchWebAddenda validates No more than 1 batch per entry detail record can exist
 // and no more than 1 addenda record per entry detail record can exist
 func testBatchWebAddenda(t testing.TB) {
-	mockBatch := mockBatchWEB()
+	mockBatch := mockBatchWEB(t)
 	// mock batch already has one addenda. Creating two addenda should error
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Create()
@@ -89,7 +88,7 @@ func BenchmarkBatchWebAddenda(b *testing.B) {
 
 // testBatchWebIndividualNameRequired validates Individual name is a mandatory field
 func testBatchWebIndividualNameRequired(t testing.TB) {
-	mockBatch := mockBatchWEB()
+	mockBatch := mockBatchWEB(t)
 	// mock batch already has one addenda. Creating two addenda should error
 	mockBatch.GetEntries()[0].IndividualName = ""
 	err := mockBatch.Validate()
@@ -141,7 +140,7 @@ func TestBatchWEBAddendum99(t *testing.T) {
 
 // testBatchWEBAddendaTypeCode validates addenda type code is valid
 func testBatchWEBAddendaTypeCode(t testing.TB) {
-	mockBatch := mockBatchWEB()
+	mockBatch := mockBatchWEB(t)
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.GetEntries()[0].Addenda05[0].TypeCode = "02"
 	err := mockBatch.Validate()
@@ -165,7 +164,7 @@ func BenchmarkBatchWEBAddendaTypeCode(b *testing.B) {
 
 // testBatchWebSEC validates that the standard entry class code is WEB for batch Web
 func testBatchWebSEC(t testing.TB) {
-	mockBatch := mockBatchWEB()
+	mockBatch := mockBatchWEB(t)
 	mockBatch.Header.StandardEntryClassCode = RCK
 	err := mockBatch.Validate()
 	if !base.Match(err, ErrBatchSECType) {
@@ -189,7 +188,7 @@ func BenchmarkBatchWebSEC(b *testing.B) {
 // testBatchWebPaymentType validates that the entry detail
 // payment type / discretionary data is either single or reoccurring
 func testBatchWebPaymentType(t testing.TB) {
-	mockBatch := mockBatchWEB()
+	mockBatch := mockBatchWEB(t)
 	mockBatch.GetEntries()[0].DiscretionaryData = "AA"
 	err := mockBatch.Validate()
 	// TODO: are we expecting there to be no errors here?
@@ -215,7 +214,7 @@ func BenchmarkBatchWebPaymentType(b *testing.B) {
 
 // testBatchWebCreate creates a WEB batch
 func testBatchWebCreate(t testing.TB) {
-	mockBatch := mockBatchWEB()
+	mockBatch := mockBatchWEB(t)
 	// Must have valid batch header to create a batch
 	mockBatch.GetHeader().ServiceClassCode = 63
 	err := mockBatch.Create()
@@ -240,7 +239,7 @@ func BenchmarkBatchWebCreate(b *testing.B) {
 // testBatchWebPaymentTypeR validates that the entry detail
 // payment type / discretionary data is reoccurring
 func testBatchWebPaymentTypeR(t testing.TB) {
-	mockBatch := mockBatchWEB()
+	mockBatch := mockBatchWEB(t)
 	mockBatch.GetEntries()[0].DiscretionaryData = "R"
 	err := mockBatch.Validate()
 	// TODO: are we expecting there to be no errors here?
@@ -312,7 +311,7 @@ func TestBatchWEBCategoryReturnAddenda98(t *testing.T) {
 
 // TestBatchWEBValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
 func TestBatchWEBValidTranCodeForServiceClassCode(t *testing.T) {
-	mockBatch := mockBatchWEB()
+	mockBatch := mockBatchWEB(t)
 	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
 	err := mockBatch.Create()
 	if !base.Match(err, NewErrBatchServiceClassTranCode(DebitsOnly, 22)) {

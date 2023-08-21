@@ -35,45 +35,40 @@ import (
 )
 
 // mockFilePPD creates an ACH file with PPD batch and entry
-func mockFilePPD() *File {
+func mockFilePPD(t testing.TB) *File {
+	t.Helper()
+
 	mockFile := NewFile()
 	mockFile.ID = "fileId"
 	mockFile.SetHeader(mockFileHeader())
 	mockFile.Header.ID = mockFile.ID
 	mockFile.Control = mockFileControl()
 	mockFile.Control.ID = mockFile.ID
-	mockBatch := mockBatchPPD()
+	mockBatch := mockBatchPPD(t)
 	mockFile.AddBatch(mockBatch)
-	if err := mockFile.Create(); err != nil {
-		panic(err)
-	}
-	if mockFile.ID != mockFile.Header.ID {
-		panic(fmt.Sprintf("mockFile.ID=%s mockFile.Header.ID=%s", mockFile.ID, mockFile.Header.ID))
-	}
-	if mockFile.ID != mockFile.Control.ID {
-		panic(fmt.Sprintf("mockFile.ID=%s mockFile.Control.ID=%s", mockFile.ID, mockFile.Control.ID))
-	}
+
+	require.NoError(t, mockFile.Create())
+
+	require.Equal(t, mockFile.ID, mockFile.Header.ID)
+	require.Equal(t, mockFile.ID, mockFile.Control.ID)
+
 	return mockFile
 }
 
-func mockFileADV() *File {
+func mockFileADV(t testing.TB) *File {
 	mockFile := NewFile()
 	mockFile.ID = "fileId"
 	mockFile.SetHeader(mockFileHeader())
 	mockFile.Header.ID = mockFile.ID
 	mockFile.ADVControl = mockADVFileControl()
 	mockFile.Control.ID = mockFile.ID
-	mockBatchADV := mockBatchADV()
+	mockBatchADV := mockBatchADV(t)
 	mockFile.AddBatch(mockBatchADV)
-	if err := mockFile.Create(); err != nil {
-		panic(err)
-	}
-	if mockFile.ID != mockFile.Header.ID {
-		panic(fmt.Sprintf("mockFile.ID=%s mockFile.Header.ID=%s", mockFile.ID, mockFile.Header.ID))
-	}
-	if mockFile.ID != mockFile.Control.ID {
-		panic(fmt.Sprintf("mockFile.ID=%s mockFile.Control.ID=%s", mockFile.ID, mockFile.Control.ID))
-	}
+	require.NoError(t, mockFile.Create())
+
+	require.Equal(t, mockFile.ID, mockFile.Header.ID)
+	require.Equal(t, mockFile.ID, mockFile.Control.ID)
+
 	return mockFile
 }
 
@@ -123,10 +118,10 @@ func TestFileEmptyError(t *testing.T) {
 
 // testFileBatchCount validates if calculated count is different from control
 func testFileBatchCount(t testing.TB) {
-	file := mockFilePPD()
+	file := mockFilePPD(t)
 
 	// More batches than the file control count.
-	file.AddBatch(mockBatchPPD())
+	file.AddBatch(mockBatchPPD(t))
 	err := file.Validate()
 	if err != NewErrFileCalculatedControlEquality("BatchCount", 2, 1) {
 		t.Errorf("%T: %s", err, err)
@@ -148,7 +143,7 @@ func BenchmarkFileBatchCount(b *testing.B) {
 
 // testFileEntryAddenda validates an addenda entry
 func testFileEntryAddenda(t testing.TB) {
-	file := mockFilePPD()
+	file := mockFilePPD(t)
 
 	// more entries than the file control
 	file.Control.EntryAddendaCount = 5
@@ -173,7 +168,7 @@ func BenchmarkFileEntryAddenda(b *testing.B) {
 
 // testFileDebitAmount validates file total debit amount
 func testFileDebitAmount(t testing.TB) {
-	file := mockFilePPD()
+	file := mockFilePPD(t)
 
 	// inequality in total debit amount
 	file.Control.TotalDebitEntryDollarAmountInFile = 63
@@ -198,7 +193,7 @@ func BenchmarkFileDebitAmount(b *testing.B) {
 
 // testFileCreditAmount validates file total credit amount
 func testFileCreditAmount(t testing.TB) {
-	file := mockFilePPD()
+	file := mockFilePPD(t)
 
 	// inequality in total credit amount
 	file.Control.TotalCreditEntryDollarAmountInFile = 63
@@ -223,8 +218,8 @@ func BenchmarkFileCreditAmount(b *testing.B) {
 
 // testFileEntryHash validates entry hash
 func testFileEntryHash(t testing.TB) {
-	file := mockFilePPD()
-	file.AddBatch(mockBatchPPD())
+	file := mockFilePPD(t)
+	file.AddBatch(mockBatchPPD(t))
 	if err := file.Create(); err != nil {
 		t.Fatal(err)
 	}
@@ -253,7 +248,7 @@ func TestFileEntryHashOverflow(t *testing.T) {
 		invalidEntryHash := 12345678912 // 11 digits
 		validEntryHash := 2345678912    // 10 digits
 
-		file := mockFilePPD()
+		file := mockFilePPD(t)
 		file.Batches[0].GetControl().EntryHash = invalidEntryHash
 		if err := file.Create(); err != nil {
 			t.Fatal(err)
@@ -795,8 +790,8 @@ func TestFileADVInvalid__StandardEntryClassCode(t *testing.T) {
 
 // TestFileADVEntryHash validates entry hash
 func TestFileADVEntryHash(t *testing.T) {
-	file := mockFileADV()
-	file.AddBatch(mockBatchADV())
+	file := mockFileADV(t)
+	file.AddBatch(mockBatchADV(t))
 	if err := file.Create(); err != nil {
 		t.Fatal(err)
 	}
@@ -809,7 +804,7 @@ func TestFileADVEntryHash(t *testing.T) {
 
 // TestFileADVDebitAmount validates file total debit amount
 func TestFileADVDebitAmount(t *testing.T) {
-	file := mockFileADV()
+	file := mockFileADV(t)
 
 	// inequality in total debit amount
 	file.ADVControl.TotalDebitEntryDollarAmountInFile = 06
@@ -821,7 +816,7 @@ func TestFileADVDebitAmount(t *testing.T) {
 
 // TestFileADVCreditAmount validates file total credit amount
 func TestFileADVCreditAmount(t *testing.T) {
-	file := mockFileADV()
+	file := mockFileADV(t)
 
 	// inequality in total credit amount
 	file.ADVControl.TotalCreditEntryDollarAmountInFile = 07
@@ -833,7 +828,7 @@ func TestFileADVCreditAmount(t *testing.T) {
 
 // TestFileADVEntryAddenda validates an addenda entry
 func TestFileADVEntryAddenda(t *testing.T) {
-	file := mockFileADV()
+	file := mockFileADV(t)
 
 	// more entries than the file control
 	file.ADVControl.EntryAddendaCount = 5
@@ -845,10 +840,10 @@ func TestFileADVEntryAddenda(t *testing.T) {
 
 // TestFileADVBatchCount validates if calculated count is different from control
 func TestFileADVBatchCount(t *testing.T) {
-	file := mockFileADV()
+	file := mockFileADV(t)
 
 	// More batches than the file control count.
-	file.AddBatch(mockBatchADV())
+	file.AddBatch(mockBatchADV(t))
 	err := file.Validate()
 	if err != NewErrFileCalculatedControlEquality("BatchCount", 2, 1) {
 		t.Errorf("%T: %s", err, err)
@@ -913,7 +908,7 @@ func TestFileADVBlockCount10(t *testing.T) {
 
 // TestFileADVControlValidate validates ADV File Control
 func TestFileADVControlValidate(t *testing.T) {
-	file := mockFileADV()
+	file := mockFileADV(t)
 
 	file.ADVControl.TotalDebitEntryDollarAmountInFile = -100
 	err := file.Validate()
@@ -924,7 +919,7 @@ func TestFileADVControlValidate(t *testing.T) {
 
 // TestFileControlValidate validates PPD File Control
 func TestFileControlValidate(t *testing.T) {
-	file := mockFilePPD()
+	file := mockFilePPD(t)
 
 	file.Control.TotalDebitEntryDollarAmountInFile = 22
 	err := file.Validate()
@@ -2027,7 +2022,7 @@ func TestFile__FileHeaderFormattingWithValidation(t *testing.T) {
 	f := NewFile()
 	f.ID = "foo"
 	f.Header = mockFileHeader()
-	f.AddBatch(mockBatchPPD())
+	f.AddBatch(mockBatchPPD(t))
 	f.SetValidation(&ValidateOpts{
 		BypassOriginValidation:      true,
 		BypassDestinationValidation: true,
@@ -2083,10 +2078,10 @@ func TestFile__AscendingBatchSequence(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
-			file := mockFilePPD()
+			file := mockFilePPD(t)
 
 			for _, num := range tt.sequence {
-				mockBatch := mockBatchPPD()
+				mockBatch := mockBatchPPD(t)
 				mockBatch.GetHeader().BatchNumber = num
 				mockBatch.GetControl().BatchNumber = num
 				file.AddBatch(mockBatch)
@@ -2110,7 +2105,7 @@ func TestFile__AscendingBatchSequence(t *testing.T) {
 }
 
 func TestFile_SkipValidation(t *testing.T) {
-	file := mockFilePPD()
+	file := mockFilePPD(t)
 	file.validateOpts = &ValidateOpts{
 		SkipAll: true,
 	}

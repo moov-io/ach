@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 // mockBatchADVHeader creates a ADV batch header
@@ -39,12 +40,10 @@ func mockBatchADVHeader() *BatchHeader {
 }
 
 // mockBatchADV creates a ADV batch
-func mockBatchADV() *BatchADV {
+func mockBatchADV(t testing.TB) *BatchADV {
 	mockBatch := NewBatchADV(mockBatchADVHeader())
 	mockBatch.AddADVEntry(mockADVEntryDetail())
-	if err := mockBatch.Create(); err != nil {
-		panic(err)
-	}
+	require.NoError(t, mockBatch.Create())
 	return mockBatch
 }
 
@@ -86,7 +85,7 @@ func TestBatchADVAddendum99(t *testing.T) {
 
 // testBatchADVSEC validates that the standard entry class code is ADV for batchADV
 func testBatchADVSEC(t testing.TB) {
-	mockBatch := mockBatchADV()
+	mockBatch := mockBatchADV(t)
 	mockBatch.Header.StandardEntryClassCode = RCK
 	err := mockBatch.Validate()
 	if !base.Match(err, ErrBatchSECType) {
@@ -109,7 +108,7 @@ func BenchmarkBatchADVSEC(b *testing.B) {
 
 // testBatchADVServiceClassCode validates ServiceClassCode
 func testBatchADVServiceClassCode(t testing.TB) {
-	mockBatch := mockBatchADV()
+	mockBatch := mockBatchADV(t)
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetHeader().ServiceClassCode = 220
 	err := mockBatch.Create()
@@ -146,7 +145,7 @@ func TestBatchADVAddendum99Category(t *testing.T) {
 
 // TestBatchADVInvalidTransactionCode validates TransactionCode
 func TestBatchADVInvalidTransactionCode(t *testing.T) {
-	mockBatch := mockBatchADV()
+	mockBatch := mockBatchADV(t)
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetADVEntries()[0].TransactionCode = CheckingCredit
 	err := mockBatch.Create()
@@ -173,7 +172,7 @@ func TestADVMaximumEntries(t *testing.T) {
 
 // TestBatchADVOriginatorStatusCode validates the originator status code
 func TestBatchADVOriginatorStatusCode(t *testing.T) {
-	mockBatch := mockBatchADV()
+	mockBatch := mockBatchADV(t)
 	mockBatch.Header.OriginatorStatusCode = 1
 	err := mockBatch.Create()
 	if !base.Match(err, ErrOrigStatusCode) {

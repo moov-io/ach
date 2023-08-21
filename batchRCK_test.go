@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 // mockBatchRCKHeader creates a BatchRCK BatchHeader
@@ -50,12 +51,10 @@ func mockRCKEntryDetail() *EntryDetail {
 }
 
 // mockBatchRCK creates a BatchRCK
-func mockBatchRCK() *BatchRCK {
+func mockBatchRCK(t testing.TB) *BatchRCK {
 	mockBatch := NewBatchRCK(mockBatchRCKHeader())
 	mockBatch.AddEntry(mockRCKEntryDetail())
-	if err := mockBatch.Create(); err != nil {
-		panic(err)
-	}
+	require.NoError(t, mockBatch.Create())
 	return mockBatch
 }
 
@@ -116,7 +115,7 @@ func BenchmarkBatchRCKHeader(b *testing.B) {
 
 // testBatchRCKCreate validates BatchRCK create
 func testBatchRCKCreate(t testing.TB) {
-	mockBatch := mockBatchRCK()
+	mockBatch := mockBatchRCK(t)
 	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -137,7 +136,7 @@ func BenchmarkBatchRCKCreate(b *testing.B) {
 
 // testBatchRCKStandardEntryClassCode validates BatchRCK create for an invalid StandardEntryClassCode
 func testBatchRCKStandardEntryClassCode(t testing.TB) {
-	mockBatch := mockBatchRCK()
+	mockBatch := mockBatchRCK(t)
 	mockBatch.Header.StandardEntryClassCode = WEB
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchSECType) {
@@ -160,7 +159,7 @@ func BenchmarkBatchRCKStandardEntryClassCode(b *testing.B) {
 
 // testBatchRCKServiceClassCodeEquality validates service class code equality
 func testBatchRCKServiceClassCodeEquality(t testing.TB) {
-	mockBatch := mockBatchRCK()
+	mockBatch := mockBatchRCK(t)
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
@@ -183,7 +182,7 @@ func BenchmarkBatchRCKServiceClassCodeEquality(b *testing.B) {
 
 // testBatchRCKMixedCreditsAndDebits validates BatchRCK create for an invalid MixedCreditsAndDebits
 func testBatchRCKMixedCreditsAndDebits(t testing.TB) {
-	mockBatch := mockBatchRCK()
+	mockBatch := mockBatchRCK(t)
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
@@ -206,7 +205,7 @@ func BenchmarkBatchRCKMixedCreditsAndDebits(b *testing.B) {
 
 // testBatchRCKCreditsOnly validates BatchRCK create for an invalid CreditsOnly
 func testBatchRCKCreditsOnly(t testing.TB) {
-	mockBatch := mockBatchRCK()
+	mockBatch := mockBatchRCK(t)
 	mockBatch.Header.ServiceClassCode = CreditsOnly
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
@@ -229,7 +228,7 @@ func BenchmarkBatchRCKCreditsOnly(b *testing.B) {
 
 // testBatchRCKAutomatedAccountingAdvices validates BatchRCK create for an invalid AutomatedAccountingAdvices
 func testBatchRCKAutomatedAccountingAdvices(t testing.TB) {
-	mockBatch := mockBatchRCK()
+	mockBatch := mockBatchRCK(t)
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(AutomatedAccountingAdvices, 225)) {
@@ -252,7 +251,7 @@ func BenchmarkBatchRCKAutomatedAccountingAdvices(b *testing.B) {
 
 // testBatchRCKCompanyEntryDescription validates BatchRCK create for an invalid CompanyEntryDescription
 func testBatchRCKCompanyEntryDescription(t testing.TB) {
-	mockBatch := mockBatchRCK()
+	mockBatch := mockBatchRCK(t)
 	mockBatch.Header.CompanyEntryDescription = "XYZ975"
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchCompanyEntryDescriptionREDEPCHECK) {
@@ -275,7 +274,7 @@ func BenchmarkBatchRCKCompanyEntryDescription(b *testing.B) {
 
 // testBatchRCKAmount validates BatchRCK create for an invalid Amount
 func testBatchRCKAmount(t testing.TB) {
-	mockBatch := mockBatchRCK()
+	mockBatch := mockBatchRCK(t)
 	mockBatch.Entries[0].Amount = 250001
 	err := mockBatch.Create()
 	if !base.Match(err, NewErrBatchAmount(250001, 250000)) {
@@ -298,7 +297,7 @@ func BenchmarkBatchRCKAmount(b *testing.B) {
 
 // testBatchRCKCheckSerialNumber validates BatchRCK CheckSerialNumber / IdentificationNumber is a mandatory field
 func testBatchRCKCheckSerialNumber(t testing.TB) {
-	mockBatch := mockBatchRCK()
+	mockBatch := mockBatchRCK(t)
 	// modify CheckSerialNumber / IdentificationNumber to empty string
 	mockBatch.GetEntries()[0].SetCheckSerialNumber("")
 	err := mockBatch.Validate()
@@ -346,7 +345,7 @@ func BenchmarkBatchRCKTransactionCode(b *testing.B) {
 
 // testBatchRCKAddendaCount validates BatchRCK addenda count
 func testBatchRCKAddendaCount(t testing.TB) {
-	mockBatch := mockBatchRCK()
+	mockBatch := mockBatchRCK(t)
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	err := mockBatch.Create()
@@ -370,7 +369,7 @@ func BenchmarkBatchRCKAddendaCount(b *testing.B) {
 
 // testBatchRCKParseCheckSerialNumber validates BatchRCK create
 func testBatchRCKParseCheckSerialNumber(t testing.TB) {
-	mockBatch := mockBatchRCK()
+	mockBatch := mockBatchRCK(t)
 	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -396,7 +395,7 @@ func BenchmarkBatchRCKParseCheckSerialNumber(b *testing.B) {
 
 // testBatchRCKInvalidBuild validates an invalid batch build
 func testBatchRCKInvalidBuild(t testing.TB) {
-	mockBatch := mockBatchRCK()
+	mockBatch := mockBatchRCK(t)
 	mockBatch.GetHeader().ServiceClassCode = 3
 	err := mockBatch.Create()
 	if !base.Match(err, ErrServiceClass) {
@@ -447,7 +446,7 @@ func TestBatchRCKAddendum99(t *testing.T) {
 
 // testBatchRCKServiceClassCodeEquality validates MixedDebitsAndCredits service class code
 func testBatchRCKMixedDebitsAndCreditsServiceClassCode(t testing.TB) {
-	mockBatch := mockBatchRCK()
+	mockBatch := mockBatchRCK(t)
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()

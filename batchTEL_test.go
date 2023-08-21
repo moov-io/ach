@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 // mockBatchTELHeader creates a TEL batch header
@@ -50,12 +51,10 @@ func mockTELEntryDetail() *EntryDetail {
 }
 
 // mockBatchTEL creates a TEL batch
-func mockBatchTEL() *BatchTEL {
+func mockBatchTEL(t testing.TB) *BatchTEL {
 	mockBatch := NewBatchTEL(mockBatchTELHeader())
 	mockBatch.AddEntry(mockTELEntryDetail())
-	if err := mockBatch.Create(); err != nil {
-		panic(err)
-	}
+	require.NoError(t, mockBatch.Create())
 	return mockBatch
 }
 
@@ -83,7 +82,7 @@ func BenchmarkBatchTELHeader(b *testing.B) {
 
 // testBatchTELCreate validates batch create for an invalid service code
 func testBatchTELCreate(t testing.TB) {
-	mockBatch := mockBatchTEL()
+	mockBatch := mockBatchTEL(t)
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetHeader().ServiceClassCode = 0
 	err := mockBatch.Create()
@@ -107,7 +106,7 @@ func BenchmarkBatchTELCreate(b *testing.B) {
 
 // testBatchTELAddendaCount validates addenda count for batch TEL
 func testBatchTELAddendaCount(t testing.TB) {
-	mockBatch := mockBatchTEL()
+	mockBatch := mockBatchTEL(t)
 	// TEL can not have an addenda02
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
@@ -132,7 +131,7 @@ func BenchmarkBatchTELAddendaCount(b *testing.B) {
 
 // testBatchTELSEC validates SEC code for batch TEL
 func testBatchTELSEC(t testing.TB) {
-	mockBatch := mockBatchTEL()
+	mockBatch := mockBatchTEL(t)
 	mockBatch.Header.StandardEntryClassCode = RCK
 	err := mockBatch.Validate()
 	if !base.Match(err, ErrBatchSECType) {
@@ -155,7 +154,7 @@ func BenchmarkBatchTELSEC(b *testing.B) {
 
 // testBatchTELDebit validates Transaction code for TEL entry detail
 func testBatchTELDebit(t testing.TB) {
-	mockBatch := mockBatchTEL()
+	mockBatch := mockBatchTEL(t)
 	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchDebitOnly) {
@@ -179,7 +178,7 @@ func BenchmarkBatchTELDebit(b *testing.B) {
 // testBatchTELPaymentType validates that the entry detail
 // payment type / discretionary data is either single or reoccurring
 func testBatchTELPaymentType(t testing.TB) {
-	mockBatch := mockBatchTEL()
+	mockBatch := mockBatchTEL(t)
 	mockBatch.GetEntries()[0].DiscretionaryData = "AA"
 	err := mockBatch.Validate()
 	// TODO: are we expecting there to be no errors here?
@@ -233,7 +232,7 @@ func TestBatchTELAddendum99(t *testing.T) {
 
 // TestBatchTELValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
 func TestBatchTELValidTranCodeForServiceClassCode(t *testing.T) {
-	mockBatch := mockBatchTEL()
+	mockBatch := mockBatchTEL(t)
 	mockBatch.GetHeader().ServiceClassCode = CreditsOnly
 	err := mockBatch.Create()
 	if !base.Match(err, NewErrBatchServiceClassTranCode(CreditsOnly, 27)) {

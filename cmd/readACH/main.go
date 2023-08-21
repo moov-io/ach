@@ -53,7 +53,8 @@ func main() {
 	f, err := os.Open(path)
 
 	if err != nil {
-		log.Panicf("Can not open file: %s: \n", err)
+		log.Printf("ERROR: Can not open file: %s: \n", err)
+		os.Exit(1)
 	}
 
 	achFile, err := ach.NewReader(f).Read()

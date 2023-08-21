@@ -45,7 +45,7 @@ func TestFiles__decodeCreateFileRequest(t *testing.T) {
 	f := ach.NewFile()
 	f.ID = "foo"
 	f.Header = *mockFileHeader()
-	batch := mockBatchWEB()
+	batch := mockBatchWEB(t)
 	f.AddBatch(batch)
 
 	// Setup our persistence
@@ -208,7 +208,7 @@ func TestFiles__decodeCreateFileRequest__validateOpts(t *testing.T) {
 	f := ach.NewFile()
 	f.ID = "foo"
 	f.Header = *mockFileHeader()
-	f.AddBatch(mockBatchWEB())
+	f.AddBatch(mockBatchWEB(t))
 
 	var body bytes.Buffer
 	if err := json.NewEncoder(&body).Encode(f); err != nil {
@@ -324,7 +324,7 @@ func TestFiles__getFilesEndpoint(t *testing.T) {
 	f := ach.NewFile()
 	f.ID = "foo"
 	f.Header = *mockFileHeader()
-	f.AddBatch(mockBatchWEB())
+	f.AddBatch(mockBatchWEB(t))
 	if err := repo.StoreFile(f); err != nil {
 		t.Fatal(err)
 	}
@@ -361,7 +361,7 @@ func TestFiles__getFileEndpoint(t *testing.T) {
 	f := ach.NewFile()
 	f.ID = "foo"
 	f.Header = *mockFileHeader()
-	f.AddBatch(mockBatchWEB())
+	f.AddBatch(mockBatchWEB(t))
 	if err := repo.StoreFile(f); err != nil {
 		t.Fatal(err)
 	}
@@ -401,7 +401,7 @@ func TestFiles__buildFileEndpoint(t *testing.T) {
 	f := ach.NewFile()
 	f.ID = "foo"
 	f.Header = *mockFileHeader()
-	f.AddBatch(mockBatchWEB())
+	f.AddBatch(mockBatchWEB(t))
 	if err := repo.StoreFile(f); err != nil {
 		t.Fatal(err)
 	}
@@ -441,7 +441,7 @@ func TestFiles__getFileContentsEndpoint(t *testing.T) {
 	f := ach.NewFile()
 	f.ID = "foo"
 	f.Header = *mockFileHeader()
-	f.AddBatch(mockBatchWEB())
+	f.AddBatch(mockBatchWEB(t))
 	if err := repo.StoreFile(f); err != nil {
 		t.Fatal(err)
 	}
@@ -886,7 +886,7 @@ func TestFiles__segmentFileEndpointValidateOpts(t *testing.T) {
 	router.ServeHTTP(w, req)
 	w.Flush()
 
-	objmap := make(map[string]json.RawMessage, 0)
+	objmap := make(map[string]json.RawMessage)
 	err = json.NewDecoder(w.Body).Decode(&objmap)
 	require.NoError(t, err)
 

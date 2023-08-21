@@ -18,15 +18,17 @@
 package server
 
 import (
+	"testing"
 	"time"
 
 	"github.com/moov-io/ach"
+	"github.com/stretchr/testify/require"
 )
 
-func mockServiceInMemory() Service {
+func mockServiceInMemory(t testing.TB) Service {
 	repository := NewRepositoryInMemory(testTTLDuration, nil)
 	repository.StoreFile(&ach.File{ID: "98765"})
-	repository.StoreBatch("98765", mockBatchWEB())
+	repository.StoreBatch("98765", mockBatchWEB(t))
 	return NewService(repository)
 }
 
@@ -69,14 +71,12 @@ func mockWEBEntryDetail() *ach.EntryDetail {
 }
 
 // mockBatchWEB creates a WEB batch
-func mockBatchWEB() *ach.BatchWEB {
+func mockBatchWEB(t testing.TB) *ach.BatchWEB {
 	mockBatch := ach.NewBatchWEB(mockBatchHeaderWeb())
 	mockBatch.SetID(mockBatch.Header.ID)
 	mockBatch.AddEntry(mockWEBEntryDetail())
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		panic(err)
-	}
+	require.NoError(t, mockBatch.Create())
 	return mockBatch
 }
 

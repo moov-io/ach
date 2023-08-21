@@ -197,7 +197,7 @@ func BenchmarkLineCount(b *testing.B) {
 		file.Control = mockFileControl()
 
 		for i := 0; i < int(batches.Int64()+1); i++ {
-			file.AddBatch(mockBatchPPD())
+			file.AddBatch(mockBatchPPD(b))
 		}
 		if err := file.Create(); err != nil {
 			b.Fatal(err)

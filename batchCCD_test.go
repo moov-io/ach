@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 // mockBatchCCDHeader creates a CCD batch header
@@ -50,14 +51,12 @@ func mockCCDEntryDetail() *EntryDetail {
 }
 
 // mockBatchCCD creates a CCD batch
-func mockBatchCCD() *BatchCCD {
+func mockBatchCCD(t testing.TB) *BatchCCD {
 	mockBatch := NewBatchCCD(mockBatchCCDHeader())
 	mockBatch.AddEntry(mockCCDEntryDetail())
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		panic(err)
-	}
+	require.NoError(t, mockBatch.Create())
 	return mockBatch
 }
 
@@ -85,7 +84,7 @@ func BenchmarkBatchCCDHeader(b *testing.B) {
 
 // testBatchCCDAddendumCount batch control CCD can only have one addendum per entry detail
 func testBatchCCDAddendumCount(t testing.TB) {
-	mockBatch := mockBatchCCD()
+	mockBatch := mockBatchCCD(t)
 	// Adding a second addenda to the mock entry
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Validate()
@@ -137,7 +136,7 @@ func TestBatchCCDAddendum99(t *testing.T) {
 
 // testBatchCCDReceivingCompanyName validates Receiving company / Individual name is a mandatory field
 func testBatchCCDReceivingCompanyName(t testing.TB) {
-	mockBatch := mockBatchCCD()
+	mockBatch := mockBatchCCD(t)
 	// modify the Individual name / receiving company to nothing
 	mockBatch.GetEntries()[0].SetReceivingCompany("")
 	err := mockBatch.Validate()
@@ -161,7 +160,7 @@ func BenchmarkBatchCCDReceivingCompanyName(b *testing.B) {
 
 // testBatchCCDAddendaTypeCode validates addenda type code is 05
 func testBatchCCDAddendaTypeCode(t testing.TB) {
-	mockBatch := mockBatchCCD()
+	mockBatch := mockBatchCCD(t)
 	mockBatch.GetEntries()[0].Addenda05[0].TypeCode = "07"
 	err := mockBatch.Validate()
 	if !base.Match(err, ErrAddendaTypeCode) {
@@ -184,7 +183,7 @@ func BenchmarkBatchCCDAddendaTypeCode(b *testing.B) {
 
 // testBatchCCDSEC validates that the standard entry class code is CCD for batchCCD
 func testBatchCCDSEC(t testing.TB) {
-	mockBatch := mockBatchCCD()
+	mockBatch := mockBatchCCD(t)
 	mockBatch.Header.StandardEntryClassCode = RCK
 	err := mockBatch.Validate()
 	if !base.Match(err, ErrBatchSECType) {
@@ -207,7 +206,7 @@ func BenchmarkBatchCCDSEC(b *testing.B) {
 
 // testBatchCCDAddendaCount validates batch CCD addenda count
 func testBatchCCDAddendaCount(t testing.TB) {
-	mockBatch := mockBatchCCD()
+	mockBatch := mockBatchCCD(t)
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Create()
 	if !base.Match(err, NewErrBatchAddendaCount(0, 1)) {
@@ -230,7 +229,7 @@ func BenchmarkBatchCCDAddendaCount(b *testing.B) {
 
 // testBatchCCDCreate creates a batch CCD
 func testBatchCCDCreate(t testing.TB) {
-	mockBatch := mockBatchCCD()
+	mockBatch := mockBatchCCD(t)
 	// Batch Header information is required to Create a batch.
 	mockBatch.GetHeader().ServiceClassCode = 0
 	err := mockBatch.Create()
@@ -255,7 +254,7 @@ func BenchmarkBatchCCDCreate(b *testing.B) {
 // testBatchCCDReceivingCompanyField validates CCDReceivingCompanyField
 // underlying IndividualName
 func testBatchCCDReceivingCompanyField(t testing.TB) {
-	mockBatch := mockBatchCCD()
+	mockBatch := mockBatchCCD(t)
 	ts := mockBatch.Entries[0].ReceivingCompanyField()
 	if ts != "Best Co. #23          " {
 		t.Error("Receiving Company Field is invalid")
@@ -279,7 +278,7 @@ func BenchmarkBatchCCDReceivingCompanyField(b *testing.B) {
 
 // TestBatchCCDValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
 func TestBatchCCDValidTranCodeForServiceClassCode(t *testing.T) {
-	mockBatch := mockBatchCCD()
+	mockBatch := mockBatchCCD(t)
 	mockBatch.GetHeader().ServiceClassCode = CreditsOnly
 	err := mockBatch.Create()
 	if !base.Match(err, NewErrBatchServiceClassTranCode(CreditsOnly, 27)) {
@@ -289,7 +288,7 @@ func TestBatchCCDValidTranCodeForServiceClassCode(t *testing.T) {
 
 // TestBatchCCDAddenda02 validates BatchCCD cannot have Addenda02
 func TestBatchCCDAddenda02(t *testing.T) {
-	mockBatch := mockBatchCCD()
+	mockBatch := mockBatchCCD(t)
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	err := mockBatch.Create()

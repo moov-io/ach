@@ -34,13 +34,11 @@ import (
 )
 
 // batch should never be used directly.
-func mockBatch() *Batch {
+func mockBatch(t testing.TB) *Batch {
 	mockBatch := &Batch{}
 	mockBatch.SetHeader(mockBatchHeader())
 	mockBatch.AddEntry(mockEntryDetail())
-	if err := mockBatch.build(); err != nil {
-		panic(err)
-	}
+	require.NoError(t, mockBatch.build())
 	return mockBatch
 }
 
@@ -87,7 +85,7 @@ func mockBatchInvalidSECHeader() *BatchHeader {
 }
 
 func TestBatch__MarshalJSON(t *testing.T) {
-	b := mockBatch()
+	b := mockBatch(t)
 	b.WithOffset(&Offset{
 		RoutingNumber: "987654320",
 	})
@@ -161,7 +159,7 @@ func TestBatch_UnmarshalOffset(t *testing.T) {
 // Test cases that apply to all batch types
 // testBatchNumberMismatch validates BatchNumber mismatch
 func testBatchNumberMismatch(t testing.TB) {
-	mockBatch := mockBatch()
+	mockBatch := mockBatch(t)
 	mockBatch.GetControl().BatchNumber = 2
 	err := mockBatch.verify()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(1, 2)) {
@@ -184,7 +182,7 @@ func BenchmarkBatchNumberMismatch(b *testing.B) {
 
 // testCreditBatchIsBatchAmount validates Batch TotalCreditEntryDollarAmount
 func testCreditBatchIsBatchAmount(t testing.TB) {
-	mockBatch := mockBatch()
+	mockBatch := mockBatch(t)
 	mockBatch.SetHeader(mockBatchHeader())
 	e1 := mockBatch.GetEntries()[0]
 	e1.TransactionCode = CheckingCredit
@@ -222,7 +220,7 @@ func BenchmarkCreditBatchIsBatchAmount(b *testing.B) {
 
 // testSavingsBatchIsBatchAmount validates Batch TotalDebitEntryDollarAmount
 func testSavingsBatchIsBatchAmount(t testing.TB) {
-	mockBatch := mockBatch()
+	mockBatch := mockBatch(t)
 	mockBatch.SetHeader(mockBatchHeader())
 	e1 := mockBatch.GetEntries()[0]
 	e1.TransactionCode = SavingsCredit
@@ -259,7 +257,7 @@ func BenchmarkSavingsBatchIsBatchAmount(b *testing.B) {
 }
 
 func testBatchIsEntryHash(t testing.TB) {
-	mockBatch := mockBatch()
+	mockBatch := mockBatch(t)
 	mockBatch.GetControl().EntryHash = 1
 	err := mockBatch.verify()
 	if !base.Match(err, NewErrBatchCalculatedControlEquality(12104288, 1)) {
@@ -281,7 +279,7 @@ func BenchmarkBatchIsEntryHash(b *testing.B) {
 func testBatchDNEMismatch(t testing.TB) {
 	bh := mockBatchHeader()
 	bh.StandardEntryClassCode = DNE
-	mockBatch := mockBatch()
+	mockBatch := mockBatch(t)
 	mockBatch.SetHeader(bh)
 	ed := mockBatch.GetEntries()[0]
 	ed.AddAddenda05(mockAddenda05())
@@ -312,7 +310,7 @@ func TestBatch__DNEOriginatorCheck(t *testing.T) {
 	bh.OriginatorStatusCode = 1
 	bh.StandardEntryClassCode = PPD
 
-	batch := mockBatch()
+	batch := mockBatch(t)
 	batch.SetHeader(bh)
 
 	if err := batch.isOriginatorDNE(); err != nil {
@@ -321,7 +319,7 @@ func TestBatch__DNEOriginatorCheck(t *testing.T) {
 }
 
 func testBatchTraceNumberNotODFI(t testing.TB) {
-	mockBatch := mockBatch()
+	mockBatch := mockBatch(t)
 	mockBatch.GetEntries()[0].SetTraceNumber("12345678", 1)
 	err := mockBatch.verify()
 	if !base.Match(err, NewErrBatchTraceNumberNotODFI("12104288", "12345678")) {
@@ -341,7 +339,7 @@ func BenchmarkBatchTraceNumberNotODFI(b *testing.B) {
 }
 
 func testBatchEntryCountEquality(t testing.TB) {
-	mockBatch := mockBatch()
+	mockBatch := mockBatch(t)
 	mockBatch.SetHeader(mockBatchHeader())
 	e := mockEntryDetail()
 	a := mockAddenda05()
@@ -376,7 +374,7 @@ func BenchmarkBatchEntryCountEquality(b *testing.B) {
 }
 
 func testBatchAddendaIndicator(t testing.TB) {
-	mockBatch := mockBatch()
+	mockBatch := mockBatch(t)
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 0
 	mockBatch.GetControl().EntryAddendaCount = 2
@@ -398,7 +396,7 @@ func BenchmarkBatchAddendaIndicator(b *testing.B) {
 }
 
 func testBatchIsAddendaSeqAscending(t testing.TB) {
-	mockBatch := mockBatch()
+	mockBatch := mockBatch(t)
 	ed := mockBatch.GetEntries()[0]
 	ed.AddAddenda05(mockAddenda05())
 	ed.AddAddenda05(mockAddenda05())
@@ -423,7 +421,7 @@ func BenchmarkBatchIsAddendaSeqAscending(b *testing.B) {
 }
 
 func testBatchIsSequenceAscending(t testing.TB) {
-	mockBatch := mockBatch()
+	mockBatch := mockBatch(t)
 	e3 := mockEntryDetail()
 	e3.TraceNumber = "1"
 	mockBatch.AddEntry(e3)
@@ -446,7 +444,7 @@ func BenchmarkBatchIsSequenceAscending(b *testing.B) {
 }
 
 func testBatchAddendaTraceNumber(t testing.TB) {
-	mockBatch := mockBatch()
+	mockBatch := mockBatch(t)
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	if err := mockBatch.build(); err != nil {
 		t.Errorf("%T: %s", err, err)
@@ -495,7 +493,7 @@ func BenchmarkNewBatchDefault(b *testing.B) {
 
 // testBatchCategory validates Batch Category
 func testBatchCategory(t testing.TB) {
-	mockBatch := mockBatch()
+	mockBatch := mockBatch(t)
 	// Add a Addenda Return to the mock batch
 	entry := mockEntryDetail()
 	entry.Addenda99 = mockAddenda99()
@@ -526,7 +524,7 @@ func BenchmarkBatchCategory(b *testing.B) {
 
 // testBatchCategoryForwardReturn validates Category based on EntryDetail
 func testBatchCategoryForwardReturn(t testing.TB) {
-	mockBatch := mockBatch()
+	mockBatch := mockBatch(t)
 	// Add a Addenda Return to the mock batch
 	entry := mockEntryDetail()
 	entry.Addenda99 = mockAddenda99()
@@ -559,7 +557,7 @@ func BenchmarkBatchCategoryForwardReturn(b *testing.B) {
 
 // Don't over write a batch trace number when building if it already exists
 func testBatchTraceNumberExists(t testing.TB) {
-	mockBatch := mockBatch()
+	mockBatch := mockBatch(t)
 	entry := mockEntryDetail()
 	traceBefore := entry.TraceNumberField()
 	mockBatch.AddEntry(entry)
@@ -582,7 +580,7 @@ func BenchmarkBatchTraceNumberExists(b *testing.B) {
 }
 
 func testBatchFieldInclusion(t testing.TB) {
-	mockBatch := mockBatch()
+	mockBatch := mockBatch(t)
 	mockBatch.Header.ODFIIdentification = ""
 	err := mockBatch.verify()
 	if !base.Match(err, ErrConstructor) {
@@ -652,7 +650,7 @@ func BenchmarkBatchNoEntry(b *testing.B) {
 
 // testBatchControl validates BatchControl ODFIIdentification
 func testBatchControl(t testing.TB) {
-	mockBatch := mockBatch()
+	mockBatch := mockBatch(t)
 	mockBatch.Control.ODFIIdentification = ""
 	err := mockBatch.verify()
 	if !base.Match(err, NewErrBatchHeaderControlEquality("12104288", "")) {
@@ -705,7 +703,7 @@ func BenchmarkIATBatch(b *testing.B) {
 }
 
 func TestBatchInvalidServiceClassCode(t *testing.T) {
-	batch := mockBatch()
+	batch := mockBatch(t)
 	require.NoError(t, batch.build())
 
 	batch.Control.ServiceClassCode = DebitsOnly
@@ -723,7 +721,7 @@ func TestBatchInvalidServiceClassCode(t *testing.T) {
 
 // TestBatchADVInvalidServiceClassCode validates ServiceClassCode
 func TestBatchADVInvalidServiceClassCode(t *testing.T) {
-	mockBatch := mockBatchADV()
+	mockBatch := mockBatchADV(t)
 	if err := mockBatch.Create(); err != nil {
 		t.Fatal(err)
 	}
@@ -742,7 +740,7 @@ func TestBatchADVInvalidServiceClassCode(t *testing.T) {
 
 // TestBatchADVInvalidODFIIdentification validates ODFIIdentification
 func TestBatchADVInvalidODFIIdentification(t *testing.T) {
-	mockBatch := mockBatchADV()
+	mockBatch := mockBatchADV(t)
 	if err := mockBatch.Create(); err != nil {
 		t.Fatal(err)
 	}
@@ -755,7 +753,7 @@ func TestBatchADVInvalidODFIIdentification(t *testing.T) {
 
 // TestBatchADVInvalidBatchNumber validates BatchNumber
 func TestBatchADVInvalidBatchNumber(t *testing.T) {
-	mockBatch := mockBatchADV()
+	mockBatch := mockBatchADV(t)
 	if err := mockBatch.Create(); err != nil {
 		t.Fatal(err)
 	}
@@ -768,7 +766,7 @@ func TestBatchADVInvalidBatchNumber(t *testing.T) {
 
 // TestBatchADVEntryAddendaCount validates EntryAddendaCount
 func TestBatchADVInvalidEntryAddendaCount(t *testing.T) {
-	mockBatch := mockBatchADV()
+	mockBatch := mockBatchADV(t)
 	if err := mockBatch.Create(); err != nil {
 		t.Fatal(err)
 	}
@@ -781,7 +779,7 @@ func TestBatchADVInvalidEntryAddendaCount(t *testing.T) {
 
 // TestBatchADVTotalDebitEntryDollarAmount validates TotalDebitEntryDollarAmount
 func TestBatchADVInvalidTotalDebitEntryDollarAmount(t *testing.T) {
-	mockBatch := mockBatchADV()
+	mockBatch := mockBatchADV(t)
 	mockBatch.GetADVEntries()[0].TransactionCode = DebitForCreditsOriginated
 	if err := mockBatch.Create(); err != nil {
 		t.Fatal(err)
@@ -795,7 +793,7 @@ func TestBatchADVInvalidTotalDebitEntryDollarAmount(t *testing.T) {
 
 // TestBatchADVTotalCreditEntryDollarAmount validates TotalCreditEntryDollarAmount
 func TestBatchADVInvalidTotalCreditEntryDollarAmount(t *testing.T) {
-	mockBatch := mockBatchADV()
+	mockBatch := mockBatchADV(t)
 	if err := mockBatch.Create(); err != nil {
 		t.Fatal(err)
 	}
@@ -808,7 +806,7 @@ func TestBatchADVInvalidTotalCreditEntryDollarAmount(t *testing.T) {
 
 // TestBatchADVEntryHash validates EntryHash
 func TestBatchADVInvalidEntryHash(t *testing.T) {
-	mockBatch := mockBatchADV()
+	mockBatch := mockBatchADV(t)
 	if err := mockBatch.Create(); err != nil {
 		t.Fatal(err)
 	}
@@ -831,7 +829,7 @@ func TestBatchAddenda98InvalidAddendaRecordIndicator(t *testing.T) {
 
 // TestBatchAddenda02InvalidAddendaRecordIndicator validates AddendaRecordIndicator
 func TestBatchAddenda02InvalidAddendaRecordIndicator(t *testing.T) {
-	mockBatch := mockBatchPOS()
+	mockBatch := mockBatchPOS(t)
 	mockBatch.GetEntries()[0].AddendaRecordIndicator = 0
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchAddendaIndicator) {
@@ -841,7 +839,7 @@ func TestBatchAddenda02InvalidAddendaRecordIndicator(t *testing.T) {
 
 // TestBatchADVCategory validates Category
 func TestBatchADVCategory(t *testing.T) {
-	mockBatch := mockBatchADV()
+	mockBatch := mockBatchADV(t)
 
 	entryOne := NewADVEntryDetail()
 	entryOne.TransactionCode = CreditForDebitsOriginated
@@ -952,12 +950,12 @@ func TestBatchConvertBatchType(t *testing.T) {
 	if reflect.TypeOf(convertedACK) != reflect.TypeOf(mockBatchACK) {
 		t.Error("ACK batch type is not converted correctly")
 	}
-	mockBatchADV := mockBatchADV()
+	mockBatchADV := mockBatchADV(t)
 	convertedADV := ConvertBatchType(mockBatchADV.Batch)
 	if reflect.TypeOf(convertedADV) != reflect.TypeOf(mockBatchADV) {
 		t.Error("ADV batch type is not converted correctly")
 	}
-	mockBatchARC := mockBatchARC()
+	mockBatchARC := mockBatchARC(t)
 	convertedARC := ConvertBatchType(mockBatchARC.Batch)
 	if reflect.TypeOf(convertedARC) != reflect.TypeOf(mockBatchARC) {
 		t.Error("ARC batch type is not converted correctly")
@@ -967,17 +965,17 @@ func TestBatchConvertBatchType(t *testing.T) {
 	if reflect.TypeOf(convertedATX) != reflect.TypeOf(mockBatchATX) {
 		t.Error("ATX batch type is not converted correctly")
 	}
-	mockBatchBOC := mockBatchBOC()
+	mockBatchBOC := mockBatchBOC(t)
 	convertedBOC := ConvertBatchType(mockBatchBOC.Batch)
 	if reflect.TypeOf(convertedBOC) != reflect.TypeOf(mockBatchBOC) {
 		t.Error("BOC batch type is not converted correctly")
 	}
-	mockBatchCCD := mockBatchCCD()
+	mockBatchCCD := mockBatchCCD(t)
 	convertedCCD := ConvertBatchType(mockBatchCCD.Batch)
 	if reflect.TypeOf(convertedCCD) != reflect.TypeOf(mockBatchCCD) {
 		t.Error("CCD batch type is not converted correctly")
 	}
-	mockBatchCIE := mockBatchCIE()
+	mockBatchCIE := mockBatchCIE(t)
 	convertedCIE := ConvertBatchType(mockBatchCIE.Batch)
 	if reflect.TypeOf(convertedCIE) != reflect.TypeOf(mockBatchCIE) {
 		t.Error("CIE batch type is not converted correctly")
@@ -1007,37 +1005,37 @@ func TestBatchConvertBatchType(t *testing.T) {
 	if reflect.TypeOf(convertedMTE) != reflect.TypeOf(mockBatchMTE) {
 		t.Error("MTE batch type is not converted correctly")
 	}
-	mockBatchPOP := mockBatchPOP()
+	mockBatchPOP := mockBatchPOP(t)
 	convertedPOP := ConvertBatchType(mockBatchPOP.Batch)
 	if reflect.TypeOf(convertedPOP) != reflect.TypeOf(mockBatchPOP) {
 		t.Error("POP batch type is not converted correctly")
 	}
-	mockBatchPOS := mockBatchPOS()
+	mockBatchPOS := mockBatchPOS(t)
 	convertedPOS := ConvertBatchType(mockBatchPOS.Batch)
 	if reflect.TypeOf(convertedPOS) != reflect.TypeOf(mockBatchPOS) {
 		t.Error("POS batch type is not converted correctly")
 	}
-	mockBatchPPD := mockBatchPPD()
+	mockBatchPPD := mockBatchPPD(t)
 	convertedPPD := ConvertBatchType(mockBatchPPD.Batch)
 	if reflect.TypeOf(convertedPPD) != reflect.TypeOf(mockBatchPPD) {
 		t.Error("PPD batch type is not converted correctly")
 	}
-	mockBatchRCK := mockBatchRCK()
+	mockBatchRCK := mockBatchRCK(t)
 	convertedRCK := ConvertBatchType(mockBatchRCK.Batch)
 	if reflect.TypeOf(convertedRCK) != reflect.TypeOf(mockBatchRCK) {
 		t.Error("RCK batch type is not converted correctly")
 	}
-	mockBatchSHR := mockBatchSHR()
+	mockBatchSHR := mockBatchSHR(t)
 	convertedSHR := ConvertBatchType(mockBatchSHR.Batch)
 	if reflect.TypeOf(convertedSHR) != reflect.TypeOf(mockBatchSHR) {
 		t.Error("SHR batch type is not converted correctly")
 	}
-	mockBatchTEL := mockBatchTEL()
+	mockBatchTEL := mockBatchTEL(t)
 	convertedTEL := ConvertBatchType(mockBatchTEL.Batch)
 	if reflect.TypeOf(convertedTEL) != reflect.TypeOf(mockBatchTEL) {
 		t.Error("TEL batch type is not converted correctly")
 	}
-	mockBatchTRC := mockBatchTRC()
+	mockBatchTRC := mockBatchTRC(t)
 	convertedTRC := ConvertBatchType(mockBatchTRC.Batch)
 	if reflect.TypeOf(convertedTRC) != reflect.TypeOf(mockBatchTRC) {
 		t.Error("TRC batch type is not converted correctly")
@@ -1047,12 +1045,12 @@ func TestBatchConvertBatchType(t *testing.T) {
 	if reflect.TypeOf(convertedTRX) != reflect.TypeOf(mockBatchTRX) {
 		t.Error("TRX batch type is not converted correctly")
 	}
-	mockBatchWEB := mockBatchWEB()
+	mockBatchWEB := mockBatchWEB(t)
 	convertedWEB := ConvertBatchType(mockBatchWEB.Batch)
 	if reflect.TypeOf(convertedWEB) != reflect.TypeOf(mockBatchWEB) {
 		t.Error("WEB batch type is not converted correctly")
 	}
-	mockBatchXCK := mockBatchXCK()
+	mockBatchXCK := mockBatchXCK(t)
 	convertedXCK := ConvertBatchType(mockBatchXCK.Batch)
 	if reflect.TypeOf(convertedXCK) != reflect.TypeOf(mockBatchXCK) {
 		t.Error("XCK batch type is not converted correctly")
@@ -1060,7 +1058,7 @@ func TestBatchConvertBatchType(t *testing.T) {
 }
 
 func TestBatch__ValidAmountForCodes(t *testing.T) {
-	b1 := mockBatchWEB()
+	b1 := mockBatchWEB(t)
 
 	// Standard EntryDetails should pass
 	require.NoError(t, b1.Create())
@@ -1296,7 +1294,7 @@ func TestBatch__lastTraceNumber(t *testing.T) {
 }
 
 func TestBatch__CalculateBalancedOffsetCredit(t *testing.T) {
-	f := mockFilePPD()
+	f := mockFilePPD(t)
 	b, ok := f.Batches[0].(*BatchPPD)
 	if !ok {
 		t.Fatalf("got %T: %#v", f.Batches[0], f.Batches[0])
@@ -1333,7 +1331,7 @@ func TestBatch__CalculateBalancedOffsetCredit(t *testing.T) {
 }
 
 func TestBatch__CalculateBalancedOffsetDebit(t *testing.T) {
-	f := mockFilePPD()
+	f := mockFilePPD(t)
 	b, ok := f.Batches[0].(*BatchPPD)
 	if !ok {
 		t.Fatalf("got %T: %#v", f.Batches[0], f.Batches[0])
@@ -1379,7 +1377,7 @@ func TestBatch__CalculateBalancedOffsetDebitAndCredit(t *testing.T) {
 	}
 
 	// Setup a file and make our only batch a Debit
-	f := mockFilePPD()
+	f := mockFilePPD(t)
 	b, ok := f.Batches[0].(*BatchPPD)
 	if !ok {
 		t.Fatalf("got %T: %#v", f.Batches[0], f.Batches[0])
@@ -1399,7 +1397,7 @@ func TestBatch__CalculateBalancedOffsetDebitAndCredit(t *testing.T) {
 	}
 
 	// Append a second (Credit) Batch
-	f2 := mockFilePPD()
+	f2 := mockFilePPD(t)
 	b, ok = f2.Batches[0].(*BatchPPD)
 	if !ok {
 		t.Fatalf("got %T: %#v", f.Batches[0], f.Batches[0])
@@ -1466,7 +1464,7 @@ func TestBatch__CalculateBalancedOffsetDebitAndCredit(t *testing.T) {
 }
 
 func TestBatch__upsertOffsetIdempotent(t *testing.T) {
-	f := mockFilePPD()
+	f := mockFilePPD(t)
 	b, ok := f.Batches[0].(*BatchPPD)
 	if !ok {
 		t.Fatalf("got %T: %#v", f.Batches[0], f.Batches[0])
@@ -1514,7 +1512,7 @@ func TestBatch__upsertOffsetIdempotent(t *testing.T) {
 }
 
 func TestBatch__upsertOffsetsErr(t *testing.T) {
-	f := mockFilePPD()
+	f := mockFilePPD(t)
 	b, ok := f.Batches[0].(*BatchPPD)
 	if !ok {
 		t.Fatalf("got %T: %#v", f.Batches[0], f.Batches[0])
@@ -1546,7 +1544,7 @@ func TestBatch__upsertOffsetsErr(t *testing.T) {
 }
 
 func TestBatch__isTraceNumberODFI(t *testing.T) {
-	file := mockFilePPD()
+	file := mockFilePPD(t)
 	batch := file.Batches[0]
 
 	// Set invalid TraceNumber and ensure it's rejected
@@ -1587,7 +1585,7 @@ func TestBatch__isTraceNumberODFI(t *testing.T) {
 }
 
 func TestBatch__CustomTraceNumbers(t *testing.T) {
-	file := mockFilePPD()
+	file := mockFilePPD(t)
 
 	file.Batches[0].SetValidation(&ValidateOpts{
 		BypassOriginValidation: false,
@@ -1613,7 +1611,7 @@ func TestBatch__CustomTraceNumbers(t *testing.T) {
 }
 
 func TestBatch__CompanyIdentificationMismatch(t *testing.T) {
-	file := mockFilePPD()
+	file := mockFilePPD(t)
 	batcher := file.Batches[0]
 	batcher.SetValidation(&ValidateOpts{
 		BypassCompanyIdentificationMatch: true,

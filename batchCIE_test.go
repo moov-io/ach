@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 // mockBatchCIEHeader creates a BatchCIE BatchHeader
@@ -51,14 +52,12 @@ func mockCIEEntryDetail() *EntryDetail {
 }
 
 // mockBatchCIE creates a BatchCIE
-func mockBatchCIE() *BatchCIE {
+func mockBatchCIE(t testing.TB) *BatchCIE {
 	mockBatch := NewBatchCIE(mockBatchCIEHeader())
 	mockBatch.AddEntry(mockCIEEntryDetail())
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		panic(err)
-	}
+	require.NoError(t, mockBatch.Create())
 	return mockBatch
 }
 
@@ -86,7 +85,7 @@ func BenchmarkBatchCIEHeader(b *testing.B) {
 
 // testBatchCIECreate validates BatchCIE create
 func testBatchCIECreate(t testing.TB) {
-	mockBatch := mockBatchCIE()
+	mockBatch := mockBatchCIE(t)
 	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -107,7 +106,7 @@ func BenchmarkBatchCIECreate(b *testing.B) {
 
 // testBatchCIEStandardEntryClassCode validates BatchCIE create for an invalid StandardEntryClassCode
 func testBatchCIEStandardEntryClassCode(t testing.TB) {
-	mockBatch := mockBatchCIE()
+	mockBatch := mockBatchCIE(t)
 	mockBatch.Header.StandardEntryClassCode = WEB
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchSECType) {
@@ -130,7 +129,7 @@ func BenchmarkBatchCIEStandardEntryClassCode(b *testing.B) {
 
 // testBatchCIEServiceClassCodeEquality validates service class code equality
 func testBatchCIEServiceClassCodeEquality(t testing.TB) {
-	mockBatch := mockBatchCIE()
+	mockBatch := mockBatchCIE(t)
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
@@ -153,7 +152,7 @@ func BenchmarkBatchCIEServiceClassCodeEquality(b *testing.B) {
 
 // testBatchCIEMixedCreditsAndDebits validates BatchCIE create for an invalid MixedCreditsAndDebits
 func testBatchCIEMixedCreditsAndDebits(t testing.TB) {
-	mockBatch := mockBatchCIE()
+	mockBatch := mockBatchCIE(t)
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 220)) {
@@ -176,7 +175,7 @@ func BenchmarkBatchCIEMixedCreditsAndDebits(b *testing.B) {
 
 // testBatchCIEDebitsOnly validates BatchCIE create for an invalid DebitsOnly
 func testBatchCIEDebitsOnly(t testing.TB) {
-	mockBatch := mockBatchCIE()
+	mockBatch := mockBatchCIE(t)
 	mockBatch.Header.ServiceClassCode = DebitsOnly
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(DebitsOnly, 220)) {
@@ -199,7 +198,7 @@ func BenchmarkBatchCIEDebitsOnly(b *testing.B) {
 
 // testBatchCIEAutomatedAccountingAdvices validates BatchCIE create for an invalid AutomatedAccountingAdvices
 func testBatchCIEAutomatedAccountingAdvices(t testing.TB) {
-	mockBatch := mockBatchCIE()
+	mockBatch := mockBatchCIE(t)
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(AutomatedAccountingAdvices, 220)) {
@@ -222,7 +221,7 @@ func BenchmarkBatchCIEAutomatedAccountingAdvices(b *testing.B) {
 
 // testBatchCIETransactionCode validates BatchCIE TransactionCode is not a debit
 func testBatchCIETransactionCode(t testing.TB) {
-	mockBatch := mockBatchCIE()
+	mockBatch := mockBatchCIE(t)
 	mockBatch.GetEntries()[0].TransactionCode = CheckingDebit
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchDebitOnly) {
@@ -245,7 +244,7 @@ func BenchmarkBatchCIETransactionCode(b *testing.B) {
 
 // testBatchCIEAddendaCount validates BatchCIE Addendum count of 2
 func testBatchCIEAddendaCount(t testing.TB) {
-	mockBatch := mockBatchCIE()
+	mockBatch := mockBatchCIE(t)
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Create()
 	if !base.Match(err, NewErrBatchAddendaCount(2, 1)) {
@@ -343,7 +342,7 @@ func BenchmarkBatchCIEInvalidAddenda(b *testing.B) {
 
 // testBatchCIEInvalidBuild validates an invalid batch build
 func testBatchCIEInvalidBuild(t testing.TB) {
-	mockBatch := mockBatchCIE()
+	mockBatch := mockBatchCIE(t)
 	mockBatch.GetHeader().ServiceClassCode = 3
 	err := mockBatch.Create()
 	if !base.Match(err, ErrServiceClass) {
@@ -366,7 +365,7 @@ func BenchmarkBatchCIEInvalidBuild(b *testing.B) {
 
 // testBatchCIECardTransactionType validates BatchCIE create for an invalid CardTransactionType
 func testBatchCIECardTransactionType(t testing.TB) {
-	mockBatch := mockBatchCIE()
+	mockBatch := mockBatchCIE(t)
 	mockBatch.GetEntries()[0].DiscretionaryData = "555"
 	err := mockBatch.Validate()
 	// TODO: are we not expecting any errors here?
@@ -418,7 +417,7 @@ func TestBatchCIEAddendum99(t *testing.T) {
 
 // TestBatchCIEAddenda validates no more than 1 addenda record per entry detail record can exist
 func TestBatchCIEAddenda(t *testing.T) {
-	mockBatch := mockBatchCIE()
+	mockBatch := mockBatchCIE(t)
 	// mock batch already has one addenda. Creating two addenda should error
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	err := mockBatch.Create()
@@ -429,7 +428,7 @@ func TestBatchCIEAddenda(t *testing.T) {
 
 // TestBatchCIEAddenda02 validates BatchCIE cannot have Addenda02
 func TestBatchCIEAddenda02(t *testing.T) {
-	mockBatch := mockBatchCIE()
+	mockBatch := mockBatchCIE(t)
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	err := mockBatch.Create()
@@ -440,7 +439,7 @@ func TestBatchCIEAddenda02(t *testing.T) {
 
 // testBatchCIEServiceClassCodeEquality validates service class code MixedDebitsAndCredits
 func testBatchCIEMixedDebitsAndCreditsServiceClassCode(t testing.TB) {
-	mockBatch := mockBatchCIE()
+	mockBatch := mockBatchCIE(t)
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()

@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 // mockBatchPOSHeader creates a BatchPOS BatchHeader
@@ -66,19 +67,17 @@ func mockPOSEntryDetailCredit() *EntryDetail {
 }
 
 // mockBatchPOS creates a BatchPOS
-func mockBatchPOS() *BatchPOS {
+func mockBatchPOS(t testing.TB) *BatchPOS {
 	mockBatch := NewBatchPOS(mockBatchPOSHeader())
 	mockBatch.AddEntry(mockPOSEntryDetail())
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		panic(err)
-	}
+	require.NoError(t, mockBatch.Create())
 	return mockBatch
 }
 
 // mockBatchPOSMixedDebitsAndCredits creates a BatchPOS with mixed debits and credits
-func mockBatchPOSMixedDebitsAndCredits() *BatchPOS {
+func mockBatchPOSMixedDebitsAndCredits(t testing.TB) *BatchPOS {
 	bh := mockBatchPOSHeader()
 	bh.ServiceClassCode = MixedDebitsAndCredits
 
@@ -93,9 +92,8 @@ func mockBatchPOSMixedDebitsAndCredits() *BatchPOS {
 
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 
-	if err := mockBatch.Create(); err != nil {
-		panic(err)
-	}
+	require.NoError(t, mockBatch.Create())
+
 	return mockBatch
 }
 
@@ -123,7 +121,7 @@ func BenchmarkBatchPOSHeader(b *testing.B) {
 
 // testBatchPOSCreate validates BatchPOS create
 func testBatchPOSCreate(t testing.TB) {
-	mockBatch := mockBatchPOS()
+	mockBatch := mockBatchPOS(t)
 	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -144,7 +142,7 @@ func BenchmarkBatchPOSCreate(b *testing.B) {
 
 // testBatchPOSStandardEntryClassCode validates BatchPOS create for an invalid StandardEntryClassCode
 func testBatchPOSStandardEntryClassCode(t testing.TB) {
-	mockBatch := mockBatchPOS()
+	mockBatch := mockBatchPOS(t)
 	mockBatch.Header.StandardEntryClassCode = WEB
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchSECType) {
@@ -167,7 +165,7 @@ func BenchmarkBatchPOSStandardEntryClassCode(b *testing.B) {
 
 // testBatchPOSServiceClassCodeEquality validates service class code equality
 func testBatchPOSServiceClassCodeEquality(t testing.TB) {
-	mockBatch := mockBatchPOS()
+	mockBatch := mockBatchPOS(t)
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
@@ -190,7 +188,7 @@ func BenchmarkBatchPOSServiceClassCodeEquality(b *testing.B) {
 
 // testBatchPOSMixedCreditsAndDebits validates BatchPOS create for an invalid MixedCreditsAndDebits
 func testBatchPOSMixedCreditsAndDebits(t testing.TB) {
-	mockBatch := mockBatchPOS()
+	mockBatch := mockBatchPOS(t)
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
@@ -213,7 +211,7 @@ func BenchmarkBatchPOSMixedCreditsAndDebits(b *testing.B) {
 
 // testBatchPOSCreditsOnly validates BatchPOS create for an invalid CreditsOnly
 func testBatchPOSCreditsOnly(t testing.TB) {
-	mockBatch := mockBatchPOS()
+	mockBatch := mockBatchPOS(t)
 	mockBatch.Header.ServiceClassCode = CreditsOnly
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
@@ -236,7 +234,7 @@ func BenchmarkBatchPOSCreditsOnly(b *testing.B) {
 
 // testBatchPOSAutomatedAccountingAdvices validates BatchPOS create for an invalid AutomatedAccountingAdvices
 func testBatchPOSAutomatedAccountingAdvices(t testing.TB) {
-	mockBatch := mockBatchPOS()
+	mockBatch := mockBatchPOS(t)
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
@@ -259,7 +257,7 @@ func BenchmarkBatchPOSAutomatedAccountingAdvices(b *testing.B) {
 
 // testBatchPOSAddendaCount validates BatchPOS Addendum count of 2
 func testBatchPOSAddendaCount(t testing.TB) {
-	mockBatch := mockBatchPOS()
+	mockBatch := mockBatchPOS(t)
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	err := mockBatch.Create()
 	// TODO: are we expecting there to be an error here?
@@ -391,7 +389,7 @@ func BenchmarkBatchPOSInvalidAddenda(b *testing.B) {
 
 // testBatchPOSInvalidBuild validates an invalid batch build
 func testBatchPOSInvalidBuild(t testing.TB) {
-	mockBatch := mockBatchPOS()
+	mockBatch := mockBatchPOS(t)
 	mockBatch.GetHeader().ServiceClassCode = 3
 	err := mockBatch.Create()
 	if !base.Match(err, ErrServiceClass) {
@@ -414,7 +412,7 @@ func BenchmarkBatchPOSInvalidBuild(b *testing.B) {
 
 // testBatchPOSCardTransactionType validates BatchPOS create for an invalid CardTransactionType
 func testBatchPOSCardTransactionType(t testing.TB) {
-	mockBatch := mockBatchPOS()
+	mockBatch := mockBatchPOS(t)
 	mockBatch.GetEntries()[0].DiscretionaryData = "555"
 	err := mockBatch.Validate()
 	if !base.Match(err, ErrBatchInvalidCardTransactionType) {
@@ -491,7 +489,7 @@ func TestBatchPOSTerminalState(t *testing.T) {
 
 // testBatchPOSMixedDebitsAndCredits validates BatchPOS with mixed debits and credits
 func testBatchPOSMixedDebitsAndCredits(t testing.TB) {
-	mockBatch := mockBatchPOSMixedDebitsAndCredits()
+	mockBatch := mockBatchPOSMixedDebitsAndCredits(t)
 	err := mockBatch.Create()
 
 	if !base.Match(err, nil) {

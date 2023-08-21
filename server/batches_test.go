@@ -44,7 +44,7 @@ func TestFiles__decodeCreateBatchRequest(t *testing.T) {
 	}
 
 	var body bytes.Buffer
-	if err := json.NewEncoder(&body).Encode(mockBatchWEB()); err != nil {
+	if err := json.NewEncoder(&body).Encode(mockBatchWEB(t)); err != nil {
 		t.Fatal(err)
 	}
 
@@ -104,7 +104,7 @@ func TestFiles__createBatchEndpoint(t *testing.T) {
 	// successful batch
 	resp, err = createBatchEndpoint(svc, log.NewNopLogger())(context.TODO(), createBatchRequest{
 		FileID: f.ID,
-		Batch:  &mockBatchWEB().Batch,
+		Batch:  &mockBatchWEB(t).Batch,
 	})
 	if r, ok := resp.(createBatchResponse); ok {
 		if r.ID != "54321" || err != nil {
@@ -160,7 +160,7 @@ func TestFiles__getBatchesEndpoint(t *testing.T) {
 	// successful batch
 	f := ach.NewFile()
 	f.ID = "get-batches"
-	f.AddBatch(mockBatchWEB())
+	f.AddBatch(mockBatchWEB(t))
 	if err := repo.StoreFile(f); err != nil {
 		t.Fatal(err)
 	}
@@ -182,7 +182,7 @@ func TestFiles__getBatchesEndpoint(t *testing.T) {
 func TestFiles__decodeGetBatchRequest(t *testing.T) {
 	f := ach.NewFile()
 	f.ID = "foo"
-	b := mockBatchWEB()
+	b := mockBatchWEB(t)
 	b.SetID("foo2")
 	f.AddBatch(b)
 
@@ -227,7 +227,7 @@ func TestFiles__getBatchEndpoint(t *testing.T) {
 	// successful batch
 	f := ach.NewFile()
 	f.ID = "get-batch"
-	b := mockBatchWEB()
+	b := mockBatchWEB(t)
 	f.AddBatch(b)
 	if err := repo.StoreFile(f); err != nil {
 		t.Fatal(err)
@@ -251,7 +251,7 @@ func TestFiles__getBatchEndpoint(t *testing.T) {
 func TestFiles__decodeDeleteBatchRequest(t *testing.T) {
 	f := ach.NewFile()
 	f.ID = "foo"
-	b := mockBatchWEB()
+	b := mockBatchWEB(t)
 	b.SetID("foo2")
 	f.AddBatch(b)
 
@@ -296,7 +296,7 @@ func TestFiles__deleteBatchEndpoint(t *testing.T) {
 	// successful batch
 	f := ach.NewFile()
 	f.ID = "delete-batch"
-	b := mockBatchWEB()
+	b := mockBatchWEB(t)
 	f.AddBatch(b)
 	if err := repo.StoreFile(f); err != nil {
 		t.Fatal(err)

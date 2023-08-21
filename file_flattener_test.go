@@ -25,6 +25,8 @@ import (
 	"sort"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestFlattenFile(t *testing.T) {
@@ -150,7 +152,7 @@ func TestFlattenFile(t *testing.T) {
 
 			flattenedFile, err := Flatten(&inputFile)
 			if err != nil {
-				panic(err)
+				require.NoError(t, err)
 			}
 
 			inputFileStructureJson, _ := json.MarshalIndent(getFileStructure(&inputFile), "", "  ")

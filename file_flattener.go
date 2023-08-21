@@ -134,12 +134,12 @@ func canMerge(a mergeable, b mergeable) bool {
 type mergeable interface {
 	GetHeaderSignature() string
 	GetTraceNumbers() map[string]bool
-	Consume(mergeable)
+	Consume(mergeable) error
 	GetBatch() interface{}
 	GetBatchNumber() int
 	Copy() mergeable
 	GetEntryCount() int
-	AddToFile(*File)
+	AddToFile(*File) error
 }
 
 type mergeableBatcher struct {
@@ -166,10 +166,10 @@ func (b mergeableBatcher) GetTraceNumbers() map[string]bool {
 	return b.traceNumbers
 }
 
-func (m mergeableBatcher) Consume(mergeableToConsume mergeable) {
+func (m mergeableBatcher) Consume(mergeableToConsume mergeable) error {
 	batcherToConsume, ok := mergeableToConsume.GetBatch().(Batcher)
 	if !ok {
-		panic(fmt.Sprintf("cannot consume %T - incompatible batch types", mergeableToConsume))
+		return fmt.Errorf("cannot consume %T - incompatible batch types", mergeableToConsume)
 	}
 
 	// Keep the lower of the two batch numbers, to roughly maintain batch order in the flattened file
@@ -185,6 +185,8 @@ func (m mergeableBatcher) Consume(mergeableToConsume mergeable) {
 	for i := range advEntries {
 		m.batcher.AddADVEntry(advEntries[i])
 	}
+
+	return nil
 }
 
 func (m mergeableBatcher) Copy() mergeable {
@@ -195,7 +197,7 @@ func (m mergeableBatcher) Copy() mergeable {
 	return newMergeable
 }
 
-func (m mergeableBatcher) AddToFile(file *File) {
+func (m mergeableBatcher) AddToFile(file *File) error {
 	// Sort entries by trace number
 	sort.Slice(m.batcher.GetEntries(), func(i, j int) bool {
 		return m.batcher.GetEntries()[i].TraceNumber < m.batcher.GetEntries()[j].TraceNumber
@@ -203,12 +205,14 @@ func (m mergeableBatcher) AddToFile(file *File) {
 
 	err := m.batcher.Create()
 	if err != nil {
-		panic(askForBugReports(fmt.Errorf("mergeableBatcher - AddToFile: %v", err)))
+		return askForBugReports(fmt.Errorf("mergeableBatcher - AddToFile: %v", err))
 	}
 
 	m.batcher.GetHeader().BatchNumber = 0
 
 	file.AddBatch(m.batcher)
+
+	return nil
 }
 
 type mergeableIATBatch struct {
@@ -235,10 +239,10 @@ func (b mergeableIATBatch) GetTraceNumbers() map[string]bool {
 	return b.traceNumbers
 }
 
-func (m mergeableIATBatch) Consume(mergeableToConsume mergeable) {
+func (m mergeableIATBatch) Consume(mergeableToConsume mergeable) error {
 	batchToConsume, ok := mergeableToConsume.GetBatch().(IATBatch)
 	if !ok {
-		panic(fmt.Sprintf("IAT cannot consume %T - incompatible batch types", mergeableToConsume))
+		return fmt.Errorf("IAT cannot consume %T - incompatible batch types", mergeableToConsume)
 	}
 
 	// Keep the lower of the two batch numbers, to roughly maintain batch order in the flattened file
@@ -249,6 +253,8 @@ func (m mergeableIATBatch) Consume(mergeableToConsume mergeable) {
 	for _, entry := range batchToConsume.Entries {
 		m.iatBatch.AddEntry(entry)
 	}
+
+	return nil
 }
 
 func (m mergeableIATBatch) Copy() mergeable {
@@ -259,7 +265,7 @@ func (m mergeableIATBatch) Copy() mergeable {
 	return newMergeable
 }
 
-func (m mergeableIATBatch) AddToFile(file *File) {
+func (m mergeableIATBatch) AddToFile(file *File) error {
 	// Sort entries by trace number
 	sort.Slice(m.iatBatch.Entries, func(i, j int) bool {
 		return m.iatBatch.Entries[i].TraceNumber < m.iatBatch.Entries[j].TraceNumber
@@ -267,9 +273,11 @@ func (m mergeableIATBatch) AddToFile(file *File) {
 
 	err := m.iatBatch.Create()
 	if err != nil {
-		panic(askForBugReports(fmt.Errorf("mergeableIATBatch - AddToFile: %v", err)))
+		return askForBugReports(fmt.Errorf("mergeableIATBatch - AddToFile: %v", err))
 	}
 	m.iatBatch.Header.BatchNumber = 0
 
 	file.AddIATBatch(*m.iatBatch)
+
+	return nil
 }
