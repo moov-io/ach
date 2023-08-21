@@ -148,7 +148,7 @@ func TestReader__crashers(t *testing.T) {
 		if v := recover(); v != nil {
 			if _, ok := v.(error); ok {
 				t.Errorf("panic from parsing %s", filepath.Join(dir, currentFile))
-				panic(v) // throw original panic so testing package emits trace
+				panic(v) //nolint:forbidigo // throw original panic so testing package emits trace
 			}
 		}
 	}()

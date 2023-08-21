@@ -72,7 +72,7 @@ func testParseADVFileControl(t testing.TB) {
 	var line = "90000010000010000000100053200010000000000000001050000000000000000000000                       "
 	r := NewReader(strings.NewReader(line))
 	r.line = line
-	batchADV := mockBatchADV()
+	batchADV := mockBatchADV(t)
 	r.File.AddBatch(batchADV)
 
 	err := r.parseFileControl()
@@ -119,7 +119,7 @@ func testADVFCString(t testing.TB) {
 	var line = "90000010000010000000100053200010000000000000001050000000000000000000000                       "
 	r := NewReader(strings.NewReader(line))
 	r.line = line
-	batchADV := mockBatchADV()
+	batchADV := mockBatchADV(t)
 	r.File.AddBatch(batchADV)
 
 	err := r.parseFileControl()
@@ -244,7 +244,7 @@ func TestInvalidADVFCParse(t *testing.T) {
 	var line = "9000001000001000000010005320001000000000000000105"
 	r := NewReader(strings.NewReader(line))
 	r.line = line
-	batchADV := mockBatchADV()
+	batchADV := mockBatchADV(t)
 	r.File.AddBatch(batchADV)
 
 	err := r.parseFileControl()

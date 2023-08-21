@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 // mockBatchPOPHeader creates a BatchPOP BatchHeader
@@ -52,12 +53,10 @@ func mockPOPEntryDetail() *EntryDetail {
 }
 
 // mockBatchPOP creates a BatchPOP
-func mockBatchPOP() *BatchPOP {
+func mockBatchPOP(t testing.TB) *BatchPOP {
 	mockBatch := NewBatchPOP(mockBatchPOPHeader())
 	mockBatch.AddEntry(mockPOPEntryDetail())
-	if err := mockBatch.Create(); err != nil {
-		panic(err)
-	}
+	require.NoError(t, mockBatch.Create())
 	return mockBatch
 }
 
@@ -120,7 +119,7 @@ func BenchmarkBatchPOPHeader(b *testing.B) {
 
 // testBatchPOPCreate validates BatchPOP create
 func testBatchPOPCreate(t testing.TB) {
-	mockBatch := mockBatchPOP()
+	mockBatch := mockBatchPOP(t)
 	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -141,7 +140,7 @@ func BenchmarkBatchPOPCreate(b *testing.B) {
 
 // testBatchPOPStandardEntryClassCode validates BatchPOP create for an invalid StandardEntryClassCode
 func testBatchPOPStandardEntryClassCode(t testing.TB) {
-	mockBatch := mockBatchPOP()
+	mockBatch := mockBatchPOP(t)
 	mockBatch.Header.StandardEntryClassCode = WEB
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchSECType) {
@@ -164,7 +163,7 @@ func BenchmarkBatchPOPStandardEntryClassCode(b *testing.B) {
 
 // testBatchPOPServiceClassCodeEquality validates service class code equality
 func testBatchPOPServiceClassCodeEquality(t testing.TB) {
-	mockBatch := mockBatchPOP()
+	mockBatch := mockBatchPOP(t)
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
@@ -187,7 +186,7 @@ func BenchmarkBatchPOPServiceClassCodeEquality(b *testing.B) {
 
 // testBatchPOPMixedCreditsAndDebits validates BatchPOP create for an invalid MixedCreditsAndDebits
 func testBatchPOPMixedCreditsAndDebits(t testing.TB) {
-	mockBatch := mockBatchPOP()
+	mockBatch := mockBatchPOP(t)
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
@@ -210,7 +209,7 @@ func BenchmarkBatchPOPMixedCreditsAndDebits(b *testing.B) {
 
 // testBatchPOPCreditsOnly validates BatchPOP create for an invalid CreditsOnly
 func testBatchPOPCreditsOnly(t testing.TB) {
-	mockBatch := mockBatchPOP()
+	mockBatch := mockBatchPOP(t)
 	mockBatch.Header.ServiceClassCode = CreditsOnly
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
@@ -233,7 +232,7 @@ func BenchmarkBatchPOPCreditsOnly(b *testing.B) {
 
 // testBatchPOPAutomatedAccountingAdvices validates BatchPOP create for an invalid AutomatedAccountingAdvices
 func testBatchPOPAutomatedAccountingAdvices(t testing.TB) {
-	mockBatch := mockBatchPOP()
+	mockBatch := mockBatchPOP(t)
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
@@ -256,7 +255,7 @@ func BenchmarkBatchPOPAutomatedAccountingAdvices(b *testing.B) {
 
 // testBatchPOPAmount validates BatchPOP create for an invalid Amount
 func testBatchPOPAmount(t testing.TB) {
-	mockBatch := mockBatchPOP()
+	mockBatch := mockBatchPOP(t)
 	mockBatch.Entries[0].Amount = 2600000
 	err := mockBatch.Create()
 	if !base.Match(err, NewErrBatchAmount(2600000, 2500000)) {
@@ -279,7 +278,7 @@ func BenchmarkBatchPOPAmount(b *testing.B) {
 
 // testBatchPOPCheckSerialNumber validates BatchPOP CheckSerialNumber / IdentificationNumber is a mandatory field
 func testBatchPOPCheckSerialNumber(t testing.TB) {
-	mockBatch := mockBatchPOP()
+	mockBatch := mockBatchPOP(t)
 	// modify CheckSerialNumber / IdentificationNumber to nothing
 	mockBatch.GetEntries()[0].SetCheckSerialNumber("")
 	err := mockBatch.Validate()
@@ -306,7 +305,7 @@ func BenchmarkBatchPOPCheckSerialNumber(b *testing.B) {
 // testBatchPOPCheckSerialNumberField validates POPCheckSerialNumberField characters 1-9 of underlying BatchPOP
 // CheckSerialNumber / IdentificationNumber
 func testBatchPOPCheckSerialNumberField(t testing.TB) {
-	mockBatch := mockBatchPOP()
+	mockBatch := mockBatchPOP(t)
 	tc := mockBatch.Entries[0].POPCheckSerialNumberField()
 	if tc != "123456789" {
 		t.Error("CheckSerialNumber is invalid")
@@ -331,7 +330,7 @@ func BenchmarkBatchPOPCheckSerialNumberField(b *testing.B) {
 // testBatchPOPTerminalCityField validates POPTerminalCity characters 10-13 of underlying BatchPOP
 // CheckSerialNumber / IdentificationNumber
 func testBatchPOPTerminalCityField(t testing.TB) {
-	mockBatch := mockBatchPOP()
+	mockBatch := mockBatchPOP(t)
 	tc := mockBatch.Entries[0].POPTerminalCityField()
 	if tc != "PHIL" {
 		t.Error("TerminalCity is invalid")
@@ -356,7 +355,7 @@ func BenchmarkBatchPOPTerminalCityField(b *testing.B) {
 // testBatchPOPTerminalStateField validates POPTerminalState characters 14-15 of underlying BatchPOP
 // CheckSerialNumber / IdentificationNumber
 func testBatchPOPTerminalStateField(t testing.TB) {
-	mockBatch := mockBatchPOP()
+	mockBatch := mockBatchPOP(t)
 	ts := mockBatch.Entries[0].POPTerminalStateField()
 	if ts != "PA" {
 		t.Error("TerminalState is invalid")
@@ -402,7 +401,7 @@ func BenchmarkBatchPOPTransactionCode(b *testing.B) {
 
 // testBatchPOPAddendaCount validates BatchPOP Addenda count
 func testBatchPOPAddendaCount(t testing.TB) {
-	mockBatch := mockBatchPOP()
+	mockBatch := mockBatchPOP(t)
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	err := mockBatch.Create()
@@ -426,7 +425,7 @@ func BenchmarkBatchPOPAddendaCount(b *testing.B) {
 
 // testBatchPOPInvalidBuild validates an invalid batch build
 func testBatchPOPInvalidBuild(t testing.TB) {
-	mockBatch := mockBatchPOP()
+	mockBatch := mockBatchPOP(t)
 	mockBatch.GetHeader().ServiceClassCode = 3
 	err := mockBatch.Create()
 	if !base.Match(err, ErrServiceClass) {
@@ -476,7 +475,7 @@ func TestBatchPOPAddendum99(t *testing.T) {
 }
 
 func testBatchPOPMixedDebitsAndCredits(t testing.TB) {
-	mockBatch := mockBatchPOP()
+	mockBatch := mockBatchPOP(t)
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	mockBatch.Batch.Control.ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()

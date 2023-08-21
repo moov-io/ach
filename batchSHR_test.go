@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 // mockBatchSHRHeader creates a BatchSHR BatchHeader
@@ -52,14 +53,12 @@ func mockSHREntryDetail() *EntryDetail {
 }
 
 // mockBatchSHR creates a BatchSHR
-func mockBatchSHR() *BatchSHR {
+func mockBatchSHR(t testing.TB) *BatchSHR {
 	mockBatch := NewBatchSHR(mockBatchSHRHeader())
 	mockBatch.AddEntry(mockSHREntryDetail())
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
-	if err := mockBatch.Create(); err != nil {
-		panic(err)
-	}
+	require.NoError(t, mockBatch.Create())
 	return mockBatch
 }
 
@@ -87,7 +86,7 @@ func BenchmarkBatchSHRHeader(b *testing.B) {
 
 // testBatchSHRCreate validates BatchSHR create
 func testBatchSHRCreate(t testing.TB) {
-	mockBatch := mockBatchSHR()
+	mockBatch := mockBatchSHR(t)
 	if err := mockBatch.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -108,7 +107,7 @@ func BenchmarkBatchSHRCreate(b *testing.B) {
 
 // testBatchSHRStandardEntryClassCode validates BatchSHR create for an invalid StandardEntryClassCode
 func testBatchSHRStandardEntryClassCode(t testing.TB) {
-	mockBatch := mockBatchSHR()
+	mockBatch := mockBatchSHR(t)
 	mockBatch.Header.StandardEntryClassCode = WEB
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchSECType) {
@@ -131,7 +130,7 @@ func BenchmarkBatchSHRStandardEntryClassCode(b *testing.B) {
 
 // testBatchSHRServiceClassCodeEquality validates service class code equality
 func testBatchSHRServiceClassCodeEquality(t testing.TB) {
-	mockBatch := mockBatchSHR()
+	mockBatch := mockBatchSHR(t)
 	mockBatch.GetControl().ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
@@ -154,7 +153,7 @@ func BenchmarkBatchSHRServiceClassCodeEquality(b *testing.B) {
 
 // testBatchSHRMixedCreditsAndDebits validates BatchSHR create for an invalid MixedCreditsAndDebits
 func testBatchSHRMixedCreditsAndDebits(t testing.TB) {
-	mockBatch := mockBatchSHR()
+	mockBatch := mockBatchSHR(t)
 	mockBatch.Header.ServiceClassCode = MixedDebitsAndCredits
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(MixedDebitsAndCredits, 225)) {
@@ -177,7 +176,7 @@ func BenchmarkBatchSHRMixedCreditsAndDebits(b *testing.B) {
 
 // testBatchSHRCreditsOnly validates BatchSHR create for an invalid CreditsOnly
 func testBatchSHRCreditsOnly(t testing.TB) {
-	mockBatch := mockBatchSHR()
+	mockBatch := mockBatchSHR(t)
 	mockBatch.Header.ServiceClassCode = CreditsOnly
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(CreditsOnly, 225)) {
@@ -200,7 +199,7 @@ func BenchmarkBatchSHRCreditsOnly(b *testing.B) {
 
 // testBatchSHRAutomatedAccountingAdvices validates BatchSHR create for an invalid AutomatedAccountingAdvices
 func testBatchSHRAutomatedAccountingAdvices(t testing.TB) {
-	mockBatch := mockBatchSHR()
+	mockBatch := mockBatchSHR(t)
 	mockBatch.Header.ServiceClassCode = AutomatedAccountingAdvices
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(AutomatedAccountingAdvices, 225)) {
@@ -223,7 +222,7 @@ func BenchmarkBatchSHRAutomatedAccountingAdvices(b *testing.B) {
 
 // testBatchSHRTransactionCode validates BatchSHR TransactionCode is not a credit
 func testBatchSHRTransactionCode(t testing.TB) {
-	mockBatch := mockBatchSHR()
+	mockBatch := mockBatchSHR(t)
 	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchDebitOnly) {
@@ -246,7 +245,7 @@ func BenchmarkBatchSHRTransactionCode(b *testing.B) {
 
 // testBatchSHRAddendaCount validates BatchSHR Addendum count of 2
 func testBatchSHRAddendaCount(t testing.TB) {
-	mockBatch := mockBatchSHR()
+	mockBatch := mockBatchSHR(t)
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	err := mockBatch.Create()
 	// TODO: are we not expecting any errors here?
@@ -377,7 +376,7 @@ func BenchmarkBatchSHRInvalidAddenda(b *testing.B) {
 
 // testBatchSHRInvalidBuild validates an invalid batch build
 func testBatchSHRInvalidBuild(t testing.TB) {
-	mockBatch := mockBatchSHR()
+	mockBatch := mockBatchSHR(t)
 	mockBatch.GetHeader().ServiceClassCode = 3
 	err := mockBatch.Create()
 	if !base.Match(err, ErrServiceClass) {
@@ -400,7 +399,7 @@ func BenchmarkBatchSHRInvalidBuild(b *testing.B) {
 
 // testBatchSHRCardTransactionType validates BatchSHR create for an invalid CardTransactionType
 func testBatchSHRCardTransactionType(t testing.TB) {
-	mockBatch := mockBatchSHR()
+	mockBatch := mockBatchSHR(t)
 	mockBatch.GetEntries()[0].DiscretionaryData = "555"
 	err := mockBatch.Validate()
 	if !base.Match(err, ErrBatchInvalidCardTransactionType) {
@@ -424,7 +423,7 @@ func BenchmarkBatchSHRCardTransactionType(b *testing.B) {
 // testBatchSHRCardExpirationDateField validates SHRCardExpirationDate
 // characters 0-4 of underlying IdentificationNumber
 func testBatchSHRCardExpirationDateField(t testing.TB) {
-	mockBatch := mockBatchSHR()
+	mockBatch := mockBatchSHR(t)
 	ts := mockBatch.Entries[0].SHRCardExpirationDateField()
 	if ts != "0722" {
 		t.Error("Card Expiration Date is invalid")
@@ -449,7 +448,7 @@ func BenchmarkBatchSHRCardExpirationDateField(b *testing.B) {
 // testBatchSHRDocumentReferenceNumberField validates SHRDocumentReferenceNumberField
 // characters 5-15 of underlying IdentificationNumber
 func testBatchSHRDocumentReferenceNumberField(t testing.TB) {
-	mockBatch := mockBatchSHR()
+	mockBatch := mockBatchSHR(t)
 	ts := mockBatch.Entries[0].SHRDocumentReferenceNumberField()
 	if ts != "12345678910" {
 		t.Error("Document Reference Number is invalid")
@@ -474,7 +473,7 @@ func BenchmarkSHRDocumentReferenceNumberField(b *testing.B) {
 // testBatchSHRIndividualCardAccountNumberField validates SHRIndividualCardAccountNumberField
 // underlying IndividualName
 func testBatchSHRIndividualCardAccountNumberField(t testing.TB) {
-	mockBatch := mockBatchSHR()
+	mockBatch := mockBatchSHR(t)
 	ts := mockBatch.Entries[0].SHRIndividualCardAccountNumberField()
 	if ts != "0001234567891123456789" {
 		t.Error("Individual Card Account Number is invalid")
@@ -498,7 +497,7 @@ func BenchmarkBatchSHRDocumentReferenceNumberField(b *testing.B) {
 
 // testSHRCardExpirationDateMonth validates the month is valid for CardExpirationDate
 func testSHRCardExpirationDateMonth(t testing.TB) {
-	mockBatch := mockBatchSHR()
+	mockBatch := mockBatchSHR(t)
 	mockBatch.GetEntries()[0].SetSHRCardExpirationDate("1306")
 	err := mockBatch.Validate()
 	if !base.Match(err, ErrValidMonth) {
@@ -521,7 +520,7 @@ func BenchmarkSHRCardExpirationDateMonth(b *testing.B) {
 
 // testSHRCardExpirationDateYear validates the year is valid for CardExpirationDate
 func testSHRCardExpirationDateYear(t testing.TB) {
-	mockBatch := mockBatchSHR()
+	mockBatch := mockBatchSHR(t)
 	mockBatch.GetEntries()[0].SetSHRCardExpirationDate("0612")
 	err := mockBatch.Validate()
 	if !base.Match(err, ErrValidYear) {

@@ -730,7 +730,9 @@ func TestWriteWithCustomLineEnding(t *testing.T) {
 }
 
 func TestWriteBypassValidation(t *testing.T) {
-	file := mockFilePPD()
+	t.Helper()
+
+	file := mockFilePPD(t)
 	file.Header.FileCreationDate = "abc" // make the file fail Nacha validation
 
 	writer := NewWriter(&bytes.Buffer{})

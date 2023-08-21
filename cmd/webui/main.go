@@ -64,7 +64,11 @@ func main() {
 	// Register our assets route
 	assetsPath := strx.Or(os.Getenv("ASSETS_PATH"), filepath.Join("cmd", "webui", "assets"))
 	log.Printf("serving assets from %s", assetsPath)
-	addAssetsPath(router, assetsPath)
+	err := addAssetsPath(router, assetsPath)
+	if err != nil {
+		log.Print(err)
+		errs <- err
+	}
 
 	serve := &http.Server{
 		Addr:    *httpAddr,
@@ -116,9 +120,10 @@ func addPingRoute(r *mux.Router) {
 	})
 }
 
-func addAssetsPath(r *mux.Router, assetPath string) {
+func addAssetsPath(r *mux.Router, assetPath string) error {
 	if _, err := os.Stat(assetPath); err != nil {
-		panic(fmt.Sprintf("ERROR: unable to stat %s: %v", assetPath, err))
+		return fmt.Errorf("ERROR: unable to stat %s: %w", assetPath, err)
 	}
 	r.Methods("GET").PathPrefix("/").Handler(http.StripPrefix(*flagBasePath, http.FileServer(http.Dir(assetPath))))
+	return nil
 }

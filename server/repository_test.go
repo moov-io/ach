@@ -82,7 +82,7 @@ func TestRepositoryBatches(t *testing.T) {
 		t.Errorf("unexpected length: %d", v)
 	}
 
-	batch := mockBatchWEB()
+	batch := mockBatchWEB(t)
 	b, err := r.FindBatch(f.ID, batch.ID())
 	if err == nil || b != nil {
 		t.Errorf("b=%v, err=%v", b, err)

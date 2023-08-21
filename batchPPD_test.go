@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 // mockBatchPPDHeader creates a PPD batch header
@@ -92,12 +93,13 @@ func mockPPDEntryDetailNOC() *EntryDetail {
 }
 
 // mockBatchPPD creates a PPD batch
-func mockBatchPPD() *BatchPPD {
+func mockBatchPPD(t testing.TB) *BatchPPD {
+	t.Helper()
+
 	mockBatch := NewBatchPPD(mockBatchPPDHeader())
 	mockBatch.AddEntry(mockPPDEntryDetail())
-	if err := mockBatch.Create(); err != nil {
-		panic(err)
-	}
+	require.NoError(t, mockBatch.Create())
+
 	return mockBatch
 }
 
@@ -124,7 +126,7 @@ func BenchmarkBatchError(b *testing.B) {
 
 // testBatchServiceClassCodeEquality validates service class code equality
 func testBatchServiceClassCodeEquality(t testing.TB) {
-	mockBatch := mockBatchPPD()
+	mockBatch := mockBatchPPD(t)
 	mockBatch.GetControl().ServiceClassCode = DebitsOnly
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality(220, MixedDebitsAndCredits)) {
@@ -147,7 +149,7 @@ func BenchmarkBatchServiceClassCodeEquality(b *testing.B) {
 
 // BatchPPDCreate validates batch create for an invalid service code
 func testBatchPPDCreate(t testing.TB) {
-	mockBatch := mockBatchPPD()
+	mockBatch := mockBatchPPD(t)
 	// can not have default values in Batch Header to build batch
 	mockBatch.GetHeader().ServiceClassCode = 0
 	err := mockBatch.Create()
@@ -171,7 +173,7 @@ func BenchmarkBatchPPDCreate(b *testing.B) {
 
 // testBatchPPDTypeCode validates batch PPD type code
 func testBatchPPDTypeCode(t testing.TB) {
-	mockBatch := mockBatchPPD()
+	mockBatch := mockBatchPPD(t)
 	// change an addendum to an invalid type code
 	a := mockAddenda05()
 	a.TypeCode = "63"
@@ -197,7 +199,7 @@ func BenchmarkBatchPPDTypeCode(b *testing.B) {
 
 // testBatchCompanyIdentification validates batch PPD company identification
 func testBatchCompanyIdentification(t testing.TB) {
-	mockBatch := mockBatchPPD()
+	mockBatch := mockBatchPPD(t)
 	mockBatch.GetControl().CompanyIdentification = "XYZ Inc"
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality("121042882", "XYZ Inc")) {
@@ -220,7 +222,7 @@ func BenchmarkBatchCompanyIdentification(b *testing.B) {
 
 // testBatchODFIIDMismatch validates ODFIIdentification mismatch
 func testBatchODFIIDMismatch(t testing.TB) {
-	mockBatch := mockBatchPPD()
+	mockBatch := mockBatchPPD(t)
 	mockBatch.GetControl().ODFIIdentification = "987654321"
 	err := mockBatch.Validate()
 	if !base.Match(err, NewErrBatchHeaderControlEquality("12104288", "987654321")) {
@@ -269,7 +271,7 @@ func BenchmarkBatchBuild(b *testing.B) {
 
 // testBatchPPDAddendaCount validates BatchPPD Addendum count of 2
 func testBatchPPDAddendaCount(t testing.TB) {
-	mockBatch := mockBatchPPD()
+	mockBatch := mockBatchPPD(t)
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
 	mockBatch.GetEntries()[0].AddAddenda05(mockAddenda05())
@@ -322,7 +324,7 @@ func TestBatchPPDAddendum99(t *testing.T) {
 
 // TestBatchPPDSEC validates that the standard entry class code is PPD for batch PPD
 func TestBatchPPDSEC(t *testing.T) {
-	mockBatch := mockBatchPPD()
+	mockBatch := mockBatchPPD(t)
 	mockBatch.Header.StandardEntryClassCode = RCK
 	err := mockBatch.Validate()
 	if !base.Match(err, ErrBatchSECType) {
@@ -332,7 +334,7 @@ func TestBatchPPDSEC(t *testing.T) {
 
 // TestBatchPPDValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
 func TestBatchPPDValidTranCodeForServiceClassCode(t *testing.T) {
-	mockBatch := mockBatchPPD()
+	mockBatch := mockBatchPPD(t)
 	mockBatch.GetHeader().ServiceClassCode = DebitsOnly
 	err := mockBatch.Create()
 	if !base.Match(err, NewErrBatchServiceClassTranCode(DebitsOnly, 22)) {
@@ -342,7 +344,7 @@ func TestBatchPPDValidTranCodeForServiceClassCode(t *testing.T) {
 
 // TestBatchPPDAddenda02 validates BatchPPD cannot have Addenda02
 func TestBatchPPDAddenda02(t *testing.T) {
-	mockBatch := mockBatchPPD()
+	mockBatch := mockBatchPPD(t)
 	mockBatch.Entries[0].AddendaRecordIndicator = 1
 	mockBatch.GetEntries()[0].Addenda02 = mockAddenda02()
 	err := mockBatch.Create()

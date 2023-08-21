@@ -781,7 +781,7 @@ func decodeSegmentFileRequest(_ context.Context, r *http.Request) (interface{}, 
 
 	header := strings.ToLower(r.Header.Get("content-type"))
 	if strings.Contains(header, "application/json") {
-		kv := make(map[string]json.RawMessage, 0)
+		kv := make(map[string]json.RawMessage)
 
 		err := json.NewDecoder(r.Body).Decode(&kv)
 		if err != nil {
