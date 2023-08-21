@@ -45,7 +45,13 @@ func main() {
 	}()
 
 	// Start Admin server (with Prometheus metrics)
-	adminServer := admin.NewServer(*adminAddr)
+	adminServer, err := admin.New(admin.Opts{
+		Addr: *adminAddr,
+	})
+	if err != nil {
+		errs <- fmt.Errorf("problem running admin server: %v", err)
+		os.Exit(1)
+	}
 	adminServer.AddVersionHandler(ach.Version) // Setup 'GET /version'
 	go func() {
 		log.Printf("listening on %s", adminServer.BindAddr())
@@ -64,7 +70,7 @@ func main() {
 	// Register our assets route
 	assetsPath := strx.Or(os.Getenv("ASSETS_PATH"), filepath.Join("cmd", "webui", "assets"))
 	log.Printf("serving assets from %s", assetsPath)
-	err := addAssetsPath(router, assetsPath)
+	err = addAssetsPath(router, assetsPath)
 	if err != nil {
 		log.Print(err)
 		errs <- err

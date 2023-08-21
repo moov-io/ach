@@ -121,7 +121,12 @@ func main() {
 	}
 
 	// Admin server (metrics and debugging)
-	adminServer := admin.NewServer(*adminAddr)
+	adminServer, err := admin.New(admin.Opts{
+		Addr: *adminAddr,
+	})
+	if err != nil {
+		errs <- logger.Fatal().LogErrorf("problem running admin server: %v", err).Err()
+	}
 	adminServer.AddVersionHandler(ach.Version) // Setup 'GET /version'
 	go func() {
 		logger.Logf("admin listening on %s", adminServer.BindAddr())
