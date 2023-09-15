@@ -28,7 +28,7 @@
 # moov-io/ach
 Moov's mission is to give developers an easy way to create and integrate bank processing into their own software products. Our open source projects are each focused on solving a single responsibility in financial services and designed around performance, scalability, and ease of use.
 
-ACH implements a reader, writer, and validator for Automated Clearing House ([ACH](https://en.wikipedia.org/wiki/Automated_Clearing_House)) files. ACH is the primary method of electronic money movement throughout the United States. The HTTP server is available in a [Docker image](#docker) and the Go package `github.com/moov-io/ach` is available.
+ACH implements a reader, writer, and validator for Automated Clearing House ([ACH](https://en.wikipedia.org/wiki/Automated_Clearing_House)) files following the Nacha standards. ACH is the primary method of electronic money movement throughout the United States. The HTTP server is available in a [Docker image](#docker) and the Go package `github.com/moov-io/ach` is available.
 
 If you're looking for an event driven ACH engine for uploading/downloading files and operations we have built [moov-io/achgateway](https://github.com/moov-io/achgateway) and run it in production. Our article [How and When to use the Moov ACH Library](https://moov.io/blog/education/how-and-when-to-use-the-moov-ach-library/) will help to generate ACH files for upload to your ODFI.
 
@@ -54,7 +54,7 @@ If you're looking for an event driven ACH engine for uploading/downloading files
 
 ## Project status
 
-Moov ACH is actively used in multiple production environments. Please star the project if you are interested in its progress. The project supports generating and parsing all Standard Entry Class (SEC) codes. If you have layers above ACH to simplify tasks, perform business operations, or found bugs we would appreciate an issue or pull request. Thanks!
+Moov ACH is actively used in multiple production environments. Please star the project if you are interested in its progress. The project supports generating and parsing all Standard Entry Class (SEC) codes and validating files according to the Nacha standards. If you have layers above ACH to simplify tasks, perform business operations, or found bugs we would appreciate an issue or pull request. Thanks!
 
 ## Usage
 
