@@ -134,6 +134,97 @@ func TestReadPartial(t *testing.T) {
 	}
 }
 
+func TestReadPartial2(t *testing.T) {
+	path := filepath.Join("test", "testdata", "bh-ed-bc-ed-ed-ed-bc.ach")
+	fd1, err := os.Open(path)
+	if err != nil {
+		t.Errorf("problem reading %s: %v", path, err)
+	}
+	defer fd1.Close()
+
+	// read the bad file with AllowMissingBatchHeader not set (normal way of processing)
+	reader1 := NewReader(fd1)
+	reader1.SetValidation(&ValidateOpts{})
+	file1, err := reader1.Read()
+	if err != nil {
+		t.Log(err) // we expect errors -- display them
+	}
+	require.Contains(t, err.Error(), "entry outside of batch")
+
+	require.Len(t, file1.Batches, 1)
+
+	fd2, err := os.Open(path)
+	if err != nil {
+		t.Errorf("problem reading %s: %v", path, err)
+	}
+	defer fd2.Close()
+
+	// read the bad file again, but with AllowMissingBatchHeader set to true (alternate way of processing)
+	reader2 := NewReader(fd2)
+	reader2.SetValidation(&ValidateOpts{
+		AllowMissingBatchHeader: true,
+	})
+	file2, err := reader2.Read()
+	if err != nil {
+		t.Log(err) // we expect errors -- display them
+	}
+	require.NotContains(t, err.Error(), "entry outside of batch")
+
+	require.Len(t, file2.Batches, 2)
+
+	b1Entries := file2.Batches[0].GetEntries()
+	require.Len(t, b1Entries, 1)
+	require.Nil(t, b1Entries[0].Addenda98)
+	require.Nil(t, b1Entries[0].Addenda99)
+
+	// batch
+	bh := file2.Batches[0].GetHeader()
+	if bh.ServiceClassCode != MixedDebitsAndCredits {
+		t.Errorf("ServiceClassCode=%d", bh.ServiceClassCode)
+	}
+	if bh.CompanyName != "Adam Shannon" {
+		t.Errorf("CompanyName=%s", bh.CompanyName)
+	}
+	if bh.CompanyIdentification != "MOOVYYYYYY" {
+		t.Errorf("CompanyIdentification=%s", bh.CompanyIdentification)
+	}
+	if bh.StandardEntryClassCode != PPD {
+		t.Errorf("StandardEntryClassCode=%s", bh.StandardEntryClassCode)
+	}
+
+	// entries
+	entry := b1Entries[0]
+	if entry.TransactionCode != CheckingReturnNOCDebit {
+		t.Errorf("TransactionCode=%d", entry.TransactionCode)
+	}
+	if num := strings.TrimSpace(entry.DFIAccountNumber); num != "15XXXXXXXXXX1" {
+		t.Errorf("DFIAccountNumber=%q", num)
+	}
+	for i := range b1Entries {
+		require.Nil(t, b1Entries[i].Addenda98)
+		require.Nil(t, b1Entries[i].Addenda99)
+	}
+
+	b2Entries := file2.Batches[1].GetEntries()
+	require.Len(t, b2Entries, 3)
+
+	for i := range b2Entries {
+		require.Nil(t, b2Entries[i].Addenda98)
+		require.Nil(t, b2Entries[i].Addenda99)
+	}
+
+	entry = b2Entries[0]
+	if entry.TransactionCode != CheckingReturnNOCCredit {
+		t.Errorf("TransactionCode=%d", entry.TransactionCode)
+	}
+	if num := strings.TrimSpace(entry.DFIAccountNumber); num != "1XXXXXXXXXXX2" {
+		t.Errorf("DFIAccountNumber=%q", num)
+	}
+	if entry.Addenda99 != nil {
+		t.Errorf("non nil Addenda99")
+	}
+}
+
 func TestReader__crashers(t *testing.T) {
 	dir := filepath.Join("test", "testdata", "crashers")
 	fds, err := os.ReadDir(dir)

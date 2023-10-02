@@ -433,7 +433,16 @@ func (r *Reader) parseEntryDetail() error {
 	r.recordName = "EntryDetail"
 
 	if r.currentBatch == nil {
-		return ErrFileEntryOutsideBatch
+		if r.File.validateOpts != nil && r.File.validateOpts.AllowMissingBatchHeader {
+			newBH := newDummyBatchHeader()
+			newBatch, err := NewBatch(newBH)
+			if err != nil {
+				return err
+			}
+			r.currentBatch = newBatch
+		} else {
+			return ErrFileEntryOutsideBatch
+		}
 	}
 	if r.currentBatch.GetHeader().StandardEntryClassCode != ADV {
 		ed := NewEntryDetail()
@@ -592,6 +601,12 @@ func (r *Reader) parseBatchControl() error {
 			if err := maybeValidate(r.currentBatch.GetControl(), r.File.validateOpts); err != nil {
 				return r.parseError(err)
 			}
+		}
+		if r.currentBatch.GetHeader().ServiceClassCode == 0 && r.currentBatch.GetHeader().BatchNumber == 0 && r.File.validateOpts.AllowMissingBatchHeader {
+			r.currentBatch.GetHeader().ServiceClassCode = r.currentBatch.GetControl().ServiceClassCode
+			r.currentBatch.GetHeader().CompanyIdentification = r.currentBatch.GetControl().CompanyIdentification
+			r.currentBatch.GetHeader().ODFIIdentification = r.currentBatch.GetControl().ODFIIdentification
+			r.currentBatch.GetHeader().BatchNumber = r.currentBatch.GetControl().BatchNumber
 		}
 	} else {
 		r.IATCurrentBatch.GetControl().Parse(r.line)

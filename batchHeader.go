@@ -145,6 +145,20 @@ func NewBatchHeader() *BatchHeader {
 	return bh
 }
 
+func newDummyBatchHeader() *BatchHeader {
+	bh := &BatchHeader{
+		OriginatorStatusCode: 1, // Prepared by a financial institution
+		//BatchNumber:            1,
+		StandardEntryClassCode: PPD,
+		//ServiceClassCode: 0,
+		CompanyName: "Dummy Batch",
+		//CompanyIdentification:   "Dummy",
+		CompanyEntryDescription: "Dummy",
+		//ODFIIdentification:      "00000000",
+	}
+	return bh
+}
+
 // Parse takes the input record string and parses the BatchHeader values
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.

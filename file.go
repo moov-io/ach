@@ -662,6 +662,9 @@ type ValidateOpts struct {
 	// AllowMissingFileControl allows a file to be read without a FileControl record.
 	AllowMissingFileControl bool `json:"allowMissingFileControl"`
 
+	// AllowMissingBatchHeader allows a batch to be read without a BatchHeader record.
+	AllowMissingBatchHeader bool `json:"-"`
+
 	// BypassCompanyIdentificationMatch allows batches in which the Company Identification field
 	// in the batch header and control do not match.
 	BypassCompanyIdentificationMatch bool `json:"bypassCompanyIdentificationMatch"`
