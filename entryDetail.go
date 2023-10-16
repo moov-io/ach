@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"bytes"
 	"fmt"
 	"sort"
 	"strconv"
@@ -198,35 +199,75 @@ func NewEntryDetail() *EntryDetail {
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
 func (ed *EntryDetail) Parse(record string) {
-	if utf8.RuneCountInString(record) != 94 {
+	runeCount := utf8.RuneCountInString(record)
+	if runeCount != 94 {
 		return
 	}
-	runes := []rune(record)
 
-	// 1-1 Always "6"
-	// 2-3 is checking credit 22 debit 27 savings credit 32 debit 37
-	ed.TransactionCode = ed.parseNumField(string(runes[1:3]))
-	// 4-11 the RDFI's routing number without the last digit.
-	ed.RDFIIdentification = string(runes[3:11])
-	// 12-12 The last digit of the RDFI's routing number
-	ed.CheckDigit = string(runes[11:12])
-	// 13-29 The receiver's bank account number you are crediting/debiting
-	ed.DFIAccountNumber = ed.parseStringFieldWithOpts(string(runes[12:29]), ed.validateOpts)
-	// 30-39 Number of cents you are debiting/crediting this account
-	ed.Amount = ed.parseNumField(string(runes[29:39]))
-	// 40-54 An internal identification (alphanumeric) that you use to uniquely identify this Entry Detail Record
-	ed.IdentificationNumber = string(runes[39:54])
-	// 55-76 The name of the receiver, usually the name on the bank account
-	ed.IndividualName = string(runes[54:76])
-	// 77-78 allows ODFIs to include codes of significance only to them, normally blank
+	// We're going to process the record rune-by-rune and at each field cutoff save the value.
+	var buf bytes.Buffer
+	reset := func() string {
+		out := buf.String()
+		buf.Reset()
+		return out
+	}
 
-	// For WEB and TEL batches this field is the PaymentType which is either R(reoccurring) or S(single)
-	ed.DiscretionaryData = string(runes[76:78])
-	// 79-79 1 if addenda exists 0 if it does not
-	ed.AddendaRecordIndicator = ed.parseNumField(string(runes[78:79]))
-	// 80-94 An internal identification (numeric) that you use to uniquely identify
-	// this Entry Detail Record This number should be unique to the transaction and will help identify the transaction in case of an inquiry
-	ed.TraceNumber = string(runes[79:94])
+	var idx int
+	for _, r := range record {
+		idx++
+
+		// Append rune to buffer
+		buf.WriteRune(r)
+
+		// At each cutoff save the buffer and reset
+		switch idx {
+		case 0, 1:
+			// do nothing, ignore "6" record type
+			reset()
+
+		case 3:
+			// 2-3 is checking credit 22 debit 27 savings credit 32 debit 37
+			ed.TransactionCode = ed.parseNumField(reset())
+
+		case 11:
+			// 4-11 the RDFI's routing number without the last digit.
+			ed.RDFIIdentification = reset()
+
+		case 12:
+			// 12-12 The last digit of the RDFI's routing number
+			ed.CheckDigit = reset()
+
+		case 29:
+			// 13-29 The receiver's bank account number you are crediting/debiting
+			ed.DFIAccountNumber = ed.parseStringFieldWithOpts(reset(), ed.validateOpts)
+
+		case 39:
+			// 30-39 Number of cents you are debiting/crediting this account
+			ed.Amount = ed.parseNumField(reset())
+
+		case 54:
+			// 40-54 An internal identification (alphanumeric) that you use to uniquely identify this Entry Detail Record
+			ed.IdentificationNumber = reset()
+
+		case 76:
+			// 55-76 The name of the receiver, usually the name on the bank account
+			ed.IndividualName = reset()
+
+		case 78:
+			// 77-78 allows ODFIs to include codes of significance only to them, normally blank
+			// For WEB and TEL batches this field is the PaymentType which is either R(reoccurring) or S(single)
+			ed.DiscretionaryData = reset()
+
+		case 79:
+			// 79-79 1 if addenda exists 0 if it does not
+			ed.AddendaRecordIndicator = ed.parseNumField(reset())
+
+		case 94:
+			// 80-94 An internal identification (numeric) that you use to uniquely identify
+			// this Entry Detail Record This number should be unique to the transaction and will help identify the transaction in case of an inquiry
+			ed.TraceNumber = reset() // capture end of record
+		}
+	}
 }
 
 // String writes the EntryDetail struct to a 94 character string.

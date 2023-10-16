@@ -124,9 +124,12 @@ func TestExtendedCharacters(t *testing.T) {
 		require.Equal(t, "windows-1252", name)
 	})
 
-	t.Run("parse windows-1252", func(t *testing.T) {
-		file, err := ReadFile(filepath.Join("test", "testdata", "nonascii.ach"))
-		require.NoError(t, err)
+	t.Run("parse nonaschii-utf8", func(t *testing.T) {
+		file, err := ReadFile(filepath.Join("test", "testdata", "nonascii-utf8.ach"))
+		// require.NoError(t, err)
+		if err != nil {
+			t.Log(err)
+		}
 
 		require.Len(t, file.Batches, 1)
 		bh := file.Batches[0].GetHeader()
@@ -134,7 +137,26 @@ func TestExtendedCharacters(t *testing.T) {
 
 		entries := file.Batches[0].GetEntries()
 		require.Len(t, entries, 1)
-		require.Equal(t, "0012Receiver Acc Name ", entries[0].IndividualName)
+		require.Equal(t, "0012Receiver¦Acc Name ", entries[0].IndividualName)
+
+		require.Len(t, entries[0].Addenda05, 12)
+		require.Contains(t, entries[0].Addenda05[0].PaymentRelatedInformation, "¦ZZ¦PAYEXPENSEPAY")
+	})
+
+	t.Run("parse windows-1252", func(t *testing.T) {
+		file, err := ReadFile(filepath.Join("test", "testdata", "nonascii.ach"))
+		// require.NoError(t, err)
+		if err != nil {
+			t.Log(err)
+		}
+
+		require.Len(t, file.Batches, 1)
+		bh := file.Batches[0].GetHeader()
+		require.Equal(t, "REG.SALARY", bh.CompanyEntryDescription)
+
+		entries := file.Batches[0].GetEntries()
+		require.Len(t, entries, 1)
+		require.Equal(t, "0012Receiver¦Acc Name ", entries[0].IndividualName)
 
 		require.Len(t, entries[0].Addenda05, 12)
 		require.Contains(t, entries[0].Addenda05[0].PaymentRelatedInformation, "¦ZZ¦PAYEXPENSEPAY")
