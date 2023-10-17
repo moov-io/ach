@@ -19,6 +19,7 @@ package ach
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -172,6 +173,9 @@ func (r *Reader) SetMaxLines(max int) {
 func (r *Reader) Read() (File, error) {
 	r.lineNum = 0
 	// read through the entire file
+	if r.scanner == nil {
+		return r.File, errors.New("nil scanner")
+	}
 	for r.scanner.Scan() {
 		line := r.scanner.Text()
 		r.lineNum++
