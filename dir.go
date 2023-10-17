@@ -57,6 +57,14 @@ func ReadDir(dir string) ([]*File, error) {
 	for i := range infos {
 		path := filepath.Join(dir, infos[i].Name())
 
+		stat, err := os.Stat(path)
+		if err != nil {
+			return nil, fmt.Errorf("stat of %s failed: %v", path, err)
+		}
+		if stat.IsDir() {
+			continue
+		}
+
 		f, err1 := readACH(path)
 		if f != nil {
 			out = append(out, f)

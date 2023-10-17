@@ -22,6 +22,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestReadDir(t *testing.T) {
@@ -37,12 +39,16 @@ func TestReadDir(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	files, err := ReadDir(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(files) != 5 {
-		t.Errorf("found %d files", len(files))
-	}
+	require.NoError(t, err)
+	require.Len(t, files, 5)
+
+	// Make a directory which is skipped
+	err = os.Mkdir(filepath.Join(dir, "other"), 0777)
+	require.NoError(t, err)
+
+	files, err = ReadDir(dir)
+	require.NoError(t, err)
+	require.Len(t, files, 5)
 }
 
 func TestReadDirErr(t *testing.T) {
@@ -55,17 +61,12 @@ func TestReadDirErr(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	// zzz- is a prefix as os.ReadDir seems to return file descriptors ordered alphabetically by filename
-	if err := os.WriteFile(filepath.Join(dir, "zzz-bad.ach"), []byte("bad data"), 0600); err != nil {
-		t.Fatal(err)
-	}
+	err := os.WriteFile(filepath.Join(dir, "zzz-bad.ach"), []byte("bad data"), 0600)
+	require.NoError(t, err)
 
 	files, err := ReadDir(dir)
-	if len(files) != 2 {
-		t.Errorf("found %d files", len(files))
-	}
-	if err == nil {
-		t.Error("expected error")
-	}
+	require.Error(t, err)
+	require.Len(t, files, 2)
 
 	files, err = ReadDir("/not/exist/")
 	if n := len(files); n != 0 || err == nil {
@@ -75,30 +76,23 @@ func TestReadDirErr(t *testing.T) {
 
 func TestReadDirSymlinkErr(t *testing.T) {
 	dir, err := os.MkdirTemp("", "readdir-symlink")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer os.RemoveAll(dir)
 
 	// write an invalid symlink
-	if err := os.Symlink(filepath.Join("missing", "directory"), filepath.Join(dir, "foo.ach")); err != nil {
-		t.Fatal(err)
-	}
+	err = os.Symlink(filepath.Join("missing", "directory"), filepath.Join(dir, "foo.ach"))
+	require.NoError(t, err)
 
 	files, err := ReadDir(dir)
-	if len(files) != 0 {
-		t.Errorf("got %d files", len(files))
-	}
-	if err == nil {
-		t.Error("expected error")
-	}
+	require.Error(t, err)
+	require.Len(t, files, 0)
 }
 
 func copyFilesToTempDir(t *testing.T, filenames []string) string {
+	t.Helper()
+
 	dir, err := os.MkdirTemp("", "ach-readdir")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	for i := range filenames {
 		in, err := os.Open(filepath.Join("test", "testdata", filenames[i]))
@@ -114,9 +108,7 @@ func copyFilesToTempDir(t *testing.T, filenames []string) string {
 		in.Close()
 		out.Close()
 
-		if err != nil {
-			t.Fatalf("copy: %v", err)
-		}
+		require.NoError(t, err)
 	}
 
 	return dir
