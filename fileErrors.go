@@ -45,6 +45,8 @@ var (
 	ErrFileIATSEC = errors.New("IAT Standard Entry Class Code should use iatBatch")
 	// ErrFileNoBatches is the error given if a file has no batches
 	ErrFileNoBatches = errors.New("must have []*Batches or []*IATBatches to be built")
+
+	ErrInvalidJSON = errors.New("invalid JSON")
 )
 
 // RecordWrongLengthErr is the error given when a record is the wrong length

@@ -141,6 +141,9 @@ func FileFromJSONWith(bs []byte, opts *ValidateOpts) (*File, error) {
 	if len(bs) == 0 {
 		return nil, errors.New("no JSON data provided")
 	}
+	if !json.Valid(bs) {
+		return nil, fmt.Errorf("problem reading File: %w", ErrInvalidJSON)
+	}
 
 	// read file root level
 	var f file
