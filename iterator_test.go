@@ -81,6 +81,50 @@ func TestIterator(t *testing.T) {
 		}
 	})
 
+	t.Run("return without batch header or control", func(t *testing.T) {
+		path := filepath.Join("test", "testdata", "return-no-batch-header.ach")
+
+		iter := iteratorFromFile(t, path, nil)
+
+		var entries []*EntryDetail
+		for {
+			bh, ed, err := iter.NextEntry()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if bh == nil && ed == nil {
+				break
+			}
+			if ed != nil {
+				entries = append(entries, ed)
+			}
+		}
+		require.Len(t, entries, 2)
+
+		// Check first EntryDetail
+		ed := entries[0]
+		require.Equal(t, "091400606", ed.RDFIIdentification+ed.CheckDigit)
+		require.Equal(t, "Paul Jones            ", ed.IndividualName)
+		require.Equal(t, "091000017611242", ed.TraceNumber)
+
+		require.Nil(t, ed.Addenda98)
+		require.Equal(t, "R01", ed.Addenda99.ReturnCode)
+		require.Equal(t, "091400600000001", ed.Addenda99.OriginalTrace)
+		require.Equal(t, "091000017611242", ed.Addenda99.TraceNumber)
+
+		// Check second EntryDetail
+		ed = entries[1]
+		require.Equal(t, "231380104", ed.RDFIIdentification+ed.CheckDigit)
+		require.Equal(t, "Best Co. #23          ", ed.IndividualName)
+		require.Equal(t, "121042880000001", ed.TraceNumber)
+
+		require.Equal(t, "C01", ed.Addenda98.ChangeCode)
+		require.Equal(t, "1918171614", ed.Addenda98.CorrectedData)
+		require.Equal(t, "121042880000001", ed.Addenda98.OriginalTrace)
+		require.Equal(t, "091012980000088", ed.Addenda98.TraceNumber)
+		require.Nil(t, ed.Addenda99)
+	})
+
 	t.Run("custom return codes", func(t *testing.T) {
 		where := filepath.Join("test", "testdata", "return-PPD-custom-reason-code.ach")
 

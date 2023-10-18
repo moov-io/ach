@@ -23,6 +23,8 @@ import (
 	"io"
 	"strings"
 	"unicode"
+
+	"github.com/moov-io/base"
 )
 
 // Iterator is a data structure for processing an ACH file one entry at a time.
@@ -100,7 +102,20 @@ func (i *Iterator) NextEntry() (*BatchHeader, *EntryDetail, error) {
 	}
 
 	if err := i.reader.readLine(line); err != nil {
-		return nil, nil, fmt.Errorf("reading line %d failed: %w", i.reader.lineNum, err)
+		if base.Match(err, ErrFileEntryOutsideBatch) {
+			// Fake a Batch so we can parse entries
+			bh := NewBatchHeader()
+			bh.StandardEntryClassCode = PPD
+			i.reader.currentBatch, err = NewBatch(bh)
+			if err != nil {
+				return nil, nil, fmt.Errorf("faking batch for line %d failed: %w", i.reader.lineNum, err)
+			}
+			if err := i.reader.readLine(line); err != nil {
+				return nil, nil, fmt.Errorf("reading line %d with fake BatchHeader failed: %w", i.reader.lineNum, err)
+			}
+		} else {
+			return nil, nil, fmt.Errorf("reading line %d failed: %w", i.reader.lineNum, err)
+		}
 	}
 
 	if i.reader.currentBatch != nil {
