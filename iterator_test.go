@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/moov-io/base"
@@ -135,6 +136,23 @@ func TestIterator(t *testing.T) {
 		iter := iteratorFromFile(t, where, opts)
 
 		ensureFileEqualsIterator(t, file, iter)
+	})
+
+	t.Run("blank file", func(t *testing.T) {
+		iter := NewIterator(strings.NewReader(""))
+
+		var recordCount int
+		for {
+			bh, ed, err := iter.NextEntry()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if bh == nil && ed == nil {
+				break
+			}
+			recordCount += 1
+		}
+		require.Equal(t, 0, recordCount)
 	})
 
 	t.Run("whitespace in file", func(t *testing.T) {
