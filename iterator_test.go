@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -90,6 +91,51 @@ func TestIterator(t *testing.T) {
 		iter := iteratorFromFile(t, where, opts)
 
 		ensureFileEqualsIterator(t, file, iter)
+	})
+
+	t.Run("whitespace in file", func(t *testing.T) {
+		firstBytes, err := os.ReadFile(filepath.Join(filepath.Join("test", "testdata", "bh-ed-ad-bh-ed-ad-ed-ad.ach")))
+		require.NoError(t, err)
+
+		secondBytes, err := os.ReadFile(filepath.Join(filepath.Join("test", "testdata", "return-no-file-header-control.ach")))
+		require.NoError(t, err)
+
+		checkBytes := func(t *testing.T, data []byte) {
+			t.Helper()
+
+			iter := NewIterator(bytes.NewReader(data))
+			var entries int
+			for {
+				bh, ed, err := iter.NextEntry()
+				if err != nil {
+					t.Fatal(err)
+				}
+				if bh != nil && ed != nil {
+					entries += 1
+				} else {
+					break
+				}
+			}
+			require.Equal(t, 4, entries)
+		}
+
+		t.Run("first then second", func(t *testing.T) {
+			data := append(firstBytes, append([]byte("\n  \n"), secondBytes...)...)
+			checkBytes(t, data)
+		})
+
+		t.Run("second then first", func(t *testing.T) {
+			data := append(secondBytes, append([]byte("\n  \n"), firstBytes...)...)
+			checkBytes(t, data)
+		})
+	})
+
+	t.Run("allSpaces", func(t *testing.T) {
+		require.True(t, allSpaces("\n"))
+		require.True(t, allSpaces("\n \r\n"))
+
+		require.False(t, allSpaces(""))
+		require.False(t, allSpaces("abc"))
 	})
 }
 

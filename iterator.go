@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"unicode"
 )
 
 // Iterator is a data structure for processing an ACH file one entry at a time.
@@ -81,9 +82,21 @@ func (i *Iterator) NextEntry() (*BatchHeader, *EntryDetail, error) {
 	if line != "" {
 		i.cachedLine = "" // clear cache
 	} else {
-		i.scanner.Scan()
-		line = i.scanner.Text()
-		i.reader.lineNum++
+		// Consume lines until we reach a non-empty line
+		for i.scanner.Scan() {
+			line = i.scanner.Text()
+			i.reader.lineNum++
+			if allSpaces(line) {
+				continue
+			}
+			if line != "" {
+				break
+			}
+		}
+		// If we've exhausted all lines in the reader then quit
+		if line == "" || allSpaces(line) {
+			return nil, nil, nil
+		}
 	}
 
 	if err := i.reader.readLine(line); err != nil {
@@ -102,6 +115,7 @@ func (i *Iterator) NextEntry() (*BatchHeader, *EntryDetail, error) {
 			for {
 				if i.scanner.Scan() {
 					foundLine := i.scanner.Text()
+					i.reader.lineNum++
 					if foundLine == "" {
 						break
 					}
@@ -136,4 +150,13 @@ func (i *Iterator) NextEntry() (*BatchHeader, *EntryDetail, error) {
 	}
 
 	return i.NextEntry()
+}
+
+func allSpaces(input string) bool {
+	for _, r := range input {
+		if !unicode.IsSpace(r) {
+			return false
+		}
+	}
+	return len(input) > 0
 }
