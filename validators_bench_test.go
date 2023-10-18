@@ -31,7 +31,7 @@ func BenchmarkCalculateCheckDigit(b *testing.B) {
 	}
 
 	aba := func(b *testing.B) string {
-		idx := rand.Int() % len(routingNumbers)
+		idx := rand.Int() % len(routingNumbers) //nolint:gosec
 		out := routingNumbers[idx]
 		return out
 	}

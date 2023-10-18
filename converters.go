@@ -65,6 +65,9 @@ var (
 	stringZeros map[int]string = populateMap(94, "0")
 )
 
+// populateMap will allocate strings for padding ACH fields.
+//
+// In Go strings are immutable so they can be reused across objects without needing to allocate new objects.
 func populateMap(max int, zero string) map[int]string {
 	out := make(map[int]string, max)
 	for i := 0; i < max; i++ {
