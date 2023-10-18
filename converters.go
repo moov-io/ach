@@ -61,6 +61,18 @@ func (c *converters) formatSimpleTime(s string) string {
 	return s
 }
 
+var (
+	stringZeros map[int]string = populateMap(94, "0")
+)
+
+func populateMap(max int, zero string) map[int]string {
+	out := make(map[int]string, max)
+	for i := 0; i < max; i++ {
+		out[i] = strings.Repeat(zero, i)
+	}
+	return out
+}
+
 // alphaField Alphanumeric and Alphabetic fields are left-justified and space filled.
 func (c *converters) alphaField(s string, max uint) string {
 	ln := uint(utf8.RuneCountInString(s))
@@ -73,13 +85,18 @@ func (c *converters) alphaField(s string, max uint) string {
 
 // numericField right-justified, unsigned, and zero filled
 func (c *converters) numericField(n int, max uint) string {
-	s := strconv.Itoa(n)
-	ln := uint(utf8.RuneCountInString(s))
-	if ln > max {
-		return s[ln-max:]
+	s := strconv.FormatInt(int64(n), 10)
+	if l := uint(len(s)); l > max {
+		return s[l-max:]
+	} else {
+		m := int(max - l)
+		pad, exists := stringZeros[m]
+		if exists {
+			return pad + s
+		}
+		// slow path
+		return strings.Repeat("0", m) + s
 	}
-	s = strings.Repeat("0", int(max-ln)) + s
-	return s
 }
 
 // stringField slices to max length and zero filled
@@ -88,8 +105,15 @@ func (c *converters) stringField(s string, max uint) string {
 	if ln > max {
 		return s[:max]
 	}
-	s = strings.Repeat("0", int(max-ln)) + s
-	return s
+
+	// Pad with preallocated string
+	m := int(max - ln)
+	pad, exists := stringZeros[m]
+	if exists {
+		return pad + s
+	}
+	// slow path
+	return strings.Repeat("0", m) + s
 }
 
 // leastSignificantDigits returns the least significant digits of v limited by maxDigits.
