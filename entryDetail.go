@@ -18,7 +18,6 @@
 package ach
 
 import (
-	"bytes"
 	"fmt"
 	"sort"
 	"strconv"
@@ -189,10 +188,9 @@ const (
 
 // NewEntryDetail returns a new EntryDetail with default values for non exported fields
 func NewEntryDetail() *EntryDetail {
-	entry := &EntryDetail{
-		Category: CategoryForward,
-	}
-	return entry
+	var entry EntryDetail
+	entry.Category = CategoryForward
+	return &entry
 }
 
 // Parse takes the input record string and parses the EntryDetail values
@@ -205,7 +203,11 @@ func (ed *EntryDetail) Parse(record string) {
 	}
 
 	// We're going to process the record rune-by-rune and at each field cutoff save the value.
-	var buf bytes.Buffer
+	buf := getBuffer()
+	defer saveBuffer(buf)
+	// var buf bytes.Buffer
+	// buf.Grow(22)
+
 	reset := func() string {
 		out := buf.String()
 		buf.Reset()
