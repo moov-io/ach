@@ -213,6 +213,10 @@ func (bh *BatchHeader) String() string {
 // Equal returns true only if two BatchHeaders are equal.
 // Equality is determined by the Nacha defined fields of each record.
 func (bh *BatchHeader) Equal(other *BatchHeader) bool {
+	if bh == nil || other == nil {
+		return false
+	}
+
 	if bh.ServiceClassCode != other.ServiceClassCode {
 		return false
 	}

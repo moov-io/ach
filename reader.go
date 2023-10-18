@@ -68,6 +68,9 @@ type Reader struct {
 
 	// errors holds each error encountered when attempting to parse the file
 	errors base.ErrorList
+
+	// skipBatchAccumulation is a flag to skip .AddBatch
+	skipBatchAccumulation bool
 }
 
 // error returns a new ParseError based on err
@@ -183,51 +186,18 @@ func (r *Reader) Read() (File, error) {
 			r.errors.Add(ErrFileTooLong)
 			return r.File, r.errors
 		}
-
-		lineLength := utf8.RuneCountInString(line)
-
-		switch {
-		case r.lineNum == 1 && lineLength > RecordLength:
-			extraChars := lineLength % RecordLength
-			if extraChars != 0 {
-				err := fmt.Errorf(
-					"%d extra character(s) in ACH file: must be %d but found %d",
-					extraChars,
-					lineLength-extraChars,
-					lineLength,
-				)
-				r.errors.Add(r.parseError(err))
-			} else if err := r.processFixedWidthFile(&line); err != nil {
-				r.errors.Add(err)
-			}
-		case lineLength != RecordLength:
-			if lineLength > RecordLength {
-				line = trimSpacesFromLongLine(line)
-			}
-			// right-pad the line with spaces
-			line, err := rightPadShortLine(line)
-			if err != nil {
-				r.errors.Add(r.parseError(err))
-			}
-			r.line = line
-			// parse the line
-			if err := r.parseLine(); err != nil {
-				r.errors.Add(r.parseError(NewRecordWrongLengthErr(lineLength)))
-				r.errors.Add(err)
-			}
-
-		default:
-			r.line = line
-			if err := r.parseLine(); err != nil {
-				r.errors.Add(err)
-			}
+		err := r.readLine(line)
+		if err != nil {
+			r.errors.Add(err)
 		}
 	}
 
 	// Add a lingering Batch to the file if there was no BatchControl record.
 	// This is common when files just contain a BatchHeader and EntryDetail records.
 	if r.currentBatch != nil {
-		r.File.AddBatch(r.currentBatch)
+		if !r.skipBatchAccumulation {
+			r.File.AddBatch(r.currentBatch)
+		}
 		r.currentBatch = nil
 	}
 
@@ -255,6 +225,47 @@ func (r *Reader) Read() (File, error) {
 		return r.File, nil
 	}
 	return r.File, r.errors
+}
+
+func (r *Reader) readLine(line string) error {
+	lineLength := utf8.RuneCountInString(line)
+	switch {
+	case r.lineNum == 1 && lineLength > RecordLength:
+		extraChars := lineLength % RecordLength
+		if extraChars != 0 {
+			err := fmt.Errorf(
+				"%d extra character(s) in ACH file: must be %d but found %d",
+				extraChars,
+				lineLength-extraChars,
+				lineLength,
+			)
+			return r.parseError(err)
+		} else if err := r.processFixedWidthFile(&line); err != nil {
+			return err
+		}
+	case lineLength != RecordLength:
+		if lineLength > RecordLength {
+			line = trimSpacesFromLongLine(line)
+		}
+		// right-pad the line with spaces
+		line, err := rightPadShortLine(line)
+		if err != nil {
+			return r.parseError(err)
+		}
+		r.line = line
+		// parse the line
+		if err := r.parseLine(); err != nil {
+			r.errors.Add(r.parseError(NewRecordWrongLengthErr(lineLength)))
+			return err
+		}
+
+	default:
+		r.line = line
+		if err := r.parseLine(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func trimSpacesFromLongLine(s string) string {
@@ -301,7 +312,9 @@ func (r *Reader) parseLine() error {
 			batch := r.currentBatch
 			r.currentBatch = nil
 			batch.SetValidation(r.File.validateOpts)
-			r.File.AddBatch(batch)
+			if !r.skipBatchAccumulation {
+				r.File.AddBatch(batch)
+			}
 		}
 		if err := r.parseBH(); err != nil {
 			return err
@@ -322,7 +335,9 @@ func (r *Reader) parseLine() error {
 			batch := r.currentBatch
 			r.currentBatch = nil
 			batch.SetValidation(r.File.validateOpts)
-			r.File.AddBatch(batch)
+			if !r.skipBatchAccumulation {
+				r.File.AddBatch(batch)
+			}
 			if err := maybeValidate(batch, r.File.validateOpts); err != nil {
 				r.recordName = "Batches"
 				return r.parseError(err)
@@ -331,7 +346,9 @@ func (r *Reader) parseLine() error {
 			batch := r.IATCurrentBatch
 			r.IATCurrentBatch = IATBatch{}
 			batch.SetValidation(r.File.validateOpts)
-			r.File.AddIATBatch(batch)
+			if !r.skipBatchAccumulation {
+				r.File.AddIATBatch(batch)
+			}
 			if err := maybeValidate(&batch, r.File.validateOpts); err != nil {
 				r.recordName = "Batches"
 				return r.parseError(err)
