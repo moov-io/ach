@@ -471,29 +471,30 @@ func CalculateCheckDigit(routingNumber string) int {
 		return -1
 	}
 
-	var routeIndex [8]string
-	for i := 0; i < 8; i++ {
-		if routingNumber[i] < '0' || routingNumber[i] > '9' {
+	var sum int
+	for i, r := range routingNumber {
+		// Don't process check digit of routing number
+		if i >= 8 {
+			break
+		}
+
+		// Reject anything that's not a digit
+		if r < '0' || r > '9' {
 			return -1 // only digits are allowed
 		}
-		routeIndex[i] = string(routingNumber[i])
+
+		// Calculate the check digit
+		var n int32 = (r - '0')
+
+		switch i {
+		case 0, 3, 6:
+			sum += int(n * 3)
+		case 1, 4, 7:
+			sum += int(n * 7)
+		case 2, 5:
+			sum += int(n)
+		}
 	}
-	n, _ := strconv.Atoi(routeIndex[0])
-	sum := n * 3
-	n, _ = strconv.Atoi(routeIndex[1])
-	sum = sum + (n * 7)
-	n, _ = strconv.Atoi(routeIndex[2])
-	sum = sum + n // multiply by 1
-	n, _ = strconv.Atoi(routeIndex[3])
-	sum = sum + (n * 3)
-	n, _ = strconv.Atoi(routeIndex[4])
-	sum = sum + (n * 7)
-	n, _ = strconv.Atoi(routeIndex[5])
-	sum = sum + n // multiply by 1
-	n, _ = strconv.Atoi(routeIndex[6])
-	sum = sum + (n * 3)
-	n, _ = strconv.Atoi(routeIndex[7])
-	sum = sum + (n * 7)
 
 	return roundUp10(sum) - sum
 }
