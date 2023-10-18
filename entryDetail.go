@@ -202,11 +202,8 @@ func (ed *EntryDetail) Parse(record string) {
 		return
 	}
 
-	// We're going to process the record rune-by-rune and at each field cutoff save the value.
 	buf := getBuffer()
 	defer saveBuffer(buf)
-	// var buf bytes.Buffer
-	// buf.Grow(22)
 
 	reset := func() string {
 		out := buf.String()
@@ -214,6 +211,7 @@ func (ed *EntryDetail) Parse(record string) {
 		return out
 	}
 
+	// We're going to process the record rune-by-rune and at each field cutoff save the value.
 	var idx int
 	for _, r := range record {
 		idx++
