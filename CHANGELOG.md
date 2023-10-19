@@ -1,3 +1,30 @@
+## v1.33.0 (Released 2023-10-19)
+
+Moov ACH v1.33.0 has undergone some major performance tuning and improvements. Please let us know if you encounter any issues when using the improved code, thanks!
+
+ADDITIONS
+
+- feat: add a File iterator
+- feat: add benchmark for ReadFile and Iterator
+- fix: produce entries from iterator that are outside of batches
+
+IMPROVEMENTS
+
+- feat: check for valid JSON before parsing
+- fix: avoid nil panic with malformed readers
+- fix: process entry rune-by-rune without casting between string -> rune -> string
+- fix: skip directories in ReadDir
+- perf: reduce allocations in formatting strings
+- perf: reduce allocations when checking routing numbers
+- perf: use sync.Pool of bytes.Buffer objects grown to max field size
+- test: benchmark merging files in groups
+
+BUILD
+
+- cmd/webui: force wasm_exec.js to go1.21.0 version
+- fix(deps): update module golang.org/x/net to v0.17.0
+- fix(deps): update module golang.org/x/oauth2 to v0.13.0
+
 ## v1.32.2 (Released 2023-08-11)
 
 IMPROVEMENTS
