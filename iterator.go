@@ -135,6 +135,10 @@ func (i *Iterator) NextEntry() (*BatchHeader, *EntryDetail, error) {
 						break
 					}
 					switch {
+					case strings.HasPrefix(foundLine, entryDetailPos):
+						i.cachedLine = foundLine
+						return bh, returnableEntry, nil
+
 					case strings.HasPrefix(foundLine, entryAddendaPos):
 						i.reader.line = foundLine
 						if err := i.reader.parseEDAddenda(); err != nil {
@@ -151,9 +155,13 @@ func (i *Iterator) NextEntry() (*BatchHeader, *EntryDetail, error) {
 						return bh, returnableEntry, nil
 
 					default:
-						i.cachedLine = foundLine
-						return bh, returnableEntry, nil
+						if !strings.HasPrefix(foundLine, "9") {
+							i.cachedLine = foundLine
+						}
+						return bh, nil, nil
 					}
+				} else {
+					break // quit processing if we can't read another line
 				}
 			}
 

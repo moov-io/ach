@@ -43,6 +43,7 @@ func TestIterator(t *testing.T) {
 		paths := []string{
 			filepath.Join("test", "testdata", "two-micro-deposits.ach"),
 			filepath.Join("test", "testdata", "web-debit.ach"),
+			filepath.Join("test", "testdata", "20110805A.ach"),
 		}
 		for i := range paths {
 			t.Logf("checking %s", paths[i])
@@ -87,19 +88,7 @@ func TestIterator(t *testing.T) {
 
 		iter := iteratorFromFile(t, path, nil)
 
-		var entries []*EntryDetail
-		for {
-			bh, ed, err := iter.NextEntry()
-			if err != nil {
-				t.Fatal(err)
-			}
-			if bh == nil && ed == nil {
-				break
-			}
-			if ed != nil {
-				entries = append(entries, ed)
-			}
-		}
+		entries := collectEntries(t, iter)
 		require.Len(t, entries, 2)
 
 		// Check first EntryDetail
@@ -141,18 +130,19 @@ func TestIterator(t *testing.T) {
 	t.Run("blank file", func(t *testing.T) {
 		iter := NewIterator(strings.NewReader(""))
 
-		var recordCount int
-		for {
-			bh, ed, err := iter.NextEntry()
-			if err != nil {
-				t.Fatal(err)
-			}
-			if bh == nil && ed == nil {
-				break
-			}
-			recordCount += 1
-		}
-		require.Equal(t, 0, recordCount)
+		entries := collectEntries(t, iter)
+		require.Len(t, entries, 0)
+	})
+
+	t.Run("short lines and has padding", func(t *testing.T) {
+		fd, err := os.Open(filepath.Join("test", "testdata", "short-line.ach"))
+		require.NoError(t, err)
+		t.Cleanup(func() { fd.Close() })
+
+		iter := NewIterator(fd)
+
+		entries := collectEntries(t, iter)
+		require.Len(t, entries, 1)
 	})
 
 	t.Run("whitespace in file", func(t *testing.T) {
@@ -166,19 +156,9 @@ func TestIterator(t *testing.T) {
 			t.Helper()
 
 			iter := NewIterator(bytes.NewReader(data))
-			var entries int
-			for {
-				bh, ed, err := iter.NextEntry()
-				if err != nil {
-					t.Fatal(err)
-				}
-				if bh != nil && ed != nil {
-					entries += 1
-				} else {
-					break
-				}
-			}
-			require.Equal(t, 4, entries)
+
+			entries := collectEntries(t, iter)
+			require.Len(t, entries, 4)
 		}
 
 		t.Run("first then second", func(t *testing.T) {
@@ -249,6 +229,35 @@ func ensureFileEqualsIterator(t *testing.T, file *File, iter *Iterator) {
 
 			require.True(t, bh.Equal(ibh), fmt.Sprintf("batch[%d] headers", i))
 			require.Equal(t, ed, ied, fmt.Sprintf("batch[%d] entry[%d] details", i, j))
+
+			require.Equal(t, ed.Addenda02, ied.Addenda02)
+			require.Equal(t, ed.Addenda05, ied.Addenda05)
+
+			require.Equal(t, ed.Addenda98, ied.Addenda98)
+			require.Equal(t, ed.Addenda98Refused, ied.Addenda98Refused)
+
+			require.Equal(t, ed.Addenda99, ied.Addenda99)
+			require.Equal(t, ed.Addenda99Contested, ied.Addenda99Contested)
+			require.Equal(t, ed.Addenda99Dishonored, ied.Addenda99Dishonored)
 		}
 	}
+}
+
+func collectEntries(t *testing.T, iter *Iterator) []*EntryDetail {
+	t.Helper()
+
+	var entries []*EntryDetail
+	for {
+		bh, ed, err := iter.NextEntry()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if bh == nil && ed == nil {
+			break
+		}
+		if bh != nil && ed != nil {
+			entries = append(entries, ed)
+		}
+	}
+	return entries
 }
