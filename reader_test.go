@@ -62,9 +62,7 @@ func TestReadFiles(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if n := len(files); n != 2 {
-		t.Fatalf("read %d files", n)
-	}
+	require.Len(t, files, 2)
 }
 
 func TestReadPartial(t *testing.T) {

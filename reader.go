@@ -125,14 +125,14 @@ func ReadFile(path string) (*File, error) {
 // ReadFiles attempts to open files at the given paths and read the contents
 // of each before closing and returning the parsed ACH Files.
 func ReadFiles(paths []string) ([]*File, error) {
-	var out []*File
+	out := make([]*File, len(paths))
 	for i := range paths {
 		file, err := ReadFile(paths[i])
 		if err != nil {
 			return nil, err
 		}
 		if file != nil {
-			out = append(out, file)
+			out[i] = file
 		}
 	}
 	return out, nil
