@@ -53,7 +53,7 @@ func ReadDir(dir string) ([]*File, error) {
 		return nil, err
 	}
 
-	var out []*File
+	out := make([]*File, 0, len(infos))
 	for i := range infos {
 		path := filepath.Join(dir, infos[i].Name())
 
