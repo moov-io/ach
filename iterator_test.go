@@ -67,6 +67,15 @@ func TestIterator(t *testing.T) {
 		}
 	})
 
+	t.Run("skip IAT batches/entries for now", func(t *testing.T) {
+		path := filepath.Join("test", "testdata", "iat-debit.ach")
+
+		iter := iteratorFromFile(t, path, nil)
+
+		entries := collectEntries(t, iter)
+		require.Len(t, entries, 0)
+	})
+
 	t.Run("return examples", func(t *testing.T) {
 		paths := []string{
 			filepath.Join("test", "testdata", "return-WEB.ach"),
