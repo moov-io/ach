@@ -69,25 +69,56 @@ func NewAddenda10() *Addenda10 {
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
 func (addenda10 *Addenda10) Parse(record string) {
-	if utf8.RuneCountInString(record) != 94 {
+	runeCount := utf8.RuneCountInString(record)
+	if runeCount != 94 {
 		return
 	}
-	runes := []rune(record)
 
-	// 1-1 Always 7
-	// 2-3 Always 10
-	addenda10.TypeCode = string(runes[1:3])
-	// 04-06 Describes the type of payment
-	addenda10.TransactionTypeCode = string(runes[3:6])
-	// 07-24 Payment Amount	For inbound IAT payments this field should contain the USD amount or may be blank.
-	addenda10.ForeignPaymentAmount = addenda10.parseNumField(string(runes[06:24]))
-	//  25-46 Insert blanks or zeros
-	addenda10.ForeignTraceNumber = strings.TrimSpace(string(runes[24:46]))
-	// 47-81 Receiving Company Name/Individual Name
-	addenda10.Name = strings.TrimSpace(string(runes[46:81]))
-	// 82-87 reserved - Leave blank
-	// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
-	addenda10.EntryDetailSequenceNumber = addenda10.parseNumField(string(runes[87:94]))
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
+	reset := func() string {
+		out := buf.String()
+		buf.Reset()
+		return out
+	}
+
+	// We're going to process the record rune-by-rune and at each field cutoff save the value.
+	var idx int
+	for _, r := range record {
+		idx++
+
+		// Append rune to buffer
+		buf.WriteRune(r)
+
+		// At each cutoff save the buffer and reset
+		switch idx {
+		case 0, 1:
+			// 1-1 Always 7
+			reset()
+		case 3:
+			// 2-3 Always 10
+			addenda10.TypeCode = reset()
+		case 6:
+			// 04-06 Describes the type of payment
+			addenda10.TransactionTypeCode = reset()
+		case 24:
+			// 07-24 Payment Amount	For inbound IAT payments this field should contain the USD amount or may be blank.
+			addenda10.ForeignPaymentAmount = addenda10.parseNumField(reset())
+		case 46:
+			//  25-46 Insert blanks or zeros
+			addenda10.ForeignTraceNumber = strings.TrimSpace(reset())
+		case 81:
+			// 47-81 Receiving Company Name/Individual Name
+			addenda10.Name = strings.TrimSpace(reset())
+		case 87:
+			// 82-87 reserved - Leave blank
+			reset()
+		case 94:
+			// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
+			addenda10.EntryDetailSequenceNumber = addenda10.parseNumField(reset())
+		}
+	}
 }
 
 // String writes the Addenda10 struct to a 94 character string.

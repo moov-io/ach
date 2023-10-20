@@ -144,36 +144,76 @@ func NewIATEntryDetail() *IATEntryDetail {
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
 func (iatEd *IATEntryDetail) Parse(record string) {
-	if utf8.RuneCountInString(record) != 94 {
+	runeCount := utf8.RuneCountInString(record)
+	if runeCount != 94 {
 		return
 	}
-	runes := []rune(record)
 
-	// 1-1 Always "6"
-	// 2-3 is checking credit 22 debit 27 savings credit 32 debit 37
-	iatEd.TransactionCode = iatEd.parseNumField(string(runes[1:3]))
-	// 4-11 the RDFI's routing number without the last digit.
-	iatEd.RDFIIdentification = iatEd.parseStringField(string(runes[3:11]))
-	// 12-12 The last digit of the RDFI's routing number
-	iatEd.CheckDigit = iatEd.parseStringField(string(runes[11:12]))
-	// 13-16 Number of addenda records
-	iatEd.AddendaRecords = iatEd.parseNumField(string(runes[12:16]))
-	// 17-29 reserved - Leave blank
-	// 30-39 Number of cents you are debiting/crediting this account
-	iatEd.Amount = iatEd.parseNumField(string(runes[29:39]))
-	// 40-74 The foreign receiver's account number you are crediting/debiting
-	iatEd.DFIAccountNumber = string(runes[39:74])
-	// 75-76 reserved Leave blank
-	// 77 OFACScreeningIndicator
-	iatEd.OFACScreeningIndicator = " "
-	// 78-78 Secondary SecondaryOFACScreeningIndicator
-	iatEd.SecondaryOFACScreeningIndicator = " "
-	// 79-79 1 if addenda exists 0 if it does not
-	//iatEd.AddendaRecordIndicator = 1
-	iatEd.AddendaRecordIndicator = iatEd.parseNumField(string(runes[78:79]))
-	// 80-94 An internal identification (alphanumeric) that you use to uniquely identify
-	// this Entry Detail Record This number should be unique to the transaction and will help identify the transaction in case of an inquiry
-	iatEd.TraceNumber = strings.TrimSpace(string(runes[79:94]))
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
+	reset := func() string {
+		out := buf.String()
+		buf.Reset()
+		return out
+	}
+
+	// We're going to process the record rune-by-rune and at each field cutoff save the value.
+	var idx int
+	for _, r := range record {
+		idx++
+
+		// Append rune to buffer
+		buf.WriteRune(r)
+
+		// At each cutoff save the buffer and reset
+		switch idx {
+		case 0, 1:
+			// do nothing, ignore "6" record type
+			reset()
+
+		case 3:
+			// 2-3 is checking credit 22 debit 27 savings credit 32 debit 37
+			iatEd.TransactionCode = iatEd.parseNumField(reset())
+		case 11:
+			// 4-11 the RDFI's routing number without the last digit.
+			iatEd.RDFIIdentification = iatEd.parseStringField(reset())
+		case 12:
+			// 12-12 The last digit of the RDFI's routing number
+			iatEd.CheckDigit = iatEd.parseStringField(reset())
+		case 16:
+			// 13-16 Number of addenda records
+			iatEd.AddendaRecords = iatEd.parseNumField(reset())
+		case 29:
+			// 17-29 reserved - Leave blank
+			reset()
+		case 39:
+			// 30-39 Number of cents you are debiting/crediting this account
+			iatEd.Amount = iatEd.parseNumField(reset())
+		case 74:
+			// 40-74 The foreign receiver's account number you are crediting/debiting
+			iatEd.DFIAccountNumber = string(reset())
+		case 76:
+			// 75-76 reserved Leave blank
+			reset()
+		case 77:
+			// 77 OFACScreeningIndicator
+			reset()
+			iatEd.OFACScreeningIndicator = " "
+		case 78:
+			// 78-78 Secondary SecondaryOFACScreeningIndicator
+			reset()
+			iatEd.SecondaryOFACScreeningIndicator = " "
+		case 79:
+			// 79-79 1 if addenda exists 0 if it does not
+			iatEd.AddendaRecordIndicator = iatEd.parseNumField(reset())
+		case 94:
+			// 80-94 An internal identification (alphanumeric) that you use to uniquely identify
+			// this Entry Detail Record This number should be unique to the transaction and will
+			// help identify the transaction in case of an inquiry
+			iatEd.TraceNumber = strings.TrimSpace(reset())
+		}
+	}
 }
 
 // String writes the EntryDetail struct to a 94 character string.

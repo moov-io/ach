@@ -73,23 +73,58 @@ func NewAddenda98Refused() *Addenda98Refused {
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
 func (addenda98Refused *Addenda98Refused) Parse(record string) {
-	if utf8.RuneCountInString(record) != 94 {
+	runeCount := utf8.RuneCountInString(record)
+	if runeCount != 94 {
 		return
 	}
-	runes := []rune(record)
 
-	// 1-1 Always 7
-	// 2-3 Always "98"
-	addenda98Refused.TypeCode = strings.TrimSpace(string(runes[1:3]))
-	addenda98Refused.RefusedChangeCode = strings.TrimSpace(string(runes[3:6]))
-	addenda98Refused.OriginalTrace = strings.TrimSpace(string(runes[6:21]))
-	// Positions 22-27 are Reserved
-	addenda98Refused.OriginalDFI = addenda98Refused.parseStringField(string(runes[27:35]))
-	addenda98Refused.CorrectedData = strings.TrimSpace(string(runes[35:64]))
-	addenda98Refused.ChangeCode = strings.TrimSpace(string(runes[64:67]))
-	addenda98Refused.TraceSequenceNumber = strings.TrimSpace(string(runes[67:74]))
-	// Positions 75-79 are Reserved
-	addenda98Refused.TraceNumber = strings.TrimSpace(string(runes[79:94]))
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
+	reset := func() string {
+		out := buf.String()
+		buf.Reset()
+		return out
+	}
+
+	// We're going to process the record rune-by-rune and at each field cutoff save the value.
+	var idx int
+	for _, r := range record {
+		idx++
+
+		// Append rune to buffer
+		buf.WriteRune(r)
+
+		// At each cutoff save the buffer and reset
+		switch idx {
+		case 0, 1:
+			// 1-1 Always 7
+			reset()
+		case 3:
+			// 2-3 Always "98"
+			addenda98Refused.TypeCode = strings.TrimSpace(reset())
+		case 6:
+			addenda98Refused.RefusedChangeCode = strings.TrimSpace(reset())
+		case 21:
+			addenda98Refused.OriginalTrace = strings.TrimSpace(reset())
+		case 27:
+			// Positions 22-27 are Reserved
+			reset()
+		case 35:
+			addenda98Refused.OriginalDFI = addenda98Refused.parseStringField(reset())
+		case 64:
+			addenda98Refused.CorrectedData = strings.TrimSpace(reset())
+		case 67:
+			addenda98Refused.ChangeCode = strings.TrimSpace(reset())
+		case 74:
+			addenda98Refused.TraceSequenceNumber = strings.TrimSpace(reset())
+		case 79:
+			// Positions 75-79 are Reserved
+			reset()
+		case 94:
+			addenda98Refused.TraceNumber = strings.TrimSpace(reset())
+		}
+	}
 }
 
 // String writes the Addenda98 struct to a 94 character string

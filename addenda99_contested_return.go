@@ -82,24 +82,61 @@ func NewAddenda99Contested() *Addenda99Contested {
 }
 
 func (Addenda99Contested *Addenda99Contested) Parse(record string) {
-	if utf8.RuneCountInString(record) != 94 {
+	runeCount := utf8.RuneCountInString(record)
+	if runeCount != 94 {
 		return
 	}
-	runes := []rune(record)
 
-	Addenda99Contested.TypeCode = string(runes[1:3])
-	Addenda99Contested.ContestedReturnCode = string(runes[3:6])
-	Addenda99Contested.OriginalEntryTraceNumber = string(runes[6:21])
-	Addenda99Contested.DateOriginalEntryReturned = string(runes[21:27])
-	Addenda99Contested.OriginalReceivingDFIIdentification = string(runes[27:35])
-	Addenda99Contested.OriginalSettlementDate = string(runes[35:38])
-	Addenda99Contested.ReturnTraceNumber = string(runes[38:53])
-	Addenda99Contested.ReturnSettlementDate = string(runes[53:56])
-	Addenda99Contested.ReturnReasonCode = string(runes[56:58])
-	Addenda99Contested.DishonoredReturnTraceNumber = string(runes[58:73])
-	Addenda99Contested.DishonoredReturnSettlementDate = string(runes[73:76])
-	Addenda99Contested.DishonoredReturnReasonCode = string(runes[76:78])
-	Addenda99Contested.TraceNumber = string(runes[79:94])
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
+	reset := func() string {
+		out := buf.String()
+		buf.Reset()
+		return out
+	}
+
+	// We're going to process the record rune-by-rune and at each field cutoff save the value.
+	var idx int
+	for _, r := range record {
+		idx++
+
+		// Append rune to buffer
+		buf.WriteRune(r)
+
+		// At each cutoff save the buffer and reset
+		switch idx {
+		case 0, 1:
+			// 1-1 Always 7
+			reset()
+		case 3:
+			Addenda99Contested.TypeCode = reset()
+		case 6:
+			Addenda99Contested.ContestedReturnCode = reset()
+		case 21:
+			Addenda99Contested.OriginalEntryTraceNumber = reset()
+		case 27:
+			Addenda99Contested.DateOriginalEntryReturned = reset()
+		case 35:
+			Addenda99Contested.OriginalReceivingDFIIdentification = reset()
+		case 38:
+			Addenda99Contested.OriginalSettlementDate = reset()
+		case 53:
+			Addenda99Contested.ReturnTraceNumber = reset()
+		case 56:
+			Addenda99Contested.ReturnSettlementDate = reset()
+		case 58:
+			Addenda99Contested.ReturnReasonCode = reset()
+		case 73:
+			Addenda99Contested.DishonoredReturnTraceNumber = reset()
+		case 76:
+			Addenda99Contested.DishonoredReturnSettlementDate = reset()
+		case 78:
+			Addenda99Contested.DishonoredReturnReasonCode = reset()
+		case 94:
+			Addenda99Contested.TraceNumber = reset()
+		}
+	}
 }
 
 func (Addenda99Contested *Addenda99Contested) String() string {

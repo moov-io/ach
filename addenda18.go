@@ -78,31 +78,62 @@ func NewAddenda18() *Addenda18 {
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
 func (addenda18 *Addenda18) Parse(record string) {
-	if utf8.RuneCountInString(record) != 94 {
+	runeCount := utf8.RuneCountInString(record)
+	if runeCount != 94 {
 		return
 	}
-	runes := []rune(record)
 
-	// 1-1 Always 7
-	// 2-3 Always 18
-	addenda18.TypeCode = string(runes[1:3])
-	// 4-83 Based on the information entered (04-38) 35 alphanumeric
-	addenda18.ForeignCorrespondentBankName = strings.TrimSpace(string(runes[3:38]))
-	// 39-40  Based on the information entered (39-40) 2 alphanumeric
-	// “01” = National Clearing System
-	// “02” = BIC Code
-	// “03” = IBAN Code
-	addenda18.ForeignCorrespondentBankIDNumberQualifier = string(runes[38:40])
-	// 41-74 Based on the information entered (41-74) 34 alphanumeric
-	addenda18.ForeignCorrespondentBankIDNumber = strings.TrimSpace(string(runes[40:74]))
-	// 75-77 Based on the information entered (75-77) 3 alphanumeric
-	addenda18.ForeignCorrespondentBankBranchCountryCode = strings.TrimSpace(string(runes[74:77]))
-	// 78-83 - Blank space
-	// 84-87 SequenceNumber is consecutively assigned to each Addenda18 Record following
-	// an Entry Detail Record
-	addenda18.SequenceNumber = addenda18.parseNumField(string(runes[83:87]))
-	// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
-	addenda18.EntryDetailSequenceNumber = addenda18.parseNumField(string(runes[87:94]))
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
+	reset := func() string {
+		out := buf.String()
+		buf.Reset()
+		return out
+	}
+
+	// We're going to process the record rune-by-rune and at each field cutoff save the value.
+	var idx int
+	for _, r := range record {
+		idx++
+
+		// Append rune to buffer
+		buf.WriteRune(r)
+
+		// At each cutoff save the buffer and reset
+		switch idx {
+		case 0, 1:
+			// 1-1 Always 7
+			reset()
+		case 3:
+			// 2-3 Always 18
+			addenda18.TypeCode = reset()
+		case 38:
+			// 4-38 Based on the information entered (04-38) 35 alphanumeric
+			addenda18.ForeignCorrespondentBankName = strings.TrimSpace(reset())
+		case 40:
+			// 39-40  Based on the information entered (39-40) 2 alphanumeric
+			// “01” = National Clearing System
+			// “02” = BIC Code
+			// “03” = IBAN Code
+			addenda18.ForeignCorrespondentBankIDNumberQualifier = reset()
+		case 74:
+			// 41-74 Based on the information entered (41-74) 34 alphanumeric
+			addenda18.ForeignCorrespondentBankIDNumber = strings.TrimSpace(reset())
+		case 77:
+			// 75-77 Based on the information entered (75-77) 3 alphanumeric
+			addenda18.ForeignCorrespondentBankBranchCountryCode = strings.TrimSpace(reset())
+		case 83:
+			// 78-83 - Blank space
+			reset()
+		case 87:
+			// 84-87 SequenceNumber is consecutively assigned to each Addenda18 Record following an Entry Detail Record
+			addenda18.SequenceNumber = addenda18.parseNumField(reset())
+		case 94:
+			// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
+			addenda18.EntryDetailSequenceNumber = addenda18.parseNumField(reset())
+		}
+	}
 }
 
 // String writes the Addenda18 struct to a 94 character string.

@@ -76,25 +76,56 @@ func NewAddenda14() *Addenda14 {
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
 func (addenda14 *Addenda14) Parse(record string) {
-	if utf8.RuneCountInString(record) != 94 {
+	runeCount := utf8.RuneCountInString(record)
+	if runeCount != 94 {
 		return
 	}
-	runes := []rune(record)
 
-	// 1-1 Always 7
-	// 2-3 Always 14
-	addenda14.TypeCode = string(runes[1:3])
-	// 4-38 RDFIName
-	addenda14.RDFIName = strings.TrimSpace(string(runes[3:38]))
-	// 39-40 RDFIIDNumberQualifier
-	addenda14.RDFIIDNumberQualifier = string(runes[38:40])
-	// 41-74 RDFIIdentification
-	addenda14.RDFIIdentification = addenda14.parseStringField(string(runes[40:74]))
-	// 75-77
-	addenda14.RDFIBranchCountryCode = strings.TrimSpace(string(runes[74:77]))
-	// 78-87 reserved - Leave blank
-	// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
-	addenda14.EntryDetailSequenceNumber = addenda14.parseNumField(string(runes[87:94]))
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
+	reset := func() string {
+		out := buf.String()
+		buf.Reset()
+		return out
+	}
+
+	// We're going to process the record rune-by-rune and at each field cutoff save the value.
+	var idx int
+	for _, r := range record {
+		idx++
+
+		// Append rune to buffer
+		buf.WriteRune(r)
+
+		// At each cutoff save the buffer and reset
+		switch idx {
+		case 0, 1:
+			// 1-1 Always 7
+			reset()
+		case 3:
+			// 2-3 Always 14
+			addenda14.TypeCode = reset()
+		case 38:
+			// 4-38 RDFIName
+			addenda14.RDFIName = strings.TrimSpace(reset())
+		case 40:
+			// 39-40 RDFIIDNumberQualifier
+			addenda14.RDFIIDNumberQualifier = reset()
+		case 74:
+			// 41-74 RDFIIdentification
+			addenda14.RDFIIdentification = addenda14.parseStringField(reset())
+		case 77:
+			// 75-77
+			addenda14.RDFIBranchCountryCode = strings.TrimSpace(reset())
+		case 87:
+			// 78-87 reserved - Leave blank
+			reset()
+		case 94:
+			// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
+			addenda14.EntryDetailSequenceNumber = addenda14.parseNumField(reset())
+		}
+	}
 }
 
 // String writes the Addenda14 struct to a 94 character string.
