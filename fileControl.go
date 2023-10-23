@@ -51,26 +51,56 @@ type FileControl struct {
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
 func (fc *FileControl) Parse(record string) {
-	if utf8.RuneCountInString(record) < 55 {
+	runeCount := utf8.RuneCountInString(record)
+	if runeCount != 94 {
 		return
 	}
-	runes := []rune(record)
 
-	// 1-1 Always "9"
-	// 2-7 The total number of Batch Header Record in the file. For example: "000003
-	fc.BatchCount = fc.parseNumField(string(runes[1:7]))
-	// 8-13 e total number of blocks on the file, including the File Header and File Control records. One block is 10 lines, so it's effectively the number of lines in the file divided by 10.
-	fc.BlockCount = fc.parseNumField(string(runes[7:13]))
-	// 14-21 Total number of Entry Detail Record in the file
-	fc.EntryAddendaCount = fc.parseNumField(string(runes[13:21]))
-	// 22-31 Total of all positions 4-11 on each Entry Detail Record in the file. This is essentially the sum of all the RDFI routing numbers in the file.
-	// If the sum exceeds 10 digits (because you have lots of Entry Detail Records), lop off the most significant digits of the sum until there are only 10
-	fc.EntryHash = fc.parseNumField(string(runes[21:31]))
-	// 32-43 Number of cents of debit entries within the file
-	fc.TotalDebitEntryDollarAmountInFile = fc.parseNumField(string(runes[31:43]))
-	// 44-55 Number of cents of credit entries within the file
-	fc.TotalCreditEntryDollarAmountInFile = fc.parseNumField(string(runes[43:55]))
-	// 56-94 Reserved Always blank (just fill with spaces)
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
+	reset := func() string {
+		out := buf.String()
+		buf.Reset()
+		return out
+	}
+
+	var idx int
+	for _, r := range record {
+		idx++
+
+		// Append rune to buffer
+		buf.WriteRune(r)
+
+		// At each field cutoff save the buffer and reset
+		switch idx {
+		case 1:
+			// 1-1 Always "9"
+			reset()
+		case 7:
+			// 2-7 The total number of Batch Header Record in the file. For example: "000003
+			fc.BatchCount = fc.parseNumField(reset())
+		case 13:
+			// 8-13 e total number of blocks on the file, including the File Header and File Control records. One block is 10 lines, so it's effectively the number of lines in the file divided by 10.
+			fc.BlockCount = fc.parseNumField(reset())
+		case 21:
+			// 14-21 Total number of Entry Detail Record in the file
+			fc.EntryAddendaCount = fc.parseNumField(reset())
+		case 31:
+			// 22-31 Total of all positions 4-11 on each Entry Detail Record in the file. This is essentially the sum of all the RDFI routing numbers in the file.
+			// If the sum exceeds 10 digits (because you have lots of Entry Detail Records), lop off the most significant digits of the sum until there are only 10
+			fc.EntryHash = fc.parseNumField(reset())
+		case 43:
+			// 32-43 Number of cents of debit entries within the file
+			fc.TotalDebitEntryDollarAmountInFile = fc.parseNumField(reset())
+		case 55:
+			// 44-55 Number of cents of credit entries within the file
+			fc.TotalCreditEntryDollarAmountInFile = fc.parseNumField(reset())
+		case 94:
+			// 56-94 Reserved Always blank (just fill with spaces)
+			reset()
+		}
+	}
 }
 
 // NewFileControl returns a new FileControl with default values for none exported fields
