@@ -829,7 +829,7 @@ type canValidate interface {
 	Validate() error
 }
 
-func maybeValidate[T canValidate](rec T, opts *ValidateOpts) error {
+func maybeValidate(rec canValidate, opts *ValidateOpts) error {
 	if opts != nil && opts.SkipAll {
 		return nil
 	}
