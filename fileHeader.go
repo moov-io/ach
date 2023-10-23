@@ -168,7 +168,8 @@ func (fh *FileHeader) Parse(record string) {
 			reset()
 		case 37:
 			// 35-37 Always "A"
-			fh.FileIDModifier = reset()
+			reset()
+			fh.FileIDModifier = "A"
 		case 39, 40:
 			reset()
 		case 63:

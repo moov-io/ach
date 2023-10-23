@@ -133,6 +133,8 @@ func (Addenda99Contested *Addenda99Contested) Parse(record string) {
 			Addenda99Contested.DishonoredReturnSettlementDate = reset()
 		case 78:
 			Addenda99Contested.DishonoredReturnReasonCode = reset()
+		case 79:
+			reset() // reserved
 		case 94:
 			Addenda99Contested.TraceNumber = reset()
 		}
