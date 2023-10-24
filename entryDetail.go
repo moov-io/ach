@@ -272,8 +272,9 @@ func (ed *EntryDetail) Parse(record string) {
 
 // String writes the EntryDetail struct to a 94 character string.
 func (ed *EntryDetail) String() string {
-	var buf strings.Builder
-	buf.Grow(94)
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
 	buf.WriteString(entryDetailPos)
 	buf.WriteString(fmt.Sprintf("%v", ed.TransactionCode))
 	buf.WriteString(ed.RDFIIdentificationField())
@@ -285,6 +286,7 @@ func (ed *EntryDetail) String() string {
 	buf.WriteString(ed.DiscretionaryDataField())
 	buf.WriteString(fmt.Sprintf("%v", ed.AddendaRecordIndicator))
 	buf.WriteString(ed.TraceNumberField())
+
 	return buf.String()
 }
 

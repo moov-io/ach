@@ -74,4 +74,16 @@ func BenchmarkParsing(b *testing.B) {
 			}
 		})
 	}
+
+	b.Run("IAT", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			file, err := ach.ReadFile(filepath.Join("..", "testdata", "20180716-IAT-A17-A18.ach"))
+			if err != nil {
+				b.Fatal(err)
+			}
+			if len(file.IATBatches) == 0 {
+				b.Error("no batches found")
+			}
+		}
+	})
 }

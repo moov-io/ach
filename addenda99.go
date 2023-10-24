@@ -92,25 +92,56 @@ func NewAddenda99() *Addenda99 {
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
 func (Addenda99 *Addenda99) Parse(record string) {
-	if utf8.RuneCountInString(record) != 94 {
+	runeCount := utf8.RuneCountInString(record)
+	if runeCount != 94 {
 		return
 	}
-	runes := []rune(record)
 
-	// 2-3 Defines the specific explanation and format for the addenda information contained in the same record
-	Addenda99.TypeCode = string(runes[1:3])
-	// 4-6
-	Addenda99.ReturnCode = string(runes[3:6])
-	// 7-21
-	Addenda99.OriginalTrace = strings.TrimSpace(string(runes[6:21]))
-	// 22-27, might be a date or blank
-	Addenda99.DateOfDeath = Addenda99.validateSimpleDate(string(runes[21:27]))
-	// 28-35
-	Addenda99.OriginalDFI = Addenda99.parseStringField(string(runes[27:35]))
-	// 36-79
-	Addenda99.AddendaInformation = strings.TrimSpace(string(runes[35:79]))
-	// 80-94
-	Addenda99.TraceNumber = strings.TrimSpace(string(runes[79:94]))
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
+	reset := func() string {
+		out := buf.String()
+		buf.Reset()
+		return out
+	}
+
+	// We're going to process the record rune-by-rune and at each field cutoff save the value.
+	var idx int
+	for _, r := range record {
+		idx++
+
+		// Append rune to buffer
+		buf.WriteRune(r)
+
+		// At each cutoff save the buffer and reset
+		switch idx {
+		case 0, 1:
+			// 1-1 Always 7
+			reset()
+		case 3:
+			// 2-3 Defines the specific explanation and format for the addenda information contained in the same record
+			Addenda99.TypeCode = reset()
+		case 6:
+			// 4-6
+			Addenda99.ReturnCode = reset()
+		case 21:
+			// 7-21
+			Addenda99.OriginalTrace = strings.TrimSpace(reset())
+		case 27:
+			// 22-27, might be a date or blank
+			Addenda99.DateOfDeath = Addenda99.validateSimpleDate(reset())
+		case 35:
+			// 28-35
+			Addenda99.OriginalDFI = Addenda99.parseStringField(reset())
+		case 79:
+			// 36-79
+			Addenda99.AddendaInformation = strings.TrimSpace(reset())
+		case 94:
+			// 80-94
+			Addenda99.TraceNumber = strings.TrimSpace(reset())
+		}
+	}
 }
 
 // String writes the Addenda99 struct to a 94 character string

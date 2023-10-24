@@ -62,29 +62,60 @@ type ADVBatchControl struct {
 
 // Parse takes the input record string and parses the EntryDetail values
 func (bc *ADVBatchControl) Parse(record string) {
-	if utf8.RuneCountInString(record) != 94 {
+	runeCount := utf8.RuneCountInString(record)
+	if runeCount != 94 {
 		return
 	}
-	runes := []rune(record)
 
-	// 1-1 Always "8"
-	// 2-4 This is the same as the "Service code" field in previous Batch Header Record
-	bc.ServiceClassCode = bc.parseNumField(string(runes[1:4]))
-	// 5-10 Total number of Entry Detail Record in the batch
-	bc.EntryAddendaCount = bc.parseNumField(string(runes[4:10]))
-	// 11-20 Total of all positions 4-11 on each Entry Detail Record in the batch. This is essentially the sum of all the RDFI routing numbers in the batch.
-	// If the sum exceeds 10 digits (because you have lots of Entry Detail Records), lop off the most significant digits of the sum until there are only 10
-	bc.EntryHash = bc.parseNumField(string(runes[10:20]))
-	// 21-32 Number of cents of debit entries within the batch
-	bc.TotalDebitEntryDollarAmount = bc.parseNumField(string(runes[20:40]))
-	// 33-44 Number of cents of credit entries within the batch
-	bc.TotalCreditEntryDollarAmount = bc.parseNumField(string(runes[40:60]))
-	// 45-54 ACH Operator Data
-	bc.ACHOperatorData = strings.TrimSpace(string(runes[60:79]))
-	// 80-87 This is the same as the "ODFI identification" field in previous Batch Header Record
-	bc.ODFIIdentification = bc.parseStringField(string(runes[79:87]))
-	// 88-94 This is the same as the "Batch number" field in previous Batch Header Record
-	bc.BatchNumber = bc.parseNumField(string(runes[87:94]))
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
+	reset := func() string {
+		out := buf.String()
+		buf.Reset()
+		return out
+	}
+
+	// We're going to process the record rune-by-rune and at each field cutoff save the value.
+	var idx int
+	for _, r := range record {
+		idx++
+
+		// Append rune to buffer
+		buf.WriteRune(r)
+
+		// At each cutoff save the buffer and reset
+		switch idx {
+		case 1:
+			// 1-1 Always "8"
+			reset()
+		case 4:
+			// 2-4 This is the same as the "Service code" field in previous Batch Header Record
+			bc.ServiceClassCode = bc.parseNumField(reset())
+		case 10:
+			// 5-10 Total number of Entry Detail Record in the batch
+			bc.EntryAddendaCount = bc.parseNumField(reset())
+		case 20:
+			// 11-20 Total of all positions 4-11 on each Entry Detail Record in the batch. This is essentially the sum of all the RDFI routing numbers in the batch.
+			// If the sum exceeds 10 digits (because you have lots of Entry Detail Records), lop off the most significant digits of the sum until there are only 10
+			bc.EntryHash = bc.parseNumField(reset())
+		case 40:
+			// 21-32 Number of cents of debit entries within the batch
+			bc.TotalDebitEntryDollarAmount = bc.parseNumField(reset())
+		case 60:
+			// 33-44 Number of cents of credit entries within the batch
+			bc.TotalCreditEntryDollarAmount = bc.parseNumField(reset())
+		case 79:
+			// 45-54 ACH Operator Data
+			bc.ACHOperatorData = strings.TrimSpace(reset())
+		case 87:
+			// 80-87 This is the same as the "ODFI identification" field in previous Batch Header Record
+			bc.ODFIIdentification = bc.parseStringField(reset())
+		case 94:
+			// 88-94 This is the same as the "Batch number" field in previous Batch Header Record
+			bc.BatchNumber = bc.parseNumField(reset())
+		}
+	}
 }
 
 // NewADVBatchControl returns a new ADVBatchControl with default values for none exported fields

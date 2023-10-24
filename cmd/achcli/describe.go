@@ -13,13 +13,13 @@ import (
 )
 
 func dumpFiles(paths []string, validateOpts *ach.ValidateOpts) error {
-	var files []*ach.File
+	files := make([]*ach.File, len(paths))
 	for i := range paths {
 		f, err := readACHFile(paths[i], validateOpts)
 		if err != nil {
 			fmt.Printf("WARN: problem reading %s:\n %v\n\n", paths[i], err)
 		}
-		files = append(files, f)
+		files[i] = f
 	}
 
 	if *flagMerge {

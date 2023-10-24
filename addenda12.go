@@ -65,21 +65,50 @@ func NewAddenda12() *Addenda12 {
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
 func (addenda12 *Addenda12) Parse(record string) {
-	if utf8.RuneCountInString(record) != 94 {
+	runeCount := utf8.RuneCountInString(record)
+	if runeCount != 94 {
 		return
 	}
-	runes := []rune(record)
 
-	// 1-1 Always 7
-	// 2-3 Always 12
-	addenda12.TypeCode = string(runes[1:3])
-	// 4-38
-	addenda12.OriginatorCityStateProvince = strings.TrimSpace(string(runes[3:38]))
-	// 39-73
-	addenda12.OriginatorCountryPostalCode = strings.TrimSpace(string(runes[38:73]))
-	// 74-87 reserved - Leave blank
-	// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
-	addenda12.EntryDetailSequenceNumber = addenda12.parseNumField(string(runes[87:94]))
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
+	reset := func() string {
+		out := buf.String()
+		buf.Reset()
+		return out
+	}
+
+	// We're going to process the record rune-by-rune and at each field cutoff save the value.
+	var idx int
+	for _, r := range record {
+		idx++
+
+		// Append rune to buffer
+		buf.WriteRune(r)
+
+		// At each cutoff save the buffer and reset
+		switch idx {
+		case 0, 1:
+			// 1-1 Always 7
+			reset()
+		case 3:
+			// 2-3 Always 12
+			addenda12.TypeCode = reset()
+		case 38:
+			// 4-38
+			addenda12.OriginatorCityStateProvince = strings.TrimSpace(reset())
+		case 73:
+			// 39-73
+			addenda12.OriginatorCountryPostalCode = strings.TrimSpace(reset())
+		case 87:
+			// 74-87 reserved - Leave blank
+			reset()
+		case 94:
+			// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
+			addenda12.EntryDetailSequenceNumber = addenda12.parseNumField(reset())
+		}
+	}
 }
 
 // String writes the Addenda12 struct to a 94 character string.

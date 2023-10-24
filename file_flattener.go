@@ -37,7 +37,7 @@ var (
 //   - they don't contain any entries with common trace numbers, since trace numbers must be unique
 //     within a batch.
 func Flatten(originalFile *File) (*File, error) {
-	var originalBatches []mergeable
+	originalBatches := make([]mergeable, 0, len(originalFile.Batches)+len(originalFile.IATBatches))
 
 	// Convert batches and IAT batches to "mergeables" for consistent flattening logic
 	for i := range originalFile.Batches {

@@ -58,21 +58,48 @@ func NewAddenda05() *Addenda05 {
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
 func (addenda05 *Addenda05) Parse(record string) {
-	if utf8.RuneCountInString(record) != 94 {
+	runeCount := utf8.RuneCountInString(record)
+	if runeCount != 94 {
 		return
 	}
-	runes := []rune(record)
 
-	// 1-1 Always 7
-	// 2-3 Always 05
-	addenda05.TypeCode = string(runes[1:3])
-	// 4-83 Based on the information entered (04-83) 80 alphanumeric
-	addenda05.PaymentRelatedInformation = strings.TrimSpace(string(runes[3:83]))
-	// 84-87 SequenceNumber is consecutively assigned to each Addenda05 Record following
-	// an Entry Detail Record
-	addenda05.SequenceNumber = addenda05.parseNumField(string(runes[83:87]))
-	// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
-	addenda05.EntryDetailSequenceNumber = addenda05.parseNumField(string(runes[87:94]))
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
+	reset := func() string {
+		out := buf.String()
+		buf.Reset()
+		return out
+	}
+
+	// We're going to process the record rune-by-rune and at each field cutoff save the value.
+	var idx int
+	for _, r := range record {
+		idx++
+
+		// Append rune to buffer
+		buf.WriteRune(r)
+
+		// At each cutoff save the buffer and reset
+		switch idx {
+		case 0, 1:
+			// 1-1 Always 7
+			reset()
+		case 3:
+			// 2-3 Always 05
+			addenda05.TypeCode = reset()
+		case 83:
+			// 4-83 Based on the information entered (04-83) 80 alphanumeric
+			addenda05.PaymentRelatedInformation = strings.TrimSpace(reset())
+		case 87:
+			// 84-87 SequenceNumber is consecutively assigned to each Addenda05 Record following
+			// an Entry Detail Record
+			addenda05.SequenceNumber = addenda05.parseNumField(reset())
+		case 94:
+			// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
+			addenda05.EntryDetailSequenceNumber = addenda05.parseNumField(reset())
+		}
+	}
 }
 
 // String writes the Addenda05 struct to a 94 character string.

@@ -70,20 +70,53 @@ func NewAddenda99Dishonored() *Addenda99Dishonored {
 }
 
 func (Addenda99Dishonored *Addenda99Dishonored) Parse(record string) {
-	if utf8.RuneCountInString(record) != 94 {
+	runeCount := utf8.RuneCountInString(record)
+	if runeCount != 94 {
 		return
 	}
-	runes := []rune(record)
 
-	Addenda99Dishonored.TypeCode = string(runes[1:3])
-	Addenda99Dishonored.DishonoredReturnReasonCode = string(runes[3:6])
-	Addenda99Dishonored.OriginalEntryTraceNumber = string(runes[6:21])
-	Addenda99Dishonored.OriginalReceivingDFIIdentification = string(runes[27:35])
-	Addenda99Dishonored.ReturnTraceNumber = string(runes[38:53])
-	Addenda99Dishonored.ReturnSettlementDate = string(runes[53:56])
-	Addenda99Dishonored.ReturnReasonCode = string(runes[56:58])
-	Addenda99Dishonored.AddendaInformation = string(runes[58:79])
-	Addenda99Dishonored.TraceNumber = string(runes[79:94])
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
+	reset := func() string {
+		out := buf.String()
+		buf.Reset()
+		return out
+	}
+
+	// We're going to process the record rune-by-rune and at each field cutoff save the value.
+	var idx int
+	for _, r := range record {
+		idx++
+
+		// Append rune to buffer
+		buf.WriteRune(r)
+
+		// At each cutoff save the buffer and reset
+		switch idx {
+		case 0, 1:
+			// 1-1 Always 7
+			reset()
+		case 3:
+			Addenda99Dishonored.TypeCode = reset()
+		case 6:
+			Addenda99Dishonored.DishonoredReturnReasonCode = reset()
+		case 21:
+			Addenda99Dishonored.OriginalEntryTraceNumber = reset()
+		case 35:
+			Addenda99Dishonored.OriginalReceivingDFIIdentification = reset()
+		case 53:
+			Addenda99Dishonored.ReturnTraceNumber = reset()
+		case 56:
+			Addenda99Dishonored.ReturnSettlementDate = reset()
+		case 58:
+			Addenda99Dishonored.ReturnReasonCode = reset()
+		case 79:
+			Addenda99Dishonored.AddendaInformation = reset()
+		case 94:
+			Addenda99Dishonored.TraceNumber = reset()
+		}
+	}
 }
 
 func (Addenda99Dishonored *Addenda99Dishonored) String() string {

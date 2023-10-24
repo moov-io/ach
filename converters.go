@@ -62,6 +62,7 @@ func (c *converters) formatSimpleTime(s string) string {
 }
 
 var (
+	spaceZeros  map[int]string = populateMap(94, " ")
 	stringZeros map[int]string = populateMap(94, "0")
 )
 
@@ -82,8 +83,14 @@ func (c *converters) alphaField(s string, max uint) string {
 	if ln > max {
 		return s[:max]
 	}
-	s += strings.Repeat(" ", int(max-ln))
-	return s
+
+	m := int(max - ln)
+	pad, exists := spaceZeros[m]
+	if exists {
+		return s + pad
+	}
+	// slow path
+	return s + strings.Repeat(" ", int(max-ln))
 }
 
 // numericField right-justified, unsigned, and zero filled

@@ -82,24 +82,53 @@ func NewAddenda98() *Addenda98 {
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
 func (addenda98 *Addenda98) Parse(record string) {
-	if utf8.RuneCountInString(record) != 94 {
+	runeCount := utf8.RuneCountInString(record)
+	if runeCount != 94 {
 		return
 	}
-	runes := []rune(record)
 
-	// 1-1 Always 7
-	// 2-3 Always "98"
-	addenda98.TypeCode = string(runes[1:3])
-	// 4-6
-	addenda98.ChangeCode = string(runes[3:6])
-	// 7-21
-	addenda98.OriginalTrace = strings.TrimSpace(string(runes[6:21]))
-	// 28-35
-	addenda98.OriginalDFI = addenda98.parseStringField(string(runes[27:35]))
-	// 36-64
-	addenda98.CorrectedData = strings.TrimSpace(string(runes[35:64]))
-	// 80-94
-	addenda98.TraceNumber = strings.TrimSpace(string(runes[79:94]))
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
+	reset := func() string {
+		out := buf.String()
+		buf.Reset()
+		return out
+	}
+
+	// We're going to process the record rune-by-rune and at each field cutoff save the value.
+	var idx int
+	for _, r := range record {
+		idx++
+
+		// Append rune to buffer
+		buf.WriteRune(r)
+
+		// At each cutoff save the buffer and reset
+		switch idx {
+		case 0, 1:
+			// 1-1 Always 7
+			reset()
+		case 3:
+			// 2-3 Always "98"
+			addenda98.TypeCode = reset()
+		case 6:
+			// 4-6
+			addenda98.ChangeCode = reset()
+		case 21:
+			// 7-21
+			addenda98.OriginalTrace = strings.TrimSpace(reset())
+		case 35:
+			// 28-35
+			addenda98.OriginalDFI = addenda98.parseStringField(reset())
+		case 64:
+			// 36-64
+			addenda98.CorrectedData = strings.TrimSpace(reset())
+		case 94:
+			// 80-94
+			addenda98.TraceNumber = strings.TrimSpace(reset())
+		}
+	}
 }
 
 // String writes the Addenda98 struct to a 94 character string
