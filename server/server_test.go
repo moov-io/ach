@@ -129,15 +129,15 @@ func getTestFiles() []testFile {
 		return nil
 	}
 
-	var testFiles []testFile
+	testFiles := make([]testFile, len(matches))
 	for i := range matches {
 		filename := filepath.Base(matches[i])
 
-		testFiles = append(testFiles, testFile{
+		testFiles[i] = testFile{
 			SECCode:     strings.ToUpper(filename[:3]),
 			ACHFilepath: matches[i],
 			Filename:    strings.TrimSuffix(filename, ".ach"),
-		})
+		}
 	}
 
 	return testFiles
