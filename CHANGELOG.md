@@ -2,7 +2,7 @@
 
 This release contains multiple performance improvements ontop of what v1.33.0 has included. The comparison to v1.32.2 is below:
 
-<detials>
+<details>
 <summary>v1.32.2 compared to v1.33.1</summary>
 
 ```
@@ -15,7 +15,6 @@ BenchmarkParsing/IAT-16                                    	    4666	    230543 
 BenchmarkFile/String-16                                    	    5512	    206355 ns/op	   35503 B/op	    1282 allocs/op
 BenchmarkFile/String-16                                    	    6181	    188959 ns/op	   30261 B/op	     639 allocs/op
 ```
-
 </details>
 
 IMPROVEMENTS
