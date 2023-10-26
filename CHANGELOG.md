@@ -1,3 +1,35 @@
+## v1.33.1 (Released 2023-10-26)
+
+This release contains multiple performance improvements ontop of what v1.33.0 has included. The comparison to v1.32.2 is below:
+
+<detials>
+<summary>v1.32.2 compared to v1.33.1</summary>
+
+```
+BenchmarkParsing/Read_../testdata/20110805A.ach-16         	    1840	    632450 ns/op	   97797 B/op	    1953 allocs/op
+BenchmarkParsing/Read_../testdata/20110805A.ach-16         	    1909	    606422 ns/op	   57270 B/op	     922 allocs/op
+
+BenchmarkParsing/IAT-16                                    	    4615	    232996 ns/op	   45724 B/op	     410 allocs/op
+BenchmarkParsing/IAT-16                                    	    4666	    230543 ns/op	   31823 B/op	     306 allocs/op
+
+BenchmarkFile/String-16                                    	    5512	    206355 ns/op	   35503 B/op	    1282 allocs/op
+BenchmarkFile/String-16                                    	    6181	    188959 ns/op	   30261 B/op	     639 allocs/op
+```
+
+</details>
+
+IMPROVEMENTS
+
+- feat: optimize parsing of ADVBatchControl and FileControl
+- feat: reduce allocations when parsing records
+- fix: allocate returned array in ReadFiles and ReadDir once
+- fix: use shared buffer when rendering EntryDetail
+- test: verify IAT batches are skipped in Iterator
+
+BUILD
+
+- chore(deps): update ossf/scorecard-action action to v2.3.1
+
 ## v1.33.0 (Released 2023-10-19)
 
 Moov ACH v1.33.0 has undergone some major performance tuning and improvements. Please let us know if you encounter any issues when using the improved code, thanks!
