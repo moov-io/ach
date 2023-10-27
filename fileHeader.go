@@ -164,13 +164,10 @@ func (fh *FileHeader) Parse(record string) {
 		case 33:
 			// 30-33 The current time in HHmm format
 			fh.FileCreationTime = fh.validateSimpleTime(reset())
-		case 36: // 35-37 Always "A"
-			reset()
-		case 37:
-			// 35-37 Always "A"
-			reset()
-			fh.FileIDModifier = "A"
-		case 39, 40:
+		case 34:
+			// (34-34) An identifier to help uniquely identify multiple files submitted in the same window. Usually "A".
+			fh.FileIDModifier = fh.parseStringField(reset())
+		case 40:
 			reset()
 		case 63:
 			// 41-63 The name of the ODFI. example "SILICON VALLEY BANK    "
