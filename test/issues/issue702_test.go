@@ -24,6 +24,8 @@ import (
 	"testing"
 
 	"github.com/moov-io/ach"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestIssue702(t *testing.T) {
@@ -48,6 +50,8 @@ func TestIssue702(t *testing.T) {
 	if err := file.Validate(); err != nil {
 		t.Error(err)
 	}
+
+	require.Equal(t, "B", file.Header.FileIDModifier)
 
 	if file.Header.ImmediateDestination != "YYYYYYYYY" {
 		t.Errorf("file.Header.ImmediateDestination=%s", file.Header.ImmediateDestination)
@@ -85,6 +89,8 @@ func TestIssue702_1(t *testing.T) {
 			t.Error(err)
 		}
 	}
+
+	require.Equal(t, "B", file.Header.FileIDModifier)
 
 	if file.Header.ImmediateOrigin != "182327390" {
 		t.Errorf("ImmediateOrigin=%s", file.Header.ImmediateOrigin)
