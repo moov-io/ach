@@ -1,3 +1,15 @@
+## v1.33.2 (Released 2023-10-31)
+
+IMPROVEMENTS
+
+- fix: Parse FileIdModifier from file header; don't assume 'A'
+- fix: revert "reduce allocations when parsing FileHeader"
+- test/issues: verify FileIDModifier is read
+
+BUILD
+
+- build(deps): bump github.com/moov-io/base from 0.47.0 to 0.47.1
+
 ## v1.33.1 (Released 2023-10-26)
 
 This release contains multiple performance improvements ontop of what v1.33.0 has included. The comparison to v1.32.2 is below:
