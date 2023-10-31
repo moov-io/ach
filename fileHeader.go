@@ -118,71 +118,37 @@ func NewFileHeader() FileHeader {
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
 func (fh *FileHeader) Parse(record string) {
-	runeCount := utf8.RuneCountInString(record)
-	if runeCount != 94 {
+	if utf8.RuneCountInString(record) != 94 {
 		return
 	}
+	runes := []rune(record)
 
-	buf := getBuffer()
-	defer saveBuffer(buf)
-
-	reset := func() string {
-		out := buf.String()
-		buf.Reset()
-		return out
-	}
-
-	// Set hardcoded fields
+	// (character position 1-1) Always "1"
+	// (2-3) Always "01"
 	fh.priorityCode = "01"
+	// (4-13) A blank space followed by your ODFI's routing number. For example: " 121140399"
+	fh.ImmediateDestination = trimRoutingNumberLeadingZero(fh.parseStringField(string(runes[3:13])))
+	// (14-23) A 10-digit number assigned to you by the ODFI once they approve you to originate ACH files through them
+	fh.ImmediateOrigin = trimRoutingNumberLeadingZero(fh.parseStringField(string(runes[13:23])))
+	// 24-29 Today's date in YYMMDD format
+	// must be after today's date.
+	fh.FileCreationDate = fh.validateSimpleDate(string(runes[23:29]))
+	// 30-33 The current time in HHmm format
+	fh.FileCreationTime = fh.validateSimpleTime(string(runes[29:33]))
+	// 35-37 Always "A"
+	fh.FileIDModifier = string(runes[33:34])
 	// 35-37 always "094"
 	fh.recordSize = "094"
 	// 38-39 always "10"
 	fh.blockingFactor = "10"
 	// 40 always "1"
 	fh.formatCode = "1"
-
-	var idx int
-	for _, r := range record {
-		idx++
-
-		// Append rune to buffer
-		buf.WriteRune(r)
-
-		// At each field cutoff save the buffer and reset
-		switch idx {
-		case 4:
-			reset()
-		case 13:
-			// (4-13) A blank space followed by your ODFI's routing number. For example: " 121140399"
-			fh.ImmediateDestination = trimRoutingNumberLeadingZero(fh.parseStringField(reset()))
-		case 23:
-			// (14-23) A 10-digit number assigned to you by the ODFI once they approve you to originate ACH files through them
-			fh.ImmediateOrigin = trimRoutingNumberLeadingZero(fh.parseStringField(reset()))
-		case 29:
-			// 24-29 Today's date in YYMMDD format must be after today's date.
-			fh.FileCreationDate = fh.validateSimpleDate(reset())
-		case 33:
-			// 30-33 The current time in HHmm format
-			fh.FileCreationTime = fh.validateSimpleTime(reset())
-		case 36: // 35-37 Always "A"
-			reset()
-		case 37:
-			// 35-37 Always "A"
-			reset()
-			fh.FileIDModifier = "A"
-		case 39, 40:
-			reset()
-		case 63:
-			// 41-63 The name of the ODFI. example "SILICON VALLEY BANK    "
-			fh.ImmediateDestinationName = fh.parseStringFieldWithOpts(reset(), fh.validateOpts)
-		case 86:
-			// 64-86 ACH operator or sending point that is sending the file
-			fh.ImmediateOriginName = fh.parseStringFieldWithOpts(reset(), fh.validateOpts)
-		case 94:
-			// 87-94 Optional field that may be used to describe the ACH file for internal accounting purposes
-			fh.ReferenceCode = fh.parseStringFieldWithOpts(reset(), fh.validateOpts)
-		}
-	}
+	// 41-63 The name of the ODFI. example "SILICON VALLEY BANK    "
+	fh.ImmediateDestinationName = fh.parseStringFieldWithOpts(string(runes[40:63]), fh.validateOpts)
+	// 64-86 ACH operator or sending point that is sending the file
+	fh.ImmediateOriginName = fh.parseStringFieldWithOpts(string(runes[63:86]), fh.validateOpts)
+	// 87-94 Optional field that may be used to describe the ACH file for internal accounting purposes
+	fh.ReferenceCode = fh.parseStringFieldWithOpts(string(runes[86:94]), fh.validateOpts)
 }
 
 func trimRoutingNumberLeadingZero(s string) string {

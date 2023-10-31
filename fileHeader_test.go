@@ -195,7 +195,7 @@ func TestFileHeader__trimRoutingNumberLeadingZero(t *testing.T) {
 
 // parseFileHeader validates parsing a file header
 func parseFileHeader(t testing.TB) {
-	var line = "101 076401251 0764012511807291511A094101achdestname            companyname                    "
+	var line = "101 076401251 0764012511807291511Q094101achdestname            companyname                    "
 	r := NewReader(strings.NewReader(line))
 	r.line = line
 	if err := r.parseFileHeader(); err != nil {
@@ -221,8 +221,8 @@ func parseFileHeader(t testing.TB) {
 		t.Errorf("FileCreationTime Expected '1900' got:'%v'", record.FileCreationTimeField())
 	}
 
-	if record.FileIDModifier != "A" {
-		t.Errorf("FileIDModifier Expected 'A' got:'%v'", record.FileIDModifier)
+	if record.FileIDModifier != "Q" {
+		t.Errorf("FileIDModifier Expected 'Q' got:'%v'", record.FileIDModifier)
 	}
 	if record.recordSize != "094" {
 		t.Errorf("RecordSize Expected '094' got:'%v'", record.recordSize)
