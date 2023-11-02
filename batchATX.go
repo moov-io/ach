@@ -60,7 +60,7 @@ func (batch *BatchATX) Validate() error {
 			return batch.Error("Amount", ErrBatchAmountNonZero, entry.Amount)
 		}
 		switch entry.TransactionCode {
-		case CheckingZeroDollarRemittanceCredit, SavingsZeroDollarRemittanceCredit:
+		case CheckingZeroDollarRemittanceCredit, SavingsZeroDollarRemittanceCredit, CheckingReturnNOCCredit:
 		default:
 			return batch.Error("TransactionCode", ErrBatchTransactionCode, entry.TransactionCode)
 		}
