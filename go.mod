@@ -7,14 +7,14 @@ require (
 	github.com/aws/aws-lambda-go v1.41.0
 	github.com/go-kit/kit v0.13.0
 	github.com/go-kit/log v0.2.1
-	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/mux v1.8.1
 	github.com/juju/ansiterm v1.0.0
-	github.com/moov-io/base v0.47.1
+	github.com/moov-io/base v0.48.0
 	github.com/moov-io/iso4217 v0.3.0
 	github.com/prometheus/client_golang v1.17.0
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/net v0.17.0
-	golang.org/x/text v0.13.0
+	golang.org/x/text v0.14.0
 )
 
 require (
@@ -27,9 +27,10 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
+	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/client_model v0.5.0 // indirect
-	github.com/prometheus/common v0.44.0 // indirect
+	github.com/prometheus/common v0.45.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/rickar/cal/v2 v2.1.13 // indirect
 	golang.org/x/sys v0.13.0 // indirect
