@@ -7,7 +7,7 @@ require (
 	github.com/aws/aws-lambda-go v1.41.0
 	github.com/go-kit/kit v0.13.0
 	github.com/go-kit/log v0.2.1
-	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/mux v1.8.1
 	github.com/juju/ansiterm v1.0.0
 	github.com/moov-io/base v0.47.1
 	github.com/moov-io/iso4217 v0.3.0
