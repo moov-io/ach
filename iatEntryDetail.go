@@ -61,11 +61,20 @@ type IATEntryDetail struct {
 	// A value of "1" indicates that one or more addenda records follow,
 	// and "0" means no such record is present.
 	AddendaRecordIndicator int `json:"addendaRecordIndicator"`
-	// TraceNumber assigned by the ODFI in ascending sequence, is included in each
-	// Entry Detail Record, Corporate Entry Detail Record, and addenda Record.
-	// Trace Numbers uniquely identify each entry within a batch in an ACH input file.
+	// TraceNumber is assigned by the ODFI or software vendor and used as part of identification.
+	//
+	// The format of trace numbers is the first 8 digits of the ODFI's routing number followed by
+	// 7 digits chosen by the ODFI or software vendor.
+	//
+	// Sequentual or random numbers can be chosen. The only requirement of Nacha is unique trace
+	// numbers within a batch and file.
+	//
+	// Trace Numbers are included in each Entry Detail Record, Corporate Entry Detail Record,
+	// and addenda Record.
+	//
 	// In association with the Batch Number, transmission (File Creation) Date,
 	// and File ID Modifier, the Trace Number uniquely identifies an entry within a given file.
+	//
 	// For addenda Records, the Trace Number will be identical to the Trace Number
 	// in the associated Entry Detail Record, since the Trace Number is associated
 	// with an entry or item rather than a physical record.
