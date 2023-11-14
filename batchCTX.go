@@ -75,7 +75,9 @@ func (batch *BatchCTX) Validate() error {
 		// use 0 value if there is no Addenda records
 		indicator, _ := strconv.Atoi(entry.CATXAddendaRecordsField())
 		if addendaCount != indicator {
-			return batch.Error("AddendaCount", NewErrBatchExpectedAddendaCount(addendaCount, indicator))
+			if batch.validateOpts == nil || !batch.validateOpts.UnequalAddendaCounts {
+				return batch.Error("AddendaCount", NewErrBatchExpectedAddendaCount(addendaCount, indicator))
+			}
 		}
 		// Verify TransactionCode for prenotes and regular entries
 		switch entry.TransactionCode {

@@ -18,6 +18,8 @@
 package ach
 
 import (
+	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/moov-io/base"
@@ -162,6 +164,11 @@ func testBatchCTXAddendaCount(t testing.TB) {
 	if !base.Match(err, NewErrBatchExpectedAddendaCount(0, 1)) {
 		t.Errorf("%T: %s", err, err)
 	}
+
+	mockBatch.SetValidation(&ValidateOpts{
+		UnequalAddendaCounts: true,
+	})
+	require.NoError(t, mockBatch.Create())
 }
 
 // TestBatchCTXAddendaCount tests validating BatchCTX Addendum count of 2
@@ -563,5 +570,28 @@ func TestBatchCTXAddenda02(t *testing.T) {
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchAddendaCategory) {
 		t.Errorf("%T: %s", err, err)
+	}
+}
+
+func TestBatchCTX_JSON_RoundTrip(t *testing.T) {
+	mockBatch := mockBatchCTX(t)
+	file := NewFile()
+	file.Header = staticFileHeader()
+	file.AddBatch(mockBatch)
+
+	bs, err := json.Marshal(file)
+	require.NoError(t, err)
+	read, err := FileFromJSON(bs)
+	require.NoError(t, err)
+
+	// Check both files against each other
+	require.Equal(t, len(file.Batches), len(read.Batches))
+
+	for i := range file.Batches {
+		ied := file.Batches[i].GetEntries()
+		red := read.Batches[i].GetEntries()
+		require.Greater(t, len(ied), 0)
+
+		require.ElementsMatch(t, ied, red, fmt.Sprintf("batch[%d]", i))
 	}
 }
