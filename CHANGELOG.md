@@ -1,3 +1,15 @@
+## v1.33.3 (Released 2023-11-14)
+
+IMPROVEMENTS
+
+- docs: improve TraceNumber
+- fix: check .UnequalAddendaCounts in CTX validation
+
+BUILD
+
+- build(deps): bump golang.org/x/net from 0.17.0 to 0.18.0
+- fix(deps): update module github.com/moov-io/base to v0.48.2
+
 ## v1.33.2 (Released 2023-10-31)
 
 IMPROVEMENTS
