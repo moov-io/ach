@@ -162,6 +162,11 @@ func testBatchCTXAddendaCount(t testing.TB) {
 	if !base.Match(err, NewErrBatchExpectedAddendaCount(0, 1)) {
 		t.Errorf("%T: %s", err, err)
 	}
+
+	mockBatch.SetValidation(&ValidateOpts{
+		UnequalAddendaCounts: true,
+	})
+	require.NoError(t, mockBatch.Create())
 }
 
 // TestBatchCTXAddendaCount tests validating BatchCTX Addendum count of 2
