@@ -47,7 +47,10 @@ func main() {
 		bh.ODFIIdentification = "121042882"
 		bh.OriginatorStatusCode = 0
 
-		batch, _ := ach.NewBatch(bh)
+		batch, err := ach.NewBatch(bh)
+		if err != nil {
+			log.Fatalf("%T: %v", err, err)
+		}
 
 		// Create Entry
 		entrySeq := 0

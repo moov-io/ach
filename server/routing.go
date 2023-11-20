@@ -242,7 +242,9 @@ func marshalStructWithError(in interface{}, w http.ResponseWriter) error {
 	for i := 0; i < v.NumField(); i++ {
 		name := v.Type().Field(i).Name
 		value := v.Field(i).Interface()
-
+		if value == nil {
+			continue
+		}
 		if err, ok := value.(error); ok {
 			out["error"] = err.Error()
 		} else {

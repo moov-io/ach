@@ -19,7 +19,9 @@ func dumpFiles(paths []string, validateOpts *ach.ValidateOpts) error {
 		if err != nil {
 			fmt.Printf("WARN: problem reading %s:\n %v\n\n", paths[i], err)
 		}
-		files[i] = f
+		if f != nil {
+			files[i] = f
+		}
 	}
 
 	if *flagMerge {
@@ -38,7 +40,9 @@ func dumpFiles(paths []string, validateOpts *ach.ValidateOpts) error {
 			if err != nil {
 				fmt.Printf("ERROR: problem flattening file: %v\n", err)
 			}
-			files[i] = file
+			if file != nil {
+				files[i] = file
+			}
 		}
 	}
 

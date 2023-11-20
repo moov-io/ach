@@ -544,6 +544,9 @@ func (f *File) Create() error {
 
 // AddBatch appends a Batch to the ach.File
 func (f *File) AddBatch(batch Batcher) []Batcher {
+	if batch == nil {
+		return f.Batches
+	}
 	if batch.Category() == CategoryNOC {
 		f.NotificationOfChange = append(f.NotificationOfChange, batch)
 	}
@@ -984,7 +987,10 @@ func (f *File) SegmentFile(_ *SegmentFileConfiguration) (*File, *File, error) {
 	}
 
 	if f.Batches != nil {
-		f.segmentFileBatches(creditFile, debitFile)
+		err := f.segmentFileBatches(creditFile, debitFile)
+		if err != nil {
+			return nil, nil, err
+		}
 	}
 
 	if f.IATBatches != nil {
@@ -1013,7 +1019,7 @@ func (f *File) SegmentFile(_ *SegmentFileConfiguration) (*File, *File, error) {
 	return creditFile, debitFile, nil
 }
 
-func (f *File) segmentFileBatches(creditFile, debitFile *File) {
+func (f *File) segmentFileBatches(creditFile, debitFile *File) error {
 	for _, batch := range f.Batches {
 		bh := batch.GetHeader()
 
@@ -1030,7 +1036,10 @@ func (f *File) segmentFileBatches(creditFile, debitFile *File) {
 
 				entries := batch.GetADVEntries()
 				for _, entry := range entries {
-					segmentFileBatchAddADVEntry(creditBatch, debitBatch, entry)
+					err := segmentFileBatchAddADVEntry(creditBatch, debitBatch, entry)
+					if err != nil {
+						return err
+					}
 				}
 				// Add the Entry to its Batch
 				if creditBatch != nil && len(creditBatch.GetADVEntries()) > 0 {
@@ -1054,7 +1063,10 @@ func (f *File) segmentFileBatches(creditFile, debitFile *File) {
 
 				entries := batch.GetEntries()
 				for _, entry := range entries {
-					segmentFileBatchAddEntry(creditBatch, debitBatch, entry)
+					err := segmentFileBatchAddEntry(creditBatch, debitBatch, entry)
+					if err != nil {
+						return err
+					}
 				}
 
 				if creditBatch != nil && len(creditBatch.GetEntries()) > 0 {
@@ -1072,6 +1084,7 @@ func (f *File) segmentFileBatches(creditFile, debitFile *File) {
 			}
 		}
 	}
+	return nil
 }
 
 // segmentFileIATBatches segments IAT batches debits and credits into debit and credit files
@@ -1175,29 +1188,45 @@ func (f *File) addFileHeaderData(file *File) *File {
 
 // segmentFileBatchAddEntry adds entries to batches in a segmented file
 // Applies to All SEC Codes except ADV (Automated Accounting Advice)
-func segmentFileBatchAddEntry(creditBatch, debitBatch Batcher, entry *EntryDetail) {
+func segmentFileBatchAddEntry(creditBatch, debitBatch Batcher, entry *EntryDetail) error {
 	switch entry.TransactionCode {
 	case CheckingCredit, CheckingReturnNOCCredit, CheckingPrenoteCredit, CheckingZeroDollarRemittanceCredit,
 		SavingsCredit, SavingsReturnNOCCredit, SavingsPrenoteCredit, SavingsZeroDollarRemittanceCredit,
 		GLCredit, GLReturnNOCCredit, GLPrenoteCredit, GLZeroDollarRemittanceCredit,
 		LoanCredit, LoanReturnNOCCredit, LoanPrenoteCredit, LoanZeroDollarRemittanceCredit:
+		if creditBatch == nil {
+			return errors.New("missing creditBatch")
+		}
 		creditBatch.AddEntry(entry)
+
 	case CheckingDebit, CheckingReturnNOCDebit, CheckingPrenoteDebit, CheckingZeroDollarRemittanceDebit,
 		SavingsDebit, SavingsReturnNOCDebit, SavingsPrenoteDebit, SavingsZeroDollarRemittanceDebit,
 		GLDebit, GLReturnNOCDebit, GLPrenoteDebit, GLZeroDollarRemittanceDebit,
 		LoanDebit, LoanReturnNOCDebit:
+		if debitBatch == nil {
+			return errors.New("missing debitBatch")
+		}
 		debitBatch.AddEntry(entry)
 	}
+	return nil
 }
 
 // segmentFileBatchAddADVEntry adds entries to batches in a segment file for SEC Code ADV (Automated Accounting Advice)
-func segmentFileBatchAddADVEntry(creditBatch Batcher, debitBatch Batcher, entry *ADVEntryDetail) {
+func segmentFileBatchAddADVEntry(creditBatch Batcher, debitBatch Batcher, entry *ADVEntryDetail) error {
 	switch entry.TransactionCode {
 	case CreditForDebitsOriginated, CreditForCreditsReceived, CreditForCreditsRejected, CreditSummary:
+		if creditBatch == nil {
+			return errors.New("missing creditBatch")
+		}
 		creditBatch.AddADVEntry(entry)
+
 	case DebitForCreditsOriginated, DebitForDebitsReceived, DebitForDebitsRejectedBatches, DebitSummary:
+		if debitBatch == nil {
+			return errors.New("missing debitBatch")
+		}
 		debitBatch.AddADVEntry(entry)
 	}
+	return nil
 }
 
 // Validates that the batch numbers are ascending
