@@ -133,7 +133,9 @@ func (r *repositoryInMemory) StoreBatch(fileID string, batch ach.Batcher) error 
 	}
 
 	// Add the batch to the file
-	r.files[fileID].AddBatch(batch)
+	if f := r.files[fileID]; f != nil {
+		f.AddBatch(batch)
+	}
 
 	return nil
 }
@@ -203,7 +205,11 @@ func (r *repositoryInMemory) cleanupOldFiles() {
 	tooOldStr := tooOld.Format("060102") // YYMMDD
 
 	for i := range r.files {
-		if r.files[i].Header.FileCreationDate < tooOldStr {
+		file := r.files[i]
+		if file == nil {
+			continue
+		}
+		if file.Header.FileCreationDate < tooOldStr {
 			removed++
 			delete(r.files, i)
 		}

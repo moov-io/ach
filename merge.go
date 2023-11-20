@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -229,7 +230,10 @@ func (fs *mergableFiles) findOutfile(f *File) *File {
 }
 
 func mergeEntries(b1, b2 Batcher) (Batcher, error) {
-	b, _ := NewBatch(b1.GetHeader())
+	b, err := NewBatch(b1.GetHeader())
+	if err != nil {
+		return nil, fmt.Errorf("mergeEntries: %w", err)
+	}
 	entries := sortEntriesByTraceNumber(append(b1.GetEntries(), b2.GetEntries()...))
 	for i := range entries {
 		b.AddEntry(entries[i])

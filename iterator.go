@@ -110,6 +110,9 @@ func (i *Iterator) NextEntry() (*BatchHeader, *EntryDetail, error) {
 			if err != nil {
 				return nil, nil, fmt.Errorf("faking batch for line %d failed: %w", i.reader.lineNum, err)
 			}
+			if i.reader.currentBatch == nil {
+				return nil, nil, fmt.Errorf("failed to create %s batch: %v", bh.StandardEntryClassCode, err)
+			}
 			if err := i.reader.readLine(line); err != nil {
 				return nil, nil, fmt.Errorf("reading line %d with fake BatchHeader failed: %w", i.reader.lineNum, err)
 			}

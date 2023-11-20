@@ -575,22 +575,30 @@ func (r *Reader) parseAddenda() error {
 
 // parseADVAddenda takes the input record string and create an Addenda99 appended to the last ADVEntryDetail
 func (r *Reader) parseADVAddenda() error {
+	if r.currentBatch == nil {
+		return ErrFileAddendaOutsideBatch
+	}
 	if len(r.currentBatch.GetADVEntries()) == 0 {
 		return ErrFileAddendaOutsideEntry
 	}
+
 	entryIndex := len(r.currentBatch.GetADVEntries()) - 1
 	entry := r.currentBatch.GetADVEntries()[entryIndex]
 
 	if entry.AddendaRecordIndicator != 1 {
 		return r.parseError(r.currentBatch.Error("AddendaRecordIndicator", ErrBatchAddendaIndicator))
 	}
+
 	addenda99 := NewAddenda99()
 	addenda99.Parse(r.line)
+
 	if err := maybeValidate(addenda99, r.File.validateOpts); err != nil {
 		return r.parseError(err)
 	}
+
 	r.currentBatch.GetADVEntries()[entryIndex].Category = CategoryReturn
 	r.currentBatch.GetADVEntries()[entryIndex].Addenda99 = addenda99
+
 	return nil
 }
 

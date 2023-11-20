@@ -47,7 +47,11 @@ func main() {
 	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
 	bh.ODFIIdentification = "121042882"
 
-	batch, _ := ach.NewBatch(bh)
+	batch, err := ach.NewBatch(bh)
+	if err != nil {
+		fmt.Printf("%T: %v", err, err)
+		return
+	}
 
 	// To create an entry
 	entry := ach.NewEntryDetail()
@@ -68,13 +72,13 @@ func main() {
 	entry.AddAddenda05(addenda)
 
 	// Entries are added to batches like so:
-
 	batch.AddEntry(entry)
 
 	// When all of the Entries are added to the batch we must create it.
 
 	if err := batch.Create(); err != nil {
 		fmt.Printf("%T: %s", err, err)
+		return
 	}
 
 	// And batches are added to files much the same way:
@@ -92,7 +96,11 @@ func main() {
 	bh2.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102") // YYMMDD
 	bh2.ODFIIdentification = "121042882"
 
-	batch2, _ := ach.NewBatch(bh2)
+	batch2, err := ach.NewBatch(bh2)
+	if err != nil {
+		fmt.Printf("%T: %v", err, err)
+		return
+	}
 
 	// Add an entry and define if it is a single or recurring payment
 	// The following is a recurring payment for $7.99
@@ -120,6 +128,7 @@ func main() {
 	// Create and add the second batch
 	if err := batch2.Create(); err != nil {
 		fmt.Printf("%T: %s", err, err)
+		return
 	}
 	file.AddBatch(batch2)
 
@@ -127,6 +136,7 @@ func main() {
 
 	if err := file.Create(); err != nil {
 		fmt.Printf("%T: %s", err, err)
+		return
 	}
 
 	// Finally we wnt to write the file to an io.Writer

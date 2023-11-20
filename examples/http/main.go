@@ -104,11 +104,12 @@ func main() {
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
+	if resp == nil || err != nil {
 		log.Fatal(err)
 	}
-	defer resp.Body.Close()
-
+	if resp != nil && resp.Body != nil {
+		defer resp.Body.Close()
+	}
 	if resp.StatusCode == 200 {
 		log.Printf("File created!")
 	} else {

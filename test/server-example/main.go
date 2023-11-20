@@ -27,6 +27,7 @@ import (
 	"github.com/moov-io/ach/server"
 
 	"github.com/go-kit/log"
+	"github.com/stretchr/testify/require"
 )
 
 func TestServer__CreateFile(t *testing.T) {
@@ -55,7 +56,10 @@ func TestServer__CreateFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	if resp != nil && resp.Body != nil {
+		defer resp.Body.Close()
+	}
+	require.NotNil(t, resp)
 
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("got %d HTTP status code", resp.StatusCode)

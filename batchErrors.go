@@ -87,10 +87,12 @@ func (b *Batch) Error(field string, err error, values ...interface{}) error {
 		return err
 	}
 	be := BatchError{
-		BatchNumber: b.Header.BatchNumber,
-		BatchType:   b.Header.StandardEntryClassCode,
-		FieldName:   field,
-		Err:         err,
+		FieldName: field,
+		Err:       err,
+	}
+	if b != nil {
+		be.BatchNumber = b.Header.BatchNumber
+		be.BatchType = b.Header.StandardEntryClassCode
 	}
 	// only the first value counts
 	if len(values) > 0 {

@@ -161,7 +161,11 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 	}
 
 	for _, name := range validationNames {
-		input := request.URL.Query().Get(name)
+		q := request.URL.Query()
+		if q == nil {
+			continue
+		}
+		input := q.Get(name)
 		if input == "" {
 			continue
 		}
@@ -237,7 +241,9 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 	// Set the fileID from the request
 	fileID, ok := mux.Vars(request)["fileID"]
 	if ok && fileID != "" && fileID != "create" {
-		req.File.ID = fileID
+		if req.File != nil {
+			req.File.ID = fileID
+		}
 	}
 
 	return req, nil

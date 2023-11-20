@@ -67,7 +67,8 @@ func write(path string) {
 
 	f, err := os.Create(path)
 	if err != nil {
-		fmt.Printf("%T: %s", err, err)
+		fmt.Printf("%T: %v\n", err, err)
+		return
 	}
 
 	// To create a file
@@ -91,7 +92,11 @@ func write(path string) {
 		bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102")
 		bh.ODFIIdentification = "121042882"
 
-		batch, _ := ach.NewBatch(bh)
+		batch, err := ach.NewBatch(bh)
+		if err != nil {
+			fmt.Printf("%T: %v\n", err, err)
+			return
+		}
 
 		// Create Entry
 		entrySeq := 0
@@ -121,7 +126,8 @@ func write(path string) {
 
 		// Create the batch.
 		if err := batch.Create(); err != nil {
-			fmt.Printf("%T: %s", err, err)
+			fmt.Printf("%T: %v\n", err, err)
+			return
 		}
 
 		// Add batch to the file
@@ -131,30 +137,35 @@ func write(path string) {
 	// ensure we have a validated file structure
 	if file.Validate(); err != nil {
 		fmt.Printf("Could not validate entire file: %v", err)
+		return
 	}
 
 	// Create the file
 	if err := file.Create(); err != nil {
-		fmt.Printf("%T: %s", err, err)
+		fmt.Printf("%T: %v\n", err, err)
+		return
 	}
 
 	// Write to a file
 	if *flagJson {
 		// Write in JSON format
 		if err := json.NewEncoder(f).Encode(file); err != nil {
-			fmt.Printf("%T: %s", err, err)
+			fmt.Printf("%T: %v\n", err, err)
+			return
 		}
 	} else {
 		// Write in ACH plain text format
 		w := ach.NewWriter(f)
 		if err := w.Write(file); err != nil {
-			fmt.Printf("%T: %s", err, err)
+			fmt.Printf("%T: %v\n", err, err)
+			return
 		}
 		w.Flush()
 	}
 
 	if err := f.Close(); err != nil {
-		fmt.Println(err.Error())
+		fmt.Printf("%T: %v\n", err, err)
+		return
 	}
 
 	fmt.Printf("Wrote %s\n", path)
