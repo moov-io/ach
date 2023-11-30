@@ -1,67 +1,24 @@
-# Use https://app.stepsecurity.io/ to improve workflow security
-name: Go
-
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
-
-permissions:
-  contents: read
-
-jobs:
-  build:
-    name: Go Build
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    steps:
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v4
-      with:
-        go-version: stable
-      id: go
-
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v3
-
-    - name: Install make (Windows)
-      if: runner.os == 'Windows'
-      run: choco install -y make mingw
-
-    - name: Check OpenAPI
-      if: runner.os == 'Linux'
-      run: make check-openapi
-
-    - name: Check
-      run: make check
-      env:
-        GOLANGCI_LINTERS: gosec
-
-    - name: Upload Code Coverage
-      if: runner.os == 'Linux'
-      run: bash <(curl -s https://codecov.io/bash)
-
-  docker:
-    name: Docker
-    runs-on: ubuntu-latest
-    steps:
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v4
-      with:
-        go-version: stable
-      id: go
-
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v3
-
-    - name: Docker Build
-      run: make docker
-
-    - name: Docker Tests
-      run: make test-integration
-
-    - name: Cleanup
-      run: make clean-integration
+            - name: Setup Node.js environment
+  uses: actions/setup-node@v4.0.0
+  with:
+    # Set always-auth in npmrc.
+    always-auth: # optional, default is false
+    # Version Spec of the version to use. Examples: 12.x, 10.15.1, >=10.15.0.
+    node-version: # optional
+    # File containing the version Spec of the version to use.  Examples: .nvmrc, .node-version, .tool-versions.
+    node-version-file: # optional
+    # Target architecture for Node to use. Examples: x86, x64. Will use system architecture by default.
+    architecture: # optional
+    # Set this option if you want the action to check for the latest available version that satisfies the version spec.
+    check-latest: # optional
+    # Optional registry to set up for auth. Will set the registry in a project level .npmrc and .yarnrc file, and set up auth to read in from env.NODE_AUTH_TOKEN.
+    registry-url: # optional
+    # Optional scope for authenticating against scoped registries. Will fall back to the repository owner when using the GitHub Packages registry (https://npm.pkg.github.com/).
+    scope: # optional
+    # Used to pull node distributions from node-versions. Since there's a default, this is typically not supplied by the user. When running this action on github.com, the default value is sufficient. When running on GHES, you can pass a personal access token for github.com if you are experiencing rate limiting.
+    token: # optional, default is ${{ github.server_url == 'https://github.com' && github.token || '' }}
+    # Used to specify a package manager for caching in the default directory. Supported values: npm, yarn, pnpm.
+    cache: # optional
+    # Used to specify the path to a dependency file: package-lock.json, yarn.lock, etc. Supports wildcards or a list of file names for caching multiple dependencies.
+    cache-dependency-path: # optional
+          
