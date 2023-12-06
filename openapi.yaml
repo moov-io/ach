@@ -1015,7 +1015,7 @@ components:
             The receiver's bank account number you are crediting/debiting. It important to note that this is an alphanumeric field, so it's space padded, not zero padded
           example: "181141847"
         amount:
-          type: integer
+          type: long
           description: Number of cents you are debiting/crediting this account
           example: 1235
         identificationNumber:
@@ -1213,7 +1213,7 @@ components:
             'RCK' = Re-presented Check Entry
           example: TEL
         foreignPaymentAmount:
-          type: integer
+          type: long
           description: For inbound IAT payments this field should contain the USD amount or may be blank.
           example: 1021441
         foreignTraceNumber:
@@ -1991,7 +1991,7 @@ components:
           description: Number of Addenda Records
           example: 1
         amount:
-          type: integer
+          type: long
           description: Number of cents you are debiting/crediting this account
           example: 1235
         DFIAccountNumber:
@@ -2102,7 +2102,7 @@ components:
             The receiver's bank account number you are crediting/debiting. It important to note that this is an alphanumeric field, so it's space padded, not zero padded
           example: "181141847"
         amount:
-          type: integer
+          type: long
           description: Number of cents you are debiting/crediting this account
           example: 1235
         adviceRoutingNumber:
