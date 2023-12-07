@@ -794,11 +794,13 @@ components:
           example: 0
         totalDebit:
           description: Accumulated Batch debit totals within the file.
-          type: long
+          type: integer
+          format: int64
           example: 100
         totalCredit:
           description: Accumulated Batch credit totals within the file.
-          type: long
+          type: integer
+          format: int64
           example: 20
       required:
         - ID
@@ -937,11 +939,13 @@ components:
           example: 0
         totalDebit:
           description: Contains accumulated Entry debit totals within the batch.
-          type: long
+          type: integer
+          format: int64
           example: 100
         totalCredit:
           description: Contains accumulated Entry credit totals within the batch.
-          type: long
+          type: integer
+          format: int64
           example: 100
         companyIdentification:
           description: |
@@ -1015,7 +1019,8 @@ components:
             The receiver's bank account number you are crediting/debiting. It important to note that this is an alphanumeric field, so it's space padded, not zero padded
           example: "181141847"
         amount:
-          type: long
+          type: integer
+          format: int64
           description: Number of cents you are debiting/crediting this account
           example: 1235
         identificationNumber:
@@ -1213,7 +1218,8 @@ components:
             'RCK' = Re-presented Check Entry
           example: TEL
         foreignPaymentAmount:
-          type: long
+          type: integer
+          format: int64
           description: For inbound IAT payments this field should contain the USD amount or may be blank.
           example: 1021441
         foreignTraceNumber:
@@ -1991,7 +1997,8 @@ components:
           description: Number of Addenda Records
           example: 1
         amount:
-          type: long
+          type: integer
+          format: int64
           description: Number of cents you are debiting/crediting this account
           example: 1235
         DFIAccountNumber:
@@ -2102,7 +2109,8 @@ components:
             The receiver's bank account number you are crediting/debiting. It important to note that this is an alphanumeric field, so it's space padded, not zero padded
           example: "181141847"
         amount:
-          type: long
+          type: integer
+          format: int64
           description: Number of cents you are debiting/crediting this account
           example: 1235
         adviceRoutingNumber:
@@ -2174,11 +2182,13 @@ components:
           example: 0
         totalDebit:
           description: Contains accumulated Entry debit totals within the batch.
-          type: long
+          type: integer
+          format: int64
           example: 100
         totalCredit:
           description: Contains accumulated Entry credit totals within the batch.
-          type: long
+          type: integer
+          format: int64
           example: 100
         achOperatorData:
           description: Alphanumeric code used to identify an ACH Operator
@@ -2228,11 +2238,13 @@ components:
           example: 0
         totalDebit:
           description: Accumulated Batch debit totals within the file.
-          type: long
+          type: integer
+          format: int64
           example: 100
         totalCredit:
           description: Accumulated Batch credit totals within the file.
-          type: long
+          type: integer
+          format: int64
           example: 20
       required:
         - ID
