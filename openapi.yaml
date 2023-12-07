@@ -795,10 +795,12 @@ components:
         totalDebit:
           description: Accumulated Batch debit totals within the file.
           type: integer
+          format: int64
           example: 100
         totalCredit:
           description: Accumulated Batch credit totals within the file.
           type: integer
+          format: int64
           example: 20
       required:
         - ID
@@ -938,10 +940,12 @@ components:
         totalDebit:
           description: Contains accumulated Entry debit totals within the batch.
           type: integer
+          format: int64
           example: 100
         totalCredit:
           description: Contains accumulated Entry credit totals within the batch.
           type: integer
+          format: int64
           example: 100
         companyIdentification:
           description: |
@@ -1016,6 +1020,7 @@ components:
           example: "181141847"
         amount:
           type: integer
+          format: int64
           description: Number of cents you are debiting/crediting this account
           example: 1235
         identificationNumber:
@@ -1214,6 +1219,7 @@ components:
           example: TEL
         foreignPaymentAmount:
           type: integer
+          format: int64
           description: For inbound IAT payments this field should contain the USD amount or may be blank.
           example: 1021441
         foreignTraceNumber:
@@ -1992,6 +1998,7 @@ components:
           example: 1
         amount:
           type: integer
+          format: int64
           description: Number of cents you are debiting/crediting this account
           example: 1235
         DFIAccountNumber:
@@ -2103,6 +2110,7 @@ components:
           example: "181141847"
         amount:
           type: integer
+          format: int64
           description: Number of cents you are debiting/crediting this account
           example: 1235
         adviceRoutingNumber:
@@ -2175,10 +2183,12 @@ components:
         totalDebit:
           description: Contains accumulated Entry debit totals within the batch.
           type: integer
+          format: int64
           example: 100
         totalCredit:
           description: Contains accumulated Entry credit totals within the batch.
           type: integer
+          format: int64
           example: 100
         achOperatorData:
           description: Alphanumeric code used to identify an ACH Operator
@@ -2229,10 +2239,12 @@ components:
         totalDebit:
           description: Accumulated Batch debit totals within the file.
           type: integer
+          format: int64
           example: 100
         totalCredit:
           description: Accumulated Batch credit totals within the file.
           type: integer
+          format: int64
           example: 20
       required:
         - ID
