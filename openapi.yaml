@@ -794,11 +794,11 @@ components:
           example: 0
         totalDebit:
           description: Accumulated Batch debit totals within the file.
-          type: integer
+          type: long
           example: 100
         totalCredit:
           description: Accumulated Batch credit totals within the file.
-          type: integer
+          type: long
           example: 20
       required:
         - ID
@@ -937,11 +937,11 @@ components:
           example: 0
         totalDebit:
           description: Contains accumulated Entry debit totals within the batch.
-          type: integer
+          type: long
           example: 100
         totalCredit:
           description: Contains accumulated Entry credit totals within the batch.
-          type: integer
+          type: long
           example: 100
         companyIdentification:
           description: |
@@ -2174,11 +2174,11 @@ components:
           example: 0
         totalDebit:
           description: Contains accumulated Entry debit totals within the batch.
-          type: integer
+          type: long
           example: 100
         totalCredit:
           description: Contains accumulated Entry credit totals within the batch.
-          type: integer
+          type: long
           example: 100
         achOperatorData:
           description: Alphanumeric code used to identify an ACH Operator
@@ -2228,11 +2228,11 @@ components:
           example: 0
         totalDebit:
           description: Accumulated Batch debit totals within the file.
-          type: integer
+          type: long
           example: 100
         totalCredit:
           description: Accumulated Batch credit totals within the file.
-          type: integer
+          type: long
           example: 20
       required:
         - ID
