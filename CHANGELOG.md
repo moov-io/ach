@@ -1,3 +1,16 @@
+## v1.33.4 (Released 2023-12-07)
+
+IMPROVEMENTS
+
+- all: fix errors found by nilaway
+- api: update amount to be long to allow handling of amounts larger than 21M (#1335)
+- webui: better overflow layout
+
+BUILD
+
+- build(deps): bump actions/setup-go from 4 to 5
+- build(deps): bump golang.org/x/net from 0.18.0 to 0.19.0
+
 ## v1.33.3 (Released 2023-11-14)
 
 IMPROVEMENTS
