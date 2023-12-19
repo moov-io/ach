@@ -1,0 +1,37 @@
+{
+    "fileHeader": {
+        "fileCreationDate": "231219",
+        "immediateOrigin": "123456780",
+        "immediateOriginName": "Anonymous Bank",
+        "immediateDestination": "123456780",
+        "immediateDestinationName": "Anonymous Bank"
+    },
+    "batches": [
+        {
+            "batchHeader": {
+                "serviceClassCode": 200,
+                "companyName": "Anonymous Bank",
+                "companyIdentification": "123456780",
+                "standardEntryClassCode": "CCD",
+                "companyEntryDescription": "Anonymous Bank",
+                "ODFIIdentification": "123456780"
+            },
+            "entryDetails": [
+                {
+                    "amount": 50000,
+                    "DFIAccountNumber": "12345",
+                    "RDFIIdentification": "12345678",
+                    "checkDigit": "0",
+                    "transactionCode": 22,
+                    "individualName": "Jane Smith"
+                }
+            ],
+            "offset": {
+                "routingNumber": "123456780",
+                "accountNumber": "12345",
+                "accountType": "checking",
+                "description": "For offset"
+            }
+        }
+    ]
+}
