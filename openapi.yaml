@@ -981,11 +981,11 @@ components:
     EntryDetail:
       required:
         - id
-        - transactionCode
+        - amount
+        - DFIAccountNumber
         - RDFIIdentification
         - checkDigit
-        - DFIAccountNumber
-        - amount
+        - transactionCode
         - individualName
       properties:
         id:
@@ -1086,13 +1086,6 @@ components:
           type: string
           description: Category defines if the entry is a Forward, Return, or NOC
           example: "Forward"
-      required:
-        - amount
-        - DFIAccountNumber
-        - RDFIIdentification
-        - checkDigit
-        - transactionCode
-        - individualName
 
     Addenda02:
       properties:
