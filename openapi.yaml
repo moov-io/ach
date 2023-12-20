@@ -1086,6 +1086,14 @@ components:
           type: string
           description: Category defines if the entry is a Forward, Return, or NOC
           example: "Forward"
+      required:
+        - amount
+        - DFIAccountNumber
+        - RDFIIdentification
+        - checkDigit
+        - transactionCode
+        - individualName
+
     Addenda02:
       properties:
         id:
