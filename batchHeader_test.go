@@ -323,6 +323,10 @@ func testBatchCompanyIdentificationAlphaNumeric(t testing.TB) {
 	if !base.Match(err, ErrNonAlphanumeric) {
 		t.Errorf("%T: %s", err, err)
 	}
+
+	// Allowed case
+	bh.CompanyIdentification = "Acme Corp!"
+	require.NoError(t, bh.Validate())
 }
 
 // TestBatchCompanyIdentificationAlphaNumeric tests validating company identification is alphanumeric
@@ -346,6 +350,10 @@ func testBatchCompanyEntryDescriptionAlphaNumeric(t testing.TB) {
 	if !base.Match(err, ErrNonAlphanumeric) {
 		t.Errorf("%T: %s", err, err)
 	}
+
+	// Allowed case
+	bh.CompanyEntryDescription = "Acme Corp!"
+	require.NoError(t, bh.Validate())
 }
 
 // TestBatchCompanyEntryDescriptionAlphaNumeric tests validating company entry description is alphanumeric

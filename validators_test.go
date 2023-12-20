@@ -183,7 +183,7 @@ func TestValidators__isAlphanumeric(t *testing.T) {
 func TestValidators__isAlphanumericExamples(t *testing.T) {
 	v := validator{}
 
-	validCases := []string{`|`, `¦`, `¢`, `¬`, `±`}
+	validCases := []string{"Acme Corp!", `|`, `¦`, `¢`, `¬`, `±`}
 	for i := range validCases {
 		err := v.isAlphanumeric(validCases[i])
 		require.NoError(t, err, fmt.Sprintf("input: %q", validCases[i]))
