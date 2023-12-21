@@ -253,6 +253,9 @@ func (Addenda99 *Addenda99) SetDishonoredAddendaInformation(
 	returnReasonCode string,
 	addenda string,
 ) {
+	// This record drops the "R"
+	returnReasonCode = strings.TrimPrefix(returnReasonCode, "R")
+
 	addendaInformation := fmt.Sprintf("   %s%s%s%s",
 		Addenda99.alphaField(returnTraceNumber, 15),
 		Addenda99.alphaField(returnSettlementDate, 3),
@@ -272,6 +275,9 @@ func (Addenda99 *Addenda99) SetContestedAddendaInformation(
 	dishonoredReturnSettlementDate string,
 	dishonoredReturnReasonCode string,
 ) {
+	// This record drops the "R"
+	returnReasonCode = strings.TrimPrefix(returnReasonCode, "R")
+
 	addendaInformation := fmt.Sprintf("%s%s%s%s%s%s%s ",
 		Addenda99.alphaField(originalSettlementDate, 3),
 		Addenda99.alphaField(returnTraceNumber, 15),
