@@ -36,6 +36,31 @@ func mockAddenda99Dishonored() *Addenda99Dishonored {
 	return addenda99
 }
 
+func TestAddenda99Dishonored(t *testing.T) {
+	addenda99 := NewAddenda99()
+	line := "799R6909100001137143222042712114530   1211453000251201170506                   091000011371432"
+	addenda99.Parse(line)
+
+	require.Equal(t, "12114530", addenda99.OriginalDFI)
+	require.Equal(t, "   1211453000251201170506                   ", addenda99.AddendaInformation)
+	require.Equal(t, "091000011371432", addenda99.TraceNumber)
+	require.Equal(t, line, addenda99.String())
+
+	addenda99 = NewAddenda99()
+	addenda99.ReturnCode = "R69"
+	addenda99.OriginalTrace = "091000011371432"
+	addenda99.DateOfDeath = "220427"
+	addenda99.OriginalDFI = "12114530"
+	addenda99.SetDishonoredAddendaInformation("121145300025120", "117", "R05", "06")
+	addenda99.TraceNumber = "091000011371432"
+	require.Equal(t, line, addenda99.String())
+
+	require.Equal(t, "121145300025120", addenda99.AddendaInformationReturnTraceNumber())
+	require.Equal(t, "117", addenda99.AddendaInformationReturnSettlementDate())
+	require.Equal(t, "R05", addenda99.AddendaInformationReturnReasonCode())
+	require.Equal(t, "06                   ", addenda99.AddendaInformationExtra())
+}
+
 func TestAddenda99Dishonored__Fields(t *testing.T) {
 	addenda99 := mockAddenda99Dishonored()
 

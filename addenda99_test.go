@@ -58,7 +58,7 @@ func testAddenda99Parse(t testing.TB) {
 	if addenda99.OriginalDFI != "09101298" {
 		t.Errorf("expected: %s got: %s", "09101298", addenda99.OriginalDFI)
 	}
-	if addenda99.AddendaInformation != "Authorization revoked" {
+	if addenda99.AddendaInformation != "Authorization revoked                       " {
 		t.Errorf("expected: %v got: %v", "Authorization revoked", addenda99.AddendaInformation)
 	}
 	if addenda99.TraceNumber != "091012980000066" {
