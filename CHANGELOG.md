@@ -1,4 +1,4 @@
-## v1.33.5 (Released 2024-01-19)
+## v1.33.6 (Released 2024-01-19)
 
 IMPROVEMENTS
 
