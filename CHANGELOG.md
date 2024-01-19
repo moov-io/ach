@@ -1,3 +1,33 @@
+## v1.33.5 (Released 2024-01-19)
+
+IMPROVEMENTS
+
+- api: fixup EntryDetail required fields
+- api: label required fields on EntryDetail
+- feat: Addenda99.SetOriginalEntryReturnDate
+- feat: Parse Addenda99.AddendaInformation
+- feat: improve addenda99 for dishonored returns
+- feat: add CheckingReturnNOCCredit to list of valid ATX txn codes (#21)
+- fix BatchHeader.EffectiveEntryDateField (#20)
+- fix: Don't truncate Addenda99.AddendaInformation
+- fix: trim "R" in dishonored and contested setter
+- test: verify "!" is allowed in isAlphanumeric
+
+BUILD
+
+- build(deps): bump actions/download-artifact from 1 to 4
+- build(deps): bump actions/upload-artifact from 1 to 4
+- build(deps): bump github.com/moov-io/base from 0.48.2 to 0.48.3 (#1341)
+- build(deps): bump github.com/aws/aws-lambda-go from 1.41.0 to 1.43.0 (#1346)
+- build(deps): bump github/codeql-action from 2 to 3 (#1342)
+- build(deps): bump github.com/prometheus/client_golang
+- build(deps): bump github.com/aws/aws-lambda-go from 1.43.0 to 1.44.0
+- build(deps): bump golang.org/x/net from 0.19.0 to 0.20.0
+- build(deps): bump github.com/moov-io/base from 0.48.3 to 0.48.5
+- build(deps): bump actions/cache from 3 to 4
+- build(deps): bump github.com/aws/aws-lambda-go from 1.44.0 to 1.45.0
+- chore(deps): update dependency jekyll-feed to v0.17.0 (#1337)
+
 ## v1.33.4 (Released 2023-12-07)
 
 IMPROVEMENTS
