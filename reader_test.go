@@ -1802,6 +1802,7 @@ func TestCategoryAssignment(t *testing.T) {
 
 	// "Forward"
 	forwardEntry := mockEntryDetail()
+	forwardEntry.DFIAccountNumber = "1"
 	forwardEntry.Category = CategoryForward
 	forwardEntry.DiscretionaryData = "01"
 	forwardBatch := NewBatchWEB(mockBatchWEBHeader())
@@ -1813,10 +1814,10 @@ func TestCategoryAssignment(t *testing.T) {
 
 	// "Return"
 	returnEntry := mockEntryDetail()
+	returnEntry.DFIAccountNumber = "2"
 	returnEntry.Addenda99 = mockAddenda99()
 	returnEntry.AddendaRecordIndicator = 1
 	returnEntry.Category = CategoryReturn
-	returnEntry.DiscretionaryData = "02"
 	returnBatch := NewBatchWEB(mockBatchWEBHeader())
 	returnBatch.AddEntry(returnEntry)
 	if err := returnBatch.Create(); err != nil {
@@ -1826,10 +1827,10 @@ func TestCategoryAssignment(t *testing.T) {
 
 	// "DishonoredReturn"
 	dishonoredReturnEntry := mockEntryDetail()
+	dishonoredReturnEntry.DFIAccountNumber = "3"
 	dishonoredReturnEntry.Addenda99Dishonored = mockAddenda99Dishonored()
 	dishonoredReturnEntry.AddendaRecordIndicator = 1
 	dishonoredReturnEntry.Category = CategoryDishonoredReturn
-	dishonoredReturnEntry.DiscretionaryData = "03"
 	dishonoredReturnBatch := NewBatchWEB(mockBatchWEBHeader())
 	dishonoredReturnBatch.AddEntry(dishonoredReturnEntry)
 	if err := dishonoredReturnBatch.Create(); err != nil {
@@ -1839,10 +1840,10 @@ func TestCategoryAssignment(t *testing.T) {
 
 	// "DishonoredReturnContested"
 	contestedDishonoredReturnEntry := mockEntryDetail()
+	contestedDishonoredReturnEntry.DFIAccountNumber = "4"
 	contestedDishonoredReturnEntry.Addenda99Contested = mockAddenda99Contested()
 	contestedDishonoredReturnEntry.AddendaRecordIndicator = 1
 	contestedDishonoredReturnEntry.Category = CategoryDishonoredReturnContested
-	contestedDishonoredReturnEntry.DiscretionaryData = "04"
 	contestedDishonoredReturnBatch := NewBatchWEB(mockBatchWEBHeader())
 	contestedDishonoredReturnBatch.AddEntry(contestedDishonoredReturnEntry)
 	if err := contestedDishonoredReturnBatch.Create(); err != nil {
@@ -1852,16 +1853,27 @@ func TestCategoryAssignment(t *testing.T) {
 
 	// "NOC"
 	nocEntry := mockCOREntryDetail()
+	nocEntry.DFIAccountNumber = "5"
 	nocEntry.Addenda98 = mockAddenda98()
 	nocEntry.AddendaRecordIndicator = 1
 	nocEntry.Category = CategoryNOC
-	nocEntry.DiscretionaryData = "05"
 	nocBatch := NewBatchCOR(mockBatchCORHeader())
 	nocBatch.AddEntry(nocEntry)
 	if err := nocBatch.Create(); err != nil {
 		t.Fatal(err)
 	}
 	file.AddBatch(nocBatch)
+
+	// "Forward" (IAT entry)
+	forwardIATEntry := mockIATEntryDetailWithAddendas()
+	forwardIATEntry.DFIAccountNumber = "6"
+	forwardIATEntry.Category = CategoryForward
+	forwardIATBatch := NewIATBatch(mockIATBatchHeaderFF())
+	forwardIATBatch.AddEntry(forwardIATEntry)
+	if err := forwardIATBatch.Create(); err != nil {
+		t.Fatal(err)
+	}
+	file.AddIATBatch(forwardIATBatch)
 
 	if err := file.Create(); err != nil {
 		t.Errorf("%T: %s", err, err)
@@ -1883,18 +1895,24 @@ func TestCategoryAssignment(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	categoriesByDiscretionaryData := map[string]string{}
+	categoriesByAccountNumber := map[string]string{}
 	for _, batch := range readFile.Batches {
 		for _, entry := range batch.GetEntries() {
-			categoriesByDiscretionaryData[entry.DiscretionaryData] = entry.Category
+			categoriesByAccountNumber[entry.DFIAccountNumber] = entry.Category
+		}
+	}
+	for _, iatBatch := range readFile.IATBatches {
+		for _, iatEntry := range iatBatch.GetEntries() {
+			categoriesByAccountNumber[iatEntry.DFIAccountNumber] = iatEntry.Category
 		}
 	}
 
-	require.Equal(t, CategoryForward, categoriesByDiscretionaryData["01"])
-	require.Equal(t, CategoryReturn, categoriesByDiscretionaryData["02"])
-	require.Equal(t, CategoryDishonoredReturn, categoriesByDiscretionaryData["03"])
-	require.Equal(t, CategoryDishonoredReturnContested, categoriesByDiscretionaryData["04"])
-	require.Equal(t, CategoryNOC, categoriesByDiscretionaryData["05"])
+	require.Equal(t, CategoryForward, categoriesByAccountNumber["1"])
+	require.Equal(t, CategoryReturn, categoriesByAccountNumber["2"])
+	require.Equal(t, CategoryDishonoredReturn, categoriesByAccountNumber["3"])
+	require.Equal(t, CategoryDishonoredReturnContested, categoriesByAccountNumber["4"])
+	require.Equal(t, CategoryNOC, categoriesByAccountNumber["5"])
+	require.Equal(t, CategoryForward, categoriesByAccountNumber["6"])
 }
 
 // TestACHFileTooLongErr checks that it errors on a file that is too long

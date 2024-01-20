@@ -92,7 +92,7 @@ func BenchmarkIATMockEntryDetail(b *testing.B) {
 
 // testParseIATEntryDetail parses a known IATEntryDetail record string.
 func testParseIATEntryDetail(t testing.TB) {
-	var line = "6221210428820007             000010000012345678901234567890123456789012345    1231380100000001"
+	var line = "6221210428820007             0000100000123456789012345678901234567890         1231380100000001"
 	r := NewReader(strings.NewReader(line))
 	r.addIATCurrentBatch(NewIATBatch(mockIATBatchHeaderFF()))
 	r.IATCurrentBatch.SetHeader(mockIATBatchHeaderFF())
@@ -118,8 +118,11 @@ func testParseIATEntryDetail(t testing.TB) {
 	if record.AmountField() != "0000100000" {
 		t.Errorf("Amount Expected '0000100000' got: %v", record.AmountField())
 	}
-	if record.DFIAccountNumberField() != "12345678901234567890123456789012345" {
-		t.Errorf("DfiAccountNumber Expected '12345678901234567890123456789012345' got: %v", record.DFIAccountNumberField())
+	if record.DFIAccountNumberField() != "123456789012345678901234567890     " {
+		t.Errorf("DfiAccountNumber Expected '123456789012345678901234567890     ' got: %v", record.DFIAccountNumberField())
+	}
+	if record.DFIAccountNumber != "123456789012345678901234567890" {
+		t.Errorf("DfiAccountNumber Expected '123456789012345678901234567890' got: %v", record.DFIAccountNumber)
 	}
 	if record.AddendaRecordIndicator != 1 {
 		t.Errorf("AddendaRecordIndicator Expected '0' got: %v", record.AddendaRecordIndicator)
