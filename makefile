@@ -30,7 +30,7 @@ else
 	@chmod +x ./lint-project.sh
 	GOLANGCI_LINTERS=prealloc GOLANGCI_SKIP_DIR=test EXPERIMENTAL=nilaway,shuffle \
 	GOCYCLO_LIMIT=26 COVER_THRESHOLD=90.0 \
-	GOOS=js GOARCH=wasm time ./lint-project.sh
+	GOOS=js GOARCH=wasm ./lint-project.sh
 endif
 
 check-openapi:
