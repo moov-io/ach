@@ -201,7 +201,7 @@ func (iatEd *IATEntryDetail) Parse(record string) {
 			iatEd.Amount = iatEd.parseNumField(reset())
 		case 74:
 			// 40-74 The foreign receiver's account number you are crediting/debiting
-			iatEd.DFIAccountNumber = string(reset())
+			iatEd.DFIAccountNumber = iatEd.parseStringFieldWithOpts(reset(), iatEd.validateOpts)
 		case 76:
 			// 75-76 reserved Leave blank
 			reset()

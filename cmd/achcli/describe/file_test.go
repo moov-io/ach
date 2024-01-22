@@ -35,7 +35,7 @@ func TestDescribeIAT(t *testing.T) {
 	if testing.Verbose() {
 		os.Stdout.Write(buf.Bytes())
 	}
-	require.Equal(t, 5255, buf.Len())
+	require.Equal(t, 5262, buf.Len())
 }
 
 func TestDescribeReturn(t *testing.T) {

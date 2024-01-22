@@ -686,7 +686,7 @@ func (r *Reader) parseIATEntryDetail() error {
 		return ErrFileEntryOutsideBatch
 	}
 
-	ed := new(IATEntryDetail)
+	ed := NewIATEntryDetail()
 	ed.Parse(r.line)
 	if err := maybeValidate(ed, r.File.validateOpts); err != nil {
 		return r.parseError(err)
