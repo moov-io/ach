@@ -41,12 +41,13 @@ import (
 	"os/user"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"time"
 )
 
 var (
 	// From https://datahub.io/core/country-list#data
-	downloadUrl    = "https://datahub.io/core/country-list/r/data.json"
+	downloadUrl    = "https://raw.githubusercontent.com/fannarsh/country-list/master/data.json"
 	outputFilename = filepath.Join("internal", "iso3166", "iso3166.go")
 )
 
@@ -97,6 +98,12 @@ package iso3166
 	if err := json.NewDecoder(resp.Body).Decode(&countries); err != nil {
 		log.Fatalf("error while parsing country response: %v", err)
 	}
+	slices.SortFunc(countries, func(a, b country) int {
+		if a.Name < b.Name {
+			return -1
+		}
+		return 1
+	})
 
 	// Write countries to source code
 	fmt.Fprintln(&buf, "var countryCodes = map[string]bool{")

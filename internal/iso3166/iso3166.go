@@ -15,12 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Generated on 2023-06-02T08:08:01Z by adam, any modifications will be overwritten
+// Generated on 2024-01-22T04:09:44Z by adam, any modifications will be overwritten
 package iso3166
 
 var countryCodes = map[string]bool{
 	"AF": true, // Afghanistan
-	"AX": true, // Åland Islands
 	"AL": true, // Albania
 	"DZ": true, // Algeria
 	"AS": true, // American Samoa
@@ -56,10 +55,10 @@ var countryCodes = map[string]bool{
 	"BG": true, // Bulgaria
 	"BF": true, // Burkina Faso
 	"BI": true, // Burundi
+	"CV": true, // Cabo Verde
 	"KH": true, // Cambodia
 	"CM": true, // Cameroon
 	"CA": true, // Canada
-	"CV": true, // Cape Verde
 	"KY": true, // Cayman Islands
 	"CF": true, // Central African Republic
 	"TD": true, // Chad
@@ -70,15 +69,15 @@ var countryCodes = map[string]bool{
 	"CO": true, // Colombia
 	"KM": true, // Comoros
 	"CG": true, // Congo
-	"CD": true, // Congo, the Democratic Republic of the
+	"CD": true, // Congo, Democratic Republic of the
 	"CK": true, // Cook Islands
 	"CR": true, // Costa Rica
-	"CI": true, // Côte d'Ivoire
 	"HR": true, // Croatia
 	"CU": true, // Cuba
 	"CW": true, // Curaçao
 	"CY": true, // Cyprus
-	"CZ": true, // Czech Republic
+	"CZ": true, // Czechia
+	"CI": true, // Côte d'Ivoire
 	"DK": true, // Denmark
 	"DJ": true, // Djibouti
 	"DM": true, // Dominica
@@ -89,6 +88,7 @@ var countryCodes = map[string]bool{
 	"GQ": true, // Equatorial Guinea
 	"ER": true, // Eritrea
 	"EE": true, // Estonia
+	"SZ": true, // Eswatini
 	"ET": true, // Ethiopia
 	"FK": true, // Falkland Islands (Malvinas)
 	"FO": true, // Faroe Islands
@@ -116,7 +116,7 @@ var countryCodes = map[string]bool{
 	"GY": true, // Guyana
 	"HT": true, // Haiti
 	"HM": true, // Heard Island and McDonald Islands
-	"VA": true, // Holy See (Vatican City State)
+	"VA": true, // Holy See
 	"HN": true, // Honduras
 	"HK": true, // Hong Kong
 	"HU": true, // Hungary
@@ -150,7 +150,6 @@ var countryCodes = map[string]bool{
 	"LT": true, // Lithuania
 	"LU": true, // Luxembourg
 	"MO": true, // Macao
-	"MK": true, // Macedonia, the Former Yugoslav Republic of
 	"MG": true, // Madagascar
 	"MW": true, // Malawi
 	"MY": true, // Malaysia
@@ -183,6 +182,7 @@ var countryCodes = map[string]bool{
 	"NG": true, // Nigeria
 	"NU": true, // Niue
 	"NF": true, // Norfolk Island
+	"MK": true, // North Macedonia
 	"MP": true, // Northern Mariana Islands
 	"NO": true, // Norway
 	"OM": true, // Oman
@@ -199,15 +199,15 @@ var countryCodes = map[string]bool{
 	"PT": true, // Portugal
 	"PR": true, // Puerto Rico
 	"QA": true, // Qatar
-	"RE": true, // Réunion
 	"RO": true, // Romania
 	"RU": true, // Russian Federation
 	"RW": true, // Rwanda
+	"RE": true, // Réunion
 	"BL": true, // Saint Barthélemy
 	"SH": true, // Saint Helena, Ascension and Tristan da Cunha
 	"KN": true, // Saint Kitts and Nevis
 	"LC": true, // Saint Lucia
-	"MF": true, // Saint Martin (French part)
+	"MF": true, // Saint Martin, (French part)
 	"PM": true, // Saint Pierre and Miquelon
 	"VC": true, // Saint Vincent and the Grenadines
 	"WS": true, // Samoa
@@ -219,7 +219,7 @@ var countryCodes = map[string]bool{
 	"SC": true, // Seychelles
 	"SL": true, // Sierra Leone
 	"SG": true, // Singapore
-	"SX": true, // Sint Maarten (Dutch part)
+	"SX": true, // Sint Maarten, (Dutch part)
 	"SK": true, // Slovakia
 	"SI": true, // Slovenia
 	"SB": true, // Solomon Islands
@@ -232,7 +232,6 @@ var countryCodes = map[string]bool{
 	"SD": true, // Sudan
 	"SR": true, // Suriname
 	"SJ": true, // Svalbard and Jan Mayen
-	"SZ": true, // Swaziland
 	"SE": true, // Sweden
 	"CH": true, // Switzerland
 	"SY": true, // Syrian Arab Republic
@@ -246,16 +245,16 @@ var countryCodes = map[string]bool{
 	"TO": true, // Tonga
 	"TT": true, // Trinidad and Tobago
 	"TN": true, // Tunisia
-	"TR": true, // Turkey
 	"TM": true, // Turkmenistan
 	"TC": true, // Turks and Caicos Islands
 	"TV": true, // Tuvalu
+	"TR": true, // Türkiye
 	"UG": true, // Uganda
 	"UA": true, // Ukraine
 	"AE": true, // United Arab Emirates
-	"GB": true, // United Kingdom
-	"US": true, // United States
+	"GB": true, // United Kingdom of Great Britain and Northern Ireland
 	"UM": true, // United States Minor Outlying Islands
+	"US": true, // United States of America
 	"UY": true, // Uruguay
 	"UZ": true, // Uzbekistan
 	"VU": true, // Vanuatu
@@ -268,4 +267,5 @@ var countryCodes = map[string]bool{
 	"YE": true, // Yemen
 	"ZM": true, // Zambia
 	"ZW": true, // Zimbabwe
+	"AX": true, // Åland Islands
 }
