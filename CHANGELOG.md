@@ -1,3 +1,15 @@
+## v1.34.0 (Released 2024-01-25)
+
+IMPROVEMENTS
+
+- fix: use constructor to create IATEntryDetails in reader
+- test/issues: write up scenario for Issue 1312
+
+BUILD
+
+- build(deps): bump actions/download-artifact from 1 to 4
+- build(deps): bump actions/upload-artifact from 1 to 4
+
 ## v1.33.6 (Released 2024-01-19)
 
 IMPROVEMENTS

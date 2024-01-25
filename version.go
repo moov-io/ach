@@ -18,4 +18,4 @@
 package ach
 
 // Version Number
-const Version = "v1.34.0-dev3"
+const Version = "v1.34.0"
