@@ -38,6 +38,11 @@ jobs:
       run: |
         go test ./test/fuzz/... -fuzz ACH -fuzztime 10m
 
+    - name: Report Failures
+      if: ${{ failure() }}
+      run: |
+        find ./test/fuzz/testdata/fuzz/ -type f | xargs -n1 tail -n +1 -v
+
   fuzz-json:
     name: Fuzz JSON
     runs-on: ubuntu-latest
@@ -67,3 +72,8 @@ jobs:
     - name: Fuzz
       run: |
         go test ./test/fuzz/... -fuzz JSON -fuzztime 10m
+
+    - name: Report Failures
+      if: ${{ failure() }}
+      run: |
+        find ./test/fuzz/testdata/fuzz/ -type f | xargs -n1 tail -n +1 -v
