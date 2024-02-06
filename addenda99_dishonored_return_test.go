@@ -77,4 +77,16 @@ func TestAddenda99Dishonored__Fields(t *testing.T) {
 	require.Equal(t, "01", addenda99.ReturnReasonCodeField())
 	require.Equal(t, "Untimely Return      ", addenda99.AddendaInformationField())
 	require.Equal(t, "000005999900001", addenda99.TraceNumberField())
+
+	line := addenda99.String()
+	dishonored := NewAddenda99Dishonored()
+	dishonored.Parse(line)
+
+	require.Equal(t, "000599999900301", dishonored.OriginalEntryTraceNumberField())
+	require.Equal(t, "12391871", dishonored.OriginalReceivingDFIIdentificationField())
+	require.Equal(t, "000123918710001", dishonored.ReturnTraceNumberField())
+	require.Equal(t, "179", dishonored.ReturnSettlementDateField())
+	require.Equal(t, "01", dishonored.ReturnReasonCodeField())
+	require.Equal(t, "Untimely Return      ", dishonored.AddendaInformationField())
+	require.Equal(t, "000005999900001", dishonored.TraceNumberField())
 }
