@@ -1,3 +1,16 @@
+## v1.34.1 (Released 2024-02-07)
+
+IMPROVEMENTS
+
+- fix: skip reserved fields in Dishonored Returns
+
+BUILD
+
+- build(deps): bump golang from 1.21 to 1.22
+- build: experiment with ARM M1 builders and releases
+- build: print crashers after fuzzing
+- fix(deps): update module github.com/aws/aws-lambda-go to v1.46.0
+
 ## v1.34.0 (Released 2024-01-25)
 
 IMPROVEMENTS
