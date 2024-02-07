@@ -74,5 +74,5 @@ func main() {
 		log.Fatalf("ERROR building file: %v", err)
 	}
 
-	describe.File(os.Stdout, file, nil)
+	describe.File(os.Stdout, *file, nil)
 }

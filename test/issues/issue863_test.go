@@ -63,10 +63,10 @@ func TestIssue863(t *testing.T) {
 	}
 }
 
-func readFiles(t *testing.T, r io.Reader) ([]*ach.File, error) {
+func readFiles(t *testing.T, r io.Reader) ([]ach.File, error) {
 	t.Helper()
 
-	var out []*ach.File
+	var out []ach.File
 	rdr := tar.NewReader(r)
 	for {
 		header, err := rdr.Next()
@@ -85,7 +85,7 @@ func readFiles(t *testing.T, r io.Reader) ([]*ach.File, error) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		out = append(out, &f)
+		out = append(out, f)
 	}
 	return out, nil
 }

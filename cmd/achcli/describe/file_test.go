@@ -19,7 +19,7 @@ func TestDescribeFile(t *testing.T) {
 	require.NoError(t, err)
 
 	var buf bytes.Buffer
-	File(&buf, file, nil) // No Options
+	File(&buf, *file, nil) // No Options
 	if testing.Verbose() {
 		os.Stdout.Write(buf.Bytes())
 	}
@@ -31,7 +31,7 @@ func TestDescribeIAT(t *testing.T) {
 	require.NoError(t, err)
 
 	var buf bytes.Buffer
-	File(&buf, file, nil) // No Options
+	File(&buf, *file, nil) // No Options
 	if testing.Verbose() {
 		os.Stdout.Write(buf.Bytes())
 	}
@@ -43,7 +43,7 @@ func TestDescribeReturn(t *testing.T) {
 	require.NoError(t, err)
 
 	var buf bytes.Buffer
-	File(&buf, file, nil) // No Options
+	File(&buf, *file, nil) // No Options
 	if testing.Verbose() {
 		os.Stdout.Write(buf.Bytes())
 	}
@@ -55,7 +55,7 @@ func TestDescribeCorrection(t *testing.T) {
 	require.NoError(t, err)
 
 	var buf bytes.Buffer
-	File(&buf, file, nil) // No Options
+	File(&buf, *file, nil) // No Options
 	if testing.Verbose() {
 		os.Stdout.Write(buf.Bytes())
 	}

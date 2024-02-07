@@ -13,14 +13,14 @@ import (
 )
 
 func dumpFiles(paths []string, validateOpts *ach.ValidateOpts) error {
-	files := make([]*ach.File, len(paths))
+	files := make([]ach.File, len(paths))
 	for i := range paths {
 		f, err := readACHFile(paths[i], validateOpts)
 		if err != nil {
 			fmt.Printf("WARN: problem reading %s:\n %v\n\n", paths[i], err)
 		}
 		if f != nil {
-			files[i] = f
+			files[i] = *f
 		}
 	}
 
@@ -41,7 +41,7 @@ func dumpFiles(paths []string, validateOpts *ach.ValidateOpts) error {
 				fmt.Printf("ERROR: problem flattening file: %v\n", err)
 			}
 			if file != nil {
-				files[i] = file
+				files[i] = *file
 			}
 		}
 	}
@@ -53,7 +53,7 @@ func dumpFiles(paths []string, validateOpts *ach.ValidateOpts) error {
 		if !*flagMerge {
 			fmt.Printf("Describing ACH file '%s'\n\n", paths[i])
 		}
-		if files[i] != nil {
+		if &files[i] != nil {
 			describe.File(os.Stdout, files[i], &describe.Opts{
 				MaskAccountNumbers: *flagMask || *flagMaskAccounts,
 				MaskCorrectedData:  *flagMask || *flagMaskCorrectedData,

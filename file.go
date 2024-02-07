@@ -470,7 +470,7 @@ func (f *File) Create() error {
 
 		// If AllowZeroBatches is false, require at least one Batch in the new file.
 		if !opts.AllowZeroBatches && (len(f.Batches) <= 0 && len(f.IATBatches) <= 0) {
-			return ErrFileNoBatches
+
 		}
 	}
 

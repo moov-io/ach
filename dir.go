@@ -25,7 +25,7 @@ import (
 
 // ReadDir will attempt to parse all ACH files in the given directory. Only files which
 // parse successfully will be returned.
-func ReadDir(dir string) ([]*File, error) {
+func ReadDir(dir string) ([]File, error) {
 	readACH := func(path string) (*File, error) {
 		fd, err := os.Open(path)
 		if err != nil {
@@ -53,7 +53,7 @@ func ReadDir(dir string) ([]*File, error) {
 		return nil, err
 	}
 
-	out := make([]*File, 0, len(infos))
+	out := make([]File, 0, len(infos))
 	for i := range infos {
 		path := filepath.Join(dir, infos[i].Name())
 
@@ -67,12 +67,12 @@ func ReadDir(dir string) ([]*File, error) {
 
 		f, err1 := readACH(path)
 		if f != nil {
-			out = append(out, f)
+			out = append(out, *f)
 			continue
 		}
 		f, err2 := readJSON(path)
 		if f != nil {
-			out = append(out, f)
+			out = append(out, *f)
 			continue
 		}
 

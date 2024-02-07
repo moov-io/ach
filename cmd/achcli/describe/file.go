@@ -27,8 +27,8 @@ type Opts struct {
 	PrettyAmounts bool
 }
 
-func File(ww io.Writer, file *ach.File, opts *Opts) {
-	if file == nil {
+func File(ww io.Writer, file ach.File, opts *Opts) {
+	if &file == nil {
 		return
 	}
 	if opts == nil {
