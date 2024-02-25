@@ -819,6 +819,7 @@ func (r *Reader) nocIATAddenda(entryIndex int) error {
 		return err
 	}
 	r.IATCurrentBatch.Entries[entryIndex].Addenda98 = addenda98
+	r.IATCurrentBatch.Entries[entryIndex].Category = CategoryNOC
 	return nil
 }
 
@@ -830,6 +831,7 @@ func (r *Reader) returnIATAddenda(entryIndex int) error {
 		return err
 	}
 	r.IATCurrentBatch.Entries[entryIndex].Addenda99 = addenda99
+	r.IATCurrentBatch.Entries[entryIndex].Category = CategoryReturn
 	return nil
 }
 
