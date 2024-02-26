@@ -36,17 +36,40 @@ import (
 )
 
 func TestIssue1378(t *testing.T) {
-	fd, err := os.Open(filepath.Join("testdata", "issue1378", "employers_test.txt"))
-	require.NoError(t, err)
-	t.Cleanup(func() { fd.Close() })
-
-	address := "http://localhost:8080/files/create?bypassDestination=true&bypassOrigin=true&customTraceNumbers=true&bypassCompanyIdentificationMatch=true&allowInvalidAmounts=true&allowMissingFileControl=true&allowMissingFileHeader=true"
-	req := httptest.NewRequest("POST", address, fd)
-
 	// setup HTTP handler
 	repo := server.NewRepositoryInMemory(0*time.Second, log.NewTestLogger())
 	svc := server.NewService(repo)
 	handler := server.MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
+
+	submitFile(t, handler, filepath.Join("testdata", "issue1378", "employers_test.txt"))
+	submitFile(t, handler, filepath.Join("testdata", "issue1378", "neither_file_record.txt"))
+	submitFile(t, handler, filepath.Join("testdata", "issue1378", "no_control.txt"))
+	submitFile(t, handler, filepath.Join("testdata", "issue1378", "no_header.txt"))
+}
+
+func submitFile(t *testing.T, handler http.Handler, where string) {
+	t.Helper()
+
+	// Read the file
+	fd, err := os.Open(where)
+	require.NoError(t, err)
+	t.Cleanup(func() { fd.Close() })
+
+	r := ach.NewReader(fd)
+	r.SetValidation(&ach.ValidateOpts{
+		AllowMissingFileHeader:  true,
+		AllowMissingFileControl: true,
+	})
+	_, err = r.Read()
+	require.NoError(t, err)
+
+	// Submit the file over HTTP
+	fd, err = os.Open(where)
+	require.NoError(t, err)
+	t.Cleanup(func() { fd.Close() })
+
+	address := "http://localhost:8080/files/create?allowMissingFileControl=true&allowMissingFileHeader=true"
+	req := httptest.NewRequest("POST", address, fd)
 
 	// execute our HTTP request
 	w := httptest.NewRecorder()
@@ -59,8 +82,17 @@ func TestIssue1378(t *testing.T) {
 		ID   string   `json:"id"`
 		File ach.File `json:"file"`
 	}
+	response.File.SetValidation(&ach.ValidateOpts{
+		AllowMissingFileHeader:  true,
+		AllowMissingFileControl: true,
+	})
+
 	err = json.NewDecoder(w.Body).Decode(&response)
 	require.NoError(t, err)
 
-	describe.File(os.Stdout, &response.File, nil)
+	if testing.Verbose() {
+		describe.File(os.Stdout, &response.File, nil)
+	}
+
+	require.NotEmpty(t, response.ID)
 }
