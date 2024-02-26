@@ -1,3 +1,9 @@
+## v1.34.4 (Released 2024-02-26)
+
+IMPROVEMENTS
+
+- fix: check AllowMissingFileHeader and AllowMissingFileControl in reader
+
 ## v1.34.3 (Released 2024-02-26)
 
 IMPROVEMENTS
