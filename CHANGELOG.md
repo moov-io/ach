@@ -1,3 +1,14 @@
+## v1.34.3 (Released 2024-02-26)
+
+IMPROVEMENTS
+
+- fix: Correctly assign Category to IAT entries.
+
+BUILD
+
+- build(deps): bump golang.org/x/net from 0.20.0 to 0.21.0
+- chore(deps): update dependency github-pages to v231
+
 ## v1.34.2 (Released 2024-02-07)
 
 IMPROVEMENTS
