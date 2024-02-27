@@ -28,7 +28,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func filesAreEqual(f1, f2 File) error {
+func filesAreEqual(f1, f2 *File) error {
 	// File Header
 	if f1.Header.ImmediateOrigin != f2.Header.ImmediateOrigin {
 		return fmt.Errorf("f1.Header.ImmediateOrigin=%s vs f2.Header.ImmediateOrigin=%s", f1.Header.ImmediateOrigin, f2.Header.ImmediateOrigin)
@@ -78,14 +78,14 @@ func TestMergeFiles__filesAreEqual(t *testing.T) {
 	}
 
 	// compare a file against itself
-	if err := filesAreEqual(*file, *file); err != nil {
+	if err := filesAreEqual(file, file); err != nil {
 		t.Fatalf("same file: %v", err)
 	}
 
 	// break the equality
 	f2 := *file
 	f2.Header.ImmediateOrigin = "12"
-	if err := filesAreEqual(*file, f2); err == nil {
+	if err := filesAreEqual(file, &f2); err == nil {
 		t.Fatal("expected error")
 	}
 }
@@ -96,7 +96,7 @@ func TestMergeFiles__identity(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	out, err := MergeFiles([]File{*file})
+	out, err := MergeFiles([]*File{file})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -105,7 +105,7 @@ func TestMergeFiles__identity(t *testing.T) {
 		t.Errorf("got %d merged ACH files", len(out))
 	}
 
-	if err := filesAreEqual(*file, out[0]); err != nil {
+	if err := filesAreEqual(file, out[0]); err != nil {
 		t.Errorf("unequal files:%v", err)
 	}
 
@@ -132,7 +132,7 @@ func TestMergeFiles__together(t *testing.T) {
 		t.Errorf("did batch counts change? f1:%d f2:%d", len(f1.Batches), len(f2.Batches))
 	}
 
-	out, err := MergeFiles([]File{*f1, *f2})
+	out, err := MergeFiles([]*File{f1, f2})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -161,7 +161,7 @@ func TestMergeFiles__apart(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	out, err := MergeFiles([]File{*f1, *f2})
+	out, err := MergeFiles([]*File{f1, f2})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -290,9 +290,9 @@ func TestMergeFiles__splitFiles(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	traceNumbersBefore := countTraceNumbers(*file, *f2, *f3)
+	traceNumbersBefore := countTraceNumbers(file, f2, f3)
 
-	out, err := MergeFiles([]File{*file, *f2, *f3})
+	out, err := MergeFiles([]*File{file, f2, f3})
 	if err != nil || len(out) != 1 {
 		t.Fatalf("got %d files, error=%v", len(out), err)
 	}
@@ -336,9 +336,9 @@ func TestMergeFiles__dollarAmount(t *testing.T) {
 	// Verify our file's contents
 	require.NoError(t, file.Create())
 	require.Equal(t, 305, lineCount(file))
-	require.Equal(t, 101, countTraceNumbers(*file))
+	require.Equal(t, 101, countTraceNumbers(file))
 
-	mergedFiles, err := MergeFilesWith([]File{*file}, Conditions{
+	mergedFiles, err := MergeFilesWith([]*File{file}, Conditions{
 		MaxDollarAmount: 1000000, // $10,000.00
 	})
 	require.NoError(t, err)
@@ -375,9 +375,9 @@ func TestMergeFiles__dollarAmount2(t *testing.T) {
 	// Verify our file's contents
 	require.NoError(t, file.Create())
 	require.Equal(t, 305, lineCount(file))
-	require.Equal(t, 101, countTraceNumbers(*file))
+	require.Equal(t, 101, countTraceNumbers(file))
 
-	mergedFiles, err := MergeFilesWith([]File{*file}, Conditions{
+	mergedFiles, err := MergeFilesWith([]*File{file}, Conditions{
 		MaxDollarAmount: 33_000_000_00,
 	})
 	require.NoError(t, err)
@@ -397,7 +397,7 @@ func TestMergeFiles__dollarAmount2(t *testing.T) {
 	}
 }
 
-func countTraceNumbers(files ...File) int {
+func countTraceNumbers(files ...*File) int {
 	var total int
 	for f := range files {
 		for b := range files[f].Batches {
@@ -420,7 +420,7 @@ func TestMergeFiles__invalid(t *testing.T) {
 	}
 	f2.Header = f1.Header
 
-	out, err := MergeFiles([]File{*f1, *f2})
+	out, err := MergeFiles([]*File{f1, f2})
 	if len(out) != 0 || err == nil {
 		t.Errorf("expected error: len(out)=%d error=%v", len(out), err)
 	}

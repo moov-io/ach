@@ -35,7 +35,7 @@ const NACHAFileLineLimit = 10000
 // Per NACHA rules files must remain under 10,000 lines (when rendered in their ASCII encoding)
 //
 // File Batches can only be merged if they are unique and routed to and from the same ABA routing numbers.
-func MergeFiles(files []File) ([]File, error) {
+func MergeFiles(files []*File) ([]*File, error) {
 	return mergeFilesHelper(files, Conditions{
 		MaxLines: NACHAFileLineLimit,
 	})
@@ -48,14 +48,14 @@ func NewMerger(opts *ValidateOpts) Merger {
 
 // Merge can merge ACH files with custom ValidateOpts
 type Merger interface {
-	MergeWith(files []File, conditions Conditions) ([]File, error)
+	MergeWith(files []*File, conditions Conditions) ([]*File, error)
 }
 
 type merger struct {
 	opts *ValidateOpts
 }
 
-func (m *merger) MergeWith(files []File, conditions Conditions) ([]File, error) {
+func (m *merger) MergeWith(files []*File, conditions Conditions) ([]*File, error) {
 	if m.opts != nil {
 		for i := range files {
 			files[i].SetValidation(m.opts)
@@ -72,17 +72,17 @@ type Conditions struct {
 	MaxDollarAmount int64 `json:"maxDollarAmount"`
 }
 
-func MergeFilesWith(files []File, conditions Conditions) ([]File, error) {
+func MergeFilesWith(files []*File, conditions Conditions) ([]*File, error) {
 	return mergeFilesHelper(files, conditions)
 }
 
-func mergeFilesHelper(files []File, conditions Conditions) ([]File, error) {
+func mergeFilesHelper(files []*File, conditions Conditions) ([]*File, error) {
 	fs := &mergableFiles{infiles: files}
 	for i := range fs.infiles {
 		if &fs.infiles[i] == nil {
 			continue // skip nil Files
 		}
-		outf := fs.findOutfile(&fs.infiles[i])
+		outf := fs.findOutfile(fs.infiles[i])
 		for j := range fs.infiles[i].Batches {
 			batchExistsInMerged := false
 			for k := range outf.Batches {
@@ -115,7 +115,7 @@ func mergeFilesHelper(files []File, conditions Conditions) ([]File, error) {
 							return nil, err
 						}
 						f := *outf
-						fs.locMaxed = append(fs.locMaxed, f)
+						fs.locMaxed = append(fs.locMaxed, &f)
 					}
 
 					outf = fs.swapLocMaxedFile(outf) // replace output file with the one we just created
@@ -151,9 +151,9 @@ func mergeFilesHelper(files []File, conditions Conditions) ([]File, error) {
 }
 
 type mergableFiles struct {
-	infiles  []File
-	outfiles []File
-	locMaxed []File
+	infiles  []*File
+	outfiles []*File
+	locMaxed []*File
 }
 
 // swapLocMaxedFile replaces an ACH file that is over the Nacha line limit with an empty file containing
@@ -177,7 +177,7 @@ next:
 	out.Header.FileCreationTime = now.Format("1504")   // HHmm
 	out.SetValidation(f.validateOpts)
 	out.Create()
-	fs.outfiles = append(fs.outfiles, *out) // add the new outfile
+	fs.outfiles = append(fs.outfiles, out) // add the new outfile
 
 	return out
 }
@@ -215,7 +215,7 @@ func (fs *mergableFiles) findOutfile(f *File) *File {
 				}
 
 				// No conflicting TraceNumber was found, so return current merge file
-				return &fs.outfiles[i]
+				return fs.outfiles[i]
 			}
 		}
 		// Record a newly mergable File/FileHeader we can use in future merge attempts
@@ -223,7 +223,7 @@ func (fs *mergableFiles) findOutfile(f *File) *File {
 		outf.Header = f.Header
 		outf.SetValidation(f.validateOpts)
 		outf.Control = f.Control
-		fs.outfiles = append(fs.outfiles, *outf)
+		fs.outfiles = append(fs.outfiles, outf)
 		return outf
 	}
 	return lookup(0)

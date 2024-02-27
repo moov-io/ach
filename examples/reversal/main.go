@@ -35,7 +35,7 @@ func main() {
 	}
 
 	fmt.Println("Original:")
-	describe.File(os.Stdout, *file, nil)
+	describe.File(os.Stdout, file, nil)
 	fmt.Printf("\n\n")
 
 	effectiveEntryDate := time.Now().In(time.UTC)
@@ -45,5 +45,5 @@ func main() {
 	}
 
 	fmt.Println("Reversal:")
-	describe.File(os.Stdout, *file, nil)
+	describe.File(os.Stdout, file, nil)
 }

@@ -15,7 +15,7 @@ func TestIssue1202(t *testing.T) {
 	require.ErrorContains(t, err, ach.ErrFileHeader.Error())
 
 	if testing.Verbose() {
-		describe.File(os.Stdout, *file, nil)
+		describe.File(os.Stdout, file, nil)
 	}
 
 	require.Len(t, file.Batches, 2)

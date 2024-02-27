@@ -35,7 +35,7 @@ func BenchmarkMergeFiles(b *testing.B) {
 		}
 	)
 
-	randomFile := func(B *testing.B) File {
+	randomFile := func(B *testing.B) *File {
 		B.Helper()
 
 		file := NewFile()
@@ -61,10 +61,10 @@ func BenchmarkMergeFiles(b *testing.B) {
 			B.Error(err)
 		}
 
-		return *file
+		return file
 	}
 
-	randomFiles := func(b *testing.B) (out []File) {
+	randomFiles := func(b *testing.B) (out []*File) {
 		b.Helper()
 		for i := 0; i < b.N; i++ {
 			out = append(out, randomFile(b))
@@ -99,7 +99,7 @@ func BenchmarkMergeFiles(b *testing.B) {
 		b.Fatalf("unexpected indices: %#v", indices)
 	}
 
-	mergeInGroups := func(b *testing.B, groups int) []File {
+	mergeInGroups := func(b *testing.B, groups int) []*File {
 		b.Helper()
 
 		files := randomFiles(b)
@@ -109,10 +109,10 @@ func BenchmarkMergeFiles(b *testing.B) {
 		b.ResetTimer()
 		b.StopTimer()
 
-		var out []File
+		var out []*File
 		var err error
 		if len(indices) > 1 {
-			var temp []File
+			var temp []*File
 			for i := 0; i < len(indices)-1; i += 0 {
 				b.StartTimer()
 				fs, err := MergeFilesWith(files[indices[i]:indices[i+1]], mergeConditions)
