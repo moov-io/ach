@@ -35,7 +35,6 @@ func dumpFiles(paths []string, validateOpts *ach.ValidateOpts) error {
 
 	if *flagFlatten {
 		for i := range files {
-			fmt.Printf("attempting flattening %d\n", i)
 			file, err := files[i].FlattenBatches()
 			if err != nil {
 				fmt.Printf("ERROR: problem flattening file: %v\n", err)

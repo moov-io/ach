@@ -19,7 +19,9 @@ package ach
 
 import (
 	"bytes"
+	"io"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -79,6 +81,30 @@ func BenchmarkPPDWrite(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testPPDWrite(b)
+	}
+}
+
+func BenchmarkLargeWEBWrite(b *testing.B) {
+	b.ReportAllocs()
+
+	b.StopTimer()
+	for i := 0; i < b.N; i++ {
+		file, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
+		require.NoError(b, err)
+		require.NoError(b, file.Create())
+
+		populateFileWithMockBatches(b, 100, file)
+		err = file.Create()
+		if err != nil {
+			b.Fatal(err)
+		}
+
+		b.StartTimer()
+		err = NewWriter(io.Discard).Write(file)
+		b.StopTimer()
+		if err != nil {
+			b.Fatal(err)
+		}
 	}
 }
 
