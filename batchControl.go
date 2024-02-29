@@ -20,7 +20,6 @@ package ach
 import (
 	"fmt"
 	"strconv"
-	"strings"
 	"unicode/utf8"
 )
 
@@ -132,8 +131,9 @@ func NewBatchControl() *BatchControl {
 
 // String writes the BatchControl struct to a 94 character string.
 func (bc *BatchControl) String() string {
-	var buf strings.Builder
-	buf.Grow(94)
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
 	buf.WriteString(batchControlPos)
 	buf.WriteString(fmt.Sprintf("%v", bc.ServiceClassCode))
 	buf.WriteString(bc.EntryAddendaCountField())

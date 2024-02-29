@@ -426,7 +426,7 @@ func TestMergeFiles__invalid(t *testing.T) {
 	}
 }
 
-func populateFileWithMockBatches(t *testing.T, numBatches int, file *File) {
+func populateFileWithMockBatches(t testing.TB, numBatches int, file *File) {
 	lastBatchIdx := len(file.Batches) - 1
 	var startSeq = file.Batches[lastBatchIdx].GetHeader().BatchNumber + 1
 	var entryDetail = file.Batches[0].GetEntries()[0]

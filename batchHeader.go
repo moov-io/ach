@@ -226,10 +226,11 @@ func (bh *BatchHeader) Parse(record string) {
 
 // String writes the BatchHeader struct to a 94 character string.
 func (bh *BatchHeader) String() string {
-	var buf strings.Builder
-	buf.Grow(94)
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
 	buf.WriteString(batchHeaderPos)
-	buf.WriteString(fmt.Sprintf("%v", bh.ServiceClassCode))
+	buf.WriteString(strconv.Itoa(bh.ServiceClassCode))
 	buf.WriteString(bh.CompanyNameField())
 	buf.WriteString(bh.CompanyDiscretionaryDataField())
 	buf.WriteString(bh.CompanyIdentificationField())

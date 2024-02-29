@@ -513,10 +513,11 @@ func CheckRoutingNumber(routingNumber string) error {
 		return fmt.Errorf("invalid routing number length of %d", n)
 	}
 
-	check := fmt.Sprintf("%d", CalculateCheckDigit(routingNumber))
-	last := string(routingNumber[len(routingNumber)-1])
+	check := CalculateCheckDigit(routingNumber)
+	last := int(routingNumber[len(routingNumber)-1]) - 48 // ASCII 0 is 48 decimal
+
 	if check != last {
-		return fmt.Errorf("routing number checksum mismatch: expected %s but got %s", check, last)
+		return fmt.Errorf("routing number checksum mismatch: expected %d but got %d", check, last)
 	}
 	return nil
 }

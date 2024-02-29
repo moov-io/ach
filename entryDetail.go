@@ -379,14 +379,14 @@ func (ed *EntryDetail) fieldInclusion() error {
 	return nil
 }
 
+var (
+	// Amount is a 10 digit field
+	maxAmount = 9_999_999_999
+)
+
 func (ed *EntryDetail) amountOverflowsField() error {
-	intstr := strconv.Itoa(ed.Amount)
-	strstr := ed.AmountField()
-	if intstr == "0" && strstr == "0000000000" {
-		return nil // both are empty values
-	}
-	if len(intstr) > len(strstr) {
-		return fmt.Errorf("does not match formatted value %s", strstr)
+	if ed.Amount > maxAmount {
+		return fmt.Errorf("does not match formatted value %s", ed.AmountField())
 	}
 	return nil
 }
