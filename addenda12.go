@@ -132,6 +132,10 @@ func (addenda12 *Addenda12) String() string {
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops that parsing.
 func (addenda12 *Addenda12) Validate() error {
+	if addenda12 == nil {
+		return nil
+	}
+
 	if err := addenda12.fieldInclusion(); err != nil {
 		return err
 	}
@@ -154,6 +158,10 @@ func (addenda12 *Addenda12) Validate() error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (addenda12 *Addenda12) fieldInclusion() error {
+	if addenda12 == nil {
+		return nil
+	}
+
 	if addenda12.TypeCode == "" {
 		return fieldError("TypeCode", ErrConstructor, addenda12.TypeCode)
 	}

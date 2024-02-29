@@ -309,6 +309,10 @@ func (iatEd *IATEntryDetail) fieldInclusion() error {
 	return nil
 }
 
+func (iatEd *IATEntryDetail) isCorrection() bool {
+	return iatEd.Addenda98 != nil
+}
+
 // SetRDFI takes the 9 digit RDFI account number and separates it for RDFIIdentification and CheckDigit
 func (iatEd *IATEntryDetail) SetRDFI(rdfi string) *IATEntryDetail {
 	s := iatEd.stringField(rdfi, 9)

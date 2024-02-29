@@ -25,6 +25,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+
 	"github.com/stretchr/testify/require"
 )
 
@@ -1765,19 +1766,20 @@ func TestIATBatchAddenda98TotalCount(t *testing.T) {
 func TestIATBatchAddenda98Nil(t *testing.T) {
 	mockBatch := IATBatch{}
 	mockBatch.SetHeader(mockIATNOCBatchHeaderFF())
-	mockBatch.AddEntry(mockIATEntryDetail())
-	mockBatch.GetEntries()[0].TransactionCode = CheckingReturnNOCCredit
-	mockBatch.GetEntries()[0].AddendaRecords = 2
-	mockBatch.GetEntries()[0].Category = CategoryNOC
 
-	if err := mockBatch.build(); err != nil {
-		t.Errorf("%T: %s", err, err)
-	}
+	entry := mockIATEntryDetail()
+	entry.TransactionCode = CheckingReturnNOCCredit
+	entry.AddendaRecords = 2
+	entry.Category = CategoryNOC
+	entry.Addenda98 = mockIATAddenda98()
 
-	err := mockBatch.Validate()
-	if !base.Match(err, ErrFieldInclusion) {
-		t.Errorf("%T: %s", err, err)
-	}
+	mockBatch.AddEntry(entry)
+
+	err := mockBatch.build()
+	require.NoError(t, err)
+
+	err = mockBatch.Validate()
+	require.NoError(t, err)
 }
 
 // TestIATBatchAddenda98RecordType validates IATBatch Addenda98 RecordType is valid
