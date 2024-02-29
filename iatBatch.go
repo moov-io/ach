@@ -110,7 +110,7 @@ func (iatBatch *IATBatch) verify() error {
 		return iatBatch.Error("BatchNumber",
 			NewErrBatchHeaderControlEquality(iatBatch.Header.BatchNumber, iatBatch.Control.BatchNumber))
 	}
-	if err := iatBatch.isBatchEntryCount(); err != nil {
+	if _, err := iatBatch.isBatchEntryCount(); err != nil {
 		return err
 	}
 	if iatBatch.validateOpts == nil || !iatBatch.validateOpts.CustomTraceNumbers {
@@ -149,18 +149,8 @@ func (iatBatch *IATBatch) build() error {
 		return iatBatch.Error("entries", ErrBatchNoEntries)
 	}
 	// Create record sequence numbers
-	entryCount := 0
 	seq := 1
 	for i, entry := range iatBatch.Entries {
-		entryCount = entryCount + 1 + 7 + len(entry.Addenda17) + len(entry.Addenda18)
-
-		if entry.Addenda98 != nil {
-			entryCount = entryCount + 1
-		}
-		if entry.Addenda99 != nil {
-			entryCount = entryCount + 1
-		}
-
 		// Verifies the required addenda* properties for an IAT entry detail are defined
 		if err := iatBatch.addendaFieldInclusion(entry); err != nil {
 			return err
@@ -188,16 +178,30 @@ func (iatBatch *IATBatch) build() error {
 			}
 		}
 
-		if entry.Category != CategoryNOC {
-			// Set TraceNumber for IATEntryDetail Addenda10-16 Record Properties
-			entry.Addenda10.EntryDetailSequenceNumber = iatBatch.parseNumField(iatBatch.Entries[i].TraceNumberField()[8:])
-			entry.Addenda11.EntryDetailSequenceNumber = iatBatch.parseNumField(iatBatch.Entries[i].TraceNumberField()[8:])
-			entry.Addenda12.EntryDetailSequenceNumber = iatBatch.parseNumField(iatBatch.Entries[i].TraceNumberField()[8:])
-			entry.Addenda13.EntryDetailSequenceNumber = iatBatch.parseNumField(iatBatch.Entries[i].TraceNumberField()[8:])
-			entry.Addenda14.EntryDetailSequenceNumber = iatBatch.parseNumField(iatBatch.Entries[i].TraceNumberField()[8:])
-			entry.Addenda15.EntryDetailSequenceNumber = iatBatch.parseNumField(iatBatch.Entries[i].TraceNumberField()[8:])
-			entry.Addenda16.EntryDetailSequenceNumber = iatBatch.parseNumField(iatBatch.Entries[i].TraceNumberField()[8:])
+		// Set TraceNumber for IATEntryDetail Addenda10-16 Record Properties
+		entryDetailSequenceNumber := iatBatch.parseNumField(iatBatch.Entries[i].TraceNumberField()[8:])
+		if entry.Addenda10 != nil {
+			entry.Addenda10.EntryDetailSequenceNumber = entryDetailSequenceNumber
 		}
+		if entry.Addenda11 != nil {
+			entry.Addenda11.EntryDetailSequenceNumber = entryDetailSequenceNumber
+		}
+		if entry.Addenda12 != nil {
+			entry.Addenda12.EntryDetailSequenceNumber = entryDetailSequenceNumber
+		}
+		if entry.Addenda13 != nil {
+			entry.Addenda13.EntryDetailSequenceNumber = entryDetailSequenceNumber
+		}
+		if entry.Addenda14 != nil {
+			entry.Addenda14.EntryDetailSequenceNumber = entryDetailSequenceNumber
+		}
+		if entry.Addenda15 != nil {
+			entry.Addenda15.EntryDetailSequenceNumber = entryDetailSequenceNumber
+		}
+		if entry.Addenda16 != nil {
+			entry.Addenda16.EntryDetailSequenceNumber = entryDetailSequenceNumber
+		}
+
 		// Set TraceNumber for Addendumer Addenda17 and Addenda18 SequenceNumber and EntryDetailSequenceNumber
 		seq++
 		addenda17Seq := 1
@@ -205,26 +209,29 @@ func (iatBatch *IATBatch) build() error {
 
 		for _, addenda17 := range entry.Addenda17 {
 			addenda17.SequenceNumber = addenda17Seq
-			addenda17.EntryDetailSequenceNumber = iatBatch.parseNumField(iatBatch.Entries[i].TraceNumberField()[8:])
+			addenda17.EntryDetailSequenceNumber = entryDetailSequenceNumber
 			addenda17Seq++
 		}
 
 		for _, addenda18 := range entry.Addenda18 {
 			addenda18.SequenceNumber = addenda18Seq
-			addenda18.EntryDetailSequenceNumber = iatBatch.parseNumField(iatBatch.Entries[i].TraceNumberField()[8:])
+			addenda18.EntryDetailSequenceNumber = entryDetailSequenceNumber
 			addenda18Seq++
 		}
 	}
 
 	// build a BatchControl record
 	bc := NewBatchControl()
+	iatBatch.Control = bc
+
 	bc.ServiceClassCode = iatBatch.Header.ServiceClassCode
 	bc.ODFIIdentification = iatBatch.Header.ODFIIdentification
 	bc.BatchNumber = iatBatch.Header.BatchNumber
-	bc.EntryAddendaCount = entryCount
 	bc.EntryHash = iatBatch.calculateEntryHash()
 	bc.TotalCreditEntryDollarAmount, bc.TotalDebitEntryDollarAmount = iatBatch.calculateBatchAmounts()
-	iatBatch.Control = bc
+
+	entryCount, _ := iatBatch.isBatchEntryCount()
+	bc.EntryAddendaCount = entryCount
 
 	return nil
 }
@@ -278,40 +285,40 @@ func (iatBatch *IATBatch) isFieldInclusion() error {
 		if err := iatBatch.addendaFieldInclusion(entry); err != nil {
 			return err
 		}
-		if entry.Category != CategoryNOC {
-			// Verifies each Addenda* record is valid
-			if err := entry.Addenda10.Validate(); err != nil {
+
+		// Verifies each Addenda* record is valid
+		if err := entry.Addenda10.Validate(); err != nil {
+			return err
+		}
+		if err := entry.Addenda11.Validate(); err != nil {
+			return err
+		}
+		if err := entry.Addenda12.Validate(); err != nil {
+			return err
+		}
+		if err := entry.Addenda13.Validate(); err != nil {
+			return err
+		}
+		if err := entry.Addenda14.Validate(); err != nil {
+			return err
+		}
+		if err := entry.Addenda15.Validate(); err != nil {
+			return err
+		}
+		if err := entry.Addenda16.Validate(); err != nil {
+			return err
+		}
+		for _, Addenda17 := range entry.Addenda17 {
+			if err := Addenda17.Validate(); err != nil {
 				return err
-			}
-			if err := entry.Addenda11.Validate(); err != nil {
-				return err
-			}
-			if err := entry.Addenda12.Validate(); err != nil {
-				return err
-			}
-			if err := entry.Addenda13.Validate(); err != nil {
-				return err
-			}
-			if err := entry.Addenda14.Validate(); err != nil {
-				return err
-			}
-			if err := entry.Addenda15.Validate(); err != nil {
-				return err
-			}
-			if err := entry.Addenda16.Validate(); err != nil {
-				return err
-			}
-			for _, Addenda17 := range entry.Addenda17 {
-				if err := Addenda17.Validate(); err != nil {
-					return err
-				}
-			}
-			for _, Addenda18 := range entry.Addenda18 {
-				if err := Addenda18.Validate(); err != nil {
-					return err
-				}
 			}
 		}
+		for _, Addenda18 := range entry.Addenda18 {
+			if err := Addenda18.Validate(); err != nil {
+				return err
+			}
+		}
+
 		if entry.Category == CategoryNOC {
 			if entry.Addenda98 == nil {
 				return fieldError("Addenda98", ErrFieldInclusion)
@@ -336,10 +343,33 @@ func (iatBatch *IATBatch) isFieldInclusion() error {
 // isBatchEntryCount validate Entry count is accurate
 // The Entry/Addenda Count Field is a tally of each Entry Detail and Addenda
 // Record processed within the batch
-func (iatBatch *IATBatch) isBatchEntryCount() error {
+func (iatBatch *IATBatch) isBatchEntryCount() (int, error) {
 	entryCount := 0
 	for _, entry := range iatBatch.Entries {
-		entryCount = entryCount + 1 + 7 + len(entry.Addenda17) + len(entry.Addenda18)
+		entryCount += 1
+
+		if entry.Addenda10 != nil {
+			entryCount += 1
+		}
+		if entry.Addenda11 != nil {
+			entryCount += 1
+		}
+		if entry.Addenda12 != nil {
+			entryCount += 1
+		}
+		if entry.Addenda13 != nil {
+			entryCount += 1
+		}
+		if entry.Addenda14 != nil {
+			entryCount += 1
+		}
+		if entry.Addenda15 != nil {
+			entryCount += 1
+		}
+		if entry.Addenda16 != nil {
+			entryCount += 1
+		}
+		entryCount += len(entry.Addenda17) + len(entry.Addenda18)
 
 		if entry.Addenda98 != nil {
 			entryCount = entryCount + 1
@@ -348,14 +378,15 @@ func (iatBatch *IATBatch) isBatchEntryCount() error {
 			entryCount = entryCount + 1
 		}
 	}
+
 	if entryCount != iatBatch.Control.EntryAddendaCount {
 		if iatBatch.validateOpts != nil && iatBatch.validateOpts.UnequalAddendaCounts {
-			return nil
+			return entryCount, nil
 		}
-		return iatBatch.Error("EntryAddendaCount",
+		return entryCount, iatBatch.Error("EntryAddendaCount",
 			NewErrBatchCalculatedControlEquality(entryCount, iatBatch.Control.EntryAddendaCount))
 	}
-	return nil
+	return entryCount, nil
 }
 
 // isBatchAmount validate Amount is the same as what is in the Entries
@@ -455,8 +486,8 @@ func (iatBatch *IATBatch) isAddendaSequence() error {
 			return iatBatch.Error("AddendaRecordIndicator", ErrIATBatchAddendaIndicator)
 		}
 
-		if entry.Category == CategoryNOC {
-			return nil
+		if entry.isCorrection() {
+			return nil // TODO(adam): probably need a smarter check
 		}
 
 		// Verify Addenda* entry detail sequence numbers are valid
@@ -529,7 +560,8 @@ func (iatBatch *IATBatch) isCategory() error {
 }
 
 func (iatBatch *IATBatch) addendaFieldInclusion(entry *IATEntryDetail) error {
-	if entry.Category == CategoryNOC {
+	// IAT Corrections are not required to have their addenda records
+	if entry.isCorrection() {
 		return nil
 	}
 	if entry.Addenda10 == nil {
@@ -593,7 +625,7 @@ func (iatBatch *IATBatch) Validate() error {
 		if iatBatch.Header.ServiceClassCode == AutomatedAccountingAdvices {
 			return iatBatch.Error("ServiceClassCode", ErrBatchServiceClassCode, iatBatch.Header.ServiceClassCode)
 		}
-		if entry.Category == CategoryNOC {
+		if entry.isCorrection() || entry.Category == CategoryNOC {
 			if iatBatch.GetHeader().IATIndicator != IATCOR {
 				return iatBatch.Error("IATIndicator", NewErrBatchIATNOC(iatBatch.GetHeader().IATIndicator, IATCOR))
 			}
