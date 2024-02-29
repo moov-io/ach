@@ -1,3 +1,19 @@
+## v1.35.0 (Released 2024-02-29)
+
+ADDITIONS
+
+- feat: Add `IATCorrectedDataField() string` on `Addenda98` to return the expanded field
+
+IMPROVEMENTS
+
+- all: reduce string allocations
+- fix: allow IAT corrections to not have IAT addenda records
+- fix: read additional corrected data on IAT corrections
+
+BUILD
+
+- build(deps): bump github.com/prometheus/client_golang
+
 ## v1.34.4 (Released 2024-02-26)
 
 IMPROVEMENTS
