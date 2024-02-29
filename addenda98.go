@@ -205,6 +205,8 @@ func (addenda98 *Addenda98) CorrectedDataField() string {
 	return addenda98.IATCorrectedDataField()
 }
 
+// IATCorrectedDataField returns a space padded CorrectedData string for IAT entries,
+// which is a slightly larger field than typical CorrectedData values.
 func (addenda98 *Addenda98) IATCorrectedDataField() string {
 	out := addenda98.alphaField(addenda98.CorrectedData, 29)
 	out += addenda98.alphaField(addenda98.iatCorrectedData, 6)
