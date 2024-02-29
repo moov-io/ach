@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/moov-io/base"
@@ -433,4 +434,55 @@ func TestCorrectedData__WriteCorrectionData(t *testing.T) {
 	data = &CorrectedData{Identification: "FooBar"}
 	require.Equal(t, "FooBar                       ", WriteCorrectionData("C09", data))
 
+}
+
+func TestIATCorrectedData(t *testing.T) {
+	t.Run("C01", func(t *testing.T) {
+		addenda98 := NewAddenda98()
+		line := "798C01123456780000001      34567891227-13569                                   345678910963842"
+		addenda98.Parse(line)
+
+		require.Equal(t, "98", addenda98.TypeCode)
+		require.Equal(t, "C01", addenda98.ChangeCode)
+		require.Equal(t, "123456780000001", addenda98.OriginalTrace)
+		require.Equal(t, "34567891", addenda98.OriginalDFI)
+
+		correctedData := "227-13569"
+		require.Equal(t, correctedData, addenda98.CorrectedData)
+		require.Equal(t, "345678910963842", addenda98.TraceNumber)
+
+		//
+		expected := correctedData + strings.Repeat(" ", 29-len(correctedData))
+		require.Equal(t, expected, addenda98.CorrectedDataField())
+		require.Equal(t, line, addenda98.String())
+
+		//
+		expected = correctedData + strings.Repeat(" ", 35-len(correctedData))
+		require.Equal(t, expected, addenda98.IATCorrectedDataField())
+		require.Equal(t, line, addenda98.String())
+	})
+
+	t.Run("C07", func(t *testing.T) {
+		addenda98 := NewAddenda98()
+		line := "798C07123456780000001      34567891227-13569                                   345678910963842"
+		addenda98.Parse(line)
+
+		data := &CorrectedData{RoutingNumber: "987654320", AccountNumber: "5421", TransactionCode: 32}
+		addenda98.CorrectedData = WriteCorrectionData("C07", data)
+		require.Equal(t, "9876543205421              32", addenda98.CorrectedDataField())
+		require.Equal(t, "9876543205421              32      ", addenda98.IATCorrectedDataField())
+
+		parsed := addenda98.ParseCorrectedData()
+		require.NotNil(t, parsed)
+		require.Equal(t, *data, *parsed)
+
+		// Now with 32 at the end
+		line = "798C07123456780000001      345678919876543205421                    32         345678910963842"
+		addenda98.Parse(line)
+		require.Equal(t, "9876543205421                32    ", addenda98.IATCorrectedDataField())
+
+		parsed = addenda98.ParseCorrectedData()
+		require.NotNil(t, parsed)
+		require.Equal(t, *data, *parsed)
+	})
 }

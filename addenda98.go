@@ -42,6 +42,10 @@ type Addenda98 struct {
 	OriginalDFI string `json:"originalDFI"`
 	// CorrectedData is the corrected data
 	CorrectedData string `json:"correctedData"`
+
+	// iatCorrectedData is a field containing the additional space allowed in IAT Correction Addenda records
+	iatCorrectedData string
+
 	// TraceNumber matches the Entry Detail Trace Number of the entry being returned.
 	//
 	// Use TraceNumberField for a properly formatted string representation.
@@ -118,12 +122,20 @@ func (addenda98 *Addenda98) Parse(record string) {
 		case 21:
 			// 7-21
 			addenda98.OriginalTrace = strings.TrimSpace(reset())
+		case 27:
+			reset()
 		case 35:
 			// 28-35
 			addenda98.OriginalDFI = addenda98.parseStringField(reset())
 		case 64:
 			// 36-64
 			addenda98.CorrectedData = strings.TrimSpace(reset())
+		case 70:
+			// 65-70 (Reserved for all except IAT Corrections)
+			addenda98.iatCorrectedData = strings.TrimSpace(reset())
+		case 79:
+			// Reserved
+			reset()
 		case 94:
 			// 80-94
 			addenda98.TraceNumber = strings.TrimSpace(reset())
@@ -187,7 +199,16 @@ func (addenda98 *Addenda98) OriginalDFIField() string {
 
 // CorrectedDataField returns a space padded CorrectedData string
 func (addenda98 *Addenda98) CorrectedDataField() string {
-	return addenda98.alphaField(addenda98.CorrectedData, 29)
+	if addenda98.iatCorrectedData == "" {
+		return addenda98.alphaField(addenda98.CorrectedData, 29)
+	}
+	return addenda98.IATCorrectedDataField()
+}
+
+func (addenda98 *Addenda98) IATCorrectedDataField() string {
+	out := addenda98.alphaField(addenda98.CorrectedData, 29)
+	out += addenda98.alphaField(addenda98.iatCorrectedData, 6)
+	return out
 }
 
 // TraceNumberField returns a zero padded traceNumber string
@@ -275,17 +296,18 @@ func (addenda98 *Addenda98) ParseCorrectedData() *CorrectedData {
 	if cc == nil {
 		return nil
 	}
+	data := addenda98.IATCorrectedDataField()
 	switch cc.Code {
 	case "C01": // Incorrect DFI Account Number
-		if v := first(17, addenda98.CorrectedData); v != "" {
+		if v := first(17, data); v != "" {
 			return &CorrectedData{AccountNumber: v}
 		}
 	case "C02": // Incorrect Routing Number
-		if v := first(9, addenda98.CorrectedData); v != "" {
+		if v := first(9, data); v != "" {
 			return &CorrectedData{RoutingNumber: v}
 		}
 	case "C03": // Incorrect Routing Number and Incorrect DFI Account Number
-		parts := strings.Fields(addenda98.CorrectedData)
+		parts := strings.Fields(data)
 		if len(parts) == 2 {
 			return &CorrectedData{
 				RoutingNumber: parts[0],
@@ -293,15 +315,15 @@ func (addenda98 *Addenda98) ParseCorrectedData() *CorrectedData {
 			}
 		}
 	case "C04": // Incorrect Individual Name
-		if v := first(22, addenda98.CorrectedData); v != "" {
+		if v := first(22, data); v != "" {
 			return &CorrectedData{Name: v}
 		}
 	case "C05": // Incorrect Transaction Code
-		if n, err := strconv.Atoi(first(2, addenda98.CorrectedData)); err == nil {
+		if n, err := strconv.Atoi(first(2, data)); err == nil {
 			return &CorrectedData{TransactionCode: n}
 		}
 	case "C06": // Incorrect DFI Account Number and Incorrect Transaction Code
-		parts := strings.Fields(addenda98.CorrectedData)
+		parts := strings.Fields(data)
 		if len(parts) == 2 {
 			if n, err := strconv.Atoi(parts[1]); err == nil {
 				return &CorrectedData{
@@ -312,12 +334,12 @@ func (addenda98 *Addenda98) ParseCorrectedData() *CorrectedData {
 		}
 	case "C07": // Incorrect Routing Number, Incorrect DFI Account Number, and Incorrect Tranaction Code
 		var cd CorrectedData
-		if n := len(addenda98.CorrectedData); n > 9 {
-			cd.RoutingNumber = addenda98.CorrectedData[:9]
+		if n := len(data); n > 9 {
+			cd.RoutingNumber = data[:9]
 		} else {
 			return nil
 		}
-		parts := strings.Fields(addenda98.CorrectedData[9:])
+		parts := strings.Fields(data[9:])
 		if len(parts) == 2 {
 			if n, err := strconv.Atoi(parts[1]); err == nil {
 				cd.AccountNumber = parts[0]
@@ -328,7 +350,7 @@ func (addenda98 *Addenda98) ParseCorrectedData() *CorrectedData {
 			return nil
 		}
 	case "C09": // Incorrect Individual Identification Number
-		if v := first(22, addenda98.CorrectedData); v != "" {
+		if v := first(22, data); v != "" {
 			return &CorrectedData{Identification: v}
 		}
 	}
