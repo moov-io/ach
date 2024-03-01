@@ -19,11 +19,13 @@ package ach
 
 import (
 	"bufio"
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
 	"os"
 	"strings"
+	"unicode"
 	"unicode/utf8"
 
 	"github.com/moov-io/base"
@@ -165,6 +167,8 @@ func (r *Reader) SetMaxLines(max int) {
 	r.maxLines = max
 }
 
+const lineLength = 94
+
 // Read reads each line in the underlying io.Reader and returns a File and any errors encountered.
 //
 // Read enforces ACH formatting rules and the first character of each line determines which parser is used.
@@ -179,14 +183,60 @@ func (r *Reader) Read() (File, error) {
 	if r.scanner == nil {
 		return r.File, errors.New("nil scanner")
 	}
+	// r.scanner.Split(scanLines)
+	r.scanner.Split(bufio.ScanRunes)
+
+	// Accumulate the current line
+	var currentLineRuneCount int
+	var currentLine bytes.Buffer
+	currentLine.Grow(lineLength)
+
 	for r.scanner.Scan() {
-		line := r.scanner.Text()
+		char := r.scanner.Text()
+		switch char {
+		case "\n", "\r":
+			// Skip accumulating the newline, but parse the line
+			if currentLineRuneCount > 0 {
+				goto fullLine
+			}
+		default:
+			currentLineRuneCount += 1
+			currentLine.WriteString(char)
+		}
+
+		if currentLineRuneCount < lineLength {
+			continue // next rune
+		}
+
+		// We have a full line to parse
+	fullLine:
 		r.lineNum++
 		if r.lineNum > r.maxLines {
 			r.errors.Add(ErrFileTooLong)
 			return r.File, r.errors
 		}
-		err := r.readLine(line)
+
+		// skip the buffered line if it's blank
+		line := currentLine.String()
+		if !blankLine(line) {
+			// hand off the line to be parsed
+			err := r.readLine(line)
+			if err != nil {
+				r.errors.Add(err)
+			}
+		}
+
+		// reset the read buffer
+		currentLine.Reset()
+		currentLineRuneCount = 0
+	}
+	if err := r.scanner.Err(); err != nil {
+		return r.File, err
+	}
+
+	// Flush anything that's left over after the scanner completes
+	if currentLineRuneCount > 0 {
+		err := r.readLine(currentLine.String())
 		if err != nil {
 			r.errors.Add(err)
 		}
@@ -236,6 +286,15 @@ func (r *Reader) Read() (File, error) {
 	return r.File, r.errors
 }
 
+func blankLine(line string) bool {
+	for _, r := range line {
+		if !unicode.IsSpace(r) {
+			return false
+		}
+	}
+	return true
+}
+
 func (r *Reader) readLine(line string) error {
 	lineLength := utf8.RuneCountInString(line)
 	switch {
@@ -249,7 +308,7 @@ func (r *Reader) readLine(line string) error {
 				lineLength,
 			)
 			return r.parseError(err)
-		} else if err := r.processFixedWidthFile(&line); err != nil {
+		} else if err := r.processFixedWidthFile(line); err != nil {
 			return err
 		}
 	case lineLength != RecordLength:
@@ -278,20 +337,20 @@ func (r *Reader) readLine(line string) error {
 }
 
 func trimSpacesFromLongLine(s string) string {
-	return strings.TrimSuffix(s[:94], " ")
+	return strings.TrimSuffix(s[:lineLength], " ")
 }
 
 func rightPadShortLine(s string) (string, error) {
 	if n := len(s); n > RecordLength {
 		return s, NewRecordWrongLengthErr(n)
 	}
-	return s + strings.Repeat(" ", 94-len(s)), nil
+	return s + strings.Repeat(" ", lineLength-len(s)), nil
 }
 
-func (r *Reader) processFixedWidthFile(line *string) error {
+func (r *Reader) processFixedWidthFile(line string) error {
 	// It should be safe to parse this byte by byte since ACH files are ASCII only.
 	record := ""
-	for i, c := range *line {
+	for i, c := range line {
 		record = record + string(c)
 		if i > 0 && (i+1)%RecordLength == 0 {
 			r.line = record
