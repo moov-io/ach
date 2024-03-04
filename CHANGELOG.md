@@ -1,3 +1,15 @@
+## v1.35.1 (Released 2024-03-04)
+
+IMPROVEMENTS
+
+- fix: further reuse memory buffers
+- fix: nil check inside setEntryRecordType
+- fix: parse large files without newlines
+
+BUILD
+
+- build(deps): bump github.com/stretchr/testify from 1.8.4 to 1.9.0
+
 ## v1.35.0 (Released 2024-02-29)
 
 ADDITIONS
