@@ -19,7 +19,6 @@ package ach
 
 import (
 	"bufio"
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -188,8 +187,8 @@ func (r *Reader) Read() (File, error) {
 
 	// Accumulate the current line
 	var currentLineRuneCount int
-	var currentLine bytes.Buffer
-	currentLine.Grow(lineLength)
+	currentLine := getBuffer()
+	defer saveBuffer(currentLine)
 
 	for r.scanner.Scan() {
 		char := r.scanner.Text()

@@ -142,8 +142,9 @@ func (addenda18 *Addenda18) String() string {
 		return ""
 	}
 
-	var buf strings.Builder
-	buf.Grow(94)
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
 	buf.WriteString(entryAddendaPos)
 	buf.WriteString(addenda18.TypeCode)
 	buf.WriteString(addenda18.ForeignCorrespondentBankNameField())
@@ -153,6 +154,7 @@ func (addenda18 *Addenda18) String() string {
 	buf.WriteString("      ")
 	buf.WriteString(addenda18.SequenceNumberField())
 	buf.WriteString(addenda18.EntryDetailSequenceNumberField())
+
 	return buf.String()
 }
 

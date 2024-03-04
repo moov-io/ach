@@ -129,8 +129,9 @@ func NewADVBatchControl() *ADVBatchControl {
 
 // String writes the ADVBatchControl struct to a 94 character string.
 func (bc *ADVBatchControl) String() string {
-	var buf strings.Builder
-	buf.Grow(94)
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
 	buf.WriteString(batchControlPos)
 	buf.WriteString(fmt.Sprintf("%v", bc.ServiceClassCode))
 	buf.WriteString(bc.EntryAddendaCountField())
@@ -140,6 +141,7 @@ func (bc *ADVBatchControl) String() string {
 	buf.WriteString(bc.ACHOperatorDataField())
 	buf.WriteString(bc.ODFIIdentificationField())
 	buf.WriteString(bc.BatchNumberField())
+
 	return buf.String()
 }
 

@@ -284,8 +284,9 @@ func (iatBh *IATBatchHeader) Parse(record string) {
 
 // String writes the BatchHeader struct to a 94 character string.
 func (iatBh *IATBatchHeader) String() string {
-	var buf strings.Builder
-	buf.Grow(94)
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
 	buf.WriteString(batchHeaderPos)
 	buf.WriteString(fmt.Sprintf("%v", iatBh.ServiceClassCode))
 	buf.WriteString(iatBh.IATIndicatorField())
@@ -303,6 +304,7 @@ func (iatBh *IATBatchHeader) String() string {
 	buf.WriteString(fmt.Sprintf("%v", iatBh.OriginatorStatusCode))
 	buf.WriteString(iatBh.ODFIIdentificationField())
 	buf.WriteString(iatBh.BatchNumberField())
+
 	return buf.String()
 }
 

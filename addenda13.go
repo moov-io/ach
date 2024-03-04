@@ -139,8 +139,9 @@ func (addenda13 *Addenda13) String() string {
 		return ""
 	}
 
-	var buf strings.Builder
-	buf.Grow(94)
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
 	buf.WriteString(entryAddendaPos)
 	buf.WriteString(addenda13.TypeCode)
 	buf.WriteString(addenda13.ODFINameField())
@@ -149,6 +150,7 @@ func (addenda13 *Addenda13) String() string {
 	buf.WriteString(addenda13.ODFIBranchCountryCodeField())
 	buf.WriteString("          ")
 	buf.WriteString(addenda13.EntryDetailSequenceNumberField())
+
 	return buf.String()
 }
 

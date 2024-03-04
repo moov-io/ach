@@ -149,8 +149,9 @@ func (addenda98 *Addenda98) String() string {
 		return ""
 	}
 
-	var buf strings.Builder
-	buf.Grow(94)
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
 	buf.WriteString(entryAddendaPos)
 	buf.WriteString(addenda98.TypeCode)
 	buf.WriteString(addenda98.ChangeCode)
@@ -160,6 +161,7 @@ func (addenda98 *Addenda98) String() string {
 	buf.WriteString(addenda98.CorrectedDataField())
 	buf.WriteString("               ") // 15 char reserved field
 	buf.WriteString(addenda98.TraceNumberField())
+
 	return buf.String()
 }
 

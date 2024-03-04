@@ -18,7 +18,6 @@
 package ach
 
 import (
-	"strings"
 	"unicode/utf8"
 )
 
@@ -146,8 +145,9 @@ func (Addenda99Contested *Addenda99Contested) String() string {
 		return ""
 	}
 
-	var buf strings.Builder
-	buf.Grow(94)
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
 	buf.WriteString(entryAddendaPos)
 	buf.WriteString(Addenda99Contested.TypeCode)
 	buf.WriteString(Addenda99Contested.ContestedReturnCodeField())
@@ -163,6 +163,7 @@ func (Addenda99Contested *Addenda99Contested) String() string {
 	buf.WriteString(Addenda99Contested.DishonoredReturnReasonCodeField())
 	buf.WriteString(" ")
 	buf.WriteString(Addenda99Contested.TraceNumberField())
+
 	return buf.String()
 }
 

@@ -133,8 +133,9 @@ func (addenda98Refused *Addenda98Refused) String() string {
 		return ""
 	}
 
-	var buf strings.Builder
-	buf.Grow(94)
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
 	buf.WriteString(entryAddendaPos)
 	buf.WriteString(addenda98Refused.TypeCode)
 	buf.WriteString(addenda98Refused.RefusedChangeCode)
@@ -146,6 +147,7 @@ func (addenda98Refused *Addenda98Refused) String() string {
 	buf.WriteString(addenda98Refused.TraceSequenceNumberField())
 	buf.WriteString(strings.Repeat(" ", 5))
 	buf.WriteString(addenda98Refused.TraceNumberField())
+
 	return buf.String()
 }
 

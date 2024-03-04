@@ -127,8 +127,9 @@ func (addenda10 *Addenda10) String() string {
 		return ""
 	}
 
-	var buf strings.Builder
-	buf.Grow(94)
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
 	buf.WriteString(entryAddendaPos)
 	buf.WriteString(addenda10.TypeCode)
 	// TransactionTypeCode Validator
@@ -138,6 +139,7 @@ func (addenda10 *Addenda10) String() string {
 	buf.WriteString(addenda10.NameField())
 	buf.WriteString("      ")
 	buf.WriteString(addenda10.EntryDetailSequenceNumberField())
+
 	return buf.String()
 }
 
