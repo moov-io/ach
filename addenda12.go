@@ -117,8 +117,9 @@ func (addenda12 *Addenda12) String() string {
 		return ""
 	}
 
-	var buf strings.Builder
-	buf.Grow(94)
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
 	buf.WriteString(entryAddendaPos)
 	buf.WriteString(addenda12.TypeCode)
 	buf.WriteString(addenda12.OriginatorCityStateProvinceField())
@@ -126,6 +127,7 @@ func (addenda12 *Addenda12) String() string {
 	buf.WriteString(addenda12.OriginatorCountryPostalCodeField())
 	buf.WriteString("              ")
 	buf.WriteString(addenda12.EntryDetailSequenceNumberField())
+
 	return buf.String()
 }
 

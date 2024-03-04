@@ -161,8 +161,9 @@ func trimRoutingNumberLeadingZero(s string) string {
 
 // String writes the FileHeader struct to a 94 character string.
 func (fh *FileHeader) String() string {
-	var buf strings.Builder
-	buf.Grow(94)
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
 	buf.WriteString(fileHeaderPos)
 	buf.WriteString(fh.priorityCode)
 	buf.WriteString(fh.ImmediateDestinationField())
@@ -176,6 +177,7 @@ func (fh *FileHeader) String() string {
 	buf.WriteString(fh.ImmediateDestinationNameField())
 	buf.WriteString(fh.ImmediateOriginNameField())
 	buf.WriteString(fh.ReferenceCodeField())
+
 	return buf.String()
 }
 

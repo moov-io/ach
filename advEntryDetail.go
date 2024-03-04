@@ -20,7 +20,6 @@ package ach
 import (
 	"fmt"
 	"strconv"
-	"strings"
 	"unicode/utf8"
 )
 
@@ -161,8 +160,9 @@ func (ed *ADVEntryDetail) Parse(record string) {
 
 // String writes the ADVEntryDetail struct to a 94 character string.
 func (ed *ADVEntryDetail) String() string {
-	var buf strings.Builder
-	buf.Grow(94)
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
 	buf.WriteString(entryDetailPos)
 	buf.WriteString(fmt.Sprintf("%v", ed.TransactionCode))
 	buf.WriteString(ed.RDFIIdentificationField())
@@ -178,6 +178,7 @@ func (ed *ADVEntryDetail) String() string {
 	buf.WriteString(ed.ACHOperatorRoutingNumberField())
 	buf.WriteString(ed.JulianDateDayField())
 	buf.WriteString(ed.SequenceNumberField())
+
 	return buf.String()
 }
 

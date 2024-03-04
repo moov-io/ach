@@ -227,8 +227,9 @@ func (iatEd *IATEntryDetail) Parse(record string) {
 
 // String writes the EntryDetail struct to a 94 character string.
 func (iatEd *IATEntryDetail) String() string {
-	var buf strings.Builder
-	buf.Grow(94)
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
 	buf.WriteString(entryDetailPos)
 	buf.WriteString(fmt.Sprintf("%v", iatEd.TransactionCode))
 	buf.WriteString(iatEd.RDFIIdentificationField())
@@ -242,6 +243,7 @@ func (iatEd *IATEntryDetail) String() string {
 	buf.WriteString(iatEd.SecondaryOFACScreeningIndicatorField())
 	buf.WriteString(fmt.Sprintf("%v", iatEd.AddendaRecordIndicator))
 	buf.WriteString(iatEd.TraceNumberField())
+
 	return buf.String()
 }
 

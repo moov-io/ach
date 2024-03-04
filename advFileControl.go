@@ -18,7 +18,6 @@
 package ach
 
 import (
-	"strings"
 	"unicode/utf8"
 )
 
@@ -85,8 +84,9 @@ func NewADVFileControl() ADVFileControl {
 
 // String writes the ADVFileControl struct to a 94 character string.
 func (fc *ADVFileControl) String() string {
-	var buf strings.Builder
-	buf.Grow(94)
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
 	buf.WriteString(fileControlPos)
 	buf.WriteString(fc.BatchCountField())
 	buf.WriteString(fc.BlockCountField())
@@ -95,6 +95,7 @@ func (fc *ADVFileControl) String() string {
 	buf.WriteString(fc.TotalDebitEntryDollarAmountInFileField())
 	buf.WriteString(fc.TotalCreditEntryDollarAmountInFileField())
 	buf.WriteString("                       ")
+
 	return buf.String()
 }
 

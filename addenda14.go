@@ -134,8 +134,9 @@ func (addenda14 *Addenda14) String() string {
 		return ""
 	}
 
-	var buf strings.Builder
-	buf.Grow(94)
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
 	buf.WriteString(entryAddendaPos)
 	buf.WriteString(addenda14.TypeCode)
 	buf.WriteString(addenda14.RDFINameField())
@@ -144,6 +145,7 @@ func (addenda14 *Addenda14) String() string {
 	buf.WriteString(addenda14.RDFIBranchCountryCodeField())
 	buf.WriteString("          ")
 	buf.WriteString(addenda14.EntryDetailSequenceNumberField())
+
 	return buf.String()
 }
 

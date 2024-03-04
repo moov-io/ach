@@ -111,13 +111,15 @@ func (addenda17 *Addenda17) String() string {
 		return ""
 	}
 
-	var buf strings.Builder
-	buf.Grow(94)
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
 	buf.WriteString(entryAddendaPos)
 	buf.WriteString(addenda17.TypeCode)
 	buf.WriteString(addenda17.PaymentRelatedInformationField())
 	buf.WriteString(addenda17.SequenceNumberField())
 	buf.WriteString(addenda17.EntryDetailSequenceNumberField())
+
 	return buf.String()
 }
 

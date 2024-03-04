@@ -146,8 +146,9 @@ func (addenda02 *Addenda02) String() string {
 		return ""
 	}
 
-	var buf strings.Builder
-	buf.Grow(94)
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
 	buf.WriteString(entryAddendaPos)
 	buf.WriteString(addenda02.TypeCode)
 	buf.WriteString(addenda02.ReferenceInformationOneField())
@@ -160,6 +161,7 @@ func (addenda02 *Addenda02) String() string {
 	buf.WriteString(addenda02.TerminalCityField())
 	buf.WriteString(addenda02.TerminalStateField())
 	buf.WriteString(addenda02.TraceNumberField())
+
 	return buf.String()
 }
 
