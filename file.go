@@ -261,6 +261,9 @@ type iatBatchesJSON struct {
 }
 
 func setEntryRecordType(e *EntryDetail) {
+	if e == nil {
+		return
+	}
 	if e.Addenda02 != nil {
 		e.Addenda02.TypeCode = "02"
 	}
@@ -285,12 +288,18 @@ func setEntryRecordType(e *EntryDetail) {
 }
 
 func setADVEntryRecordType(e *ADVEntryDetail) {
+	if e == nil {
+		return
+	}
 	if e.Addenda99 == nil {
 		e.Category = CategoryForward
 	}
 }
 
 func setIATEntryRecordType(e *IATEntryDetail) {
+	if e == nil {
+		return
+	}
 	// these values need to be inferred from the json field names
 	if e.Addenda10 != nil {
 		e.Addenda10.TypeCode = "10"
