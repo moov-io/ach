@@ -327,7 +327,7 @@ func TestPPDDebitFixedLengthRead__InvalidLength(t *testing.T) {
 		t.Errorf("expected error")
 	}
 
-	wantErr := "1 extra character(s) in ACH file: must be 470 but found 471"
+	wantErr := "ach.RecordWrongLengthErr must be 94 characters and found 1"
 	if err != nil && !strings.Contains(err.Error(), wantErr) {
 		t.Errorf("want: %v, got: %v", wantErr, err)
 	}
