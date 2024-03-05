@@ -53,7 +53,7 @@ func dumpFiles(paths []string, validateOpts *ach.ValidateOpts) error {
 		if !*flagMerge {
 			fmt.Printf("Describing ACH file '%s'\n\n", paths[i])
 		}
-		if &files[i] != nil {
+		if files[i] != nil {
 			describe.File(os.Stdout, files[i], &describe.Opts{
 				MaskAccountNumbers: *flagMask || *flagMaskAccounts,
 				MaskCorrectedData:  *flagMask || *flagMaskCorrectedData,

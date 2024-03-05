@@ -79,7 +79,7 @@ func MergeFilesWith(files []*File, conditions Conditions) ([]*File, error) {
 func mergeFilesHelper(files []*File, conditions Conditions) ([]*File, error) {
 	fs := &mergableFiles{infiles: files}
 	for i := range fs.infiles {
-		if &fs.infiles[i] == nil {
+		if fs.infiles[i] == nil {
 			continue // skip nil Files
 		}
 		outf := fs.findOutfile(fs.infiles[i])

@@ -28,7 +28,7 @@ type Opts struct {
 }
 
 func File(ww io.Writer, file *ach.File, opts *Opts) {
-	if &file == nil {
+	if file == nil {
 		return
 	}
 	if opts == nil {
