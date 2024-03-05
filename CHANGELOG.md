@@ -1,3 +1,33 @@
+## v1.34.4 (Released 2024-02-26)
+
+IMPROVEMENTS
+
+- fix: check AllowMissingFileHeader and AllowMissingFileControl in reader
+
+## v1.34.3 (Released 2024-02-26)
+
+IMPROVEMENTS
+
+- fix: Correctly assign Category to IAT entries.
+
+BUILD
+
+- build(deps): bump golang.org/x/net from 0.20.0 to 0.21.0
+- chore(deps): update dependency github-pages to v231
+
+## v1.34.2 (Released 2024-02-07)
+
+IMPROVEMENTS
+
+- fix: skip reserved fields in Dishonored Returns
+
+BUILD
+
+- build(deps): bump golang from 1.21 to 1.22
+- build: experiment with ARM M1 builders and releases
+- build: print crashers after fuzzing
+- fix(deps): update module github.com/aws/aws-lambda-go to v1.46.0
+
 ## v1.34.0 (Released 2024-01-25)
 
 IMPROVEMENTS

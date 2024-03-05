@@ -1481,8 +1481,41 @@ func TestACHFileIATAddenda18(t *testing.T) {
 	}
 }
 
-// TestACHFileIATAddenda98 validates error when reading an invalid IATAddenda98
+// TestACHFileIATAddenda98 validates error when reading a valid IAT Addenda98
 func TestACHFileIATAddenda98(t *testing.T) {
+	f, err := os.Open(filepath.Join("test", "testdata", "iat-addenda98.ach"))
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	file, err := r.Read()
+
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	if len(file.IATBatches) != 1 || len(file.IATBatches[0].Entries) != 1 {
+		t.Error("This file should contain a single IAT batch with a single entry")
+	}
+
+	entry := file.IATBatches[0].Entries[0]
+
+	if entry.Addenda98 == nil {
+		t.Error("This entry should have an Addenda 98")
+	}
+
+	if entry.Category != CategoryNOC {
+		t.Errorf(
+			"This entry has an Addenda98, so its category should be `%s`, but it's `%s`",
+			CategoryNOC,
+			entry.Category,
+		)
+	}
+}
+
+// TestACHFileIATInvalidAddenda98 validates error when reading an invalid IATAddenda98
+func TestACHFileIATInvalidAddenda98(t *testing.T) {
 	f, err := os.Open(filepath.Join("test", "testdata", "iat-invalidAddenda98.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)
@@ -1496,8 +1529,41 @@ func TestACHFileIATAddenda98(t *testing.T) {
 	}
 }
 
-// TestACHFileIATAddenda99 validates error when reading an invalid IATAddenda99
+// TestACHFileIATAddenda99 validates error when reading a valid IAT Addenda99
 func TestACHFileIATAddenda99(t *testing.T) {
+	f, err := os.Open(filepath.Join("test", "testdata", "iat-addenda99.ach"))
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+	defer f.Close()
+	r := NewReader(f)
+	file, err := r.Read()
+
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+
+	if len(file.IATBatches) != 1 || len(file.IATBatches[0].Entries) != 1 {
+		t.Error("This file should contain a single IAT batch with a single entry")
+	}
+
+	entry := file.IATBatches[0].Entries[0]
+
+	if entry.Addenda99 == nil {
+		t.Error("This entry should have an Addenda 99")
+	}
+
+	if entry.Category != CategoryReturn {
+		t.Errorf(
+			"This entry has an Addenda99, so its category should be `%s`, but it's `%s`",
+			CategoryReturn,
+			entry.Category,
+		)
+	}
+}
+
+// TestACHFileIATAddenda99 validates error when reading an invalid IATAddenda99
+func TestACHFileIATInvalidAddenda99(t *testing.T) {
 	f, err := os.Open(filepath.Join("test", "testdata", "iat-invalidAddenda99.ach"))
 	if err != nil {
 		t.Errorf("%T: %s", err, err)

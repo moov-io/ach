@@ -379,7 +379,7 @@ func TestAddenda99__MissingFileHeaderControl(t *testing.T) {
 	// This test just checks we can parse the file and get the expected errors.
 	file, err := ReadFile(filepath.Join("test", "testdata", "return-no-file-header-control.ach"))
 	if err == nil {
-		t.Error("expected an error")
+		t.Fatal("expected an error")
 	}
 	if !strings.Contains(err.Error(), ErrFileHeader.Error()) {
 		t.Errorf("unexpected error: %v", err)

@@ -203,22 +203,31 @@ func (r *Reader) Read() (File, error) {
 
 	// Carry through any ValidateOpts for this comparison
 	if (FileHeader{validateOpts: r.File.validateOpts}) == r.File.Header {
-		// There must be at least one File Header
-		r.recordName = "FileHeader"
-		r.errors.Add(ErrFileHeader)
+		// Make sure we're required to report a missing FileHeader record
+		if r.File.validateOpts == nil || !r.File.validateOpts.AllowMissingFileHeader {
+			// There must be at least one File Header
+			r.recordName = "FileHeader"
+			r.errors.Add(ErrFileHeader)
+		}
 	}
 
 	if !r.File.IsADV() {
-		if (FileControl{}) == r.File.Control {
-			// There must be at least one File Control
-			r.recordName = "FileControl"
-			r.errors.Add(ErrFileControl)
+		// Make sure we're required to report a missing FileControl record
+		if r.File.validateOpts == nil || !r.File.validateOpts.AllowMissingFileControl {
+			if (FileControl{}) == r.File.Control {
+				// There must be at least one File Control
+				r.recordName = "FileControl"
+				r.errors.Add(ErrFileControl)
+			}
 		}
 	} else {
-		if (ADVFileControl{}) == r.File.ADVControl {
-			// There must be at least one File Control
-			r.recordName = "FileControl"
-			r.errors.Add(ErrFileControl)
+		// Make sure we're required to report a missing FileControl record
+		if r.File.validateOpts == nil || !r.File.validateOpts.AllowMissingFileControl {
+			if (ADVFileControl{}) == r.File.ADVControl {
+				// There must be at least one File Control
+				r.recordName = "FileControl"
+				r.errors.Add(ErrFileControl)
+			}
 		}
 	}
 	if r.errors.Empty() {
@@ -819,6 +828,7 @@ func (r *Reader) nocIATAddenda(entryIndex int) error {
 		return err
 	}
 	r.IATCurrentBatch.Entries[entryIndex].Addenda98 = addenda98
+	r.IATCurrentBatch.Entries[entryIndex].Category = CategoryNOC
 	return nil
 }
 
@@ -830,6 +840,7 @@ func (r *Reader) returnIATAddenda(entryIndex int) error {
 		return err
 	}
 	r.IATCurrentBatch.Entries[entryIndex].Addenda99 = addenda99
+	r.IATCurrentBatch.Entries[entryIndex].Category = CategoryReturn
 	return nil
 }
 
