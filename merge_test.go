@@ -132,7 +132,7 @@ func TestMergeFiles__together(t *testing.T) {
 		t.Errorf("did batch counts change? f1:%d f2:%d", len(f1.Batches), len(f2.Batches))
 	}
 
-	out, err := MergeFiles([]*File{f1, f2})
+	out, err := MergeFiles2([]*File{f1, f2})
 	if err != nil {
 		t.Fatal(err)
 	}

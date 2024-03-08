@@ -55,6 +55,8 @@ type merger struct {
 	opts *ValidateOpts
 }
 
+// TODO(adam): linked list with map[BatchHeader]Tree where Tree is keyed by traceNumber
+
 func (m *merger) MergeWith(files []*File, conditions Conditions) ([]*File, error) {
 	if m.opts != nil {
 		for i := range files {
