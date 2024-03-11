@@ -25,15 +25,17 @@ import (
 
 const NACHAFileLineLimit = 10000
 
-// MergeFiles is a helper function for consolidating an array of ACH Files into as few files
-// as possible. This is useful for optimizing cost and network efficiency.
+// MergeFiles is a helper function for consolidating an array of ACH Files into as few files as possible.
+// This is useful for optimizing cost and network utilization.
 //
 // This operation will override batch numbers in each file to ensure they do not collide.
 // The ascending batch numbers will start at 1.
 //
-// Duplicate TraceNumbers will not be allowed in the same file. Multiple files will be created.
+// Entries with TraceNumbers are allowed in the same file, but must be in separate batches
+// and are automatically separated.
 //
-// Per NACHA rules files must remain under 10,000 lines (when rendered in their ASCII encoding)
+// Old rules limit files to 10,000 lines (when rendered in their ASCII encoding), which
+// is the default for this function. Use MergeFilesWith for a higher limit.
 //
 // File Batches can only be merged if they are unique and routed to and from the same ABA routing numbers.
 func MergeFiles(files []*File) ([]*File, error) {
@@ -73,6 +75,19 @@ type Conditions struct {
 	MaxDollarAmount int64 `json:"maxDollarAmount"`
 }
 
+// MergeFilesWith is a function for consolidating an array of ACH Files into a few files as possible.
+// This is useful for optimizing cost and network utilization.
+//
+// This operation will override batch numbers in each file to ensure they do not collide.
+// The ascending batch numbers will start at 1.
+//
+// Entries with TraceNumbers are allowed in the same file, but must be in separate batches
+// and are automatically separated.
+//
+// Old rules limit files to 10,000 lines (when rendered in their ASCII encoding), which
+// is the default for this function. Use MergeFilesWith for a higher limit.
+//
+// File Batches can only be merged if they are unique and routed to and from the same ABA routing numbers.
 func MergeFilesWith(incoming []*File, conditions Conditions) ([]*File, error) {
 	if len(incoming) == 0 {
 		return nil, nil
@@ -83,7 +98,7 @@ func MergeFilesWith(incoming []*File, conditions Conditions) ([]*File, error) {
 	}
 
 	for i := range incoming {
-		outFile, _ := pickOutFile(incoming[i].Header, sorted)
+		outFile := pickOutFile(incoming[i].Header, sorted)
 		if outFile == nil {
 			return nil, fmt.Errorf("finding outfile from incoming[%d]: %w", i, ErrPleaseReportBug)
 		}
@@ -94,108 +109,22 @@ func MergeFilesWith(incoming []*File, conditions Conditions) ([]*File, error) {
 				return nil, fmt.Errorf("incoming[%d].batch[%d] has nil batchHeader", i, j)
 			}
 
-			// b := findOutBatch(bh, outFile.batches, nil)
-			// if b == nil {
-			// 	b = &batch{
-			// 		header:  *bh,
-			// 		entries: rbtree.NewTree[string, *EntryDetail](),
-			// 	}
-			// 	outFile.batches = append(outFile.batches, b)
-			// }
-
-			// entries := incoming[i].Batches[j].GetEntries()
-			// for m := range entries {
-			// 	if b.entries.Find(entries[m].TraceNumber) != nil {
-
 			entries := incoming[i].Batches[j].GetEntries()
 			for m := range entries {
+				// Find a batch where this entry can fit
 				b := findOutBatch(bh, outFile.batches, entries[m])
+
+				// No batch can hold this EntryDetail so create one
 				if b == nil {
 					b = &batch{
-						header: *bh,
-						// entries: rbtree.NewTree[string, *EntryDetail](),
+						header:  *bh,
 						entries: treemap.New[string, *EntryDetail](),
 					}
 					outFile.batches = append(outFile.batches, b)
 				}
 
-				// // Can't add this entry to the batch since the trace number exists already.
-				// // Grab the next file where this trace number could go, or create one
-				// newFile, created := pickOutFile(incoming[i].Header, outFile.next)
-				// if newFile == nil {
-				// 	return nil, fmt.Errorf("finding outfile from incoming[%d].batches[%d]: %w", i, j, ErrPleaseReportBug)
-				// }
-
-				// if created {
-				// 	if outFile.next == nil {
-				// 		outFile.next = newFile
-				// 	} else {
-				// 		// TODO(adam): can this happen?
-				// 		// fmt.Println("CCC")
-				// 	}
-				// }
-
-				// newBatch := findOutBatch(bh, newFile.batches, entries[m])
-				// if newBatch == nil {
-				// 	newBatch = &batch{
-				// 		header:  *bh,
-				// 		entries: rbtree.NewTree[string, *EntryDetail](),
-				// 	}
-				// }
-				// newFile.batches = append(newFile.batches, newBatch)
-
-				// // add the entry
-				// newBatch.entries.Insert(entries[m].TraceNumber, entries[m])
-				// } else {
-				// add the entry
 				b.entries.Set(entries[m].TraceNumber, entries[m])
-				// }
 			}
-
-			// if !found {
-			// 	b := batch{
-			// 		header:  *bh,
-			// 		entries: rbtree.NewTree[string, *EntryDetail](),
-			// 	}
-			// 	entries := incoming[i].Batches[j].GetEntries()
-			// 	for m := range entries {
-			// 		if b.entries.Find(entries[m].TraceNumber) != nil {
-			// 			return nil, fmt.Errorf("unable to add Entry %v to new batch", entries[m].TraceNumber)
-			// 		}
-			// 		b.entries.Insert(entries[m].TraceNumber, entries[m])
-			// 	}
-			// 	outFile.batches = append(outFile.batches, b)
-
-			// }
-
-			// Just find the batch
-			// outBatch, created := pickOutBatch(bh, outFile.batch)
-			// if created {
-			// 	outFile.lineCount += 2 // BatchHeader, BatchControl
-			// }
-			//
-			// entries := incoming[i].Batches[j].GetEntries()
-			// for m := range entries {
-			// 	entry := entries[m]
-			//
-			// 	// Can we store this entry in the current outFile / outBatch ?
-			// 	if outBatch.entries.Find(entry.TraceNumber) != nil {
-			// 		// Grab the next file where this trace number could go
-			// 		outFile := pickOutFile(incoming[i].Header, sorted.next)
-			// 		outBatch, created := pickOutBatch(bh, outFile.batch)
-			// 		if created {
-			// 			outFile.lineCount += 2 // BatchHeader, BatchControl
-			// 		}
-			//
-			// 		outBatch.entries.Insert(entry.TraceNumber, entry)
-			// 		outFile.lineCount += 1 + entry.addendaCount()
-			// 		outFile.dollarAmount += entry.Amount
-			// 	} else {
-			// 		outBatch.entries.Insert(entry.TraceNumber, entry)
-			// 		outFile.lineCount += 1 + entry.addendaCount()
-			// 		outFile.dollarAmount += entry.Amount
-			// 	}
-			// }
 		}
 	}
 
@@ -223,7 +152,7 @@ func MergeFilesWith(incoming []*File, conditions Conditions) ([]*File, error) {
 
 			batch, err := NewBatch(&bh)
 			if err != nil {
-				return nil, fmt.Errorf("A: %w", err)
+				return nil, fmt.Errorf("creating batch from sorted.batches[%d] failed: %w", i, err)
 			}
 
 			currentFileLineCount += 2 // BatchHeader, BatchControl
@@ -240,17 +169,19 @@ func MergeFilesWith(incoming []*File, conditions Conditions) ([]*File, error) {
 						goto overflow
 					}
 				}
+
 				// File would exceed the dollar amount we're limited to
 				if conditions.MaxDollarAmount > 0 {
 					if int64(currentFileDollarAmount)+int64(nextEntry.Amount) > conditions.MaxDollarAmount {
 						goto overflow
 					}
 				}
-				// Without an exceeded condition just merge into the current batch
+
+				// Without a condition being exceeded jump into adding the entry in the current batch
 				goto merge
 
 			overflow:
-				// Close out the current batch and file
+				// Close out the current batch and file since we exceeded some limit
 				if len(batch.GetEntries()) > 0 {
 					err = batch.Create()
 					if err != nil {
@@ -292,7 +223,7 @@ func MergeFilesWith(incoming []*File, conditions Conditions) ([]*File, error) {
 			if len(batch.GetEntries()) > 0 {
 				err = batch.Create()
 				if err != nil {
-					return nil, fmt.Errorf("B: %w", err)
+					return nil, fmt.Errorf("problem creating batch for outfile: %w", err)
 				}
 				file.AddBatch(batch)
 			}
@@ -301,7 +232,7 @@ func MergeFilesWith(incoming []*File, conditions Conditions) ([]*File, error) {
 		if len(file.Batches) > 0 {
 			err := file.Create()
 			if err != nil {
-				return nil, fmt.Errorf("C: %w", err)
+				return nil, fmt.Errorf("problem creating outfile: %w", err)
 			}
 			out = append(out, file)
 		}
@@ -311,6 +242,7 @@ func MergeFilesWith(incoming []*File, conditions Conditions) ([]*File, error) {
 	return out, nil
 }
 
+// outFile is a partial ACH file with batches and forms a linked list to additional files
 type outFile struct {
 	header  FileHeader
 	batches []*batch
@@ -318,31 +250,36 @@ type outFile struct {
 	next *outFile
 }
 
+// batch contains a BatcHeader and tree of entries sorted by TraceNumber, which allows for
+// faster lookup and insertion into an ACH file
 type batch struct {
-	header BatchHeader
-	// entries *rbtree.Tree[string, *EntryDetail]
+	header  BatchHeader
 	entries *treemap.TreeMap[string, *EntryDetail]
 }
 
-func pickOutFile(fh FileHeader, file *outFile) (*outFile, bool) {
+// pickOutFile will search for an exising outFile matching the FileHeader Origin and Destination.
+// If no such file can be found it will create one. A nil file will never be returned.
+func pickOutFile(fh FileHeader, file *outFile) *outFile {
 	if file == nil {
 		return &outFile{
 			header: fh,
-		}, true
+		}
 	}
 	if fh.ImmediateOrigin == file.header.ImmediateOrigin &&
 		fh.ImmediateDestination == file.header.ImmediateDestination {
-		return file, false
+		return file
 	}
 	if file.next == nil {
 		file.next = &outFile{
 			header: fh,
 		}
-		return file.next, false
+		return file.next
 	}
 	return pickOutFile(fh, file.next)
 }
 
+// findOutBatch searches an array of batches for one whose BatcHeader matches bh
+// and doesn't contain the TraceNumber from entry.
 func findOutBatch(bh *BatchHeader, batches []*batch, entry *EntryDetail) *batch {
 	for i := range batches {
 		if batches[i].header.Equal(bh) {
