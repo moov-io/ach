@@ -257,7 +257,7 @@ type batch struct {
 	entries *treemap.TreeMap[string, *EntryDetail]
 }
 
-// pickOutFile will search for an exising outFile matching the FileHeader Origin and Destination.
+// pickOutFile will search for an existing outFile matching the FileHeader Origin and Destination.
 // If no such file can be found it will create one. A nil file will never be returned.
 func pickOutFile(fh FileHeader, file *outFile) *outFile {
 	if file == nil {
