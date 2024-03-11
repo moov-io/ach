@@ -26,33 +26,21 @@ import (
 	"testing"
 
 	"github.com/moov-io/ach"
+	"github.com/stretchr/testify/require"
 )
 
 func TestIssue863(t *testing.T) {
 	fd, err := os.Open(filepath.Join("testdata", "storage.tar"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	files, err := readFiles(t, fd)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Logf("read %d files", len(files))
-	if n := len(files); n != 11 {
-		t.Fatalf("found %d ACH files", n)
-	}
+	require.NoError(t, err)
+	require.Equal(t, 11, len(files))
 
 	merged, err := ach.MergeFiles(files)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if n := len(merged); n != 1 {
-		t.Fatalf("found %d files", n)
-	}
-
-	if err := merged[0].Validate(); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+	require.Len(t, merged, 1)
+	require.NoError(t, merged[0].Validate())
 
 	final, err := merged[0].FlattenBatches()
 	if err != nil {

@@ -115,7 +115,7 @@ func BenchmarkMergeFiles(b *testing.B) {
 			var temp []*File
 			for i := 0; i < len(indices)-1; i += 0 {
 				b.StartTimer()
-				fs, err := MergeFilesWith2(files[indices[i]:indices[i+1]], mergeConditions)
+				fs, err := MergeFilesWith(files[indices[i]:indices[i+1]], mergeConditions)
 				if err != nil {
 					b.Fatal(err)
 				}
@@ -125,10 +125,10 @@ func BenchmarkMergeFiles(b *testing.B) {
 				temp = append(temp, fs...)
 			}
 			b.StartTimer()
-			out, err = MergeFilesWith2(temp, mergeConditions)
+			out, err = MergeFilesWith(temp, mergeConditions)
 		} else {
 			b.StartTimer()
-			out, err = MergeFilesWith2(files, mergeConditions)
+			out, err = MergeFilesWith(files, mergeConditions)
 		}
 		b.StopTimer()
 

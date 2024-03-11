@@ -8,11 +8,11 @@ require (
 	github.com/go-kit/kit v0.13.0
 	github.com/go-kit/log v0.2.1
 	github.com/gorilla/mux v1.8.1
+	github.com/igrmk/treemap/v2 v2.0.1
 	github.com/juju/ansiterm v1.0.0
 	github.com/moov-io/base v0.48.5
 	github.com/moov-io/iso4217 v0.3.0
 	github.com/prometheus/client_golang v1.19.0
-	github.com/sakeven/RbTree v0.0.0-20240311154204-b3417faf71f1
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/net v0.22.0
 	golang.org/x/text v0.14.0

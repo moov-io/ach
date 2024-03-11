@@ -28,6 +28,74 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func lineCount(f *File) int {
+	lines := 2 // FileHeader, FileControl
+	for i := range f.Batches {
+		lines += 2 // BatchHeader, BatchControl
+		entries := f.Batches[i].GetEntries()
+		for j := range entries {
+			lines++
+			if entries[j].Addenda02 != nil {
+				lines++
+			}
+			lines += len(entries[j].Addenda05)
+			if entries[j].Addenda98 != nil {
+				lines++
+			}
+			if entries[j].Addenda98Refused != nil {
+				lines++
+			}
+			if entries[j].Addenda99 != nil {
+				lines++
+			}
+			if entries[j].Addenda99Dishonored != nil {
+				lines++
+			}
+			if entries[j].Addenda99Contested != nil {
+				lines++
+			}
+		}
+	}
+	for i := range f.IATBatches {
+		lines += 2 // IATBatchHeader, BatchControl
+		for j := range f.IATBatches[i].Entries {
+			lines++
+			if f.IATBatches[i].Entries[j].Addenda10 != nil {
+				lines++
+			}
+			if f.IATBatches[i].Entries[j].Addenda11 != nil {
+				lines++
+			}
+			if f.IATBatches[i].Entries[j].Addenda12 != nil {
+				lines++
+			}
+			if f.IATBatches[i].Entries[j].Addenda13 != nil {
+				lines++
+			}
+			if f.IATBatches[i].Entries[j].Addenda14 != nil {
+				lines++
+			}
+			if f.IATBatches[i].Entries[j].Addenda15 != nil {
+				lines++
+			}
+			if f.IATBatches[i].Entries[j].Addenda16 != nil {
+				lines++
+			}
+
+			lines += len(f.IATBatches[i].Entries[j].Addenda17)
+			lines += len(f.IATBatches[i].Entries[j].Addenda18)
+
+			if f.IATBatches[i].Entries[j].Addenda98 != nil {
+				lines++
+			}
+			if f.IATBatches[i].Entries[j].Addenda99 != nil {
+				lines++
+			}
+		}
+	}
+	return lines
+}
+
 func filesAreEqual(f1, f2 *File) error {
 	// File Header
 	if f1.Header.ImmediateOrigin != f2.Header.ImmediateOrigin {
@@ -73,69 +141,65 @@ func filesAreEqual(f1, f2 *File) error {
 
 func TestMergeFiles__filesAreEqual(t *testing.T) {
 	file, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	// compare a file against itself
-	if err := filesAreEqual(file, file); err != nil {
-		t.Fatalf("same file: %v", err)
-	}
+	err = filesAreEqual(file, file)
+	require.NoError(t, err)
 
 	// break the equality
 	f2 := *file
 	f2.Header.ImmediateOrigin = "12"
-	if err := filesAreEqual(file, &f2); err == nil {
-		t.Fatal("expected error")
-	}
+	err = filesAreEqual(file, &f2)
+	require.Error(t, err)
 }
 
 func TestMergeFiles__identity(t *testing.T) {
 	file, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	out, err := MergeFiles([]*File{file})
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+	require.Len(t, out, 1)
 
-	if len(out) != 1 {
-		t.Errorf("got %d merged ACH files", len(out))
-	}
-
-	if err := filesAreEqual(file, out[0]); err != nil {
-		t.Errorf("unequal files:%v", err)
-	}
+	err = filesAreEqual(file, out[0])
+	require.NoError(t, err)
 
 	for _, f := range out {
-		if err := f.Validate(); err != nil {
-			t.Fatalf("invalid file: %v", err)
-		}
+		require.NoError(t, f.Validate())
 	}
 
+	t.Run("multiple", func(t *testing.T) {
+		out, err := MergeFiles([]*File{file, file, file, file})
+		require.NoError(t, err)
+		require.Len(t, out, 1)
+
+		for i := range out[0].Batches {
+			entries := out[0].Batches[i].GetEntries()
+			require.Equal(t, 1, len(entries))
+		}
+		for i := range out {
+			require.NoError(t, out[i].Create())
+			require.NoError(t, out[i].Validate())
+		}
+	})
 }
 
 func TestMergeFiles__together(t *testing.T) {
 	f1, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	f2, err := readACHFilepath(filepath.Join("test", "testdata", "web-debit.ach"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	f2.Header = f1.Header // replace Header so they're merged into one file
 
 	if len(f1.Batches) != 1 || len(f2.Batches) != 3 {
 		t.Errorf("did batch counts change? f1:%d f2:%d", len(f1.Batches), len(f2.Batches))
 	}
 
-	out, err := MergeFiles2([]*File{f1, f2})
-	if err != nil {
-		t.Fatal(err)
-	}
+	out, err := MergeFiles([]*File{f1, f2})
+	require.NoError(t, err)
 
 	if len(out) != 1 {
 		t.Errorf("got %d merged ACH files", len(out))
@@ -145,26 +209,19 @@ func TestMergeFiles__together(t *testing.T) {
 	}
 
 	for _, f := range out {
-		if err := f.Validate(); err != nil {
-			t.Fatalf("invalid file: %v", err)
-		}
+		require.NoError(t, f.Validate())
 	}
 }
 
 func TestMergeFiles__apart(t *testing.T) {
 	f1, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	f2, err := readACHFilepath(filepath.Join("test", "testdata", "web-debit.ach"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	out, err := MergeFiles([]*File{f1, f2})
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	if len(out) != 2 {
 		t.Errorf("got %d merged ACH files", len(out))
@@ -177,9 +234,7 @@ func TestMergeFiles__apart(t *testing.T) {
 	}
 
 	for _, f := range out {
-		if err := f.Validate(); err != nil {
-			t.Fatalf("invalid file: %v", err)
-		}
+		require.NoError(t, f.Validate())
 	}
 }
 
@@ -217,12 +272,8 @@ func BenchmarkLineCount(b *testing.B) {
 
 func TestMergeFiles__lineCount(t *testing.T) {
 	file, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := file.Create(); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+	require.NoError(t, file.Create())
 
 	if n := lineCount(file); n != 5 {
 		// We've optimized small file line counts to bypass writing out the file
@@ -233,9 +284,8 @@ func TestMergeFiles__lineCount(t *testing.T) {
 	// Add 100 batches to file and get a real line count
 	populateFileWithMockBatches(t, 100, file)
 
-	if err := file.Create(); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, file.Create())
+
 	if n := lineCount(file); n != 305 {
 		t.Errorf("unexpected line count of %d", n)
 	}
@@ -251,13 +301,11 @@ func TestMergeFiles__lineCount(t *testing.T) {
 // another file into it only to come away with two files after merging.
 func TestMergeFiles__splitFiles(t *testing.T) {
 	file, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	file.Control = NewFileControl()
-	if err := file.Create(); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, file.Create())
+
 	if len(file.Batches) != 1 {
 		t.Fatalf("unexpected batch count of %d", len(file.Batches))
 	}
@@ -266,29 +314,21 @@ func TestMergeFiles__splitFiles(t *testing.T) {
 	// somewhere between 3-4k Batches exceed the 10k line limit
 	populateFileWithMockBatches(t, 4000, file)
 
-	if err := file.Create(); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, file.Create())
 
 	// Read another file to merge
 	f2, err := readACHFilepath(filepath.Join("test", "testdata", "web-debit.ach"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	f2.Header = file.Header // replace Header so they're merged into one file
-	if err := f2.Create(); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, f2.Create())
 
 	// read a third file
 	f3, err := readACHFilepath(filepath.Join("test", "testdata", "20110805A.ach"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	f3.Header = file.Header // replace Header so they're merged into one file
-	if err := f3.Create(); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, f3.Create())
 
 	traceNumbersBefore := countTraceNumbers(file, f2, f3)
 
@@ -296,9 +336,7 @@ func TestMergeFiles__splitFiles(t *testing.T) {
 	if err != nil || len(out) != 1 {
 		t.Fatalf("got %d files, error=%v", len(out), err)
 	}
-	if n := len(out[0].Batches); n != 2006 {
-		t.Fatalf("out[0] has %d batches", n)
-	}
+	require.Equal(t, 7, len(out[0].Batches))
 
 	traceNumbersAfter := countTraceNumbers(out...)
 	if traceNumbersBefore != traceNumbersAfter {
@@ -309,13 +347,10 @@ func TestMergeFiles__splitFiles(t *testing.T) {
 		if err := f.Validate(); err != nil {
 			t.Fatalf("invalid file: %v", err)
 		}
+
 		min, err := f.FlattenBatches()
-		if err != nil {
-			t.Fatal(err)
-		}
-		if err := min.Validate(); err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
+		require.NoError(t, min.Validate())
 	}
 }
 
@@ -342,7 +377,7 @@ func TestMergeFiles__dollarAmount(t *testing.T) {
 		MaxDollarAmount: 1000000, // $10,000.00
 	})
 	require.NoError(t, err)
-	require.Len(t, mergedFiles, 51)
+	require.Len(t, mergedFiles, 101)
 	require.Equal(t, 101, countTraceNumbers(mergedFiles...))
 
 	for i := range mergedFiles {
@@ -350,11 +385,7 @@ func TestMergeFiles__dollarAmount(t *testing.T) {
 		require.Equal(t, 1, len(mergedFiles[i].Batches))
 
 		entryCount := len(mergedFiles[i].Batches[0].GetEntries())
-		if i == 0 {
-			require.Equal(t, 1, entryCount)
-		} else {
-			require.Equal(t, 2, entryCount)
-		}
+		require.Equal(t, 1, entryCount)
 	}
 }
 
@@ -381,20 +412,27 @@ func TestMergeFiles__dollarAmount2(t *testing.T) {
 		MaxDollarAmount: 33_000_000_00,
 	})
 	require.NoError(t, err)
-	require.Len(t, mergedFiles, 3)
+	require.Len(t, mergedFiles, 4)
 	require.Equal(t, 101, countTraceNumbers(mergedFiles...))
 
-	for i := range mergedFiles {
-		// With our static cases each file has one Batch
-		require.Equal(t, 17, len(mergedFiles[i].Batches))
+	require.Equal(t, 2, len(mergedFiles[0].Batches))
+	require.Equal(t, 1, len(mergedFiles[1].Batches))
+	require.Equal(t, 1, len(mergedFiles[2].Batches))
+	require.Equal(t, 1, len(mergedFiles[3].Batches))
 
-		entryCount := len(mergedFiles[i].Batches[0].GetEntries())
-		if i == 0 {
-			require.Equal(t, 1, entryCount)
-		} else {
-			require.Equal(t, 2, entryCount)
-		}
-	}
+	entryCount := len(mergedFiles[0].Batches[0].GetEntries())
+	require.Equal(t, 1, entryCount)
+	entryCount = len(mergedFiles[0].Batches[1].GetEntries())
+	require.Equal(t, 32, entryCount)
+
+	entryCount = len(mergedFiles[1].Batches[0].GetEntries())
+	require.Equal(t, 33, entryCount)
+
+	entryCount = len(mergedFiles[2].Batches[0].GetEntries())
+	require.Equal(t, 33, entryCount)
+
+	entryCount = len(mergedFiles[3].Batches[0].GetEntries())
+	require.Equal(t, 2, entryCount)
 }
 
 func countTraceNumbers(files ...*File) int {

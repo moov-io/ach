@@ -22,26 +22,30 @@ import (
 	"testing"
 
 	"github.com/moov-io/ach"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestIssue927(t *testing.T) {
 	before, err := ach.ReadDir(filepath.Join("testdata", "issue927"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	after, err := ach.MergeFiles(before)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
-	if len(after) != 2 {
+	after, err := ach.MergeFiles(before)
+	require.NoError(t, err)
+
+	if len(after) != 1 {
 		t.Fatalf("merged %d files into %d files", len(before), len(after))
 	}
 
-	if n := len(after[0].Batches); n != 5 {
-		t.Errorf("found %d batches", n)
+	// batches are flattened
+	require.Equal(t, 2, len(after[0].Batches))
+
+	// Verify all the entries are present
+	var entryCount int
+	for i := range after {
+		for j := range after[i].Batches {
+			entryCount += len(after[i].Batches[j].GetEntries())
+		}
 	}
-	if n := len(after[1].Batches); n != 3 {
-		t.Errorf("found %d batches", n)
-	}
+	require.Equal(t, 18, entryCount)
 }
