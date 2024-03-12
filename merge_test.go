@@ -25,6 +25,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/igrmk/treemap/v2"
 	"github.com/stretchr/testify/require"
 )
 
@@ -295,6 +296,20 @@ func TestMergeFiles__lineCount(t *testing.T) {
 	if n := lineCount(file); n != 305 {
 		t.Errorf("unexpected error n=%d", n)
 	}
+
+	// Ensure merge won't create files over the line limit
+	f2, err := readACHFilepath(filepath.Join("test", "testdata", "web-debit.ach"))
+	require.NoError(t, err)
+	f2.Header = file.Header // replace Header so they're merged into one file
+	require.NoError(t, f2.Create())
+
+	output, err := MergeFilesWith([]*File{file, f2}, Conditions{
+		MaxLines: 100,
+	})
+	require.NoError(t, err)
+	require.Len(t, output, 2)
+	require.Equal(t, 100, lineCount(output[0]))
+	require.Equal(t, 23, lineCount(output[1]))
 }
 
 // TestMergeFiles__splitFiles generates a file over the 10k line limit and attempts to merge
@@ -496,4 +511,65 @@ func populateFileWithMockBatches(t testing.TB, numBatches int, file *File) {
 
 		file.AddBatch(batch)
 	}
+}
+
+func TestMergeFilesHelpers(t *testing.T) {
+	t.Run("pickOutFile", func(t *testing.T) {
+		fh := mockFileHeader()
+		var input *outFile
+
+		output := pickOutFile(fh, input)
+		require.Equal(t, fh, output.header)
+		require.Empty(t, output.batches)
+		require.Nil(t, output.next)
+
+		input = &outFile{
+			header: mockFileHeader(),
+		}
+		require.Equal(t, input, pickOutFile(fh, input))
+
+		fh2 := mockFileHeader()
+		fh2.ImmediateOrigin = "123456780"
+		output = pickOutFile(fh2, input)
+		require.Equal(t, output, input.next) // verify the chain continues
+		require.Equal(t, fh2, output.header)
+		require.Empty(t, output.batches)
+		require.Nil(t, output.next)
+
+		fh3 := mockFileHeader()
+		fh3.ImmediateDestination = "123456780"
+		output = pickOutFile(fh3, input)
+		require.Equal(t, fh3, output.header)
+	})
+
+	t.Run("findOutBatch", func(t *testing.T) {
+		bh := mockBatchPPDHeader()
+		var batches []*batch
+		var entry *EntryDetail
+
+		output := findOutBatch(bh, batches, entry)
+		require.Nil(t, output)
+
+		// find the batch
+		batches = append(batches, &batch{
+			header:  *bh,
+			entries: treemap.New[string, *EntryDetail](),
+		})
+		output = findOutBatch(bh, batches, entry)
+		require.Equal(t, batches[0], output)
+
+		// add an entry to the batch
+		traceNumber := "123456780000000001"
+		batches[0].entries.Set(traceNumber, &EntryDetail{
+			ID:          "1",
+			TraceNumber: traceNumber,
+		})
+		require.True(t, batches[0].entries.Contains(traceNumber))
+
+		// exclude the batch when the trace number is found
+		output = findOutBatch(bh, batches, &EntryDetail{
+			TraceNumber: traceNumber,
+		})
+		require.Nil(t, output)
+	})
 }
