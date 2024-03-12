@@ -19,7 +19,6 @@ package ach
 
 import (
 	"fmt"
-	"sort"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -705,11 +704,4 @@ func (ed *EntryDetail) addendaCount() (n int) {
 		n += 1
 	}
 	return n
-}
-
-func sortEntriesByTraceNumber(entries []*EntryDetail) []*EntryDetail {
-	sort.Slice(entries[:], func(i, j int) bool {
-		return entries[i].TraceNumber < entries[j].TraceNumber
-	})
-	return entries
 }

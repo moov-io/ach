@@ -19,24 +19,27 @@ package ach
 
 import (
 	"fmt"
-	"time"
+
+	"github.com/igrmk/treemap/v2"
 )
 
 const NACHAFileLineLimit = 10000
 
-// MergeFiles is a helper function for consolidating an array of ACH Files into as few files
-// as possible. This is useful for optimizing cost and network efficiency.
+// MergeFiles is a helper function for consolidating an array of ACH Files into as few files as possible.
+// This is useful for optimizing cost and network utilization.
 //
 // This operation will override batch numbers in each file to ensure they do not collide.
 // The ascending batch numbers will start at 1.
 //
-// Duplicate TraceNumbers will not be allowed in the same file. Multiple files will be created.
+// Entries with TraceNumbers are allowed in the same file, but must be in separate batches
+// and are automatically separated.
 //
-// Per NACHA rules files must remain under 10,000 lines (when rendered in their ASCII encoding)
+// Old rules limit files to 10,000 lines (when rendered in their ASCII encoding), which
+// is the default for this function. Use MergeFilesWith for a higher limit.
 //
 // File Batches can only be merged if they are unique and routed to and from the same ABA routing numbers.
 func MergeFiles(files []*File) ([]*File, error) {
-	return mergeFilesHelper(files, Conditions{
+	return MergeFilesWith(files, Conditions{
 		MaxLines: NACHAFileLineLimit,
 	})
 }
@@ -72,254 +75,223 @@ type Conditions struct {
 	MaxDollarAmount int64 `json:"maxDollarAmount"`
 }
 
-func MergeFilesWith(files []*File, conditions Conditions) ([]*File, error) {
-	return mergeFilesHelper(files, conditions)
-}
+// MergeFilesWith is a function for consolidating an array of ACH Files into a few files as possible.
+// This is useful for optimizing cost and network utilization.
+//
+// This operation will override batch numbers in each file to ensure they do not collide.
+// The ascending batch numbers will start at 1.
+//
+// Entries with TraceNumbers are allowed in the same file, but must be in separate batches
+// and are automatically separated.
+//
+// Old rules limit files to 10,000 lines (when rendered in their ASCII encoding), which
+// is the default for this function. Use MergeFilesWith for a higher limit.
+//
+// File Batches can only be merged if they are unique and routed to and from the same ABA routing numbers.
+func MergeFilesWith(incoming []*File, conditions Conditions) ([]*File, error) {
+	if len(incoming) == 0 {
+		return nil, nil
+	}
 
-func mergeFilesHelper(files []*File, conditions Conditions) ([]*File, error) {
-	fs := &mergableFiles{infiles: files}
-	for i := range fs.infiles {
-		if fs.infiles[i] == nil {
-			continue // skip nil Files
+	sorted := &outFile{
+		header: incoming[0].Header,
+	}
+
+	for i := range incoming {
+		outFile := pickOutFile(incoming[i].Header, sorted)
+		if outFile == nil {
+			return nil, fmt.Errorf("finding outfile from incoming[%d]: %w", i, ErrPleaseReportBug)
 		}
-		outf := fs.findOutfile(fs.infiles[i])
-		for j := range fs.infiles[i].Batches {
-			batchExistsInMerged := false
-			for k := range outf.Batches {
-				if fs.infiles[i].Batches[j].Equal(outf.Batches[k]) {
-					batchExistsInMerged = true
 
-					batch, err := mergeEntries(outf.Batches[k], fs.infiles[i].Batches[j])
-					if err != nil {
-						return nil, err
-					}
-					outf.Batches[k] = batch
-					break
-				}
+		for j := range incoming[i].Batches {
+			bh := incoming[i].Batches[j].GetHeader()
+			if bh == nil {
+				return nil, fmt.Errorf("incoming[%d].batch[%d] has nil batchHeader", i, j)
 			}
-			if !batchExistsInMerged {
-				outf.AddBatch(fs.infiles[i].Batches[j])
-				if err := outf.Create(); err != nil {
-					return nil, err
+
+			entries := incoming[i].Batches[j].GetEntries()
+			for m := range entries {
+				// Find a batch where this entry can fit
+				b := findOutBatch(bh, outFile.batches, entries[m])
+
+				// No batch can hold this EntryDetail so create one
+				if b == nil {
+					b = &batch{
+						header:  *bh,
+						entries: treemap.New[string, *EntryDetail](),
+					}
+					outFile.batches = append(outFile.batches, b)
 				}
 
-				fileTooLong := (conditions.MaxLines > 0 && (lineCount(outf) > conditions.MaxLines))
-				fileTooExpensive := (conditions.MaxDollarAmount > 0 && (dollarAmount(outf) > conditions.MaxDollarAmount))
-
-				// Split into a new file if needed
-				if fileTooLong || fileTooExpensive {
-					// In the event of a file with one batch and one entry just keep it
-					if len(outf.Batches) > 1 || len(outf.Batches[0].GetEntries()) > 1 {
-						outf.RemoveBatch(fs.infiles[i].Batches[j])
-						if err := outf.Create(); err != nil { // rebalance ACH file after removing the Batch
-							return nil, err
-						}
-						f := *outf
-						fs.locMaxed = append(fs.locMaxed, &f)
-					}
-
-					outf = fs.swapLocMaxedFile(outf) // replace output file with the one we just created
-
-					outf.AddBatch(fs.infiles[i].Batches[j])
-					if err := outf.Create(); err != nil {
-						return nil, err
-					}
-				}
+				b.entries.Set(entries[m].TraceNumber, entries[m])
 			}
 		}
 	}
 
-	// Return LOC-maxed files and merged files
-	out := append(fs.locMaxed, fs.outfiles...)
+	var batchNumber int
 
-	// Override batch numbers to ensure they don't collide
-	for _, f := range out {
-		for i, b := range f.Batches {
-			b.GetHeader().BatchNumber = i + 1
-			b.GetControl().BatchNumber = i + 1
-			// Tabulate each Batch after combining them
-			if err := b.Create(); err != nil {
-				return out, err
+	var out []*File
+	for {
+		// Run through the linked list (sorted.next) until we terminate
+		if sorted == nil {
+			break
+		}
+
+		file := NewFile()
+		file.Header = sorted.header
+
+		currentFileLineCount := 2 // FileHeader, FileControl
+		var currentFileDollarAmount int
+
+		for i := range sorted.batches {
+			nextBatch := sorted.batches[i]
+
+			bh := nextBatch.header
+			batchNumber += 1
+			bh.BatchNumber = batchNumber
+
+			batch, err := NewBatch(&bh)
+			if err != nil {
+				return nil, fmt.Errorf("creating batch from sorted.batches[%d] failed: %w", i, err)
+			}
+
+			currentFileLineCount += 2 // BatchHeader, BatchControl
+
+			// add each entry detail
+			for it := nextBatch.entries.Iterator(); it.Valid(); it.Next() {
+				nextEntry := it.Value()
+
+				// Check if we're going to exceed the merge conditions before adding the entry
+				entryLineCount := 1 + nextEntry.addendaCount()
+				if conditions.MaxLines > 0 {
+					// File will be too large, so make a new file and batch
+					if currentFileLineCount+entryLineCount > conditions.MaxLines {
+						goto overflow
+					}
+				}
+
+				// File would exceed the dollar amount we're limited to
+				if conditions.MaxDollarAmount > 0 {
+					if int64(currentFileDollarAmount)+int64(nextEntry.Amount) > conditions.MaxDollarAmount {
+						goto overflow
+					}
+				}
+
+				// Without a condition being exceeded jump into adding the entry in the current batch
+				goto merge
+
+			overflow:
+				// Close out the current batch and file since we exceeded some limit
+				if len(batch.GetEntries()) > 0 {
+					err = batch.Create()
+					if err != nil {
+						return nil, fmt.Errorf("problem creating batch for new file/batch: %w", err)
+					}
+					file.AddBatch(batch)
+				}
+				if len(file.Batches) > 0 {
+					err = file.Create()
+					if err != nil {
+						return nil, fmt.Errorf("problem creating file for new file/batch: %w", err)
+					}
+					out = append(out, file)
+				}
+
+				// Reset counters
+				currentFileLineCount = 4 // FileHeader, FileControl, BatchHeader, BatchControl
+				currentFileDollarAmount = 0
+
+				// Create the new file and batch
+				file = NewFile()
+				file.Header = sorted.header
+
+				batch, err = NewBatch(&nextBatch.header)
+				if err != nil {
+					return nil, fmt.Errorf("problem creating overflow batch: %w", err)
+				}
+				batchNumber += 1
+				batch.GetHeader().BatchNumber = batchNumber
+
+			merge:
+				// Add the entry to the current batch
+				batch.AddEntry(nextEntry)
+
+				currentFileLineCount += 1 + nextEntry.addendaCount()
+				currentFileDollarAmount += nextEntry.Amount
+			}
+
+			if len(batch.GetEntries()) > 0 {
+				err = batch.Create()
+				if err != nil {
+					return nil, fmt.Errorf("problem creating batch for outfile: %w", err)
+				}
+				file.AddBatch(batch)
 			}
 		}
-		// Tabulate the files before returning them
-		if err := f.Create(); err != nil {
-			return out, err
+
+		if len(file.Batches) > 0 {
+			err := file.Create()
+			if err != nil {
+				return nil, fmt.Errorf("problem creating outfile: %w", err)
+			}
+			out = append(out, file)
 		}
+
+		sorted = sorted.next
 	}
 	return out, nil
 }
 
-type mergableFiles struct {
-	infiles  []*File
-	outfiles []*File
-	locMaxed []*File
+// outFile is a partial ACH file with batches and forms a linked list to additional files
+type outFile struct {
+	header  FileHeader
+	batches []*batch
+
+	next *outFile
 }
 
-// swapLocMaxedFile replaces an ACH file that is over the Nacha line limit with an empty file containing
-// a matching FileHeader record. This allows future iterations inside of MergeFiles to append
-func (fs *mergableFiles) swapLocMaxedFile(f *File) *File {
-	now := time.Now()
+// batch contains a BatcHeader and tree of entries sorted by TraceNumber, which allows for
+// faster lookup and insertion into an ACH file
+type batch struct {
+	header  BatchHeader
+	entries *treemap.TreeMap[string, *EntryDetail]
+}
 
-	// remove the current file from outfiles
-	for i := range fs.outfiles {
-		if fs.outfiles[i].Header.ImmediateDestination == f.Header.ImmediateDestination &&
-			fs.outfiles[i].Header.ImmediateOrigin == f.Header.ImmediateOrigin {
-			// found a matching file, so remove it from fs.outfiles
-			fs.outfiles = append(fs.outfiles[:i], fs.outfiles[i+1:]...)
-			goto next
+// pickOutFile will search for an existing outFile matching the FileHeader Origin and Destination.
+// If no such file can be found it will create one. A nil file will never be returned.
+func pickOutFile(fh FileHeader, file *outFile) *outFile {
+	if file == nil {
+		return &outFile{
+			header: fh,
 		}
 	}
-next:
-	out := NewFile()
-	out.Header = f.Header
-	out.Header.FileCreationDate = now.Format("060102") // YYMMDD
-	out.Header.FileCreationTime = now.Format("1504")   // HHmm
-	out.SetValidation(f.validateOpts)
-	out.Create()
-	fs.outfiles = append(fs.outfiles, out) // add the new outfile
-
-	return out
-}
-
-// findOutfile optionally returns a File from fs.files if the FileHeaders match.
-// This is done because we append batches into files to minimize the count of output files.
-//
-// findOutfile will return the existing file (stored in outfiles) if no matching file exists.
-func (fs *mergableFiles) findOutfile(f *File) *File {
-	var lookup func(int) *File
-	lookup = func(start int) *File {
-		// To allow recursive lookups we need to memorize the current index so deeper calls
-		// will bypass files with conflicting trace numbers.
-		for i := start; i < len(fs.outfiles); i++ {
-			if fs.outfiles[i].Header.ImmediateDestination == f.Header.ImmediateDestination &&
-				fs.outfiles[i].Header.ImmediateOrigin == f.Header.ImmediateOrigin {
-
-				// found a matching file, so verify the TraceNumber isn't alreay inside
-				for inB := range f.Batches {
-					inEntries := f.Batches[inB].GetEntries()
-					for inE := range inEntries {
-						// Compare against outfiles
-						for outB := range fs.outfiles[i].Batches {
-							outEntries := fs.outfiles[i].Batches[outB].GetEntries()
-							for outE := range outEntries {
-								// If any of our incoming trace numbers match the existing merged file
-								// return the entire file as separate. This keeps partially overlapping
-								// batches self-contained.
-								if inEntries[inE].TraceNumber == outEntries[outE].TraceNumber {
-									return lookup(i + 1)
-								}
-							}
-						}
-					}
-				}
-
-				// No conflicting TraceNumber was found, so return current merge file
-				return fs.outfiles[i]
-			}
+	if fh.ImmediateOrigin == file.header.ImmediateOrigin &&
+		fh.ImmediateDestination == file.header.ImmediateDestination {
+		return file
+	}
+	if file.next == nil {
+		file.next = &outFile{
+			header: fh,
 		}
-		// Record a newly mergable File/FileHeader we can use in future merge attempts
-		outf := NewFile()
-		outf.Header = f.Header
-		outf.SetValidation(f.validateOpts)
-		outf.Control = f.Control
-		fs.outfiles = append(fs.outfiles, outf)
-		return outf
+		return file.next
 	}
-	return lookup(0)
+	return pickOutFile(fh, file.next)
 }
 
-func mergeEntries(b1, b2 Batcher) (Batcher, error) {
-	b, err := NewBatch(b1.GetHeader())
-	if err != nil {
-		return nil, fmt.Errorf("mergeEntries: %w", err)
-	}
-	entries := sortEntriesByTraceNumber(append(b1.GetEntries(), b2.GetEntries()...))
-	for i := range entries {
-		b.AddEntry(entries[i])
-	}
-	b.SetControl(b1.GetControl())
-	if err := b.Create(); err != nil {
-		return nil, err
-	}
-	return b, nil
-}
-
-func lineCount(f *File) int {
-	lines := 2 // FileHeader, FileControl
-	for i := range f.Batches {
-		lines += 2 // BatchHeader, BatchControl
-		entries := f.Batches[i].GetEntries()
-		for j := range entries {
-			lines++
-			if entries[j].Addenda02 != nil {
-				lines++
+// findOutBatch searches an array of batches for one whose BatcHeader matches bh
+// and doesn't contain the TraceNumber from entry.
+func findOutBatch(bh *BatchHeader, batches []*batch, entry *EntryDetail) *batch {
+	for i := range batches {
+		if batches[i].header.Equal(bh) {
+			// Make sure this batch doesn't contain the TraceNumber already
+			var found bool
+			if entry != nil {
+				found = batches[i].entries.Contains(entry.TraceNumber)
 			}
-			lines += len(entries[j].Addenda05)
-			if entries[j].Addenda98 != nil {
-				lines++
-			}
-			if entries[j].Addenda98Refused != nil {
-				lines++
-			}
-			if entries[j].Addenda99 != nil {
-				lines++
-			}
-			if entries[j].Addenda99Dishonored != nil {
-				lines++
-			}
-			if entries[j].Addenda99Contested != nil {
-				lines++
+			if !found {
+				return batches[i]
 			}
 		}
 	}
-	for i := range f.IATBatches {
-		lines += 2 // IATBatchHeader, BatchControl
-		for j := range f.IATBatches[i].Entries {
-			lines++
-			if f.IATBatches[i].Entries[j].Addenda10 != nil {
-				lines++
-			}
-			if f.IATBatches[i].Entries[j].Addenda11 != nil {
-				lines++
-			}
-			if f.IATBatches[i].Entries[j].Addenda12 != nil {
-				lines++
-			}
-			if f.IATBatches[i].Entries[j].Addenda13 != nil {
-				lines++
-			}
-			if f.IATBatches[i].Entries[j].Addenda14 != nil {
-				lines++
-			}
-			if f.IATBatches[i].Entries[j].Addenda15 != nil {
-				lines++
-			}
-			if f.IATBatches[i].Entries[j].Addenda16 != nil {
-				lines++
-			}
-
-			lines += len(f.IATBatches[i].Entries[j].Addenda17)
-			lines += len(f.IATBatches[i].Entries[j].Addenda18)
-
-			if f.IATBatches[i].Entries[j].Addenda98 != nil {
-				lines++
-			}
-			if f.IATBatches[i].Entries[j].Addenda99 != nil {
-				lines++
-			}
-		}
-	}
-	return lines
-}
-
-func dollarAmount(f *File) int64 {
-	var total int64
-	for i := range f.Batches {
-		entries := f.Batches[i].GetEntries()
-		for j := range entries {
-			total += int64(entries[j].Amount)
-		}
-	}
-	return total
+	return nil
 }
