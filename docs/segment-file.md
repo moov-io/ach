@@ -47,3 +47,7 @@ if err := w.Write(debitFile); err != nil {
 
 w.Flush()
 ```
+
+## HTTP API
+
+Files can be segmented with [an http endpoint](https://moov-io.github.io/ach/api/#post-/segment).

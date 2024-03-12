@@ -47,3 +47,7 @@ if err := w.Write(of); err != nil {
 
 w.Flush()
 ```
+
+## HTTP API
+
+Files can be flattened with [an http endpoint](https://moov-io.github.io/ach/api/#post-/files/-fileID-/flatten).

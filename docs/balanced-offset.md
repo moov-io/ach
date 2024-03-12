@@ -34,3 +34,7 @@ batch.WithOffset(&ach.Offset{
 
 // On each batch.Create() call the offset record will be re-tabulated
 ```
+
+## HTTP API
+
+The [HTTP server](https://moov-io.github.io/ach/usage-docker/) supports [balancing existing batches](https://moov-io.github.io/ach/api/#post-/files/-fileID-) and [adding new batches to be balanced](https://moov-io.github.io/ach/api/#post-/files/-fileID-/batches).
