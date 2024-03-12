@@ -34,6 +34,8 @@ const NACHAFileLineLimit = 10000
 // Entries with TraceNumbers are allowed in the same file, but must be in separate batches
 // and are automatically separated.
 //
+// ADV and IAT Batches and Entries are currently not merged together.
+//
 // Old rules limit files to 10,000 lines (when rendered in their ASCII encoding), which
 // is the default for this function. Use MergeFilesWith for a higher limit.
 //
@@ -83,6 +85,8 @@ type Conditions struct {
 //
 // Entries with TraceNumbers are allowed in the same file, but must be in separate batches
 // and are automatically separated.
+//
+// ADV and IAT Batches and Entries are currently not merged together.
 //
 // Old rules limit files to 10,000 lines (when rendered in their ASCII encoding), which
 // is the default for this function. Use MergeFilesWith for a higher limit.
