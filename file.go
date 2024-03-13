@@ -19,7 +19,6 @@ package ach
 
 import (
 	"bytes"
-	"cmp"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -710,8 +709,11 @@ type ValidateOpts struct {
 // merge will combine two ValidateOpts structs and keep any non-zero field values.
 func (v *ValidateOpts) merge(other *ValidateOpts) *ValidateOpts {
 	// If either ValidateOpts is nil return the other
-	if v == nil || other == nil {
-		return cmp.Or(v, other)
+	if v == nil {
+		return other
+	}
+	if other == nil {
+		return v
 	}
 
 	out := &ValidateOpts{
