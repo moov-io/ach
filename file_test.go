@@ -2134,7 +2134,7 @@ func TestFile_ValidateOpts_Merge(t *testing.T) {
 		PreserveSpaces:   true,
 	}
 
-	merged := first.Merge(second)
+	merged := first.merge(second)
 
 	require.False(t, merged.SkipAll)                 // keep false when both are false
 	require.True(t, merged.RequireABAOrigin)         // was true in first
@@ -2148,7 +2148,7 @@ func TestFile_ValidateOpts_Merge(t *testing.T) {
 		return fmt.Errorf("code %d is invalid", code)
 	}
 
-	merged = first.Merge(second)
+	merged = first.merge(second)
 	require.False(t, merged.SkipAll)               // keep false when both are false
 	require.True(t, merged.RequireABAOrigin)       // was true in first
 	require.NotNil(t, merged.CheckTransactionCode) // non-nil function
@@ -2162,8 +2162,8 @@ func TestFile_ValidateOpts_Merge(t *testing.T) {
 			CustomReturnCodes: true,
 		}
 
-		require.Nil(t, empty.Merge(empty))
-		require.NotNil(t, empty.Merge(full))
-		require.NotNil(t, full.Merge(empty))
+		require.Nil(t, empty.merge(empty))
+		require.NotNil(t, empty.merge(full))
+		require.NotNil(t, full.merge(empty))
 	})
 }

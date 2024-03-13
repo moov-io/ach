@@ -24,7 +24,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"reflect"
 	"strings"
 	"time"
 
@@ -708,52 +707,37 @@ type ValidateOpts struct {
 	AllowInvalidAmounts bool `json:"allowInvalidAmounts"`
 }
 
-// Merge will combine two ValidateOpts structs and keep any non-zero field values.
-func (v *ValidateOpts) Merge(other *ValidateOpts) *ValidateOpts {
+// merge will combine two ValidateOpts structs and keep any non-zero field values.
+func (v *ValidateOpts) merge(other *ValidateOpts) *ValidateOpts {
 	// If either ValidateOpts is nil return the other
 	if v == nil || other == nil {
 		return cmp.Or(v, other)
 	}
 
-	out := &ValidateOpts{}
-	outValue := reflect.ValueOf(out).Elem()
+	out := &ValidateOpts{
+		SkipAll:                          v.SkipAll || other.SkipAll,
+		RequireABAOrigin:                 v.RequireABAOrigin || other.RequireABAOrigin,
+		BypassOriginValidation:           v.BypassOriginValidation || other.BypassOriginValidation,
+		BypassDestinationValidation:      v.BypassDestinationValidation || other.BypassDestinationValidation,
+		CustomTraceNumbers:               v.CustomTraceNumbers || other.CustomTraceNumbers,
+		AllowZeroBatches:                 v.AllowZeroBatches || other.AllowZeroBatches,
+		AllowMissingFileHeader:           v.AllowMissingFileHeader || other.AllowMissingFileHeader,
+		AllowMissingFileControl:          v.AllowMissingFileControl || other.AllowMissingFileControl,
+		BypassCompanyIdentificationMatch: v.BypassCompanyIdentificationMatch || other.BypassCompanyIdentificationMatch,
+		CustomReturnCodes:                v.CustomReturnCodes || other.CustomReturnCodes,
+		UnequalServiceClassCode:          v.UnequalServiceClassCode || other.UnequalServiceClassCode,
+		AllowUnorderedBatchNumbers:       v.AllowUnorderedBatchNumbers || other.AllowUnorderedBatchNumbers,
+		AllowInvalidCheckDigit:           v.AllowInvalidCheckDigit || other.AllowInvalidCheckDigit,
+		UnequalAddendaCounts:             v.UnequalAddendaCounts || other.UnequalAddendaCounts,
+		PreserveSpaces:                   v.PreserveSpaces || other.PreserveSpaces,
+		AllowInvalidAmounts:              v.AllowInvalidAmounts || other.AllowInvalidAmounts,
+	}
 
-	// Go over each field of the two structs and keep any non-zero values
-	V := reflect.ValueOf(v).Elem()
-	O := reflect.ValueOf(other).Elem()
-
-	for v := 0; v < V.NumField(); v++ {
-		vName := V.Type().Field(v).Name
-		vValue := V.Field(v).Interface()
-
-		for o := 0; o < O.NumField(); o++ {
-			oName := O.Type().Field(o).Name
-
-			if vName == oName {
-				oValue := O.Field(o).Interface()
-
-				switch vv := vValue.(type) {
-				case bool:
-					if vv {
-						outValue.FieldByName(vName).SetBool(vv)
-					}
-					if vv, ok := oValue.(bool); ok && vv {
-						outValue.FieldByName(vName).SetBool(vv)
-					}
-
-				case func(int) error:
-					if !V.Field(v).IsNil() {
-						outValue.FieldByName(vName).Set(V.Field(v))
-					}
-					if !O.Field(o).IsNil() {
-						outValue.FieldByName(vName).Set(O.Field(o))
-					}
-
-				default:
-					panic(fmt.Sprintf(`unhandled "%v %T" in ValidateOpts.Merge(..)`, vName, vValue)) //nolint:forbidigo
-				}
-			}
-		}
+	if v.CheckTransactionCode != nil {
+		out.CheckTransactionCode = v.CheckTransactionCode
+	}
+	if other.CheckTransactionCode != nil {
+		out.CheckTransactionCode = other.CheckTransactionCode
 	}
 
 	return out

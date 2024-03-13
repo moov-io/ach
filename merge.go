@@ -107,7 +107,7 @@ func MergeFilesWith(incoming []*File, conditions Conditions) ([]*File, error) {
 		if outFile == nil {
 			return nil, fmt.Errorf("finding outfile from incoming[%d]: %w", i, ErrPleaseReportBug)
 		}
-		outFile.validateOpts = outFile.validateOpts.Merge(incoming[i].GetValidation())
+		outFile.validateOpts = outFile.validateOpts.merge(incoming[i].GetValidation())
 
 		for j := range incoming[i].Batches {
 			bh := incoming[i].Batches[j].GetHeader()
