@@ -35,12 +35,22 @@ func BenchmarkMergeFiles(b *testing.B) {
 		}
 	)
 
-	randomFile := func(B *testing.B) *File {
+	type options struct {
+		withValidateOpts bool
+	}
+
+	randomFile := func(B *testing.B, opts options) *File {
 		B.Helper()
 
 		file := NewFile()
 		fh := staticFileHeader()
 		file.SetHeader(fh)
+
+		if opts.withValidateOpts {
+			file.SetValidation(&ValidateOpts{
+				PreserveSpaces: true,
+			})
+		}
 
 		for b := 0; b < batchesPerFile; b++ {
 			base, _ := rand.Int(rand.Reader, big.NewInt(1e7))
@@ -64,10 +74,10 @@ func BenchmarkMergeFiles(b *testing.B) {
 		return file
 	}
 
-	randomFiles := func(b *testing.B) (out []*File) {
+	randomFiles := func(b *testing.B, opts options) (out []*File) {
 		b.Helper()
 		for i := 0; i < b.N; i++ {
-			out = append(out, randomFile(b))
+			out = append(out, randomFile(b, opts))
 		}
 		return
 	}
@@ -99,10 +109,10 @@ func BenchmarkMergeFiles(b *testing.B) {
 		b.Fatalf("unexpected indices: %#v", indices)
 	}
 
-	mergeInGroups := func(b *testing.B, groups int) []*File {
+	mergeInGroups := func(b *testing.B, groups int, opts options) []*File {
 		b.Helper()
 
-		files := randomFiles(b)
+		files := randomFiles(b, opts)
 		indices := makeIndices(len(files), groups)
 
 		b.ReportAllocs()
@@ -145,19 +155,25 @@ func BenchmarkMergeFiles(b *testing.B) {
 	}
 
 	b.Run("MergeFiles", func(b *testing.B) {
-		mergeInGroups(b, 1)
+		mergeInGroups(b, 1, options{})
+	})
+
+	b.Run("MergeFiles_ValidateOpts", func(b *testing.B) {
+		mergeInGroups(b, 1, options{
+			withValidateOpts: true,
+		})
 	})
 
 	b.Run("MergeFiles_3Groups", func(b *testing.B) {
-		mergeInGroups(b, 3)
+		mergeInGroups(b, 3, options{})
 	})
 	b.Run("MergeFiles_5Groups", func(b *testing.B) {
-		mergeInGroups(b, 5)
+		mergeInGroups(b, 5, options{})
 	})
 	b.Run("MergeFiles_10Groups", func(b *testing.B) {
-		mergeInGroups(b, 10)
+		mergeInGroups(b, 10, options{})
 	})
 	b.Run("MergeFiles_100Groups", func(b *testing.B) {
-		mergeInGroups(b, 100)
+		mergeInGroups(b, 100, options{})
 	})
 }

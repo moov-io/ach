@@ -19,10 +19,12 @@ package ach
 
 import (
 	"bytes"
+	"cmp"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
+	"reflect"
 	"strings"
 	"time"
 
@@ -704,6 +706,57 @@ type ValidateOpts struct {
 
 	// AllowInvalidAmounts will skip verifying the Amount is valid for the TransactionCode and entry type.
 	AllowInvalidAmounts bool `json:"allowInvalidAmounts"`
+}
+
+// Merge will combine two ValidateOpts structs and keep any non-zero field values.
+func (v *ValidateOpts) Merge(other *ValidateOpts) *ValidateOpts {
+	// If either ValidateOpts is nil return the other
+	if v == nil || other == nil {
+		return cmp.Or(v, other)
+	}
+
+	out := &ValidateOpts{}
+	outValue := reflect.ValueOf(out).Elem()
+
+	// Go over each field of the two structs and keep any non-zero values
+	V := reflect.ValueOf(v).Elem()
+	O := reflect.ValueOf(other).Elem()
+
+	for v := 0; v < V.NumField(); v++ {
+		vName := V.Type().Field(v).Name
+		vValue := V.Field(v).Interface()
+
+		for o := 0; o < O.NumField(); o++ {
+			oName := O.Type().Field(o).Name
+
+			if vName == oName {
+				oValue := O.Field(o).Interface()
+
+				switch vv := vValue.(type) {
+				case bool:
+					if vv {
+						outValue.FieldByName(vName).SetBool(vv)
+					}
+					if vv, ok := oValue.(bool); ok && vv {
+						outValue.FieldByName(vName).SetBool(vv)
+					}
+
+				case func(int) error:
+					if !V.Field(v).IsNil() {
+						outValue.FieldByName(vName).Set(V.Field(v))
+					}
+					if !O.Field(o).IsNil() {
+						outValue.FieldByName(vName).Set(O.Field(o))
+					}
+
+				default:
+					panic(fmt.Sprintf(`unhandled "%v %T" in ValidateOpts.Merge(..)`, vName, vValue)) //nolint:forbidigo
+				}
+			}
+		}
+	}
+
+	return out
 }
 
 // ValidateWith performs checks on each record according to Nacha guidelines.

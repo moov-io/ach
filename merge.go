@@ -98,7 +98,8 @@ func MergeFilesWith(incoming []*File, conditions Conditions) ([]*File, error) {
 	}
 
 	sorted := &outFile{
-		header: incoming[0].Header,
+		header:       incoming[0].Header,
+		validateOpts: incoming[0].GetValidation(),
 	}
 
 	for i := range incoming {
@@ -106,6 +107,7 @@ func MergeFilesWith(incoming []*File, conditions Conditions) ([]*File, error) {
 		if outFile == nil {
 			return nil, fmt.Errorf("finding outfile from incoming[%d]: %w", i, ErrPleaseReportBug)
 		}
+		outFile.validateOpts = outFile.validateOpts.Merge(incoming[i].GetValidation())
 
 		for j := range incoming[i].Batches {
 			bh := incoming[i].Batches[j].GetHeader()
@@ -143,6 +145,10 @@ func MergeFilesWith(incoming []*File, conditions Conditions) ([]*File, error) {
 
 		file := NewFile()
 		file.Header = sorted.header
+
+		if sorted.validateOpts != nil {
+			file.SetValidation(sorted.validateOpts)
+		}
 
 		currentFileLineCount := 2 // FileHeader, FileControl
 		var currentFileDollarAmount int
@@ -250,6 +256,8 @@ func MergeFilesWith(incoming []*File, conditions Conditions) ([]*File, error) {
 type outFile struct {
 	header  FileHeader
 	batches []*batch
+
+	validateOpts *ValidateOpts
 
 	next *outFile
 }

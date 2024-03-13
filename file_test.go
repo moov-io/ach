@@ -2120,3 +2120,50 @@ func TestFile_SkipValidation(t *testing.T) {
 	})
 	require.NoError(t, err)
 }
+
+func TestFile_ValidateOpts_Merge(t *testing.T) {
+	first := &ValidateOpts{
+		RequireABAOrigin: true,
+		CheckTransactionCode: func(code int) error {
+			return nil
+		},
+		CustomReturnCodes: true,
+	}
+	second := &ValidateOpts{
+		RequireABAOrigin: false,
+		PreserveSpaces:   true,
+	}
+
+	merged := first.Merge(second)
+
+	require.False(t, merged.SkipAll)                 // keep false when both are false
+	require.True(t, merged.RequireABAOrigin)         // was true in first
+	require.NotNil(t, merged.CheckTransactionCode)   // non-nil function
+	require.Nil(t, merged.CheckTransactionCode(123)) // func always returns nil
+	require.True(t, merged.CustomReturnCodes)
+	require.True(t, merged.PreserveSpaces)
+
+	// Now make sure that second's CheckTransactionCode can overwrite first's
+	second.CheckTransactionCode = func(code int) error {
+		return fmt.Errorf("code %d is invalid", code)
+	}
+
+	merged = first.Merge(second)
+	require.False(t, merged.SkipAll)               // keep false when both are false
+	require.True(t, merged.RequireABAOrigin)       // was true in first
+	require.NotNil(t, merged.CheckTransactionCode) // non-nil function
+	require.ErrorContains(t, merged.CheckTransactionCode(123), "code 123 is invalid")
+	require.True(t, merged.CustomReturnCodes)
+	require.True(t, merged.PreserveSpaces)
+
+	t.Run("empty", func(t *testing.T) {
+		var empty *ValidateOpts
+		full := &ValidateOpts{
+			CustomReturnCodes: true,
+		}
+
+		require.Nil(t, empty.Merge(empty))
+		require.NotNil(t, empty.Merge(full))
+		require.NotNil(t, full.Merge(empty))
+	})
+}
