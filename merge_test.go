@@ -513,6 +513,32 @@ func populateFileWithMockBatches(t testing.TB, numBatches int, file *File) {
 	}
 }
 
+func TestMergeFiles__ValidateOpts(t *testing.T) {
+	f1, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+
+	f1.SetValidation(&ValidateOpts{
+		CustomReturnCodes: true,
+	})
+
+	f2, err := readACHFilepath(filepath.Join("test", "testdata", "web-debit.ach"))
+	require.NoError(t, err)
+
+	f2.Header = f1.Header
+	f2.SetValidation(&ValidateOpts{
+		AllowInvalidAmounts: true,
+	})
+
+	merged, err := MergeFiles([]*File{f1, f2})
+	require.NoError(t, err)
+	require.Len(t, merged, 1)
+
+	opts := merged[0].GetValidation()
+	require.False(t, opts.SkipAll)
+	require.True(t, opts.CustomReturnCodes)
+	require.True(t, opts.AllowInvalidAmounts)
+}
+
 func TestMergeFilesHelpers(t *testing.T) {
 	t.Run("pickOutFile", func(t *testing.T) {
 		fh := mockFileHeader()

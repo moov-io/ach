@@ -706,6 +706,45 @@ type ValidateOpts struct {
 	AllowInvalidAmounts bool `json:"allowInvalidAmounts"`
 }
 
+// merge will combine two ValidateOpts structs and keep any non-zero field values.
+func (v *ValidateOpts) merge(other *ValidateOpts) *ValidateOpts {
+	// If either ValidateOpts is nil return the other
+	if v == nil {
+		return other
+	}
+	if other == nil {
+		return v
+	}
+
+	out := &ValidateOpts{
+		SkipAll:                          v.SkipAll || other.SkipAll,
+		RequireABAOrigin:                 v.RequireABAOrigin || other.RequireABAOrigin,
+		BypassOriginValidation:           v.BypassOriginValidation || other.BypassOriginValidation,
+		BypassDestinationValidation:      v.BypassDestinationValidation || other.BypassDestinationValidation,
+		CustomTraceNumbers:               v.CustomTraceNumbers || other.CustomTraceNumbers,
+		AllowZeroBatches:                 v.AllowZeroBatches || other.AllowZeroBatches,
+		AllowMissingFileHeader:           v.AllowMissingFileHeader || other.AllowMissingFileHeader,
+		AllowMissingFileControl:          v.AllowMissingFileControl || other.AllowMissingFileControl,
+		BypassCompanyIdentificationMatch: v.BypassCompanyIdentificationMatch || other.BypassCompanyIdentificationMatch,
+		CustomReturnCodes:                v.CustomReturnCodes || other.CustomReturnCodes,
+		UnequalServiceClassCode:          v.UnequalServiceClassCode || other.UnequalServiceClassCode,
+		AllowUnorderedBatchNumbers:       v.AllowUnorderedBatchNumbers || other.AllowUnorderedBatchNumbers,
+		AllowInvalidCheckDigit:           v.AllowInvalidCheckDigit || other.AllowInvalidCheckDigit,
+		UnequalAddendaCounts:             v.UnequalAddendaCounts || other.UnequalAddendaCounts,
+		PreserveSpaces:                   v.PreserveSpaces || other.PreserveSpaces,
+		AllowInvalidAmounts:              v.AllowInvalidAmounts || other.AllowInvalidAmounts,
+	}
+
+	if v.CheckTransactionCode != nil {
+		out.CheckTransactionCode = v.CheckTransactionCode
+	}
+	if other.CheckTransactionCode != nil {
+		out.CheckTransactionCode = other.CheckTransactionCode
+	}
+
+	return out
+}
+
 // ValidateWith performs checks on each record according to Nacha guidelines.
 // ValidateWith will never modify the File.
 //
