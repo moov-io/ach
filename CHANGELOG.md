@@ -1,3 +1,18 @@
+## v1.36.0 (Released 2024-03-13)
+
+This release of moov-io/ach contains some major performance improvements to `MergeFiles(...)`. We have tested this new implementation and are confident that merged files contain all of the input files, but if you encounter any issues [please open an issue](https://github.com/moov-io/ach/issues/new/choose).
+
+IMPROVEMENTS
+
+- docs: add links to http endpoints where features overlap
+- docs: clarify what isn't supported by MergeFiles
+- refactor: improve merge performance
+- test: add checks for pickOutFile, findOutBatch and lineCount
+
+BUILD
+
+- build(deps): bump golang.org/x/net from 0.21.0 to 0.22.0
+
 ## v1.35.1 (Released 2024-03-04)
 
 IMPROVEMENTS
