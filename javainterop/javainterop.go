@@ -924,7 +924,7 @@ func (batch *Batch) GetADVControl() *ADVBatchControl {
 type EntryDetail struct{ ach.EntryDetail }
 
 func (batch *Batch) GetEntries() []*EntryDetail {
-	var entries []*EntryDetail
+	entries := make([]*EntryDetail, 0, len(batch.Batch.GetEntries()))
 	for _, v := range batch.Batch.GetEntries() {
 		entries = append(entries, &EntryDetail{*v})
 	}
@@ -940,7 +940,7 @@ func (batch *Batch) AddADVEntry(entry *ADVEntryDetail) {
 }
 
 func (batch *Batch) GetADVEntries() []*ADVEntryDetail {
-	var entries []*ADVEntryDetail
+	entries := make([]*ADVEntryDetail, 0, len(batch.Batch.GetADVEntries()))
 	for _, v := range batch.Batch.GetADVEntries() {
 		entries = append(entries, &ADVEntryDetail{v})
 	}
@@ -1627,8 +1627,8 @@ const (
 )
 
 func ReadDir(dir string) ([]*File, error) {
-	var files []*File
 	achFiles, err := ach.ReadDir(dir)
+	files := make([]*File, 0, len(achFiles))
 	for _, v := range achFiles {
 		files = append(files, &File{*v})
 	}
@@ -1996,7 +1996,7 @@ func (f *File) RemoveBatch(batch Batcher) {
 }
 
 func (f *File) AddIATBatch(iatBatch IATBatch) []IATBatch {
-	var batchers []IATBatch
+	batchers := make([]IATBatch, 0, len(f.File.AddIATBatch(iatBatch.IATBatch)))
 	for _, b := range f.File.AddIATBatch(iatBatch.IATBatch) {
 		batchers = append(batchers, IATBatch{b})
 	}
@@ -2230,7 +2230,7 @@ func (iatBatch *IATBatch) GetControl() *BatchControl {
 }
 
 func (iatBatch *IATBatch) GetEntries() []*IATEntryDetail {
-	var entries []*IATEntryDetail
+	entries := make([]*IATEntryDetail, 0, len(iatBatch.IATBatch.GetEntries()))
 	for _, v := range iatBatch.IATBatch.GetEntries() {
 		entries = append(entries, &IATEntryDetail{*v})
 	}
@@ -2434,12 +2434,12 @@ const NACHAFileLineLimit = 10000
 type AchFiles []*ach.File
 
 func MergeFiles(files []*File) ([]*File, error) {
-	var achFiles []*ach.File
+	achFiles := make([]*ach.File, 0, len(files))
 	for _, v := range files {
 		achFiles = append(achFiles, (*ach.File)(&v.File))
 	}
 	res, err := ach.MergeFiles(achFiles)
-	var newFiles []*File
+	newFiles := make([]*File, 0, len(res))
 	for _, v := range res {
 		newFiles = append(newFiles, &File{*v})
 	}
@@ -2479,7 +2479,7 @@ func ReadFile(path string) (*File, error) {
 }
 
 func ReadFiles(paths []string) ([]*File, error) {
-	var files []*File
+	files := make([]*File, 0, len(paths))
 	achFiles, err := ach.ReadFiles(paths)
 	for _, v := range achFiles {
 		files = append(files, &File{*v})
