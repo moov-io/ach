@@ -58,7 +58,10 @@ func BenchmarkMergeFiles(b *testing.B) {
 
 		for b := 0; b < batchesPerFile; b++ {
 			base, _ := rand.Int(rand.Reader, big.NewInt(1e7))
-			traceNumber := int(base.Int64())
+			traceNumber := int(base.Int64() - int64(entriesPerBatch+1))
+			if traceNumber < 0 {
+				traceNumber = 1
+			}
 
 			batch := NewBatchPPD(mockBatchPPDHeader())
 			for e := 0; e < entriesPerBatch; e++ {
