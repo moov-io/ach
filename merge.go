@@ -181,7 +181,7 @@ func MergeDir(dir string, conditions Conditions) ([]*File, error) {
 		g.Go(func() error {
 			defer wg.Done()
 
-			return queueFileForMerging(ctx, discoveredPaths, setup, sorted, mergableFiles)
+			return queueFileForMerging(ctx, discoveredPaths, &setup, sorted, mergableFiles)
 		})
 	}
 	g.Go(func() error {
@@ -208,7 +208,6 @@ func MergeDir(dir string, conditions Conditions) ([]*File, error) {
 				return fmt.Errorf("adding file into merged set failed: %w", err)
 			}
 		}
-		return nil
 	})
 
 	err := g.Wait()
@@ -219,7 +218,7 @@ func MergeDir(dir string, conditions Conditions) ([]*File, error) {
 	return convertToFiles(sorted, conditions)
 }
 
-func queueFileForMerging(ctx context.Context, discoveredPaths chan string, setup sync.Once, sorted *outFile, mergableFiles chan *File) error {
+func queueFileForMerging(ctx context.Context, discoveredPaths chan string, setup *sync.Once, sorted *outFile, mergableFiles chan *File) error {
 	for {
 		select {
 		case path := <-discoveredPaths:
@@ -248,7 +247,6 @@ func queueFileForMerging(ctx context.Context, discoveredPaths chan string, setup
 			return nil
 		}
 	}
-	return nil
 }
 
 // outFile is a partial ACH file with batches and forms a linked list to additional files
