@@ -21,6 +21,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
+	"os"
 	"path/filepath"
 	"strconv"
 	"testing"
@@ -537,6 +538,54 @@ func TestMergeFiles__ValidateOpts(t *testing.T) {
 	require.False(t, opts.SkipAll)
 	require.True(t, opts.CustomReturnCodes)
 	require.True(t, opts.AllowInvalidAmounts)
+}
+
+func TestMergeDir__DefaultFileAcceptor(t *testing.T) {
+	output := DefaultFileAcceptor("")
+	require.Equal(t, AcceptFile, output)
+
+	output = DefaultFileAcceptor("foo.ach")
+	require.Equal(t, AcceptFile, output)
+
+	output = DefaultFileAcceptor("foo.txt")
+	require.Equal(t, AcceptFile, output)
+
+	output = DefaultFileAcceptor("foo.json")
+	require.Equal(t, AcceptAsJSON, output)
+
+	output = DefaultFileAcceptor("foo.mp3")
+	require.Equal(t, SkipFile, output)
+}
+
+func TestMergeDirHelpers(t *testing.T) {
+	dir := os.DirFS(filepath.Join("test", "testdata"))
+
+	t.Run("readFile", func(t *testing.T) {
+		t.Run("ach", func(t *testing.T) {
+			file, err := readFile(dir, "web-debit.ach", AcceptFile, nil)
+			require.NoError(t, err)
+			require.NotNil(t, file)
+		})
+
+		t.Run("json", func(t *testing.T) {
+			file, err := readFile(dir, "ppd-valid.json", AcceptAsJSON, nil)
+			require.NoError(t, err)
+			require.NotNil(t, file)
+		})
+	})
+
+	t.Run("readValidateOptsFromFile", func(t *testing.T) {
+		opts := &MergeDirOptions{
+			FS: dir,
+
+			ValidateOptsExtension: ".json",
+		}
+		output := readValidateOptsFromFile("web-debit.ach", opts)
+		require.NotNil(t, output)
+		require.True(t, output.RequireABAOrigin)
+		require.True(t, output.AllowMissingFileHeader)
+		require.True(t, output.UnequalServiceClassCode)
+	})
 }
 
 func TestMergeFilesHelpers(t *testing.T) {
