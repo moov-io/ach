@@ -107,6 +107,17 @@ func testNumericFieldLong(t testing.TB) {
 // TestNumericFieldLong test ensures right justified and sliced to max length
 func TestNumericFieldLong(t *testing.T) {
 	testNumericFieldLong(t)
+
+	c := converters{}
+
+	result := c.numericField(999991, 5)
+	require.Equal(t, "99991", result)
+
+	result = c.numericField(999981, 5)
+	require.Equal(t, "99981", result)
+
+	result = c.numericField(654321, 5)
+	require.Equal(t, "54321", result)
 }
 
 // BenchmarkNumericFieldLong benchmark ensures right justified and sliced to max length
