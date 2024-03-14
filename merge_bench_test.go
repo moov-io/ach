@@ -18,16 +18,20 @@
 package ach
 
 import (
+	"bytes"
 	"crypto/rand"
+	"fmt"
 	"math/big"
+	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 )
 
 func BenchmarkMergeFiles(b *testing.B) {
 	var (
-		batchesPerFile  = 10
-		entriesPerBatch = 2
+		batchesPerFile  = 3
+		entriesPerBatch = 20
 
 		mergeConditions = Conditions{
 			MaxLines:        10_000,
@@ -54,16 +58,24 @@ func BenchmarkMergeFiles(b *testing.B) {
 
 		for b := 0; b < batchesPerFile; b++ {
 			base, _ := rand.Int(rand.Reader, big.NewInt(1e7))
-			traceNumber := int(base.Int64())
+			traceNumber := int(base.Int64() - int64(entriesPerBatch+1))
+			if traceNumber < 0 {
+				traceNumber = 1
+			}
 
 			batch := NewBatchPPD(mockBatchPPDHeader())
 			for e := 0; e < entriesPerBatch; e++ {
 				entry := mockPPDEntryDetail()
+				entry.Amount = (b + 1) * (e + 1) * 100
 
 				traceNumber += 1
 				entry.SetTraceNumber(batch.GetHeader().ODFIIdentification, traceNumber)
 
 				batch.AddEntry(entry)
+			}
+			err := batch.Create()
+			if err != nil {
+				B.Fatal(err)
 			}
 			file.AddBatch(batch)
 		}
@@ -80,6 +92,28 @@ func BenchmarkMergeFiles(b *testing.B) {
 			out = append(out, randomFile(b, opts))
 		}
 		return
+	}
+
+	writeFiles := func(b *testing.B, dir string, files []*File) []string {
+		b.Helper()
+
+		out := make([]string, len(files))
+		for i := range files {
+			where := filepath.Join(dir, fmt.Sprintf("ACH-%d.txt", i))
+			out[i] = where
+
+			var buf bytes.Buffer
+			err := NewWriter(&buf).Write(files[i])
+			if err != nil {
+				b.Fatal(err)
+			}
+
+			err = os.WriteFile(where, buf.Bytes(), 0600)
+			if err != nil {
+				b.Fatal(err)
+			}
+		}
+		return out
 	}
 
 	makeIndices := func(total, groups int) []int {
@@ -112,35 +146,39 @@ func BenchmarkMergeFiles(b *testing.B) {
 	mergeInGroups := func(b *testing.B, groups int, opts options) []*File {
 		b.Helper()
 
+		// Write files to disk without capturing them in memory
+		dir := b.TempDir()
 		files := randomFiles(b, opts)
-		indices := makeIndices(len(files), groups)
+		paths := writeFiles(b, dir, files)
 
 		b.ReportAllocs()
 		b.ResetTimer()
-		b.StopTimer()
+
+		// We need to read files from disk, which needs to be accounted for in our cpu/memory
+		files, err := ReadFiles(paths)
+		if err != nil {
+			b.Fatal(err)
+		}
+		indices := makeIndices(len(files), groups)
+
+		b.ReportAllocs()
 
 		var out []*File
-		var err error
 		if len(indices) > 1 {
 			var temp []*File
 			for i := 0; i < len(indices)-1; i += 0 {
-				b.StartTimer()
 				fs, err := MergeFilesWith(files[indices[i]:indices[i+1]], mergeConditions)
 				if err != nil {
 					b.Fatal(err)
 				}
-				b.StopTimer()
 
 				i += 1
 				temp = append(temp, fs...)
 			}
-			b.StartTimer()
 			out, err = MergeFilesWith(temp, mergeConditions)
 		} else {
-			b.StartTimer()
 			out, err = MergeFilesWith(files, mergeConditions)
 		}
-		b.StopTimer()
 
 		if err != nil {
 			b.Error(err)
@@ -158,22 +196,56 @@ func BenchmarkMergeFiles(b *testing.B) {
 		mergeInGroups(b, 1, options{})
 	})
 
-	b.Run("MergeFiles_ValidateOpts", func(b *testing.B) {
+	b.Run("MergeFiles ValidateOpts", func(b *testing.B) {
 		mergeInGroups(b, 1, options{
 			withValidateOpts: true,
 		})
 	})
 
-	b.Run("MergeFiles_3Groups", func(b *testing.B) {
+	b.Run("MergeDir", func(b *testing.B) {
+		dir := b.TempDir()
+		var opts options
+		incoming := randomFiles(b, opts)
+		writeFiles(b, dir, incoming)
+
+		b.ReportAllocs()
+		b.ResetTimer()
+
+		merged, err := MergeDir(dir, mergeConditions)
+		if err != nil {
+			b.Fatal(err)
+		}
+		b.Logf("merged %d files into %d files", len(incoming), len(merged))
+	})
+
+	b.Run("MergeDir ValidateOpts", func(b *testing.B) {
+		dir := b.TempDir()
+		opts := options{
+			withValidateOpts: true,
+		}
+		incoming := randomFiles(b, opts)
+		writeFiles(b, dir, incoming)
+
+		b.ReportAllocs()
+		b.ResetTimer()
+
+		merged, err := MergeDir(dir, mergeConditions)
+		if err != nil {
+			b.Fatal(err)
+		}
+		b.Logf("merged %d files into %d files", len(incoming), len(merged))
+	})
+
+	b.Run("MergeFiles 3Groups", func(b *testing.B) {
 		mergeInGroups(b, 3, options{})
 	})
-	b.Run("MergeFiles_5Groups", func(b *testing.B) {
+	b.Run("MergeFiles 5Groups", func(b *testing.B) {
 		mergeInGroups(b, 5, options{})
 	})
-	b.Run("MergeFiles_10Groups", func(b *testing.B) {
+	b.Run("MergeFiles 10Groups", func(b *testing.B) {
 		mergeInGroups(b, 10, options{})
 	})
-	b.Run("MergeFiles_100Groups", func(b *testing.B) {
+	b.Run("MergeFiles 100Groups", func(b *testing.B) {
 		mergeInGroups(b, 100, options{})
 	})
 }
