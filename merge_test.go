@@ -481,6 +481,33 @@ func TestMergeFiles__invalid(t *testing.T) {
 	}
 }
 
+func TestMerge_SameBatchAndTrace(t *testing.T) {
+	f1, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+
+	f2, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+	f2.Batches[0].GetEntries()[0].IndividualName = "Other Guy"
+
+	merged, err := MergeFiles([]*File{f1, f2})
+	require.NoError(t, err)
+	require.Len(t, merged, 1)
+	require.Len(t, merged[0].Batches, 2)
+
+	found := make(map[string]int)
+	for i := range merged[0].Batches {
+		b := merged[0].Batches[i]
+
+		entries := b.GetEntries()
+		for m := range entries {
+			found[entries[m].IndividualName] += 1
+		}
+	}
+	require.Len(t, found, 2)
+	require.Equal(t, 1, found["Receiver Account Name "])
+	require.Equal(t, 1, found["Other Guy"])
+}
+
 func populateFileWithMockBatches(t testing.TB, numBatches int, file *File) {
 	lastBatchIdx := len(file.Batches) - 1
 	var startSeq = file.Batches[lastBatchIdx].GetHeader().BatchNumber + 1
