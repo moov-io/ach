@@ -1984,7 +1984,8 @@ func (f *File) Create() error {
 }
 
 func (f *File) AddBatch(batch Batcher) []Batcher {
-	var batchers []Batcher
+	batchers := make([]Batcher, 0, len(f.File.AddBatch(batch.Batcher)))
+
 	for _, b := range f.File.AddBatch(batch.Batcher) {
 		batchers = append(batchers, Batcher{b})
 	}
@@ -2455,12 +2456,13 @@ func NewMerger(opts *ValidateOpts) Merger {
 type Conditions struct{ ach.Conditions }
 
 func MergeFilesWith(files []*File, conditions Conditions) ([]*File, error) {
-	var achFiles []*ach.File
+	achFiles := make([]*ach.File, 0, len(files))
 	for _, v := range files {
 		achFiles = append(achFiles, (*ach.File)(&v.File))
 	}
 	res, err := ach.MergeFilesWith(achFiles, conditions.Conditions)
-	var newFiles []*File
+
+	newFiles := make([]*File, 0, len(files))
 	for _, v := range res {
 		newFiles = append(newFiles, &File{*v})
 	}
