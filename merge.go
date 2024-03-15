@@ -134,6 +134,8 @@ type MergeDirOptions struct {
 
 	// FS is the fs.FS (filesystem) to read and scan files from.
 	// If nil the system's filesystem will be used.
+	//
+	// This fs.FS should be at a higher directory level than the dir passed into MergeDir.
 	FS fs.FS
 
 	// ValidateOptsExtension is a setting to check the filesystem for files containing
@@ -237,21 +239,7 @@ func MergeDir(dir string, conditions Conditions, opts *MergeDirOptions) ([]*File
 			close(discoveredPaths)
 		}()
 
-		return fs.WalkDir(opts.FS, ".", func(path string, info fs.DirEntry, err error) error {
-			// For now don't delve into subdirs and bubble up errors
-			if err != nil {
-				return err
-			}
-			if info.IsDir() {
-				return nil
-			}
-
-			if path != "" {
-				discoveredPaths <- path
-			}
-
-			return nil
-		})
+		return walkDir(opts.FS, dir, discoveredPaths)
 	})
 
 	// Setup concurrent ACH file parsers which is typically the longest part of merging.
@@ -298,6 +286,31 @@ func MergeDir(dir string, conditions Conditions, opts *MergeDirOptions) ([]*File
 	return convertToFiles(sorted, conditions)
 }
 
+func walkDir(fsys fs.FS, dir string, discoveredPaths chan string) error {
+	reader, ok := fsys.(fs.ReadDirFS)
+	if !ok {
+		return fmt.Errorf("unexpected %T wanted fs.ReadDirFS", fsys)
+	}
+
+	items, err := reader.ReadDir(dir)
+	if err != nil {
+		return fmt.Errorf("listing %s failed: %w", dir, err)
+	}
+
+	for i := range items {
+		if items[i].IsDir() {
+			return walkDir(fsys, filepath.Join(dir, items[i].Name()), discoveredPaths)
+		}
+
+		fullPath := filepath.Join(dir, items[i].Name())
+		if fullPath != "" {
+			discoveredPaths <- fullPath
+		}
+	}
+
+	return nil
+}
+
 func queueFileForMerging(ctx context.Context, discoveredPaths chan string, setup *sync.Once, sorted *outFile, mergableFiles chan *File, opts *MergeDirOptions) error {
 	for {
 		select {
@@ -309,9 +322,6 @@ func queueFileForMerging(ctx context.Context, discoveredPaths chan string, setup
 			var file *File
 			var err error
 
-			// Load any ValidateOpts that exist
-			validateOpts := readValidateOptsFromFile(path, opts)
-
 			// Without an accept function assume the file is Nacha formatted
 			var as FileAcceptance
 			if opts.AcceptFile != nil {
@@ -319,6 +329,13 @@ func queueFileForMerging(ctx context.Context, discoveredPaths chan string, setup
 			} else {
 				as = AcceptFile
 			}
+
+			if as == SkipFile {
+				continue
+			}
+
+			// Load any ValidateOpts that exist
+			validateOpts := readValidateOptsFromFile(path, opts)
 
 			// Read the file
 			file, err = readFile(opts.FS, path, as, validateOpts)

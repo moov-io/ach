@@ -20,6 +20,7 @@ package ach
 import (
 	"crypto/rand"
 	"fmt"
+	"io"
 	"math/big"
 	"os"
 	"path/filepath"
@@ -555,6 +556,30 @@ func TestMergeDir__DefaultFileAcceptor(t *testing.T) {
 
 	output = DefaultFileAcceptor("foo.mp3")
 	require.Equal(t, SkipFile, output)
+}
+
+func TestMergeDir_SubFS(t *testing.T) {
+	dir := t.TempDir()
+	sub := filepath.Join("a", "b", "c")
+	require.NoError(t, os.MkdirAll(filepath.Join(dir, sub), 0777))
+
+	src, err := os.Open(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+	t.Cleanup(func() { src.Close() })
+
+	dst, err := os.Create(filepath.Join(dir, sub, "input.ach"))
+	require.NoError(t, err)
+
+	_, err = io.Copy(dst, src)
+	require.NoError(t, err)
+	require.NoError(t, dst.Close())
+
+	var conditions Conditions
+	merged, err := MergeDir(sub, conditions, &MergeDirOptions{
+		FS: os.DirFS(dir),
+	})
+	require.NoError(t, err)
+	require.Len(t, merged, 1)
 }
 
 func TestMergeDirHelpers(t *testing.T) {
