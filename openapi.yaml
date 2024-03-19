@@ -936,6 +936,7 @@ components:
             Validate the Receiving DFI Identification in each Entry Detail Record is hashed to provide a check against inadvertent alteration of data contents due to hardware failure or program error.
             In this context the Entry Hash is the sum of the corresponding fields in the Entry Detail Records on the file.
           type: integer
+          format: int64
           example: 0
         totalDebit:
           description: Contains accumulated Entry debit totals within the batch.
@@ -2039,9 +2040,13 @@ components:
         addenda16:
           $ref: '#/components/schemas/Addenda16'
         addenda17:
-          $ref: '#/components/schemas/Addenda17'
+          type: array
+          items:
+            $ref: '#/components/schemas/Addenda17'
         addenda18:
-          $ref: '#/components/schemas/Addenda18'
+          type: array
+          items:
+            $ref: '#/components/schemas/Addenda18'
         addenda98:
           $ref: '#/components/schemas/Addenda98'
         addenda99:
@@ -2180,6 +2185,7 @@ components:
             Validate the Receiving DFI Identification in each Entry Detail Record is hashed to provide a check against inadvertent alteration of data contents due to hardware failure or program error.
             In this context the Entry Hash is the sum of the corresponding fields in the Entry Detail Records on the file.
           type: integer
+          format: int64
           example: 0
         totalDebit:
           description: Contains accumulated Entry debit totals within the batch.
@@ -2236,6 +2242,7 @@ components:
         entryHash:
           description: Calculated in the same manner as the batch total but includes total from entire file
           type: integer
+          format: int64
           example: 0
         totalDebit:
           description: Accumulated Batch debit totals within the file.
