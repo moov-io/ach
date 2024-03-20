@@ -9,9 +9,10 @@ import (
 )
 
 func TestFuzzCrashers(t *testing.T) {
-	t.Run("json", func(t *testing.T) {
+	t.Run("read json", func(t *testing.T) {
 		input := []string{
 			`{"BAtChes":[{"entrYDetAils":[null]}]}`,
+			`{"BAtChes":[{"entrYDetAils":[{"AddendA05":[null]}]}]}`,
 		}
 		for i := range input {
 			require.NotPanics(t, func() {

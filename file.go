@@ -268,7 +268,9 @@ func setEntryRecordType(e *EntryDetail) {
 		e.Addenda02.TypeCode = "02"
 	}
 	for _, a := range e.Addenda05 {
-		a.TypeCode = "05"
+		if a != nil {
+			a.TypeCode = "05"
+		}
 	}
 	if e.Addenda98 != nil {
 		e.Addenda98.TypeCode = "98"
@@ -323,10 +325,14 @@ func setIATEntryRecordType(e *IATEntryDetail) {
 		e.Addenda16.TypeCode = "16"
 	}
 	for _, a := range e.Addenda17 {
-		a.TypeCode = "17"
+		if a != nil {
+			a.TypeCode = "17"
+		}
 	}
 	for _, a := range e.Addenda18 {
-		a.TypeCode = "18"
+		if a != nil {
+			a.TypeCode = "18"
+		}
 	}
 	if e.Addenda98 != nil {
 		e.Addenda98.TypeCode = "98"
