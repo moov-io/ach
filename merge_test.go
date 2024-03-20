@@ -585,7 +585,27 @@ func TestMergeDir__DefaultFileAcceptor(t *testing.T) {
 	require.Equal(t, SkipFile, output)
 }
 
-func TestMergeDir_SubFS(t *testing.T) {
+func TestMergeDir(t *testing.T) {
+	dir := t.TempDir()
+
+	src, err := os.Open(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+	t.Cleanup(func() { src.Close() })
+
+	dst, err := os.Create(filepath.Join(dir, "input.ach"))
+	require.NoError(t, err)
+
+	_, err = io.Copy(dst, src)
+	require.NoError(t, err)
+	require.NoError(t, dst.Close())
+
+	var conditions Conditions
+	merged, err := MergeDir(dir, conditions, nil)
+	require.NoError(t, err)
+	require.Len(t, merged, 1)
+}
+
+func TestMergeDir_WithFS(t *testing.T) {
 	dir := t.TempDir()
 	sub := filepath.Join("a", "b", "c")
 	require.NoError(t, os.MkdirAll(filepath.Join(dir, sub), 0777))
@@ -602,8 +622,17 @@ func TestMergeDir_SubFS(t *testing.T) {
 	require.NoError(t, dst.Close())
 
 	var conditions Conditions
+
+	// partial dir + sub
 	merged, err := MergeDir(sub, conditions, &MergeDirOptions{
 		FS: os.DirFS(dir),
+	})
+	require.NoError(t, err)
+	require.Len(t, merged, 1)
+
+	// full dir
+	merged, err = MergeDir(".", conditions, &MergeDirOptions{
+		FS: os.DirFS(filepath.Join(dir, sub)),
 	})
 	require.NoError(t, err)
 	require.Len(t, merged, 1)

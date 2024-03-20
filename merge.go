@@ -25,6 +25,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 
@@ -187,8 +188,18 @@ func MergeDir(dir string, conditions Conditions, opts *MergeDirOptions) ([]*File
 	if opts.AcceptFile == nil {
 		opts.AcceptFile = DefaultFileAcceptor
 	}
-	if opts.FS == nil {
-		opts.FS = os.DirFS(dir)
+	if opts.FS != nil {
+		// Go running on windows does not support os.DirFS properly
+		// See: https://github.com/golang/go/issues/44279
+		subdir := filepath.Clean(dir)
+		if runtime.GOOS == "windows" {
+			subdir = filepath.ToSlash(subdir)
+		}
+		fsys, err := fs.Sub(opts.FS, subdir)
+		if err != nil {
+			return nil, fmt.Errorf("fs.Sub of %v and %s failed: %w", opts.FS, dir, err)
+		}
+		opts.FS = fsys
 		dir = "."
 	}
 
@@ -279,14 +290,23 @@ func MergeDir(dir string, conditions Conditions, opts *MergeDirOptions) ([]*File
 }
 
 func walkDir(fsys fs.FS, dir string, discoveredPaths chan string) error {
-	reader, ok := fsys.(fs.ReadDirFS)
-	if !ok {
-		return fmt.Errorf("unexpected %T wanted fs.ReadDirFS", fsys)
-	}
+	var items []fs.DirEntry
+	var err error
 
-	items, err := reader.ReadDir(dir)
+	if fsys != nil {
+		// Defer to the provided fs.FS when we can
+		if rr, ok := fsys.(fs.ReadDirFS); ok {
+			items, err = rr.ReadDir(dir)
+		}
+	}
 	if err != nil {
-		return fmt.Errorf("listing %s failed: %w", dir, err)
+		return fmt.Errorf("fs.readdir %s failed: %w", dir, err)
+	}
+	if len(items) == 0 {
+		items, err = os.ReadDir(dir)
+	}
+	if err != nil {
+		return fmt.Errorf("os.readdir %s failed: %w", dir, err)
 	}
 
 	for i := range items {
@@ -356,7 +376,14 @@ func readValidateOptsFromFile(path string, opts *MergeDirOptions) *ValidateOpts 
 	if opts.ValidateOptsExtension != "" {
 		where := strings.TrimSuffix(path, filepath.Ext(path)) + opts.ValidateOptsExtension
 
-		fd, err := opts.FS.Open(where)
+		var fd fs.File
+		var err error
+
+		if opts.FS != nil {
+			fd, err = opts.FS.Open(where)
+		} else {
+			fd, err = os.Open(where)
+		}
 		if err != nil {
 			return nil
 		}
@@ -369,12 +396,18 @@ func readValidateOptsFromFile(path string, opts *MergeDirOptions) *ValidateOpts 
 	return nil
 }
 
-func readFile(fs fs.FS, path string, as FileAcceptance, validateOpts *ValidateOpts) (*File, error) {
+func readFile(fsys fs.FS, path string, as FileAcceptance, validateOpts *ValidateOpts) (*File, error) {
 	if as == SkipFile {
 		return nil, nil
 	}
 
-	fd, err := fs.Open(path)
+	var fd fs.File
+	var err error
+	if fsys != nil {
+		fd, err = fsys.Open(path)
+	} else {
+		fd, err = os.Open(path)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("opening %s failed: %w", path, err)
 	}
