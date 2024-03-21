@@ -19,9 +19,14 @@ package ach
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"io/fs"
+	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"sync"
 
 	"github.com/igrmk/treemap/v2"
@@ -116,6 +121,54 @@ func MergeFilesWith(incoming []*File, conditions Conditions) ([]*File, error) {
 	return convertToFiles(sorted, conditions)
 }
 
+type FileAcceptance string
+
+const (
+	AcceptFile   FileAcceptance = "accept"
+	AcceptAsJSON FileAcceptance = "json"
+	SkipFile     FileAcceptance = "skip"
+)
+
+type MergeDirOptions struct {
+	// AcceptFile is a function which determines what to do with the file.
+	AcceptFile func(path string) FileAcceptance
+
+	// FS is the fs.FS (filesystem) to read and scan files from.
+	// If nil the system's filesystem will be used.
+	//
+	// This fs.FS should be at a higher directory level than the dir passed into MergeDir.
+	FS fs.FS
+
+	// ValidateOptsExtension is a setting to check the filesystem for files containing
+	// JSON representations of ValidateOpts for each ACH file encountered.
+	// The value should be the file extension for ValidateOpts files.
+	ValidateOptsExtension string
+
+	// ParseWorkers is the concurrent number of ACH file reader/parser goroutines
+	// Default: 10
+	ParseWorkers int
+
+	// SubDirectories is a setting to traverse sub directories for mergable ACH files.
+	SubDirectories bool
+}
+
+// DefaultFileAcceptor is the default logic for which file extensions to merge and how to read them.
+//
+//	Nacha Format: "" (blank), .ach, and .txt
+//	 JSON Format: ".json"
+//
+// Files with extensions that do not match are skipped.
+func DefaultFileAcceptor(path string) FileAcceptance {
+	_, filename := filepath.Split(path)
+	switch strings.ToLower(filepath.Ext(filename)) {
+	case "", ".ach", ".txt":
+		return AcceptFile
+	case ".json":
+		return AcceptAsJSON
+	}
+	return SkipFile
+}
+
 // MergeDir will consolidate a directory of ACH files into as few files as possible.
 // This is useful for optimizing cost and network utilization.
 //
@@ -131,7 +184,28 @@ func MergeFilesWith(incoming []*File, conditions Conditions) ([]*File, error) {
 // This has a more stable cpu and memory usage trend over reading all files into memory and then calling MergeFiles.
 //
 // File Batches can only be merged if they are unique and routed to and from the same ABA routing numbers.
-func MergeDir(dir string, conditions Conditions) ([]*File, error) {
+func MergeDir(dir string, conditions Conditions, opts *MergeDirOptions) ([]*File, error) {
+	if opts == nil {
+		opts = &MergeDirOptions{}
+	}
+	if opts.AcceptFile == nil {
+		opts.AcceptFile = DefaultFileAcceptor
+	}
+	if opts.FS != nil {
+		// Go running on windows does not support os.DirFS properly
+		// See: https://github.com/golang/go/issues/44279
+		subdir := filepath.Clean(dir)
+		if runtime.GOOS == "windows" {
+			subdir = filepath.ToSlash(subdir)
+		}
+		fsys, err := fs.Sub(opts.FS, subdir)
+		if err != nil {
+			return nil, fmt.Errorf("fs.Sub of %v and %s failed: %w", opts.FS, dir, err)
+		}
+		opts.FS = fsys
+		dir = "."
+	}
+
 	sorted := &outFile{}
 	var setup sync.Once
 
@@ -144,68 +218,68 @@ func MergeDir(dir string, conditions Conditions) ([]*File, error) {
 	//    queueFileForMerging  20-250ms
 	//    sorted.add             1-25ms
 	var g errgroup.Group
-	parseWorkers := 50 // active ACH Reader's
-	discoveredPaths := make(chan string, parseWorkers*2)
-	mergableFiles := make(chan *File, parseWorkers*2)
 
-	ctx, cancelFunc := context.WithCancel(context.Background())
+	parseWorkers := 50 // active ACH Reader's
+	if opts.ParseWorkers > 0 {
+		parseWorkers = opts.ParseWorkers
+	}
+
+	discoveredPaths := make(chan string)
+	mergableFiles := make(chan *File)
 
 	// We are going to scan the directory for files to parse and merge.
+	pathsCtx, pathsCancelFunc := context.WithCancel(context.Background())
+
+	var pathsGroup sync.WaitGroup
+	pathsGroup.Add(1)
 	g.Go(func() error {
 		defer func() {
-			// After we're done reading paths close the channel
-			cancelFunc()
-			close(discoveredPaths)
+			pathsGroup.Done()
 		}()
-		return filepath.Walk(dir, func(path string, info fs.FileInfo, err error) error {
-			// For now don't delve into subdirs and bubble up errors
-			if err != nil {
-				return err
-			}
-			if info.IsDir() {
-				return nil
-			}
 
-			if path != "" {
-				discoveredPaths <- path
-			}
-
-			return nil
-		})
+		return walkDir(opts.FS, dir, opts, discoveredPaths)
+	})
+	g.Go(func() error {
+		pathsGroup.Wait()
+		pathsCancelFunc()
+		return nil
 	})
 
 	// Setup concurrent ACH file parsers which is typically the longest part of merging.
-	var wg sync.WaitGroup
-	wg.Add(parseWorkers)
+	parsingCtx, parsingCancelFunc := context.WithCancel(context.Background())
+
+	var parsingGroup sync.WaitGroup
+	parsingGroup.Add(parseWorkers)
 	for i := 0; i < parseWorkers; i++ {
 		g.Go(func() error {
-			defer wg.Done()
+			defer parsingGroup.Done()
 
-			return queueFileForMerging(ctx, discoveredPaths, &setup, sorted, mergableFiles)
+			return queueFileForMerging(pathsCtx, discoveredPaths, &setup, sorted, mergableFiles, opts)
 		})
 	}
 	g.Go(func() error {
-		wg.Wait()
-
-		// Sending a nil file is the signal to stop merging
-		mergableFiles <- nil
-		close(mergableFiles)
-
+		parsingGroup.Wait()
+		parsingCancelFunc()
 		return nil
 	})
 
 	// Merge ACH files into the final output
 	g.Go(func() error {
 		for {
-			file := <-mergableFiles
-			if file == nil {
-				return nil
-			}
+			select {
+			case file := <-mergableFiles:
+				if file == nil {
+					continue
+				}
 
-			// accumulate the file into our merged set
-			err := sorted.add(file)
-			if err != nil {
-				return fmt.Errorf("adding file into merged set failed: %w", err)
+				// accumulate the file into our merged set
+				err := sorted.add(file)
+				if err != nil {
+					return fmt.Errorf("adding file into merged set failed: %w", err)
+				}
+
+			case <-parsingCtx.Done():
+				return nil
 			}
 		}
 	})
@@ -218,16 +292,72 @@ func MergeDir(dir string, conditions Conditions) ([]*File, error) {
 	return convertToFiles(sorted, conditions)
 }
 
-func queueFileForMerging(ctx context.Context, discoveredPaths chan string, setup *sync.Once, sorted *outFile, mergableFiles chan *File) error {
+func walkDir(fsys fs.FS, dir string, opts *MergeDirOptions, discoveredPaths chan string) error {
+	var items []fs.DirEntry
+	var err error
+
+	if fsys != nil {
+		// Defer to the provided fs.FS when we can
+		if rr, ok := fsys.(fs.ReadDirFS); ok {
+			items, err = rr.ReadDir(dir)
+		}
+	}
+	if err != nil {
+		return fmt.Errorf("fs.readdir %s failed: %w", dir, err)
+	}
+	if len(items) == 0 {
+		items, err = os.ReadDir(dir)
+	}
+	if err != nil {
+		return fmt.Errorf("os.readdir %s failed: %w", dir, err)
+	}
+
+	for i := range items {
+		if items[i].IsDir() {
+			if opts.SubDirectories {
+				return walkDir(fsys, filepath.Join(dir, items[i].Name()), opts, discoveredPaths)
+			} else {
+				continue
+			}
+		}
+
+		fullPath := filepath.Join(dir, items[i].Name())
+		if fullPath != "" {
+			discoveredPaths <- fullPath
+		}
+	}
+
+	return nil
+}
+
+func queueFileForMerging(ctx context.Context, discoveredPaths chan string, setup *sync.Once, sorted *outFile, mergableFiles chan *File, opts *MergeDirOptions) error {
 	for {
 		select {
 		case path := <-discoveredPaths:
 			if path == "" {
-				return nil
+				continue
 			}
 
+			var file *File
+			var err error
+
+			// Without an accept function assume the file is Nacha formatted
+			var as FileAcceptance
+			if opts.AcceptFile != nil {
+				as = opts.AcceptFile(path)
+			} else {
+				as = AcceptFile
+			}
+
+			if as == SkipFile {
+				continue
+			}
+
+			// Load any ValidateOpts that exist
+			validateOpts := readValidateOptsFromFile(path, opts)
+
 			// Read the file
-			file, err := ReadFile(path)
+			file, err = readFile(opts.FS, path, as, validateOpts)
 			if file == nil || err != nil {
 				return fmt.Errorf("reading %s failed: %w", path, err)
 			}
@@ -247,6 +377,66 @@ func queueFileForMerging(ctx context.Context, discoveredPaths chan string, setup
 			return nil
 		}
 	}
+}
+
+func readValidateOptsFromFile(path string, opts *MergeDirOptions) *ValidateOpts {
+	if opts.ValidateOptsExtension != "" {
+		where := strings.TrimSuffix(path, filepath.Ext(path)) + opts.ValidateOptsExtension
+
+		var fd fs.File
+		var err error
+
+		if opts.FS != nil {
+			fd, err = opts.FS.Open(where)
+		} else {
+			fd, err = os.Open(where)
+		}
+		if err != nil {
+			return nil
+		}
+		defer fd.Close()
+
+		var v ValidateOpts
+		json.NewDecoder(fd).Decode(&v)
+		return &v
+	}
+	return nil
+}
+
+func readFile(fsys fs.FS, path string, as FileAcceptance, validateOpts *ValidateOpts) (*File, error) {
+	if as == SkipFile {
+		return nil, nil
+	}
+
+	var fd fs.File
+	var err error
+	if fsys != nil {
+		fd, err = fsys.Open(path)
+	} else {
+		fd, err = os.Open(path)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("opening %s failed: %w", path, err)
+	}
+	defer fd.Close()
+
+	if as == AcceptFile {
+		r := NewReader(fd)
+		r.SetValidation(validateOpts)
+		file, err := r.Read()
+		if err != nil {
+			return nil, fmt.Errorf("reading %s as nacha failed: %w", path, err)
+		}
+		return &file, nil
+	}
+	if as == AcceptAsJSON {
+		bs, err := io.ReadAll(fd)
+		if err != nil {
+			return nil, fmt.Errorf("reading %s as bytes failed: %w", path, err)
+		}
+		return FileFromJSONWith(bs, validateOpts)
+	}
+	return nil, fmt.Errorf("unknown %v for %s", as, path)
 }
 
 // outFile is a partial ACH file with batches and forms a linked list to additional files

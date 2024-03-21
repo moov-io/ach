@@ -20,7 +20,9 @@ package ach
 import (
 	"crypto/rand"
 	"fmt"
+	"io"
 	"math/big"
+	"os"
 	"path/filepath"
 	"strconv"
 	"testing"
@@ -479,6 +481,33 @@ func TestMergeFiles__invalid(t *testing.T) {
 	}
 }
 
+func TestMerge_SameBatchAndTrace(t *testing.T) {
+	f1, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+
+	f2, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+	f2.Batches[0].GetEntries()[0].IndividualName = "Other Guy"
+
+	merged, err := MergeFiles([]*File{f1, f2})
+	require.NoError(t, err)
+	require.Len(t, merged, 1)
+	require.Len(t, merged[0].Batches, 2)
+
+	found := make(map[string]int)
+	for i := range merged[0].Batches {
+		b := merged[0].Batches[i]
+
+		entries := b.GetEntries()
+		for m := range entries {
+			found[entries[m].IndividualName] += 1
+		}
+	}
+	require.Len(t, found, 2)
+	require.Equal(t, 1, found["Receiver Account Name "])
+	require.Equal(t, 1, found["Other Guy"])
+}
+
 func populateFileWithMockBatches(t testing.TB, numBatches int, file *File) {
 	lastBatchIdx := len(file.Batches) - 1
 	var startSeq = file.Batches[lastBatchIdx].GetHeader().BatchNumber + 1
@@ -537,6 +566,138 @@ func TestMergeFiles__ValidateOpts(t *testing.T) {
 	require.False(t, opts.SkipAll)
 	require.True(t, opts.CustomReturnCodes)
 	require.True(t, opts.AllowInvalidAmounts)
+}
+
+func TestMergeDir__DefaultFileAcceptor(t *testing.T) {
+	output := DefaultFileAcceptor("")
+	require.Equal(t, AcceptFile, output)
+
+	output = DefaultFileAcceptor("foo.ach")
+	require.Equal(t, AcceptFile, output)
+
+	output = DefaultFileAcceptor("foo.txt")
+	require.Equal(t, AcceptFile, output)
+
+	output = DefaultFileAcceptor("foo.json")
+	require.Equal(t, AcceptAsJSON, output)
+
+	output = DefaultFileAcceptor("foo.mp3")
+	require.Equal(t, SkipFile, output)
+}
+
+func TestMergeDir(t *testing.T) {
+	dir := t.TempDir()
+
+	src, err := os.Open(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+	t.Cleanup(func() { src.Close() })
+
+	dst, err := os.Create(filepath.Join(dir, "input.ach"))
+	require.NoError(t, err)
+
+	_, err = io.Copy(dst, src)
+	require.NoError(t, err)
+	require.NoError(t, dst.Close())
+
+	var conditions Conditions
+	merged, err := MergeDir(dir, conditions, nil)
+	require.NoError(t, err)
+	require.Len(t, merged, 1)
+}
+
+func TestMergeDir_WithFS(t *testing.T) {
+	dir := t.TempDir()
+	sub := filepath.Join("a", "b", "c")
+	require.NoError(t, os.MkdirAll(filepath.Join(dir, sub), 0777))
+
+	src, err := os.Open(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+	t.Cleanup(func() { src.Close() })
+
+	dst, err := os.Create(filepath.Join(dir, sub, "input.ach"))
+	require.NoError(t, err)
+
+	_, err = io.Copy(dst, src)
+	require.NoError(t, err)
+	require.NoError(t, dst.Close())
+
+	var conditions Conditions
+
+	// partial dir + sub
+	merged, err := MergeDir(sub, conditions, &MergeDirOptions{
+		FS: os.DirFS(dir),
+	})
+	require.NoError(t, err)
+	require.Len(t, merged, 1)
+
+	// full dir
+	merged, err = MergeDir(".", conditions, &MergeDirOptions{
+		FS: os.DirFS(filepath.Join(dir, sub)),
+	})
+	require.NoError(t, err)
+	require.Len(t, merged, 1)
+}
+
+func TestMergeDir_Nested(t *testing.T) {
+	dir := t.TempDir()
+	sub := filepath.Join("inner")
+	require.NoError(t, os.MkdirAll(filepath.Join(dir, sub), 0777))
+
+	src, err := os.Open(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+	t.Cleanup(func() { src.Close() })
+
+	dst, err := os.Create(filepath.Join(dir, sub, "input.ach"))
+	require.NoError(t, err)
+
+	_, err = io.Copy(dst, src)
+	require.NoError(t, err)
+	require.NoError(t, dst.Close())
+
+	var conditions Conditions
+
+	// nothing in the top level
+	merged, err := MergeDir(dir, conditions, nil)
+	require.NoError(t, err)
+	require.Len(t, merged, 0)
+
+	// found files in sub directories
+	merged, err = MergeDir(dir, conditions, &MergeDirOptions{
+		SubDirectories: true,
+	})
+	require.NoError(t, err)
+	require.Len(t, merged, 1)
+}
+
+func TestMergeDirHelpers(t *testing.T) {
+	dir := os.DirFS(filepath.Join("test", "testdata"))
+
+	t.Run("readFile", func(t *testing.T) {
+		t.Run("ach", func(t *testing.T) {
+			file, err := readFile(dir, "web-debit.ach", AcceptFile, nil)
+			require.NoError(t, err)
+			require.NotNil(t, file)
+		})
+
+		t.Run("json", func(t *testing.T) {
+			file, err := readFile(dir, "ppd-valid.json", AcceptAsJSON, nil)
+			require.NoError(t, err)
+			require.NotNil(t, file)
+		})
+	})
+
+	t.Run("readValidateOptsFromFile", func(t *testing.T) {
+		opts := &MergeDirOptions{
+			FS: dir,
+
+			ValidateOptsExtension: ".json",
+		}
+		output := readValidateOptsFromFile("web-debit.ach", opts)
+		require.NotNil(t, output)
+		require.True(t, output.RequireABAOrigin)
+		require.True(t, output.AllowMissingFileHeader)
+		require.True(t, output.UnequalServiceClassCode)
+	})
 }
 
 func TestMergeFilesHelpers(t *testing.T) {

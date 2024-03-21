@@ -211,7 +211,7 @@ func BenchmarkMergeFiles(b *testing.B) {
 		b.ReportAllocs()
 		b.ResetTimer()
 
-		merged, err := MergeDir(dir, mergeConditions)
+		merged, err := MergeDir(dir, mergeConditions, nil)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -229,7 +229,7 @@ func BenchmarkMergeFiles(b *testing.B) {
 		b.ReportAllocs()
 		b.ResetTimer()
 
-		merged, err := MergeDir(dir, mergeConditions)
+		merged, err := MergeDir(dir, mergeConditions, nil)
 		if err != nil {
 			b.Fatal(err)
 		}
