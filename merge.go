@@ -147,6 +147,9 @@ type MergeDirOptions struct {
 	// ParseWorkers is the concurrent number of ACH file reader/parser goroutines
 	// Default: 10
 	ParseWorkers int
+
+	// SubDirectories is a setting to traverse sub directories for mergable ACH files.
+	SubDirectories bool
 }
 
 // DefaultFileAcceptor is the default logic for which file extensions to merge and how to read them.
@@ -234,7 +237,7 @@ func MergeDir(dir string, conditions Conditions, opts *MergeDirOptions) ([]*File
 			pathsGroup.Done()
 		}()
 
-		return walkDir(opts.FS, dir, discoveredPaths)
+		return walkDir(opts.FS, dir, opts, discoveredPaths)
 	})
 	g.Go(func() error {
 		pathsGroup.Wait()
@@ -289,7 +292,7 @@ func MergeDir(dir string, conditions Conditions, opts *MergeDirOptions) ([]*File
 	return convertToFiles(sorted, conditions)
 }
 
-func walkDir(fsys fs.FS, dir string, discoveredPaths chan string) error {
+func walkDir(fsys fs.FS, dir string, opts *MergeDirOptions, discoveredPaths chan string) error {
 	var items []fs.DirEntry
 	var err error
 
@@ -311,7 +314,11 @@ func walkDir(fsys fs.FS, dir string, discoveredPaths chan string) error {
 
 	for i := range items {
 		if items[i].IsDir() {
-			return walkDir(fsys, filepath.Join(dir, items[i].Name()), discoveredPaths)
+			if opts.SubDirectories {
+				return walkDir(fsys, filepath.Join(dir, items[i].Name()), opts, discoveredPaths)
+			} else {
+				continue
+			}
 		}
 
 		fullPath := filepath.Join(dir, items[i].Name())

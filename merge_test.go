@@ -638,6 +638,37 @@ func TestMergeDir_WithFS(t *testing.T) {
 	require.Len(t, merged, 1)
 }
 
+func TestMergeDir_Nested(t *testing.T) {
+	dir := t.TempDir()
+	sub := filepath.Join("inner")
+	require.NoError(t, os.MkdirAll(filepath.Join(dir, sub), 0777))
+
+	src, err := os.Open(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+	t.Cleanup(func() { src.Close() })
+
+	dst, err := os.Create(filepath.Join(dir, sub, "input.ach"))
+	require.NoError(t, err)
+
+	_, err = io.Copy(dst, src)
+	require.NoError(t, err)
+	require.NoError(t, dst.Close())
+
+	var conditions Conditions
+
+	// nothing in the top level
+	merged, err := MergeDir(dir, conditions, nil)
+	require.NoError(t, err)
+	require.Len(t, merged, 0)
+
+	// found files in sub directories
+	merged, err = MergeDir(dir, conditions, &MergeDirOptions{
+		SubDirectories: true,
+	})
+	require.NoError(t, err)
+	require.Len(t, merged, 1)
+}
+
 func TestMergeDirHelpers(t *testing.T) {
 	dir := os.DirFS(filepath.Join("test", "testdata"))
 
