@@ -47,11 +47,11 @@ func diffFiles(paths []string, validateOpts *ach.ValidateOpts) error {
 }
 
 func readTwoFiles(paths []string, validateOpts *ach.ValidateOpts) (*ach.File, *ach.File, error) {
-	f1, err := readACHFile(paths[0], validateOpts)
+	f1, err := readIncomingFile(paths[0], validateOpts)
 	if err != nil {
 		return nil, nil, fmt.Errorf("problem reading %s: %v", paths[0], err)
 	}
-	f2, err := readACHFile(paths[1], validateOpts)
+	f2, err := readIncomingFile(paths[1], validateOpts)
 	if err != nil {
 		return nil, nil, fmt.Errorf("problem reading %s: %v", paths[1], err)
 	}

@@ -7,7 +7,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"os"
 
 	"github.com/moov-io/ach"
@@ -42,28 +41,14 @@ func reformat(as string, filepath string, validateOpts *ach.ValidateOpts) error 
 }
 
 func readIncomingFile(path string, validateOpts *ach.ValidateOpts) (*ach.File, error) {
-	file, err := readJsonFile(path, validateOpts)
-	if file != nil && err == nil {
-		return file, nil
+	bs, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
 	}
-	file, err = readACHFile(path, validateOpts)
-	if file != nil && err == nil {
-		return file, nil
+	if json.Valid(bs) {
+		return readJsonFile(bs, validateOpts)
+	} else {
+		return readACHFile(bs, validateOpts)
 	}
 	return nil, fmt.Errorf("unable to read %s:\n %v", path, err)
-}
-
-func readJsonFile(path string, validateOpts *ach.ValidateOpts) (*ach.File, error) {
-	fd, err := os.Open(path)
-	if err != nil {
-		return nil, fmt.Errorf("problem opening %s: %v", path, err)
-	}
-	defer fd.Close()
-
-	bs, err := io.ReadAll(fd)
-	if err != nil {
-		return nil, fmt.Errorf("problem reading %s: %v", path, err)
-	}
-
-	return ach.FileFromJSONWith(bs, validateOpts)
 }

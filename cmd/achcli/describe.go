@@ -5,6 +5,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 
@@ -15,7 +16,7 @@ import (
 func dumpFiles(paths []string, validateOpts *ach.ValidateOpts) error {
 	files := make([]*ach.File, len(paths))
 	for i := range paths {
-		f, err := readACHFile(paths[i], validateOpts)
+		f, err := readIncomingFile(paths[i], validateOpts)
 		if err != nil {
 			fmt.Printf("WARN: problem reading %s:\n %v\n\n", paths[i], err)
 		}
@@ -67,15 +68,13 @@ func dumpFiles(paths []string, validateOpts *ach.ValidateOpts) error {
 	return nil
 }
 
-func readACHFile(path string, validateOpts *ach.ValidateOpts) (*ach.File, error) {
-	fd, readErr := os.Open(path)
-	if readErr != nil {
-		return nil, fmt.Errorf("problem opening %s: %v", path, readErr)
-	}
-	defer fd.Close()
-
-	r := ach.NewReader(fd)
+func readACHFile(input []byte, validateOpts *ach.ValidateOpts) (*ach.File, error) {
+	r := ach.NewReader(bytes.NewReader(input))
 	r.SetValidation(validateOpts)
 	f, err := r.Read()
 	return &f, err
+}
+
+func readJsonFile(input []byte, validateOpts *ach.ValidateOpts) (*ach.File, error) {
+	return ach.FileFromJSONWith(input, validateOpts)
 }
