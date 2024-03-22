@@ -47,8 +47,6 @@ func readIncomingFile(path string, validateOpts *ach.ValidateOpts) (*ach.File, e
 	}
 	if json.Valid(bs) {
 		return readJsonFile(bs, validateOpts)
-	} else {
-		return readACHFile(bs, validateOpts)
 	}
-	return nil, fmt.Errorf("unable to read %s:\n %v", path, err)
+	return readACHFile(bs, validateOpts)
 }
