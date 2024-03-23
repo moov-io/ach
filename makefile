@@ -21,6 +21,13 @@ generate: clean
 clean:
 	@rm -rf ./bin/ ./tmp/ coverage.txt misspell* staticcheck lint-project.sh
 
+.PHONY: java
+java:
+	go install golang.org/x/mobile/cmd/gobind@latest
+	go get golang.org/x/mobile/bind@latest
+	gobind -lang=java -outdir ./java/ github.com/moov-io/ach/internal/...
+	gobind -lang=java -outdir ./java/ github.com/moov-io/ach/javainterop/...
+
 .PHONY: check
 check:
 ifeq ($(OS),Windows_NT)
