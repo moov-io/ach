@@ -506,11 +506,21 @@ func convertToFiles(sorted *outFile, conditions Conditions) ([]*File, error) {
 		for i := range sorted.batches {
 			nextBatch := sorted.batches[i]
 
-			bh := nextBatch.header
 			batchNumber += 1
-			bh.BatchNumber = batchNumber
-
-			batch, err := NewBatch(&bh)
+			batch, err := NewBatch(&BatchHeader{ // don't let BatchHeader escape and mutate
+				ServiceClassCode:         nextBatch.header.ServiceClassCode,
+				CompanyName:              nextBatch.header.CompanyName,
+				CompanyDiscretionaryData: nextBatch.header.CompanyDiscretionaryData,
+				CompanyIdentification:    nextBatch.header.CompanyIdentification,
+				StandardEntryClassCode:   nextBatch.header.StandardEntryClassCode,
+				CompanyEntryDescription:  nextBatch.header.CompanyEntryDescription,
+				CompanyDescriptiveDate:   nextBatch.header.CompanyDescriptiveDate,
+				EffectiveEntryDate:       nextBatch.header.EffectiveEntryDate,
+				SettlementDate:           nextBatch.header.SettlementDate,
+				OriginatorStatusCode:     nextBatch.header.OriginatorStatusCode,
+				ODFIIdentification:       nextBatch.header.ODFIIdentification,
+				BatchNumber:              batchNumber,
+			})
 			if err != nil {
 				return nil, fmt.Errorf("creating batch from sorted.batches[%d] failed: %w", i, err)
 			}
@@ -565,12 +575,24 @@ func convertToFiles(sorted *outFile, conditions Conditions) ([]*File, error) {
 				file = NewFile()
 				file.Header = sorted.header
 
-				batch, err = NewBatch(&nextBatch.header)
+				batchNumber += 1
+				batch, err = NewBatch(&BatchHeader{ // don't let BatchHeader escape and mutate
+					ServiceClassCode:         nextBatch.header.ServiceClassCode,
+					CompanyName:              nextBatch.header.CompanyName,
+					CompanyDiscretionaryData: nextBatch.header.CompanyDiscretionaryData,
+					CompanyIdentification:    nextBatch.header.CompanyIdentification,
+					StandardEntryClassCode:   nextBatch.header.StandardEntryClassCode,
+					CompanyEntryDescription:  nextBatch.header.CompanyEntryDescription,
+					CompanyDescriptiveDate:   nextBatch.header.CompanyDescriptiveDate,
+					EffectiveEntryDate:       nextBatch.header.EffectiveEntryDate,
+					SettlementDate:           nextBatch.header.SettlementDate,
+					OriginatorStatusCode:     nextBatch.header.OriginatorStatusCode,
+					ODFIIdentification:       nextBatch.header.ODFIIdentification,
+					BatchNumber:              batchNumber,
+				})
 				if err != nil {
 					return nil, fmt.Errorf("problem creating overflow batch: %w", err)
 				}
-				batchNumber += 1
-				batch.GetHeader().BatchNumber = batchNumber
 
 			merge:
 				// Add the entry to the current batch
