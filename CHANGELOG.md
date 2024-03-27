@@ -1,26 +1,35 @@
-## v1.36.1 (Released 2024-03-13)
+## v1.37.0 (Released 2024-03-13)
 
-This release of moov-io/ach contains some major performance improvements to `MergeFiles(...)`. We have tested this new implementation and are confident that merged files contain all of the input files, but if you encounter any issues [please open an issue](https://github.com/moov-io/ach/issues/new/choose).
+The latest update to moov-io/ach introduces significant performance enhancements, particularly to the `MergeFiles(...)` function. Through rigorous testing, we've ensured that the merging process accurately incorporates all input files. However, should any issues arise, we encourage you to [report them](https://github.com/moov-io/ach/issues/new/choose).
 
-Several notable changes in `MergeFiles(..)` behavior:
+Furthermore, this update includes a new function, `MergeDir(...)`, designed to combine a directory of ACH files efficiently, mirroring the functionality of MergeFiles but with enhanced performance.
 
-- Duplicate trace numbers are put into separate batches within the same output file
-   - This is allowed by Nacha rules, which only requires they be in separate batches
-- Merging now much closer approaches the `Conditions` limits
-   - Previously it was common to see only half of the limit reached
-- ValidateOpts are combined together from all input files
-   - All non-zero values (e.g. `true`) would make the option `true` for all batches and entries in the file
+Key modifications to the behavior of `MergeFiles(..)` include:
+
+- The management of duplicate trace numbers has been refined. They are now allocated to distinct batches within the same output file, in compliance with Nacha regulations, which mandate separation into different batches.
+- The merging process now more accurately aligns with the `Conditions` constraints, significantly improving upon previous versions where the limit was seldom fully utilized.
+- ValidateOpts are now aggregated across all input files, ensuring that any non-zero value (for example, `true`) applies uniformly to all batches and entries within the file, streamlining the validation process.
 
 IMPROVEMENTS
 
+- cmd/achcli: read files in Nacha or JSON automatically
+- docs: Update openapi.yaml - addenda17/addenda18/format for entryHash
 - docs: add links to http endpoints where features overlap
 - docs: clarify what isn't supported by MergeFiles
 - feat: MergeFiles now combines `ValidateOpts` from all input files
+- fix: nil check Addenda records inside FileFromJSON
+- fix: recreate batch header to avoid mutations
+- merge: delve into subdir with custom FS provided
+- merge: option to walk sub directories
 - refactor: improve merge performance
 - test: add checks for pickOutFile, findOutBatch and lineCount
+- test: verify entries that are very close still merge properly
+- test: verify more numericField inputs
 
 BUILD
 
+- fix(deps): update module golang.org/x/sync to v0.6.0
+- build(deps): bump google.golang.org/protobuf from 1.32.0 to 1.33.0
 - build(deps): bump golang.org/x/net from 0.21.0 to 0.22.0
 
 ## v1.35.1 (Released 2024-03-04)
