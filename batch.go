@@ -819,10 +819,14 @@ func (batch *Batch) isTraceNumberODFI() error {
 	if batch.validateOpts != nil && batch.validateOpts.BypassOriginValidation {
 		return nil
 	}
+	bhODFI := batch.Header.ODFIIdentificationField()
 	for _, entry := range batch.Entries {
-		if batch.Header.ODFIIdentificationField() != entry.TraceNumberField()[:8] {
-			return batch.Error("ODFIIdentificationField",
-				NewErrBatchTraceNumberNotODFI(batch.Header.ODFIIdentificationField(), entry.TraceNumberField()[:8]))
+		var entryODFI string
+		if len(entry.TraceNumber) >= 8 {
+			entryODFI = entry.TraceNumber[:8]
+		}
+		if bhODFI != entryODFI {
+			return batch.Error("ODFIIdentificationField", NewErrBatchTraceNumberNotODFI(bhODFI, entryODFI))
 		}
 	}
 	return nil
