@@ -76,7 +76,7 @@ func TestExtendedCharacters(t *testing.T) {
 		require.Equal(t, "456¦123", entries[0].Addenda18[0].ForeignCorrespondentBankIDNumber)
 	})
 
-	t.Run("MTE File", func(t *testing.T) {
+	t.Run("ACH File", func(t *testing.T) {
 		bh := mockBatchMTEHeader()
 		bh.CompanyName = "Merchant | ATM"
 
@@ -84,6 +84,7 @@ func TestExtendedCharacters(t *testing.T) {
 		ed := mockMTEEntryDetail()
 		ed.IndividualName = "My {Store}"
 		ed.Addenda02.ReferenceInformationOne = `RF1¦RF2`
+		ed.IdentificationNumber = `0 is not Ø` // X12 extended zeros
 		b.AddEntry(ed)
 		require.NoError(t, b.Create())
 
@@ -91,6 +92,7 @@ func TestExtendedCharacters(t *testing.T) {
 		file.SetHeader(mockFileHeader())
 		file.AddBatch(b)
 		require.NoError(t, file.Create())
+		require.NoError(t, file.Validate())
 
 		// Cycle file through write/read
 		var buf bytes.Buffer
@@ -109,6 +111,7 @@ func TestExtendedCharacters(t *testing.T) {
 
 		entries := b1.GetEntries()
 		require.Equal(t, `My {Store}            `, entries[0].IndividualName)
+		require.Equal(t, `0 is not Ø     `, entries[0].IdentificationNumber)
 		require.Equal(t, `RF1¦RF2`, entries[0].Addenda02.ReferenceInformationOne)
 	})
 
