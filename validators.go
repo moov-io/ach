@@ -33,6 +33,7 @@ var (
 	numericCharacters     = "0123456789"
 	asciiCharacters       = ` !"#$%&'()*+,-./:;<=>?@[\]^_{|}~` + "`"
 	ebcdicExtraCharacters = `¢¬¦±`
+	realWorldEncountered  = `Ø`
 
 	validAlphaNumericCharacters          map[rune]bool
 	validUppercaseAlphaNumericCharacters map[rune]bool
@@ -40,11 +41,13 @@ var (
 
 func init() {
 	validAlphaNumericCharacters = setupCharacterMap(
-		lowerAlphaCharacters, strings.ToUpper(lowerAlphaCharacters), numericCharacters, asciiCharacters, ebcdicExtraCharacters,
+		lowerAlphaCharacters, strings.ToUpper(lowerAlphaCharacters), numericCharacters, asciiCharacters,
+		ebcdicExtraCharacters, realWorldEncountered,
 	)
 
 	validUppercaseAlphaNumericCharacters = setupCharacterMap(
-		strings.ToUpper(lowerAlphaCharacters), numericCharacters, asciiCharacters, ebcdicExtraCharacters,
+		strings.ToUpper(lowerAlphaCharacters), numericCharacters, asciiCharacters,
+		ebcdicExtraCharacters, realWorldEncountered,
 	)
 }
 
