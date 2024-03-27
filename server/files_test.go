@@ -46,6 +46,7 @@ func TestFiles__decodeCreateFileRequest(t *testing.T) {
 	f.ID = "foo"
 	f.Header = *mockFileHeader()
 	batch := mockBatchWEB(t)
+	batch.Entries[0].TraceNumber = "121042880000007"
 	f.AddBatch(batch)
 
 	// Setup our persistence
@@ -88,6 +89,11 @@ func TestFiles__decodeCreateFileRequest(t *testing.T) {
 	if got.Batches[0].ID() != batch.ID() {
 		t.Fatalf("batch ID: got %v, want %v", got.Batches[0].ID(), batch.ID())
 	}
+	require.Len(t, got.Batches, 1)
+
+	entries := got.Batches[0].GetEntries()
+	require.Len(t, entries, 1)
+	require.Equal(t, "121042880000007", entries[0].TraceNumber)
 }
 
 func TestFiles__createFileEndpoint(t *testing.T) {
@@ -401,7 +407,10 @@ func TestFiles__buildFileEndpoint(t *testing.T) {
 	f := ach.NewFile()
 	f.ID = "foo"
 	f.Header = *mockFileHeader()
-	f.AddBatch(mockBatchWEB(t))
+	batch := mockBatchWEB(t)
+	batch.Entries[0].TraceNumber = "121042880000007"
+	f.AddBatch(batch)
+
 	if err := repo.StoreFile(f); err != nil {
 		t.Fatal(err)
 	}
@@ -431,7 +440,7 @@ func TestFiles__buildFileEndpoint(t *testing.T) {
 
 	entries := response.File.Batches[0].GetEntries()
 	require.Len(t, entries, 1)
-	require.Equal(t, "121042880000001", entries[0].TraceNumber)
+	require.Equal(t, "121042880000007", entries[0].TraceNumber)
 }
 
 func TestFiles__getFileContentsEndpoint(t *testing.T) {
@@ -439,30 +448,34 @@ func TestFiles__getFileContentsEndpoint(t *testing.T) {
 	svc := NewService(repo)
 
 	f := ach.NewFile()
-	f.ID = "foo"
+	f.ID = "foo3"
 	f.Header = *mockFileHeader()
-	f.AddBatch(mockBatchWEB(t))
+	batch := mockBatchWEB(t)
+	batch.Entries[0].TraceNumber = "121042880000007"
+	require.NoError(t, batch.Create())
+
+	f.AddBatch(batch)
+	require.NoError(t, f.Create())
+
 	if err := repo.StoreFile(f); err != nil {
 		t.Fatal(err)
 	}
 
-	req := httptest.NewRequest("GET", "/files/foo/contents", nil)
+	req := httptest.NewRequest("GET", "/files/foo3/contents", nil)
 	req.Header.Set("x-request-id", "test")
 
 	// setup our HTTP handler
-	handler := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
+	handler := MakeHTTPHandler(svc, repo, kitlog.NewLogfmtLogger(os.Stdout))
 
 	// execute our HTTP request
 	w := httptest.NewRecorder()
 	handler.ServeHTTP(w, req)
 	w.Flush()
 
-	if w.Code != http.StatusOK {
-		t.Errorf("bogus HTTP status code: %d: %s", w.Code, w.Body.String())
-	}
-	if v := w.Header().Get("content-type"); v != "text/plain" {
-		t.Errorf("content-type: %s", v)
-	}
+	require.Equal(t, http.StatusOK, w.Code)
+	require.Equal(t, "text/plain", w.Header().Get("content-type"))
+
+	require.Contains(t, w.Body.String(), "121042880000007")
 
 	// sad path
 	body := strings.NewReader(`{"random":"json"}`)
