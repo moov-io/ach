@@ -10,8 +10,16 @@ menubar: docs-menu
 
 Moov ACH supports merging an arbitrary set of ACH files together. This is useful for optimizing cost and network efficiency. NACHA files are limited to 10,000 lines (in their text format) and so Moov ACH merges valid files together where the FileHeaders match the same ABA routing numbers.
 
-An example of merging ACH files can be seen below. Assuming we have two ACH files to merge (`first.ach` and `second.ach`) on disk, let's read them and produce a merged file.
+See [`MergeFiles`](https://pkg.go.dev/github.com/moov-io/ach#MergeFiles) and [`MergeDir`](https://pkg.go.dev/github.com/moov-io/ach#MergeDir)
 
+Merging accepts a [`Conditions`](https://pkg.go.dev/github.com/moov-io/ach#Conditions) struct which allows custom file lengths and dollar amounts per-file.
+
+There are several key features of file merging:
+
+- **Duplicate Trace Number Handling**: Duplicate trace numbers are allocated to separate batches within the same output file, adhering to Nacha regulations.
+- **Validation Options Aggregation**: Aggregate `ValidateOpts` from all input files to apply non-zero values (e.g., `true`) uniformly across all batches and entries within the file, thus streamlining the validation process.
+
+An example of merging ACH files can be seen below. Assuming we have two ACH files to merge (`first.ach` and `second.ach`) on disk, let's read them and produce a merged file.
 
 ```go
 package main
