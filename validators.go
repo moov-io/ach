@@ -34,9 +34,19 @@ var (
 	asciiCharacters       = ` !"#$%&'()*+,-./:;<=>?@[\]^_{|}~` + "`"
 	ebcdicExtraCharacters = `¢¬¦±`
 
-	validAlphaNumericCharacters          = lowerAlphaCharacters + strings.ToUpper(lowerAlphaCharacters) + numericCharacters + asciiCharacters + ebcdicExtraCharacters
-	validUppercaseAlphaNumericCharacters = strings.ToUpper(lowerAlphaCharacters) + numericCharacters + asciiCharacters + ebcdicExtraCharacters
+	validAlphaNumericCharacters          map[rune]bool
+	validUppercaseAlphaNumericCharacters map[rune]bool
 )
+
+func init() {
+	validAlphaNumericCharacters = setupCharacterMap(
+		lowerAlphaCharacters, strings.ToUpper(lowerAlphaCharacters), numericCharacters, asciiCharacters, ebcdicExtraCharacters,
+	)
+
+	validUppercaseAlphaNumericCharacters = setupCharacterMap(
+		strings.ToUpper(lowerAlphaCharacters), numericCharacters, asciiCharacters, ebcdicExtraCharacters,
+	)
+}
 
 // validator is common validation and formatting of golang types to ach type strings
 type validator struct{}
@@ -425,15 +435,19 @@ func (v *validator) isTransactionTypeCode(s string) error {
 	return ErrTransactionTypeCode
 }
 
-func (v *validator) includesValidCharacters(input string, charset string) error {
-	for _, i := range input {
-		var found bool
-		for _, c := range charset {
-			if i == c {
-				found = true
-				break
-			}
+func setupCharacterMap(inputs ...string) map[rune]bool {
+	out := make(map[rune]bool)
+	for _, input := range inputs {
+		for _, r := range input {
+			out[r] = true
 		}
+	}
+	return out
+}
+
+func (v *validator) includesValidCharacters(input string, charset map[rune]bool) error {
+	for _, i := range input {
+		_, found := charset[i]
 		if !found {
 			return fmt.Errorf("invalid character: %v", i)
 		}
