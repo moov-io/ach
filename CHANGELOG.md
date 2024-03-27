@@ -1,3 +1,10 @@
+## v1.37.1 (Released 2024-03-27)
+
+IMPROVEMENTS
+
+- perf: improve includesValidCharacters lookups
+- perf: isTraceNumberODFI
+
 ## v1.37.0 (Released 2024-03-13)
 
 The latest update to moov-io/ach introduces significant performance enhancements, particularly to the `MergeFiles(...)` function. Through rigorous testing, we've ensured that the merging process accurately incorporates all input files. However, should any issues arise, we encourage you to [report them](https://github.com/moov-io/ach/issues/new/choose).
