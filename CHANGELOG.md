@@ -1,3 +1,10 @@
+## v1.37.2 (Released 2024-03-28)
+
+IMPROVEMENTS
+
+- fix: allow "slashed zero" which some OCR software produces
+- test: verify trace numbers are kept through HTTP create
+
 ## v1.37.1 (Released 2024-03-27)
 
 IMPROVEMENTS
