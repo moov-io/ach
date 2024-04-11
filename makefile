@@ -18,6 +18,13 @@ build-webui:
 generate: clean
 	@go run internal/iso3166/iso3166_gen.go
 
+.PHONY: java
+java:
+	go install golang.org/x/mobile/cmd/gobind@latest
+	go get golang.org/x/mobile/bind@latest
+	./java/setup.sh
+	gobind -lang=java -outdir ./java/gen/ github.com/moov-io/ach/java/...
+
 clean:
 	@rm -rf ./bin/ ./tmp/ coverage.txt misspell* staticcheck lint-project.sh
 
