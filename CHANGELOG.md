@@ -1,3 +1,14 @@
+## v1.37.3 (Released 2024-04-12)
+
+IMPROVEMENTS
+
+- fix: CTX allows SavingsReturnNOCDebit
+
+BUILD
+
+- build(deps): bump golang.org/x/net from 0.22.0 to 0.24.0
+- build(deps): bump golang.org/x/sync from 0.6.0 to 0.7.0
+
 ## v1.37.2 (Released 2024-03-28)
 
 IMPROVEMENTS
