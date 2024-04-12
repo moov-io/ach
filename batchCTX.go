@@ -79,10 +79,10 @@ func (batch *BatchCTX) Validate() error {
 				return batch.Error("AddendaCount", NewErrBatchExpectedAddendaCount(addendaCount, indicator))
 			}
 		}
-		// Verify TransactionCode for prenotes and regular entries
+		// Verify TransactionCode is valid for CTX
 		switch entry.TransactionCode {
 		case CheckingPrenoteCredit, CheckingPrenoteDebit,
-			SavingsPrenoteCredit, SavingsReturnNOCDebit,
+			SavingsPrenoteCredit, SavingsPrenoteDebit,
 			GLPrenoteCredit, GLPrenoteDebit, LoanPrenoteCredit:
 			if entry.Amount != 0 {
 				return batch.Error("TransactionCode", ErrBatchTransactionCode, entry.TransactionCode)
