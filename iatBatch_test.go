@@ -817,6 +817,43 @@ func TestIATBatchControl(t *testing.T) {
 	testIATBatchControl(t)
 }
 
+// testIATBatchControlWithCompanyIdentification validates BatchControl CompanyIdentification
+func testIATBatchControlWithCompanyIdentification(t *testing.T) {
+	mockBatch := mockIATBatch(t)
+	mockBatch.Control.CompanyIdentification = "121042882"
+	err := mockBatch.verify()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// testIATBatchControlInvalidCompanyIdentification attempts to validate an invalid BatchControl CompanyIdentification
+func testIATBatchControlInvalidCompanyIdentification(t *testing.T) {
+	mockBatch := mockIATBatch(t)
+	mockBatch.Control.CompanyIdentification = "1234®6789"
+	err := mockBatch.Control.Validate()
+	if !base.Match(err, ErrNonAlphanumeric) {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// testIATBatchControlEmptyCompanyIdentification validates an empty BatchControl CompanyIdentification
+func testIATBatchControlEmptyCompanyIdentification(t *testing.T) {
+	mockBatch := mockIATBatch(t)
+	mockBatch.Control.CompanyIdentification = ""
+	err := mockBatch.verify()
+	if err != nil {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+// TestIATBatchControlCompanyIdentification tests validating BatchControl CompanyIdentification
+func TestIATBatchControlCompanyIdentification(t *testing.T) {
+	testIATBatchControlWithCompanyIdentification(t)
+	testIATBatchControlInvalidCompanyIdentification(t)
+	testIATBatchControlEmptyCompanyIdentification(t)
+}
+
 // BenchmarkIATBatchControl benchmarks validating BatchControl ODFIIdentification
 func BenchmarkIATBatchControl(b *testing.B) {
 	b.ReportAllocs()
