@@ -664,6 +664,30 @@ func TestFile__IATdatetimeParse(t *testing.T) {
 	}
 }
 
+func TestFile__IATEmptyCompanyIdentificationParse(t *testing.T) {
+	file, err := ReadJSONFile(filepath.Join("test", "testdata", "iat-debit.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	bc := file.IATBatches[0].GetControl()
+	if bc == nil || bc.CompanyIdentification != "" {
+		t.Errorf("file.IATBatches[0].Control.CompanyIdentification=expected no Company Identification, got %v", bc.CompanyIdentification)
+	}
+}
+
+func TestFile__IATcompanyIdentificationParse(t *testing.T) {
+	file, err := ReadJSONFile(filepath.Join("test", "testdata", "iat-debit-company-identification.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	bc := file.IATBatches[0].GetControl()
+	if bc == nil || bc.CompanyIdentification != "231380102" {
+		t.Errorf("file.IATBatches[0].Control.CompanyIdentification=expected Company Identification 231380102, got %v", bc.CompanyIdentification)
+	}
+}
+
 func TestFile__JsonBypassOrigin(t *testing.T) {
 	path := filepath.Join("test", "testdata", "json-bypass-origin.json")
 	opts := &ValidateOpts{

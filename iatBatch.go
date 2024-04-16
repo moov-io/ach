@@ -110,6 +110,9 @@ func (iatBatch *IATBatch) verify() error {
 		return iatBatch.Error("BatchNumber",
 			NewErrBatchHeaderControlEquality(iatBatch.Header.BatchNumber, iatBatch.Control.BatchNumber))
 	}
+	if err := iatBatch.Control.isAlphanumeric(iatBatch.Control.CompanyIdentification); err != nil {
+		return fieldError("CompanyIdentification", err, iatBatch.Control.CompanyIdentification)
+	}
 	if _, err := iatBatch.isBatchEntryCount(); err != nil {
 		return err
 	}
@@ -220,9 +223,15 @@ func (iatBatch *IATBatch) build() error {
 		}
 	}
 
+	originalControl := iatBatch.GetControl()
+
 	// build a BatchControl record
 	bc := NewBatchControl()
 	iatBatch.Control = bc
+
+	if originalControl != nil {
+		bc.CompanyIdentification = originalControl.CompanyIdentification
+	}
 
 	bc.ServiceClassCode = iatBatch.Header.ServiceClassCode
 	bc.ODFIIdentification = iatBatch.Header.ODFIIdentification
