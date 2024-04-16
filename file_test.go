@@ -671,10 +671,7 @@ func TestFile__IATEmptyCompanyIdentificationParse(t *testing.T) {
 	}
 
 	bc := file.IATBatches[0].GetControl()
-	if bc == nil {
-		t.Error("file.IATBatches[0].Control.CompanyIdentification=missing batch control")
-	}
-	if bc.CompanyIdentification != "" {
+	if bc == nil || bc.CompanyIdentification != "" {
 		t.Errorf("file.IATBatches[0].Control.CompanyIdentification=expected no Company Identification, got %v", bc.CompanyIdentification)
 	}
 }
@@ -686,10 +683,7 @@ func TestFile__IATcompanyIdentificationParse(t *testing.T) {
 	}
 
 	bc := file.IATBatches[0].GetControl()
-	if bc == nil {
-		t.Error("file.IATBatches[0].Control.CompanyIdentification=missing batch control")
-	}
-	if bc.CompanyIdentification != "231380102" {
+	if bc == nil || bc.CompanyIdentification != "231380102" {
 		t.Errorf("file.IATBatches[0].Control.CompanyIdentification=expected Company Identification 231380102, got %v", bc.CompanyIdentification)
 	}
 }
