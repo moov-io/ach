@@ -1,3 +1,9 @@
+## v1.37.4 (Released 2024-04-17)
+
+IMPROVEMENTS
+
+- fix: preserve IAT BatchControl.CompanyIdentification when parsing from json
+
 ## v1.37.3 (Released 2024-04-12)
 
 IMPROVEMENTS
