@@ -632,6 +632,7 @@ paths:
 components:
   schemas:
     CreateFile:
+      description: \`batches\` OR `IATBatches` is required
       properties:
         id:
           type: string
@@ -643,10 +644,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Batch'
+          minItems: 1
         IATBatches:
           type: array
           items:
             $ref: '#/components/schemas/IATBatch'
+          minItems: 1
         fileControl:
           $ref: '#/components/schemas/FileControl'
         advEntryDetails:
@@ -657,6 +660,8 @@ components:
           $ref: '#/components/schemas/ADVBatchControl'
       required:
         - fileHeader
+        - batches
+        - IATBatches
     CreateFileResponse:
       properties:
         id:
@@ -762,10 +767,7 @@ components:
           description: Reserved field for information pertinent to the Originator.
       required:
         - immediateOrigin
-        - immediateOriginName
         - immediateDestination
-        - immediateDestinationName
-        - fileCreationTime
         - fileCreationDate
     FileControl:
       properties:
@@ -826,7 +828,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EntryDetail'
-          minLength: 1
+          minItems: 1
         batchControl:
           $ref: '#/components/schemas/BatchControl'
         advEntryDetails:
@@ -840,15 +842,14 @@ components:
       required:
         - batchHeader
         - entryDetails
-        - batchControl
     BatchHeader:
       required:
         - serviceClassCode
         - standardEntryClassCode
         - companyName
         - companyIdentification
+        - companyEntryDescription
         - ODFIIdentification
-        - batchNumber
       properties:
         id:
           type: string
@@ -981,7 +982,6 @@ components:
         $ref: '#/components/schemas/Batch'
     EntryDetail:
       required:
-        - id
         - amount
         - DFIAccountNumber
         - RDFIIdentification
