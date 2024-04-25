@@ -1,0 +1,107 @@
+{
+  "IATBatches": null,
+  "NotificationOfChange": null,
+  "ReturnEntries": null,
+  "batches": [
+    {
+      "batchHeader": {
+        "ODFIIdentification": "03130001",
+        "batchNumber": 2,
+        "companyEntryDescription": "Vndr Pay",
+        "companyIdentification": "231380104",
+        "companyName": "Name on Account",
+        "effectiveEntryDate": "190816",
+        "id": "",
+        "originatorStatusCode": 1,
+        "serviceClassCode": 225,
+        "settlementDate": "   ",
+        "standardEntryClassCode": "CCD"
+      },
+      "entryDetails": [
+        {
+          "DFIAccountNumber": "744-5678-99",
+          "RDFIIdentification": "23138010",
+          "amount": 500000,
+          "category": "Forward",
+          "checkDigit": "4",
+          "discretionaryData": "S ",
+          "id": "",
+          "identificationNumber": "location1234567",
+          "individualName": "Best Co. #123456789012",
+          "traceNumber": "031300010000001",
+          "transactionCode": 27
+        },
+        {
+          "DFIAccountNumber": "744-5678-99",
+          "RDFIIdentification": "23138010",
+          "amount": 125,
+          "category": "Forward",
+          "checkDigit": "4",
+          "discretionaryData": "S ",
+          "id": "",
+          "identificationNumber": "Fee123456789012",
+          "individualName": "Best Co. #123456789012",
+          "traceNumber": "031300010000002",
+          "transactionCode": 27
+        }
+      ],
+      "offset": null
+    },
+    {
+      "batchHeader": {
+        "ODFIIdentification": "03130001",
+        "batchNumber": 1,
+        "companyEntryDescription": "Vndr Pay",
+        "companyIdentification": "231380104",
+        "companyName": "Name on Account",
+        "effectiveEntryDate": "190816",
+        "id": "",
+        "originatorStatusCode": 1,
+        "serviceClassCode": 225,
+        "settlementDate": "   ",
+        "standardEntryClassCode": "CCD"
+      },
+      "entryDetails": [
+        {
+          "DFIAccountNumber": "744-5678-99",
+          "RDFIIdentification": "23138010",
+          "amount": 500000,
+          "category": "Forward",
+          "checkDigit": "4",
+          "discretionaryData": "S ",
+          "id": "",
+          "identificationNumber": "location1234567",
+          "individualName": "Best Co. #123456789012",
+          "traceNumber": "031300010000001",
+          "transactionCode": 27
+        },
+        {
+          "DFIAccountNumber": "744-5678-99",
+          "RDFIIdentification": "23138010",
+          "amount": 125,
+          "category": "Forward",
+          "checkDigit": "4",
+          "discretionaryData": "S ",
+          "id": "",
+          "identificationNumber": "Fee123456789012",
+          "individualName": "Best Co. #123456789012",
+          "traceNumber": "031300010000002",
+          "transactionCode": 27
+        }
+      ],
+      "offset": null
+    }
+  ],
+  "fileHeader": {
+    "fileCreationDate": "190816",
+    "fileCreationTime": "1055",
+    "fileIDModifier": "A",
+    "id": "",
+    "immediateDestination": "031300012",
+    "immediateDestinationName": "Federal Reserve Bank",
+    "immediateOrigin": "231380104",
+    "immediateOriginName": "My Bank Name",
+    "referenceCode": "12345678"
+  },
+  "id": ""
+}

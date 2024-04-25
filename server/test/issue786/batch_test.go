@@ -25,19 +25,13 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"time"
 
 	"github.com/moov-io/ach"
-	"github.com/moov-io/ach/server"
-	"github.com/moov-io/base/log"
-
-	kitlog "github.com/go-kit/log"
+	"github.com/moov-io/ach/server/test"
 )
 
 func TestIssue786(t *testing.T) {
-	repo := server.NewRepositoryInMemory(0*time.Second, log.NewNopLogger())
-	svc := server.NewService(repo)
-	handler := server.MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
+	server := test.NewServer()
 
 	// create the file
 	fd, err := os.Open(filepath.Join("testdata", "1-create.json"))
@@ -49,7 +43,7 @@ func TestIssue786(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("POST", "/files/create", fd)
 	req.Header.Set("Content-Type", "application/json")
-	handler.ServeHTTP(w, req)
+	server.Handler.ServeHTTP(w, req)
 	w.Flush()
 
 	if w.Code != http.StatusOK {
@@ -74,7 +68,7 @@ func TestIssue786(t *testing.T) {
 	w = httptest.NewRecorder()
 	req = httptest.NewRequest("POST", fmt.Sprintf("/files/%s/batches", file.ID), fd)
 	req.Header.Set("Content-Type", "application/json")
-	handler.ServeHTTP(w, req)
+	server.Handler.ServeHTTP(w, req)
 	w.Flush()
 
 	if w.Code != http.StatusOK {
@@ -85,7 +79,7 @@ func TestIssue786(t *testing.T) {
 	// read the file and verify
 	w = httptest.NewRecorder()
 	req = httptest.NewRequest("GET", fmt.Sprintf("/files/%s/contents", file.ID), nil)
-	handler.ServeHTTP(w, req)
+	server.Handler.ServeHTTP(w, req)
 	w.Flush()
 
 	if w.Code != http.StatusOK {
