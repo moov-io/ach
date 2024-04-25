@@ -157,7 +157,7 @@ func (Addenda99Dishonored *Addenda99Dishonored) SetValidation(opts *ValidateOpts
 
 func IsDishonoredReturnCode(code string) bool {
 	switch code {
-	case "R61", "R67", "R68", "R69", "R70":
+	case "R61", "R62", "R67", "R68", "R69", "R70":
 		return true
 	}
 	return false
