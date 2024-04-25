@@ -1,3 +1,14 @@
+## v1.37.5 (Released 2024-04-25)
+
+IMPROVEMENTS
+
+- docs: update required fields for CreateFile schema object in openapi.yaml
+- fix: add R62 to list of dishonored return codes
+
+BUILD
+
+- build(deps): bump github.com/aws/aws-lambda-go from 1.46.0 to 1.47.0
+
 ## v1.37.4 (Released 2024-04-17)
 
 IMPROVEMENTS
