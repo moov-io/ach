@@ -48,10 +48,11 @@ Example: `POST /files/create?requireABAOrigin=true&bypassDestination=true`
 | `allowInvalidCheckDigit`           | `AllowInvalidCheckDigit`           |
 | `allowMissingFileControl`          | `AllowMissingFileControl`          |
 | `allowMissingFileHeader`           | `AllowMissingFileHeader`           |
+| `allowUnorderedBatchNumbers`       | `AllowUnorderedBatchNumbers`       |
 | `allowZeroBatches`                 | `AllowZeroBatches`                 |
 | `bypassCompanyIdentificationMatch` | `BypassCompanyIdentificationMatch` |
-| `bypassDestination`                | `BypassDestinationValidation`      |
-| `bypassOrigin`                     | `BypassOriginValidation`           |
+| `bypassDestinationValidation`      | `BypassDestinationValidation`      |
+| `bypassOriginValidation`           | `BypassOriginValidation`           |
 | `customReturnCodes`                | `CustomReturnCodes`                |
 | `customTraceNumbers`               | `CustomTraceNumbers`               |
 | `preserveSpaces`                   | `PreserveSpaces`                   |
@@ -59,7 +60,8 @@ Example: `POST /files/create?requireABAOrigin=true&bypassDestination=true`
 | `skipAll`                          | `SkipAll`                          |
 | `unequalAddendaCounts`             | `UnequalAddendaCounts`             |
 | `unequalServiceClassCode`          | `UnequalServiceClassCode`          |
-| `unorderedBatchNumbers`            | `AllowUnorderedBatchNumbers`       |
+
+> Note: `bypassDestination`, `bypassOrigin`, and `unorderedBatchNumbers` are deprecated query parameters replace by identical named parameters.
 
 ## Upload a raw ACH file
 
