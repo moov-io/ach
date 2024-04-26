@@ -1,3 +1,15 @@
+## v1.38.0 (Released 2024-04-26)
+
+This release of moov-io/ach standardizes `ValidateOpts` query parameters on the HTTP server. Previously slightly different names
+were used, which are still supported and deprecated. The GET/POST `/files/{fileID}/validate` endpoints accept `ValidateOpts` as
+query parameters with this release.
+
+IMPROVEMENTS
+
+- feat: standardize validate opts query params, accept on GET/POST validate
+- fix: nil check BatchHeader when reading JSON
+- server/test: verify allowUnorderedBatchNumbers
+
 ## v1.37.5 (Released 2024-04-25)
 
 IMPROVEMENTS
