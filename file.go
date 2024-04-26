@@ -361,9 +361,10 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 	}
 	// Add new batches to file
 	for i := range batches.Batches {
-		if batches.Batches[i] == nil {
+		if batches.Batches[i] == nil || batches.Batches[i].Header == nil {
 			continue
 		}
+
 		batch := *batches.Batches[i]
 		batch.SetID(batch.Header.ID)
 		batch.SetValidation(f.validateOpts)
@@ -390,11 +391,12 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 
 	// Add new iatBatches to file
 	for i := range iatBatches.IATBatches {
-		if len(iatBatches.IATBatches) == 0 {
+		iatBatch := iatBatches.IATBatches[i]
+
+		if iatBatch.Header == nil {
 			continue
 		}
 
-		iatBatch := iatBatches.IATBatches[i]
 		iatBatch.ID = iatBatch.Header.ID
 		iatBatch.SetValidation(f.validateOpts)
 

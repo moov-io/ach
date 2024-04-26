@@ -52,7 +52,5 @@ func TestUnorderedBatches(t *testing.T) {
 	server.Handler.ServeHTTP(w, req)
 	w.Flush()
 
-	fmt.Printf("\n%s\n", w.Body.String())
-
 	require.Equal(t, http.StatusOK, w.Code)
 }
