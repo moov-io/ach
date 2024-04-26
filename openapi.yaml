@@ -89,7 +89,19 @@ paths:
           description: Optional parameter to configure ImmediateOrigin validation
           schema:
             type: boolean
+          deprecated: true
+        - name: bypassOriginValidation
+          in: query
+          description: Optional parameter to configure ImmediateOrigin validation
+          schema:
+            type: boolean
         - name: bypassDestination
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+          deprecated: true
+        - name: bypassDestinationValidation
           in: query
           description: Optional parameter to configure ImmediateDestination validation
           schema:
@@ -130,6 +142,12 @@ paths:
           schema:
             type: boolean
         - name: unorderedBatchNumbers
+          in: query
+          description: Allow a file to be read with unordered batch numbers.
+          schema:
+            type: boolean
+          deprecated: true
+        - name: allowUnorderedBatchNumbers
           in: query
           description: Allow a file to be read with unordered batch numbers.
           schema:
@@ -304,6 +322,87 @@ paths:
               schema:
                 $ref: '#/components/schemas/RawFile'
   /files/{fileID}/validate:
+    parameters:
+      - name: skipAll
+        in: query
+        description: Optional parameter to disable all validation checks for a File
+        schema:
+          type: boolean
+      - name: requireABAOrigin
+        in: query
+        description: Optional parameter to configure ImmediateOrigin validation
+        schema:
+          type: boolean
+      - name: bypassOriginValidation
+        in: query
+        description: Optional parameter to configure ImmediateOrigin validation
+        schema:
+          type: boolean
+      - name: bypassDestinationValidation
+        in: query
+        description: Optional parameter to configure ImmediateDestination validation
+        schema:
+          type: boolean
+      - name: customTraceNumbers
+        in: query
+        description: Optional parameter to configure ImmediateDestination validation
+        schema:
+          type: boolean
+      - name: allowZeroBatches
+        in: query
+        description: Optional parameter to configure ImmediateDestination validation
+        schema:
+          type: boolean
+      - name: allowMissingFileHeader
+        in: query
+        description: Optional parameter to configure ImmediateDestination validation
+        schema:
+          type: boolean
+      - name: allowMissingFileControl
+        in: query
+        description: Optional parameter to configure ImmediateDestination validation
+        schema:
+          type: boolean
+      - name: bypassCompanyIdentificationMatch
+        in: query
+        description: Optional parameter to configure ImmediateDestination validation
+        schema:
+          type: boolean
+      - name: customReturnCodes
+        in: query
+        description: Optional parameter to configure ImmediateDestination validation
+        schema:
+          type: boolean
+      - name: unequalServiceClassCode
+        in: query
+        description: Optional parameter to configure ImmediateDestination validation
+        schema:
+          type: boolean
+      - name: allowUnorderedBatchNumbers
+        in: query
+        description: Allow a file to be read with unordered batch numbers.
+        schema:
+          type: boolean
+      - name: allowInvalidCheckDigit
+        in: query
+        description: Allow the CheckDigit field in EntryDetail to differ from the expected calculation
+        schema:
+          type: boolean
+      - name: unequalAddendaCounts
+        in: query
+        description: Optional parameter to configure UnequalAddendaCounts validation
+        schema:
+          type: boolean
+      - name: preserveSpaces
+        in: query
+        description: Optional parameter to save all padding spaces
+        schema:
+          type: boolean
+      - name: allowInvalidAmounts
+        in: query
+        description: Optional parameter to save all padding spaces
+        schema:
+          type: boolean
     get:
       tags: ['ACH Files']
       summary: Validate File

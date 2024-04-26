@@ -25,7 +25,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/moov-io/ach"
@@ -117,104 +116,17 @@ func createFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.End
 func decodeCreateFileRequest(_ context.Context, request *http.Request) (interface{}, error) {
 	var r io.Reader
 	req := createFileRequest{
-		File:         ach.NewFile(),
-		requestID:    moovhttp.GetRequestID(request),
-		validateOpts: &ach.ValidateOpts{},
+		File:      ach.NewFile(),
+		requestID: moovhttp.GetRequestID(request),
 	}
 
-	const (
-		skipAll                          = "skipAll"
-		requireABAOrigin                 = "requireABAOrigin"
-		bypassOrigin                     = "bypassOrigin"
-		bypassDestination                = "bypassDestination"
-		customTraceNumbers               = "customTraceNumbers"
-		allowZeroBatches                 = "allowZeroBatches"
-		allowMissingFileHeader           = "allowMissingFileHeader"
-		allowMissingFileControl          = "allowMissingFileControl"
-		bypassCompanyIdentificationMatch = "bypassCompanyIdentificationMatch"
-		customReturnCodes                = "customReturnCodes"
-		unequalServiceClassCode          = "unequalServiceClassCode"
-		unorderedBatchNumbers            = "unorderedBatchNumbers"
-		allowInvalidCheckDigit           = "allowInvalidCheckDigit"
-		unequalAddendaCounts             = "unequalAddendaCounts"
-		preserveSpaces                   = "preserveSpaces"
-		allowInvalidAmounts              = "allowInvalidAmounts"
-	)
-
-	validationNames := []string{
-		skipAll,
-		requireABAOrigin,
-		bypassOrigin,
-		bypassDestination,
-		customTraceNumbers,
-		allowZeroBatches,
-		allowMissingFileHeader,
-		allowMissingFileControl,
-		bypassCompanyIdentificationMatch,
-		customReturnCodes,
-		unequalServiceClassCode,
-		unorderedBatchNumbers,
-		allowInvalidCheckDigit,
-		unequalAddendaCounts,
-		preserveSpaces,
-		allowInvalidAmounts,
+	body, validateOpts, err := readValidateOpts(request)
+	if err != nil {
+		return nil, err
 	}
+	req.validateOpts = validateOpts
 
-	for _, name := range validationNames {
-		q := request.URL.Query()
-		if q == nil {
-			continue
-		}
-		input := q.Get(name)
-		if input == "" {
-			continue
-		}
-
-		ok, err := strconv.ParseBool(input)
-		if err != nil {
-			return nil, fmt.Errorf("invalid bool: %v", err)
-		}
-		if !ok {
-			continue
-		}
-
-		switch name {
-		case skipAll:
-			req.validateOpts.SkipAll = true
-		case requireABAOrigin:
-			req.validateOpts.RequireABAOrigin = true
-		case bypassOrigin:
-			req.validateOpts.BypassOriginValidation = true
-		case bypassDestination:
-			req.validateOpts.BypassDestinationValidation = true
-		case customTraceNumbers:
-			req.validateOpts.CustomTraceNumbers = true
-		case allowZeroBatches:
-			req.validateOpts.AllowZeroBatches = true
-		case allowMissingFileHeader:
-			req.validateOpts.AllowMissingFileHeader = true
-		case allowMissingFileControl:
-			req.validateOpts.AllowMissingFileControl = true
-		case bypassCompanyIdentificationMatch:
-			req.validateOpts.BypassCompanyIdentificationMatch = true
-		case customReturnCodes:
-			req.validateOpts.CustomReturnCodes = true
-		case unequalServiceClassCode:
-			req.validateOpts.UnequalServiceClassCode = true
-		case unorderedBatchNumbers:
-			req.validateOpts.AllowUnorderedBatchNumbers = true
-		case allowInvalidCheckDigit:
-			req.validateOpts.AllowInvalidCheckDigit = true
-		case unequalAddendaCounts:
-			req.validateOpts.UnequalAddendaCounts = true
-		case preserveSpaces:
-			req.validateOpts.PreserveSpaces = true
-		case allowInvalidAmounts:
-			req.validateOpts.AllowInvalidAmounts = true
-		}
-	}
-
-	bs, err := io.ReadAll(request.Body)
+	bs, err := io.ReadAll(body)
 	if err != nil {
 		return nil, err
 	}
@@ -538,10 +450,11 @@ func decodeValidateFileRequest(_ context.Context, r *http.Request) (interface{},
 		requestID: moovhttp.GetRequestID(r),
 	}
 
-	var opts ach.ValidateOpts
-	if err := json.NewDecoder(r.Body).Decode(&opts); err == nil {
-		req.opts = &opts
+	_, validateOpts, err := readValidateOpts(r)
+	if err != nil {
+		return nil, err
 	}
+	req.opts = validateOpts
 
 	return req, nil
 }
