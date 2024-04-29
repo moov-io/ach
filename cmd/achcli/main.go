@@ -93,6 +93,13 @@ func main() {
 }
 
 func readValidationOpts(path string) *ach.ValidateOpts {
+	var opts ach.ValidateOpts
+
+	if *flagSkipValidation {
+		opts.SkipAll = true
+		return &opts
+	}
+
 	if path != "" {
 		// read config file
 		bs, readErr := os.ReadFile(path)
@@ -101,13 +108,9 @@ func readValidationOpts(path string) *ach.ValidateOpts {
 			os.Exit(1)
 		}
 
-		var opts ach.ValidateOpts
 		if err := json.Unmarshal(bs, &opts); err != nil {
 			fmt.Printf("ERROR: unmarshal of validate opts failed: %v\n", err)
 			os.Exit(1)
-		}
-		if *flagSkipValidation {
-			opts.SkipAll = true
 		}
 		return &opts
 	}

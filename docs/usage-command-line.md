@@ -24,35 +24,37 @@ EXAMPLES
   achcli -mask file.ach                Print file details with personally identifiable information partially removed
   achcli -reformat=json first.ach      Convert an incoming ACH file into another format (options: ach, json)
   achcli -validate opts.json file.ach  Read an ACH File with the provided ValidateOpts
-  achcli -version                      Print the version of achcli (Example: v1.26.4)
+  achcli -version                      Print the version of achcli (Example: v1.38.0)
   achcli 20060102.ach                  Summarize an ACH file for human readability
 
 FLAGS
   -diff
-    	Compare two files against each other
+        Compare two files against each other
   -flatten
-    	Flatten batches in each file
+        Flatten batches in each file
   -mask
-    	Mask/hide full account numbers and individual names
+        Mask/hide full account numbers and individual names
   -mask.accounts
-    	Mask/hide full account numbers
+        Mask/hide full account numbers
   -mask.corrections
-    	Mask/Hide Corrected Data in Addenda98 records
+        Mask/Hide Corrected Data in Addenda98 records
   -mask.names
-    	Mask/hide full individual names
+        Mask/hide full individual names
   -merge
-    	Merge files before describing
+        Merge files before describing
   -pretty
-    	Display all values in their human readable format
+        Display all values in their human readable format
   -pretty.amounts
-    	Display human readable amounts instead of exact values
+        Display human readable amounts instead of exact values
   -reformat string
-    	Reformat an incoming ACH file to another format
-  -v	Print verbose details about each ACH file
+        Reformat an incoming ACH file to another format
+  -skip-validation
+        Skip all validation checks
+  -v    Print verbose details about each ACH file
   -validate string
-    	Path to config file in json format to enable validation opts
+        Path to config file in json format to enable validation opts
   -version
-    	Print moov-io/ach cli version
+        Print moov-io/ach cli version
 ```
 
 ## Install and Usage
