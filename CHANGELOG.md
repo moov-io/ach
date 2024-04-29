@@ -1,3 +1,9 @@
+## v1.38.1 (Released 2024-04-29)
+
+IMPROVEMENTS
+
+- fix: make -skip-validation flag not depend on -validate flag being present
+
 ## v1.38.0 (Released 2024-04-26)
 
 This release of moov-io/ach standardizes `ValidateOpts` query parameters on the HTTP server. Previously slightly different names
