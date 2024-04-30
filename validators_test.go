@@ -36,6 +36,7 @@ func TestValidators__checkDigit(t *testing.T) {
 		// valid
 		"07300022": 8, // Wells Fargo - Iowa
 		"10200007": 6, // Wells Fargo - Colorado
+		"02601367": 3, // TD BANK NA - LEWISTON, ME
 	}
 
 	for rtn, check := range cases {
