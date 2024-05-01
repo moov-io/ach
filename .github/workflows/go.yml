@@ -40,10 +40,6 @@ jobs:
       env:
         GOLANGCI_LINTERS: gosec
 
-    - name: Upload Code Coverage
-      if: runner.os == 'Linux'
-      run: bash <(curl -s https://codecov.io/bash)
-
   docker:
     name: Docker
     runs-on: ubuntu-latest
