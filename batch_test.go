@@ -1070,15 +1070,55 @@ func TestBatch__ValidAmountForCodes(t *testing.T) {
 	b1.Entries[0].Amount = 0
 	require.NoError(t, b1.Create())
 
-	// NOC entries must have zero amounts
-	file, err := ReadFile(filepath.Join("test", "testdata", "cor-example.ach"))
-	require.NoError(t, err)
-	require.NoError(t, file.Validate())
+	t.Run("corrections", func(t *testing.T) {
+		// NOC entries must have zero amounts
+		file, err := ReadFile(filepath.Join("test", "testdata", "cor-example.ach"))
+		require.NoError(t, err)
+		require.NoError(t, file.Validate())
 
-	batch, ok := file.Batches[0].(*BatchCOR)
-	require.True(t, ok)
-	batch.Entries[0].Amount = 12345
-	require.ErrorContains(t, batch.Create(), ErrBatchAmountNonZero.Error())
+		batch, ok := file.Batches[0].(*BatchCOR)
+		require.True(t, ok)
+		batch.Entries[0].Amount = 12345
+		require.ErrorContains(t, batch.Create(), ErrBatchAmountNonZero.Error())
+	})
+
+	t.Run("returns", func(t *testing.T) {
+		// The TransactionCode of a Returned Prenote does not convey it was a prenote,
+		// so ValidAmountForCodes is forced to pick between:
+		//  - allow returns with zero'd amounts (would allow for invalid non-prenote returns)
+		//  - force AllowInvalidAmounts to be set for zero-amount returns to be accepted
+		file, err := ReadFile(filepath.Join("test", "testdata", "return-WEB.ach"))
+		require.NoError(t, err)
+		require.NoError(t, file.Validate())
+
+		batch, ok := file.Batches[0].(*BatchWEB)
+		require.True(t, ok)
+		batch.Header.CompanyEntryDescription = "PRENOTE"
+		batch.Entries[0].Amount = 0
+		require.NoError(t, batch.Create())
+
+		// Allow zero-amount returns through without CompanyEntryDescription set to PRENOTE
+		batch.Header.CompanyEntryDescription = "OTHER"
+		batch.Entries[0].Addenda99 = mockAddenda99()
+		batch.Entries[0].TransactionCode = CheckingReturnNOCCredit
+		require.NoError(t, batch.Create())
+	})
+
+	t.Run("prenote", func(t *testing.T) {
+		file, err := ReadFile(filepath.Join("test", "testdata", "ppd-debit.ach"))
+		require.NoError(t, err)
+		require.NoError(t, file.Validate())
+
+		batch, ok := file.Batches[0].(*BatchPPD)
+		require.True(t, ok)
+		batch.Header.CompanyEntryDescription = "PRENOTE"
+		batch.Entries[0].Amount = 102
+		batch.Entries[0].TransactionCode = CheckingPrenoteDebit
+		require.ErrorContains(t, batch.Create(), ErrBatchAmountNonZero.Error())
+
+		batch.Entries[0].Amount = 0
+		require.NoError(t, batch.Create())
+	})
 }
 
 func TestBatch_AllowInvalidAmounts(t *testing.T) {
@@ -1094,23 +1134,14 @@ func TestBatch_AllowInvalidAmounts(t *testing.T) {
 		BatchNumber:             63472,
 	}
 	entry := &EntryDetail{
-		TransactionCode:        CheckingReturnNOCDebit,
-		RDFIIdentification:     "98765432",
-		CheckDigit:             "0",
-		DFIAccountNumber:       "4000000013",
-		Amount:                 0,
-		IndividualName:         "Jane Doe",
-		TraceNumber:            "123456781176120",
-		Category:               CategoryReturn,
-		AddendaRecordIndicator: 1,
-		Addenda99: &Addenda99{
-			TypeCode:           "99",
-			ReturnCode:         "R03",
-			OriginalTrace:      "987654327608587",
-			OriginalDFI:        "12345678",
-			AddendaInformation: "",
-			TraceNumber:        "123456781176120",
-		},
+		TransactionCode:    CheckingDebit,
+		RDFIIdentification: "98765432",
+		CheckDigit:         "0",
+		DFIAccountNumber:   "4000000013",
+		Amount:             0,
+		IndividualName:     "Jane Doe",
+		TraceNumber:        "123456781176120",
+		Category:           CategoryForward,
 	}
 	b, err := NewBatch(bh)
 	require.NoError(t, err)
