@@ -1,3 +1,18 @@
+## v1.39.0 (Released 2024-05-10)
+
+This release of moov-io/ach removes the check verifying Amount is non-zero. This has been removed because returned Prenotes
+were being incorrectly marked as invalid.
+
+IMPROVEMENTS
+
+- fix: stop checking if .Amount is valid for returns
+
+BUILD
+
+- fix(deps): update module golang.org/x/net to v0.25.0
+- build(deps): bump bulma-clean-theme from 0.13.3 to 0.14.0 in /docs
+- build(deps): bump golang.org/x/text from 0.14.0 to 0.15.0
+
 ## v1.38.1 (Released 2024-04-29)
 
 IMPROVEMENTS
