@@ -17,11 +17,12 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-13, macos-14, windows-latest]
+        version: [stable, oldstable]
     steps:
     - name: Set up Go 1.x
       uses: actions/setup-go@v5
       with:
-        go-version: stable
+        go-version: ${{ matrix.version }}
       id: go
 
     - name: Check out code into the Go module directory
