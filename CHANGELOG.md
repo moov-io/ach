@@ -1,4 +1,4 @@
-## v1.39.1 (Released 2024-05-10)
+## v1.39.2 (Released 2024-05-10)
 
 This release of moov-io/ach removes the check verifying Amount is non-zero. This has been removed because returned Prenotes
 were being incorrectly marked as invalid.
