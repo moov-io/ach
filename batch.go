@@ -1038,6 +1038,7 @@ func (batch *Batch) ValidAmountForCodes(entry *EntryDetail) error {
 	if batch.validateOpts != nil && batch.validateOpts.AllowInvalidAmounts {
 		return nil
 	}
+
 	if entry != nil && (entry.Addenda98 != nil || entry.Addenda98Refused != nil) {
 		// NOC entries will have a zero'd amount value
 		if entry.Amount != 0 {
@@ -1045,7 +1046,12 @@ func (batch *Batch) ValidAmountForCodes(entry *EntryDetail) error {
 		}
 		return nil
 	}
+	if entry != nil && (entry.Addenda99 != nil || entry.Addenda99Contested != nil || entry.Addenda99Dishonored != nil) {
+		// Returned prenotes can have a zero amount, so allow returns through
+		return nil
+	}
 
+	// If the entry is a PRENOTE force it's amount to be zero
 	var isPrenoteDesc bool
 	if batch != nil && batch.Header != nil {
 		isPrenoteDesc = strings.EqualFold(batch.Header.CompanyEntryDescription, "PRENOTE")
