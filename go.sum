@@ -42,8 +42,8 @@ github.com/mattn/go-isatty v0.0.14/go.mod h1:7GGIvUiUoEMVVmxf/4nioHXj79iQHKdU27k
 github.com/mattn/go-isatty v0.0.16/go.mod h1:kYGgaQfpe5nmfYZH+SKPsOc2e4SrIfOl2e/yFXSvRLM=
 github.com/mattn/go-isatty v0.0.19 h1:JITubQf0MOLdlGRuRq+jtsDlekdYPia9ZFsB8h/APPA=
 github.com/mattn/go-isatty v0.0.19/go.mod h1:W+V8PltTTMOvKvAeJH7IuucS94S2C6jfK/D7dTCTo3Y=
-github.com/moov-io/base v0.49.1 h1:qoIqWimWBTD4duREAu0GDv+euZt4Wczd0OI/n6V6psA=
-github.com/moov-io/base v0.49.1/go.mod h1:ri6h0lEraRhho1S7Qe9uZy3mH77fkXU4Vnt3KjAVzaw=
+github.com/moov-io/base v0.49.2 h1:R9c9r6Bhlp94f5mgjsT/tbb81Rji0RD/z3ZTjdsuTDo=
+github.com/moov-io/base v0.49.2/go.mod h1:ri6h0lEraRhho1S7Qe9uZy3mH77fkXU4Vnt3KjAVzaw=
 github.com/moov-io/iso4217 v0.3.0 h1:xAxeJEn7QIpEy971eElEGiaLNdj81UwOcCcvE6j2ZAo=
 github.com/moov-io/iso4217 v0.3.0/go.mod h1:/pF1mBInDSJtwyWkLNr8EMdIn1zIl2cyjaVi4Xhpd44=
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 h1:Jamvg5psRIccs7FGNTlIRMkT8wgtp5eCXdBlqhYGL6U=
