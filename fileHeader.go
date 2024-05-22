@@ -196,6 +196,11 @@ func (fh *FileHeader) Validate() error {
 	return fh.ValidateWith(fh.validateOpts)
 }
 
+var (
+	zeroRoutingNumber9  = strings.Repeat("0", 9)
+	zeroRoutingNumber10 = strings.Repeat("0", 10)
+)
+
 // ValidateWith performs NACHA format rule checks on each record according to their specification
 // overlayed with any custom flags.
 // The first error encountered is returned and stops the parsing.
@@ -225,13 +230,12 @@ func (fh *FileHeader) ValidateWith(opts *ValidateOpts) error {
 		return fieldError("ImmediateDestinationName", err, fh.ImmediateDestinationName)
 	}
 	if !opts.BypassOriginValidation {
+		if fh.ImmediateOrigin == zeroRoutingNumber9 || fh.ImmediateOrigin == zeroRoutingNumber10 {
+			return fieldError("ImmediateOrigin", ErrConstructor, fh.ImmediateOrigin)
+		}
 		if opts.RequireABAOrigin {
 			if err := CheckRoutingNumber(fh.ImmediateOrigin); err != nil {
-				return fieldError("ImmediateOrigin", ErrConstructor, fh.ImmediateOrigin)
-			}
-		} else {
-			if fh.ImmediateOrigin == "0000000000" {
-				return fieldError("ImmediateOrigin", ErrConstructor, fh.ImmediateOrigin)
+				return fieldError("ImmediateOrigin", err, fh.ImmediateOrigin)
 			}
 		}
 	}
