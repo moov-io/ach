@@ -625,7 +625,19 @@ func TestFHImmediateDestinationInvalidLength(t *testing.T) {
 	}
 }
 
-func TestFHImmediateDestinationInvalidCheckSum(t *testing.T) {
+func TestFHImmediateOriginInvalidChecksum(t *testing.T) {
+	fh := mockFileHeader()
+	fh.ImmediateOrigin = "123456781"
+	fh.SetValidation(&ValidateOpts{
+		RequireABAOrigin: true,
+	})
+	err := fh.Validate()
+	if !strings.Contains(err.Error(), "routing number checksum mismatch") {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+func TestFHImmediateDestinationInvalidChecksum(t *testing.T) {
 	fh := mockFileHeader()
 	fh.ImmediateDestination = "121042880"
 	err := fh.Validate()
