@@ -41,6 +41,9 @@ jobs:
       env:
         GOLANGCI_LINTERS: gosec
 
+    - name: WASM
+      run: make build-wasm
+
   docker:
     name: Docker
     runs-on: ubuntu-latest
