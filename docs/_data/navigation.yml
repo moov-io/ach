@@ -3,7 +3,7 @@
 - name: Go
   link: https://pkg.go.dev/github.com/moov-io/ach#section-documentation
 - name: Demo
-  link: https://oss.moov.io/ach/
+  link: https://moov-io.github.io/ach/webui/
 - name: Community
   dropdown:
     - name: Awesome Fintech
