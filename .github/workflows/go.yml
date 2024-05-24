@@ -41,8 +41,8 @@ jobs:
       env:
         GOLANGCI_LINTERS: gosec
 
-    - name: WASM
-      run: make build-wasm
+    - name: WebUI
+      run: make build-webui
 
   docker:
     name: Docker
