@@ -6,7 +6,7 @@ on:
     tags: [ "v*.*.*" ]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   testing:
@@ -28,9 +28,10 @@ jobs:
     - name: Check
       run: make check
 
+    - name: WASM
+      run: make dist-wasm
+
   create_release:
-    permissions:
-      contents: write
     name: Create Release
     needs: [testing]
     runs-on: ubuntu-latest
@@ -56,8 +57,6 @@ jobs:
         retention-days: 1
 
   publish:
-    permissions:
-      contents: write
     name: Publish
     needs: [testing, create_release]
     runs-on: ${{ matrix.os }}
