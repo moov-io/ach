@@ -351,6 +351,8 @@ type getFileContentsRequest struct {
 	ID string
 
 	requestID string
+
+	opts *ach.WriteOpts
 }
 
 type getFileContentsResponse struct {
@@ -366,7 +368,7 @@ func getFileContentsEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 			return getFileContentsResponse{Err: ErrFoundABug}, ErrFoundABug
 		}
 
-		r, err := s.GetFileContents(req.ID)
+		r, err := s.GetFileContents(req.ID, req.opts)
 
 		if logger != nil {
 			logger := logger.With(log.Fields{

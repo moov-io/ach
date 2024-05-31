@@ -18,6 +18,8 @@
 package server
 
 import (
+	"github.com/moov-io/ach"
+	"github.com/moov-io/base"
 	"io"
 	"log"
 	"os"
@@ -25,9 +27,6 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/moov-io/ach"
-	"github.com/moov-io/base"
 
 	"github.com/stretchr/testify/require"
 )
@@ -122,7 +121,7 @@ func TestGetFileContents(t *testing.T) {
 	s.CreateBatch(id, batch)
 
 	// build file
-	r, err := s.GetFileContents(id)
+	r, err := s.GetFileContents(id, nil)
 	if err != nil {
 		if !strings.Contains(err.Error(), "mandatory ") {
 			t.Fatal(err.Error())
@@ -135,7 +134,40 @@ func TestGetFileContents(t *testing.T) {
 		}
 
 		if len(bs) == 0 {
-			t.Fatal("expected to read fil")
+			t.Fatal("expected to read file")
+		}
+	}
+}
+
+func TestGetFileContents_CRLF(t *testing.T) {
+	s := mockServiceInMemory(t)
+	id, err := s.CreateFile(mockFileHeader())
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	// make the file valid
+	batch := mockBatchWEB(t)
+	s.CreateBatch(id, batch)
+
+	// build file
+	opts := &ach.WriteOpts{
+		LineEnding: "\r\n",
+	}
+	r, err := s.GetFileContents(id, opts)
+	if err != nil {
+		if !strings.Contains(err.Error(), "mandatory ") {
+			t.Fatal(err.Error())
+		}
+	}
+	if r != nil {
+		bs, err := io.ReadAll(r)
+		if err != nil {
+			t.Fatal(err.Error())
+		}
+
+		if len(bs) == 0 {
+			t.Fatal("expected to read file")
 		}
 	}
 }
