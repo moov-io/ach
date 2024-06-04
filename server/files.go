@@ -352,7 +352,7 @@ type getFileContentsRequest struct {
 
 	requestID string
 
-	opts *ach.WriteOpts
+	lineEnding string
 }
 
 type getFileContentsResponse struct {
@@ -368,12 +368,14 @@ func getFileContentsEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 			return getFileContentsResponse{Err: ErrFoundABug}, ErrFoundABug
 		}
 
-		r, err := s.GetFileContents(req.ID, req.opts)
+		opts := &ach.WriteOpts{LineEnding: req.lineEnding}
+		r, err := s.GetFileContents(req.ID, opts)
 
 		if logger != nil {
 			logger := logger.With(log.Fields{
-				"files":     log.String("getFileContents"),
-				"requestID": log.String(req.requestID),
+				"files":      log.String("getFileContents"),
+				"requestID":  log.String(req.requestID),
+				"lineEnding": log.String(req.lineEnding),
 			})
 			if err != nil {
 				logger.Error().LogError(err)
@@ -396,9 +398,15 @@ func decodeGetFileContentsRequest(_ context.Context, r *http.Request) (interface
 		return nil, ErrBadRouting
 	}
 	return getFileContentsRequest{
-		ID:        id,
-		requestID: moovhttp.GetRequestID(r),
+		ID:         id,
+		requestID:  moovhttp.GetRequestID(r),
+		lineEnding: GetLineEnding(r),
 	}, nil
+}
+
+// GetLineEnding returns the header value for Line Endings
+func GetLineEnding(r *http.Request) string {
+	return r.Header.Get("X-Line-Ending")
 }
 
 type validateFileRequest struct {
