@@ -404,9 +404,14 @@ func decodeGetFileContentsRequest(_ context.Context, r *http.Request) (interface
 	}, nil
 }
 
-// GetLineEnding returns the header value for Line Endings
+// Inspects the `X-Line-Ending` header. If it is a valid value (CRLF | LF), returns the line ending associated
+// with the selected enum value. Otherwise, defaults to Unix-style newline characters.
 func GetLineEnding(r *http.Request) string {
-	return r.Header.Get("X-Line-Ending")
+	header := r.Header.Get("X-Line-Ending")
+	if header == "CRLF" {
+		return "\r\n"
+	}
+	return "\n"
 }
 
 type validateFileRequest struct {

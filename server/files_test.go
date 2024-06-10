@@ -1086,12 +1086,11 @@ func TestFileContentsByID__getFileContentsEndpoint_WindowsLineEndings(t *testing
 	file, _ := ach.FileFromJSON(bs)
 	repo.StoreFile(file)
 
-	lineEnding := "\r\n"
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", fmt.Sprintf("/files/%s/contents", file.ID), nil)
 	req.Header.Set("Origin", "https://moov.io")
 	req.Header.Set("X-Request-Id", "11113")
-	req.Header.Set("X-Line-Ending", lineEnding)
+	req.Header.Set("X-Line-Ending", "CRLF")
 
 	router.ServeHTTP(w, req)
 	w.Flush()
@@ -1099,7 +1098,7 @@ func TestFileContentsByID__getFileContentsEndpoint_WindowsLineEndings(t *testing
 	if w.Code != http.StatusOK {
 		t.Errorf("bogus HTTP status: %d", w.Code)
 	}
-	lines := strings.Split(w.Body.String(), lineEnding)
+	lines := strings.Split(w.Body.String(), "\r\n")
 	require.True(t, len(lines) >= 10)
 }
 
@@ -1119,12 +1118,11 @@ func TestFileContentsByID__getFileContentsEndpoint_UnixLineEndings(t *testing.T)
 	file, _ := ach.FileFromJSON(bs)
 	repo.StoreFile(file)
 
-	lineEnding := "\n"
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", fmt.Sprintf("/files/%s/contents", file.ID), nil)
 	req.Header.Set("Origin", "https://moov.io")
 	req.Header.Set("X-Request-Id", "11113")
-	req.Header.Set("X-Line-Ending", lineEnding)
+	req.Header.Set("X-Line-Ending", "LF")
 
 	router.ServeHTTP(w, req)
 	w.Flush()
@@ -1132,7 +1130,7 @@ func TestFileContentsByID__getFileContentsEndpoint_UnixLineEndings(t *testing.T)
 	if w.Code != http.StatusOK {
 		t.Errorf("bogus HTTP status: %d", w.Code)
 	}
-	lines := strings.Split(w.Body.String(), lineEnding)
+	lines := strings.Split(w.Body.String(), "\n")
 	require.True(t, len(lines) >= 10)
 	// Line terminator should be `\n` and NOT include a carriage return.
 	windowsLines := strings.Split(w.Body.String(), "\r\n")
