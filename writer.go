@@ -35,11 +35,26 @@ type Writer struct {
 	BypassValidation bool
 }
 
+// WriteOpts defines options for writing a file.
+type WriteOpts struct {
+	// LineEnding sets a custom line ending character.
+	LineEnding string `json:"lineEnding"`
+}
+
 // NewWriter returns a new Writer that writes to w.
 func NewWriter(w io.Writer) *Writer {
+	return NewWriterWithOpts(w, nil)
+}
+
+// NewWriter returns a new Writer that writes to w.
+func NewWriterWithOpts(w io.Writer, opts *WriteOpts) *Writer {
+	lineEnding := "\n"
+	if opts != nil && opts.LineEnding != "" {
+		lineEnding = opts.LineEnding
+	}
 	return &Writer{
 		w:          bufio.NewWriter(w),
-		LineEnding: "\n", //set default line ending
+		LineEnding: lineEnding,
 	}
 }
 

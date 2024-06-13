@@ -351,6 +351,8 @@ type getFileContentsRequest struct {
 	ID string
 
 	requestID string
+
+	lineEnding string
 }
 
 type getFileContentsResponse struct {
@@ -366,12 +368,14 @@ func getFileContentsEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 			return getFileContentsResponse{Err: ErrFoundABug}, ErrFoundABug
 		}
 
-		r, err := s.GetFileContents(req.ID)
+		opts := &ach.WriteOpts{LineEnding: req.lineEnding}
+		r, err := s.GetFileContents(req.ID, opts)
 
 		if logger != nil {
 			logger := logger.With(log.Fields{
-				"files":     log.String("getFileContents"),
-				"requestID": log.String(req.requestID),
+				"files":      log.String("getFileContents"),
+				"requestID":  log.String(req.requestID),
+				"lineEnding": log.String(req.lineEnding),
 			})
 			if err != nil {
 				logger.Error().LogError(err)
@@ -394,9 +398,20 @@ func decodeGetFileContentsRequest(_ context.Context, r *http.Request) (interface
 		return nil, ErrBadRouting
 	}
 	return getFileContentsRequest{
-		ID:        id,
-		requestID: moovhttp.GetRequestID(r),
+		ID:         id,
+		requestID:  moovhttp.GetRequestID(r),
+		lineEnding: GetLineEnding(r),
 	}, nil
+}
+
+// Inspects the `X-Line-Ending` header. If it is a valid value (CRLF | LF), returns the line ending associated
+// with the selected enum value. Otherwise, defaults to Unix-style newline characters.
+func GetLineEnding(r *http.Request) string {
+	header := r.Header.Get("X-Line-Ending")
+	if header == "CRLF" {
+		return "\r\n"
+	}
+	return "\n"
 }
 
 type validateFileRequest struct {

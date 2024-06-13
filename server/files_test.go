@@ -1068,7 +1068,73 @@ func TestFileContentsByID__getFileContentsEndpoint(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Errorf("bogus HTTP status: %d", w.Code)
 	}
+}
 
+func TestFileContentsByID__getFileContentsEndpoint_WindowsLineEndings(t *testing.T) {
+	logger := log.NewNopLogger()
+	repo := NewRepositoryInMemory(testTTLDuration, logger)
+	svc := NewService(repo)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
+
+	// write an ACH file into repository
+	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-valid.json"))
+	if fd == nil {
+		t.Fatalf("empty ACH file: %v", err)
+	}
+	defer fd.Close()
+	bs, _ := io.ReadAll(fd)
+	file, _ := ach.FileFromJSON(bs)
+	repo.StoreFile(file)
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", fmt.Sprintf("/files/%s/contents", file.ID), nil)
+	req.Header.Set("Origin", "https://moov.io")
+	req.Header.Set("X-Request-Id", "11113")
+	req.Header.Set("X-Line-Ending", "CRLF")
+
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+	lines := strings.Split(w.Body.String(), "\r\n")
+	require.True(t, len(lines) >= 10)
+}
+
+func TestFileContentsByID__getFileContentsEndpoint_UnixLineEndings(t *testing.T) {
+	logger := log.NewNopLogger()
+	repo := NewRepositoryInMemory(testTTLDuration, logger)
+	svc := NewService(repo)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
+
+	// write an ACH file into repository
+	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-valid.json"))
+	if fd == nil {
+		t.Fatalf("empty ACH file: %v", err)
+	}
+	defer fd.Close()
+	bs, _ := io.ReadAll(fd)
+	file, _ := ach.FileFromJSON(bs)
+	repo.StoreFile(file)
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", fmt.Sprintf("/files/%s/contents", file.ID), nil)
+	req.Header.Set("Origin", "https://moov.io")
+	req.Header.Set("X-Request-Id", "11113")
+	req.Header.Set("X-Line-Ending", "LF")
+
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+	lines := strings.Split(w.Body.String(), "\n")
+	require.True(t, len(lines) >= 10)
+	// Line terminator should be `\n` and NOT include a carriage return.
+	windowsLines := strings.Split(w.Body.String(), "\r\n")
+	require.True(t, len(windowsLines) == 1)
 }
 
 // TestFilesByID__deleteFileEndpoint tests by File ID

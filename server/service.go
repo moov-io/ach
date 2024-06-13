@@ -46,7 +46,7 @@ type Service interface {
 	// DeleteFile takes a file resource ID and deletes it from the store
 	DeleteFile(id string) error
 	// GetFileContents creates a valid plaintext file in memory assuming it has a FileHeader and at least one Batch record.
-	GetFileContents(id string) (io.Reader, error)
+	GetFileContents(id string, opts *ach.WriteOpts) (io.Reader, error)
 	// ValidateFile
 	ValidateFile(id string, opts *ach.ValidateOpts) error
 	// BalanceFile will apply a given offset record to the file
@@ -129,7 +129,7 @@ func (s *service) DeleteFile(id string) error {
 	return s.store.DeleteFile(id)
 }
 
-func (s *service) GetFileContents(id string) (io.Reader, error) {
+func (s *service) GetFileContents(id string, opts *ach.WriteOpts) (io.Reader, error) {
 	f, err := s.GetFile(id)
 	if err != nil {
 		return nil, fmt.Errorf("problem reading file %s: %v", id, err)
@@ -139,7 +139,7 @@ func (s *service) GetFileContents(id string) (io.Reader, error) {
 	}
 
 	var buf bytes.Buffer
-	w := ach.NewWriter(&buf)
+	w := ach.NewWriterWithOpts(&buf, opts)
 	if err := w.Write(f); err != nil {
 		return nil, fmt.Errorf("problem writing plaintext file %s: %v", id, err)
 	}

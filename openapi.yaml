@@ -307,6 +307,13 @@ paths:
           example: "rs4f9915"
           schema:
             type: string
+        - name: X-Line-Ending
+          in: header
+          description: Optional Line Ending allows application developer to alter line ending of the file data returned. Supported choices are LF (Line Feed) and CRLF (Carriage Return Line Feed).
+          example: "CRLF"
+          schema:
+            type: string
+            enum: ["LF", "CRLF"]
         - name: fileID
           in: path
           description: File ID
