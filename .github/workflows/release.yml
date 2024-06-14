@@ -28,9 +28,6 @@ jobs:
     - name: Check
       run: make check
 
-    - name: WebUI
-      run: make dist-webui
-
   create_release:
     name: Create Release
     needs: [testing]
@@ -81,6 +78,10 @@ jobs:
 
     - name: Distribute
       run: make dist
+
+    - name: WebUI
+      if: runner.os == 'Linux'
+      run: make dist-webui
 
     - name: Get Release File Name & Upload URL
       id: get_release_info
