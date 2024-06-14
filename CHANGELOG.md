@@ -1,3 +1,18 @@
+## v1.40.0 (Released 2024-06-14)
+
+IMPROVEMENTS
+
+- feat: allow specifying line ending via API
+- fix: return checksum error when ImmediateOrigin doesn't validate
+
+BUILD
+
+- build: run oldstable Go in CI
+- build(deps): bump github.com/moov-io/base from 0.49.3 to 0.49.4
+- build(deps-dev): bump nokogiri from 1.16.2 to 1.16.5 in /docs
+- build(deps): bump rexml from 3.2.6 to 3.2.8 in /docs
+- build(deps): bump golang.org/x/net from 0.25.0 to 0.26.0
+
 ## v1.39.2 (Released 2024-05-10)
 
 This release of moov-io/ach removes the check verifying Amount is non-zero. This has been removed because returned Prenotes
