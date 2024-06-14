@@ -65,7 +65,7 @@ dist-webui: build-webui
 	git config user.name "moov-bot"
 	git config user.email "oss@moov.io"
 	git add ./docs/webui/assets/wasm_exec.js ./docs/webui/assets/ach.wasm
-	git commit -m "chore: updating wasm webui" || echo "No changes to commit"
+	git commit -m "chore: updating wasm webui [skip ci]" || echo "No changes to commit"
 	git push origin master
 
 docker: clean docker-hub docker-openshift

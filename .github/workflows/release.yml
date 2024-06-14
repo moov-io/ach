@@ -79,10 +79,6 @@ jobs:
     - name: Distribute
       run: make dist
 
-    - name: WebUI
-      if: runner.os == 'Linux'
-      run: make dist-webui
-
     - name: Get Release File Name & Upload URL
       id: get_release_info
       shell: bash
@@ -158,6 +154,27 @@ jobs:
         asset_path: ./bin/achcli.exe
         asset_name: achcli.exe
         asset_content_type: application/octet-stream
+
+  webui:
+    name: WebUI
+    needs: [testing, create_release]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v5
+      with:
+        go-version: stable
+      id: go
+
+    - name: Check out code
+      uses: actions/checkout@v4
+
+    - name: Switch to master
+      run: |
+        git checkout master
+
+    - name: Distribute
+      run: make dist-webui
 
   docker:
     name: Docker
