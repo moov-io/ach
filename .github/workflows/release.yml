@@ -22,8 +22,8 @@ jobs:
         go-version: stable
       id: go
 
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v3
+    - name: Check out code
+      uses: actions/checkout@v4
 
     - name: Check
       run: make check
@@ -70,8 +70,8 @@ jobs:
         go-version: stable
       id: go
 
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v3
+    - name: Check out code
+      uses: actions/checkout@v4
 
     - name: Load Release URL File from release job
       uses: actions/download-artifact@v4
@@ -169,8 +169,8 @@ jobs:
         go-version: stable
       id: go
 
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v3
+    - name: Check out code
+      uses: actions/checkout@v4
 
     - name: Docker
       run: make docker
