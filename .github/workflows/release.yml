@@ -171,6 +171,7 @@ jobs:
 
     - name: Switch to master
       run: |
+        git fetch origin
         git checkout master
 
     - name: Distribute
