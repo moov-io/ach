@@ -1,4 +1,4 @@
-## v1.40.2 (Released 2024-06-14)
+## v1.40.3 (Released 2024-06-14)
 
 IMPROVEMENTS
 
