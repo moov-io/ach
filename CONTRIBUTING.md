@@ -187,15 +187,15 @@ $ go test ./cmd/readACH -bench=BenchmarkTestFileRead -count=10000 > BenchmarkTes
 
 ## References
 
-* [Wikipedia: Automated Clearing House](http://en.wikipedia.org/wiki/Automated_Clearing_House)
-* [Nacha ACH Network: How it Works](https://www.nacha.org/ach-network)
+* [Wikipedia: Automated Clearing House](https://en.wikipedia.org/wiki/Automated_Clearing_House)
+* [NACHA ACH Network: How it Works](https://www.nacha.org/ach-network)
 * [Federal ACH Directory](https://www.frbservices.org/EPaymentsDirectory/search.html)
 
 ## Format Specification
 
 * [NACHA ACH File Details](https://achdevguide.nacha.org/ach-file-details)
 * [PNC ACH File Specification](http://content.pncmc.com/live/pnc/corporate/treasury-management/ach-conversion/ACH-File-Specifications.pdf)
-* [Thomson Reuters ACH FIle Structure](https://www.thomsonreuters.com/en-us/help/accounting-cs/direct-deposit/ach-structure-and-contents.html)
+* [Thomson Reuters ACH File Structure](https://www.thomsonreuters.com/en-us/help/accounting-cs/direct-deposit/ach-structure-and-contents.html)
 * [Gusto: How ACH Works: A developer perspective](https://medium.com/gusto-engineering/how-ach-works-a-developer-perspective-part-5-1d998bbcd82c)
 
 ![ACH File Layout](https://github.com/moov-io/ach/blob/master/docs/ach_file_structure_shg.gif)
