@@ -1,3 +1,15 @@
+## v1.40.4 (Unreleased)
+
+IMPROVEMENTS
+
+- docs: fix capitlization error. Changed '9' to '('
+- docs: update CONTRIBUTING.md
+
+BUILD
+
+- build(deps): bump github.com/moov-io/base from 0.49.4 to 0.50.0
+- fix(deps): update module golang.org/x/net to v0.27.0
+
 ## v1.40.3 (Released 2024-06-14)
 
 IMPROVEMENTS
