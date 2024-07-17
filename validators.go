@@ -28,29 +28,6 @@ import (
 	"unicode/utf8"
 )
 
-var (
-	lowerAlphaCharacters  = "abcdefghijklmnopqrstuvwxyz"
-	numericCharacters     = "0123456789"
-	asciiCharacters       = ` !"#$%&'()*+,-./:;<=>?@[\]^_{|}~` + "`"
-	ebcdicExtraCharacters = `¢¬¦±`
-	realWorldEncountered  = `Ø`
-
-	validAlphaNumericCharacters          map[rune]bool
-	validUppercaseAlphaNumericCharacters map[rune]bool
-)
-
-func init() {
-	validAlphaNumericCharacters = setupCharacterMap(
-		lowerAlphaCharacters, strings.ToUpper(lowerAlphaCharacters), numericCharacters, asciiCharacters,
-		ebcdicExtraCharacters, realWorldEncountered,
-	)
-
-	validUppercaseAlphaNumericCharacters = setupCharacterMap(
-		strings.ToUpper(lowerAlphaCharacters), numericCharacters, asciiCharacters,
-		ebcdicExtraCharacters, realWorldEncountered,
-	)
-}
-
 // validator is common validation and formatting of golang types to ach type strings
 type validator struct{}
 
@@ -438,40 +415,43 @@ func (v *validator) isTransactionTypeCode(s string) error {
 	return ErrTransactionTypeCode
 }
 
-func setupCharacterMap(inputs ...string) map[rune]bool {
-	out := make(map[rune]bool)
-	for _, input := range inputs {
-		for _, r := range input {
-			out[r] = true
+// isUpperASCII checks if string only contains ASCII alphanumeric upper case characters
+func (v *validator) isUpperASCII(s string) error {
+	for _, r := range s {
+		if (r == 0x20) || (0x30 <= r && r <= 0x39) || 0x41 <= r && r <= 0x5A { // Space, 0 to 9, A to Z
+			continue
 		}
-	}
-	return out
-}
-
-func (v *validator) includesValidCharacters(input string, charset map[rune]bool) error {
-	for _, i := range input {
-		_, found := charset[i]
-		if !found {
-			return fmt.Errorf("invalid character: %v", i)
-		}
+		return fmt.Errorf("%w: %c", ErrUpperAlpha, r)
 	}
 	return nil
 }
 
-// isUpperAlphanumeric checks if string only contains ASCII alphanumeric upper case characters
-func (v *validator) isUpperAlphanumeric(s string) error {
-	err := v.includesValidCharacters(s, validUppercaseAlphaNumericCharacters)
-	if err != nil {
-		return fmt.Errorf("%w: %v", ErrUpperAlpha, err)
-	}
-	return nil
-}
+var (
+	slashZero = []rune(`Ø`)[0]
+)
 
 // isAlphanumeric checks if a string only contains ASCII alphanumeric characters
 func (v *validator) isAlphanumeric(s string) error {
-	err := v.includesValidCharacters(s, validAlphaNumericCharacters)
-	if err != nil {
-		return fmt.Errorf("%w: %v", ErrNonAlphanumeric, err)
+	for _, r := range s {
+		if 0x20 <= r && r <= 0x7E { // Space to ~ (Typical ASCII)
+			continue
+		}
+		if 0xC0 <= r && r <= 0xFF { // À to ÿ (Extended Latin Alphabet)
+			continue
+		}
+		// Specific characters that are accepted
+		switch r {
+		case
+			0xA2, // ¢ - Cent Sign
+			0xAC, // ¬ - Negation
+			0xA6, // ¦ - Pipe
+			0xB1, // ± - Plus or Minus Sign
+			slashZero:
+			continue
+
+			// case `¢`, `¬`, `¦`, `±`, `Ø`:
+		}
+		return fmt.Errorf("%w: %c", ErrNonAlphanumeric, r)
 	}
 	return nil
 }

@@ -146,15 +146,15 @@ func TestValidators__isAlphanumeric(t *testing.T) {
 			name:      "is alphanumeric",
 			checkFunc: v.isAlphanumeric,
 			shouldErr: func(i int) bool {
-				return i <= 0x1F || i > 0x7E
+				return (i <= 0x1F || i > 0x7E) && (i < 0xC0 || i > 0xFF)
 			},
 		},
-		// Ensure that ASCII characters from 0x20 to 0x60 and 0x7B to 0x7E are considered upper case alphanumeric.
+		// Ensure that ASCII characters from 0x41 to 0x5A are considered upper case ASCII.
 		{
-			name:      "is upper alphanumeric",
-			checkFunc: v.isUpperAlphanumeric,
+			name:      "is upper ascii",
+			checkFunc: v.isUpperASCII,
 			shouldErr: func(i int) bool {
-				return i <= 0x1F || i > 0x7E || (i > 0x60 && i < 0x7B)
+				return i != 0x20 && (i < 0x30 || i > 0x39) && (i < 0x41 || i > 0x5A)
 			},
 		},
 	}
@@ -187,13 +187,13 @@ func TestValidators__isAlphanumeric(t *testing.T) {
 func TestValidators__isAlphanumericExamples(t *testing.T) {
 	v := validator{}
 
-	validCases := []string{"Acme Corp!", `|`, `¦`, `¢`, `¬`, `±`}
+	validCases := []string{"Acme Corp!", `|`, `¦`, `¢`, `¬`, `±`, `ã`, `è`, `ñ`}
 	for i := range validCases {
 		err := v.isAlphanumeric(validCases[i])
 		require.NoError(t, err, fmt.Sprintf("input: %q", validCases[i]))
 	}
 
-	invalidCases := []string{`©`, `®`, `§101.1`, `ã`, `è`}
+	invalidCases := []string{`©`, `®`, `§101.1`}
 	for i := range invalidCases {
 		err := v.isAlphanumeric(invalidCases[i])
 		require.ErrorIs(t, err, ErrNonAlphanumeric, fmt.Sprintf("input: %q", invalidCases[i]))

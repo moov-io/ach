@@ -211,7 +211,7 @@ func (fh *FileHeader) ValidateWith(opts *ValidateOpts) error {
 	if err := fh.fieldInclusion(); err != nil {
 		return err
 	}
-	if err := fh.isUpperAlphanumeric(fh.FileIDModifier); err != nil {
+	if err := fh.isUpperASCII(fh.FileIDModifier); err != nil {
 		return fieldError("FileIDModifier", err, fh.FileIDModifier)
 	}
 	if len(fh.FileIDModifier) != 1 {
