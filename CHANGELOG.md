@@ -1,9 +1,10 @@
-## v1.40.4 (Unreleased)
+## v1.40.4 (Released 2024-07-18)
 
 IMPROVEMENTS
 
 - docs: fix capitlization error. Changed '9' to '('
 - docs: update CONTRIBUTING.md
+- fix: expand which latin characters are accepted
 
 BUILD
 
