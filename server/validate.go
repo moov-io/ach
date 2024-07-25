@@ -48,6 +48,7 @@ const (
 	unequalAddendaCounts             = "unequalAddendaCounts"
 	preserveSpaces                   = "preserveSpaces"
 	allowInvalidAmounts              = "allowInvalidAmounts"
+	allowZeroEntryAmount             = "allowZeroEntryAmount"
 )
 
 // readValidateOpts parses ValidateOpts from the URL query parameters and from the request body.
@@ -75,6 +76,7 @@ func readValidateOpts(request *http.Request) (io.Reader, *ach.ValidateOpts, erro
 		unequalAddendaCounts,
 		preserveSpaces,
 		allowInvalidAmounts,
+		allowZeroEntryAmount,
 	}
 
 	var buf bytes.Buffer
@@ -130,6 +132,8 @@ func readValidateOpts(request *http.Request) (io.Reader, *ach.ValidateOpts, erro
 			opts.PreserveSpaces = yes
 		case allowInvalidAmounts:
 			opts.AllowInvalidAmounts = yes
+		case allowZeroEntryAmount:
+			opts.AllowZeroEntryAmount = yes
 		}
 	}
 

@@ -1064,6 +1064,9 @@ func (batch *Batch) ValidAmountForCodes(entry *EntryDetail) error {
 		return fieldError("Amount", ErrBatchAmountNonZero, entry.Amount)
 	} else {
 		if entry.Amount == 0 {
+			if batch.validateOpts != nil && batch.validateOpts.AllowZeroEntryAmount {
+				return nil
+			}
 			return fieldError("Amount", ErrBatchAmountZero, entry.Amount)
 		}
 	}

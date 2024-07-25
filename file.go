@@ -712,6 +712,9 @@ type ValidateOpts struct {
 
 	// AllowInvalidAmounts will skip verifying the Amount is valid for the TransactionCode and entry type.
 	AllowInvalidAmounts bool `json:"allowInvalidAmounts"`
+
+	// AllowZeroEntryAmount will skip enforcing the entry Amount to be non-zero
+	AllowZeroEntryAmount bool `json:"allowZeroEntryAmount"`
 }
 
 // merge will combine two ValidateOpts structs and keep any non-zero field values.

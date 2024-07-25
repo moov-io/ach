@@ -92,6 +92,9 @@ UnequalAddendaCounts bool `json:"unequalAddendaCounts"`
 ```
 // AllowInvalidAmounts will skip verifying the Amount is valid for the TransactionCode and entry type.
 AllowInvalidAmounts bool `json:"allowInvalidAmounts"`
+
+// AllowZeroEntryAmount will skip enforcing the entry Amount to be non-zero.
+AllowZeroEntryAmount bool `json:"allowZeroEntryAmount"`
 ```
 
 ### File Header
