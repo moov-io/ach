@@ -1,3 +1,14 @@
+## v1.41.0 (Released 2024-07-29)
+
+IMPROVEMENTS
+
+- feat: add AllowZeroEntryAmount validation option
+
+BUILD
+
+- build(deps): bump ossf/scorecard-action from 2.3.3 to 2.4.0
+- build(deps): bump rexml from 3.2.8 to 3.3.2 in /docs
+
 ## v1.40.4 (Released 2024-07-18)
 
 IMPROVEMENTS
