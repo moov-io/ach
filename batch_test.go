@@ -1121,6 +1121,23 @@ func TestBatch__ValidAmountForCodes(t *testing.T) {
 	})
 }
 
+func TestBatch_ValidAmountForCodes_AllowZeroEntryAmount(t *testing.T) {
+	b1 := mockBatchWEB(t)
+
+	// Standard EntryDetails should pass
+	require.NoError(t, b1.Create())
+
+	// Verify a zero amount fails
+	b1.Entries[0].Amount = 0
+	require.ErrorContains(t, b1.Create(), ErrBatchAmountZero.Error())
+
+	// Bypass zero amount check
+	b1.SetValidation(&ValidateOpts{
+		AllowZeroEntryAmount: true,
+	})
+	require.NoError(t, b1.Create())
+}
+
 func TestBatch_AllowInvalidAmounts(t *testing.T) {
 	bh := &BatchHeader{
 		OriginatorStatusCode:    1,
