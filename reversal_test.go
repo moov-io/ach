@@ -56,3 +56,71 @@ func TestFileDebitReversal(t *testing.T) {
 	require.Len(t, entries, 1)
 	require.Equal(t, CheckingCredit, entries[0].TransactionCode)
 }
+
+func TestReversal_GL(t *testing.T) {
+	// Debit
+	file, err := ReadFile(filepath.Join("test", "testdata", "gl-debit.ach"))
+	require.NoError(t, err)
+
+	b1 := file.Batches[0]
+	entries := b1.GetEntries()
+	require.Len(t, entries, 1)
+	require.Equal(t, GLDebit, entries[0].TransactionCode)
+
+	// Reverse
+	effectiveEntryDate := time.Now().In(time.UTC)
+	err = file.Reversal(effectiveEntryDate)
+	require.NoError(t, err)
+
+	b1 = file.Batches[0]
+	require.Equal(t, "REVERSAL", b1.GetHeader().CompanyEntryDescription)
+
+	entries = b1.GetEntries()
+	require.Len(t, entries, 1)
+	require.Equal(t, GLCredit, entries[0].TransactionCode)
+
+	// Reverse the REVERSAL
+	err = file.Reversal(effectiveEntryDate)
+	require.NoError(t, err)
+
+	b1 = file.Batches[0]
+	require.Equal(t, "REVERSAL", b1.GetHeader().CompanyEntryDescription)
+
+	entries = b1.GetEntries()
+	require.Len(t, entries, 1)
+	require.Equal(t, GLDebit, entries[0].TransactionCode)
+}
+
+func TestReversal_LoanCredit(t *testing.T) {
+	// Credit
+	file, err := ReadFile(filepath.Join("test", "testdata", "loan-credit.ach"))
+	require.NoError(t, err)
+
+	b1 := file.Batches[0]
+	entries := b1.GetEntries()
+	require.Len(t, entries, 1)
+	require.Equal(t, LoanCredit, entries[0].TransactionCode)
+
+	// Reverse
+	effectiveEntryDate := time.Now().In(time.UTC)
+	err = file.Reversal(effectiveEntryDate)
+	require.NoError(t, err)
+
+	b1 = file.Batches[0]
+	require.Equal(t, "REVERSAL", b1.GetHeader().CompanyEntryDescription)
+
+	entries = b1.GetEntries()
+	require.Len(t, entries, 1)
+	require.Equal(t, LoanDebit, entries[0].TransactionCode)
+
+	// Reverse the REVERSAL
+	err = file.Reversal(effectiveEntryDate)
+	require.NoError(t, err)
+
+	b1 = file.Batches[0]
+	require.Equal(t, "REVERSAL", b1.GetHeader().CompanyEntryDescription)
+
+	entries = b1.GetEntries()
+	require.Len(t, entries, 1)
+	require.Equal(t, LoanCredit, entries[0].TransactionCode)
+}
