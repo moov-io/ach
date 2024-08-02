@@ -81,11 +81,11 @@ docker-openshift:
 .PHONY: clean-integration test-integration
 
 clean-integration:
-	docker-compose kill
-	docker-compose rm -v -f
+	docker compose kill
+	docker compose rm -v -f
 
 test-integration: clean-integration
-	docker-compose up -d
+	docker compose up -d
 	sleep 5
 	curl -v http://localhost:8080/files
 
