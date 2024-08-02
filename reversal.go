@@ -56,20 +56,28 @@ func (f *File) Reversal(effectiveEntryDate time.Time) error {
 			case
 				CheckingCredit, CheckingReturnNOCCredit, CheckingPrenoteCredit, CheckingZeroDollarRemittanceCredit,
 				GLCredit, GLPrenoteCredit, GLReturnNOCCredit, GLZeroDollarRemittanceCredit,
-				LoanCredit, LoanPrenoteCredit, LoanReturnNOCCredit, LoanZeroDollarRemittanceCredit,
+				LoanPrenoteCredit, LoanReturnNOCCredit, LoanZeroDollarRemittanceCredit,
 				SavingsCredit, SavingsPrenoteCredit, SavingsReturnNOCCredit, SavingsZeroDollarRemittanceCredit:
 				// Credit -> Debit
 				hasDebits = true
 				entries[j].TransactionCode += 5
 
+			case LoanCredit:
+				hasDebits = true
+				entries[j].TransactionCode += 3
+
 			case
 				CheckingDebit, CheckingPrenoteDebit, CheckingReturnNOCDebit, CheckingZeroDollarRemittanceDebit,
 				GLDebit, GLPrenoteDebit, GLReturnNOCDebit, GLZeroDollarRemittanceDebit,
-				LoanDebit, LoanReturnNOCDebit,
+				LoanReturnNOCDebit,
 				SavingsDebit, SavingsPrenoteDebit, SavingsReturnNOCDebit, SavingsZeroDollarRemittanceDebit:
 				// Debit -> Credit
 				hasCredits = true
 				entries[j].TransactionCode -= 5
+
+			case LoanDebit:
+				hasDebits = true
+				entries[j].TransactionCode -= 3
 			}
 		}
 
