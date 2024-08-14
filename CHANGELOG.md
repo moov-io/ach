@@ -1,3 +1,19 @@
+## v1.41.1 (Released 2024-08-14)
+
+IMPROVEMENTS
+
+- fix: allow ForeignExchangeReferenceIndicator=0 when ForeignExchangeIndicator=FF
+- fix: correctly reverse loan transaction codes, test GL credit/debit
+
+BUILD
+
+- build(deps): bump golang from 1.22-alpine to 1.23-alpine
+- build(deps): bump golang.org/x/net from 0.27.0 to 0.28.0
+- build(deps): bump golang.org/x/text from 0.16.0 to 0.17.0
+- build(deps): bump rexml from 3.3.2 to 3.3.3 in /docs
+- build(deps-dev): bump github-pages from 231 to 232 in /docs
+- build: convert docker-compose to docker compose
+
 ## v1.41.0 (Released 2024-07-29)
 
 IMPROVEMENTS
