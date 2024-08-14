@@ -29,7 +29,7 @@ import (
 //
 // The Addenda14 identifies the Receiving financial institution holding the Receiver's account.
 type Addenda14 struct {
-	// ID is a client defined string used as a reference to this record.
+	// ID is an identifier only used by the moov-io/ach HTTP server as a way to identify a batch.
 	ID string `json:"id"`
 	// TypeCode Addenda14 types code '14'
 	TypeCode string `json:"typeCode"`

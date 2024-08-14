@@ -31,7 +31,7 @@ import (
 // processing of the IAT entry. If no Foreign Correspondent Bank is involved,t he record should not be
 // included. A maximum of five of these Addenda Records may be included with each IAT entry.
 type Addenda18 struct {
-	// ID is a client defined string used as a reference to this record.
+	// ID is an identifier only used by the moov-io/ach HTTP server as a way to identify a batch.
 	ID string `json:"id"`
 	// TypeCode Addenda18 types code '18'
 	TypeCode string `json:"typeCode"`

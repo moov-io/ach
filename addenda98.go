@@ -27,7 +27,7 @@ import (
 // Addenda98 is a Addendumer addenda record format for Notification OF Change(98)
 // The field contents for Notification of Change Entries must match the field contents of the original Entries
 type Addenda98 struct {
-	// ID is a client defined string used as a reference to this record.
+	// ID is an identifier only used by the moov-io/ach HTTP server as a way to identify a batch.
 	ID string `json:"id"`
 	// TypeCode Addenda types code '98'
 	TypeCode string `json:"typeCode"`

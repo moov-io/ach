@@ -42,7 +42,7 @@ func init() {
 
 // Addenda99 utilized for Notification of Change Entry (COR) and Return types.
 type Addenda99 struct {
-	// ID is a client defined string used as a reference to this record.
+	// ID is an identifier only used by the moov-io/ach HTTP server as a way to identify a batch.
 	ID string `json:"id"`
 	// TypeCode Addenda types code '99'
 	TypeCode string `json:"typeCode"`

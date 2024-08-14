@@ -31,7 +31,7 @@ import (
 // settlement date, for all entries contained in this batch. The settlement date
 // field is not entered as it is determined by the ACH operator
 type BatchHeader struct {
-	// ID is a client defined string used as a reference to this record.
+	// ID is an identifier only used by the moov-io/ach HTTP server as a way to identify a batch.
 	ID string `json:"id"`
 
 	// ServiceClassCode ACH Mixed Debits and Credits '200'

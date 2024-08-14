@@ -27,7 +27,7 @@ import (
 // ADVBatchControl contains entry counts, dollar total and has totals for all
 // entries contained in the preceding batch
 type ADVBatchControl struct {
-	// ID is a client defined string used as a reference to this record.
+	// ID is an identifier only used by the moov-io/ach HTTP server as a way to identify a batch.
 	ID string `json:"id"`
 	// This should be the same as BatchHeader ServiceClassCode for ADV: AutomatedAccountingAdvices.
 	ServiceClassCode int `json:"serviceClassCode"`

@@ -26,7 +26,7 @@ import (
 // Code 02 in a machine readable format. It is usually formatted according to ANSI, ASC, X12 Standard.
 // It is used for following StandardEntryClassCode: MTE, POS, and SHR.
 type Addenda02 struct {
-	// ID is a client defined string used as a reference to this record.
+	// ID is an identifier only used by the moov-io/ach HTTP server as a way to identify a batch.
 	ID string `json:"id"`
 	// TypeCode Addenda02 type code '02'
 	TypeCode string `json:"typeCode"`

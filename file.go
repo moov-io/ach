@@ -56,7 +56,9 @@ func (e FileError) Error() string {
 
 // File contains the structures of a parsed ACH File.
 type File struct {
-	ID         string         `json:"id"`
+	// ID is an identifier only used by the moov-io/ach HTTP server as a way to identify a file.
+	ID string `json:"id"`
+
 	Header     FileHeader     `json:"fileHeader"`
 	Batches    []Batcher      `json:"batches"`
 	IATBatches []IATBatch     `json:"IATBatches"`

@@ -29,7 +29,7 @@ import (
 //
 // The Addenda15 record identifies key information related to the Receiver.
 type Addenda15 struct {
-	// ID is a client defined string used as a reference to this record.
+	// ID is an identifier only used by the moov-io/ach HTTP server as a way to identify a batch.
 	ID string `json:"id"`
 	// TypeCode Addenda15 types code '15'
 	TypeCode string `json:"typeCode"`

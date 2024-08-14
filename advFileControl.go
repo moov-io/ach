@@ -24,7 +24,7 @@ import (
 // ADVFileControl record contains entry counts, dollar totals and hash
 // totals accumulated from each batchADV control record in the file.
 type ADVFileControl struct {
-	// ID is a client defined string used as a reference to this record.
+	// ID is an identifier only used by the moov-io/ach HTTP server as a way to identify a batch.
 	ID string `json:"id"`
 
 	// BatchCount total number of batches (i.e., '5' records) in the file

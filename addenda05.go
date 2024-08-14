@@ -26,7 +26,7 @@ import (
 // Code 05 in a machine readable format. It is usually formatted according to ANSI, ASC, X12 Standard.
 // It is used for the following StandardEntryClassCode: ACK, ATX, CCD, CIE, CTX, DNE, ENR, WEB, PPD, TRX.
 type Addenda05 struct {
-	// ID is a client defined string used as a reference to this record.
+	// ID is an identifier only used by the moov-io/ach HTTP server as a way to identify a batch.
 	ID string `json:"id"`
 	// TypeCode Addenda05 types code '05'
 	TypeCode string `json:"typeCode"`

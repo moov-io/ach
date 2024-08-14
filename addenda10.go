@@ -30,7 +30,7 @@ import (
 // The Addenda10 Record identifies the Receiver of the transaction and the dollar amount of
 // the payment.
 type Addenda10 struct {
-	// ID is a client defined string used as a reference to this record.
+	// ID is an identifier only used by the moov-io/ach HTTP server as a way to identify a batch.
 	ID string `json:"id"`
 	// TypeCode Addenda10 types code '10'
 	TypeCode string `json:"typeCode"`

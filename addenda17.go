@@ -30,7 +30,7 @@ import (
 // The Addenda17 record identifies payment-related data. A maximum of two of these Addenda Records
 // may be included with each IAT entry.
 type Addenda17 struct {
-	// ID is a client defined string used as a reference to this record.
+	// ID is an identifier only used by the moov-io/ach HTTP server as a way to identify a batch.
 	ID string `json:"id"`
 	// TypeCode Addenda17 types code '17'
 	TypeCode string `json:"typeCode"`

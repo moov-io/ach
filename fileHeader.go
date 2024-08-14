@@ -30,8 +30,9 @@ import (
 // contained in the file. The file header also includes creation date and time
 // fields which can be used to uniquely identify a file.
 type FileHeader struct {
-	// ID is a client defined string used as a reference to this record.
+	// ID is an identifier only used by the moov-io/ach HTTP server as a way to identify a batch.
 	ID string `json:"id"`
+
 	// PriorityCode consists of the numerals 01
 	priorityCode string
 

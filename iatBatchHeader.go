@@ -42,7 +42,7 @@ import (
 // the name and physical address of the Originator, name and physical address of the
 // Receiver, Receiver's account number, Receiver's bank identity and reason for the payment.
 type IATBatchHeader struct {
-	// ID is a client defined string used as a reference to this record.
+	// ID is an identifier only used by the moov-io/ach HTTP server as a way to identify a batch.
 	ID string `json:"id"`
 
 	// ServiceClassCode ACH Mixed Debits and Credits '200'

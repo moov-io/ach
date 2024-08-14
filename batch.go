@@ -28,8 +28,10 @@ import (
 
 // Batch holds the Batch Header and Batch Control and all Entry Records
 type Batch struct {
-	// id is a client defined string used as a reference to this record. accessed via ID/SetID
-	id         string
+	// id is an identifier only used by the moov-io/ach HTTP server as a way to identify a batch.
+	// This field is managed by SetID() and ID().
+	id string
+
 	Header     *BatchHeader      `json:"batchHeader"`
 	Entries    []*EntryDetail    `json:"entryDetails"`
 	Control    *BatchControl     `json:"batchControl"`
