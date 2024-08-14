@@ -141,28 +141,6 @@ func (v *validator) validateSimpleTime(s string) string {
 	return ""
 }
 
-// isForeignExchangeIndicator ensures foreign exchange indicators of an
-// IATBatchHeader is valid
-func (v *validator) isForeignExchangeIndicator(code string) error {
-	switch code {
-	case
-		"FV", "VF", "FF":
-		return nil
-	}
-	return ErrForeignExchangeIndicator
-}
-
-// isForeignExchangeReferenceIndicator ensures foreign exchange reference
-// indicator of am IATBatchHeader is valid
-func (v *validator) isForeignExchangeReferenceIndicator(code int) error {
-	switch code {
-	case
-		1, 2, 3:
-		return nil
-	}
-	return ErrForeignExchangeReferenceIndicator
-}
-
 // isIDNumberQualifier ensures ODFI Identification Number Qualifier is valid
 // For Inbound IATs: The 2-digit code that identifies the numbering scheme used in the
 // Foreign DFI Identification Number field:

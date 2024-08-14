@@ -563,6 +563,7 @@ func BenchmarkIATBHForeignExchangeIndicator(b *testing.B) {
 // testIATBHForeignExchangeReferenceIndicator validates IATBatchHeader ForeignExchangeReferenceIndicator fieldInclusion
 func testIATBHForeignExchangeReferenceIndicator(t testing.TB) {
 	bh := mockIATBatchHeaderFF()
+	bh.ForeignExchangeIndicator = "VF"
 	bh.ForeignExchangeReferenceIndicator = 0
 	err := bh.Validate()
 	if !base.Match(err, ErrFieldRequired) {

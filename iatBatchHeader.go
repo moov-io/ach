@@ -308,6 +308,32 @@ func (iatBh *IATBatchHeader) String() string {
 	return buf.String()
 }
 
+// isForeignExchangeIndicator ensures foreign exchange indicators of an
+// IATBatchHeader is valid
+func (iatBh *IATBatchHeader) isForeignExchangeIndicator() error {
+	switch iatBh.ForeignExchangeIndicator {
+	case "FV", "VF", "FF":
+		return nil
+	}
+	return ErrForeignExchangeIndicator
+}
+
+// isForeignExchangeReferenceIndicator ensures foreign exchange reference
+// indicator of am IATBatchHeader is valid
+func (iatBh *IATBatchHeader) isForeignExchangeReferenceIndicator() error {
+	switch iatBh.ForeignExchangeReferenceIndicator {
+	case 1, 2, 3:
+		return nil
+
+	case 0:
+		if iatBh.ForeignExchangeIndicator == "FF" {
+			return nil
+		}
+		return ErrForeignExchangeReferenceIndicator
+	}
+	return ErrForeignExchangeReferenceIndicator
+}
+
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops that parsing.
 func (iatBh *IATBatchHeader) Validate() error {
@@ -317,10 +343,10 @@ func (iatBh *IATBatchHeader) Validate() error {
 	if err := iatBh.isServiceClass(iatBh.ServiceClassCode); err != nil {
 		return fieldError("ServiceClassCode", err, strconv.Itoa(iatBh.ServiceClassCode))
 	}
-	if err := iatBh.isForeignExchangeIndicator(iatBh.ForeignExchangeIndicator); err != nil {
+	if err := iatBh.isForeignExchangeIndicator(); err != nil {
 		return fieldError("ForeignExchangeIndicator", err, iatBh.ForeignExchangeIndicator)
 	}
-	if err := iatBh.isForeignExchangeReferenceIndicator(iatBh.ForeignExchangeReferenceIndicator); err != nil {
+	if err := iatBh.isForeignExchangeReferenceIndicator(); err != nil {
 		return fieldError("ForeignExchangeReferenceIndicator", err, strconv.Itoa(iatBh.ForeignExchangeReferenceIndicator))
 	}
 	if !iso3166.Valid(iatBh.ISODestinationCountryCode) {
@@ -354,7 +380,9 @@ func (iatBh *IATBatchHeader) fieldInclusion() error {
 		return fieldError("ForeignExchangeIndicator", ErrFieldInclusion, iatBh.ForeignExchangeIndicator)
 	}
 	if iatBh.ForeignExchangeReferenceIndicator == 0 {
-		return fieldError("ForeignExchangeReferenceIndicator", ErrFieldRequired, strconv.Itoa(iatBh.ForeignExchangeReferenceIndicator))
+		if iatBh.ForeignExchangeIndicator != "FF" {
+			return fieldError("ForeignExchangeReferenceIndicator", ErrFieldRequired, strconv.Itoa(iatBh.ForeignExchangeReferenceIndicator))
+		}
 	}
 	// ToDo: It can be space filled based on ForeignExchangeReferenceIndicator just use a validator to handle -
 	// ToDo: Calling Field ok for validation?
