@@ -12,7 +12,7 @@ require (
 	github.com/juju/ansiterm v1.0.0
 	github.com/moov-io/base v0.51.1
 	github.com/moov-io/iso4217 v0.3.0
-	github.com/prometheus/client_golang v1.19.1
+	github.com/prometheus/client_golang v1.20.0
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/net v0.28.0
 	golang.org/x/sync v0.8.0
@@ -24,6 +24,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
+	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/lunixbochs/vtclean v1.0.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
