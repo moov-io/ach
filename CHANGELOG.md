@@ -1,3 +1,13 @@
+## v1.42.0 (Released 2024-08-20)
+
+BREAKING CHANGES
+
+This release of moov-io/ach adjusts the type of `ENRPaymentInformation.EnrolleeClassificationCode` to be a string (was int). This change is needed to properly support the values "A" (consumer) and "B" (company).
+
+IMPROVEMENTS
+
+- fix: cleanup ENR parsing and generation, add tests
+
 ## v1.41.1 (Released 2024-08-14)
 
 IMPROVEMENTS

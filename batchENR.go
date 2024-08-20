@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 // BatchENR is a non-monetary entry that enrolls a person with an agency of the US government
@@ -128,12 +129,40 @@ type ENRPaymentInformation struct {
 	//  1: (yes) - Initiated by someone other than named beneficiary
 	//  A: Enrollee is a consumer
 	//  b: Enrollee is a company
-	EnrolleeClassificationCode int
+	EnrolleeClassificationCode string
 }
 
 func (info *ENRPaymentInformation) String() string {
-	line := "TransactionCode: %d, RDFIIdentification: %s, CheckDigit: %s, DFIAccountNumber: %s, IndividualIdentification: %v, IndividualName: %s, EnrolleeClassificationCode: %d"
-	return fmt.Sprintf(line, info.TransactionCode, info.RDFIIdentification, info.CheckDigit, info.DFIAccountNumber, info.IndividualIdentification != "", info.IndividualName, info.EnrolleeClassificationCode)
+	// Stretch the companies name across two fields
+	var individualName string
+	if strings.EqualFold(info.EnrolleeClassificationCode, "B") {
+		// First fifteen characters are added
+		individualName = strings.TrimSpace(fmt.Sprintf("%15.15s", info.IndividualName)) + "*"
+
+		// Add on a second field if needed
+		runes := utf8.RuneCountInString(info.IndividualName)
+		if runes > 15 {
+			individualName += strings.TrimSpace(fmt.Sprintf("%7.7s", info.IndividualName[15:]))
+		}
+	} else {
+		// Format the Individual's name by Surname first
+		nameParts := strings.Fields(info.IndividualName)
+
+		if len(nameParts) > 1 {
+			// Surname comes fist
+			nameParts = append(nameParts[len(nameParts)-1:], nameParts[:len(nameParts)-1]...)
+		}
+		individualName = strings.Join(nameParts, "*")
+	}
+
+	return fmt.Sprintf(`%v*%v*%v*%v*%v*%v*%v\`,
+		info.TransactionCode,
+		info.RDFIIdentification,
+		info.CheckDigit,
+		info.DFIAccountNumber,
+		info.IndividualIdentification,
+		individualName,
+		info.EnrolleeClassificationCode)
 }
 
 // ParsePaymentInformation returns an ENRPaymentInformation for a given Addenda05 record. The information is parsed from the addenda's
@@ -150,9 +179,13 @@ func (batch *BatchENR) ParsePaymentInformation(addenda05 *Addenda05) (*ENRPaymen
 	if err != nil {
 		return nil, fmt.Errorf("ENR: unable to parse TransactionCode (%s) from Addenda05.ID=%s", parts[0], addenda05.ID)
 	}
-	enrolleeCode, err := strconv.Atoi(parts[7])
-	if err != nil {
-		return nil, fmt.Errorf("ENR: unable to parse EnrolleeClassificationCode (%s) from Addenda05.ID=%s", parts[7], addenda05.ID)
+
+	enrolleeClassificationCode := parts[7]
+
+	individualName := fmt.Sprintf("%s %s", parts[6], parts[5])
+	if strings.EqualFold(enrolleeClassificationCode, "B") {
+		// Business Names can be fill two field lengths
+		individualName = fmt.Sprintf("%s%s", parts[5], parts[6])
 	}
 
 	return &ENRPaymentInformation{
@@ -161,7 +194,7 @@ func (batch *BatchENR) ParsePaymentInformation(addenda05 *Addenda05) (*ENRPaymen
 		CheckDigit:                 parts[2],
 		DFIAccountNumber:           parts[3],
 		IndividualIdentification:   parts[4],
-		IndividualName:             fmt.Sprintf("%s %s", parts[6], parts[5]),
-		EnrolleeClassificationCode: enrolleeCode,
+		IndividualName:             individualName,
+		EnrolleeClassificationCode: enrolleeClassificationCode,
 	}, nil
 }
