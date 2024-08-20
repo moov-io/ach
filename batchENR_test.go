@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 // mockBatchENRHeader creates a ENR batch header
@@ -289,9 +290,85 @@ func TestBatchENR__PaymentInformation(t *testing.T) {
 	if v := info.IndividualName; v != "JOHN DOE" {
 		t.Errorf("IndividualName: %s", v)
 	}
-	if v := info.EnrolleeClassificationCode; v != 1 {
-		t.Errorf("EnrolleeClassificationCode: %d", v)
+	if v := info.EnrolleeClassificationCode; v != "1" {
+		t.Errorf("EnrolleeClassificationCode: %v", v)
 	}
+
+	b := &BatchENR{}
+	addenda05 = NewAddenda05()
+
+	t.Run("Nacha Examples", func(t *testing.T) {
+		// Consumer
+		input := `22*12200004*3*123987654321*777777777*DOE*JOHN*0\`
+		expected := &ENRPaymentInformation{
+			TransactionCode:            22,
+			RDFIIdentification:         "12200004",
+			CheckDigit:                 "3",
+			DFIAccountNumber:           "123987654321",
+			IndividualIdentification:   "777777777",
+			IndividualName:             "JOHN DOE",
+			EnrolleeClassificationCode: "0",
+		}
+		addenda05.PaymentRelatedInformation = input
+		parsed, err := b.ParsePaymentInformation(addenda05)
+		require.NoError(t, err)
+		require.Equal(t, expected, parsed)
+		require.Equal(t, input, parsed.String())
+
+		// Consumer
+		input = `27*12200004*3*123987654321*777777777*DOE*JOHN*A\`
+		addenda05.PaymentRelatedInformation = input
+		parsed, err = b.ParsePaymentInformation(addenda05)
+		require.NoError(t, err)
+
+		expected = &ENRPaymentInformation{
+			TransactionCode:            27,
+			RDFIIdentification:         "12200004",
+			CheckDigit:                 "3",
+			DFIAccountNumber:           "123987654321",
+			IndividualIdentification:   "777777777",
+			IndividualName:             "JOHN DOE",
+			EnrolleeClassificationCode: "A",
+		}
+		require.Equal(t, expected, parsed)
+		require.Equal(t, input, parsed.String())
+
+		// Company
+		input = `27*12200004*3*987654321123*876543210*ABCELECTRONICIN*DUSTRIE*B\`
+		addenda05.PaymentRelatedInformation = input
+		parsed, err = b.ParsePaymentInformation(addenda05)
+		require.NoError(t, err)
+
+		expected = &ENRPaymentInformation{
+			TransactionCode:            27,
+			RDFIIdentification:         "12200004",
+			CheckDigit:                 "3",
+			DFIAccountNumber:           "987654321123",
+			IndividualIdentification:   "876543210",
+			IndividualName:             "ABCELECTRONICINDUSTRIE",
+			EnrolleeClassificationCode: "B",
+		}
+		require.Equal(t, expected, parsed)
+		require.Equal(t, input, parsed.String())
+
+		// Company
+		input = `27*12200004*3*987654321123*876543210*ELECTRIC**B\`
+		addenda05.PaymentRelatedInformation = input
+		parsed, err = b.ParsePaymentInformation(addenda05)
+		require.NoError(t, err)
+
+		expected = &ENRPaymentInformation{
+			TransactionCode:            27,
+			RDFIIdentification:         "12200004",
+			CheckDigit:                 "3",
+			DFIAccountNumber:           "987654321123",
+			IndividualIdentification:   "876543210",
+			IndividualName:             "ELECTRIC",
+			EnrolleeClassificationCode: "B",
+		}
+		require.Equal(t, expected, parsed)
+		require.Equal(t, input, parsed.String())
+	})
 }
 
 // TestBatchENRValidTranCodeForServiceClassCode validates a transactionCode based on ServiceClassCode
