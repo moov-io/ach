@@ -84,11 +84,11 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 			fmt.Fprintf(w, "    %d %s\t%s\t%s\t%s\t%s\t%s\t%s\n", e.TransactionCode, transactionCodes[e.TransactionCode], e.RDFIIdentificationField(), accountNumber, amount, name, e.TraceNumberField(), e.Category)
 
 			dumpAddenda02(w, e.Addenda02)
-			for i := range e.Addenda05 {
-				if i == 0 {
+			for a := range e.Addenda05 {
+				if a == 0 {
 					fmt.Fprintln(w, "\n      Addenda05")
 				}
-				dumpAddenda05(w, e.Addenda05[i])
+				dumpAddenda05(w, file.Batches[i], e.Addenda05[a], opts)
 			}
 			dumpAddenda98(w, opts, e.Addenda98)
 			dumpAddenda99(w, e.Addenda99)
@@ -239,13 +239,31 @@ func dumpAddenda99Contested(w *tabwriter.Writer, a *ach.Addenda99Contested) {
 		a.ReturnSettlementDateField(), a.ReturnReasonCodeField(), a.DishonoredReturnTraceNumberField(), a.DishonoredReturnSettlementDateField(), a.DishonoredReturnReasonCodeField(), a.TraceNumberField())
 }
 
-func dumpAddenda05(w *tabwriter.Writer, a *ach.Addenda05) {
+func dumpAddenda05(w *tabwriter.Writer, batch ach.Batcher, a *ach.Addenda05, opts *Opts) {
 	if a == nil {
 		return
 	}
 
+	paymentRelatedInfo := a.PaymentRelatedInformationField()
+
+	switch b := batch.(type) {
+	case *ach.BatchENR:
+		paymentInfo, _ := b.ParsePaymentInformation(a)
+		if paymentInfo != nil {
+			if opts.MaskNames {
+				paymentInfo.IndividualName = maskName(paymentInfo.IndividualName)
+			}
+			if opts.MaskAccountNumbers {
+				paymentInfo.IndividualIdentification = maskNumber(paymentInfo.IndividualIdentification)
+				paymentInfo.DFIAccountNumber = maskNumber(paymentInfo.DFIAccountNumber)
+			}
+
+			paymentRelatedInfo = paymentInfo.String()
+		}
+	}
+
 	fmt.Fprintln(w, "      PaymentRelatedInformation\tSequenceNumber\tEntryDetailSequenceNumber")
-	fmt.Fprintf(w, "      %s\t%s\t%s\n", a.PaymentRelatedInformationField(), a.SequenceNumberField(), a.EntryDetailSequenceNumberField())
+	fmt.Fprintf(w, "      %s\t%s\t%s\n", paymentRelatedInfo, a.SequenceNumberField(), a.EntryDetailSequenceNumberField())
 }
 
 func dumpAddenda98(w *tabwriter.Writer, opts *Opts, a *ach.Addenda98) {
