@@ -12,7 +12,7 @@ require (
 	github.com/juju/ansiterm v1.0.0
 	github.com/moov-io/base v0.51.1
 	github.com/moov-io/iso4217 v0.3.0
-	github.com/prometheus/client_golang v1.20.1
+	github.com/prometheus/client_golang v1.20.2
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/net v0.28.0
 	golang.org/x/sync v0.8.0
