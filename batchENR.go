@@ -66,15 +66,15 @@ func (batch *BatchENR) Validate() error {
 		}
 
 		switch entry.TransactionCode {
-		case CheckingCredit, CheckingDebit, SavingsCredit, SavingsDebit:
+		case CheckingPrenoteCredit, SavingsPrenoteCredit:
 			// nothing
 		default:
 			return batch.Error("TransactionCode", ErrBatchTransactionCode, entry.TransactionCode)
 		}
-		// // Verify the Amount is valid for SEC code and TransactionCode
-		// if err := batch.ValidAmountForCodes(entry); err != nil { // TODO(adam): https://github.com/moov-io/ach/issues/1172
-		// 	return err
-		// }
+		// Verify the Amount is valid for SEC code and TransactionCode
+		if err := batch.ValidAmountForCodes(entry); err != nil {
+			return err
+		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {
 			return err
@@ -132,7 +132,7 @@ type ENRPaymentInformation struct {
 	EnrolleeClassificationCode string
 }
 
-func (info *ENRPaymentInformation) String() string {
+func (info ENRPaymentInformation) String() string {
 	// Stretch the companies name across two fields
 	var individualName string
 	if strings.EqualFold(info.EnrolleeClassificationCode, "B") {
@@ -165,11 +165,15 @@ func (info *ENRPaymentInformation) String() string {
 		info.EnrolleeClassificationCode)
 }
 
-// ParsePaymentInformation returns an ENRPaymentInformation for a given Addenda05 record. The information is parsed from the addenda's
+// ParseENRPaymentInformation returns an ENRPaymentInformation for a given Addenda05 record. The information is parsed from the addenda's
 // PaymentRelatedInformation field.
 //
 // The returned information is not validated for correctness.
-func (batch *BatchENR) ParsePaymentInformation(addenda05 *Addenda05) (*ENRPaymentInformation, error) {
+func ParseENRPaymentInformation(addenda05 *Addenda05) (*ENRPaymentInformation, error) {
+	if addenda05 == nil {
+		return nil, nil
+	}
+
 	parts := strings.Split(strings.TrimSuffix(addenda05.PaymentRelatedInformation, `\`), "*") // PaymentRelatedInformation is terminated by '\'
 	if len(parts) != 8 {
 		return nil, fmt.Errorf("ENR: unable to parse Addenda05 (%s) PaymentRelatedInformation", addenda05.ID)

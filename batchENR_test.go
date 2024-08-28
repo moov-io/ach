@@ -39,7 +39,7 @@ func mockBatchENRHeader() *BatchHeader {
 // mockENREntryDetail creates a ENR entry detail
 func mockENREntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = CheckingCredit
+	entry.TransactionCode = CheckingPrenoteCredit
 	entry.SetRDFI("031300012")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
@@ -267,7 +267,7 @@ func TestBatchENR__PaymentInformation(t *testing.T) {
 		t.Fatal(err)
 	}
 	addenda05 := batch.GetEntries()[0].Addenda05[0]
-	info, err := batch.ParsePaymentInformation(addenda05)
+	info, err := ParseENRPaymentInformation(addenda05)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -294,7 +294,6 @@ func TestBatchENR__PaymentInformation(t *testing.T) {
 		t.Errorf("EnrolleeClassificationCode: %v", v)
 	}
 
-	b := &BatchENR{}
 	addenda05 = NewAddenda05()
 
 	t.Run("Nacha Examples", func(t *testing.T) {
@@ -310,7 +309,7 @@ func TestBatchENR__PaymentInformation(t *testing.T) {
 			EnrolleeClassificationCode: "0",
 		}
 		addenda05.PaymentRelatedInformation = input
-		parsed, err := b.ParsePaymentInformation(addenda05)
+		parsed, err := ParseENRPaymentInformation(addenda05)
 		require.NoError(t, err)
 		require.Equal(t, expected, parsed)
 		require.Equal(t, input, parsed.String())
@@ -318,7 +317,7 @@ func TestBatchENR__PaymentInformation(t *testing.T) {
 		// Consumer
 		input = `27*12200004*3*123987654321*777777777*DOE*JOHN*A\`
 		addenda05.PaymentRelatedInformation = input
-		parsed, err = b.ParsePaymentInformation(addenda05)
+		parsed, err = ParseENRPaymentInformation(addenda05)
 		require.NoError(t, err)
 
 		expected = &ENRPaymentInformation{
@@ -336,7 +335,7 @@ func TestBatchENR__PaymentInformation(t *testing.T) {
 		// Company
 		input = `27*12200004*3*987654321123*876543210*ABCELECTRONICIN*DUSTRIE*B\`
 		addenda05.PaymentRelatedInformation = input
-		parsed, err = b.ParsePaymentInformation(addenda05)
+		parsed, err = ParseENRPaymentInformation(addenda05)
 		require.NoError(t, err)
 
 		expected = &ENRPaymentInformation{
@@ -354,7 +353,7 @@ func TestBatchENR__PaymentInformation(t *testing.T) {
 		// Company
 		input = `27*12200004*3*987654321123*876543210*ELECTRIC**B\`
 		addenda05.PaymentRelatedInformation = input
-		parsed, err = b.ParsePaymentInformation(addenda05)
+		parsed, err = ParseENRPaymentInformation(addenda05)
 		require.NoError(t, err)
 
 		expected = &ENRPaymentInformation{
