@@ -1,12 +1,29 @@
-## v1.42.0 (Released 2024-08-20)
+## v1.42.0 (Released 2024-08-28)
 
 BREAKING CHANGES
 
 This release of moov-io/ach adjusts the type of `ENRPaymentInformation.EnrolleeClassificationCode` to be a string (was int). This change is needed to properly support the values "A" (consumer) and "B" (company).
 
+This release also changes the parsing functions for ENR `PaymentRelatedInformation` to operate outside of a `BatchENR`. There was no reason for the method to be a pointer receiver.
+
+This release also changes the parsing functions for DNE `PaymentRelatedInformation` to return parsed information for all entries in a DNE batch. Previously only the first DNE record would be returned.
+
 IMPROVEMENTS
 
+- api: ValidateOpts exists on File
+- break: unlink ENR PaymentRelatedInformation parser from BatchENR
+- cmd/achcli/describe: accept mask flags for ENR payment related information
+- cmd/achcli/describe: mask customer SSN in DNE Addenda05 records
+- fix: DNE records use prenote TransactionCodes
 - fix: cleanup ENR parsing and generation, add tests
+- fix: read validateOpts from JSON blobs
+- fix: verify ACK and ATX amounts are zero
+- test: verify stdlib JSON marshal retains ValidateOpts
+
+BUILD
+
+- build(deps): bump rexml from 3.3.5 to 3.3.6 in /docs
+- fix(deps): update module github.com/prometheus/client_golang to v1.20.1
 
 ## v1.41.1 (Released 2024-08-14)
 
