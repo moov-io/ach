@@ -55,7 +55,7 @@ func main() {
 	add := batch.GetEntries()[0].Addenda05[0]
 
 	fmt.Printf("Payment Related Information: %s\n", add.PaymentRelatedInformation)
-	info, err := ach.ParseENRPaymentInformation(add)
+	info, err := batch.ParsePaymentInformation(add)
 	if err != nil {
 		log.Fatalf("Problem Parsing ENR Addenda05 PaymentRelatedInformation: %v\n", err)
 	}
