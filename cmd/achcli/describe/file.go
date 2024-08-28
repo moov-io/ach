@@ -246,9 +246,9 @@ func dumpAddenda05(w *tabwriter.Writer, batch ach.Batcher, a *ach.Addenda05, opt
 
 	paymentRelatedInfo := a.PaymentRelatedInformationField()
 
-	switch b := batch.(type) {
+	switch batch.(type) {
 	case *ach.BatchENR:
-		paymentInfo, _ := b.ParsePaymentInformation(a)
+		paymentInfo, _ := ach.ParseENRPaymentInformation(a)
 		if paymentInfo != nil {
 			if opts.MaskNames {
 				paymentInfo.IndividualName = maskName(paymentInfo.IndividualName)
@@ -256,6 +256,16 @@ func dumpAddenda05(w *tabwriter.Writer, batch ach.Batcher, a *ach.Addenda05, opt
 			if opts.MaskAccountNumbers {
 				paymentInfo.IndividualIdentification = maskNumber(paymentInfo.IndividualIdentification)
 				paymentInfo.DFIAccountNumber = maskNumber(paymentInfo.DFIAccountNumber)
+			}
+
+			paymentRelatedInfo = paymentInfo.String()
+		}
+
+	case *ach.BatchDNE:
+		paymentInfo, _ := ach.ParseDNEPaymentInformation(a)
+		if paymentInfo != nil {
+			if opts.MaskNames || opts.MaskAccountNumbers {
+				paymentInfo.CustomerSSN = maskNumber(paymentInfo.CustomerSSN)
 			}
 
 			paymentRelatedInfo = paymentInfo.String()
