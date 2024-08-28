@@ -205,7 +205,7 @@ func TestFiles__CustomJsonValidation(t *testing.T) {
 	var resp createFileResponse
 	err = json.NewDecoder(w.Body).Decode(&resp)
 
-	require.ErrorContains(t, err, "ImmediateOrigin 000000000 is a mandatory field")
+	require.NoError(t, err)
 	require.Equal(t, "adam-01", resp.ID)
 	require.NotNil(t, resp.File)
 	require.Equal(t, nil, resp.Err)
