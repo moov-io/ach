@@ -2191,3 +2191,16 @@ func TestFile_ValidateOpts_Merge(t *testing.T) {
 		require.NotNil(t, full.merge(empty))
 	})
 }
+
+func TestFileFromJSON_ValidateOpts(t *testing.T) {
+	bs, err := os.ReadFile(filepath.Join("test", "testdata", "ppd-valid-preserve-spaces.json"))
+	require.NoError(t, err)
+
+	file, err := FileFromJSON(bs)
+	require.NoError(t, err)
+	require.NotNil(t, file)
+
+	validateOpts := file.GetValidation()
+	require.NotNil(t, validateOpts)
+	require.True(t, validateOpts.PreserveSpaces)
+}

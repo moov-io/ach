@@ -204,6 +204,12 @@ func FileFromJSONWith(bs []byte, opts *ValidateOpts) (*File, error) {
 	if opts != nil {
 		file.SetValidation(opts)
 	}
+	validateOpts, err := readValidateOpts(bs)
+	if err != nil {
+		return nil, fmt.Errorf("reading validate opts: %w", err)
+	}
+	file.SetValidation(file.validateOpts.merge(validateOpts))
+
 	if err := file.Create(); err != nil {
 		return file, err
 	}
