@@ -822,6 +822,8 @@ components:
           nullable: true
         fileADVControl:
           $ref: '#/components/schemas/ADVFileControl'
+        validateOpts:
+          $ref: '#/components/schemas/ValidateOpts'
       required:
         - ID
         - fileHeader
