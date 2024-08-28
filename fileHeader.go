@@ -100,7 +100,7 @@ type FileHeader struct {
 	// converters is composed for ACH to GoLang Converters
 	converters
 
-	validateOpts *ValidateOpts
+	ValidateOpts *ValidateOpts `json:"validateOpts,omitempty"`
 }
 
 // NewFileHeader returns a new FileHeader with default values for none exported fields
@@ -145,11 +145,11 @@ func (fh *FileHeader) Parse(record string) {
 	// 40 always "1"
 	fh.formatCode = "1"
 	// 41-63 The name of the ODFI. example "SILICON VALLEY BANK    "
-	fh.ImmediateDestinationName = fh.parseStringFieldWithOpts(string(runes[40:63]), fh.validateOpts)
+	fh.ImmediateDestinationName = fh.parseStringFieldWithOpts(string(runes[40:63]), fh.ValidateOpts)
 	// 64-86 ACH operator or sending point that is sending the file
-	fh.ImmediateOriginName = fh.parseStringFieldWithOpts(string(runes[63:86]), fh.validateOpts)
+	fh.ImmediateOriginName = fh.parseStringFieldWithOpts(string(runes[63:86]), fh.ValidateOpts)
 	// 87-94 Optional field that may be used to describe the ACH file for internal accounting purposes
-	fh.ReferenceCode = fh.parseStringFieldWithOpts(string(runes[86:94]), fh.validateOpts)
+	fh.ReferenceCode = fh.parseStringFieldWithOpts(string(runes[86:94]), fh.ValidateOpts)
 }
 
 func trimRoutingNumberLeadingZero(s string) string {
@@ -188,13 +188,13 @@ func (fh *FileHeader) SetValidation(opts *ValidateOpts) {
 	if fh == nil {
 		return
 	}
-	fh.validateOpts = opts
+	fh.ValidateOpts = opts
 }
 
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops the parsing.
 func (fh *FileHeader) Validate() error {
-	return fh.ValidateWith(fh.validateOpts)
+	return fh.ValidateWith(fh.ValidateOpts)
 }
 
 var (
@@ -266,7 +266,7 @@ func (fh *FileHeader) ValidateWith(opts *ValidateOpts) error {
 // fieldInclusion validate mandatory fields are not default values. If fields are
 // invalid the ACH transfer will be returned.
 func (fh *FileHeader) fieldInclusion() error {
-	if fh.validateOpts != nil && fh.validateOpts.AllowMissingFileHeader {
+	if fh.ValidateOpts != nil && fh.ValidateOpts.AllowMissingFileHeader {
 		return nil
 	}
 
@@ -300,7 +300,7 @@ func (fh *FileHeader) ImmediateDestinationField() string {
 		return strings.Repeat(" ", 10)
 	}
 	fh.ImmediateDestination = strings.TrimSpace(fh.ImmediateDestination)
-	if fh.validateOpts != nil && fh.validateOpts.BypassDestinationValidation && len(fh.ImmediateDestination) == 10 {
+	if fh.ValidateOpts != nil && fh.ValidateOpts.BypassDestinationValidation && len(fh.ImmediateDestination) == 10 {
 		return fh.ImmediateDestination
 	}
 	return " " + fh.stringField(fh.ImmediateDestination, 9)
@@ -312,7 +312,7 @@ func (fh *FileHeader) ImmediateOriginField() string {
 		return strings.Repeat(" ", 10)
 	}
 	fh.ImmediateOrigin = strings.TrimSpace(fh.ImmediateOrigin)
-	if fh.validateOpts != nil && fh.validateOpts.BypassOriginValidation && len(fh.ImmediateOrigin) == 10 {
+	if fh.ValidateOpts != nil && fh.ValidateOpts.BypassOriginValidation && len(fh.ImmediateOrigin) == 10 {
 		return fh.ImmediateOrigin
 	}
 	return " " + fh.stringField(fh.ImmediateOrigin, 9)

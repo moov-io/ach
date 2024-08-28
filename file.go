@@ -71,7 +71,7 @@ type File struct {
 	// ReturnEntries is a slice of references to file.Batches that contain return entries
 	ReturnEntries []Batcher `json:"ReturnEntries"`
 
-	validateOpts *ValidateOpts
+	ValidateOpts *ValidateOpts `json:"validateOpts,omitempty"`
 }
 
 // NewFile constructs a file template.
@@ -217,17 +217,17 @@ func FileFromJSONWith(bs []byte, opts *ValidateOpts) (*File, error) {
 func (f *File) MarshalJSON() ([]byte, error) {
 	type Aux struct {
 		File
-		ValidateOpts *ValidateOpts `json:"validateOpts"`
+		ValidateOpts *ValidateOpts `json:"ValidateOpts"`
 	}
 	return json.Marshal(Aux{
 		File:         *f,
-		ValidateOpts: f.validateOpts,
+		ValidateOpts: f.ValidateOpts,
 	})
 }
 
 // UnmarshalJSON parses a JSON blob with ach.FileFromJSON
 func (f *File) UnmarshalJSON(p []byte) error {
-	file, err := FileFromJSONWith(p, f.validateOpts)
+	file, err := FileFromJSONWith(p, f.ValidateOpts)
 	if err != nil {
 		return err
 	}
@@ -244,7 +244,7 @@ func (f *File) UnmarshalJSON(p []byte) error {
 
 func readValidateOpts(p []byte) (*ValidateOpts, error) {
 	type Aux struct {
-		ValidateOpts *ValidateOpts `json:"validateOpts"`
+		ValidateOpts *ValidateOpts `json:"ValidateOpts"`
 	}
 	var opts Aux
 	err := json.Unmarshal(p, &opts)
@@ -369,7 +369,7 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 
 		batch := *batches.Batches[i]
 		batch.SetID(batch.Header.ID)
-		batch.SetValidation(f.validateOpts)
+		batch.SetValidation(f.ValidateOpts)
 
 		for _, e := range batch.Entries {
 			// these values need to be inferred from the json field names
@@ -400,7 +400,7 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 		}
 
 		iatBatch.ID = iatBatch.Header.ID
-		iatBatch.SetValidation(f.validateOpts)
+		iatBatch.SetValidation(f.ValidateOpts)
 
 		for _, e := range iatBatch.Entries {
 			setIATEntryRecordType(e)
@@ -468,14 +468,14 @@ func datetimeParse(v string) (time.Time, error) {
 // Create will modify the File to tabulate and assemble it into a valid state.
 // This includes setting any posting dates, sequence numbers, counts, and sums.
 //
-// Create requires a FileHeader and at least one Batch if validateOpts.AllowZeroBatches is false.
+// Create requires a FileHeader and at least one Batch if ValidateOpts.AllowZeroBatches is false.
 //
 // Since each Batch may modify computable fields in the File, any calls to
 // Batch.Create should be done before Create.
 //
 // To check if the File is Nacha compliant, call Validate or ValidateWith.
 func (f *File) Create() error {
-	opts := f.validateOpts
+	opts := f.ValidateOpts
 	if opts == nil {
 		opts = &ValidateOpts{}
 	}
@@ -622,14 +622,14 @@ func (f *File) SetHeader(h FileHeader) *File {
 //
 // The first error encountered is returned.
 func (f *File) Validate() error {
-	return f.ValidateWith(f.validateOpts)
+	return f.ValidateWith(f.ValidateOpts)
 }
 
 func (f *File) GetValidation() *ValidateOpts {
 	if f == nil {
 		return nil
 	}
-	return f.validateOpts
+	return f.ValidateOpts
 }
 
 // SetValidation stores ValidateOpts on the File which are to be used to override
@@ -639,7 +639,7 @@ func (f *File) SetValidation(opts *ValidateOpts) {
 		return
 	}
 
-	f.validateOpts = opts
+	f.ValidateOpts = opts
 	f.Header.SetValidation(opts)
 }
 
@@ -851,7 +851,7 @@ func (f *File) isEntryAddendaCount(IsADV bool) error {
 			count += iatBatch.GetControl().EntryAddendaCount
 		}
 		if f.Control.EntryAddendaCount != count {
-			if f.validateOpts != nil && f.validateOpts.UnequalAddendaCounts {
+			if f.ValidateOpts != nil && f.ValidateOpts.UnequalAddendaCounts {
 				return nil
 			}
 			return NewErrFileCalculatedControlEquality("EntryAddendaCount", count, f.Control.EntryAddendaCount)
@@ -861,7 +861,7 @@ func (f *File) isEntryAddendaCount(IsADV bool) error {
 			count += batch.GetADVControl().EntryAddendaCount
 		}
 		if f.ADVControl.EntryAddendaCount != count {
-			if f.validateOpts != nil && f.validateOpts.UnequalAddendaCounts {
+			if f.ValidateOpts != nil && f.ValidateOpts.UnequalAddendaCounts {
 				return nil
 			}
 			return NewErrFileCalculatedControlEquality("EntryAddendaCount", count, f.ADVControl.EntryAddendaCount)
@@ -1042,9 +1042,9 @@ func (f *File) SegmentFile(_ *SegmentFileConfiguration) (*File, *File, error) {
 	creditFile := NewFile()
 	debitFile := NewFile()
 
-	if f.validateOpts != nil {
-		creditFile.SetValidation(f.validateOpts)
-		debitFile.SetValidation(f.validateOpts)
+	if f.ValidateOpts != nil {
+		creditFile.SetValidation(f.ValidateOpts)
+		debitFile.SetValidation(f.ValidateOpts)
 	}
 
 	if f.Batches != nil {
@@ -1295,7 +1295,7 @@ func (f *File) isSequenceAscending() error {
 	lastSeq := 0
 	for _, batch := range f.Batches {
 		current := batch.GetHeader().BatchNumber
-		if f.validateOpts == nil || !f.validateOpts.CustomTraceNumbers {
+		if f.ValidateOpts == nil || !f.ValidateOpts.CustomTraceNumbers {
 			if current <= lastSeq {
 				return NewErrFileBatchNumberAscending(lastSeq, current)
 			}

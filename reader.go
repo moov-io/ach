@@ -251,9 +251,9 @@ func (r *Reader) Read() (File, error) {
 	}
 
 	// Carry through any ValidateOpts for this comparison
-	if (FileHeader{validateOpts: r.File.validateOpts}) == r.File.Header {
+	if (FileHeader{ValidateOpts: r.File.ValidateOpts}) == r.File.Header {
 		// Make sure we're required to report a missing FileHeader record
-		if r.File.validateOpts == nil || !r.File.validateOpts.AllowMissingFileHeader {
+		if r.File.ValidateOpts == nil || !r.File.ValidateOpts.AllowMissingFileHeader {
 			// There must be at least one File Header
 			r.recordName = "FileHeader"
 			r.errors.Add(ErrFileHeader)
@@ -262,7 +262,7 @@ func (r *Reader) Read() (File, error) {
 
 	if !r.File.IsADV() {
 		// Make sure we're required to report a missing FileControl record
-		if r.File.validateOpts == nil || !r.File.validateOpts.AllowMissingFileControl {
+		if r.File.ValidateOpts == nil || !r.File.ValidateOpts.AllowMissingFileControl {
 			if (FileControl{}) == r.File.Control {
 				// There must be at least one File Control
 				r.recordName = "FileControl"
@@ -271,7 +271,7 @@ func (r *Reader) Read() (File, error) {
 		}
 	} else {
 		// Make sure we're required to report a missing FileControl record
-		if r.File.validateOpts == nil || !r.File.validateOpts.AllowMissingFileControl {
+		if r.File.ValidateOpts == nil || !r.File.ValidateOpts.AllowMissingFileControl {
 			if (ADVFileControl{}) == r.File.ADVControl {
 				// There must be at least one File Control
 				r.recordName = "FileControl"
@@ -378,7 +378,7 @@ func (r *Reader) parseLine() error {
 			// Accumulate currentBatch before parsing another Batch
 			batch := r.currentBatch
 			r.currentBatch = nil
-			batch.SetValidation(r.File.validateOpts)
+			batch.SetValidation(r.File.ValidateOpts)
 			if !r.skipBatchAccumulation {
 				r.File.AddBatch(batch)
 			}
@@ -401,22 +401,22 @@ func (r *Reader) parseLine() error {
 		if r.currentBatch != nil {
 			batch := r.currentBatch
 			r.currentBatch = nil
-			batch.SetValidation(r.File.validateOpts)
+			batch.SetValidation(r.File.ValidateOpts)
 			if !r.skipBatchAccumulation {
 				r.File.AddBatch(batch)
 			}
-			if err := maybeValidate(batch, r.File.validateOpts); err != nil {
+			if err := maybeValidate(batch, r.File.ValidateOpts); err != nil {
 				r.recordName = "Batches"
 				return r.parseError(err)
 			}
 		} else {
 			batch := r.IATCurrentBatch
 			r.IATCurrentBatch = IATBatch{}
-			batch.SetValidation(r.File.validateOpts)
+			batch.SetValidation(r.File.ValidateOpts)
 			if !r.skipBatchAccumulation {
 				r.File.AddIATBatch(batch)
 			}
-			if err := maybeValidate(&batch, r.File.validateOpts); err != nil {
+			if err := maybeValidate(&batch, r.File.ValidateOpts); err != nil {
 				r.recordName = "Batches"
 				return r.parseError(err)
 			}
@@ -482,13 +482,13 @@ func (r *Reader) parseFileHeader() error {
 	r.recordName = "FileHeader"
 	// Pass through any ValidateOpts from the Reader for this comparison
 	// as we need to compare the other struct fields (e.g. origin, destination)
-	if (FileHeader{validateOpts: r.File.validateOpts}) != r.File.Header {
+	if (FileHeader{ValidateOpts: r.File.ValidateOpts}) != r.File.Header {
 		// There can only be one File Header per File exit
 		return ErrFileHeader
 	}
 	r.File.Header.Parse(r.line)
 
-	if err := maybeValidate(&r.File.Header, r.File.validateOpts); err != nil {
+	if err := maybeValidate(&r.File.Header, r.File.ValidateOpts); err != nil {
 		return r.parseError(err)
 	}
 	return nil
@@ -500,9 +500,9 @@ func (r *Reader) parseBatchHeader() error {
 
 	// Ensure we have a valid batch header before building a batch.
 	bh := NewBatchHeader()
-	bh.SetValidation(r.File.validateOpts)
+	bh.SetValidation(r.File.ValidateOpts)
 	bh.Parse(r.line)
-	if err := maybeValidate(bh, r.File.validateOpts); err != nil {
+	if err := maybeValidate(bh, r.File.ValidateOpts); err != nil {
 		return r.parseError(err)
 	}
 
@@ -525,16 +525,16 @@ func (r *Reader) parseEntryDetail() error {
 	}
 	if r.currentBatch.GetHeader().StandardEntryClassCode != ADV {
 		ed := NewEntryDetail()
-		ed.SetValidation(r.File.validateOpts)
+		ed.SetValidation(r.File.ValidateOpts)
 		ed.Parse(r.line)
-		if err := maybeValidate(ed, r.File.validateOpts); err != nil {
+		if err := maybeValidate(ed, r.File.ValidateOpts); err != nil {
 			return r.parseError(err)
 		}
 		r.currentBatch.AddEntry(ed)
 	} else {
 		ed := NewADVEntryDetail()
 		ed.Parse(r.line)
-		if err := maybeValidate(ed, r.File.validateOpts); err != nil {
+		if err := maybeValidate(ed, r.File.ValidateOpts); err != nil {
 			return r.parseError(err)
 		}
 		r.currentBatch.AddADVEntry(ed)
@@ -561,14 +561,14 @@ func (r *Reader) parseAddenda() error {
 			case "02":
 				addenda02 := NewAddenda02()
 				addenda02.Parse(r.line)
-				if err := maybeValidate(addenda02, r.File.validateOpts); err != nil {
+				if err := maybeValidate(addenda02, r.File.ValidateOpts); err != nil {
 					return r.parseError(err)
 				}
 				r.currentBatch.GetEntries()[entryIndex].Addenda02 = addenda02
 			case "05":
 				addenda05 := NewAddenda05()
 				addenda05.Parse(r.line)
-				if err := maybeValidate(addenda05, r.File.validateOpts); err != nil {
+				if err := maybeValidate(addenda05, r.File.ValidateOpts); err != nil {
 					return r.parseError(err)
 				}
 				r.currentBatch.GetEntries()[entryIndex].AddAddenda05(addenda05)
@@ -579,7 +579,7 @@ func (r *Reader) parseAddenda() error {
 				case IsRefusedChangeCode(r.line[3:6]):
 					addenda98Refused := NewAddenda98Refused()
 					addenda98Refused.Parse(r.line)
-					if err := maybeValidate(addenda98Refused, r.File.validateOpts); err != nil {
+					if err := maybeValidate(addenda98Refused, r.File.ValidateOpts); err != nil {
 						return r.parseError(err)
 					}
 					r.currentBatch.GetEntries()[entryIndex].Category = CategoryNOC
@@ -588,7 +588,7 @@ func (r *Reader) parseAddenda() error {
 				default:
 					addenda98 := NewAddenda98()
 					addenda98.Parse(r.line)
-					if err := maybeValidate(addenda98, r.File.validateOpts); err != nil {
+					if err := maybeValidate(addenda98, r.File.ValidateOpts); err != nil {
 						return r.parseError(err)
 					}
 					r.currentBatch.GetEntries()[entryIndex].Category = CategoryNOC
@@ -601,8 +601,8 @@ func (r *Reader) parseAddenda() error {
 				case IsDishonoredReturnCode(r.line[3:6]):
 					addenda99Dishonored := NewAddenda99Dishonored()
 					addenda99Dishonored.Parse(r.line)
-					addenda99Dishonored.SetValidation(r.File.validateOpts)
-					if err := maybeValidate(addenda99Dishonored, r.File.validateOpts); err != nil {
+					addenda99Dishonored.SetValidation(r.File.ValidateOpts)
+					if err := maybeValidate(addenda99Dishonored, r.File.ValidateOpts); err != nil {
 						return r.parseError(err)
 					}
 					r.currentBatch.GetEntries()[entryIndex].Addenda99Dishonored = addenda99Dishonored
@@ -611,8 +611,8 @@ func (r *Reader) parseAddenda() error {
 				case IsContestedReturnCode(r.line[3:6]):
 					addenda99Contested := NewAddenda99Contested()
 					addenda99Contested.Parse(r.line)
-					addenda99Contested.SetValidation(r.File.validateOpts)
-					if err := maybeValidate(addenda99Contested, r.File.validateOpts); err != nil {
+					addenda99Contested.SetValidation(r.File.ValidateOpts)
+					if err := maybeValidate(addenda99Contested, r.File.ValidateOpts); err != nil {
 						return r.parseError(err)
 					}
 					r.currentBatch.GetEntries()[entryIndex].Addenda99Contested = addenda99Contested
@@ -621,8 +621,8 @@ func (r *Reader) parseAddenda() error {
 				default:
 					addenda99 := NewAddenda99()
 					addenda99.Parse(r.line)
-					addenda99.SetValidation(r.File.validateOpts)
-					if err := maybeValidate(addenda99, r.File.validateOpts); err != nil {
+					addenda99.SetValidation(r.File.ValidateOpts)
+					if err := maybeValidate(addenda99, r.File.ValidateOpts); err != nil {
 						return r.parseError(err)
 					}
 					r.currentBatch.GetEntries()[entryIndex].Addenda99 = addenda99
@@ -659,7 +659,7 @@ func (r *Reader) parseADVAddenda() error {
 	addenda99 := NewAddenda99()
 	addenda99.Parse(r.line)
 
-	if err := maybeValidate(addenda99, r.File.validateOpts); err != nil {
+	if err := maybeValidate(addenda99, r.File.ValidateOpts); err != nil {
 		return r.parseError(err)
 	}
 
@@ -679,19 +679,19 @@ func (r *Reader) parseBatchControl() error {
 	if r.currentBatch != nil {
 		if r.currentBatch.GetHeader().StandardEntryClassCode == ADV {
 			r.currentBatch.GetADVControl().Parse(r.line)
-			if err := maybeValidate(r.currentBatch.GetADVControl(), r.File.validateOpts); err != nil {
+			if err := maybeValidate(r.currentBatch.GetADVControl(), r.File.ValidateOpts); err != nil {
 				return r.parseError(err)
 			}
 		} else {
-			r.currentBatch.GetControl().SetValidation(r.File.validateOpts)
+			r.currentBatch.GetControl().SetValidation(r.File.ValidateOpts)
 			r.currentBatch.GetControl().Parse(r.line)
-			if err := maybeValidate(r.currentBatch.GetControl(), r.File.validateOpts); err != nil {
+			if err := maybeValidate(r.currentBatch.GetControl(), r.File.ValidateOpts); err != nil {
 				return r.parseError(err)
 			}
 		}
 	} else {
 		r.IATCurrentBatch.GetControl().Parse(r.line)
-		if err := maybeValidate(r.IATCurrentBatch.GetControl(), r.File.validateOpts); err != nil {
+		if err := maybeValidate(r.IATCurrentBatch.GetControl(), r.File.ValidateOpts); err != nil {
 			return r.parseError(err)
 		}
 
@@ -709,7 +709,7 @@ func (r *Reader) parseFileControl() error {
 			return ErrFileControl
 		}
 		r.File.Control.Parse(r.line)
-		if err := maybeValidate(&r.File.Control, r.File.validateOpts); err != nil {
+		if err := maybeValidate(&r.File.Control, r.File.ValidateOpts); err != nil {
 			return r.parseError(err)
 		}
 	} else {
@@ -718,7 +718,7 @@ func (r *Reader) parseFileControl() error {
 			return ErrFileControl
 		}
 		r.File.ADVControl.Parse(r.line)
-		if err := maybeValidate(&r.File.ADVControl, r.File.validateOpts); err != nil {
+		if err := maybeValidate(&r.File.ADVControl, r.File.ValidateOpts); err != nil {
 			return r.parseError(err)
 		}
 	}
@@ -734,7 +734,7 @@ func (r *Reader) parseIATBatchHeader() error {
 	// Ensure we have a valid IAT BatchHeader before building a batch.
 	bh := NewIATBatchHeader()
 	bh.Parse(r.line)
-	if err := maybeValidate(bh, r.File.validateOpts); err != nil {
+	if err := maybeValidate(bh, r.File.ValidateOpts); err != nil {
 		return r.parseError(err)
 	}
 
@@ -755,7 +755,7 @@ func (r *Reader) parseIATEntryDetail() error {
 
 	ed := NewIATEntryDetail()
 	ed.Parse(r.line)
-	if err := maybeValidate(ed, r.File.validateOpts); err != nil {
+	if err := maybeValidate(ed, r.File.ValidateOpts); err != nil {
 		return r.parseError(err)
 	}
 	r.IATCurrentBatch.AddEntry(ed)
@@ -814,63 +814,63 @@ func (r *Reader) mandatoryOptionalIATAddenda(entryIndex int) error {
 	case "10":
 		addenda10 := NewAddenda10()
 		addenda10.Parse(r.line)
-		if err := maybeValidate(addenda10, r.File.validateOpts); err != nil {
+		if err := maybeValidate(addenda10, r.File.ValidateOpts); err != nil {
 			return err
 		}
 		r.IATCurrentBatch.Entries[entryIndex].Addenda10 = addenda10
 	case "11":
 		addenda11 := NewAddenda11()
 		addenda11.Parse(r.line)
-		if err := maybeValidate(addenda11, r.File.validateOpts); err != nil {
+		if err := maybeValidate(addenda11, r.File.ValidateOpts); err != nil {
 			return err
 		}
 		r.IATCurrentBatch.Entries[entryIndex].Addenda11 = addenda11
 	case "12":
 		addenda12 := NewAddenda12()
 		addenda12.Parse(r.line)
-		if err := maybeValidate(addenda12, r.File.validateOpts); err != nil {
+		if err := maybeValidate(addenda12, r.File.ValidateOpts); err != nil {
 			return err
 		}
 		r.IATCurrentBatch.Entries[entryIndex].Addenda12 = addenda12
 	case "13":
 		addenda13 := NewAddenda13()
 		addenda13.Parse(r.line)
-		if err := maybeValidate(addenda13, r.File.validateOpts); err != nil {
+		if err := maybeValidate(addenda13, r.File.ValidateOpts); err != nil {
 			return err
 		}
 		r.IATCurrentBatch.Entries[entryIndex].Addenda13 = addenda13
 	case "14":
 		addenda14 := NewAddenda14()
 		addenda14.Parse(r.line)
-		if err := maybeValidate(addenda14, r.File.validateOpts); err != nil {
+		if err := maybeValidate(addenda14, r.File.ValidateOpts); err != nil {
 			return err
 		}
 		r.IATCurrentBatch.Entries[entryIndex].Addenda14 = addenda14
 	case "15":
 		addenda15 := NewAddenda15()
 		addenda15.Parse(r.line)
-		if err := maybeValidate(addenda15, r.File.validateOpts); err != nil {
+		if err := maybeValidate(addenda15, r.File.ValidateOpts); err != nil {
 			return err
 		}
 		r.IATCurrentBatch.Entries[entryIndex].Addenda15 = addenda15
 	case "16":
 		addenda16 := NewAddenda16()
 		addenda16.Parse(r.line)
-		if err := maybeValidate(addenda16, r.File.validateOpts); err != nil {
+		if err := maybeValidate(addenda16, r.File.ValidateOpts); err != nil {
 			return err
 		}
 		r.IATCurrentBatch.Entries[entryIndex].Addenda16 = addenda16
 	case "17":
 		addenda17 := NewAddenda17()
 		addenda17.Parse(r.line)
-		if err := maybeValidate(addenda17, r.File.validateOpts); err != nil {
+		if err := maybeValidate(addenda17, r.File.ValidateOpts); err != nil {
 			return err
 		}
 		r.IATCurrentBatch.Entries[entryIndex].AddAddenda17(addenda17)
 	case "18":
 		addenda18 := NewAddenda18()
 		addenda18.Parse(r.line)
-		if err := maybeValidate(addenda18, r.File.validateOpts); err != nil {
+		if err := maybeValidate(addenda18, r.File.ValidateOpts); err != nil {
 			return err
 		}
 		r.IATCurrentBatch.Entries[entryIndex].AddAddenda18(addenda18)
@@ -882,7 +882,7 @@ func (r *Reader) mandatoryOptionalIATAddenda(entryIndex int) error {
 func (r *Reader) nocIATAddenda(entryIndex int) error {
 	addenda98 := NewAddenda98()
 	addenda98.Parse(r.line)
-	if err := maybeValidate(addenda98, r.File.validateOpts); err != nil {
+	if err := maybeValidate(addenda98, r.File.ValidateOpts); err != nil {
 		return err
 	}
 	r.IATCurrentBatch.Entries[entryIndex].Addenda98 = addenda98
@@ -894,7 +894,7 @@ func (r *Reader) nocIATAddenda(entryIndex int) error {
 func (r *Reader) returnIATAddenda(entryIndex int) error {
 	addenda99 := NewAddenda99()
 	addenda99.Parse(r.line)
-	if err := maybeValidate(addenda99, r.File.validateOpts); err != nil {
+	if err := maybeValidate(addenda99, r.File.ValidateOpts); err != nil {
 		return err
 	}
 	r.IATCurrentBatch.Entries[entryIndex].Addenda99 = addenda99

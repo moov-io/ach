@@ -2034,7 +2034,7 @@ func TestFile__SetValidation(t *testing.T) {
 		t.Error("expected error")
 	}
 
-	t.Logf("file.validateOpts=%#v", file.validateOpts)
+	t.Logf("file.ValidateOpts=%#v", file.ValidateOpts)
 
 	// nil File and set
 	file = nil
@@ -2130,7 +2130,7 @@ func TestFile__AscendingBatchSequence(t *testing.T) {
 
 func TestFile_SkipValidation(t *testing.T) {
 	file := mockFilePPD(t)
-	file.validateOpts = &ValidateOpts{
+	file.ValidateOpts = &ValidateOpts{
 		SkipAll: true,
 	}
 
@@ -2138,7 +2138,7 @@ func TestFile_SkipValidation(t *testing.T) {
 	err := file.Validate()
 	require.NoError(t, err)
 
-	file.validateOpts = nil
+	file.ValidateOpts = nil
 	err = file.ValidateWith(&ValidateOpts{
 		SkipAll: true,
 	})
