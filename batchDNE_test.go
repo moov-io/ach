@@ -22,6 +22,8 @@ import (
 	"time"
 
 	"github.com/moov-io/base"
+
+	"github.com/stretchr/testify/require"
 )
 
 // mockBatchDNEHeader creates a DNE batch header
@@ -41,7 +43,7 @@ func mockBatchDNEHeader() *BatchHeader {
 // mockDNEEntryDetail creates a DNE entry detail
 func mockDNEEntryDetail() *EntryDetail {
 	entry := NewEntryDetail()
-	entry.TransactionCode = CheckingReturnNOCCredit
+	entry.TransactionCode = CheckingPrenoteCredit
 	entry.SetRDFI("031300012")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
@@ -264,35 +266,38 @@ func TestBatchDNETransactionCode(t *testing.T) {
 	}
 }
 
-func TestBatchDNE__Details(t *testing.T) {
+func TestBatchDNE__ParseDNEPaymentInformation(t *testing.T) {
 	mockBatch := mockBatchDNE(t)
-	date, ssn, amount := mockBatch.details()
-	if date != "010218" {
-		t.Errorf("Got %s", date)
-	}
-	if ssn != "#########" {
-		t.Errorf("Got %s", ssn)
-	}
-	if amount != "$$$$.cc" {
-		t.Errorf("Got %s", amount)
-	}
 
-	// Check the helper methods too
-	if v := mockBatch.DateOfDeath(); v != date {
-		t.Errorf("got %s expected %s", v, date)
-	}
-	if v := mockBatch.CustomerSSN(); v != ssn {
-		t.Errorf("got %s expected %s", v, ssn)
-	}
-	if v := mockBatch.Amount(); v != amount {
-		t.Errorf("got %s expected %s", v, amount)
-	}
+	details, err := ParseDNEPaymentInformation(mockBatch.Entries[0].Addenda05[0])
+	require.NoError(t, err)
+
+	require.Equal(t, "010218", details.DateOfDeath.Format("010206"))
+	require.Equal(t, "#########", details.CustomerSSN)
+	require.Equal(t, "$$$$.cc", details.Amount)
 }
 
 func TestBatchDNE__nil(t *testing.T) {
-	var batch *BatchDNE = nil
-	date, ssn, amount := batch.details()
-	if date != "" || ssn != "" || amount != "" {
-		t.Errorf("got non-empty details from nil BatchDNE: date=%q ssn=%q amount=%q", date, ssn, amount)
+	details, err := ParseDNEPaymentInformation(nil)
+	require.Nil(t, details)
+	require.NoError(t, err)
+
+	t.Run("panic", func(t *testing.T) {
+		batch := mockBatchDNE(t)
+		batch.Entries[0].Addenda05[0].PaymentRelatedInformation = ""
+
+		details, err := ParseDNEPaymentInformation(batch.Entries[0].Addenda05[0])
+		require.ErrorContains(t, err, "unexpected 1 fields")
+		require.Nil(t, details)
+	})
+}
+
+func TestDNRPaymentInformation(t *testing.T) {
+	info := DNEPaymentInformation{
+		DateOfDeath: time.Date(2024, time.August, 28, 10, 30, 0, 0, time.UTC),
+		CustomerSSN: "333224444",
+		Amount:      "123.45",
 	}
+	expected := `DATE OF DEATH*082824*CUSTOMER SSN*333224444*AMOUNT*123.45\`
+	require.Equal(t, expected, info.String())
 }

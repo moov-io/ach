@@ -18,7 +18,9 @@
 package ach
 
 import (
+	"fmt"
 	"strings"
+	"time"
 )
 
 // BatchDNE is a batch file that handles SEC code Death Notification Entry (DNE)
@@ -60,7 +62,7 @@ func (batch *BatchDNE) Validate() error {
 		}
 
 		switch entry.TransactionCode {
-		case CheckingReturnNOCCredit, CheckingPrenoteCredit, SavingsReturnNOCCredit, SavingsPrenoteCredit:
+		case CheckingPrenoteCredit, SavingsPrenoteCredit:
 		default:
 			return batch.Error("TransactionCode", ErrBatchTransactionCode, entry.TransactionCode)
 		}
@@ -69,10 +71,10 @@ func (batch *BatchDNE) Validate() error {
 		if len(entry.Addenda05) != 1 {
 			return batch.Error("AddendaCount", NewErrBatchAddendaCount(len(entry.Addenda05), 1))
 		}
-		// // Verify the Amount is valid for SEC code and TransactionCode
-		// if err := batch.ValidAmountForCodes(entry); err != nil { // TODO(adam): https://github.com/moov-io/ach/issues/1171
-		// 	return err
-		// }
+		// Verify the Amount is valid for SEC code and TransactionCode
+		if err := batch.ValidAmountForCodes(entry); err != nil {
+			return err
+		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {
 			return err
@@ -98,36 +100,42 @@ func (batch *BatchDNE) Create() error {
 	return batch.Validate()
 }
 
-// details returns the Date of Death (YYMMDD), Customer SSN (9 digits), and Amount ($$$$.cc)
-// from the Addenda05 record. This method assumes the addenda05 PaymentRelatedInformation is valid.
-func (batch *BatchDNE) details() (string, string, string) {
-	if batch == nil || len(batch.Entries) == 0 {
-		return "", "", ""
+type DNEPaymentInformation struct {
+	DateOfDeath time.Time
+	CustomerSSN string
+
+	// Amount is a two-decimal float value formatted as a string
+	// Example: 123.45
+	Amount string
+}
+
+// ParseDNEPaymentInformation returns an DNEPaymentInformation for a given Addenda05 record. The information is parsed from the addenda's
+// PaymentRelatedInformation field.
+//
+// The returned information is not validated for correctness.
+func ParseDNEPaymentInformation(addenda05 *Addenda05) (*DNEPaymentInformation, error) {
+	if addenda05 == nil {
+		return nil, nil
 	}
 
-	addendas := batch.Entries[0].Addenda05
-	if len(addendas) != 1 {
-		return "", "", ""
+	fields := strings.Split(strings.TrimSuffix(addenda05.PaymentRelatedInformation, `\`), "*")
+	if len(fields) != 6 {
+		return nil, fmt.Errorf("unexpected %d fields", len(fields))
 	}
 
-	line := addendas[0].PaymentRelatedInformation
-	return line[18:24], line[37:46], strings.TrimSuffix(line[54:], `\`)
+	dateOfDeath, err := time.Parse("010206", fields[1])
+	if err != nil {
+		return nil, fmt.Errorf("parsing DateOfDeath: %w", err)
+	}
+
+	return &DNEPaymentInformation{
+		DateOfDeath: dateOfDeath,
+		CustomerSSN: fields[3],
+		Amount:      fields[5],
+	}, nil
 }
 
-// DateOfDeath returns the YYMMDD string from Addenda05's PaymentRelatedInformation
-func (batch *BatchDNE) DateOfDeath() string {
-	date, _, _ := batch.details()
-	return date
-}
-
-// CustomerSSN returns the SSN string from Addenda05's PaymentRelatedInformation
-func (batch *BatchDNE) CustomerSSN() string {
-	_, ssn, _ := batch.details()
-	return ssn
-}
-
-// Amount returns the amount to be dispursed to the named beneficiary from Addenda05's PaymentRelatedInformation.
-func (batch *BatchDNE) Amount() string {
-	_, _, amount := batch.details()
-	return amount
+func (info DNEPaymentInformation) String() string {
+	return fmt.Sprintf(`DATE OF DEATH*%s*CUSTOMER SSN*%s*AMOUNT*%s\`,
+		info.DateOfDeath.Format("010206"), info.CustomerSSN, info.Amount)
 }

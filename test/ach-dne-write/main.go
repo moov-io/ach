@@ -53,7 +53,7 @@ func main() {
 	// can be multiple entries per batch
 	entry := ach.NewEntryDetail()
 	// Identifies the entry as a debit and credit entry AND to what type of account (Savings, DDA, Loan, GL)
-	entry.TransactionCode = ach.CheckingReturnNOCCredit
+	entry.TransactionCode = ach.CheckingPrenoteCredit
 	entry.SetRDFI("031300012")             // Receiver's bank transit routing number
 	entry.DFIAccountNumber = "744-5678-99" // Receiver's bank account number
 	entry.Amount = 0                       // Amount of transaction with no decimal. One dollar and eleven cents = 111

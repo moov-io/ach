@@ -39,7 +39,7 @@ func Example_dneWrite() {
 	bh.OriginatorStatusCode = 2
 
 	entry := ach.NewEntryDetail()
-	entry.TransactionCode = ach.CheckingReturnNOCCredit
+	entry.TransactionCode = ach.CheckingPrenoteCredit
 	entry.SetRDFI("031300012")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
@@ -77,7 +77,7 @@ func Example_dneWrite() {
 	// Output:
 	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
 	// 5220Name on Account                     231380104 DNEDeath           190816   2231380100000001
-	// 621031300012744-5678-99      0000000000031300010000001Best. #1                1231380100000001
+	// 623031300012744-5678-99      0000000000031300010000001Best. #1                1231380100000001
 	// 705    DATE OF DEATH*010218*CUSTOMERSSN*#########*AMOUNT*$$$$.cc\                  00010000001
 	// 82200000020003130001000000000000000000000000231380104                          231380100000001
 	// 9000001000001000000020003130001000000000000000000000000
