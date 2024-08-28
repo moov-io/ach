@@ -66,15 +66,15 @@ func (batch *BatchENR) Validate() error {
 		}
 
 		switch entry.TransactionCode {
-		case CheckingCredit, CheckingDebit, SavingsCredit, SavingsDebit:
+		case CheckingPrenoteCredit, SavingsPrenoteCredit:
 			// nothing
 		default:
 			return batch.Error("TransactionCode", ErrBatchTransactionCode, entry.TransactionCode)
 		}
-		// // Verify the Amount is valid for SEC code and TransactionCode
-		// if err := batch.ValidAmountForCodes(entry); err != nil { // TODO(adam): https://github.com/moov-io/ach/issues/1172
-		// 	return err
-		// }
+		// Verify the Amount is valid for SEC code and TransactionCode
+		if err := batch.ValidAmountForCodes(entry); err != nil {
+			return err
+		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {
 			return err

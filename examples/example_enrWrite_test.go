@@ -29,7 +29,7 @@ func Example_enrWrite() {
 	fh := mockFileHeader()
 
 	bh := ach.NewBatchHeader()
-	bh.ServiceClassCode = ach.DebitsOnly
+	bh.ServiceClassCode = ach.CreditsOnly
 	bh.CompanyName = "Name on Account"
 	bh.CompanyIdentification = fh.ImmediateOrigin
 	bh.StandardEntryClassCode = ach.ENR
@@ -37,7 +37,7 @@ func Example_enrWrite() {
 	bh.ODFIIdentification = "23138010"
 
 	entry := ach.NewEntryDetail()
-	entry.TransactionCode = ach.CheckingDebit
+	entry.TransactionCode = ach.CheckingPrenoteCredit
 	entry.SetRDFI("031300012")
 	entry.DFIAccountNumber = "744-5678-99"
 	entry.Amount = 0
@@ -74,9 +74,9 @@ func Example_enrWrite() {
 
 	// Output:
 	// 101 031300012 2313801041908161055A094101Federal Reserve Bank   My Bank Name           12345678
-	// 5225Name on Account                     231380104 ENRAUTOENROLL               1231380100000001
-	// 627031300012744-5678-99      0000000000031300010000001Best. #1                1231380100000001
+	// 5220Name on Account                     231380104 ENRAUTOENROLL               1231380100000001
+	// 623031300012744-5678-99      0000000000031300010000001Best. #1                1231380100000001
 	// 70522*12200004*3*123987654321*777777777*DOE*JOHN*1\                                00010000001
-	// 82250000020003130001000000000000000000000000231380104                          231380100000001
+	// 82200000020003130001000000000000000000000000231380104                          231380100000001
 	// 9000001000001000000020003130001000000000000000000000000
 }
