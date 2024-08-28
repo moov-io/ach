@@ -1069,6 +1069,14 @@ func (batch *Batch) ValidAmountForCodes(entry *EntryDetail) error {
 			if batch.validateOpts != nil && batch.validateOpts.AllowZeroEntryAmount {
 				return nil
 			}
+
+			switch batch.Header.StandardEntryClassCode {
+			case ACK, ATX:
+				if entry.TransactionCode == CheckingZeroDollarRemittanceCredit || entry.TransactionCode == SavingsZeroDollarRemittanceCredit {
+					return nil
+				}
+			}
+
 			return fieldError("Amount", ErrBatchAmountZero, entry.Amount)
 		}
 	}
