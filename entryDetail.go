@@ -56,6 +56,8 @@ type EntryDetail struct {
 	// field must be returned intact for any returned entry.
 	//
 	// WEB and TEL batches use the Discretionary Data Field as the Payment Type Code
+	//
+	// Refused ACK AND ATX entries will use this field for the Refused Acknowledgement Code
 	DiscretionaryData string `json:"discretionaryData,omitempty"`
 	// AddendaRecordIndicator indicates the existence of an Addenda Record.
 	// A value of "1" indicates that one ore more addenda records follow,
