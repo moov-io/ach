@@ -79,54 +79,100 @@ func populateMap(max int, zero string) map[int]string {
 
 // alphaField Alphanumeric and Alphabetic fields are left-justified and space filled.
 func (c *converters) alphaField(s string, max uint) string {
-	ln := uint(utf8.RuneCountInString(s))
+	count := utf8.RuneCountInString(s)
+	if count < 0 {
+		return ""
+	}
+
+	// ACH never has lines longer than 94 characters
+	if max > lineLength {
+		return ""
+	}
+
+	ln := uint(count)
 	if ln > max {
 		return s[:max]
 	}
 
-	m := int(max - ln)
+	m := int(max) - int(ln) //nolint:gosec
+	if m < 0 {
+		return ""
+	}
+
 	pad, exists := spaceZeros[m]
 	if exists {
 		return s + pad
 	}
 	// slow path
-	return s + strings.Repeat(" ", int(max-ln))
+	return s + strings.Repeat(" ", m)
 }
 
 // numericField right-justified, unsigned, and zero filled
 func (c *converters) numericField(n int, max uint) string {
+	// ACH never has lines longer than 94 characters
+	if max > lineLength {
+		return ""
+	}
+
 	s := strconv.FormatInt(int64(n), 10)
-	if l := uint(len(s)); l > max {
+	l := uint(len(s))
+
+	// Truncate if the length exceeds max
+	if l > max {
 		return s[l-max:]
-	} else {
-		m := int(max - l)
-		pad, exists := stringZeros[m]
-		if exists {
-			return pad + s
-		}
-		// slow path
-		return strings.Repeat("0", m) + s
-	}
-}
-
-// stringField slices to max length and zero filled
-func (c *converters) stringField(s string, max uint) string {
-	ln := uint(utf8.RuneCountInString(s))
-	if ln > max {
-		return s[:max]
 	}
 
-	// Pad with preallocated string
-	m := int(max - ln)
+	m := int(max) - int(l) //nolint:gosec
+	if m < 0 {
+		return ""
+	}
+
+	// Pad with preallocated string if available
 	pad, exists := stringZeros[m]
 	if exists {
 		return pad + s
 	}
+
+	// Slow path: Pad with "0" if no preallocated string found
+	return strings.Repeat("0", m) + s
+}
+
+// stringField slices to max length and zero filled
+func (c *converters) stringField(s string, max uint) string {
+	count := utf8.RuneCountInString(s)
+	if count < 0 {
+		return ""
+	}
+
+	// ACH never has lines longer than 94 characters
+	if max > lineLength {
+		return ""
+	}
+
+	ln := uint(count)
+	if ln > max {
+		return s[:max]
+	}
+
+	m := int(max) - int(ln) //nolint:gosec
+	if m < 0 {
+		return ""
+	}
+
+	// Pad with preallocated string if available
+	pad, exists := stringZeros[m]
+	if exists {
+		return pad + s
+	}
+
 	// slow path
 	return strings.Repeat("0", m) + s
 }
 
 // leastSignificantDigits returns the least significant digits of v limited by maxDigits.
 func (c *converters) leastSignificantDigits(v int, maxDigits uint) int {
+	if maxDigits > lineLength {
+		return 0
+	}
 	return v % int(math.Pow10(int(maxDigits)))
 }
