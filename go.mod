@@ -10,7 +10,7 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/igrmk/treemap/v2 v2.0.1
 	github.com/juju/ansiterm v1.0.0
-	github.com/moov-io/base v0.52.1
+	github.com/moov-io/base v0.53.0
 	github.com/moov-io/iso4217 v0.3.2
 	github.com/prometheus/client_golang v1.20.4
 	github.com/stretchr/testify v1.9.0
