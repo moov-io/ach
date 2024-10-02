@@ -1,0 +1,40 @@
+name: Go Benchmark Testing
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+
+permissions:
+  deployments: write
+  contents: write
+
+jobs:
+  benchmark:
+    name: Benchmark
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: "stable"
+
+      - name: Run benchmark
+        run: go test ./... -bench Benchmark -benchmem | tee output.txt
+
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          name: My Project Go Benchmark
+          tool: 'go'
+          output-file-path: output.txt
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          # Show alert with commit comment on detecting possible performance regression
+          alert-threshold: '120%'
+          comment-on-alert: true
+          fail-on-alert: true
+          alert-comment-cc-users: '@adamdecaf'
+          # Update files on master branch
+          gh-pages-branch: master
+          benchmark-data-dir-path: docs/dev/bench/
