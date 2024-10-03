@@ -22,7 +22,17 @@ jobs:
           go-version: "stable"
 
       - name: Run benchmark
-        run: go test ./... -timeout 20m -bench Benchmark -benchmem | tee output.txt
+        run: |
+          go test . -bench BenchmarkBuildFile -benchmem > output.txt
+          go test . -bench Read -benchmem >> output.txt
+          go test . -bench Write -benchmem >> output.txt
+          go test . -bench AlphaField -benchmem >> output.txt
+          go test . -bench NumericField -benchmem >> output.txt
+          go test . -bench ParseNumField -benchmem >> output.txt
+          go test . -bench ParseStringField -benchmem >> output.txt
+          go test . -bench BenchmarkMergeFiles -benchmem >> output.txt
+          go test . -bench BenchmarkCalculateCheckDigit -benchmem >> output.txt
+          go test ./server/ -bench Benchmark -benchmem >> output.txt
 
       - name: Store benchmark result
         uses: benchmark-action/github-action-benchmark@v1
