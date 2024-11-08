@@ -557,6 +557,8 @@ func (ed *EntryDetail) SetOriginalTraceNumber(s string) {
 
 // SetCATXAddendaRecords setter for CTX and ATX AddendaRecords characters 1-4 of underlying IndividualName
 func (ed *EntryDetail) SetCATXAddendaRecords(i int) {
+	ed.AddendaRecordIndicator = i
+
 	count := ed.numericField(i, 4)
 	current := ed.IndividualName
 	if utf8.RuneCountInString(current) > 4 {
