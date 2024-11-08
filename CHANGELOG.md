@@ -1,3 +1,18 @@
+## v1.42.1 (Released 2024-11-08)
+
+IMPROVEMENTS
+
+- doc: mention how ACK/ATX present Refused Acknowledgement Code
+- fix: populate CTX receiving company / addenda indicator from JSON
+
+BUILD
+
+- build: setup automated benchmark job
+- fix(deps): update module github.com/moov-io/base to v0.53.0
+- fix(deps): update module github.com/moov-io/iso4217 to v0.3.2
+- fix(deps): update module github.com/prometheus/client_golang to v1.20.5
+- fix(deps): update module golang.org/x/net to v0.31.0
+
 ## v1.42.0 (Released 2024-08-28)
 
 BREAKING CHANGES
