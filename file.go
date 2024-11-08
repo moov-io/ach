@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -380,6 +381,28 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 		for _, e := range batch.Entries {
 			// these values need to be inferred from the json field names
 			setEntryRecordType(e)
+
+			// A few SEC codes don't follow the standard columns so we have to smush
+			// them together as the JSON doesn't support ReceivingCompany separate
+			// from IndividualName.
+			switch batch.GetHeader().StandardEntryClassCode {
+			case ATX, CTX:
+				addendaIndicator := e.AddendaRecordIndicator
+				addendaField, _ := strconv.Atoi(e.CATXAddendaRecordsField())
+
+				individualName := e.IndividualName
+
+				if addendaIndicator > 0 && addendaField == 0 {
+					e.SetCATXAddendaRecords(addendaIndicator)
+				}
+				if addendaIndicator == 0 && addendaField > 0 {
+					e.SetCATXAddendaRecords(addendaField)
+				}
+
+				if addendaField == 0 {
+					e.SetCATXReceivingCompany(individualName)
+				}
+			}
 		}
 		for _, e := range batch.ADVEntries {
 			setADVEntryRecordType(e)
