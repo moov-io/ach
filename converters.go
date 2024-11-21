@@ -33,8 +33,7 @@ func (c *converters) parseNumField(r string) (s int) {
 }
 
 func (c *converters) parseStringField(r string) (s string) {
-	s = strings.TrimSpace(r)
-	return s
+	return strings.TrimSpace(r)
 }
 
 func (c *converters) parseStringFieldWithOpts(r string, opts *ValidateOpts) string {
@@ -90,8 +89,9 @@ func (c *converters) alphaField(s string, max uint) string {
 	}
 
 	ln := uint(count)
-	if ln > max {
-		return s[:max]
+	if ln > max && len(s) >= count {
+		// Find which index corresponds to the max characters allowed
+		return string([]rune(s)[:max])
 	}
 
 	m := int(max) - int(ln) //nolint:gosec
@@ -150,8 +150,9 @@ func (c *converters) stringField(s string, max uint) string {
 	}
 
 	ln := uint(count)
-	if ln > max {
-		return s[:max]
+	if ln > max && len(s) >= count {
+		// Find which index corresponds to the max characters allowed
+		return string([]rune(s)[:max])
 	}
 
 	m := int(max) - int(ln) //nolint:gosec

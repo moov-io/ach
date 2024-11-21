@@ -28,6 +28,8 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+
+	"github.com/stretchr/testify/require"
 )
 
 // mockEntryDetail creates an entry detail
@@ -765,4 +767,12 @@ func TestEntryDetail__InvalidCheckDigitNotAllowedWithNullValidateOpt(t *testing.
 	// nil out
 	ed = nil
 	ed.SetValidation(&ValidateOpts{})
+}
+
+func TestEntryDetail_UTF8Truncation(t *testing.T) {
+	ed := mockEntryDetail()
+	ed.IdentificationNumber = "Testée Samples01"
+
+	require.Equal(t, "Testée Samples0", ed.IdentificationNumberField())
+	require.Equal(t, "Testée Samples01", ed.IdentificationNumber)
 }

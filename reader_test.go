@@ -988,9 +988,12 @@ func testFileBatchControlValidate(t testing.TB) {
 	bh := mockBatchHeader()
 	ed := mockEntryDetail()
 	bc := mockBatchControl()
-	bc.CompanyIdentification = "B1G C0MP®NY"
+	bc.CompanyIdentification = "B1G C0MPANY"
+
 	line := bh.String() + "\n" + ed.String() + "\n" + bc.String()
+
 	r := NewReader(strings.NewReader(line))
+
 	_, err := r.Read()
 	if !base.Has(err, NewErrBatchHeaderControlEquality(220, 200)) {
 		t.Errorf("%T: %s", err, err)

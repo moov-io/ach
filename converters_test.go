@@ -306,3 +306,16 @@ func TestLeastSignificantDigits(t *testing.T) {
 		}
 	}
 }
+
+func TestConvertors_UTF8Truncation(t *testing.T) {
+	c := converters{}
+
+	require.Equal(t, "John Doe       ", c.alphaField("John Doe", 15))
+	require.Equal(t, "0000000John Doe", c.stringField("John Doe", 15))
+
+	require.Equal(t, "Testée Samples ", c.alphaField("Testée Samples", 15))
+	require.Equal(t, "0Testée Samples", c.stringField("Testée Samples", 15))
+
+	require.Equal(t, "Testée Samples0", c.alphaField("Testée Samples01", 15))
+	require.Equal(t, "Testée Samples0", c.stringField("Testée Samples01", 15))
+}
