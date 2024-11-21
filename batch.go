@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -528,10 +529,32 @@ func (batch *Batch) AddEntry(entry *EntryDetail) {
 	batch.Entries = append(batch.Entries, entry)
 }
 
+// DeleteEntry deletes an EntryDetail from the Batch
+func (batch *Batch) DeleteEntry(entry *EntryDetail) {
+	if entry == nil {
+		return
+	}
+
+	batch.Entries = slices.DeleteFunc(batch.Entries, func(e *EntryDetail) bool {
+		return e == entry
+	})
+}
+
 // AddADVEntry appends an ADV EntryDetail to the Batch
 func (batch *Batch) AddADVEntry(entry *ADVEntryDetail) {
 	batch.category = entry.Category
 	batch.ADVEntries = append(batch.ADVEntries, entry)
+}
+
+// DeleteADVEntry deletes an ADV EntryDetail from the Batch
+func (batch *Batch) DeleteADVEntry(entry *ADVEntryDetail) {
+	if entry == nil {
+		return
+	}
+
+	batch.ADVEntries = slices.DeleteFunc(batch.ADVEntries, func(e *ADVEntryDetail) bool {
+		return e == entry
+	})
 }
 
 // GetADVEntries returns a slice of entry details for the batch

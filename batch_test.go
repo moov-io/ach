@@ -1697,3 +1697,55 @@ func TestBatch_calculateEntryHash(t *testing.T) {
 	hash := b.calculateEntryHash()
 	require.Equal(t, 22140797, hash)
 }
+
+func TestBatch_DeleteEntry(t *testing.T) {
+	b := &Batch{}
+	b.SetHeader(mockBatchHeader())
+
+	ed1 := mockEntryDetail()
+	ed1.TraceNumber = "1"
+	b.AddEntry(ed1)
+
+	ed2 := mockEntryDetail()
+	ed2.TraceNumber = "2"
+	b.AddEntry(ed2)
+
+	ed3 := mockEntryDetail()
+	ed3.TraceNumber = "3"
+	b.AddEntry(ed3)
+
+	require.Equal(t, 3, len(b.Entries))
+
+	b.DeleteEntry(ed2)
+	require.Equal(t, 2, len(b.Entries))
+	require.Equal(t, "1", b.Entries[0].TraceNumber)
+	require.Equal(t, "3", b.Entries[1].TraceNumber)
+	b.DeleteEntry(ed2)
+	require.Equal(t, 2, len(b.Entries))
+}
+
+func TestBatch_DeleteADVEntry(t *testing.T) {
+	b := &Batch{}
+	b.SetHeader(mockBatchADVHeader())
+
+	ed1 := NewADVEntryDetail()
+	ed1.ID = "1"
+	b.AddADVEntry(ed1)
+
+	ed2 := NewADVEntryDetail()
+	ed2.ID = "2"
+	b.AddADVEntry(ed2)
+
+	ed3 := NewADVEntryDetail()
+	ed3.ID = "3"
+	b.AddADVEntry(ed3)
+
+	require.Equal(t, 3, len(b.ADVEntries))
+
+	b.DeleteADVEntry(ed2)
+	require.Equal(t, 2, len(b.ADVEntries))
+	require.Equal(t, "1", b.ADVEntries[0].ID)
+	require.Equal(t, "3", b.ADVEntries[1].ID)
+	b.DeleteADVEntry(ed2)
+	require.Equal(t, 2, len(b.ADVEntries))
+}
