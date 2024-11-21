@@ -38,10 +38,10 @@ type Batcher interface {
 	SetADVControl(*ADVBatchControl)
 	GetEntries() []*EntryDetail
 	AddEntry(*EntryDetail)
-	DeleteEntry(*EntryDetail)
+	DeleteEntries(func(*EntryDetail) bool)
 	GetADVEntries() []*ADVEntryDetail
 	AddADVEntry(*ADVEntryDetail)
-	DeleteADVEntry(*ADVEntryDetail)
+	DeleteADVEntries(func(*ADVEntryDetail) bool)
 	Create() error
 	Validate() error
 	SetID(string)

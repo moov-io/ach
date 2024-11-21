@@ -529,15 +529,9 @@ func (batch *Batch) AddEntry(entry *EntryDetail) {
 	batch.Entries = append(batch.Entries, entry)
 }
 
-// DeleteEntry deletes an EntryDetail from the Batch
-func (batch *Batch) DeleteEntry(entry *EntryDetail) {
-	if entry == nil {
-		return
-	}
-
-	batch.Entries = slices.DeleteFunc(batch.Entries, func(e *EntryDetail) bool {
-		return e == entry
-	})
+// DeleteEntries deletes all Entries from the Batch where del() == true
+func (batch *Batch) DeleteEntries(del func(e *EntryDetail) bool) {
+	batch.Entries = slices.DeleteFunc(batch.Entries, del)
 }
 
 // AddADVEntry appends an ADV EntryDetail to the Batch
@@ -546,15 +540,9 @@ func (batch *Batch) AddADVEntry(entry *ADVEntryDetail) {
 	batch.ADVEntries = append(batch.ADVEntries, entry)
 }
 
-// DeleteADVEntry deletes an ADV EntryDetail from the Batch
-func (batch *Batch) DeleteADVEntry(entry *ADVEntryDetail) {
-	if entry == nil {
-		return
-	}
-
-	batch.ADVEntries = slices.DeleteFunc(batch.ADVEntries, func(e *ADVEntryDetail) bool {
-		return e == entry
-	})
+// DeleteADVEntries deletes all ADV Entries from the Batch where del() == true
+func (batch *Batch) DeleteADVEntries(del func(e *ADVEntryDetail) bool) {
+	batch.ADVEntries = slices.DeleteFunc(batch.ADVEntries, del)
 }
 
 // GetADVEntries returns a slice of entry details for the batch
