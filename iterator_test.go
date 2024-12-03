@@ -19,7 +19,6 @@ package ach
 
 import (
 	"bytes"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -73,7 +72,7 @@ func TestIterator(t *testing.T) {
 		iter := iteratorFromFile(t, path, nil)
 
 		entries := collectEntries(t, iter)
-		require.Len(t, entries, 0)
+		require.Empty(t, entries)
 	})
 
 	t.Run("return examples", func(t *testing.T) {
@@ -140,7 +139,7 @@ func TestIterator(t *testing.T) {
 		iter := NewIterator(strings.NewReader(""))
 
 		entries := collectEntries(t, iter)
-		require.Len(t, entries, 0)
+		require.Empty(t, entries)
 	})
 
 	t.Run("short lines and has padding", func(t *testing.T) {
@@ -236,8 +235,8 @@ func ensureFileEqualsIterator(t *testing.T, file *File, iter *Iterator) {
 			ibh, ied, err := iter.NextEntry()
 			require.NoError(t, err, "iterator batch[%d], entry[%d] error: %v", i, j, err)
 
-			require.True(t, bh.Equal(ibh), fmt.Sprintf("batch[%d] headers", i))
-			require.Equal(t, ed, ied, fmt.Sprintf("batch[%d] entry[%d] details", i, j))
+			require.True(t, bh.Equal(ibh), "batch[%d] headers", i)
+			require.Equal(t, ed, ied, "batch[%d] entry[%d] details", i, j)
 
 			require.Equal(t, ed.Addenda02, ied.Addenda02)
 			require.Equal(t, ed.Addenda05, ied.Addenda05)

@@ -1716,13 +1716,13 @@ func TestBatch_DeleteEntries(t *testing.T) {
 	b.AddEntry(ed2)
 	b.AddEntry(ed3)
 
-	require.Equal(t, 3, len(b.Entries))
+	require.Len(t, b.Entries, 3)
 
 	b.DeleteEntries(func(e *EntryDetail) bool {
 		return e.TraceNumber == "2"
 	})
 
-	require.Equal(t, 2, len(b.Entries))
+	require.Len(t, b.Entries, 2)
 	require.Equal(t, "1", b.Entries[0].TraceNumber)
 	require.Equal(t, "3", b.Entries[1].TraceNumber)
 
@@ -1731,7 +1731,7 @@ func TestBatch_DeleteEntries(t *testing.T) {
 	b.DeleteEntries(func(e *EntryDetail) bool {
 		return e.Amount >= 50
 	})
-	require.Equal(t, 1, len(b.Entries))
+	require.Len(t, b.Entries, 1)
 	require.Equal(t, "1", b.Entries[0].TraceNumber)
 }
 
@@ -1753,13 +1753,13 @@ func TestBatch_DeleteADVEntries(t *testing.T) {
 	b.AddADVEntry(ed2)
 	b.AddADVEntry(ed3)
 
-	require.Equal(t, 3, len(b.ADVEntries))
+	require.Len(t, b.ADVEntries, 3)
 
 	b.DeleteADVEntries(func(e *ADVEntryDetail) bool {
 		return e.ID == "2"
 	})
 
-	require.Equal(t, 2, len(b.ADVEntries))
+	require.Len(t, b.ADVEntries, 2)
 	require.Equal(t, "1", b.ADVEntries[0].ID)
 	require.Equal(t, "3", b.ADVEntries[1].ID)
 
@@ -1768,6 +1768,6 @@ func TestBatch_DeleteADVEntries(t *testing.T) {
 	b.DeleteADVEntries(func(e *ADVEntryDetail) bool {
 		return e.Amount >= 50
 	})
-	require.Equal(t, 1, len(b.ADVEntries))
+	require.Len(t, b.ADVEntries, 1)
 	require.Equal(t, "1", b.ADVEntries[0].ID)
 }

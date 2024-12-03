@@ -85,7 +85,7 @@ func TestReadDirSymlinkErr(t *testing.T) {
 
 	files, err := ReadDir(dir)
 	require.Error(t, err)
-	require.Len(t, files, 0)
+	require.Empty(t, files)
 }
 
 func copyFilesToTempDir(t *testing.T, filenames []string) string {

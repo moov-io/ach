@@ -179,7 +179,7 @@ func TestMergeFiles__identity(t *testing.T) {
 
 		for i := range out[0].Batches {
 			entries := out[0].Batches[i].GetEntries()
-			require.Equal(t, 1, len(entries))
+			require.Len(t, entries, 1)
 		}
 		for i := range out {
 			require.NoError(t, out[i].Create())
@@ -353,7 +353,7 @@ func TestMergeFiles__splitFiles(t *testing.T) {
 	if err != nil || len(out) != 1 {
 		t.Fatalf("got %d files, error=%v", len(out), err)
 	}
-	require.Equal(t, 7, len(out[0].Batches))
+	require.Len(t, out[0].Batches, 7)
 
 	traceNumbersAfter := countTraceNumbers(out...)
 	if traceNumbersBefore != traceNumbersAfter {
@@ -399,7 +399,7 @@ func TestMergeFiles__dollarAmount(t *testing.T) {
 
 	for i := range mergedFiles {
 		// With our static cases each file has one Batch
-		require.Equal(t, 1, len(mergedFiles[i].Batches))
+		require.Len(t, mergedFiles[i].Batches, 1)
 
 		entryCount := len(mergedFiles[i].Batches[0].GetEntries())
 		require.Equal(t, 1, entryCount)
@@ -432,10 +432,10 @@ func TestMergeFiles__dollarAmount2(t *testing.T) {
 	require.Len(t, mergedFiles, 4)
 	require.Equal(t, 101, countTraceNumbers(mergedFiles...))
 
-	require.Equal(t, 2, len(mergedFiles[0].Batches))
-	require.Equal(t, 1, len(mergedFiles[1].Batches))
-	require.Equal(t, 1, len(mergedFiles[2].Batches))
-	require.Equal(t, 1, len(mergedFiles[3].Batches))
+	require.Len(t, mergedFiles[0].Batches, 2)
+	require.Len(t, mergedFiles[1].Batches, 1)
+	require.Len(t, mergedFiles[2].Batches, 1)
+	require.Len(t, mergedFiles[3].Batches, 1)
 
 	entryCount := len(mergedFiles[0].Batches[0].GetEntries())
 	require.Equal(t, 1, entryCount)
@@ -659,7 +659,7 @@ func TestMergeDir_Nested(t *testing.T) {
 	// nothing in the top level
 	merged, err := MergeDir(dir, conditions, nil)
 	require.NoError(t, err)
-	require.Len(t, merged, 0)
+	require.Empty(t, merged)
 
 	// found files in sub directories
 	merged, err = MergeDir(dir, conditions, &MergeDirOptions{

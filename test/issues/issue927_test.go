@@ -38,7 +38,7 @@ func TestIssue927(t *testing.T) {
 	}
 
 	// batches are flattened
-	require.Equal(t, 2, len(after[0].Batches))
+	require.Len(t, after[0].Batches, 2)
 
 	// Verify all the entries are present
 	var entryCount int

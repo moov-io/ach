@@ -18,7 +18,6 @@
 package ach
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -239,7 +238,7 @@ func (bh *BatchHeader) String() string {
 	buf.WriteString(bh.CompanyDescriptiveDateField())
 	buf.WriteString(bh.EffectiveEntryDateField())
 	buf.WriteString(bh.SettlementDateField())
-	buf.WriteString(fmt.Sprintf("%v", bh.OriginatorStatusCode))
+	buf.WriteString(strconv.Itoa(bh.OriginatorStatusCode))
 	buf.WriteString(bh.ODFIIdentificationField())
 	buf.WriteString(bh.BatchNumberField())
 	return buf.String()

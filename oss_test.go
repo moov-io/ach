@@ -33,5 +33,5 @@ func TestOSS(t *testing.T) {
 	)
 
 	err = errors.Unwrap(err)
-	require.True(t, errors.Is(err, ErrFlattenChangedEntryCount))
+	require.ErrorIs(t, err, ErrFlattenChangedEntryCount)
 }

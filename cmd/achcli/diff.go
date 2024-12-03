@@ -106,7 +106,7 @@ func printColumn(minusBuf, plusBuf *bytes.Buffer, v1, v2 string) {
 		// ansiterm.Write([]byte(fmt.Sprintf("[red]%s[reset]\t", v2)))
 		// ansiterm.Write([]byte(fmt.Sprintf("[green]%s[reset]\t", v1)))
 	} else {
-		minusBuf.WriteString(fmt.Sprintf("%s\t", v2))
-		plusBuf.WriteString(fmt.Sprintf("%s\t", v1))
+		minusBuf.WriteString(v2 + "\t")
+		plusBuf.WriteString(v1 + "\t")
 	}
 }

@@ -494,7 +494,7 @@ func balanceFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.En
 		balancedFile, err := s.BalanceFile(req.fileID, req.offset)
 		if balancedFile != nil && logger != nil {
 			logger := logger.With(log.Fields{
-				"files":     log.String(fmt.Sprintf("balance file created %s", balancedFile.ID)),
+				"files":     log.String("balance file created " + balancedFile.ID),
 				"requestID": log.String(req.requestID),
 			})
 			if err != nil {

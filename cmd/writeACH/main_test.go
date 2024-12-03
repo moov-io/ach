@@ -18,7 +18,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -32,7 +31,7 @@ func TestFileWrite(t *testing.T) {
 	}
 	defer os.RemoveAll(dir)
 
-	path := filepath.Join(dir, fmt.Sprintf("%s.ach", time.Now().UTC().Format("200601021504")))
+	path := filepath.Join(dir, time.Now().UTC().Format("200601021504")+".ach")
 	write(path)
 
 	s, err := os.Stat(path)

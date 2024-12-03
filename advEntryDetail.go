@@ -18,7 +18,6 @@
 package ach
 
 import (
-	"fmt"
 	"strconv"
 	"unicode/utf8"
 )
@@ -164,7 +163,7 @@ func (ed *ADVEntryDetail) String() string {
 	defer saveBuffer(buf)
 
 	buf.WriteString(entryDetailPos)
-	buf.WriteString(fmt.Sprintf("%v", ed.TransactionCode))
+	buf.WriteString(strconv.Itoa(ed.TransactionCode))
 	buf.WriteString(ed.RDFIIdentificationField())
 	buf.WriteString(ed.CheckDigit)
 	buf.WriteString(ed.DFIAccountNumberField())
@@ -174,7 +173,7 @@ func (ed *ADVEntryDetail) String() string {
 	buf.WriteString(ed.ACHOperatorDataField())
 	buf.WriteString(ed.IndividualNameField())
 	buf.WriteString(ed.DiscretionaryDataField())
-	buf.WriteString(fmt.Sprintf("%v", ed.AddendaRecordIndicator))
+	buf.WriteString(strconv.Itoa(ed.AddendaRecordIndicator))
 	buf.WriteString(ed.ACHOperatorRoutingNumberField())
 	buf.WriteString(ed.JulianDateDayField())
 	buf.WriteString(ed.SequenceNumberField())

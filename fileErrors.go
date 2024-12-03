@@ -76,7 +76,7 @@ type ErrUnknownRecordType struct {
 // NewErrUnknownRecordType creates a new error of the ErrUnknownRecordType type
 func NewErrUnknownRecordType(recordType string) ErrUnknownRecordType {
 	return ErrUnknownRecordType{
-		Message: fmt.Sprintf("%s is an unknown record type", recordType),
+		Message: recordType + " is an unknown record type",
 		Type:    recordType,
 	}
 }
@@ -94,7 +94,7 @@ type ErrFileUnknownSEC struct {
 // NewErrFileUnknownSEC creates a new error of the ErrFileUnknownSEC type
 func NewErrFileUnknownSEC(secType string) ErrFileUnknownSEC {
 	return ErrFileUnknownSEC{
-		Message: fmt.Sprintf("%s Standard Entry Class Code is not implemented", secType),
+		Message: secType + " Standard Entry Class Code is not implemented",
 		SEC:     secType,
 	}
 }

@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"strconv"
 	"strings"
 	"text/tabwriter"
 	"unicode/utf8"
@@ -191,7 +192,7 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 // formatAmount can optionally convert an integer into a human readable amount
 func formatAmount(prettyAmounts bool, amt int) string {
 	if !prettyAmounts {
-		return fmt.Sprintf("%d", amt)
+		return strconv.Itoa(amt)
 	}
 
 	printer := message.NewPrinter(language.Und)

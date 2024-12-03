@@ -131,7 +131,7 @@ func TestAddenda99AllReturnCodes(t *testing.T) {
 		require.NoError(t, addenda99.Validate())
 
 		line := addenda99.String()
-		require.Equal(t, 94, len(line))
+		require.Len(t, line, 94)
 		require.Equal(t, 94, utf8.RuneCountInString(line))
 
 		// Set Addenda on EntryDetail record
@@ -142,7 +142,7 @@ func TestAddenda99AllReturnCodes(t *testing.T) {
 		require.NoError(t, ed.Validate())
 
 		line = ed.String()
-		require.Equal(t, 94, len(line))
+		require.Len(t, line, 94)
 		require.Equal(t, 94, utf8.RuneCountInString(line))
 	}
 }

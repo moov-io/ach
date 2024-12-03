@@ -190,13 +190,13 @@ func TestValidators__isAlphanumericExamples(t *testing.T) {
 	validCases := []string{"Acme Corp!", `|`, `¦`, `¢`, `¬`, `±`, `ã`, `è`, `ñ`}
 	for i := range validCases {
 		err := v.isAlphanumeric(validCases[i])
-		require.NoError(t, err, fmt.Sprintf("input: %q", validCases[i]))
+		require.NoError(t, err, "input: %q", validCases[i])
 	}
 
 	invalidCases := []string{`©`, `®`, `§101.1`}
 	for i := range invalidCases {
 		err := v.isAlphanumeric(invalidCases[i])
-		require.ErrorIs(t, err, ErrNonAlphanumeric, fmt.Sprintf("input: %q", invalidCases[i]))
+		require.ErrorIs(t, err, ErrNonAlphanumeric, "input: %q", invalidCases[i])
 	}
 }
 

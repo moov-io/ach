@@ -18,7 +18,6 @@
 package ach
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -288,7 +287,7 @@ func (iatBh *IATBatchHeader) String() string {
 	defer saveBuffer(buf)
 
 	buf.WriteString(batchHeaderPos)
-	buf.WriteString(fmt.Sprintf("%v", iatBh.ServiceClassCode))
+	buf.WriteString(strconv.Itoa(iatBh.ServiceClassCode))
 	buf.WriteString(iatBh.IATIndicatorField())
 	buf.WriteString(iatBh.ForeignExchangeIndicatorField())
 	buf.WriteString(iatBh.ForeignExchangeReferenceIndicatorField())
@@ -301,7 +300,7 @@ func (iatBh *IATBatchHeader) String() string {
 	buf.WriteString(iatBh.ISODestinationCurrencyCodeField())
 	buf.WriteString(iatBh.EffectiveEntryDateField())
 	buf.WriteString(iatBh.SettlementDateField())
-	buf.WriteString(fmt.Sprintf("%v", iatBh.OriginatorStatusCode))
+	buf.WriteString(strconv.Itoa(iatBh.OriginatorStatusCode))
 	buf.WriteString(iatBh.ODFIIdentificationField())
 	buf.WriteString(iatBh.BatchNumberField())
 

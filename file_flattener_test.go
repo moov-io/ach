@@ -23,6 +23,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -39,7 +40,7 @@ func TestFlattenFile(t *testing.T) {
 				batchStructure = append(batchStructure, entry.TraceNumber)
 			}
 			for _, entry := range batcher.GetADVEntries() {
-				batchStructure = append(batchStructure, fmt.Sprintf("%d", entry.Amount))
+				batchStructure = append(batchStructure, strconv.Itoa(entry.Amount))
 			}
 			fileStructure = append(fileStructure, batchStructure)
 		}

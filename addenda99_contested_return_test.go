@@ -94,8 +94,8 @@ func TestAddenda99Contested(t *testing.T) {
 	file.AddBatch(batch)
 	require.NoError(t, file.Create())
 
-	require.Equal(t, 1, len(file.Batches))
-	require.Equal(t, 1, len(file.Batches[0].GetEntries()))
+	require.Len(t, file.Batches, 1)
+	require.Len(t, file.Batches[0].GetEntries(), 1)
 	require.Equal(t, 4, file.Batches[0].GetControl().EntryAddendaCount)
 	require.Equal(t, 4, file.Control.EntryAddendaCount)
 

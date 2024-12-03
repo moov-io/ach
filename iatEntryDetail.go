@@ -18,7 +18,6 @@
 package ach
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -231,7 +230,7 @@ func (iatEd *IATEntryDetail) String() string {
 	defer saveBuffer(buf)
 
 	buf.WriteString(entryDetailPos)
-	buf.WriteString(fmt.Sprintf("%v", iatEd.TransactionCode))
+	buf.WriteString(strconv.Itoa(iatEd.TransactionCode))
 	buf.WriteString(iatEd.RDFIIdentificationField())
 	buf.WriteString(iatEd.CheckDigit)
 	buf.WriteString(iatEd.AddendaRecordsField())
@@ -241,7 +240,7 @@ func (iatEd *IATEntryDetail) String() string {
 	buf.WriteString("  ")
 	buf.WriteString(iatEd.OFACScreeningIndicatorField())
 	buf.WriteString(iatEd.SecondaryOFACScreeningIndicatorField())
-	buf.WriteString(fmt.Sprintf("%v", iatEd.AddendaRecordIndicator))
+	buf.WriteString(strconv.Itoa(iatEd.AddendaRecordIndicator))
 	buf.WriteString(iatEd.TraceNumberField())
 
 	return buf.String()

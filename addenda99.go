@@ -301,7 +301,7 @@ func (Addenda99 *Addenda99) AddendaInformationReturnSettlementDate() string {
 }
 
 func (Addenda99 *Addenda99) AddendaInformationReturnReasonCode() string {
-	return fmt.Sprintf("R%s", Addenda99.AddendaInformation[21:23])
+	return "R" + Addenda99.AddendaInformation[21:23]
 }
 
 func (Addenda99 *Addenda99) AddendaInformationExtra() string {

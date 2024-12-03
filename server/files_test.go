@@ -121,7 +121,7 @@ func TestFiles__CreateFileNacha(t *testing.T) {
 	defer fd.Close()
 
 	fileID := base.ID()
-	req := httptest.NewRequest("POST", fmt.Sprintf("/files/%s", fileID), fd)
+	req := httptest.NewRequest("POST", "/files/"+fileID, fd)
 	req.Header.Set("content-type", "text/html")
 
 	handler := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
@@ -155,7 +155,7 @@ func TestFiles_CreateWithOffset(t *testing.T) {
 	defer fd.Close()
 
 	fileID := base.ID()
-	req := httptest.NewRequest("POST", fmt.Sprintf("/files/%s", fileID), fd)
+	req := httptest.NewRequest("POST", "/files/"+fileID, fd)
 	req.Header.Set("content-type", "application/json")
 
 	handler := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
@@ -208,7 +208,7 @@ func TestFiles__CustomJsonValidation(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "adam-01", resp.ID)
 	require.NotNil(t, resp.File)
-	require.Equal(t, nil, resp.Err)
+	require.NoError(t, resp.Err)
 }
 
 func TestFiles__decodeCreateFileRequest__validateOpts(t *testing.T) {
@@ -1026,7 +1026,7 @@ func TestFilesByID__getFileEndpoint(t *testing.T) {
 
 	// test status code
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", fmt.Sprintf("/files/%s", file.ID), nil)
+	req := httptest.NewRequest("GET", "/files/"+file.ID, nil)
 	req.Header.Set("Origin", "https://moov.io")
 	req.Header.Set("X-Request-Id", "11112")
 
@@ -1099,7 +1099,7 @@ func TestFileContentsByID__getFileContentsEndpoint_WindowsLineEndings(t *testing
 		t.Errorf("bogus HTTP status: %d", w.Code)
 	}
 	lines := strings.Split(w.Body.String(), "\r\n")
-	require.True(t, len(lines) >= 10)
+	require.GreaterOrEqual(t, len(lines), 10)
 }
 
 func TestFileContentsByID__getFileContentsEndpoint_UnixLineEndings(t *testing.T) {
@@ -1131,10 +1131,10 @@ func TestFileContentsByID__getFileContentsEndpoint_UnixLineEndings(t *testing.T)
 		t.Errorf("bogus HTTP status: %d", w.Code)
 	}
 	lines := strings.Split(w.Body.String(), "\n")
-	require.True(t, len(lines) >= 10)
+	require.GreaterOrEqual(t, len(lines), 10)
 	// Line terminator should be `\n` and NOT include a carriage return.
 	windowsLines := strings.Split(w.Body.String(), "\r\n")
-	require.True(t, len(windowsLines) == 1)
+	require.Len(t, windowsLines, 1)
 }
 
 // TestFilesByID__deleteFileEndpoint tests by File ID
@@ -1156,7 +1156,7 @@ func TestFilesByID__deleteFileEndpoint(t *testing.T) {
 
 	// test status code
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest("DELETE", fmt.Sprintf("/files/%s", file.ID), nil)
+	req := httptest.NewRequest("DELETE", "/files/"+file.ID, nil)
 	req.Header.Set("Origin", "https://moov.io")
 	req.Header.Set("X-Request-Id", "11113")
 
@@ -1226,7 +1226,7 @@ func TestFiles__CreateFileEndpoint(t *testing.T) {
 
 		// test status code
 		w := httptest.NewRecorder()
-		req := httptest.NewRequest("POST", fmt.Sprintf("/files/create%s", tc.queryParams), fd)
+		req := httptest.NewRequest("POST", "/files/create"+tc.queryParams, fd)
 		req.Header.Set("Origin", "https://moov.io")
 		req.Header.Set("X-Request-Id", "11114")
 

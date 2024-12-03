@@ -18,7 +18,6 @@
 package ach
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -133,7 +132,7 @@ func (bc *ADVBatchControl) String() string {
 	defer saveBuffer(buf)
 
 	buf.WriteString(batchControlPos)
-	buf.WriteString(fmt.Sprintf("%v", bc.ServiceClassCode))
+	buf.WriteString(strconv.Itoa(bc.ServiceClassCode))
 	buf.WriteString(bc.EntryAddendaCountField())
 	buf.WriteString(bc.EntryHashField())
 	buf.WriteString(bc.TotalDebitEntryDollarAmountField())

@@ -19,7 +19,6 @@ package ach
 
 import (
 	"encoding/json"
-	"fmt"
 	"testing"
 
 	"github.com/moov-io/base"
@@ -590,8 +589,8 @@ func TestBatchCTX_JSON_RoundTrip(t *testing.T) {
 	for i := range file.Batches {
 		ied := file.Batches[i].GetEntries()
 		red := read.Batches[i].GetEntries()
-		require.Greater(t, len(ied), 0)
+		require.NotEmpty(t, ied)
 
-		require.ElementsMatch(t, ied, red, fmt.Sprintf("batch[%d]", i))
+		require.ElementsMatch(t, ied, red, "batch[%d]", i)
 	}
 }

@@ -2160,10 +2160,10 @@ func TestFile_ValidateOpts_Merge(t *testing.T) {
 
 	merged := first.merge(second)
 
-	require.False(t, merged.SkipAll)                 // keep false when both are false
-	require.True(t, merged.RequireABAOrigin)         // was true in first
-	require.NotNil(t, merged.CheckTransactionCode)   // non-nil function
-	require.Nil(t, merged.CheckTransactionCode(123)) // func always returns nil
+	require.False(t, merged.SkipAll)                     // keep false when both are false
+	require.True(t, merged.RequireABAOrigin)             // was true in first
+	require.NotNil(t, merged.CheckTransactionCode)       // non-nil function
+	require.NoError(t, merged.CheckTransactionCode(123)) // func always returns nil
 	require.True(t, merged.CustomReturnCodes)
 	require.True(t, merged.PreserveSpaces)
 

@@ -35,7 +35,7 @@ func TestIssue863(t *testing.T) {
 
 	files, err := readFiles(t, fd)
 	require.NoError(t, err)
-	require.Equal(t, 11, len(files))
+	require.Len(t, files, 11)
 
 	merged, err := ach.MergeFiles(files)
 	require.NoError(t, err)
