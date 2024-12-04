@@ -1,3 +1,9 @@
+## v1.44.1 (Released 2024-12-04)
+
+IMPROVEMENTS
+
+- fix: preserve FileIDModifier when flattening files
+
 ## v1.44.0 (Released 2024-12-04)
 
 ADDITIONS
