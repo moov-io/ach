@@ -16,7 +16,7 @@ There are [three same-day transmission deadlines with the Federal Reserve](https
 * **2nd Cutoff**: 2:45 p.m. ET
 * **3rd Cutoff**: 4:45 p.m. ET
 
-Files must be submitted before the last cutoff time to be eligible for same-day processing.
+Files must be submitted before the last cutoff time to be eligible for same-day processing. At each cutoff the Federal Reserve processes uploaded files and distributes them to financial institutions. 
 
 If a file is submitted after the last cutoff, entries that list the current banking day as their Effective Entry Date will be settled on the next banking day.
 
