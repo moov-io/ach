@@ -2219,3 +2219,25 @@ func TestFileFromJSON_ValidateOpts(t *testing.T) {
 	require.NotNil(t, validateOpts)
 	require.True(t, validateOpts.PreserveSpaces)
 }
+
+func TestFile_FlattenBatches_PreservesFileIDModifier(t *testing.T) {
+	f := NewFile()
+	f.SetHeader(mockFileHeader())
+	f.Header.FileIDModifier = "B"
+	batch1 := mockBatchPPD(t)
+	f.AddBatch(batch1)
+
+	err := f.Create()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	flattened, err := f.FlattenBatches()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if flattened.Header.FileIDModifier != "B" {
+		t.Errorf("FileIDModifier not preserved: want 'B' got %s", flattened.Header.FileIDModifier)
+	}
+}
