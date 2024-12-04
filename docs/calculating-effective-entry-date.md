@@ -59,7 +59,7 @@ The moov-io/base package provides functionality for calculating valid Effective 
 
 ## Creating Batch Headers
 
-The NewBatchHeader function creates a BatchHeader object that requires several key fields to be populated according to NACHA rules:
+The [`NewBatchHeader`](https://pkg.go.dev/github.com/moov-io/ach#NewBatchHeader) function creates a [`BatchHeader`](https://pkg.go.dev/github.com/moov-io/ach#BatchHeader) object that requires several key fields to be populated according to NACHA rules:
 
 ```go
 bh := ach.NewBatchHeader()
