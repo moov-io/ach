@@ -1271,6 +1271,7 @@ func (f *File) addFileHeaderData(file *File) *File {
 	file.Header.ImmediateDestination = f.Header.ImmediateDestination
 	file.Header.FileCreationDate = time.Now().Format("060102")
 	file.Header.FileCreationTime = time.Now().AddDate(0, 0, 1).Format("1504") // HHmm
+	file.Header.FileIDModifier = f.Header.FileIDModifier
 	file.Header.ImmediateDestinationName = f.Header.ImmediateDestinationName
 	file.Header.ImmediateOriginName = f.Header.ImmediateOriginName
 	return file
