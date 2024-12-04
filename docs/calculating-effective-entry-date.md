@@ -70,7 +70,7 @@ bh.CompanyIdentification = "121042882"       // Your company ID
 bh.CompanyEntryDescription = "PAYROLL"       // Transaction description
 bh.ODFIIdentification = "12104288"           // Your bank's routing number
 
-bh.EffectiveEntryDate = "240102"             // YYMMDD format
+bh.EffectiveEntryDate = "240102"             // YYMMDD format (e.g. 2024-01-02)
 ```
 
 ## Banking Day Functions
