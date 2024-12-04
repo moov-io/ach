@@ -75,7 +75,7 @@ bh.EffectiveEntryDate = "240102"             // YYMMDD format (e.g. 2024-01-02)
 
 ## Banking Day Functions
 
-The moov-io/base Time package provides these essential functions for determining valid banking days:
+The [`moov-io/base.Time`](https://pkg.go.dev/github.com/moov-io/base#NewTime) package provides these essential functions for determining valid banking days:
 
 * `AddBankingTime(hours, minutes, seconds int)`: Increments time by specified duration while respecting banking hours (9am-5pm ET)
 * `AddBankingDay(d int)`: Adds the specified number of valid banking days to a date
