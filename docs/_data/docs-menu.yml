@@ -35,6 +35,8 @@
       link: https://github.com/moov-io/ach/blob/master/examples/http/main.go
     - name: Micro Entries
       link: https://github.com/moov-io/ach/blob/master/examples/micro-entries/main.go
+    - name: Calculating Effective Entry Date
+      link: /calculating-effective-entry-date/
 
 - label: File operations
   items:
