@@ -22,8 +22,7 @@ If a file is submitted after the last cutoff, entries that list the current bank
 
 ## 2. Same-Day ACH Transaction Limit
 
-* The per-entry limit for same-day ACH is **$1,000,000**
-* Entries exceeding this amount are not eligible for same-day settlement
+* Entries qualify for same-day processing if their amount is **$1,000,000** or less.
 * In a batch containing entries over the limit, those entries will have their Effective Entry Date adjusted to the next banking day and remaining items will still be eligible for same-day settlement
 
 ## 3. Credit Entries
