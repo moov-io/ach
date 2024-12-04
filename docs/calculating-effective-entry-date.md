@@ -6,7 +6,7 @@ show_sidebar: false
 menubar: docs-menu
 ---
 
-# Effective Entry Date Field Constraints
+# Calculating Effective Entry Date 
 
 ## 1. Transmission Windows for Same-Day ACH
 
