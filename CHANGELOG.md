@@ -1,3 +1,20 @@
+## v1.44.0 (Released 2024-12-04)
+
+ADDITIONS
+
+- Add `NachaEntryAmountLimit`, `NachaBatchDebitCreditLimit`, and `NachaFileDebitCreditLimit` constants
+
+IMPROVEMENTS
+
+- docs: add guide for calculating effective entry date
+- fix: enforce limits on max amount in entries, batches, files and merge
+
+BUILD
+
+- fix(deps): update module github.com/stretchr/testify to v1.10.0 (#1512)
+- fix(deps): update module golang.org/x/sync to v0.10.0
+- fix(deps): update module golang.org/x/text to v0.21.0
+
 ## v1.43.0 (Released 2024-11-21)
 
 ADDITIONS
