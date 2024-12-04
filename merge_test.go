@@ -760,3 +760,35 @@ func TestMergeFilesHelpers(t *testing.T) {
 		require.Nil(t, output)
 	})
 }
+
+func TestMergeFiles_NachaMaxDollarAmount(t *testing.T) {
+	file := NewFile()
+	file.Header = mockFileHeader()
+
+	bh := mockBatchPPDHeader()
+	b, err := NewBatch(bh)
+	require.NoError(t, err)
+
+	for i := 0; i < 1000; i++ {
+		entry := mockPPDEntryDetail()
+		entry.SetTraceNumber(bh.ODFIIdentification, i)
+		entry.Amount = NachaEntryAmountLimit
+
+		b.AddEntry(entry)
+	}
+	require.ErrorContains(t, b.Create(), "FieldError TotalCreditEntryDollarAmount 9999999999000 does not match formatted value 999999999000")
+	file.AddBatch(b)
+
+	merged, err := MergeFiles([]*File{file})
+	require.NoError(t, err)
+	require.Len(t, merged, 10)
+
+	for _, file := range merged {
+		require.NoError(t, file.Create())
+
+		require.Len(t, file.Batches, 1)
+		require.Equal(t, 999999999900, file.Batches[0].GetControl().TotalCreditEntryDollarAmount)
+
+		require.Equal(t, 999999999900, file.Control.TotalCreditEntryDollarAmountInFile)
+	}
+}

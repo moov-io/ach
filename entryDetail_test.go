@@ -724,6 +724,8 @@ func TestEntryDetail__LargeAmountStrings(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 	}
+
+	require.ErrorContains(t, ed.amountOverflowsField(), "does not match formatted value 6854775807")
 }
 
 func TestEntryDetail__InvalidCheckDigitAllowedWithOpt(t *testing.T) {

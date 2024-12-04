@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"fmt"
 	"unicode/utf8"
 )
 
@@ -129,6 +130,33 @@ func (fc *FileControl) String() string {
 func (fc *FileControl) Validate() error {
 	if err := fc.fieldInclusion(); err != nil {
 		return err
+	}
+
+	if err := fc.totalDebitsOverflowsField(); err != nil {
+		return fieldError("TotalDebitEntryDollarAmount", err, fc.TotalDebitEntryDollarAmountInFile)
+	}
+	if err := fc.totalCreditsOverflowsField(); err != nil {
+		return fieldError("TotalCreditEntryDollarAmount", err, fc.TotalCreditEntryDollarAmountInFile)
+	}
+
+	return nil
+}
+
+const (
+	// NachaFileDebitCreditLimit is the maximum amount allowed by the Nacha format for a batch's debit/credit total (12 digits)
+	NachaFileDebitCreditLimit = 9_999_999_999_99
+)
+
+func (fc *FileControl) totalDebitsOverflowsField() error {
+	if fc.TotalDebitEntryDollarAmountInFile > NachaFileDebitCreditLimit {
+		return fmt.Errorf("does not match formatted value %s", fc.TotalDebitEntryDollarAmountInFileField())
+	}
+	return nil
+}
+
+func (fc *FileControl) totalCreditsOverflowsField() error {
+	if fc.TotalCreditEntryDollarAmountInFile > NachaFileDebitCreditLimit {
+		return fmt.Errorf("does not match formatted value %s", fc.TotalCreditEntryDollarAmountInFileField())
 	}
 	return nil
 }
