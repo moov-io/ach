@@ -55,11 +55,11 @@ For debit entries, the Effective Entry Date must be either:
 
 ## Overview
 
-The moov-io/base package provides functionality for calculating valid Effective Entry Dates when creating ACH batch headers, ensuring compliance with NACHA rules and Federal Reserve processing schedules.
+The moov-io/base package provides functionality for calculating valid Effective Entry Dates when creating ACH batch headers, ensuring compliance with Nacha rules and Federal Reserve processing schedules.
 
 ## Creating Batch Headers
 
-The [`NewBatchHeader`](https://pkg.go.dev/github.com/moov-io/ach#NewBatchHeader) function creates a [`BatchHeader`](https://pkg.go.dev/github.com/moov-io/ach#BatchHeader) object that requires several key fields to be populated according to NACHA rules:
+The [`NewBatchHeader`](https://pkg.go.dev/github.com/moov-io/ach#NewBatchHeader) function creates a [`BatchHeader`](https://pkg.go.dev/github.com/moov-io/ach#BatchHeader) object that requires several key fields to be populated according to Nacha rules:
 
 ```go
 bh := ach.NewBatchHeader()
@@ -77,86 +77,60 @@ bh.EffectiveEntryDate = "240102"             // YYMMDD format (e.g. 2024-01-02)
 
 The [`moov-io/base.Time`](https://pkg.go.dev/github.com/moov-io/base#NewTime) package provides these essential functions for determining valid banking days:
 
-* `AddBankingTime(hours, minutes, seconds int)`: Increments time by specified duration while respecting banking hours (9am-5pm ET)
-* `AddBankingDay(d int)`: Adds the specified number of valid banking days to a date
-* `IsBankingDay()`: Validates if a date is a banking day by checking both holidays and weekends
-* `IsBusinessDay()`: Determines if a date is a standard business day
-* `IsHoliday()`: Checks if a date falls on a Federal Reserve holiday
-* `IsWeekend()`: Verifies if a date falls on Saturday or Sunday
+* [`AddBankingTime(hours, minutes, seconds int)`](https://pkg.go.dev/github.com/moov-io/base#Time.AddBankingTime): Increments time by specified duration while respecting banking hours (9am-5pm ET)
+* [`AddBankingDay(d int)`](https://pkg.go.dev/github.com/moov-io/base#Time.AddBankingDay): Adds the specified number of valid banking days to a date
+* [`IsBankingDay()`](https://pkg.go.dev/github.com/moov-io/base#Time.IsBankingDay): Validates if a date is a banking day by checking both holidays and weekends
+* [`IsBusinessDay()`](https://pkg.go.dev/github.com/moov-io/base#Time.IsBusinessDay): Determines if a date is a standard business day
+* [`IsHoliday()`](https://pkg.go.dev/github.com/moov-io/base#Time.IsHoliday): Checks if a date falls on a Federal Reserve holiday
+* [`IsWeekend()`](https://pkg.go.dev/github.com/moov-io/base#Time.IsWeekend): Verifies if a date falls on Saturday or Sunday
 
 ## Transmission Windows
 
 The package handles Same-Day ACH transmission windows with time-based validations. Here's how to implement the cutoff time checks:
 
 ```go
-now := base.Now()
-// Create cutoff times for each window
-firstCutoff := now.AddBankingTime(10, 30, 0)    // 10:30 AM ET
-secondCutoff := now.AddBankingTime(14, 45, 0)   // 2:45 PM ET
-thirdCutoff := now.AddBankingTime(16, 45, 0)    // 4:45 PM ET
+package main
 
-if now.Before(firstCutoff.Time) {
-   // In first window
-   bh.EffectiveEntryDate = now.Format("060102")
-} else if now.Before(secondCutoff.Time) {
-   // First window closed, in second window
-   bh.EffectiveEntryDate = now.Format("060102")
-} else if now.Before(thirdCutoff.Time) {
-   // Second window closed, in third window
-   bh.EffectiveEntryDate = now.Format("060102")
-} else {
-   // All windows closed for today
-   now = now.AddBankingDay(1)
-   bh.EffectiveEntryDate = now.Format("060102")
+import (
+   "fmt"
+   "github.com/moov-io/ach"
+   "github.com/moov-io/base"
+)
+
+func main() {
+   // Create batch header
+   bh := ach.NewBatchHeader()
+   bh.ServiceClassCode = "220"
+   bh.StandardEntryClassCode = ach.PPD
+   bh.CompanyName = "ACME Corporation"
+   bh.CompanyIdentification = "121042882"
+   bh.CompanyEntryDescription = "PAYROLL"
+   bh.ODFIIdentification = "12104288"
+
+   amount := 500000 // Example amount
+   bh.EffectiveEntryDate = calculateEffectiveEntryDate(amount)
+   
+   fmt.Printf("Settlement Date: %s\n", bh.EffectiveEntryDate)
 }
-```
 
-## Implementation Example
-
-Here's a complete example showing how to calculate an Effective Entry Date based on various conditions:
-
-```go
-func calculateEffectiveEntryDate(amount int, isCredit bool) string {
+func calculateEffectiveEntryDate(amount int) string {
    now := base.Now()
    
-   // On weekends and holidays, entries must be processed on future banking days
-   if !now.IsBankingDay() {
-       if amount <= 1000000 {
-           // Same day entries settle on the next available banking day
-           // Example: Saturday file -> Monday settlement
-           now = now.AddBankingDay(1)
-           return now.Format("060102")
-       } else {
-           // Non same-day entries must settle beyond the next banking day
-           // to prevent inadvertent same-day settlement
-           // Example: Saturday file -> Tuesday settlement (skipping Monday)
-           now = now.AddBankingDay(1) // Move to next banking day (Monday)
-           now = now.AddBankingDay(1) // Move one more day (Tuesday) to maintain non same-day settlement
+   // Create cutoff time - in real world scenarios, there's typically an internal buffer before Fed cutoff
+   thirdCutoff := now.AddBankingTime(16, 15, 0)  // 4:15 PM ET
+
+   if now.IsBankingDay() {
+       // Same day settlement is available if under limit and before cutoff
+       if amount <= 1000000 && now.Before(thirdCutoff.Time) {
            return now.Format("060102")
        }
    }
-   
-   // The last cutoff for same-day ACH is 4:45 PM ET
-   thirdCutoff := now.AddBankingTime(16, 45, 0)
-   if now.After(thirdCutoff.Time) {
-       // After the cutoff, entries follow the same rules as non-banking days
-       if amount <= 1000000 {
-           // Same day entries settle next banking day
-           now = now.AddBankingDay(1)
-       } else {
-           // Non same-day entries must settle two banking days out
-           now = now.AddBankingDay(2)
-       }
-       return now.Format("060102")
-   }
-   
-   // Before the cutoff on a banking day, same-day settlement is available
+
+   // After cutoff or non-banking day - settle on future date
    if amount <= 1000000 {
-       // Entries within same-day limits can settle today
-       return now.Format("060102")
+       // Same day entries settle next banking day
+       return now.AddBankingDay(1).Format("060102")
    }
-   
-   // Non same-day entries must settle at least one banking day after creation
-   now = now.AddBankingDay(1)
-   return now.Format("060102")
+   // Non same-day entries must settle two banking days out
+   return now.AddBankingDay(2).Format("060102")
 }
