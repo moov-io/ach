@@ -380,13 +380,13 @@ func (ed *EntryDetail) fieldInclusion() error {
 	return nil
 }
 
-var (
-	// Amount is a 10 digit field
-	maxAmount = 9_999_999_999
+const (
+	// NachaEntryAmountLimit is the maximum amount allowed by the Nacha format for an entry (10 digits)
+	NachaEntryAmountLimit = 99_999_999_99
 )
 
 func (ed *EntryDetail) amountOverflowsField() error {
-	if ed.Amount > maxAmount {
+	if ed.Amount > NachaEntryAmountLimit {
 		return fmt.Errorf("does not match formatted value %s", ed.AmountField())
 	}
 	return nil

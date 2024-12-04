@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"fmt"
 	"strconv"
 	"unicode/utf8"
 )
@@ -147,6 +148,11 @@ func (bc *BatchControl) String() string {
 	return buf.String()
 }
 
+const (
+	// NachaBatchDebitCreditLimit is the maximum amount allowed by the Nacha format for a batch's debit/credit total (12 digits)
+	NachaBatchDebitCreditLimit = 9_999_999_999_99
+)
+
 // Validate performs NACHA format rule checks on the record and returns an error if not Validated
 // The first error encountered is returned and stops that parsing.
 func (bc *BatchControl) Validate() error {
@@ -165,6 +171,27 @@ func (bc *BatchControl) Validate() error {
 		return fieldError("MessageAuthenticationCode", err, bc.MessageAuthenticationCode)
 	}
 
+	if err := bc.totalDebitsOverflowsField(); err != nil {
+		return fieldError("TotalDebitEntryDollarAmount", err, bc.TotalDebitEntryDollarAmount)
+	}
+	if err := bc.totalCreditsOverflowsField(); err != nil {
+		return fieldError("TotalCreditEntryDollarAmount", err, bc.TotalCreditEntryDollarAmount)
+	}
+
+	return nil
+}
+
+func (bc *BatchControl) totalDebitsOverflowsField() error {
+	if bc.TotalDebitEntryDollarAmount > NachaBatchDebitCreditLimit {
+		return fmt.Errorf("does not match formatted value %s", bc.TotalDebitEntryDollarAmountField())
+	}
+	return nil
+}
+
+func (bc *BatchControl) totalCreditsOverflowsField() error {
+	if bc.TotalCreditEntryDollarAmount > NachaBatchDebitCreditLimit {
+		return fmt.Errorf("does not match formatted value %s", bc.TotalCreditEntryDollarAmountField())
+	}
 	return nil
 }
 

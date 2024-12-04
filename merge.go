@@ -33,7 +33,9 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-const NACHAFileLineLimit = 10000
+const (
+	NACHAFileLineLimit = 10000
+)
 
 // MergeFiles is a helper function for consolidating an array of ACH Files into as few files as possible.
 // This is useful for optimizing cost and network utilization.
@@ -484,6 +486,11 @@ func (outf *outFile) add(incoming *File) error {
 }
 
 func convertToFiles(sorted *outFile, conditions Conditions) ([]*File, error) {
+	// Force the MaxDollarAmount to within what the Nacha format allows
+	if conditions.MaxDollarAmount == 0 || conditions.MaxDollarAmount > NachaFileDebitCreditLimit {
+		conditions.MaxDollarAmount = NachaFileDebitCreditLimit
+	}
+
 	var batchNumber int
 
 	var out []*File

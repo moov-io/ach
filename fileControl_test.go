@@ -18,10 +18,12 @@
 package ach
 
 import (
+	"math"
 	"strings"
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 // mockFileControl create a file control
@@ -230,4 +232,17 @@ func BenchmarkFCFieldInclusionEntryHash(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		testFCFieldInclusionEntryHash(b)
 	}
+}
+
+func TestFileControl_Overflow(t *testing.T) {
+	fc := mockFileControl()
+
+	require.NoError(t, fc.totalDebitsOverflowsField())
+	require.NoError(t, fc.totalCreditsOverflowsField())
+
+	fc.TotalDebitEntryDollarAmountInFile = math.MaxInt64
+	require.ErrorContains(t, fc.totalDebitsOverflowsField(), "does not match formatted value 036854775807")
+	require.NoError(t, fc.totalCreditsOverflowsField())
+
+	require.ErrorContains(t, fc.Validate(), "does not match formatted value 036854775807")
 }

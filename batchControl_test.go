@@ -18,10 +18,12 @@
 package ach
 
 import (
+	"math"
 	"strings"
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 func mockBatchControl() *BatchControl {
@@ -335,4 +337,17 @@ func TestBatchControl__IsValidWithPreserveSpacesOpt(t *testing.T) {
 	if err := bc.Validate(); err != nil {
 		t.Error(err)
 	}
+}
+
+func TestBatchControl_Overflow(t *testing.T) {
+	bc := mockBatchControl()
+
+	require.NoError(t, bc.totalDebitsOverflowsField())
+	require.NoError(t, bc.totalCreditsOverflowsField())
+
+	bc.TotalDebitEntryDollarAmount = math.MaxInt64
+	require.ErrorContains(t, bc.totalDebitsOverflowsField(), "does not match formatted value 036854775807")
+	require.NoError(t, bc.totalCreditsOverflowsField())
+
+	require.ErrorContains(t, bc.Validate(), "does not match formatted value 036854775807")
 }
