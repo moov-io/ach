@@ -10,7 +10,7 @@ menubar: docs-menu
 
 ## 1. Transmission Windows for Same-Day ACH
 
-There are three transmission deadlines:
+There are [three same-day transmission deadlines with the Federal Reserve](https://www.frbservices.org/resources/resource-centers/same-day-ach/fedach-processing-schedule.html):
 
 * **1st Cutoff**: 10:30 a.m. ET
 * **2nd Cutoff**: 2:45 p.m. ET
