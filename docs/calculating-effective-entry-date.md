@@ -62,9 +62,9 @@ The moov-io/base package provides functionality for calculating valid Effective 
 The NewBatchHeader function creates a BatchHeader object that requires several key fields to be populated according to NACHA rules:
 
 ```go
-bh := NewBatchHeader()
+bh := ach.NewBatchHeader()
 bh.ServiceClassCode = "220"                  // 220 for credits only
-bh.StandardEntryClassCode = PPD              // PPD, CCD, WEB, etc.
+bh.StandardEntryClassCode = ach.PPD              // PPD, CCD, WEB, etc.
 bh.CompanyName = "ACME Corporation"          // Your company name
 bh.CompanyIdentification = "121042882"       // Your company ID
 bh.CompanyEntryDescription = "PAYROLL"       // Transaction description
