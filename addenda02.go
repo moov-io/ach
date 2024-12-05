@@ -250,7 +250,7 @@ func (addenda02 *Addenda02) ReferenceInformationOneField() string {
 
 // ReferenceInformationTwoField returns a space padded ReferenceInformationTwo string
 func (addenda02 *Addenda02) ReferenceInformationTwoField() string {
-	return addenda02.alphaField(addenda02.ReferenceInformationOne, 3)
+	return addenda02.alphaField(addenda02.ReferenceInformationTwo, 3)
 }
 
 // TerminalIdentificationCodeField returns a space padded TerminalIdentificationCode string
