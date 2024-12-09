@@ -1,3 +1,13 @@
+## v1.44.2 (Released 2024-12-09)
+
+IMPROVEMENTS
+
+- fix bug in Addenda02: Corrected ReferenceInformationTwoField to use ReferenceInformationTwo
+
+BUILD
+
+- fix(deps): update module golang.org/x/net to v0.32.0 (#1519)
+
 ## v1.44.1 (Released 2024-12-04)
 
 IMPROVEMENTS
