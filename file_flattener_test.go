@@ -204,3 +204,20 @@ func TestFlattenFile(t *testing.T) {
 		})
 	}
 }
+
+func TestFlattenFile_ValidateOpts(t *testing.T) {
+	file, err := ReadFile(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+
+	file.SetValidation(&ValidateOpts{
+		SkipAll: true,
+	})
+
+	file, err = Flatten(file)
+	require.NoError(t, err)
+	require.NotNil(t, file)
+
+	opts := file.GetValidation()
+	require.NotNil(t, opts)
+	require.True(t, opts.SkipAll)
+}
