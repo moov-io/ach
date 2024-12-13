@@ -77,7 +77,10 @@ func Flatten(originalFile *File) (*File, error) {
 	}
 
 	// Create a new file containing each of our new batches
-	newFile := originalFile.addFileHeaderData(NewFile())
+	newFile := NewFile()
+	newFile.SetValidation(originalFile.GetValidation())
+
+	newFile = originalFile.addFileHeaderData(newFile)
 	var allBatches []mergeable
 	for i := range newBatchesByHeader {
 		allBatches = append(allBatches, newBatchesByHeader[i]...)
