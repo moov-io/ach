@@ -19,6 +19,7 @@ package ach
 
 import (
 	"encoding/json"
+	"slices"
 	"strconv"
 )
 
@@ -274,6 +275,11 @@ func (iatBatch *IATBatch) GetEntries() []*IATEntryDetail {
 func (iatBatch *IATBatch) AddEntry(entry *IATEntryDetail) {
 	iatBatch.category = entry.Category
 	iatBatch.Entries = append(iatBatch.Entries, entry)
+}
+
+// DeleteEntries deletes all Entries from the Batch where del() == true
+func (iatBatch *IATBatch) DeleteEntries(del func(e *IATEntryDetail) bool) {
+	iatBatch.Entries = slices.DeleteFunc(iatBatch.Entries, del)
 }
 
 // Category returns IATBatch Category
