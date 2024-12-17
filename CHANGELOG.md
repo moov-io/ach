@@ -1,3 +1,14 @@
+## v1.45.0 (Released 2024-12-17)
+
+IMPROVEMENTS
+
+- fix: copy ValidateOpts through Flatten
+- feat: add `DeleteEntries()` to IATBatch
+
+BUILD
+
+- chore(deps): update registry.access.redhat.com/ubi9/ubi-minimal docker tag to v9.5-1733767867 (#1522)
+
 ## v1.44.2 (Released 2024-12-09)
 
 IMPROVEMENTS
