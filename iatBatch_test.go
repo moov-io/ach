@@ -2095,3 +2095,40 @@ func TestIATBatchInvalidServiceClassCode(t *testing.T) {
 	err = iatBatch.verify()
 	require.NoError(t, err)
 }
+
+func TestIATBatch_DeleteEntries(t *testing.T) {
+	mockBatch := IATBatch{}
+	mockBatch.SetHeader(mockIATBatchHeaderFF())
+
+	ed1 := mockIATEntryDetail()
+	ed1.TraceNumber = "1"
+	ed1.Amount = 20
+	ed2 := mockIATEntryDetail()
+	ed2.TraceNumber = "2"
+	ed2.Amount = 60
+	ed3 := mockIATEntryDetail()
+	ed3.TraceNumber = "3"
+	ed3.Amount = 100
+
+	mockBatch.AddEntry(ed1)
+	mockBatch.AddEntry(ed2)
+	mockBatch.AddEntry(ed3)
+
+	require.Len(t, mockBatch.Entries, 3)
+
+	mockBatch.DeleteEntries(func(e *IATEntryDetail) bool {
+		return e.TraceNumber == "2"
+	})
+
+	require.Len(t, mockBatch.Entries, 2)
+	require.Equal(t, "1", mockBatch.Entries[0].TraceNumber)
+	require.Equal(t, "3", mockBatch.Entries[1].TraceNumber)
+
+	mockBatch.AddEntry(ed2)
+
+	mockBatch.DeleteEntries(func(e *IATEntryDetail) bool {
+		return e.Amount >= 50
+	})
+	require.Len(t, mockBatch.Entries, 1)
+	require.Equal(t, "1", mockBatch.Entries[0].TraceNumber)
+}
