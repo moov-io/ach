@@ -1,3 +1,13 @@
+## v1.45.1 (Released 2024-12-19)
+
+IMPROVEMENTS
+
+- fix: update change codes to comly with 2024 nacha operating rules
+
+BUILD
+
+- fix(deps): update module golang.org/x/net to v0.33.0 (#1528)
+
 ## v1.45.0 (Released 2024-12-17)
 
 IMPROVEMENTS
