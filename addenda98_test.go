@@ -157,7 +157,7 @@ func BenchmarkAddenda98ValidCorrectedData(b *testing.B) {
 
 func testAddenda98ValidateTrue(t testing.TB) {
 	addenda98 := mockAddenda98()
-	addenda98.ChangeCode = "C11"
+	addenda98.ChangeCode = "C13"
 	err := addenda98.Validate()
 	// no error expected
 	if !base.Match(err, nil) {

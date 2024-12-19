@@ -248,10 +248,10 @@ func makeChangeCodeDict() map[string]*ChangeCode {
 		{"C05", "Incorrect transaction code", "Entry posted to demand account should contain savings transaction codes or vice versa"},
 		{"C06", "Incorrect bank account number and transit code", "Bank account number must be changed and transaction code should indicate posting to another account type (demand/savings)"},
 		{"C07", "Incorrect transit/routing number, bank account number and transaction code", "Changes required in three fields indicated"},
+		{"C08", "Incorrect Receiving transit/routing number (IAT only)", "Once valid transit/routing number must be changed"},
 		{"C09", "Incorrect individual ID number", "Individual's ID number is incorrect"},
-		{"C10", "Incorrect company name", "Company name is no longer valid and should be changed."},
-		{"C11", "Incorrect company identification", "Company ID is no longer valid and should be changed"},
-		{"C12", "Incorrect company name and company ID", "Both the company name and company id are no longer valid and must be changed"},
+		{"C13", "Addenda Format Error", "Entry Detail Record was correct and processed, however unclear or incorrect data was found in the addenda record"},
+		{"C14", "Incorrect SEC Code for outbound IAT payment", "Outbound international payments must use the IAT SEC code and convey required information for OFAC compliance."},
 		// Change codes used when refusing a Notification of Change
 		{"C61", "Misrouted Notification of Change", ""},
 		{"C62", "Incorrect Trace Number", ""},
