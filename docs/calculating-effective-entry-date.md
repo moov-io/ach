@@ -1,12 +1,12 @@
 ---
 layout: page
-title: Calculating Effective Entry Date 
+title: Calculating Effective Entry Date
 hide_hero: true
 show_sidebar: false
 menubar: docs-menu
 ---
 
-# Calculating Effective Entry Date 
+# Calculating Effective Entry Date
 
 ## 1. Transmission Windows for Same-Day ACH
 
@@ -16,7 +16,7 @@ There are [three same-day transmission deadlines with the Federal Reserve](https
 * **2nd Cutoff**: 2:45 p.m. ET
 * **3rd Cutoff**: 4:45 p.m. ET
 
-Files must be submitted before the last cutoff time to be eligible for same-day processing. At each cutoff the Federal Reserve processes uploaded files and distributes them to financial institutions. 
+Files must be submitted before the last cutoff time to be eligible for same-day processing. At each cutoff the Federal Reserve processes uploaded files and distributes them to financial institutions.
 
 If a file is submitted after the last cutoff, entries that list the current banking day as their Effective Entry Date will be settled on the next banking day.
 
@@ -109,13 +109,13 @@ func main() {
 
    amount := 500000 // Example amount
    bh.EffectiveEntryDate = calculateEffectiveEntryDate(amount)
-   
+
    fmt.Printf("Settlement Date: %s\n", bh.EffectiveEntryDate)
 }
 
 func calculateEffectiveEntryDate(amount int) string {
    now := base.Now()
-   
+
    // Create cutoff time - in real world scenarios, there's typically an internal buffer before Fed cutoff
    thirdCutoff := now.AddBankingTime(16, 15, 0)  // 4:15 PM ET
 
@@ -134,3 +134,4 @@ func calculateEffectiveEntryDate(amount int) string {
    // Non same-day entries must settle two banking days out
    return now.AddBankingDay(2).Format("060102")
 }
+```
