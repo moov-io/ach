@@ -75,12 +75,10 @@ func TestReadDirErr(t *testing.T) {
 }
 
 func TestReadDirSymlinkErr(t *testing.T) {
-	dir, err := os.MkdirTemp("", "readdir-symlink")
-	require.NoError(t, err)
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	// write an invalid symlink
-	err = os.Symlink(filepath.Join("missing", "directory"), filepath.Join(dir, "foo.ach"))
+	err := os.Symlink(filepath.Join("missing", "directory"), filepath.Join(dir, "foo.ach"))
 	require.NoError(t, err)
 
 	files, err := ReadDir(dir)
@@ -91,8 +89,7 @@ func TestReadDirSymlinkErr(t *testing.T) {
 func copyFilesToTempDir(t *testing.T, filenames []string) string {
 	t.Helper()
 
-	dir, err := os.MkdirTemp("", "ach-readdir")
-	require.NoError(t, err)
+	dir := t.TempDir()
 
 	for i := range filenames {
 		in, err := os.Open(filepath.Join("test", "testdata", filenames[i]))

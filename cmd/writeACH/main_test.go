@@ -25,11 +25,7 @@ import (
 )
 
 func TestFileWrite(t *testing.T) {
-	dir, err := os.MkdirTemp("", "ach-writeACH-test")
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	path := filepath.Join(dir, time.Now().UTC().Format("200601021504")+".ach")
 	write(path)
