@@ -420,6 +420,7 @@ func (v *validator) isAlphanumeric(s string) error {
 		// Specific characters that are accepted
 		switch r {
 		case
+			0xA0, //   - Non-breaking Space
 			0xA2, // ¢ - Cent Sign
 			0xAC, // ¬ - Negation
 			0xA6, // ¦ - Pipe
