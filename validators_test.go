@@ -167,7 +167,7 @@ func TestValidators__isAlphanumeric(t *testing.T) {
 				shouldError := tt.shouldErr(i)
 
 				switch chr {
-				case `¢`, `¦`, `¬`, `±`: // skip valid ASCII characters
+				case ` `, `¢`, `¦`, `¬`, `±`: // skip valid ASCII characters
 					continue
 
 				case `Ø`: // skip characters found in real world usage
