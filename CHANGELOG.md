@@ -1,3 +1,13 @@
+## v1.45.2 (Released 2025-01-09)
+
+IMPROVEMENTS
+
+- Allow NBSP (U+00A0) in PPD Addenda Payment Related Information
+
+BUILD
+
+- fix(deps): update module golang.org/x/net to v0.34.0 (#1532)
+
 ## v1.45.1 (Released 2024-12-19)
 
 IMPROVEMENTS
