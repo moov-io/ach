@@ -58,16 +58,21 @@ func (batch *BatchSHR) Validate() error {
 		return batch.Error("StandardEntryClassCode", ErrBatchSECType, SHR)
 	}
 
-	// SHR detail entries can only be a debit, ServiceClassCode must allow debits
+	// SHR entries can be debit, credit or mixed ServiceClassCode
 	switch batch.Header.ServiceClassCode {
-	case MixedDebitsAndCredits, CreditsOnly:
+	case MixedDebitsAndCredits, CreditsOnly, DebitsOnly:
+		// do nothing
+	default:
 		return batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode)
 	}
 
 	for _, entry := range batch.Entries {
-		// SHR detail entries must be a debit
-		if entry.CreditOrDebit() != "D" {
-			return batch.Error("TransactionCode", ErrBatchDebitOnly, entry.TransactionCode)
+		// SHR detail entries can be debit or credit
+		switch entry.CreditOrDebit() {
+		case "C", "D":
+			// do nothing
+		default:
+			return batch.Error("TransactionCode", ErrBatchTransactionCode, entry.TransactionCode)
 		}
 		if err := entry.isCardTransactionType(entry.DiscretionaryData); err != nil {
 			return batch.Error("CardTransactionType", ErrBatchInvalidCardTransactionType, entry.DiscretionaryData)
