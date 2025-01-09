@@ -1,3 +1,9 @@
+## v1.45.3 (Released 2025-01-09)
+
+IMPROVEMENTS
+
+- fix: allow credits in SHR batches
+
 ## v1.45.2 (Released 2025-01-09)
 
 IMPROVEMENTS
