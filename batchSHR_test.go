@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/moov-io/base"
@@ -220,22 +221,20 @@ func BenchmarkBatchSHRAutomatedAccountingAdvices(b *testing.B) {
 	}
 }
 
-// testBatchSHRTransactionCode validates BatchSHR TransactionCode is not a credit
+// testBatchSHRTransactionCode validates BatchSHR TransactionCode is credit or debit
 func testBatchSHRTransactionCode(t testing.TB) {
 	mockBatch := mockBatchSHR(t)
-	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
+	mockBatch.GetEntries()[0].TransactionCode = AutomatedAccountingAdvices
 	err := mockBatch.Create()
-	if !base.Match(err, ErrBatchDebitOnly) {
-		t.Errorf("%T: %s", err, err)
-	}
+	require.ErrorContains(t, err, "batch #1 (SHR) FieldError TransactionCode 280 is an invalid Transaction Code")
 }
 
-// TestBatchSHRTransactionCode tests validating BatchSHR TransactionCode is not a credit
+// TestBatchSHRTransactionCode tests validating BatchSHR TransactionCode is a credit or debit
 func TestBatchSHRTransactionCode(t *testing.T) {
 	testBatchSHRTransactionCode(t)
 }
 
-// BenchmarkBatchSHRTransactionCode benchmarks validating BatchSHR TransactionCode is not a credit
+// BenchmarkBatchSHRTransactionCode benchmarks validating BatchSHR TransactionCode is a credit or debit
 func BenchmarkBatchSHRTransactionCode(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -567,4 +566,24 @@ func TestBatchSHRTerminalState(t *testing.T) {
 	if !base.Match(err, ErrValidState) {
 		t.Errorf("%T: %s", err, err)
 	}
+}
+
+func TestBatchSHR_AcceptCredits(t *testing.T) {
+	file, err := ReadFile(filepath.Join("test", "testdata", "shr-credit.ach"))
+	require.ErrorContains(t, err, "*ach.FieldError CardExpirationDate 00 is an invalid month")
+	require.Len(t, file.Batches, 1)
+
+	b := file.Batches[0]
+	require.ErrorContains(t, b.Create(), "CardExpirationDate 00 is an invalid month")
+	require.ErrorContains(t, b.Validate(), "CardExpirationDate 00 is an invalid month")
+
+	bh := b.GetHeader()
+	require.Equal(t, SHR, bh.StandardEntryClassCode)
+	require.Equal(t, MixedDebitsAndCredits, bh.ServiceClassCode)
+
+	entries := b.GetEntries()
+	require.Len(t, entries, 14)
+
+	require.NoError(t, file.Create())
+	require.ErrorContains(t, err, "*ach.FieldError CardExpirationDate 00 is an invalid month")
 }
