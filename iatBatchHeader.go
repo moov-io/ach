@@ -22,7 +22,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/moov-io/ach/internal/iso3166"
+	"github.com/moov-io/iso3166"
 	"github.com/moov-io/iso4217"
 )
 

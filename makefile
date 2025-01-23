@@ -1,7 +1,7 @@
 PLATFORM=$(shell uname -s | tr '[:upper:]' '[:lower:]')
 VERSION := $(shell grep -Eo '(v[0-9]+[\.][0-9]+[\.][0-9]+([-a-zA-Z0-9]*)?)' version.go)
 
-.PHONY: build generate docker release
+.PHONY: build docker release
 
 build:
 	go fmt ./...
@@ -13,9 +13,6 @@ build:
 build-webui:
 	cp $(shell go env GOROOT)/misc/wasm/wasm_exec.js ./docs/webui/assets/wasm_exec.js
 	GOOS=js GOARCH=wasm go build -o ./docs/webui/assets/ach.wasm github.com/moov-io/ach/docs/webui/
-
-generate: clean
-	@go run internal/iso3166/iso3166_gen.go
 
 clean:
 	@rm -rf ./bin/ ./tmp/ coverage.txt misspell* staticcheck lint-project.sh
@@ -52,7 +49,7 @@ else
 	go test ./client
 endif
 
-dist: clean generate build
+dist: clean build
 ifeq ($(OS),Windows_NT)
 	CGO_ENABLED=1 GOOS=windows go build -o bin/achcli.exe github.com/moov-io/ach/cmd/achcli
 	CGO_ENABLED=1 GOOS=windows go build -o bin/ach.exe github.com/moov-io/ach/cmd/server
@@ -89,7 +86,7 @@ test-integration: clean-integration
 	sleep 5
 	curl -v http://localhost:8080/files
 
-release: docker generate AUTHORS
+release: docker AUTHORS
 	go test ./...
 	git tag -f $(VERSION)
 
