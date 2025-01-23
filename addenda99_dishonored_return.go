@@ -104,10 +104,11 @@ func (Addenda99Dishonored *Addenda99Dishonored) Parse(record string) {
 			Addenda99Dishonored.OriginalEntryTraceNumber = reset()
 		case 27:
 			reset() // reserved
-		case 38:
-			reset() // reserved
 		case 35:
 			Addenda99Dishonored.OriginalReceivingDFIIdentification = reset()
+		case 38:
+			// 36-38 reserved - Leave blank
+			reset()
 		case 53:
 			Addenda99Dishonored.ReturnTraceNumber = reset()
 		case 56:

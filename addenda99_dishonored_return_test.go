@@ -37,16 +37,24 @@ func mockAddenda99Dishonored() *Addenda99Dishonored {
 }
 
 func TestAddenda99Dishonored(t *testing.T) {
-	addenda99 := NewAddenda99()
+	addenda99Dishonored := NewAddenda99Dishonored()
 	line := "799R6909100001137143222042712114530   1211453000251201170506                   091000011371432"
-	addenda99.Parse(line)
+	addenda99Dishonored.Parse(line)
 
-	require.Equal(t, "12114530", addenda99.OriginalDFI)
-	require.Equal(t, "   1211453000251201170506                   ", addenda99.AddendaInformation)
-	require.Equal(t, "091000011371432", addenda99.TraceNumber)
-	require.Equal(t, line, addenda99.String())
+	expected := &Addenda99Dishonored{
+		TypeCode:                           "99",
+		DishonoredReturnReasonCode:         "R69",
+		OriginalEntryTraceNumber:           "091000011371432",
+		OriginalReceivingDFIIdentification: "12114530",
+		ReturnTraceNumber:                  "121145300025120",
+		ReturnSettlementDate:               "117",
+		ReturnReasonCode:                   "05",
+		AddendaInformation:                 "06                   ",
+		TraceNumber:                        "091000011371432",
+	}
+	require.Equal(t, expected, addenda99Dishonored)
 
-	addenda99 = NewAddenda99()
+	addenda99 := NewAddenda99()
 	addenda99.ReturnCode = "R69"
 	addenda99.OriginalTrace = "091000011371432"
 	addenda99.DateOfDeath = "220427"
@@ -59,6 +67,25 @@ func TestAddenda99Dishonored(t *testing.T) {
 	require.Equal(t, "117", addenda99.AddendaInformationReturnSettlementDate())
 	require.Equal(t, "R05", addenda99.AddendaInformationReturnReasonCode())
 	require.Equal(t, "06                   ", addenda99.AddendaInformationExtra())
+}
+
+func TestAddenda99Dishonored_Example(t *testing.T) {
+	addenda99Dishonored := NewAddenda99Dishonored()
+	line := "799R68059999990000301      12391871   12391871000000117901                     059999990000001"
+	addenda99Dishonored.Parse(line)
+
+	expected := &Addenda99Dishonored{
+		TypeCode:                           "99",
+		DishonoredReturnReasonCode:         "R68",
+		OriginalEntryTraceNumber:           "059999990000301",
+		OriginalReceivingDFIIdentification: "12391871",
+		ReturnTraceNumber:                  "123918710000001",
+		ReturnSettlementDate:               "179",
+		ReturnReasonCode:                   "01",
+		AddendaInformation:                 "                     ",
+		TraceNumber:                        "059999990000001",
+	}
+	require.Equal(t, expected, addenda99Dishonored)
 }
 
 func TestAddenda99Dishonored__Fields(t *testing.T) {
