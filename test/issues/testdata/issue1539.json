@@ -1,0 +1,97 @@
+{
+    "id": "179837a5-ea10-46da-8777-53c4eed2258c",
+    "fileHeader": {
+        "id": "179837a5-ea10-46da-8777-53c4eed2258c",
+        "immediateDestination": "12345678",
+        "immediateOrigin": "987654321",
+        "fileCreationDate": "250127",
+        "fileCreationTime": "1452",
+        "fileIDModifier": "A",
+        "immediateDestinationName": "MyBANK",
+        "immediateOriginName": "Moov Financial"
+    },
+    "batches": [
+        {
+            "batchHeader": {
+                "id": "179837a5-ea10-46da-8777-53c4eed2258c",
+                "serviceClassCode": 200,
+                "companyName": "MOOV",
+                "companyIdentification": "987654",
+                "standardEntryClassCode": "CCD",
+                "companyEntryDescription": "MV",
+                "effectiveEntryDate": "250128",
+                "originatorStatusCode": 1,
+                "ODFIIdentification": "43219876",
+                "batchNumber": 1
+            },
+            "entryDetails": [
+                {
+                    "id": "179837a5-ea10-46da-8777-53c4eed2258c",
+                    "transactionCode": 22,
+                    "RDFIIdentification": "27397636",
+                    "checkDigit": "9",
+                    "DFIAccountNumber": "0123456789",
+                    "amount": 100,
+                    "individualName": "MOOV",
+                    "discretionaryData": "179837a5-ea10-46da-8777-53c4eed2258c",
+                    "traceNumber": "291471021010100",
+                    "category": "Forward"
+                },
+                {
+                    "id": "179837a5-ea10-46da-8777-53c4eed2258c",
+                    "transactionCode": 27,
+                    "RDFIIdentification": "43219876",
+                    "checkDigit": "8",
+                    "DFIAccountNumber": "3323523523",
+                    "amount": 100,
+                    "individualName": "MOOV",
+                    "discretionaryData": "OFFSET",
+                    "traceNumber": "291471023010100",
+                    "category": "Forward"
+                }
+            ],
+            "batchControl": {
+                "id": "",
+                "serviceClassCode": 200,
+                "entryAddendaCount": 2,
+                "entryHash": 54794647,
+                "totalDebit": 100,
+                "totalCredit": 100,
+                "companyIdentification": "987654",
+                "ODFIIdentification": "43219876",
+                "batchNumber": 1
+            },
+            "offset": null
+        }
+    ],
+    "fileControl": {
+        "id": "179837a5-ea10-46da-8777-53c4eed2258c",
+        "batchCount": 1,
+        "blockCount": 1,
+        "entryAddendaCount": 2,
+        "entryHash": 54794647,
+        "totalDebit": 100,
+        "totalCredit": 100
+    },
+    "NotificationOfChange": null,
+    "ReturnEntries": null,
+    "validateOpts": {
+        "skipAll": false,
+        "requireABAOrigin": false,
+        "bypassOriginValidation": true,
+        "bypassDestinationValidation": true,
+        "customTraceNumbers": true,
+        "allowZeroBatches": false,
+        "allowMissingFileHeader": false,
+        "allowMissingFileControl": false,
+        "bypassCompanyIdentificationMatch": false,
+        "customReturnCodes": false,
+        "unequalServiceClassCode": false,
+        "allowUnorderedBatchNumbers": false,
+        "allowInvalidCheckDigit": false,
+        "unequalAddendaCounts": false,
+        "preserveSpaces": false,
+        "allowInvalidAmounts": false,
+        "allowZeroEntryAmount": false
+    }
+}

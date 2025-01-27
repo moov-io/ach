@@ -148,35 +148,44 @@ func FileFromJSONWith(bs []byte, opts *ValidateOpts) (*File, error) {
 		return nil, fmt.Errorf("problem reading File: %w", ErrInvalidJSON)
 	}
 
+	// Read the ValidateOpts first
+	out := NewFile()
+	out.SetValidation(opts)
+
+	validateOpts, err := readValidateOpts(bs)
+	if err != nil {
+		return nil, fmt.Errorf("reading validate opts: %w", err)
+	}
+	out.SetValidation(out.validateOpts.merge(validateOpts))
+
 	// read file root level
 	var f file
-	file := NewFile()
 	if err := json.NewDecoder(bytes.NewReader(bs)).Decode(&f); err != nil {
 		return nil, fmt.Errorf("problem reading File: %v", err)
 	}
-	file.ID = f.ID
+	out.ID = f.ID
 	if opts != nil {
-		file.SetValidation(opts)
+		out.SetValidation(opts)
 	}
 
 	// Read FileHeader
 	header := fileHeader{
-		Header: file.Header,
+		Header: out.Header,
 	}
 	if err := json.NewDecoder(bytes.NewReader(bs)).Decode(&header); err != nil {
 		return nil, fmt.Errorf("problem reading FileHeader: %v", err)
 	}
-	file.Header = header.Header
+	out.Header = header.Header
 
 	// Build resulting file
-	if err := file.setBatchesFromJSON(bs); err != nil {
+	if err := out.setBatchesFromJSON(bs); err != nil {
 		return nil, err
 	}
 
 	// Overwrite various timestamps with their ACH formatted values
-	file.overwriteDateTimeFields()
+	out.overwriteDateTimeFields()
 
-	if !file.IsADV() {
+	if !out.IsADV() {
 		// Read FileControl
 		control := fileControl{
 			Control: NewFileControl(),
@@ -184,7 +193,7 @@ func FileFromJSONWith(bs []byte, opts *ValidateOpts) (*File, error) {
 		if err := json.NewDecoder(bytes.NewReader(bs)).Decode(&control); err != nil {
 			return nil, fmt.Errorf("problem reading FileControl: %v", err)
 		}
-		file.Control = control.Control
+		out.Control = control.Control
 	} else {
 		// Read ADVFileControl
 		advControl := advFileControl{
@@ -193,31 +202,22 @@ func FileFromJSONWith(bs []byte, opts *ValidateOpts) (*File, error) {
 		if err := json.NewDecoder(bytes.NewReader(bs)).Decode(&advControl); err != nil {
 			return nil, fmt.Errorf("problem reading ADVFileControl: %v", err)
 		}
-		file.ADVControl = advControl.ADVControl
+		out.ADVControl = advControl.ADVControl
 	}
 
-	if !file.IsADV() {
-		file.Control.BatchCount = len(file.Batches)
+	if !out.IsADV() {
+		out.Control.BatchCount = len(out.Batches)
 	} else {
-		file.ADVControl.BatchCount = len(file.Batches)
+		out.ADVControl.BatchCount = len(out.Batches)
 	}
 
-	if opts != nil {
-		file.SetValidation(opts)
+	if err := out.Create(); err != nil {
+		return out, err
 	}
-	validateOpts, err := readValidateOpts(bs)
-	if err != nil {
-		return nil, fmt.Errorf("reading validate opts: %w", err)
+	if err := out.Validate(); err != nil {
+		return out, err
 	}
-	file.SetValidation(file.validateOpts.merge(validateOpts))
-
-	if err := file.Create(); err != nil {
-		return file, err
-	}
-	if err := file.Validate(); err != nil {
-		return file, err
-	}
-	return file, nil
+	return out, nil
 }
 
 // MarshalJSON will produce a JSON blob with the ACH file's fields and validation settings.
@@ -234,6 +234,14 @@ func (f *File) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON parses a JSON blob with ach.FileFromJSON
 func (f *File) UnmarshalJSON(p []byte) error {
+	if f.validateOpts == nil {
+		opts, err := readValidateOpts(p)
+		if err != nil {
+			return err
+		}
+		f.SetValidation(opts)
+	}
+
 	file, err := FileFromJSONWith(p, f.validateOpts)
 	if err != nil {
 		return err
@@ -241,11 +249,7 @@ func (f *File) UnmarshalJSON(p []byte) error {
 	if file != nil {
 		*f = *file
 	}
-	opts, err := readValidateOpts(p)
-	if err != nil {
-		return err
-	}
-	f.SetValidation(opts)
+
 	return nil
 }
 
