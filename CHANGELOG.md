@@ -1,3 +1,14 @@
+## v1.45.4 (Released 2025-01-27)
+
+IMPROVEMENTS
+
+- fix: read ValidateOpts from JSON before data
+- test: verify more about Addenda99Dishonored returns
+
+BUILD
+
+- chore: replace internal iso3166 with moov-io/iso3166
+
 ## v1.45.3 (Released 2025-01-09)
 
 IMPROVEMENTS
