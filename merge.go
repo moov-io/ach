@@ -472,8 +472,9 @@ func (outf *outFile) add(incoming *File) error {
 			// No batch can hold this EntryDetail so create one
 			if b == nil {
 				b = &batch{
-					header:  *bh,
-					entries: treemap.New[string, *EntryDetail](),
+					header:       *bh,
+					entries:      treemap.New[string, *EntryDetail](),
+					validateOpts: incoming.GetValidation(),
 				}
 				outFile.batches = append(outFile.batches, b)
 			}
@@ -531,6 +532,7 @@ func convertToFiles(sorted *outFile, conditions Conditions) ([]*File, error) {
 			if err != nil {
 				return nil, fmt.Errorf("creating batch from sorted.batches[%d] failed: %w", i, err)
 			}
+			batch.SetValidation(nextBatch.validateOpts)
 
 			currentFileLineCount += 2 // BatchHeader, BatchControl
 
@@ -600,6 +602,7 @@ func convertToFiles(sorted *outFile, conditions Conditions) ([]*File, error) {
 				if err != nil {
 					return nil, fmt.Errorf("problem creating overflow batch: %w", err)
 				}
+				batch.SetValidation(nextBatch.validateOpts)
 
 			merge:
 				// Add the entry to the current batch
@@ -634,8 +637,9 @@ func convertToFiles(sorted *outFile, conditions Conditions) ([]*File, error) {
 // batch contains a BatcHeader and tree of entries sorted by TraceNumber, which allows for
 // faster lookup and insertion into an ACH file
 type batch struct {
-	header  BatchHeader
-	entries *treemap.TreeMap[string, *EntryDetail]
+	header       BatchHeader
+	entries      *treemap.TreeMap[string, *EntryDetail]
+	validateOpts *ValidateOpts
 }
 
 // pickOutFile will search for an existing outFile matching the FileHeader Origin and Destination.

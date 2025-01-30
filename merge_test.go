@@ -566,6 +566,13 @@ func TestMergeFiles__ValidateOpts(t *testing.T) {
 	require.False(t, opts.SkipAll)
 	require.True(t, opts.CustomReturnCodes)
 	require.True(t, opts.AllowInvalidAmounts)
+
+	// verify ValidateOpts are set on batches
+	b, ok := merged[0].Batches[0].(*BatchPPD)
+	require.True(t, ok)
+	require.NotNil(t, b.Batch.validateOpts)
+	require.False(t, b.Batch.validateOpts.SkipAll)
+	require.True(t, b.Batch.validateOpts.CustomReturnCodes)
 }
 
 func TestMergeDir__DefaultFileAcceptor(t *testing.T) {
