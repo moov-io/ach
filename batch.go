@@ -55,11 +55,11 @@ const (
 	// ACK ACH Payment Acknowledgment - A code that indicates acknowledgment of receipt of a corporate credit payment
 	// (CCD).
 	ACK = "ACK"
-	// ADV Automated Accounting Advice – A code that provide accounting information regarding an Entry. It is an
+	// ADV Automated Accounting Advice – A code that provides accounting information regarding an Entry. It is an
 	// optional service.
 	ADV = "ADV"
 	// ARC Accounts Receivable Entry – A code that indicates a consumer check converted to a one-time ACH debit.
-	// The Accounts Receivable (ARC) Entry provides initiates a single-entry ACH debit to customer accounts by
+	// The Accounts Receivable (ARC) Entry initiates a single-entry ACH debit to customer accounts by
 	// converting checks at the point of receipt through the U.S. mail, at a drop box location or in-person for
 	// payment of a bill at a manned location.
 	ARC = "ARC"
@@ -88,7 +88,7 @@ const (
 	// ENR Automated Enrollment Entry - A code indicating enrollment of a person with an agency of the US government
 	// for a depository financial institution.
 	ENR = "ENR"
-	// IAT International ACH Transaction - A code IAT indicating a  credit or debit ACH entry that is part of a payment
+	// IAT International ACH Transaction - A code IAT indicating a credit or debit ACH entry that is part of a payment
 	// transaction involving a financial agency's office (i.e., depository financial institution or business issuing
 	// money orders) that is not located in the territorial jurisdiction of the United States. IAT entries can be made
 	// to or from a corporate or consumer account and must be accompanied by seven (7) mandatory addenda records
@@ -96,40 +96,40 @@ const (
 	// Receiver's account number, Receiver's bank identity and reason for the payment.
 	IAT = "IAT"
 	// MTE Machine Transfer Entry - A code that indicates when a consumer uses their debit card at an Automated Teller
-	// Machine (ATM) to withdraw cash.  MTE transactions cannot be aggregated together under a single Entry.
+	// Machine (ATM) to withdraw cash. MTE transactions cannot be aggregated together under a single Entry.
 	MTE = "MTE"
 	// POP Point of Purchase Entry - A code that indicates a check presented in-person to a merchant for purchase
 	// is presented as an ACH entry instead of a physical check.
 	POP = "POP"
-	// POS Point of Sale Entry - A code that indicates a debit entry initiated at an “electronic terminal” to a
+	// POS Point of Sale Entry - A code that indicates a debit entry initiated at an "electronic terminal" to a
 	// consumer account of the receiver to pay an obligation incurred in a point-of-sale transaction, or to effect a
 	// point-of-sale terminal cash withdrawal.
 	POS = "POS"
-	// PPD Prearranged Payment and Deposit Entry - A code tha indicates a an entry initiated by an organization based
+	// PPD Prearranged Payment and Deposit Entry - A code that indicates an entry initiated by an organization based
 	// on a standing or a single entry authorization to transfer funds.
 	PPD = "PPD"
 	// RCK Re-presented Check Entry - A code that indicates a physical check that was presented but returned because of
 	//// insufficient funds may be represented as an ACH entry.
 	RCK = "RCK"
-	// SHR Shared Network Transaction - A code that indicates a debit Entry initiated at an “electronic terminal,” as
+	// SHR Shared Network Transaction - A code that indicates a debit Entry initiated at an "electronic terminal," as
 	// that term is defined in Regulation E, to a Consumer Account of the Receiver to pay an obligation incurred in a
 	// point-of-sale transaction, or to effect a point-of-sale terminal cash withdrawal. Also an adjusting or other
 	// credit Entry related to such debit Entry, transfer of funds, or obligation. SHR Entries are initiated in a
 	// shared network where the ODFI and RDFI have an agreement in addition to these Rules to process such Entries.
 	SHR = "SHR"
-	// TEL Telephone Initiated Entry - A code indicating a Telephone-Initiated consumer debit transactions. The NACHA
+	// TEL Telephone Initiated Entry - A code indicating a Telephone-Initiated consumer debit transaction. The NACHA
 	// Operating Rules permit TEL entries when the originator obtains the Receiver's authorization for the debit entry
-	// orally via the telephone.  An entry based upon a Receiver's oral authorization must utilize the TEL
+	// orally via the telephone. An entry based upon a Receiver's oral authorization must utilize the TEL
 	// Standard Entry Class (SEC) Code.
 	TEL = "TEL"
 	// TRC Check Truncation Entry - is a code used to identify a debit entry of a truncated check.
 	TRC = "TRC"
-	// TRX Check Truncation Entries Exchange - used to identify a debit entry exchange of a truncated checks (multiple).
+	// TRX Check Truncation Entries Exchange - used to identify a debit entry exchange of truncated checks (multiple).
 	TRX = "TRX"
 	// WEB Internet-Initiated/Mobile Entry - A code indicating an entry submitted pursuant to an authorization obtained
 	// solely via the Internet or a mobile network. For consumer accounts only.
 	WEB = "WEB"
-	// XCK Destroyed Check Entry - A code indicating a debit entry initiated for a destroyed check eligible items
+	// XCK Destroyed Check Entry - A code indicating a debit entry initiated for destroyed check eligible items
 	XCK = "XCK"
 )
 
