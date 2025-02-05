@@ -1,3 +1,14 @@
+## v1.45.5 (Released 2025-02-05)
+
+IMPROVEMENTS
+
+- fix: set ValidateOpts on newly constructed Batches of merge
+- fix: typos in batch code constants
+
+BUILD
+
+- chore(deps): update registry.access.redhat.com/ubi9/ubi-minimal docker tag to v9.5-1738643652 (#1543)
+
 ## v1.45.4 (Released 2025-01-27)
 
 IMPROVEMENTS
