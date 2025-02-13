@@ -2092,17 +2092,15 @@ func TestJSONReader__IncludeFieldName(t *testing.T) {
 	// it's easier to debug. Otherwise we get generic error messages that just include
 	// "cannot unmarshal %T into %T"
 	bs, err := os.ReadFile(filepath.Join("test", "testdata", "invalid-batchNumber.json"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
-	if _, err := FileFromJSON(bs); err == nil {
-		t.Fatal("expected error")
-	} else {
-		if !strings.Contains(err.Error(), `batchHeader.batchNumber: json: cannot unmarshal string into Go struct field BatchHeader.batchHeader.batchNumber of type int`) {
-			t.Fatalf("unexpected error:\n  %v", err)
-		}
-	}
+	_, err = FileFromJSON(bs)
+	require.Error(t, err)
+
+	// Go 1.24 slightly changed these error messages to include embedded struct names
+	// See: https://github.com/golang/go/issues/68941
+	require.ErrorContains(t, err, `batchHeader.batchNumber: json: cannot unmarshal string into Go struct field`)
+	require.ErrorContains(t, err, `batchHeader.batchNumber of type int`)
 }
 
 func TestReadFile_SkipValidation(t *testing.T) {
