@@ -11,7 +11,7 @@ build:
 	CGO_ENABLED=0 go build -o ./bin/server github.com/moov-io/ach/cmd/server
 
 build-webui:
-	cp $(shell go env GOROOT)/misc/wasm/wasm_exec.js ./docs/webui/assets/wasm_exec.js
+	cp $(shell go env GOROOT)/lib/wasm/wasm_exec.js  ./docs/webui/assets/wasm_exec.js
 	GOOS=js GOARCH=wasm go build -o ./docs/webui/assets/ach.wasm github.com/moov-io/ach/docs/webui/
 
 clean:
