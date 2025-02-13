@@ -42,6 +42,7 @@ jobs:
         GOLANGCI_LINTERS: gosec
 
     - name: WebUI
+      if: runner.os != 'Windows'
       run: make build-webui
 
   docker:
