@@ -11,7 +11,7 @@ COPY ./test ./test
 COPY makefile makefile
 RUN make build
 
-FROM registry.access.redhat.com/ubi9/ubi-minimal:9.5-1739420147
+FROM registry.access.redhat.com/ubi9/ubi-minimal:9.5-1741599792
 ARG VERSION=unknown
 LABEL maintainer="Moov <oss@moov.io>"
 LABEL name="ach"
