@@ -227,6 +227,28 @@ func BenchmarkEDFieldInclusion(b *testing.B) {
 	}
 }
 
+func TestEntryDetail_DFIAccountNumber(t *testing.T) {
+	cases := []struct {
+		accountNumber string
+		err           string
+	}{
+		{
+			accountNumber: "123456-9876.1234",
+		},
+	}
+	for _, tc := range cases {
+		ed := mockEntryDetail()
+		ed.DFIAccountNumber = tc.accountNumber
+
+		err := ed.Validate()
+		if tc.err != "" {
+			require.ErrorContains(t, err, tc.err)
+		} else {
+			require.NoError(t, err)
+		}
+	}
+}
+
 // testEDdfiAccountNumberAlphaNumeric validates DFI account number is alpha numeric
 func testEDdfiAccountNumberAlphaNumeric(t testing.TB) {
 	ed := mockEntryDetail()
