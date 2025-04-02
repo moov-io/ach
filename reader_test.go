@@ -2057,6 +2057,34 @@ func TestReader__morphing(t *testing.T) {
 	}
 }
 
+func TestReader_explicit_contenttype(t *testing.T) {
+	path := filepath.Join("test", "testdata", "extended-ascii.ach")
+	file, err := readACHFilepath(path)
+	if err == nil {
+		t.Error("expected error")
+	}
+	if file == nil {
+		t.Fatal("nil File")
+	}
+
+	fd, err := os.Open(path)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	defer fd.Close()
+
+	utf8Reader := NewReaderWithContentType(fd, "plain/text; charset=utf-8")
+	utf8Reader.SetValidation(&ValidateOpts{SkipAll: true})
+
+	utf8File, err := utf8Reader.Read()
+	if err != nil {
+		t.Error(err.Error())
+	}
+	if len(utf8File.Batches) != 2 {
+		t.Fatal("file batch count mismatch")
+	}
+}
+
 func TestReader__partial(t *testing.T) {
 	file, err := readACHFilepath(filepath.Join("test", "testdata", "invalid-two-micro-deposits.ach"))
 	if err == nil {
