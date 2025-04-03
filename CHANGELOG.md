@@ -1,3 +1,19 @@
+## v1.46.0 (Released 2025-04-03)
+
+ADDITIONS
+
+- feat: allow explicit content type to be provided to Reader (via `NewReaderWithContentType`)
+
+IMPROVEMENTS
+
+- test: verify we accept account numbers with decimals
+
+BUILD
+
+- test: fixup error check after go1.24 change
+- build: update wasm_exec.js path for Go 1.24
+- build: mingw compatiable way to build paths unix-style
+
 ## v1.45.5 (Released 2025-02-05)
 
 IMPROVEMENTS
