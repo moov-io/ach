@@ -78,6 +78,8 @@ type ADVEntryDetail struct {
 	Addenda99 *Addenda99 `json:"addenda99,omitempty"`
 	// Category defines if the entry is a Forward, Return, or NOC
 	Category string `json:"category,omitempty"`
+	// Line number at which the record appears in the file
+	LineNumber int `json:"lineNumber,omitempty"`
 	// validator is composed for data validation
 	validator
 	// converters is composed for ACH to golang Converters

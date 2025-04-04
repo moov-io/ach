@@ -42,6 +42,8 @@ type Addenda98 struct {
 	OriginalDFI string `json:"originalDFI"`
 	// CorrectedData is the corrected data
 	CorrectedData string `json:"correctedData"`
+	// Line number at which the record appears in the file
+	LineNumber int `json:"lineNumber,omitempty"`
 
 	// iatCorrectedData is a field containing the additional space allowed in IAT Correction Addenda records
 	iatCorrectedData string

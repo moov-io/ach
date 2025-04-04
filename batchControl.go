@@ -74,6 +74,8 @@ type BatchControl struct {
 	// in the Batch Header Record and the Batch Control Record is the same,
 	// the ascending sequence number should be assigned by batch and not by record.
 	BatchNumber int `json:"batchNumber"`
+	// Line number at which the record appears in the file
+	LineNumber int `json:"lineNumber,omitempty"`
 	// validator is composed for data validation
 	validator
 	// converters is composed for ACH to golang Converters
