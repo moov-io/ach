@@ -41,6 +41,8 @@ type FileControl struct {
 	TotalDebitEntryDollarAmountInFile int `json:"totalDebit"`
 	// TotalCreditEntryDollarAmountInFile contains accumulated Batch credit totals within the file.
 	TotalCreditEntryDollarAmountInFile int `json:"totalCredit"`
+	// Line number at which the record appears in the file
+	LineNumber int `json:"lineNumber,omitempty"`
 	// validator is composed for data validation
 	validator
 	// converters is composed for ACH to golang Converters

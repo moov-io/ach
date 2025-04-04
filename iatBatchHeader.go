@@ -161,6 +161,9 @@ type IATBatchHeader struct {
 	// record.
 	BatchNumber int `json:"batchNumber"`
 
+	// Line number at which the record appears in the file
+	LineNumber int `json:"lineNumber,omitempty"`
+
 	// validator is composed for data validation
 	validator
 

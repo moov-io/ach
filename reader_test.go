@@ -2207,3 +2207,96 @@ func TestReadFile_PreserveSpacesOptEnabled(t *testing.T) {
 		t.Errorf("Expected company id: '%s', Actual: '%s'", expectedCompanyId, batchControlCompanyId)
 	}
 }
+
+func TestReadFile_lineNumbers(t *testing.T) {
+	assertLineNumber := func(t *testing.T, expected, actual int) {
+		if expected != actual {
+			t.Fatalf("Line number %d doesn't match expectation %d", actual, expected)
+		}
+	}
+
+	fd, _ := os.Open(filepath.Join("test", "testdata", "return-WEB.ach"))
+	defer fd.Close()
+	reader := NewReader(fd)
+	file, _ := reader.Read()
+
+	// file header
+	assertLineNumber(t, 1, file.Header.LineNumber)
+
+	// batch header
+	assertLineNumber(t, 2, file.Batches[0].GetHeader().LineNumber)
+
+	// entry detail
+	assertLineNumber(t, 3, file.Batches[0].GetEntries()[0].LineNumber)
+
+	// addenda 99
+	assertLineNumber(t, 4, file.Batches[0].GetEntries()[0].Addenda99.LineNumber)
+
+	// batch control
+	assertLineNumber(t, 5, file.Batches[0].GetControl().LineNumber)
+
+	// file control
+	assertLineNumber(t, 10, file.Control.LineNumber)
+
+	fd, _ = os.Open(filepath.Join("test", "testdata", "20180713-IAT.ach"))
+	defer fd.Close()
+	reader = NewReader(fd)
+	file, _ = reader.Read()
+
+	// iat batch header
+	assertLineNumber(t, 2, file.IATBatches[0].GetHeader().LineNumber)
+
+	// iat entry detail
+	assertLineNumber(t, 3, file.IATBatches[0].Entries[0].LineNumber)
+
+	// addenda 10
+	assertLineNumber(t, 4, file.IATBatches[0].Entries[0].Addenda10.LineNumber)
+
+	// addenda 11
+	assertLineNumber(t, 5, file.IATBatches[0].Entries[0].Addenda11.LineNumber)
+
+	// addenda 12
+	assertLineNumber(t, 6, file.IATBatches[0].Entries[0].Addenda12.LineNumber)
+
+	// addenda 13
+	assertLineNumber(t, 7, file.IATBatches[0].Entries[0].Addenda13.LineNumber)
+
+	// addenda 14
+	assertLineNumber(t, 8, file.IATBatches[0].Entries[0].Addenda14.LineNumber)
+
+	// addenda 15
+	assertLineNumber(t, 9, file.IATBatches[0].Entries[0].Addenda15.LineNumber)
+
+	// addenda 16
+	assertLineNumber(t, 10, file.IATBatches[0].Entries[0].Addenda16.LineNumber)
+
+	// iat batch control
+	assertLineNumber(t, 11, file.IATBatches[0].GetControl().LineNumber)
+
+	fd, err := os.Open(filepath.Join("test", "testdata", "adv.ach"))
+	if err != nil {
+		panic(err)
+	}
+	defer fd.Close()
+	reader = NewReader(fd)
+	file, err = reader.Read()
+
+	if err != nil {
+		panic(err)
+	}
+
+	// adv file header
+	assertLineNumber(t, 1, file.Header.LineNumber)
+
+	// adv batch header
+	assertLineNumber(t, 2, file.Batches[0].GetHeader().LineNumber)
+
+	// adv entry detail
+	assertLineNumber(t, 3, file.Batches[0].GetADVEntries()[0].LineNumber)
+
+	// adv batch control
+	assertLineNumber(t, 5, file.Batches[0].GetADVControl().LineNumber)
+
+	// adv file control
+	assertLineNumber(t, 6, file.ADVControl.LineNumber)
+}
