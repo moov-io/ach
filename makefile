@@ -74,15 +74,11 @@ dist-webui: build-webui
 	git commit -m "chore: updating wasm webui [skip ci]" || echo "No changes to commit"
 	git push origin master
 
-docker: clean docker-hub docker-openshift
+docker: clean docker-hub
 
 docker-hub:
 	docker build --pull -t moov/ach:$(VERSION) -f Dockerfile .
 	docker tag moov/ach:$(VERSION) moov/ach:latest
-
-docker-openshift:
-	docker build --pull -t quay.io/moov/ach:$(VERSION) -f Dockerfile-openshift --build-arg VERSION=$(VERSION) .
-	docker tag quay.io/moov/ach:$(VERSION) quay.io/moov/ach:latest
 
 .PHONY: clean-integration test-integration
 
@@ -102,10 +98,6 @@ release: docker AUTHORS
 release-push:
 	docker push moov/ach:$(VERSION)
 	docker push moov/ach:latest
-
-quay-push:
-	docker push quay.io/moov/ach:$(VERSION)
-	docker push quay.io/moov/ach:latest
 
 .PHONY: cover-test cover-web
 cover-test:
