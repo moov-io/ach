@@ -338,8 +338,10 @@ func (ed *EntryDetail) Validate() error {
 	if err := ed.isAlphanumeric(ed.IdentificationNumber); err != nil {
 		return fieldError("IdentificationNumber", err, ed.IdentificationNumber)
 	}
-	if err := ed.isAlphanumeric(ed.IndividualName); err != nil {
-		return fieldError("IndividualName", err, ed.IndividualName)
+	if !ed.validateOpts.AllowNonAlphanumericIndividualName {
+		if err := ed.isAlphanumeric(ed.IndividualName); err != nil {
+			return fieldError("IndividualName", err, ed.IndividualName)
+		}
 	}
 	if err := ed.isAlphanumeric(ed.DiscretionaryData); err != nil {
 		return fieldError("DiscretionaryData", err, ed.DiscretionaryData)
