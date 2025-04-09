@@ -104,26 +104,3 @@ cover-test:
 	go test -coverprofile=cover.out ./...
 cover-web:
 	go tool cover -html=cover.out
-
-# From https://github.com/genuinetools/img
-.PHONY: AUTHORS
-AUTHORS:
-	@$(file >$@,# This file lists all individuals having contributed content to the repository.)
-	@$(file >>$@,# For how it is generated, see `make AUTHORS`.)
-	@echo "$(shell git log --format='\n%aN <%aE>' | LC_ALL=C.UTF-8 sort -uf)" >> $@
-
-.PHONY: tagged-release
-tagged-release:
-	@./tagged-release.sh $(VERSION)
-
-.PHONY: legal
-legal:
-ifeq ($(OS),Linux)
-	@wget -q -nc https://github.com/elastic/go-licenser/releases/download/v0.3.0/go-licenser_0.3.0_Linux_x86_64.tar.gz
-	@tar xf go-licenser_0.3.0_Linux_x86_64.tar.gz
-else
-	@wget -q -nc https://github.com/elastic/go-licenser/releases/download/v0.3.0/go-licenser_0.3.0_Darwin_x86_64.tar.gz
-	@tar xf go-licenser_0.3.0_Darwin_x86_64.tar.gz
-endif
-	./go-licenser -license ASL2 -licensor 'The Moov Authors' -notice
-	@git checkout README.md LICENSE
