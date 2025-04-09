@@ -338,7 +338,7 @@ func (ed *EntryDetail) Validate() error {
 	if err := ed.isAlphanumeric(ed.IdentificationNumber); err != nil {
 		return fieldError("IdentificationNumber", err, ed.IdentificationNumber)
 	}
-	if !ed.validateOpts.AllowNonAlphanumericIndividualName {
+	if ed.validateOpts == nil || !ed.validateOpts.AllowSpecialCharactersInIndividualName {
 		if err := ed.isAlphanumeric(ed.IndividualName); err != nil {
 			return fieldError("IndividualName", err, ed.IndividualName)
 		}

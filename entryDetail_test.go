@@ -305,9 +305,21 @@ func testEDIndividualNameAlphaNumeric(t testing.TB) {
 	}
 }
 
+// testEDIndividualNameAllowSpecialCharacters validates individual name can contain special characters
+func testEDIndividualNameAllowSpecialCharacters(t testing.TB) {
+	ed := mockEntryDetail()
+	ed.IndividualName = "Ĵóĥñ Đøë"
+	ed.SetValidation(&ValidateOpts{
+		AllowSpecialCharactersInIndividualName: true,
+	})
+	err := ed.Validate()
+	require.NoError(t, err)
+}
+
 // TestEDIndividualNameAlphaNumeric tests validating individual name is alpha numeric
 func TestEDIndividualNameAlphaNumeric(t *testing.T) {
 	testEDIndividualNameAlphaNumeric(t)
+	testEDIndividualNameAllowSpecialCharacters(t)
 }
 
 // BenchmarkEDIndividualNameAlphaNumeric benchmarks validating individual name is alpha numeric

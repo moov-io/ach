@@ -751,8 +751,8 @@ type ValidateOpts struct {
 	// AllowZeroEntryAmount will skip enforcing the entry Amount to be non-zero
 	AllowZeroEntryAmount bool `json:"allowZeroEntryAmount"`
 
-	// AllowNonAlphanumericIndividualName will skip enforcing Individual Name in entry details to be Alphanumeric by Nacha standard
-	AllowNonAlphanumericIndividualName bool `json:"allowAllowNonAlphanumericIndividualName"`
+	// AllowSpecialCharactersInIndividualName will skip enforcing Individual Name in entry details to be Alphanumeric
+	AllowSpecialCharactersInIndividualName bool `json:"allowSpecialCharactersInIndividualName"`
 }
 
 // merge will combine two ValidateOpts structs and keep any non-zero field values.
