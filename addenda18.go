@@ -67,6 +67,8 @@ type Addenda18 struct {
 	validator
 	// converters is composed for ACH to GoLang Converters
 	converters
+	// validateOpts defines optional overrides for record validation
+	validateOpts *ValidateOpts
 }
 
 // NewAddenda18 returns a new Addenda18 with default values for none exported fields
@@ -138,6 +140,12 @@ func (addenda18 *Addenda18) Parse(record string) {
 	}
 }
 
+func (a *Addenda18) SetValidation(opts *ValidateOpts) {
+	if a != nil {
+		a.validateOpts = opts
+	}
+}
+
 // String writes the Addenda18 struct to a 94 character string.
 func (addenda18 *Addenda18) String() string {
 	if addenda18 == nil {
@@ -173,17 +181,19 @@ func (addenda18 *Addenda18) Validate() error {
 	if addenda18.TypeCode != "18" {
 		return fieldError("TypeCode", ErrAddendaTypeCode, addenda18.TypeCode)
 	}
-	if err := addenda18.isAlphanumeric(addenda18.ForeignCorrespondentBankName); err != nil {
-		return fieldError("ForeignCorrespondentBankName", err, addenda18.ForeignCorrespondentBankName)
-	}
-	if err := addenda18.isAlphanumeric(addenda18.ForeignCorrespondentBankIDNumberQualifier); err != nil {
-		return fieldError("ForeignCorrespondentBankIDNumberQualifier", err, addenda18.ForeignCorrespondentBankIDNumberQualifier)
-	}
-	if err := addenda18.isAlphanumeric(addenda18.ForeignCorrespondentBankIDNumber); err != nil {
-		return fieldError("ForeignCorrespondentBankIDNumber", err, addenda18.ForeignCorrespondentBankIDNumber)
-	}
-	if err := addenda18.isAlphanumeric(addenda18.ForeignCorrespondentBankBranchCountryCode); err != nil {
-		return fieldError("ForeignCorrespondentBankBranchCountryCode", err, addenda18.ForeignCorrespondentBankBranchCountryCode)
+	if addenda18.validateOpts == nil || !addenda18.validateOpts.AllowSpecialCharacters {
+		if err := addenda18.isAlphanumeric(addenda18.ForeignCorrespondentBankName); err != nil {
+			return fieldError("ForeignCorrespondentBankName", err, addenda18.ForeignCorrespondentBankName)
+		}
+		if err := addenda18.isAlphanumeric(addenda18.ForeignCorrespondentBankIDNumberQualifier); err != nil {
+			return fieldError("ForeignCorrespondentBankIDNumberQualifier", err, addenda18.ForeignCorrespondentBankIDNumberQualifier)
+		}
+		if err := addenda18.isAlphanumeric(addenda18.ForeignCorrespondentBankIDNumber); err != nil {
+			return fieldError("ForeignCorrespondentBankIDNumber", err, addenda18.ForeignCorrespondentBankIDNumber)
+		}
+		if err := addenda18.isAlphanumeric(addenda18.ForeignCorrespondentBankBranchCountryCode); err != nil {
+			return fieldError("ForeignCorrespondentBankBranchCountryCode", err, addenda18.ForeignCorrespondentBankBranchCountryCode)
+		}
 	}
 	return nil
 }

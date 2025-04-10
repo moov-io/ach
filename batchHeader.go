@@ -312,17 +312,19 @@ func (bh *BatchHeader) Validate() error {
 		return fieldError("OriginatorStatusCode", ErrOrigStatusCode, bh.OriginatorStatusCode)
 	}
 
-	if err := bh.isAlphanumeric(bh.CompanyName); err != nil {
-		return fieldError("CompanyName", err, bh.CompanyName)
-	}
-	if err := bh.isAlphanumeric(bh.CompanyDiscretionaryData); err != nil {
-		return fieldError("CompanyDiscretionaryData", err, bh.CompanyDiscretionaryData)
-	}
-	if err := bh.isAlphanumeric(bh.CompanyIdentification); err != nil {
-		return fieldError("CompanyIdentification", err, bh.CompanyIdentification)
-	}
-	if err := bh.isAlphanumeric(bh.CompanyEntryDescription); err != nil {
-		return fieldError("CompanyEntryDescription", err, bh.CompanyEntryDescription)
+	if bh.validateOpts == nil || !bh.validateOpts.AllowSpecialCharacters {
+		if err := bh.isAlphanumeric(bh.CompanyName); err != nil {
+			return fieldError("CompanyName", err, bh.CompanyName)
+		}
+		if err := bh.isAlphanumeric(bh.CompanyDiscretionaryData); err != nil {
+			return fieldError("CompanyDiscretionaryData", err, bh.CompanyDiscretionaryData)
+		}
+		if err := bh.isAlphanumeric(bh.CompanyIdentification); err != nil {
+			return fieldError("CompanyIdentification", err, bh.CompanyIdentification)
+		}
+		if err := bh.isAlphanumeric(bh.CompanyEntryDescription); err != nil {
+			return fieldError("CompanyEntryDescription", err, bh.CompanyEntryDescription)
+		}
 	}
 	return nil
 }

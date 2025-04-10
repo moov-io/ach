@@ -272,8 +272,10 @@ func (iatEd *IATEntryDetail) Validate() error {
 			return fieldError("TransactionCode", err, strconv.Itoa(iatEd.TransactionCode))
 		}
 	}
-	if err := iatEd.isAlphanumeric(iatEd.DFIAccountNumber); err != nil {
-		return fieldError("DFIAccountNumber", err, iatEd.DFIAccountNumber)
+	if iatEd.validateOpts == nil || !iatEd.validateOpts.AllowSpecialCharacters {
+		if err := iatEd.isAlphanumeric(iatEd.DFIAccountNumber); err != nil {
+			return fieldError("DFIAccountNumber", err, iatEd.DFIAccountNumber)
+		}
 	}
 	// CheckDigit calculations
 	calculated := CalculateCheckDigit(iatEd.RDFIIdentificationField())

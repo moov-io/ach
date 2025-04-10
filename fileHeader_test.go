@@ -825,3 +825,18 @@ func TestFileHeader__IsValidWithPreserveSpacesOpt(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestFileHeaderSpecialCharacter(t *testing.T) {
+	record := mockFileHeader()
+	record.ImmediateOriginName = "Łomża"
+	err := record.Validate()
+	if err == nil {
+		t.Error("Special character should have caused a validation failure")
+	}
+
+	record.SetValidation(&ValidateOpts{AllowSpecialCharacters: true})
+	err = record.Validate()
+	if err != nil {
+		t.Error("Special character should have been allowed with override set.")
+	}
+}

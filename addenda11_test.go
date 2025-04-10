@@ -134,6 +134,21 @@ func TestOriginatorNameAlphaNumeric(t *testing.T) {
 	testOriginatorNameAlphaNumeric(t)
 }
 
+func TestAddenda11SpecialCharacter(t *testing.T) {
+	record := mockAddenda11()
+	record.OriginatorName = "Łomża"
+	err := record.Validate()
+	if err == nil {
+		t.Error("Special character should have caused a validation failure")
+	}
+
+	record.SetValidation(&ValidateOpts{AllowSpecialCharacters: true})
+	err = record.Validate()
+	if err != nil {
+		t.Error("Special character should have been allowed with override set.")
+	}
+}
+
 // BenchmarkOriginatorNameAlphaNumeric benchmarks validating OriginatorName is alphanumeric
 func BenchmarkOriginatorNameAlphaNumeric(b *testing.B) {
 	b.ReportAllocs()

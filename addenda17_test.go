@@ -216,3 +216,18 @@ func TestAddenda17RuneCountInString(t *testing.T) {
 		t.Error("Parsed with an invalid RuneCountInString not equal to 94")
 	}
 }
+
+func TestAddenda17SpecialCharacter(t *testing.T) {
+	record := mockAddenda17()
+	record.PaymentRelatedInformation = "Łomża"
+	err := record.Validate()
+	if err == nil {
+		t.Error("Special character should have caused a validation failure")
+	}
+
+	record.SetValidation(&ValidateOpts{AllowSpecialCharacters: true})
+	err = record.Validate()
+	if err != nil {
+		t.Error("Special character should have been allowed with override set.")
+	}
+}

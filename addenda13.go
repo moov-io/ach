@@ -70,6 +70,8 @@ type Addenda13 struct {
 	validator
 	// converters is composed for ACH to GoLang Converters
 	converters
+	// validateOpts defines optional overrides for record validation
+	validateOpts *ValidateOpts
 }
 
 // NewAddenda13 returns a new Addenda13 with default values for none exported fields
@@ -135,6 +137,12 @@ func (addenda13 *Addenda13) Parse(record string) {
 	}
 }
 
+func (a *Addenda13) SetValidation(opts *ValidateOpts) {
+	if a != nil {
+		a.validateOpts = opts
+	}
+}
+
 // String writes the Addenda13 struct to a 94 character string.
 func (addenda13 *Addenda13) String() string {
 	if addenda13 == nil {
@@ -173,18 +181,20 @@ func (addenda13 *Addenda13) Validate() error {
 	if addenda13.TypeCode != "13" {
 		return fieldError("TypeCode", ErrAddendaTypeCode, addenda13.TypeCode)
 	}
-	if err := addenda13.isAlphanumeric(addenda13.ODFIName); err != nil {
-		return fieldError("ODFIName", err, addenda13.ODFIName)
-	}
 	// Valid ODFI Identification Number Qualifier
 	if err := addenda13.isIDNumberQualifier(addenda13.ODFIIDNumberQualifier); err != nil {
 		return fieldError("ODFIIDNumberQualifier", err, addenda13.ODFIIDNumberQualifier)
 	}
-	if err := addenda13.isAlphanumeric(addenda13.ODFIIdentification); err != nil {
-		return fieldError("ODFIIdentification", err, addenda13.ODFIIdentification)
-	}
-	if err := addenda13.isAlphanumeric(addenda13.ODFIBranchCountryCode); err != nil {
-		return fieldError("ODFIBranchCountryCode", err, addenda13.ODFIBranchCountryCode)
+	if addenda13.validateOpts == nil || !addenda13.validateOpts.AllowSpecialCharacters {
+		if err := addenda13.isAlphanumeric(addenda13.ODFIName); err != nil {
+			return fieldError("ODFIName", err, addenda13.ODFIName)
+		}
+		if err := addenda13.isAlphanumeric(addenda13.ODFIIdentification); err != nil {
+			return fieldError("ODFIIdentification", err, addenda13.ODFIIdentification)
+		}
+		if err := addenda13.isAlphanumeric(addenda13.ODFIBranchCountryCode); err != nil {
+			return fieldError("ODFIBranchCountryCode", err, addenda13.ODFIBranchCountryCode)
+		}
 	}
 	return nil
 }

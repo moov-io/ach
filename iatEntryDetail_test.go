@@ -433,3 +433,18 @@ func BenchmarkIATEDAddendaRecordIndicator(b *testing.B) {
 		testIATEDAddendaRecordIndicator(b)
 	}
 }
+
+func TestIATEntryDetailSpecialCharacter(t *testing.T) {
+	record := mockIATEntryDetail()
+	record.DFIAccountNumber = "Łomża"
+	err := record.Validate()
+	if err == nil {
+		t.Error("Special character should have caused a validation failure")
+	}
+
+	record.SetValidation(&ValidateOpts{AllowSpecialCharacters: true})
+	err = record.Validate()
+	if err != nil {
+		t.Error("Special character should have been allowed with override set.")
+	}
+}

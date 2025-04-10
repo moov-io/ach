@@ -59,6 +59,8 @@ type ADVBatchControl struct {
 	validator
 	// converters is composed for ACH to golang Converters
 	converters
+	// validateOpts defines optional overrides for record validation
+	validateOpts *ValidateOpts
 }
 
 // Parse takes the input record string and parses the EntryDetail values
@@ -119,6 +121,12 @@ func (bc *ADVBatchControl) Parse(record string) {
 	}
 }
 
+func (a *ADVBatchControl) SetValidation(opts *ValidateOpts) {
+	if a != nil {
+		a.validateOpts = opts
+	}
+}
+
 // NewADVBatchControl returns a new ADVBatchControl with default values for none exported fields
 func NewADVBatchControl() *ADVBatchControl {
 	return &ADVBatchControl{
@@ -156,8 +164,10 @@ func (bc *ADVBatchControl) Validate() error {
 		return fieldError("ServiceClassCode", err, strconv.Itoa(bc.ServiceClassCode))
 	}
 
-	if err := bc.isAlphanumeric(bc.ACHOperatorData); err != nil {
-		return fieldError("ACHOperatorData", err, bc.ACHOperatorData)
+	if bc.validateOpts == nil || !bc.validateOpts.AllowSpecialCharacters {
+		if err := bc.isAlphanumeric(bc.ACHOperatorData); err != nil {
+			return fieldError("ACHOperatorData", err, bc.ACHOperatorData)
+		}
 	}
 	return nil
 }

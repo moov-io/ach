@@ -124,6 +124,21 @@ func TestAddenda05FieldInclusion(t *testing.T) {
 	}
 }
 
+func TestAddenda05SpecialCharacter(t *testing.T) {
+	record := mockAddenda05()
+	record.PaymentRelatedInformation = "Łomża"
+	err := record.Validate()
+	if err == nil {
+		t.Error("Special character should have caused a validation failure")
+	}
+
+	record.SetValidation(&ValidateOpts{AllowSpecialCharacters: true})
+	err = record.Validate()
+	if err != nil {
+		t.Error("Special character should have been allowed with override set.")
+	}
+}
+
 func TestAddenda05FieldInclusionSequenceNumber(t *testing.T) {
 	addenda05 := mockAddenda05()
 	addenda05.SequenceNumber = 0

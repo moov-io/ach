@@ -53,6 +53,8 @@ type Addenda16 struct {
 	validator
 	// converters is composed for ACH to GoLang Converters
 	converters
+	// validateOpts defines optional overrides for record validation
+	validateOpts *ValidateOpts
 }
 
 // NewAddenda16 returns a new Addenda16 with default values for none exported fields
@@ -112,6 +114,12 @@ func (addenda16 *Addenda16) Parse(record string) {
 	}
 }
 
+func (a *Addenda16) SetValidation(opts *ValidateOpts) {
+	if a != nil {
+		a.validateOpts = opts
+	}
+}
+
 // String writes the Addenda16 struct to a 94 character string.
 func (addenda16 *Addenda16) String() string {
 	if addenda16 == nil {
@@ -148,11 +156,13 @@ func (addenda16 *Addenda16) Validate() error {
 	if addenda16.TypeCode != "16" {
 		return fieldError("TypeCode", ErrAddendaTypeCode, addenda16.TypeCode)
 	}
-	if err := addenda16.isAlphanumeric(addenda16.ReceiverCityStateProvince); err != nil {
-		return fieldError("ReceiverCityStateProvince", err, addenda16.ReceiverCityStateProvince)
-	}
-	if err := addenda16.isAlphanumeric(addenda16.ReceiverCountryPostalCode); err != nil {
-		return fieldError("ReceiverCountryPostalCode", err, addenda16.ReceiverCountryPostalCode)
+	if addenda16.validateOpts == nil || !addenda16.validateOpts.AllowSpecialCharacters {
+		if err := addenda16.isAlphanumeric(addenda16.ReceiverCityStateProvince); err != nil {
+			return fieldError("ReceiverCityStateProvince", err, addenda16.ReceiverCityStateProvince)
+		}
+		if err := addenda16.isAlphanumeric(addenda16.ReceiverCountryPostalCode); err != nil {
+			return fieldError("ReceiverCountryPostalCode", err, addenda16.ReceiverCountryPostalCode)
+		}
 	}
 	return nil
 }

@@ -65,6 +65,8 @@ type Addenda14 struct {
 	validator
 	// converters is composed for ACH to GoLang Converters
 	converters
+	// validateOpts defines optional overrides for record validation
+	validateOpts *ValidateOpts
 }
 
 // NewAddenda14 returns a new Addenda14 with default values for none exported fields
@@ -130,6 +132,12 @@ func (addenda14 *Addenda14) Parse(record string) {
 	}
 }
 
+func (a *Addenda14) SetValidation(opts *ValidateOpts) {
+	if a != nil {
+		a.validateOpts = opts
+	}
+}
+
 // String writes the Addenda14 struct to a 94 character string.
 func (addenda14 *Addenda14) String() string {
 	if addenda14 == nil {
@@ -168,18 +176,20 @@ func (addenda14 *Addenda14) Validate() error {
 	if addenda14.TypeCode != "14" {
 		return fieldError("TypeCode", ErrAddendaTypeCode, addenda14.TypeCode)
 	}
-	if err := addenda14.isAlphanumeric(addenda14.RDFIName); err != nil {
-		return fieldError("RDFIName", err, addenda14.RDFIName)
-	}
 	// Valid RDFI Identification Number Qualifier
 	if err := addenda14.isIDNumberQualifier(addenda14.RDFIIDNumberQualifier); err != nil {
 		return fieldError("RDFIIDNumberQualifier", ErrIDNumberQualifier, addenda14.RDFIIDNumberQualifier)
 	}
-	if err := addenda14.isAlphanumeric(addenda14.RDFIIdentification); err != nil {
-		return fieldError("RDFIIdentification", err, addenda14.RDFIIdentification)
-	}
-	if err := addenda14.isAlphanumeric(addenda14.RDFIBranchCountryCode); err != nil {
-		return fieldError("RDFIBranchCountryCode", err, addenda14.RDFIBranchCountryCode)
+	if addenda14.validateOpts == nil || !addenda14.validateOpts.AllowSpecialCharacters {
+		if err := addenda14.isAlphanumeric(addenda14.RDFIName); err != nil {
+			return fieldError("RDFIName", err, addenda14.RDFIName)
+		}
+		if err := addenda14.isAlphanumeric(addenda14.RDFIIdentification); err != nil {
+			return fieldError("RDFIIdentification", err, addenda14.RDFIIdentification)
+		}
+		if err := addenda14.isAlphanumeric(addenda14.RDFIBranchCountryCode); err != nil {
+			return fieldError("RDFIBranchCountryCode", err, addenda14.RDFIBranchCountryCode)
+		}
 	}
 	return nil
 }

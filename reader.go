@@ -541,6 +541,7 @@ func (r *Reader) parseEntryDetail() error {
 		r.currentBatch.AddEntry(ed)
 	} else {
 		ed := NewADVEntryDetail()
+		ed.validateOpts = r.File.validateOpts
 		ed.Parse(r.line)
 		ed.LineNumber = r.lineNum
 		if err := maybeValidate(ed, r.File.validateOpts); err != nil {
@@ -569,6 +570,7 @@ func (r *Reader) parseAddenda() error {
 			switch r.line[1:3] {
 			case "02":
 				addenda02 := NewAddenda02()
+				addenda02.SetValidation(r.File.validateOpts)
 				addenda02.Parse(r.line)
 				addenda02.LineNumber = r.lineNum
 				if err := maybeValidate(addenda02, r.File.validateOpts); err != nil {
@@ -577,6 +579,7 @@ func (r *Reader) parseAddenda() error {
 				r.currentBatch.GetEntries()[entryIndex].Addenda02 = addenda02
 			case "05":
 				addenda05 := NewAddenda05()
+				addenda05.SetValidation(r.File.validateOpts)
 				addenda05.Parse(r.line)
 				addenda05.LineNumber = r.lineNum
 				if err := maybeValidate(addenda05, r.File.validateOpts); err != nil {
@@ -755,6 +758,7 @@ func (r *Reader) parseIATBatchHeader() error {
 
 	// Ensure we have a valid IAT BatchHeader before building a batch.
 	bh := NewIATBatchHeader()
+	bh.validateOpts = r.File.validateOpts
 	bh.Parse(r.line)
 	bh.LineNumber = r.lineNum
 	if err := maybeValidate(bh, r.File.validateOpts); err != nil {
@@ -837,6 +841,7 @@ func (r *Reader) mandatoryOptionalIATAddenda(entryIndex int) error {
 	switch r.line[1:3] {
 	case "10":
 		addenda10 := NewAddenda10()
+		addenda10.SetValidation(r.File.validateOpts)
 		addenda10.Parse(r.line)
 		addenda10.LineNumber = r.lineNum
 		if err := maybeValidate(addenda10, r.File.validateOpts); err != nil {
@@ -845,6 +850,7 @@ func (r *Reader) mandatoryOptionalIATAddenda(entryIndex int) error {
 		r.IATCurrentBatch.Entries[entryIndex].Addenda10 = addenda10
 	case "11":
 		addenda11 := NewAddenda11()
+		addenda11.SetValidation(r.File.validateOpts)
 		addenda11.Parse(r.line)
 		addenda11.LineNumber = r.lineNum
 		if err := maybeValidate(addenda11, r.File.validateOpts); err != nil {
@@ -853,6 +859,7 @@ func (r *Reader) mandatoryOptionalIATAddenda(entryIndex int) error {
 		r.IATCurrentBatch.Entries[entryIndex].Addenda11 = addenda11
 	case "12":
 		addenda12 := NewAddenda12()
+		addenda12.SetValidation(r.File.validateOpts)
 		addenda12.Parse(r.line)
 		addenda12.LineNumber = r.lineNum
 		if err := maybeValidate(addenda12, r.File.validateOpts); err != nil {
@@ -861,6 +868,7 @@ func (r *Reader) mandatoryOptionalIATAddenda(entryIndex int) error {
 		r.IATCurrentBatch.Entries[entryIndex].Addenda12 = addenda12
 	case "13":
 		addenda13 := NewAddenda13()
+		addenda13.SetValidation(r.File.validateOpts)
 		addenda13.Parse(r.line)
 		addenda13.LineNumber = r.lineNum
 		if err := maybeValidate(addenda13, r.File.validateOpts); err != nil {
@@ -869,6 +877,7 @@ func (r *Reader) mandatoryOptionalIATAddenda(entryIndex int) error {
 		r.IATCurrentBatch.Entries[entryIndex].Addenda13 = addenda13
 	case "14":
 		addenda14 := NewAddenda14()
+		addenda14.SetValidation(r.File.validateOpts)
 		addenda14.Parse(r.line)
 		addenda14.LineNumber = r.lineNum
 		if err := maybeValidate(addenda14, r.File.validateOpts); err != nil {
@@ -877,6 +886,7 @@ func (r *Reader) mandatoryOptionalIATAddenda(entryIndex int) error {
 		r.IATCurrentBatch.Entries[entryIndex].Addenda14 = addenda14
 	case "15":
 		addenda15 := NewAddenda15()
+		addenda15.SetValidation(r.File.validateOpts)
 		addenda15.Parse(r.line)
 		addenda15.LineNumber = r.lineNum
 		if err := maybeValidate(addenda15, r.File.validateOpts); err != nil {
@@ -885,6 +895,7 @@ func (r *Reader) mandatoryOptionalIATAddenda(entryIndex int) error {
 		r.IATCurrentBatch.Entries[entryIndex].Addenda15 = addenda15
 	case "16":
 		addenda16 := NewAddenda16()
+		addenda16.SetValidation(r.File.validateOpts)
 		addenda16.Parse(r.line)
 		addenda16.LineNumber = r.lineNum
 		if err := maybeValidate(addenda16, r.File.validateOpts); err != nil {
@@ -893,6 +904,7 @@ func (r *Reader) mandatoryOptionalIATAddenda(entryIndex int) error {
 		r.IATCurrentBatch.Entries[entryIndex].Addenda16 = addenda16
 	case "17":
 		addenda17 := NewAddenda17()
+		addenda17.SetValidation(r.File.validateOpts)
 		addenda17.Parse(r.line)
 		addenda17.LineNumber = r.lineNum
 		if err := maybeValidate(addenda17, r.File.validateOpts); err != nil {
@@ -901,6 +913,7 @@ func (r *Reader) mandatoryOptionalIATAddenda(entryIndex int) error {
 		r.IATCurrentBatch.Entries[entryIndex].AddAddenda17(addenda17)
 	case "18":
 		addenda18 := NewAddenda18()
+		addenda18.SetValidation(r.File.validateOpts)
 		addenda18.Parse(r.line)
 		addenda18.LineNumber = r.lineNum
 		if err := maybeValidate(addenda18, r.File.validateOpts); err != nil {

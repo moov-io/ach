@@ -127,6 +127,21 @@ func BenchmarkAddenda10TypeCode10(b *testing.B) {
 	}
 }
 
+func TestAddenda10SpecialCharacter(t *testing.T) {
+	record := mockAddenda10()
+	record.Name = "Łomża"
+	err := record.Validate()
+	if err == nil {
+		t.Error("Special character should have caused a validation failure")
+	}
+
+	record.SetValidation(&ValidateOpts{AllowSpecialCharacters: true})
+	err = record.Validate()
+	if err != nil {
+		t.Error("Special character should have been allowed with override set.")
+	}
+}
+
 // testAddenda10TransactionTypeCode validates TransactionTypeCode
 func testAddenda10TransactionTypeCode(t testing.TB) {
 	addenda10 := mockAddenda10()

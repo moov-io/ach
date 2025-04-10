@@ -291,3 +291,18 @@ func BenchmarkADVBatchControlLength(b *testing.B) {
 		testADVBatchControlLength(b)
 	}
 }
+
+func TestADVBatchControlSpecialCharacter(t *testing.T) {
+	record := mockADVBatchControl()
+	record.ACHOperatorData = "Łomża"
+	err := record.Validate()
+	if err == nil {
+		t.Error("Special character should have caused a validation failure")
+	}
+
+	record.SetValidation(&ValidateOpts{AllowSpecialCharacters: true})
+	err = record.Validate()
+	if err != nil {
+		t.Error("Special character should have been allowed with override set.")
+	}
+}

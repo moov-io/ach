@@ -2060,12 +2060,18 @@ func TestReader__morphing(t *testing.T) {
 func TestReader_explicit_contenttype(t *testing.T) {
 	// weird character appears past the first 1024 bytes of the file, so encoding detection fails
 	path := filepath.Join("test", "testdata", "extended-ascii.ach")
-	file, err := readACHFilepath(path)
+	f, err := os.Open(path)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	defer f.Close()
+
+	reader := NewReader(f)
+	reader.SetValidation(&ValidateOpts{AllowSpecialCharacters: true})
+	_, err = reader.Read()
+
 	if err == nil {
 		t.Error("expected error because of decoding issue")
-	}
-	if file == nil {
-		t.Fatal("nil File")
 	}
 
 	// providing an explicit content type allows us to parse the file
@@ -2076,7 +2082,7 @@ func TestReader_explicit_contenttype(t *testing.T) {
 	defer fd.Close()
 
 	utf8Reader := NewReaderWithContentType(fd, "plain/text; charset=utf-8")
-	utf8Reader.SetValidation(&ValidateOpts{SkipAll: true})
+	utf8Reader.SetValidation(&ValidateOpts{AllowSpecialCharacters: true})
 
 	utf8File, err := utf8Reader.Read()
 	if err != nil {
