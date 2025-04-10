@@ -2467,6 +2467,18 @@ components:
           type: boolean
           default: false
           description: Skip checking that Addenda Count fields match their expected and computed values.
+        preserveSpaces:
+          type: boolean
+          default: false
+          description: Keeps any spacing before and after values that normally have spaces trimmed during parsing.
+        allowInvalidAmounts:
+          type: boolean
+          default: false
+          description: Skip verifying the Amount is valid for the TransactionCode and entry type.
+        allowZeroEntryAmount:
+          type: boolean
+          default: false
+          description: Skip enforcing the entry Amount to be non-zero.
     SegmentFileConfiguration:
       properties: {} # TODO: Are there any config options people need?
     SegmentFile:
