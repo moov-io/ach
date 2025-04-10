@@ -782,6 +782,7 @@ func (v *ValidateOpts) merge(other *ValidateOpts) *ValidateOpts {
 		UnequalAddendaCounts:             v.UnequalAddendaCounts || other.UnequalAddendaCounts,
 		PreserveSpaces:                   v.PreserveSpaces || other.PreserveSpaces,
 		AllowInvalidAmounts:              v.AllowInvalidAmounts || other.AllowInvalidAmounts,
+		AllowZeroEntryAmount:             v.AllowZeroEntryAmount || other.AllowZeroEntryAmount,
 		AllowSpecialCharacters:           v.AllowSpecialCharacters || other.AllowSpecialCharacters,
 	}
 
