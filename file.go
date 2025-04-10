@@ -751,8 +751,8 @@ type ValidateOpts struct {
 	// AllowZeroEntryAmount will skip enforcing the entry Amount to be non-zero
 	AllowZeroEntryAmount bool `json:"allowZeroEntryAmount"`
 
-	// AllowSpecialCharacters will permit a wider range of characters in alphanumeric fields
-	AllowSpecialCharacters bool `json:"flexibleAlphanumericFields"`
+	// AllowSpecialCharacters will permit a wider range of UTF-8 characters in alphanumeric fields
+	AllowSpecialCharacters bool `json:"allowSpecialCharacters"`
 }
 
 // merge will combine two ValidateOpts structs and keep any non-zero field values.
@@ -782,6 +782,7 @@ func (v *ValidateOpts) merge(other *ValidateOpts) *ValidateOpts {
 		UnequalAddendaCounts:             v.UnequalAddendaCounts || other.UnequalAddendaCounts,
 		PreserveSpaces:                   v.PreserveSpaces || other.PreserveSpaces,
 		AllowInvalidAmounts:              v.AllowInvalidAmounts || other.AllowInvalidAmounts,
+		AllowSpecialCharacters:           v.AllowSpecialCharacters || other.AllowSpecialCharacters,
 	}
 
 	if v.CheckTransactionCode != nil {

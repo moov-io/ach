@@ -85,6 +85,9 @@ AllowUnorderedBatchNumbers bool `json:"allowUnorderedBatchNumbers"`
 
 // UnequalAddendaCounts skips checking that Addenda Count fields match their expected and computed values.
 UnequalAddendaCounts bool `json:"unequalAddendaCounts"`
+
+// AllowSpecialCharacters will permit a wider range of UTF-8 characters in alphanumeric fields
+AllowSpecialCharacters bool `json:"allowSpecialCharacters"`
 ```
 
 ### Entries
@@ -95,6 +98,9 @@ AllowInvalidAmounts bool `json:"allowInvalidAmounts"`
 
 // AllowZeroEntryAmount will skip enforcing the entry Amount to be non-zero.
 AllowZeroEntryAmount bool `json:"allowZeroEntryAmount"`
+
+// AllowSpecialCharacters will permit a wider range of UTF-8 characters in alphanumeric fields
+AllowSpecialCharacters bool `json:"allowSpecialCharacters"`
 ```
 
 ### File Header
@@ -102,6 +108,9 @@ AllowZeroEntryAmount bool `json:"allowZeroEntryAmount"`
 ```
 // AllowMissingFileHeader allows a file to be read without a FileHeader record.
 AllowMissingFileHeader bool `json:"allowMissingFileHeader"`
+
+// AllowSpecialCharacters will permit a wider range of UTF-8 characters in alphanumeric fields
+AllowSpecialCharacters bool `json:"allowSpecialCharacters"`
 ```
 
 ### File Control
@@ -117,6 +126,9 @@ AllowMissingFileControl bool `json:"allowMissingFileControl"`
 // CustomReturnCodes can be set to skip validation for the Return Code field in an Addenda99
 // This allows for non-standard/deprecated return codes (e.g. R97)
 CustomReturnCodes bool `json:"customReturnCodes"`
+
+// AllowSpecialCharacters will permit a wider range of UTF-8 characters in alphanumeric fields
+AllowSpecialCharacters bool `json:"allowSpecialCharacters"`
 ```
 
 ### Parsing

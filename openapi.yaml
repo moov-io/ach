@@ -172,6 +172,11 @@ paths:
           description: Optional parameter to save all padding spaces
           schema:
             type: boolean
+        - name: allowSpecialCharacters
+          in: query
+          description: Optional parameter to permit a wider range of UTF-8 characters in alphanumeric fields
+          schema:
+            type: boolean
       requestBody:
         description: Content of the ACH file (in json or raw text)
         required: true
@@ -408,6 +413,11 @@ paths:
       - name: allowInvalidAmounts
         in: query
         description: Optional parameter to save all padding spaces
+        schema:
+          type: boolean
+      - name: allowSpecialCharacters
+        in: query
+        description: Optional parameter to permit a wider range of UTF-8 characters in alphanumeric fields
         schema:
           type: boolean
     get:
@@ -2479,6 +2489,10 @@ components:
           type: boolean
           default: false
           description: Skip enforcing the entry Amount to be non-zero.
+        allowSpecialCharacters:
+          type: boolean
+          default: false
+          description: Permit a wider range of UTF-8 characters in alphanumeric fields.
     SegmentFileConfiguration:
       properties: {} # TODO: Are there any config options people need?
     SegmentFile:
