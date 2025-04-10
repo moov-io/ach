@@ -2241,17 +2241,3 @@ func TestFile_FlattenBatches_PreservesFileIDModifier(t *testing.T) {
 		t.Errorf("FileIDModifier not preserved: want 'B' got %s", flattened.Header.FileIDModifier)
 	}
 }
-
-func TestFile_AllowNonAlphanumericIndividualName(t *testing.T) {
-	/*
-		file := NewFile().SetHeader(mockFileHeader())
-		batch := NewBatchPPD(mockBatchPPDHeader())
-
-		ed := mockEntryDetail()
-		ed.IndividualName = "Ĵóĥñ Đøë"
-		ed.SetTraceNumber(mockBatchHeader().ODFIIdentification, 1)
-		batch.AddEntry(ed)
-		require.NotNil(t, ed.Validate())
-	*/
-
-}
