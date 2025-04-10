@@ -1,3 +1,18 @@
+## v1.47.0 (Released 2025-04-10)
+
+ADDITIONS
+
+- feat: store line numbers on each record (`.LineNumber`)
+- feat: Add `AllowSpecialCharacters` as a validation option
+
+IMPROVEMENTS
+
+- fix: support `AllowZeroEntryAmount` in merge
+
+BUILD
+
+- build: remove openshift images
+
 ## v1.46.0 (Released 2025-04-03)
 
 ADDITIONS
