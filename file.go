@@ -750,6 +750,9 @@ type ValidateOpts struct {
 
 	// AllowZeroEntryAmount will skip enforcing the entry Amount to be non-zero
 	AllowZeroEntryAmount bool `json:"allowZeroEntryAmount"`
+
+	// AllowSpecialCharacters will permit a wider range of characters in alphanumeric fields
+	AllowSpecialCharacters bool `json:"flexibleAlphanumericFields"`
 }
 
 // merge will combine two ValidateOpts structs and keep any non-zero field values.

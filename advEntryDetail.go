@@ -84,6 +84,8 @@ type ADVEntryDetail struct {
 	validator
 	// converters is composed for ACH to golang Converters
 	converters
+	// validateOpts defines optional overrides for record validation
+	validateOpts *ValidateOpts
 }
 
 const (
@@ -159,6 +161,12 @@ func (ed *ADVEntryDetail) Parse(record string) {
 	ed.SequenceNumber = ed.parseNumField(string(runes[90:94]))
 }
 
+func (a *ADVEntryDetail) SetValidation(opts *ValidateOpts) {
+	if a != nil {
+		a.validateOpts = opts
+	}
+}
+
 // String writes the ADVEntryDetail struct to a 94 character string.
 func (ed *ADVEntryDetail) String() string {
 	buf := getBuffer()
@@ -192,20 +200,22 @@ func (ed *ADVEntryDetail) Validate() error {
 	if err := ed.isTransactionCode(ed.TransactionCode); err != nil {
 		return fieldError("TransactionCode", err, strconv.Itoa(ed.TransactionCode))
 	}
-	if err := ed.isAlphanumeric(ed.DFIAccountNumber); err != nil {
-		return fieldError("DFIAccountNumber", err, ed.DFIAccountNumber)
-	}
-	if err := ed.isAlphanumeric(ed.AdviceRoutingNumber); err != nil {
-		return fieldError("AdviceRoutingNumber", err, ed.AdviceRoutingNumber)
-	}
-	if err := ed.isAlphanumeric(ed.IndividualName); err != nil {
-		return fieldError("IndividualName", err, ed.IndividualName)
-	}
-	if err := ed.isAlphanumeric(ed.DiscretionaryData); err != nil {
-		return fieldError("DiscretionaryData", err, ed.DiscretionaryData)
-	}
-	if err := ed.isAlphanumeric(ed.ACHOperatorRoutingNumber); err != nil {
-		return fieldError("ACHOperatorRoutingNumber", err, ed.ACHOperatorRoutingNumber)
+	if ed.validateOpts == nil || !ed.validateOpts.AllowSpecialCharacters {
+		if err := ed.isAlphanumeric(ed.DFIAccountNumber); err != nil {
+			return fieldError("DFIAccountNumber", err, ed.DFIAccountNumber)
+		}
+		if err := ed.isAlphanumeric(ed.AdviceRoutingNumber); err != nil {
+			return fieldError("AdviceRoutingNumber", err, ed.AdviceRoutingNumber)
+		}
+		if err := ed.isAlphanumeric(ed.IndividualName); err != nil {
+			return fieldError("IndividualName", err, ed.IndividualName)
+		}
+		if err := ed.isAlphanumeric(ed.DiscretionaryData); err != nil {
+			return fieldError("DiscretionaryData", err, ed.DiscretionaryData)
+		}
+		if err := ed.isAlphanumeric(ed.ACHOperatorRoutingNumber); err != nil {
+			return fieldError("ACHOperatorRoutingNumber", err, ed.ACHOperatorRoutingNumber)
+		}
 	}
 	calculated := CalculateCheckDigit(ed.RDFIIdentificationField())
 

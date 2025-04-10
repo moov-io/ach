@@ -57,6 +57,21 @@ func testAddenda02ValidTypeCode(t testing.TB) {
 	}
 }
 
+func TestAddenda02SpecialCharacter(t *testing.T) {
+	record := mockAddenda02()
+	record.TerminalCity = "Łomża"
+	err := record.Validate()
+	if err == nil {
+		t.Error("Special character should have caused a validation failure")
+	}
+
+	record.SetValidation(&ValidateOpts{AllowSpecialCharacters: true})
+	err = record.Validate()
+	if err != nil {
+		t.Error("Special character should have been allowed with override set.")
+	}
+}
+
 // TestAddenda02ValidTypeCode tests validating Addenda02 TypeCode
 func TestAddenda02ValidTypeCode(t *testing.T) {
 	testAddenda02ValidTypeCode(t)

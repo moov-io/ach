@@ -129,6 +129,21 @@ func testOriginatorCityStateProvinceAlphaNumeric(t testing.TB) {
 	}
 }
 
+func TestAddenda12SpecialCharacter(t *testing.T) {
+	record := mockAddenda12()
+	record.OriginatorCityStateProvince = "Łomża"
+	err := record.Validate()
+	if err == nil {
+		t.Error("Special character should have caused a validation failure")
+	}
+
+	record.SetValidation(&ValidateOpts{AllowSpecialCharacters: true})
+	err = record.Validate()
+	if err != nil {
+		t.Error("Special character should have been allowed with override set.")
+	}
+}
+
 // TestOriginatorCityStateProvinceAlphaNumeric tests validating OriginatorCityStateProvince is alphanumeric
 func TestOriginatorCityStateProvinceAlphaNumeric(t *testing.T) {
 	testOriginatorCityStateProvinceAlphaNumeric(t)

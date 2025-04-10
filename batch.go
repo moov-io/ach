@@ -472,6 +472,7 @@ func (batch *Batch) build() error {
 		}
 		// build a BatchADVControl record
 		bcADV := NewADVBatchControl()
+		bcADV.validateOpts = batch.validateOpts
 		bcADV.ServiceClassCode = batch.Header.ServiceClassCode
 		bcADV.ACHOperatorData = batch.Header.CompanyName
 		bcADV.ODFIIdentification = batch.Header.ODFIIdentification

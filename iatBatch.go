@@ -111,8 +111,10 @@ func (iatBatch *IATBatch) verify() error {
 		return iatBatch.Error("BatchNumber",
 			NewErrBatchHeaderControlEquality(iatBatch.Header.BatchNumber, iatBatch.Control.BatchNumber))
 	}
-	if err := iatBatch.Control.isAlphanumeric(iatBatch.Control.CompanyIdentification); err != nil {
-		return fieldError("CompanyIdentification", err, iatBatch.Control.CompanyIdentification)
+	if iatBatch.validateOpts == nil || !iatBatch.validateOpts.AllowSpecialCharacters {
+		if err := iatBatch.Control.isAlphanumeric(iatBatch.Control.CompanyIdentification); err != nil {
+			return fieldError("CompanyIdentification", err, iatBatch.Control.CompanyIdentification)
+		}
 	}
 	if _, err := iatBatch.isBatchEntryCount(); err != nil {
 		return err

@@ -47,6 +47,8 @@ type Addenda05 struct {
 	validator
 	// converters is composed for ACH to GoLang Converters
 	converters
+	// validateOpts defines optional overrides for record validation
+	validateOpts *ValidateOpts
 }
 
 // NewAddenda05 returns a new Addenda05 with default values for none exported fields
@@ -104,6 +106,12 @@ func (addenda05 *Addenda05) Parse(record string) {
 	}
 }
 
+func (a *Addenda05) SetValidation(opts *ValidateOpts) {
+	if a != nil {
+		a.validateOpts = opts
+	}
+}
+
 // String writes the Addenda05 struct to a 94 character string.
 func (addenda05 *Addenda05) String() string {
 	if addenda05 == nil {
@@ -136,8 +144,11 @@ func (addenda05 *Addenda05) Validate() error {
 	if addenda05.TypeCode != "05" {
 		return fieldError("TypeCode", ErrAddendaTypeCode, addenda05.TypeCode)
 	}
-	if err := addenda05.isAlphanumeric(addenda05.PaymentRelatedInformation); err != nil {
-		return fieldError("PaymentRelatedInformation", err, addenda05.PaymentRelatedInformation)
+
+	if addenda05.validateOpts == nil || !addenda05.validateOpts.AllowSpecialCharacters {
+		if err := addenda05.isAlphanumeric(addenda05.PaymentRelatedInformation); err != nil {
+			return fieldError("PaymentRelatedInformation", err, addenda05.PaymentRelatedInformation)
+		}
 	}
 
 	return nil

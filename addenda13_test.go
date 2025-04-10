@@ -165,6 +165,21 @@ func TestODFIIDNumberQualifierValid(t *testing.T) {
 	testODFIIDNumberQualifierValid(t)
 }
 
+func TestAddenda13SpecialCharacter(t *testing.T) {
+	record := mockAddenda13()
+	record.ODFIName = "Łomża"
+	err := record.Validate()
+	if err == nil {
+		t.Error("Special character should have caused a validation failure")
+	}
+
+	record.SetValidation(&ValidateOpts{AllowSpecialCharacters: true})
+	err = record.Validate()
+	if err != nil {
+		t.Error("Special character should have been allowed with override set.")
+	}
+}
+
 // BenchmarkODFIIDNumberQualifierValid benchmarks validating ODFIIDNumberQualifier is valid
 func BenchmarkODFIIDNumberQualifierValid(b *testing.B) {
 	b.ReportAllocs()

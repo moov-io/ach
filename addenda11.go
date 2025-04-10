@@ -49,6 +49,8 @@ type Addenda11 struct {
 	validator
 	// converters is composed for ACH to GoLang Converters
 	converters
+	// validateOpts defines optional overrides for record validation
+	validateOpts *ValidateOpts
 }
 
 // NewAddenda11 returns a new Addenda11 with default values for none exported fields
@@ -108,6 +110,12 @@ func (addenda11 *Addenda11) Parse(record string) {
 	}
 }
 
+func (a *Addenda11) SetValidation(opts *ValidateOpts) {
+	if a != nil {
+		a.validateOpts = opts
+	}
+}
+
 // String writes the Addenda11 struct to a 94 character string.
 func (addenda11 *Addenda11) String() string {
 	if addenda11 == nil {
@@ -144,11 +152,13 @@ func (addenda11 *Addenda11) Validate() error {
 	if addenda11.TypeCode != "11" {
 		return fieldError("TypeCode", ErrAddendaTypeCode, addenda11.TypeCode)
 	}
-	if err := addenda11.isAlphanumeric(addenda11.OriginatorName); err != nil {
-		return fieldError("OriginatorName", err, addenda11.OriginatorName)
-	}
-	if err := addenda11.isAlphanumeric(addenda11.OriginatorStreetAddress); err != nil {
-		return fieldError("OriginatorStreetAddress", err, addenda11.OriginatorStreetAddress)
+	if addenda11.validateOpts == nil || !addenda11.validateOpts.AllowSpecialCharacters {
+		if err := addenda11.isAlphanumeric(addenda11.OriginatorName); err != nil {
+			return fieldError("OriginatorName", err, addenda11.OriginatorName)
+		}
+		if err := addenda11.isAlphanumeric(addenda11.OriginatorStreetAddress); err != nil {
+			return fieldError("OriginatorStreetAddress", err, addenda11.OriginatorStreetAddress)
+		}
 	}
 	return nil
 }

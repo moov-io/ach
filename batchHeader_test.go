@@ -556,3 +556,18 @@ func TestBatchHeader__IsValidWithPreserveSpacesOpt(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestBatchHeaderSpecialCharacter(t *testing.T) {
+	record := mockBatchHeader()
+	record.CompanyName = "Łomża"
+	err := record.Validate()
+	if err == nil {
+		t.Error("Special character should have caused a validation failure")
+	}
+
+	record.SetValidation(&ValidateOpts{AllowSpecialCharacters: true})
+	err = record.Validate()
+	if err != nil {
+		t.Error("Special character should have been allowed with override set.")
+	}
+}

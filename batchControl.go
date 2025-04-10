@@ -165,12 +165,14 @@ func (bc *BatchControl) Validate() error {
 		return fieldError("ServiceClassCode", err, strconv.Itoa(bc.ServiceClassCode))
 	}
 
-	if err := bc.isAlphanumeric(bc.CompanyIdentification); err != nil {
-		return fieldError("CompanyIdentification", err, bc.CompanyIdentification)
-	}
+	if bc.validateOpts == nil || !bc.validateOpts.AllowSpecialCharacters {
+		if err := bc.isAlphanumeric(bc.CompanyIdentification); err != nil {
+			return fieldError("CompanyIdentification", err, bc.CompanyIdentification)
+		}
 
-	if err := bc.isAlphanumeric(bc.MessageAuthenticationCode); err != nil {
-		return fieldError("MessageAuthenticationCode", err, bc.MessageAuthenticationCode)
+		if err := bc.isAlphanumeric(bc.MessageAuthenticationCode); err != nil {
+			return fieldError("MessageAuthenticationCode", err, bc.MessageAuthenticationCode)
+		}
 	}
 
 	if err := bc.totalDebitsOverflowsField(); err != nil {

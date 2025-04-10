@@ -345,3 +345,18 @@ func TestADVUnmarshal(t *testing.T) {
 		t.Errorf("ed.JulianDay=%d", ed.JulianDay)
 	}
 }
+
+func TestADVEntryDetailSpecialCharacter(t *testing.T) {
+	record := mockADVEntryDetail()
+	record.IndividualName = "Łomża"
+	err := record.Validate()
+	if err == nil {
+		t.Error("Special character should have caused a validation failure")
+	}
+
+	record.SetValidation(&ValidateOpts{AllowSpecialCharacters: true})
+	err = record.Validate()
+	if err != nil {
+		t.Error("Special character should have been allowed with override set.")
+	}
+}
