@@ -378,7 +378,7 @@ func (r *Reader) parseLine() error {
 		// without BatchControls. We need to still accumulate Batches.
 		if r.currentBatch != nil {
 			if len(r.currentBatch.GetEntries()) == 0 {
-				return ErrFileConsecutiveBatchHeaders
+				return r.parseError(ErrFileConsecutiveBatchHeaders)
 			}
 			// Accumulate currentBatch before parsing another Batch
 			batch := r.currentBatch
@@ -489,7 +489,7 @@ func (r *Reader) parseFileHeader() error {
 	// as we need to compare the other struct fields (e.g. origin, destination)
 	if (FileHeader{validateOpts: r.File.validateOpts}) != r.File.Header {
 		// There can only be one File Header per File exit
-		return ErrFileHeader
+		return r.parseError(ErrFileHeader)
 	}
 	r.File.Header.Parse(r.line)
 	r.File.Header.LineNumber = r.lineNum
@@ -528,7 +528,7 @@ func (r *Reader) parseEntryDetail() error {
 	r.recordName = "EntryDetail"
 
 	if r.currentBatch == nil {
-		return ErrFileEntryOutsideBatch
+		return r.parseError(ErrFileEntryOutsideBatch)
 	}
 	if r.currentBatch.GetHeader().StandardEntryClassCode != ADV {
 		ed := NewEntryDetail()
@@ -556,12 +556,12 @@ func (r *Reader) parseEntryDetail() error {
 func (r *Reader) parseAddenda() error {
 	r.recordName = "Addenda"
 	if r.currentBatch == nil {
-		return ErrFileAddendaOutsideBatch
+		return r.parseError(ErrFileAddendaOutsideBatch)
 	}
 
 	if r.currentBatch.GetHeader().StandardEntryClassCode != ADV {
 		if len(r.currentBatch.GetEntries()) == 0 {
-			return ErrFileAddendaOutsideEntry
+			return r.parseError(ErrFileAddendaOutsideEntry)
 		}
 		entryIndex := len(r.currentBatch.GetEntries()) - 1
 		entry := r.currentBatch.GetEntries()[entryIndex]
@@ -662,10 +662,10 @@ func (r *Reader) parseAddenda() error {
 // parseADVAddenda takes the input record string and create an Addenda99 appended to the last ADVEntryDetail
 func (r *Reader) parseADVAddenda() error {
 	if r.currentBatch == nil {
-		return ErrFileAddendaOutsideBatch
+		return r.parseError(ErrFileAddendaOutsideBatch)
 	}
 	if len(r.currentBatch.GetADVEntries()) == 0 {
-		return ErrFileAddendaOutsideEntry
+		return r.parseError(ErrFileAddendaOutsideEntry)
 	}
 
 	entryIndex := len(r.currentBatch.GetADVEntries()) - 1
@@ -694,7 +694,7 @@ func (r *Reader) parseBatchControl() error {
 	r.recordName = "BatchControl"
 	if r.currentBatch == nil && r.IATCurrentBatch.GetEntries() == nil {
 		// batch Control without a current batch
-		return ErrFileBatchControlOutsideBatch
+		return r.parseError(ErrFileBatchControlOutsideBatch)
 	}
 	if r.currentBatch != nil {
 		if r.currentBatch.GetHeader().StandardEntryClassCode == ADV {
@@ -729,7 +729,7 @@ func (r *Reader) parseFileControl() error {
 	if !r.File.IsADV() {
 		if (FileControl{}) != r.File.Control {
 			// Can be only one file control per file
-			return ErrFileControl
+			return r.parseError(ErrFileControl)
 		}
 		r.File.Control.Parse(r.line)
 		r.File.Control.LineNumber = r.lineNum
@@ -739,7 +739,7 @@ func (r *Reader) parseFileControl() error {
 	} else {
 		if (ADVFileControl{}) != r.File.ADVControl {
 			// Can be only one file control per file
-			return ErrFileControl
+			return r.parseError(ErrFileControl)
 		}
 		r.File.ADVControl.Parse(r.line)
 		r.File.ADVControl.LineNumber = r.lineNum
@@ -777,7 +777,7 @@ func (r *Reader) parseIATEntryDetail() error {
 	r.recordName = "EntryDetail"
 
 	if r.IATCurrentBatch.Header == nil {
-		return ErrFileEntryOutsideBatch
+		return r.parseError(ErrFileEntryOutsideBatch)
 	}
 
 	ed := NewIATEntryDetail()
@@ -795,7 +795,7 @@ func (r *Reader) parseIATAddenda() error {
 	r.recordName = "Addenda"
 
 	if r.IATCurrentBatch.GetEntries() == nil {
-		return ErrFileAddendaOutsideEntry
+		return r.parseError(ErrFileAddendaOutsideEntry)
 	}
 	entryIndex := len(r.IATCurrentBatch.GetEntries()) - 1
 	entry := r.IATCurrentBatch.GetEntries()[entryIndex]
