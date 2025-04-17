@@ -199,16 +199,32 @@ func TestValidators__isAlphanumericExamples(t *testing.T) {
 		require.ErrorIs(t, err, ErrNonAlphanumeric, "input: %q", invalidCases[i])
 	}
 
-	// Real world examples
-	otherCases := []string{
-		"123456-9876.1234",
-	}
-	for _, input := range otherCases {
-		t.Run(input, func(t *testing.T) {
-			err := v.isAlphanumeric(input)
-			require.NoError(t, err)
-		})
-	}
+	// Real world examples (allowed)
+	t.Run("allowed", func(t *testing.T) {
+		otherCases := []string{
+			"123456-9876.1234",
+			"D'Amador",
+		}
+		for _, input := range otherCases {
+			t.Run(input, func(t *testing.T) {
+				err := v.isAlphanumeric(input)
+				require.NoError(t, err)
+			})
+		}
+	})
+
+	// Real world examples (not allowed)
+	t.Run("not allowed", func(t *testing.T) {
+		otherCases := []string{
+			"L’Allier",
+		}
+		for _, input := range otherCases {
+			t.Run(input, func(t *testing.T) {
+				err := v.isAlphanumeric(input)
+				require.ErrorContains(t, err, "has non alphanumeric characters:")
+			})
+		}
+	})
 }
 
 func TestValidators__validateJulianDay(t *testing.T) {
