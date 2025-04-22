@@ -883,6 +883,10 @@ components:
         referenceCode:
           type: string
           description: Reserved field for information pertinent to the Originator.
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
         - immediateOrigin
         - immediateDestination
@@ -922,6 +926,10 @@ components:
           type: integer
           format: int64
           example: 20
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
         - ID
         - batchCount
@@ -1036,6 +1044,10 @@ components:
           description: The date the entries actually settled (this is inserted by the ACH operator)
           format: "YYMMDD"
           example: "190102"
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
     BatchControl:
       properties:
         id:
@@ -1085,6 +1097,10 @@ components:
           type: integer
           description: BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
           example: 0
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
         - serviceClassCode
         - entryAddendaCount
@@ -1205,6 +1221,10 @@ components:
           type: string
           description: Category defines if the entry is a Forward, Return, or NOC
           example: "Forward"
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
 
     Addenda02:
       properties:
@@ -1266,6 +1286,10 @@ components:
           type: string
           description: Entry Detail Trace Number
           example: "124782618117"
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
         - typeCode
         - terminalIdentificationCode
@@ -1300,6 +1324,10 @@ components:
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 2618117
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
         - typeCode
         - paymentRelatedInformation
@@ -1358,6 +1386,10 @@ components:
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 2618117
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
         - typeCode
         - transactionCode
@@ -1390,6 +1422,10 @@ components:
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 2618117
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
         - typeCode
         - originatorName
@@ -1427,6 +1463,10 @@ components:
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 2618117
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
         - typeCode
         - originatorCityStateProvince
@@ -1486,6 +1526,10 @@ components:
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 2618117
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
         - typeCode
         - ODFIName
@@ -1539,6 +1583,10 @@ components:
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 2618117
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
         - typeCode
         - RDFIName
@@ -1573,6 +1621,10 @@ components:
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 2618117
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
         - typeCode
         - receiverStreetAddress
@@ -1610,6 +1662,10 @@ components:
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 2618117
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
         - typeCode
         - receiverCityStateProvince
@@ -1642,6 +1698,10 @@ components:
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 2618117
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
         - typeCode
         - paymentRelatedInformation
@@ -1691,6 +1751,10 @@ components:
             the same as the last seven digits of the trace number of the related
             Entry Detail Record or Corporate Entry Detail Record.
           example: 2618117
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
         - typeCode
         - foreignCorrespondentBankName
@@ -1731,6 +1795,10 @@ components:
           type: string
           description: Entry Detail Trace Number
           example: "124782618117"
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
       - typeCode
       - changeCode
@@ -1776,6 +1844,10 @@ components:
           type: string
           description: Entry Detail Trace Number
           example: "124782618117"
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
       - typeCode
       - refusedChangeCode
@@ -1823,6 +1895,10 @@ components:
           type: string
           description: Matches the Entry Detail Trace Number of the entry being returned.
           example: "214874812"
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
         - typeCode
         - returnCode
@@ -1871,6 +1947,10 @@ components:
           type: string
           description: Additional data
           example: '00134                                       '
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
         - typeCode
         - originalEntryTraceNumber
@@ -1937,6 +2017,10 @@ components:
           type: string
           description: Unique Trace Number for the contested dishonored return
           example: "214874812"
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
         - typeCode
         - dishonoredReturnReasonCode
@@ -2073,6 +2157,10 @@ components:
           description: The date the entries actually settled (this is inserted by the ACH operator)
           format: "YYMMDD"
           example: "190102"
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
         - serviceClassCode
         - standardEntryClassCode
@@ -2173,6 +2261,10 @@ components:
           type: string
           description: Category defines if the entry is a Forward, Return, or NOC
           example: Forward
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
        - transactionCode
        - RDFIIdentification
@@ -2284,6 +2376,10 @@ components:
           type: string
           description: Category defines if the entry is a Forward, Return, or NOC
           example: Forward
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
     ADVBatchControl:
       properties:
         id:
@@ -2327,6 +2423,10 @@ components:
           type: integer
           description: BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
           example: 0
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
        - serviceClassCode
        - entryAddendaCount
@@ -2372,6 +2472,10 @@ components:
           type: integer
           format: int64
           example: 20
+        lineNumber:
+          type: integer
+          description: Line number at which the record appears in the file.
+          example: 138
       required:
         - ID
         - batchCount
