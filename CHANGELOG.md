@@ -1,3 +1,16 @@
+## v1.48.0 (Released 2025-04-22)
+
+IMPROVEMENTS
+
+- feat: add line numbers to record schemas in openapi spec
+- fix: Return `ParseError` more consistently when reading files
+- test: verify what accents are allowed or not
+
+BUILD
+
+- build(deps-dev): bump nokogiri from 1.18.4 to 1.18.8 in /docs
+- fix(deps): update module github.com/moov-io/base to v0.54.4
+
 ## v1.47.0 (Released 2025-04-10)
 
 ADDITIONS
