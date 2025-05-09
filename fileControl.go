@@ -41,6 +41,8 @@ type FileControl struct {
 	TotalDebitEntryDollarAmountInFile int `json:"totalDebit"`
 	// TotalCreditEntryDollarAmountInFile contains accumulated Batch credit totals within the file.
 	TotalCreditEntryDollarAmountInFile int `json:"totalCredit"`
+	// Reserved contains the data from 56-94. This may change if Nacha updates the File Control record.
+	Reserved string `json:"reserved"`
 	// Line number at which the record appears in the file
 	LineNumber int `json:"lineNumber,omitempty"`
 	// validator is composed for data validation
@@ -100,7 +102,7 @@ func (fc *FileControl) Parse(record string) {
 			fc.TotalCreditEntryDollarAmountInFile = fc.parseNumField(reset())
 		case 94:
 			// 56-94 Reserved Always blank (just fill with spaces)
-			reset()
+			fc.Reserved = reset()
 		}
 	}
 }
