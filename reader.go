@@ -19,6 +19,7 @@ package ach
 
 import (
 	"bufio"
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -288,6 +289,25 @@ func (r *Reader) Read() (File, error) {
 		return r.File, nil
 	}
 	return r.File, r.errors
+}
+
+func readRunes(start, length int, input string) string {
+	var buf bytes.Buffer
+
+	var added int
+	for idx, r := range input {
+		if idx < start {
+			continue
+		}
+		if added >= length {
+			break
+		}
+
+		added++
+		buf.WriteRune(r)
+	}
+
+	return buf.String()
 }
 
 func blankLine(line string) bool {
