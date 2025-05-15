@@ -54,37 +54,71 @@ func (batch *BatchXCK) Validate() error {
 		return batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode)
 	}
 
+	invalidEntries := batch.InvalidEntries()
+	if len(invalidEntries) > 0 {
+		return invalidEntries[0].Error // return the first invalid entry's error
+	}
+
+	return nil
+}
+
+// InvalidEntries returns entries with validation errors in the batch
+func (batch *BatchXCK) InvalidEntries() []InvalidEntry {
+	var out []InvalidEntry
+
 	for _, entry := range batch.Entries {
 		// XCK detail entries must be a debit
 		if entry.CreditOrDebit() != "D" {
-			return batch.Error("TransactionCode", ErrBatchDebitOnly, entry.TransactionCode)
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: batch.Error("TransactionCode", ErrBatchDebitOnly, entry.TransactionCode),
+			})
 		}
 		// Amount must be 2,500 or less
 		if entry.Amount > 250000 {
-			return batch.Error("Amount", NewErrBatchAmount(entry.Amount, 250000))
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: batch.Error("Amount", NewErrBatchAmount(entry.Amount, 250000)),
+			})
 		}
 		// ProcessControlField underlying IdentificationNumber, must be defined
 		if entry.ProcessControlField() == "" {
-			return batch.Error("ProcessControlField", ErrFieldRequired)
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: batch.Error("ProcessControlField", ErrFieldRequired),
+			})
 		}
 		// ItemResearchNumber underlying IdentificationNumber, must be defined
 		if entry.ItemResearchNumber() == "" {
-			return batch.Error("ItemResearchNumber", ErrFieldRequired)
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: batch.Error("ItemResearchNumber", ErrFieldRequired),
+			})
 		}
 		// Verify the Amount is valid for SEC code and TransactionCode
 		if err := batch.ValidAmountForCodes(entry); err != nil {
-			return err
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: err,
+			})
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {
-			return err
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: err,
+			})
 		}
 		// Verify Addenda* FieldInclusion based on entry.Category and batchHeader.StandardEntryClassCode
 		if err := batch.addendaFieldInclusion(entry); err != nil {
-			return err
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: err,
+			})
 		}
 	}
-	return nil
+
+	return out
 }
 
 // Create will tabulate and assemble an ACH batch into a valid state. This includes

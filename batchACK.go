@@ -46,35 +46,65 @@ func (batch *BatchACK) Validate() error {
 	if batch.Header.StandardEntryClassCode != ACK {
 		return batch.Error("StandardEntryClassCode", ErrBatchSECType, ACK)
 	}
-	// Range through Entries
+
+	invalidEntries := batch.InvalidEntries()
+	if len(invalidEntries) > 0 {
+		return invalidEntries[0].Error // return the first invalid entry's error
+	}
+
+	return nil
+}
+
+// InvalidEntries returns entries with validation errors in the batch
+func (batch *BatchACK) InvalidEntries() []InvalidEntry {
+	var out []InvalidEntry
+
 	for _, entry := range batch.Entries {
 		// Amount must be zero for Acknowledgement Entries
 		if entry.Amount > 0 {
-			return batch.Error("Amount", ErrBatchAmountNonZero, entry.Amount)
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: batch.Error("Amount", ErrBatchAmountNonZero, entry.Amount),
+			})
 		}
 		if len(entry.Addenda05) > 1 {
-			return batch.Error("AddendaCount", NewErrBatchAddendaCount(len(entry.Addenda05), 1))
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: batch.Error("AddendaCount", NewErrBatchAddendaCount(len(entry.Addenda05), 1)),
+			})
 		}
 		switch entry.TransactionCode {
 		case CheckingZeroDollarRemittanceCredit, SavingsZeroDollarRemittanceCredit:
 		default:
-			return batch.Error("TransactionCode", ErrBatchTransactionCode, entry.TransactionCode)
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: batch.Error("TransactionCode", ErrBatchTransactionCode, entry.TransactionCode),
+			})
 		}
 		// // Verify the Amount is valid for SEC code and TransactionCode
 		if err := batch.ValidAmountForCodes(entry); err != nil {
-			return err
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: err,
+			})
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {
-			return err
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: err,
+			})
 		}
 		// Verify Addenda* FieldInclusion based on entry.Category and batchHeader.StandardEntryClassCode
 		if err := batch.addendaFieldInclusion(entry); err != nil {
-			return err
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: err,
+			})
 		}
 	}
 
-	return nil
+	return out
 }
 
 // Create will tabulate and assemble an ACH batch into a valid state. This includes
