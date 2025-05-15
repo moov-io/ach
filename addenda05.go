@@ -163,7 +163,7 @@ func (addenda05 *Addenda05) fieldInclusion() error {
 	if addenda05.SequenceNumber == 0 {
 		return fieldError("SequenceNumber", ErrConstructor, addenda05.SequenceNumberField())
 	}
-	if addenda05.EntryDetailSequenceNumber == 0 {
+	if addenda05.EntryDetailSequenceNumber < 0 {
 		return fieldError("EntryDetailSequenceNumber", ErrConstructor, addenda05.EntryDetailSequenceNumberField())
 	}
 	return nil

@@ -308,7 +308,7 @@ func BenchmarkAddenda10FieldInclusionName(b *testing.B) {
 // testAddenda10FieldInclusionEntryDetailSequenceNumber validates EntryDetailSequenceNumber fieldInclusion
 func testAddenda10FieldInclusionEntryDetailSequenceNumber(t testing.TB) {
 	addenda10 := mockAddenda10()
-	addenda10.EntryDetailSequenceNumber = 0
+	addenda10.EntryDetailSequenceNumber = -1
 	err := addenda10.Validate()
 	if !base.Match(err, ErrConstructor) {
 		t.Errorf("%T: %s", err, err)

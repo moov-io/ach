@@ -216,7 +216,7 @@ func (addenda14 *Addenda14) fieldInclusion() error {
 	if addenda14.RDFIBranchCountryCode == "" {
 		return fieldError("RDFIBranchCountryCode", ErrConstructor, addenda14.RDFIBranchCountryCode)
 	}
-	if addenda14.EntryDetailSequenceNumber == 0 {
+	if addenda14.EntryDetailSequenceNumber < 0 {
 		return fieldError("EntryDetailSequenceNumber", ErrConstructor, addenda14.EntryDetailSequenceNumberField())
 	}
 	return nil

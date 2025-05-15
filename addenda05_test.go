@@ -117,7 +117,7 @@ func BenchmarkAddenda05String(b *testing.B) {
 
 func TestAddenda05FieldInclusion(t *testing.T) {
 	addenda05 := mockAddenda05()
-	addenda05.EntryDetailSequenceNumber = 0
+	addenda05.EntryDetailSequenceNumber = -1
 	err := addenda05.Validate()
 	if !base.Match(err, ErrConstructor) {
 		t.Errorf("%T: %s", err, err)

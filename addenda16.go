@@ -183,7 +183,7 @@ func (addenda16 *Addenda16) fieldInclusion() error {
 	if addenda16.ReceiverCountryPostalCode == "" {
 		return fieldError("ReceiverCountryPostalCode", ErrConstructor, addenda16.ReceiverCountryPostalCode)
 	}
-	if addenda16.EntryDetailSequenceNumber == 0 {
+	if addenda16.EntryDetailSequenceNumber < 0 {
 		return fieldError("EntryDetailSequenceNumber", ErrConstructor, addenda16.EntryDetailSequenceNumberField())
 	}
 	return nil

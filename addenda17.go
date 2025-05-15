@@ -164,7 +164,7 @@ func (addenda17 *Addenda17) fieldInclusion() error {
 	if addenda17.SequenceNumber == 0 {
 		return fieldError("SequenceNumber", ErrConstructor, addenda17.SequenceNumberField())
 	}
-	if addenda17.EntryDetailSequenceNumber == 0 {
+	if addenda17.EntryDetailSequenceNumber < 0 {
 		return fieldError("EntryDetailSequenceNumber", ErrConstructor, addenda17.EntryDetailSequenceNumberField())
 	}
 	return nil

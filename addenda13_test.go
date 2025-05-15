@@ -352,7 +352,7 @@ func BenchmarkAddenda13FieldInclusionODFIBranchCountryCode(b *testing.B) {
 // testAddenda13FieldInclusionEntryDetailSequenceNumber validates EntryDetailSequenceNumber fieldInclusion
 func testAddenda13FieldInclusionEntryDetailSequenceNumber(t testing.TB) {
 	addenda13 := mockAddenda13()
-	addenda13.EntryDetailSequenceNumber = 0
+	addenda13.EntryDetailSequenceNumber = -1
 	err := addenda13.Validate()
 	if !base.Match(err, ErrConstructor) {
 		t.Errorf("%T: %s", err, err)
