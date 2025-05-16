@@ -1,3 +1,15 @@
+## v1.48.1 (Released 2025-05-16)
+
+IMPROVEMENTS
+
+- fix: allow EntryDetailSequenceNumber to be zero (or greater)
+
+BUILD
+
+- fix(deps): update module golang.org/x/net to v0.40.0
+- fix(deps): update module golang.org/x/sync to v0.14.0
+- fix(deps): update module golang.org/x/text to v0.25.0
+
 ## v1.48.0 (Released 2025-04-22)
 
 IMPROVEMENTS
