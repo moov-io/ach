@@ -24,6 +24,7 @@ type Opts struct {
 	MaskNames          bool
 	MaskAccountNumbers bool
 	MaskCorrectedData  bool
+	MaskIdentification bool
 
 	PrettyAmounts bool
 }
@@ -67,7 +68,7 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 
 		entries := file.Batches[i].GetEntries()
 		for j := range entries {
-			fmt.Fprintln(w, "\n    TransactionCode\tRDFIIdentification\tAccountNumber\tAmount\tName\tTraceNumber\tCategory")
+			fmt.Fprintln(w, "\n    TransactionCode\tRDFIIdentification\tAccountNumber\tAmount\tName\tIdentificationNumber\tTraceNumber\tCategory")
 
 			e := entries[j]
 			accountNumber := e.DFIAccountNumberField()
@@ -82,7 +83,12 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 				name = maskName(name)
 			}
 
-			fmt.Fprintf(w, "    %d %s\t%s\t%s\t%s\t%s\t%s\t%s\n", e.TransactionCode, transactionCodes[e.TransactionCode], e.RDFIIdentificationField(), accountNumber, amount, name, e.TraceNumberField(), e.Category)
+			identificationNumber := e.IdentificationNumberField()
+			if opts.MaskIdentification {
+				name = maskNumber(identificationNumber)
+			}
+
+			fmt.Fprintf(w, "    %d %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", e.TransactionCode, transactionCodes[e.TransactionCode], e.RDFIIdentificationField(), accountNumber, amount, name, identificationNumber, e.TraceNumberField(), e.Category)
 
 			dumpAddenda02(w, e.Addenda02)
 			for a := range e.Addenda05 {

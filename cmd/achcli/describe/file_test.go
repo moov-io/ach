@@ -23,7 +23,7 @@ func TestDescribeFile(t *testing.T) {
 	if testing.Verbose() {
 		os.Stdout.Write(buf.Bytes())
 	}
-	require.Equal(t, 1174, buf.Len())
+	require.Equal(t, 1218, buf.Len())
 }
 
 func TestDescribeIAT(t *testing.T) {
@@ -47,7 +47,7 @@ func TestDescribeReturn(t *testing.T) {
 	if testing.Verbose() {
 		os.Stdout.Write(buf.Bytes())
 	}
-	require.Equal(t, 2604, buf.Len())
+	require.Equal(t, 2692, buf.Len())
 }
 
 func TestDescribeCorrection(t *testing.T) {
@@ -59,7 +59,7 @@ func TestDescribeCorrection(t *testing.T) {
 	if testing.Verbose() {
 		os.Stdout.Write(buf.Bytes())
 	}
-	require.Equal(t, 1357, buf.Len())
+	require.Equal(t, 1401, buf.Len())
 }
 
 func TestFormatAmount(t *testing.T) {
@@ -108,4 +108,12 @@ func TestMaskName(t *testing.T) {
 		IndividualName: "Jane Smith Jr",
 	}
 	require.Equal(t, "Ja** Sm*** **", maskName(ed.IndividualNameField()))
+}
+
+func TestMaskIdentification(t *testing.T) {
+	ed := &ach.EntryDetail{
+		IdentificationNumber: "abc123",
+	}
+	require.Equal(t, "**c123", maskNumber(ed.IdentificationNumber))
+	require.Equal(t, "**c123         ", maskNumber(ed.IdentificationNumberField()))
 }
