@@ -237,7 +237,7 @@ func BenchmarkAddenda16FieldInclusionReceiverCountryPostalCode(b *testing.B) {
 // testAddenda16FieldInclusionEntryDetailSequenceNumber validates EntryDetailSequenceNumber fieldInclusion
 func testAddenda16FieldInclusionEntryDetailSequenceNumber(t testing.TB) {
 	addenda16 := mockAddenda16()
-	addenda16.EntryDetailSequenceNumber = 0
+	addenda16.EntryDetailSequenceNumber = -1
 	err := addenda16.Validate()
 	if !base.Match(err, ErrConstructor) {
 		t.Errorf("%T: %s", err, err)

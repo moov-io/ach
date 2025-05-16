@@ -187,7 +187,7 @@ func TestAddenda18FieldInclusionTypeCode(t *testing.T) {
 
 func TestAddenda18FieldInclusion(t *testing.T) {
 	addenda18 := mockAddenda18()
-	addenda18.EntryDetailSequenceNumber = 0
+	addenda18.EntryDetailSequenceNumber = -1
 	err := addenda18.Validate()
 	if !base.Match(err, ErrConstructor) {
 		t.Errorf("%T: %s", err, err)

@@ -205,7 +205,7 @@ func (addenda10 *Addenda10) fieldInclusion() error {
 	if addenda10.Name == "" {
 		return fieldError("Name", ErrConstructor, addenda10.Name)
 	}
-	if addenda10.EntryDetailSequenceNumber == 0 {
+	if addenda10.EntryDetailSequenceNumber < 0 {
 		return fieldError("EntryDetailSequenceNumber", ErrConstructor, addenda10.EntryDetailSequenceNumberField())
 	}
 	return nil

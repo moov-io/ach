@@ -177,7 +177,7 @@ func (addenda15 *Addenda15) fieldInclusion() error {
 	if addenda15.ReceiverStreetAddress == "" {
 		return fieldError("ReceiverStreetAddress", ErrConstructor, addenda15.ReceiverStreetAddress)
 	}
-	if addenda15.EntryDetailSequenceNumber == 0 {
+	if addenda15.EntryDetailSequenceNumber < 0 {
 		return fieldError("EntryDetailSequenceNumber", ErrConstructor, addenda15.EntryDetailSequenceNumberField())
 	}
 	return nil
