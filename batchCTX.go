@@ -55,12 +55,27 @@ func (batch *BatchCTX) Validate() error {
 		return batch.Error("StandardEntryClassCode", ErrBatchSECType, CTX)
 	}
 
+	invalidEntries := batch.InvalidEntries()
+	if len(invalidEntries) > 0 {
+		return invalidEntries[0].Error // return the first invalid entry's error
+	}
+
+	return nil
+}
+
+// InvalidEntries returns entries with validation errors in the batch
+func (batch *BatchCTX) InvalidEntries() []InvalidEntry {
+	var out []InvalidEntry
+
 	for _, entry := range batch.Entries {
 		addendaCount := len(entry.Addenda05)
 
 		// Trapping this error, as entry.CTXAddendaRecordsField() can not be greater than 9999
 		if addendaCount > 9999 {
-			return batch.Error("AddendaCount", NewErrBatchAddendaCount(len(entry.Addenda05), 9999))
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: batch.Error("AddendaCount", NewErrBatchAddendaCount(len(entry.Addenda05), 9999)),
+			})
 		}
 
 		// Add to addendaCount so Corrections and Returns compare AddendaRecordIndicator correctly
@@ -76,7 +91,10 @@ func (batch *BatchCTX) Validate() error {
 		indicator, _ := strconv.Atoi(entry.CATXAddendaRecordsField())
 		if addendaCount != indicator {
 			if batch.validateOpts == nil || !batch.validateOpts.UnequalAddendaCounts {
-				return batch.Error("AddendaCount", NewErrBatchExpectedAddendaCount(addendaCount, indicator))
+				out = append(out, InvalidEntry{
+					Entry: entry,
+					Error: batch.Error("AddendaCount", NewErrBatchExpectedAddendaCount(addendaCount, indicator)),
+				})
 			}
 		}
 		// Verify TransactionCode is valid for CTX
@@ -85,23 +103,36 @@ func (batch *BatchCTX) Validate() error {
 			SavingsPrenoteCredit, SavingsPrenoteDebit,
 			GLPrenoteCredit, GLPrenoteDebit, LoanPrenoteCredit:
 			if entry.Amount != 0 {
-				return batch.Error("TransactionCode", ErrBatchTransactionCode, entry.TransactionCode)
+				out = append(out, InvalidEntry{
+					Entry: entry,
+					Error: batch.Error("TransactionCode", ErrBatchTransactionCode, entry.TransactionCode),
+				})
 			}
 		}
 		// Verify the Amount is valid for SEC code and TransactionCode
 		if err := batch.ValidAmountForCodes(entry); err != nil {
-			return err
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: err,
+			})
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {
-			return err
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: err,
+			})
 		}
 		// Verify Addenda* FieldInclusion based on entry.Category and batchHeader.StandardEntryClassCode
 		if err := batch.addendaFieldInclusion(entry); err != nil {
-			return err
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: err,
+			})
 		}
 	}
-	return nil
+
+	return out
 }
 
 // Create will tabulate and assemble an ACH batch into a valid state. This includes

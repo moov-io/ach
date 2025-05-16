@@ -54,34 +54,65 @@ func (batch *BatchMTE) Validate() error {
 		return batch.Error("StandardEntryClassCode", ErrBatchSECType, MTE)
 	}
 
+	invalidEntries := batch.InvalidEntries()
+	if len(invalidEntries) > 0 {
+		return invalidEntries[0].Error // return the first invalid entry's error
+	}
+
+	return nil
+}
+
+// InvalidEntries returns entries with validation errors in the batch
+func (batch *BatchMTE) InvalidEntries() []InvalidEntry {
+	var out []InvalidEntry
+
 	for _, entry := range batch.Entries {
 		if entry.Amount <= 0 {
-			return batch.Error("Amount", ErrBatchAmountZero, entry.Amount)
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: batch.Error("Amount", ErrBatchAmountZero, entry.Amount),
+			})
 		}
 		// Verify the Amount is valid for SEC code and TransactionCode
 		if err := batch.ValidAmountForCodes(entry); err != nil {
-			return err
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: err,
+			})
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {
-			return err
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: err,
+			})
 		}
 		// Verify Addenda* FieldInclusion based on entry.Category and batchHeader.StandardEntryClassCode
 		if err := batch.addendaFieldInclusion(entry); err != nil {
-			return err
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: err,
+			})
 		}
 		if entry.Category == CategoryForward {
 			if !usabbrev.Valid(entry.Addenda02.TerminalState) {
-				return batch.Error("TerminalState", ErrValidState, entry.Addenda02.TerminalState)
+				out = append(out, InvalidEntry{
+					Entry: entry,
+					Error: batch.Error("TerminalState", ErrValidState, entry.Addenda02.TerminalState),
+				})
 			}
 		}
 
 		// MTE entries cannot have an identification number that is all spaces or all zeros
 		if strings.Trim(entry.IdentificationNumber, " 0") == "" {
-			return batch.Error("IdentificationNumber", ErrIdentificationNumber, entry.IdentificationNumber)
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: batch.Error("IdentificationNumber", ErrIdentificationNumber, entry.IdentificationNumber),
+			})
 		}
 	}
-	return nil
+
+	return out
 }
 
 // Create will tabulate and assemble an ACH batch into a valid state. This includes

@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -2305,4 +2306,52 @@ func TestReadFile_lineNumbers(t *testing.T) {
 
 	// adv file control
 	assertLineNumber(t, 6, file.ADVControl.LineNumber)
+}
+
+func TestReadRunes(t *testing.T) {
+	cases := []struct {
+		input         string
+		start, length int
+		expected      string
+	}{
+		{
+			input:    "def321",
+			start:    0,
+			length:   0,
+			expected: "",
+		},
+		{
+			input:    "def321",
+			start:    3,
+			length:   9,
+			expected: "321",
+		},
+		{
+			input:    "abc123",
+			start:    1,
+			length:   4,
+			expected: "bc12",
+		},
+		{
+			input:    "D'Amador",
+			start:    0,
+			length:   4,
+			expected: "D'Am",
+		},
+		{
+			input:    `¦¢¬±ãèñ`,
+			start:    2,
+			length:   4,
+			expected: `¢¬±ã`,
+		},
+	}
+	for _, tc := range cases {
+		name := fmt.Sprintf("first %d of %s", tc.length, tc.input)
+
+		t.Run(name, func(t *testing.T) {
+			got := readRunes(tc.start, tc.length, tc.input)
+
+			require.Equal(t, tc.expected, got)
+		})
+	}
 }

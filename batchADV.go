@@ -53,21 +53,38 @@ func (batch *BatchADV) Validate() error {
 	if err := batch.verify(); err != nil {
 		return err
 	}
-	// Add configuration and type specific validation for this type.
+
+	invalidEntries := batch.InvalidEntries()
+	if len(invalidEntries) > 0 {
+		return invalidEntries[0].Error // return the first invalid entry's error
+	}
+
+	return nil
+}
+
+// InvalidEntries returns entries with validation errors in the batch
+func (batch *BatchADV) InvalidEntries() []InvalidEntry {
+	var out []InvalidEntry
 	for _, entry := range batch.ADVEntries {
 		if entry.Category == CategoryForward {
 			switch entry.TransactionCode {
 			case CreditForDebitsOriginated, CreditForCreditsReceived, CreditForCreditsRejected, CreditSummary,
 				DebitForCreditsOriginated, DebitForDebitsReceived, DebitForDebitsRejectedBatches, DebitSummary:
 			default:
-				return batch.Error("TransactionCode", ErrBatchTransactionCode, entry.TransactionCode)
+				out = append(out, InvalidEntry{
+					ADVEntry: entry,
+					Error:    batch.Error("TransactionCode", ErrBatchTransactionCode, entry.TransactionCode),
+				})
 			}
 			if entry.Addenda99 != nil {
-				return batch.Error("Addenda99", ErrBatchAddendaCategory, entry.Category)
+				out = append(out, InvalidEntry{
+					ADVEntry: entry,
+					Error:    batch.Error("Addenda99", ErrBatchAddendaCategory, entry.Category),
+				})
 			}
 		}
 	}
-	return nil
+	return out
 }
 
 // Create will tabulate and assemble an ACH batch into a valid state. This includes

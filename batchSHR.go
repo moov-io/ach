@@ -66,46 +66,83 @@ func (batch *BatchSHR) Validate() error {
 		return batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode)
 	}
 
+	invalidEntries := batch.InvalidEntries()
+	if len(invalidEntries) > 0 {
+		return invalidEntries[0].Error // return the first invalid entry's error
+	}
+
+	return nil
+}
+
+// InvalidEntries returns entries with validation errors in the batch
+func (batch *BatchSHR) InvalidEntries() []InvalidEntry {
+	var out []InvalidEntry
+
 	for _, entry := range batch.Entries {
 		// SHR detail entries can be debit or credit
 		switch entry.CreditOrDebit() {
 		case "C", "D":
 			// do nothing
 		default:
-			return batch.Error("TransactionCode", ErrBatchTransactionCode, entry.TransactionCode)
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: batch.Error("TransactionCode", ErrBatchTransactionCode, entry.TransactionCode),
+			})
 		}
 		if err := entry.isCardTransactionType(entry.DiscretionaryData); err != nil {
-			return batch.Error("CardTransactionType", ErrBatchInvalidCardTransactionType, entry.DiscretionaryData)
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: batch.Error("CardTransactionType", ErrBatchInvalidCardTransactionType, entry.DiscretionaryData),
+			})
 		}
 
 		// CardExpirationDate BatchSHR ACH File format is MMYY.  Validate MM is 01-12.
 		month := entry.parseStringField(entry.SHRCardExpirationDateField()[0:2])
 		year := entry.parseStringField(entry.SHRCardExpirationDateField()[2:4])
 		if err := entry.isMonth(month); err != nil {
-			return fieldError("CardExpirationDate", ErrValidMonth, month)
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: fieldError("CardExpirationDate", ErrValidMonth, month),
+			})
 		}
 		if err := entry.isCreditCardYear(year); err != nil {
-			return fieldError("CardExpirationDate", ErrValidYear, year)
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: fieldError("CardExpirationDate", ErrValidYear, year),
+			})
 		}
 		// Verify the Amount is valid for SEC code and TransactionCode
 		if err := batch.ValidAmountForCodes(entry); err != nil {
-			return err
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: err,
+			})
 		}
 		// Verify the TransactionCode is valid for a ServiceClassCode
 		if err := batch.ValidTranCodeForServiceClassCode(entry); err != nil {
-			return err
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: err,
+			})
 		}
 		// Verify Addenda* FieldInclusion based on entry.Category and batchHeader.StandardEntryClassCode
 		if err := batch.addendaFieldInclusion(entry); err != nil {
-			return err
+			out = append(out, InvalidEntry{
+				Entry: entry,
+				Error: err,
+			})
 		}
 		if entry.Category == CategoryForward {
 			if !usabbrev.Valid(entry.Addenda02.TerminalState) {
-				return batch.Error("TerminalState", ErrValidState, entry.Addenda02.TerminalState)
+				out = append(out, InvalidEntry{
+					Entry: entry,
+					Error: batch.Error("TerminalState", ErrValidState, entry.Addenda02.TerminalState),
+				})
 			}
 		}
 	}
-	return nil
+
+	return out
 }
 
 // Create will tabulate and assemble an ACH batch into a valid state. This includes
