@@ -483,19 +483,19 @@ func (ed *EntryDetail) SetPOPTerminalState(s string) {
 // POPCheckSerialNumberField is used in POP, characters 1-9 of underlying BatchPOP
 // CheckSerialNumber / IdentificationNumber
 func (ed *EntryDetail) POPCheckSerialNumberField() string {
-	return ed.parseStringField(ed.IdentificationNumber[0:9])
+	return ed.parseStringField(readRunes(0, 9, ed.IdentificationNumber))
 }
 
 // POPTerminalCityField is used in POP, characters 10-13 of underlying BatchPOP
 // CheckSerialNumber / IdentificationNumber
 func (ed *EntryDetail) POPTerminalCityField() string {
-	return ed.parseStringField(ed.IdentificationNumber[9:13])
+	return ed.parseStringField(readRunes(9, 4, ed.IdentificationNumber))
 }
 
 // POPTerminalStateField is used in POP, characters 14-15 of underlying BatchPOP
 // CheckSerialNumber / IdentificationNumber
 func (ed *EntryDetail) POPTerminalStateField() string {
-	return ed.parseStringField(ed.IdentificationNumber[13:15])
+	return ed.parseStringField(readRunes(13, 2, ed.IdentificationNumber))
 }
 
 // SetSHRCardExpirationDate format MMYY is used in SHR, characters 1-4 of underlying
@@ -519,13 +519,13 @@ func (ed *EntryDetail) SetSHRIndividualCardAccountNumber(s string) {
 // SHRCardExpirationDateField format MMYY is used in SHR, characters 1-4 of underlying
 // IdentificationNumber
 func (ed *EntryDetail) SHRCardExpirationDateField() string {
-	return ed.alphaField(ed.parseStringField(ed.IdentificationNumber[0:4]), 4)
+	return ed.alphaField(ed.parseStringField(readRunes(0, 4, ed.IdentificationNumber)), 4)
 }
 
 // SHRDocumentReferenceNumberField format int is used in SHR, characters 5-15 of underlying
 // IdentificationNumber
 func (ed *EntryDetail) SHRDocumentReferenceNumberField() string {
-	return ed.stringField(ed.IdentificationNumber[4:15], 11)
+	return ed.stringField(readRunes(4, 11, ed.IdentificationNumber), 11)
 }
 
 // SHRIndividualCardAccountNumberField format int is used in SHR, underlying
@@ -589,7 +589,7 @@ func (ed *EntryDetail) CATXAddendaRecordsField() string {
 	if utf8.RuneCountInString(ed.IndividualName) < 5 {
 		return ed.IndividualName
 	}
-	return ed.parseStringField(ed.IndividualName[:4])
+	return ed.parseStringField(readRunes(0, 4, ed.IndividualName))
 }
 
 // CATXReceivingCompanyField is used in CTX and ATX files, characters 5-20 of underlying IndividualName field
@@ -597,12 +597,12 @@ func (ed *EntryDetail) CATXReceivingCompanyField() string {
 	if utf8.RuneCountInString(ed.IndividualName) < 4 {
 		return ""
 	}
-	return ed.IndividualName[4:]
+	return readRunes(4, 18, ed.IndividualName)
 }
 
 // CATXReservedField is used in CTX and ATX files, characters 21-22 of underlying IndividualName field
 func (ed *EntryDetail) CATXReservedField() string {
-	return ed.IndividualName[20:22]
+	return readRunes(20, 22, ed.IndividualName)
 }
 
 // DiscretionaryDataField returns a space padded string of DiscretionaryData
@@ -645,12 +645,12 @@ func (ed *EntryDetail) SetItemTypeIndicator(s string) {
 
 // ProcessControlField getter for TRC Process Control Field characters 1-6 of underlying IndividualName
 func (ed *EntryDetail) ProcessControlField() string {
-	return ed.parseStringField(ed.IndividualName[0:6])
+	return ed.parseStringField(readRunes(0, 6, ed.IndividualName))
 }
 
 // ItemResearchNumber getter for TRC Item Research Number characters 7-22 of underlying IndividualName
 func (ed *EntryDetail) ItemResearchNumber() string {
-	return ed.parseStringField(ed.IndividualName[6:22])
+	return ed.parseStringField(readRunes(7, 16, ed.IndividualName))
 }
 
 // ItemTypeIndicator getter for TRC Item Type Indicator which is underlying Discretionary Data

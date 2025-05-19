@@ -332,9 +332,7 @@ func BenchmarkBatchPOPCheckSerialNumberField(b *testing.B) {
 func testBatchPOPTerminalCityField(t testing.TB) {
 	mockBatch := mockBatchPOP(t)
 	tc := mockBatch.Entries[0].POPTerminalCityField()
-	if tc != "PHIL" {
-		t.Error("TerminalCity is invalid")
-	}
+	require.Equal(t, "PHIL", tc)
 }
 
 // TestBatchPOPTerminalCityField tests validating POPTerminalCity characters 10-13 of underlying BatchPOP
