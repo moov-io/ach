@@ -1,3 +1,14 @@
+## v1.49.0 (Released 2025-05-19)
+
+ADDITIONS
+
+- feat: add InvalidEntries() to each batch type
+
+IMPROVEMENTS
+
+- cmd/achcli/describe: include IdentificationNumber on EntryDetail, add mask option
+- fix: index and read fields on EntryDetail in a safer way
+
 ## v1.48.1 (Released 2025-05-16)
 
 IMPROVEMENTS
