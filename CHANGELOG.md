@@ -1,3 +1,9 @@
+## v1.49.1 (Released 2025-05-22)
+
+IMPROVEMENTS
+
+- fix: nil guard around Addenda02.TerminalState
+
 ## v1.49.0 (Released 2025-05-19)
 
 ADDITIONS
