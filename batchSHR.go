@@ -133,11 +133,13 @@ func (batch *BatchSHR) InvalidEntries() []InvalidEntry {
 			})
 		}
 		if entry.Category == CategoryForward {
-			if !usabbrev.Valid(entry.Addenda02.TerminalState) {
-				out = append(out, InvalidEntry{
-					Entry: entry,
-					Error: batch.Error("TerminalState", ErrValidState, entry.Addenda02.TerminalState),
-				})
+			if entry.Addenda02 != nil {
+				if !usabbrev.Valid(entry.Addenda02.TerminalState) {
+					out = append(out, InvalidEntry{
+						Entry: entry,
+						Error: batch.Error("TerminalState", ErrValidState, entry.Addenda02.TerminalState),
+					})
+				}
 			}
 		}
 	}
