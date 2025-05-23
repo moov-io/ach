@@ -40,6 +40,10 @@ func NewBatchADV(bh *BatchHeader) *BatchADV {
 //
 // Validate will never modify the batch.
 func (batch *BatchADV) Validate() error {
+	if batch.validateOpts != nil && batch.validateOpts.SkipAll {
+		return nil
+	}
+
 	if batch.Header.StandardEntryClassCode != ADV {
 		return batch.Error("StandardEntryClassCode", ErrBatchSECType, ADV)
 	}

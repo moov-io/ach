@@ -46,6 +46,10 @@ func NewBatchDNE(bh *BatchHeader) *BatchDNE {
 
 // Validate ensures the batch meets NACHA rules specific to this batch type.
 func (batch *BatchDNE) Validate() error {
+	if batch.validateOpts != nil && batch.validateOpts.SkipAll {
+		return nil
+	}
+
 	if err := batch.verify(); err != nil {
 		return err
 	}

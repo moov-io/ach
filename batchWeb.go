@@ -35,6 +35,10 @@ func NewBatchWEB(bh *BatchHeader) *BatchWEB {
 
 // Validate ensures the batch meets NACHA rules specific to this batch type.
 func (batch *BatchWEB) Validate() error {
+	if batch.validateOpts != nil && batch.validateOpts.SkipAll {
+		return nil
+	}
+
 	// basic verification of the batch before we validate specific rules.
 	if err := batch.verify(); err != nil {
 		return err
