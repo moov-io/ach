@@ -227,6 +227,49 @@ func TestValidators__isAlphanumericExamples(t *testing.T) {
 	})
 }
 
+func TestValidators__isNonZero(t *testing.T) {
+	v := &validator{}
+
+	cases := []struct {
+		input string
+		err   error
+	}{
+		{
+			input: "",
+			err:   ErrOnlyZeros,
+		},
+		{
+			input: " ",
+			err:   ErrOnlyZeros,
+		},
+		{
+			input: "0",
+			err:   ErrOnlyZeros,
+		},
+		{
+			input: "0 0",
+			err:   ErrOnlyZeros,
+		},
+		{
+			input: "    000   ",
+			err:   ErrOnlyZeros,
+		},
+		// Valid cases
+		{input: "abc"},
+		{input: "000 123 a "},
+	}
+	for _, tc := range cases {
+		t.Run(tc.input, func(t *testing.T) {
+			err := v.isNonZero(tc.input)
+			if tc.err == nil {
+				require.NoError(t, err)
+			} else {
+				require.ErrorIs(t, tc.err, ErrOnlyZeros)
+			}
+		})
+	}
+}
+
 func TestValidators__validateJulianDay(t *testing.T) {
 	empty := "   "
 	cases := map[string]string{
