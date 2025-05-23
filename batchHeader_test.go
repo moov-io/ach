@@ -269,6 +269,27 @@ func BenchmarkBatchHeaderFieldInclusion(b *testing.B) {
 	}
 }
 
+func TestBatchHeader_CompanyIdentificationZeros(t *testing.T) {
+	bh := mockBatchHeader()
+	bh.CompanyIdentification = strings.Repeat("0", 10)
+	err := bh.Validate()
+	require.ErrorContains(t, err, "CompanyIdentification 0000000000 contains only spaces and zeros")
+}
+
+func TestBatchHeader_CompanyNameZeros(t *testing.T) {
+	bh := mockBatchHeader()
+	bh.CompanyName = "000  000"
+	err := bh.Validate()
+	require.ErrorContains(t, err, "CompanyName 000  000 contains only spaces and zeros")
+}
+
+func TestBatchHeader_CompanyEntryDescriptionZeros(t *testing.T) {
+	bh := mockBatchHeader()
+	bh.CompanyEntryDescription = "  000  "
+	err := bh.Validate()
+	require.ErrorContains(t, err, "CompanyEntryDescription   000   contains only spaces and zeros")
+}
+
 // testBatchHeaderCompanyNameAlphaNumeric validates batch header company name is alphanumeric
 func testBatchHeaderCompanyNameAlphaNumeric(t testing.TB) {
 	bh := mockBatchHeader()

@@ -25,6 +25,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 	"unicode/utf8"
 )
 
@@ -433,6 +434,20 @@ func (v *validator) isAlphanumeric(s string) error {
 		return fmt.Errorf("%w: %c", ErrNonAlphanumeric, r)
 	}
 	return nil
+}
+
+var (
+	ErrOnlyZeros = errors.New("contains only spaces and zeros")
+)
+
+// isNonZero checks if a string is not blank and non-zero
+func (v *validator) isNonZero(s string) error {
+	for _, r := range s {
+		if !unicode.IsSpace(r) && r != '0' {
+			return nil
+		}
+	}
+	return ErrOnlyZeros
 }
 
 // CalculateCheckDigit returns a check digit for a routing number

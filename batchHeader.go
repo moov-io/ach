@@ -316,13 +316,25 @@ func (bh *BatchHeader) Validate() error {
 		if err := bh.isAlphanumeric(bh.CompanyName); err != nil {
 			return fieldError("CompanyName", err, bh.CompanyName)
 		}
+		if err := bh.isNonZero(bh.CompanyName); err != nil {
+			return fieldError("CompanyName", err, bh.CompanyName)
+		}
+
 		if err := bh.isAlphanumeric(bh.CompanyDiscretionaryData); err != nil {
 			return fieldError("CompanyDiscretionaryData", err, bh.CompanyDiscretionaryData)
 		}
+
 		if err := bh.isAlphanumeric(bh.CompanyIdentification); err != nil {
 			return fieldError("CompanyIdentification", err, bh.CompanyIdentification)
 		}
+		if err := bh.isNonZero(bh.CompanyIdentification); err != nil {
+			return fieldError("CompanyIdentification", err, bh.CompanyIdentification)
+		}
+
 		if err := bh.isAlphanumeric(bh.CompanyEntryDescription); err != nil {
+			return fieldError("CompanyEntryDescription", err, bh.CompanyEntryDescription)
+		}
+		if err := bh.isNonZero(bh.CompanyEntryDescription); err != nil {
 			return fieldError("CompanyEntryDescription", err, bh.CompanyEntryDescription)
 		}
 	}

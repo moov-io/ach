@@ -29,6 +29,8 @@ var (
 	ErrFileHeader = errors.New("none or more than one file headers exists")
 	// ErrFileControl is the error given if there is the wrong number of file control records
 	ErrFileControl = errors.New("none or more than one file control exists")
+	// ErrMisplacedFileHeader is the error given when a file header is the non-first record
+	ErrMisplacedFileHeader = errors.New("file header is not the first record")
 	// ErrFileEntryOutsideBatch is the error given if an entry is outside of a batch
 	ErrFileEntryOutsideBatch = errors.New("entry outside of batch")
 	// ErrFileAddendaOutsideBatch is the error given if an addenda is outside of a batch
