@@ -504,6 +504,10 @@ func (r *Reader) parseEDAddenda() error {
 
 // parseFileHeader takes the input record string and parses the FileHeaderRecord values
 func (r *Reader) parseFileHeader() error {
+	if r.currentBatch != nil || len(r.File.Batches) > 0 || len(r.File.IATBatches) > 0 {
+		return r.parseError(ErrMisplacedFileHeader)
+	}
+
 	r.recordName = "FileHeader"
 	// Pass through any ValidateOpts from the Reader for this comparison
 	// as we need to compare the other struct fields (e.g. origin, destination)
