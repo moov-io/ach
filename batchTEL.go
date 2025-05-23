@@ -37,6 +37,10 @@ func NewBatchTEL(bh *BatchHeader) *BatchTEL {
 
 // Validate ensures the batch meets NACHA rules specific to the SEC type TEL
 func (batch *BatchTEL) Validate() error {
+	if batch.validateOpts != nil && batch.validateOpts.SkipAll {
+		return nil
+	}
+
 	// basic verification of the batch before we validate specific rules.
 	if err := batch.verify(); err != nil {
 		return err

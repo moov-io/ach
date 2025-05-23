@@ -2163,7 +2163,7 @@ func TestReadFile_SkipValidation(t *testing.T) {
 		t.Errorf("got: %v, want: %v (batched length)", len(f.Batches), 3)
 	} else {
 		for _, batch := range f.Batches {
-			require.Error(t, batch.Validate())
+			require.NoError(t, batch.Validate())
 		}
 	}
 
