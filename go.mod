@@ -6,7 +6,7 @@ toolchain go1.24.3
 
 require (
 	github.com/Pallinder/go-randomdata v1.2.0
-	github.com/aws/aws-lambda-go v1.48.0
+	github.com/aws/aws-lambda-go v1.49.0
 	github.com/go-kit/kit v0.13.0
 	github.com/go-kit/log v0.2.1
 	github.com/gorilla/mux v1.8.1
