@@ -1,3 +1,17 @@
+## v1.49.2 (Released 2025-06-02)
+
+IMPROVEMENTS
+
+- batch: check SkipAll inside Validate()
+- fix: ensure CompanyName, CompanyIdentification, and CompanyEntryDescription are non-zero
+- fix: reject FileHeader records inside files/batches
+- fuzz: add another InvalidBatches crasher
+
+BUILD
+
+- chore(deps): update ossf/scorecard-action action to v2.4.2 (#1603)
+- fix(deps): update module github.com/aws/aws-lambda-go to v1.49.0
+
 ## v1.49.1 (Released 2025-05-22)
 
 IMPROVEMENTS
