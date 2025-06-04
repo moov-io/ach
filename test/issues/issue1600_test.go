@@ -55,19 +55,13 @@ func TestIssue1600(t *testing.T) {
 		})
 
 		t.Run("1k8RecordFollowing9Record.txt", func(t *testing.T) {
-			file, err := ach.ReadFile(filepath.Join("testdata", "issue1600", "1e5RecordBefore1or8.txt"))
-			require.ErrorAs(t, err, &ach.ErrMisplacedFileHeader)
-
-			err = file.Create()
-			require.ErrorContains(t, err, "ImmediateDestination            is a mandatory field")
-
-			err = file.Validate()
-			require.ErrorContains(t, err, "ImmediateDestination            is a mandatory field")
-
-			var buf bytes.Buffer
-			err = ach.NewWriter(&buf).Write(file)
-			require.ErrorContains(t, err, "ImmediateDestination            is a mandatory field")
-			require.Equal(t, 0, buf.Len())
+			_, err := ach.ReadFile(filepath.Join("testdata", "issue1600", "1k8RecordFollowing9Record.txt"))
+			require.ErrorAs(t, err, &ach.ErrExtraRecordsAfterFileControl)
 		})
+	})
+}
+
+
+
 	})
 }
