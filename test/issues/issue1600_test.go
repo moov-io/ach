@@ -61,7 +61,32 @@ func TestIssue1600(t *testing.T) {
 	})
 }
 
+func TestIssue1600_TEL_Validate(t *testing.T) {
+	t.Run("3fTELIndvNameAllBlank.txt", func(t *testing.T) {
+		file, err := ach.ReadFile(filepath.Join("testdata", "issue1600", "3fTELIndvNameAllBlank.txt"))
+		require.ErrorAs(t, err, &ach.ErrOnlyZeros)
 
+		for idx := range file.Batches {
+			bh := file.Batches[idx].GetHeader()
 
+			if bh.StandardEntryClassCode == ach.TEL {
+				err := file.Batches[idx].Validate()
+				require.ErrorAs(t, err, &ach.ErrOnlyZeros)
+			}
+		}
+	})
+
+	t.Run("3fTELIndvNameAllZeros.txt", func(t *testing.T) {
+		file, err := ach.ReadFile(filepath.Join("testdata", "issue1600", "3fTELIndvNameAllZeros.txt"))
+		require.ErrorAs(t, err, &ach.ErrOnlyZeros)
+
+		for idx := range file.Batches {
+			bh := file.Batches[idx].GetHeader()
+
+			if bh.StandardEntryClassCode == ach.TEL {
+				err := file.Batches[idx].Validate()
+				require.ErrorAs(t, err, &ach.ErrOnlyZeros)
+			}
+		}
 	})
 }

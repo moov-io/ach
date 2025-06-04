@@ -594,6 +594,15 @@ func (batch *Batch) isFieldInclusion() error {
 				return err
 			}
 
+			// Some SEC codes require IndividualName is non-blank (and non-zeros)
+			switch batch.Header.StandardEntryClassCode {
+			case ARC, BOC, CIE, DNE, ENR, MTE, POP, POS, PPD, RCK, SHR, TEL, WEB:
+				// Verify IndividualName is populated
+				if err := entry.isNonZero(entry.IndividualName); err != nil {
+					return fieldError("IndividualName", err, entry.IndividualName)
+				}
+			}
+
 			if entry.Addenda02 != nil {
 				if err := entry.Addenda02.Validate(); err != nil {
 					return err
