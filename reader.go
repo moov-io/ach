@@ -388,6 +388,16 @@ func (r *Reader) processFixedWidthFile(line string) error {
 }
 
 func (r *Reader) parseLine() error {
+	// Break once we encounter padding records
+	if r.line[:2] == "99" {
+		return nil
+	}
+	// Reject everything after a FileControl is found
+	if r.File.Control.LineNumber > 0 {
+		return r.parseError(ErrExtraRecordsAfterFileControl)
+	}
+
+	// Parse the line
 	switch r.line[:1] {
 	case fileHeaderPos:
 		if err := r.parseFileHeader(); err != nil {
@@ -447,10 +457,6 @@ func (r *Reader) parseLine() error {
 			}
 		}
 	case fileControlPos:
-		if r.line[:2] == "99" {
-			// final blocking padding
-			break
-		}
 		if err := r.parseFileControl(); err != nil {
 			return err
 		}

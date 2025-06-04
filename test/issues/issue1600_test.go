@@ -2,6 +2,7 @@ package issues
 
 import (
 	"bytes"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -55,19 +56,52 @@ func TestIssue1600(t *testing.T) {
 		})
 
 		t.Run("1k8RecordFollowing9Record.txt", func(t *testing.T) {
-			file, err := ach.ReadFile(filepath.Join("testdata", "issue1600", "1e5RecordBefore1or8.txt"))
-			require.ErrorAs(t, err, &ach.ErrMisplacedFileHeader)
-
-			err = file.Create()
-			require.ErrorContains(t, err, "ImmediateDestination            is a mandatory field")
-
-			err = file.Validate()
-			require.ErrorContains(t, err, "ImmediateDestination            is a mandatory field")
-
-			var buf bytes.Buffer
-			err = ach.NewWriter(&buf).Write(file)
-			require.ErrorContains(t, err, "ImmediateDestination            is a mandatory field")
-			require.Equal(t, 0, buf.Len())
+			_, err := ach.ReadFile(filepath.Join("testdata", "issue1600", "1k8RecordFollowing9Record.txt"))
+			require.ErrorAs(t, err, &ach.ErrExtraRecordsAfterFileControl)
 		})
+	})
+}
+
+func TestIssue1600_TEL_Validate(t *testing.T) {
+	t.Run("3fTELIndvNameAllBlank.txt", func(t *testing.T) {
+		file, err := ach.ReadFile(filepath.Join("testdata", "issue1600", "3fTELIndvNameAllBlank.txt"))
+		require.ErrorAs(t, err, &ach.ErrOnlyZeros)
+
+		for idx := range file.Batches {
+			bh := file.Batches[idx].GetHeader()
+
+			if bh.StandardEntryClassCode == ach.TEL {
+				err := file.Batches[idx].Validate()
+				require.ErrorAs(t, err, &ach.ErrOnlyZeros)
+			}
+		}
+	})
+
+	t.Run("3fTELIndvNameAllZeros.txt", func(t *testing.T) {
+		file, err := ach.ReadFile(filepath.Join("testdata", "issue1600", "3fTELIndvNameAllZeros.txt"))
+		require.ErrorAs(t, err, &ach.ErrOnlyZeros)
+
+		for idx := range file.Batches {
+			bh := file.Batches[idx].GetHeader()
+
+			if bh.StandardEntryClassCode == ach.TEL {
+				err := file.Batches[idx].Validate()
+				require.ErrorAs(t, err, &ach.ErrOnlyZeros)
+			}
+		}
+	})
+
+	t.Run("AllowEmptyIndividualName", func(t *testing.T) {
+		bs, err := os.ReadFile(filepath.Join("testdata", "issue1600", "3fTELIndvNameAllBlank.txt"))
+		require.NoError(t, err)
+
+		rdr := ach.NewReader(bytes.NewReader(bs))
+		rdr.SetValidation(&ach.ValidateOpts{
+			AllowEmptyIndividualName: true,
+		})
+
+		file, err := rdr.Read()
+		require.NoError(t, err)
+		require.NotNil(t, file)
 	})
 }
