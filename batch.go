@@ -598,8 +598,10 @@ func (batch *Batch) isFieldInclusion() error {
 			switch batch.Header.StandardEntryClassCode {
 			case ARC, BOC, CIE, DNE, ENR, MTE, POP, POS, PPD, RCK, SHR, TEL, WEB:
 				// Verify IndividualName is populated
-				if err := entry.isNonZero(entry.IndividualName); err != nil {
-					return fieldError("IndividualName", err, entry.IndividualName)
+				if batch.validateOpts == nil || !batch.validateOpts.AllowEmptyIndividualName {
+					if err := entry.isNonZero(entry.IndividualName); err != nil {
+						return fieldError("IndividualName", err, entry.IndividualName)
+					}
 				}
 			}
 

@@ -101,6 +101,10 @@ AllowZeroEntryAmount bool `json:"allowZeroEntryAmount"`
 
 // AllowSpecialCharacters will permit a wider range of UTF-8 characters in alphanumeric fields
 AllowSpecialCharacters bool `json:"allowSpecialCharacters"`
+
+// AllowEmptyIndividualName will skip verifying IndividualName fields are populated
+// for SEC codes that require the field to be non-blank (and non-zero)
+AllowEmptyIndividualName bool `json:"allowEmptyIndividualName"`
 ```
 
 ### File Header

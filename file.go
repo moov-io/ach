@@ -753,6 +753,10 @@ type ValidateOpts struct {
 
 	// AllowSpecialCharacters will permit a wider range of UTF-8 characters in alphanumeric fields
 	AllowSpecialCharacters bool `json:"allowSpecialCharacters"`
+
+	// AllowEmptyIndividualName will skip verifying IndividualName fields are populated
+	// for SEC codes that require the field to be non-blank (and non-zero)
+	AllowEmptyIndividualName bool `json:"allowEmptyIndividualName"`
 }
 
 // merge will combine two ValidateOpts structs and keep any non-zero field values.
@@ -784,6 +788,7 @@ func (v *ValidateOpts) merge(other *ValidateOpts) *ValidateOpts {
 		AllowInvalidAmounts:              v.AllowInvalidAmounts || other.AllowInvalidAmounts,
 		AllowZeroEntryAmount:             v.AllowZeroEntryAmount || other.AllowZeroEntryAmount,
 		AllowSpecialCharacters:           v.AllowSpecialCharacters || other.AllowSpecialCharacters,
+		AllowEmptyIndividualName:         v.AllowEmptyIndividualName || other.AllowEmptyIndividualName,
 	}
 
 	if v.CheckTransactionCode != nil {

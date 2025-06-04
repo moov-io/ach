@@ -2,6 +2,7 @@ package issues
 
 import (
 	"bytes"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -88,5 +89,19 @@ func TestIssue1600_TEL_Validate(t *testing.T) {
 				require.ErrorAs(t, err, &ach.ErrOnlyZeros)
 			}
 		}
+	})
+
+	t.Run("AllowEmptyIndividualName", func(t *testing.T) {
+		bs, err := os.ReadFile(filepath.Join("testdata", "issue1600", "3fTELIndvNameAllBlank.txt"))
+		require.NoError(t, err)
+
+		rdr := ach.NewReader(bytes.NewReader(bs))
+		rdr.SetValidation(&ach.ValidateOpts{
+			AllowEmptyIndividualName: true,
+		})
+
+		file, err := rdr.Read()
+		require.NoError(t, err)
+		require.NotNil(t, file)
 	})
 }
