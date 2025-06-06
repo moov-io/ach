@@ -2,7 +2,7 @@ module github.com/moov-io/ach
 
 go 1.23.0
 
-toolchain go1.24.3
+toolchain go1.24.4
 
 require (
 	github.com/Pallinder/go-randomdata v1.2.0
@@ -17,9 +17,9 @@ require (
 	github.com/moov-io/iso4217 v0.3.2
 	github.com/prometheus/client_golang v1.22.0
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/net v0.40.0
-	golang.org/x/sync v0.14.0
-	golang.org/x/text v0.25.0
+	golang.org/x/net v0.41.0
+	golang.org/x/sync v0.15.0
+	golang.org/x/text v0.26.0
 )
 
 require (
