@@ -105,3 +105,20 @@ func TestIssue1600_TEL_Validate(t *testing.T) {
 		require.NotNil(t, file)
 	})
 }
+
+func TestIssue1600_FormatCode(t *testing.T) {
+	bs, err := os.ReadFile(filepath.Join("testdata", "issue1600", "1qFormatCodeIncorrect.txt"))
+	require.NoError(t, err)
+
+	rdr := ach.NewReader(bytes.NewReader(bs))
+	rdr.SetValidation(&ach.ValidateOpts{
+		SkipAll: false,
+	})
+
+	file, err := rdr.Read()
+	require.ErrorAs(t, err, &ach.ErrFormatCode)
+	require.Equal(t, "011000015", file.Header.ImmediateOrigin)
+
+	err = file.Header.Validate()
+	require.ErrorAs(t, err, &ach.ErrFormatCode)
+}
