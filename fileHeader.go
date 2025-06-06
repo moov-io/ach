@@ -147,7 +147,7 @@ func (fh *FileHeader) Parse(record string) {
 	// 38-39 always "10"
 	fh.blockingFactor = "10"
 	// 40 always "1"
-	fh.formatCode = "1"
+	fh.formatCode = fh.parseStringField(string(runes[39:40]))
 	// 41-63 The name of the ODFI. example "SILICON VALLEY BANK    "
 	fh.ImmediateDestinationName = fh.parseStringFieldWithOpts(string(runes[40:63]), fh.validateOpts)
 	// 64-86 ACH operator or sending point that is sending the file
