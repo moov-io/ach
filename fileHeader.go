@@ -83,7 +83,7 @@ type FileHeader struct {
 
 	// FormatCode a code to allow for future format variations. As
 	// currently defined, this field will contain a value of "1".
-	formatCode string
+	FormatCode string
 
 	// ImmediateDestinationName us the name of the ACH or receiving point for which that
 	// file is destined. Name corresponding to the ImmediateDestination
@@ -114,7 +114,7 @@ func NewFileHeader() FileHeader {
 		FileIDModifier: "A",
 		recordSize:     "094",
 		blockingFactor: "10",
-		formatCode:     "1",
+		FormatCode:     "1",
 	}
 	return fh
 }
@@ -147,7 +147,7 @@ func (fh *FileHeader) Parse(record string) {
 	// 38-39 always "10"
 	fh.blockingFactor = "10"
 	// 40 always "1"
-	fh.formatCode = fh.parseStringField(string(runes[39:40]))
+	fh.FormatCode = fh.parseStringField(string(runes[39:40]))
 	// 41-63 The name of the ODFI. example "SILICON VALLEY BANK    "
 	fh.ImmediateDestinationName = fh.parseStringFieldWithOpts(string(runes[40:63]), fh.validateOpts)
 	// 64-86 ACH operator or sending point that is sending the file
@@ -178,7 +178,7 @@ func (fh *FileHeader) String() string {
 	buf.WriteString(fh.FileIDModifier)
 	buf.WriteString(fh.recordSize)
 	buf.WriteString(fh.blockingFactor)
-	buf.WriteString(fh.formatCode)
+	buf.WriteString(fh.FormatCode)
 	buf.WriteString(fh.ImmediateDestinationNameField())
 	buf.WriteString(fh.ImmediateOriginNameField())
 	buf.WriteString(fh.ReferenceCodeField())
@@ -228,8 +228,8 @@ func (fh *FileHeader) ValidateWith(opts *ValidateOpts) error {
 	if fh.blockingFactor != "10" {
 		return fieldError("blockingFactor", ErrBlockingFactor, fh.blockingFactor)
 	}
-	if fh.formatCode != "1" {
-		return fieldError("formatCode", ErrFormatCode, fh.formatCode)
+	if fh.FormatCode != "1" {
+		return fieldError("FormatCode", ErrFormatCode, fh.FormatCode)
 	}
 	if !opts.BypassOriginValidation {
 		if fh.ImmediateOrigin == zeroRoutingNumber9 || fh.ImmediateOrigin == zeroRoutingNumber10 {
@@ -294,8 +294,8 @@ func (fh *FileHeader) fieldInclusion() error {
 	if fh.blockingFactor == "" {
 		return fieldError("blockingFactor", ErrConstructor, fh.blockingFactor)
 	}
-	if fh.formatCode == "" {
-		return fieldError("formatCode", ErrConstructor, fh.formatCode)
+	if fh.FormatCode == "" {
+		return fieldError("FormatCode", ErrConstructor, fh.FormatCode)
 	}
 	return nil
 }

@@ -230,8 +230,8 @@ func parseFileHeader(t testing.TB) {
 	if record.blockingFactor != "10" {
 		t.Errorf("BlockingFactor Expected '10' got:'%v'", record.blockingFactor)
 	}
-	if record.formatCode != "1" {
-		t.Errorf("FormatCode Expected '1' got:'%v'", record.formatCode)
+	if record.FormatCode != "1" {
+		t.Errorf("FormatCode Expected '1' got:'%v'", record.FormatCode)
 	}
 	if record.ImmediateDestinationNameField() != "achdestname            " {
 		t.Errorf("ImmediateDestinationName Expected 'achdestname           ' got:'%v'", record.ImmediateDestinationNameField())
@@ -353,7 +353,7 @@ func BenchmarkBlockingFactor(b *testing.B) {
 // testFormatCode validates format code is "1"
 func testFormatCode(t testing.TB) {
 	fh := mockFileHeader()
-	fh.formatCode = "2"
+	fh.FormatCode = "2"
 	err := fh.Validate()
 	if !base.Match(err, ErrFormatCode) {
 		t.Errorf("%T: %s", err, err)
@@ -596,7 +596,7 @@ func BenchmarkFHFieldInclusionBlockingFactor(b *testing.B) {
 // testFHFieldInclusionFormatCode validates format code field inclusion
 func testFHFieldInclusionFormatCode(t testing.TB) {
 	fh := mockFileHeader()
-	fh.formatCode = ""
+	fh.FormatCode = ""
 	err := fh.Validate()
 	if !base.Match(err, ErrConstructor) {
 		t.Errorf("%T: %s", err, err)
