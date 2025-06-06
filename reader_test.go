@@ -419,6 +419,15 @@ func BenchmarkTwoFileHeaders(b *testing.B) {
 	}
 }
 
+func TestFileControl_RTF(t *testing.T) {
+	bs, err := os.ReadFile(filepath.Join("test", "testdata", "file_header_control.rtf"))
+	require.NoError(t, err)
+
+	file, err := NewReader(bytes.NewReader(bs)).Read()
+	require.ErrorAs(t, err, &ErrFileControl)
+	require.Equal(t, "", file.Header.ImmediateOrigin)
+}
+
 // testTwoFileControls validates one file control
 func testTwoFileControls(t testing.TB) {
 	var line = "9000001000001000000010005320001000000010500000000000000                                       "
@@ -1643,17 +1652,13 @@ func TestADVInvalidBatchEntries(t *testing.T) {
 
 // TestADVNoFileControl validates error when reading an invalid ADV file with no FileControl
 func TestADVNoFileControl(t *testing.T) {
-	f, err := os.Open(filepath.Join("test", "testdata", "adv-noFileControl.ach"))
-	if err != nil {
-		t.Errorf("%T: %s", err, err)
-	}
-	defer f.Close()
-	r := NewReader(f)
-	_, err = r.Read()
+	bs, err := os.ReadFile(filepath.Join("test", "testdata", "adv-noFileControl.ach"))
+	require.NoError(t, err)
 
-	if !base.Has(err, ErrFileControl) {
-		t.Errorf("%T: %s", err, err)
-	}
+	file, err := NewReader(bytes.NewReader(bs)).Read()
+	require.ErrorAs(t, err, &ErrFileControl)
+
+	require.Equal(t, "121042882", file.Header.ImmediateOrigin)
 }
 
 func TestADVCategoryReturn(t *testing.T) {
