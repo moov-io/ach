@@ -1,3 +1,18 @@
+## v1.50.0 (Released 2025-06-09)
+
+ADDITIONS
+
+- feat: make FormatCode public
+- fix: read FormatCode into FileHeader and validate
+
+IMPROVEMENTS
+
+- feat: add AllowEmptyIndividualName
+- fix: reject records after FileControl is parsed
+- fix: ensure IndividualName is populated (non-blank, non-zero) for some SEC codes
+- test: trying out .rtf file
+- test: checking out missing_file_control.rtf
+
 ## v1.49.2 (Released 2025-06-02)
 
 IMPROVEMENTS
