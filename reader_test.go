@@ -420,12 +420,23 @@ func BenchmarkTwoFileHeaders(b *testing.B) {
 }
 
 func TestFileControl_RTF(t *testing.T) {
-	bs, err := os.ReadFile(filepath.Join("test", "testdata", "file_header_control.rtf"))
-	require.NoError(t, err)
+	t.Run("file_header_control.rtf", func(t *testing.T) {
+		bs, err := os.ReadFile(filepath.Join("test", "testdata", "file_header_control.rtf"))
+		require.NoError(t, err)
 
-	file, err := NewReader(bytes.NewReader(bs)).Read()
-	require.ErrorAs(t, err, &ErrFileControl)
-	require.Equal(t, "", file.Header.ImmediateOrigin)
+		file, err := NewReader(bytes.NewReader(bs)).Read()
+		require.ErrorAs(t, err, &ErrFileControl)
+		require.Equal(t, "", file.Header.ImmediateOrigin)
+	})
+
+	t.Run("missing_file_control.rtf", func(t *testing.T) {
+		bs, err := os.ReadFile(filepath.Join("test", "testdata", "missing_file_control.rtf"))
+		require.NoError(t, err)
+
+		file, err := NewReader(bytes.NewReader(bs)).Read()
+		require.ErrorAs(t, err, &ErrFileControl)
+		require.Equal(t, "", file.Header.ImmediateOrigin)
+	})
 }
 
 // testTwoFileControls validates one file control
