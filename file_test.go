@@ -2241,3 +2241,14 @@ func TestFile_FlattenBatches_PreservesFileIDModifier(t *testing.T) {
 		t.Errorf("FileIDModifier not preserved: want 'B' got %s", flattened.Header.FileIDModifier)
 	}
 }
+
+func TestFileFromJSON_10DigitOrigin(t *testing.T) {
+	bs, err := os.ReadFile(filepath.Join("test", "testdata", "origin10-digits.json"))
+	require.NoError(t, err)
+
+	file, err := FileFromJSON(bs)
+	require.NoError(t, err)
+
+	require.Equal(t, "B231380104", file.Header.ImmediateDestination)
+	require.Equal(t, "A121042882", file.Header.ImmediateOrigin)
+}
