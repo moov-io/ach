@@ -2220,6 +2220,27 @@ func TestFileFromJSON_ValidateOpts(t *testing.T) {
 	require.True(t, validateOpts.PreserveSpaces)
 }
 
+func TestFileUnmarshal_MergeValidateOpts(t *testing.T) {
+	// Create a file, set some validate opts and then unmarhsal, merging the validate opts
+	file := NewFile()
+	file.SetValidation(&ValidateOpts{
+		AllowUnorderedBatchNumbers: true,
+	})
+
+	bs, err := os.ReadFile(filepath.Join("test", "testdata", "bypass.json"))
+	require.NoError(t, err)
+
+	err = json.Unmarshal(bs, file)
+	require.NoError(t, err)
+
+	opts := file.GetValidation()
+	require.NotNil(t, opts)
+	require.True(t, opts.PreserveSpaces)
+	require.True(t, opts.BypassOriginValidation)
+	require.True(t, opts.AllowUnorderedBatchNumbers)
+	require.False(t, opts.AllowInvalidAmounts)
+}
+
 func TestFile_FlattenBatches_PreservesFileIDModifier(t *testing.T) {
 	f := NewFile()
 	f.SetHeader(mockFileHeader())
