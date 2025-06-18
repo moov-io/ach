@@ -234,14 +234,14 @@ func (f *File) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON parses a JSON blob with ach.FileFromJSON
 func (f *File) UnmarshalJSON(p []byte) error {
-	if f.validateOpts == nil {
-		opts, err := readValidateOpts(p)
-		if err != nil {
-			return err
-		}
-		f.SetValidation(opts)
+	// merge any validate opts with the current file
+	opts, err := readValidateOpts(p)
+	if err != nil {
+		return err
 	}
+	f.SetValidation(f.validateOpts.merge(opts))
 
+	// Read the file
 	file, err := FileFromJSONWith(p, f.validateOpts)
 	if err != nil {
 		return err
