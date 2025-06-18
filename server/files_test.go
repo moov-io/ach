@@ -1442,3 +1442,55 @@ func TestFiles__flattenFileEndpointError(t *testing.T) {
 		t.Errorf("resp.Err=%q", resp.Err)
 	}
 }
+
+func TestFiles_MergeFiles(t *testing.T) {
+	logger := log.NewTestLogger()
+	repo := NewRepositoryInMemory(testTTLDuration, logger)
+	svc := NewService(repo)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewLogfmtLogger(os.Stdout))
+
+	// Write a file into the repository
+	file, err := ach.ReadJSONFile(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-valid.json"))
+	require.NoError(t, err)
+
+	file.ID = base.ID()
+
+	err = repo.StoreFile(file)
+	require.NoError(t, err)
+
+	// Merge this with another file
+	file2, err := ach.ReadJSONFile(filepath.Join("..", "test", "testdata", "ppd-valid.json"))
+	require.NoError(t, err)
+
+	var body bytes.Buffer
+	err = json.NewEncoder(&body).Encode(mergeFilesRequest{
+		FileIDs: []string{file.ID},
+		Files:   []*ach.File{file2},
+	})
+	req := httptest.NewRequest("POST", "/merge", &body)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusOK, w.Code)
+
+	var resp mergeFilesResponse
+	err = json.NewDecoder(w.Body).Decode(&resp)
+	require.NoError(t, err)
+
+	require.Len(t, resp.Files, 1)
+
+	// Check the file
+	merged := resp.Files[0]
+	require.Len(t, merged.Batches, 2)
+
+	var foundEntries int
+	for idx := range merged.Batches {
+		foundEntries += len(merged.Batches[idx].GetEntries())
+	}
+	require.Equal(t, 3, foundEntries)
+
+	require.Equal(t, 100000, merged.Control.TotalDebitEntryDollarAmountInFile)
+	require.Equal(t, 200000, merged.Control.TotalCreditEntryDollarAmountInFile)
+}
