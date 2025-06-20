@@ -19,6 +19,8 @@ package server
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -65,6 +67,8 @@ type Service interface {
 	GetBatches(fileID string) []ach.Batcher
 	// DeleteBatch takes a fileID and BatchID and removes the batch from the file
 	DeleteBatch(fileID string, batchID string) error
+	// MergeFiles will combine all the given files together
+	MergeFiles(fileIDs []string, files []*ach.File) ([]*ach.File, error)
 }
 
 // service a concrete implementation of the service.
@@ -261,4 +265,38 @@ func (s *service) FlattenBatches(fileID string) (*ach.File, error) {
 		return nil, err
 	}
 	return ff, err
+}
+
+func (s *service) MergeFiles(fileIDs []string, files []*ach.File) ([]*ach.File, error) {
+	for idx := range fileIDs {
+		file, err := s.store.FindFile(fileIDs[idx])
+		if err != nil {
+			return nil, fmt.Errorf("file not found: %v", fileIDs[idx])
+		}
+
+		files = append(files, file)
+	}
+
+	merged, err := ach.MergeFiles(files)
+	if err != nil {
+		return nil, fmt.Errorf("merging files: %w", err)
+	}
+
+	for idx := range merged {
+		var buf bytes.Buffer
+		err := ach.NewWriter(&buf).Write(merged[idx])
+		if err != nil {
+			return nil, fmt.Errorf("problem hashing merged file: %w", err)
+		}
+
+		merged[idx].ID = hash(buf.Bytes())
+	}
+
+	return merged, nil
+}
+
+func hash(data []byte) string {
+	ss := sha256.New()
+	ss.Write(data)
+	return hex.EncodeToString(ss.Sum(nil))
 }

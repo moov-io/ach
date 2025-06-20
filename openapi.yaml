@@ -744,6 +744,41 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
         '404':
           description: A resource with the specified ID was not found
+  /merge:
+    post:
+      tags: ['ACH Files']
+      summary: Merge Files
+      description: Combine multiple fileIDs and files together. Returned is the results of merging
+      operationId: mergeFiles
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the system's logs
+          example: "rs4f9915"
+          schema:
+            type: string
+      requestBody:
+        description: JSON object containing FileIDs and ACH files (in JSON format)
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MergeFilesRequest'
+      responses:
+        '200':
+          description: Files were merged together
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MergeFilesResponse'
+        '400':
+          description: See error in response body
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+        '404':
+          description: A resource with the specified ID was not found
 
 components:
   schemas:
@@ -2607,3 +2642,19 @@ components:
           $ref: '#/components/schemas/SegmentFileConfiguration'
         validateOpts:
           $ref: '#/components/schemas/ValidateOpts'
+    MergeFilesRequest:
+      properties:
+        fileIDs:
+          type: array
+          items:
+            type: string
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/File'
+    MergeFilesResponse:
+      properties:
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/File'
