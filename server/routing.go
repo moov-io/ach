@@ -211,6 +211,12 @@ func MakeHTTPHandler(s Service, repo Repository, kitlog gokitlog.Logger) http.Ha
 		encodeResponse,
 		options...,
 	))
+	r.Methods("POST").Path("/merge").Handler(httptransport.NewServer(
+		mergeFilesEndpoint(s, repo, logger),
+		decodeMergeFilesRequest,
+		encodeResponse,
+		options...,
+	))
 	return r
 }
 

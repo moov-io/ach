@@ -19,6 +19,7 @@ package server
 
 import (
 	"bytes"
+	"cmp"
 	"context"
 	"encoding/json"
 	"errors"
@@ -820,4 +821,72 @@ func decodeFlattenBatchesRequest(_ context.Context, r *http.Request) (interface{
 		fileID:    fileID,
 		requestID: moovhttp.GetRequestID(r),
 	}, nil
+}
+
+type mergeFilesRequest struct {
+	FileIDs []string    `json:"fileIDs"`
+	Files   []*ach.File `json:"files"`
+
+	RequestID string `json:"requestID"`
+}
+
+type mergeFilesResponse struct {
+	Files []*ach.File `json:"files"`
+	Err   error       `json:"error"`
+}
+
+func mergeFilesEndpoint(s Service, r Repository, logger log.Logger) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req, ok := request.(mergeFilesRequest)
+		if !ok {
+			return mergeFilesResponse{Err: ErrFoundABug}, ErrFoundABug
+		}
+
+		merged, err := s.MergeFiles(req.FileIDs, req.Files)
+		if logger != nil {
+			logger := logger.With(log.Fields{
+				"file_ids":  log.Strings(req.FileIDs),
+				"requestID": log.String(req.RequestID),
+			})
+			if err != nil {
+				logger.Error().LogError(err)
+			} else {
+				logger.Info().Log("merging files")
+			}
+		}
+		if err != nil {
+			return mergeFilesResponse{Err: err}, err
+		}
+
+		for idx := range merged {
+			err := r.StoreFile(merged[idx])
+			if logger != nil {
+				logger := logger.With(log.Fields{
+					"file_ids":  log.Strings(req.FileIDs),
+					"requestID": log.String(req.RequestID),
+				})
+				if err != nil {
+					logger.Error().LogError(err)
+				} else {
+					logger.Info().Logf("merge created file %s", merged[idx].ID)
+				}
+			}
+		}
+
+		return mergeFilesResponse{
+			Files: merged,
+		}, nil
+	}
+}
+
+func decodeMergeFilesRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var req mergeFilesRequest
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		return nil, fmt.Errorf("decoding merge files json: %w", err)
+	}
+
+	req.RequestID = cmp.Or(req.RequestID, moovhttp.GetRequestID(r))
+
+	return req, nil
 }
