@@ -257,7 +257,12 @@ func (r *Reader) Read() (File, error) {
 	}
 
 	// Carry through any ValidateOpts for this comparison
-	if (FileHeader{validateOpts: r.File.validateOpts}) == r.File.Header {
+	emptyFileHeader := FileHeader{
+		LineNumber:   r.File.Header.LineNumber,
+		validateOpts: r.File.validateOpts,
+	}
+
+	if emptyFileHeader == r.File.Header {
 		// Make sure we're required to report a missing FileHeader record
 		if r.File.validateOpts == nil || !r.File.validateOpts.AllowMissingFileHeader {
 			// There must be at least one File Header
@@ -269,7 +274,10 @@ func (r *Reader) Read() (File, error) {
 	if !r.File.IsADV() {
 		// Make sure we're required to report a missing FileControl record
 		if r.File.validateOpts == nil || !r.File.validateOpts.AllowMissingFileControl {
-			if (FileControl{}) == r.File.Control {
+			emptyFileControl := FileControl{
+				LineNumber: r.File.Control.LineNumber,
+			}
+			if r.File.Control == emptyFileControl {
 				// There must be at least one File Control
 				r.recordName = "FileControl"
 				r.errors.Add(ErrFileControl)
@@ -278,7 +286,10 @@ func (r *Reader) Read() (File, error) {
 	} else {
 		// Make sure we're required to report a missing FileControl record
 		if r.File.validateOpts == nil || !r.File.validateOpts.AllowMissingFileControl {
-			if (ADVFileControl{}) == r.File.ADVControl {
+			emptyFileControl := ADVFileControl{
+				LineNumber: r.File.Control.LineNumber,
+			}
+			if r.File.ADVControl == emptyFileControl {
 				// There must be at least one File Control
 				r.recordName = "FileControl"
 				r.errors.Add(ErrFileControl)
