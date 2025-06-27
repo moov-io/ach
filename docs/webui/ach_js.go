@@ -10,6 +10,7 @@ import (
 
 	"github.com/moov-io/ach"
 	"github.com/moov-io/ach/cmd/achcli/describe"
+	"github.com/moov-io/ach/cmd/achcli/describe/mask"
 )
 
 func parseACH(input string) (string, error) {
@@ -28,7 +29,12 @@ func parseACH(input string) (string, error) {
 
 func parseReadable(file *ach.File) (string, error) {
 	var buf bytes.Buffer
-	opts := describe.Opts{MaskNames: false, MaskAccountNumbers: false}
+	opts := describe.Opts{
+		Options: mask.Options{
+			MaskNames:          false,
+			MaskAccountNumbers: false,
+		},
+	}
 	describe.File(&buf, file, &opts)
 	return buf.String(), nil
 }

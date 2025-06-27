@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/ach"
+	"github.com/moov-io/ach/cmd/achcli/describe/mask"
 	"github.com/stretchr/testify/require"
 )
 
@@ -19,11 +20,17 @@ func TestDescribeFile(t *testing.T) {
 	require.NoError(t, err)
 
 	var buf bytes.Buffer
-	File(&buf, file, nil) // No Options
+	File(&buf, file, &Opts{
+		Options: mask.Options{
+			MaskNames:          true,
+			MaskAccountNumbers: true,
+		},
+	})
 	if testing.Verbose() {
 		os.Stdout.Write(buf.Bytes())
 	}
 	require.Equal(t, 1218, buf.Len())
+	require.Contains(t, buf.String(), "Re****** Ac***** Na**")
 }
 
 func TestDescribeIAT(t *testing.T) {
@@ -31,11 +38,16 @@ func TestDescribeIAT(t *testing.T) {
 	require.NoError(t, err)
 
 	var buf bytes.Buffer
-	File(&buf, file, nil) // No Options
+	File(&buf, file, &Opts{
+		Options: mask.Options{
+			MaskAccountNumbers: true,
+		},
+	})
 	if testing.Verbose() {
 		os.Stdout.Write(buf.Bytes())
 	}
 	require.Equal(t, 5262, buf.Len())
+	require.Contains(t, buf.String(), "*****6789")
 }
 
 func TestDescribeReturn(t *testing.T) {
@@ -43,11 +55,16 @@ func TestDescribeReturn(t *testing.T) {
 	require.NoError(t, err)
 
 	var buf bytes.Buffer
-	File(&buf, file, nil) // No Options
+	File(&buf, file, &Opts{
+		Options: mask.Options{
+			MaskIdentification: true,
+		},
+	})
 	if testing.Verbose() {
 		os.Stdout.Write(buf.Bytes())
 	}
 	require.Equal(t, 2692, buf.Len())
+	require.Contains(t, buf.String(), "***********tMGN")
 }
 
 func TestDescribeCorrection(t *testing.T) {
@@ -55,65 +72,20 @@ func TestDescribeCorrection(t *testing.T) {
 	require.NoError(t, err)
 
 	var buf bytes.Buffer
-	File(&buf, file, nil) // No Options
+	File(&buf, file, &Opts{
+		Options: mask.Options{
+			MaskCorrectedData: true,
+		},
+	})
 	if testing.Verbose() {
 		os.Stdout.Write(buf.Bytes())
 	}
 	require.Equal(t, 1401, buf.Len())
+	require.Contains(t, buf.String(), "******1614")
 }
 
 func TestFormatAmount(t *testing.T) {
 	require.Equal(t, "12345", formatAmount(false, 12345))
 	require.Equal(t, "123.45", formatAmount(true, 12345))
 	require.Equal(t, "1,234,567.89", formatAmount(true, 123456789))
-}
-
-func TestMaskNumber(t *testing.T) {
-	require.Equal(t, "*****", maskNumber(""))
-	require.Equal(t, "*****", maskNumber("1"))
-	require.Equal(t, "*****", maskNumber("12"))
-	require.Equal(t, "*****", maskNumber("123"))
-	require.Equal(t, "*****", maskNumber("1234"))
-	require.Equal(t, "**34 ", maskNumber("1234 "))
-	require.Equal(t, "**345", maskNumber("12345"))
-	require.Equal(t, "***2345", maskNumber("  12345"))
-	require.Equal(t, "**2345 ", maskNumber(" 12345 "))
-	require.Equal(t, "**3456", maskNumber("123456"))
-	require.Equal(t, "***4567", maskNumber("1234567"))
-	require.Equal(t, "****5678", maskNumber("12345678"))
-	require.Equal(t, "*******5678", maskNumber("   12345678"))
-	require.Equal(t, "*****6789", maskNumber("123456789"))
-	require.Equal(t, "******7890", maskNumber("1234567890"))
-	require.Equal(t, "********7890", maskNumber("  1234567890"))
-	require.Equal(t, "******7890  ", maskNumber("1234567890  "))
-	require.Equal(t, "*******7890 ", maskNumber(" 1234567890 "))
-
-	// Verify we mask .DFIAccountNumberField() as expected
-	ed := &ach.EntryDetail{
-		DFIAccountNumber: "12345678",
-	}
-	require.Equal(t, "****5678         ", maskNumber(ed.DFIAccountNumberField()))
-}
-
-func TestMaskName(t *testing.T) {
-	require.Equal(t, "", maskName(""))
-	require.Equal(t, "* * *", maskName(`a b c`))
-	require.Equal(t, "* * *", maskName(` a  b  c `))
-	require.Equal(t, "Jo** ***", maskName("John Doe"))
-	require.Equal(t, "Jo** Sm*** **", maskName("John Smith Jr"))
-	require.Equal(t, "Al******* Lo********** ** ***", maskName("Alexander Longnameiton Jr III"))
-
-	// Verify we mask .IndividualNameField() as expected
-	ed := &ach.EntryDetail{
-		IndividualName: "Jane Smith Jr",
-	}
-	require.Equal(t, "Ja** Sm*** **", maskName(ed.IndividualNameField()))
-}
-
-func TestMaskIdentification(t *testing.T) {
-	ed := &ach.EntryDetail{
-		IdentificationNumber: "abc123",
-	}
-	require.Equal(t, "**c123", maskNumber(ed.IdentificationNumber))
-	require.Equal(t, "**c123         ", maskNumber(ed.IdentificationNumberField()))
 }
