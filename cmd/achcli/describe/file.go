@@ -5,15 +5,13 @@
 package describe
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"strconv"
-	"strings"
 	"text/tabwriter"
-	"unicode/utf8"
 
 	"github.com/moov-io/ach"
+	"github.com/moov-io/ach/cmd/achcli/describe/mask"
 
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
@@ -21,10 +19,7 @@ import (
 )
 
 type Opts struct {
-	MaskNames          bool
-	MaskAccountNumbers bool
-	MaskCorrectedData  bool
-	MaskIdentification bool
+	mask.Options
 
 	PrettyAmounts bool
 }
@@ -36,6 +31,9 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 	if opts == nil {
 		opts = &Opts{}
 	}
+
+	// Mask the file
+	file = mask.File(file, opts.Options)
 
 	w := tabwriter.NewWriter(ww, 0, 0, 2, ' ', 0)
 	defer w.Flush()
@@ -71,24 +69,10 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 			fmt.Fprintln(w, "\n    TransactionCode\tRDFIIdentification\tAccountNumber\tAmount\tName\tIdentificationNumber\tTraceNumber\tCategory")
 
 			e := entries[j]
-			accountNumber := e.DFIAccountNumberField()
-			if opts.MaskAccountNumbers {
-				accountNumber = maskNumber(accountNumber)
-			}
 
 			amount := formatAmount(opts.PrettyAmounts, e.Amount)
 
-			name := e.IndividualNameField()
-			if opts.MaskNames {
-				name = maskName(name)
-			}
-
-			identificationNumber := e.IdentificationNumberField()
-			if opts.MaskIdentification {
-				name = maskNumber(identificationNumber)
-			}
-
-			fmt.Fprintf(w, "    %d %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", e.TransactionCode, transactionCodes[e.TransactionCode], e.RDFIIdentificationField(), accountNumber, amount, name, identificationNumber, e.TraceNumberField(), e.Category)
+			fmt.Fprintf(w, "    %d %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", e.TransactionCode, transactionCodes[e.TransactionCode], e.RDFIIdentificationField(), e.DFIAccountNumberField(), amount, e.IndividualNameField(), e.IdentificationNumberField(), e.TraceNumberField(), e.Category)
 
 			dumpAddenda02(w, e.Addenda02)
 			for a := range e.Addenda05 {
@@ -149,13 +133,8 @@ func File(ww io.Writer, file *ach.File, opts *Opts) {
 			fmt.Fprintln(w, "\n    TransactionCode\tRDFIIdentification\tAccountNumber\tAmount\tAddendaRecords\tTraceNumber\tCategory")
 
 			e := entries[j]
-			accountNumber := e.DFIAccountNumberField()
-			if opts.MaskAccountNumbers {
-				accountNumber = maskNumber(accountNumber)
-			}
-
 			amount := formatAmount(opts.PrettyAmounts, e.Amount)
-			fmt.Fprintf(w, "    %d %s\t%s\t%s\t%s\t%s\t%s\t%s\n", e.TransactionCode, transactionCodes[e.TransactionCode], e.RDFIIdentificationField(), accountNumber, amount, e.AddendaRecordsField(), e.TraceNumberField(), e.Category)
+			fmt.Fprintf(w, "    %d %s\t%s\t%s\t%s\t%s\t%s\t%s\n", e.TransactionCode, transactionCodes[e.TransactionCode], e.RDFIIdentificationField(), e.DFIAccountNumberField(), amount, e.AddendaRecordsField(), e.TraceNumberField(), e.Category)
 
 			dumpAddenda10(w, e.Addenda10)
 			dumpAddenda11(w, e.Addenda11)
@@ -251,36 +230,8 @@ func dumpAddenda05(w *tabwriter.Writer, batch ach.Batcher, a *ach.Addenda05, opt
 		return
 	}
 
-	paymentRelatedInfo := a.PaymentRelatedInformationField()
-
-	switch batch.(type) {
-	case *ach.BatchENR:
-		paymentInfo, _ := ach.ParseENRPaymentInformation(a)
-		if paymentInfo != nil {
-			if opts.MaskNames {
-				paymentInfo.IndividualName = maskName(paymentInfo.IndividualName)
-			}
-			if opts.MaskAccountNumbers {
-				paymentInfo.IndividualIdentification = maskNumber(paymentInfo.IndividualIdentification)
-				paymentInfo.DFIAccountNumber = maskNumber(paymentInfo.DFIAccountNumber)
-			}
-
-			paymentRelatedInfo = paymentInfo.String()
-		}
-
-	case *ach.BatchDNE:
-		paymentInfo, _ := ach.ParseDNEPaymentInformation(a)
-		if paymentInfo != nil {
-			if opts.MaskNames || opts.MaskAccountNumbers {
-				paymentInfo.CustomerSSN = maskNumber(paymentInfo.CustomerSSN)
-			}
-
-			paymentRelatedInfo = paymentInfo.String()
-		}
-	}
-
 	fmt.Fprintln(w, "      PaymentRelatedInformation\tSequenceNumber\tEntryDetailSequenceNumber")
-	fmt.Fprintf(w, "      %s\t%s\t%s\n", paymentRelatedInfo, a.SequenceNumberField(), a.EntryDetailSequenceNumberField())
+	fmt.Fprintf(w, "      %s\t%s\t%s\n", a.PaymentRelatedInformationField(), a.SequenceNumberField(), a.EntryDetailSequenceNumberField())
 }
 
 func dumpAddenda98(w *tabwriter.Writer, opts *Opts, a *ach.Addenda98) {
@@ -293,7 +244,7 @@ func dumpAddenda98(w *tabwriter.Writer, opts *Opts, a *ach.Addenda98) {
 
 	data := a.CorrectedData
 	if opts.MaskCorrectedData {
-		data = maskNumber(data)
+		data = mask.Number(data)
 	}
 
 	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\n", a.ChangeCode, a.OriginalTraceField(), a.OriginalDFIField(), data, a.TraceNumberField())
@@ -390,47 +341,4 @@ func dumpAddenda18(w *tabwriter.Writer, a *ach.Addenda18) {
 	fmt.Fprintf(w, "      %s\t%s\t%s\t%s\t%s\t%s\t%s\n",
 		a.TypeCode, a.ForeignCorrespondentBankNameField(), a.ForeignCorrespondentBankIDNumberQualifierField(), a.ForeignCorrespondentBankIDNumberField(),
 		a.ForeignCorrespondentBankBranchCountryCodeField(), a.SequenceNumberField(), a.EntryDetailSequenceNumberField())
-}
-
-func maskNumber(s string) string {
-	length := utf8.RuneCountInString(s)
-	if length < 5 {
-		return strings.Repeat("*", 5) // too short, we can't show anything
-	}
-
-	out := bytes.Repeat([]byte("*"), length)
-	var unmaskedDigits int
-	// Since we want the right-most digits unmasked start from the end of our string
-	for i := length - 1; i >= 2; i-- {
-		r := rune(s[i])
-		if r == ' ' {
-			// If the char to our right is masked then mask this left-aligned space as well.
-			if i+1 < length && out[i+1] == '*' {
-				out[i] = byte('*')
-			} else {
-				out[i] = byte(' ')
-			}
-		} else {
-			if unmaskedDigits < 4 {
-				unmaskedDigits += 1
-				out[i] = byte(r)
-			}
-		}
-	}
-	return string(out)
-}
-
-func maskName(s string) string {
-	words := strings.Fields(s)
-
-	var out []string
-	for i := range words {
-		length := utf8.RuneCountInString(words[i])
-		if length > 3 {
-			out = append(out, words[i][0:2]+strings.Repeat("*", length-2))
-		} else {
-			out = append(out, strings.Repeat("*", length))
-		}
-	}
-	return strings.Join(out, " ")
 }
