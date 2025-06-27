@@ -2,7 +2,6 @@ package mask
 
 import (
 	"bytes"
-	"fmt"
 	"strings"
 	"unicode/utf8"
 
@@ -60,8 +59,6 @@ type Options struct {
 }
 
 func File(file *ach.File, options Options) *ach.File {
-	fmt.Printf("mask.File: %#v\n", options)
-
 	out := ach.NewFile()
 	out.Header = file.Header
 	out.Control = file.Control
