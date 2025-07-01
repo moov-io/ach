@@ -68,7 +68,7 @@ type Service interface {
 	// DeleteBatch takes a fileID and BatchID and removes the batch from the file
 	DeleteBatch(fileID string, batchID string) error
 	// MergeFiles will combine all the given files together
-	MergeFiles(fileIDs []string, files []*ach.File) ([]*ach.File, error)
+	MergeFiles(fileIDs []string, files []*ach.File, conditions *ach.Conditions) ([]*ach.File, error)
 }
 
 // service a concrete implementation of the service.
@@ -267,7 +267,7 @@ func (s *service) FlattenBatches(fileID string) (*ach.File, error) {
 	return ff, err
 }
 
-func (s *service) MergeFiles(fileIDs []string, files []*ach.File) ([]*ach.File, error) {
+func (s *service) MergeFiles(fileIDs []string, files []*ach.File, conditions *ach.Conditions) ([]*ach.File, error) {
 	for idx := range fileIDs {
 		file, err := s.store.FindFile(fileIDs[idx])
 		if err != nil {
@@ -277,7 +277,13 @@ func (s *service) MergeFiles(fileIDs []string, files []*ach.File) ([]*ach.File, 
 		files = append(files, file)
 	}
 
-	merged, err := ach.MergeFiles(files)
+	var merged []*ach.File
+	var err error
+	if conditions != nil {
+		merged, err = ach.MergeFilesWith(files, *conditions)
+	} else {
+		merged, err = ach.MergeFiles(files)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("merging files: %w", err)
 	}

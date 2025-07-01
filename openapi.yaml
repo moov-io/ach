@@ -2642,6 +2642,16 @@ components:
           $ref: '#/components/schemas/SegmentFileConfiguration'
         validateOpts:
           $ref: '#/components/schemas/ValidateOpts'
+    MergeConditions:
+      properties:
+        maxLines:
+          type: integer
+          description: Maximum number of lines in a merged file.
+          example: 25000
+        maxDollarAmount:
+          type: integer
+          description: Maximum total dollar amount in a merged file.
+          example: 25000000
     MergeFilesRequest:
       properties:
         fileIDs:
@@ -2652,6 +2662,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/File'
+        conditions:
+          $ref: '#/components/schemas/MergeConditions'
     MergeFilesResponse:
       properties:
         files:
