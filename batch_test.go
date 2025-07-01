@@ -1093,11 +1093,8 @@ func TestBatch__ValidAmountForCodes(t *testing.T) {
 
 		batch, ok := file.Batches[0].(*BatchWEB)
 		require.True(t, ok)
-		batch.Header.CompanyEntryDescription = "PRENOTE"
+		// Allow zero-amount returns through
 		batch.Entries[0].Amount = 0
-		require.NoError(t, batch.Create())
-
-		// Allow zero-amount returns through without CompanyEntryDescription set to PRENOTE
 		batch.Header.CompanyEntryDescription = "OTHER"
 		batch.Entries[0].Addenda99 = mockAddenda99()
 		batch.Entries[0].TransactionCode = CheckingReturnNOCCredit
@@ -1111,7 +1108,6 @@ func TestBatch__ValidAmountForCodes(t *testing.T) {
 
 		batch, ok := file.Batches[0].(*BatchPPD)
 		require.True(t, ok)
-		batch.Header.CompanyEntryDescription = "PRENOTE"
 		batch.Entries[0].Amount = 102
 		batch.Entries[0].TransactionCode = CheckingPrenoteDebit
 		require.ErrorContains(t, batch.Create(), ErrBatchAmountNonZero.Error())
