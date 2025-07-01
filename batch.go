@@ -1077,12 +1077,8 @@ func (batch *Batch) ValidAmountForCodes(entry *EntryDetail) error {
 	}
 
 	// If the entry is a PRENOTE force it's amount to be zero
-	var isPrenoteDesc bool
-	if batch != nil && batch.Header != nil {
-		isPrenoteDesc = strings.EqualFold(batch.Header.CompanyEntryDescription, "PRENOTE")
-	}
 	isPrenoteTxCode := entry.isPrenote(entry.TransactionCode)
-	if isPrenoteDesc || isPrenoteTxCode {
+	if isPrenoteTxCode {
 		if entry.Amount == 0 {
 			return nil
 		}
