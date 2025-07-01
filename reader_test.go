@@ -445,8 +445,19 @@ func TestFileControl_RTF(t *testing.T) {
 		achReader := NewReader(bytes.NewReader(bs))
 		achReader.SetValidation(&ValidateOpts{SkipAll: true})
 		_, err = achReader.Read()
+		// The file control record is empty so we should receive an error
 		require.NotNil(t, err)
 		require.ErrorAs(t, err, &ErrFileControl)
+	})
+	t.Run("file_parsing_missing_file_control.txt set preserve spaces to true", func(t *testing.T) {
+		bs, err := os.ReadFile(filepath.Join("test", "testdata", "file_parsing_missing_file_control.txt"))
+		require.NoError(t, err)
+
+		achReader := NewReader(bytes.NewReader(bs))
+		achReader.SetValidation(&ValidateOpts{SkipAll: true, PreserveSpaces: true})
+		_, err = achReader.Read()
+		// the file control record is technically not empty due to the additional spaces, so we should receive no error
+		require.Nil(t, err)
 	})
 
 }
