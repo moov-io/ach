@@ -73,5 +73,5 @@ func TestReadWithMoovIDs(t *testing.T) {
 	require.Equal(t, "12345678904", b1entries[1].DFIAccountNumber)
 
 	// File Control
-	require.Equal(t, "8c365fa8-460f-4665-99d0-735ec25e346b   ", file.Control.Reserved)
+	require.Equal(t, "8c365fa8-460f-4665-99d0-735ec25e346b", file.Control.Reserved)
 }
