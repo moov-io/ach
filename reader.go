@@ -271,6 +271,8 @@ func (r *Reader) Read() (File, error) {
 		}
 	}
 
+	// Remove any trailing spaces within the file control reserved
+	r.File.Control.Reserved = strings.TrimSpace(r.File.Control.Reserved)
 	if !r.File.IsADV() {
 		// Make sure we're required to report a missing FileControl record
 		if r.File.validateOpts == nil || !r.File.validateOpts.AllowMissingFileControl {
