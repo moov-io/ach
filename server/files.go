@@ -827,6 +827,8 @@ type mergeFilesRequest struct {
 	FileIDs []string    `json:"fileIDs"`
 	Files   []*ach.File `json:"files"`
 
+	Conditions *ach.Conditions `json:"conditions"`
+
 	RequestID string `json:"requestID"`
 }
 
@@ -842,7 +844,7 @@ func mergeFilesEndpoint(s Service, r Repository, logger log.Logger) endpoint.End
 			return mergeFilesResponse{Err: ErrFoundABug}, ErrFoundABug
 		}
 
-		merged, err := s.MergeFiles(req.FileIDs, req.Files)
+		merged, err := s.MergeFiles(req.FileIDs, req.Files, req.Conditions)
 		if logger != nil {
 			logger := logger.With(log.Fields{
 				"file_ids":  log.Strings(req.FileIDs),
