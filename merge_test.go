@@ -341,7 +341,7 @@ func TestMergeFiles__splitFiles(t *testing.T) {
 	require.NoError(t, f2.Create())
 
 	// read a third file
-	f3, err := readACHFilepath(filepath.Join("test", "testdata", "20110805A.ach"))
+	f3, err := readACHFilepath(filepath.Join("test", "testdata", "return-WEB.ach"))
 	require.NoError(t, err)
 
 	f3.Header = file.Header // replace Header so they're merged into one file

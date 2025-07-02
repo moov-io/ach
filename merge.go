@@ -464,7 +464,7 @@ func (outf *outFile) add(incoming *File) error {
 	outFile.validateOpts = outFile.validateOpts.merge(incoming.GetValidation())
 
 	for j := range incoming.Batches {
-		if len(incoming.Batches[j].ADVEntries) > 0 || incoming.Batches[j].ADVControl != nil {
+		if len(incoming.Batches[j].GetADVEntries()) > 0 {
 			return errors.New("merging ADV batches is not supported")
 		}
 
