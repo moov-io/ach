@@ -20,6 +20,7 @@ package ach
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -452,6 +453,10 @@ type outFile struct {
 }
 
 func (outf *outFile) add(incoming *File) error {
+	if len(incoming.IATBatches) > 0 {
+		return errors.New("merging IAT files is not supported")
+	}
+
 	outFile := pickOutFile(incoming.Header, outf)
 	if outFile == nil {
 		return fmt.Errorf("found no outfile: %w", ErrPleaseReportBug)
@@ -459,6 +464,10 @@ func (outf *outFile) add(incoming *File) error {
 	outFile.validateOpts = outFile.validateOpts.merge(incoming.GetValidation())
 
 	for j := range incoming.Batches {
+		if len(incoming.Batches[j].ADVEntries) > 0 || incoming.Batches[j].ADVControl != nil {
+			return errors.New("merging ADV batches is not supported")
+		}
+
 		bh := incoming.Batches[j].GetHeader()
 		if bh == nil {
 			return fmt.Errorf("batch[%d] has nil BatchHeader", j)
