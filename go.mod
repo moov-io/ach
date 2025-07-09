@@ -2,7 +2,7 @@ module github.com/moov-io/ach
 
 go 1.23.0
 
-toolchain go1.24.4
+toolchain go1.24.5
 
 require (
 	github.com/Pallinder/go-randomdata v1.2.0
