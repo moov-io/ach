@@ -149,14 +149,13 @@ func FileFromJSONWith(bs []byte, opts *ValidateOpts) (*File, error) {
 	}
 
 	// Read the ValidateOpts first
-	out := NewFile()
-	out.SetValidation(opts)
-
 	validateOpts, err := readValidateOpts(bs)
 	if err != nil {
 		return nil, fmt.Errorf("reading validate opts: %w", err)
 	}
-	out.SetValidation(out.validateOpts.merge(validateOpts))
+
+	out := NewFile()
+	out.SetValidation(opts.merge(validateOpts))
 
 	// read file root level
 	var f file
@@ -164,9 +163,6 @@ func FileFromJSONWith(bs []byte, opts *ValidateOpts) (*File, error) {
 		return nil, fmt.Errorf("problem reading File: %v", err)
 	}
 	out.ID = f.ID
-	if opts != nil {
-		out.SetValidation(opts)
-	}
 
 	// Read FileHeader
 	header := fileHeader{
@@ -383,6 +379,8 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 		batch.SetValidation(f.validateOpts)
 
 		for _, e := range batch.Entries {
+			e.SetValidation(f.validateOpts)
+
 			// these values need to be inferred from the json field names
 			setEntryRecordType(e)
 

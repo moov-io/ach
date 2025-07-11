@@ -553,6 +553,37 @@ func TestFileReadJSONFile(t *testing.T) {
 	}
 }
 
+func TestFileFromJSONWith(t *testing.T) {
+	opts := &ValidateOpts{
+		AllowZeroEntryAmount:   true,
+		AllowSpecialCharacters: true,
+	}
+
+	bs, err := os.ReadFile(filepath.Join("test", "testdata", "ppd-valid-preserve-spaces.json"))
+	require.NoError(t, err)
+
+	file, err := FileFromJSONWith(bs, opts)
+	require.NoError(t, err)
+
+	found := file.GetValidation()
+	require.True(t, found.PreserveSpaces)
+	require.True(t, found.AllowZeroEntryAmount)
+	require.True(t, found.AllowSpecialCharacters)
+
+	// Check the entries
+	entries := file.Batches[0].GetEntries()
+	require.Len(t, entries, 2)
+
+	for idx := range entries {
+		found := entries[idx].validateOpts
+		require.NotNil(t, found)
+
+		require.True(t, found.PreserveSpaces)
+		require.True(t, found.AllowZeroEntryAmount)
+		require.True(t, found.AllowSpecialCharacters)
+	}
+}
+
 // TestFile__jsonFileNoControlBlobs will read an ach.File from its JSON form, but the JSON has no
 // batchControl or fileControl sub-objects.
 func TestFile__jsonFileNoControlBlobs(t *testing.T) {
