@@ -191,8 +191,20 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v4
 
-    - name: Docker
-      run: make docker
+    - name: Extract VERSION from Makefile
+      id: get_version
+      run: |
+        VERSION=$(make --no-print-directory get-version)
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Build ARM64 and AMD64 Docker images
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile
+        platforms: linux/arm64,linux/amd64
+        push: false
+        tags: moov/ach:${{ steps.get_version.outputs.version }},moov/ach:latest
 
     - name: Docker Push
       run: |+
