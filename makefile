@@ -11,6 +11,8 @@ DEV_VERSION := dev-${COMMIT_HASH}
 USERID := $(shell id -u $$USER)
 GROUPID:= $(shell id -g $$USER)
 
+ARCH ?= amd64
+
 .PHONY: build docker release
 
 build:
@@ -79,6 +81,20 @@ docker: clean docker-hub
 
 docker-hub:
 	docker build --pull -t moov/ach:$(VERSION) -f Dockerfile .
+	docker tag moov/ach:$(VERSION) moov/ach:latest
+
+.PHONY: docker-build-arch
+docker-build-arch:
+	docker build --platform linux/$(ARCH) -t moov/ach:$(VERSION)-$(ARCH) -f Dockerfile .
+
+.PHONY: docker-push-arch
+docker-push-arch:
+	docker push moov/ach:$(VERSION)-$(ARCH)
+
+.PHONY: docker-manifest
+docker-manifest:
+	docker manifest create moov/ach:$(VERSION) moov/ach:$(VERSION)-amd64 moov/ach:$(VERSION)-arm64
+	docker manifest push moov/ach:$(VERSION)
 	docker tag moov/ach:$(VERSION) moov/ach:latest
 
 .PHONY: dev-docker

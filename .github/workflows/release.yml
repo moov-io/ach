@@ -74,9 +74,16 @@ jobs:
       run: make dist-webui
 
   docker:
-    name: Docker
+    name: Docker ${{ matrix.arch }}
     needs: [testing, release]
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            arch: amd64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
     steps:
     - name: Set up Go 1.x
       uses: actions/setup-go@v6
@@ -87,13 +94,30 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v6
 
-    - name: Docker
-      run: make docker
-
-    - name: Docker Push
-      run: |+
-          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-          make release-push
+    - name: Login to DockerHub
+      run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       env:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and push image
+      run: |
+        make docker-build-arch ARCH=${{ matrix.arch }}
+        make docker-push-arch ARCH=${{ matrix.arch }}
+
+  docker-manifest:
+    name: Docker Manifest
+    needs: [docker]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v6
+
+    - name: Login to DockerHub
+      run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Create and push manifests
+      run: make docker-manifest
