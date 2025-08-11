@@ -36,6 +36,10 @@ addenda99.OriginalDFI = "9101298"
 
 ### Return codes
 
+Below are Nacha's supported return codes. Refer to the Nacha rules and regulations for more detail on a specific return code handling and usage.
+
+#### General Return Codes
+
 | Code | Reason | Description |
 |----|-----|------|
 | `R01` | Insufficient Funds | Available balance is not sufficient to cover the dollar value of the debit entry |
