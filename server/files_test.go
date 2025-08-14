@@ -50,7 +50,7 @@ func TestFiles__decodeCreateFileRequest(t *testing.T) {
 	f.AddBatch(batch)
 
 	// Setup our persistence
-	repo := NewRepositoryInMemory(testTTLDuration, log.NewNopLogger())
+	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)
 
 	var body bytes.Buffer
@@ -96,6 +96,81 @@ func TestFiles__decodeCreateFileRequest(t *testing.T) {
 	require.Equal(t, "121042880000007", entries[0].TraceNumber)
 }
 
+func TestFilesV2__decodeCreateFileRequest(t *testing.T) {
+	// happy path
+	f := ach.NewFile()
+	f.ID = "foo"
+	f.Header = *mockFileHeader()
+	batch := mockBatchWEB(t)
+	batch.Entries[0].TraceNumber = "121042880000007"
+	f.AddBatch(batch)
+
+	// Setup our persistence
+	repo := NewRepositoryInMemory(testTTLDuration, nil)
+	svc := NewService(repo)
+
+	var body bytes.Buffer
+	err := json.NewEncoder(&body).Encode(f)
+	require.NoError(t, err)
+
+	req := httptest.NewRequest("POST", "/v2/files/create", &body)
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("content-type", "application/json")
+
+	// setup our HTTP handler
+	handler := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
+
+	// execute our HTTP request
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status code: %d: %s", w.Code, w.Body.String())
+	}
+
+	var resp createFileResponse
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatal(err)
+	}
+	if resp.ID == "" || resp.Err != nil {
+		t.Errorf("id=%q error=%v", resp.ID, resp.Err)
+	}
+	require.Equal(t, "foo", f.ID)
+	require.NotNil(t, resp.File)
+	require.Equal(t, "foo", resp.File.ID)
+
+	// Check stored file state
+	got, _ := svc.GetFile(f.ID)
+	if got.Batches[0].ID() != batch.ID() {
+		t.Fatalf("batch ID: got %v, want %v", got.Batches[0].ID(), batch.ID())
+	}
+	require.Len(t, got.Batches, 1)
+
+	entries := got.Batches[0].GetEntries()
+	require.Len(t, entries, 1)
+	require.Equal(t, "121042880000007", entries[0].TraceNumber)
+
+	// unhappy path
+	body = *bytes.NewBufferString(`{"id": "bad"}`)
+	req = httptest.NewRequest("POST", "/v2/files/create", &body)
+	req.Header.Set("Content-Type", "application/json")
+
+	w = httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusBadRequest, w.Code)
+
+	var errs StructuredErrorResponse
+	err = json.NewDecoder(w.Body).Decode(&errs)
+	require.NoError(t, err)
+	require.Len(t, errs.Errors, 1)
+	require.Equal(t, "FieldError", errs.Errors[0].ErrorType)
+	require.Equal(t, "ImmediateDestination", errs.Errors[0].FieldName)
+	require.Contains(t, errs.Errors[0].Message, "is a mandatory field")
+}
+
 func TestFiles__createFileEndpoint(t *testing.T) {
 	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)
@@ -113,7 +188,7 @@ func TestFiles__createFileEndpoint(t *testing.T) {
 }
 
 func TestFiles__CreateFileNacha(t *testing.T) {
-	repo := NewRepositoryInMemory(testTTLDuration, log.NewNopLogger())
+	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)
 
 	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-debit.ach"))
@@ -147,7 +222,7 @@ func TestFiles__CreateFileNacha(t *testing.T) {
 }
 
 func TestFiles_CreateWithOffset(t *testing.T) {
-	repo := NewRepositoryInMemory(testTTLDuration, log.NewNopLogger())
+	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)
 
 	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-with-offset.json"))

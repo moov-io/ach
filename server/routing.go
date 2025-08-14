@@ -127,6 +127,20 @@ func MakeHTTPHandler(s Service, repo Repository, kitlog gokitlog.Logger) http.Ha
 		encodeResponse,
 		options...,
 	))
+
+	v2Options := []httptransport.ServerOption{
+		httptransport.ServerErrorLogger(kitlog),
+		httptransport.ServerErrorEncoder(encodeStructuredError),
+		httptransport.ServerBefore(saveCORSHeadersIntoContext()),
+		httptransport.ServerAfter(respondWithSavedCORSHeaders()),
+	}
+	r.Methods("POST").Path("/v2/files/create").Handler(httptransport.NewServer(
+		createFileEndpointV2(s, repo, logger),
+		decodeCreateFileRequest,
+		encodeResponse,
+		v2Options...,
+	))
+
 	r.Methods("POST").Path("/files/{fileID}").Handler(httptransport.NewServer(
 		createFileEndpoint(s, repo, logger),
 		decodeCreateFileRequest,

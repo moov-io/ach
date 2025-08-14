@@ -67,6 +67,56 @@ type createFileResponse struct {
 
 func (r createFileResponse) error() error { return r.Err }
 
+func createFileEndpointV2(s Service, r Repository, logger log.Logger) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req, ok := request.(createFileRequest)
+		if !ok {
+			return createFileResponse{Err: ErrFoundABug}, ErrFoundABug
+		}
+
+		// record a metric for files created
+		if req.File != nil && req.File.Header.ImmediateDestination != "" && req.File.Header.ImmediateOrigin != "" {
+			filesCreated.With("destination", req.File.Header.ImmediateDestination, "origin", req.File.Header.ImmediateOrigin).Add(1)
+		}
+
+		// Create a random file ID if none was provided
+		if req.File.ID == "" {
+			req.File.ID = base.ID()
+		}
+
+		if req.validateOpts != nil {
+			req.File.SetValidation(req.validateOpts)
+		}
+
+		err := r.StoreFile(req.File)
+		if logger != nil {
+			logger := logger.With(log.Fields{
+				"files":     log.String("createFile"),
+				"requestID": log.String(req.requestID),
+			})
+			if err != nil {
+				logger.Error().LogError(err)
+			} else {
+				logger.Info().Log("create file")
+			}
+		}
+
+		resp := createFileResponse{
+			ID:   req.File.ID,
+			File: req.File,
+			Err:  err,
+		}
+		if req.parseError != nil {
+			resp.Err = req.parseError
+		}
+
+		if resp.Err != nil {
+			return nil, resp.Err
+		}
+		return resp, nil
+	}
+}
+
 func createFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req, ok := request.(createFileRequest)
