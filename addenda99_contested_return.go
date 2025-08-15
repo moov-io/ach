@@ -201,7 +201,7 @@ func (Addenda99Contested *Addenda99Contested) Validate() error {
 
 func IsContestedReturnCode(code string) bool {
 	switch code {
-	case "R71", "R72", "R73", "R74", "R75", "R76":
+	case "R71", "R72", "R73", "R74", "R75", "R76", "R77":
 		return true
 	}
 	return false
