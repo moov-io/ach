@@ -2318,7 +2318,7 @@ func TestFile_BypassBatchValidation(t *testing.T) {
 
 	// With bypass flag, should not catch validation error
 	err = file.ValidateWith(&ValidateOpts{
-		BypassBatchDetailsValidation: true,
+		BypassBatchValidation: true,
 	})
 	require.NoError(t, err)
 
@@ -2326,7 +2326,7 @@ func TestFile_BypassBatchValidation(t *testing.T) {
 	testControl := testBatch.GetControl()
 	testControl.TotalCreditEntryDollarAmount = 50 // The mocked credit amount should be 100
 	err = file.ValidateWith(&ValidateOpts{
-		BypassBatchDetailsValidation: true,
+		BypassBatchValidation: true,
 	})
 	require.Error(t, err)
 }
