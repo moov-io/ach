@@ -791,6 +791,7 @@ func (v *ValidateOpts) merge(other *ValidateOpts) *ValidateOpts {
 		AllowZeroEntryAmount:             v.AllowZeroEntryAmount || other.AllowZeroEntryAmount,
 		AllowSpecialCharacters:           v.AllowSpecialCharacters || other.AllowSpecialCharacters,
 		AllowEmptyIndividualName:         v.AllowEmptyIndividualName || other.AllowEmptyIndividualName,
+		BypassBatchValidation:            v.BypassBatchValidation || other.BypassBatchValidation,
 	}
 
 	if v.CheckTransactionCode != nil {
