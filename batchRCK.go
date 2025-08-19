@@ -39,7 +39,7 @@ func NewBatchRCK(bh *BatchHeader) *BatchRCK {
 //
 // Validate will never modify the batch.
 func (batch *BatchRCK) Validate() error {
-	if batch.validateOpts != nil && batch.validateOpts.SkipAll {
+	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
 		return nil
 	}
 

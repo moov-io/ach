@@ -177,6 +177,11 @@ paths:
           description: Optional parameter to permit a wider range of UTF-8 characters in alphanumeric fields
           schema:
             type: boolean
+        - name: bypassBatchValidation
+          in: query
+          description: Skip validation for batches in a file and only validate file header and control info
+          schema:
+            type: boolean
       requestBody:
         description: Content of the ACH file (in json or raw text)
         required: true

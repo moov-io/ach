@@ -36,7 +36,7 @@ func NewBatchPPD(bh *BatchHeader) *BatchPPD {
 //
 // Validate will never modify the batch.
 func (batch *BatchPPD) Validate() error {
-	if batch.validateOpts != nil && batch.validateOpts.SkipAll {
+	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
 		return nil
 	}
 

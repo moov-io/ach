@@ -53,6 +53,7 @@ Example: `POST /files/create?requireABAOrigin=true&bypassDestination=true`
 | `allowUnorderedBatchNumbers`       | `AllowUnorderedBatchNumbers`       |
 | `allowZeroBatches`                 | `AllowZeroBatches`                 |
 | `allowZeroEntryAmount`             | `AllowZeroEntryAmount`             |
+| `bypassBatchValidation`            | `BypassBatchValidation`            |
 | `bypassCompanyIdentificationMatch` | `BypassCompanyIdentificationMatch` |
 | `bypassDestinationValidation`      | `BypassDestinationValidation`      |
 | `bypassOriginValidation`           | `BypassOriginValidation`           |
