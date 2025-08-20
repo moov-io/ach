@@ -177,8 +177,8 @@ jobs:
     - name: Distribute
       run: make dist-webui
 
-  docker:
-    name: Docker
+  docker-amd64:
+    name: Docker AMD64
     needs: [testing, create_release]
     runs-on: ubuntu-latest
     steps:
@@ -187,17 +187,74 @@ jobs:
       with:
         go-version: stable
       id: go
-
     - name: Check out code
       uses: actions/checkout@v4
-
-    - name: Docker
-      run: make docker
-
-    - name: Docker Push
-      run: |+
-          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-          make release-push
+    - name: Extract VERSION from Makefile
+      id: get_version
+      run: |
+        VERSION=$(make --no-print-directory get-version)
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+    - name: Login to DockerHub
+      run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       env:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Build and push amd64 image
+      run: |
+        docker build --platform linux/amd64 -t moov/ach:${{ steps.get_version.outputs.version }}-amd64 -t moov/ach:latest-amd64 -f Dockerfile .
+        docker push moov/ach:${{ steps.get_version.outputs.version }}-amd64
+        docker push moov/ach:latest-amd64
+
+  docker-arm64:
+    name: Docker ARM64
+    needs: [testing, create_release]
+    runs-on: ubuntu-24.04-arm
+    steps:
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v5
+      with:
+        go-version: stable
+      id: go
+    - name: Check out code
+      uses: actions/checkout@v4
+    - name: Extract VERSION from Makefile
+      id: get_version
+      run: |
+        VERSION=$(make --no-print-directory get-version)
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+    - name: Login to DockerHub
+      run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Build and push arm64 image
+      run: |
+        docker build --platform linux/arm64 -t moov/ach:${{ steps.get_version.outputs.version }}-arm64 -t moov/ach:latest-arm64 -f Dockerfile .
+        docker push moov/ach:${{ steps.get_version.outputs.version }}-arm64
+        docker push moov/ach:latest-arm64
+
+  docker-manifest:
+    name: Docker Manifest
+    needs: [docker-amd64, docker-arm64]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract VERSION from Makefile
+        id: get_version
+        run: |
+          VERSION=$(make --no-print-directory get-version)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+      - name: Login to DockerHub
+        run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Create and push manifests
+        run: |
+          docker manifest create moov/ach:${{ steps.get_version.outputs.version }} \
+            moov/ach:${{ steps.get_version.outputs.version }}-amd64 \
+            moov/ach:${{ steps.get_version.outputs.version }}-arm64
+          docker manifest push moov/ach:${{ steps.get_version.outputs.version }}
+          docker manifest create moov/ach:latest \
+            moov/ach:latest-amd64 \
+            moov/ach:latest-arm64
+          docker manifest push moov/ach:latest
