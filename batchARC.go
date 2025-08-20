@@ -48,7 +48,7 @@ func NewBatchARC(bh *BatchHeader) *BatchARC {
 //
 // Validate will never modify the batch.
 func (batch *BatchARC) Validate() error {
-	if batch.validateOpts != nil && batch.validateOpts.SkipAll {
+	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
 		return nil
 	}
 
