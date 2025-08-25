@@ -133,6 +133,21 @@ func MakeHTTPHandler(s Service, repo Repository, kitlog gokitlog.Logger) http.Ha
 		encodeResponse,
 		options...,
 	))
+	// Explicitely define endpoints for each content type supported by the create file function in order
+	// to allow Java clients to use this functionality. This is needed due to a bug in the Java OpenAPI generator.
+	// https://github.com/OpenAPITools/openapi-generator/issues/17877
+	r.Methods("POST").Path("/files/{fileID}/json").Handler(httptransport.NewServer(
+		createFileEndpoint(s, repo, logger),
+		decodeCreateFileRequest,
+		encodeResponse,
+		options...,
+	))
+	r.Methods("POST").Path("/files/{fileID}/plaintext").Handler(httptransport.NewServer(
+		createFileEndpoint(s, repo, logger),
+		decodeCreateFileRequest,
+		encodeResponse,
+		options...,
+	))
 	r.Methods("GET").Path("/files/{id}").Handler(httptransport.NewServer(
 		getFileEndpoint(s, logger),
 		decodeGetFileRequest,
@@ -200,6 +215,21 @@ func MakeHTTPHandler(s Service, repo Repository, kitlog gokitlog.Logger) http.Ha
 		options...,
 	))
 	r.Methods("POST").Path("/segment").Handler(httptransport.NewServer(
+		segmentFileEndpoint(s, repo, logger),
+		decodeSegmentFileRequest,
+		encodeResponse,
+		options...,
+	))
+	// Explicitely define endpoints for each content type supported by the segment function in order to allow
+	// Java clients to use this functionality. This is needed due to a bug in the Java OpenAPI generator.
+	// https://github.com/OpenAPITools/openapi-generator/issues/17877
+	r.Methods("POST").Path("/segment/json").Handler(httptransport.NewServer(
+		segmentFileEndpoint(s, repo, logger),
+		decodeSegmentFileRequest,
+		encodeResponse,
+		options...,
+	))
+	r.Methods("POST").Path("/segment/plaintext").Handler(httptransport.NewServer(
 		segmentFileEndpoint(s, repo, logger),
 		decodeSegmentFileRequest,
 		encodeResponse,

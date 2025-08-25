@@ -270,6 +270,316 @@ paths:
           description: Permanently deleted File.
         '404':
           description: A File with the specified ID was not found.
+  /files/{fileID}/json:
+    post:
+      tags: ['ACH Files']
+      summary: Create File
+      description: Create a new File object from the JSON representation.
+      operationId: createFile
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the system's logs
+          example: "rs4f9915"
+          schema:
+            type: string
+        - name: fileID
+          in: path
+          description: File ID
+          required: true
+          schema:
+            type: string
+            example: "3f2d23ee214"
+        - name: skipAll
+          in: query
+          description: Optional parameter to disable all validation checks for a File
+          schema:
+            type: boolean
+        - name: requireABAOrigin
+          in: query
+          description: Optional parameter to configure ImmediateOrigin validation
+          schema:
+            type: boolean
+        - name: bypassOrigin
+          in: query
+          description: Optional parameter to configure ImmediateOrigin validation
+          schema:
+            type: boolean
+          deprecated: true
+        - name: bypassOriginValidation
+          in: query
+          description: Optional parameter to configure ImmediateOrigin validation
+          schema:
+            type: boolean
+        - name: bypassDestination
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+          deprecated: true
+        - name: bypassDestinationValidation
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+        - name: customTraceNumbers
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+        - name: allowZeroBatches
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+        - name: allowMissingFileHeader
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+        - name: allowMissingFileControl
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+        - name: bypassCompanyIdentificationMatch
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+        - name: customReturnCodes
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+        - name: unequalServiceClassCode
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+        - name: unorderedBatchNumbers
+          in: query
+          description: Allow a file to be read with unordered batch numbers.
+          schema:
+            type: boolean
+          deprecated: true
+        - name: allowUnorderedBatchNumbers
+          in: query
+          description: Allow a file to be read with unordered batch numbers.
+          schema:
+            type: boolean
+        - name: allowInvalidCheckDigit
+          in: query
+          description: Allow the CheckDigit field in EntryDetail to differ from the expected calculation
+          schema:
+            type: boolean
+        - name: unequalAddendaCounts
+          in: query
+          description: Optional parameter to configure UnequalAddendaCounts validation
+          schema:
+            type: boolean
+        - name: preserveSpaces
+          in: query
+          description: Optional parameter to save all padding spaces
+          schema:
+            type: boolean
+        - name: allowInvalidAmounts
+          in: query
+          description: Optional parameter to save all padding spaces
+          schema:
+            type: boolean
+        - name: allowSpecialCharacters
+          in: query
+          description: Optional parameter to permit a wider range of UTF-8 characters in alphanumeric fields
+          schema:
+            type: boolean
+      requestBody:
+        description: Content of the ACH file (in json)
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFile'
+      responses:
+        '200':
+          description: A JSON object containing a new File
+          headers:
+            Location:
+              description: The location of the new resource
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateFileResponse'
+        '400':
+          description: "Invalid File Header Object"
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+  /files/{fileID}/plaintext:
+    post:
+      tags: ['ACH Files']
+      summary: Create File
+      description: Create a new File object from the plaintext representation.
+      operationId: createFile
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the system's logs
+          example: "rs4f9915"
+          schema:
+            type: string
+        - name: fileID
+          in: path
+          description: File ID
+          required: true
+          schema:
+            type: string
+            example: "3f2d23ee214"
+        - name: skipAll
+          in: query
+          description: Optional parameter to disable all validation checks for a File
+          schema:
+            type: boolean
+        - name: requireABAOrigin
+          in: query
+          description: Optional parameter to configure ImmediateOrigin validation
+          schema:
+            type: boolean
+        - name: bypassOrigin
+          in: query
+          description: Optional parameter to configure ImmediateOrigin validation
+          schema:
+            type: boolean
+          deprecated: true
+        - name: bypassOriginValidation
+          in: query
+          description: Optional parameter to configure ImmediateOrigin validation
+          schema:
+            type: boolean
+        - name: bypassDestination
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+          deprecated: true
+        - name: bypassDestinationValidation
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+        - name: customTraceNumbers
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+        - name: allowZeroBatches
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+        - name: allowMissingFileHeader
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+        - name: allowMissingFileControl
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+        - name: bypassCompanyIdentificationMatch
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+        - name: customReturnCodes
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+        - name: unequalServiceClassCode
+          in: query
+          description: Optional parameter to configure ImmediateDestination validation
+          schema:
+            type: boolean
+        - name: unorderedBatchNumbers
+          in: query
+          description: Allow a file to be read with unordered batch numbers.
+          schema:
+            type: boolean
+          deprecated: true
+        - name: allowUnorderedBatchNumbers
+          in: query
+          description: Allow a file to be read with unordered batch numbers.
+          schema:
+            type: boolean
+        - name: allowInvalidCheckDigit
+          in: query
+          description: Allow the CheckDigit field in EntryDetail to differ from the expected calculation
+          schema:
+            type: boolean
+        - name: unequalAddendaCounts
+          in: query
+          description: Optional parameter to configure UnequalAddendaCounts validation
+          schema:
+            type: boolean
+        - name: preserveSpaces
+          in: query
+          description: Optional parameter to save all padding spaces
+          schema:
+            type: boolean
+        - name: allowInvalidAmounts
+          in: query
+          description: Optional parameter to save all padding spaces
+          schema:
+            type: boolean
+        - name: allowSpecialCharacters
+          in: query
+          description: Optional parameter to permit a wider range of UTF-8 characters in alphanumeric fields
+          schema:
+            type: boolean
+      requestBody:
+        description: Content of the ACH file (in raw text)
+        required: true
+        content:
+          text/plain:
+            schema:
+              description: A plaintext ACH file
+              type: string
+              example: |
+               101 23138010401210428821906240000A094101Federal Reserve Bank   My Bank Name
+               5225Name on Account                     121042882 PPDREG.SALARY      190625   1121042880000001
+               62723138010412345678         0100000000               Receiver Account Name   0121042880000001
+               82250000010023138010000100000000000000000000121042882                          121042880000001
+               9000001000001000000010023138010000100000000000000000000
+               9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+               9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+               9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+               9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+               9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+      responses:
+        '200':
+          description: A JSON object containing a new File
+          headers:
+            Location:
+              description: The location of the new resource
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateFileResponse'
+        '400':
+          description: "Invalid File Header Object"
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /files/{fileID}/build:
     get:
       tags: ['ACH Files']
@@ -729,6 +1039,88 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SegmentFile'
+      responses:
+        '200':
+          description: An ID of each new ACH file
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SegmentedFiles'
+        '400':
+          description: See error in response body
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+        '404':
+          description: A resource with the specified ID was not found
+  /segment/json:
+    post:
+      tags: ['ACH Files']
+      summary: Segment File
+      description: Split one JSON formatted ACH File into two. One with only debits and one with only credits.
+      operationId: segmentFile
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the system's logs
+          example: "rs4f9915"
+          schema:
+            type: string
+      requestBody:
+        description: ACH file (in JSON format) along with optional segment configuration
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SegmentFile'
+      responses:
+        '200':
+          description: An ID of each new ACH file
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SegmentedFiles'
+        '400':
+          description: See error in response body
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+        '404':
+          description: A resource with the specified ID was not found
+  /segment/plaintext:
+    post:
+      tags: ['ACH Files']
+      summary: Segment File
+      description: Split one raw text formatted ACH File into two. One with only debits and one with only credits.
+      operationId: segmentFile
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the system's logs
+          example: "rs4f9915"
+          schema:
+            type: string
+      requestBody:
+        description: ACH file (in Nacha formatting) along with optional segment configuration
+        required: false
+        content:
+          text/plain:
+            schema:
+              description: A plaintext ACH file
+              type: string
+              example: |
+               101 23138010401210428821906240000A094101Federal Reserve Bank   My Bank Name
+               5225Name on Account                     121042882 PPDREG.SALARY      190625   1121042880000001
+               62723138010412345678         0100000000               Receiver Account Name   0121042880000001
+               82250000010023138010000100000000000000000000121042882                          121042880000001
+               9000001000001000000010023138010000100000000000000000000
+               9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+               9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+               9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+               9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+               9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
       responses:
         '200':
           description: An ID of each new ACH file
