@@ -625,6 +625,10 @@ func (iatBatch *IATBatch) Create() error {
 //
 // Validate will never modify the iatBatch.
 func (iatBatch *IATBatch) Validate() error {
+	if iatBatch.validateOpts != nil && (iatBatch.validateOpts.SkipAll || iatBatch.validateOpts.BypassBatchValidation) {
+		return nil
+	}
+
 	// basic verification of the batch before we validate specific rules.
 	if err := iatBatch.verify(); err != nil {
 		return err

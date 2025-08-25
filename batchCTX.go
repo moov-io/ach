@@ -45,7 +45,7 @@ func NewBatchCTX(bh *BatchHeader) *BatchCTX {
 //
 // Validate will never modify the batch.
 func (batch *BatchCTX) Validate() error {
-	if batch.validateOpts != nil && batch.validateOpts.SkipAll {
+	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
 		return nil
 	}
 

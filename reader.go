@@ -1000,7 +1000,7 @@ type canValidate interface {
 }
 
 func maybeValidate(rec canValidate, opts *ValidateOpts) error {
-	if opts != nil && opts.SkipAll {
+	if opts != nil && (opts.SkipAll || opts.BypassBatchValidation) {
 		return nil
 	}
 	return rec.Validate()

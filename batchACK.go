@@ -38,7 +38,7 @@ func NewBatchACK(bh *BatchHeader) *BatchACK {
 //
 // Validate will never modify the batch.
 func (batch *BatchACK) Validate() error {
-	if batch.validateOpts != nil && batch.validateOpts.SkipAll {
+	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
 		return nil
 	}
 

@@ -53,7 +53,7 @@ func NewBatchPOS(bh *BatchHeader) *BatchPOS {
 //
 // Validate will never modify the batch.
 func (batch *BatchPOS) Validate() error {
-	if batch.validateOpts != nil && batch.validateOpts.SkipAll {
+	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
 		return nil
 	}
 
