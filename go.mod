@@ -16,7 +16,7 @@ require (
 	github.com/moov-io/iso3166 v0.3.0
 	github.com/moov-io/iso4217 v0.3.2
 	github.com/prometheus/client_golang v1.23.0
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.0
 	golang.org/x/net v0.43.0
 	golang.org/x/sync v0.16.0
 	golang.org/x/text v0.28.0
