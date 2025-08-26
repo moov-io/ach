@@ -43,7 +43,7 @@ func NewBatchENR(bh *BatchHeader) *BatchENR {
 
 // Validate ensures the batch meets NACHA rules specific to this batch type.
 func (batch *BatchENR) Validate() error {
-	if batch.validateOpts != nil && batch.validateOpts.SkipAll {
+	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
 		return nil
 	}
 

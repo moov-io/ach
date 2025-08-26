@@ -755,6 +755,9 @@ type ValidateOpts struct {
 	// AllowEmptyIndividualName will skip verifying IndividualName fields are populated
 	// for SEC codes that require the field to be non-blank (and non-zero)
 	AllowEmptyIndividualName bool `json:"allowEmptyIndividualName"`
+
+	// BypassBatchValidation will skip validation for batches in a file and only validate file header and control info
+	BypassBatchValidation bool `json:"bypassBatchValidation"`
 }
 
 // merge will combine two ValidateOpts structs and keep any non-zero field values.
@@ -787,6 +790,7 @@ func (v *ValidateOpts) merge(other *ValidateOpts) *ValidateOpts {
 		AllowZeroEntryAmount:             v.AllowZeroEntryAmount || other.AllowZeroEntryAmount,
 		AllowSpecialCharacters:           v.AllowSpecialCharacters || other.AllowSpecialCharacters,
 		AllowEmptyIndividualName:         v.AllowEmptyIndividualName || other.AllowEmptyIndividualName,
+		BypassBatchValidation:            v.BypassBatchValidation || other.BypassBatchValidation,
 	}
 
 	if v.CheckTransactionCode != nil {
@@ -828,9 +832,11 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 			return NewErrFileCalculatedControlEquality("BatchCount", len(f.Batches), f.Control.BatchCount)
 		}
 
-		for _, b := range f.Batches {
-			if err := b.Validate(); err != nil {
-				return err
+		if !opts.BypassBatchValidation {
+			for _, b := range f.Batches {
+				if err := b.Validate(); err != nil {
+					return err
+				}
 			}
 		}
 

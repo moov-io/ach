@@ -44,7 +44,7 @@ func NewBatchCIE(bh *BatchHeader) *BatchCIE {
 //
 // Validate will never modify the batch.
 func (batch *BatchCIE) Validate() error {
-	if batch.validateOpts != nil && batch.validateOpts.SkipAll {
+	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
 		return nil
 	}
 

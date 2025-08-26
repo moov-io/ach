@@ -1000,8 +1000,23 @@ type canValidate interface {
 }
 
 func maybeValidate(rec canValidate, opts *ValidateOpts) error {
-	if opts != nil && opts.SkipAll {
-		return nil
+	if opts != nil {
+		if opts.SkipAll {
+			return nil
+		}
+		if opts.BypassBatchValidation {
+			// If BypassBatchValidation is specified, only call validate for File objects.
+			// Otherwise just validate for all
+			switch rec.(type) {
+			case *ADVFileControl, *FileControl, *FileHeader:
+				return rec.Validate()
+
+			default:
+				return nil
+			}
+		}
 	}
+
+	// Default case
 	return rec.Validate()
 }

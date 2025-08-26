@@ -2304,3 +2304,29 @@ func TestFileFromJSON_10DigitOrigin(t *testing.T) {
 	require.Equal(t, "B231380104", file.Header.ImmediateDestination)
 	require.Equal(t, "A121042882", file.Header.ImmediateOrigin)
 }
+
+func TestFile_BypassBatchValidation(t *testing.T) {
+
+	// By default, catching batch details error
+	file := mockFilePPD(t)
+	testBatch := file.Batches[0]
+	entries := testBatch.GetEntries()
+	entries[0].IndividualName = "testÑåṁe" // IndividualName was "Wade Arnold" in mocked entry
+
+	err := file.Validate()
+	require.Error(t, err)
+
+	// With bypass flag, should not catch validation error
+	err = file.ValidateWith(&ValidateOpts{
+		BypassBatchValidation: true,
+	})
+	require.NoError(t, err)
+
+	// If we change the file control, validation should then fail
+	testControl := testBatch.GetControl()
+	testControl.TotalCreditEntryDollarAmount = 50 // The mocked credit amount should be 100
+	err = file.ValidateWith(&ValidateOpts{
+		BypassBatchValidation: true,
+	})
+	require.Error(t, err)
+}

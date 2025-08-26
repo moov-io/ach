@@ -51,6 +51,7 @@ const (
 	allowZeroEntryAmount             = "allowZeroEntryAmount"
 	allowSpecialCharacters           = "allowSpecialCharacters"
 	allowEmptyIndividualName         = "allowEmptyIndividualName"
+	bypassBatchValidation            = "bypassBatchValidation"
 )
 
 // readValidateOpts parses ValidateOpts from the URL query parameters and from the request body.
@@ -81,6 +82,7 @@ func readValidateOpts(request *http.Request) (io.ReadCloser, *ach.ValidateOpts, 
 		allowZeroEntryAmount,
 		allowSpecialCharacters,
 		allowEmptyIndividualName,
+		bypassBatchValidation,
 	}
 
 	var buf bytes.Buffer
@@ -142,6 +144,8 @@ func readValidateOpts(request *http.Request) (io.ReadCloser, *ach.ValidateOpts, 
 			opts.AllowSpecialCharacters = yes
 		case allowEmptyIndividualName:
 			opts.AllowEmptyIndividualName = yes
+		case bypassBatchValidation:
+			opts.BypassBatchValidation = yes
 		}
 	}
 
