@@ -127,13 +127,13 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 	}
 	req.validateOpts = validateOpts
 
-	bs, err := io.ReadAll(body)
+	bs, err := readBody(body)
 	if err != nil {
 		return nil, err
 	}
 
 	h := strings.ToLower(request.Header.Get("Content-Type"))
-	if strings.Contains(h, "application/json") {
+	if strings.Contains(h, "application/json") || json.Valid(bs) {
 		// Read body as ACH file in JSON
 		f, err := ach.FileFromJSONWith(bs, req.validateOpts)
 		if f != nil {
@@ -160,6 +160,22 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 	}
 
 	return req, nil
+}
+
+const (
+	maxBodySize = 10 * 1024 * 1024 // 10MB
+)
+
+func readBody(body io.ReadCloser) ([]byte, error) {
+	defer body.Close()
+
+	r := io.LimitReader(body, maxBodySize)
+
+	bs, err := io.ReadAll(r)
+	if err != nil {
+		return nil, fmt.Errorf("reading request body: %w", err)
+	}
+	return bs, nil
 }
 
 type getFilesRequest struct {
@@ -714,11 +730,16 @@ func decodeSegmentFileRequest(_ context.Context, r *http.Request) (interface{}, 
 		ValidateOpts *ach.ValidateOpts             `json:"validateOpts"`
 	}
 
-	header := strings.ToLower(r.Header.Get("content-type"))
-	if strings.Contains(header, "application/json") {
+	bs, err := readBody(r.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	h := strings.ToLower(r.Header.Get("content-type"))
+	if strings.Contains(h, "application/json") || json.Valid(bs) {
 		kv := make(map[string]json.RawMessage)
 
-		err := json.NewDecoder(r.Body).Decode(&kv)
+		err := json.NewDecoder(bytes.NewReader(bs)).Decode(&kv)
 		if err != nil {
 			return segmentedFilesResponse{Err: err}, fmt.Errorf("A : %v", err)
 		}
@@ -742,7 +763,7 @@ func decodeSegmentFileRequest(_ context.Context, r *http.Request) (interface{}, 
 			}
 		}
 	} else {
-		ff, err := ach.NewReader(r.Body).Read()
+		ff, err := ach.NewReader(bytes.NewReader(bs)).Read()
 		if err != nil {
 			return segmentedFilesResponse{Err: err}, fmt.Errorf("D : %v", err)
 		}

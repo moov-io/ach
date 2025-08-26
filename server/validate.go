@@ -57,7 +57,7 @@ const (
 // A copy of the request body is returned. Callers are responsible for closing the body.
 //
 // Query parameters override the JSON body
-func readValidateOpts(request *http.Request) (io.Reader, *ach.ValidateOpts, error) {
+func readValidateOpts(request *http.Request) (io.ReadCloser, *ach.ValidateOpts, error) {
 	validationNames := []string{
 		skipAll,
 		requireABAOrigin,
@@ -145,5 +145,5 @@ func readValidateOpts(request *http.Request) (io.Reader, *ach.ValidateOpts, erro
 		}
 	}
 
-	return &buf, opts, nil
+	return io.NopCloser(&buf), opts, nil
 }
