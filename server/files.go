@@ -26,7 +26,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 
 	"github.com/moov-io/ach"
 	"github.com/moov-io/base"
@@ -132,8 +131,7 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 		return nil, err
 	}
 
-	h := strings.ToLower(request.Header.Get("Content-Type"))
-	if strings.Contains(h, "application/json") || json.Valid(bs) {
+	if json.Valid(bs) {
 		// Read body as ACH file in JSON
 		f, err := ach.FileFromJSONWith(bs, req.validateOpts)
 		if f != nil {
@@ -735,8 +733,7 @@ func decodeSegmentFileRequest(_ context.Context, r *http.Request) (interface{}, 
 		return nil, err
 	}
 
-	h := strings.ToLower(r.Header.Get("content-type"))
-	if strings.Contains(h, "application/json") || json.Valid(bs) {
+	if json.Valid(bs) {
 		kv := make(map[string]json.RawMessage)
 
 		err := json.NewDecoder(bytes.NewReader(bs)).Decode(&kv)
