@@ -177,6 +177,11 @@ paths:
           description: Optional parameter to permit a wider range of UTF-8 characters in alphanumeric fields
           schema:
             type: boolean
+        - name: allowEmptyIndividualName
+          in: query
+          description: AllowEmptyIndividualName will skip verifying IndividualName fields are populated for SEC codes that require the field to be non-blank (and non-zero)
+          schema:
+            type: boolean
         - name: bypassBatchValidation
           in: query
           description: Skip validation for batches in a file and only validate file header and control info
