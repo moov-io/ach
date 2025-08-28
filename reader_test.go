@@ -701,11 +701,17 @@ func BenchmarkFileEntryDetail(b *testing.B) {
 func testFileAddenda05(t testing.TB) {
 	bh := mockBatchHeader()
 	ed := mockEntryDetail()
+
 	addenda05 := mockAddenda05()
 	addenda05.SequenceNumber = 0
+
 	ed.AddAddenda05(addenda05)
+	ed.AddendaRecordIndicator = 0 // force reset
+
 	line := bh.String() + "\n" + ed.String() + "\n" + ed.Addenda05[0].String()
+
 	r := NewReader(strings.NewReader(line))
+
 	_, err := r.Read()
 	if !base.Has(err, ErrBatchAddendaIndicator) {
 		t.Errorf("%T: %s", err, err)
@@ -2261,10 +2267,14 @@ func TestReadFile_lineNumbers(t *testing.T) {
 		}
 	}
 
-	fd, _ := os.Open(filepath.Join("test", "testdata", "return-WEB.ach"))
+	fd, err := os.Open(filepath.Join("test", "testdata", "return-WEB.ach"))
+	require.NoError(t, err)
 	defer fd.Close()
+
 	reader := NewReader(fd)
-	file, _ := reader.Read()
+
+	file, err := reader.Read()
+	require.NoError(t, err)
 
 	// file header
 	assertLineNumber(t, 1, file.Header.LineNumber)
@@ -2284,10 +2294,13 @@ func TestReadFile_lineNumbers(t *testing.T) {
 	// file control
 	assertLineNumber(t, 10, file.Control.LineNumber)
 
-	fd, _ = os.Open(filepath.Join("test", "testdata", "20180713-IAT.ach"))
+	fd, err = os.Open(filepath.Join("test", "testdata", "20180713-IAT.ach"))
+	require.NoError(t, err)
 	defer fd.Close()
+
 	reader = NewReader(fd)
-	file, _ = reader.Read()
+	file, err = reader.Read()
+	require.NoError(t, err)
 
 	// iat batch header
 	assertLineNumber(t, 2, file.IATBatches[0].GetHeader().LineNumber)
@@ -2319,17 +2332,13 @@ func TestReadFile_lineNumbers(t *testing.T) {
 	// iat batch control
 	assertLineNumber(t, 11, file.IATBatches[0].GetControl().LineNumber)
 
-	fd, err := os.Open(filepath.Join("test", "testdata", "adv.ach"))
-	if err != nil {
-		panic(err)
-	}
+	fd, err = os.Open(filepath.Join("test", "testdata", "adv.ach"))
+	require.NoError(t, err)
 	defer fd.Close()
+
 	reader = NewReader(fd)
 	file, err = reader.Read()
-
-	if err != nil {
-		panic(err)
-	}
+	require.NoError(t, err)
 
 	// adv file header
 	assertLineNumber(t, 1, file.Header.LineNumber)

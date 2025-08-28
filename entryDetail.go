@@ -683,7 +683,10 @@ func (ed *EntryDetail) CreditOrDebit() string {
 
 // AddAddenda05 appends an Addenda05 to the EntryDetail
 func (ed *EntryDetail) AddAddenda05(addenda05 *Addenda05) {
-	ed.Addenda05 = append(ed.Addenda05, addenda05)
+	if addenda05 != nil {
+		ed.AddendaRecordIndicator = 1
+		ed.Addenda05 = append(ed.Addenda05, addenda05)
+	}
 }
 
 // addendaCount returns the count of Addenda records added onto this EntryDetail
