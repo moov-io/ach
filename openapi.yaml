@@ -61,12 +61,7 @@ paths:
       description: Create a new File object from either the plaintext or JSON representation.
       operationId: createFile
       parameters:
-        - name: X-Request-ID
-          in: header
-          description: Optional Request ID allows application developer to trace requests through the system's logs
-          example: "rs4f9915"
-          schema:
-            type: string
+        - $ref: "#/components/parameters/X-Request-ID"
         - name: fileID
           in: path
           description: File ID
@@ -74,119 +69,26 @@ paths:
           schema:
             type: string
             example: "3f2d23ee214"
-        - name: skipAll
-          in: query
-          description: Optional parameter to disable all validation checks for a File
-          schema:
-            type: boolean
-        - name: requireABAOrigin
-          in: query
-          description: Optional parameter to configure ImmediateOrigin validation
-          schema:
-            type: boolean
-        - name: bypassOrigin
-          in: query
-          description: Optional parameter to configure ImmediateOrigin validation
-          schema:
-            type: boolean
-          deprecated: true
-        - name: bypassOriginValidation
-          in: query
-          description: Optional parameter to configure ImmediateOrigin validation
-          schema:
-            type: boolean
-        - name: bypassDestination
-          in: query
-          description: Optional parameter to configure ImmediateDestination validation
-          schema:
-            type: boolean
-          deprecated: true
-        - name: bypassDestinationValidation
-          in: query
-          description: Optional parameter to configure ImmediateDestination validation
-          schema:
-            type: boolean
-        - name: customTraceNumbers
-          in: query
-          description: Optional parameter to configure ImmediateDestination validation
-          schema:
-            type: boolean
-        - name: allowZeroBatches
-          in: query
-          description: Optional parameter to configure ImmediateDestination validation
-          schema:
-            type: boolean
-        - name: allowMissingFileHeader
-          in: query
-          description: Optional parameter to configure ImmediateDestination validation
-          schema:
-            type: boolean
-        - name: allowMissingFileControl
-          in: query
-          description: Optional parameter to configure ImmediateDestination validation
-          schema:
-            type: boolean
-        - name: bypassCompanyIdentificationMatch
-          in: query
-          description: Optional parameter to configure ImmediateDestination validation
-          schema:
-            type: boolean
-        - name: customReturnCodes
-          in: query
-          description: Optional parameter to configure ImmediateDestination validation
-          schema:
-            type: boolean
-        - name: unequalServiceClassCode
-          in: query
-          description: Optional parameter to configure ImmediateDestination validation
-          schema:
-            type: boolean
-        - name: unorderedBatchNumbers
-          in: query
-          description: Allow a file to be read with unordered batch numbers.
-          schema:
-            type: boolean
-          deprecated: true
-        - name: allowUnorderedBatchNumbers
-          in: query
-          description: Allow a file to be read with unordered batch numbers.
-          schema:
-            type: boolean
-        - name: allowInvalidCheckDigit
-          in: query
-          description: Allow the CheckDigit field in EntryDetail to differ from the expected calculation
-          schema:
-            type: boolean
-        - name: unequalAddendaCounts
-          in: query
-          description: Optional parameter to configure UnequalAddendaCounts validation
-          schema:
-            type: boolean
-        - name: preserveSpaces
-          in: query
-          description: Optional parameter to save all padding spaces
-          schema:
-            type: boolean
-        - name: allowInvalidAmounts
-          in: query
-          description: Optional parameter to save all padding spaces
-          schema:
-            type: boolean
-        - name: allowSpecialCharacters
-          in: query
-          description: Optional parameter to permit a wider range of UTF-8 characters in alphanumeric fields
-          schema:
-            type: boolean
-        - name: allowEmptyIndividualName
-          in: query
-          description: AllowEmptyIndividualName will skip verifying IndividualName fields are populated for SEC codes that require the field to be non-blank (and non-zero)
-          schema:
-            type: boolean
-        - name: bypassBatchValidation
-          in: query
-          description: Skip validation for batches in a file and only validate file header and control info
-          schema:
-            type: boolean
+        - $ref: "#/components/parameters/SkipAll"
+        - $ref: "#/components/parameters/AllowInvalidAmounts"
+        - $ref: "#/components/parameters/AllowInvalidCheckDigit"
+        - $ref: "#/components/parameters/AllowMissingFileControl"
+        - $ref: "#/components/parameters/AllowMissingFileHeader"
+        - $ref: "#/components/parameters/AllowSpecialCharacters"
+        - $ref: "#/components/parameters/AllowUnorderedBatchNumbers"
+        - $ref: "#/components/parameters/AllowZeroBatches"
+        - $ref: "#/components/parameters/BypassCompanyIdentificationMatch"
+        - $ref: "#/components/parameters/BypassDestination"
+        - $ref: "#/components/parameters/BypassDestinationValidation"
+        - $ref: "#/components/parameters/BypassOrigin"
+        - $ref: "#/components/parameters/BypassOriginValidation"
+        - $ref: "#/components/parameters/CustomReturnCodes"
+        - $ref: "#/components/parameters/CustomTraceNumbers"
+        - $ref: "#/components/parameters/PreserveSpaces"
+        - $ref: "#/components/parameters/RequireABAOrigin"
+        - $ref: "#/components/parameters/UnequalAddendaCounts"
+        - $ref: "#/components/parameters/UnequalServiceClassCode"
+        - $ref: "#/components/parameters/UnorderedBatchNumbers"
       requestBody:
         description: Content of the ACH file (in json or raw text)
         required: true
@@ -280,6 +182,71 @@ paths:
           description: Permanently deleted File.
         '404':
           description: A File with the specified ID was not found.
+  /files/{fileID}/new:
+    post:
+      tags: ['ACH Files']
+      summary: Create New File
+      description: |
+        Create a new File object from either the plaintext or JSON representation. This endpoint is the same as POST /files/{fileID}
+        but it's documented to accept a string/generic body which helps some generated clients. (e.g. Java)
+        See https://github.com/moov-io/ach/issues/1650 for more details.
+      operationId: createNewFile
+      parameters:
+        - $ref: "#/components/parameters/X-Request-ID"
+        - name: fileID
+          in: path
+          description: File ID
+          required: true
+          schema:
+            type: string
+            example: "3f2d23ee214"
+        - $ref: "#/components/parameters/SkipAll"
+        - $ref: "#/components/parameters/AllowInvalidAmounts"
+        - $ref: "#/components/parameters/AllowInvalidCheckDigit"
+        - $ref: "#/components/parameters/AllowMissingFileControl"
+        - $ref: "#/components/parameters/AllowMissingFileHeader"
+        - $ref: "#/components/parameters/AllowSpecialCharacters"
+        - $ref: "#/components/parameters/AllowUnorderedBatchNumbers"
+        - $ref: "#/components/parameters/AllowZeroBatches"
+        - $ref: "#/components/parameters/BypassCompanyIdentificationMatch"
+        - $ref: "#/components/parameters/BypassDestination"
+        - $ref: "#/components/parameters/BypassDestinationValidation"
+        - $ref: "#/components/parameters/BypassOrigin"
+        - $ref: "#/components/parameters/BypassOriginValidation"
+        - $ref: "#/components/parameters/CustomReturnCodes"
+        - $ref: "#/components/parameters/CustomTraceNumbers"
+        - $ref: "#/components/parameters/PreserveSpaces"
+        - $ref: "#/components/parameters/RequireABAOrigin"
+        - $ref: "#/components/parameters/UnequalAddendaCounts"
+        - $ref: "#/components/parameters/UnequalServiceClassCode"
+        - $ref: "#/components/parameters/UnorderedBatchNumbers"
+      requestBody:
+        description: Content of the ACH file (in json or raw text)
+        required: true
+        content:
+          text/plain:
+            schema:
+              description: A plaintext Nacha formatted file or moov-io/ach JSON representation
+              type: string
+      responses:
+        '200':
+          description: A JSON object containing a new File
+          headers:
+            Location:
+              description: The location of the new resource
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateFileResponse'
+        '400':
+          description: "Invalid File Header Object"
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /files/{fileID}/build:
     get:
       tags: ['ACH Files']
@@ -345,91 +312,26 @@ paths:
                 $ref: '#/components/schemas/RawFile'
   /files/{fileID}/validate:
     parameters:
-      - name: skipAll
-        in: query
-        description: Optional parameter to disable all validation checks for a File
-        schema:
-          type: boolean
-      - name: requireABAOrigin
-        in: query
-        description: Optional parameter to configure ImmediateOrigin validation
-        schema:
-          type: boolean
-      - name: bypassOriginValidation
-        in: query
-        description: Optional parameter to configure ImmediateOrigin validation
-        schema:
-          type: boolean
-      - name: bypassDestinationValidation
-        in: query
-        description: Optional parameter to configure ImmediateDestination validation
-        schema:
-          type: boolean
-      - name: customTraceNumbers
-        in: query
-        description: Optional parameter to configure ImmediateDestination validation
-        schema:
-          type: boolean
-      - name: allowZeroBatches
-        in: query
-        description: Optional parameter to configure ImmediateDestination validation
-        schema:
-          type: boolean
-      - name: allowMissingFileHeader
-        in: query
-        description: Optional parameter to configure ImmediateDestination validation
-        schema:
-          type: boolean
-      - name: allowMissingFileControl
-        in: query
-        description: Optional parameter to configure ImmediateDestination validation
-        schema:
-          type: boolean
-      - name: bypassCompanyIdentificationMatch
-        in: query
-        description: Optional parameter to configure ImmediateDestination validation
-        schema:
-          type: boolean
-      - name: customReturnCodes
-        in: query
-        description: Optional parameter to configure ImmediateDestination validation
-        schema:
-          type: boolean
-      - name: unequalServiceClassCode
-        in: query
-        description: Optional parameter to configure ImmediateDestination validation
-        schema:
-          type: boolean
-      - name: allowUnorderedBatchNumbers
-        in: query
-        description: Allow a file to be read with unordered batch numbers.
-        schema:
-          type: boolean
-      - name: allowInvalidCheckDigit
-        in: query
-        description: Allow the CheckDigit field in EntryDetail to differ from the expected calculation
-        schema:
-          type: boolean
-      - name: unequalAddendaCounts
-        in: query
-        description: Optional parameter to configure UnequalAddendaCounts validation
-        schema:
-          type: boolean
-      - name: preserveSpaces
-        in: query
-        description: Optional parameter to save all padding spaces
-        schema:
-          type: boolean
-      - name: allowInvalidAmounts
-        in: query
-        description: Optional parameter to save all padding spaces
-        schema:
-          type: boolean
-      - name: allowSpecialCharacters
-        in: query
-        description: Optional parameter to permit a wider range of UTF-8 characters in alphanumeric fields
-        schema:
-          type: boolean
+      - $ref: "#/components/parameters/SkipAll"
+      - $ref: "#/components/parameters/AllowInvalidAmounts"
+      - $ref: "#/components/parameters/AllowInvalidCheckDigit"
+      - $ref: "#/components/parameters/AllowMissingFileControl"
+      - $ref: "#/components/parameters/AllowMissingFileHeader"
+      - $ref: "#/components/parameters/AllowSpecialCharacters"
+      - $ref: "#/components/parameters/AllowUnorderedBatchNumbers"
+      - $ref: "#/components/parameters/AllowZeroBatches"
+      - $ref: "#/components/parameters/BypassCompanyIdentificationMatch"
+      - $ref: "#/components/parameters/BypassDestination"
+      - $ref: "#/components/parameters/BypassDestinationValidation"
+      - $ref: "#/components/parameters/BypassOrigin"
+      - $ref: "#/components/parameters/BypassOriginValidation"
+      - $ref: "#/components/parameters/CustomReturnCodes"
+      - $ref: "#/components/parameters/CustomTraceNumbers"
+      - $ref: "#/components/parameters/PreserveSpaces"
+      - $ref: "#/components/parameters/RequireABAOrigin"
+      - $ref: "#/components/parameters/UnequalAddendaCounts"
+      - $ref: "#/components/parameters/UnequalServiceClassCode"
+      - $ref: "#/components/parameters/UnorderedBatchNumbers"
     get:
       tags: ['ACH Files']
       summary: Validate File
@@ -791,6 +693,137 @@ paths:
           description: A resource with the specified ID was not found
 
 components:
+  parameters:
+    X-Request-ID:
+      name: X-Request-ID
+      in: header
+      description: Optional Request ID allows application developer to trace requests through the system's logs
+      example: "rs4f9915"
+      schema:
+        type: string
+    SkipAll:
+      name: skipAll
+      in: query
+      description: Optional parameter to disable all validation checks for a File
+      schema:
+        type: boolean
+    RequireABAOrigin:
+      name: requireABAOrigin
+      in: query
+      description: Optional parameter to configure ImmediateOrigin validation
+      schema:
+        type: boolean
+    BypassOrigin:
+      name: bypassOrigin
+      in: query
+      description: Optional parameter to configure ImmediateOrigin validation
+      schema:
+        type: boolean
+        deprecated: true
+    BypassOriginValidation:
+      name: bypassOriginValidation
+      in: query
+      description: Optional parameter to configure ImmediateOrigin validation
+      schema:
+        type: boolean
+    BypassDestination:
+      name: bypassDestination
+      in: query
+      description: Optional parameter to configure ImmediateDestination validation
+      schema:
+        type: boolean
+      deprecated: true
+    BypassDestinationValidation:
+      name: bypassDestinationValidation
+      in: query
+      description: Optional parameter to configure ImmediateDestination validation
+      schema:
+        type: boolean
+    CustomTraceNumbers:
+      name: customTraceNumbers
+      in: query
+      description: Optional parameter to configure ImmediateDestination validation
+      schema:
+        type: boolean
+    AllowZeroBatches:
+      name: allowZeroBatches
+      in: query
+      description: Optional parameter to configure ImmediateDestination validation
+      schema:
+        type: boolean
+    AllowMissingFileHeader:
+      name: allowMissingFileHeader
+      in: query
+      description: Optional parameter to configure ImmediateDestination validation
+      schema:
+        type: boolean
+    AllowMissingFileControl:
+      name: allowMissingFileControl
+      in: query
+      description: Optional parameter to configure ImmediateDestination validation
+      schema:
+        type: boolean
+    BypassCompanyIdentificationMatch:
+      name: bypassCompanyIdentificationMatch
+      in: query
+      description: Optional parameter to configure ImmediateDestination validation
+      schema:
+        type: boolean
+    CustomReturnCodes:
+      name: customReturnCodes
+      in: query
+      description: Optional parameter to configure ImmediateDestination validation
+      schema:
+        type: boolean
+    UnequalServiceClassCode:
+      name: unequalServiceClassCode
+      in: query
+      description: Optional parameter to configure ImmediateDestination validation
+      schema:
+        type: boolean
+    UnorderedBatchNumbers:
+      name: unorderedBatchNumbers
+      in: query
+      description: Allow a file to be read with unordered batch numbers.
+      schema:
+        type: boolean
+      deprecated: true
+    AllowUnorderedBatchNumbers:
+      name: allowUnorderedBatchNumbers
+      in: query
+      description: Allow a file to be read with unordered batch numbers.
+      schema:
+        type: boolean
+    AllowInvalidCheckDigit:
+      name: allowInvalidCheckDigit
+      in: query
+      description: Allow the CheckDigit field in EntryDetail to differ from the expected calculation
+      schema:
+        type: boolean
+    UnequalAddendaCounts:
+      name: unequalAddendaCounts
+      in: query
+      description: Optional parameter to configure UnequalAddendaCounts validation
+      schema:
+        type: boolean
+    PreserveSpaces:
+      name: preserveSpaces
+      in: query
+      description: Optional parameter to save all padding spaces
+      schema:
+        type: boolean
+    AllowInvalidAmounts:
+      name: allowInvalidAmounts
+      in: query
+      description: Optional parameter to save all padding spaces
+      schema:
+        type: boolean
+    AllowSpecialCharacters:
+      name: allowSpecialCharacters
+      in: query
+      description: Optional parameter to permit a wider range of UTF-8 characters in alphanumeric fields
+      schema:
+        type: boolean
   schemas:
     CreateFile:
       description: \`batches\` OR `IATBatches` is required
