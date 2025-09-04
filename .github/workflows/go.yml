@@ -20,7 +20,7 @@ jobs:
         version: [stable, oldstable]
     steps:
     - name: Set up Go 1.x
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         go-version: ${{ matrix.version }}
       id: go
@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Set up Go 1.x
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         go-version: stable
       id: go
