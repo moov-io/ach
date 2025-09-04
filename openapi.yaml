@@ -274,7 +274,7 @@ paths:
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/File'
+                $ref: '#/components/schemas/BuildFileResponse'
   /files/{fileID}/contents:
     get:
       tags: ['ACH Files']
@@ -825,6 +825,14 @@ components:
       schema:
         type: boolean
   schemas:
+    BuildFileResponse:
+      properties:
+        file:
+          $ref: '#/components/schemas/File'
+        error:
+          type: string
+          description: An error message describing the problem intended for humans.
+          example: Any error(s) present.
     CreateFile:
       description: \`batches\` OR `IATBatches` is required
       properties:
