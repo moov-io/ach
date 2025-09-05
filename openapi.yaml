@@ -2599,6 +2599,11 @@ components:
           type: string
           description: Memo for Offset EntryDetail record
           example: OFFSET
+        addenda05:
+          type: array
+          description: List of Addenda05 records
+          items:
+            $ref: '#/components/schemas/Addenda05'
       required:
         - routingNumber
         - accountNumber

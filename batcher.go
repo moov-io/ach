@@ -67,6 +67,8 @@ type Offset struct {
 	AccountNumber string            `json:"accountNumber"`
 	AccountType   OffsetAccountType `json:"accountType"`
 	Description   string            `json:"description"`
+
+	Addenda05 []*Addenda05 `json:"addenda05"`
 }
 
 type OffsetAccountType string
