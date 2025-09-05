@@ -2571,6 +2571,15 @@ components:
         - totalDebit
         - totalCredit
     Offset:
+      description: |
+        Offset contains the fields required to append a balancing EntryDetail to a Batch during Create.
+
+        After tabulating the amounts and counts a batch with an Offset field populated will create
+        an EntryDetail record that balances the net debit/credit of the file. This is often used to upload
+        balanced files (files whose debit and credit totals match).
+
+        The EntryDetail offset record will have an IndividualName of "OFFSET" and any existing EntryDetails
+        with an exactly matching IndividualName will be deleted from the file.
       properties:
         routingNumber:
           type: string
