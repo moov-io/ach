@@ -357,7 +357,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+                $ref: '#/components/schemas/ValidateFileResponse'
         '400':
           description: Validation failed. Check response for errors
     post:
@@ -2713,3 +2713,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/File'
+    ValidateFileResponse:
+      properties:
+        error:
+            type: string
