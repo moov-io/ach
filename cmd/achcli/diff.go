@@ -9,8 +9,6 @@ import (
 	"fmt"
 	"os"
 
-	// "text/tabwriter"
-
 	"github.com/moov-io/ach"
 
 	"github.com/juju/ansiterm"
@@ -24,9 +22,6 @@ func diffFiles(paths []string, validateOpts *ach.ValidateOpts) error {
 	if err != nil {
 		return err
 	}
-
-	// w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
-	// defer w.Flush()
 
 	w := ansiterm.NewTabWriter(os.Stdout, 0, 0, 1, ' ', 0)
 	w = w.Init(os.Stdout, 0, 0, 1, ' ', 0)
@@ -79,32 +74,21 @@ func printDiffedFileHeader(w *ansiterm.TabWriter, f1, f2 *ach.File) {
 
 	fmt.Fprintln(w, minusBuf.String())
 	fmt.Fprintln(w, plusBuf.String())
-
-	// fmt.Fprintln(w, fmt.Sprintf("- %s\t%s\t%s\t%s\t", f2.Header.ImmediateOrigin, f2.Header.ImmediateOriginName, f2.Header.ImmediateDestination, f2.Header.ImmediateDestinationName))
-	// fmt.Fprintln(w, fmt.Sprintf("+ %s\t%s\t%s\t%s\t", f1.Header.ImmediateOrigin, f1.Header.ImmediateOriginName, f1.Header.ImmediateDestination, f1.Header.ImmediateDestinationName))
 }
 
 func printColumn(minusBuf, plusBuf *bytes.Buffer, v1, v2 string) {
 	if v1 != v2 {
 		w := ansiterm.NewWriter(minusBuf)
 		ctx := ansiterm.Foreground(ansiterm.Green)
-		ctx.Fprintf(w, v2)
+		ctx.Fprint(w, v2)
 		ctx.SetForeground(ansiterm.Default)
-		ctx.Fprintf(w, "\t")
+		ctx.Fprint(w, "\t")
 
 		w = ansiterm.NewWriter(plusBuf)
 		ctx = ansiterm.Foreground(ansiterm.Red)
-		ctx.Fprintf(w, v1)
+		ctx.Fprint(w, v1)
 		ctx.SetForeground(ansiterm.Default)
-		ctx.Fprintf(w, "\t")
-
-		// minusBuf.WriteString(
-
-		// ansiterm.Fprint(minusBuf, fmt.Sprintf("[red]%s[reset]\t", v2))
-		// ansiterm.Fprint(plusBuf, fmt.Sprintf("[green]%s[reset]\t", v1))
-
-		// ansiterm.Write([]byte(fmt.Sprintf("[red]%s[reset]\t", v2)))
-		// ansiterm.Write([]byte(fmt.Sprintf("[green]%s[reset]\t", v1)))
+		ctx.Fprint(w, "\t")
 	} else {
 		minusBuf.WriteString(v2 + "\t")
 		plusBuf.WriteString(v1 + "\t")
