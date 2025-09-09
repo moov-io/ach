@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"errors"
 	"strings"
 	"unicode/utf8"
 )
@@ -25,6 +26,8 @@ import (
 // Addenda05 is a Addendumer addenda which provides business transaction information for Addenda Type
 // Code 05 in a machine readable format. It is usually formatted according to ANSI, ASC, X12 Standard.
 // It is used for the following StandardEntryClassCode: ACK, ATX, CCD, CIE, CTX, DNE, ENR, WEB, PPD, TRX.
+var ErrFieldTooLong = errors.New("field exceeds maximum length")
+
 type Addenda05 struct {
 	// ID is an identifier only used by the moov-io/ach HTTP server as a way to identify a batch.
 	ID string `json:"id"`
@@ -149,6 +152,13 @@ func (addenda05 *Addenda05) Validate() error {
 		if err := addenda05.isAlphanumeric(addenda05.PaymentRelatedInformation); err != nil {
 			return fieldError("PaymentRelatedInformation", err, addenda05.PaymentRelatedInformation)
 		}
+	}
+
+	// Enforce PRI length limit (UTF-8 safe) ---
+	if utf8.RuneCountInString(addenda05.PaymentRelatedInformation) > 80 {
+		return fieldError("PaymentRelatedInformation",
+			ErrFieldTooLong,
+			addenda05.PaymentRelatedInformation)
 	}
 
 	return nil
