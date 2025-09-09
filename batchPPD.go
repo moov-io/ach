@@ -6,7 +6,7 @@
 // not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//	http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
@@ -14,8 +14,11 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
 package ach
+
+import (
+	"fmt"
+)
 
 // BatchPPD holds the Batch Header and Batch Control and all Entry Records for PPD Entries
 type BatchPPD struct {
@@ -40,20 +43,42 @@ func (batch *BatchPPD) Validate() error {
 		return nil
 	}
 
-	// basic verification of the batch before we validate specific rules.
+	// Basic verification of the batch before we validate specific rules.
 	if err := batch.verify(); err != nil {
 		return err
 	}
-	// Add configuration and type specific validation for this type.
 
+	// PPD-specific header check.
 	if batch.Header.StandardEntryClassCode != PPD {
 		return batch.Error("StandardEntryClassCode", ErrBatchSECType, PPD)
 	}
 
-	invalidEntries := batch.InvalidEntries()
-	if len(invalidEntries) > 0 {
-		return invalidEntries[0].Error // return the first invalid entry's error
+	// Surface any previously-detected invalid entries.
+	if invalid := batch.InvalidEntries(); len(invalid) > 0 {
+		return invalid[0].Error
 	}
+
+	// --- Addenda05 validation (explicit) ---
+	// Enforce: PaymentRelatedInformation must be <= 80 characters per NACHA.
+	for _, ed := range batch.Entries { // or batch.GetEntries() if your type uses an accessor
+		if ed == nil || ed.AddendaRecordIndicator != 1 || len(ed.Addenda05) == 0 {
+			continue
+		}
+		for _, a := range ed.Addenda05 {
+			if a == nil {
+				continue
+			}
+			// hard limit to ensure we catch invalid data even if Create() renumbers fields, etc.
+			if len(a.PaymentRelatedInformation) > 80 {
+				return fmt.Errorf("Addenda05: PaymentRelatedInformation exceeds 80 characters")
+			}
+			// still run the type's own validation in case it flags anything else
+			if err := a.Validate(); err != nil {
+				return err
+			}
+		}
+	}
+	// --------------------------------------
 
 	return nil
 }
