@@ -1,12 +1,15 @@
-package ach
+package addenda05_length_test
 
 import (
 	"strings"
 	"testing"
+
+	"github.com/moov-io/ach"
 )
 
-func minPPDHeader() *BatchHeader {
-	bh := NewBatchHeader()
+// helpers to create minimal headers per SEC
+func minPPDHeader() *ach.BatchHeader {
+	bh := ach.NewBatchHeader()
 	bh.ServiceClassCode = 200
 	bh.StandardEntryClassCode = "PPD"
 	bh.CompanyName = "COMPANY"
@@ -16,8 +19,8 @@ func minPPDHeader() *BatchHeader {
 	return bh
 }
 
-func minCCDHeader() *BatchHeader {
-	bh := NewBatchHeader()
+func minCCDHeader() *ach.BatchHeader {
+	bh := ach.NewBatchHeader()
 	bh.ServiceClassCode = 200
 	bh.StandardEntryClassCode = "CCD"
 	bh.CompanyName = "COMPANY"
@@ -27,8 +30,9 @@ func minCCDHeader() *BatchHeader {
 	return bh
 }
 
-func minimalEntryDetail() *EntryDetail {
-	ed := NewEntryDetail()
+// helper to build a minimal valid entry
+func minimalEntryDetail() *ach.EntryDetail {
+	ed := ach.NewEntryDetail()
 	ed.TransactionCode = 22
 	ed.RDFIIdentification = "23138010"
 	ed.CheckDigit = "4"
@@ -43,10 +47,10 @@ func minimalEntryDetail() *EntryDetail {
 func Test_Addenda05_Length_AppliesTo_PPD_and_CCD(t *testing.T) {
 	secs := []struct {
 		name     string
-		newBatch func() Batcher
+		newBatch func() ach.Batcher
 	}{
-		{"PPD", func() Batcher { return NewBatchPPD(minPPDHeader()) }},
-		{"CCD", func() Batcher { return NewBatchCCD(minCCDHeader()) }},
+		{"PPD", func() ach.Batcher { return ach.NewBatchPPD(minPPDHeader()) }},
+		{"CCD", func() ach.Batcher { return ach.NewBatchCCD(minCCDHeader()) }},
 	}
 
 	cases := []struct {
@@ -65,7 +69,7 @@ func Test_Addenda05_Length_AppliesTo_PPD_and_CCD(t *testing.T) {
 				batch := sec.newBatch()
 				ed := minimalEntryDetail()
 
-				add := NewAddenda05()
+				add := ach.NewAddenda05()
 				add.PaymentRelatedInformation = strings.Repeat("A", tc.priLen)
 
 				ed.AddAddenda05(add)
