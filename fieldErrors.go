@@ -95,6 +95,8 @@ var (
 	ErrBlockingFactor = errors.New("is not 10")
 	// ErrFormatCode is given when there's an invalid format code
 	ErrFormatCode = errors.New("is not 1")
+	// ErrExceedsFieldLength is given when a field exceeds its Nacha allowed length
+	ErrExceedsFieldLength = errors.New("exceeds the Nacha field length")
 
 	// IAT
 
