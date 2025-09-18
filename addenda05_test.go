@@ -22,6 +22,8 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+
+	"github.com/stretchr/testify/require"
 )
 
 func mockAddenda05() *Addenda05 {
@@ -209,4 +211,14 @@ func TestAddenda05RuneCountInString(t *testing.T) {
 	if addenda05.PaymentRelatedInformation != "" {
 		t.Error("Parsed with an invalid RuneCountInString not equal to 94")
 	}
+}
+
+func TestAddenda05_PaymentRelatedInformation_Length(t *testing.T) {
+	addenda05 := NewAddenda05()
+	addenda05.SequenceNumber = 1
+	addenda05.PaymentRelatedInformation = strings.Repeat("1", 95)
+
+	err := addenda05.Validate()
+	require.ErrorContains(t, err, "PaymentRelatedInformation")
+	require.ErrorContains(t, err, "exceeds the Nacha field length")
 }

@@ -151,6 +151,11 @@ func (addenda05 *Addenda05) Validate() error {
 		}
 	}
 
+	infoLength := utf8.RuneCountInString(addenda05.PaymentRelatedInformation)
+	if infoLength > 80 {
+		return fieldError("PaymentRelatedInformation", ErrExceedsFieldLength, addenda05.PaymentRelatedInformation)
+	}
+
 	return nil
 }
 
