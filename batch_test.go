@@ -1419,6 +1419,43 @@ func TestBatch__CalculateBalancedOffsetDebit(t *testing.T) {
 	}
 }
 
+func TestBatch_OffsetAddenda05(t *testing.T) {
+	file, err := ReadFile(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+
+	entries := file.Batches[0].GetEntries()
+	require.Len(t, entries, 1)
+
+	addenda05 := NewAddenda05()
+	addenda05.PaymentRelatedInformation = "abc123"
+	addenda05.SequenceNumber = 1
+	addenda05.EntryDetailSequenceNumber = 2
+
+	file.Batches[0].WithOffset(&Offset{
+		RoutingNumber: "121042882",
+		AccountNumber: "123456789",
+		AccountType:   OffsetChecking,
+		Description:   "test offset",
+		Addenda05:     []*Addenda05{addenda05},
+	})
+
+	// retabulate
+	err = file.Batches[0].Create()
+	require.NoError(t, err)
+
+	err = file.Create()
+	require.NoError(t, err)
+
+	// verify offset entry was added
+	entries = file.Batches[0].GetEntries()
+	require.Len(t, entries, 2)
+	require.Empty(t, entries[0].Addenda05)
+
+	// Check the Addenda05 on our offset record PaymentRelatedInformation
+	require.Len(t, entries[1].Addenda05, 1)
+	require.Equal(t, "abc123", entries[1].Addenda05[0].PaymentRelatedInformation)
+}
+
 func TestBatch__CalculateBalancedOffsetDebitAndCredit(t *testing.T) {
 	off := &Offset{
 		RoutingNumber: "121042882",
