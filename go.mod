@@ -12,7 +12,7 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/igrmk/treemap/v2 v2.0.1
 	github.com/juju/ansiterm v1.0.0
-	github.com/moov-io/base v0.57.1
+	github.com/moov-io/base v0.58.0
 	github.com/moov-io/iso3166 v0.3.0
 	github.com/moov-io/iso4217 v0.3.2
 	github.com/prometheus/client_golang v1.23.2
@@ -36,11 +36,11 @@ require (
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.66.1 // indirect
 	github.com/prometheus/procfs v0.16.1 // indirect
-	github.com/rickar/cal/v2 v2.1.23 // indirect
+	github.com/rickar/cal/v2 v2.1.25 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	golang.org/x/exp v0.0.0-20240707233637-46b078467d37 // indirect
 	golang.org/x/sys v0.36.0 // indirect
-	google.golang.org/protobuf v1.36.8 // indirect
+	google.golang.org/protobuf v1.36.9 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
