@@ -4,6 +4,8 @@ github.com/VividCortex/gohistogram v1.0.0 h1:6+hBz+qvs0JOrrNhhmR7lFxo5sINxBCGXrd
 github.com/VividCortex/gohistogram v1.0.0/go.mod h1:Pf5mBqqDxYaXu3hDrrU+w6nw50o/4+TcAqDqk/vUH7g=
 github.com/aws/aws-lambda-go v1.49.0 h1:z4VhTqkFZPM3xpEtTqWqRqsRH4TZBMJqTkRiBPYLqIQ=
 github.com/aws/aws-lambda-go v1.49.0/go.mod h1:dpMpZgvWx5vuQJfBt0zqBha60q7Dd7RfgJv23DymV8A=
+github.com/aws/aws-lambda-go v1.50.0 h1:0GzY18vT4EsCvIyk3kn3ZH5Jg30NRlgYaai1w0aGPMU=
+github.com/aws/aws-lambda-go v1.50.0/go.mod h1:dpMpZgvWx5vuQJfBt0zqBha60q7Dd7RfgJv23DymV8A=
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
 github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6rlkpw=
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=
@@ -56,6 +58,8 @@ github.com/moov-io/base v0.58.0 h1:GA06qtS76+5ltOv54LuYB3Xc3rjNw89c9c1ajsAJJUE=
 github.com/moov-io/base v0.58.0/go.mod h1:RuAKyWaPn0/GqvVATsgk3y0AOrwZzGhBzbbx4VkpA/s=
 github.com/moov-io/base v0.59.0 h1:uc+UcxshQC8nQHy7yfxkReunmglwC1LHEQFWMzlpJks=
 github.com/moov-io/base v0.59.0/go.mod h1:RuAKyWaPn0/GqvVATsgk3y0AOrwZzGhBzbbx4VkpA/s=
+github.com/moov-io/base v0.60.0 h1:1n6fXq9Dr3ahXxwKjXB526oAheRC9q6OKldllzsw1Ag=
+github.com/moov-io/base v0.60.0/go.mod h1:fQAez06Kf0JDpkGzaXGDzWq8fHpVFvWjARjxSGZ05Yg=
 github.com/moov-io/iso3166 v0.3.0 h1:7mnqBDYmvwif4T5soC81mA82ZQGYqzRf7LnQGxb8YC8=
 github.com/moov-io/iso3166 v0.3.0/go.mod h1:2fyJk2mvovjij1ya1/9gSuB2li1ZIm9jB2O/YusZQHQ=
 github.com/moov-io/iso4217 v0.3.2 h1:/PNKwvt0LCaDx3r5cQEjIdX6a7PEELWJ8D5thi2jiHU=
@@ -123,6 +127,8 @@ google.golang.org/protobuf v1.36.8 h1:xHScyCOEuuwZEc6UtSOvPbAT4zRh0xcNRYekJwfqyM
 google.golang.org/protobuf v1.36.8/go.mod h1:fuxRtAxBytpl4zzqUh6/eyUujkJdNiuEkXntxiD/uRU=
 google.golang.org/protobuf v1.36.9 h1:w2gp2mA27hUeUzj9Ex9FBjsBm40zfaDtEWow293U7Iw=
 google.golang.org/protobuf v1.36.9/go.mod h1:fuxRtAxBytpl4zzqUh6/eyUujkJdNiuEkXntxiD/uRU=
+google.golang.org/protobuf v1.36.10 h1:AYd7cD/uASjIL6Q9LiTjz8JLcrh/88q5UObnmY3aOOE=
+google.golang.org/protobuf v1.36.10/go.mod h1:HTf+CrKn2C3g5S8VImy6tdcUvCska2kB7j23XfzDpco=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c h1:Hei/4ADfdWqJk1ZMxUNpqntNwaWcugrBjAiHlqqRiVk=
 gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c/go.mod h1:JHkPIbrfpd72SG/EVd6muEfDQjcINNoR0C8j2r3qZ4Q=
