@@ -55,7 +55,7 @@ func TestServer__CreateFileEndpoint(t *testing.T) {
 
 		// ensure we have a validated file structure
 		if err := achFile.Validate(); err != nil {
-			t.Errorf("Could not validate entire read file: %v", err)
+			t.Errorf("Could not validate file %s: %v", file.Filename, err)
 		}
 
 		// If you trust the file but it's formatting is off building will probably resolve the malformed file.
