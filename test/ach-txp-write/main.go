@@ -64,7 +64,7 @@ func main() {
 
 	// Create TXP addenda record for tax payment information
 	addenda05 := ach.NewAddenda05()
-	addenda05.PaymentRelatedInformation = "TXP*123456789*FEDERAL*20231231*TAX2023Q4*500000*****VERIFIED\\"
+	addenda05.PaymentRelatedInformation = "TXP*123456789*FEDERAL*20231231*TAX2023Q4*500000*1*25000*2*5000*3**VER\\"
 	addenda05.SequenceNumber = 1
 	addenda05.EntryDetailSequenceNumber = 1
 

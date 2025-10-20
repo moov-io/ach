@@ -22,6 +22,15 @@ import (
 	"strings"
 )
 
+// TaxAmount represents a single tax amount with its type
+type TaxAmount struct {
+	// AmountCents is the amount in cents
+	AmountCents string
+	// AmountType is the tax information type ID for the tax amount
+	// Can be an integer or letter (e.g., "1", "2", "3", "S", "P", "I", etc.)
+	AmountType string
+}
+
 // TXP represents a Tax Payment addenda parsed from PaymentRelatedInformation
 // of an Addenda05 record. TXP is not a NACHA standard addenda type, but rather
 // a specific format for tax payment information within existing Addenda05 records.
@@ -34,20 +43,34 @@ type TXP struct {
 	Date string
 	// TaxInformationIDNumber is a unique identifier for the tax information
 	TaxInformationIDNumber string
-	// TaxAmount is the tax amount in cents
-	TaxAmount string
+	// TaxAmounts is a slice of tax amounts with their types
+	TaxAmounts []TaxAmount
 	// TaxpayerVerification is the verification information
 	TaxpayerVerification string
 }
 
-// ErrInvalidTXPFormat is returned when the TXP format is invalid
-var ErrInvalidTXPFormat = errors.New("invalid TXP format")
+// isNumeric checks if a string contains only numeric characters
+func isNumeric(s string) bool {
+	if s == "" {
+		return false
+	}
+	for _, r := range s {
+		if r < '0' || r > '9' {
+			return false
+		}
+	}
+	return true
+}
 
 // ErrInvalidTXPCharacter is returned when TXP contains invalid characters
 var ErrInvalidTXPCharacter = errors.New("invalid TXP character")
 
+// ErrInvalidTXPFormat is returned when the TXP format is invalid
+var ErrInvalidTXPFormat = errors.New("invalid TXP format")
+
 // ParseTXP parses a TXP-formatted PaymentRelatedInformation string
-// Expected format: TXP*tax identification number*tax payment type code*date*tax information ID number*tax amount*****taxpayer verification\
+// Expected format: TXP*tax identification number*tax payment type code*date*type1*amount1*type2*amount2*type3*amount3*taxpayer verification\
+// Note: The total TXP addenda should be limited to 80 bytes
 func ParseTXP(paymentInfo string) (*TXP, error) {
 	if paymentInfo == "" {
 		return nil, ErrInvalidTXPFormat
@@ -58,18 +81,15 @@ func ParseTXP(paymentInfo string) (*TXP, error) {
 		return nil, ErrInvalidTXPFormat
 	}
 
-	// Must end with backslash terminator
-	if !strings.HasSuffix(strings.TrimSpace(paymentInfo), "\\") {
-		return nil, ErrInvalidTXPFormat
-	}
+	// Remove the "TXP*" prefix for parsing
+	content := strings.TrimSpace(paymentInfo[4:])
 
-	// Remove the "TXP*" prefix and "\" suffix for parsing
-	content := strings.TrimSpace(paymentInfo[4:]) // Remove "TXP*"
-	content = strings.TrimSuffix(content, "\\")   // Remove trailing "\"
+	// Remove backslash terminator if present
+	content = strings.TrimSuffix(content, "\\")
 
 	// Split by asterisk delimiter
 	parts := strings.Split(content, "*")
-	if len(parts) < 10 {
+	if len(parts) < 5 { // Minimum: tax_id*tax_type*date*amount_type*amount_cents
 		return nil, ErrInvalidTXPFormat
 	}
 
@@ -78,16 +98,76 @@ func ParseTXP(paymentInfo string) (*TXP, error) {
 		return nil, err
 	}
 
-	// The format is: tax_id*tax_type*date*tax_info_id*tax_amount*****verification
-	// When split by "*", "*****" creates empty parts at indices 5,6,7,8
-	// So verification is at index 9
-	txp := &TXP{
-		TaxIdentificationNumber: parts[0],
-		TaxPaymentTypeCode:      parts[1],
-		Date:                    parts[2],
-		TaxInformationIDNumber:  parts[3],
-		TaxAmount:               parts[4],
-		TaxpayerVerification:    parts[9], // Skip empty parts 5,6,7,8 from "*****"
+	txp := &TXP{}
+	txp.TaxIdentificationNumber = parts[0]
+	txp.TaxPaymentTypeCode = parts[1]
+	txp.Date = parts[2]
+
+	// Parse amount pairs sequentially
+	i := 3
+	for i < len(parts) {
+		// Check if we have at least 2 more parts for an amount pair
+		if i+1 >= len(parts) {
+			break
+		}
+
+		// Check if the current part is empty (indicates delimiter)
+		if parts[i] == "" {
+			// We've hit a delimiter, look for verification after empty parts
+			j := i
+			for j < len(parts) && parts[j] == "" {
+				j++
+			}
+
+			// If there's a non-empty part after the empty parts, it's verification
+			if j < len(parts) {
+				txp.TaxpayerVerification = parts[j]
+			}
+			break
+		}
+
+		// Check if the next part is empty (indicates we're at the end of amount pairs)
+		if parts[i+1] == "" {
+			// We have a type but no amount, this indicates we've hit a delimiter
+			// Look for verification after the empty parts
+			j := i + 1
+			for j < len(parts) && parts[j] == "" {
+				j++
+			}
+
+			// If there's a non-empty part after the empty parts, it's verification
+			if j < len(parts) {
+				txp.TaxpayerVerification = parts[j]
+			}
+			break
+		}
+
+		// We have a valid amount pair
+		taxAmount := TaxAmount{
+			AmountType:  parts[i],
+			AmountCents: parts[i+1],
+		}
+
+		// Validate that amount cents is numeric
+		if !isNumeric(taxAmount.AmountCents) {
+			return nil, ErrInvalidTXPFormat
+		}
+
+		txp.TaxAmounts = append(txp.TaxAmounts, taxAmount)
+		i += 2
+	}
+
+	// If we didn't find verification through delimiter detection,
+	// check if there's a single remaining part after parsing amount pairs
+	// This indicates the last part is verification (for cases like 3 amounts with verification)
+	if txp.TaxpayerVerification == "" && i < len(parts) {
+		// We have a single remaining part, so it's likely verification
+		txp.TaxpayerVerification = parts[i]
+	}
+
+	// Validate that we have at least one amount
+	if len(txp.TaxAmounts) == 0 {
+		return nil, ErrInvalidTXPFormat
 	}
 
 	return txp, nil
@@ -99,20 +179,40 @@ func FormatTXP(txp *TXP) string {
 		return ""
 	}
 
-	// Format: TXP*tax identification number*tax payment type code*date*tax information ID number*tax amount*****taxpayer verification\
-	return strings.Join([]string{
+	// Start with basic fields
+	parts := []string{
 		"TXP",
 		txp.TaxIdentificationNumber,
 		txp.TaxPaymentTypeCode,
 		txp.Date,
-		txp.TaxInformationIDNumber,
-		txp.TaxAmount,
-		"",
-		"",
-		"",
-		"",
-		txp.TaxpayerVerification + "\\",
-	}, "*")
+	}
+
+	// Add tax amounts (pairs of type*amount)
+	for _, taxAmount := range txp.TaxAmounts {
+		parts = append(parts, taxAmount.AmountType, taxAmount.AmountCents)
+	}
+
+	// Join parts with asterisk delimiter
+	result := strings.Join(parts, "*")
+
+	// Add verification field if present, following NACHA pattern:
+	// - 3 amount pairs: verification comes directly after (no delimiter)
+	// - 2 amount pairs: verification comes after *** delimiter
+	// - 1 amount pair: verification comes after *** delimiter
+	if txp.TaxpayerVerification != "" {
+		if len(txp.TaxAmounts) >= 3 {
+			// Three or more amounts: no delimiter
+			result += "*" + txp.TaxpayerVerification
+		} else {
+			// One or two amounts: use *** delimiter
+			result += "***" + txp.TaxpayerVerification
+		}
+	}
+
+	// Add backslash terminator
+	result += "\\"
+
+	return result
 }
 
 // validateTXPCharacters ensures PaymentRelatedInformation only contains characters

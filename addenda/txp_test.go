@@ -30,28 +30,107 @@ func TestParseTXP(t *testing.T) {
 		expectError bool
 	}{
 		{
-			name:  "Valid TXP format",
-			input: "TXP*123456789*FEDERAL*20231231*TAX2023Q4*500000*****VERIFIED\\",
+			name:  "Valid TXP with 3 amounts and verification (NACHA Example 1)",
+			input: "TXP*123456789*606*960331*T*100000*P*12000*I*4567*SML2A\\",
 			expected: &TXP{
 				TaxIdentificationNumber: "123456789",
-				TaxPaymentTypeCode:      "FEDERAL",
-				Date:                    "20231231",
-				TaxInformationIDNumber:  "TAX2023Q4",
-				TaxAmount:               "500000",
-				TaxpayerVerification:    "VERIFIED",
+				TaxPaymentTypeCode:      "606",
+				Date:                    "960331",
+				TaxAmounts: []TaxAmount{
+					{AmountType: "T", AmountCents: "100000"},
+					{AmountType: "P", AmountCents: "12000"},
+					{AmountType: "I", AmountCents: "4567"},
+				},
+				TaxpayerVerification: "SML2A",
 			},
 			expectError: false,
 		},
 		{
-			name:  "Valid TXP with different values",
-			input: "TXP*987654321*STATE*20231231*CA2023Q4*250000*****CONFIRMED\\",
+			name:  "Valid TXP with 1 amount and verification (NACHA Example 2)",
+			input: "TXP*12345678934*526*960930*T*100000***SML2A\\",
 			expected: &TXP{
-				TaxIdentificationNumber: "987654321",
+				TaxIdentificationNumber: "12345678934",
+				TaxPaymentTypeCode:      "526",
+				Date:                    "960930",
+				TaxAmounts: []TaxAmount{
+					{AmountType: "T", AmountCents: "100000"},
+				},
+				TaxpayerVerification: "SML2A",
+			},
+			expectError: false,
+		},
+		{
+			name:  "Valid TXP with 3 amounts and no verification (NACHA Example 3)",
+			input: "TXP*123456789*94105*960301*1*10000*2*5000*3*15000\\",
+			expected: &TXP{
+				TaxIdentificationNumber: "123456789",
+				TaxPaymentTypeCode:      "94105",
+				Date:                    "960301",
+				TaxAmounts: []TaxAmount{
+					{AmountType: "1", AmountCents: "10000"},
+					{AmountType: "2", AmountCents: "5000"},
+					{AmountType: "3", AmountCents: "15000"},
+				},
+				TaxpayerVerification: "",
+			},
+			expectError: false,
+		},
+		{
+			name:  "Valid TXP with 2 amounts and *** delimiter",
+			input: "TXP*123456789*941*250901*1*1000*2*500***VERIFIED\\",
+			expected: &TXP{
+				TaxIdentificationNumber: "123456789",
+				TaxPaymentTypeCode:      "941",
+				Date:                    "250901",
+				TaxAmounts: []TaxAmount{
+					{AmountType: "1", AmountCents: "1000"},
+					{AmountType: "2", AmountCents: "500"},
+				},
+				TaxpayerVerification: "VERIFIED",
+			},
+			expectError: false,
+		},
+		{
+			name:  "Valid TXP with 1 amount and no verification",
+			input: "TXP*123456789*941*250901*T*100000\\",
+			expected: &TXP{
+				TaxIdentificationNumber: "123456789",
+				TaxPaymentTypeCode:      "941",
+				Date:                    "250901",
+				TaxAmounts: []TaxAmount{
+					{AmountType: "T", AmountCents: "100000"},
+				},
+				TaxpayerVerification: "",
+			},
+			expectError: false,
+		},
+		{
+			name:  "Valid TXP with 2 amounts and no verification",
+			input: "TXP*123456789*941*250901*1*1000*2*500\\",
+			expected: &TXP{
+				TaxIdentificationNumber: "123456789",
+				TaxPaymentTypeCode:      "941",
+				Date:                    "250901",
+				TaxAmounts: []TaxAmount{
+					{AmountType: "1", AmountCents: "1000"},
+					{AmountType: "2", AmountCents: "500"},
+				},
+				TaxpayerVerification: "",
+			},
+			expectError: false,
+		},
+		{
+			name:  "Valid TXP with mixed amount types",
+			input: "TXP*888999000*STATE*20231231*S*200000*2*10000**CONFIRMED\\",
+			expected: &TXP{
+				TaxIdentificationNumber: "888999000",
 				TaxPaymentTypeCode:      "STATE",
 				Date:                    "20231231",
-				TaxInformationIDNumber:  "CA2023Q4",
-				TaxAmount:               "250000",
-				TaxpayerVerification:    "CONFIRMED",
+				TaxAmounts: []TaxAmount{
+					{AmountType: "S", AmountCents: "200000"},
+					{AmountType: "2", AmountCents: "10000"},
+				},
+				TaxpayerVerification: "CONFIRMED",
 			},
 			expectError: false,
 		},
@@ -63,19 +142,33 @@ func TestParseTXP(t *testing.T) {
 		},
 		{
 			name:        "Missing TXP prefix",
-			input:       "123456789*FEDERAL*20231231*TAX2023Q4*500000*****VERIFIED\\",
+			input:       "123456789*FEDERAL*20231231*TAX2023Q4*500000*1**VERIFIED\\",
 			expected:    nil,
 			expectError: true,
 		},
 		{
-			name:        "Missing backslash terminator",
-			input:       "TXP*123456789*FEDERAL*20231231*TAX2023Q4*500000*****VERIFIED",
-			expected:    nil,
-			expectError: true,
+			name:  "Valid TXP without backslash terminator",
+			input: "TXP*123456789*FEDERAL*20231231*TAX2023Q4*500000*1**VERIFIED",
+			expected: &TXP{
+				TaxIdentificationNumber: "123456789",
+				TaxPaymentTypeCode:      "FEDERAL",
+				Date:                    "20231231",
+				TaxAmounts: []TaxAmount{
+					{AmountType: "TAX2023Q4", AmountCents: "500000"},
+				},
+				TaxpayerVerification: "VERIFIED",
+			},
+			expectError: false,
 		},
 		{
 			name:        "Too few parts",
-			input:       "TXP*123456789*FEDERAL*20231231*TAX2023Q4*500000\\",
+			input:       "TXP*123456789*FEDERAL*20231231*TAX2023Q4\\",
+			expected:    nil,
+			expectError: true,
+		},
+		{
+			name:        "Odd number of amount parts",
+			input:       "TXP*123456789*FEDERAL*20231231*500000*1*25000*VERIFIED\\",
 			expected:    nil,
 			expectError: true,
 		},
@@ -111,11 +204,17 @@ func TestParseTXP(t *testing.T) {
 			if result.Date != tt.expected.Date {
 				t.Errorf("Date: expected %s, got %s", tt.expected.Date, result.Date)
 			}
-			if result.TaxInformationIDNumber != tt.expected.TaxInformationIDNumber {
-				t.Errorf("TaxInformationIDNumber: expected %s, got %s", tt.expected.TaxInformationIDNumber, result.TaxInformationIDNumber)
-			}
-			if result.TaxAmount != tt.expected.TaxAmount {
-				t.Errorf("TaxAmount: expected %s, got %s", tt.expected.TaxAmount, result.TaxAmount)
+			if len(result.TaxAmounts) != len(tt.expected.TaxAmounts) {
+				t.Errorf("TaxAmounts length: expected %d, got %d", len(tt.expected.TaxAmounts), len(result.TaxAmounts))
+			} else {
+				for i, expectedAmount := range tt.expected.TaxAmounts {
+					if result.TaxAmounts[i].AmountCents != expectedAmount.AmountCents {
+						t.Errorf("TaxAmounts[%d].AmountCents: expected %s, got %s", i, expectedAmount.AmountCents, result.TaxAmounts[i].AmountCents)
+					}
+					if result.TaxAmounts[i].AmountType != expectedAmount.AmountType {
+						t.Errorf("TaxAmounts[%d].AmountType: expected %s, got %s", i, expectedAmount.AmountType, result.TaxAmounts[i].AmountType)
+					}
+				}
 			}
 			if result.TaxpayerVerification != tt.expected.TaxpayerVerification {
 				t.Errorf("TaxpayerVerification: expected %s, got %s", tt.expected.TaxpayerVerification, result.TaxpayerVerification)
@@ -132,16 +231,60 @@ func TestFormatTXP(t *testing.T) {
 		expected string
 	}{
 		{
-			name: "Valid TXP struct",
+			name: "Valid TXP struct with three amounts",
 			input: &TXP{
 				TaxIdentificationNumber: "123456789",
 				TaxPaymentTypeCode:      "FEDERAL",
 				Date:                    "20231231",
-				TaxInformationIDNumber:  "TAX2023Q4",
-				TaxAmount:               "500000",
-				TaxpayerVerification:    "VERIFIED",
+				TaxAmounts: []TaxAmount{
+					{AmountType: "1", AmountCents: "500000"},
+					{AmountType: "2", AmountCents: "25000"},
+					{AmountType: "3", AmountCents: "5000"},
+				},
+				TaxpayerVerification: "VERIFIED",
 			},
-			expected: "TXP*123456789*FEDERAL*20231231*TAX2023Q4*500000*****VERIFIED\\",
+			expected: "TXP*123456789*FEDERAL*20231231*1*500000*2*25000*3*5000*VERIFIED\\",
+		},
+		{
+			name: "Valid TXP struct with single amount",
+			input: &TXP{
+				TaxIdentificationNumber: "987654321",
+				TaxPaymentTypeCode:      "STATE",
+				Date:                    "20231231",
+				TaxAmounts: []TaxAmount{
+					{AmountType: "1", AmountCents: "250000"},
+				},
+				TaxpayerVerification: "CONFIRMED",
+			},
+			expected: "TXP*987654321*STATE*20231231*1*250000***CONFIRMED\\",
+		},
+		{
+			name: "Valid TXP struct with integer amount types",
+			input: &TXP{
+				TaxIdentificationNumber: "555666777",
+				TaxPaymentTypeCode:      "FEDERAL",
+				Date:                    "20231231",
+				TaxAmounts: []TaxAmount{
+					{AmountType: "1", AmountCents: "300000"},
+					{AmountType: "2", AmountCents: "15000"},
+					{AmountType: "3", AmountCents: "3000"},
+				},
+				TaxpayerVerification: "VERIFIED",
+			},
+			expected: "TXP*555666777*FEDERAL*20231231*1*300000*2*15000*3*3000*VERIFIED\\",
+		},
+		{
+			name: "Valid TXP struct with letter amount type",
+			input: &TXP{
+				TaxIdentificationNumber: "444555666",
+				TaxPaymentTypeCode:      "STATE",
+				Date:                    "20231231",
+				TaxAmounts: []TaxAmount{
+					{AmountType: "S", AmountCents: "150000"},
+				},
+				TaxpayerVerification: "APPROVED",
+			},
+			expected: "TXP*444555666*STATE*20231231*S*150000***APPROVED\\",
 		},
 		{
 			name:     "Nil TXP",
@@ -169,42 +312,52 @@ func TestValidateTXPCharacters(t *testing.T) {
 	}{
 		{
 			name:        "Valid characters",
-			input:       "TXP*123456789*FEDERAL*20231231*TAX2023Q4*500000*****VERIFIED\\",
+			input:       "TXP*123456789*FEDERAL*20231231*TAX2023Q4*500000*1*25000*2**VERIFIED\\",
 			expectError: false,
 		},
 		{
 			name:        "Invalid @ symbol",
-			input:       "TXP*123@456*FEDERAL*20231231*TAX2023Q4*500000*****VERIFIED\\",
+			input:       "TXP*123@456*FEDERAL*20231231*TAX2023Q4*500000*1**VERIFIED\\",
 			expectError: true,
 		},
 		{
 			name:        "Invalid # symbol",
-			input:       "TXP*123#456*FEDERAL*20231231*TAX2023Q4*500000*****VERIFIED\\",
+			input:       "TXP*123#456*FEDERAL*20231231*TAX2023Q4*500000*1**VERIFIED\\",
 			expectError: true,
 		},
 		{
 			name:        "Invalid newline",
-			input:       "TXP*123\n456*FEDERAL*20231231*TAX2023Q4*500000*****VERIFIED\\",
+			input:       "TXP*123\n456*FEDERAL*20231231*TAX2023Q4*500000*1**VERIFIED\\",
 			expectError: true,
 		},
 		{
 			name:        "Invalid tab",
-			input:       "TXP*123\t456*FEDERAL*20231231*TAX2023Q4*500000*****VERIFIED\\",
+			input:       "TXP*123\t456*FEDERAL*20231231*TAX2023Q4*500000*1**VERIFIED\\",
 			expectError: true,
 		},
 		{
 			name:        "Valid hyphen",
-			input:       "TXP*123-456*FEDERAL*20231231*TAX2023Q4*500000*****VERIFIED\\",
+			input:       "TXP*123-456*FEDERAL*20231231*TAX2023Q4*500000*1**VERIFIED\\",
 			expectError: false,
 		},
 		{
 			name:        "Valid period",
-			input:       "TXP*123.456*FEDERAL*20231231*TAX2023Q4*500000*****VERIFIED\\",
+			input:       "TXP*123.456*FEDERAL*20231231*TAX2023Q4*500000*1**VERIFIED\\",
 			expectError: false,
 		},
 		{
 			name:        "Valid colon",
-			input:       "TXP*123:456*FEDERAL*20231231*TAX2023Q4*500000*****VERIFIED\\",
+			input:       "TXP*123:456*FEDERAL*20231231*TAX2023Q4*500000*1**VERIFIED\\",
+			expectError: false,
+		},
+		{
+			name:        "Valid integer amount type",
+			input:       "TXP*123456789*FEDERAL*20231231*TAX2023Q4*500000*1*25000*2**VERIFIED\\",
+			expectError: false,
+		},
+		{
+			name:        "Valid single letter amount type",
+			input:       "TXP*123456789*STATE*20231231*TAX2023Q4*500000*S**VERIFIED\\",
 			expectError: false,
 		},
 	}
@@ -235,18 +388,18 @@ func TestIsTXPFormat(t *testing.T) {
 	}{
 		{
 			name:     "Valid TXP format",
-			input:    "TXP*123456789*FEDERAL*20231231*TAX2023Q4*500000*****VERIFIED\\",
+			input:    "TXP*123456789*FEDERAL*20231231*TAX2023Q4*500000*1*25000*2**VERIFIED\\",
 			expected: true,
 		},
 		{
 			name:     "Invalid format - missing TXP prefix",
-			input:    "123456789*FEDERAL*20231231*TAX2023Q4*500000*****VERIFIED\\",
+			input:    "123456789*FEDERAL*20231231*TAX2023Q4*500000*1**VERIFIED\\",
 			expected: false,
 		},
 		{
-			name:     "Invalid format - missing backslash",
-			input:    "TXP*123456789*FEDERAL*20231231*TAX2023Q4*500000*****VERIFIED",
-			expected: false,
+			name:     "Valid format - without backslash",
+			input:    "TXP*123456789*FEDERAL*20231231*TAX2023Q4*500000*1**VERIFIED",
+			expected: true,
 		},
 		{
 			name:     "Empty string",
@@ -267,7 +420,7 @@ func TestIsTXPFormat(t *testing.T) {
 
 // TestTXPParseFormatRoundTrip tests that parsing and formatting are consistent
 func TestTXPParseFormatRoundTrip(t *testing.T) {
-	original := "TXP*123456789*FEDERAL*20231231*TAX2023Q4*500000*****VERIFIED\\"
+	original := "TXP*123456789*FEDERAL*20231231*500000*1*25000*2*5000*3*VERIFIED\\"
 
 	// Parse the original string
 	txp, err := ParseTXP(original)
