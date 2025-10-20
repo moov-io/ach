@@ -223,86 +223,6 @@ func TestParseTXP(t *testing.T) {
 	}
 }
 
-// TestFormatTXP tests formatting TXP structs to strings
-func TestFormatTXP(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    *TXP
-		expected string
-	}{
-		{
-			name: "Valid TXP struct with three amounts",
-			input: &TXP{
-				TaxIdentificationNumber: "123456789",
-				TaxPaymentTypeCode:      "FEDERAL",
-				Date:                    "20231231",
-				TaxAmounts: []TaxAmount{
-					{AmountType: "1", AmountCents: "500000"},
-					{AmountType: "2", AmountCents: "25000"},
-					{AmountType: "3", AmountCents: "5000"},
-				},
-				TaxpayerVerification: "VERIFIED",
-			},
-			expected: "TXP*123456789*FEDERAL*20231231*1*500000*2*25000*3*5000*VERIFIED\\",
-		},
-		{
-			name: "Valid TXP struct with single amount",
-			input: &TXP{
-				TaxIdentificationNumber: "987654321",
-				TaxPaymentTypeCode:      "STATE",
-				Date:                    "20231231",
-				TaxAmounts: []TaxAmount{
-					{AmountType: "1", AmountCents: "250000"},
-				},
-				TaxpayerVerification: "CONFIRMED",
-			},
-			expected: "TXP*987654321*STATE*20231231*1*250000***CONFIRMED\\",
-		},
-		{
-			name: "Valid TXP struct with integer amount types",
-			input: &TXP{
-				TaxIdentificationNumber: "555666777",
-				TaxPaymentTypeCode:      "FEDERAL",
-				Date:                    "20231231",
-				TaxAmounts: []TaxAmount{
-					{AmountType: "1", AmountCents: "300000"},
-					{AmountType: "2", AmountCents: "15000"},
-					{AmountType: "3", AmountCents: "3000"},
-				},
-				TaxpayerVerification: "VERIFIED",
-			},
-			expected: "TXP*555666777*FEDERAL*20231231*1*300000*2*15000*3*3000*VERIFIED\\",
-		},
-		{
-			name: "Valid TXP struct with letter amount type",
-			input: &TXP{
-				TaxIdentificationNumber: "444555666",
-				TaxPaymentTypeCode:      "STATE",
-				Date:                    "20231231",
-				TaxAmounts: []TaxAmount{
-					{AmountType: "S", AmountCents: "150000"},
-				},
-				TaxpayerVerification: "APPROVED",
-			},
-			expected: "TXP*444555666*STATE*20231231*S*150000***APPROVED\\",
-		},
-		{
-			name:     "Nil TXP",
-			input:    nil,
-			expected: "",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := FormatTXP(tt.input)
-			if result != tt.expected {
-				t.Errorf("expected %s, got %s", tt.expected, result)
-			}
-		})
-	}
-}
-
 // TestValidateTXPCharacters tests character validation
 func TestValidateTXPCharacters(t *testing.T) {
 	tests := []struct {
@@ -415,22 +335,5 @@ func TestIsTXPFormat(t *testing.T) {
 				t.Errorf("expected %v, got %v", tt.expected, result)
 			}
 		})
-	}
-}
-
-// TestTXPParseFormatRoundTrip tests that parsing and formatting are consistent
-func TestTXPParseFormatRoundTrip(t *testing.T) {
-	original := "TXP*123456789*FEDERAL*20231231*500000*1*25000*2*5000*3*VERIFIED\\"
-
-	// Parse the original string
-	txp, err := ParseTXP(original)
-	if err != nil {
-		t.Fatalf("unexpected error parsing: %v", err)
-	}
-
-	// Format it back to string
-	formatted := FormatTXP(txp)
-	if formatted != original {
-		t.Errorf("round trip failed: expected %s, got %s", original, formatted)
 	}
 }

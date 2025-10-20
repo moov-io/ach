@@ -173,48 +173,6 @@ func ParseTXP(paymentInfo string) (*TXP, error) {
 	return txp, nil
 }
 
-// FormatTXP creates a TXP-formatted PaymentRelatedInformation string
-func FormatTXP(txp *TXP) string {
-	if txp == nil {
-		return ""
-	}
-
-	// Start with basic fields
-	parts := []string{
-		"TXP",
-		txp.TaxIdentificationNumber,
-		txp.TaxPaymentTypeCode,
-		txp.Date,
-	}
-
-	// Add tax amounts (pairs of type*amount)
-	for _, taxAmount := range txp.TaxAmounts {
-		parts = append(parts, taxAmount.AmountType, taxAmount.AmountCents)
-	}
-
-	// Join parts with asterisk delimiter
-	result := strings.Join(parts, "*")
-
-	// Add verification field if present, following NACHA pattern:
-	// - 3 amount pairs: verification comes directly after (no delimiter)
-	// - 2 amount pairs: verification comes after *** delimiter
-	// - 1 amount pair: verification comes after *** delimiter
-	if txp.TaxpayerVerification != "" {
-		if len(txp.TaxAmounts) >= 3 {
-			// Three or more amounts: no delimiter
-			result += "*" + txp.TaxpayerVerification
-		} else {
-			// One or two amounts: use *** delimiter
-			result += "***" + txp.TaxpayerVerification
-		}
-	}
-
-	// Add backslash terminator
-	result += "\\"
-
-	return result
-}
-
 // validateTXPCharacters ensures PaymentRelatedInformation only contains characters
 // permitted by TXP addenda conventions (printable set and delimiters).
 func validateTXPCharacters(s string) error {
