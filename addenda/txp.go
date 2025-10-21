@@ -18,8 +18,9 @@
 package addenda
 
 import (
-	"errors"
 	"strings"
+
+	"github.com/moov-io/ach"
 )
 
 // TaxAmount represents a single tax amount with its type
@@ -63,10 +64,10 @@ func isNumeric(s string) bool {
 }
 
 // ErrInvalidTXPCharacter is returned when TXP contains invalid characters
-var ErrInvalidTXPCharacter = errors.New("invalid TXP character")
+var ErrInvalidTXPCharacter = ach.ErrInvalidProperty
 
 // ErrInvalidTXPFormat is returned when the TXP format is invalid
-var ErrInvalidTXPFormat = errors.New("invalid TXP format")
+var ErrInvalidTXPFormat = ach.ErrVariableFields
 
 // ParseTXP parses a TXP-formatted PaymentRelatedInformation string
 // Expected format: TXP*tax identification number*tax payment type code*date*type1*amount1*type2*amount2*type3*amount3*taxpayer verification\
