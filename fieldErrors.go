@@ -61,12 +61,6 @@ var (
 	ErrValidISO3166 = errors.New("is an invalid ISO 3166-1-alpha-2 code")
 	// ErrValidISO4217 is the error given when a field has an invalid ISO 4217 code
 	ErrValidISO4217 = errors.New("is an invalid ISO 4217 code")
-	// ErrVariableFields indicates an invalid or missing field count or separator in variable-length segments like TXP.
-	ErrVariableFields = errors.New("variable fields")
-	// ErrInvalidProperty is the error given when a field contains an invalid property value
-	ErrInvalidProperty = errors.New("invalid property")
-	// ErrNonNumeric is the error given when a field that should contain only numeric characters contains non-numeric characters
-	ErrNonNumeric = errors.New("non-numeric")
 
 	// EntryDetail errors
 

@@ -172,6 +172,12 @@ func TestParseTXP(t *testing.T) {
 			expected:    nil,
 			expectError: true,
 		},
+		{
+			name:        "TXP exceeds 80 byte limit",
+			input:       "TXP*123456789*FEDERAL*20231231*TAX2023Q4*500000*1*25000*2*10000*VERIFIED_WITH_VERY_LONG_VERIFICATION_STRING\\",
+			expected:    nil,
+			expectError: true,
+		},
 	}
 
 	for _, tt := range tests {

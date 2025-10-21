@@ -18,9 +18,8 @@
 package addenda
 
 import (
+	"errors"
 	"strings"
-
-	"github.com/moov-io/ach"
 )
 
 // TaxAmount represents a single tax amount with its type
@@ -64,12 +63,30 @@ func isNumeric(s string) bool {
 }
 
 // ErrInvalidTXPCharacter is returned when TXP contains invalid characters
-var ErrInvalidTXPCharacter = ach.ErrInvalidProperty
+var ErrInvalidTXPCharacter = errors.New("invalid TXP character")
 
 // ErrInvalidTXPFormat is returned when the TXP format is invalid
-var ErrInvalidTXPFormat = ach.ErrVariableFields
+var ErrInvalidTXPFormat = errors.New("invalid TXP format")
+
+// TXPPrefix is the required prefix for TXP addenda records
+const TXPPrefix = "TXP*"
 
 // ParseTXP parses a TXP-formatted PaymentRelatedInformation string
+//
+// NACHA TXP Addenda Specification:
+// Data Element Reference Designator & Name    Content
+// 1  Segment Identifier                      'TXP'
+// 2  TXP01 Taxpayer Identification Number    XXXXXXXXX
+// 3  TXP02 Tax Payment Type Code             XXXXX
+// 4  TXP03 Tax Period End Date               YYMMDD
+// 5  TXP04 Amount Type (Tax Information ID)  XXXXX
+// 6  TXP05 Tax Amount                        $$$$$$$$cc
+// 7  TXP06 Amount Type (Tax Information ID)  XXXXX
+// 8  TXP07 Tax Amount                        $$$$$$$$cc
+// 9  TXP08 Amount Type (Tax Information ID)  XXXXX
+// 10 TXP09 Tax Amount                        $$$$$$$$cc
+// 11 TXP10 Taxpayer Verification             (Not used)
+//
 // Expected format: TXP*tax identification number*tax payment type code*date*type1*amount1*type2*amount2*type3*amount3*taxpayer verification\
 // Note: The total TXP addenda should be limited to 80 bytes
 func ParseTXP(paymentInfo string) (*TXP, error) {
@@ -77,13 +94,18 @@ func ParseTXP(paymentInfo string) (*TXP, error) {
 		return nil, ErrInvalidTXPFormat
 	}
 
-	// Must start with "TXP*"
-	if !strings.HasPrefix(paymentInfo, "TXP*") {
+	// Must start with TXP prefix
+	if !strings.HasPrefix(paymentInfo, TXPPrefix) {
 		return nil, ErrInvalidTXPFormat
 	}
 
-	// Remove the "TXP*" prefix for parsing
-	content := strings.TrimSpace(paymentInfo[4:])
+	// Validate 80-byte limit for TXP addenda
+	if len(paymentInfo) > 80 {
+		return nil, ErrInvalidTXPFormat
+	}
+
+	// Remove the TXP prefix for parsing
+	content := strings.TrimSpace(strings.TrimPrefix(paymentInfo, TXPPrefix))
 
 	// Remove backslash terminator if present
 	content = strings.TrimSuffix(content, "\\")
