@@ -413,6 +413,11 @@ func (batch *Batch) build() error {
 		for i, entry := range batch.Entries {
 			entryCount += 1 + entry.addendaCount()
 
+			// addendaCount := entry.addendaCount()
+			// if (addendaCount > 0 && entry.AddendaRecordIndicator != 1) || (addendaCount == 0 && entry.AddendaRecordIndicator != 0) {
+			// 	return fieldError("AddendaRecordIndicator", NewErrAddendaRecordIndicator(addendaCount), entry.AddendaRecordIndicator)
+			// }
+
 			currentTraceNumberODFI, err := strconv.Atoi(entry.TraceNumberField()[:8])
 			if err != nil {
 				return err
