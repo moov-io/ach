@@ -62,6 +62,7 @@ Example: `POST /files/create?requireABAOrigin=true&bypassDestination=true`
 | `preserveSpaces`                   | `PreserveSpaces`                   |
 | `requireABAOrigin`                 | `RequireABAOrigin`                 |
 | `skipAll`                          | `SkipAll`                          |
+| `skipFileCreationValidation`       | `SkipFileCreationValidation`       |
 | `unequalAddendaCounts`             | `UnequalAddendaCounts`             |
 | `unequalServiceClassCode`          | `UnequalServiceClassCode`          |
 

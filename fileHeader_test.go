@@ -840,3 +840,19 @@ func TestFileHeaderSpecialCharacter(t *testing.T) {
 		t.Error("Special character should have been allowed with override set.")
 	}
 }
+
+func TestFileHeader_SkipFileCreationValidation(t *testing.T) {
+	// Make FileCreationDate invalid
+	record := mockFileHeader()
+	record.FileCreationDate = "ABC"
+
+	err := record.Validate()
+	require.ErrorContains(t, err, "FileCreationDate ABC unknown format:")
+
+	// Make FileCreationTime invalid
+	record = mockFileHeader()
+	record.FileCreationTime = "DEF"
+
+	err = record.Validate()
+	require.ErrorContains(t, err, "FileCreationTime DEF unknown format:")
+}

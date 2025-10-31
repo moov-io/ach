@@ -485,6 +485,7 @@ var datetimeformats = []string{
 	"2006-01-02T15:04:05.999Z", // Default javascript (new Date).toISOString()
 	"2006-01-02T15:04:05Z",     // ISO 8601 without milliseconds
 	time.RFC3339,               // Go default
+	"01/02/2006",               // DD/MM/YYYY
 }
 
 func datetimeParse(v string) (time.Time, error) {
@@ -758,6 +759,9 @@ type ValidateOpts struct {
 
 	// BypassBatchValidation will skip validation for batches in a file and only validate file header and control info
 	BypassBatchValidation bool `json:"bypassBatchValidation"`
+
+	// SkipFileCreationValidation will skip validation of the FileCreationTime and FileCreationDate fields in a file header
+	SkipFileCreationValidation bool `json:"skipFileCreationValidation"`
 }
 
 // merge will combine two ValidateOpts structs and keep any non-zero field values.
@@ -791,6 +795,7 @@ func (v *ValidateOpts) merge(other *ValidateOpts) *ValidateOpts {
 		AllowSpecialCharacters:           v.AllowSpecialCharacters || other.AllowSpecialCharacters,
 		AllowEmptyIndividualName:         v.AllowEmptyIndividualName || other.AllowEmptyIndividualName,
 		BypassBatchValidation:            v.BypassBatchValidation || other.BypassBatchValidation,
+		SkipFileCreationValidation:       v.SkipFileCreationValidation || other.SkipFileCreationValidation,
 	}
 
 	if v.CheckTransactionCode != nil {
