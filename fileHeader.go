@@ -18,6 +18,8 @@
 package ach
 
 import (
+	"cmp"
+	"errors"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -260,12 +262,27 @@ func (fh *FileHeader) ValidateWith(opts *ValidateOpts) error {
 			return fieldError("ReferenceCode", err, fh.ReferenceCode)
 		}
 	}
-	// todo: handle test cases for before date
-	/*
-		if fh.fileCreationDate.Before(time.Now()) {
-			return false, ErrFileCreationDate
+	if fh.validateOpts == nil || !fh.validateOpts.SkipFileCreationValidation {
+		if fh.FileCreationDate != "" {
+			_, err := datetimeParse(fh.FileCreationDate)
+			when := fh.FileCreationDateField()
+
+			if err != nil && when == "" {
+				err = cmp.Or(err, errors.New("invalid FileCreationDate"))
+				return fieldError("FileCreationDate", err, fh.FileCreationDate)
+			}
 		}
-	*/
+		if fh.FileCreationTime != "" {
+			_, err := datetimeParse(fh.FileCreationTime)
+			when := fh.FileCreationTimeField()
+
+			if err != nil && when == "" {
+				err = cmp.Or(err, errors.New("invalid FileCreationTime"))
+				return fieldError("FileCreationTime", err, fh.FileCreationTime)
+			}
+		}
+	}
+
 	return nil
 }
 
