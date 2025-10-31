@@ -254,7 +254,7 @@ func TestBatchENRAmount(t *testing.T) {
 // TestBatchENRTransactionCode validates TransactionCode
 func TestBatchENRTransactionCode(t *testing.T) {
 	mockBatch := mockBatchENR(t)
-	mockBatch.GetEntries()[0].TransactionCode = CheckingReturnNOCCredit
+	mockBatch.GetEntries()[0].TransactionCode = CheckingCredit
 	err := mockBatch.Create()
 	if !base.Match(err, ErrBatchTransactionCode) {
 		t.Errorf("%T: %s", err, err)
