@@ -90,6 +90,8 @@ func (batch *BatchENR) InvalidEntries() []InvalidEntry {
 		switch entry.TransactionCode {
 		case CheckingPrenoteCredit, SavingsPrenoteCredit:
 			// nothing
+		case CheckingReturnNOCCredit, SavingsReturnNOCCredit:
+			// reurns, do nothing
 		default:
 			out = append(out, InvalidEntry{
 				Entry: entry,
