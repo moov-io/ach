@@ -70,6 +70,7 @@ paths:
             type: string
             example: "3f2d23ee214"
         - $ref: "#/components/parameters/SkipAll"
+        - $ref: "#/components/parameters/AllowEmptyIndividualName"
         - $ref: "#/components/parameters/AllowInvalidAmounts"
         - $ref: "#/components/parameters/AllowInvalidCheckDigit"
         - $ref: "#/components/parameters/AllowMissingFileControl"
@@ -77,6 +78,7 @@ paths:
         - $ref: "#/components/parameters/AllowSpecialCharacters"
         - $ref: "#/components/parameters/AllowUnorderedBatchNumbers"
         - $ref: "#/components/parameters/AllowZeroBatches"
+        - $ref: "#/components/parameters/BypassBatchValidation"
         - $ref: "#/components/parameters/BypassCompanyIdentificationMatch"
         - $ref: "#/components/parameters/BypassDestination"
         - $ref: "#/components/parameters/BypassDestinationValidation"
@@ -86,6 +88,7 @@ paths:
         - $ref: "#/components/parameters/CustomTraceNumbers"
         - $ref: "#/components/parameters/PreserveSpaces"
         - $ref: "#/components/parameters/RequireABAOrigin"
+        - $ref: "#/components/parameters/SkipFileCreationValidation"
         - $ref: "#/components/parameters/UnequalAddendaCounts"
         - $ref: "#/components/parameters/UnequalServiceClassCode"
         - $ref: "#/components/parameters/UnorderedBatchNumbers"
@@ -201,6 +204,7 @@ paths:
             type: string
             example: "3f2d23ee214"
         - $ref: "#/components/parameters/SkipAll"
+        - $ref: "#/components/parameters/AllowEmptyIndividualName"
         - $ref: "#/components/parameters/AllowInvalidAmounts"
         - $ref: "#/components/parameters/AllowInvalidCheckDigit"
         - $ref: "#/components/parameters/AllowMissingFileControl"
@@ -208,6 +212,7 @@ paths:
         - $ref: "#/components/parameters/AllowSpecialCharacters"
         - $ref: "#/components/parameters/AllowUnorderedBatchNumbers"
         - $ref: "#/components/parameters/AllowZeroBatches"
+        - $ref: "#/components/parameters/BypassBatchValidation"
         - $ref: "#/components/parameters/BypassCompanyIdentificationMatch"
         - $ref: "#/components/parameters/BypassDestination"
         - $ref: "#/components/parameters/BypassDestinationValidation"
@@ -217,6 +222,7 @@ paths:
         - $ref: "#/components/parameters/CustomTraceNumbers"
         - $ref: "#/components/parameters/PreserveSpaces"
         - $ref: "#/components/parameters/RequireABAOrigin"
+        - $ref: "#/components/parameters/SkipFileCreationValidation"
         - $ref: "#/components/parameters/UnequalAddendaCounts"
         - $ref: "#/components/parameters/UnequalServiceClassCode"
         - $ref: "#/components/parameters/UnorderedBatchNumbers"
@@ -313,6 +319,7 @@ paths:
   /files/{fileID}/validate:
     parameters:
       - $ref: "#/components/parameters/SkipAll"
+      - $ref: "#/components/parameters/AllowEmptyIndividualName"
       - $ref: "#/components/parameters/AllowInvalidAmounts"
       - $ref: "#/components/parameters/AllowInvalidCheckDigit"
       - $ref: "#/components/parameters/AllowMissingFileControl"
@@ -320,6 +327,7 @@ paths:
       - $ref: "#/components/parameters/AllowSpecialCharacters"
       - $ref: "#/components/parameters/AllowUnorderedBatchNumbers"
       - $ref: "#/components/parameters/AllowZeroBatches"
+      - $ref: "#/components/parameters/BypassBatchValidation"
       - $ref: "#/components/parameters/BypassCompanyIdentificationMatch"
       - $ref: "#/components/parameters/BypassDestination"
       - $ref: "#/components/parameters/BypassDestinationValidation"
@@ -329,6 +337,7 @@ paths:
       - $ref: "#/components/parameters/CustomTraceNumbers"
       - $ref: "#/components/parameters/PreserveSpaces"
       - $ref: "#/components/parameters/RequireABAOrigin"
+      - $ref: "#/components/parameters/SkipFileCreationValidation"
       - $ref: "#/components/parameters/UnequalAddendaCounts"
       - $ref: "#/components/parameters/UnequalServiceClassCode"
       - $ref: "#/components/parameters/UnorderedBatchNumbers"
@@ -822,6 +831,24 @@ components:
       name: allowSpecialCharacters
       in: query
       description: Optional parameter to permit a wider range of UTF-8 characters in alphanumeric fields
+      schema:
+        type: boolean
+    AllowEmptyIndividualName:
+      name: allowEmptyIndividualName
+      in: query
+      description: Optional paramater to skip verifying IndividualName fields are populated for SEC codes that require the field to be non-blank (and non-zero)
+      schema:
+        type: boolean
+    BypassBatchValidation:
+      name: bypassBatchValidation
+      in: query
+      description: Optional parameter to skip validation for batches in a file and only validate file header and control info
+      schema:
+        type: boolean
+    SkipFileCreationValidation:
+      name: skipFileCreationValidation
+      in: query
+      description: Optional parameter to skip validation of the FileCreationTime and FileCreationDate fields in a file header
       schema:
         type: boolean
   schemas:
