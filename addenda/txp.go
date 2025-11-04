@@ -196,10 +196,10 @@ func ParseTXP(paymentInfo string) (*TXP, error) {
 	return txp, nil
 }
 
-// ToString serializes the TXP object into a TXP-formatted string
+// String serializes the TXP object into a TXP-formatted string
 // The format matches the expected TXP addenda format:
 // TXP*tax_id*tax_type*date*type1*amount1*type2*amount2*type3*amount3*taxpayer_verification\
-func (txp *TXP) ToString() string {
+func (txp *TXP) String() string {
 	var builder strings.Builder
 	builder.WriteString(TXPPrefix)
 	builder.WriteString(txp.TaxIdentificationNumber)

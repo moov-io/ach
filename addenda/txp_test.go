@@ -19,6 +19,8 @@ package addenda
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 // TestParseTXP tests parsing valid TXP format strings
@@ -492,7 +494,7 @@ func TestTXPToString(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := tt.txp.ToString()
+			result := tt.txp.String()
 			if result != tt.expected {
 				t.Errorf("expected %q, got %q", tt.expected, result)
 			}
@@ -532,44 +534,25 @@ func TestTXPToStringRoundTrip(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Parse the input
 			txp, err := ParseTXP(tt.input)
-			if err != nil {
-				t.Fatalf("failed to parse TXP: %v", err)
-			}
+			require.NoError(t, err, "failed to parse TXP")
 
 			// Serialize it back
-			serialized := txp.ToString()
+			serialized := txp.String()
 
 			// Parse the serialized string again
 			reparsed, err := ParseTXP(serialized)
-			if err != nil {
-				t.Fatalf("failed to reparse serialized TXP: %v", err)
-			}
+			require.NoError(t, err, "failed to reparse serialized TXP")
 
 			// Verify the round-trip results match
-			if reparsed.TaxIdentificationNumber != txp.TaxIdentificationNumber {
-				t.Errorf("TaxIdentificationNumber: expected %s, got %s", txp.TaxIdentificationNumber, reparsed.TaxIdentificationNumber)
+			require.Equal(t, txp.TaxIdentificationNumber, reparsed.TaxIdentificationNumber)
+			require.Equal(t, txp.TaxPaymentTypeCode, reparsed.TaxPaymentTypeCode)
+			require.Equal(t, txp.Date, reparsed.Date)
+			require.Len(t, reparsed.TaxAmounts, len(txp.TaxAmounts))
+			for i, expectedAmount := range txp.TaxAmounts {
+				require.Equal(t, expectedAmount.AmountCents, reparsed.TaxAmounts[i].AmountCents)
+				require.Equal(t, expectedAmount.AmountType, reparsed.TaxAmounts[i].AmountType)
 			}
-			if reparsed.TaxPaymentTypeCode != txp.TaxPaymentTypeCode {
-				t.Errorf("TaxPaymentTypeCode: expected %s, got %s", txp.TaxPaymentTypeCode, reparsed.TaxPaymentTypeCode)
-			}
-			if reparsed.Date != txp.Date {
-				t.Errorf("Date: expected %s, got %s", txp.Date, reparsed.Date)
-			}
-			if len(reparsed.TaxAmounts) != len(txp.TaxAmounts) {
-				t.Errorf("TaxAmounts length: expected %d, got %d", len(txp.TaxAmounts), len(reparsed.TaxAmounts))
-			} else {
-				for i, expectedAmount := range txp.TaxAmounts {
-					if reparsed.TaxAmounts[i].AmountCents != expectedAmount.AmountCents {
-						t.Errorf("TaxAmounts[%d].AmountCents: expected %s, got %s", i, expectedAmount.AmountCents, reparsed.TaxAmounts[i].AmountCents)
-					}
-					if reparsed.TaxAmounts[i].AmountType != expectedAmount.AmountType {
-						t.Errorf("TaxAmounts[%d].AmountType: expected %s, got %s", i, expectedAmount.AmountType, reparsed.TaxAmounts[i].AmountType)
-					}
-				}
-			}
-			if reparsed.TaxpayerVerification != txp.TaxpayerVerification {
-				t.Errorf("TaxpayerVerification: expected %s, got %s", txp.TaxpayerVerification, reparsed.TaxpayerVerification)
-			}
+			require.Equal(t, txp.TaxpayerVerification, reparsed.TaxpayerVerification)
 		})
 	}
 }
