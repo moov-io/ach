@@ -1,14 +1,24 @@
 PLATFORM=$(shell uname -s | tr '[:upper:]' '[:lower:]')
-VERSION := $(shell grep -Eo '(v[0-9]+[\.][0-9]+[\.][0-9]+([-a-zA-Z0-9]*)?)' version.go)
+PWD := $(shell pwd)
+
+ifndef VERSION
+	VERSION := $(shell git describe --tags --abbrev=0)
+endif
+
+COMMIT_HASH :=$(shell git rev-parse --short HEAD)
+DEV_VERSION := dev-${COMMIT_HASH}
+
+USERID := $(shell id -u $$USER)
+GROUPID:= $(shell id -g $$USER)
 
 .PHONY: build docker release
 
 build:
 	go fmt ./...
 	@mkdir -p ./bin/
-	go build github.com/moov-io/ach
-	go build -o bin/examples-http github.com/moov-io/ach/examples/http
-	CGO_ENABLED=0 go build -o ./bin/server github.com/moov-io/ach/cmd/server
+	go build -ldflags "-X github.com/moov-io/ach.Version=${VERSION}" github.com/moov-io/ach
+	go build -ldflags "-X github.com/moov-io/ach.Version=${VERSION}" -o bin/examples-http github.com/moov-io/ach/examples/http
+	CGO_ENABLED=0 go build -ldflags "-X github.com/moov-io/ach.Version=${VERSION}" -o ./bin/server github.com/moov-io/ach/cmd/server
 
 GOROOT_PATH=$(shell go env GOROOT)
 WASM_124=$(GOROOT_PATH)/lib/wasm/wasm_exec.js
@@ -21,7 +31,7 @@ build-webui:
 	else \
 		cp "$(WASM_123)" "$(TARGET_DIR)/wasm_exec.js"; \
 	fi
-	GOOS=js GOARCH=wasm go build -o $(TARGET_DIR)/ach.wasm github.com/moov-io/ach/docs/webui/
+	GOOS=js GOARCH=wasm go build -ldflags "-X github.com/moov-io/ach.Version=${VERSION}" -o $(TARGET_DIR)/ach.wasm github.com/moov-io/ach/docs/webui/
 
 clean:
 	@rm -rf ./bin/ ./tmp/ coverage.txt misspell* staticcheck lint-project.sh
@@ -60,11 +70,11 @@ endif
 
 dist: clean build
 ifeq ($(OS),Windows_NT)
-	CGO_ENABLED=1 GOOS=windows go build -o bin/achcli.exe github.com/moov-io/ach/cmd/achcli
-	CGO_ENABLED=1 GOOS=windows go build -o bin/ach.exe github.com/moov-io/ach/cmd/server
+	CGO_ENABLED=1 GOOS=windows go build -ldflags "-X github.com/moov-io/ach.Version=${VERSION}" -o bin/achcli.exe github.com/moov-io/ach/cmd/achcli
+	CGO_ENABLED=1 GOOS=windows go build -ldflags "-X github.com/moov-io/ach.Version=${VERSION}" -o bin/ach.exe github.com/moov-io/ach/cmd/server
 else
-	CGO_ENABLED=0 GOOS=$(PLATFORM) go build -o bin/achcli-$(PLATFORM)-amd64 github.com/moov-io/ach/cmd/achcli
-	CGO_ENABLED=0 GOOS=$(PLATFORM) go build -o bin/ach-$(PLATFORM)-amd64 github.com/moov-io/ach/cmd/server
+	CGO_ENABLED=0 GOOS=$(PLATFORM) go build -ldflags "-X github.com/moov-io/ach.Version=${VERSION}" -o bin/achcli-$(PLATFORM)-amd64 github.com/moov-io/ach/cmd/achcli
+	CGO_ENABLED=0 GOOS=$(PLATFORM) go build -ldflags "-X github.com/moov-io/ach.Version=${VERSION}" -o bin/ach-$(PLATFORM)-amd64 github.com/moov-io/ach/cmd/server
 endif
 
 dist-webui: build-webui

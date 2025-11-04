@@ -17,6 +17,4 @@
 
 package ach
 
-// Version Number
-const Version = "v1.53.1"
-
+var Version string
