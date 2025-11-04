@@ -91,7 +91,7 @@ docker-hub:
 	docker tag moov/ach:$(VERSION) moov/ach:latest
 
 .PHONY: dev-docker
-dev-docker: update
+dev-docker:
 	docker build --pull --build-arg VERSION=${DEV_VERSION} -t moov/achgateway:${DEV_VERSION} -f Dockerfile .
 
 .PHONY: dev-push
