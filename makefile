@@ -90,6 +90,14 @@ docker-hub:
 	docker build --pull -t moov/ach:$(VERSION) -f Dockerfile .
 	docker tag moov/ach:$(VERSION) moov/ach:latest
 
+.PHONY: dev-docker
+dev-docker: update
+	docker build --pull --build-arg VERSION=${DEV_VERSION} -t moov/achgateway:${DEV_VERSION} -f Dockerfile .
+
+.PHONY: dev-push
+dev-push:
+	docker push moov/achgateway:${DEV_VERSION}
+
 .PHONY: clean-integration test-integration
 
 clean-integration:

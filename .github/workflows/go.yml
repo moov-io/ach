@@ -58,7 +58,7 @@ jobs:
       uses: actions/checkout@v5
 
     - name: Docker Build
-      run: make docker
+      run: make dev-docker
 
     - name: Docker Tests
       run: make test-integration
