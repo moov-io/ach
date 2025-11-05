@@ -196,6 +196,38 @@ func ParseTXP(paymentInfo string) (*TXP, error) {
 	return txp, nil
 }
 
+// String serializes the TXP object into a TXP-formatted string
+// The format matches the expected TXP addenda format:
+// TXP*tax_id*tax_type*date*type1*amount1*type2*amount2*type3*amount3*taxpayer_verification\
+func (txp *TXP) String() string {
+	var builder strings.Builder
+	builder.WriteString(TXPPrefix)
+	builder.WriteString(txp.TaxIdentificationNumber)
+	builder.WriteString("*")
+	builder.WriteString(txp.TaxPaymentTypeCode)
+	builder.WriteString("*")
+	builder.WriteString(txp.Date)
+
+	// Add each tax amount pair
+	for _, taxAmount := range txp.TaxAmounts {
+		builder.WriteString("*")
+		builder.WriteString(taxAmount.AmountType)
+		builder.WriteString("*")
+		builder.WriteString(taxAmount.AmountCents)
+	}
+
+	// Add taxpayer verification if present
+	if txp.TaxpayerVerification != "" {
+		builder.WriteString("*")
+		builder.WriteString(txp.TaxpayerVerification)
+	}
+
+	// Add backslash terminator
+	builder.WriteString("\\")
+
+	return builder.String()
+}
+
 // validateTXPCharacters ensures PaymentRelatedInformation only contains characters
 // permitted by TXP addenda conventions (printable set and delimiters).
 func validateTXPCharacters(s string) error {

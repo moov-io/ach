@@ -19,6 +19,8 @@ package addenda
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 // TestParseTXP tests parsing valid TXP format strings
@@ -406,6 +408,151 @@ func TestIsTXPFormat(t *testing.T) {
 			if result != tt.expected {
 				t.Errorf("expected %v, got %v", tt.expected, result)
 			}
+		})
+	}
+}
+
+// TestTXPToString tests serialization of TXP objects
+func TestTXPToString(t *testing.T) {
+	tests := []struct {
+		name     string
+		txp      *TXP
+		expected string
+	}{
+		{
+			name: "TXP with 3 amounts and verification",
+			txp: &TXP{
+				TaxIdentificationNumber: "123456789",
+				TaxPaymentTypeCode:      "606",
+				Date:                    "960331",
+				TaxAmounts: []TaxAmount{
+					{AmountType: "T", AmountCents: "100000"},
+					{AmountType: "P", AmountCents: "12000"},
+					{AmountType: "I", AmountCents: "4567"},
+				},
+				TaxpayerVerification: "SML2A",
+			},
+			expected: "TXP*123456789*606*960331*T*100000*P*12000*I*4567*SML2A\\",
+		},
+		{
+			name: "TXP with 1 amount and verification",
+			txp: &TXP{
+				TaxIdentificationNumber: "12345678934",
+				TaxPaymentTypeCode:      "526",
+				Date:                    "960930",
+				TaxAmounts: []TaxAmount{
+					{AmountType: "T", AmountCents: "100000"},
+				},
+				TaxpayerVerification: "SML2A",
+			},
+			expected: "TXP*12345678934*526*960930*T*100000*SML2A\\",
+		},
+		{
+			name: "TXP with 3 amounts and no verification",
+			txp: &TXP{
+				TaxIdentificationNumber: "123456789",
+				TaxPaymentTypeCode:      "94105",
+				Date:                    "960301",
+				TaxAmounts: []TaxAmount{
+					{AmountType: "1", AmountCents: "10000"},
+					{AmountType: "2", AmountCents: "5000"},
+					{AmountType: "3", AmountCents: "15000"},
+				},
+				TaxpayerVerification: "",
+			},
+			expected: "TXP*123456789*94105*960301*1*10000*2*5000*3*15000\\",
+		},
+		{
+			name: "TXP with 2 amounts and no verification",
+			txp: &TXP{
+				TaxIdentificationNumber: "123456789",
+				TaxPaymentTypeCode:      "941",
+				Date:                    "250901",
+				TaxAmounts: []TaxAmount{
+					{AmountType: "1", AmountCents: "1000"},
+					{AmountType: "2", AmountCents: "500"},
+				},
+				TaxpayerVerification: "",
+			},
+			expected: "TXP*123456789*941*250901*1*1000*2*500\\",
+		},
+		{
+			name: "TXP with mixed amount types",
+			txp: &TXP{
+				TaxIdentificationNumber: "888999000",
+				TaxPaymentTypeCode:      "STATE",
+				Date:                    "20231231",
+				TaxAmounts: []TaxAmount{
+					{AmountType: "S", AmountCents: "200000"},
+					{AmountType: "2", AmountCents: "10000"},
+				},
+				TaxpayerVerification: "CONFIRMED",
+			},
+			expected: "TXP*888999000*STATE*20231231*S*200000*2*10000*CONFIRMED\\",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.txp.String()
+			if result != tt.expected {
+				t.Errorf("expected %q, got %q", tt.expected, result)
+			}
+		})
+	}
+}
+
+// TestTXPToStringRoundTrip tests that parsing and serializing produces consistent results
+func TestTXPToStringRoundTrip(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+	}{
+		{
+			name:  "TXP with 3 amounts and verification",
+			input: "TXP*123456789*606*960331*T*100000*P*12000*I*4567*SML2A\\",
+		},
+		{
+			name:  "TXP with 1 amount and verification",
+			input: "TXP*12345678934*526*960930*T*100000***SML2A\\",
+		},
+		{
+			name:  "TXP with 3 amounts and no verification",
+			input: "TXP*123456789*94105*960301*1*10000*2*5000*3*15000\\",
+		},
+		{
+			name:  "TXP with 2 amounts and no verification",
+			input: "TXP*123456789*941*250901*1*1000*2*500\\",
+		},
+		{
+			name:  "TXP with 1 amount and no verification",
+			input: "TXP*123456789*941*250901*T*100000\\",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Parse the input
+			txp, err := ParseTXP(tt.input)
+			require.NoError(t, err, "failed to parse TXP")
+
+			// Serialize it back
+			serialized := txp.String()
+
+			// Parse the serialized string again
+			reparsed, err := ParseTXP(serialized)
+			require.NoError(t, err, "failed to reparse serialized TXP")
+
+			// Verify the round-trip results match
+			require.Equal(t, txp.TaxIdentificationNumber, reparsed.TaxIdentificationNumber)
+			require.Equal(t, txp.TaxPaymentTypeCode, reparsed.TaxPaymentTypeCode)
+			require.Equal(t, txp.Date, reparsed.Date)
+			require.Len(t, reparsed.TaxAmounts, len(txp.TaxAmounts))
+			for i, expectedAmount := range txp.TaxAmounts {
+				require.Equal(t, expectedAmount.AmountCents, reparsed.TaxAmounts[i].AmountCents)
+				require.Equal(t, expectedAmount.AmountType, reparsed.TaxAmounts[i].AmountType)
+			}
+			require.Equal(t, txp.TaxpayerVerification, reparsed.TaxpayerVerification)
 		})
 	}
 }
