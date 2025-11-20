@@ -23,7 +23,7 @@ jobs:
       id: go
 
     - name: Check out code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Check
       run: make check
@@ -68,7 +68,7 @@ jobs:
       id: go
 
     - name: Check out code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Load Release URL File from release job
       uses: actions/download-artifact@v6
@@ -167,7 +167,7 @@ jobs:
       id: go
 
     - name: Check out code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Switch to master
       run: |
@@ -189,7 +189,7 @@ jobs:
       id: go
 
     - name: Check out code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Docker
       run: make docker
