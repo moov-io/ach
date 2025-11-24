@@ -1215,7 +1215,7 @@ func (b *Batch) upsertOffsets() error {
 			}
 			// remove the EntryDetail
 			b.Control.EntryAddendaCount -= 1
-			b.Entries = append(b.Entries[:i], b.Entries[i+i:]...)
+			b.Entries = append(b.Entries[:i], b.Entries[i+1:]...)
 			i--
 		}
 	}
