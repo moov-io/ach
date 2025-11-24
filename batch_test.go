@@ -1774,3 +1774,49 @@ func TestBatch_DeleteADVEntries(t *testing.T) {
 	require.Len(t, b.ADVEntries, 1)
 	require.Equal(t, "1", b.ADVEntries[0].ID)
 }
+
+func TestBatch_upsertOffsets_PanicRegression(t *testing.T) {
+	batch := NewBatchWEB(&BatchHeader{
+		ServiceClassCode:       MixedDebitsAndCredits,
+		StandardEntryClassCode: "WEB",
+		CompanyName:            "Test",
+		CompanyIdentification:  "123456789",
+	})
+
+	// Add 3 normal entries
+	for i := 0; i < 3; i++ {
+		batch.AddEntry(&EntryDetail{
+			TransactionCode:    CheckingDebit,
+			RDFIIdentification: "12345678",
+			Amount:             100,
+			IndividualName:     "User",
+		})
+	}
+
+	// Add offset as last entry (this triggered the i+i bug)
+	batch.AddEntry(&EntryDetail{
+		TransactionCode:    CheckingCredit,
+		RDFIIdentification: "98765432",
+		Amount:             300,
+		IndividualName:     offsetIndividualName,
+	})
+
+	// Setup control
+	batch.Control = &BatchControl{
+		TotalDebitEntryDollarAmount:  300,
+		TotalCreditEntryDollarAmount: 300,
+		EntryAddendaCount:            4,
+	}
+
+	batch.offset = &Offset{
+		RoutingNumber: "987654320",
+		AccountNumber: "123456",
+		AccountType:   OffsetChecking,
+	}
+
+	require.NotPanics(t, func() {
+		batch.upsertOffsets()
+	})
+
+	require.Len(t, batch.Entries, 4)
+}
