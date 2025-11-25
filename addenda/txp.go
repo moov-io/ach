@@ -123,8 +123,31 @@ func ParseTXP(paymentInfo string) (*TXP, error) {
 
 	txp := &TXP{}
 	txp.TaxIdentificationNumber = parts[0]
+
+	// Validate that TaxIdentificationNumber is not empty
+	if txp.TaxIdentificationNumber == "" {
+		return nil, ErrInvalidTXPFormat
+	}
+
 	txp.TaxPaymentTypeCode = parts[1]
+
+	// Validate that TaxPaymentTypeCode is not empty
+	if txp.TaxPaymentTypeCode == "" {
+		return nil, ErrInvalidTXPFormat
+	}
+
 	txp.Date = parts[2]
+
+	// Validate that Date is not empty and matches YYMMDD (6 digits) or YYYYMMDD (8 digits) format
+	if txp.Date == "" {
+		return nil, ErrInvalidTXPFormat
+	}
+	if len(txp.Date) != 6 && len(txp.Date) != 8 {
+		return nil, ErrInvalidTXPFormat
+	}
+	if !isNumeric(txp.Date) {
+		return nil, ErrInvalidTXPFormat
+	}
 
 	// Parse amount pairs sequentially
 	i := 3

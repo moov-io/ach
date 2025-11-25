@@ -193,6 +193,42 @@ func TestParseTXP(t *testing.T) {
 			expectError: true,
 		},
 		{
+			name:        "Empty TaxIdentificationNumber",
+			input:       "TXP**941*250901*T*1000\\",
+			expected:    nil,
+			expectError: true,
+		},
+		{
+			name:        "Empty TaxPaymentTypeCode",
+			input:       "TXP*123456789**250901*T*1000\\",
+			expected:    nil,
+			expectError: true,
+		},
+		{
+			name:        "Empty Date",
+			input:       "TXP*123456789*941**T*1000\\",
+			expected:    nil,
+			expectError: true,
+		},
+		{
+			name:        "Date too short",
+			input:       "TXP*123456789*941*2509*T*1000\\",
+			expected:    nil,
+			expectError: true,
+		},
+		{
+			name:        "Date too long",
+			input:       "TXP*123456789*941*2509011*T*1000\\",
+			expected:    nil,
+			expectError: true,
+		},
+		{
+			name:        "Date non-numeric",
+			input:       "TXP*123456789*941*ABCDEF*T*1000\\",
+			expected:    nil,
+			expectError: true,
+		},
+		{
 			name:  "Multiple consecutive empty delimiters",
 			input: "TXP*123456789*941*250901*T*1000****VERIFIED\\",
 			expected: &TXP{
