@@ -20,6 +20,7 @@ package addenda
 import (
 	"errors"
 	"strings"
+	"unicode/utf8"
 )
 
 // TaxAmount represents a single tax amount with its type
@@ -41,8 +42,6 @@ type TXP struct {
 	TaxPaymentTypeCode string
 	// Date represents the tax period or payment date in YYYYMMDD format
 	Date string
-	// TaxInformationIDNumber is a unique identifier for the tax information
-	TaxInformationIDNumber string
 	// TaxAmounts is a slice of tax amounts with their types
 	TaxAmounts []TaxAmount
 	// TaxpayerVerification is the verification information
@@ -100,7 +99,7 @@ func ParseTXP(paymentInfo string) (*TXP, error) {
 	}
 
 	// Validate 80-byte limit for TXP addenda
-	if len(paymentInfo) > 80 {
+	if utf8.RuneCountInString(paymentInfo) > 80 {
 		return nil, ErrInvalidTXPFormat
 	}
 

@@ -289,46 +289,22 @@ func TestParseTXP(t *testing.T) {
 			result, err := ParseTXP(tt.input)
 
 			if tt.expectError {
-				if err == nil {
-					t.Errorf("expected error but got none")
-				}
+				require.Error(t, err)
 				return
 			}
 
-			if err != nil {
-				t.Errorf("unexpected error: %v", err)
-				return
-			}
+			require.NoError(t, err)
+			require.NotNil(t, result)
 
-			if result == nil {
-				t.Errorf("expected result but got nil")
-				return
+			require.Equal(t, tt.expected.TaxIdentificationNumber, result.TaxIdentificationNumber)
+			require.Equal(t, tt.expected.TaxPaymentTypeCode, result.TaxPaymentTypeCode)
+			require.Equal(t, tt.expected.Date, result.Date)
+			require.Len(t, result.TaxAmounts, len(tt.expected.TaxAmounts))
+			for i, expectedAmount := range tt.expected.TaxAmounts {
+				require.Equal(t, expectedAmount.AmountCents, result.TaxAmounts[i].AmountCents)
+				require.Equal(t, expectedAmount.AmountType, result.TaxAmounts[i].AmountType)
 			}
-
-			if result.TaxIdentificationNumber != tt.expected.TaxIdentificationNumber {
-				t.Errorf("TaxIdentificationNumber: expected %s, got %s", tt.expected.TaxIdentificationNumber, result.TaxIdentificationNumber)
-			}
-			if result.TaxPaymentTypeCode != tt.expected.TaxPaymentTypeCode {
-				t.Errorf("TaxPaymentTypeCode: expected %s, got %s", tt.expected.TaxPaymentTypeCode, result.TaxPaymentTypeCode)
-			}
-			if result.Date != tt.expected.Date {
-				t.Errorf("Date: expected %s, got %s", tt.expected.Date, result.Date)
-			}
-			if len(result.TaxAmounts) != len(tt.expected.TaxAmounts) {
-				t.Errorf("TaxAmounts length: expected %d, got %d", len(tt.expected.TaxAmounts), len(result.TaxAmounts))
-			} else {
-				for i, expectedAmount := range tt.expected.TaxAmounts {
-					if result.TaxAmounts[i].AmountCents != expectedAmount.AmountCents {
-						t.Errorf("TaxAmounts[%d].AmountCents: expected %s, got %s", i, expectedAmount.AmountCents, result.TaxAmounts[i].AmountCents)
-					}
-					if result.TaxAmounts[i].AmountType != expectedAmount.AmountType {
-						t.Errorf("TaxAmounts[%d].AmountType: expected %s, got %s", i, expectedAmount.AmountType, result.TaxAmounts[i].AmountType)
-					}
-				}
-			}
-			if result.TaxpayerVerification != tt.expected.TaxpayerVerification {
-				t.Errorf("TaxpayerVerification: expected %s, got %s", tt.expected.TaxpayerVerification, result.TaxpayerVerification)
-			}
+			require.Equal(t, tt.expected.TaxpayerVerification, result.TaxpayerVerification)
 		})
 	}
 }
@@ -397,13 +373,9 @@ func TestValidateTXPCharacters(t *testing.T) {
 			err := validateTXPCharacters(tt.input)
 
 			if tt.expectError {
-				if err == nil {
-					t.Errorf("expected error but got none")
-				}
+				require.Error(t, err)
 			} else {
-				if err != nil {
-					t.Errorf("unexpected error: %v", err)
-				}
+				require.NoError(t, err)
 			}
 		})
 	}
@@ -441,9 +413,7 @@ func TestIsTXPFormat(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := IsTXPFormat(tt.input)
-			if result != tt.expected {
-				t.Errorf("expected %v, got %v", tt.expected, result)
-			}
+			require.Equal(t, tt.expected, result)
 		})
 	}
 }
@@ -531,9 +501,7 @@ func TestTXPToString(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := tt.txp.String()
-			if result != tt.expected {
-				t.Errorf("expected %q, got %q", tt.expected, result)
-			}
+			require.Equal(t, tt.expected, result)
 		})
 	}
 }
