@@ -47,7 +47,7 @@ jobs:
       run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
 
     - name: Save Release URL File for publish
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: release_url
         path: release_url.txt
@@ -71,7 +71,7 @@ jobs:
       uses: actions/checkout@v6
 
     - name: Load Release URL File from release job
-      uses: actions/download-artifact@v6
+      uses: actions/download-artifact@v7
       with:
         name: release_url
         path: release_url
