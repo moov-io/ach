@@ -359,7 +359,7 @@ func makeReturnCodeDict() map[string]*ReturnCode {
 		{"R14", "Representative payee deceased or unable to continue in that capacity", "The representative payee authorized to accept entries on behalf of a beneficiary is either deceased or unable to continue in that capacity"},
 		{"R15", "Beneficiary or bank account holder", "(Other than representative payee) deceased* - (1) the beneficiary entitled to payments is deceased or (2) the bank account holder other than a representative payee is deceased"},
 		{"R16", "Bank account frozen", "Funds in bank account are unavailable due to action by RDFI or legal order"},
-		{"R17", "File Record Edit Criteria/Entry with Invalid Account Number Initiated Under Questionable Circumstances", "(1) Field(s) cannot be processed by RDFI; or (2) the Entry contains an invalid DFI Account Number (account closed/no account/unable to locate account/invalid account number) and is believed by the RDFI to have been initiated under questionable circumstances; or (3) either the RDFI or Receiver has identified a Reversing Entry as one that was improperly initiated by the Originator or ODFI."},
+		{"R17", "File Record Edit Criteria/Entry with Invalid Account Number Initiated Under Questionable Circumstances", "(1) Field(s) cannot be processed by RDFI; or (2) the RDFI believes the Entry to the Receiver's account was initiated under questionable circumstances (which includes, but is not limited to, an ACH Entry Transmitted without the Originator's authorization, or an ACH Entry authorized by the Originator under False Pretenses); or (3) either the RDFI of Receiver has identified a Reversing Entry as one that was improperly initiated by the Originator or ODFI."},
 		{"R18", "Improper effective entry date", "Entries have been presented prior to the first available processing window for the effective date."},
 		{"R19", "Amount field error", "Improper formatting of the amount field"},
 		{"R20", "Non-payment bank account", "Entry destined for non-payment bank account defined by reg."},
@@ -418,6 +418,8 @@ func makeReturnCodeDict() map[string]*ReturnCode {
 		{"R83", "Foreign Receiving DFI Unable to Settle", "The IAT Entry is being returned due to settlement problems in the foreign payment system."},
 		{"R84", "Entry Not Processed by Gateway", "For Outbound IAT Entries, the Entry has not been processed and is being returned at the Gateway's discretion because either (1) the processing of such Entry may expose the Gateway to excessive risk, or (2) the foreign payment system does not support the functions needed to process the transaction."},
 		{"R85", "Incorrectly Coded Outbound International Payment", "The RDFI/Gateway has identified the Entry as an Outbound international payment and is returning the Entry because it bears an SEC Code that lacks information required by the Gateway for OFAC compliance."},
+		// Additional Codes to be used by RDFI's for the Return of Entries
+		{"R90", "Entry Returned Due to RDFI's Sanctions Compliance Obligations", "The RDFI/Gateway has determined that the Entry must be returned to comply with its sanctions compliance obligations."},
 	}
 	// populate the map
 	for i := range codes {

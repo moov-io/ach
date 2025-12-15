@@ -42,6 +42,9 @@ type Addenda16 struct {
 	// Data elements must be separated by an asterisk (*) and must end with a backslash (\)
 	// For example: US*10036\
 	ReceiverCountryPostalCode string `json:"receiverCountryPostalCode"`
+	// Receiver Date of Birth
+	// Example: YYYY-MM-DD
+	ReceiverDateOfBirth string `json:"receiverDateOfBirth"`
 	// EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
 	// Detail or Corporate Entry Detail Record's trace number This number is
 	// the same as the last seven digits of the trace number of the related
@@ -104,8 +107,11 @@ func (addenda16 *Addenda16) Parse(record string) {
 		case 73:
 			// 39-73 ReceiverCountryPostalCode
 			addenda16.ReceiverCountryPostalCode = strings.TrimSpace(reset())
+		case 83:
+			// 74-83 ReceiverDateOfBirth
+			addenda16.ReceiverDateOfBirth = strings.TrimSpace(reset())
 		case 87:
-			// 74-87 reserved - Leave blank
+			// 84-87 reserved - Leave blank
 			reset()
 		case 94:
 			// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
@@ -133,7 +139,8 @@ func (addenda16 *Addenda16) String() string {
 	buf.WriteString(addenda16.TypeCode)
 	buf.WriteString(addenda16.ReceiverCityStateProvinceField())
 	buf.WriteString(addenda16.ReceiverCountryPostalCodeField())
-	buf.WriteString("              ")
+	buf.WriteString(addenda16.ReceiverDateOfBirthField())
+	buf.WriteString("    ")
 	buf.WriteString(addenda16.EntryDetailSequenceNumberField())
 
 	return buf.String()
@@ -197,6 +204,11 @@ func (addenda16 *Addenda16) ReceiverCityStateProvinceField() string {
 // ReceiverCountryPostalCodeField gets the ReceiverCountryPostalCode field left padded
 func (addenda16 *Addenda16) ReceiverCountryPostalCodeField() string {
 	return addenda16.alphaField(addenda16.ReceiverCountryPostalCode, 35)
+}
+
+// ReceiverDateOfBirthField formats the ReceiverDateOfBirth field
+func (addenda16 *Addenda16) ReceiverDateOfBirthField() string {
+	return addenda16.alphaField(addenda16.ReceiverDateOfBirth, 10)
 }
 
 // EntryDetailSequenceNumberField returns a zero padded EntryDetailSequenceNumber string

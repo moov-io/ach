@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 // mockAddenda16 creates a mock Addenda16 record
@@ -316,4 +317,17 @@ func TestAddenda16SpecialCharacter(t *testing.T) {
 	if err != nil {
 		t.Error("Special character should have been allowed with override set.")
 	}
+}
+
+func TestAddenda16_DateOfBirth(t *testing.T) {
+	record := mockAddenda16()
+	record.ReceiverDateOfBirth = "2025-03-04"
+
+	expected := "716LetterTown*AB\\                     CA*80014\\                          2025-03-04    0000001"
+	require.Equal(t, expected, record.String())
+
+	rec2 := NewAddenda16()
+	rec2.Parse(expected)
+
+	require.Equal(t, record, rec2)
 }
