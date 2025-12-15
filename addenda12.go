@@ -43,6 +43,9 @@ type Addenda12 struct {
 	// Data elements must be separated by an asterisk (*) and must end with a backslash (\)
 	// For example: US*10036\
 	OriginatorCountryPostalCode string `json:"originatorCountryPostalCode"`
+	// Originator Date of Birth
+	// Example: YYYY-MM-DD
+	OriginatorDateOfBirth string `json:"originatorDateOfBirth"`
 	// EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
 	// Detail or Corporate Entry Detail Record's trace number This number is
 	// the same as the last seven digits of the trace number of the related
@@ -105,8 +108,11 @@ func (addenda12 *Addenda12) Parse(record string) {
 		case 73:
 			// 39-73
 			addenda12.OriginatorCountryPostalCode = strings.TrimSpace(reset())
+		case 83:
+			// 74-83
+			addenda12.OriginatorDateOfBirth = strings.TrimSpace(reset())
 		case 87:
-			// 74-87 reserved - Leave blank
+			// 84-87 reserved - Leave blank
 			reset()
 		case 94:
 			// 88-94 Contains the last seven digits of the number entered in the Trace Number field in the corresponding Entry Detail Record
@@ -135,7 +141,8 @@ func (addenda12 *Addenda12) String() string {
 	buf.WriteString(addenda12.OriginatorCityStateProvinceField())
 	// ToDo Validator for backslash
 	buf.WriteString(addenda12.OriginatorCountryPostalCodeField())
-	buf.WriteString("              ")
+	buf.WriteString(addenda12.OriginatorDateOfBirthField())
+	buf.WriteString("    ")
 	buf.WriteString(addenda12.EntryDetailSequenceNumberField())
 
 	return buf.String()
@@ -199,6 +206,11 @@ func (addenda12 *Addenda12) OriginatorCityStateProvinceField() string {
 // OriginatorCountryPostalCodeField gets the OriginatorCountryPostalCode field left padded
 func (addenda12 *Addenda12) OriginatorCountryPostalCodeField() string {
 	return addenda12.alphaField(addenda12.OriginatorCountryPostalCode, 35)
+}
+
+// OriginatorDateOfBirthField formats the OriginatorDateOfBirth field
+func (addenda12 *Addenda12) OriginatorDateOfBirthField() string {
+	return addenda12.alphaField(addenda12.OriginatorDateOfBirth, 10)
 }
 
 // EntryDetailSequenceNumberField returns a zero padded EntryDetailSequenceNumber string

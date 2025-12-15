@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 // mockAddenda12 creates a mock Addenda12 record
@@ -316,4 +317,17 @@ func TestAddenda12RuneCountInString(t *testing.T) {
 	if addenda12.OriginatorCountryPostalCode != "" {
 		t.Error("Parsed with an invalid RuneCountInString not equal to 94")
 	}
+}
+
+func TestAddenda12_DateOfBirth(t *testing.T) {
+	record := mockAddenda12()
+	record.OriginatorDateOfBirth = "2025-01-02"
+
+	expected := "712JacobsTown*PA\\                     US*19305\\                          2025-01-02    0000001"
+	require.Equal(t, expected, record.String())
+
+	rec2 := NewAddenda12()
+	rec2.Parse(expected)
+
+	require.Equal(t, record, rec2)
 }
