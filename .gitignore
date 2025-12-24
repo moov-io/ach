@@ -64,3 +64,5 @@ openapi-generator*.jar
 /client/
 .idea/
 .vscode/
+
+test/testdata/ppd-debit.ach.fix

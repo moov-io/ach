@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/moov-io/ach"
+	"github.com/moov-io/ach/cmd/achcli/fix"
 )
 
 var (
@@ -33,6 +34,10 @@ var (
 
 	flagSkipValidation = flag.Bool("skip-validation", false, "Skip all validation checks")
 	flagValidateOpts   = flag.String("validate", "", "Path to config file in json format to enable validation opts")
+
+	// Fix commands
+	flagFix       = flag.Bool("fix", false, "Trigger fix tasks")
+	flagUpdateEED = flag.String("update-eed", "", "Set the EffectiveEntryDate to a new value")
 )
 
 func main() {
@@ -77,6 +82,21 @@ func main() {
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)
 		}
+
+	case *flagFix:
+		if len(args) != 1 {
+			fmt.Printf("ERROR: unexpected %d arguments: %#v\n", len(args), args)
+			os.Exit(1)
+		}
+		conf := fix.Config{
+			UpdateEED: *flagUpdateEED,
+		}
+		newpath, err := fix.Perform(args[0], flagValidateOpts, flagSkipValidation, conf)
+		if err != nil {
+			fmt.Printf("ERROR: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Printf("Fixed file: %s\n", newpath)
 
 	case *flagReformat != "" && len(args) == 1:
 		if err := reformat(*flagReformat, args[0], validateOpts); err != nil {
