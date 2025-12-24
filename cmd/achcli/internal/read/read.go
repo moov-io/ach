@@ -18,34 +18,35 @@ var (
 )
 
 func Filepath(path string, validateOptsPath *string, skipAll *bool) (*ach.File, Format, error) {
-	validateOpts := readValidationOpts(validateOptsPath, skipAll)
-
+	validateOpts, err := readValidationOpts(validateOptsPath, skipAll)
+	if err != nil {
+		return nil, FormatUnknown, err
+	}
 	return readFile(path, validateOpts)
 }
 
-func readValidationOpts(path *string, skipAll *bool) *ach.ValidateOpts {
+func readValidationOpts(path *string, skipAll *bool) (*ach.ValidateOpts, error) {
 	var opts ach.ValidateOpts
 
 	if skipAll != nil && *skipAll {
 		opts.SkipAll = true
-		return &opts
+		return &opts, nil
 	}
 
 	if path != nil && *path != "" {
 		// read config file
 		bs, readErr := os.ReadFile(*path)
 		if readErr != nil {
-			fmt.Printf("ERROR: reading %s for validate opts failed: %v\n", *path, readErr)
-			os.Exit(1)
+			return nil, fmt.Errorf("reading %s for validate opts failed: %w", *path, readErr)
 		}
 
 		if err := json.Unmarshal(bs, &opts); err != nil {
-			fmt.Printf("ERROR: unmarshal of validate opts failed: %v\n", err)
-			os.Exit(1)
+			return nil, fmt.Errorf("unmarshal of validate opts failed: %v", err)
 		}
-		return &opts
+		return &opts, nil
 	}
-	return nil
+
+	return nil, nil
 }
 
 func readFile(path string, validateOpts *ach.ValidateOpts) (*ach.File, Format, error) {

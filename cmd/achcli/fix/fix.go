@@ -35,7 +35,6 @@ func Perform(path string, validateOptsPath *string, skipAll *bool, conf Config) 
 	}
 
 	// Write file
-	// TODO(adam): write back as json if we accepted json
 	newpath := path + ".fix"
 
 	var buf bytes.Buffer
@@ -44,7 +43,7 @@ func Perform(path string, validateOptsPath *string, skipAll *bool, conf Config) 
 		return "", fmt.Errorf("encoding fixed file as %s: %w", format, err)
 	}
 
-	err = os.WriteFile(newpath, buf.Bytes(), 0644)
+	err = os.WriteFile(newpath, buf.Bytes(), 0600)
 	if err != nil {
 		return "", fmt.Errorf("writing %s failed: %w", newpath, err)
 	}

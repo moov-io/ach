@@ -40,8 +40,8 @@ func TestPerform(t *testing.T) {
 			expected, err := os.ReadFile(tc.expectedFilepath)
 			require.NoError(t, err)
 
-			got = bytes.TrimSpace(got)
-			expected = bytes.TrimSpace(expected)
+			got = normalize(got)
+			expected = normalize(expected)
 
 			require.Equal(t, string(expected), string(got))
 		})
@@ -49,3 +49,7 @@ func TestPerform(t *testing.T) {
 }
 
 func ptr[T any](in T) *T { return &in }
+
+func normalize(input []byte) []byte {
+	return bytes.TrimSpace(bytes.ReplaceAll(input, []byte("\r\n"), []byte("\n")))
+}
