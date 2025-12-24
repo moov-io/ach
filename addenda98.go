@@ -292,16 +292,35 @@ type CorrectedData struct {
 	Identification  string
 }
 
+type correctedDataOptions struct {
+	ReturnPartialData bool
+}
+
+type correctedDataOption func(conf *correctedDataOptions)
+
+func PartialCorrectedData() correctedDataOption {
+	return func(conf *correctedDataOptions) {
+		conf.ReturnPartialData = true
+	}
+}
+
 // ParseCorrectedData returns a struct with some fields filled in depending on the Addenda98's
 // Code and CorrectedData. Fields are trimmed when populated in this struct.
-func (addenda98 *Addenda98) ParseCorrectedData() *CorrectedData {
+func (addenda98 *Addenda98) ParseCorrectedData(options ...correctedDataOption) *CorrectedData {
 	if addenda98 == nil {
 		return nil
 	}
+
 	cc := addenda98.ChangeCodeField()
 	if cc == nil {
 		return nil
 	}
+
+	var conf correctedDataOptions
+	for _, opt := range options {
+		opt(&conf)
+	}
+
 	data := addenda98.IATCorrectedDataField()
 	switch cc.Code {
 	case "C01": // Incorrect DFI Account Number
@@ -315,13 +334,22 @@ func (addenda98 *Addenda98) ParseCorrectedData() *CorrectedData {
 		}
 
 	case "C03": // Incorrect Routing Number and Incorrect DFI Account Number
+		var out CorrectedData
+
 		parts := strings.Fields(data)
-		if len(parts) == 2 {
-			return &CorrectedData{
-				RoutingNumber: parts[0],
-				AccountNumber: parts[1],
-			}
+		if len(parts) > 0 {
+			out.RoutingNumber = parts[0]
 		}
+		if len(parts) > 1 {
+			out.AccountNumber = parts[1]
+			return &out
+		}
+
+		// Return partial data only if we're asked to
+		if conf.ReturnPartialData {
+			return &out
+		}
+		return nil
 
 	case "C04": // Incorrect Individual Name
 		if v := first(22, data); v != "" {
@@ -354,31 +382,47 @@ func (addenda98 *Addenda98) ParseCorrectedData() *CorrectedData {
 				}
 			}
 		}
+
+		// Return partial data only if we're asked to
+		if conf.ReturnPartialData {
+			return &out
+		}
+
 		return nil
 
 	case "C07": // Incorrect Routing Number, Incorrect DFI Account Number, and Incorrect Tranaction Code
-		var cd CorrectedData
-		if n := len(data); n > 9 {
-			cd.RoutingNumber = data[:9]
-		} else {
+		var out CorrectedData
+		if len(data) == 0 {
 			return nil
 		}
-		parts := strings.Fields(data[9:])
+
+		var parts []string
+		if n := len(data); n > 9 {
+			out.RoutingNumber = data[:9]
+
+			parts = strings.Fields(data[9:])
+		}
 		if len(parts) == 2 {
 			if n, err := strconv.Atoi(parts[1]); err == nil {
-				cd.AccountNumber = parts[0]
-				cd.TransactionCode = n
-				return &cd
+				out.AccountNumber = parts[0]
+				out.TransactionCode = n
+				return &out
 			}
-		} else {
-			return nil
 		}
+
+		// Return partial data only if we're asked to
+		if conf.ReturnPartialData {
+			return &out
+		}
+
+		return nil
 
 	case "C09": // Incorrect Individual Identification Number
 		if v := first(22, data); v != "" {
 			return &CorrectedData{Identification: v}
 		}
 	}
+
 	// The Code/Correction is either unsupported or wasn't parsed correctly
 	return nil
 }

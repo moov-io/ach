@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -358,55 +359,150 @@ func TestCorrectedData__first(t *testing.T) {
 }
 
 func TestCorrectedData__ParseCorrectedData(t *testing.T) {
-	run := func(code, data string) *CorrectedData {
+	run := func(code, data string, options ...correctedDataOption) *CorrectedData {
 		add := NewAddenda98()
 		add.ChangeCode = code
 		add.CorrectedData = data
-		return add.ParseCorrectedData()
+		return add.ParseCorrectedData(options...)
 	}
 
-	if v := run("C01", "123456789       "); v.AccountNumber != "123456789" {
-		t.Errorf("%#v", v)
+	cases := []struct {
+		changeCode    string
+		correctedData string
+		options       []correctedDataOption
+
+		expected *CorrectedData
+	}{
+		{
+			changeCode:    "C01",
+			correctedData: "123456789       ",
+			expected:      &CorrectedData{AccountNumber: "123456789"},
+		},
+		{
+			changeCode:    "C02",
+			correctedData: "987654320  ",
+			expected:      &CorrectedData{RoutingNumber: "987654320"},
+		},
+		{
+			changeCode:    "C03",
+			correctedData: "987654320   123456",
+			expected: &CorrectedData{
+				AccountNumber: "123456",
+				RoutingNumber: "987654320",
+			},
+		},
+		{
+			changeCode:    "C03",
+			correctedData: "987654320              123456",
+			expected: &CorrectedData{
+				AccountNumber: "123456",
+				RoutingNumber: "987654320",
+			},
+		},
+		{
+			changeCode:    "C04",
+			correctedData: "Jane Doe",
+			expected: &CorrectedData{
+				Name: "Jane Doe",
+			},
+		},
+		{
+			changeCode:    "C05",
+			correctedData: "22  other",
+			expected: &CorrectedData{
+				TransactionCode: 22,
+			},
+		},
+		{
+			changeCode:    "C06",
+			correctedData: "123456789                22",
+			expected: &CorrectedData{
+				AccountNumber:   "123456789",
+				TransactionCode: 22,
+			},
+		},
+		{
+			changeCode:    "C07",
+			correctedData: "987654320  12345  22",
+			expected: &CorrectedData{
+				RoutingNumber:   "987654320",
+				AccountNumber:   "12345",
+				TransactionCode: 22,
+			},
+		},
+		{
+			changeCode:    "C07",
+			correctedData: "9876543201242415    22",
+			expected: &CorrectedData{
+				RoutingNumber:   "987654320",
+				AccountNumber:   "1242415",
+				TransactionCode: 22,
+			},
+		},
+		{
+			changeCode:    "C07",
+			correctedData: "9876543201242415           22",
+			expected: &CorrectedData{
+				RoutingNumber:   "987654320",
+				AccountNumber:   "1242415",
+				TransactionCode: 22,
+			},
+		},
+		{
+			changeCode:    "C07",
+			correctedData: "1234",
+			expected:      nil,
+		},
+		{
+			changeCode:    "C07",
+			correctedData: "1234",
+			options:       []correctedDataOption{PartialCorrectedData()},
+			expected: &CorrectedData{
+				RoutingNumber: "1234     ",
+			},
+		},
+		{
+			changeCode:    "C07",
+			correctedData: "987654320 1234 1234 1234",
+			expected:      nil,
+		},
+		{
+			changeCode:    "C07",
+			correctedData: "987654320 1234 1234 1234",
+			options:       []correctedDataOption{PartialCorrectedData()},
+			expected: &CorrectedData{
+				RoutingNumber: "987654320",
+			},
+		},
+		{
+			changeCode:    "C09",
+			correctedData: "21345678    ",
+			expected: &CorrectedData{
+				Identification: "21345678",
+			},
+		},
+		{
+			changeCode:    "C99",
+			correctedData: "    ",
+			expected:      nil,
+		},
+		{
+			changeCode:    "C99",
+			correctedData: "    ",
+			options:       []correctedDataOption{PartialCorrectedData()},
+			expected:      nil,
+		},
 	}
-	if v := run("C02", "987654320  "); v.RoutingNumber != "987654320" {
-		t.Errorf("%#v", v)
+
+	for _, tc := range cases {
+		name := fmt.Sprintf("%s/%s", tc.changeCode, strings.TrimSpace(tc.correctedData))
+
+		t.Run(name, func(t *testing.T) {
+			got := run(tc.changeCode, tc.correctedData, tc.options...)
+			require.Equal(t, tc.expected, got)
+		})
 	}
-	if v := run("C03", "987654320   123456"); v.AccountNumber != "123456" || v.RoutingNumber != "987654320" {
-		t.Errorf("%#v", v)
-	}
-	if v := run("C03", "987654320              123456"); v.AccountNumber != "123456" || v.RoutingNumber != "987654320" {
-		t.Errorf("%#v", v)
-	}
-	if v := run("C04", "Jane Doe"); v.Name != "Jane Doe" {
-		t.Errorf("%#v", v)
-	}
-	if v := run("C05", "22  other"); v.TransactionCode != 22 {
-		t.Errorf("%#v", v)
-	}
-	if v := run("C06", "123456789                22"); v.AccountNumber != "123456789" || v.TransactionCode != 22 {
-		t.Errorf("%#v", v)
-	}
-	if v := run("C07", "987654320  12345  22"); v.RoutingNumber != "987654320" || v.AccountNumber != "12345" || v.TransactionCode != 22 {
-		t.Errorf("%#v", v)
-	}
-	if v := run("C07", "9876543201242415    22"); v.RoutingNumber != "987654320" || v.AccountNumber != "1242415" || v.TransactionCode != 22 {
-		t.Errorf("%#v", v)
-	}
-	if v := run("C07", "9876543201242415           22"); v.RoutingNumber != "987654320" || v.AccountNumber != "1242415" || v.TransactionCode != 22 {
-		t.Errorf("%#v", v)
-	}
-	if v := run("C07", "1234"); v != nil {
-		t.Errorf("expected nil: %v", v)
-	}
-	if v := run("C07", "987654320 1234 1234 1234"); v != nil {
-		t.Errorf("expected nil: %v", v)
-	}
-	if v := run("C09", "21345678    "); v.Identification != "21345678" {
-		t.Errorf("%#v", v)
-	}
-	if v := run("C99", "    "); v != nil {
-		t.Error("expected nil CorrectedData")
-	}
+
 }
 
 func TestCorrectedData__WriteCorrectionData(t *testing.T) {
