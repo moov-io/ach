@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/moov-io/ach"
 	"github.com/moov-io/ach/cmd/achcli/fix"
 
 	"github.com/stretchr/testify/require"
@@ -15,7 +14,8 @@ import (
 func TestPerform(t *testing.T) {
 	cases := []struct {
 		inputFilepath    string
-		validateOpts     *ach.ValidateOpts
+		validateOptsPath *string
+		skipAll          *bool
 		config           fix.Config
 		expectedFilepath string
 	}{
@@ -31,7 +31,7 @@ func TestPerform(t *testing.T) {
 		_, filename := filepath.Split(tc.inputFilepath)
 
 		t.Run(filename, func(t *testing.T) {
-			newpath, err := fix.Perform(tc.inputFilepath, tc.validateOpts, tc.config)
+			newpath, err := fix.Perform(tc.inputFilepath, tc.validateOptsPath, tc.skipAll, tc.config)
 			require.NoError(t, err)
 
 			got, err := os.ReadFile(newpath)
@@ -47,3 +47,5 @@ func TestPerform(t *testing.T) {
 		})
 	}
 }
+
+func ptr[T any](in T) *T { return &in }

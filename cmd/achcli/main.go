@@ -91,7 +91,7 @@ func main() {
 		conf := fix.Config{
 			UpdateEED: *flagUpdateEED,
 		}
-		newpath, err := fix.Perform(args[0], validateOpts, conf)
+		newpath, err := fix.Perform(args[0], flagValidateOpts, flagSkipValidation, conf)
 		if err != nil {
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)

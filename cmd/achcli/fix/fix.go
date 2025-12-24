@@ -2,15 +2,16 @@ package fix
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"os"
 
 	"github.com/moov-io/ach"
+	"github.com/moov-io/ach/cmd/achcli/internal/read"
+	"github.com/moov-io/ach/cmd/achcli/internal/write"
 )
 
-func Perform(path string, validateOpts *ach.ValidateOpts, conf Config) (string, error) {
-	file, err := readFile(path, validateOpts)
+func Perform(path string, validateOptsPath *string, skipAll *bool, conf Config) (string, error) {
+	file, format, err := read.Filepath(path, validateOptsPath, skipAll)
 	if err != nil {
 		return "", fmt.Errorf("reading %s failed: %w", path, err)
 	}
@@ -38,9 +39,9 @@ func Perform(path string, validateOpts *ach.ValidateOpts, conf Config) (string, 
 	newpath := path + ".fix"
 
 	var buf bytes.Buffer
-	err = ach.NewWriter(&buf).Write(file)
+	err = write.File(&buf, file, format)
 	if err != nil {
-		return "", fmt.Errorf("encoding fixed file: %w", err)
+		return "", fmt.Errorf("encoding fixed file as %s: %w", format, err)
 	}
 
 	err = os.WriteFile(newpath, buf.Bytes(), 0644)
@@ -51,33 +52,4 @@ func Perform(path string, validateOpts *ach.ValidateOpts, conf Config) (string, 
 	return newpath, nil
 }
 
-func readFile(path string, validateOpts *ach.ValidateOpts) (*ach.File, error) {
-	bs, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-	if json.Valid(bs) {
-		return readJsonFile(bs, validateOpts)
-	}
-	return readACHFile(bs, validateOpts)
-}
-
-func readACHFile(input []byte, validateOpts *ach.ValidateOpts) (*ach.File, error) {
-	r := ach.NewReader(bytes.NewReader(input))
-	r.SetValidation(validateOpts)
-	f, err := r.Read()
-	return &f, err
-}
-
-func readJsonFile(input []byte, validateOpts *ach.ValidateOpts) (*ach.File, error) {
-	return ach.FileFromJSONWith(input, validateOpts)
-}
-
 type batchHeaderFixer func(bh *ach.BatchHeader) error
-
-// TODO(adam): process file batch by batch
-// TODO(adam): fix funcs take a file header, batch, entry, etc
-
-// TODO(adam): updateEED()
-
-// TODO(adam): write output to disk
