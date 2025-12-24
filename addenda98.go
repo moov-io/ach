@@ -402,9 +402,17 @@ func (addenda98 *Addenda98) ParseCorrectedData(options ...correctedDataOption) *
 
 			parts = strings.Fields(data[9:])
 		}
-		if len(parts) == 2 {
+		// Return nothing if we have extra data
+		if len(parts) > 2 && !conf.ReturnPartialData {
+			return nil
+		}
+
+		// Accumulate part by part
+		if len(parts) > 0 {
+			out.AccountNumber = parts[0]
+		}
+		if len(parts) > 1 {
 			if n, err := strconv.Atoi(parts[1]); err == nil {
-				out.AccountNumber = parts[0]
 				out.TransactionCode = n
 				return &out
 			}

@@ -471,7 +471,9 @@ func TestCorrectedData__ParseCorrectedData(t *testing.T) {
 			correctedData: "987654320 1234 1234 1234",
 			options:       []correctedDataOption{PartialCorrectedData()},
 			expected: &CorrectedData{
-				RoutingNumber: "987654320",
+				AccountNumber:   "1234",
+				RoutingNumber:   "987654320",
+				TransactionCode: 1234,
 			},
 		},
 		{
