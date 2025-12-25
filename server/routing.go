@@ -217,6 +217,12 @@ func MakeHTTPHandler(s Service, repo Repository, kitlog gokitlog.Logger) http.Ha
 		encodeResponse,
 		options...,
 	))
+	r.Methods("POST").Path("/files/{fileID}/reverse").Handler(httptransport.NewServer(
+		reverseFileEndpoint(s, repo, logger),
+		decodeReverseFileRequest,
+		encodeResponse,
+		options...,
+	))
 	r.Methods("POST").Path("/merge").Handler(httptransport.NewServer(
 		mergeFilesEndpoint(s, repo, logger),
 		decodeMergeFilesRequest,
