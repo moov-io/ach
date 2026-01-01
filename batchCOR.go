@@ -17,6 +17,8 @@
 
 package ach
 
+import "github.com/moov-io/base"
+
 // BatchCOR COR - Automated Notification of Change (NOC) or Refused Notification of Change
 // This Standard Entry Class Code is used by an RDFI or ODFI when originating a Notification of Change or Refused Notification of Change in automated format.
 // A Notification of Change may be created by an RDFI to notify the ODFI that a posted Entry or Prenotification Entry contains invalid or erroneous information and should be changed.
@@ -68,6 +70,45 @@ func (batch *BatchCOR) Validate() error {
 	}
 
 	return nil
+}
+
+// ValidateAll checks properties of the ACH batch and returns ALL errors found.
+func (batch *BatchCOR) ValidateAll() base.ErrorList {
+	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
+		return nil
+	}
+
+	var errors base.ErrorList
+
+	if verifyErrs := batch.verifyAll(); verifyErrs != nil {
+		for _, err := range verifyErrs {
+			errors.Add(err)
+		}
+	}
+
+	if err := batch.isAddenda98(); err != nil {
+		errors.Add(err)
+	}
+
+	if batch.Header.StandardEntryClassCode != COR {
+		errors.Add(batch.Error("StandardEntryClassCode", ErrBatchSECType, COR))
+	}
+
+	if batch.Control.TotalCreditEntryDollarAmount != 0 {
+		errors.Add(batch.Error("TotalCreditEntryDollarAmount", ErrBatchAmountNonZero, batch.Control.TotalCreditEntryDollarAmount))
+	}
+	if batch.Control.TotalDebitEntryDollarAmount != 0 {
+		errors.Add(batch.Error("TotalDebitEntryDollarAmount", ErrBatchAmountNonZero, batch.Control.TotalDebitEntryDollarAmount))
+	}
+
+	for _, inv := range batch.InvalidEntries() {
+		errors.Add(inv.Error)
+	}
+
+	if errors.Empty() {
+		return nil
+	}
+	return errors
 }
 
 // InvalidEntries returns entries with validation errors in the batch

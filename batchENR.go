@@ -22,6 +22,8 @@ import (
 	"strconv"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/moov-io/base"
 )
 
 // BatchENR is a non-monetary entry that enrolls a person with an agency of the US government
@@ -65,6 +67,38 @@ func (batch *BatchENR) Validate() error {
 	}
 
 	return nil
+}
+
+// ValidateAll checks properties of the ACH batch and returns ALL errors found.
+func (batch *BatchENR) ValidateAll() base.ErrorList {
+	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
+		return nil
+	}
+
+	var errors base.ErrorList
+
+	if verifyErrs := batch.verifyAll(); verifyErrs != nil {
+		for _, err := range verifyErrs {
+			errors.Add(err)
+		}
+	}
+
+	// Batch Header checks
+	if batch.Header.StandardEntryClassCode != ENR {
+		errors.Add(batch.Error("StandardEntryClassCode", ErrBatchSECType, ENR))
+	}
+	if batch.Header.CompanyEntryDescription != "AUTOENROLL" {
+		errors.Add(batch.Error("CompanyEntryDescription", ErrBatchCompanyEntryDescriptionAutoenroll, batch.Header.CompanyEntryDescription))
+	}
+
+	for _, inv := range batch.InvalidEntries() {
+		errors.Add(inv.Error)
+	}
+
+	if errors.Empty() {
+		return nil
+	}
+	return errors
 }
 
 // InvalidEntries returns entries with validation errors in the batch

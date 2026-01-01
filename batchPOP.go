@@ -17,6 +17,8 @@
 
 package ach
 
+import "github.com/moov-io/base"
+
 // BatchPOP holds the BatchHeader and BatchControl and all EntryDetail for POP Entries.
 //
 // Point-of-Purchase. A check presented in-person to a merchant for purchase is presented
@@ -76,6 +78,41 @@ func (batch *BatchPOP) Validate() error {
 	}
 
 	return nil
+}
+
+// ValidateAll checks properties of the ACH batch and returns ALL errors found.
+func (batch *BatchPOP) ValidateAll() base.ErrorList {
+	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
+		return nil
+	}
+
+	var errors base.ErrorList
+
+	if verifyErrs := batch.verifyAll(); verifyErrs != nil {
+		for _, err := range verifyErrs {
+			errors.Add(err)
+		}
+	}
+
+	// Add configuration and type specific validation for this type.
+	if batch.Header.StandardEntryClassCode != POP {
+		errors.Add(batch.Error("StandardEntryClassCode", ErrBatchSECType, POP))
+	}
+
+	// POP detail entries can only be a debit, ServiceClassCode must allow debits
+	switch batch.Header.ServiceClassCode {
+	case CreditsOnly:
+		errors.Add(batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode))
+	}
+
+	for _, inv := range batch.InvalidEntries() {
+		errors.Add(inv.Error)
+	}
+
+	if errors.Empty() {
+		return nil
+	}
+	return errors
 }
 
 // InvalidEntries returns entries with validation errors in the batch

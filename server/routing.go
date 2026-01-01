@@ -223,6 +223,49 @@ func MakeHTTPHandler(s Service, repo Repository, kitlog gokitlog.Logger) http.Ha
 		encodeResponse,
 		options...,
 	))
+
+	// v2 API endpoints with structured errors
+	v2Options := []httptransport.ServerOption{
+		httptransport.ServerErrorLogger(kitlog),
+		httptransport.ServerErrorEncoder(encodeErrorV2),
+		httptransport.ServerBefore(saveCORSHeadersIntoContext()),
+		httptransport.ServerAfter(respondWithSavedCORSHeaders()),
+	}
+
+	// v2 File endpoints
+	r.Methods("POST").Path("/v2/files/create").Handler(httptransport.NewServer(
+		createFileEndpointV2(s, repo, logger),
+		decodeCreateFileRequest,
+		encodeResponseV2,
+		v2Options...,
+	))
+	r.Methods("POST").Path("/v2/files/{fileID}").Handler(httptransport.NewServer(
+		createFileEndpointV2(s, repo, logger),
+		decodeCreateFileRequest,
+		encodeResponseV2,
+		v2Options...,
+	))
+	r.Methods("GET").Path("/v2/files/{id}/validate").Handler(httptransport.NewServer(
+		validateFileEndpointV2(s, logger),
+		decodeValidateFileRequest,
+		encodeResponseV2,
+		v2Options...,
+	))
+	r.Methods("POST").Path("/v2/files/{id}/validate").Handler(httptransport.NewServer(
+		validateFileEndpointV2(s, logger),
+		decodeValidateFileRequest,
+		encodeResponseV2,
+		v2Options...,
+	))
+
+	// v2 Batch endpoints
+	r.Methods("POST").Path("/v2/files/{fileID}/batches").Handler(httptransport.NewServer(
+		createBatchEndpointV2(s, logger),
+		decodeCreateBatchRequest,
+		encodeResponseV2,
+		v2Options...,
+	))
+
 	return r
 }
 
@@ -303,6 +346,36 @@ func encodeTextResponse(ctx context.Context, w http.ResponseWriter, response int
 		return err
 	}
 	return nil
+}
+
+// encodeResponseV2 encodes v2 API responses with structured errors
+func encodeResponseV2(ctx context.Context, w http.ResponseWriter, response interface{}) error {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
+	if e, ok := response.(errorer); ok && e.error() != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	}
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+// encodeErrorV2 encodes transport-level errors in v2 format with structured errors
+func encodeErrorV2(_ context.Context, err error, w http.ResponseWriter) {
+	if err == nil {
+		err = ErrFoundABug
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(codeFrom(err))
+
+	response := struct {
+		Errors []ValidationError `json:"errors"`
+	}{
+		Errors: []ValidationError{ConvertError(err)},
+	}
+
+	if encErr := json.NewEncoder(w).Encode(response); encErr != nil {
+		w.Write([]byte(fmt.Sprintf("problem rendering json: %v", encErr)))
+	}
 }
 
 // encodeError JSON encodes the supplied error

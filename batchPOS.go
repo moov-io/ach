@@ -19,6 +19,7 @@ package ach
 
 import (
 	"github.com/moov-io/ach/internal/usabbrev"
+	"github.com/moov-io/base"
 )
 
 // BatchPOS holds the BatchHeader and BatchControl and all EntryDetail for POS Entries.
@@ -74,6 +75,35 @@ func (batch *BatchPOS) Validate() error {
 	}
 
 	return nil
+}
+
+// ValidateAll checks properties of the ACH batch and returns ALL errors found.
+func (batch *BatchPOS) ValidateAll() base.ErrorList {
+	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
+		return nil
+	}
+
+	var errors base.ErrorList
+
+	if verifyErrs := batch.verifyAll(); verifyErrs != nil {
+		for _, err := range verifyErrs {
+			errors.Add(err)
+		}
+	}
+
+	// Add configuration and type specific validation for this type.
+	if batch.Header.StandardEntryClassCode != POS {
+		errors.Add(batch.Error("StandardEntryClassCode", ErrBatchSECType, POS))
+	}
+
+	for _, inv := range batch.InvalidEntries() {
+		errors.Add(inv.Error)
+	}
+
+	if errors.Empty() {
+		return nil
+	}
+	return errors
 }
 
 // InvalidEntries returns entries with validation errors in the batch
