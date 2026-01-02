@@ -884,6 +884,105 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 	return f.isEntryHash(true)
 }
 
+// ValidateAllWith performs checks on each record according to Nacha guidelines and returns ALL errors found.
+// Unlike ValidateWith which returns on the first error, this method accumulates all validation errors.
+//
+// ValidateOpts may be set to bypass certain rules and will only be applied to the FileHeader.
+// opts passed in will override ValidateOpts set by SetValidation.
+// The underlying Batches and Entries on this File will use their own ValidateOpts if they are set.
+//
+// Returns nil if no errors are found, otherwise returns a base.ErrorList containing all errors.
+func (f *File) ValidateAllWith(opts *ValidateOpts) base.ErrorList {
+	if opts == nil {
+		opts = &ValidateOpts{}
+	}
+
+	if opts.SkipAll {
+		return nil
+	}
+
+	var errors base.ErrorList
+
+	if !opts.AllowMissingFileHeader {
+		if err := f.Header.ValidateWith(opts); err != nil {
+			errors.Add(err)
+		}
+	}
+
+	if !f.IsADV() {
+		// The value of the Batch Count Field is equal to the number of Company/Batch/Header Records in the file.
+		if f.Control.BatchCount != (len(f.Batches) + len(f.IATBatches)) {
+			errors.Add(NewErrFileCalculatedControlEquality("BatchCount", len(f.Batches)+len(f.IATBatches), f.Control.BatchCount))
+		}
+
+		if !opts.BypassBatchValidation {
+			for _, b := range f.Batches {
+				if batchErrs := b.ValidateAll(); batchErrs != nil {
+					for _, err := range batchErrs {
+						errors.Add(err)
+					}
+				}
+			}
+			for _, iatBatch := range f.IATBatches {
+				if err := iatBatch.Validate(); err != nil {
+					errors.Add(err)
+				}
+			}
+		}
+
+		if !opts.AllowMissingFileControl {
+			if err := f.Control.Validate(); err != nil {
+				errors.Add(err)
+			}
+		}
+		if err := f.isEntryAddendaCount(false); err != nil {
+			errors.Add(err)
+		}
+		if err := f.isFileAmount(false); err != nil {
+			errors.Add(err)
+		}
+		if !opts.AllowUnorderedBatchNumbers {
+			if err := f.isSequenceAscending(); err != nil {
+				errors.Add(err)
+			}
+		}
+		if err := f.isEntryHash(false); err != nil {
+			errors.Add(err)
+		}
+	} else {
+		// File contains ADV batches BatchADV
+
+		// The value of the Batch Count Field is equal to the number of Company/Batch/Header Records in the file.
+		if f.ADVControl.BatchCount != len(f.Batches) {
+			errors.Add(NewErrFileCalculatedControlEquality("BatchCount", len(f.Batches), f.ADVControl.BatchCount))
+		}
+		if !opts.AllowMissingFileControl {
+			if err := f.ADVControl.Validate(); err != nil {
+				errors.Add(err)
+			}
+		}
+		if err := f.isEntryAddendaCount(true); err != nil {
+			errors.Add(err)
+		}
+		if err := f.isFileAmount(true); err != nil {
+			errors.Add(err)
+		}
+		if err := f.isEntryHash(true); err != nil {
+			errors.Add(err)
+		}
+	}
+
+	if errors.Empty() {
+		return nil
+	}
+	return errors
+}
+
+// ValidateAll calls ValidateAllWith with the File's stored ValidateOpts.
+func (f *File) ValidateAll() base.ErrorList {
+	return f.ValidateAllWith(f.validateOpts)
+}
+
 // isEntryAddendaCount is prepared by hashing the RDFI's 8-digit Routing Number in each entry.
 // The Entry Hash provides a check against inadvertent alteration of data
 func (f *File) isEntryAddendaCount(IsADV bool) error {
