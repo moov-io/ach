@@ -711,3 +711,189 @@ func TestFlattenBatches_NoFileID(t *testing.T) {
 		}
 	}
 }
+
+// Regression tests: verify original files remain unchanged after operations
+// These tests ensure that service methods don't mutate files stored in the repository
+
+func TestBalanceFile_OriginalUnchanged(t *testing.T) {
+	s := mockServiceInMemory(t)
+
+	// Create a file with known state
+	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+	defer fd.Close()
+
+	file, err := ach.NewReader(fd).Read()
+	require.NoError(t, err)
+
+	fileID, err := s.CreateFile(&file.Header)
+	require.NoError(t, err)
+	_, err = s.CreateBatch(fileID, file.Batches[0])
+	require.NoError(t, err)
+
+	// Get original state
+	originalFile, err := s.GetFile(fileID)
+	require.NoError(t, err)
+	originalEntryCount := len(originalFile.Batches[0].GetEntries())
+	originalID := originalFile.ID
+
+	// Perform balance operation
+	balancedFile, err := s.BalanceFile(fileID, &ach.Offset{
+		RoutingNumber: "987654320",
+		AccountNumber: "28198241",
+		AccountType:   ach.OffsetChecking,
+		Description:   "OFFSET",
+	})
+	require.NoError(t, err)
+	require.NotEqual(t, fileID, balancedFile.ID, "balanced file should have new ID")
+
+	// Verify original file is unchanged
+	originalAfter, err := s.GetFile(fileID)
+	require.NoError(t, err)
+	require.Equal(t, originalID, originalAfter.ID, "original file ID should be unchanged")
+	require.Equal(t, originalEntryCount, len(originalAfter.Batches[0].GetEntries()),
+		"original file should not have offset entry added")
+}
+
+func TestBuildFile_OriginalUnchanged(t *testing.T) {
+	s := mockServiceInMemory(t)
+
+	// Create a file
+	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+	defer fd.Close()
+
+	file, err := ach.NewReader(fd).Read()
+	require.NoError(t, err)
+
+	fileID, err := s.CreateFile(&file.Header)
+	require.NoError(t, err)
+	_, err = s.CreateBatch(fileID, file.Batches[0])
+	require.NoError(t, err)
+
+	// Get original control values (before Build)
+	originalFile, err := s.GetFile(fileID)
+	require.NoError(t, err)
+	originalBatchCount := originalFile.Control.BatchCount
+
+	// Perform build operation
+	builtFile, err := s.BuildFile(fileID)
+	require.NoError(t, err)
+	require.NotNil(t, builtFile)
+
+	// Verify original file control values are unchanged
+	originalAfter, err := s.GetFile(fileID)
+	require.NoError(t, err)
+	require.Equal(t, originalBatchCount, originalAfter.Control.BatchCount,
+		"original file control should be unchanged")
+}
+
+func TestSegmentFileID_OriginalUnchanged(t *testing.T) {
+	s := mockServiceInMemory(t)
+
+	// Create a file with mixed debits and credits
+	fh := ach.NewFileHeader()
+	fh.ID = "segment-test"
+	fh.ImmediateDestination = "231380104"
+	fh.ImmediateOrigin = "121042882"
+	fh.FileCreationDate = time.Now().Format("060102")
+	fh.FileCreationTime = time.Now().AddDate(0, 0, 1).Format("1504")
+	fh.ImmediateDestinationName = "Federal Reserve Bank"
+	fh.ImmediateOriginName = "My Bank Name"
+
+	fileID, err := s.CreateFile(&fh)
+	require.NoError(t, err)
+
+	// Add batch with mixed entries
+	bh := ach.NewBatchHeader()
+	bh.ServiceClassCode = ach.MixedDebitsAndCredits
+	bh.CompanyName = "Name on Account"
+	bh.CompanyIdentification = fh.ImmediateOrigin
+	bh.StandardEntryClassCode = ach.PPD
+	bh.CompanyEntryDescription = "REG.SALARY"
+	bh.EffectiveEntryDate = time.Now().AddDate(0, 0, 1).Format("060102")
+	bh.ODFIIdentification = "121042882"
+
+	batch, _ := ach.NewBatch(bh)
+
+	entryCredit := ach.NewEntryDetail()
+	entryCredit.TransactionCode = ach.CheckingCredit
+	entryCredit.SetRDFI("231380104")
+	entryCredit.DFIAccountNumber = "123456789"
+	entryCredit.Amount = 10000
+	entryCredit.IndividualName = "Credit Person"
+	entryCredit.SetTraceNumber("121042882", 1)
+	batch.AddEntry(entryCredit)
+
+	entryDebit := ach.NewEntryDetail()
+	entryDebit.TransactionCode = ach.CheckingDebit
+	entryDebit.SetRDFI("231380104")
+	entryDebit.DFIAccountNumber = "987654321"
+	entryDebit.Amount = 5000
+	entryDebit.IndividualName = "Debit Person"
+	entryDebit.SetTraceNumber("121042882", 2)
+	batch.AddEntry(entryDebit)
+
+	require.NoError(t, batch.Create())
+	_, err = s.CreateBatch(fileID, batch)
+	require.NoError(t, err)
+
+	// Get original state
+	originalFile, err := s.GetFile(fileID)
+	require.NoError(t, err)
+	originalBatchCount := len(originalFile.Batches)
+	originalEntryCount := len(originalFile.Batches[0].GetEntries())
+
+	// Perform segment operation
+	creditFile, debitFile, err := s.SegmentFileID(fileID, nil)
+	require.NoError(t, err)
+	require.NotNil(t, creditFile)
+	require.NotNil(t, debitFile)
+
+	// Verify original file is unchanged
+	originalAfter, err := s.GetFile(fileID)
+	require.NoError(t, err)
+	require.Equal(t, originalBatchCount, len(originalAfter.Batches),
+		"original file batch count should be unchanged")
+	require.Equal(t, originalEntryCount, len(originalAfter.Batches[0].GetEntries()),
+		"original file entry count should be unchanged")
+}
+
+func TestFlattenBatches_OriginalUnchanged(t *testing.T) {
+	s := mockServiceInMemory(t)
+
+	// Create a file
+	f, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-valid.json"))
+	require.NoError(t, err)
+	defer f.Close()
+
+	bs, err := io.ReadAll(f)
+	require.NoError(t, err)
+
+	achFile, err := ach.FileFromJSON(bs)
+	require.NoError(t, err)
+
+	fileID, err := s.CreateFile(&achFile.Header)
+	require.NoError(t, err)
+
+	for _, b := range achFile.Batches {
+		_, err := s.CreateBatch(fileID, b)
+		require.NoError(t, err)
+	}
+
+	// Get original state
+	originalFile, err := s.GetFile(fileID)
+	require.NoError(t, err)
+	originalBatchCount := len(originalFile.Batches)
+
+	// Perform flatten operation
+	flattenedFile, err := s.FlattenBatches(fileID)
+	require.NoError(t, err)
+	require.NotNil(t, flattenedFile)
+
+	// Verify original file is unchanged
+	originalAfter, err := s.GetFile(fileID)
+	require.NoError(t, err)
+	require.Equal(t, originalBatchCount, len(originalAfter.Batches),
+		"original file batch count should be unchanged")
+}
