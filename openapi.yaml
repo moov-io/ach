@@ -480,6 +480,48 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
         '404':
           description: A resource with the specified ID was not found
+  /files/{fileID}/reverse:
+    post:
+      tags: ['ACH Files']
+      summary: Reverse File
+      description: Creates a new file that is a REVERSAL of the given fileID.
+      operationId: reverseFile
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the system's logs
+          example: "rs4f9915"
+          schema:
+            type: string
+        - name: fileID
+          in: path
+          description: File ID
+          required: true
+          schema:
+            type: string
+            example: "3f2d23ee214"
+      requestBody:
+        description: Optional configuration for reversing a file
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReverseFileRequest'
+      responses:
+        '200':
+          description: An ID of the new ACH file
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReverseFileResponse'
+        '400':
+          description: See error in response body
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+        '404':
+          description: A resource with the specified ID was not found
   /files/{fileID}/batches:
     get:
       tags: ['ACH Files']
@@ -892,6 +934,24 @@ components:
         - batches
         - IATBatches
     CreateFileResponse:
+      properties:
+        id:
+          type: string
+          description: File ID
+          example: "1e522dc8"
+        file:
+          $ref: '#/components/schemas/File'
+        error:
+          type: string
+          description: An error message describing the problem intended for humans.
+          example: Validation error(s) present.
+    ReverseFileRequest:
+      properties:
+        effectiveEntryDate:
+          type: string
+          description: ISO 8601 formatted timestamp of the Effectve Entry Date
+          example: "2018-11-27T00:54:53Z"
+    ReverseFileResponse:
       properties:
         id:
           type: string
