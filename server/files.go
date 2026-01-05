@@ -980,7 +980,7 @@ func decodeReverseFileRequest(_ context.Context, r *http.Request) (interface{}, 
 	}
 
 	var body struct {
-		EffectiveEntryDate time.Time `json:"effectiveEntryDate"`
+		EffectiveEntryDate base.Time `json:"effectiveEntryDate"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil && err != io.EOF {
 		return nil, fmt.Errorf("parsing reverse request: %w", err)
@@ -989,7 +989,7 @@ func decodeReverseFileRequest(_ context.Context, r *http.Request) (interface{}, 
 	if body.EffectiveEntryDate.IsZero() {
 		req.effectiveEntryDate = time.Now().In(time.UTC)
 	} else {
-		req.effectiveEntryDate = body.EffectiveEntryDate
+		req.effectiveEntryDate = body.EffectiveEntryDate.Time
 	}
 
 	return req, nil
