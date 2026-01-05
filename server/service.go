@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -121,10 +122,17 @@ func (s *service) GetFiles() []*ach.File {
 
 // BuildFile tabulates file values according to the Nacha spec
 func (s *service) BuildFile(id string) (*ach.File, error) {
-	file, err := s.GetFile(id)
+	original, err := s.GetFile(id)
 	if err != nil {
-		return nil, fmt.Errorf("build file: error reading file %s: %v", id, err)
+		return nil, fmt.Errorf("build file: error reading file %s: %w", id, err)
 	}
+
+	// Clone the file to avoid mutating the original in the repository
+	file, err := cloneFile(original)
+	if err != nil {
+		return nil, fmt.Errorf("build file: error cloning file %s: %w", id, err)
+	}
+
 	err = file.Create()
 	return file, err
 }
@@ -134,18 +142,25 @@ func (s *service) DeleteFile(id string) error {
 }
 
 func (s *service) GetFileContents(id string, opts *ach.WriteOpts) (io.Reader, error) {
-	f, err := s.GetFile(id)
+	original, err := s.GetFile(id)
 	if err != nil {
-		return nil, fmt.Errorf("problem reading file %s: %v", id, err)
+		return nil, fmt.Errorf("problem reading file %s: %w", id, err)
 	}
+
+	// Clone the file to avoid mutating the original in the repository
+	f, err := cloneFile(original)
+	if err != nil {
+		return nil, fmt.Errorf("problem cloning file %s: %w", id, err)
+	}
+
 	if err := f.Create(); err != nil {
-		return nil, fmt.Errorf("problem creating file %s: %v", id, err)
+		return nil, fmt.Errorf("problem creating file %s: %w", id, err)
 	}
 
 	var buf bytes.Buffer
 	w := ach.NewWriterWithOpts(&buf, opts)
 	if err := w.Write(f); err != nil {
-		return nil, fmt.Errorf("problem writing plaintext file %s: %v", id, err)
+		return nil, fmt.Errorf("problem writing plaintext file %s: %w", id, err)
 	}
 	if err := w.Flush(); err != nil {
 		return nil, err
@@ -161,7 +176,7 @@ func (s *service) GetFileContents(id string, opts *ach.WriteOpts) (io.Reader, er
 func (s *service) ValidateFile(id string, opts *ach.ValidateOpts) error {
 	f, err := s.GetFile(id)
 	if err != nil {
-		return fmt.Errorf("problem reading file %s: %v", id, err)
+		return fmt.Errorf("problem reading file %s: %w", id, err)
 	}
 	return f.ValidateWith(opts)
 }
@@ -202,10 +217,17 @@ func (s *service) DeleteBatch(fileID string, batchID string) error {
 }
 
 func (s *service) BalanceFile(fileID string, off *ach.Offset) (*ach.File, error) {
-	f, err := s.GetFile(fileID)
+	original, err := s.GetFile(fileID)
 	if err != nil {
 		return nil, err
 	}
+
+	// Clone the file to avoid mutating the original in the repository
+	f, err := cloneFile(original)
+	if err != nil {
+		return nil, err
+	}
+
 	if err := f.Create(); err != nil {
 		return nil, err
 	}
@@ -229,10 +251,17 @@ func (s *service) BalanceFile(fileID string, off *ach.Offset) (*ach.File, error)
 
 // SegmentFileID takes an ACH FileID and segments the files into a credit ACH File and debit ACH File and adds to in memory storage.
 func (s *service) SegmentFileID(fileID string, opts *ach.SegmentFileConfiguration) (*ach.File, *ach.File, error) {
-	f, err := s.GetFile(fileID)
+	original, err := s.GetFile(fileID)
 	if err != nil {
 		return nil, nil, err
 	}
+
+	// Clone the file to avoid mutating the original in the repository
+	f, err := cloneFile(original)
+	if err != nil {
+		return nil, nil, fmt.Errorf("cloning file: %w", err)
+	}
+
 	return s.SegmentFile(f, opts)
 }
 
@@ -252,10 +281,17 @@ func (s *service) SegmentFile(file *ach.File, opts *ach.SegmentFileConfiguration
 
 // FlattenBatches consolidates batches that have the same BatchHeader
 func (s *service) FlattenBatches(fileID string) (*ach.File, error) {
-	f, err := s.GetFile(fileID)
+	original, err := s.GetFile(fileID)
 	if err != nil {
 		return nil, err
 	}
+
+	// Clone the file to avoid mutating the original in the repository
+	f, err := cloneFile(original)
+	if err != nil {
+		return nil, fmt.Errorf("cloning file: %w", err)
+	}
+
 	// File Create in the case a file is malformed.
 	if err := f.Create(); err != nil {
 		return nil, err
@@ -305,4 +341,26 @@ func hash(data []byte) string {
 	ss := sha256.New()
 	ss.Write(data)
 	return hex.EncodeToString(ss.Sum(nil))
+}
+
+// cloneFile creates a deep copy of the file via JSON serialization.
+// This prevents mutations to the returned file from affecting the original in the repository.
+// JSON is used instead of ACH Writer/Reader because it can handle files that haven't been built yet.
+func cloneFile(f *ach.File) (*ach.File, error) {
+	data, err := json.Marshal(f)
+	if err != nil {
+		return nil, fmt.Errorf("cloning file: %w", err)
+	}
+	if len(data) > 64*1024*1024 {
+		return nil, fmt.Errorf("json data of %d bytes is too large", len(data))
+	}
+
+	// Use SkipAll to avoid validation during cloning - we just want an exact copy
+	cloned, err := ach.FileFromJSONWith(data, &ach.ValidateOpts{SkipAll: true})
+	if err != nil {
+		return nil, fmt.Errorf("cloning file: %w", err)
+	}
+	// Restore original validation options (or clear the SkipAll we used for cloning)
+	cloned.SetValidation(f.GetValidation())
+	return cloned, nil
 }
