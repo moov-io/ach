@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/moov-io/ach"
 	"github.com/moov-io/base"
@@ -907,6 +908,89 @@ func decodeMergeFilesRequest(_ context.Context, r *http.Request) (interface{}, e
 	}
 
 	req.RequestID = cmp.Or(req.RequestID, moovhttp.GetRequestID(r))
+
+	return req, nil
+}
+
+type reverseFileRequest struct {
+	fileID             string
+	effectiveEntryDate time.Time
+	requestID          string
+}
+
+type reverseFileResponse struct {
+	ID   string    `json:"id"`
+	File *ach.File `json:"file"`
+	Err  error     `json:"error"`
+}
+
+func (r reverseFileResponse) error() error { return r.Err }
+
+func reverseFileEndpoint(s Service, r Repository, logger log.Logger) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req, ok := request.(reverseFileRequest)
+		if !ok {
+			return reverseFileResponse{Err: ErrFoundABug}, ErrFoundABug
+		}
+
+		reversedFile, err := s.ReverseFile(req.fileID, req.effectiveEntryDate)
+		if logger != nil {
+			logger := logger.With(log.Fields{
+				"files":     log.String("ReverseFile"),
+				"requestID": log.String(req.requestID),
+			})
+			if err != nil {
+				logger.Error().LogError(err)
+			} else {
+				logger.Info().Log("reverse file")
+			}
+		}
+		if err != nil {
+			return reverseFileResponse{Err: err}, err
+		}
+
+		if reversedFile.ID != "" {
+			err = r.StoreFile(reversedFile)
+			if logger != nil && err != nil {
+				logger.With(log.Fields{
+					"files":     log.String("storeReversedFile"),
+					"requestID": log.String(req.requestID),
+				}).LogError(err)
+			}
+		}
+
+		return reverseFileResponse{
+			ID:   reversedFile.ID,
+			File: reversedFile,
+			Err:  err,
+		}, nil
+	}
+}
+
+func decodeReverseFileRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	fileID, ok := vars["fileID"]
+	if !ok {
+		return nil, ErrBadRouting
+	}
+
+	req := reverseFileRequest{
+		fileID:    fileID,
+		requestID: moovhttp.GetRequestID(r),
+	}
+
+	var body struct {
+		EffectiveEntryDate base.Time `json:"effectiveEntryDate"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil && err != io.EOF {
+		return nil, fmt.Errorf("parsing reverse request: %w", err)
+	}
+
+	if body.EffectiveEntryDate.IsZero() {
+		req.effectiveEntryDate = time.Now().In(time.UTC)
+	} else {
+		req.effectiveEntryDate = body.EffectiveEntryDate.Time
+	}
 
 	return req, nil
 }

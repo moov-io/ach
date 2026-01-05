@@ -25,6 +25,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/moov-io/ach"
 	"github.com/moov-io/base"
@@ -70,6 +71,8 @@ type Service interface {
 	DeleteBatch(fileID string, batchID string) error
 	// MergeFiles will combine all the given files together
 	MergeFiles(fileIDs []string, files []*ach.File, conditions *ach.Conditions) ([]*ach.File, error)
+	// ReverseFile creates a NACHA compliant reversal of the ACH file
+	ReverseFile(fileID string, effectiveEntryDate time.Time) (*ach.File, error)
 }
 
 // service a concrete implementation of the service.
@@ -341,6 +344,30 @@ func hash(data []byte) string {
 	ss := sha256.New()
 	ss.Write(data)
 	return hex.EncodeToString(ss.Sum(nil))
+}
+
+// ReverseFile creates a NACHA compliant reversal of the ACH file
+func (s *service) ReverseFile(fileID string, effectiveEntryDate time.Time) (*ach.File, error) {
+	f, err := s.GetFile(fileID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Clone the file to avoid modifying the original in the repository
+	var buf bytes.Buffer
+	if err := ach.NewWriter(&buf).Write(f); err != nil {
+		return nil, fmt.Errorf("cloning file for reversal: %w", err)
+	}
+	cloned, err := ach.NewReader(&buf).Read()
+	if err != nil {
+		return nil, fmt.Errorf("reading cloned file: %w", err)
+	}
+
+	if err := cloned.Reversal(effectiveEntryDate); err != nil {
+		return nil, err
+	}
+	cloned.ID = base.ID() // new ID for reversed file
+	return &cloned, nil
 }
 
 // cloneFile creates a deep copy of the file via JSON serialization.

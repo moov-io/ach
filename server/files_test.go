@@ -1494,3 +1494,126 @@ func TestFiles_MergeFiles(t *testing.T) {
 	require.Equal(t, 100000, merged.Control.TotalDebitEntryDollarAmountInFile)
 	require.Equal(t, 200000, merged.Control.TotalCreditEntryDollarAmountInFile)
 }
+
+func TestFiles__reverseFileEndpoint(t *testing.T) {
+	logger := log.NewNopLogger()
+	repo := NewRepositoryInMemory(testTTLDuration, logger)
+	svc := NewService(repo)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
+
+	// write an ACH file into repository
+	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-valid.json"))
+	if fd == nil {
+		t.Fatalf("empty ACH file: %v", err)
+	}
+	defer fd.Close()
+	bs, _ := io.ReadAll(fd)
+	file, _ := ach.FileFromJSON(bs)
+	repo.StoreFile(file)
+
+	// test with empty body (should use current time)
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", fmt.Sprintf("/files/%s/reverse", file.ID), nil)
+	req.Header.Set("Origin", "https://moov.io")
+	req.Header.Set("X-Request-Id", "22222")
+
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusOK, w.Code)
+
+	var resp reverseFileResponse
+	err = json.NewDecoder(w.Body).Decode(&resp)
+	require.NoError(t, err)
+	require.NotEqual(t, file.ID, resp.ID)
+	require.NotNil(t, resp.File)
+	require.NotEqual(t, file.ID, resp.File.ID)
+
+	// Verify reversal was applied
+	require.NotEmpty(t, resp.File.Batches)
+	bh := resp.File.Batches[0].GetHeader()
+	require.Equal(t, "REVERSAL", bh.CompanyEntryDescription)
+}
+
+func TestFiles__reverseFileEndpointWithDate(t *testing.T) {
+	logger := log.NewNopLogger()
+	repo := NewRepositoryInMemory(testTTLDuration, logger)
+	svc := NewService(repo)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
+
+	// write an ACH file into repository
+	fd, err := os.Open(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-valid.json"))
+	if fd == nil {
+		t.Fatalf("empty ACH file: %v", err)
+	}
+	defer fd.Close()
+	bs, _ := io.ReadAll(fd)
+	file, _ := ach.FileFromJSON(bs)
+	repo.StoreFile(file)
+
+	// test with specific effectiveEntryDate
+	body := strings.NewReader(`{"effectiveEntryDate": "2025-06-15T10:00:00Z"}`)
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", fmt.Sprintf("/files/%s/reverse", file.ID), body)
+	req.Header.Set("Origin", "https://moov.io")
+	req.Header.Set("X-Request-Id", "33333")
+
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusOK, w.Code)
+
+	var resp reverseFileResponse
+	err = json.NewDecoder(w.Body).Decode(&resp)
+	require.NoError(t, err)
+	require.NotNil(t, resp.File)
+
+	// Verify reversal was applied with correct date
+	bh := resp.File.Batches[0].GetHeader()
+	require.Equal(t, "REVERSAL", bh.CompanyEntryDescription)
+	require.Equal(t, "250615", bh.EffectiveEntryDate)
+}
+
+func TestFilesError__reverseFileEndpoint(t *testing.T) {
+	repo := NewRepositoryInMemory(testTTLDuration, nil)
+	svc := NewService(repo)
+
+	resp, err := reverseFileEndpoint(svc, repo, nil)(context.TODO(), nil)
+	r, ok := resp.(reverseFileResponse)
+	if !ok {
+		t.Errorf("got %#v", resp)
+	}
+	if err == nil || r.Err == nil {
+		t.Errorf("expected error: err=%v resp.Err=%v", err, r.Err)
+	}
+}
+
+func TestFiles__decodeReverseFileRequest(t *testing.T) {
+	req := httptest.NewRequest("POST", "/files/reverse", nil)
+	req.Header.Set("Origin", "https://moov.io")
+	req.Header.Set("X-Request-Id", "44444")
+
+	_, err := decodeReverseFileRequest(context.TODO(), req)
+
+	if !base.Match(err, ErrBadRouting) {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+func TestFiles__decodeReverseFileRequestWithFileID(t *testing.T) {
+	body := strings.NewReader(`{"effectiveEntryDate": "2025-01-15T10:00:00Z"}`)
+	req := httptest.NewRequest("POST", "/files/test-file-id/reverse", body)
+	req = mux.SetURLVars(req, map[string]string{"fileID": "test-file-id"})
+	req.Header.Set("Origin", "https://moov.io")
+	req.Header.Set("X-Request-Id", "55555")
+
+	result, err := decodeReverseFileRequest(context.TODO(), req)
+	require.NoError(t, err)
+
+	r, ok := result.(reverseFileRequest)
+	require.True(t, ok)
+	require.Equal(t, "test-file-id", r.fileID)
+	require.Equal(t, 2025, r.effectiveEntryDate.Year())
+	require.Equal(t, 1, int(r.effectiveEntryDate.Month()))
+	require.Equal(t, 15, r.effectiveEntryDate.Day())
+}
