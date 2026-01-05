@@ -124,13 +124,13 @@ func (s *service) GetFiles() []*ach.File {
 func (s *service) BuildFile(id string) (*ach.File, error) {
 	original, err := s.GetFile(id)
 	if err != nil {
-		return nil, fmt.Errorf("build file: error reading file %s: %v", id, err)
+		return nil, fmt.Errorf("build file: error reading file %s: %w", id, err)
 	}
 
 	// Clone the file to avoid mutating the original in the repository
 	file, err := cloneFile(original)
 	if err != nil {
-		return nil, fmt.Errorf("build file: error cloning file %s: %v", id, err)
+		return nil, fmt.Errorf("build file: error cloning file %s: %w", id, err)
 	}
 
 	err = file.Create()
@@ -144,23 +144,23 @@ func (s *service) DeleteFile(id string) error {
 func (s *service) GetFileContents(id string, opts *ach.WriteOpts) (io.Reader, error) {
 	original, err := s.GetFile(id)
 	if err != nil {
-		return nil, fmt.Errorf("problem reading file %s: %v", id, err)
+		return nil, fmt.Errorf("problem reading file %s: %w", id, err)
 	}
 
 	// Clone the file to avoid mutating the original in the repository
 	f, err := cloneFile(original)
 	if err != nil {
-		return nil, fmt.Errorf("problem cloning file %s: %v", id, err)
+		return nil, fmt.Errorf("problem cloning file %s: %w", id, err)
 	}
 
 	if err := f.Create(); err != nil {
-		return nil, fmt.Errorf("problem creating file %s: %v", id, err)
+		return nil, fmt.Errorf("problem creating file %s: %w", id, err)
 	}
 
 	var buf bytes.Buffer
 	w := ach.NewWriterWithOpts(&buf, opts)
 	if err := w.Write(f); err != nil {
-		return nil, fmt.Errorf("problem writing plaintext file %s: %v", id, err)
+		return nil, fmt.Errorf("problem writing plaintext file %s: %w", id, err)
 	}
 	if err := w.Flush(); err != nil {
 		return nil, err
@@ -176,7 +176,7 @@ func (s *service) GetFileContents(id string, opts *ach.WriteOpts) (io.Reader, er
 func (s *service) ValidateFile(id string, opts *ach.ValidateOpts) error {
 	f, err := s.GetFile(id)
 	if err != nil {
-		return fmt.Errorf("problem reading file %s: %v", id, err)
+		return fmt.Errorf("problem reading file %s: %w", id, err)
 	}
 	return f.ValidateWith(opts)
 }
@@ -351,6 +351,10 @@ func cloneFile(f *ach.File) (*ach.File, error) {
 	if err != nil {
 		return nil, fmt.Errorf("cloning file: %w", err)
 	}
+	if len(data) > 64*1024*1024 {
+		return nil, fmt.Errorf("json data of %d bytes is too large", len(data))
+	}
+
 	// Use SkipAll to avoid validation during cloning - we just want an exact copy
 	cloned, err := ach.FileFromJSONWith(data, &ach.ValidateOpts{SkipAll: true})
 	if err != nil {
