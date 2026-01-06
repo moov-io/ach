@@ -8,10 +8,16 @@ permissions:
   contents: read
 
 jobs:
-  fuzz-ach:
-    name: Fuzz ACH
+  fuzz:
+    name: Fuzz
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        command:
+          - "go test ./addenda/... -fuzz Fuzz -fuzztime 10m"
+          - "go test ./test/fuzz/... -fuzz ACH -fuzztime 10m"
+          - "go test ./test/fuzz/... -fuzz JSON -fuzztime 10m"
 
     steps:
     - name: Set up Go 1.x
@@ -25,55 +31,11 @@ jobs:
       with:
         fetch-depth: 0
 
-    - uses: actions/cache@v5
-      with:
-        path: |
-          ~/.cache/go-build
-          ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
-
     - name: Fuzz
-      run: |
-        go test ./test/fuzz/... -fuzz ACH -fuzztime 10m
+      run: ${{ matrix.command }}
 
     - name: Report Failures
       if: ${{ failure() }}
       run: |
-        find ./test/fuzz/testdata/fuzz/ -type f | xargs -n1 tail -n +1 -v
-
-  fuzz-json:
-    name: Fuzz JSON
-    runs-on: ubuntu-latest
-    timeout-minutes: 12
-
-    steps:
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v6
-      with:
-        go-version: stable
-      id: go
-
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v6
-      with:
-        fetch-depth: 0
-
-    - uses: actions/cache@v5
-      with:
-        path: |
-          ~/.cache/go-build
-          ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
-
-    - name: Fuzz
-      run: |
-        go test ./test/fuzz/... -fuzz JSON -fuzztime 10m
-
-    - name: Report Failures
-      if: ${{ failure() }}
-      run: |
+        find ./addenda/testdata/fuzz/ -type f | xargs -n1 tail -n +1 -v
         find ./test/fuzz/testdata/fuzz/ -type f | xargs -n1 tail -n +1 -v
