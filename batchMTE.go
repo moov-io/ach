@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"github.com/moov-io/ach/internal/usabbrev"
+	"github.com/moov-io/base"
 )
 
 // BatchMTE holds the BatchHeader, BatchControl, and EntryDetail for Machine Transfer Entry (MTE) entries.
@@ -64,6 +65,34 @@ func (batch *BatchMTE) Validate() error {
 	}
 
 	return nil
+}
+
+// ValidateAll checks properties of the ACH batch and returns ALL errors found.
+func (batch *BatchMTE) ValidateAll() base.ErrorList {
+	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
+		return nil
+	}
+
+	var errors base.ErrorList
+
+	if verifyErrs := batch.verifyAll(); verifyErrs != nil {
+		for _, err := range verifyErrs {
+			errors.Add(err)
+		}
+	}
+
+	if batch.Header.StandardEntryClassCode != MTE {
+		errors.Add(batch.Error("StandardEntryClassCode", ErrBatchSECType, MTE))
+	}
+
+	for _, inv := range batch.InvalidEntries() {
+		errors.Add(inv.Error)
+	}
+
+	if errors.Empty() {
+		return nil
+	}
+	return errors
 }
 
 // InvalidEntries returns entries with validation errors in the batch

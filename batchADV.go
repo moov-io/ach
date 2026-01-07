@@ -17,6 +17,8 @@
 
 package ach
 
+import "github.com/moov-io/base"
+
 // BatchADV holds the Batch Header and Batch Control and all Entry Records for ADV Entries
 //
 // The ADV entry identifies a Non-Monetary Entry that is used by an ACH Operator to provide accounting information
@@ -64,6 +66,41 @@ func (batch *BatchADV) Validate() error {
 	}
 
 	return nil
+}
+
+// ValidateAll checks properties of the ACH batch and returns ALL errors found.
+func (batch *BatchADV) ValidateAll() base.ErrorList {
+	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
+		return nil
+	}
+
+	var errors base.ErrorList
+
+	if batch.Header.StandardEntryClassCode != ADV {
+		errors.Add(batch.Error("StandardEntryClassCode", ErrBatchSECType, ADV))
+	}
+	if batch.Header.ServiceClassCode != AutomatedAccountingAdvices {
+		errors.Add(batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode))
+	}
+	if batch.Header.OriginatorStatusCode != 0 {
+		errors.Add(batch.Error("OriginatorStatusCode", ErrOrigStatusCode, batch.Header.OriginatorStatusCode))
+	}
+
+	// basic verification of the batch
+	if verifyErrs := batch.verifyAll(); verifyErrs != nil {
+		for _, err := range verifyErrs {
+			errors.Add(err)
+		}
+	}
+
+	for _, inv := range batch.InvalidEntries() {
+		errors.Add(inv.Error)
+	}
+
+	if errors.Empty() {
+		return nil
+	}
+	return errors
 }
 
 // InvalidEntries returns entries with validation errors in the batch
