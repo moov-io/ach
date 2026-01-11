@@ -67,7 +67,7 @@ type ADVEntryDetail struct {
 	// AddendaRecordIndicator indicates the existence of an Addenda Record.
 	// A value of "1" indicates that one ore more addenda records follow,
 	// and "0" means no such record is present.
-	AddendaRecordIndicator int `json:"addendaRecordIndicator,omitempty"`
+	AddendaRecordIndicator int `json:"addendaRecordIndicator"`
 	// ACHOperatorRoutingNumber
 	ACHOperatorRoutingNumber string `json:"achOperatorRoutingNumber"`
 	// JulianDay
