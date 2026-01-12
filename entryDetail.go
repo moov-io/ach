@@ -62,7 +62,7 @@ type EntryDetail struct {
 	// AddendaRecordIndicator indicates the existence of an Addenda Record.
 	// A value of "1" indicates that one ore more addenda records follow,
 	// and "0" means no such record is present.
-	AddendaRecordIndicator int `json:"addendaRecordIndicator,omitempty"`
+	AddendaRecordIndicator int `json:"addendaRecordIndicator"`
 	// TraceNumber is assigned by the ODFI or software vendor and used as part of identification.
 	//
 	// The format of trace numbers is the first 8 digits of the ODFI's routing number followed by

@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 
@@ -178,4 +179,45 @@ func TestBatchADVOriginatorStatusCode(t *testing.T) {
 	if !base.Match(err, ErrOrigStatusCode) {
 		t.Errorf("%T: %s", err, err)
 	}
+}
+
+// TestBatchADV_JSONRoundTrip validates that OriginatorStatusCode=0 is preserved
+// through JSON serialization/deserialization (issue #1725)
+func TestBatchADV_JSONRoundTrip(t *testing.T) {
+	mockBatch := mockBatchADV(t)
+
+	// Verify initial state - ADV requires OriginatorStatusCode=0
+	require.Equal(t, 0, mockBatch.GetHeader().OriginatorStatusCode)
+	require.Equal(t, 0, mockBatch.GetADVEntries()[0].AddendaRecordIndicator)
+
+	// Create file with ADV batch
+	file := NewFile()
+	file.Header = staticFileHeader()
+	file.AddBatch(mockBatch)
+
+	// Marshal to JSON
+	bs, err := json.Marshal(file)
+	require.NoError(t, err)
+
+	// Verify JSON contains originatorStatusCode field (not omitted)
+	require.Contains(t, string(bs), `"originatorStatusCode":0`)
+	require.Contains(t, string(bs), `"addendaRecordIndicator":0`)
+
+	// Unmarshal back
+	read, err := FileFromJSON(bs)
+	require.NoError(t, err)
+
+	// Verify OriginatorStatusCode=0 is preserved
+	require.Equal(t, 1, len(read.Batches))
+	require.Equal(t, 0, read.Batches[0].GetHeader().OriginatorStatusCode,
+		"OriginatorStatusCode should be preserved as 0 after JSON round-trip")
+
+	// Verify AddendaRecordIndicator=0 is preserved
+	advBatch, ok := read.Batches[0].(*BatchADV)
+	require.True(t, ok, "Expected BatchADV type")
+	require.Equal(t, 0, advBatch.GetADVEntries()[0].AddendaRecordIndicator,
+		"AddendaRecordIndicator should be preserved as 0 after JSON round-trip")
+
+	// Validate the file still passes validation
+	require.NoError(t, read.Validate())
 }

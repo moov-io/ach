@@ -897,3 +897,53 @@ func TestFlattenBatches_OriginalUnchanged(t *testing.T) {
 	require.Equal(t, originalBatchCount, len(originalAfter.Batches),
 		"original file batch count should be unchanged")
 }
+
+// TestBuildFile_ADVOriginatorStatusCode validates that OriginatorStatusCode=0
+// is preserved through cloneFile for ADV batches (issue #1725)
+func TestBuildFile_ADVOriginatorStatusCode(t *testing.T) {
+	s := mockServiceInMemory(t)
+
+	// Read ADV test file
+	fd, err := os.Open(filepath.Join("..", "test", "testdata", "adv.ach"))
+	require.NoError(t, err)
+	defer fd.Close()
+
+	file, err := ach.NewReader(fd).Read()
+	require.NoError(t, err)
+
+	// Verify source file has OriginatorStatusCode=0 (required for ADV)
+	require.Equal(t, 1, len(file.Batches))
+	require.Equal(t, 0, file.Batches[0].GetHeader().OriginatorStatusCode,
+		"ADV batch should have OriginatorStatusCode=0")
+
+	// Create file via service
+	fileID, err := s.CreateFile(&file.Header)
+	require.NoError(t, err)
+	_, err = s.CreateBatch(fileID, file.Batches[0])
+	require.NoError(t, err)
+
+	// Verify stored file preserves OriginatorStatusCode=0
+	storedFile, err := s.GetFile(fileID)
+	require.NoError(t, err)
+	require.Equal(t, 0, storedFile.Batches[0].GetHeader().OriginatorStatusCode,
+		"stored ADV batch should have OriginatorStatusCode=0")
+
+	// BuildFile uses cloneFile internally - verify OriginatorStatusCode=0 is preserved
+	builtFile, err := s.BuildFile(fileID)
+	require.NoError(t, err)
+	require.Equal(t, 0, builtFile.Batches[0].GetHeader().OriginatorStatusCode,
+		"built ADV batch should have OriginatorStatusCode=0 after cloneFile")
+
+	// GetFileContents also uses cloneFile - verify it validates
+	contents, err := s.GetFileContents(fileID, nil)
+	require.NoError(t, err)
+	require.NotNil(t, contents)
+
+	// Read back the contents and verify
+	contentBytes, err := io.ReadAll(contents)
+	require.NoError(t, err)
+	readBack, err := ach.NewReader(strings.NewReader(string(contentBytes))).Read()
+	require.NoError(t, err)
+	require.Equal(t, 0, readBack.Batches[0].GetHeader().OriginatorStatusCode,
+		"ADV batch from GetFileContents should have OriginatorStatusCode=0")
+}

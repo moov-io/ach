@@ -145,7 +145,7 @@ type IATBatchHeader struct {
 	// 0 ADV File prepared by an ACH Operator.
 	// 1 This code identifies the Originator as a depository financial institution.
 	// 2 This code identifies the Originator as a Federal Government entity or agency.
-	OriginatorStatusCode int `json:"originatorStatusCode,omitempty"`
+	OriginatorStatusCode int `json:"originatorStatusCode"`
 
 	// ODFIIdentification First 8 digits of the originating DFI transit routing number
 	// For Inbound IAT Entries, this field contains the routing number of the U.S. Gateway
