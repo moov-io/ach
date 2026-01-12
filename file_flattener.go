@@ -20,6 +20,7 @@ package ach
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"sort"
 )
 
@@ -81,10 +82,11 @@ func Flatten(originalFile *File) (*File, error) {
 	newFile.SetValidation(originalFile.GetValidation())
 
 	newFile = originalFile.addFileHeaderData(newFile)
-	var allBatches []mergeable
-	for i := range newBatchesByHeader {
-		allBatches = append(allBatches, newBatchesByHeader[i]...)
+	batchSlices := make([][]mergeable, 0, len(newBatchesByHeader))
+	for _, batches := range newBatchesByHeader {
+		batchSlices = append(batchSlices, batches)
 	}
+	allBatches := slices.Concat(batchSlices...)
 
 	// Sort batches by original batch number to roughly maintain batch order in the flattened file
 	sort.Slice(allBatches, func(i int, j int) bool { return allBatches[i].GetBatchNumber() < allBatches[j].GetBatchNumber() })
