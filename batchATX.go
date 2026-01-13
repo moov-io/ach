@@ -19,6 +19,8 @@ package ach
 
 import (
 	"strconv"
+
+	"github.com/moov-io/base"
 )
 
 // BatchATX holds the BatchHeader and BatchControl and all EntryDetail for ATX (Acknowledgment)
@@ -64,6 +66,34 @@ func (batch *BatchATX) Validate() error {
 	}
 
 	return nil
+}
+
+// ValidateAll checks properties of the ACH batch and returns ALL errors found.
+func (batch *BatchATX) ValidateAll() base.ErrorList {
+	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
+		return nil
+	}
+
+	var errors base.ErrorList
+
+	if verifyErrs := batch.verifyAll(); verifyErrs != nil {
+		for _, err := range verifyErrs {
+			errors.Add(err)
+		}
+	}
+
+	if batch.Header.StandardEntryClassCode != ATX {
+		errors.Add(batch.Error("StandardEntryClassCode", ErrBatchSECType, ATX))
+	}
+
+	for _, inv := range batch.InvalidEntries() {
+		errors.Add(inv.Error)
+	}
+
+	if errors.Empty() {
+		return nil
+	}
+	return errors
 }
 
 // InvalidEntries returns entries with validation errors in the batch
