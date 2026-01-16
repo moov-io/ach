@@ -2,11 +2,11 @@ module github.com/moov-io/ach
 
 go 1.24.0
 
-toolchain go1.25.5
+toolchain go1.25.6
 
 require (
 	github.com/Pallinder/go-randomdata v1.2.0
-	github.com/aws/aws-lambda-go v1.51.2
+	github.com/aws/aws-lambda-go v1.52.0
 	github.com/go-kit/kit v0.13.0
 	github.com/go-kit/log v0.2.1
 	github.com/gorilla/mux v1.8.1
