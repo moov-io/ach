@@ -17,6 +17,8 @@
 
 package ach
 
+import "github.com/moov-io/base"
+
 // BatchARC holds the BatchHeader and BatchControl and all EntryDetail for ARC Entries.
 //
 // Accounts Receivable Entry (ARC). A consumer check converted to a one-time ACH debit.
@@ -74,6 +76,40 @@ func (batch *BatchARC) Validate() error {
 	}
 
 	return nil
+}
+
+// ValidateAll checks properties of the ACH batch and returns ALL errors found.
+func (batch *BatchARC) ValidateAll() base.ErrorList {
+	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
+		return nil
+	}
+
+	var errors base.ErrorList
+
+	if verifyErrs := batch.verifyAll(); verifyErrs != nil {
+		for _, err := range verifyErrs {
+			errors.Add(err)
+		}
+	}
+
+	if batch.Header.StandardEntryClassCode != ARC {
+		errors.Add(batch.Error("StandardEntryClassCode", ErrBatchSECType, ARC))
+	}
+
+	// ARC detail entries can only be a debit, ServiceClassCode must allow debits
+	switch batch.Header.ServiceClassCode {
+	case CreditsOnly:
+		errors.Add(batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode))
+	}
+
+	for _, inv := range batch.InvalidEntries() {
+		errors.Add(inv.Error)
+	}
+
+	if errors.Empty() {
+		return nil
+	}
+	return errors
 }
 
 // InvalidEntries returns entries with validation errors in the batch
