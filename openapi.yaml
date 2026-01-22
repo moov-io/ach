@@ -1042,6 +1042,7 @@ components:
         fileCreationTime:
           description: 'The File Creation Time is the time when the file was prepared by an ODFI. (Format HHmm - H=Hour, m=Minute)'
           type: string
+          maxLength: 4
           format: "HHmm"
           example: "1504"
         fileCreationDate:
@@ -1049,12 +1050,15 @@ components:
           type: string
           format: "YYMMDD"
           example: "190102"
+          maxLength: 6
         fileIDModifier:
           type: string
           description: Incremented value for each file for RDFIs.
           example: "0"
+          maxLength: 1
         referenceCode:
           type: string
+          maxLength: 8
           description: Reserved field for information pertinent to the Originator.
         lineNumber:
           type: integer
