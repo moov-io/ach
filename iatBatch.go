@@ -675,5 +675,13 @@ func (iatBatch *IATBatch) SetValidation(opts *ValidateOpts) {
 	if iatBatch == nil {
 		return
 	}
+
 	iatBatch.validateOpts = opts
+
+	if iatBatch.Header != nil {
+		iatBatch.Header.SetValidation(opts)
+	}
+	if iatBatch.Control != nil {
+		iatBatch.Control.SetValidation(opts)
+	}
 }

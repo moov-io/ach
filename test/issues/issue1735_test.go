@@ -7,7 +7,7 @@ import (
 )
 
 func TestIssue1735_ValidateOptsNotPropagated(t *testing.T) {
-// Test that ValidateOpts are propagated when creating a file from JSON.
+	// Test that ValidateOpts are propagated when creating a file from JSON.
 	jsonData := []byte(`{
 		"fileHeader": {
 			"immediateOrigin": "022083649",

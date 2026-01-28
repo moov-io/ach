@@ -26,8 +26,6 @@ import (
 	"github.com/moov-io/iso4217"
 )
 
-// msgServiceClass
-
 // IATBatchHeader identifies the originating entity and the type of transactions
 // contained in the batch for SEC Code IAT. This record also contains the effective
 // date, or desired settlement date, for all entries contained in this batch. The
