@@ -307,7 +307,15 @@ func (batch *Batch) SetValidation(opts *ValidateOpts) {
 	if batch == nil {
 		return
 	}
+
 	batch.validateOpts = opts
+
+	if batch.Header != nil {
+		batch.Header.SetValidation(opts)
+	}
+	if batch.Control != nil {
+		batch.Control.SetValidation(opts)
+	}
 }
 
 // verify checks basic valid NACHA batch rules. Assumes properly parsed records. This does not mean it is a valid batch as validity is tied to each batch type
