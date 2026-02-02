@@ -1079,30 +1079,36 @@ components:
           type: integer
           minimum: 1
           example: 1
+          maxLength: 6
         blockCount:
           description: |
             Total number of records in the file (include all headers and trailer) divided by 10 (This number must be evenly divisible by 10. If not, additional records consisting of all 9's are added to the file after the initial '9' record to fill out the block 10.)
           type: integer
           example: 1
+          maxLength: 6
         entryAddendaCount:
           description: Total detail and addenda records in the file
           type: integer
           minimum: 1
           example: 1
+          maxLength: 8
         entryHash:
           description: Calculated in the same manner as the batch total but includes total from entire file
           type: integer
           example: 0
+          maxLength: 10
         totalDebit:
           description: Accumulated Batch debit totals within the file.
           type: integer
           format: int64
           example: 100
+          maxLength: 12
         totalCredit:
           description: Accumulated Batch credit totals within the file.
           type: integer
           format: int64
           example: 20
+          maxLength: 12
         lineNumber:
           type: integer
           description: Line number at which the record appears in the file.
@@ -1162,24 +1168,30 @@ components:
           type: integer
           description: Service Class Code - Mixed Debits and Credits '200', ACH Credits Only '220', or ACH Debits Only '225'
           example: 220
+          maxLength: 3
+          enum: [200, 220, 225]
         companyName:
           type: string
           description: Company originating the entries in the batch
           example: Acme Corp
+          maxLength: 16
         companyDiscretionaryData:
           type: string
           description: The 9 digit FEIN number (proceeded by a predetermined alpha or numeric character) of the entity in the company name field
           example: "123456789"
+          maxLength: 20
         companyIdentification:
           description: |
             Alphanumeric code used to identify an Originator. The Company Identification Field must be included on all prenotification records and on each entry initiated pursuant to such prenotification. The Company ID may begin with the ANSI one-digit Identification Code Designator (ICD), followed by the identification number.
             Possible ICDs are the IRS Employer Identification Number (EIN) "1", Data Universal Numbering Systems (DUNS) "3", or User Assigned Number "9".
           type: string
           example: "121042882"
+          maxLength: 10
         standardEntryClassCode:
           type: string
           description: Identifies the payment type (product) found within an ACH batch using a 3-character code.
           example: "PPD"
+          maxLength: 3
         companyEntryDescription:
           type: string
           description: |
@@ -1189,16 +1201,19 @@ components:
             This field must contain the word "RECLAIM" (left justified) when the batch contains reclamation entries.
             This field must contain the word "NONSETTLED" (left justified) when the batch contains entries which could not settle.
           example: "PURCHASE"
+          maxLength: 10
         companyDescriptiveDate:
           type: string
           description: |
             The Originator establishes this field as the date it would like to see displayed to the receiver for descriptive purposes. This field is never used to control timing of any computer or manual operation. It is solely for descriptive purposes. The RDFI should not assume any specific format.
           example: "SD1300"
+          maxLength: 6
         effectiveEntryDate:
           description: Date on which the entries are to settle. (Format YYMMDD - Y=Year, M=Month, D=Day)
           type: string
           format: "YYMMDD"
           example: "190102"
+          maxLength: 6
         originatorStatusCode:
           type: integer
           description: |
@@ -1207,20 +1222,25 @@ components:
             1 - This code identifies the Originator as a depository financial institution. |
             2 - This code identifies the Originator as a Federal Government entity or agency.
           example: 1
+          maxLength: 1
+          enum: [0,1,2]
         ODFIIdentification:
           description: First 8 digits of the originating DFI transit routing number
           type: string
           example: "12345678"
+          maxLength: 8
         batchNumber:
           type: integer
           description: |
             BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
           example: 0
+          maxLength: 7
         settlementDate:
           type: string
           description: The date the entries actually settled (this is inserted by the ACH operator)
           format: "YYMMDD"
           example: "190102"
+          maxLength: 3
         lineNumber:
           type: integer
           description: Line number at which the record appears in the file.
@@ -1235,10 +1255,13 @@ components:
           description: Same as ServiceClassCode in BatchHeaderRecord
           type: integer
           example: 220
+          maxLength: 3
+          enum: [200, 220, 225]
         entryAddendaCount:
           description: EntryAddendaCount is a tally of each Entry Detail Record and each Addenda Record processed, within either the batch or file as appropriate.
           type: integer
           example: 1
+          maxLength: 6
         entryHash:
           description: |
             Validate the Receiving DFI Identification in each Entry Detail Record is hashed to provide a check against inadvertent alteration of data contents due to hardware failure or program error.
@@ -1246,34 +1269,41 @@ components:
           type: integer
           format: int64
           example: 0
+          maxLength: 10
         totalDebit:
           description: Contains accumulated Entry debit totals within the batch.
           type: integer
           format: int64
           example: 100
+          maxLength: 12
         totalCredit:
           description: Contains accumulated Entry credit totals within the batch.
           type: integer
           format: int64
           example: 100
+          maxLength: 12
         companyIdentification:
           description: |
             Alphanumeric code used to identify an Originator. The Company Identification Field must be included on all prenotification records and on each entry initiated pursuant to such prenotification. The Company ID may begin with the ANSI one-digit Identification Code Designator (ICD), followed by the identification number.
             Possible ICDs are the IRS Employer Identification Number (EIN) "1", Data Universal Numbering Systems (DUNS) "3", and User Assigned Number "9".
           type: string
           example: "121042882"
+          maxLength: 10
         messageAuthentication:
           description: MAC is an eight character code derived from a special key used in conjunction with the DES algorithm. The purpose of the MAC is to validate the authenticity of ACH entries. The DES algorithm and key message standards must be in accordance with standards adopted by the American National Standards Institute. The remaining eleven characters of this field are blank.
           type: string
           example: "3fe106cf"
+          maxLength: 19
         ODFIIdentification:
           description: The routing number is used to identify the DFI originating entries within a given branch.
           type: string
           example: "123456789"
+          maxLength: 8
         batchNumber:
           type: integer
           description: BatchNumber is assigned in ascending sequence to each batch by the ODFI or its Sending Point in a given file of entries. Since the batch number in the Batch Header Record and the Batch Control Record is the same, the ascending sequence number should be assigned by batch and not by record.
           example: 0
+          maxLength: 7
         lineNumber:
           type: integer
           description: Line number at which the record appears in the file.
@@ -1317,43 +1347,54 @@ components:
             37 - Debit to savings account |
             38 - Prenote for debit to savings account
           example: 22
+          maxLength: 2
+          enum: [22,23,27,28,32,33,37,38]
         RDFIIdentification:
           type: string
           description: RDFI's routing number without the last digit.
           example: "12345678"
+          maxLength: 8
         checkDigit:
           type: string
           description: Last digit in RDFI routing number.
           example: "0"
+          maxLength: 1
         DFIAccountNumber:
           type: string
           description: |
             The receiver's bank account number you are crediting/debiting. It important to note that this is an alphanumeric field, so it's space padded, not zero padded
           example: "181141847"
+          maxLength: 17
         amount:
           type: integer
           format: int64
           description: Number of cents you are debiting/crediting this account
           example: 1235
+          maxLength: 10
         identificationNumber:
           type: string
           description: Internal identification (alphanumeric) that you use to uniquely identify this Entry Detail Record
           example: "8aa786"
+          maxLength: 15
         individualName:
           type: string
           description: The name of the receiver, usually the name on the bank account
           example: Taylor Swift
+          maxLength: 22
         discretionaryData:
           type: string
           description: |
             DiscretionaryData allows ODFIs to include codes, of significance only to them, to enable specialized handling of the entry. There will be no standardized interpretation for the value of this field. It can either be a single two-character code, or two distinct one-character codes, according to the needs of the ODFI and/or Originator involved. This field must be returned intact for any returned entry.
             WEB uses the Discretionary Data Field as the Payment Type Code.
           example: "AB"
+          maxLength: 2
         addendaRecordIndicator:
           type: integer
           description: |
             AddendaRecordIndicator indicates the existence of an Addenda Record. A value of "1" indicates that one or more addenda records follow, and "0" means no such record is present.
           example: 1
+          maxLength: 1
+          enum: [0, 1]
         traceNumber:
           type: string
           description: |
@@ -1377,6 +1418,7 @@ components:
 
             Use TraceNumberField for a properly formatted string representation.
           example: "124782618117"
+          maxLength: 15
         addenda02:
           $ref: '#/components/schemas/Addenda02'
         addenda05:
@@ -1568,8 +1610,7 @@ components:
           description: Line number at which the record appears in the file.
           example: 138
       required:
-        - typeCode
-        - transactionCode
+        - transactionTypeCode
         - foreignPaymentAmount
         - name
         - entryDetailSequenceNumber
