@@ -1,0 +1,74 @@
+{
+    "fileHeader": {
+        "immediateDestination": "123456780",
+        "immediateOrigin": "123456780",
+        "fileCreationDate": "231219",
+        "fileCreationTime": "",
+        "fileIDModifier": "A",
+        "FormatCode": "1",
+        "immediateDestinationName": "Anonymous Bank",
+        "immediateOriginName": "Anonymous Bank"
+    },
+    "batches": [
+        {
+            "batchHeader": {
+                "serviceClassCode": 200,
+                "companyName": "Anonymous Bank",
+                "companyIdentification": "123456780",
+                "standardEntryClassCode": "CCD",
+                "companyEntryDescription": "Anonymous Bank",
+                "originatorStatusCode": 1,
+                "ODFIIdentification": "123456780",
+                "batchNumber": 1
+            },
+            "entryDetails": [
+                {
+                    "transactionCode": 22,
+                    "RDFIIdentification": "12345678",
+                    "checkDigit": "0",
+                    "DFIAccountNumber": "12345",
+                    "amount": 50000,
+                    "individualName": "Jane Smith",
+                    "traceNumber": "123456780000001",
+                    "addendaRecordIndicator": 1,
+                    "addenda05": [
+                        {
+                            "typeCode": "05",
+                            "paymentRelatedInformation": "abc",
+                            "sequenceNumber": 1,
+                            "entryDetailSequenceNumber": 10000
+                        }
+                    ]
+                },
+                {
+                    "transactionCode": 27,
+                    "RDFIIdentification": "12345678",
+                    "checkDigit": "0",
+                    "DFIAccountNumber": "12345",
+                    "amount": 50000,
+                    "individualName": "OFFSET",
+                    "discretionaryData": "For offset",
+                    "traceNumber": "123456780000002",
+                    "addendaRecordIndicator": 1,
+                    "addenda05": [
+                        {
+                            "typeCode": "05",
+                            "paymentRelatedInformation": "def",
+                            "sequenceNumber": 1,
+                            "entryDetailSequenceNumber": 10000
+                        }
+                    ]
+                }
+            ],
+            "offset": {
+                "routingNumber": "123456780",
+                "accountNumber": "12345",
+                "accountType": "checking",
+                "description": "For offset"
+            }
+        }
+    ],
+    "IATBatches": null,
+    "NotificationOfChange": null,
+    "ReturnEntries": null
+}

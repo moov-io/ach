@@ -1209,12 +1209,15 @@ func (b *Batch) upsertOffsets() error {
 	}
 
 	// remove any Offset records already on the batch
+	var found *EntryDetail
 	for i := 0; i < len(b.Entries); i++ {
 		// TODO(adam): Should we remove this based on checking the last element is
 		// debit/credit and sums to all the other elements (which are mutually exclusive to
 		// the last record being debit or credit)?
 		// See: https://github.com/moov-io/ach/issues/540
 		if strings.EqualFold(b.Entries[i].IndividualName, offsetIndividualName) {
+			found = b.Entries[i] // save the EntryDetail to copy addenda records back onto
+
 			// fixup BatchControl records for our conditional after this for loop
 			if b.Entries[i].TransactionCode == CheckingCredit || b.Entries[i].TransactionCode == SavingsCredit {
 				b.Control.TotalCreditEntryDollarAmount -= b.Entries[i].Amount
@@ -1267,13 +1270,29 @@ func (b *Batch) upsertOffsets() error {
 
 	// Add both EntryDetails to our Batch and recalculate some fields
 	if debitED != nil {
+		// Copy any addenda records from a previous OFFSET EntryDetail
+		if found != nil {
+			if len(found.Addenda05) > 0 {
+				debitED.AddendaRecordIndicator = 1
+				debitED.Addenda05 = append(debitED.Addenda05, found.Addenda05...)
+			}
+		}
+
 		b.AddEntry(debitED)
-		b.Control.EntryAddendaCount += 1
+		b.Control.EntryAddendaCount += 1 + debitED.addendaCount() - found.addendaCount()
 		b.Control.TotalDebitEntryDollarAmount += debitED.Amount
 	}
 	if creditED != nil {
+		// Copy any addenda records from a previous OFFSET EntryDetail
+		if found != nil {
+			if len(found.Addenda05) > 0 {
+				creditED.AddendaRecordIndicator = 1
+				creditED.Addenda05 = append(creditED.Addenda05, found.Addenda05...)
+			}
+		}
+
 		b.AddEntry(creditED)
-		b.Control.EntryAddendaCount += 1
+		b.Control.EntryAddendaCount += 1 + creditED.addendaCount() - found.addendaCount()
 		b.Control.TotalCreditEntryDollarAmount += creditED.Amount
 	}
 	b.Header.ServiceClassCode = MixedDebitsAndCredits

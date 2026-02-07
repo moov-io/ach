@@ -688,6 +688,10 @@ func (ed *EntryDetail) AddAddenda05(addenda05 *Addenda05) {
 
 // addendaCount returns the count of Addenda records added onto this EntryDetail
 func (ed *EntryDetail) addendaCount() (n int) {
+	if ed == nil {
+		return 0
+	}
+
 	if ed.Addenda02 != nil {
 		n += 1
 	}
