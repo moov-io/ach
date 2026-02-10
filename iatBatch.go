@@ -628,6 +628,17 @@ func (iatBatch *IATBatch) Validate() error {
 	if iatBatch.validateOpts != nil && (iatBatch.validateOpts.SkipAll || iatBatch.validateOpts.BypassBatchValidation) {
 		return nil
 	}
+	if iatBatch.validateOpts.SkipAllValidationsExceptTotals {
+		_, err := iatBatch.isBatchEntryCount()
+		if err != nil {
+			return err
+		}
+		err = iatBatch.isBatchAmount()
+		if err != nil {
+			return err
+		}
+		return nil
+	}
 
 	// basic verification of the batch before we validate specific rules.
 	if err := iatBatch.verify(); err != nil {

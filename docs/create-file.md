@@ -63,6 +63,7 @@ Example: `POST /files/create?requireABAOrigin=true&bypassDestination=true`
 | `requireABAOrigin`                 | `RequireABAOrigin`                 |
 | `skipAll`                          | `SkipAll`                          |
 | `skipFileCreationValidation`       | `SkipFileCreationValidation`       |
+| `skipAllValidationsExceptTotals`   | `skipAllValidationsExceptTotals`   |
 | `unequalAddendaCounts`             | `UnequalAddendaCounts`             |
 | `unequalServiceClassCode`          | `UnequalServiceClassCode`          |
 
