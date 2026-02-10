@@ -628,7 +628,7 @@ func (iatBatch *IATBatch) Validate() error {
 	if iatBatch.validateOpts != nil && (iatBatch.validateOpts.SkipAll || iatBatch.validateOpts.BypassBatchValidation) {
 		return nil
 	}
-	if iatBatch.validateOpts.SkipAllValidationsExceptTotals {
+	if iatBatch.validateOpts != nil && iatBatch.validateOpts.SkipAllValidationsExceptTotals {
 		_, err := iatBatch.isBatchEntryCount()
 		if err != nil {
 			return err

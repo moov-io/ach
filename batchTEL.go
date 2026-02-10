@@ -40,7 +40,7 @@ func (batch *BatchTEL) Validate() error {
 	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
 		return nil
 	}
-	if batch.validateOpts.SkipAllValidationsExceptTotals {
+	if batch.validateOpts != nil && batch.validateOpts.SkipAllValidationsExceptTotals {
 		err := batch.isBatchEntryCount()
 		if err != nil {
 			return err
