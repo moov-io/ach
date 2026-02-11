@@ -211,22 +211,15 @@ func (m mergeableBatcher) AddToFile(file *File) error {
 	})
 
 	// Inherit validation options from file if batch doesn't have them
-	if file.GetValidation() != nil {
-		// Use a local interface to access SetValidation
-		type validatable interface {
-			SetValidation(*ValidateOpts)
+	if opts := file.GetValidation(); opts != nil {
+		m.batcher.SetValidation(opts)
+
+		// Also set validation on all entries
+		for _, entry := range m.batcher.GetEntries() {
+			entry.SetValidation(opts)
 		}
-
-		if v, ok := m.batcher.(validatable); ok {
-			v.SetValidation(file.GetValidation())
-
-			// Also set validation on all entries
-			for _, entry := range m.batcher.GetEntries() {
-				entry.SetValidation(file.GetValidation())
-			}
-			for _, entry := range m.batcher.GetADVEntries() {
-				entry.SetValidation(file.GetValidation())
-			}
+		for _, entry := range m.batcher.GetADVEntries() {
+			entry.SetValidation(opts)
 		}
 	}
 
