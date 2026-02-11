@@ -92,7 +92,9 @@ func Flatten(originalFile *File) (*File, error) {
 	sort.Slice(allBatches, func(i int, j int) bool { return allBatches[i].GetBatchNumber() < allBatches[j].GetBatchNumber() })
 
 	for i := range allBatches {
-		allBatches[i].AddToFile(newFile)
+		if err := allBatches[i].AddToFile(newFile); err != nil {
+			return nil, err
+		}
 	}
 
 	if err := newFile.Create(); err != nil {
@@ -208,6 +210,26 @@ func (m mergeableBatcher) AddToFile(file *File) error {
 		return m.batcher.GetEntries()[i].TraceNumber < m.batcher.GetEntries()[j].TraceNumber
 	})
 
+	// Inherit validation options from file if batch doesn't have them
+	if file.GetValidation() != nil {
+		// Use a local interface to access SetValidation
+		type validatable interface {
+			SetValidation(*ValidateOpts)
+		}
+
+		if v, ok := m.batcher.(validatable); ok {
+			v.SetValidation(file.GetValidation())
+
+			// Also set validation on all entries
+			for _, entry := range m.batcher.GetEntries() {
+				entry.SetValidation(file.GetValidation())
+			}
+			for _, entry := range m.batcher.GetADVEntries() {
+				entry.SetValidation(file.GetValidation())
+			}
+		}
+	}
+
 	err := m.batcher.Create()
 	if err != nil {
 		return askForBugReports(fmt.Errorf("mergeableBatcher - AddToFile: %v", err))
@@ -275,6 +297,16 @@ func (m mergeableIATBatch) AddToFile(file *File) error {
 	sort.Slice(m.iatBatch.Entries, func(i, j int) bool {
 		return m.iatBatch.Entries[i].TraceNumber < m.iatBatch.Entries[j].TraceNumber
 	})
+
+	// Inherit validation options from file
+	if file.GetValidation() != nil {
+		m.iatBatch.SetValidation(file.GetValidation())
+
+		// Also set validation on all entries
+		for _, entry := range m.iatBatch.Entries {
+			entry.SetValidation(file.GetValidation())
+		}
+	}
 
 	err := m.iatBatch.Create()
 	if err != nil {
