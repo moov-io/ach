@@ -221,3 +221,124 @@ func TestFlattenFile_ValidateOpts(t *testing.T) {
 	require.NotNil(t, opts)
 	require.True(t, opts.SkipAll)
 }
+
+func TestFlattenFile_PropagatesValidationToBatches(t *testing.T) {
+	// Create a file with multiple WEB batches that have entries with empty IndividualName
+	// This tests that AllowEmptyIndividualName is propagated from file to batches during flatten
+
+	file := NewFile()
+	file.SetHeader(mockFileHeader())
+
+	// Create two batches with the same header (so they'll be flattened together)
+	// but with entries that have empty IndividualName
+	for i := 0; i < 2; i++ {
+		bh := NewBatchHeader()
+		bh.ServiceClassCode = MixedDebitsAndCredits
+		bh.CompanyName = "Test Company"
+		bh.CompanyIdentification = "1234567890"
+		bh.StandardEntryClassCode = WEB
+		bh.CompanyEntryDescription = "Test"
+		bh.ODFIIdentification = "12104288"
+
+		batch, err := NewBatch(bh)
+		require.NoError(t, err)
+
+		// Set validation to allow empty names during batch creation
+		batch.SetValidation(&ValidateOpts{
+			AllowEmptyIndividualName: true,
+		})
+
+		// Add entry with empty IndividualName (only spaces)
+		entry := NewEntryDetail()
+		entry.TransactionCode = CheckingCredit
+		entry.RDFIIdentification = "12345678"
+		entry.CheckDigit = "0"
+		entry.DFIAccountNumber = "123456789"
+		entry.Amount = 100000
+		entry.IndividualName = "                      " // 22 spaces - empty name
+		entry.TraceNumber = fmt.Sprintf("121042880000%03d", i+1)
+		entry.IdentificationNumber = "location1234567"
+
+		batch.AddEntry(entry)
+		require.NoError(t, batch.Create())
+
+		file.AddBatch(batch)
+	}
+
+	require.NoError(t, file.Create())
+
+	// Now set validation on the file and flatten
+	file.SetValidation(&ValidateOpts{
+		AllowEmptyIndividualName: true,
+	})
+
+	// Flatten should succeed because validation is propagated to batches
+	flattenedFile, err := Flatten(file)
+	require.NoError(t, err)
+	require.NotNil(t, flattenedFile)
+
+	// Verify we have one batch (two were merged)
+	require.Equal(t, 1, len(flattenedFile.Batches))
+
+	// Verify the batch has both entries
+	require.Equal(t, 2, len(flattenedFile.Batches[0].GetEntries()))
+
+	// Verify entries still have empty names
+	for _, entry := range flattenedFile.Batches[0].GetEntries() {
+		require.Equal(t, "                      ", entry.IndividualName)
+	}
+
+	// Verify file-level validation was preserved
+	opts := flattenedFile.GetValidation()
+	require.NotNil(t, opts)
+	require.True(t, opts.AllowEmptyIndividualName)
+}
+
+func TestFlattenFile_ValidationPropagationFailsWithoutOpts(t *testing.T) {
+	// This test verifies that without AllowEmptyIndividualName,
+	// flattening batches with empty names will fail
+
+	file := NewFile()
+	file.SetHeader(mockFileHeader())
+
+	// Create batch with empty IndividualName
+	bh := NewBatchHeader()
+	bh.ServiceClassCode = MixedDebitsAndCredits
+	bh.CompanyName = "Test Company"
+	bh.CompanyIdentification = "1234567890"
+	bh.StandardEntryClassCode = WEB
+	bh.CompanyEntryDescription = "Test"
+	bh.ODFIIdentification = "12104288"
+
+	batch, err := NewBatch(bh)
+	require.NoError(t, err)
+
+	// Initially allow empty names to create the batch
+	batch.SetValidation(&ValidateOpts{
+		AllowEmptyIndividualName: true,
+	})
+
+	entry := NewEntryDetail()
+	entry.TransactionCode = CheckingCredit
+	entry.RDFIIdentification = "12345678"
+	entry.CheckDigit = "0"
+	entry.DFIAccountNumber = "123456789"
+	entry.Amount = 100000
+	entry.IndividualName = "                      " // 22 spaces - empty name
+	entry.TraceNumber = "121042880000001"
+	entry.IdentificationNumber = "location1234567"
+
+	batch.AddEntry(entry)
+	require.NoError(t, batch.Create())
+
+	file.AddBatch(batch)
+	require.NoError(t, file.Create())
+
+	// Don't set validation on file (or set it without AllowEmptyIndividualName)
+	file.SetValidation(&ValidateOpts{})
+
+	// Flatten should fail because validation is not allowing empty names
+	_, err = Flatten(file)
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "IndividualName")
+}
