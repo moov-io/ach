@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build examples
-// +build examples
 
 package main
 
