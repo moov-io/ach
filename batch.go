@@ -1239,6 +1239,11 @@ func (b *Batch) upsertOffsets() error {
 	debitED := createOffsetEntryDetail(b.offset, b)
 	debitED.TraceNumber = fmt.Sprintf("%15.15d", lastTraceNumber(b.Entries)+offsetCount)
 	debitED.Amount = b.Control.TotalCreditEntryDollarAmount
+	if len(b.offset.Addenda05) > 0 {
+		debitED.AddendaRecordIndicator = 1
+		debitED.Addenda05 = make([]*Addenda05, len(b.offset.Addenda05))
+		copy(debitED.Addenda05, b.offset.Addenda05)
+	}
 	switch b.offset.AccountType {
 	case OffsetChecking:
 		debitED.TransactionCode = CheckingDebit
@@ -1255,6 +1260,11 @@ func (b *Batch) upsertOffsets() error {
 	creditED := createOffsetEntryDetail(b.offset, b)
 	creditED.TraceNumber = fmt.Sprintf("%15.15d", lastTraceNumber(b.Entries)+offsetCount)
 	creditED.Amount = b.Control.TotalDebitEntryDollarAmount
+	if len(b.offset.Addenda05) > 0 {
+		creditED.AddendaRecordIndicator = 1
+		creditED.Addenda05 = make([]*Addenda05, len(b.offset.Addenda05))
+		copy(creditED.Addenda05, b.offset.Addenda05)
+	}
 	switch b.offset.AccountType {
 	case OffsetChecking:
 		creditED.TransactionCode = CheckingCredit
@@ -1268,12 +1278,12 @@ func (b *Batch) upsertOffsets() error {
 	// Add both EntryDetails to our Batch and recalculate some fields
 	if debitED != nil {
 		b.AddEntry(debitED)
-		b.Control.EntryAddendaCount += 1
+		b.Control.EntryAddendaCount += 1 + debitED.addendaCount()
 		b.Control.TotalDebitEntryDollarAmount += debitED.Amount
 	}
 	if creditED != nil {
 		b.AddEntry(creditED)
-		b.Control.EntryAddendaCount += 1
+		b.Control.EntryAddendaCount += 1 + creditED.addendaCount()
 		b.Control.TotalCreditEntryDollarAmount += creditED.Amount
 	}
 	b.Header.ServiceClassCode = MixedDebitsAndCredits

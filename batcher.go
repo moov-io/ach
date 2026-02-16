@@ -54,12 +54,21 @@ type Batcher interface {
 	SetValidation(*ValidateOpts)
 }
 
-// Offset contains the associated information to append an 'Offset Record' on an ACH batch during Create.
+// Offset contains the fields required to append a balancing EntryDetail to a Batch during Create.
+//
+// After tabulating the amounts and counts a batch with an Offset field populated will create
+// an EntryDetail record that balances the net debit/credit of the file. This is often used to upload
+// balanced files (files whose debit and credit totals match).
+//
+// The EntryDetail offset record will have an IndividualName of "OFFSET" and any existing EntryDetails
+// with an exactly matching IndividualName will be deleted from the file.
 type Offset struct {
 	RoutingNumber string            `json:"routingNumber"`
 	AccountNumber string            `json:"accountNumber"`
 	AccountType   OffsetAccountType `json:"accountType"`
 	Description   string            `json:"description"`
+
+	Addenda05 []*Addenda05 `json:"addenda05"`
 }
 
 type OffsetAccountType string
