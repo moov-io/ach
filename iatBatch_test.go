@@ -1748,7 +1748,7 @@ func testIATBatchAddenda99Count(t testing.TB) {
 	mockBatch.Entries[0].Addenda14 = mockAddenda14()
 	mockBatch.Entries[0].Addenda15 = mockAddenda15()
 	mockBatch.Entries[0].Addenda16 = mockAddenda16()
-	mockBatch.Entries[0].AddAddenda17(mockAddenda17())
+	// Addenda17 and Addenda18 must not be included in IAT return entries
 	mockBatch.Entries[0].Addenda99 = mockIATAddenda99()
 	mockBatch.category = CategoryReturn
 
@@ -1757,7 +1757,6 @@ func testIATBatchAddenda99Count(t testing.TB) {
 	}
 
 	err := mockBatch.Validate()
-	// TODO: are we expecting there to be no errors here?
 	if !base.Match(err, nil) {
 		t.Errorf("%T: %s", err, err)
 	}
@@ -1774,6 +1773,54 @@ func BenchmarkIATBatchAddenda99Count(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		testIATBatchAddenda99Count(b)
+	}
+}
+
+// TestIATBatchReturnAddendaError tests that Addenda17 and Addenda18 are not allowed in IAT return entries
+func TestIATBatchReturnAddendaError(t *testing.T) {
+	tests := []struct {
+		name        string
+		setupEntry  func(*IATEntryDetail)
+		description string
+	}{
+		{
+			name: "Addenda17",
+			setupEntry: func(entry *IATEntryDetail) {
+				entry.AddAddenda17(mockAddenda17())
+			},
+			description: "Addenda17 should not be allowed in IAT return entries",
+		},
+		{
+			name: "Addenda18",
+			setupEntry: func(entry *IATEntryDetail) {
+				entry.AddAddenda18(mockAddenda18())
+			},
+			description: "Addenda18 should not be allowed in IAT return entries",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockBatch := IATBatch{}
+			mockBatch.SetHeader(mockIATReturnBatchHeaderFF())
+			mockBatch.AddEntry(mockIATEntryDetail())
+			mockBatch.GetEntries()[0].Category = CategoryReturn
+			mockBatch.Entries[0].Addenda10 = mockAddenda10()
+			mockBatch.Entries[0].Addenda11 = mockAddenda11()
+			mockBatch.Entries[0].Addenda12 = mockAddenda12()
+			mockBatch.Entries[0].Addenda13 = mockAddenda13()
+			mockBatch.Entries[0].Addenda14 = mockAddenda14()
+			mockBatch.Entries[0].Addenda15 = mockAddenda15()
+			mockBatch.Entries[0].Addenda16 = mockAddenda16()
+			tt.setupEntry(mockBatch.Entries[0])
+			mockBatch.Entries[0].Addenda99 = mockIATAddenda99()
+			mockBatch.category = CategoryReturn
+
+			err := mockBatch.Validate()
+			if !base.Match(err, ErrFieldInclusion) {
+				t.Errorf("%s: %T: %s", tt.description, err, err)
+			}
+		})
 	}
 }
 

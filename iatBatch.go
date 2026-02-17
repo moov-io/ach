@@ -352,6 +352,16 @@ func (iatBatch *IATBatch) isFieldInclusion() error {
 			if err := entry.Addenda99.Validate(); err != nil {
 				return err
 			}
+
+			// IAT Return entries must not include Addenda17 or Addenda18
+			// Per NACHA rules, only Addenda10-16 and Addenda99 are allowed in IAT returns
+			// Including Addenda17/18 in returns will cause Fed rejection with R25 (Addenda error)
+			if len(entry.Addenda17) > 0 {
+				return fieldError("Addenda17", ErrFieldInclusion)
+			}
+			if len(entry.Addenda18) > 0 {
+				return fieldError("Addenda18", ErrFieldInclusion)
+			}
 		}
 	}
 	return iatBatch.Control.Validate()
