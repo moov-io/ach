@@ -22,7 +22,7 @@ builds:
     - -X main.Version={{ .Version }}
     - -X main.Commit={{ .FullCommit }}
     - -X main.Date={{ .Date }}
-    - -X github.com/adamdecaf/aba.Version={{ .Tag }}
+    - -X github.com/moov-io/ach.Version=={{ .Tag }}
 - id: ach
   main: ./cmd/server
   binary: ach
