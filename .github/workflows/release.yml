@@ -29,6 +29,20 @@ jobs:
     - name: Check
       run: make check
 
+  release:
+    name: Testing
+    needs: [testing]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v6
+      with:
+        go-version: stable
+      id: go
+
+    - name: Check out code
+      uses: actions/checkout@v6
+
     - uses: goreleaser/goreleaser-action@v6
       with:
         distribution: goreleaser
@@ -39,7 +53,7 @@ jobs:
 
   webui:
     name: WebUI
-    needs: [testing]
+    needs: [testing, release]
     runs-on: ubuntu-latest
     steps:
     - name: Set up Go 1.x
@@ -61,7 +75,7 @@ jobs:
 
   docker:
     name: Docker
-    needs: [testing]
+    needs: [testing, release]
     runs-on: ubuntu-latest
     steps:
     - name: Set up Go 1.x
