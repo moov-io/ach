@@ -1,6 +1,7 @@
 builds:
 - id: achcli
   main: ./cmd/achcli
+  binary: achcli
   env:
     - CGO_ENABLED=0
     - RELEASE=yes
@@ -24,6 +25,7 @@ builds:
     - -X github.com/adamdecaf/aba.Version={{ .Tag }}
 - id: ach
   main: ./cmd/server
+  binary: ach
   goos:
     - linux
     - darwin

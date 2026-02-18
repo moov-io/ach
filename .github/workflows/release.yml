@@ -30,7 +30,7 @@ jobs:
       run: make check
 
   release:
-    name: Testing
+    name: Release
     needs: [testing]
     runs-on: ubuntu-latest
     steps:
