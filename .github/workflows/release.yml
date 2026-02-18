@@ -39,7 +39,7 @@ jobs:
 
   webui:
     name: WebUI
-    needs: [testing, create_release]
+    needs: [testing]
     runs-on: ubuntu-latest
     steps:
     - name: Set up Go 1.x
@@ -61,7 +61,7 @@ jobs:
 
   docker:
     name: Docker
-    needs: [testing, create_release]
+    needs: [testing]
     runs-on: ubuntu-latest
     steps:
     - name: Set up Go 1.x
