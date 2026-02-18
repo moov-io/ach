@@ -17,6 +17,8 @@
 
 package ach
 
+import "github.com/moov-io/base"
+
 // BatchRCK holds the BatchHeader and BatchControl and all EntryDetail for RCK Entries.
 //
 // Represented Check Entries (RCK). A physical check that was presented but returned because of
@@ -70,6 +72,46 @@ func (batch *BatchRCK) Validate() error {
 	}
 
 	return nil
+}
+
+// ValidateAll checks properties of the ACH batch and returns ALL errors found.
+func (batch *BatchRCK) ValidateAll() base.ErrorList {
+	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
+		return nil
+	}
+
+	var errors base.ErrorList
+
+	if verifyErrs := batch.verifyAll(); verifyErrs != nil {
+		for _, err := range verifyErrs {
+			errors.Add(err)
+		}
+	}
+
+	// Add configuration and type specific validation for this type.
+	if batch.Header.StandardEntryClassCode != RCK {
+		errors.Add(batch.Error("StandardEntryClassCode", ErrBatchSECType, RCK))
+	}
+
+	// RCK detail entries can only be a debit, ServiceClassCode must allow debits
+	switch batch.Header.ServiceClassCode {
+	case CreditsOnly:
+		errors.Add(batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode))
+	}
+
+	// CompanyEntryDescription is required to be REDEPCHECK
+	if batch.Header.CompanyEntryDescription != "REDEPCHECK" {
+		errors.Add(batch.Error("CompanyEntryDescription", ErrBatchCompanyEntryDescriptionREDEPCHECK, batch.Header.CompanyEntryDescription))
+	}
+
+	for _, inv := range batch.InvalidEntries() {
+		errors.Add(inv.Error)
+	}
+
+	if errors.Empty() {
+		return nil
+	}
+	return errors
 }
 
 // InvalidEntries returns entries with validation errors in the batch

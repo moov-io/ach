@@ -17,6 +17,8 @@
 
 package ach
 
+import "github.com/moov-io/base"
+
 // BatchPPD holds the Batch Header and Batch Control and all Entry Records for PPD Entries
 type BatchPPD struct {
 	Batch
@@ -56,6 +58,38 @@ func (batch *BatchPPD) Validate() error {
 	}
 
 	return nil
+}
+
+// ValidateAll checks properties of the ACH batch and returns ALL errors found.
+// Unlike Validate which returns the first error, this method accumulates all validation errors.
+func (batch *BatchPPD) ValidateAll() base.ErrorList {
+	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
+		return nil
+	}
+
+	var errors base.ErrorList
+
+	// basic verification of the batch
+	if verifyErrs := batch.verifyAll(); verifyErrs != nil {
+		for _, err := range verifyErrs {
+			errors.Add(err)
+		}
+	}
+
+	// Add configuration and type specific validation for this type.
+	if batch.Header.StandardEntryClassCode != PPD {
+		errors.Add(batch.Error("StandardEntryClassCode", ErrBatchSECType, PPD))
+	}
+
+	// Collect all invalid entry errors
+	for _, inv := range batch.InvalidEntries() {
+		errors.Add(inv.Error)
+	}
+
+	if errors.Empty() {
+		return nil
+	}
+	return errors
 }
 
 // InvalidEntries returns entries with validation errors in the batch

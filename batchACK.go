@@ -17,6 +17,8 @@
 
 package ach
 
+import "github.com/moov-io/base"
+
 // BatchACK is a batch file that handles SEC payment type ACK and ACK+.
 // Acknowledgement of a Corporate credit by the Receiving Depository Financial Institution (RDFI).
 // For commercial accounts only.
@@ -57,6 +59,34 @@ func (batch *BatchACK) Validate() error {
 	}
 
 	return nil
+}
+
+// ValidateAll checks properties of the ACH batch and returns ALL errors found.
+func (batch *BatchACK) ValidateAll() base.ErrorList {
+	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
+		return nil
+	}
+
+	var errors base.ErrorList
+
+	if verifyErrs := batch.verifyAll(); verifyErrs != nil {
+		for _, err := range verifyErrs {
+			errors.Add(err)
+		}
+	}
+
+	if batch.Header.StandardEntryClassCode != ACK {
+		errors.Add(batch.Error("StandardEntryClassCode", ErrBatchSECType, ACK))
+	}
+
+	for _, inv := range batch.InvalidEntries() {
+		errors.Add(inv.Error)
+	}
+
+	if errors.Empty() {
+		return nil
+	}
+	return errors
 }
 
 // InvalidEntries returns entries with validation errors in the batch

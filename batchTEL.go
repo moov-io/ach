@@ -17,6 +17,8 @@
 
 package ach
 
+import "github.com/moov-io/base"
+
 // BatchTEL is a batch that handles SEC payment type Telephone-Initiated Entries (TEL)
 // Telephone-Initiated Entries (TEL) are consumer debit transactions. The NACHA Operating Rules permit TEL entries when
 // the Originator obtains the Receiver's authorization for the debit entry orally via the telephone.
@@ -56,6 +58,35 @@ func (batch *BatchTEL) Validate() error {
 	}
 
 	return nil
+}
+
+// ValidateAll checks properties of the ACH batch and returns ALL errors found.
+func (batch *BatchTEL) ValidateAll() base.ErrorList {
+	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
+		return nil
+	}
+
+	var errors base.ErrorList
+
+	if verifyErrs := batch.verifyAll(); verifyErrs != nil {
+		for _, err := range verifyErrs {
+			errors.Add(err)
+		}
+	}
+
+	// Add configuration and type specific based validation for this type.
+	if batch.Header.StandardEntryClassCode != TEL {
+		errors.Add(batch.Error("StandardEntryClassCode", ErrBatchSECType, TEL))
+	}
+
+	for _, inv := range batch.InvalidEntries() {
+		errors.Add(inv.Error)
+	}
+
+	if errors.Empty() {
+		return nil
+	}
+	return errors
 }
 
 // InvalidEntries returns entries with validation errors in the batch

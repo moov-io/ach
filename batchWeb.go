@@ -17,6 +17,8 @@
 
 package ach
 
+import "github.com/moov-io/base"
+
 // BatchWEB creates a batch file that handles SEC payment type WEB.
 // Entry submitted pursuant to an authorization obtained solely via the Internet or a wireless network
 // For consumer accounts only.
@@ -54,6 +56,34 @@ func (batch *BatchWEB) Validate() error {
 	}
 
 	return nil
+}
+
+// ValidateAll checks properties of the ACH batch and returns ALL errors found.
+func (batch *BatchWEB) ValidateAll() base.ErrorList {
+	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
+		return nil
+	}
+
+	var errors base.ErrorList
+
+	if verifyErrs := batch.verifyAll(); verifyErrs != nil {
+		for _, err := range verifyErrs {
+			errors.Add(err)
+		}
+	}
+
+	if batch.Header.StandardEntryClassCode != WEB {
+		errors.Add(batch.Error("StandardEntryClassCode", ErrBatchSECType, WEB))
+	}
+
+	for _, inv := range batch.InvalidEntries() {
+		errors.Add(inv.Error)
+	}
+
+	if errors.Empty() {
+		return nil
+	}
+	return errors
 }
 
 // InvalidEntries returns entries with validation errors in the batch
