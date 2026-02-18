@@ -37,6 +37,10 @@ func TestMaskNumber(t *testing.T) {
 		DFIAccountNumber: "12345678",
 	}
 	require.Equal(t, "****5678         ", Number(ed.DFIAccountNumberField()))
+
+	// Test with multi-byte UTF-8 characters
+	require.Equal(t, "**3é4", Number("123é4"))
+	require.Equal(t, "*****5678", Number("12😊345678"))
 }
 
 func TestMaskName(t *testing.T) {

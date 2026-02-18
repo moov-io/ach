@@ -1,7 +1,6 @@
 package mask
 
 import (
-	"bytes"
 	"strings"
 	"unicode/utf8"
 
@@ -9,27 +8,30 @@ import (
 )
 
 func Number(s string) string {
-	length := utf8.RuneCountInString(s)
+	runes := []rune(s)
+	length := len(runes)
 	if length < 5 {
 		return strings.Repeat("*", 5) // too short, we can't show anything
 	}
 
-	out := bytes.Repeat([]byte("*"), length)
+	out := make([]rune, length)
+	for i := range out {
+		out[i] = '*'
+	}
 	var unmaskedDigits int
 	// Since we want the right-most digits unmasked start from the end of our string
 	for i := length - 1; i >= 2; i-- {
-		r := rune(s[i])
-		if r == ' ' {
+		if runes[i] == ' ' {
 			// If the char to our right is masked then mask this left-aligned space as well.
 			if i+1 < length && out[i+1] == '*' {
-				out[i] = byte('*')
+				out[i] = '*'
 			} else {
-				out[i] = byte(' ')
+				out[i] = ' '
 			}
 		} else {
 			if unmaskedDigits < 4 {
 				unmaskedDigits += 1
-				out[i] = byte(r)
+				out[i] = runes[i]
 			}
 		}
 	}
