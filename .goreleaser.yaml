@@ -1,0 +1,44 @@
+builds:
+- id: achcli
+  main: ./cmd/achcli
+  env:
+    - CGO_ENABLED=0
+    - RELEASE=yes
+  goos:
+    - linux
+    - darwin
+    - windows
+  goarch:
+    - amd64
+    - arm64
+  ignore:
+    - goos: windows
+      goarch: arm64
+    - goos: darwin
+      goarch: 386
+  ldflags:
+    - -s -w # strip debug info + DWARF
+    - -X main.Version={{ .Version }}
+    - -X main.Commit={{ .FullCommit }}
+    - -X main.Date={{ .Date }}
+    - -X github.com/adamdecaf/aba.Version={{ .Tag }}
+- id: ach
+  main: ./cmd/server
+  goos:
+    - linux
+    - darwin
+    - windows
+  goarch:
+    - amd64
+    - arm64
+  ignore:
+    - goos: windows
+      goarch: arm64
+    - goos: darwin
+      goarch: 386
+  ldflags:
+    - -s -w # strip debug info + DWARF
+    - -X main.Version={{ .Version }}
+    - -X main.Commit={{ .FullCommit }}
+    - -X main.Date={{ .Date }}
+    - -X github.com/moov-io/ach.Version=={{ .Tag }}

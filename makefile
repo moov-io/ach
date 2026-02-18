@@ -68,15 +68,6 @@ else
 	go test ./client
 endif
 
-dist: clean build
-ifeq ($(OS),Windows_NT)
-	CGO_ENABLED=1 GOOS=windows go build -ldflags "-X github.com/moov-io/ach.Version=${VERSION}" -o bin/achcli.exe github.com/moov-io/ach/cmd/achcli
-	CGO_ENABLED=1 GOOS=windows go build -ldflags "-X github.com/moov-io/ach.Version=${VERSION}" -o bin/ach.exe github.com/moov-io/ach/cmd/server
-else
-	CGO_ENABLED=0 GOOS=$(PLATFORM) go build -ldflags "-X github.com/moov-io/ach.Version=${VERSION}" -o bin/achcli-$(PLATFORM)-amd64 github.com/moov-io/ach/cmd/achcli
-	CGO_ENABLED=0 GOOS=$(PLATFORM) go build -ldflags "-X github.com/moov-io/ach.Version=${VERSION}" -o bin/ach-$(PLATFORM)-amd64 github.com/moov-io/ach/cmd/server
-endif
-
 dist-webui: build-webui
 	git config user.name "moov-bot"
 	git config user.email "oss@moov.io"
