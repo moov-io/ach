@@ -762,6 +762,9 @@ type ValidateOpts struct {
 
 	// SkipFileCreationValidation will skip validation of the FileCreationTime and FileCreationDate fields in a file header
 	SkipFileCreationValidation bool `json:"skipFileCreationValidation"`
+
+	// SkipAllValidationsExceptTotals will skip all validations except checking credit/debit totals and addenda entry counts on file and batch footers
+	SkipAllValidationsExceptTotals bool `json:"skipAllValidationsExceptTotals"`
 }
 
 // merge will combine two ValidateOpts structs and keep any non-zero field values.
@@ -796,6 +799,7 @@ func (v *ValidateOpts) merge(other *ValidateOpts) *ValidateOpts {
 		AllowEmptyIndividualName:         v.AllowEmptyIndividualName || other.AllowEmptyIndividualName,
 		BypassBatchValidation:            v.BypassBatchValidation || other.BypassBatchValidation,
 		SkipFileCreationValidation:       v.SkipFileCreationValidation || other.SkipFileCreationValidation,
+		SkipAllValidationsExceptTotals:   v.SkipAllValidationsExceptTotals || other.SkipAllValidationsExceptTotals,
 	}
 
 	if v.CheckTransactionCode != nil {
@@ -819,6 +823,23 @@ func (v *ValidateOpts) merge(other *ValidateOpts) *ValidateOpts {
 func (f *File) ValidateWith(opts *ValidateOpts) error {
 	if opts == nil {
 		opts = &ValidateOpts{}
+	}
+
+	if opts.SkipAllValidationsExceptTotals {
+		if err := f.isEntryAddendaCount(false); err != nil {
+			return err
+		}
+		if err := f.isFileAmount(false); err != nil {
+			return err
+		}
+		if err := f.isEntryHash(false); err != nil {
+			return err
+		}
+		for _, b := range f.Batches {
+			if err := b.Validate(); err != nil {
+				return err
+			}
+		}
 	}
 
 	if opts.SkipAll {

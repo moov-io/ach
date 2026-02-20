@@ -2330,3 +2330,47 @@ func TestFile_BypassBatchValidation(t *testing.T) {
 	})
 	require.Error(t, err)
 }
+
+func TestFile_SkipAllValidationsExceptTotals(t *testing.T) {
+	file := mockFilePPD(t)
+	
+	// Invalidate the file header to trigger a header validation error
+	file.Header.ImmediateOrigin = "invalid"
+
+	// Should skip header validation, but still check totals
+	file.Control.TotalCreditEntryDollarAmountInFile = 123 // incorrect total
+
+	err := file.ValidateWith(&ValidateOpts{
+		SkipAllValidationsExceptTotals: true,
+	})
+	require.ErrorContains(t, err, "TotalCreditEntryDollarAmountInFile")
+
+	// Now fix the totals, but leave the header invalid
+	file.Control.TotalCreditEntryDollarAmountInFile = 100000000 // correct total
+
+	err = file.ValidateWith(&ValidateOpts{
+		SkipAllValidationsExceptTotals: true,
+	})
+	require.NoError(t, err)
+}
+
+func TestFile_SkipAllValidationsExceptTotals_BatchTotals(t *testing.T) {
+	file := mockFilePPD(t)
+	batch := file.Batches[0]
+	control := batch.GetControl()
+	// Invalidate batch control total
+	control.TotalCreditEntryDollarAmount = 999
+
+	err := file.ValidateWith(&ValidateOpts{
+		SkipAllValidationsExceptTotals: true,
+	})
+	require.ErrorContains(t, err, "TotalCreditEntryDollarAmount")
+
+	// Fix the batch control total
+	control.TotalCreditEntryDollarAmount = 100000000
+
+	err = file.ValidateWith(&ValidateOpts{
+		SkipAllValidationsExceptTotals: true,
+	})
+	require.NoError(t, err)
+}

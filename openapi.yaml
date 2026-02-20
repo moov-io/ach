@@ -89,6 +89,7 @@ paths:
         - $ref: "#/components/parameters/PreserveSpaces"
         - $ref: "#/components/parameters/RequireABAOrigin"
         - $ref: "#/components/parameters/SkipFileCreationValidation"
+        - $ref: "#/components/parameters/SkipAllValidationsExceptTotals"
         - $ref: "#/components/parameters/UnequalAddendaCounts"
         - $ref: "#/components/parameters/UnequalServiceClassCode"
         - $ref: "#/components/parameters/UnorderedBatchNumbers"
@@ -223,6 +224,7 @@ paths:
         - $ref: "#/components/parameters/PreserveSpaces"
         - $ref: "#/components/parameters/RequireABAOrigin"
         - $ref: "#/components/parameters/SkipFileCreationValidation"
+        - $ref: "#/components/parameters/SkipAllValidationsExceptTotals"
         - $ref: "#/components/parameters/UnequalAddendaCounts"
         - $ref: "#/components/parameters/UnequalServiceClassCode"
         - $ref: "#/components/parameters/UnorderedBatchNumbers"
@@ -338,6 +340,7 @@ paths:
       - $ref: "#/components/parameters/PreserveSpaces"
       - $ref: "#/components/parameters/RequireABAOrigin"
       - $ref: "#/components/parameters/SkipFileCreationValidation"
+      - $ref: "#/components/parameters/SkipAllValidationsExceptTotals"
       - $ref: "#/components/parameters/UnequalAddendaCounts"
       - $ref: "#/components/parameters/UnequalServiceClassCode"
       - $ref: "#/components/parameters/UnorderedBatchNumbers"
@@ -891,6 +894,12 @@ components:
       name: skipFileCreationValidation
       in: query
       description: Optional parameter to skip validation of the FileCreationTime and FileCreationDate fields in a file header
+      schema:
+        type: boolean
+    SkipAllValidationsExceptTotals:
+      name: skipAllValidationsExceptTotals
+      in: query
+      description: Optional parameter to skip all validations except checking credit/debit totals and addenda entry counts on file and batch footers
       schema:
         type: boolean
   schemas:

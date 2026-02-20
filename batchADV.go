@@ -43,6 +43,17 @@ func (batch *BatchADV) Validate() error {
 	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
 		return nil
 	}
+	if batch.validateOpts != nil && batch.validateOpts.SkipAllValidationsExceptTotals {
+		err := batch.isBatchEntryCount()
+		if err != nil {
+			return err
+		}
+		err = batch.isBatchAmount()
+		if err != nil {
+			return err
+		}
+		return nil
+	}
 
 	if batch.Header.StandardEntryClassCode != ADV {
 		return batch.Error("StandardEntryClassCode", ErrBatchSECType, ADV)

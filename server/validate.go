@@ -53,6 +53,7 @@ const (
 	allowEmptyIndividualName         = "allowEmptyIndividualName"
 	bypassBatchValidation            = "bypassBatchValidation"
 	skipFileCreationValidation       = "skipFileCreationValidation"
+	skipAllValidationsExceptTotals   = "skipAllValidationsExceptTotals"
 )
 
 // readValidateOpts parses ValidateOpts from the URL query parameters and from the request body.
@@ -85,6 +86,7 @@ func readValidateOpts(request *http.Request) (io.ReadCloser, *ach.ValidateOpts, 
 		allowEmptyIndividualName,
 		bypassBatchValidation,
 		skipFileCreationValidation,
+		skipAllValidationsExceptTotals,
 	}
 
 	var buf bytes.Buffer
@@ -152,6 +154,8 @@ func readValidateOpts(request *http.Request) (io.ReadCloser, *ach.ValidateOpts, 
 			opts.BypassBatchValidation = yes
 		case skipFileCreationValidation:
 			opts.SkipFileCreationValidation = yes
+		case skipAllValidationsExceptTotals:
+			opts.SkipAllValidationsExceptTotals = yes
 		}
 	}
 

@@ -56,6 +56,17 @@ func (batch *BatchBOC) Validate() error {
 	if batch.validateOpts != nil && (batch.validateOpts.SkipAll || batch.validateOpts.BypassBatchValidation) {
 		return nil
 	}
+	if batch.validateOpts != nil && batch.validateOpts.SkipAllValidationsExceptTotals {
+		err := batch.isBatchEntryCount()
+		if err != nil {
+			return err
+		}
+		err = batch.isBatchAmount()
+		if err != nil {
+			return err
+		}
+		return nil
+	}
 
 	// basic verification of the batch before we validate specific rules.
 	if err := batch.verify(); err != nil {
