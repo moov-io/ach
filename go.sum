@@ -47,6 +47,8 @@ github.com/mattn/go-isatty v0.0.20 h1:xfD0iDuEKnDkl03q4limB+vH+GxLEtL/jb4xVJSWWE
 github.com/mattn/go-isatty v0.0.20/go.mod h1:W+V8PltTTMOvKvAeJH7IuucS94S2C6jfK/D7dTCTo3Y=
 github.com/moov-io/base v0.61.0 h1:CAAWAewgq0zCESnKUne/1YGtYfvxYxr7vLUKa21hOVk=
 github.com/moov-io/base v0.61.0/go.mod h1:ARSrOTripCz/nWDFUhSU8mRhySB3oEwqdhv/DanHzTA=
+github.com/moov-io/base v0.61.1 h1:aEGG5CIzTWxj7TrsvGyfv6kNdQtI9aMi1Pd36BkVroU=
+github.com/moov-io/base v0.61.1/go.mod h1:ktS09E9ss56kvpW7wv1yLtUtLmQ1aHgn9XZ2a0U5kRI=
 github.com/moov-io/iso3166 v0.4.0 h1:WtXIptANC16DrHpbSAt4+itFciCCnA+C6eAi9k7HEsA=
 github.com/moov-io/iso3166 v0.4.0/go.mod h1:13ubAoOZNfWzs2fN3x467zg8q982U867Ee+ulqrArlM=
 github.com/moov-io/iso4217 v0.3.2 h1:/PNKwvt0LCaDx3r5cQEjIdX6a7PEELWJ8D5thi2jiHU=
