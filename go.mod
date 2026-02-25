@@ -1,6 +1,6 @@
 module github.com/moov-io/ach
 
-go 1.24.0
+go 1.25.0
 
 toolchain go1.26.0
 
@@ -17,7 +17,7 @@ require (
 	github.com/moov-io/iso4217 v0.3.2
 	github.com/prometheus/client_golang v1.23.2
 	github.com/stretchr/testify v1.11.1
-	golang.org/x/net v0.50.0
+	golang.org/x/net v0.51.0
 	golang.org/x/sync v0.19.0
 	golang.org/x/text v0.34.0
 )
