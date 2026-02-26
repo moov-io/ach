@@ -301,6 +301,22 @@ func (batch *Batch) Validate() error {
 	return errors.New("use an implementation of batch or NewBatch")
 }
 
+// ValidateTotals performs checks on the dollar and entry addenda totals of the batch
+// ValidateTotals will never modify the Batch.
+//
+// The first error encountered is returned.
+func (batch *Batch) ValidateTotals() error {
+	err := batch.isBatchEntryCount()
+	if err != nil {
+		return err
+	}
+	err = batch.isBatchAmount()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // SetValidation stores ValidateOpts on the Batch which are to be used to override
 // the default NACHA validation rules.
 func (batch *Batch) SetValidation(opts *ValidateOpts) {

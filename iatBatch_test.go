@@ -2179,3 +2179,82 @@ func TestIATBatch_DeleteEntries(t *testing.T) {
 	require.Len(t, mockBatch.Entries, 1)
 	require.Equal(t, "1", mockBatch.Entries[0].TraceNumber)
 }
+
+// TestIATBatch_ValidateTotals tests the ValidateTotals method
+func TestIATBatch_ValidateTotals(t *testing.T) {
+	t.Run("valid IAT batch", func(t *testing.T) {
+		batch := mockIATBatch(t)
+		err := batch.ValidateTotals()
+		require.NoError(t, err)
+	})
+
+	t.Run("valid IAT batch with multiple entries", func(t *testing.T) {
+		batch := mockIATBatchManyEntries(t)
+		err := batch.ValidateTotals()
+		require.NoError(t, err)
+	})
+
+	t.Run("entry count mismatch", func(t *testing.T) {
+		batch := mockIATBatch(t)
+		// Corrupt the entry count in control record
+		batch.Control.EntryAddendaCount = 999
+
+		err := batch.ValidateTotals()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "EntryAddendaCount")
+	})
+
+	t.Run("debit amount mismatch", func(t *testing.T) {
+		batch := mockIATBatch(t)
+		// Corrupt the debit amount in control record
+		batch.Control.TotalDebitEntryDollarAmount = 999999
+
+		err := batch.ValidateTotals()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "TotalDebitEntryDollarAmount")
+	})
+
+	t.Run("credit amount mismatch", func(t *testing.T) {
+		batch := mockIATBatch(t)
+		// Change entry to credit and corrupt credit amount
+		batch.Entries[0].TransactionCode = CheckingCredit
+		batch.Control.TotalCreditEntryDollarAmount = 999999
+
+		err := batch.ValidateTotals()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "TotalCreditEntryDollarAmount")
+	})
+
+	t.Run("batch with zero amounts", func(t *testing.T) {
+		batch := IATBatch{}
+		batch.SetHeader(mockIATBatchHeaderFF())
+
+		// Add entry with zero amount
+		entry := mockIATEntryDetail()
+		entry.Amount = 0
+		entry.Addenda10 = mockAddenda10()
+		entry.Addenda11 = mockAddenda11()
+		entry.Addenda12 = mockAddenda12()
+		entry.Addenda13 = mockAddenda13()
+		entry.Addenda14 = mockAddenda14()
+		entry.Addenda15 = mockAddenda15()
+		entry.Addenda16 = mockAddenda16()
+		batch.AddEntry(entry)
+
+		require.NoError(t, batch.build())
+
+		err := batch.ValidateTotals()
+		require.NoError(t, err)
+	})
+
+	t.Run("multiple entries with amount mismatch", func(t *testing.T) {
+		batch := mockIATBatchManyEntries(t)
+		// Corrupt one of the entry amounts but don't update control
+		originalAmount := batch.Entries[0].Amount
+		batch.Entries[0].Amount = originalAmount + 100000
+
+		err := batch.ValidateTotals()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "TotalCreditEntryDollarAmount")
+	})
+}
