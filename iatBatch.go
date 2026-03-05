@@ -684,12 +684,10 @@ func (iatBatch *IATBatch) Validate() error {
 //
 // The first error encountered is returned.
 func (batch *IATBatch) ValidateTotals() error {
-	_, err := batch.isBatchEntryCount()
-	if err != nil {
+	if _, err := batch.isBatchEntryCount(); err != nil {
 		return err
 	}
-	err = batch.isBatchAmount()
-	if err != nil {
+	if err := batch.isBatchAmount(); err != nil {
 		return err
 	}
 	return nil

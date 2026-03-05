@@ -306,12 +306,10 @@ func (batch *Batch) Validate() error {
 //
 // The first error encountered is returned.
 func (batch *Batch) ValidateTotals() error {
-	err := batch.isBatchEntryCount()
-	if err != nil {
+	if err := batch.isBatchEntryCount(); err != nil {
 		return err
 	}
-	err = batch.isBatchAmount()
-	if err != nil {
+	if err := batch.isBatchAmount(); err != nil {
 		return err
 	}
 	return nil

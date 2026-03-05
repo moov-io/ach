@@ -889,13 +889,14 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 //
 // The first error encountered is returned.
 func (f *File) ValidateTotals() error {
-	if err := f.isEntryAddendaCount(false); err != nil {
+	isADV := f.IsADV()
+	if err := f.isEntryAddendaCount(isADV); err != nil {
 		return err
 	}
-	if err := f.isFileAmount(false); err != nil {
+	if err := f.isFileAmount(isADV); err != nil {
 		return err
 	}
-	if err := f.isEntryHash(false); err != nil {
+	if err := f.isEntryHash(isADV); err != nil {
 		return err
 	}
 	for _, b := range f.Batches {
