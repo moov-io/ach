@@ -679,6 +679,22 @@ func (iatBatch *IATBatch) Validate() error {
 	return nil
 }
 
+// ValidateTotals performs checks on the dollar and entry addenda totals of the batch
+// ValidateTotals will never modify the Batch.
+//
+// The first error encountered is returned.
+func (batch *IATBatch) ValidateTotals() error {
+	_, err := batch.isBatchEntryCount()
+	if err != nil {
+		return err
+	}
+	err = batch.isBatchAmount()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // SetValidation stores ValidateOpts on the Batch which are to be used to override
 // the default NACHA validation rules.
 func (iatBatch *IATBatch) SetValidation(opts *ValidateOpts) {

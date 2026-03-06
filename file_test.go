@@ -2330,3 +2330,160 @@ func TestFile_BypassBatchValidation(t *testing.T) {
 	})
 	require.Error(t, err)
 }
+
+// TestFile_ValidateTotals tests the ValidateTotals method
+func TestFile_ValidateTotals(t *testing.T) {
+	t.Run("valid file with PPD batch", func(t *testing.T) {
+		file := mockFilePPD(t)
+		err := file.ValidateTotals()
+		require.NoError(t, err)
+	})
+
+	t.Run("valid file with IAT batch", func(t *testing.T) {
+		file := NewFile()
+		file.SetHeader(mockFileHeader())
+		iatBatch := mockIATBatch(t)
+		file.AddIATBatch(iatBatch)
+		require.NoError(t, file.Create())
+
+		err := file.ValidateTotals()
+		require.NoError(t, err)
+	})
+
+	t.Run("valid file with both PPD and IAT batches", func(t *testing.T) {
+		file := mockFilePPD(t)
+		iatBatch := mockIATBatch(t)
+		file.AddIATBatch(iatBatch)
+		require.NoError(t, file.Create())
+
+		err := file.ValidateTotals()
+		require.NoError(t, err)
+	})
+
+	t.Run("file entry addenda count error", func(t *testing.T) {
+		file := mockFilePPD(t)
+		// Corrupt the entry addenda count
+		file.Control.EntryAddendaCount = 999
+
+		err := file.ValidateTotals()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "EntryAddendaCount")
+	})
+
+	t.Run("file amount error", func(t *testing.T) {
+		file := mockFilePPD(t)
+		// Corrupt the total debit amount
+		file.Control.TotalDebitEntryDollarAmountInFile = 999999
+
+		err := file.ValidateTotals()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "TotalDebitEntryDollarAmountInFile")
+	})
+
+	t.Run("file entry hash error", func(t *testing.T) {
+		file := mockFilePPD(t)
+		// Corrupt the entry hash
+		file.Control.EntryHash = 999999999
+
+		err := file.ValidateTotals()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "EntryHash")
+	})
+
+	t.Run("batch ValidateTotals error", func(t *testing.T) {
+		file := mockFilePPD(t)
+		// Corrupt the batch entry count to trigger batch ValidateTotals error
+		file.Batches[0].GetControl().EntryAddendaCount = 999
+
+		err := file.ValidateTotals()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "EntryAddendaCount")
+	})
+
+	t.Run("IAT batch ValidateTotals error", func(t *testing.T) {
+		file := NewFile()
+		file.SetHeader(mockFileHeader())
+		iatBatch := mockIATBatch(t)
+		file.AddIATBatch(iatBatch)
+		require.NoError(t, file.Create())
+
+		// Corrupt the IAT batch entry count to trigger IAT batch ValidateTotals error
+		file.IATBatches[0].GetControl().EntryAddendaCount = 999
+
+		err := file.ValidateTotals()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "EntryAddendaCount")
+	})
+
+	t.Run("multiple batches with one invalid", func(t *testing.T) {
+		file := mockFilePPD(t)
+		// Add another valid batch
+		file.AddBatch(mockBatchPPD(t))
+		require.NoError(t, file.Create())
+
+		// Corrupt the second batch
+		file.Batches[1].GetControl().EntryAddendaCount = 999
+
+		err := file.ValidateTotals()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "EntryAddendaCount")
+	})
+
+	t.Run("empty file", func(t *testing.T) {
+		file := NewFile()
+		file.SetHeader(mockFileHeader())
+		file.Control = mockFileControl()
+		file.Control.EntryAddendaCount = 0
+		file.Control.TotalCreditEntryDollarAmountInFile = 0
+		file.Control.TotalDebitEntryDollarAmountInFile = 0
+		file.Control.EntryHash = 0
+		file.Control.BatchCount = 0
+
+		err := file.ValidateTotals()
+		require.NoError(t, err)
+	})
+
+	t.Run("file with zero amounts", func(t *testing.T) {
+		file := NewFile()
+		file.SetHeader(mockFileHeader())
+
+		// Create a batch with zero amounts
+		bh := mockBatchPPDHeader()
+		batch := NewBatchPPD(bh)
+		entry := mockPPDEntryDetail()
+		entry.Amount = 0
+		batch.AddEntry(entry)
+		batch.GetControl().EntryAddendaCount = 1
+		file.AddBatch(batch)
+		require.NoError(t, file.Create())
+
+		err := file.ValidateTotals()
+		require.NoError(t, err)
+	})
+}
+
+// TestFile_ValidateTotals_FileControlErrors tests specific file control validation errors
+func TestFile_ValidateTotals_FileControlErrors(t *testing.T) {
+	t.Run("credit amount mismatch", func(t *testing.T) {
+		file := mockFilePPD(t)
+		// Change entry to credit and corrupt file control credit amount
+		file.Batches[0].GetEntries()[0].TransactionCode = CheckingCredit
+		file.Batches[0].GetEntries()[0].Amount = 100000
+		require.NoError(t, file.Create())
+		file.Control.TotalCreditEntryDollarAmountInFile = 999999
+
+		err := file.ValidateTotals()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "TotalCreditEntryDollarAmountInFile")
+	})
+
+	t.Run("batch count mismatch", func(t *testing.T) {
+		file := mockFilePPD(t)
+		// Add another batch but don't update file control
+		file.AddBatch(mockBatchPPD(t))
+		file.Control.BatchCount = 1 // Should be 2
+
+		err := file.ValidateTotals()
+		require.Error(t, err)
+	})
+}

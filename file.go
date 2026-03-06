@@ -884,6 +884,33 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 	return f.isEntryHash(true)
 }
 
+// ValidateTotals performs checks on the dollar and entry addenda totals of the file and its contained batches
+// ValidateTotals will never modify the File.
+//
+// The first error encountered is returned.
+func (f *File) ValidateTotals() error {
+	if err := f.isEntryAddendaCount(false); err != nil {
+		return err
+	}
+	if err := f.isFileAmount(false); err != nil {
+		return err
+	}
+	if err := f.isEntryHash(false); err != nil {
+		return err
+	}
+	for _, b := range f.Batches {
+		if err := b.ValidateTotals(); err != nil {
+			return err
+		}
+	}
+	for _, b := range f.IATBatches {
+		if err := b.ValidateTotals(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // isEntryAddendaCount is prepared by hashing the RDFI's 8-digit Routing Number in each entry.
 // The Entry Hash provides a check against inadvertent alteration of data
 func (f *File) isEntryAddendaCount(IsADV bool) error {
