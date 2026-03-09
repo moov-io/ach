@@ -888,6 +888,9 @@ func (f *File) ValidateTotals() error {
 	if err := f.isEntryHash(isADV); err != nil {
 		return err
 	}
+	if err := f.isBlockCount(isADV); err != nil {
+		return err
+	}
 	for _, b := range f.Batches {
 		if err := b.ValidateTotals(); err != nil {
 			return err
