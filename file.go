@@ -904,6 +904,7 @@ func (f *File) ValidateTotals() error {
 	return f.isBatchCount(isADV)
 }
 
+// isBlockCount validates that the block count is equal to the number of blocks in the file
 func (f *File) isBlockCount(IsADV bool) error {
 	var numLines int
 	var blockCount int
@@ -921,6 +922,7 @@ func (f *File) isBlockCount(IsADV bool) error {
 	return nil
 }
 
+// isBatchCount validates that the batch count is equal to the number of batches in the file
 func (f *File) isBatchCount(IsADV bool) error {
 	var batchCount int
 	if IsADV {
