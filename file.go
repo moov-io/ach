@@ -911,7 +911,7 @@ func (f *File) isBlockCount(IsADV bool) error {
 		numLines = f.Control.LineNumber
 		blockCount = f.Control.BlockCount
 	}
-	calculatedBlockCount := numLines / 10
+	calculatedBlockCount := 1 + numLines/10
 	if calculatedBlockCount != blockCount {
 		return NewErrFileCalculatedControlEquality("BlockCount", calculatedBlockCount, blockCount)
 	}

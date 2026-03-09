@@ -2487,3 +2487,81 @@ func TestFile_ValidateTotals_FileControlErrors(t *testing.T) {
 		require.Error(t, err)
 	})
 }
+
+func TestFile_isBlockCount(t *testing.T) {
+	t.Run("valid block count non-ADV", func(t *testing.T) {
+		file := mockFilePPD(t)
+		err := file.isBlockCount(false)
+		require.NoError(t, err)
+	})
+
+	t.Run("invalid block count non-ADV", func(t *testing.T) {
+		file := mockFilePPD(t)
+		file.Control.BlockCount = 999
+		err := file.isBlockCount(false)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "BlockCount")
+	})
+
+	t.Run("valid block count ADV", func(t *testing.T) {
+		file := mockFileADV(t)
+		err := file.isBlockCount(true)
+		require.NoError(t, err)
+	})
+
+	t.Run("invalid block count ADV", func(t *testing.T) {
+		file := mockFileADV(t)
+		file.ADVControl.BlockCount = 999
+		err := file.isBlockCount(true)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "BlockCount")
+	})
+}
+
+func TestFile_isBatchCount(t *testing.T) {
+	t.Run("valid batch count non-ADV", func(t *testing.T) {
+		file := mockFilePPD(t)
+		err := file.isBatchCount(false)
+		require.NoError(t, err)
+	})
+
+	t.Run("invalid batch count non-ADV", func(t *testing.T) {
+		file := mockFilePPD(t)
+		file.Control.BatchCount = 999
+		err := file.isBatchCount(false)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "BatchCount")
+	})
+
+	t.Run("valid batch count ADV", func(t *testing.T) {
+		file := mockFileADV(t)
+		err := file.isBatchCount(true)
+		require.NoError(t, err)
+	})
+
+	t.Run("invalid batch count ADV", func(t *testing.T) {
+		file := mockFileADV(t)
+		file.ADVControl.BatchCount = 999
+		err := file.isBatchCount(true)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "BatchCount")
+	})
+
+	t.Run("multiple batches", func(t *testing.T) {
+		file := mockFilePPD(t)
+		file.AddBatch(mockBatchPPD(t))
+		require.NoError(t, file.Create())
+
+		err := file.isBatchCount(false)
+		require.NoError(t, err)
+	})
+
+	t.Run("with IAT batches", func(t *testing.T) {
+		file := mockFilePPD(t)
+		file.AddIATBatch(mockIATBatch(t))
+		require.NoError(t, file.Create())
+
+		err := file.isBatchCount(false)
+		require.NoError(t, err)
+	})
+}
