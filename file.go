@@ -850,18 +850,12 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 				return err
 			}
 		}
-		if err := f.isEntryAddendaCount(false); err != nil {
-			return err
-		}
-		if err := f.isFileAmount(false); err != nil {
-			return err
-		}
 		if !opts.AllowUnorderedBatchNumbers {
 			if err := f.isSequenceAscending(); err != nil {
 				return err
 			}
 		}
-		return f.isEntryHash(false)
+		return f.ValidateTotals()
 	}
 
 	// File contains ADV batches BatchADV
@@ -875,17 +869,12 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 			return err
 		}
 	}
-	if err := f.isEntryAddendaCount(true); err != nil {
-		return err
-	}
-	if err := f.isFileAmount(true); err != nil {
-		return err
-	}
-	return f.isEntryHash(true)
+	return f.ValidateTotals()
 }
 
-// ValidateTotals performs checks on the dollar and entry addenda totals of the file and its contained batches
-// ValidateTotals will never modify the File.
+// ValidateTotals performs checks on: 1.File entry addenda counts 2. File credit/debit totals 3. File entry hash 4. File batch count
+// ValidateTotals will also call the ValidateTotals function on all contained batches
+// ValidateTotals will never modify the File or contained Batches.
 //
 // The first error encountered is returned.
 func (f *File) ValidateTotals() error {
@@ -908,6 +897,37 @@ func (f *File) ValidateTotals() error {
 		if err := b.ValidateTotals(); err != nil {
 			return err
 		}
+	}
+	return f.isBatchCount(isADV)
+}
+
+func (f *File) isBlockCount(IsADV bool) error {
+	var numLines int
+	var blockCount int
+	if IsADV {
+		numLines = f.ADVControl.LineNumber
+		blockCount = f.ADVControl.BlockCount
+	} else {
+		numLines = f.Control.LineNumber
+		blockCount = f.Control.BlockCount
+	}
+	calculatedBlockCount := numLines / 10
+	if calculatedBlockCount != blockCount {
+		return NewErrFileCalculatedControlEquality("BlockCount", calculatedBlockCount, blockCount)
+	}
+	return nil
+}
+
+func (f *File) isBatchCount(IsADV bool) error {
+	var batchCount int
+	if IsADV {
+		batchCount = f.ADVControl.BatchCount
+	} else {
+		batchCount = f.Control.BatchCount
+	}
+	calculatedBatchCount := len(f.Batches) + len(f.IATBatches)
+	if calculatedBatchCount != batchCount {
+		return NewErrFileCalculatedControlEquality("BatchCount", calculatedBatchCount, batchCount)
 	}
 	return nil
 }

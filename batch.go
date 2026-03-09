@@ -301,7 +301,7 @@ func (batch *Batch) Validate() error {
 	return errors.New("use an implementation of batch or NewBatch")
 }
 
-// ValidateTotals performs checks on the dollar and entry addenda totals of the batch
+// ValidateTotals performs checks on: 1. Batch entry count 2. Batch credit/debit totals of the 3. Batch entry hash
 // ValidateTotals will never modify the Batch.
 //
 // The first error encountered is returned.
@@ -310,6 +310,9 @@ func (batch *Batch) ValidateTotals() error {
 		return err
 	}
 	if err := batch.isBatchAmount(); err != nil {
+		return err
+	}
+	if err := batch.isEntryHash(); err != nil {
 		return err
 	}
 	return nil
@@ -386,18 +389,12 @@ func (batch *Batch) verify() error {
 		}
 	}
 
-	if err := batch.isBatchEntryCount(); err != nil {
-		return err
-	}
 	if batch.validateOpts == nil || !batch.validateOpts.CustomTraceNumbers {
 		if err := batch.isSequenceAscending(); err != nil {
 			return err
 		}
 	}
-	if err := batch.isBatchAmount(); err != nil {
-		return err
-	}
-	if err := batch.isEntryHash(); err != nil {
+	if err := batch.ValidateTotals(); err != nil {
 		return err
 	}
 	if err := batch.isOriginatorDNE(); err != nil {
