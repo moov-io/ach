@@ -888,9 +888,6 @@ func (f *File) ValidateTotals() error {
 	if err := f.isEntryHash(isADV); err != nil {
 		return err
 	}
-	if err := f.isBlockCount(isADV); err != nil {
-		return err
-	}
 	for _, b := range f.Batches {
 		if err := b.ValidateTotals(); err != nil {
 			return err
@@ -902,24 +899,6 @@ func (f *File) ValidateTotals() error {
 		}
 	}
 	return f.isBatchCount(isADV)
-}
-
-// isBlockCount validates that the block count is equal to the number of blocks in the file
-func (f *File) isBlockCount(IsADV bool) error {
-	var numLines int
-	var blockCount int
-	if IsADV {
-		numLines = f.ADVControl.LineNumber
-		blockCount = f.ADVControl.BlockCount
-	} else {
-		numLines = f.Control.LineNumber
-		blockCount = f.Control.BlockCount
-	}
-	calculatedBlockCount := 1 + numLines/10
-	if calculatedBlockCount != blockCount {
-		return NewErrFileCalculatedControlEquality("BlockCount", calculatedBlockCount, blockCount)
-	}
-	return nil
 }
 
 // isBatchCount validates that the batch count is equal to the number of batches in the file

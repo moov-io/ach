@@ -388,14 +388,13 @@ func (batch *Batch) verify() error {
 				NewErrBatchHeaderControlEquality(batch.Header.BatchNumber, batch.ADVControl.BatchNumber))
 		}
 	}
-
+	if err := batch.ValidateTotals(); err != nil {
+		return err
+	}
 	if batch.validateOpts == nil || !batch.validateOpts.CustomTraceNumbers {
 		if err := batch.isSequenceAscending(); err != nil {
 			return err
 		}
-	}
-	if err := batch.ValidateTotals(); err != nil {
-		return err
 	}
 	if err := batch.isOriginatorDNE(); err != nil {
 		return err

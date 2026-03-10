@@ -426,6 +426,8 @@ func testBatchIsSequenceAscending(t testing.TB) {
 	e3.TraceNumber = "1"
 	mockBatch.AddEntry(e3)
 	mockBatch.GetControl().EntryAddendaCount = 2
+	mockBatch.GetControl().TotalCreditEntryDollarAmount, mockBatch.GetControl().TotalDebitEntryDollarAmount = mockBatch.calculateBatchAmounts()
+	mockBatch.GetControl().EntryHash = mockBatch.calculateEntryHash()
 	err := mockBatch.verify()
 	if !base.Match(err, NewErrBatchAscending(121042880000001, 1)) {
 		t.Errorf("%T: %s", err, err)

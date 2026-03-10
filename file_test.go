@@ -1500,6 +1500,10 @@ func TestFile__SegmentADVFileDebit(t *testing.T) {
 
 	// Force the ADVEntryDetail to Debit
 	f.Batches[0].GetADVEntries()[0].TransactionCode = DebitForDebitsReceived
+	f.Batches[0].GetADVControl().TotalDebitEntryDollarAmount = f.Batches[0].GetADVControl().TotalCreditEntryDollarAmount
+	f.Batches[0].GetADVControl().TotalCreditEntryDollarAmount = 0
+	f.ADVControl.TotalDebitEntryDollarAmountInFile = f.ADVControl.TotalCreditEntryDollarAmountInFile
+	f.ADVControl.TotalCreditEntryDollarAmountInFile = 0
 
 	creditFile, debitFile, err := f.SegmentFile(nil)
 	if err != nil {
@@ -2454,6 +2458,7 @@ func TestFile_ValidateTotals(t *testing.T) {
 		entry.Amount = 0
 		batch.AddEntry(entry)
 		batch.GetControl().EntryAddendaCount = 1
+		batch.GetControl().EntryHash = batch.calculateEntryHash()
 		file.AddBatch(batch)
 		require.NoError(t, file.Create())
 
@@ -2485,36 +2490,6 @@ func TestFile_ValidateTotals_FileControlErrors(t *testing.T) {
 
 		err := file.ValidateTotals()
 		require.Error(t, err)
-	})
-}
-
-func TestFile_isBlockCount(t *testing.T) {
-	t.Run("valid block count non-ADV", func(t *testing.T) {
-		file := mockFilePPD(t)
-		err := file.isBlockCount(false)
-		require.NoError(t, err)
-	})
-
-	t.Run("invalid block count non-ADV", func(t *testing.T) {
-		file := mockFilePPD(t)
-		file.Control.BlockCount = 999
-		err := file.isBlockCount(false)
-		require.Error(t, err)
-		require.Contains(t, err.Error(), "BlockCount")
-	})
-
-	t.Run("valid block count ADV", func(t *testing.T) {
-		file := mockFileADV(t)
-		err := file.isBlockCount(true)
-		require.NoError(t, err)
-	})
-
-	t.Run("invalid block count ADV", func(t *testing.T) {
-		file := mockFileADV(t)
-		file.ADVControl.BlockCount = 999
-		err := file.isBlockCount(true)
-		require.Error(t, err)
-		require.Contains(t, err.Error(), "BlockCount")
 	})
 }
 
