@@ -25,6 +25,8 @@ import (
 	"strconv"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/moov-io/base"
 )
 
 // Batch holds the Batch Header and Batch Control and all Entry Records
@@ -301,6 +303,18 @@ func (batch *Batch) Validate() error {
 	return errors.New("use an implementation of batch or NewBatch")
 }
 
+// ValidateAll checks properties of the ACH batch and returns ALL errors found.
+// Unlike Validate which returns the first error, this method accumulates all validation errors.
+//
+// ValidateAll will never modify the batch.
+func (batch *Batch) ValidateAll() base.ErrorList {
+	// This stub returns nil - specific batch types should override this method.
+	// If this method is called on the base Batch type, we treat it as an error.
+	var errors base.ErrorList
+	errors.Add(batch.Error("Batch", ErrBatchSECType))
+	return errors
+}
+
 // SetValidation stores ValidateOpts on the Batch which are to be used to override
 // the default NACHA validation rules.
 func (batch *Batch) SetValidation(opts *ValidateOpts) {
@@ -401,6 +415,98 @@ func (batch *Batch) verify() error {
 		return err
 	}
 	return nil
+}
+
+// verifyAll checks basic valid NACHA batch rules and returns ALL errors found.
+// Unlike verify which returns on first error, this method accumulates all validation errors.
+func (batch *Batch) verifyAll() base.ErrorList {
+	var errors base.ErrorList
+
+	// No entries in batch
+	if len(batch.Entries) <= 0 && len(batch.ADVEntries) <= 0 {
+		errors.Add(batch.Error("entries", ErrBatchNoEntries))
+	}
+	// verify field inclusion in all the records of the batch.
+	if err := batch.isFieldInclusion(); err != nil {
+		// convert the field error in to a batch error for a consistent api
+		errors.Add(batch.Error("FieldError", err))
+	}
+
+	if !batch.IsADV() {
+		// validate batch header and control codes are the same
+		if (batch.validateOpts == nil || !batch.validateOpts.UnequalServiceClassCode) &&
+			batch.Header.ServiceClassCode != batch.Control.ServiceClassCode {
+			errors.Add(batch.Error("ServiceClassCode",
+				NewErrBatchHeaderControlEquality(batch.Header.ServiceClassCode, batch.Control.ServiceClassCode)))
+		}
+		// Company Identification in the batch header and control must match if bypassCompanyIdentificationMatch is not enabled.
+		if batch.Header.CompanyIdentification != batch.Control.CompanyIdentification &&
+			!(batch.validateOpts != nil && batch.validateOpts.BypassCompanyIdentificationMatch) {
+			errors.Add(batch.Error("CompanyIdentification",
+				NewErrBatchHeaderControlEquality(batch.Header.CompanyIdentification, batch.Control.CompanyIdentification)))
+		}
+
+		// Control ODFIIdentification must be the same as batch header
+		if batch.Header.ODFIIdentification != batch.Control.ODFIIdentification {
+			errors.Add(batch.Error("ODFIIdentification",
+				NewErrBatchHeaderControlEquality(batch.Header.ODFIIdentification, batch.Control.ODFIIdentification)))
+		}
+		// batch number header and control must match
+		if batch.Header.BatchNumber != batch.Control.BatchNumber {
+			errors.Add(batch.Error("BatchNumber",
+				NewErrBatchHeaderControlEquality(batch.Header.BatchNumber, batch.Control.BatchNumber)))
+		}
+	} else {
+		if (batch.validateOpts == nil || !batch.validateOpts.UnequalServiceClassCode) &&
+			batch.Header.ServiceClassCode != batch.ADVControl.ServiceClassCode {
+			errors.Add(batch.Error("ServiceClassCode",
+				NewErrBatchHeaderControlEquality(batch.Header.ServiceClassCode, batch.ADVControl.ServiceClassCode)))
+		}
+		// Control ODFIIdentification must be the same as batch header
+		if batch.Header.ODFIIdentification != batch.ADVControl.ODFIIdentification {
+			errors.Add(batch.Error("ODFIIdentification",
+				NewErrBatchHeaderControlEquality(batch.Header.ODFIIdentification, batch.ADVControl.ODFIIdentification)))
+		}
+		// batch number header and control must match
+		if batch.Header.BatchNumber != batch.ADVControl.BatchNumber {
+			errors.Add(batch.Error("BatchNumber",
+				NewErrBatchHeaderControlEquality(batch.Header.BatchNumber, batch.ADVControl.BatchNumber)))
+		}
+	}
+
+	if err := batch.isBatchEntryCount(); err != nil {
+		errors.Add(err)
+	}
+	if batch.validateOpts == nil || !batch.validateOpts.CustomTraceNumbers {
+		if err := batch.isSequenceAscending(); err != nil {
+			errors.Add(err)
+		}
+	}
+	if err := batch.isBatchAmount(); err != nil {
+		errors.Add(err)
+	}
+	if err := batch.isEntryHash(); err != nil {
+		errors.Add(err)
+	}
+	if err := batch.isOriginatorDNE(); err != nil {
+		errors.Add(err)
+	}
+	if batch.validateOpts == nil || !batch.validateOpts.CustomTraceNumbers {
+		if err := batch.isTraceNumberODFI(); err != nil {
+			errors.Add(err)
+		}
+		if err := batch.isAddendaSequence(); err != nil {
+			errors.Add(err)
+		}
+	}
+	if err := batch.isCategory(); err != nil {
+		errors.Add(err)
+	}
+
+	if errors.Empty() {
+		return nil
+	}
+	return errors
 }
 
 // Build creates valid batch by building sequence numbers and batch control. An error is returned if

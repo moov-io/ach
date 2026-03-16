@@ -19,6 +19,8 @@ package ach
 
 import (
 	"fmt"
+
+	"github.com/moov-io/base"
 )
 
 // Batcher abstract the different ACH batch types that can exist in a file.
@@ -44,6 +46,7 @@ type Batcher interface {
 	DeleteADVEntries(func(*ADVEntryDetail) bool)
 	Create() error
 	Validate() error
+	ValidateAll() base.ErrorList
 	SetID(string)
 	ID() string
 	// Category defines if a Forward or Return
