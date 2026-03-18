@@ -301,6 +301,23 @@ func (batch *Batch) Validate() error {
 	return errors.New("use an implementation of batch or NewBatch")
 }
 
+// ValidateTotals performs checks on: 1. Batch entry count 2. Batch credit/debit totals of the 3. Batch entry hash
+// ValidateTotals will never modify the Batch.
+//
+// The first error encountered is returned.
+func (batch *Batch) ValidateTotals() error {
+	if err := batch.isBatchEntryCount(); err != nil {
+		return err
+	}
+	if err := batch.isBatchAmount(); err != nil {
+		return err
+	}
+	if err := batch.isEntryHash(); err != nil {
+		return err
+	}
+	return nil
+}
+
 // SetValidation stores ValidateOpts on the Batch which are to be used to override
 // the default NACHA validation rules.
 func (batch *Batch) SetValidation(opts *ValidateOpts) {
@@ -371,20 +388,13 @@ func (batch *Batch) verify() error {
 				NewErrBatchHeaderControlEquality(batch.Header.BatchNumber, batch.ADVControl.BatchNumber))
 		}
 	}
-
-	if err := batch.isBatchEntryCount(); err != nil {
+	if err := batch.ValidateTotals(); err != nil {
 		return err
 	}
 	if batch.validateOpts == nil || !batch.validateOpts.CustomTraceNumbers {
 		if err := batch.isSequenceAscending(); err != nil {
 			return err
 		}
-	}
-	if err := batch.isBatchAmount(); err != nil {
-		return err
-	}
-	if err := batch.isEntryHash(); err != nil {
-		return err
 	}
 	if err := batch.isOriginatorDNE(); err != nil {
 		return err

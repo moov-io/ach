@@ -426,6 +426,8 @@ func testBatchIsSequenceAscending(t testing.TB) {
 	e3.TraceNumber = "1"
 	mockBatch.AddEntry(e3)
 	mockBatch.GetControl().EntryAddendaCount = 2
+	mockBatch.GetControl().TotalCreditEntryDollarAmount, mockBatch.GetControl().TotalDebitEntryDollarAmount = mockBatch.calculateBatchAmounts()
+	mockBatch.GetControl().EntryHash = mockBatch.calculateEntryHash()
 	err := mockBatch.verify()
 	if !base.Match(err, NewErrBatchAscending(121042880000001, 1)) {
 		t.Errorf("%T: %s", err, err)
@@ -1819,4 +1821,136 @@ func TestBatch_upsertOffsets_PanicRegression(t *testing.T) {
 	})
 
 	require.Len(t, batch.Entries, 4)
+}
+
+// TestBatch_ValidateTotals tests the ValidateTotals method
+func TestBatch_ValidateTotals(t *testing.T) {
+	t.Run("valid batch", func(t *testing.T) {
+		batch := mockBatch(t)
+		err := batch.ValidateTotals()
+		require.NoError(t, err)
+	})
+
+	t.Run("valid PPD batch", func(t *testing.T) {
+		batch := mockBatchPPD(t)
+		err := batch.ValidateTotals()
+		require.NoError(t, err)
+	})
+
+	t.Run("valid ADV batch", func(t *testing.T) {
+		batch := mockBatchADV(t)
+		err := batch.ValidateTotals()
+		require.NoError(t, err)
+	})
+
+	t.Run("entry count mismatch", func(t *testing.T) {
+		batch := mockBatch(t)
+		// Corrupt the entry count in control record
+		batch.Control.EntryAddendaCount = 999
+
+		err := batch.ValidateTotals()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "EntryAddendaCount")
+	})
+
+	t.Run("debit amount mismatch", func(t *testing.T) {
+		batch := mockBatch(t)
+		// Corrupt the debit amount in control record
+		batch.Control.TotalDebitEntryDollarAmount = 999999
+
+		err := batch.ValidateTotals()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "TotalDebitEntryDollarAmount")
+	})
+
+	t.Run("credit amount mismatch", func(t *testing.T) {
+		batch := mockBatch(t)
+		// Change entry to credit and corrupt credit amount
+		batch.Entries[0].TransactionCode = CheckingCredit
+		batch.Control.TotalCreditEntryDollarAmount = 999999
+
+		err := batch.ValidateTotals()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "TotalCreditEntryDollarAmount")
+	})
+
+	t.Run("empty batch", func(t *testing.T) {
+		batch := &Batch{}
+		batch.SetHeader(mockBatchHeader())
+		batch.Control = &BatchControl{
+			EntryAddendaCount:            0,
+			TotalDebitEntryDollarAmount:  0,
+			TotalCreditEntryDollarAmount: 0,
+		}
+
+		err := batch.ValidateTotals()
+		require.NoError(t, err)
+	})
+
+	t.Run("batch with zero amounts", func(t *testing.T) {
+		batch := &Batch{}
+		batch.SetHeader(mockBatchHeader())
+
+		// Add entry with zero amount
+		entry := mockEntryDetail()
+		entry.Amount = 0
+		batch.AddEntry(entry)
+		require.NoError(t, batch.build())
+
+		err := batch.ValidateTotals()
+		require.NoError(t, err)
+	})
+
+	t.Run("multiple entries with amount mismatch", func(t *testing.T) {
+		batch := &Batch{}
+		batch.SetHeader(mockBatchHeader())
+		batch.AddEntry(mockEntryDetail())
+		batch.AddEntry(mockEntryDetail())
+		require.NoError(t, batch.build())
+
+		// Corrupt one of the entry amounts but don't update control
+		originalAmount := batch.Entries[0].Amount
+		batch.Entries[0].Amount = originalAmount + 100000
+
+		err := batch.ValidateTotals()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "TotalCreditEntryDollarAmount")
+	})
+
+	t.Run("addenda count affects entry count", func(t *testing.T) {
+		batch := &Batch{}
+		batch.SetHeader(mockBatchHeader())
+		entry := mockEntryDetail()
+		entry.AddendaRecordIndicator = 1
+		entry.AddAddenda05(mockAddenda05())
+		batch.AddEntry(entry)
+		require.NoError(t, batch.build())
+
+		// Add extra addenda without updating control
+		entry.AddAddenda05(mockAddenda05())
+
+		err := batch.ValidateTotals()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "EntryAddendaCount")
+	})
+
+	t.Run("ADV batch entry count mismatch", func(t *testing.T) {
+		batch := mockBatchADV(t)
+		// Corrupt the entry count in ADV control record
+		batch.ADVControl.EntryAddendaCount = 999
+
+		err := batch.ValidateTotals()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "EntryAddendaCount")
+	})
+
+	t.Run("ADV batch amount mismatch", func(t *testing.T) {
+		batch := mockBatchADV(t)
+		// Corrupt the debit amount in ADV control record
+		batch.ADVControl.TotalDebitEntryDollarAmount = 999999
+
+		err := batch.ValidateTotals()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "TotalDebitEntryDollarAmount")
+	})
 }

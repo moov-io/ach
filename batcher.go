@@ -44,6 +44,7 @@ type Batcher interface {
 	DeleteADVEntries(func(*ADVEntryDetail) bool)
 	Create() error
 	Validate() error
+	ValidateTotals() error
 	SetID(string)
 	ID() string
 	// Category defines if a Forward or Return

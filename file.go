@@ -850,18 +850,12 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 				return err
 			}
 		}
-		if err := f.isEntryAddendaCount(false); err != nil {
-			return err
-		}
-		if err := f.isFileAmount(false); err != nil {
-			return err
-		}
 		if !opts.AllowUnorderedBatchNumbers {
 			if err := f.isSequenceAscending(); err != nil {
 				return err
 			}
 		}
-		return f.isEntryHash(false)
+		return f.ValidateTotals()
 	}
 
 	// File contains ADV batches BatchADV
@@ -875,13 +869,51 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 			return err
 		}
 	}
-	if err := f.isEntryAddendaCount(true); err != nil {
+	return f.ValidateTotals()
+}
+
+// ValidateTotals performs checks on: 1.File entry addenda counts 2. File credit/debit totals 3. File entry hash 4. File batch count
+// ValidateTotals will also call the ValidateTotals function on all contained batches
+// ValidateTotals will never modify the File or contained Batches.
+//
+// The first error encountered is returned.
+func (f *File) ValidateTotals() error {
+	isADV := f.IsADV()
+	if err := f.isEntryAddendaCount(isADV); err != nil {
 		return err
 	}
-	if err := f.isFileAmount(true); err != nil {
+	if err := f.isFileAmount(isADV); err != nil {
 		return err
 	}
-	return f.isEntryHash(true)
+	if err := f.isEntryHash(isADV); err != nil {
+		return err
+	}
+	for _, b := range f.Batches {
+		if err := b.ValidateTotals(); err != nil {
+			return err
+		}
+	}
+	for _, b := range f.IATBatches {
+		if err := b.ValidateTotals(); err != nil {
+			return err
+		}
+	}
+	return f.isBatchCount(isADV)
+}
+
+// isBatchCount validates that the batch count is equal to the number of batches in the file
+func (f *File) isBatchCount(IsADV bool) error {
+	var batchCount int
+	if IsADV {
+		batchCount = f.ADVControl.BatchCount
+	} else {
+		batchCount = f.Control.BatchCount
+	}
+	calculatedBatchCount := len(f.Batches) + len(f.IATBatches)
+	if calculatedBatchCount != batchCount {
+		return NewErrFileCalculatedControlEquality("BatchCount", calculatedBatchCount, batchCount)
+	}
+	return nil
 }
 
 // isEntryAddendaCount is prepared by hashing the RDFI's 8-digit Routing Number in each entry.

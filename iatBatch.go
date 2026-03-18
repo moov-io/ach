@@ -116,18 +116,12 @@ func (iatBatch *IATBatch) verify() error {
 			return fieldError("CompanyIdentification", err, iatBatch.Control.CompanyIdentification)
 		}
 	}
-	if _, err := iatBatch.isBatchEntryCount(); err != nil {
-		return err
-	}
 	if iatBatch.validateOpts == nil || !iatBatch.validateOpts.CustomTraceNumbers {
 		if err := iatBatch.isSequenceAscending(); err != nil {
 			return err
 		}
 	}
-	if err := iatBatch.isBatchAmount(); err != nil {
-		return err
-	}
-	if err := iatBatch.isEntryHash(); err != nil {
+	if err := iatBatch.ValidateTotals(); err != nil {
 		return err
 	}
 	if iatBatch.validateOpts == nil || !iatBatch.validateOpts.CustomTraceNumbers {
@@ -675,6 +669,23 @@ func (iatBatch *IATBatch) Validate() error {
 			}
 		}
 
+	}
+	return nil
+}
+
+// ValidateTotals performs checks on: 1. Batch entry count 2. Batch credit/debit totals of the 3. Batch entry hash
+// ValidateTotals will never modify the Batch.
+//
+// The first error encountered is returned.
+func (batch *IATBatch) ValidateTotals() error {
+	if _, err := batch.isBatchEntryCount(); err != nil {
+		return err
+	}
+	if err := batch.isBatchAmount(); err != nil {
+		return err
+	}
+	if err := batch.isEntryHash(); err != nil {
+		return err
 	}
 	return nil
 }

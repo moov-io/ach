@@ -38,6 +38,8 @@ func TestIssue1275(t *testing.T) {
 	entries[0].Addenda11 = nil
 	entries[0].Addenda12 = nil
 	entries[0].Addenda14 = nil
+	b1.Control.EntryAddendaCount = b1.Control.EntryAddendaCount - 3
+	file.Control.EntryAddendaCount = file.Control.EntryAddendaCount - 3
 
 	expectedLines := []string{
 		`101 121042882 2313801041908071540A094101Bank                   My Bank Name                   `,
@@ -59,8 +61,8 @@ func TestIssue1275(t *testing.T) {
 		`71598746549321398718 Fifth Street                                                      0000002`,
 		`716LetterTown*AB\                     CA*80014\                                        0000002`,
 		`718Bank of Fr` + "`" + `nce                     01456456456987987                   FR       00010000002`,
-		`82000000200024208576000000100000000000100000                                   231380100000001`,
-		`9000001000003000000200024208576000000100000000000100000                                       `,
+		`82000000170024208576000000100000000000100000                                   231380100000001`,
+		`9000001000003000000170024208576000000100000000000100000                                       `,
 	}
 
 	t.Run("with padding", func(t *testing.T) {
@@ -76,8 +78,34 @@ func TestIssue1275(t *testing.T) {
 		require.Equal(t, expected, buf.String())
 	})
 
+	expectedLines = []string{
+		`101 121042882 2313801041908071540A094101Bank                   My Bank Name                   `,
+		`5200                FF3               US123456789 IATTRADEPAYMTCADUSD190808   0231380100000001`,
+		`6271210428820007             0000100000123456789                              1231380100000001`,
+		`710ANN000000000000100000928383-23938          BEK Enterprises                          0000001`,
+		`713Wells Fargo                        01231380104                         US           0000001`,
+		`7159874654932139872121 Front Street                                                    0000001`,
+		`716LetterTown*AB\                     CA*80014\                                        0000001`, // [6]
+		`717This is an international payment                                                00020000001`,
+		`717This is an international payment                                                00020000001`,
+		`718Bank of Fr` + "`" + `nce                     01456456456987987                   FR       00010000001`,
+		`6221210428820007             0000100000123456789                              1231380100000002`,
+		`710ANN000000000000100000928383-23938          ADCAF Enterprises                        0000002`,
+		`711ADCAF Solutions                    15 West Place Street                             0000002`,
+		`712JacobsTown*PA\                     US*19305\                                        0000002`,
+		`713Wells Fargo                        01231380104                         US           0000002`,
+		`714Citadel Bank                       01121042882                         CA           0000002`,
+		`71598746549321398718 Fifth Street                                                      0000002`,
+		`716LetterTown*AB\                     CA*80014\                                        0000002`,
+		`718Bank of Fr` + "`" + `nce                     01456456456987987                   FR       00010000002`,
+		`82000000160024208576000000100000000000100000                                   231380100000001`,
+		`9000001000003000000160024208576000000100000000000100000                                       `,
+	}
+
 	t.Run("no padding", func(t *testing.T) {
 		entries[0].Addenda16 = nil
+		b1.Control.EntryAddendaCount = b1.Control.EntryAddendaCount - 1
+		file.Control.EntryAddendaCount = file.Control.EntryAddendaCount - 1
 		lines := append(expectedLines[:6], expectedLines[7:]...)
 
 		var buf bytes.Buffer
