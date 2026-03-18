@@ -83,11 +83,11 @@ docker-hub:
 
 .PHONY: dev-docker
 dev-docker:
-	docker build --pull --build-arg VERSION=${DEV_VERSION} -t moov/achgateway:${DEV_VERSION} -f Dockerfile .
+	docker build --pull --build-arg VERSION=${DEV_VERSION} -t moov/ach:${DEV_VERSION} -f Dockerfile .
 
 .PHONY: dev-push
 dev-push:
-	docker push moov/achgateway:${DEV_VERSION}
+	docker push moov/ach:${DEV_VERSION}
 
 .PHONY: clean-integration test-integration
 
