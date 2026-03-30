@@ -1,0 +1,109 @@
+{
+    "fileHeader": {
+        "id": "",
+        "immediateDestination": "091218005",
+        "immediateOrigin": "691000000",
+        "fileCreationDate": "260330",
+        "fileCreationTime": "0831",
+        "fileIDModifier": "A",
+        "FormatCode": "1",
+        "immediateDestinationName": "[DEST]",
+        "immediateOriginName": "[ORIG]",
+        "lineNumber": 1
+    },
+    "batches": [
+        {
+            "batchHeader": {
+                "id": "",
+                "serviceClassCode": 220,
+                "companyName": "[COMP]",
+                "companyIdentification": "2883000000",
+                "standardEntryClassCode": "PPD",
+                "companyEntryDescription": "payout ach",
+                "effectiveEntryDate": "260330",
+                "settlementDate": "089",
+                "originatorStatusCode": 1,
+                "ODFIIdentification": "10100000",
+                "batchNumber": 154,
+                "lineNumber": 2
+            },
+            "entryDetails": [
+                {
+                    "id": "",
+                    "transactionCode": 22,
+                    "RDFIIdentification": "09120000",
+                    "checkDigit": "0",
+                    "DFIAccountNumber": "999900002185",
+                    "amount": 300,
+                    "identificationNumber": "               ",
+                    "individualName": "[NAME]             ",
+                    "discretionaryData": "  ",
+                    "addendaRecordIndicator": 1,
+                    "traceNumber": "101000008250000",
+                    "addenda05": [
+                        {
+                            "id": "",
+                            "typeCode": "05",
+                            "paymentRelatedInformation": "Personal",
+                            "sequenceNumber": 1,
+                            "entryDetailSequenceNumber": 8253293,
+                            "lineNumber": 4
+                        }
+                    ],
+                    "category": "Forward",
+                    "lineNumber": 3
+                }
+            ],
+            "offset": null
+        },
+        {
+            "batchHeader": {
+                "id": "",
+                "serviceClassCode": 200,
+                "companyName": "PAYPAL",
+                "companyDiscretionaryData": "VERIFYBANK",
+                "companyIdentification": "PAYPALRD33",
+                "standardEntryClassCode": "PPD",
+                "companyEntryDescription": "ACCTVERIFY",
+                "companyDescriptiveDate": "260325",
+                "effectiveEntryDate": "260326",
+                "settlementDate": "089",
+                "originatorStatusCode": 1,
+                "ODFIIdentification": "09100000",
+                "batchNumber": 105237,
+                "lineNumber": 6
+            },
+            "entryDetails": [
+                {
+                    "id": "",
+                    "transactionCode": 26,
+                    "RDFIIdentification": "09120000",
+                    "checkDigit": "0",
+                    "DFIAccountNumber": "999900003000",
+                    "amount": 12,
+                    "identificationNumber": "1049166872012  ",
+                    "individualName": "[NAME]  ",
+                    "discretionaryData": "  ",
+                    "addendaRecordIndicator": 1,
+                    "traceNumber": "091000007810000",
+                    "addenda99Dishonored": {
+                        "id": "",
+                        "typeCode": "99",
+                        "dishonoredReturnReasonCode": "R69",
+                        "originalEntryTraceNumber": "091000007810000",
+                        "originalReceivingDFIIdentification": "09120000",
+                        "returnTraceNumber": "091200001773609",
+                        "returnSettlementDate": "089",
+                        "returnReasonCode": "17",
+                        "addendaInformation": "02*07                ",
+                        "traceNumber": "091000007810000",
+                        "lineNumber": 8
+                    },
+                    "category": "DishonoredReturn",
+                    "lineNumber": 7
+                }
+            ],
+            "offset": null
+        }
+    ]
+}
