@@ -125,9 +125,21 @@ func (w *Writer) writeBatch(file *File, isADV bool) error {
 			return err
 		}
 		if !isADV {
+			secCode := batch.GetHeader().StandardEntryClassCode
 			for _, entry := range batch.GetEntries() {
-				if err := w.writeLine(entry); err != nil {
-					return err
+				// Use SEC-code-specific string methods for CIE and MTE
+				if secCode == CIE {
+					if err := w.writeLine(&cIEEntryDetail{entry}); err != nil {
+						return err
+					}
+				} else if secCode == MTE {
+					if err := w.writeLine(&mTEEntryDetail{entry}); err != nil {
+						return err
+					}
+				} else {
+					if err := w.writeLine(entry); err != nil {
+						return err
+					}
 				}
 				if err := w.writeLine(entry.Addenda02); err != nil {
 					return err
@@ -237,6 +249,26 @@ func (w *Writer) writeIATBatch(file *File) error {
 
 type writeEntry interface {
 	String() string
+}
+
+// cIEEntryDetail wraps EntryDetail to provide CIE-specific String method
+type cIEEntryDetail struct {
+	*EntryDetail
+}
+
+// String returns the CIE-specific string representation
+func (e *cIEEntryDetail) String() string {
+	return e.EntryDetail.StringCIE()
+}
+
+// mTEEntryDetail wraps EntryDetail to provide MTE-specific String method
+type mTEEntryDetail struct {
+	*EntryDetail
+}
+
+// String returns the MTE-specific string representation
+func (e *mTEEntryDetail) String() string {
+	return e.EntryDetail.StringMTE()
 }
 
 func (w *Writer) writeLine(entry writeEntry) error {

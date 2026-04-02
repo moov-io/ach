@@ -110,8 +110,9 @@ func TestExtendedCharacters(t *testing.T) {
 		require.Equal(t, `Merchant | ATM`, b1.GetHeader().CompanyName)
 
 		entries := b1.GetEntries()
-		require.Equal(t, `My {Store}            `, entries[0].IndividualName)
-		require.Equal(t, `0 is not Ø     `, entries[0].IdentificationNumber)
+		// For MTE: IndividualName is in positions 40-54 (15 chars), IdentificationNumber in 55-76 (22 chars)
+		require.Equal(t, `My {Store}     `, entries[0].IndividualName)
+		require.Equal(t, `0 is not Ø            `, entries[0].IdentificationNumber)
 		require.Equal(t, `RF1¦RF2`, entries[0].Addenda02.ReferenceInformationOne)
 	})
 

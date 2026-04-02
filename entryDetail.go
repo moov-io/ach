@@ -302,6 +302,50 @@ func (ed *EntryDetail) String() string {
 	return buf.String()
 }
 
+// StringCIE writes the EntryDetail struct to a 94 character string for CIE SEC code.
+// CIE has swapped IdentificationNumber and IndividualName fields compared to standard.
+func (ed *EntryDetail) StringCIE() string {
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
+	buf.WriteString(entryDetailPos)
+	buf.WriteString(strconv.Itoa(ed.TransactionCode))
+	buf.WriteString(ed.RDFIIdentificationField())
+	buf.WriteString(ed.CheckDigit)
+	buf.WriteString(ed.DFIAccountNumberField())
+	buf.WriteString(ed.AmountField())
+	// For CIE: IndividualName goes in positions 40-54 (15 chars), IdentificationNumber in 55-76 (22 chars)
+	buf.WriteString(ed.alphaField(ed.IndividualName, 15))
+	buf.WriteString(ed.alphaField(ed.IdentificationNumber, 22))
+	buf.WriteString(ed.DiscretionaryDataField())
+	buf.WriteString(strconv.Itoa(ed.AddendaRecordIndicator))
+	buf.WriteString(ed.TraceNumberField())
+
+	return buf.String()
+}
+
+// StringMTE writes the EntryDetail struct to a 94 character string for MTE SEC code.
+// MTE has swapped IdentificationNumber and IndividualName fields compared to standard.
+func (ed *EntryDetail) StringMTE() string {
+	buf := getBuffer()
+	defer saveBuffer(buf)
+
+	buf.WriteString(entryDetailPos)
+	buf.WriteString(strconv.Itoa(ed.TransactionCode))
+	buf.WriteString(ed.RDFIIdentificationField())
+	buf.WriteString(ed.CheckDigit)
+	buf.WriteString(ed.DFIAccountNumberField())
+	buf.WriteString(ed.AmountField())
+	// For MTE: IndividualName goes in positions 40-54 (15 chars), IdentificationNumber in 55-76 (22 chars)
+	buf.WriteString(ed.alphaField(ed.IndividualName, 15))
+	buf.WriteString(ed.alphaField(ed.IdentificationNumber, 22))
+	buf.WriteString(ed.DiscretionaryDataField())
+	buf.WriteString(strconv.Itoa(ed.AddendaRecordIndicator))
+	buf.WriteString(ed.TraceNumberField())
+
+	return buf.String()
+}
+
 // SetValidation stores ValidateOpts on the EntryDetail which are to be used to override
 // the default NACHA validation rules.
 func (ed *EntryDetail) SetValidation(opts *ValidateOpts) {

@@ -580,6 +580,16 @@ func (r *Reader) parseEntryDetail() error {
 		ed.SetValidation(r.File.validateOpts)
 		ed.Parse(r.line)
 		ed.LineNumber = r.lineNum
+
+		// CIE and MTE SEC codes have swapped IdentificationNumber and IndividualName fields
+		// compared to other SEC codes. Positions 40-54 should be IndividualName and
+		// positions 55-76 should be IdentificationNumber for these SEC codes.
+		secCode := r.currentBatch.GetHeader().StandardEntryClassCode
+		if secCode == CIE || secCode == MTE {
+			// Swap the fields
+			ed.IdentificationNumber, ed.IndividualName = ed.IndividualName, ed.IdentificationNumber
+		}
+
 		if err := maybeValidate(ed, r.File.validateOpts); err != nil {
 			return r.parseError(err)
 		}
