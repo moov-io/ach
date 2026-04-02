@@ -1048,11 +1048,21 @@ func (batch *Batch) addendaFieldInclusionReturn(entry *EntryDetail) error {
 		return batch.Error("Addenda02", ErrBatchAddendaCategory, entry.Category)
 	}
 	if entry.Addenda05 != nil {
-		switch batch.Header.StandardEntryClassCode {
-		case CTX:
-			// do nothing, CTX allows Addneda05 records
+		switch entry.Category {
+		case CategoryDishonoredReturn, CategoryDishonoredReturnContested:
+			switch batch.Header.StandardEntryClassCode {
+			case ATX, CTX, PPD, TRX, WEB:
+				// do nothing, these SEC codes allow multiple Addenda05 records alongside the DishonoredReturn addenda
+			default:
+				return batch.Error("Addenda05", ErrBatchAddendaCategory, entry.Category)
+			}
 		default:
-			return batch.Error("Addenda05", ErrBatchAddendaCategory, entry.Category)
+			switch batch.Header.StandardEntryClassCode {
+			case CTX:
+				// do nothing, CTX allows Addenda05 records for Return
+			default:
+				return batch.Error("Addenda05", ErrBatchAddendaCategory, entry.Category)
+			}
 		}
 	}
 	if entry.Addenda98 != nil || entry.Addenda98Refused != nil {

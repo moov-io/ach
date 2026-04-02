@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -116,4 +117,32 @@ func TestAddenda99Dishonored__Fields(t *testing.T) {
 	require.Equal(t, "01", dishonored.ReturnReasonCodeField())
 	require.Equal(t, "Untimely Return      ", dishonored.AddendaInformationField())
 	require.Equal(t, "000005999900001", dishonored.TraceNumberField())
+}
+
+// TestBatchWEBDishonoredReturnWithAddenda05 validates that Addenda05 is allowed on DishonoredReturn entries in WEB batches
+func TestBatchWEBDishonoredReturnWithAddenda05(t *testing.T) {
+	batch := NewBatchWEB(mockBatchWEBHeader())
+	entry := mockWEBEntryDetail()
+	entry.Category = CategoryDishonoredReturn
+	entry.AddendaRecordIndicator = 1
+	entry.Addenda99Dishonored = mockAddenda99Dishonored()
+	entry.AddAddenda05(mockAddenda05())
+	batch.AddEntry(entry)
+	err := batch.Create()
+	require.NoError(t, err)
+	err = batch.Validate()
+	require.NoError(t, err)
+}
+
+func TestReadDishonredWithAddenda05(t *testing.T) {
+	file, err := ReadJSONFile(filepath.Join("test", "testdata", "dishonored-with-addenda05.json"))
+	require.NoError(t, err)
+
+	require.NoError(t, file.Create())
+	require.NoError(t, file.Validate())
+
+	for _, batch := range file.Batches {
+		require.NoError(t, batch.Create())
+		require.NoError(t, batch.Validate())
+	}
 }
