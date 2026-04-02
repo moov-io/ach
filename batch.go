@@ -544,6 +544,11 @@ func (batch *Batch) AddEntry(entry *EntryDetail) {
 		return
 	}
 
+	if entry.secCode == nil {
+		secCode := strings.ToUpper(batch.Header.StandardEntryClassCode)
+		entry.secCode = &secCode
+	}
+
 	batch.category = entry.Category
 	batch.Entries = append(batch.Entries, entry)
 }

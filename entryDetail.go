@@ -107,6 +107,7 @@ type EntryDetail struct {
 	converters
 
 	validateOpts *ValidateOpts
+	secCode      *string
 }
 
 const (
@@ -205,6 +206,12 @@ func NewEntryDetail() *EntryDetail {
 	return &entry
 }
 
+func (ed *EntryDetail) SetSECCode(code string) {
+	if ed != nil {
+		ed.secCode = &code
+	}
+}
+
 // Parse takes the input record string and parses the EntryDetail values
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
@@ -258,12 +265,20 @@ func (ed *EntryDetail) Parse(record string) {
 			ed.Amount = ed.parseNumField(reset())
 
 		case 54:
-			// 40-54 An internal identification (alphanumeric) that you use to uniquely identify this Entry Detail Record
-			ed.IdentificationNumber = reset()
+			// 40-54 For CIE/MTE: Individual Name; For others: Identification Number
+			if ed.secCode != nil && (strings.EqualFold(*ed.secCode, CIE) || strings.EqualFold(*ed.secCode, MTE)) {
+				ed.IndividualName = reset()
+			} else {
+				ed.IdentificationNumber = reset()
+			}
 
 		case 76:
-			// 55-76 The name of the receiver, usually the name on the bank account
-			ed.IndividualName = reset()
+			// 55-76 For CIE/MTE: Identification Number; For others: Individual Name
+			if ed.secCode != nil && (strings.EqualFold(*ed.secCode, CIE) || strings.EqualFold(*ed.secCode, MTE)) {
+				ed.IdentificationNumber = reset()
+			} else {
+				ed.IndividualName = reset()
+			}
 
 		case 78:
 			// 77-78 allows ODFIs to include codes of significance only to them, normally blank
@@ -293,8 +308,13 @@ func (ed *EntryDetail) String() string {
 	buf.WriteString(ed.CheckDigit)
 	buf.WriteString(ed.DFIAccountNumberField())
 	buf.WriteString(ed.AmountField())
-	buf.WriteString(ed.IdentificationNumberField())
-	buf.WriteString(ed.IndividualNameField())
+	if ed.secCode != nil && (strings.EqualFold(*ed.secCode, CIE) || strings.EqualFold(*ed.secCode, MTE)) {
+		buf.WriteString(ed.IndividualNameField())
+		buf.WriteString(ed.IdentificationNumberField())
+	} else {
+		buf.WriteString(ed.IdentificationNumberField())
+		buf.WriteString(ed.IndividualNameField())
+	}
 	buf.WriteString(ed.DiscretionaryDataField())
 	buf.WriteString(strconv.Itoa(ed.AddendaRecordIndicator))
 	buf.WriteString(ed.TraceNumberField())
