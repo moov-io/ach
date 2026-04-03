@@ -577,6 +577,7 @@ func (r *Reader) parseEntryDetail() error {
 	}
 	if r.currentBatch.GetHeader().StandardEntryClassCode != ADV {
 		ed := NewEntryDetail()
+		ed.SetSECCode(r.currentBatch.GetHeader().StandardEntryClassCode)
 		ed.SetValidation(r.File.validateOpts)
 		ed.Parse(r.line)
 		ed.LineNumber = r.lineNum

@@ -378,11 +378,17 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 		batch.SetID(batch.Header.ID)
 		batch.SetValidation(f.validateOpts)
 
+		secCode := strings.ToUpper(batch.Header.StandardEntryClassCode)
+
 		for _, e := range batch.Entries {
 			e.SetValidation(f.validateOpts)
 
 			// these values need to be inferred from the json field names
 			setEntryRecordType(e)
+
+			if e != nil && e.secCode == "" {
+				e.secCode = secCode
+			}
 
 			// A few SEC codes don't follow the standard columns so we have to smush
 			// them together as the JSON doesn't support ReceivingCompany separate
