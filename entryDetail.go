@@ -467,7 +467,11 @@ func (ed *EntryDetail) AmountField() string {
 
 // IdentificationNumberField returns a space padded string of IdentificationNumber
 func (ed *EntryDetail) IdentificationNumberField() string {
-	return ed.alphaField(ed.IdentificationNumber, 15)
+	var length uint = 15
+	if ed.secCode != nil && (strings.EqualFold(*ed.secCode, CIE) || strings.EqualFold(*ed.secCode, MTE)) {
+		length = 22
+	}
+	return ed.alphaField(ed.IdentificationNumber, length)
 }
 
 // CheckSerialNumberField is used in RCK, ARC, BOC files but returns
@@ -556,7 +560,11 @@ func (ed *EntryDetail) SHRIndividualCardAccountNumberField() string {
 
 // IndividualNameField returns a space padded string of IndividualName
 func (ed *EntryDetail) IndividualNameField() string {
-	return ed.alphaField(ed.IndividualName, 22)
+	var length uint = 22
+	if ed.secCode != nil && (strings.EqualFold(*ed.secCode, CIE) || strings.EqualFold(*ed.secCode, MTE)) {
+		length = 15
+	}
+	return ed.alphaField(ed.IndividualName, length)
 }
 
 // ReceivingCompanyField is used in CCD files but returns the underlying IndividualName field
