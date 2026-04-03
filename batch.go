@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"cmp"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -544,10 +545,7 @@ func (batch *Batch) AddEntry(entry *EntryDetail) {
 		return
 	}
 
-	if entry.secCode == nil {
-		secCode := strings.ToUpper(batch.Header.StandardEntryClassCode)
-		entry.secCode = &secCode
-	}
+	entry.secCode = cmp.Or(entry.secCode, strings.ToUpper(batch.Header.StandardEntryClassCode))
 
 	batch.category = entry.Category
 	batch.Entries = append(batch.Entries, entry)

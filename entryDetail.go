@@ -107,7 +107,7 @@ type EntryDetail struct {
 	converters
 
 	validateOpts *ValidateOpts
-	secCode      *string
+	secCode      string
 }
 
 const (
@@ -208,7 +208,7 @@ func NewEntryDetail() *EntryDetail {
 
 func (ed *EntryDetail) SetSECCode(code string) {
 	if ed != nil {
-		ed.secCode = &code
+		ed.secCode = code
 	}
 }
 
@@ -266,7 +266,7 @@ func (ed *EntryDetail) Parse(record string) {
 
 		case 54:
 			// 40-54 For CIE/MTE: Individual Name; For others: Identification Number
-			if ed.secCode != nil && (strings.EqualFold(*ed.secCode, CIE) || strings.EqualFold(*ed.secCode, MTE)) {
+			if strings.EqualFold(ed.secCode, CIE) || strings.EqualFold(ed.secCode, MTE) {
 				ed.IndividualName = reset()
 			} else {
 				ed.IdentificationNumber = reset()
@@ -274,7 +274,7 @@ func (ed *EntryDetail) Parse(record string) {
 
 		case 76:
 			// 55-76 For CIE/MTE: Identification Number; For others: Individual Name
-			if ed.secCode != nil && (strings.EqualFold(*ed.secCode, CIE) || strings.EqualFold(*ed.secCode, MTE)) {
+			if strings.EqualFold(ed.secCode, CIE) || strings.EqualFold(ed.secCode, MTE) {
 				ed.IdentificationNumber = reset()
 			} else {
 				ed.IndividualName = reset()
@@ -308,7 +308,7 @@ func (ed *EntryDetail) String() string {
 	buf.WriteString(ed.CheckDigit)
 	buf.WriteString(ed.DFIAccountNumberField())
 	buf.WriteString(ed.AmountField())
-	if ed.secCode != nil && (strings.EqualFold(*ed.secCode, CIE) || strings.EqualFold(*ed.secCode, MTE)) {
+	if strings.EqualFold(ed.secCode, CIE) || strings.EqualFold(ed.secCode, MTE) {
 		buf.WriteString(ed.IndividualNameField())
 		buf.WriteString(ed.IdentificationNumberField())
 	} else {
@@ -468,7 +468,7 @@ func (ed *EntryDetail) AmountField() string {
 // IdentificationNumberField returns a space padded string of IdentificationNumber
 func (ed *EntryDetail) IdentificationNumberField() string {
 	var length uint = 15
-	if ed.secCode != nil && (strings.EqualFold(*ed.secCode, CIE) || strings.EqualFold(*ed.secCode, MTE)) {
+	if strings.EqualFold(ed.secCode, CIE) || strings.EqualFold(ed.secCode, MTE) {
 		length = 22
 	}
 	return ed.alphaField(ed.IdentificationNumber, length)
@@ -561,7 +561,7 @@ func (ed *EntryDetail) SHRIndividualCardAccountNumberField() string {
 // IndividualNameField returns a space padded string of IndividualName
 func (ed *EntryDetail) IndividualNameField() string {
 	var length uint = 22
-	if ed.secCode != nil && (strings.EqualFold(*ed.secCode, CIE) || strings.EqualFold(*ed.secCode, MTE)) {
+	if strings.EqualFold(ed.secCode, CIE) || strings.EqualFold(ed.secCode, MTE) {
 		length = 15
 	}
 	return ed.alphaField(ed.IndividualName, length)

@@ -386,8 +386,8 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 			// these values need to be inferred from the json field names
 			setEntryRecordType(e)
 
-			if e != nil && e.secCode == nil {
-				e.secCode = &secCode
+			if e != nil && e.secCode == "" {
+				e.secCode = secCode
 			}
 
 			// A few SEC codes don't follow the standard columns so we have to smush
