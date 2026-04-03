@@ -135,14 +135,25 @@ func TestBatchWEBDishonoredReturnWithAddenda05(t *testing.T) {
 }
 
 func TestReadDishonredWithAddenda05(t *testing.T) {
-	file, err := ReadJSONFile(filepath.Join("test", "testdata", "dishonored-with-addenda05.json"))
-	require.NoError(t, err)
+	filepaths := []string{
+		filepath.Join("test", "testdata", "dishonored-with-addenda05.json"),
+		filepath.Join("test", "testdata", "dishonored-with-addenda05-2.json"),
+	}
 
-	require.NoError(t, file.Create())
-	require.NoError(t, file.Validate())
+	for _, path := range filepaths {
+		_, filename := filepath.Split(path)
 
-	for _, batch := range file.Batches {
-		require.NoError(t, batch.Create())
-		require.NoError(t, batch.Validate())
+		t.Run(filename, func(t *testing.T) {
+			file, err := ReadJSONFile(path)
+			require.NoError(t, err)
+
+			require.NoError(t, file.Create())
+			require.NoError(t, file.Validate())
+
+			for _, batch := range file.Batches {
+				require.NoError(t, batch.Create())
+				require.NoError(t, batch.Validate())
+			}
+		})
 	}
 }

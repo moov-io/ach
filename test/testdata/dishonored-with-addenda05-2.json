@@ -1,0 +1,104 @@
+{
+  "fileHeader": {
+    "id": "",
+    "immediateDestination": "091000000",
+    "immediateOrigin": "691000134",
+    "fileCreationDate": "260402",
+    "fileCreationTime": "1609",
+    "fileIDModifier": "C",
+    "FormatCode": "1",
+    "immediateDestinationName": "OUR BANKK",
+    "immediateOriginName": "OTHER BANK",
+    "lineNumber": 1
+  },
+  "batches": [
+    {
+      "batchHeader": {
+        "id": "",
+        "serviceClassCode": 200,
+        "companyName": "Customer Name",
+        "companyIdentification": "4270400000",
+        "standardEntryClassCode": "CCD",
+        "companyEntryDescription": "Dacula",
+        "effectiveEntryDate": "260403",
+        "settlementDate": "093",
+        "originatorStatusCode": 1,
+        "ODFIIdentification": "11100000",
+        "batchNumber": 32001,
+        "lineNumber": 2
+      },
+      "entryDetails": [
+        {
+          "id": "",
+          "transactionCode": 22,
+          "RDFIIdentification": "09100000",
+          "checkDigit": "0",
+          "DFIAccountNumber": "999900004488",
+          "amount": 11440,
+          "identificationNumber": "IND ID",
+          "individualName": "IND NAME",
+          "discretionaryData": "  ",
+          "addendaRecordIndicator": 0,
+          "traceNumber": "111000009400000",
+          "category": "Forward",
+          "lineNumber": 3
+        }
+      ],
+      "offset": null
+    },
+    {
+      "batchHeader": {
+        "id": "",
+        "serviceClassCode": 220,
+        "companyName": "Amazon.com Servi",
+        "companyDiscretionaryData": "ABC DEF",
+        "companyIdentification": "9000027358",
+        "standardEntryClassCode": "CCD",
+        "companyEntryDescription": "PAYMENTS",
+        "effectiveEntryDate": "260327",
+        "settlementDate": "092",
+        "originatorStatusCode": 1,
+        "ODFIIdentification": "02100000",
+        "batchNumber": 25,
+        "lineNumber": 5
+      },
+      "entryDetails": [
+        {
+          "id": "",
+          "transactionCode": 21,
+          "RDFIIdentification": "09100000",
+          "checkDigit": "0",
+          "DFIAccountNumber": "999900000000",
+          "amount": 1,
+          "identificationNumber": "TLR003628300000",
+          "individualName": "OUR BANK",
+          "discretionaryData": "  ",
+          "addendaRecordIndicator": 1,
+          "traceNumber": "021000000920000",
+          "addenda99Dishonored": {
+            "id": "",
+            "typeCode": "99",
+            "dishonoredReturnReasonCode": "R67",
+            "originalEntryTraceNumber": "021000003800000",
+            "originalReceivingDFIIdentification": "09100000",
+            "returnTraceNumber": "091000000000087",
+            "returnSettlementDate": "086",
+            "returnReasonCode": "17",
+            "addendaInformation": "                     ",
+            "traceNumber": "021000000920000",
+            "lineNumber": 7
+          },
+          "category": "DishonoredReturn",
+          "lineNumber": 6
+        }
+      ],
+      "offset": null
+    }
+  ],
+  "IATBatches": null,
+  "validateOpts": {
+    "allowInvalidCheckDigit": true,
+    "bypassDestinationValidation": true,
+    "allowUnorderedBatchNumbers": true
+  }
+}
