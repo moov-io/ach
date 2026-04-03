@@ -93,9 +93,12 @@ docker-push-arch:
 
 .PHONY: docker-manifest
 docker-manifest:
+# Versioned
 	docker manifest create moov/ach:$(VERSION) moov/ach:$(VERSION)-amd64 moov/ach:$(VERSION)-arm64
 	docker manifest push moov/ach:$(VERSION)
-	docker tag moov/ach:$(VERSION) moov/ach:latest
+# Latest
+	docker manifest create moov/ach:latest moov/ach:$(VERSION)-amd64 moov/ach:$(VERSION)-arm64
+	docker manifest push moov/ach:latest
 
 .PHONY: dev-docker
 dev-docker:
