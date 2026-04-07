@@ -592,3 +592,26 @@ func TestBatchHeaderSpecialCharacter(t *testing.T) {
 		t.Error("Special character should have been allowed with override set.")
 	}
 }
+
+func TestBatchHeader__SkipBatchHeaderCompanyValidation(t *testing.T) {
+	record := mockBatchHeader()
+
+	// Set invalid company fields that would normally fail validation
+	record.CompanyName = "   "                 // Spaces should fail isNonZero
+	record.CompanyIdentification = "000000000" // All zeros should fail isNonZero
+	record.CompanyDiscretionaryData = ""       // Empty should fail isAlphanumeric? Wait, isAlphanumeric on empty?
+	record.CompanyEntryDescription = "000"     // All zeros should fail isNonZero
+
+	// Without the option, validation should fail
+	err := record.Validate()
+	if err == nil {
+		t.Error("Expected validation to fail with invalid company fields")
+	}
+
+	// With SkipBatchHeaderCompanyValidation, validation should pass
+	record.SetValidation(&ValidateOpts{SkipBatchHeaderCompanyValidation: true})
+	err = record.Validate()
+	if err != nil {
+		t.Errorf("Expected validation to pass with SkipBatchHeaderCompanyValidation, got error: %v", err)
+	}
+}

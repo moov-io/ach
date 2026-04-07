@@ -312,7 +312,7 @@ func (bh *BatchHeader) Validate() error {
 		return fieldError("OriginatorStatusCode", ErrOrigStatusCode, bh.OriginatorStatusCode)
 	}
 
-	if bh.validateOpts == nil || !bh.validateOpts.AllowSpecialCharacters {
+	if bh.validateOpts == nil || (!bh.validateOpts.AllowSpecialCharacters && !bh.validateOpts.SkipBatchHeaderCompanyValidation) {
 		if err := bh.isAlphanumeric(bh.CompanyName); err != nil {
 			return fieldError("CompanyName", err, bh.CompanyName)
 		}
