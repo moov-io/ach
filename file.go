@@ -768,6 +768,9 @@ type ValidateOpts struct {
 
 	// SkipFileCreationValidation will skip validation of the FileCreationTime and FileCreationDate fields in a file header
 	SkipFileCreationValidation bool `json:"skipFileCreationValidation"`
+
+	// SkipBatchHeaderCompanyValidation will bypass validation of Company fields in a BatchHeader
+	SkipBatchHeaderCompanyValidation bool `json:"skipBatchHeaderCompanyValidation"`
 }
 
 // merge will combine two ValidateOpts structs and keep any non-zero field values.
@@ -802,6 +805,7 @@ func (v *ValidateOpts) merge(other *ValidateOpts) *ValidateOpts {
 		AllowEmptyIndividualName:         v.AllowEmptyIndividualName || other.AllowEmptyIndividualName,
 		BypassBatchValidation:            v.BypassBatchValidation || other.BypassBatchValidation,
 		SkipFileCreationValidation:       v.SkipFileCreationValidation || other.SkipFileCreationValidation,
+		SkipBatchHeaderCompanyValidation: v.SkipBatchHeaderCompanyValidation || other.SkipBatchHeaderCompanyValidation,
 	}
 
 	if v.CheckTransactionCode != nil {

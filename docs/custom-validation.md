@@ -88,6 +88,9 @@ UnequalAddendaCounts bool `json:"unequalAddendaCounts"`
 
 // AllowSpecialCharacters will permit a wider range of UTF-8 characters in alphanumeric fields
 AllowSpecialCharacters bool `json:"allowSpecialCharacters"`
+
+// SkipBatchHeaderCompanyValidation will bypass validation of Company fields in a BatchHeader
+SkipBatchHeaderCompanyValidation bool `json:"skipBatchHeaderCompanyValidation"`
 ```
 
 ### Entries

@@ -27,11 +27,11 @@ import (
 
 func TestReadValidateOpts(t *testing.T) {
 	body := strings.NewReader(`{
- "bypassOriginValidation":true,
- "bypassDestinationValidation":true,
- "allowUnorderedBatchNumbers":true
+  "bypassOriginValidation":true,
+  "bypassDestinationValidation":true,
+  "allowUnorderedBatchNumbers":true
 }`)
-	req, err := http.NewRequest("POST", "/files/f1/validate?bypassDestination=false&allowInvalidCheckDigit=true", body)
+	req, err := http.NewRequest("POST", "/files/f1/validate?bypassDestination=false&allowInvalidCheckDigit=true&skipBatchHeaderCompanyValidation=true", body)
 	require.NoError(t, err)
 
 	_, opts, err := readValidateOpts(req)
@@ -41,4 +41,5 @@ func TestReadValidateOpts(t *testing.T) {
 	require.False(t, opts.BypassDestinationValidation) // query params override body
 	require.True(t, opts.AllowUnorderedBatchNumbers)
 	require.True(t, opts.AllowInvalidCheckDigit)
+	require.True(t, opts.SkipBatchHeaderCompanyValidation)
 }
