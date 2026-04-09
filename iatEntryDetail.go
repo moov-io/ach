@@ -375,3 +375,36 @@ func (iatEd *IATEntryDetail) AddAddenda17(addenda17 *Addenda17) {
 func (iatEd *IATEntryDetail) AddAddenda18(addenda18 *Addenda18) {
 	iatEd.Addenda18 = append(iatEd.Addenda18, addenda18)
 }
+
+func (iatEd *IATEntryDetail) addendaCount() (n int) {
+	if iatEd.Addenda10 != nil {
+		n += 1
+	}
+	if iatEd.Addenda11 != nil {
+		n += 1
+	}
+	if iatEd.Addenda12 != nil {
+		n += 1
+	}
+	if iatEd.Addenda13 != nil {
+		n += 1
+	}
+	if iatEd.Addenda14 != nil {
+		n += 1
+	}
+	if iatEd.Addenda15 != nil {
+		n += 1
+	}
+	if iatEd.Addenda16 != nil {
+		n += 1
+	}
+	n += len(iatEd.Addenda17)
+	n += len(iatEd.Addenda18)
+	if iatEd.Addenda98 != nil {
+		n += 1
+	}
+	if iatEd.Addenda99 != nil {
+		n += 1
+	}
+	return n
+}
