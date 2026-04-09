@@ -47,7 +47,7 @@ const (
 // Entries with duplicate TraceNumbers are allowed in the same file, but must be in separate batches
 // and are automatically separated.
 //
-// ADV and IAT Batches and Entries are currently not merged together.
+// ADV Batches and Entries are currently not merged together.
 //
 // Old rules limit files to 10,000 lines (when rendered in their ASCII encoding), which
 // is the default for this function. Use MergeFilesWith for a higher limit.
@@ -99,7 +99,7 @@ type Conditions struct {
 // Entries with duplicate TraceNumbers are allowed in the same file, but must be in separate batches
 // and are automatically separated.
 //
-// ADV and IAT Batches and Entries are currently not merged together.
+// ADV Batches and Entries are currently not merged together.
 //
 // Conditions allows for capping the maximum line length or dollar amount of merged files.
 //
@@ -181,7 +181,7 @@ func DefaultFileAcceptor(path string) FileAcceptance {
 // Entries with duplicate TraceNumbers are allowed in the same file, but must be in separate batches
 // and are automatically separated.
 //
-// ADV and IAT Batches and Entries are currently not merged together.
+// ADV Batches and Entries are currently not merged together.
 //
 // MergeDir is typically more performant than MergeFiles as it reads files concurrently while merging occurs.
 // This has a more stable cpu and memory usage trend over reading all files into memory and then calling MergeFiles.
@@ -447,16 +447,14 @@ type outFile struct {
 	header  FileHeader
 	batches []*batch
 
+	iatBatches []*iatBatch
+
 	validateOpts *ValidateOpts
 
 	next *outFile
 }
 
 func (outf *outFile) add(incoming *File) error {
-	if len(incoming.IATBatches) > 0 {
-		return errors.New("merging IAT files is not supported")
-	}
-
 	outFile := pickOutFile(incoming.Header, outf)
 	if outFile == nil {
 		return fmt.Errorf("found no outfile: %w", ErrPleaseReportBug)
@@ -486,6 +484,29 @@ func (outf *outFile) add(incoming *File) error {
 					validateOpts: incoming.GetValidation(),
 				}
 				outFile.batches = append(outFile.batches, b)
+			}
+
+			b.entries.Set(entries[m].TraceNumber, entries[m])
+		}
+	}
+
+	for j := range incoming.IATBatches {
+		ibh := incoming.IATBatches[j].GetHeader()
+		if ibh == nil {
+			return fmt.Errorf("IATBatch[%d] has nil IATBatchHeader", j)
+		}
+
+		entries := incoming.IATBatches[j].GetEntries()
+		for m := range entries {
+			b := findOutIATBatch(ibh, outFile.iatBatches, entries[m])
+
+			if b == nil {
+				b = &iatBatch{
+					header:       *ibh,
+					entries:      treemap.New[string, *IATEntryDetail](),
+					validateOpts: incoming.GetValidation(),
+				}
+				outFile.iatBatches = append(outFile.iatBatches, b)
 			}
 
 			b.entries.Set(entries[m].TraceNumber, entries[m])
@@ -577,7 +598,7 @@ func convertToFiles(sorted *outFile, conditions Conditions) ([]*File, error) {
 					}
 					file.AddBatch(batch)
 				}
-				if len(file.Batches) > 0 {
+				if len(file.Batches) > 0 || len(file.IATBatches) > 0 {
 					err = file.Create()
 					if err != nil {
 						return nil, fmt.Errorf("problem creating file for new file/batch: %w", err)
@@ -630,7 +651,121 @@ func convertToFiles(sorted *outFile, conditions Conditions) ([]*File, error) {
 			}
 		}
 
-		if len(file.Batches) > 0 {
+		for i := range sorted.iatBatches {
+			nextBatch := sorted.iatBatches[i]
+
+			batchNumber += 1
+			iatBh := &IATBatchHeader{
+				ServiceClassCode:                  nextBatch.header.ServiceClassCode,
+				IATIndicator:                      nextBatch.header.IATIndicator,
+				ForeignExchangeIndicator:          nextBatch.header.ForeignExchangeIndicator,
+				ForeignExchangeReferenceIndicator: nextBatch.header.ForeignExchangeReferenceIndicator,
+				ForeignExchangeReference:          nextBatch.header.ForeignExchangeReference,
+				ISODestinationCountryCode:         nextBatch.header.ISODestinationCountryCode,
+				OriginatorIdentification:          nextBatch.header.OriginatorIdentification,
+				StandardEntryClassCode:            nextBatch.header.StandardEntryClassCode,
+				CompanyEntryDescription:           nextBatch.header.CompanyEntryDescription,
+				ISOOriginatingCurrencyCode:        nextBatch.header.ISOOriginatingCurrencyCode,
+				ISODestinationCurrencyCode:        nextBatch.header.ISODestinationCurrencyCode,
+				EffectiveEntryDate:                nextBatch.header.EffectiveEntryDate,
+				SettlementDate:                    nextBatch.header.SettlementDate,
+				OriginatorStatusCode:              nextBatch.header.OriginatorStatusCode,
+				ODFIIdentification:                nextBatch.header.ODFIIdentification,
+				BatchNumber:                       batchNumber,
+			}
+			iatBatch := NewIATBatch(iatBh)
+			iatBatch.SetValidation(nextBatch.validateOpts)
+
+			currentFileLineCount += 2 // IATBatchHeader, BatchControl
+
+			// add each IAT entry detail
+			for it := nextBatch.entries.Iterator(); it.Valid(); it.Next() {
+				nextEntry := it.Value()
+
+				// Check if we're going to exceed the merge conditions before adding the entry
+				entryLineCount := 1 + nextEntry.addendaCount()
+				if conditions.MaxLines > 0 {
+					// File will be too large, so make a new file and batch
+					if currentFileLineCount+entryLineCount > conditions.MaxLines {
+						goto iatOverflow
+					}
+				}
+
+				// File would exceed the dollar amount we're limited to
+				if conditions.MaxDollarAmount > 0 {
+					if int64(currentFileDollarAmount)+int64(nextEntry.Amount) > conditions.MaxDollarAmount {
+						goto iatOverflow
+					}
+				}
+
+				// Without a condition being exceeded jump into adding the entry in the current batch
+				goto iatMerge
+
+			iatOverflow:
+				// Close out the current batch and file since we exceeded some limit
+				if len(iatBatch.Entries) > 0 {
+					err := iatBatch.Create()
+					if err != nil {
+						return nil, fmt.Errorf("problem creating IAT batch for new file/batch: %w", err)
+					}
+					file.AddIATBatch(iatBatch)
+				}
+				if len(file.Batches) > 0 || len(file.IATBatches) > 0 {
+					err := file.Create()
+					if err != nil {
+						return nil, fmt.Errorf("problem creating file for new file/batch: %w", err)
+					}
+					out = append(out, file)
+				}
+
+				// Reset counters
+				currentFileLineCount = 4 // FileHeader, FileControl, IATBatchHeader, BatchControl
+				currentFileDollarAmount = 0
+
+				// Create the new file and batch
+				file = NewFile()
+				file.Header = sorted.header
+
+				batchNumber += 1
+				iatBh = &IATBatchHeader{
+					ServiceClassCode:                  nextBatch.header.ServiceClassCode,
+					IATIndicator:                      nextBatch.header.IATIndicator,
+					ForeignExchangeIndicator:          nextBatch.header.ForeignExchangeIndicator,
+					ForeignExchangeReferenceIndicator: nextBatch.header.ForeignExchangeReferenceIndicator,
+					ForeignExchangeReference:          nextBatch.header.ForeignExchangeReference,
+					ISODestinationCountryCode:         nextBatch.header.ISODestinationCountryCode,
+					OriginatorIdentification:          nextBatch.header.OriginatorIdentification,
+					StandardEntryClassCode:            nextBatch.header.StandardEntryClassCode,
+					CompanyEntryDescription:           nextBatch.header.CompanyEntryDescription,
+					ISOOriginatingCurrencyCode:        nextBatch.header.ISOOriginatingCurrencyCode,
+					ISODestinationCurrencyCode:        nextBatch.header.ISODestinationCurrencyCode,
+					EffectiveEntryDate:                nextBatch.header.EffectiveEntryDate,
+					SettlementDate:                    nextBatch.header.SettlementDate,
+					OriginatorStatusCode:              nextBatch.header.OriginatorStatusCode,
+					ODFIIdentification:                nextBatch.header.ODFIIdentification,
+					BatchNumber:                       batchNumber,
+				}
+				iatBatch = NewIATBatch(iatBh)
+				iatBatch.SetValidation(nextBatch.validateOpts)
+
+			iatMerge:
+				// Add the entry to the current batch
+				iatBatch.AddEntry(nextEntry)
+
+				currentFileLineCount += 1 + nextEntry.addendaCount()
+				currentFileDollarAmount += nextEntry.Amount
+			}
+
+			if len(iatBatch.Entries) > 0 {
+				err := iatBatch.Create()
+				if err != nil {
+					return nil, fmt.Errorf("problem creating IAT batch for outfile: %w", err)
+				}
+				file.AddIATBatch(iatBatch)
+			}
+		}
+
+		if len(file.Batches) > 0 || len(file.IATBatches) > 0 {
 			err := file.Create()
 			if err != nil {
 				return nil, fmt.Errorf("problem creating outfile: %w", err)
@@ -648,6 +783,14 @@ func convertToFiles(sorted *outFile, conditions Conditions) ([]*File, error) {
 type batch struct {
 	header       BatchHeader
 	entries      *treemap.TreeMap[string, *EntryDetail]
+	validateOpts *ValidateOpts
+}
+
+// iatBatch contains an IATBatchHeader and tree of IAT entries sorted by TraceNumber,
+// which allows for faster lookup and insertion into an ACH file
+type iatBatch struct {
+	header       IATBatchHeader
+	entries      *treemap.TreeMap[string, *IATEntryDetail]
 	validateOpts *ValidateOpts
 }
 
@@ -675,6 +818,24 @@ func pickOutFile(fh FileHeader, file *outFile) *outFile {
 // findOutBatch searches an array of batches for one whose BatcHeader matches bh
 // and doesn't contain the TraceNumber from entry.
 func findOutBatch(bh *BatchHeader, batches []*batch, entry *EntryDetail) *batch {
+	for i := range batches {
+		if batches[i].header.Equal(bh) {
+			// Make sure this batch doesn't contain the TraceNumber already
+			var found bool
+			if entry != nil {
+				found = batches[i].entries.Contains(entry.TraceNumber)
+			}
+			if !found {
+				return batches[i]
+			}
+		}
+	}
+	return nil
+}
+
+// findOutIATBatch searches an array of IAT batches for one whose IATBatchHeader matches bh
+// and doesn't contain the TraceNumber from entry.
+func findOutIATBatch(bh *IATBatchHeader, batches []*iatBatch, entry *IATEntryDetail) *iatBatch {
 	for i := range batches {
 		if batches[i].header.Equal(bh) {
 			// Make sure this batch doesn't contain the TraceNumber already

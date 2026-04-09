@@ -493,3 +493,38 @@ func (iatBh *IATBatchHeader) BatchNumberField() string {
 func (iatBh *IATBatchHeader) SettlementDateField() string {
 	return iatBh.alphaField(iatBh.SettlementDate, 3)
 }
+
+// Equal checks if two IATBatchHeader records are equal for merge matching purposes.
+func (iatBh *IATBatchHeader) Equal(other *IATBatchHeader) bool {
+	if iatBh == nil || other == nil {
+		return false
+	}
+	if iatBh.ServiceClassCode != other.ServiceClassCode {
+		return false
+	}
+	if iatBh.ForeignExchangeIndicator != other.ForeignExchangeIndicator {
+		return false
+	}
+	if iatBh.ISODestinationCountryCode != other.ISODestinationCountryCode {
+		return false
+	}
+	if iatBh.OriginatorIdentification != other.OriginatorIdentification {
+		return false
+	}
+	if iatBh.StandardEntryClassCode != other.StandardEntryClassCode {
+		return false
+	}
+	if iatBh.CompanyEntryDescription != other.CompanyEntryDescription {
+		return false
+	}
+	if iatBh.ISOOriginatingCurrencyCode != other.ISOOriginatingCurrencyCode {
+		return false
+	}
+	if iatBh.ISODestinationCurrencyCode != other.ISODestinationCurrencyCode {
+		return false
+	}
+	if iatBh.ODFIIdentification != other.ODFIIdentification {
+		return false
+	}
+	return true
+}
