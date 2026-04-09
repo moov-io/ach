@@ -648,7 +648,10 @@ func TestMergeDir_WithFS(t *testing.T) {
 
 func TestMergeDir_Nested(t *testing.T) {
 	dir := t.TempDir()
-	sub := filepath.Join("inner")
+
+	sub := filepath.Join("aaaa")
+	require.NoError(t, os.MkdirAll(filepath.Join(dir, sub), 0777))
+	sub = filepath.Join("inner")
 	require.NoError(t, os.MkdirAll(filepath.Join(dir, sub), 0777))
 
 	src, err := os.Open(filepath.Join("test", "testdata", "ppd-debit.ach"))
@@ -1018,4 +1021,46 @@ func TestFindOutIATBatch(t *testing.T) {
 		TraceNumber: traceNumber,
 	})
 	require.Nil(t, output)
+}
+
+func TestMergeDir_DeadlockPrevention(t *testing.T) {
+	dir := t.TempDir()
+
+	// Copy a valid file
+	src1, err := os.Open(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+	defer src1.Close()
+
+	dst1, err := os.Create(filepath.Join(dir, "valid.ach"))
+	require.NoError(t, err)
+	_, err = io.Copy(dst1, src1)
+	require.NoError(t, err)
+	require.NoError(t, dst1.Close())
+
+	// Copy an ADV file which will cause sorted.add to fail
+	src2, err := os.Open(filepath.Join("test", "testdata", "adv.ach"))
+	require.NoError(t, err)
+	defer src2.Close()
+
+	dst2, err := os.Create(filepath.Join(dir, "adv.ach"))
+	require.NoError(t, err)
+	_, err = io.Copy(dst2, src2)
+	require.NoError(t, err)
+	require.NoError(t, dst2.Close())
+
+	// Copy another valid file to ensure concurrency
+	src3, err := os.Open(filepath.Join("test", "testdata", "web-debit.ach"))
+	require.NoError(t, err)
+	defer src3.Close()
+
+	dst3, err := os.Create(filepath.Join(dir, "valid2.ach"))
+	require.NoError(t, err)
+	_, err = io.Copy(dst3, src3)
+	require.NoError(t, err)
+	require.NoError(t, dst3.Close())
+
+	// MergeDir should fail due to ADV file, but not deadlock
+	_, err = MergeDir(dir, Conditions{}, nil)
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "merging ADV batches is not supported")
 }

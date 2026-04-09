@@ -240,7 +240,7 @@ func MergeDir(dir string, conditions Conditions, opts *MergeDirOptions) ([]*File
 			pathsGroup.Done()
 		}()
 
-		return walkDir(opts.FS, dir, opts, discoveredPaths)
+		return walkDir(pathsCtx, opts.FS, dir, opts, discoveredPaths)
 	})
 	g.Go(func() error {
 		pathsGroup.Wait()
@@ -257,7 +257,12 @@ func MergeDir(dir string, conditions Conditions, opts *MergeDirOptions) ([]*File
 		g.Go(func() error {
 			defer parsingGroup.Done()
 
-			return queueFileForMerging(pathsCtx, discoveredPaths, &setup, sorted, mergableFiles, opts)
+			err := queueFileForMerging(pathsCtx, parsingCtx, discoveredPaths, &setup, sorted, mergableFiles, opts)
+			if err != nil {
+				pathsCancelFunc()
+				parsingCancelFunc()
+			}
+			return err
 		})
 	}
 	g.Go(func() error {
@@ -278,6 +283,10 @@ func MergeDir(dir string, conditions Conditions, opts *MergeDirOptions) ([]*File
 				// accumulate the file into our merged set
 				err := sorted.add(file)
 				if err != nil {
+					// Cancel all goroutines to avoid deadlock on unbuffered channels
+					pathsCancelFunc()
+					parsingCancelFunc()
+
 					return fmt.Errorf("adding file into merged set failed: %w", err)
 				}
 
@@ -295,7 +304,7 @@ func MergeDir(dir string, conditions Conditions, opts *MergeDirOptions) ([]*File
 	return convertToFiles(sorted, conditions)
 }
 
-func walkDir(fsys fs.FS, dir string, opts *MergeDirOptions, discoveredPaths chan string) error {
+func walkDir(ctx context.Context, fsys fs.FS, dir string, opts *MergeDirOptions, discoveredPaths chan string) error {
 	var items []fs.DirEntry
 	var err error
 
@@ -318,7 +327,10 @@ func walkDir(fsys fs.FS, dir string, opts *MergeDirOptions, discoveredPaths chan
 	for i := range items {
 		if items[i].IsDir() {
 			if opts.SubDirectories {
-				return walkDir(fsys, filepath.Join(dir, items[i].Name()), opts, discoveredPaths)
+				err := walkDir(ctx, fsys, filepath.Join(dir, items[i].Name()), opts, discoveredPaths)
+				if err != nil {
+					return err
+				}
 			} else {
 				continue
 			}
@@ -326,14 +338,18 @@ func walkDir(fsys fs.FS, dir string, opts *MergeDirOptions, discoveredPaths chan
 
 		fullPath := filepath.Join(dir, items[i].Name())
 		if fullPath != "" {
-			discoveredPaths <- fullPath
+			select {
+			case discoveredPaths <- fullPath:
+			case <-ctx.Done():
+				return nil
+			}
 		}
 	}
 
 	return nil
 }
 
-func queueFileForMerging(ctx context.Context, discoveredPaths chan string, setup *sync.Once, sorted *outFile, mergableFiles chan *File, opts *MergeDirOptions) error {
+func queueFileForMerging(pathsCtx, parsingCtx context.Context, discoveredPaths chan string, setup *sync.Once, sorted *outFile, mergableFiles chan *File, opts *MergeDirOptions) error {
 	for {
 		select {
 		case path := <-discoveredPaths:
@@ -361,8 +377,11 @@ func queueFileForMerging(ctx context.Context, discoveredPaths chan string, setup
 
 			// Read the file
 			file, err = readFile(opts.FS, path, as, validateOpts)
-			if file == nil || err != nil {
+			if err != nil {
 				return fmt.Errorf("reading %s failed: %w", path, err)
+			}
+			if file == nil {
+				continue
 			}
 
 			// Save the first file's header information if it's not already
@@ -373,10 +392,14 @@ func queueFileForMerging(ctx context.Context, discoveredPaths chan string, setup
 
 			// Only send non-nil files, once this channel receives a nil file we stop merging
 			if file != nil {
-				mergableFiles <- file
+				select {
+				case mergableFiles <- file:
+				case <-parsingCtx.Done():
+					return nil
+				}
 			}
 
-		case <-ctx.Done():
+		case <-pathsCtx.Done():
 			return nil
 		}
 	}
@@ -422,6 +445,14 @@ func readFile(fsys fs.FS, path string, as FileAcceptance, validateOpts *Validate
 		return nil, fmt.Errorf("opening %s failed: %w", path, err)
 	}
 	defer fd.Close()
+
+	stat, err := fd.Stat()
+	if stat != nil && stat.IsDir() {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("stat %s failed: %w", path, err)
+	}
 
 	if as == AcceptFile {
 		r := NewReader(fd)
