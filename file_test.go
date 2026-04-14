@@ -2540,3 +2540,57 @@ func TestFile_isBatchCount(t *testing.T) {
 		require.NoError(t, err)
 	})
 }
+
+// Check the line numbers computed by Create()
+func TestFileLineNumbers(t *testing.T) {
+	file := mockFilePPD(t)
+
+	// expected line numbers:
+	// 1: fh
+	// 2: bh
+	// 3: ed
+	// 4: bc
+	// 5: fc
+	require.Equal(t, 1, file.Header.LineNumber)
+	require.Equal(t, 2, file.Batches[0].GetHeader().LineNumber)
+	require.Equal(t, 3, file.Batches[0].GetEntries()[0].LineNumber)
+	require.Equal(t, 4, file.Batches[0].GetControl().LineNumber)
+	require.Equal(t, 5, file.Control.LineNumber)
+
+	// add a single entry IAT Batch (with addendas)
+	newBatch := mockIATBatch(t)
+	file.AddIATBatch(newBatch)
+	file.Create()
+
+	// expected line numbers:
+	// 1: fh
+	// 2: bh
+	// 3: ed
+	// 4: bc
+	// 5: bh
+	// 6: ed
+	// 7: addenda10
+	// 8: addenda11
+	// 9: addenda12
+	// 10: addenda13
+	// 11: addenda14
+	// 12: addenda15
+	// 13: addenda16
+	// 14: bc
+	// 15: fc
+	require.Equal(t, 1, file.Header.LineNumber)
+	require.Equal(t, 2, file.Batches[0].GetHeader().LineNumber)
+	require.Equal(t, 3, file.Batches[0].GetEntries()[0].LineNumber)
+	require.Equal(t, 4, file.Batches[0].GetControl().LineNumber)
+	require.Equal(t, 5, file.IATBatches[0].GetHeader().LineNumber)
+	require.Equal(t, 6, file.IATBatches[0].GetEntries()[0].LineNumber)
+	require.Equal(t, 7, file.IATBatches[0].GetEntries()[0].Addenda10.LineNumber)
+	require.Equal(t, 8, file.IATBatches[0].GetEntries()[0].Addenda11.LineNumber)
+	require.Equal(t, 9, file.IATBatches[0].GetEntries()[0].Addenda12.LineNumber)
+	require.Equal(t, 10, file.IATBatches[0].GetEntries()[0].Addenda13.LineNumber)
+	require.Equal(t, 11, file.IATBatches[0].GetEntries()[0].Addenda14.LineNumber)
+	require.Equal(t, 12, file.IATBatches[0].GetEntries()[0].Addenda15.LineNumber)
+	require.Equal(t, 13, file.IATBatches[0].GetEntries()[0].Addenda16.LineNumber)
+	require.Equal(t, 14, file.IATBatches[0].GetControl().LineNumber)
+	require.Equal(t, 15, file.Control.LineNumber)
+}
