@@ -521,8 +521,8 @@ func (f *File) annotateLineNumbers() {
 	for _, b := range f.Batches {
 		n = annotateBatchLineNumbers(b, n)
 	}
-	for _, b := range f.IATBatches {
-		n = annotateIATBatchLineNumbers(&b, n)
+	for i := range f.IATBatches {
+		n = annotateIATBatchLineNumbers(&f.IATBatches[i], n)
 	}
 
 	if !isADV {
