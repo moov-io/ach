@@ -577,6 +577,7 @@ func TestBatchCTX_JSON_RoundTrip(t *testing.T) {
 	file := NewFile()
 	file.Header = staticFileHeader()
 	file.AddBatch(mockBatch)
+	file.Create()
 
 	bs, err := json.Marshal(file)
 	require.NoError(t, err)

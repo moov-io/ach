@@ -129,28 +129,47 @@ func (w *Writer) writeBatch(file *File, isADV bool) error {
 				if err := w.writeLine(entry); err != nil {
 					return err
 				}
-				if err := w.writeLine(entry.Addenda02); err != nil {
-					return err
-				}
-				for _, addenda05 := range entry.Addenda05 {
-					if err := w.writeLine(addenda05); err != nil {
+				if entry.Addenda02 != nil {
+					if err := w.writeLine(entry.Addenda02); err != nil {
 						return err
 					}
 				}
-				if err := w.writeLine(entry.Addenda98); err != nil {
-					return err
+
+				for _, addenda05 := range entry.Addenda05 {
+					if addenda05 != nil {
+						if err := w.writeLine(addenda05); err != nil {
+							return err
+						}
+					}
 				}
-				if err := w.writeLine(entry.Addenda98Refused); err != nil {
-					return err
+				if entry.Addenda98 != nil {
+					if err := w.writeLine(entry.Addenda98); err != nil {
+						return err
+					}
 				}
-				if err := w.writeLine(entry.Addenda99); err != nil {
-					return err
+
+				if entry.Addenda98Refused != nil {
+					if err := w.writeLine(entry.Addenda98Refused); err != nil {
+						return err
+					}
 				}
-				if err := w.writeLine(entry.Addenda99Dishonored); err != nil {
-					return err
+
+				if entry.Addenda99 != nil {
+					if err := w.writeLine(entry.Addenda99); err != nil {
+						return err
+					}
 				}
-				if err := w.writeLine(entry.Addenda99Contested); err != nil {
-					return err
+
+				if entry.Addenda99Dishonored != nil {
+					if err := w.writeLine(entry.Addenda99Dishonored); err != nil {
+						return err
+					}
+				}
+
+				if entry.Addenda99Contested != nil {
+					if err := w.writeLine(entry.Addenda99Contested); err != nil {
+						return err
+					}
 				}
 			}
 		} else {
@@ -158,8 +177,10 @@ func (w *Writer) writeBatch(file *File, isADV bool) error {
 				if err := w.writeLine(entry); err != nil {
 					return err
 				}
-				if err := w.writeLine(entry.Addenda99); err != nil {
-					return err
+				if entry.Addenda99 != nil {
+					if err := w.writeLine(entry.Addenda99); err != nil {
+						return err
+					}
 				}
 			}
 		}
@@ -186,45 +207,73 @@ func (w *Writer) writeIATBatch(file *File) error {
 			if err := w.writeLine(entry); err != nil {
 				return err
 			}
-			if err := w.writeLine(entry.Addenda10); err != nil {
-				return err
+			if entry.Addenda10 != nil {
+				if err := w.writeLine(entry.Addenda10); err != nil {
+					return err
+				}
 			}
-			if err := w.writeLine(entry.Addenda11); err != nil {
-				return err
+
+			if entry.Addenda11 != nil {
+				if err := w.writeLine(entry.Addenda11); err != nil {
+					return err
+				}
 			}
-			if err := w.writeLine(entry.Addenda12); err != nil {
-				return err
+
+			if entry.Addenda12 != nil {
+				if err := w.writeLine(entry.Addenda12); err != nil {
+					return err
+				}
+
 			}
-			if err := w.writeLine(entry.Addenda13); err != nil {
-				return err
+			if entry.Addenda13 != nil {
+				if err := w.writeLine(entry.Addenda13); err != nil {
+					return err
+				}
+
 			}
-			if err := w.writeLine(entry.Addenda14); err != nil {
-				return err
+			if entry.Addenda14 != nil {
+				if err := w.writeLine(entry.Addenda14); err != nil {
+					return err
+				}
 			}
-			if err := w.writeLine(entry.Addenda15); err != nil {
-				return err
+			if entry.Addenda15 != nil {
+				if err := w.writeLine(entry.Addenda15); err != nil {
+					return err
+				}
 			}
-			if err := w.writeLine(entry.Addenda16); err != nil {
-				return err
+			if entry.Addenda16 != nil {
+				if err := w.writeLine(entry.Addenda16); err != nil {
+					return err
+				}
 			}
 			// IAT Addenda17
 			for _, addenda17 := range entry.Addenda17 {
-				if err := w.writeLine(addenda17); err != nil {
-					return err
+				if addenda17 != nil {
+					if err := w.writeLine(addenda17); err != nil {
+						return err
+					}
+
 				}
 			}
 			// IAT Addenda18
 			for _, addenda18 := range entry.Addenda18 {
-				if err := w.writeLine(addenda18); err != nil {
+				if addenda18 != nil {
+					if err := w.writeLine(addenda18); err != nil {
+						return err
+					}
+				}
+
+			}
+			if entry.Addenda98 != nil {
+				if err := w.writeLine(entry.Addenda98); err != nil {
 					return err
 				}
-			}
-			if err := w.writeLine(entry.Addenda98); err != nil {
-				return err
-			}
 
-			if err := w.writeLine(entry.Addenda99); err != nil {
-				return err
+			}
+			if entry.Addenda99 != nil {
+				if err := w.writeLine(entry.Addenda99); err != nil {
+					return err
+				}
 			}
 
 		}
@@ -240,14 +289,8 @@ type writeEntry interface {
 }
 
 func (w *Writer) writeLine(entry writeEntry) error {
-	if entry == nil {
-		return nil
-	}
 
 	line := entry.String()
-	if line == "" {
-		return nil
-	}
 
 	_, err := w.w.WriteString(line)
 	if err != nil {
