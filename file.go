@@ -513,10 +513,10 @@ func datetimeParse(v string) (time.Time, error) {
 // fc
 func (f *File) annotateLineNumbers() {
 	n := 1
-	if f.Header.String() != "" {
-		f.Header.LineNumber = n
-		n++
-	}
+
+	f.Header.LineNumber = n
+	n++
+
 	isADV := f.IsADV()
 	for _, b := range f.Batches {
 		n = annotateBatchLineNumbers(b, n)
@@ -526,23 +526,21 @@ func (f *File) annotateLineNumbers() {
 	}
 
 	if !isADV {
-		if f.Control.String() != "" {
-			f.Control.LineNumber = n
-		}
+		f.Control.LineNumber = n
 	} else {
-		if f.ADVControl.String() != "" {
-			f.ADVControl.LineNumber = n
-		}
+
+		f.ADVControl.LineNumber = n
 	}
 }
 
 func annotateBatchLineNumbers(b Batcher, startIndex int) int {
 	n := startIndex
 	bh := b.GetHeader()
-	if bh != nil && bh.String() != "" {
+	if bh != nil {
 		bh.LineNumber = n
 		n++
 	}
+
 	isADV := bh != nil && bh.StandardEntryClassCode == ADV
 
 	if !isADV {
@@ -557,13 +555,13 @@ func annotateBatchLineNumbers(b Batcher, startIndex int) int {
 
 	if !isADV {
 		bc := b.GetControl()
-		if bc != nil && bc.String() != "" {
+		if bc != nil {
 			bc.LineNumber = n
 			n++
 		}
 	} else {
 		bc := b.GetADVControl()
-		if bc != nil && bc.String() != "" {
+		if bc != nil {
 			bc.LineNumber = n
 			n++
 		}
@@ -574,7 +572,7 @@ func annotateBatchLineNumbers(b Batcher, startIndex int) int {
 func annotateIATBatchLineNumbers(b *IATBatch, startIndex int) int {
 	n := startIndex
 	bh := b.GetHeader()
-	if bh != nil && bh.String() != "" {
+	if bh != nil {
 		bh.LineNumber = n
 		n++
 	}
@@ -584,7 +582,7 @@ func annotateIATBatchLineNumbers(b *IATBatch, startIndex int) int {
 	}
 
 	bc := b.GetControl()
-	if bc != nil && bc.String() != "" {
+	if bc != nil {
 		bc.LineNumber = n
 		n++
 	}
@@ -597,37 +595,37 @@ func annotateEntryLineNumbers(ed *EntryDetail, startIndex int) int {
 	if ed == nil {
 		return n
 	}
-	if ed.String() != "" {
-		ed.LineNumber = n
-		n++
-	}
-	if ed.Addenda02 != nil && ed.Addenda02.String() != "" {
+
+	ed.LineNumber = n
+	n++
+
+	if ed.Addenda02 != nil {
 		ed.Addenda02.LineNumber = n
 		n++
 	}
 	for _, addenda05 := range ed.Addenda05 {
-		if addenda05 != nil && addenda05.String() != "" {
+		if addenda05 != nil {
 			addenda05.LineNumber = n
 			n++
 		}
 	}
-	if ed.Addenda98 != nil && ed.Addenda98.String() != "" {
+	if ed.Addenda98 != nil {
 		ed.Addenda98.LineNumber = n
 		n++
 	}
-	if ed.Addenda98Refused != nil && ed.Addenda98Refused.String() != "" {
+	if ed.Addenda98Refused != nil {
 		ed.Addenda98Refused.LineNumber = n
 		n++
 	}
-	if ed.Addenda99 != nil && ed.Addenda99.String() != "" {
+	if ed.Addenda99 != nil {
 		ed.Addenda99.LineNumber = n
 		n++
 	}
-	if ed.Addenda99Dishonored != nil && ed.Addenda99Dishonored.String() != "" {
+	if ed.Addenda99Dishonored != nil {
 		ed.Addenda99Dishonored.LineNumber = n
 		n++
 	}
-	if ed.Addenda99Contested != nil && ed.Addenda99Contested.String() != "" {
+	if ed.Addenda99Contested != nil {
 		ed.Addenda99Contested.LineNumber = n
 		n++
 	}
@@ -640,11 +638,9 @@ func annotateADVEntryLineNumbers(ed *ADVEntryDetail, startIndex int) int {
 	if ed == nil {
 		return n
 	}
-	if ed.String() != "" {
-		ed.LineNumber = n
-		n++
-	}
-	if ed.Addenda99 != nil && ed.Addenda99.String() != "" {
+	ed.LineNumber = n
+	n++
+	if ed.Addenda99 != nil {
 		ed.Addenda99.LineNumber = n
 		n++
 	}
@@ -657,55 +653,55 @@ func annotateIATEntryLineNumbers(ed *IATEntryDetail, startIndex int) int {
 	if ed == nil {
 		return n
 	}
-	if ed.String() != "" {
-		ed.LineNumber = n
-		n++
-	}
-	if ed.Addenda10 != nil && ed.Addenda10.String() != "" {
+
+	ed.LineNumber = n
+	n++
+
+	if ed.Addenda10 != nil {
 		ed.Addenda10.LineNumber = n
 		n++
 	}
-	if ed.Addenda11 != nil && ed.Addenda11.String() != "" {
+	if ed.Addenda11 != nil {
 		ed.Addenda11.LineNumber = n
 		n++
 	}
-	if ed.Addenda12 != nil && ed.Addenda12.String() != "" {
+	if ed.Addenda12 != nil {
 		ed.Addenda12.LineNumber = n
 		n++
 	}
-	if ed.Addenda13 != nil && ed.Addenda13.String() != "" {
+	if ed.Addenda13 != nil {
 		ed.Addenda13.LineNumber = n
 		n++
 	}
-	if ed.Addenda14 != nil && ed.Addenda14.String() != "" {
+	if ed.Addenda14 != nil {
 		ed.Addenda14.LineNumber = n
 		n++
 	}
-	if ed.Addenda15 != nil && ed.Addenda15.String() != "" {
+	if ed.Addenda15 != nil {
 		ed.Addenda15.LineNumber = n
 		n++
 	}
-	if ed.Addenda16 != nil && ed.Addenda16.String() != "" {
+	if ed.Addenda16 != nil {
 		ed.Addenda16.LineNumber = n
 		n++
 	}
 	for _, addenda17 := range ed.Addenda17 {
-		if addenda17 != nil && addenda17.String() != "" {
+		if addenda17 != nil {
 			addenda17.LineNumber = n
 			n++
 		}
 	}
 	for _, addenda18 := range ed.Addenda18 {
-		if addenda18 != nil && addenda18.String() != "" {
+		if addenda18 != nil {
 			addenda18.LineNumber = n
 			n++
 		}
 	}
-	if ed.Addenda98 != nil && ed.Addenda98.String() != "" {
+	if ed.Addenda98 != nil {
 		ed.Addenda98.LineNumber = n
 		n++
 	}
-	if ed.Addenda99 != nil && ed.Addenda99.String() != "" {
+	if ed.Addenda99 != nil {
 		ed.Addenda99.LineNumber = n
 		n++
 	}
