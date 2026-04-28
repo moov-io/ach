@@ -19,6 +19,7 @@ package ach
 
 import (
 	"bytes"
+	"cmp"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -503,7 +504,7 @@ func TestFileReadJSONFile(t *testing.T) {
 	if file.Header.ImmediateDestination != "231380104" || file.Header.ImmediateDestinationName != "Citadel" {
 		t.Errorf("destination=%s name=%s", file.Header.ImmediateDestination, file.Header.ImmediateDestinationName)
 	}
-	if file.Header.FileCreationTime != "" || file.Header.FileCreationDate != "181008" {
+	if file.Header.FileCreationTime != "0000" || file.Header.FileCreationDate != "181008" {
 		t.Errorf("time=%v date=%v", file.Header.FileCreationTime, file.Header.FileCreationDate)
 	}
 	if v := file.Header.FileCreationTimeField(); v == "" || len(v) != 4 {
@@ -607,6 +608,64 @@ func TestFile__jsonFileNoControlBlobs(t *testing.T) {
 
 	if file.ID != "adam-01" {
 		t.Errorf("file.ID: %s", file.ID)
+	}
+}
+
+func TestFile_overwriteDateTimeFields(t *testing.T) {
+	now := time.Now()
+
+	cases := []struct {
+		fileCreationDate string
+		fileCreationTime string
+
+		expectedFileCreationDate string
+		expectedFileCreationTime string
+	}{
+		{
+			fileCreationDate: "",
+			fileCreationTime: "",
+
+			expectedFileCreationDate: now.Format("060102"),
+			expectedFileCreationTime: now.Format("1504"),
+		},
+		{
+			fileCreationDate: strings.Repeat(" ", 6),
+			fileCreationTime: strings.Repeat(" ", 4),
+
+			expectedFileCreationDate: strings.Repeat(" ", 6),
+			expectedFileCreationTime: strings.Repeat(" ", 4),
+		},
+		{
+			fileCreationDate: "261230",
+			fileCreationTime: "",
+
+			expectedFileCreationDate: "261230",
+			expectedFileCreationTime: "0000",
+		},
+		{
+			fileCreationDate: "261230",
+			fileCreationTime: "1234",
+
+			expectedFileCreationDate: "261230",
+			expectedFileCreationTime: "1234",
+		},
+	}
+	for _, tc := range cases {
+		name := fmt.Sprintf("%s at %s", cmp.Or(tc.fileCreationDate, "empty"), cmp.Or(tc.fileCreationTime, "empty"))
+
+		t.Run(name, func(t *testing.T) {
+			file := mockFilePPD(t)
+			file.Header.FileCreationDate = tc.fileCreationDate
+			file.Header.FileCreationTime = tc.fileCreationTime
+
+			file.overwriteDateTimeFields()
+
+			require.Equal(t, tc.expectedFileCreationDate, file.Header.FileCreationDate)
+			require.Equal(t, tc.expectedFileCreationDate, file.Header.FileCreationDateField())
+
+			require.Equal(t, tc.expectedFileCreationTime, file.Header.FileCreationTime)
+			require.Equal(t, tc.expectedFileCreationTime, file.Header.FileCreationTimeField())
+		})
 	}
 }
 
