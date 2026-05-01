@@ -456,6 +456,17 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 // values which are not in their ACH format (YYMMDD, hhmm). It'll attempt to parse
 // various formats and overwrite them to the expected values (YYMMDD, hhmm).
 func (f *File) overwriteDateTimeFields() {
+	// Sometimes FileCreationTime is empty but FileCreationDate is populated, so set Time to 0000
+	if f.Header.FileCreationDate != "" && f.Header.FileCreationTime == "" {
+		f.Header.FileCreationTime = "0000"
+	}
+	// If both Date and Time are empty use the current wall clock value
+	if f.Header.FileCreationDate == "" && f.Header.FileCreationTime == "" {
+		now := time.Now()
+		f.Header.FileCreationTime = now.Format("1504")
+		f.Header.FileCreationDate = now.Format("060102")
+	}
+
 	// File header
 	if t, err := datetimeParse(f.Header.FileCreationDate); err == nil {
 		f.Header.FileCreationDate = t.Format("060102")
