@@ -94,7 +94,7 @@ func (c *converters) alphaField(s string, max uint) string {
 		return string([]rune(s)[:max])
 	}
 
-	m := int(max) - int(ln) //nolint:gosec
+	m := int(max) - int(ln)
 	if m < 0 {
 		return ""
 	}
@@ -122,7 +122,7 @@ func (c *converters) numericField(n int, max uint) string {
 		return s[l-max:]
 	}
 
-	m := int(max) - int(l) //nolint:gosec
+	m := int(max) - int(l)
 	if m < 0 {
 		return ""
 	}
@@ -155,7 +155,7 @@ func (c *converters) stringField(s string, max uint) string {
 		return string([]rune(s)[:max])
 	}
 
-	m := int(max) - int(ln) //nolint:gosec
+	m := int(max) - int(ln)
 	if m < 0 {
 		return ""
 	}

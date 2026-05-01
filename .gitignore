@@ -49,6 +49,7 @@ staticcheck*
 bin/
 tmp/
 gitleaks.tar.gz
+/.golangci-lint-generated.yml
 
 # fuzzing
 test/fuzz-reader/crashes
