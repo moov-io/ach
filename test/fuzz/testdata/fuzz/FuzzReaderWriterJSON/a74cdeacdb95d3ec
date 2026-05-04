@@ -1,0 +1,2 @@
+go test fuzz v1
+string("{\"BAtChes\":[{\"BAtChHeAder\":{\"serviCeClAssCode\":200,\"CompAnYNAme\":\"1\",\"CompAnYIdentifiCAtion\":\"1\",\"stAndArdEntrYClAssCode\":\"PPD\",\"CompAnYEntrYDesCription\":\"1\",\"ODFIIdentifiCAtion\":\"0\"},\"entrYDetAils\":[null]}]}")

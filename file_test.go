@@ -1096,6 +1096,15 @@ func TestBatchControlNil(t *testing.T) {
 
 }
 
+func TestFileReadEntriesNull(t *testing.T) {
+	file, err := ReadJSONFile(filepath.Join("test", "testdata", "null-entries.json"))
+	require.NoError(t, err)
+
+	require.NotNil(t, file)
+	require.NoError(t, file.Create())
+	require.NoError(t, file.Validate())
+}
+
 func TestFileADV__readFromJson(t *testing.T) {
 	path := filepath.Join("test", "testdata", "adv-valid.json")
 	bs, err := os.ReadFile(path)

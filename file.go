@@ -380,7 +380,12 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 
 		secCode := strings.ToUpper(batch.Header.StandardEntryClassCode)
 
+		var filteredEntries []*EntryDetail
 		for _, e := range batch.Entries {
+			if e == nil {
+				continue
+			}
+
 			e.SetValidation(f.validateOpts)
 
 			// these values need to be inferred from the json field names
@@ -411,9 +416,22 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 					e.SetCATXReceivingCompany(individualName)
 				}
 			}
+			filteredEntries = append(filteredEntries, e)
 		}
+		batch.Entries = filteredEntries
+		var filteredADVEntries []*ADVEntryDetail
 		for _, e := range batch.ADVEntries {
+			if e == nil {
+				continue
+			}
 			setADVEntryRecordType(e)
+			filteredADVEntries = append(filteredADVEntries, e)
+		}
+		batch.ADVEntries = filteredADVEntries
+
+		// Skip batches with no entries after filtering nulls
+		if len(batch.Entries) == 0 && len(batch.ADVEntries) == 0 {
+			continue
 		}
 
 		if err := batch.build(); err != nil {

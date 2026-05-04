@@ -1,0 +1,28 @@
+{
+    "validateOpts": {
+        "allowZeroBatches": true
+    },
+    "fileHeader": {
+        "immediateDestination": "231380104",
+        "immediateOrigin": "121042882",
+        "fileCreationDate": "181008",
+        "fileIDModifier": "A",
+        "immediateDestinationName": "Citadel",
+        "immediateOriginName": "Wells Fargo"
+    },
+    "batches": [
+        {
+            "batchHeader": {
+                "serviceClassCode": 200,
+                "companyName": "1",
+                "companyIdentification": "1",
+                "standardEntryClassCode": "PPD",
+                "companyEntryDescription": "1",
+                "odfiIdentification": "0"
+            },
+            "entryDetails": [
+                null
+            ]
+        }
+    ]
+}
