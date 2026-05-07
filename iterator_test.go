@@ -219,7 +219,9 @@ func iteratorFromFile(t *testing.T, where string, opts *ValidateOpts) *Iterator 
 	t.Cleanup(func() { fd.Close() })
 
 	iter := NewIterator(fd)
-	iter.SetValidation(opts)
+	if opts != nil {
+		iter.SetValidation(opts)
+	}
 	return iter
 }
 
@@ -234,6 +236,10 @@ func ensureFileEqualsIterator(t *testing.T, file *File, iter *Iterator) {
 
 			ibh, ied, err := iter.NextEntry()
 			require.NoError(t, err, "iterator batch[%d], entry[%d] error: %v", i, j, err)
+
+			if ibh != nil && ied == nil {
+				t.Fatal("Iterator returned BatchHeader with nil EntryDetail")
+			}
 
 			require.True(t, bh.Equal(ibh), "batch[%d] headers", i)
 			require.Equal(t, ed, ied, "batch[%d] entry[%d] details", i, j)
@@ -262,6 +268,9 @@ func collectEntries(t *testing.T, iter *Iterator) []*EntryDetail {
 		}
 		if bh == nil && ed == nil {
 			break
+		}
+		if bh != nil && ed == nil {
+			t.Fatal("Iterator returned BatchHeader with nil EntryDetail")
 		}
 		if bh != nil && ed != nil {
 			entries = append(entries, ed)

@@ -161,7 +161,7 @@ func (i *Iterator) NextEntry() (*BatchHeader, *EntryDetail, error) {
 						if !strings.HasPrefix(foundLine, "9") {
 							i.cachedLine = foundLine
 						}
-						return bh, nil, nil
+						return i.NextEntry()
 					}
 				} else {
 					break // quit processing if we can't read another line
