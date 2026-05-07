@@ -124,3 +124,23 @@ func TestReversal_LoanCredit(t *testing.T) {
 	require.Len(t, entries, 1)
 	require.Equal(t, LoanCredit, entries[0].TransactionCode)
 }
+
+func TestReversal_TEL(t *testing.T) {
+	file := NewFile()
+	file.Header = mockFileHeader()
+
+	batch := mockBatchTEL(t)
+	file.AddBatch(batch)
+
+	err := file.Create()
+	require.NoError(t, err)
+
+	err = file.Reversal(time.Now())
+	require.NoError(t, err)
+
+	err = file.Create()
+	require.NoError(t, err)
+
+	err = file.Validate()
+	require.NoError(t, err)
+}
