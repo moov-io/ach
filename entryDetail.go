@@ -221,80 +221,34 @@ func (ed *EntryDetail) Parse(record string) {
 		return
 	}
 
-	buf := getBuffer()
-	defer saveBuffer(buf)
+	// Precompute byte positions for all rune boundaries (0 to 94)
+	bytePositions := make([]int, 95)
+	byteIndex := 0
+	for i := 0; i < 94; i++ {
+		bytePositions[i] = byteIndex
+		_, size := utf8.DecodeRuneInString(record[byteIndex:])
+		byteIndex += size
+	}
+	bytePositions[94] = byteIndex
 
-	reset := func() string {
-		out := buf.String()
-		buf.Reset()
-		return out
+	// Extract fields using precomputed byte positions
+	ed.TransactionCode = ed.parseNumField(record[bytePositions[1]:bytePositions[3]])
+	ed.RDFIIdentification = record[bytePositions[3]:bytePositions[11]]
+	ed.CheckDigit = record[bytePositions[11]:bytePositions[12]]
+	ed.DFIAccountNumber = ed.parseStringFieldWithOpts(record[bytePositions[12]:bytePositions[29]], ed.validateOpts)
+	ed.Amount = ed.parseNumField(record[bytePositions[29]:bytePositions[39]])
+
+	if strings.EqualFold(ed.secCode, CIE) || strings.EqualFold(ed.secCode, MTE) {
+		ed.IndividualName = record[bytePositions[39]:bytePositions[54]]
+		ed.IdentificationNumber = record[bytePositions[54]:bytePositions[76]]
+	} else {
+		ed.IdentificationNumber = record[bytePositions[39]:bytePositions[54]]
+		ed.IndividualName = record[bytePositions[54]:bytePositions[76]]
 	}
 
-	// We're going to process the record rune-by-rune and at each field cutoff save the value.
-	var idx int
-	for _, r := range record {
-		idx++
-
-		// Append rune to buffer
-		buf.WriteRune(r)
-
-		// At each cutoff save the buffer and reset
-		switch idx {
-		case 0, 1:
-			// do nothing, ignore "6" record type
-			reset()
-
-		case 3:
-			// 2-3 is checking credit 22 debit 27 savings credit 32 debit 37
-			ed.TransactionCode = ed.parseNumField(reset())
-
-		case 11:
-			// 4-11 the RDFI's routing number without the last digit.
-			ed.RDFIIdentification = reset()
-
-		case 12:
-			// 12-12 The last digit of the RDFI's routing number
-			ed.CheckDigit = reset()
-
-		case 29:
-			// 13-29 The receiver's bank account number you are crediting/debiting
-			ed.DFIAccountNumber = ed.parseStringFieldWithOpts(reset(), ed.validateOpts)
-
-		case 39:
-			// 30-39 Number of cents you are debiting/crediting this account
-			ed.Amount = ed.parseNumField(reset())
-
-		case 54:
-			// 40-54 For CIE/MTE: Individual Name; For others: Identification Number
-			if strings.EqualFold(ed.secCode, CIE) || strings.EqualFold(ed.secCode, MTE) {
-				ed.IndividualName = reset()
-			} else {
-				ed.IdentificationNumber = reset()
-			}
-
-		case 76:
-			// 55-76 For CIE/MTE: Identification Number; For others: Individual Name
-			if strings.EqualFold(ed.secCode, CIE) || strings.EqualFold(ed.secCode, MTE) {
-				ed.IdentificationNumber = reset()
-			} else {
-				ed.IndividualName = reset()
-			}
-
-		case 78:
-			// 77-78 allows ODFIs to include codes of significance only to them, normally blank
-			// For WEB and TEL batches this field is the PaymentType which is either R(reoccurring) or S(single)
-			ed.DiscretionaryData = reset()
-
-		case 79:
-			// 79-79 1 if addenda exists 0 if it does not
-			ed.AddendaRecordIndicator = ed.parseNumField(reset())
-
-		case 94:
-			// 80-94 An internal identification (numeric) that you use to uniquely identify
-			// this Entry Detail Record This number should be unique to the transaction and will help identify the transaction in case of an inquiry
-			ed.TraceNumber = reset() // capture end of record
-		}
-	}
+	ed.DiscretionaryData = record[bytePositions[76]:bytePositions[78]]
+	ed.AddendaRecordIndicator = ed.parseNumField(record[bytePositions[78]:bytePositions[79]])
+	ed.TraceNumber = record[bytePositions[79]:bytePositions[94]]
 }
 
 // String writes the EntryDetail struct to a 94 character string.
