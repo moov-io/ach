@@ -187,6 +187,54 @@ func TestIterator(t *testing.T) {
 		require.False(t, allSpaces(""))
 		require.False(t, allSpaces("abc"))
 	})
+
+	t.Run("max lines error", func(t *testing.T) {
+		// Create a simple ACH file content
+		content := `101 121042882 2313801042308080808A094101Federal Reserve Bank   My Bank Name
+5220ACME Corporation                    121042882 PPDPAYROLL         000000   1121042880000001
+622121042882123456789        0100000000ABC##jvkdjfuiwnWade Arnold             1121042880000001
+82200000020012104288000000000000000100000000121042882                          121042880000001
+90000010000010000000100042882000000000000000010000
+9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999`
+
+		iter := NewIterator(strings.NewReader(content))
+		iter.SetMaxLines(5) // Set low max lines to trigger error
+
+		// Collect entries but expect error
+		var entries []*EntryDetail
+		for {
+			bh, ed, err := iter.NextEntry()
+			if err != nil {
+				// Expect max lines error
+				require.Contains(t, err.Error(), "maximum")
+				break
+			}
+			if bh == nil && ed == nil {
+				break
+			}
+			if bh != nil && ed != nil {
+				entries = append(entries, ed)
+			}
+		}
+		require.Len(t, entries, 1)
+	})
+
+	t.Run("get header and control", func(t *testing.T) {
+		iter := iteratorFromFile(t, filepath.Join("test", "testdata", "ppd-mixedDebitCredit.ach"), nil)
+
+		// Consume all entries
+		entries := collectEntries(t, iter)
+		require.Len(t, entries, 3)
+
+		header := iter.GetHeader()
+		require.NotNil(t, header)
+		require.Equal(t, "231380104", header.ImmediateDestination)
+
+		control := iter.GetControl()
+		require.NotNil(t, control)
+		require.Equal(t, 3, control.EntryAddendaCount)
+	})
 }
 
 func openFile(t *testing.T, where string, opts *ValidateOpts) *File {
@@ -219,7 +267,9 @@ func iteratorFromFile(t *testing.T, where string, opts *ValidateOpts) *Iterator 
 	t.Cleanup(func() { fd.Close() })
 
 	iter := NewIterator(fd)
-	iter.SetValidation(opts)
+	if opts != nil {
+		iter.SetValidation(opts)
+	}
 	return iter
 }
 
@@ -234,6 +284,10 @@ func ensureFileEqualsIterator(t *testing.T, file *File, iter *Iterator) {
 
 			ibh, ied, err := iter.NextEntry()
 			require.NoError(t, err, "iterator batch[%d], entry[%d] error: %v", i, j, err)
+
+			if ibh != nil && ied == nil {
+				t.Fatal("Iterator returned BatchHeader with nil EntryDetail")
+			}
 
 			require.True(t, bh.Equal(ibh), "batch[%d] headers", i)
 			require.Equal(t, ed, ied, "batch[%d] entry[%d] details", i, j)
@@ -262,6 +316,9 @@ func collectEntries(t *testing.T, iter *Iterator) []*EntryDetail {
 		}
 		if bh == nil && ed == nil {
 			break
+		}
+		if bh != nil && ed == nil {
+			t.Fatal("Iterator returned BatchHeader with nil EntryDetail")
 		}
 		if bh != nil && ed != nil {
 			entries = append(entries, ed)
