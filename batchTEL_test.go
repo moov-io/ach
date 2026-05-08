@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/moov-io/base"
@@ -238,4 +239,24 @@ func TestBatchTELValidTranCodeForServiceClassCode(t *testing.T) {
 	if !base.Match(err, NewErrBatchServiceClassTranCode(CreditsOnly, 27)) {
 		t.Errorf("%T: %s", err, err)
 	}
+}
+
+func TestTEL_Reversal(t *testing.T) {
+	file, err := ReadFile(filepath.Join("test", "testdata", "NACHA_SAMPLE_TEL_REVERSAL.ach"))
+	require.ErrorContains(t, err, `line:5 record:Batches *ach.BatchError batch #1 (TEL) TransactionCode this batch type does not allow debit transaction codes: 27`)
+	require.Len(t, file.Batches, 1)
+
+	// make it valid
+	b, ok := file.Batches[0].(*BatchTEL)
+	require.True(t, ok)
+
+	b.Entries = b.Entries[:1]
+	require.NoError(t, b.Create())
+
+	// verify
+	invalidEntries := b.InvalidEntries()
+	require.Empty(t, invalidEntries)
+
+	require.NoError(t, file.Create())
+	require.NoError(t, file.Validate())
 }

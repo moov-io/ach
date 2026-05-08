@@ -17,6 +17,10 @@
 
 package ach
 
+import (
+	"strings"
+)
+
 // BatchTEL is a batch that handles SEC payment type Telephone-Initiated Entries (TEL)
 // Telephone-Initiated Entries (TEL) are consumer debit transactions. The NACHA Operating Rules permit TEL entries when
 // the Originator obtains the Receiver's authorization for the debit entry orally via the telephone.
@@ -62,13 +66,26 @@ func (batch *BatchTEL) Validate() error {
 func (batch *BatchTEL) InvalidEntries() []InvalidEntry {
 	var out []InvalidEntry
 
+	isReversal := strings.EqualFold(strings.TrimSpace(batch.Header.CompanyEntryDescription), "REVERSAL")
+
 	for _, entry := range batch.Entries {
-		// can not have credits in TEL batches
-		if entry.CreditOrDebit() != "D" {
-			out = append(out, InvalidEntry{
-				Entry: entry,
-				Error: batch.Error("TransactionCode", ErrBatchDebitOnly, entry.TransactionCode),
-			})
+		creditOrDebit := entry.CreditOrDebit()
+
+		// Forward TEL batches can only have debit entries, but REVERSAL batches can only have credits
+		if isReversal {
+			if creditOrDebit != "C" {
+				out = append(out, InvalidEntry{
+					Entry: entry,
+					Error: batch.Error("TransactionCode", ErrBatchCreditOnly, entry.TransactionCode),
+				})
+			}
+		} else {
+			if creditOrDebit != "D" { // Forward batch: can only have debits
+				out = append(out, InvalidEntry{
+					Entry: entry,
+					Error: batch.Error("TransactionCode", ErrBatchDebitOnly, entry.TransactionCode),
+				})
+			}
 		}
 		// Verify the Amount is valid for SEC code and TransactionCode
 		if err := batch.ValidAmountForCodes(entry); err != nil {
