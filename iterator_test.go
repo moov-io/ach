@@ -187,6 +187,38 @@ func TestIterator(t *testing.T) {
 		require.False(t, allSpaces(""))
 		require.False(t, allSpaces("abc"))
 	})
+
+	t.Run("max lines error", func(t *testing.T) {
+		// Create a simple ACH file content
+		content := `101 121042882 2313801042308080808A094101Federal Reserve Bank   My Bank Name
+5220ACME Corporation                    121042882 PPDPAYROLL         000000   1121042880000001
+622121042882123456789        0100000000ABC##jvkdjfuiwnWade Arnold             1121042880000001
+82200000020012104288000000000000000100000000121042882                          121042880000001
+90000010000010000000100042882000000000000000010000
+9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999`
+
+		iter := NewIterator(strings.NewReader(content))
+		iter.SetMaxLines(5) // Set low max lines to trigger error
+
+		// Collect entries but expect error
+		var entries []*EntryDetail
+		for {
+			bh, ed, err := iter.NextEntry()
+			if err != nil {
+				// Expect max lines error
+				require.Contains(t, err.Error(), "maximum number of lines")
+				break
+			}
+			if bh == nil && ed == nil {
+				break
+			}
+			if bh != nil && ed != nil {
+				entries = append(entries, ed)
+			}
+		}
+		require.Len(t, entries, 2) // For simple files, entry returned twice: once parsed, once at batch control
+	})
 }
 
 func openFile(t *testing.T, where string, opts *ValidateOpts) *File {

@@ -52,6 +52,13 @@ func (i *Iterator) SetValidation(opts *ValidateOpts) {
 	}
 }
 
+// SetMaxLines sets the maximum number of lines the iterator will process
+func (i *Iterator) SetMaxLines(max int) {
+	if i.reader != nil {
+		i.reader.SetMaxLines(max)
+	}
+}
+
 // GetHeader will return the FileHeader once encountered by the iterator.
 // Call NextEntry() at least once to populate the header.
 func (i *Iterator) GetHeader() *FileHeader {
