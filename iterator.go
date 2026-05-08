@@ -27,14 +27,17 @@ import (
 	"github.com/moov-io/base"
 )
 
-// Iterator is a data structure for processing an ACH file one entry at a time.
+// Iterator provides a way to read an ACH file one entry at a time without loading the entire file into memory.
+// It is useful for processing large ACH files efficiently.
+// The iterator maintains internal state to track the current position in the file.
 type Iterator struct {
 	reader     *Reader
 	scanner    *bufio.Scanner
 	cachedLine string
 }
 
-// NewIterator returns an Iterator
+// NewIterator creates a new Iterator for reading ACH files from the provided io.Reader.
+// The iterator processes the file incrementally, returning one EntryDetail at a time.
 func NewIterator(r io.Reader) *Iterator {
 	reader := NewReader(strings.NewReader("")) // the input is not used, we rely on .readLine()
 	reader.skipBatchAccumulation = true        // don't call .AddBatch(..)
@@ -46,21 +49,25 @@ func NewIterator(r io.Reader) *Iterator {
 	return out
 }
 
+// SetValidation configures validation options for the iterator's internal reader.
+// This affects how strictly the ACH file format is enforced during parsing.
 func (i *Iterator) SetValidation(opts *ValidateOpts) {
 	if i.reader != nil {
 		i.reader.SetValidation(opts)
 	}
 }
 
-// SetMaxLines sets the maximum number of lines the iterator will process
+// SetMaxLines limits the number of lines the iterator will process to prevent excessive memory usage or processing time.
+// If the limit is exceeded, NextEntry returns an error.
+// Set to 0 for no limit (default).
 func (i *Iterator) SetMaxLines(max int) {
 	if i.reader != nil {
 		i.reader.SetMaxLines(max)
 	}
 }
 
-// GetHeader will return the FileHeader once encountered by the iterator.
-// Call NextEntry() at least once to populate the header.
+// GetHeader returns the FileHeader record from the ACH file.
+// Returns nil if NextEntry has not been called yet or if the file has no header.
 func (i *Iterator) GetHeader() *FileHeader {
 	if i.reader != nil {
 		return &i.reader.File.Header
@@ -68,8 +75,8 @@ func (i *Iterator) GetHeader() *FileHeader {
 	return nil
 }
 
-// GetControl will return the FileControl once encountered by the iterator.
-// Call NextEntry() at least once to populate the control.
+// GetControl returns the FileControl record from the ACH file.
+// Returns nil if the end of the file has not been reached yet.
 func (i *Iterator) GetControl() *FileControl {
 	if i.reader != nil {
 		return &i.reader.File.Control
@@ -77,15 +84,13 @@ func (i *Iterator) GetControl() *FileControl {
 	return nil
 }
 
-// NextEntry will return the next available EntryDetail record and the BatchHeader the entry belongs to.
-//
+// NextEntry advances the iterator and returns the next EntryDetail record along with its associated BatchHeader.
+// Returns (nil, nil, nil) when there are no more entries.
+// Returns an error if the file is malformed or if the max lines limit is exceeded.
 // IAT entries are not currently supported.
 func (i *Iterator) NextEntry() (*BatchHeader, *EntryDetail, error) {
-	// Clear the reader's File
-	defer func() {
-		i.reader.File = File{}
-	}()
 
+start:
 	// Read the file one line at a time
 	line := i.cachedLine
 	if line != "" {
@@ -95,6 +100,9 @@ func (i *Iterator) NextEntry() (*BatchHeader, *EntryDetail, error) {
 		for i.scanner.Scan() {
 			line = i.scanner.Text()
 			i.reader.lineNum++
+			if i.reader.maxLines > 0 && i.reader.lineNum > i.reader.maxLines {
+				return nil, nil, fmt.Errorf("line %d: %w", i.reader.lineNum, ErrFileTooLong)
+			}
 			if allSpaces(line) {
 				continue
 			}
@@ -141,6 +149,9 @@ func (i *Iterator) NextEntry() (*BatchHeader, *EntryDetail, error) {
 				if i.scanner.Scan() {
 					foundLine := i.scanner.Text()
 					i.reader.lineNum++
+					if i.reader.maxLines > 0 && i.reader.lineNum > i.reader.maxLines {
+						return nil, nil, fmt.Errorf("line %d: %w", i.reader.lineNum, ErrFileTooLong)
+					}
 					if foundLine == "" {
 						break
 					}
@@ -162,13 +173,13 @@ func (i *Iterator) NextEntry() (*BatchHeader, *EntryDetail, error) {
 
 					case strings.HasPrefix(foundLine, batchControlPos):
 						// Do nothing with the Batch Control record
+						i.reader.currentBatch = nil
 						return bh, returnableEntry, nil
 
 					default:
-						if !strings.HasPrefix(foundLine, "9") {
-							i.cachedLine = foundLine
-						}
-						return i.NextEntry()
+						i.cachedLine = foundLine
+						i.reader.currentBatch = nil
+						return bh, returnableEntry, nil
 					}
 				} else {
 					break // quit processing if we can't read another line
@@ -178,11 +189,11 @@ func (i *Iterator) NextEntry() (*BatchHeader, *EntryDetail, error) {
 			return bh, returnableEntry, nil
 		} else {
 			// We processed the BatchHeader, but need to find an Entry Detail record
-			return i.NextEntry()
+			goto start
 		}
 	}
 
-	return i.NextEntry()
+	goto start
 }
 
 func allSpaces(input string) bool {

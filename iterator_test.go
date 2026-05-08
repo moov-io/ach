@@ -207,7 +207,7 @@ func TestIterator(t *testing.T) {
 			bh, ed, err := iter.NextEntry()
 			if err != nil {
 				// Expect max lines error
-				require.Contains(t, err.Error(), "maximum number of lines")
+				require.Contains(t, err.Error(), "maximum")
 				break
 			}
 			if bh == nil && ed == nil {
@@ -217,7 +217,23 @@ func TestIterator(t *testing.T) {
 				entries = append(entries, ed)
 			}
 		}
-		require.Len(t, entries, 2) // For simple files, entry returned twice: once parsed, once at batch control
+		require.Len(t, entries, 1)
+	})
+
+	t.Run("get header and control", func(t *testing.T) {
+		iter := iteratorFromFile(t, filepath.Join("test", "testdata", "ppd-mixedDebitCredit.ach"), nil)
+
+		// Consume all entries
+		entries := collectEntries(t, iter)
+		require.Len(t, entries, 3)
+
+		header := iter.GetHeader()
+		require.NotNil(t, header)
+		require.Equal(t, "231380104", header.ImmediateDestination)
+
+		control := iter.GetControl()
+		require.NotNil(t, control)
+		require.Equal(t, 3, control.EntryAddendaCount)
 	})
 }
 

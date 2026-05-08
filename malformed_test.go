@@ -55,7 +55,7 @@ func TestIterator_MalformedFiles(t *testing.T) {
 		{
 			path: filepath.Join("test", "testdata", "ppd-mixedDebitCredit-invalid.ach"),
 			expectedBatches: []batchExpectation{
-				{entries: 3},
+				{entries: 2},
 			},
 		},
 	}
