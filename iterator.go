@@ -89,7 +89,6 @@ func (i *Iterator) GetControl() *FileControl {
 // Returns an error if the file is malformed or if the max lines limit is exceeded.
 // IAT entries are not currently supported.
 func (i *Iterator) NextEntry() (*BatchHeader, *EntryDetail, error) {
-
 start:
 	// Read the file one line at a time
 	line := i.cachedLine
