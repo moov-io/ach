@@ -313,7 +313,7 @@ func testBatchControlLength(t testing.TB) {
 // round-trip unchanged even though the encoded record is longer in bytes than runes.
 func TestBatchControl__ParseUTF8RoundTrip(t *testing.T) {
 	bc := mockBatchControl()
-	bc.CompanyIdentification = "Café12345" // 9 runes, 10 bytes (é is 2 bytes)
+	bc.CompanyIdentification = "Caféé12345"
 
 	line := bc.String()
 	require.Equal(t, 94, utf8.RuneCountInString(line))
