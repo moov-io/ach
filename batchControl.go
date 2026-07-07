@@ -99,27 +99,40 @@ func (bc *BatchControl) Parse(record string) {
 		return
 	}
 
+	// Precompute byte positions for all rune boundaries (0 to 94) so multi-byte
+	// UTF-8 in a field (e.g. an accented CompanyIdentification) does not shift the
+	// byte offsets of the fields that follow it. Field slices below are zero-copy
+	// byte substrings. Mirrors EntryDetail.Parse.
+	bytePositions := make([]int, 95)
+	byteIndex := 0
+	for i := 0; i < 94; i++ {
+		bytePositions[i] = byteIndex
+		_, size := utf8.DecodeRuneInString(record[byteIndex:])
+		byteIndex += size
+	}
+	bytePositions[94] = byteIndex
+
 	// 1-1 Always "8"
 	// 2-4 This is the same as the "Service code" field in previous Batch Header Record
-	bc.ServiceClassCode = bc.parseNumField(record[1:4])
+	bc.ServiceClassCode = bc.parseNumField(record[bytePositions[1]:bytePositions[4]])
 	// 5-10 Total number of Entry Detail Record in the batch
-	bc.EntryAddendaCount = bc.parseNumField(record[4:10])
+	bc.EntryAddendaCount = bc.parseNumField(record[bytePositions[4]:bytePositions[10]])
 	// 11-20 Total of all positions 4-11 on each Entry Detail Record in the batch. This is essentially the sum of all the RDFI routing numbers in the batch.
 	// If the sum exceeds 10 digits (because you have lots of Entry Detail Records), lop off the most significant digits of the sum until there are only 10
-	bc.EntryHash = bc.parseNumField(record[10:20])
+	bc.EntryHash = bc.parseNumField(record[bytePositions[10]:bytePositions[20]])
 	// 21-32 Number of cents of debit entries within the batch
-	bc.TotalDebitEntryDollarAmount = bc.parseNumField(record[20:32])
+	bc.TotalDebitEntryDollarAmount = bc.parseNumField(record[bytePositions[20]:bytePositions[32]])
 	// 33-44 Number of cents of credit entries within the batch
-	bc.TotalCreditEntryDollarAmount = bc.parseNumField(record[32:44])
+	bc.TotalCreditEntryDollarAmount = bc.parseNumField(record[bytePositions[32]:bytePositions[44]])
 	// 45-54 This is the same as the "Company identification" field in previous Batch Header Record
-	bc.CompanyIdentification = bc.parseStringFieldWithOpts(record[44:54], bc.validateOpts)
+	bc.CompanyIdentification = bc.parseStringFieldWithOpts(record[bytePositions[44]:bytePositions[54]], bc.validateOpts)
 	// 55-73 Seems to always be blank
-	bc.MessageAuthenticationCode = bc.parseStringFieldWithOpts(record[54:73], bc.validateOpts)
+	bc.MessageAuthenticationCode = bc.parseStringFieldWithOpts(record[bytePositions[54]:bytePositions[73]], bc.validateOpts)
 	// 74-79 Always blank (just fill with spaces)
 	// 80-87 This is the same as the "ODFI identification" field in previous Batch Header Record
-	bc.ODFIIdentification = bc.parseStringFieldWithOpts(record[79:87], bc.validateOpts)
+	bc.ODFIIdentification = bc.parseStringFieldWithOpts(record[bytePositions[79]:bytePositions[87]], bc.validateOpts)
 	// 88-94 This is the same as the "Batch number" field in previous Batch Header Record
-	bc.BatchNumber = bc.parseNumField(record[87:94])
+	bc.BatchNumber = bc.parseNumField(record[bytePositions[87]:bytePositions[94]])
 }
 
 // NewBatchControl returns a new BatchControl with default values for none exported fields

@@ -21,6 +21,7 @@ import (
 	"math"
 	"strings"
 	"testing"
+	"unicode/utf8"
 
 	"github.com/moov-io/base"
 	"github.com/stretchr/testify/require"
@@ -306,6 +307,27 @@ func testBatchControlLength(t testing.TB) {
 }
 
 // TestBatchControlLength tests verifying batch control length
+// TestBatchControl__ParseUTF8RoundTrip verifies that a multi-byte UTF-8 rune in a
+// variable field (here CompanyIdentification) does not shift the byte offsets of
+// the fields that follow it. Parse indexes by rune, so the trailing fields must
+// round-trip unchanged even though the encoded record is longer in bytes than runes.
+func TestBatchControl__ParseUTF8RoundTrip(t *testing.T) {
+	bc := mockBatchControl()
+	bc.CompanyIdentification = "Caféé12345"
+
+	line := bc.String()
+	require.Equal(t, 94, utf8.RuneCountInString(line))
+	require.Greater(t, len(line), 94, "record should be longer in bytes than runes")
+
+	parsed := NewBatchControl()
+	parsed.Parse(line)
+
+	require.Equal(t, bc.CompanyIdentification, parsed.CompanyIdentification)
+	require.Equal(t, bc.ODFIIdentification, parsed.ODFIIdentification)
+	require.Equal(t, bc.BatchNumber, parsed.BatchNumber)
+	require.Equal(t, bc.EntryHash, parsed.EntryHash)
+}
+
 func TestBatchControlLength(t *testing.T) {
 	testBatchControlLength(t)
 }
