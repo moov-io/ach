@@ -138,9 +138,11 @@ func writeLargeACHFile(tb testing.TB, shape string, batchCount, entryCount int, 
 		}
 
 		for e := 0; e < entriesToCreate; e++ {
-			entry := mockPPDEntryDetail()
+			var entry *EntryDetail
 			if addenda {
 				entry = mockCCDEntryDetail()
+			} else {
+				entry = mockPPDEntryDetail()
 			}
 			entry.Amount = 1234
 			sequence := entriesCreated + e + 1
