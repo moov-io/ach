@@ -62,6 +62,21 @@ func NewAddenda05() *Addenda05 {
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
 func (addenda05 *Addenda05) Parse(record string) {
+	if len(record) == 94 && isASCII(record) {
+		addenda05.parseASCII(record)
+		return
+	}
+	addenda05.parseRuneSafe(record)
+}
+
+func (addenda05 *Addenda05) parseASCII(record string) {
+	addenda05.TypeCode = record[1:3]
+	addenda05.PaymentRelatedInformation = strings.TrimSpace(record[3:83])
+	addenda05.SequenceNumber = addenda05.parseNumField(record[83:87])
+	addenda05.EntryDetailSequenceNumber = addenda05.parseNumField(record[87:94])
+}
+
+func (addenda05 *Addenda05) parseRuneSafe(record string) {
 	runeCount := utf8.RuneCountInString(record)
 	if runeCount != 94 {
 		return
