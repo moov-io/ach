@@ -216,6 +216,34 @@ func (ed *EntryDetail) SetSECCode(code string) {
 //
 // Parse provides no guarantee about all fields being filled in. Callers should make a Validate call to confirm successful parsing and data validity.
 func (ed *EntryDetail) Parse(record string) {
+	if len(record) == 94 && isASCII(record) {
+		ed.parseASCII(record)
+		return
+	}
+	ed.parseRuneSafe(record)
+}
+
+func (ed *EntryDetail) parseASCII(record string) {
+	ed.TransactionCode = ed.parseNumField(record[1:3])
+	ed.RDFIIdentification = record[3:11]
+	ed.CheckDigit = record[11:12]
+	ed.DFIAccountNumber = ed.parseStringFieldWithOpts(record[12:29], ed.validateOpts)
+	ed.Amount = ed.parseNumField(record[29:39])
+
+	if strings.EqualFold(ed.secCode, CIE) || strings.EqualFold(ed.secCode, MTE) {
+		ed.IndividualName = record[39:54]
+		ed.IdentificationNumber = record[54:76]
+	} else {
+		ed.IdentificationNumber = record[39:54]
+		ed.IndividualName = record[54:76]
+	}
+
+	ed.DiscretionaryData = record[76:78]
+	ed.AddendaRecordIndicator = ed.parseNumField(record[78:79])
+	ed.TraceNumber = record[79:94]
+}
+
+func (ed *EntryDetail) parseRuneSafe(record string) {
 	runeCount := utf8.RuneCountInString(record)
 	if runeCount != 94 {
 		return

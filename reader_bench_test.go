@@ -21,12 +21,17 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io"
-	"math/rand/v2"
 	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+)
+
+var (
+	benchmarkReadFile   File
+	benchmarkReadHeader *BatchHeader
+	benchmarkReadEntry  *EntryDetail
 )
 
 // Benchmark_ReadLargeFile generates/uses large files to measure read performance and memory usage.
@@ -41,17 +46,21 @@ import (
 // Benchmark_ReadLargeFile/2500_batches_500000_entries/iterator-16  	       6	 199791917 ns/op	215435520 B/op	 1042806 allocs/op
 func Benchmark_ReadLargeFile(b *testing.B) {
 	cases := []struct {
+		shape   string
 		batches int
 		entries int
+		addenda bool
 	}{
-		{batches: 200, entries: 100_000},
-		{batches: 2500, entries: 500_000},
+		{shape: "PPD", batches: 200, entries: 100_000},
+		{shape: "CCD+addenda05", batches: 200, entries: 100_000, addenda: true},
+		{shape: "PPD", batches: 2500, entries: 500_000},
+		{shape: "CCD+addenda05", batches: 2500, entries: 500_000, addenda: true},
 	}
 	for _, tc := range cases {
-		name := fmt.Sprintf("%d batches %d entries", tc.batches, tc.entries)
+		name := fmt.Sprintf("%s %d batches %d entries", tc.shape, tc.batches, tc.entries)
 
 		b.Run(name, func(b *testing.B) {
-			path := writeLargeACHFile(b, tc.batches, tc.entries)
+			path := writeLargeACHFile(b, tc.shape, tc.batches, tc.entries, tc.addenda)
 
 			b.Run("reader", func(b *testing.B) {
 				for b.Loop() {
@@ -60,6 +69,7 @@ func Benchmark_ReadLargeFile(b *testing.B) {
 
 					err = file.Validate()
 					require.NoError(b, err)
+					benchmarkReadFile = file
 				}
 			})
 
@@ -78,6 +88,8 @@ func Benchmark_ReadLargeFile(b *testing.B) {
 						if bh == nil && entry == nil {
 							break
 						}
+						benchmarkReadHeader = bh
+						benchmarkReadEntry = entry
 					}
 				}
 			})
@@ -97,10 +109,10 @@ func largeFileReader(b *testing.B, path string) io.Reader {
 	return gr
 }
 
-func writeLargeACHFile(tb testing.TB, batchCount, entryCount int) string {
+func writeLargeACHFile(tb testing.TB, shape string, batchCount, entryCount int, addenda bool) string {
 	tb.Helper()
 
-	filename := fmt.Sprintf("PPD-%d-batches-%d-entries.ach.gz", batchCount, entryCount)
+	filename := fmt.Sprintf("%s-%d-batches-%d-entries.ach.gz", shape, batchCount, entryCount)
 	path := filepath.Join("test", "testdata", "large-files", filename)
 
 	// If the file exists already skip creating it
@@ -116,19 +128,31 @@ func writeLargeACHFile(tb testing.TB, batchCount, entryCount int) string {
 	var batchesCreated int
 	var entriesCreated int
 
-	for {
-		if batchesCreated >= batchCount || entriesCreated >= entryCount {
-			break
+	for batchesCreated < batchCount && entriesCreated < entryCount {
+		entriesToCreate := (entryCount - entriesCreated + batchCount - batchesCreated - 1) / (batchCount - batchesCreated)
+		var batch Batcher
+		if addenda {
+			batch = NewBatchCCD(mockBatchCCDHeader())
+		} else {
+			batch = NewBatchPPD(mockBatchPPDHeader())
 		}
 
-		// Create a batch with entries
-		batch := mockBatchPPD(tb)
-
-		entriesToCreate := rand.IntN(entryCount - entriesCreated)
 		for e := 0; e < entriesToCreate; e++ {
-			entry := mockPPDEntryDetail()
+			var entry *EntryDetail
+			if addenda {
+				entry = mockCCDEntryDetail()
+			} else {
+				entry = mockPPDEntryDetail()
+			}
 			entry.Amount = 1234
-			entry.SetTraceNumber(batch.Header.ODFIIdentification, e+10)
+			sequence := entriesCreated + e + 1
+			entry.SetTraceNumber(batch.GetHeader().ODFIIdentification, sequence)
+			if addenda {
+				addenda05 := mockAddenda05()
+				addenda05.EntryDetailSequenceNumber = sequence
+				entry.AddAddenda05(addenda05)
+				entry.AddendaRecordIndicator = 1
+			}
 
 			batch.AddEntry(entry)
 		}
