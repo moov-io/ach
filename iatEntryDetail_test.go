@@ -448,3 +448,65 @@ func TestIATEntryDetailSpecialCharacter(t *testing.T) {
 		t.Error("Special character should have been allowed with override set.")
 	}
 }
+
+// TestIATEntryDetail_PreserveSpacesDFIAccountNumber verifies that leading and trailing
+// whitespace in DFIAccountNumber is retained when ValidateOpts.PreserveSpaces is true.
+// See: https://github.com/moov-io/ach/issues/1812
+func TestIATEntryDetail_PreserveSpacesDFIAccountNumber(t *testing.T) {
+	// DFIAccountNumber field is positions 40-74 (35 characters).
+	// Include leading and trailing spaces that must be preserved.
+	// 2 leading spaces + 20 digits + 13 trailing spaces = 35
+	accountWithSpaces := "  12345678901234567890" + strings.Repeat(" ", 13)
+	if len(accountWithSpaces) != 35 {
+		t.Fatalf("test setup: accountWithSpaces length is %d, want 35", len(accountWithSpaces))
+	}
+
+	// Build a full 94-character IAT entry detail record
+	// After DFIAccountNumber: 2 reserved spaces, OFAC, SecondaryOFAC, AddendaRecordIndicator, TraceNumber
+	line := "6221210428820007             0000100000" + accountWithSpaces + "    1" + "231380100000001"
+	if len(line) != 94 {
+		t.Fatalf("test setup: line length is %d, want 94", len(line))
+	}
+
+	t.Run("PreserveSpaces=true keeps whitespace", func(t *testing.T) {
+		ed := NewIATEntryDetail()
+		ed.SetValidation(&ValidateOpts{PreserveSpaces: true})
+		ed.Parse(line)
+
+		if ed.DFIAccountNumber != accountWithSpaces {
+			t.Errorf("DFIAccountNumber = %q, want %q", ed.DFIAccountNumber, accountWithSpaces)
+		}
+		if len(ed.DFIAccountNumber) != 35 {
+			t.Errorf("DFIAccountNumber length = %d, want 35", len(ed.DFIAccountNumber))
+		}
+	})
+
+	t.Run("PreserveSpaces=false trims whitespace", func(t *testing.T) {
+		ed := NewIATEntryDetail()
+		ed.Parse(line)
+
+		want := "12345678901234567890"
+		if ed.DFIAccountNumber != want {
+			t.Errorf("DFIAccountNumber = %q, want %q", ed.DFIAccountNumber, want)
+		}
+	})
+
+	t.Run("via Reader with PreserveSpaces", func(t *testing.T) {
+		r := NewReader(strings.NewReader(line))
+		r.SetValidation(&ValidateOpts{PreserveSpaces: true})
+		r.addIATCurrentBatch(NewIATBatch(mockIATBatchHeaderFF()))
+		r.IATCurrentBatch.SetHeader(mockIATBatchHeaderFF())
+		r.line = line
+		if err := r.parseIATEntryDetail(); err != nil {
+			t.Fatalf("parseIATEntryDetail: %v", err)
+		}
+		record := r.IATCurrentBatch.GetEntries()[0]
+
+		if record.DFIAccountNumber != accountWithSpaces {
+			t.Errorf("DFIAccountNumber = %q, want %q", record.DFIAccountNumber, accountWithSpaces)
+		}
+		if len(record.DFIAccountNumber) != 35 {
+			t.Errorf("DFIAccountNumber length = %d, want 35", len(record.DFIAccountNumber))
+		}
+	})
+}
