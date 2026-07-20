@@ -827,6 +827,7 @@ func (r *Reader) parseIATEntryDetail() error {
 	}
 
 	ed := NewIATEntryDetail()
+	ed.SetValidation(r.File.validateOpts)
 	ed.Parse(r.line)
 	ed.LineNumber = r.lineNum
 	if err := maybeValidate(ed, r.File.validateOpts); err != nil {
