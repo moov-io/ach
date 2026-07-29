@@ -1198,9 +1198,34 @@ components:
           maxLength: 10
         standardEntryClassCode:
           type: string
-          description: Identifies the payment type (product) found within an ACH batch using a 3-character code.
+          description: |
+            Identifies the payment type (product) found within an ACH batch using a 3-character code.
+            ACK - ACH Payment Acknowledgment |
+            ADV - Automated Accounting Advice |
+            ARC - Accounts Receivable Entry |
+            ATX - Financial EDI Acknowledgment |
+            BOC - Back Office Conversion Entry |
+            CCD - Corporate Credit or Debit Entry |
+            CIE - Customer Initiated Entry |
+            COR - Notification of Change or Refused Notification of Change |
+            CTX - Corporate Trade Exchange |
+            DNE - Death Notification Entry |
+            ENR - Automated Enrollment Entry |
+            IAT - International ACH Transaction |
+            MTE - Machine Transfer Entry |
+            POP - Point of Purchase Entry |
+            POS - Point of Sale Entry |
+            PPD - Prearranged Payment and Deposit Entry |
+            RCK - Re-presented Check Entry |
+            SHR - Shared Network Transaction |
+            TEL - Telephone-Initiated Entry |
+            TRC - Check Truncation Entry |
+            TRX - Check Truncation Entries Exchange |
+            WEB - Internet-Initiated/Mobile Entry |
+            XCK - Destroyed Check Entry
           example: "PPD"
           maxLength: 3
+          enum: [ACK, ADV, ARC, ATX, BOC, CCD, CIE, COR, CTX, DNE, ENR, IAT, MTE, POP, POS, PPD, RCK, SHR, TEL, TRC, TRX, WEB, XCK]
         companyEntryDescription:
           type: string
           description: |
@@ -1469,8 +1494,10 @@ components:
           $ref: '#/components/schemas/Addenda99Contested'
         category:
           type: string
-          description: Category defines if the entry is a Forward, Return, or NOC
+          description: |
+            Category defines if the entry is a Forward, Return, NOC, DishonoredReturn, or DishonoredReturnContested
           example: "Forward"
+          enum: [Forward, Return, NOC, DishonoredReturn, DishonoredReturnContested]
         lineNumber:
           type: integer
           description: Line number at which the record appears in the file.
@@ -1596,25 +1623,30 @@ components:
         transactionTypeCode:
           type: string
           description: |
-            Describes the type of payment:
-            'ANN' = Annuity |
-            'BUS' = Business/Commercial |
-            'DEP' = Deposit |
-            'LOA' = Loan |
-            'MIS' = Miscellaneous |
-            'MOR' = Mortgage |
-            'PEN' = Pension |
-            'RLS' = Rent/Lease |
-            'REM' = Remittance2 |
-            'SAL' = Salary/Payroll |
-            'TAX' = Tax |
-            'TEL' = Telephone-Initiated Transaction |
-            'WEB' = Internet-Initiated Transaction |
-            'ARC' = Accounts Receivable Entry |
-            'BOC' = Back Office Conversion Entry |
-            'POP' = Point of Purchase Entry |
-            'RCK' = Re-presented Check Entry
+            Describes the type of payment (secondary SEC code):
+            ANN - Annuity |
+            BUS - Business/Commercial |
+            DEP - Deposit |
+            LOA - Loan |
+            MIS - Miscellaneous |
+            MOR - Mortgage |
+            PEN - Pension |
+            REM - Remittance |
+            RLS - Rent/Lease |
+            SAL - Salary/Payroll |
+            TAX - Tax |
+            ARC - Accounts Receivable Entry |
+            BOC - Back Office Conversion Entry |
+            IAT - International ACH Transaction |
+            MTE - Machine Transfer Entry |
+            POP - Point of Purchase Entry |
+            POS - Point of Sale Entry |
+            RCK - Re-presented Check Entry |
+            SHR - Shared Network Transaction |
+            TEL - Telephone-Initiated Transaction |
+            WEB - Internet-Initiated Transaction
           example: TEL
+          enum: [ANN, BUS, DEP, LOA, MIS, MOR, PEN, REM, RLS, SAL, TAX, ARC, BOC, IAT, MTE, POP, POS, RCK, SHR, TEL, WEB]
         foreignPaymentAmount:
           type: integer
           format: int64
@@ -2024,8 +2056,30 @@ components:
           example: "98"
         changeCode:
           type: string
-          description: ChangeCode field contains a standard code used by an ACH Operator or RDFI to describe the reason for a change Entry.
+          description: |
+            ChangeCode field contains a standard code used by an ACH Operator or RDFI to describe the reason for a change Entry.
+            C01 - Incorrect bank account number |
+            C02 - Incorrect transit/routing number |
+            C03 - Incorrect transit/routing number and bank account number |
+            C04 - Bank account name change |
+            C05 - Incorrect transaction code |
+            C06 - Incorrect bank account number and transit code |
+            C07 - Incorrect transit/routing number, bank account number and transaction code |
+            C08 - Incorrect Receiving transit/routing number (IAT only) |
+            C09 - Incorrect individual ID number |
+            C13 - Addenda Format Error |
+            C14 - Incorrect SEC Code for outbound IAT payment |
+            C61 - Misrouted Notification of Change |
+            C62 - Incorrect Trace Number |
+            C63 - Incorrect Company Identification Number |
+            C64 - Incorrect Individual Identification Number or Identification Number |
+            C65 - Incorrectly Formatted Corrected Data |
+            C66 - Incorrect Discretionary Data |
+            C67 - Routing Number not from Original Entry Detail Record |
+            C68 - DFI Account Number not from Original Entry Detail Record |
+            C69 - Incorrect Transaction Code
           example: C01
+          enum: [C01, C02, C03, C04, C05, C06, C07, C08, C09, C13, C14, C61, C62, C63, C64, C65, C66, C67, C68, C69]
         originalTrace:
           type: string
           description: |
@@ -2067,7 +2121,18 @@ components:
           example: "98"
         refusedChangeCode:
           type: string
-          description: The code specifying why the Notification of Change is being refused.
+          description: |
+            The code specifying why the Notification of Change is being refused.
+            C61 - Misrouted Notification of Change |
+            C62 - Incorrect Trace Number |
+            C63 - Incorrect Company Identification Number |
+            C64 - Incorrect Individual Identification Number or Identification Number |
+            C65 - Incorrectly Formatted Corrected Data |
+            C66 - Incorrect Discretionary Data |
+            C67 - Routing Number not from Original Entry Detail Record |
+            C68 - DFI Account Number not from Original Entry Detail Record |
+            C69 - Incorrect Transaction Code
+          enum: [C61, C62, C63, C64, C65, C66, C67, C68, C69]
         originalTrace:
           type: string
           description: |
@@ -2085,8 +2150,11 @@ components:
           example: "198424892"
         changeCode:
           type: string
-          description: ChangeCode field contains a standard code used by an ACH Operator or RDFI to describe the reason for a change Entry.
+          description: |
+            ChangeCode field contains a standard code used by an ACH Operator or RDFI to describe the reason for a change Entry.
+            See Addenda98.changeCode for the full list of values.
           example: C01
+          enum: [C01, C02, C03, C04, C05, C06, C07, C08, C09, C13, C14, C61, C62, C63, C64, C65, C66, C67, C68, C69]
         traceSequenceNumber:
           type: string
           description: The last seven digits of the TraceNumber in the original Notification of Change.
@@ -2119,8 +2187,11 @@ components:
           example: "99"
         returnCode:
           type: string
-          description: Standard code used by an ACH Operator or RDFI to describe the reason for returning an Entry.
+          description: |
+            Standard code used by an ACH Operator or RDFI to describe the reason for returning an Entry.
+            Values match Nacha return reason codes supported by moov-io/ach (R01-R47, R50-R53, R61-R62, R67-R77, R80-R85, R90).
           example: "R01"
+          enum: [R01, R02, R03, R04, R05, R06, R07, R08, R09, R10, R11, R12, R13, R14, R15, R16, R17, R18, R19, R20, R21, R22, R23, R24, R25, R26, R27, R28, R29, R30, R31, R32, R33, R34, R35, R36, R37, R38, R39, R40, R41, R42, R43, R44, R45, R46, R47, R50, R51, R52, R53, R61, R62, R67, R68, R69, R70, R71, R72, R73, R74, R75, R76, R77, R80, R81, R82, R83, R84, R85, R90]
         originalTrace:
           type: string
           description: |
@@ -2183,12 +2254,21 @@ components:
           example: "200102"
         returnReasonCode:
           type: string
-          description: Return reason code
-          example: "R12"
+          description: |
+            Original return reason code (2-character numeric portion as stored on the dishonored addenda, e.g. "01" for R01).
+          example: "01"
         dishonoredReturnReasonCode:
           type: string
-          description: Return reason code of the Dishonored Return
-          example: "R12"
+          description: |
+            Return reason code of the Dishonored Return:
+            R61 - Misrouted Return |
+            R62 - Return of Erroneous or Reversing Debt |
+            R67 - Duplicate Return |
+            R68 - Untimely Return |
+            R69 - Field Error(s) |
+            R70 - Permissible Return Entry Not Accepted/Return Not Requested by ODFI
+          example: "R61"
+          enum: [R61, R62, R67, R68, R69, R70]
         traceNumber:
           type: string
           description: Matches the Entry Detail Trace Number of the entry being returned.
@@ -2221,16 +2301,33 @@ components:
           example: "99"
         contestedReturnCode:
           type: string
-          description: "return code explaining the contested dishonorment"
-          example: "R12"
+          description: |
+            Return code explaining the contested dishonorment:
+            R71 - Misrouted Dishonored Return |
+            R72 - Untimely Dishonored Return |
+            R73 - Timely Original Return |
+            R74 - Corrected Return |
+            R75 - Return Not a Duplicate |
+            R76 - No Errors Found |
+            R77 - Non-Acceptance of R62 Dishonored Return
+          example: "R71"
+          enum: [R71, R72, R73, R74, R75, R76, R77]
         dateOriginalEntryReturned:
           type: string
           description: Date original entry was returned
           example: "200102"
         dishonoredReturnReasonCode:
           type: string
-          description: Return reason code of the Dishonored Return
-          example: "R12"
+          description: |
+            Return reason code of the Dishonored Return:
+            R61 - Misrouted Return |
+            R62 - Return of Erroneous or Reversing Debt |
+            R67 - Duplicate Return |
+            R68 - Untimely Return |
+            R69 - Field Error(s) |
+            R70 - Permissible Return Entry Not Accepted/Return Not Requested by ODFI
+          example: "R61"
+          enum: [R61, R62, R67, R68, R69, R70]
         dishonoredReturnTraceNumber:
           type: string
           description: Trace number from Dishonored Return
@@ -2261,8 +2358,9 @@ components:
           example: "200102"
         returnReasonCode:
           type: string
-          description: Return reason code
-          example: "R12"
+          description: |
+            Original return reason code (2-character numeric portion as stored on the contested addenda, e.g. "01" for R01).
+          example: "01"
         traceNumber:
           type: string
           description: Unique Trace Number for the contested dishonored return
@@ -2311,11 +2409,12 @@ components:
           type: string
           example: a747e53f
         serviceClassCode:
-          description: Service Class Code - Mixed Debits and Credits '200', ACH Credits Only '220', or ACH Debits Only '225'
+          description: Service Class Code - Mixed Debits and Credits '200', ACH Credits Only '220', or ACH Debits Only '225'. Automated Accounting Advices '280' is not valid for IAT.
           type: integer
           example: 220
+          enum: [200, 220, 225]
         IATIndicator:
-          description: Leave Blank. Only used for corrected IAT entries
+          description: Leave blank for normal IAT entries. Use 'IATCOR' for corrected IAT entries (Notification of Change).
           type: string
           example: ""
         foreignExchangeIndicator:
@@ -2326,6 +2425,7 @@ components:
             'FF' (Fixed-to-Fixed) – Entry is originated in a fixed-value amount and is to be received in the same fixed-value amount in the same currency denomination. There is no foreign exchange conversion for entries transmitted using this code. For entries originated in a fixed value amount, the foreign Exchange Reference Field will be space filled.
           type: string
           example: FF
+          enum: [FV, VF, FF]
         foreignExchangeReferenceIndicator:
           description: |
             Code used to indicate the content of the Foreign Exchange Reference Field and is filled by the gateway operator. Valid entries are
@@ -2334,6 +2434,7 @@ components:
             3 - Space Filled
           type: integer
           example: 2
+          enum: [1, 2, 3]
         foreignExchangeReference:
           description: Contains either the foreign exchange rate used to execute the foreign exchange conversion of a cross-border entry or another reference to the foreign exchange transaction.
           type: string
@@ -2350,14 +2451,11 @@ components:
         standardEntryClassCode:
           description: |
             StandardEntryClassCode for consumer and non consumer international payments is IAT.
+            Use COR for IAT Notification of Change batches.
             Identifies the payment type (product) found within an ACH batch using a 3-character code.
-            The SEC Code pertains to all items within batch.
-            Determines format of the detail records.
-            Determines addenda records (required or optional PLUS one or up to 9,999 records).
-            Determines rules to follow (return time frames).
-            Some SEC codes require specific data in predetermined fields within the ACH record.
           type: string
           example: IAT
+          enum: [IAT, COR]
         companyEntryDescription:
           description: |
             A description of the entries contained in the batch
@@ -2391,6 +2489,7 @@ components:
             2 - This code identifies the Originator as a Federal Government entity or agency.
           type: integer
           example: 1
+          enum: [0, 1, 2]
         ODFIIdentification:
           description: |
             First 8 digits of the originating DFI transit routing number. For Inbound IAT Entries, this field contains the routing number of the U.S. Gateway Operator.  For Outbound IAT Entries, this field contains the standard routing number, as assigned by Accuity, that identifies the U.S. ODFI initiating the Entry. (Format TTTTAAAA - T=Federal Reserve Routing Symbol, A=ABA Institution Identifier)
@@ -2433,15 +2532,39 @@ components:
           type: integer
           description: |
             Based on transaction type:
+            21 - Return or NOC for a credit to checking account |
             22 - Credit (deposit) to checking account |
             23 - Prenote for credit to checking account |
+            24 - Zero dollar with remittance data (credit) to checking account |
+            26 - Return or NOC for a debit to checking account |
             27 - Debit (withdrawal) to checking account |
             28 - Prenote for debit to checking account |
+            29 - Zero dollar with remittance data (debit) to checking account |
+            31 - Return or NOC for a credit to savings account |
             32 - Credit to savings account |
             33 - Prenote for credit to savings account |
+            34 - Zero dollar with remittance data (credit) to savings account |
+            36 - Return or NOC for a debit to savings account |
             37 - Debit to savings account |
-            38 - Prenote for debit to savings account
+            38 - Prenote for debit to savings account |
+            39 - Zero dollar with remittance data (debit) to savings account |
+            41 - Return or NOC for a credit to general ledger (GL) account |
+            42 - Credit to general ledger (GL) account |
+            43 - Prenote for credit to general ledger (GL) account |
+            44 - Zero dollar with remittance data (credit) to general ledger (GL) account |
+            46 - Return or NOC for a debit to general ledger (GL) account |
+            47 - Debit to general ledger (GL) account |
+            48 - Prenote for debit to general ledger (GL) account |
+            49 - Zero dollar with remittance data (debit) to general ledger (GL) account |
+            51 - Return or NOC for a credit to loan account |
+            52 - Credit to loan account |
+            53 - Prenote for credit to loan account |
+            54 - Zero dollar with remittance data (credit) to loan account |
+            55 - Debit to loan account (reversals only) |
+            56 - Return or NOC for a debit to loan account
           example: 22
+          maximum: 99
+          enum: [21,22,23,24,26,27,28,29,31,32,33,34,36,37,38,39,41,42,43,44,46,47,48,49,51,52,53,54,55,56]
         RDFIIdentification:
           type: string
           description: RDFI's routing number without the last digit.
@@ -2477,6 +2600,7 @@ components:
           description: |
             AddendaRecordIndicator indicates the existence of an Addenda Record. A value of "1" indicates that one or more addenda records follow, and "0" means no such record is present.
           example: 1
+          enum: [0, 1]
         traceNumber:
           type: string
           description: Matches the Entry Detail Trace Number of the entry being returned.
@@ -2509,8 +2633,10 @@ components:
           $ref: '#/components/schemas/Addenda99'
         category:
           type: string
-          description: Category defines if the entry is a Forward, Return, or NOC
+          description: |
+            Category defines if the entry is a Forward, Return, NOC, DishonoredReturn, or DishonoredReturnContested
           example: Forward
+          enum: [Forward, Return, NOC, DishonoredReturn, DishonoredReturnContested]
         lineNumber:
           type: integer
           description: Line number at which the record appears in the file.
@@ -2561,6 +2687,8 @@ components:
             87 - Summary credit for respondent ACH activity |
             88 - Summary debit for respondent ACH activity
           example: 81
+          maximum: 99
+          enum: [81, 82, 83, 84, 85, 86, 87, 88]
         RDFIIdentification:
           type: string
           description: RDFI's routing number without the last digit.
@@ -2606,6 +2734,7 @@ components:
           description: |
             AddendaRecordIndicator indicates the existence of an Addenda Record. A value of "1" indicates that one or more addenda records follow, and "0" means no such record is present.
           example: 1
+          enum: [0, 1]
         achOperatorRoutingNumber:
           type: string
           description: Routing number for ACH Operator
@@ -2624,8 +2753,10 @@ components:
             $ref: '#/components/schemas/Addenda99'
         category:
           type: string
-          description: Category defines if the entry is a Forward, Return, or NOC
+          description: |
+            Category defines if the entry is a Forward, Return, NOC, DishonoredReturn, or DishonoredReturnContested
           example: Forward
+          enum: [Forward, Return, NOC, DishonoredReturn, DishonoredReturnContested]
         lineNumber:
           type: integer
           description: Line number at which the record appears in the file.
@@ -2637,9 +2768,12 @@ components:
           type: string
           example: 62d8f0cd
         serviceClassCode:
-          description: Same as ServiceClassCode in BatchHeader record
+          description: |
+            Same as ServiceClassCode in BatchHeader record. ADV batches use Automated Accounting Advices '280'.
+            Also accepts Mixed Debits and Credits '200', ACH Credits Only '220', or ACH Debits Only '225'.
           type: integer
-          example: 220
+          example: 280
+          enum: [200, 220, 225, 280]
         entryAddendaCount:
           description: EntryAddendaCount is a tally of each Entry Detail Record and each Addenda Record processed, within either the batch or file as appropriate.
           type: integer
