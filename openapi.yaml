@@ -1175,10 +1175,10 @@ components:
           example: "913b5742"
         serviceClassCode:
           type: integer
-          description: Service Class Code - Mixed Debits and Credits '200', ACH Credits Only '220', or ACH Debits Only '225'
+          description: Service Class Code - Mixed Debits and Credits '200', ACH Credits Only '220', ACH Debits Only '225', or Automated Accounting Advices '280' (ADV files only)
           example: 220
           maximum: 999
-          enum: [200, 220, 225]
+          enum: [200, 220, 225, 280]
         companyName:
           type: string
           description: Company originating the entries in the batch
@@ -1265,7 +1265,7 @@ components:
           type: integer
           example: 220
           maximum: 999
-          enum: [200, 220, 225]
+          enum: [200, 220, 225, 280]
         entryAddendaCount:
           description: EntryAddendaCount is a tally of each Entry Detail Record and each Addenda Record processed, within either the batch or file as appropriate.
           type: integer
@@ -1347,17 +1347,39 @@ components:
           type: integer
           description: |
             Based on transaction type:
+            21 - Return or NOC for a credit to checking account |
             22 - Credit (deposit) to checking account |
             23 - Prenote for credit to checking account |
+            24 - Zero dollar with remittance data (credit) to checking account |
+            26 - Return or NOC for a debit to checking account |
             27 - Debit (withdrawal) to checking account |
             28 - Prenote for debit to checking account |
+            29 - Zero dollar with remittance data (debit) to checking account |
+            31 - Return or NOC for a credit to savings account |
             32 - Credit to savings account |
             33 - Prenote for credit to savings account |
+            34 - Zero dollar with remittance data (credit) to savings account |
+            36 - Return or NOC for a debit to savings account |
             37 - Debit to savings account |
-            38 - Prenote for debit to savings account
+            38 - Prenote for debit to savings account |
+            39 - Zero dollar with remittance data (debit) to savings account |
+            41 - Return or NOC for a credit to general ledger (GL) account |
+            42 - Credit to general ledger (GL) account |
+            43 - Prenote for credit to general ledger (GL) account |
+            44 - Zero dollar with remittance data (credit) to general ledger (GL) account |
+            46 - Return or NOC for a debit to general ledger (GL) account |
+            47 - Debit to general ledger (GL) account |
+            48 - Prenote for debit to general ledger (GL) account |
+            49 - Zero dollar with remittance data (debit) to general ledger (GL) account |
+            51 - Return or NOC for a credit to loan account |
+            52 - Credit to loan account |
+            53 - Prenote for credit to loan account |
+            54 - Zero dollar with remittance data (credit) to loan account |
+            55 - Debit to loan account (reversals only) |
+            56 - Return or NOC for a debit to loan account
           example: 22
           maximum: 99
-          enum: [22,23,27,28,32,33,37,38]
+          enum: [21,22,23,24,26,27,28,29,31,32,33,34,36,37,38,39,41,42,43,44,46,47,48,49,51,52,53,54,55,56]
         RDFIIdentification:
           type: string
           description: RDFI's routing number without the last digit.
