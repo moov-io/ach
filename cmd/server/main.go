@@ -73,6 +73,11 @@ func main() {
 			logger.Logf("Using %v as ach.File TTL", achFileTTL)
 		}
 	}
+	if size, err := server.ConfigureMaxBodySizeFromEnv(); err != nil {
+		logger.Logf("Unable to parse ACH_MAX_BODY_SIZE: %v", err)
+	} else if v := os.Getenv("ACH_MAX_BODY_SIZE"); v != "" {
+		logger.Logf("Using %d bytes as max request body size", size)
+	}
 	r := server.NewRepositoryInMemory(achFileTTL, logger)
 	svc = server.NewService(r)
 

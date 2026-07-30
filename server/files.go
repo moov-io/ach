@@ -26,6 +26,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/moov-io/ach"
@@ -33,6 +35,7 @@ import (
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/base/log"
 
+	"github.com/docker/go-units"
 	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/gorilla/mux"
@@ -161,9 +164,57 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 	return req, nil
 }
 
-const (
-	maxBodySize = 10 * 1024 * 1024 // 10MB
-)
+const defaultMaxBodySize int64 = 10 * 1024 * 1024 // 10MB
+
+// maxBodySize is the maximum number of bytes read from an HTTP request body.
+// Override with ACH_MAX_BODY_SIZE (see ParseMaxBodySize / SetMaxBodySize).
+var maxBodySize = defaultMaxBodySize
+
+// SetMaxBodySize overrides the maximum HTTP request body size in bytes.
+// Values less than or equal to zero are ignored.
+func SetMaxBodySize(size int64) {
+	if size > 0 {
+		maxBodySize = size
+	}
+}
+
+// MaxBodySize returns the current maximum HTTP request body size in bytes.
+func MaxBodySize() int64 {
+	return maxBodySize
+}
+
+// ParseMaxBodySize parses a human-friendly size string into bytes using
+// github.com/docker/go-units (binary units: KB/MB/GB are 1024-based).
+// Plain integers are bytes. Examples: "12MB", "12M", "13107200", "1GB".
+func ParseMaxBodySize(v string) (int64, error) {
+	v = strings.TrimSpace(v)
+	if v == "" {
+		return 0, fmt.Errorf("empty body size")
+	}
+	n, err := units.RAMInBytes(v)
+	if err != nil {
+		return 0, fmt.Errorf("parsing body size %q: %w", v, err)
+	}
+	if n <= 0 {
+		return 0, fmt.Errorf("body size must be positive: %d", n)
+	}
+	return n, nil
+}
+
+// ConfigureMaxBodySizeFromEnv reads ACH_MAX_BODY_SIZE and applies it when set.
+// Returns the configured size and true when the env var was present and valid.
+func ConfigureMaxBodySizeFromEnv() (int64, error) {
+	v := os.Getenv("ACH_MAX_BODY_SIZE")
+	if v == "" {
+		return maxBodySize, nil
+	}
+	size, err := ParseMaxBodySize(v)
+	if err != nil {
+		return maxBodySize, err
+	}
+	SetMaxBodySize(size)
+	return size, nil
+}
 
 func readBody(body io.ReadCloser) ([]byte, error) {
 	defer body.Close()

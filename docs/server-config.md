@@ -11,6 +11,7 @@ menubar: docs-menu
 | Environmental Variable | Description | Default |
 |-----|-----|-----|
 | `ACH_FILE_TTL` | Time to live (TTL) for `*ach.File` objects stored in the in-memory repository. | 0 = No TTL / Never delete files (Example: `240m`) |
+| `ACH_MAX_BODY_SIZE` | Maximum HTTP request body size accepted by the server. Parsed by [docker/go-units](https://pkg.go.dev/github.com/docker/go-units) (`RAMInBytes`): plain integers are bytes; suffixes like `KB`/`MB`/`GB`/`K`/`M`/`G` are 1024-based. | `10MB` (Example: `25MB`) |
 | `LOG_FORMAT` | Format for logging lines to be written as. | Options: `json`, `plain` - Default: `plain` |
 | `HTTP_BIND_ADDRESS` | Address for ACH to bind its HTTP server on. This overrides the command-line flag `-http.addr`. | Default: `:8080` |
 | `HTTP_ADMIN_BIND_ADDRESS` | Address for ACH to bind its admin HTTP server on. This overrides the command-line flag `-admin.addr`. | Default: `:9090` |
