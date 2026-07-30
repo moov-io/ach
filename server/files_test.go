@@ -1617,3 +1617,93 @@ func TestFiles__decodeReverseFileRequestWithFileID(t *testing.T) {
 	require.Equal(t, 1, int(r.effectiveEntryDate.Month()))
 	require.Equal(t, 15, r.effectiveEntryDate.Day())
 }
+
+func TestParseMaxBodySize(t *testing.T) {
+	tests := []struct {
+		in      string
+		want    int64
+		wantErr bool
+	}{
+		{in: "12MB", want: 12 * 1024 * 1024},
+		{in: "12mb", want: 12 * 1024 * 1024},
+		{in: "12M", want: 12 * 1024 * 1024},
+		{in: "25MB", want: 25 * 1024 * 1024},
+		{in: "1024KB", want: 1024 * 1024},
+		{in: "1G", want: 1024 * 1024 * 1024},
+		{in: "1GB", want: 1024 * 1024 * 1024},
+		{in: "10485760", want: 10485760},
+		{in: "100B", want: 100},
+		{in: " 15MB ", want: 15 * 1024 * 1024},
+		{in: "", wantErr: true},
+		{in: "0", wantErr: true},
+		{in: "-5MB", wantErr: true},
+		{in: "abc", wantErr: true},
+		{in: "12TB", wantErr: true},
+	}
+	for _, tc := range tests {
+		t.Run(tc.in, func(t *testing.T) {
+			got, err := ParseMaxBodySize(tc.in)
+			if tc.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			require.Equal(t, tc.want, got)
+		})
+	}
+}
+
+func TestConfigureMaxBodySizeFromEnv(t *testing.T) {
+	original := MaxBodySize()
+	t.Cleanup(func() {
+		SetMaxBodySize(original)
+	})
+
+	t.Setenv("ACH_MAX_BODY_SIZE", "")
+	// Ensure empty resets nothing harmful — restore default first
+	SetMaxBodySize(defaultMaxBodySize)
+
+	size, err := ConfigureMaxBodySizeFromEnv()
+	require.NoError(t, err)
+	require.Equal(t, defaultMaxBodySize, size)
+	require.Equal(t, defaultMaxBodySize, MaxBodySize())
+
+	t.Setenv("ACH_MAX_BODY_SIZE", "25MB")
+	size, err = ConfigureMaxBodySizeFromEnv()
+	require.NoError(t, err)
+	require.Equal(t, int64(25*1024*1024), size)
+	require.Equal(t, int64(25*1024*1024), MaxBodySize())
+
+	t.Setenv("ACH_MAX_BODY_SIZE", "nope")
+	size, err = ConfigureMaxBodySizeFromEnv()
+	require.Error(t, err)
+	// Invalid value should leave the previous setting in place
+	require.Equal(t, int64(25*1024*1024), size)
+	require.Equal(t, int64(25*1024*1024), MaxBodySize())
+}
+
+func TestReadBodyRespectsMaxBodySize(t *testing.T) {
+	original := MaxBodySize()
+	t.Cleanup(func() {
+		SetMaxBodySize(original)
+	})
+
+	SetMaxBodySize(16)
+	body := io.NopCloser(strings.NewReader(strings.Repeat("a", 64)))
+	bs, err := readBody(body)
+	require.NoError(t, err)
+	require.Len(t, bs, 16)
+}
+
+func TestSetMaxBodySizeIgnoresNonPositive(t *testing.T) {
+	original := MaxBodySize()
+	t.Cleanup(func() {
+		SetMaxBodySize(original)
+	})
+
+	SetMaxBodySize(defaultMaxBodySize)
+	SetMaxBodySize(0)
+	require.Equal(t, defaultMaxBodySize, MaxBodySize())
+	SetMaxBodySize(-1)
+	require.Equal(t, defaultMaxBodySize, MaxBodySize())
+}
