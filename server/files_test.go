@@ -1627,21 +1627,26 @@ func TestParseMaxBodySize(t *testing.T) {
 		{in: "12MB", want: 12 * 1024 * 1024},
 		{in: "12mb", want: 12 * 1024 * 1024},
 		{in: "12M", want: 12 * 1024 * 1024},
+		{in: "12MiB", want: 12 * 1024 * 1024},
 		{in: "25MB", want: 25 * 1024 * 1024},
 		{in: "1024KB", want: 1024 * 1024},
 		{in: "1G", want: 1024 * 1024 * 1024},
 		{in: "1GB", want: 1024 * 1024 * 1024},
 		{in: "10485760", want: 10485760},
 		{in: "100B", want: 100},
+		{in: "1.5MB", want: 1572864},
 		{in: " 15MB ", want: 15 * 1024 * 1024},
 		{in: "", wantErr: true},
 		{in: "0", wantErr: true},
 		{in: "-5MB", wantErr: true},
 		{in: "abc", wantErr: true},
-		{in: "12TB", wantErr: true},
 	}
 	for _, tc := range tests {
-		t.Run(tc.in, func(t *testing.T) {
+		name := tc.in
+		if name == "" {
+			name = "empty"
+		}
+		t.Run(name, func(t *testing.T) {
 			got, err := ParseMaxBodySize(tc.in)
 			if tc.wantErr {
 				require.Error(t, err)

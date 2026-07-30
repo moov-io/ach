@@ -27,7 +27,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -36,6 +35,7 @@ import (
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/base/log"
 
+	"github.com/docker/go-units"
 	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/gorilla/mux"
@@ -183,48 +183,22 @@ func MaxBodySize() int64 {
 	return maxBodySize
 }
 
-// ParseMaxBodySize parses a human-friendly size string into bytes.
-// Plain integers are treated as bytes. Optional case-insensitive suffixes:
-// B, KB/K, MB/M, GB/G (1024-based). Examples: "12MB", "13107200", "1G".
+// ParseMaxBodySize parses a human-friendly size string into bytes using
+// github.com/docker/go-units (binary units: KB/MB/GB are 1024-based).
+// Plain integers are bytes. Examples: "12MB", "12M", "13107200", "1GB".
 func ParseMaxBodySize(v string) (int64, error) {
 	v = strings.TrimSpace(v)
 	if v == "" {
 		return 0, fmt.Errorf("empty body size")
 	}
-
-	upper := strings.ToUpper(v)
-	multiplier := int64(1)
-	switch {
-	case strings.HasSuffix(upper, "GB"):
-		multiplier = 1024 * 1024 * 1024
-		v = v[:len(v)-2]
-	case strings.HasSuffix(upper, "G"):
-		multiplier = 1024 * 1024 * 1024
-		v = v[:len(v)-1]
-	case strings.HasSuffix(upper, "MB"):
-		multiplier = 1024 * 1024
-		v = v[:len(v)-2]
-	case strings.HasSuffix(upper, "M"):
-		multiplier = 1024 * 1024
-		v = v[:len(v)-1]
-	case strings.HasSuffix(upper, "KB"):
-		multiplier = 1024
-		v = v[:len(v)-2]
-	case strings.HasSuffix(upper, "K"):
-		multiplier = 1024
-		v = v[:len(v)-1]
-	case strings.HasSuffix(upper, "B"):
-		v = v[:len(v)-1]
-	}
-
-	n, err := strconv.ParseInt(strings.TrimSpace(v), 10, 64)
+	n, err := units.RAMInBytes(v)
 	if err != nil {
 		return 0, fmt.Errorf("parsing body size %q: %w", v, err)
 	}
 	if n <= 0 {
 		return 0, fmt.Errorf("body size must be positive: %d", n)
 	}
-	return n * multiplier, nil
+	return n, nil
 }
 
 // ConfigureMaxBodySizeFromEnv reads ACH_MAX_BODY_SIZE and applies it when set.
