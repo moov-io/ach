@@ -1064,3 +1064,119 @@ func TestMergeDir_DeadlockPrevention(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "merging ADV batches is not supported")
 }
+
+func TestMergeFiles__mixedDebitCreditDollarLimit(t *testing.T) {
+	// Debits and credits should be limited independently (NACHA file control totals).
+	// A file with $80 debit + $80 credit under a $100 max should stay in one file.
+	makeFile := func(amount int, credit bool) *File {
+		t.Helper()
+		file := NewFile()
+		file.SetHeader(staticFileHeader())
+
+		bh := mockBatchPPDHeader()
+		if credit {
+			bh.ServiceClassCode = CreditsOnly
+		} else {
+			bh.ServiceClassCode = DebitsOnly
+		}
+		batch := NewBatchPPD(bh)
+		entry := mockPPDEntryDetail()
+		entry.Amount = amount
+		if credit {
+			entry.TransactionCode = CheckingCredit
+		} else {
+			entry.TransactionCode = CheckingDebit
+		}
+		entry.SetTraceNumber(bh.ODFIIdentification, amount)
+		batch.AddEntry(entry)
+		require.NoError(t, batch.Create())
+		file.AddBatch(batch)
+		require.NoError(t, file.Create())
+		return file
+	}
+
+	merged, err := MergeFilesWith([]*File{
+		makeFile(80_00, false),
+		makeFile(80_00, true),
+	}, Conditions{
+		MaxDollarAmount: 100_00,
+	})
+	require.NoError(t, err)
+	require.Len(t, merged, 1, "debit and credit sides should not share a single running total")
+	require.Equal(t, 80_00, merged[0].Control.TotalDebitEntryDollarAmountInFile)
+	require.Equal(t, 80_00, merged[0].Control.TotalCreditEntryDollarAmountInFile)
+
+	// Same-side amounts that exceed the limit must still split.
+	merged, err = MergeFilesWith([]*File{
+		makeFile(80_00, false),
+		makeFile(80_00, false),
+	}, Conditions{
+		MaxDollarAmount: 100_00,
+	})
+	require.NoError(t, err)
+	require.Len(t, merged, 2)
+}
+
+func TestWouldExceedDollarAmount(t *testing.T) {
+	require.False(t, wouldExceedDollarAmount(100, 50, 50, 40, "D"))
+	require.True(t, wouldExceedDollarAmount(100, 70, 0, 40, "D"))
+	require.False(t, wouldExceedDollarAmount(100, 70, 0, 40, "C"))
+	require.True(t, wouldExceedDollarAmount(100, 0, 70, 40, "C"))
+	require.False(t, wouldExceedDollarAmount(0, 0, 0, 999, "D"))
+}
+
+func TestAddEntryAmount(t *testing.T) {
+	d, c := addEntryAmount(10, 20, 5, "D")
+	require.Equal(t, int64(15), d)
+	require.Equal(t, int64(20), c)
+
+	d, c = addEntryAmount(10, 20, 5, "C")
+	require.Equal(t, int64(10), d)
+	require.Equal(t, int64(25), c)
+
+	d, c = addEntryAmount(10, 20, 5, "")
+	require.Equal(t, int64(15), d)
+	require.Equal(t, int64(25), c)
+}
+
+func TestCreditOrDebitHelper(t *testing.T) {
+	require.Equal(t, "C", creditOrDebit(CheckingCredit))
+	require.Equal(t, "D", creditOrDebit(CheckingDebit))
+	require.Equal(t, "", creditOrDebit(0))
+	require.Equal(t, "", creditOrDebit(100))
+
+	// EntryDetail.CreditOrDebit delegates to the shared helper
+	ed := mockPPDEntryDetail()
+	ed.TransactionCode = CheckingDebit
+	require.Equal(t, creditOrDebit(ed.TransactionCode), ed.CreditOrDebit())
+}
+
+func TestMergeDir_HeaderFromFirstFileNoRace(t *testing.T) {
+	// Stress concurrent parse + merge; header must come from a real file.
+	dir := t.TempDir()
+	src, err := os.Open(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+	defer src.Close()
+
+	for i := 0; i < 50; i++ {
+		dst, err := os.Create(filepath.Join(dir, fmt.Sprintf("f-%d.ach", i)))
+		require.NoError(t, err)
+		_, err = src.Seek(0, 0)
+		require.NoError(t, err)
+		_, err = io.Copy(dst, src)
+		require.NoError(t, err)
+		require.NoError(t, dst.Close())
+	}
+
+	merged, err := MergeDir(dir, Conditions{}, &MergeDirOptions{ParseWorkers: 8})
+	require.NoError(t, err)
+	require.NotEmpty(t, merged)
+	require.NotEmpty(t, merged[0].Header.ImmediateOrigin)
+	require.NotEmpty(t, merged[0].Header.ImmediateDestination)
+}
+
+func TestDefaultParseWorkers(t *testing.T) {
+	n := defaultParseWorkers()
+	require.GreaterOrEqual(t, n, 8)
+	require.LessOrEqual(t, n, 50)
+}
