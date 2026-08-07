@@ -13,11 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:
+      fail-fast: false
       matrix:
         command:
-          - "go test ./addenda/... -fuzz Fuzz -fuzztime 10m"
-          - "go test ./test/fuzz/... -fuzz ACH -fuzztime 10m"
-          - "go test ./test/fuzz/... -fuzz JSON -fuzztime 10m"
+          - "go test ./addenda/... -fuzz FuzzParseTXP -fuzztime 10m"
+          - "go test ./test/fuzz/... -fuzz FuzzReaderWriterACH -fuzztime 10m"
+          - "go test ./test/fuzz/... -fuzz FuzzReaderWriterJSON -fuzztime 10m"
 
     steps:
     - name: Set up Go 1.x
@@ -37,5 +38,4 @@ jobs:
     - name: Report Failures
       if: ${{ failure() }}
       run: |
-        find ./addenda/testdata/fuzz/ -type f | xargs -n1 tail -n +1 -v
-        find ./test/fuzz/testdata/fuzz/ -type f | xargs -n1 tail -n +1 -v
+        find . -path '*/testdata/fuzz/*' -type f 2>/dev/null | xargs -r -n1 tail -n +1 -v || true
