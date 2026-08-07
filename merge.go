@@ -86,7 +86,7 @@ type Conditions struct {
 	// MaxLines will limit each merged files line count.
 	MaxLines int `json:"maxLines"`
 
-	// MaxDollarAmount will limit each merged file's total dollar amount.
+	// MaxDollarAmount will limit each merged file's total dollar amount per side
 	MaxDollarAmount int64 `json:"maxDollarAmount"`
 }
 
@@ -147,11 +147,11 @@ type MergeDirOptions struct {
 	// The value should be the file extension for ValidateOpts files.
 	ValidateOptsExtension string
 
-	// ParseWorkers is the concurrent number of ACH file reader/parser goroutines
-	// Default: 10
+	// ParseWorkers is the concurrent number of ACH file reader/parser goroutines.
+	// Default: 4 * GOMAXPROCS (clamped between 8 and 50)
 	ParseWorkers int
 
-	// SubDirectories is a setting to traverse sub directories for mergable ACH files.
+	// SubDirectories is a setting to traverse subdirectories for mergable ACH files.
 	SubDirectories bool
 }
 
@@ -210,7 +210,6 @@ func MergeDir(dir string, conditions Conditions, opts *MergeDirOptions) ([]*File
 	}
 
 	sorted := &outFile{}
-	var setup sync.Once
 
 	// We've observed the slowest part of MergeDir is reading files from disk and
 	// parsing them into File structs. We want to have a decent buffer of *File
@@ -218,90 +217,103 @@ func MergeDir(dir string, conditions Conditions, opts *MergeDirOptions) ([]*File
 	//
 	// For example we have observed (on an Intel Mac w/ SSD)
 	//    filepath.Walk        50-250µs
-	//    queueFileForMerging  20-250ms
+	//    readFileForMerging  20-250ms
 	//    sorted.add             1-25ms
+	//
+	// Completion is signaled by closing channels (not only context cancel) so
+	// in-flight paths/files are drained instead of dropped on shutdown races.
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	var g errgroup.Group
 
-	parseWorkers := 50 // active ACH Reader's
+	parseWorkers := defaultParseWorkers()
 	if opts.ParseWorkers > 0 {
 		parseWorkers = opts.ParseWorkers
 	}
 
-	discoveredPaths := make(chan string)
-	mergableFiles := make(chan *File)
+	// Buffer paths/files so slow merges don't immediately stall every parser,
+	// and so cancel/error paths can make progress while peers drain.
+	discoveredPaths := make(chan string, parseWorkers)
+	mergableFiles := make(chan *File, parseWorkers)
 
-	// We are going to scan the directory for files to parse and merge.
-	pathsCtx, pathsCancelFunc := context.WithCancel(context.Background())
-
-	var pathsGroup sync.WaitGroup
-	pathsGroup.Add(1)
+	// Scan the directory for files to parse and merge.
 	g.Go(func() error {
-		defer func() {
-			pathsGroup.Done()
-		}()
-
-		return walkDir(pathsCtx, opts.FS, dir, opts, discoveredPaths)
-	})
-	g.Go(func() error {
-		pathsGroup.Wait()
-		pathsCancelFunc()
-		return nil
+		defer close(discoveredPaths)
+		return walkDir(ctx, opts.FS, dir, opts, discoveredPaths)
 	})
 
-	// Setup concurrent ACH file parsers which is typically the longest part of merging.
-	parsingCtx, parsingCancelFunc := context.WithCancel(context.Background())
-
+	// Concurrent ACH file parsers — typically the longest part of merging.
 	var parsingGroup sync.WaitGroup
-	parsingGroup.Add(parseWorkers)
+	var parseErr error
+	var parseErrOnce sync.Once
 	for i := 0; i < parseWorkers; i++ {
+		parsingGroup.Add(1)
 		g.Go(func() error {
 			defer parsingGroup.Done()
-
-			err := queueFileForMerging(pathsCtx, parsingCtx, discoveredPaths, &setup, sorted, mergableFiles, opts)
+			err := readFileForMerging(ctx, discoveredPaths, mergableFiles, opts)
 			if err != nil {
-				pathsCancelFunc()
-				parsingCancelFunc()
+				parseErrOnce.Do(func() {
+					parseErr = err
+					cancel()
+				})
 			}
 			return err
 		})
 	}
 	g.Go(func() error {
 		parsingGroup.Wait()
-		parsingCancelFunc()
+		close(mergableFiles)
 		return nil
 	})
 
-	// Merge ACH files into the final output
+	// Merge ACH files into the final output on a single goroutine (outFile is not concurrent-safe).
+	// Header/validateOpts come from the first successfully read file here to avoid data races
+	// with parser workers.
 	g.Go(func() error {
-		for {
-			select {
-			case file := <-mergableFiles:
-				if file == nil {
-					continue
+		first := true
+		for file := range mergableFiles {
+			if file == nil {
+				continue
+			}
+			if first {
+				sorted.header = file.Header
+				sorted.validateOpts = file.GetValidation()
+				first = false
+			}
+			if err := sorted.add(file); err != nil {
+				cancel()
+				// Drain remaining files so parser workers are not stuck on send.
+				for range mergableFiles {
 				}
-
-				// accumulate the file into our merged set
-				err := sorted.add(file)
-				if err != nil {
-					// Cancel all goroutines to avoid deadlock on unbuffered channels
-					pathsCancelFunc()
-					parsingCancelFunc()
-
-					return fmt.Errorf("adding file into merged set failed: %w", err)
-				}
-
-			case <-parsingCtx.Done():
-				return nil
+				return fmt.Errorf("adding file into merged set failed: %w", err)
 			}
 		}
+		return nil
 	})
 
 	err := g.Wait()
 	if err != nil {
 		return nil, fmt.Errorf("merging %s failed: %w", dir, err)
 	}
+	if parseErr != nil {
+		return nil, fmt.Errorf("merging %s failed: %w", dir, parseErr)
+	}
 
 	return convertToFiles(sorted, conditions)
+}
+
+func defaultParseWorkers() int {
+	// Match historical default of 50 for large directory merges while remaining
+	// adaptive on smaller machines.
+	n := runtime.GOMAXPROCS(0) * 4
+	if n < 8 {
+		n = 8
+	}
+	if n > 50 {
+		n = 50
+	}
+	return n
 }
 
 func walkDir(ctx context.Context, fsys fs.FS, dir string, opts *MergeDirOptions, discoveredPaths chan string) error {
@@ -349,34 +361,35 @@ func walkDir(ctx context.Context, fsys fs.FS, dir string, opts *MergeDirOptions,
 	return nil
 }
 
-func queueFileForMerging(pathsCtx, parsingCtx context.Context, discoveredPaths chan string, setup *sync.Once, sorted *outFile, mergableFiles chan *File, opts *MergeDirOptions) error {
+func readFileForMerging(ctx context.Context, discoveredPaths <-chan string, mergableFiles chan<- *File, opts *MergeDirOptions) error {
 	for {
 		select {
-		case path := <-discoveredPaths:
+		case <-ctx.Done():
+			// Drain remaining paths so the walker is not blocked on send after cancel.
+			for range discoveredPaths {
+			}
+			return nil
+
+		case path, ok := <-discoveredPaths:
+			if !ok {
+				return nil
+			}
 			if path == "" {
 				continue
 			}
 
-			var file *File
-			var err error
-
 			// Without an accept function assume the file is Nacha formatted
-			var as FileAcceptance
+			as := AcceptFile
 			if opts.AcceptFile != nil {
 				as = opts.AcceptFile(path)
-			} else {
-				as = AcceptFile
 			}
-
 			if as == SkipFile {
 				continue
 			}
 
-			// Load any ValidateOpts that exist
+			// Load any ValidateOpts that exist and read the file
 			validateOpts := readValidateOptsFromFile(path, opts)
-
-			// Read the file
-			file, err = readFile(opts.FS, path, as, validateOpts)
+			file, err := readFile(opts.FS, path, as, validateOpts)
 			if err != nil {
 				return fmt.Errorf("reading %s failed: %w", path, err)
 			}
@@ -384,23 +397,14 @@ func queueFileForMerging(pathsCtx, parsingCtx context.Context, discoveredPaths c
 				continue
 			}
 
-			// Save the first file's header information if it's not already
-			setup.Do(func() {
-				sorted.header = file.Header
-				sorted.validateOpts = file.GetValidation()
-			})
-
-			// Only send non-nil files, once this channel receives a nil file we stop merging
-			if file != nil {
-				select {
-				case mergableFiles <- file:
-				case <-parsingCtx.Done():
-					return nil
+			select {
+			case mergableFiles <- file:
+			case <-ctx.Done():
+				// Drain so peers can exit cleanly
+				for range discoveredPaths {
 				}
+				return nil
 			}
-
-		case <-pathsCtx.Done():
-			return nil
 		}
 	}
 }
@@ -492,6 +496,8 @@ func (outf *outFile) add(incoming *File) error {
 	}
 	outFile.validateOpts = outFile.validateOpts.merge(incoming.GetValidation())
 
+	incomingValidateOpts := incoming.GetValidation()
+
 	for j := range incoming.Batches {
 		if len(incoming.Batches[j].GetADVEntries()) > 0 {
 			return errors.New("merging ADV batches is not supported")
@@ -503,21 +509,27 @@ func (outf *outFile) add(incoming *File) error {
 		}
 
 		entries := incoming.Batches[j].GetEntries()
+		// Cache the current destination batch across entries that share a header.
+		// Most incoming batches have unique trace numbers, so this avoids an
+		// O(batches) scan for every entry.
+		var current *batch
 		for m := range entries {
-			// Find a batch where this entry can fit
-			b := findOutBatch(bh, outFile.batches, entries[m])
-
-			// No batch can hold this EntryDetail so create one
-			if b == nil {
-				b = &batch{
-					header:       *bh,
-					entries:      treemap.New[string, *EntryDetail](),
-					validateOpts: incoming.GetValidation(),
-				}
-				outFile.batches = append(outFile.batches, b)
+			entry := entries[m]
+			if entry == nil {
+				continue
 			}
-
-			b.entries.Set(entries[m].TraceNumber, entries[m])
+			if current == nil || current.entries.Contains(entry.TraceNumber) {
+				current = findOutBatch(bh, outFile.batches, entry)
+				if current == nil {
+					current = &batch{
+						header:       *bh,
+						entries:      treemap.New[string, *EntryDetail](),
+						validateOpts: incomingValidateOpts,
+					}
+					outFile.batches = append(outFile.batches, current)
+				}
+			}
+			current.entries.Set(entry.TraceNumber, entry)
 		}
 	}
 
@@ -528,19 +540,24 @@ func (outf *outFile) add(incoming *File) error {
 		}
 
 		entries := incoming.IATBatches[j].GetEntries()
+		var current *iatBatch
 		for m := range entries {
-			b := findOutIATBatch(ibh, outFile.iatBatches, entries[m])
-
-			if b == nil {
-				b = &iatBatch{
-					header:       *ibh,
-					entries:      treemap.New[string, *IATEntryDetail](),
-					validateOpts: incoming.GetValidation(),
-				}
-				outFile.iatBatches = append(outFile.iatBatches, b)
+			entry := entries[m]
+			if entry == nil {
+				continue
 			}
-
-			b.entries.Set(entries[m].TraceNumber, entries[m])
+			if current == nil || current.entries.Contains(entry.TraceNumber) {
+				current = findOutIATBatch(ibh, outFile.iatBatches, entry)
+				if current == nil {
+					current = &iatBatch{
+						header:       *ibh,
+						entries:      treemap.New[string, *IATEntryDetail](),
+						validateOpts: incomingValidateOpts,
+					}
+					outFile.iatBatches = append(outFile.iatBatches, current)
+				}
+			}
+			current.entries.Set(entry.TraceNumber, entry)
 		}
 	}
 
@@ -570,7 +587,9 @@ func convertToFiles(sorted *outFile, conditions Conditions) ([]*File, error) {
 		}
 
 		currentFileLineCount := 2 // FileHeader, FileControl
-		var currentFileDollarAmount int
+		// NACHA enforces separate debit and credit file totals (each up to MaxDollarAmount),
+		// so track them independently rather than summing absolute amounts together.
+		var currentFileDebitAmount, currentFileCreditAmount int64
 
 		for i := range sorted.batches {
 			nextBatch := sorted.batches[i]
@@ -610,11 +629,9 @@ func convertToFiles(sorted *outFile, conditions Conditions) ([]*File, error) {
 					}
 				}
 
-				// File would exceed the dollar amount we're limited to
-				if conditions.MaxDollarAmount > 0 {
-					if int64(currentFileDollarAmount)+int64(nextEntry.Amount) > conditions.MaxDollarAmount {
-						goto overflow
-					}
+				// File would exceed the per-side dollar amount we're limited to
+				if conditions.MaxDollarAmount > 0 && wouldExceedDollarAmount(conditions.MaxDollarAmount, currentFileDebitAmount, currentFileCreditAmount, nextEntry.Amount, creditOrDebit(nextEntry.TransactionCode)) {
+					goto overflow
 				}
 
 				// Without a condition being exceeded jump into adding the entry in the current batch
@@ -639,7 +656,8 @@ func convertToFiles(sorted *outFile, conditions Conditions) ([]*File, error) {
 
 				// Reset counters
 				currentFileLineCount = 4 // FileHeader, FileControl, BatchHeader, BatchControl
-				currentFileDollarAmount = 0
+				currentFileDebitAmount = 0
+				currentFileCreditAmount = 0
 
 				// Create the new file and batch
 				file = NewFile()
@@ -670,7 +688,7 @@ func convertToFiles(sorted *outFile, conditions Conditions) ([]*File, error) {
 				batch.AddEntry(nextEntry)
 
 				currentFileLineCount += 1 + nextEntry.addendaCount()
-				currentFileDollarAmount += nextEntry.Amount
+				currentFileDebitAmount, currentFileCreditAmount = addEntryAmount(currentFileDebitAmount, currentFileCreditAmount, nextEntry.Amount, creditOrDebit(nextEntry.TransactionCode))
 			}
 
 			if len(batch.GetEntries()) > 0 {
@@ -722,11 +740,9 @@ func convertToFiles(sorted *outFile, conditions Conditions) ([]*File, error) {
 					}
 				}
 
-				// File would exceed the dollar amount we're limited to
-				if conditions.MaxDollarAmount > 0 {
-					if int64(currentFileDollarAmount)+int64(nextEntry.Amount) > conditions.MaxDollarAmount {
-						goto iatOverflow
-					}
+				// File would exceed the per-side dollar amount we're limited to
+				if conditions.MaxDollarAmount > 0 && wouldExceedDollarAmount(conditions.MaxDollarAmount, currentFileDebitAmount, currentFileCreditAmount, nextEntry.Amount, creditOrDebit(nextEntry.TransactionCode)) {
+					goto iatOverflow
 				}
 
 				// Without a condition being exceeded jump into adding the entry in the current batch
@@ -751,7 +767,8 @@ func convertToFiles(sorted *outFile, conditions Conditions) ([]*File, error) {
 
 				// Reset counters
 				currentFileLineCount = 4 // FileHeader, FileControl, IATBatchHeader, BatchControl
-				currentFileDollarAmount = 0
+				currentFileDebitAmount = 0
+				currentFileCreditAmount = 0
 
 				// Create the new file and batch
 				file = NewFile()
@@ -784,7 +801,7 @@ func convertToFiles(sorted *outFile, conditions Conditions) ([]*File, error) {
 				iatBatch.AddEntry(nextEntry)
 
 				currentFileLineCount += 1 + nextEntry.addendaCount()
-				currentFileDollarAmount += nextEntry.Amount
+				currentFileDebitAmount, currentFileCreditAmount = addEntryAmount(currentFileDebitAmount, currentFileCreditAmount, nextEntry.Amount, creditOrDebit(nextEntry.TransactionCode))
 			}
 
 			if len(iatBatch.Entries) > 0 {
@@ -809,7 +826,7 @@ func convertToFiles(sorted *outFile, conditions Conditions) ([]*File, error) {
 	return out, nil
 }
 
-// batch contains a BatcHeader and tree of entries sorted by TraceNumber, which allows for
+// batch contains a BatchHeader and tree of entries sorted by TraceNumber, which allows for
 // faster lookup and insertion into an ACH file
 type batch struct {
 	header       BatchHeader
@@ -846,7 +863,7 @@ func pickOutFile(fh FileHeader, file *outFile) *outFile {
 	return pickOutFile(fh, file.next)
 }
 
-// findOutBatch searches an array of batches for one whose BatcHeader matches bh
+// findOutBatch searches an array of batches for one whose BatchHeader matches bh
 // and doesn't contain the TraceNumber from entry.
 func findOutBatch(bh *BatchHeader, batches []*batch, entry *EntryDetail) *batch {
 	for i := range batches {
@@ -880,4 +897,36 @@ func findOutIATBatch(bh *IATBatchHeader, batches []*iatBatch, entry *IATEntryDet
 		}
 	}
 	return nil
+}
+
+// wouldExceedDollarAmount reports whether adding amount on the debit or credit side
+// would push that side over max. NACHA file control totals are tracked per side.
+// side is "C", "D", or "" from creditOrDebit.
+func wouldExceedDollarAmount(max, currentDebit, currentCredit int64, amount int, side string) bool {
+	if max <= 0 {
+		return false
+	}
+	next := int64(amount)
+	switch side {
+	case "C":
+		return currentCredit+next > max
+	case "D":
+		return currentDebit+next > max
+	default:
+		// Unknown side: treat conservatively against either running total.
+		return currentDebit+next > max || currentCredit+next > max
+	}
+}
+
+func addEntryAmount(currentDebit, currentCredit int64, amount int, side string) (int64, int64) {
+	next := int64(amount)
+	switch side {
+	case "C":
+		return currentDebit, currentCredit + next
+	case "D":
+		return currentDebit + next, currentCredit
+	default:
+		// If side is unknown keep both counters growing so limits still apply.
+		return currentDebit + next, currentCredit + next
+	}
 }
