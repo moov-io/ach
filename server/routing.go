@@ -29,7 +29,6 @@ import (
 	"strings"
 
 	"github.com/moov-io/base"
-	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/base/log"
 
 	"github.com/go-kit/kit/endpoint"
@@ -72,7 +71,7 @@ func respondWithSavedCORSHeaders() httptransport.ServerResponseFunc {
 	return func(ctx context.Context, w http.ResponseWriter) context.Context {
 		v, ok := ctx.Value(contextKey).(string)
 		if ok && v != "" {
-			moovhttp.SetAccessControlAllowHeaders(w, v) // set CORS headers
+			setAccessControlAllowHeaders(w, v) // set CORS headers (allowlisted only)
 		}
 		return ctx
 	}
@@ -111,7 +110,7 @@ func MakeHTTPHandler(s Service, repo Repository, kitlog gokitlog.Logger) http.Ha
 	// HTTP Methods
 	r.Methods("OPTIONS").Handler(preflightHandler(options)) // CORS pre-flight handler
 	r.Methods("GET").Path("/ping").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		moovhttp.SetAccessControlAllowHeaders(w, r.Header.Get("Origin"))
+		setAccessControlAllowHeaders(w, r.Header.Get("Origin"))
 		w.Header().Set("Content-Type", "text/plain")
 		w.Write([]byte("PONG"))
 	})
