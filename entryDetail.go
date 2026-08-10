@@ -675,20 +675,26 @@ func (ed *EntryDetail) TraceNumberField() string {
 
 // CreditOrDebit returns a "C" for credit or "D" for debit based on the entry TransactionCode
 func (ed *EntryDetail) CreditOrDebit() string {
-	if ed.TransactionCode < 10 || ed.TransactionCode > 99 {
+	if ed == nil {
 		return ""
 	}
-	tc := strconv.Itoa(ed.TransactionCode)
+	return creditOrDebit(ed.TransactionCode)
+}
 
-	// take the second number in the TransactionCode
-	switch tc[1:2] {
-	case "1", "2", "3", "4":
+// creditOrDebit returns "C", "D", or "" from an ACH transaction code.
+// The ones digit determines the side: 1-4 credit, 5-9 debit.
+func creditOrDebit(code int) string {
+	if code < 10 || code > 99 {
+		return ""
+	}
+	switch code % 10 {
+	case 1, 2, 3, 4:
 		return "C"
-	case "5", "6", "7", "8", "9":
+	case 5, 6, 7, 8, 9:
 		return "D"
 	default:
+		return ""
 	}
-	return ""
 }
 
 // AddAddenda05 appends an Addenda05 to the EntryDetail
