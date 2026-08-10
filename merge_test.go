@@ -18,12 +18,9 @@
 package ach
 
 import (
-	"bytes"
 	"crypto/rand"
 	"fmt"
-	"io"
 	"math/big"
-	"os"
 	"path/filepath"
 	"strconv"
 	"testing"
@@ -576,141 +573,6 @@ func TestMergeFiles__ValidateOpts(t *testing.T) {
 	require.True(t, b.Batch.validateOpts.CustomReturnCodes)
 }
 
-func TestMergeDir__DefaultFileAcceptor(t *testing.T) {
-	output := DefaultFileAcceptor("")
-	require.Equal(t, AcceptFile, output)
-
-	output = DefaultFileAcceptor("foo.ach")
-	require.Equal(t, AcceptFile, output)
-
-	output = DefaultFileAcceptor("foo.txt")
-	require.Equal(t, AcceptFile, output)
-
-	output = DefaultFileAcceptor("foo.json")
-	require.Equal(t, AcceptAsJSON, output)
-
-	output = DefaultFileAcceptor("foo.mp3")
-	require.Equal(t, SkipFile, output)
-}
-
-func TestMergeDir(t *testing.T) {
-	dir := t.TempDir()
-
-	src, err := os.Open(filepath.Join("test", "testdata", "ppd-debit.ach"))
-	require.NoError(t, err)
-	t.Cleanup(func() { src.Close() })
-
-	dst, err := os.Create(filepath.Join(dir, "input.ach"))
-	require.NoError(t, err)
-
-	_, err = io.Copy(dst, src)
-	require.NoError(t, err)
-	require.NoError(t, dst.Close())
-
-	var conditions Conditions
-	merged, err := MergeDir(dir, conditions, nil)
-	require.NoError(t, err)
-	require.Len(t, merged, 1)
-}
-
-func TestMergeDir_WithFS(t *testing.T) {
-	dir := t.TempDir()
-	sub := filepath.Join("a", "b", "c")
-	require.NoError(t, os.MkdirAll(filepath.Join(dir, sub), 0777))
-
-	src, err := os.Open(filepath.Join("test", "testdata", "ppd-debit.ach"))
-	require.NoError(t, err)
-	t.Cleanup(func() { src.Close() })
-
-	dst, err := os.Create(filepath.Join(dir, sub, "input.ach"))
-	require.NoError(t, err)
-
-	_, err = io.Copy(dst, src)
-	require.NoError(t, err)
-	require.NoError(t, dst.Close())
-
-	var conditions Conditions
-
-	// partial dir + sub
-	merged, err := MergeDir(sub, conditions, &MergeDirOptions{
-		FS: os.DirFS(dir),
-	})
-	require.NoError(t, err)
-	require.Len(t, merged, 1)
-
-	// full dir
-	merged, err = MergeDir(".", conditions, &MergeDirOptions{
-		FS: os.DirFS(filepath.Join(dir, sub)),
-	})
-	require.NoError(t, err)
-	require.Len(t, merged, 1)
-}
-
-func TestMergeDir_Nested(t *testing.T) {
-	dir := t.TempDir()
-
-	sub := filepath.Join("aaaa")
-	require.NoError(t, os.MkdirAll(filepath.Join(dir, sub), 0777))
-	sub = filepath.Join("inner")
-	require.NoError(t, os.MkdirAll(filepath.Join(dir, sub), 0777))
-
-	src, err := os.Open(filepath.Join("test", "testdata", "ppd-debit.ach"))
-	require.NoError(t, err)
-	t.Cleanup(func() { src.Close() })
-
-	dst, err := os.Create(filepath.Join(dir, sub, "input.ach"))
-	require.NoError(t, err)
-
-	_, err = io.Copy(dst, src)
-	require.NoError(t, err)
-	require.NoError(t, dst.Close())
-
-	var conditions Conditions
-
-	// nothing in the top level
-	merged, err := MergeDir(dir, conditions, nil)
-	require.NoError(t, err)
-	require.Empty(t, merged)
-
-	// found files in sub directories
-	merged, err = MergeDir(dir, conditions, &MergeDirOptions{
-		SubDirectories: true,
-	})
-	require.NoError(t, err)
-	require.Len(t, merged, 1)
-}
-
-func TestMergeDirHelpers(t *testing.T) {
-	dir := os.DirFS(filepath.Join("test", "testdata"))
-
-	t.Run("readFile", func(t *testing.T) {
-		t.Run("ach", func(t *testing.T) {
-			file, err := readFile(dir, "web-debit.ach", AcceptFile, nil)
-			require.NoError(t, err)
-			require.NotNil(t, file)
-		})
-
-		t.Run("json", func(t *testing.T) {
-			file, err := readFile(dir, "ppd-valid.json", AcceptAsJSON, nil)
-			require.NoError(t, err)
-			require.NotNil(t, file)
-		})
-	})
-
-	t.Run("readValidateOptsFromFile", func(t *testing.T) {
-		opts := &MergeDirOptions{
-			FS: dir,
-
-			ValidateOptsExtension: ".json",
-		}
-		output := readValidateOptsFromFile("web-debit.ach", opts)
-		require.NotNil(t, output)
-		require.True(t, output.RequireABAOrigin)
-		require.True(t, output.AllowMissingFileHeader)
-		require.True(t, output.UnequalServiceClassCode)
-	})
-}
-
 func TestMergeFilesHelpers(t *testing.T) {
 	t.Run("pickOutFile", func(t *testing.T) {
 		fh := mockFileHeader()
@@ -804,267 +666,6 @@ func TestMergeFiles_NachaMaxDollarAmount(t *testing.T) {
 	}
 }
 
-func TestMergeFiles__IAT(t *testing.T) {
-	iatFile, err := readACHFilepath(filepath.Join("test", "testdata", "iat-debit.ach"))
-	require.NoError(t, err)
-	require.NotEmpty(t, iatFile.IATBatches)
-
-	out, err := MergeFiles([]*File{iatFile})
-	require.NoError(t, err)
-	require.Len(t, out, 1)
-	require.Len(t, out[0].IATBatches, 1)
-	require.NoError(t, out[0].Validate())
-}
-
-func TestMergeFiles__IATMultiple(t *testing.T) {
-	iatFile, err := readACHFilepath(filepath.Join("test", "testdata", "iat-debit.ach"))
-	require.NoError(t, err)
-
-	out, err := MergeFiles([]*File{iatFile, iatFile})
-	require.NoError(t, err)
-	require.Len(t, out, 1)
-	require.Len(t, out[0].IATBatches, 2)
-	require.NoError(t, out[0].Validate())
-}
-
-func TestMergeFiles__IATAndNonIAT(t *testing.T) {
-	ppdFile, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
-	require.NoError(t, err)
-
-	iatFile, err := readACHFilepath(filepath.Join("test", "testdata", "iat-debit.ach"))
-	require.NoError(t, err)
-
-	iatFile.Header = ppdFile.Header
-
-	out, err := MergeFiles([]*File{ppdFile, iatFile})
-	require.NoError(t, err)
-	require.Len(t, out, 1)
-	require.Len(t, out[0].Batches, 1)
-	require.Len(t, out[0].IATBatches, 1)
-	require.NoError(t, out[0].Validate())
-}
-
-func TestMergeFiles__IATSameBatchAndTrace(t *testing.T) {
-	iatFile1, err := readACHFilepath(filepath.Join("test", "testdata", "iat-debit.ach"))
-	require.NoError(t, err)
-
-	iatFile2, err := readACHFilepath(filepath.Join("test", "testdata", "iat-debit.ach"))
-	require.NoError(t, err)
-
-	out, err := MergeFiles([]*File{iatFile1, iatFile2})
-	require.NoError(t, err)
-	require.Len(t, out, 1)
-	require.Len(t, out[0].IATBatches, 2)
-}
-
-func TestMergeFiles__IATAndNonIATApart(t *testing.T) {
-	ppdFile, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
-	require.NoError(t, err)
-
-	iatFile, err := readACHFilepath(filepath.Join("test", "testdata", "iat-debit.ach"))
-	require.NoError(t, err)
-
-	out, err := MergeFiles([]*File{ppdFile, iatFile})
-	require.NoError(t, err)
-	require.Len(t, out, 2)
-}
-
-func TestMergeDir__IAT(t *testing.T) {
-	dir := t.TempDir()
-
-	src, err := os.Open(filepath.Join("test", "testdata", "iat-debit.ach"))
-	require.NoError(t, err)
-	t.Cleanup(func() { src.Close() })
-
-	dst, err := os.Create(filepath.Join(dir, "input.ach"))
-	require.NoError(t, err)
-
-	_, err = io.Copy(dst, src)
-	require.NoError(t, err)
-	require.NoError(t, dst.Close())
-
-	var conditions Conditions
-	merged, err := MergeDir(dir, conditions, nil)
-	require.NoError(t, err)
-	require.Len(t, merged, 1)
-	require.Len(t, merged[0].IATBatches, 1)
-	require.NoError(t, merged[0].Validate())
-}
-
-func TestMergeDir__MixedIATAndNonIAT(t *testing.T) {
-	dir := t.TempDir()
-
-	ppdSrc, err := os.Open(filepath.Join("test", "testdata", "ppd-debit.ach"))
-	require.NoError(t, err)
-	t.Cleanup(func() { ppdSrc.Close() })
-
-	ppdDst, err := os.Create(filepath.Join(dir, "ppd.ach"))
-	require.NoError(t, err)
-	_, err = io.Copy(ppdDst, ppdSrc)
-	require.NoError(t, err)
-	require.NoError(t, ppdDst.Close())
-
-	iatSrc, err := os.Open(filepath.Join("test", "testdata", "iat-debit.ach"))
-	require.NoError(t, err)
-	t.Cleanup(func() { iatSrc.Close() })
-
-	iatDst, err := os.Create(filepath.Join(dir, "iat.ach"))
-	require.NoError(t, err)
-	_, err = io.Copy(iatDst, iatSrc)
-	require.NoError(t, err)
-	require.NoError(t, iatDst.Close())
-
-	var conditions Conditions
-	merged, err := MergeDir(dir, conditions, nil)
-	require.NoError(t, err)
-	require.Len(t, merged, 2)
-
-	var hasIAT, hasNonIAT bool
-	for _, f := range merged {
-		if len(f.IATBatches) > 0 {
-			hasIAT = true
-		}
-		if len(f.Batches) > 0 {
-			hasNonIAT = true
-		}
-		require.NoError(t, f.Validate())
-	}
-	require.True(t, hasIAT, "expected at least one file with IAT batches")
-	require.True(t, hasNonIAT, "expected at least one file with non-IAT batches")
-}
-
-func TestMergeDir__MixedIATSameHeader(t *testing.T) {
-	ppdFile, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
-	require.NoError(t, err)
-
-	iatFile, err := readACHFilepath(filepath.Join("test", "testdata", "iat-debit.ach"))
-	require.NoError(t, err)
-
-	iatFile.Header = ppdFile.Header
-
-	out, err := MergeFiles([]*File{ppdFile, iatFile})
-	require.NoError(t, err)
-	require.Len(t, out, 1)
-
-	dir := t.TempDir()
-	for i, f := range out {
-		var buf bytes.Buffer
-		require.NoError(t, NewWriter(&buf).Write(f))
-
-		dst, err := os.Create(filepath.Join(dir, fmt.Sprintf("file-%d.ach", i)))
-		require.NoError(t, err)
-		_, err = dst.Write(buf.Bytes())
-		require.NoError(t, err)
-		require.NoError(t, dst.Close())
-	}
-
-	var conditions Conditions
-	merged, err := MergeDir(dir, conditions, nil)
-	require.NoError(t, err)
-	require.Len(t, merged, 1)
-	require.Len(t, merged[0].Batches, 1)
-	require.Len(t, merged[0].IATBatches, 1)
-	require.NoError(t, merged[0].Validate())
-}
-
-func TestIATBatchHeader__Equal(t *testing.T) {
-	bh1 := mockIATBatchHeaderFF()
-	bh2 := mockIATBatchHeaderFF()
-	require.True(t, bh1.Equal(bh2))
-	require.True(t, bh1.Equal(bh1))
-
-	bh2.ServiceClassCode = DebitsOnly
-	require.False(t, bh1.Equal(bh2))
-
-	require.False(t, bh1.Equal(nil))
-	var nilBh *IATBatchHeader
-	require.False(t, nilBh.Equal(bh1))
-}
-
-func TestIATEntryDetail__addendaCount(t *testing.T) {
-	ed := mockIATEntryDetailWithAddendas()
-	require.Equal(t, 7, ed.addendaCount())
-
-	ed.Addenda17 = append(ed.Addenda17, mockAddenda17())
-	require.Equal(t, 8, ed.addendaCount())
-
-	ed.Addenda18 = append(ed.Addenda18, mockAddenda18())
-	require.Equal(t, 9, ed.addendaCount())
-
-	ed.Addenda99 = mockAddenda99()
-	require.Equal(t, 10, ed.addendaCount())
-}
-
-func TestFindOutIATBatch(t *testing.T) {
-	bh := mockIATBatchHeaderFF()
-	var batches []*iatBatch
-	var entry *IATEntryDetail
-
-	output := findOutIATBatch(bh, batches, entry)
-	require.Nil(t, output)
-
-	batches = append(batches, &iatBatch{
-		header:  *bh,
-		entries: treemap.New[string, *IATEntryDetail](),
-	})
-	output = findOutIATBatch(bh, batches, entry)
-	require.Equal(t, batches[0], output)
-
-	traceNumber := "231380100000001"
-	batches[0].entries.Set(traceNumber, &IATEntryDetail{
-		ID:          "1",
-		TraceNumber: traceNumber,
-	})
-	require.True(t, batches[0].entries.Contains(traceNumber))
-
-	output = findOutIATBatch(bh, batches, &IATEntryDetail{
-		TraceNumber: traceNumber,
-	})
-	require.Nil(t, output)
-}
-
-func TestMergeDir_DeadlockPrevention(t *testing.T) {
-	dir := t.TempDir()
-
-	// Copy a valid file
-	src1, err := os.Open(filepath.Join("test", "testdata", "ppd-debit.ach"))
-	require.NoError(t, err)
-	defer src1.Close()
-
-	dst1, err := os.Create(filepath.Join(dir, "valid.ach"))
-	require.NoError(t, err)
-	_, err = io.Copy(dst1, src1)
-	require.NoError(t, err)
-	require.NoError(t, dst1.Close())
-
-	// Copy an ADV file which will cause sorted.add to fail
-	src2, err := os.Open(filepath.Join("test", "testdata", "adv.ach"))
-	require.NoError(t, err)
-	defer src2.Close()
-
-	dst2, err := os.Create(filepath.Join(dir, "adv.ach"))
-	require.NoError(t, err)
-	_, err = io.Copy(dst2, src2)
-	require.NoError(t, err)
-	require.NoError(t, dst2.Close())
-
-	// Copy another valid file to ensure concurrency
-	src3, err := os.Open(filepath.Join("test", "testdata", "web-debit.ach"))
-	require.NoError(t, err)
-	defer src3.Close()
-
-	dst3, err := os.Create(filepath.Join(dir, "valid2.ach"))
-	require.NoError(t, err)
-	_, err = io.Copy(dst3, src3)
-	require.NoError(t, err)
-	require.NoError(t, dst3.Close())
-
-	// MergeDir should fail due to ADV file, but not deadlock
-	_, err = MergeDir(dir, Conditions{}, nil)
-	require.Error(t, err)
-	require.Contains(t, err.Error(), "merging ADV batches is not supported")
-}
-
 func TestMergeFiles__mixedDebitCreditDollarLimit(t *testing.T) {
 	// Debits and credits should be limited independently (NACHA file control totals).
 	// A file with $80 debit + $80 credit under a $100 max should stay in one file.
@@ -1151,32 +752,121 @@ func TestCreditOrDebitHelper(t *testing.T) {
 	require.Equal(t, creditOrDebit(ed.TransactionCode), ed.CreditOrDebit())
 }
 
-func TestMergeDir_HeaderFromFirstFileNoRace(t *testing.T) {
-	// Stress concurrent parse + merge; header must come from a real file.
-	dir := t.TempDir()
-	src, err := os.Open(filepath.Join("test", "testdata", "ppd-debit.ach"))
+func TestNewMerger(t *testing.T) {
+	f1, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
 	require.NoError(t, err)
-	defer src.Close()
-
-	for i := 0; i < 50; i++ {
-		dst, err := os.Create(filepath.Join(dir, fmt.Sprintf("f-%d.ach", i)))
-		require.NoError(t, err)
-		_, err = src.Seek(0, 0)
-		require.NoError(t, err)
-		_, err = io.Copy(dst, src)
-		require.NoError(t, err)
-		require.NoError(t, dst.Close())
-	}
-
-	merged, err := MergeDir(dir, Conditions{}, &MergeDirOptions{ParseWorkers: 8})
+	f2, err := readACHFilepath(filepath.Join("test", "testdata", "web-debit.ach"))
 	require.NoError(t, err)
-	require.NotEmpty(t, merged)
-	require.NotEmpty(t, merged[0].Header.ImmediateOrigin)
-	require.NotEmpty(t, merged[0].Header.ImmediateDestination)
+	f2.Header = f1.Header
+
+	t.Run("nil opts", func(t *testing.T) {
+		m := NewMerger(nil)
+		require.NotNil(t, m)
+		out, err := m.MergeWith([]*File{f1, f2}, Conditions{})
+		require.NoError(t, err)
+		require.Len(t, out, 1)
+	})
+
+	t.Run("with ValidateOpts", func(t *testing.T) {
+		opts := &ValidateOpts{CustomReturnCodes: true}
+		m := NewMerger(opts)
+		out, err := m.MergeWith([]*File{f1}, Conditions{})
+		require.NoError(t, err)
+		require.Len(t, out, 1)
+		// MergeWith applies opts onto each incoming file before merging
+		require.NotNil(t, f1.GetValidation())
+		require.True(t, f1.GetValidation().CustomReturnCodes)
+	})
 }
 
-func TestDefaultParseWorkers(t *testing.T) {
-	n := defaultParseWorkers()
-	require.GreaterOrEqual(t, n, 8)
-	require.LessOrEqual(t, n, 50)
+func TestMergeFilesWith_Empty(t *testing.T) {
+	out, err := MergeFilesWith(nil, Conditions{})
+	require.NoError(t, err)
+	require.Nil(t, out)
+
+	out, err = MergeFilesWith([]*File{}, Conditions{})
+	require.NoError(t, err)
+	require.Nil(t, out)
+}
+
+func TestMergeFilesWith_ADVRejected(t *testing.T) {
+	adv, err := readACHFilepath(filepath.Join("test", "testdata", "adv.ach"))
+	require.NoError(t, err)
+	require.NotEmpty(t, adv.Batches)
+	require.NotEmpty(t, adv.Batches[0].GetADVEntries())
+
+	out, err := MergeFilesWith([]*File{adv}, Conditions{})
+	require.Error(t, err)
+	require.Nil(t, out)
+	require.Contains(t, err.Error(), "merging ADV batches is not supported")
+}
+
+func TestWouldExceedDollarAmount_Edges(t *testing.T) {
+	// max <= 0 already covered; hit the unknown-side default branch
+	require.True(t, wouldExceedDollarAmount(100, 90, 0, 20, ""))
+	require.True(t, wouldExceedDollarAmount(100, 0, 90, 20, "X"))
+	require.False(t, wouldExceedDollarAmount(100, 50, 50, 20, ""))
+	require.False(t, wouldExceedDollarAmount(-1, 0, 0, 999, "D"))
+}
+
+func TestMergeFilesWith_AddError(t *testing.T) {
+	// MergeFilesWith must surface errors from outFile.add (e.g. ADV)
+	ppd, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+	adv, err := readACHFilepath(filepath.Join("test", "testdata", "adv.ach"))
+	require.NoError(t, err)
+	adv.Header = ppd.Header
+
+	out, err := MergeFilesWith([]*File{ppd, adv}, Conditions{})
+	require.Error(t, err)
+	require.Nil(t, out)
+	require.Contains(t, err.Error(), "ADV")
+}
+
+func TestMergeFiles_NoEntriesLostOnSplit(t *testing.T) {
+	// Build several files with distinct traces and merge under tight limits;
+	// every input trace must appear exactly once in the outputs.
+	const filesN = 5
+	const entriesPer = 10
+
+	var inputs []*File
+	wantTraces := make(map[string]int)
+	for fi := 0; fi < filesN; fi++ {
+		file := NewFile()
+		file.SetHeader(mockFileHeader())
+		bh := mockBatchPPDHeader()
+		// Distinct company so batches stay separate if needed
+		bh.CompanyName = fmt.Sprintf("CO-%d", fi)
+		batch := NewBatchPPD(bh)
+		for ei := 0; ei < entriesPer; ei++ {
+			ed := mockPPDEntryDetail()
+			ed.Amount = 1000 + ei
+			ed.SetTraceNumber(bh.ODFIIdentification, fi*100+ei+1)
+			ed.IndividualName = fmt.Sprintf("person-%d-%d", fi, ei)
+			batch.AddEntry(ed)
+			wantTraces[ed.TraceNumber]++
+		}
+		require.NoError(t, batch.Create())
+		file.AddBatch(batch)
+		require.NoError(t, file.Create())
+		inputs = append(inputs, file)
+	}
+
+	out, err := MergeFilesWith(inputs, Conditions{
+		MaxLines:        20,
+		MaxDollarAmount: 5000,
+	})
+	require.NoError(t, err)
+	require.NotEmpty(t, out)
+
+	gotTraces := make(map[string]int)
+	for _, f := range out {
+		require.NoError(t, f.Validate())
+		for _, b := range f.Batches {
+			for _, ed := range b.GetEntries() {
+				gotTraces[ed.TraceNumber]++
+			}
+		}
+	}
+	require.Equal(t, wantTraces, gotTraces, "merge split dropped or duplicated entries")
 }

@@ -253,12 +253,14 @@ func MergeDir(dir string, conditions Conditions, opts *MergeDirOptions) ([]*File
 			defer parsingGroup.Done()
 			err := readFileForMerging(ctx, discoveredPaths, mergableFiles, opts)
 			if err != nil {
+				// Record once and cancel peers; surface via parseErr after Wait so
+				// in-flight workers can drain without errgroup short-circuit races.
 				parseErrOnce.Do(func() {
 					parseErr = err
 					cancel()
 				})
 			}
-			return err
+			return nil
 		})
 	}
 	g.Go(func() error {
@@ -343,9 +345,9 @@ func walkDir(ctx context.Context, fsys fs.FS, dir string, opts *MergeDirOptions,
 				if err != nil {
 					return err
 				}
-			} else {
-				continue
 			}
+			// Never enqueue directories as merge inputs (only their files).
+			continue
 		}
 
 		fullPath := filepath.Join(dir, items[i].Name())
