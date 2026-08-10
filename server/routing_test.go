@@ -55,6 +55,12 @@ func TestRouting_codeFrom(t *testing.T) {
 	if v := codeFrom(ErrAlreadyExists); v != http.StatusBadRequest {
 		t.Errorf("HTTP status: %d", v)
 	}
+	if v := codeFrom(ErrRequestBodyTooLarge); v != http.StatusRequestEntityTooLarge {
+		t.Errorf("HTTP status: %d", v)
+	}
+	if v := codeFrom(fmt.Errorf("%w: max 16 bytes", ErrRequestBodyTooLarge)); v != http.StatusRequestEntityTooLarge {
+		t.Errorf("HTTP status: %d", v)
+	}
 	if v := codeFrom(errors.New("other")); v != http.StatusInternalServerError {
 		t.Errorf("HTTP status: %d", v)
 	}

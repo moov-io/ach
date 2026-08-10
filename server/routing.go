@@ -331,6 +331,10 @@ func codeFrom(err error) int {
 		return http.StatusOK
 	}
 
+	if errors.Is(err, ErrRequestBodyTooLarge) {
+		return http.StatusRequestEntityTooLarge
+	}
+
 	errString := fmt.Sprintf("%#v", err)
 	if el, ok := err.(base.ErrorList); ok {
 		errString = el.Error()
