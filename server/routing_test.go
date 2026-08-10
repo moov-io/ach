@@ -29,11 +29,18 @@ import (
 	"time"
 
 	"github.com/moov-io/ach"
+	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/base/log"
 
 	httptransport "github.com/go-kit/kit/transport/http"
 	kitlog "github.com/go-kit/log"
 )
+
+func withCORSAllowOrigins(t *testing.T, origins ...string) {
+	t.Helper()
+	moovhttp.SetCORSAllowedOrigins(origins)
+	t.Cleanup(moovhttp.ResetCORSAllowlistForTest)
+}
 
 func TestRouting_codeFrom(t *testing.T) {
 	if v := codeFrom(nil); v != http.StatusOK {
@@ -54,6 +61,8 @@ func TestRouting_codeFrom(t *testing.T) {
 }
 
 func TestRouting_ping(t *testing.T) {
+	withCORSAllowOrigins(t, "https://moov.io")
+
 	logger := log.NewNopLogger()
 	r := NewRepositoryInMemory(1*time.Minute, logger)
 	svc := NewService(r)
@@ -165,6 +174,8 @@ func TestBatchesXTotalCountHeader(t *testing.T) {
 }
 
 func TestRouting__CORSHeaders(t *testing.T) {
+	withCORSAllowOrigins(t, "https://api.moov.io")
+
 	ctx := context.TODO()
 	req := httptest.NewRequest("GET", "/files/create", nil)
 	req.Header.Set("Origin", "https://api.moov.io")
@@ -197,7 +208,22 @@ func TestRouting__CORSHeaders(t *testing.T) {
 	}
 }
 
+func TestRouting__CORSRejectsUnlistedOrigin(t *testing.T) {
+	withCORSAllowOrigins(t, "https://moov.io")
+
+	w := httptest.NewRecorder()
+	moovhttp.SetAccessControlAllowHeaders(w, "https://evil.example")
+	if v := w.Header().Get("Access-Control-Allow-Origin"); v != "" {
+		t.Errorf("expected no ACAO for unlisted origin, got %q", v)
+	}
+	if v := w.Header().Get("Access-Control-Allow-Credentials"); v != "" {
+		t.Errorf("expected no credentials header, got %q", v)
+	}
+}
+
 func TestPreflightHandler(t *testing.T) {
+	withCORSAllowOrigins(t, "https://moov.io")
+
 	options := []httptransport.ServerOption{
 		httptransport.ServerBefore(saveCORSHeadersIntoContext()),
 		httptransport.ServerAfter(respondWithSavedCORSHeaders()),

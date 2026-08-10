@@ -46,8 +46,8 @@ github.com/mattn/go-isatty v0.0.12/go.mod h1:cbi8OIDigv2wuxKPP5vlRcQ1OAZbq2CE4Ky
 github.com/mattn/go-isatty v0.0.14/go.mod h1:7GGIvUiUoEMVVmxf/4nioHXj79iQHKdU27kJ6hsGG94=
 github.com/mattn/go-isatty v0.0.22 h1:j8l17JJ9i6VGPUFUYoTUKPSgKe/83EYU2zBC7YNKMw4=
 github.com/mattn/go-isatty v0.0.22/go.mod h1:ZXfXG4SQHsB/w3ZeOYbR0PrPwLy+n6xiMrJlRFqopa4=
-github.com/moov-io/base v0.62.1 h1:nM+RdTWMsWaUd572D/Hitgf+wND6vnfnYjM9MNWLd7g=
-github.com/moov-io/base v0.62.1/go.mod h1:Rndo5mNk38K74u6zTA8K5pxpsgmnK7CirAf++zXuWuM=
+github.com/moov-io/base v0.63.0 h1:J2dGj5z5X2dbLumWkbCCjM6rWycf/Zfdvk31fHJQjZk=
+github.com/moov-io/base v0.63.0/go.mod h1:7lW1P0fiFOrINtS2zoxYtvTgvhdI0EcGSi5J//pIZcY=
 github.com/moov-io/iso3166 v0.4.0 h1:WtXIptANC16DrHpbSAt4+itFciCCnA+C6eAi9k7HEsA=
 github.com/moov-io/iso3166 v0.4.0/go.mod h1:13ubAoOZNfWzs2fN3x467zg8q982U867Ee+ulqrArlM=
 github.com/moov-io/iso4217 v0.4.0 h1:+97e9chdg8Cx3kMLmGmvN64+CtmtodPLfUT2PaCXUUE=
@@ -64,8 +64,8 @@ github.com/prometheus/common v0.70.1 h1:1HvjP4D5oL3t8RsPlwxA9onvvStjtIHYE5XuuwOi
 github.com/prometheus/common v0.70.1/go.mod h1:VdFUQDMZK3VLkurFUVhia6uys/0suUp86TJz5qbJRhc=
 github.com/prometheus/procfs v0.21.1 h1:GljZCt+zSTS+NZq88cyQ1LjZ+RCHp3uVuabBWA5+OJI=
 github.com/prometheus/procfs v0.21.1/go.mod h1:aB55Cww9pdSJVHk0hUf0inxWyyjPogFIjmHKYgMKmtY=
-github.com/rickar/cal/v2 v2.1.28 h1:PLNjsw5YrCMkcE+EtD/wFh0Ys+a4Qp9yN6SKyksVso0=
-github.com/rickar/cal/v2 v2.1.28/go.mod h1:/fdlMcx7GjPlIBibMzOM9gMvDBsrK+mOtRXdTzUqV/A=
+github.com/rickar/cal/v2 v2.1.29 h1:VDs0S1RZTD7DUbc/pDBdZyTMOQn0uOf5Qjz3sIpaeAU=
+github.com/rickar/cal/v2 v2.1.29/go.mod h1:/fdlMcx7GjPlIBibMzOM9gMvDBsrK+mOtRXdTzUqV/A=
 github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
 go.uber.org/goleak v1.3.0 h1:2K3zAYmnTNqV73imy9J1T3WC+gmCePx2hEGkimedGto=
