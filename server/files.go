@@ -166,6 +166,9 @@ func decodeCreateFileRequest(_ context.Context, request *http.Request) (interfac
 
 const defaultMaxBodySize int64 = 10 * 1024 * 1024 // 10MB
 
+// ErrRequestBodyTooLarge is returned when an HTTP request body exceeds MaxBodySize.
+var ErrRequestBodyTooLarge = errors.New("request body too large")
+
 // maxBodySize is the maximum number of bytes read from an HTTP request body.
 // Override with ACH_MAX_BODY_SIZE (see ParseMaxBodySize / SetMaxBodySize).
 var maxBodySize = defaultMaxBodySize
@@ -219,11 +222,17 @@ func ConfigureMaxBodySizeFromEnv() (int64, error) {
 func readBody(body io.ReadCloser) ([]byte, error) {
 	defer body.Close()
 
-	r := io.LimitReader(body, maxBodySize)
+	// Read one byte past the limit so we can reject oversized bodies instead of
+	// silently truncating with io.LimitReader (which would leave a partial parse
+	// that createFileEndpoint could still store).
+	r := io.LimitReader(body, maxBodySize+1)
 
 	bs, err := io.ReadAll(r)
 	if err != nil {
 		return nil, fmt.Errorf("reading request body: %w", err)
+	}
+	if int64(len(bs)) > maxBodySize {
+		return nil, fmt.Errorf("%w: max %d bytes", ErrRequestBodyTooLarge, maxBodySize)
 	}
 	return bs, nil
 }

@@ -1694,10 +1694,65 @@ func TestReadBodyRespectsMaxBodySize(t *testing.T) {
 	})
 
 	SetMaxBodySize(16)
-	body := io.NopCloser(strings.NewReader(strings.Repeat("a", 64)))
+
+	// Bodies within the limit are accepted in full.
+	body := io.NopCloser(strings.NewReader(strings.Repeat("a", 16)))
 	bs, err := readBody(body)
 	require.NoError(t, err)
 	require.Len(t, bs, 16)
+
+	// Bodies over the limit are rejected rather than silently truncated.
+	body = io.NopCloser(strings.NewReader(strings.Repeat("a", 64)))
+	bs, err = readBody(body)
+	require.ErrorIs(t, err, ErrRequestBodyTooLarge)
+	require.Nil(t, bs)
+}
+
+func TestCreateFileRejectsOversizedBody(t *testing.T) {
+	original := MaxBodySize()
+	t.Cleanup(func() {
+		SetMaxBodySize(original)
+	})
+
+	// Build a valid ACH JSON file, then pad it past a tight body limit so that a
+	// silent truncate would still leave parseable JSON prefix content.
+	f := ach.NewFile()
+	f.ID = "oversized-should-not-store"
+	f.Header = *mockFileHeader()
+	batch := mockBatchWEB(t)
+	batch.Entries[0].TraceNumber = "121042880000007"
+	f.AddBatch(batch)
+
+	var body bytes.Buffer
+	require.NoError(t, json.NewEncoder(&body).Encode(f))
+	// Pad with spaces after the JSON object; truncation mid-pad would still parse.
+	body.WriteString(strings.Repeat(" ", 256))
+
+	// Limit smaller than the full payload but large enough that a truncated read
+	// could still produce a partial *ach.File under the old LimitReader behavior.
+	require.Greater(t, body.Len(), 64)
+	SetMaxBodySize(int64(body.Len() - 32))
+
+	repo := NewRepositoryInMemory(testTTLDuration, log.NewNopLogger())
+	svc := NewService(repo)
+	handler := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
+
+	req := httptest.NewRequest("POST", "/files/create", bytes.NewReader(body.Bytes()))
+	req.Header.Set("content-type", "application/json")
+	req.Header.Set("x-request-id", "oversized-body")
+
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+
+	require.Equal(t, http.StatusRequestEntityTooLarge, w.Code, w.Body.String())
+	require.Contains(t, w.Body.String(), "request body too large")
+
+	// Failed create must leave the repository unchanged.
+	files := svc.GetFiles()
+	require.Empty(t, files)
+
+	_, err := svc.GetFile(f.ID)
+	require.ErrorIs(t, err, ErrNotFound)
 }
 
 func TestSetMaxBodySizeIgnoresNonPositive(t *testing.T) {
