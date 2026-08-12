@@ -109,6 +109,9 @@ start:
 				break
 			}
 		}
+		if err := i.scanner.Err(); err != nil {
+			return nil, nil, fmt.Errorf("scanning line %d failed: %w", i.reader.lineNum+1, err)
+		}
 		// If we've exhausted all lines in the reader then quit
 		if line == "" || allSpaces(line) {
 			return nil, nil, nil
@@ -181,6 +184,9 @@ start:
 						return bh, returnableEntry, nil
 					}
 				} else {
+					if err := i.scanner.Err(); err != nil {
+						return nil, nil, fmt.Errorf("scanning line %d failed: %w", i.reader.lineNum+1, err)
+					}
 					break // quit processing if we can't read another line
 				}
 			}
