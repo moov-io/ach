@@ -387,17 +387,24 @@ func rightPadShortLine(s string) (string, error) {
 }
 
 func (r *Reader) processFixedWidthFile(line string) error {
-	// It should be safe to parse this byte by byte since ACH files are ASCII only.
+	// Records are RecordLength characters each, so split on rune boundaries rather
+	// than byte offsets, which desynchronize when the line contains multibyte characters.
 	record := ""
-	for i, c := range line {
+	runes := 0
+	for _, c := range line {
 		record = record + string(c)
-		if i > 0 && (i+1)%RecordLength == 0 {
+		runes++
+		if runes == RecordLength {
 			r.line = record
 			if err := r.parseLine(); err != nil {
 				return err
 			}
 			record = ""
+			runes = 0
 		}
+	}
+	if runes > 0 {
+		return r.parseError(fmt.Errorf("%d extra character(s) in ACH file: records must be %d characters", runes, RecordLength))
 	}
 	return nil
 }

@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"bufio"
 	"bytes"
 	"os"
 	"path/filepath"
@@ -218,6 +219,52 @@ func TestIterator(t *testing.T) {
 			}
 		}
 		require.Len(t, entries, 1)
+	})
+
+	t.Run("scanner error on overlong line", func(t *testing.T) {
+		// bufio.Scanner stops permanently on any line over bufio.MaxScanTokenSize,
+		// so the iterator must surface the error instead of reporting a clean end of file.
+		content := `101 121042882 2313801042308080808A094101Federal Reserve Bank   My Bank Name
+5220ACME Corporation                    121042882 PPDPAYROLL         000000   1121042880000001
+622121042882123456789        0100000000ABC##jvkdjfuiwnWade Arnold             1121042880000001
+` + strings.Repeat("9", bufio.MaxScanTokenSize+1) + "\n"
+
+		iter := NewIterator(strings.NewReader(content))
+
+		var err error
+		for {
+			bh, ed, e := iter.NextEntry()
+			if e != nil {
+				err = e
+				break
+			}
+			if bh == nil && ed == nil {
+				break
+			}
+		}
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "token too long")
+	})
+
+	t.Run("fixed-width file with multibyte characters", func(t *testing.T) {
+		bs, err := os.ReadFile(filepath.Join("test", "testdata", "ppd-debit-fixedLength.ach"))
+		require.NoError(t, err)
+
+		// Swap one ASCII letter for a multibyte UTF-8 character, keeping the single line's
+		// rune count an exact multiple of the 94-character record length. Validation is
+		// skipped since NACHA field rules reject non-ASCII characters outright.
+		data := strings.Replace(string(bs), "achdestname", "achdestnáme", 1)
+		require.NotEqual(t, string(bs), data)
+
+		iter := NewIterator(strings.NewReader(data))
+		iter.SetValidation(&ValidateOpts{SkipAll: true})
+
+		_, _, err = iter.NextEntry()
+		require.NoError(t, err)
+
+		header := iter.GetHeader()
+		require.NotNil(t, header)
+		require.Equal(t, "achdestnáme", header.ImmediateDestinationName)
 	})
 
 	t.Run("get header and control", func(t *testing.T) {
