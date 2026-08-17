@@ -1,0 +1,16 @@
+# Use https://app.stepsecurity.io/ to improve workflow security
+name: zizmor
+
+on:
+  push:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  zizmor:
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    uses: moov-io/.github/.github/workflows/zizmor.yml@768836368a4ebdf0959c6497d41433e7193103cc
