@@ -6,8 +6,7 @@ on:
     tags: [ "v*.*.*" ]
 
 permissions:
-  contents: write
-  packages: write
+  contents: read
 
 jobs:
   testing:
@@ -18,32 +17,40 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
     - name: Set up Go 1.x
-      uses: actions/setup-go@v7
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
       with:
         go-version: stable
+        cache: false
       id: go
 
     - name: Check out code
-      uses: actions/checkout@v7
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
 
     - name: Check
       run: make check
 
   release:
+    permissions:
+      contents: write
     name: Release
     needs: [testing]
     runs-on: ubuntu-latest
     steps:
     - name: Set up Go 1.x
-      uses: actions/setup-go@v7
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
       with:
         go-version: stable
+        cache: false
       id: go
 
     - name: Check out code
-      uses: actions/checkout@v7
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
 
-    - uses: goreleaser/goreleaser-action@v7
+    - uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7.2.3
       with:
         distribution: goreleaser
         version: 'latest'
@@ -52,21 +59,30 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   webui:
+    permissions:
+      contents: write
     name: WebUI
     needs: [testing, release]
     runs-on: ubuntu-latest
     steps:
     - name: Set up Go 1.x
-      uses: actions/setup-go@v7
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
       with:
         go-version: stable
+        cache: false
       id: go
 
     - name: Check out code
-      uses: actions/checkout@v7
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
 
     - name: Switch to master
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REPO: ${{ github.repository }}
       run: |
+        git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
         git fetch origin
         git checkout master
 
@@ -86,13 +102,16 @@ jobs:
     runs-on: ${{ matrix.runner }}
     steps:
     - name: Set up Go 1.x
-      uses: actions/setup-go@v7
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
       with:
         go-version: stable
+        cache: false
       id: go
 
     - name: Check out code
-      uses: actions/checkout@v7
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
 
     - name: Login to DockerHub
       run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
@@ -101,9 +120,11 @@ jobs:
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Build and push image
+      env:
+        ARCH: ${{ matrix.arch }}
       run: |
-        make docker-build-arch ARCH=${{ matrix.arch }}
-        make docker-push-arch ARCH=${{ matrix.arch }}
+        make docker-build-arch ARCH=${ARCH}
+        make docker-push-arch ARCH=${ARCH}
 
   docker-manifest:
     name: Docker Manifest
@@ -111,7 +132,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out code
-      uses: actions/checkout@v7
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
 
     - name: Login to DockerHub
       run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
