@@ -67,10 +67,14 @@ func (batch *BatchBOC) Validate() error {
 		return batch.Error("StandardEntryClassCode", ErrBatchSECType, BOC)
 	}
 
-	// BOC detail entries can only be a debit, ServiceClassCode must allow debits
-	switch batch.Header.ServiceClassCode {
-	case CreditsOnly:
-		return batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode)
+	// BOC detail entries can only be a debit, ServiceClassCode must allow debits.
+	// A reversal is the exception: it carries credits, so File.Reversal sets
+	// CreditsOnly here and this check would reject the library's own output.
+	if !batch.IsReversal() {
+		switch batch.Header.ServiceClassCode {
+		case CreditsOnly:
+			return batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode)
+		}
 	}
 
 	invalidEntries := batch.InvalidEntries()
@@ -85,9 +89,19 @@ func (batch *BatchBOC) Validate() error {
 func (batch *BatchBOC) InvalidEntries() []InvalidEntry {
 	var out []InvalidEntry
 
+	isReversal := batch.IsReversal()
+
 	for _, entry := range batch.Entries {
-		// BOC detail entries must be a debit
-		if entry.CreditOrDebit() != "D" {
+		// Forward BOC entries must be a debit. A reversal moves the funds back,
+		// so the same batch carries credits and only credits.
+		if isReversal {
+			if entry.CreditOrDebit() != "C" {
+				out = append(out, InvalidEntry{
+					Entry: entry,
+					Error: batch.Error("TransactionCode", ErrBatchCreditOnly, entry.TransactionCode),
+				})
+			}
+		} else if entry.CreditOrDebit() != "D" {
 			out = append(out, InvalidEntry{
 				Entry: entry,
 				Error: batch.Error("TransactionCode", ErrBatchDebitOnly, entry.TransactionCode),
