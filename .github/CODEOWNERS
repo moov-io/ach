@@ -1,1 +1,7 @@
 * @adamdecaf
+
+# Lockfiles have no owners so dependency-only PRs skip code-owner review.
+go.mod
+go.sum
+**/go.mod
+**/go.sum
