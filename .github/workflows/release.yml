@@ -91,6 +91,7 @@ jobs:
 
   docker:
     name: Docker ${{ matrix.arch }}
+    if: github.repository_owner == 'moov-io' && !github.event.repository.fork
     needs: [testing, release]
     strategy:
       matrix:
@@ -128,6 +129,7 @@ jobs:
 
   docker-manifest:
     name: Docker Manifest
+    if: github.repository_owner == 'moov-io' && !github.event.repository.fork
     needs: [docker]
     runs-on: ubuntu-latest
     steps:
