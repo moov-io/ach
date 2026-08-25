@@ -13,6 +13,7 @@ permissions:
 
 jobs:
   CodeQL-Build:
+    if: ${{ !github.event.repository.private && !github.event.repository.archived }}
     permissions:
       actions: read
       contents: read
