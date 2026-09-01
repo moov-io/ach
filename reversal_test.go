@@ -160,6 +160,7 @@ func TestReversal_DebitOnlySECTypes(t *testing.T) {
 		{"ARC", func(t *testing.T) Batcher { return mockBatchARC(t) }},
 		{"BOC", func(t *testing.T) Batcher { return mockBatchBOC(t) }},
 		{"POP", func(t *testing.T) Batcher { return mockBatchPOP(t) }},
+		{"RCK", func(t *testing.T) Batcher { return mockBatchRCK(t) }},
 		{"XCK", func(t *testing.T) Batcher { return mockBatchXCK(t) }},
 		{"TRC", func(t *testing.T) Batcher { return mockBatchTRC(t) }},
 		{"TRX", func(t *testing.T) Batcher { return mockBatchTRX(t) }},
@@ -185,36 +186,6 @@ func TestReversal_DebitOnlySECTypes(t *testing.T) {
 			require.NoError(t, err)
 		})
 	}
-}
-
-// RCK is left out of the table above on purpose, and this test is why.
-//
-// RCK requires its Company Entry Description to be REDEPCHECK, and Reversal
-// overwrites that field with REVERSAL. The two requirements cannot both hold,
-// so an RCK batch can never validate after a reversal no matter what the
-// transaction codes say. Reversal still returns nil, so the caller is told
-// nothing and finds out when the file is rejected downstream.
-//
-// Whether Nacha permits reversing an RCK entry at all is a question for the
-// maintainers rather than something to guess at, so this test records the
-// behaviour as it stands instead of asserting what it should be.
-func TestReversal_RCKCannotValidate(t *testing.T) {
-	file := NewFile()
-	file.Header = mockFileHeader()
-	file.AddBatch(mockBatchRCK(t))
-
-	require.NoError(t, file.Create())
-	require.NoError(t, file.Validate())
-
-	require.NoError(t, file.Reversal(time.Now()))
-
-	// Create stays quiet. The conflict only surfaces at Validate, which is
-	// later than the caller would want to hear about it.
-	require.NoError(t, file.Create())
-
-	err := file.Validate()
-	require.Error(t, err)
-	require.Contains(t, err.Error(), "REDEPCHECK")
 }
 
 func TestBatch_IsReversal(t *testing.T) {

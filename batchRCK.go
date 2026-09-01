@@ -53,18 +53,15 @@ func (batch *BatchRCK) Validate() error {
 		return batch.Error("StandardEntryClassCode", ErrBatchSECType, RCK)
 	}
 
-	// RCK detail entries can only be a debit, ServiceClassCode must allow debits.
-	// A reversal is the exception: it carries credits, so File.Reversal sets
-	// CreditsOnly here and this check would reject the library's own output.
-	if !batch.IsReversal() {
-		switch batch.Header.ServiceClassCode {
-		case CreditsOnly:
-			return batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode)
-		}
+	// Forward RCK batches can only have debit entries, but REVERSAL batches can only have credits
+	if batch.Header.ServiceClassCode == CreditsOnly && !batch.IsReversal() {
+		return batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode)
 	}
 
-	// CompanyEntryDescription is required to be REDEPCHECK
-	if batch.Header.CompanyEntryDescription != "REDEPCHECK" {
+	// CompanyEntryDescription is required to be REDEPCHECK, except after a
+	// reversal: "REVERSAL" replaces the original description, including content
+	// that would otherwise be required by the Rules. See File.Reversal.
+	if !batch.IsReversal() && batch.Header.CompanyEntryDescription != "REDEPCHECK" {
 		return batch.Error("CompanyEntryDescription", ErrBatchCompanyEntryDescriptionREDEPCHECK, batch.Header.CompanyEntryDescription)
 	}
 
@@ -83,8 +80,7 @@ func (batch *BatchRCK) InvalidEntries() []InvalidEntry {
 	isReversal := batch.IsReversal()
 
 	for _, entry := range batch.Entries {
-		// Forward RCK entries must be a debit. A reversal moves the funds back,
-		// so the same batch carries credits and only credits.
+		// Forward RCK batches can only have debit entries, but REVERSAL batches can only have credits
 		if isReversal {
 			if entry.CreditOrDebit() != "C" {
 				out = append(out, InvalidEntry{

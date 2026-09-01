@@ -64,14 +64,9 @@ func (batch *BatchPOP) Validate() error {
 		return batch.Error("StandardEntryClassCode", ErrBatchSECType, POP)
 	}
 
-	// POP detail entries can only be a debit, ServiceClassCode must allow debits.
-	// A reversal is the exception: it carries credits, so File.Reversal sets
-	// CreditsOnly here and this check would reject the library's own output.
-	if !batch.IsReversal() {
-		switch batch.Header.ServiceClassCode {
-		case CreditsOnly:
-			return batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode)
-		}
+	// Forward POP batches can only have debit entries, but REVERSAL batches can only have credits
+	if batch.Header.ServiceClassCode == CreditsOnly && !batch.IsReversal() {
+		return batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode)
 	}
 
 	invalidEntries := batch.InvalidEntries()
@@ -89,8 +84,7 @@ func (batch *BatchPOP) InvalidEntries() []InvalidEntry {
 	isReversal := batch.IsReversal()
 
 	for _, entry := range batch.Entries {
-		// Forward POP entries must be a debit. A reversal moves the funds back,
-		// so the same batch carries credits and only credits.
+		// Forward POP batches can only have debit entries, but REVERSAL batches can only have credits
 		if isReversal {
 			if entry.CreditOrDebit() != "C" {
 				out = append(out, InvalidEntry{

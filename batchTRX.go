@@ -56,14 +56,9 @@ func (batch *BatchTRX) Validate() error {
 		return batch.Error("StandardEntryClassCode", ErrBatchSECType, TRX)
 	}
 
-	// TRX detail entries can only be a debit, ServiceClassCode must allow debits.
-	// A reversal is the exception: it carries credits, so File.Reversal sets
-	// CreditsOnly here and this check would reject the library's own output.
-	if !batch.IsReversal() {
-		switch batch.Header.ServiceClassCode {
-		case CreditsOnly:
-			return batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode)
-		}
+	// Forward TRX batches can only have debit entries, but REVERSAL batches can only have credits
+	if batch.Header.ServiceClassCode == CreditsOnly && !batch.IsReversal() {
+		return batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode)
 	}
 
 	invalidEntries := batch.InvalidEntries()
@@ -81,8 +76,7 @@ func (batch *BatchTRX) InvalidEntries() []InvalidEntry {
 	isReversal := batch.IsReversal()
 
 	for _, entry := range batch.Entries {
-		// Forward TRX entries must be a debit. A reversal moves the funds back,
-		// so the same batch carries credits and only credits.
+		// Forward TRX batches can only have debit entries, but REVERSAL batches can only have credits
 		if isReversal {
 			if entry.CreditOrDebit() != "C" {
 				out = append(out, InvalidEntry{

@@ -290,19 +290,6 @@ func ConvertBatchType(b Batch) Batcher {
 //
 // Create implementations are free to modify computable fields in a file and should
 // call the Batch's Validate function at the end of their execution.
-// IsReversal reports whether this batch was turned into a reversal, which the
-// Nacha rules signal by putting "REVERSAL" in the Company Entry Description.
-//
-// A reversal moves funds the other way, so a batch type that normally carries
-// debits only carries credits here, and its ServiceClassCode becomes
-// CreditsOnly. Validation that assumes the forward direction has to know about
-// this or it rejects a file the library itself produced.
-func (batch *Batch) IsReversal() bool {
-	if batch.Header == nil {
-		return false
-	}
-	return strings.EqualFold(strings.TrimSpace(batch.Header.CompanyEntryDescription), "REVERSAL")
-}
 
 func (batch *Batch) Create() error {
 	return errors.New("use an implementation of batch or NewBatch")
@@ -1096,6 +1083,14 @@ func (batch *Batch) addendaFieldInclusionReturn(entry *EntryDetail) error {
 		return batch.Error("Addenda99", ErrFieldInclusion)
 	}
 	return nil
+}
+
+// IsReversal determines if a batch carries reversing entries - see File.Reversal
+func (batch *Batch) IsReversal() bool {
+	if batch.Header == nil {
+		return false
+	}
+	return strings.EqualFold(strings.TrimSpace(batch.Header.CompanyEntryDescription), "REVERSAL")
 }
 
 // IsADV determines if a batch is batch type ADV - BatchADV
