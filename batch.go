@@ -290,6 +290,7 @@ func ConvertBatchType(b Batch) Batcher {
 //
 // Create implementations are free to modify computable fields in a file and should
 // call the Batch's Validate function at the end of their execution.
+
 func (batch *Batch) Create() error {
 	return errors.New("use an implementation of batch or NewBatch")
 }
@@ -1082,6 +1083,14 @@ func (batch *Batch) addendaFieldInclusionReturn(entry *EntryDetail) error {
 		return batch.Error("Addenda99", ErrFieldInclusion)
 	}
 	return nil
+}
+
+// IsReversal determines if a batch carries reversing entries - see File.Reversal
+func (batch *Batch) IsReversal() bool {
+	if batch.Header == nil {
+		return false
+	}
+	return strings.EqualFold(strings.TrimSpace(batch.Header.CompanyEntryDescription), "REVERSAL")
 }
 
 // IsADV determines if a batch is batch type ADV - BatchADV
