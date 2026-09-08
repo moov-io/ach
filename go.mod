@@ -20,7 +20,7 @@ require (
 	github.com/stretchr/testify v1.12.1
 	golang.org/x/net v0.58.0
 	golang.org/x/sync v0.23.0
-	golang.org/x/text v0.41.0
+	golang.org/x/text v0.42.0
 )
 
 require (
