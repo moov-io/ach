@@ -50,6 +50,14 @@ else
 	GOOS=js GOARCH=wasm ./lint-project.sh
 endif
 
+# Hot-path suite only. The package has hundreds of Benchmark* helpers
+# converted from unit tests; do not use -bench=.
+BENCH_REGEX := ^(BenchmarkBuildFile|Benchmark_ReadLargeFile|BenchmarkPPDDebitRead|BenchmarkWEBDebitRead|BenchmarkPPDDebitFixedLengthRead|BenchmarkACHFileRead|BenchmarkPPDWrite|BenchmarkLargeWEBWrite|BenchmarkIATWrite|BenchmarkPPDIATWrite|BenchmarkAlphaField|BenchmarkNumericField|BenchmarkParseNumField|BenchmarkParseStringField|BenchmarkMergeFiles|BenchmarkCalculateCheckDigit)
+
+.PHONY: bench
+bench:
+	go test . -count=1 -run '^$$' -bench '$(BENCH_REGEX)' -benchmem | tee output.txt
+
 check-openapi:
 	docker run \
 	-v ${PWD}/openapi.yaml:/projects/openapi.yaml \

@@ -1,0 +1,67 @@
+# Use https://app.stepsecurity.io/ to improve workflow security
+name: Benchmarks
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+
+permissions: {}
+
+jobs:
+  bench:
+    name: Run
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      deployments: write
+    steps:
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 50
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: stable
+
+      - name: Resolve code commit
+        id: meta
+        run: |
+          sha=$(git log -1 --format=%H --invert-grep --grep='benchmark result' || true)
+          if [ -z "${sha}" ]; then
+            sha="${GITHUB_SHA}"
+          fi
+          echo "sha=${sha}" >> "${GITHUB_OUTPUT}"
+
+      - name: Run benchmarks
+        run: make bench
+
+      - name: Show results
+        run: cat output.txt
+
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba # v1.22.1
+        with:
+          name: "moov-io/ach"
+          tool: go
+          output-file-path: output.txt
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ steps.meta.outputs.sha }}
+          skip-fetch-gh-pages: true
+          auto-push: true
+          alert-threshold: "120%"
+          comment-on-alert: true
+          fail-on-alert: false
+          summary-always: true
+          alert-comment-cc-users: "@adamdecaf"
+          max-items-in-chart: 90
+          gh-pages-branch: master
+          benchmark-data-dir-path: docs/bench
+
+      - name: Logs
+        if: failure()
+        run: cat output.txt || true
