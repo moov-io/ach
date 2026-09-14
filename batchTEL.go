@@ -17,10 +17,6 @@
 
 package ach
 
-import (
-	"strings"
-)
-
 // BatchTEL is a batch that handles SEC payment type Telephone-Initiated Entries (TEL)
 // Telephone-Initiated Entries (TEL) are consumer debit transactions. The NACHA Operating Rules permit TEL entries when
 // the Originator obtains the Receiver's authorization for the debit entry orally via the telephone.
@@ -66,7 +62,7 @@ func (batch *BatchTEL) Validate() error {
 func (batch *BatchTEL) InvalidEntries() []InvalidEntry {
 	var out []InvalidEntry
 
-	isReversal := strings.EqualFold(strings.TrimSpace(batch.Header.CompanyEntryDescription), "REVERSAL")
+	isReversal := batch.IsReversal()
 
 	for _, entry := range batch.Entries {
 		creditOrDebit := entry.CreditOrDebit()

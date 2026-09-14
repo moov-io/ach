@@ -1084,6 +1084,14 @@ func (batch *Batch) addendaFieldInclusionReturn(entry *EntryDetail) error {
 	return nil
 }
 
+// IsReversal determines if a batch carries reversing entries - see File.Reversal
+func (batch *Batch) IsReversal() bool {
+	if batch.Header == nil {
+		return false
+	}
+	return strings.EqualFold(strings.TrimSpace(batch.Header.CompanyEntryDescription), "REVERSAL")
+}
+
 // IsADV determines if a batch is batch type ADV - BatchADV
 func (batch *Batch) IsADV() bool {
 	ok := batch.GetHeader().StandardEntryClassCode == ADV
