@@ -334,6 +334,9 @@ func (ed *EntryDetail) Validate() error {
 	if err := ed.amountOverflowsField(); err != nil {
 		return fieldError("Amount", err, ed.Amount)
 	}
+	if ed.validateOpts != nil && ed.validateOpts.MaxAmountPerEntry > 0 && ed.Amount > ed.validateOpts.MaxAmountPerEntry {
+		return fieldError("Amount", NewErrEntryAmountExceedsMax(ed.validateOpts.MaxAmountPerEntry), ed.Amount)
+	}
 	if ed.validateOpts == nil || !ed.validateOpts.AllowSpecialCharacters {
 		if err := ed.isAlphanumeric(ed.DFIAccountNumber); err != nil {
 			return fieldError("DFIAccountNumber", err, ed.DFIAccountNumber)

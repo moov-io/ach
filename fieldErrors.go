@@ -169,6 +169,25 @@ func (e ErrValidCheckDigit) Error() string {
 	return e.Message
 }
 
+// ErrEntryAmountExceedsMax is the error given when an EntryDetail's Amount exceeds the
+// MaxAmountPerEntry configured in ValidateOpts
+type ErrEntryAmountExceedsMax struct {
+	Message string
+	Max     int
+}
+
+// NewErrEntryAmountExceedsMax creates a new error of the ErrEntryAmountExceedsMax type
+func NewErrEntryAmountExceedsMax(max int) ErrEntryAmountExceedsMax {
+	return ErrEntryAmountExceedsMax{
+		Message: fmt.Sprintf("exceeds maximum allowed entry amount %v", max),
+		Max:     max,
+	}
+}
+
+func (e ErrEntryAmountExceedsMax) Error() string {
+	return e.Message
+}
+
 // ErrValidFieldLength is the error given when the field does not have the correct length
 type ErrValidFieldLength struct {
 	Message        string

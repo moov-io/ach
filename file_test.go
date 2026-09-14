@@ -2293,6 +2293,22 @@ func TestFile_ValidateOpts_Merge(t *testing.T) {
 		require.NotNil(t, empty.merge(full))
 		require.NotNil(t, full.merge(empty))
 	})
+
+	t.Run("MaxAmountPerEntry", func(t *testing.T) {
+		// stricter (smaller) non-zero value wins, regardless of argument order
+		strict := &ValidateOpts{MaxAmountPerEntry: 100}
+		loose := &ValidateOpts{MaxAmountPerEntry: 500}
+		require.Equal(t, 100, strict.merge(loose).MaxAmountPerEntry)
+		require.Equal(t, 100, loose.merge(strict).MaxAmountPerEntry)
+
+		// unset (zero) on one side defers to whichever side has a cap
+		unset := &ValidateOpts{}
+		require.Equal(t, 500, unset.merge(loose).MaxAmountPerEntry)
+		require.Equal(t, 500, loose.merge(unset).MaxAmountPerEntry)
+
+		// unset on both sides stays unset
+		require.Equal(t, 0, unset.merge(&ValidateOpts{}).MaxAmountPerEntry)
+	})
 }
 
 func TestFileJSON_ValidateOpts(t *testing.T) {

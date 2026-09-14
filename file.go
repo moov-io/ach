@@ -1007,6 +1007,11 @@ type ValidateOpts struct {
 
 	// SkipBatchHeaderCompanyValidation will bypass validation of Company fields in a BatchHeader
 	SkipBatchHeaderCompanyValidation bool `json:"skipBatchHeaderCompanyValidation"`
+
+	// MaxAmountPerEntry caps the Amount (in cents) allowed on a single domestic EntryDetail record.
+	// A file containing an EntryDetail whose Amount exceeds this value will fail validation.
+	// Zero (the default) disables the check. IATEntryDetail and ADVEntryDetail are not affected.
+	MaxAmountPerEntry int `json:"maxAmountPerEntry"`
 }
 
 // merge will combine two ValidateOpts structs and keep any non-zero field values.
@@ -1049,6 +1054,19 @@ func (v *ValidateOpts) merge(other *ValidateOpts) *ValidateOpts {
 	}
 	if other.CheckTransactionCode != nil {
 		out.CheckTransactionCode = other.CheckTransactionCode
+	}
+
+	// MaxAmountPerEntry is a ceiling rather than a relaxation, so merging must never
+	// silently loosen it: the stricter (smaller) non-zero value wins.
+	switch {
+	case v.MaxAmountPerEntry == 0:
+		out.MaxAmountPerEntry = other.MaxAmountPerEntry
+	case other.MaxAmountPerEntry == 0:
+		out.MaxAmountPerEntry = v.MaxAmountPerEntry
+	case v.MaxAmountPerEntry < other.MaxAmountPerEntry:
+		out.MaxAmountPerEntry = v.MaxAmountPerEntry
+	default:
+		out.MaxAmountPerEntry = other.MaxAmountPerEntry
 	}
 
 	return out

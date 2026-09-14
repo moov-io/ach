@@ -750,6 +750,34 @@ func TestEntryDetail__LargeAmountStrings(t *testing.T) {
 	require.ErrorContains(t, ed.amountOverflowsField(), "does not match formatted value 6854775807")
 }
 
+func TestEntryDetail__MaxAmountPerEntry(t *testing.T) {
+	ed := mockEntryDetail()
+	ed.SetValidation(&ValidateOpts{
+		MaxAmountPerEntry: ed.Amount, // cap == amount, still allowed
+	})
+	require.NoError(t, ed.Validate())
+
+	ed.SetValidation(&ValidateOpts{
+		MaxAmountPerEntry: ed.Amount - 1,
+	})
+	err := ed.Validate()
+	require.ErrorContains(t, err, "exceeds maximum allowed entry amount")
+
+	// zero (unset) disables the check regardless of amount
+	ed.SetValidation(&ValidateOpts{
+		MaxAmountPerEntry: 0,
+	})
+	require.NoError(t, ed.Validate())
+
+	// nil validateOpts also disables the check
+	ed.SetValidation(nil)
+	require.NoError(t, ed.Validate())
+
+	// nil out
+	ed = nil
+	ed.SetValidation(&ValidateOpts{})
+}
+
 func TestEntryDetail__InvalidCheckDigitAllowedWithOpt(t *testing.T) {
 	ed := mockEntryDetail()
 	ed.SetValidation(&ValidateOpts{
