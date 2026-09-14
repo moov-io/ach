@@ -51,7 +51,7 @@ jobs:
           output-file-path: output.txt
           github-token: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ steps.meta.outputs.sha }}
-          skip-fetch-gh-pages: true
+          skip-fetch-gh-pages: false
           auto-push: true
           alert-threshold: "120%"
           comment-on-alert: true
@@ -59,7 +59,8 @@ jobs:
           summary-always: true
           alert-comment-cc-users: "@adamdecaf"
           max-items-in-chart: 90
-          gh-pages-branch: master
+          # Default branch requires PRs. Results live on an unprotected branch.
+          gh-pages-branch: bench-data
           benchmark-data-dir-path: docs/bench
 
       - name: Logs
