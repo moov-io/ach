@@ -144,3 +144,80 @@ func TestReversal_TEL(t *testing.T) {
 	err = file.Validate()
 	require.NoError(t, err)
 }
+
+// Debit-only SEC types must still validate after File.Reversal
+func TestReversal_DebitOnlySECTypes(t *testing.T) {
+	tests := []struct {
+		name  string
+		batch func(*testing.T) Batcher
+	}{
+		{"ARC", func(t *testing.T) Batcher { return mockBatchARC(t) }},
+		{"BOC", func(t *testing.T) Batcher { return mockBatchBOC(t) }},
+		{"POP", func(t *testing.T) Batcher { return mockBatchPOP(t) }},
+		{"RCK", func(t *testing.T) Batcher { return mockBatchRCK(t) }},
+		{"XCK", func(t *testing.T) Batcher { return mockBatchXCK(t) }},
+		{"TRC", func(t *testing.T) Batcher { return mockBatchTRC(t) }},
+		{"TRX", func(t *testing.T) Batcher { return mockBatchTRX(t) }},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			file := NewFile()
+			file.Header = mockFileHeader()
+			file.AddBatch(tc.batch(t))
+
+			err := file.Create()
+			require.NoError(t, err)
+			require.NoError(t, file.Validate())
+
+			err = file.Reversal(time.Now())
+			require.NoError(t, err)
+
+			err = file.Create()
+			require.NoError(t, err)
+
+			err = file.Validate()
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestReversal_LeftoverDebit(t *testing.T) {
+	file := NewFile()
+	file.Header = mockFileHeader()
+	file.AddBatch(mockBatchARC(t))
+
+	require.NoError(t, file.Create())
+	require.NoError(t, file.Reversal(time.Now()))
+	require.NoError(t, file.Create())
+	require.NoError(t, file.Validate())
+
+	batch, ok := file.Batches[0].(*BatchARC)
+	require.True(t, ok)
+
+	entries := batch.GetEntries()
+	require.NotEmpty(t, entries)
+	entries[0].TransactionCode = CheckingDebit
+
+	invalid := batch.InvalidEntries()
+	require.NotEmpty(t, invalid)
+	require.ErrorIs(t, invalid[0].Error, ErrBatchCreditOnly)
+}
+
+func TestBatch_IsReversal(t *testing.T) {
+	require.False(t, (&Batch{}).IsReversal())
+
+	batch := mockBatchARC(t)
+
+	require.False(t, batch.IsReversal())
+
+	// Nacha spells it in capitals and left justified, so the comparison has to
+	// survive both a different case and the padding a fixed-width file carries.
+	for _, description := range []string{"REVERSAL", "reversal", "  REVERSAL  "} {
+		batch.GetHeader().CompanyEntryDescription = description
+		require.True(t, batch.IsReversal(), description)
+	}
+
+	batch.GetHeader().CompanyEntryDescription = "REVERSALS"
+	require.False(t, batch.IsReversal())
+}

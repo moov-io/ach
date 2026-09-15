@@ -52,9 +52,8 @@ func (batch *BatchXCK) Validate() error {
 		return batch.Error("StandardEntryClassCode", ErrBatchSECType, XCK)
 	}
 
-	// XCK detail entries can only be a debit, ServiceClassCode must allow debits
-	switch batch.Header.ServiceClassCode {
-	case CreditsOnly:
+	// Forward XCK batches can only have debit entries, but REVERSAL batches can only have credits
+	if batch.Header.ServiceClassCode == CreditsOnly && !batch.IsReversal() {
 		return batch.Error("ServiceClassCode", ErrBatchServiceClassCode, batch.Header.ServiceClassCode)
 	}
 
@@ -70,9 +69,18 @@ func (batch *BatchXCK) Validate() error {
 func (batch *BatchXCK) InvalidEntries() []InvalidEntry {
 	var out []InvalidEntry
 
+	isReversal := batch.IsReversal()
+
 	for _, entry := range batch.Entries {
-		// XCK detail entries must be a debit
-		if entry.CreditOrDebit() != "D" {
+		// Forward XCK batches can only have debit entries, but REVERSAL batches can only have credits
+		if isReversal {
+			if entry.CreditOrDebit() != "C" {
+				out = append(out, InvalidEntry{
+					Entry: entry,
+					Error: batch.Error("TransactionCode", ErrBatchCreditOnly, entry.TransactionCode),
+				})
+			}
+		} else if entry.CreditOrDebit() != "D" {
 			out = append(out, InvalidEntry{
 				Entry: entry,
 				Error: batch.Error("TransactionCode", ErrBatchDebitOnly, entry.TransactionCode),
