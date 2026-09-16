@@ -169,6 +169,20 @@ func (e ErrValidCheckDigit) Error() string {
 	return e.Message
 }
 
+type ErrAddendaRecordIndicator struct {
+	Calculated int
+}
+
+func NewErrAddendaRecordIndicator(calculated int) ErrAddendaRecordIndicator {
+	return ErrAddendaRecordIndicator{
+		Calculated: calculated,
+	}
+}
+
+func (e ErrAddendaRecordIndicator) Error() string {
+	return fmt.Sprintf("does not match %d addendas found", e.Calculated)
+}
+
 // ErrValidFieldLength is the error given when the field does not have the correct length
 type ErrValidFieldLength struct {
 	Message        string
