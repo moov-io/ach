@@ -1116,29 +1116,48 @@ func (batch *Batch) ValidAmountForCodes(entry *EntryDetail) error {
 	}
 
 	// If the entry is a PRENOTE force it's amount to be zero
-	isPrenoteTxCode := entry.isPrenote(entry.TransactionCode)
-	if isPrenoteTxCode {
+	if entry.isPrenote(entry.TransactionCode) {
 		if entry.Amount == 0 {
 			return nil
 		}
 		return fieldError("Amount", ErrBatchAmountNonZero, entry.Amount)
-	} else {
-		if entry.Amount == 0 {
-			if batch.validateOpts != nil && batch.validateOpts.AllowZeroEntryAmount {
-				return nil
-			}
+	}
 
-			switch batch.Header.StandardEntryClassCode {
-			case ACK, ATX:
-				if entry.TransactionCode == CheckingZeroDollarRemittanceCredit || entry.TransactionCode == SavingsZeroDollarRemittanceCredit {
-					return nil
-				}
-			}
-
-			return fieldError("Amount", ErrBatchAmountZero, entry.Amount)
+	// Zero-dollar remittance codes (24, 29, 34, 39, 44, 49, 54) must have a
+	// zero Amount. NACHA allows them on CCD and CTX; ACK and ATX use 24 and 34.
+	if entry.isZeroDollarRemittance(entry.TransactionCode) {
+		if entry.Amount != 0 {
+			return fieldError("Amount", ErrBatchAmountNonZero, entry.Amount)
 		}
+		if batch.allowsZeroDollarRemittance(entry.TransactionCode) {
+			return nil
+		}
+		if batch.validateOpts != nil && batch.validateOpts.AllowZeroEntryAmount {
+			return nil
+		}
+		return fieldError("Amount", ErrBatchAmountZero, entry.Amount)
+	}
+
+	if entry.Amount == 0 {
+		if batch.validateOpts != nil && batch.validateOpts.AllowZeroEntryAmount {
+			return nil
+		}
+		return fieldError("Amount", ErrBatchAmountZero, entry.Amount)
 	}
 	return nil
+}
+
+func (batch *Batch) allowsZeroDollarRemittance(code int) bool {
+	if batch.Header == nil {
+		return false
+	}
+	switch batch.Header.StandardEntryClassCode {
+	case CCD, CTX:
+		return true
+	case ACK, ATX:
+		return code == CheckingZeroDollarRemittanceCredit || code == SavingsZeroDollarRemittanceCredit
+	}
+	return false
 }
 
 // ValidTranCodeForServiceClassCode validates a TransactionCode is valid for a ServiceClassCode

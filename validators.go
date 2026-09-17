@@ -371,6 +371,21 @@ func (v *validator) isPrenote(code int) bool {
 	return false
 }
 
+// isZeroDollarRemittance reports whether code is a NACHA zero-dollar remittance
+// transaction code (24, 29, 34, 39, 44, 49, 54). These codes require a zero
+// Amount and are valid on CCD, CTX, and IAT entries; 24 and 34 are also used
+// by ACK and ATX acknowledgment entries.
+func (v *validator) isZeroDollarRemittance(code int) bool {
+	switch code {
+	case CheckingZeroDollarRemittanceCredit, CheckingZeroDollarRemittanceDebit,
+		SavingsZeroDollarRemittanceCredit, SavingsZeroDollarRemittanceDebit,
+		GLZeroDollarRemittanceCredit, GLZeroDollarRemittanceDebit,
+		LoanZeroDollarRemittanceCredit:
+		return true
+	}
+	return false
+}
+
 // isTransactionTypeCode verifies Addenda10 TransactionTypeCode is a valid value
 // This code is used as a Secondary SEC code to help identify the source and purpose of the transaction.
 //

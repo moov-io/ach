@@ -1143,6 +1143,101 @@ func TestBatch_ValidAmountForCodes_AllowZeroEntryAmount(t *testing.T) {
 	require.NoError(t, b1.Create())
 }
 
+func TestBatch_ValidAmountForCodes_ZeroDollarRemittance(t *testing.T) {
+	remittanceCodes := []int{
+		CheckingZeroDollarRemittanceCredit,
+		CheckingZeroDollarRemittanceDebit,
+		SavingsZeroDollarRemittanceCredit,
+		SavingsZeroDollarRemittanceDebit,
+		GLZeroDollarRemittanceCredit,
+		GLZeroDollarRemittanceDebit,
+		LoanZeroDollarRemittanceCredit,
+	}
+	ackATXRemittance := map[int]bool{
+		CheckingZeroDollarRemittanceCredit: true,
+		SavingsZeroDollarRemittanceCredit:  true,
+	}
+
+	validAmount := func(sec string, code, amount int) error {
+		batch := &Batch{Header: &BatchHeader{StandardEntryClassCode: sec}}
+		entry := &EntryDetail{TransactionCode: code, Amount: amount}
+		return batch.ValidAmountForCodes(entry)
+	}
+
+	t.Run("CCD and CTX allow zero remittance amounts", func(t *testing.T) {
+		for _, sec := range []string{CCD, CTX} {
+			for _, code := range remittanceCodes {
+				require.NoError(t, validAmount(sec, code, 0), "sec=%s code=%d", sec, code)
+			}
+		}
+	})
+
+	t.Run("ACK and ATX allow zero amount only on codes 24 and 34", func(t *testing.T) {
+		for _, sec := range []string{ACK, ATX} {
+			for _, code := range remittanceCodes {
+				err := validAmount(sec, code, 0)
+				if ackATXRemittance[code] {
+					require.NoError(t, err, "sec=%s code=%d", sec, code)
+				} else {
+					require.ErrorContains(t, err, ErrBatchAmountZero.Error(), "sec=%s code=%d", sec, code)
+				}
+			}
+		}
+	})
+
+	t.Run("non-zero remittance amounts are rejected", func(t *testing.T) {
+		for _, sec := range []string{CCD, CTX, ACK, ATX, WEB, PPD} {
+			for _, code := range remittanceCodes {
+				err := validAmount(sec, code, 100)
+				require.ErrorContains(t, err, ErrBatchAmountNonZero.Error(), "sec=%s code=%d", sec, code)
+			}
+		}
+	})
+
+	t.Run("WEB and PPD still reject zero remittance amounts", func(t *testing.T) {
+		for _, sec := range []string{WEB, PPD} {
+			for _, code := range remittanceCodes {
+				err := validAmount(sec, code, 0)
+				require.ErrorContains(t, err, ErrBatchAmountZero.Error(), "sec=%s code=%d", sec, code)
+			}
+		}
+	})
+
+	t.Run("live entries keep existing amount rules", func(t *testing.T) {
+		require.NoError(t, validAmount(CCD, CheckingCredit, 100))
+		require.NoError(t, validAmount(CCD, CheckingDebit, 100))
+		require.NoError(t, validAmount(WEB, CheckingCredit, 100))
+		require.ErrorContains(t, validAmount(CCD, CheckingCredit, 0), ErrBatchAmountZero.Error())
+		require.ErrorContains(t, validAmount(CCD, CheckingDebit, 0), ErrBatchAmountZero.Error())
+		require.ErrorContains(t, validAmount(WEB, CheckingCredit, 0), ErrBatchAmountZero.Error())
+	})
+
+	t.Run("prenotes still require a zero amount", func(t *testing.T) {
+		require.NoError(t, validAmount(CCD, CheckingPrenoteCredit, 0))
+		require.NoError(t, validAmount(WEB, CheckingPrenoteDebit, 0))
+		require.ErrorContains(t, validAmount(CCD, CheckingPrenoteCredit, 100), ErrBatchAmountNonZero.Error())
+	})
+
+	t.Run("AllowZeroEntryAmount still bypasses zero-amount rejection", func(t *testing.T) {
+		batch := &Batch{
+			Header:       &BatchHeader{StandardEntryClassCode: WEB},
+			validateOpts: &ValidateOpts{AllowZeroEntryAmount: true},
+		}
+		require.NoError(t, batch.ValidAmountForCodes(&EntryDetail{TransactionCode: CheckingCredit, Amount: 0}))
+		require.NoError(t, batch.ValidAmountForCodes(&EntryDetail{TransactionCode: CheckingZeroDollarRemittanceCredit, Amount: 0}))
+		require.ErrorContains(t, batch.ValidAmountForCodes(&EntryDetail{TransactionCode: CheckingZeroDollarRemittanceCredit, Amount: 100}), ErrBatchAmountNonZero.Error())
+	})
+
+	t.Run("AllowInvalidAmounts still bypasses amount checks", func(t *testing.T) {
+		batch := &Batch{
+			Header:       &BatchHeader{StandardEntryClassCode: CCD},
+			validateOpts: &ValidateOpts{AllowInvalidAmounts: true},
+		}
+		require.NoError(t, batch.ValidAmountForCodes(&EntryDetail{TransactionCode: CheckingZeroDollarRemittanceCredit, Amount: 100}))
+		require.NoError(t, batch.ValidAmountForCodes(&EntryDetail{TransactionCode: CheckingDebit, Amount: 0}))
+	})
+}
+
 func TestBatch_AllowInvalidAmounts(t *testing.T) {
 	bh := &BatchHeader{
 		OriginatorStatusCode:    1,
