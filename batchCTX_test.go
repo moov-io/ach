@@ -101,6 +101,22 @@ func TestBatchCTXCreate(t *testing.T) {
 	testBatchCTXCreate(t)
 }
 
+func TestBatchCTX_ZeroDollarRemittance(t *testing.T) {
+	bh := mockBatchCTXHeader()
+	batch := NewBatchCTX(bh)
+	entry := mockCTXEntryDetail()
+	entry.TransactionCode = CheckingZeroDollarRemittanceCredit
+	entry.Amount = 0
+	entry.SetCATXAddendaRecords(1)
+	entry.AddendaRecordIndicator = 1
+	entry.AddAddenda05(mockAddenda05())
+	batch.AddEntry(entry)
+	require.NoError(t, batch.Create())
+
+	batch.Entries[0].Amount = 25000
+	require.ErrorContains(t, batch.Create(), ErrBatchAmountNonZero.Error())
+}
+
 // BenchmarkBatchCTXCreate benchmarks validating BatchCTX create
 func BenchmarkBatchCTXCreate(b *testing.B) {
 	b.ReportAllocs()

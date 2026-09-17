@@ -227,6 +227,49 @@ func BenchmarkBatchCCDAddendaCount(b *testing.B) {
 	}
 }
 
+func TestBatchCCD_ZeroDollarRemittance(t *testing.T) {
+	newBatch := func(code, amount int) *BatchCCD {
+		t.Helper()
+		bh := mockBatchCCDHeader()
+		if creditOrDebit(code) == "C" {
+			bh.ServiceClassCode = CreditsOnly
+		}
+		batch := NewBatchCCD(bh)
+		entry := mockCCDEntryDetail()
+		entry.TransactionCode = code
+		entry.Amount = amount
+		entry.AddendaRecordIndicator = 1
+		entry.AddAddenda05(mockAddenda05())
+		batch.AddEntry(entry)
+		return batch
+	}
+
+	t.Run("zero dollar remittance codes are allowed", func(t *testing.T) {
+		codes := []int{
+			CheckingZeroDollarRemittanceCredit,
+			CheckingZeroDollarRemittanceDebit,
+			SavingsZeroDollarRemittanceCredit,
+			SavingsZeroDollarRemittanceDebit,
+			GLZeroDollarRemittanceCredit,
+			GLZeroDollarRemittanceDebit,
+			LoanZeroDollarRemittanceCredit,
+		}
+		for _, code := range codes {
+			require.NoError(t, newBatch(code, 0).Create(), "code=%d", code)
+		}
+	})
+
+	t.Run("non-zero remittance amounts are rejected", func(t *testing.T) {
+		err := newBatch(CheckingZeroDollarRemittanceCredit, 100).Create()
+		require.ErrorContains(t, err, ErrBatchAmountNonZero.Error())
+	})
+
+	t.Run("live CCD entries still require a non-zero amount", func(t *testing.T) {
+		err := newBatch(CheckingDebit, 0).Create()
+		require.ErrorContains(t, err, ErrBatchAmountZero.Error())
+	})
+}
+
 // testBatchCCDCreate creates a batch CCD
 func testBatchCCDCreate(t testing.TB) {
 	mockBatch := mockBatchCCD(t)
