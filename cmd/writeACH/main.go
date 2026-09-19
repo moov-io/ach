@@ -70,6 +70,7 @@ func write(path string) {
 		fmt.Printf("%T: %v\n", err, err)
 		return
 	}
+	defer f.Close()
 
 	// To create a file
 	fh := ach.NewFileHeader()
