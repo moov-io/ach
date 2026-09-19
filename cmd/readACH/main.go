@@ -56,6 +56,7 @@ func main() {
 		log.Printf("ERROR: Can not open file: %s: \n", err)
 		os.Exit(1)
 	}
+	defer f.Close()
 
 	achFile, err := ach.NewReader(f).Read()
 	if err != nil {
