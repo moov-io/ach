@@ -882,6 +882,15 @@ func (batch *Batch) isTraceNumberODFI() error {
 func (batch *Batch) isAddendaSequence() error {
 	for _, entry := range batch.Entries {
 
+		// Check that AddendaRecordIndicator matches the actual addenda count
+		addendaCount := entry.addendaCount()
+		if addendaCount > 0 && entry.AddendaRecordIndicator != 1 {
+			return batch.Error("AddendaRecordIndicator", ErrBatchAddendaIndicator)
+		}
+		if addendaCount == 0 && entry.AddendaRecordIndicator == 1 {
+			return batch.Error("AddendaRecordIndicator", NewErrBatchExpectedAddendaCount(0, 1))
+		}
+
 		if entry.Addenda02 != nil {
 			if entry.AddendaRecordIndicator != 1 {
 				return batch.Error("AddendaRecordIndicator", ErrBatchAddendaIndicator)
