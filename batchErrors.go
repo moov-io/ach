@@ -27,8 +27,10 @@ var (
 	ErrBatchNoEntries = errors.New("must have Entry Record(s) to be built")
 	// ErrBatchADVCount is the error given when an ADV batch has too many entries
 	ErrBatchADVCount = errors.New("there can be a maximum of 9999 ADV Sequence Numbers (ADV Entry Detail Records)")
-	// ErrBatchAddendaIndicator is the error given when the addenda indicator is incorrectly set
+	// ErrBatchAddendaIndicator is the error given when the addenda indicator is 0 but addenda records exist
 	ErrBatchAddendaIndicator = errors.New("is 0 but found addenda record(s)")
+	// ErrBatchAddendaRequired is the error given when the addenda indicator is 1 but no addenda records exist
+	ErrBatchAddendaRequired = errors.New("is 1 but found no addenda record(s)")
 	// ErrBatchOriginatorDNE is the error given when a non-government agency tries to originate a DNE
 	ErrBatchOriginatorDNE = errors.New("only government agencies (originator status code 2) can originate a DNE")
 	// ErrBatchInvalidCardTransactionType is the error given when a card transaction type is invalid

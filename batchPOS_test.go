@@ -466,7 +466,6 @@ func TestBatchPOSCategoryReturnAddenda99(t *testing.T) {
 	mockBatch := NewBatchPOS(mockBatchPOSHeader())
 	mockBatch.AddEntry(mockPOSEntryDetail())
 	mockBatch.GetEntries()[0].Category = CategoryReturn
-	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
 	err := mockBatch.Create()
 	if !base.Match(err, ErrFieldInclusion) {
 		t.Errorf("%T: %s", err, err)

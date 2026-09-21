@@ -388,6 +388,19 @@ func TestBatchAddendaIndicator(t *testing.T) {
 	testBatchAddendaIndicator(t)
 }
 
+func testBatchAddendaRequired(t testing.TB) {
+	mockBatch := mockBatch(t)
+	mockBatch.GetEntries()[0].AddendaRecordIndicator = 1
+	err := mockBatch.verify()
+	if !base.Match(err, ErrBatchAddendaRequired) {
+		t.Errorf("%T: %s", err, err)
+	}
+}
+
+func TestBatchAddendaRequired(t *testing.T) {
+	testBatchAddendaRequired(t)
+}
+
 func BenchmarkBatchAddendaIndicator(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
