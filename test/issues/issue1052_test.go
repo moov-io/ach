@@ -18,79 +18,116 @@
 package issues
 
 import (
+	"encoding/json"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/moov-io/ach"
 	"github.com/stretchr/testify/require"
 )
 
-// TestIssue1052 tests that prenote files don't get ADV batch control with ServiceClassCode 280
-// 
-// Issue #1052: Users were incorrectly creating ADV batches when they intended to create
-// prenote files. This was due to misleading documentation that labeled ADV as "Prenote Debit".
-// 
-// The fix corrects the documentation to clarify that:
-// - ADV (Automated Accounting Advice) is for accounting advice entries from ACH operators
-// - Prenotes are regular entries with transaction codes like 23, 28, 33, 38 used with SEC codes like PPD, CCD, CTX
-// - Prenote batches should NOT use ServiceClassCode 280 (AutomatedAccountingAdvices)
+// Prenote JSON omits advBatchControl. Decoding used to install one with service class 280.
+const prenoteFileJSON = `{
+  "fileHeader": {
+    "immediateDestination": "231380104",
+    "immediateOrigin": "121042882",
+    "fileCreationDate": "190816",
+    "fileIDModifier": "A",
+    "immediateDestinationName": "Federal Reserve Bank",
+    "immediateOriginName": "My Bank Name"
+  },
+  "batches": [
+    {
+      "batchHeader": {
+        "serviceClassCode": 220,
+        "companyName": "Company Name, Inc",
+        "companyIdentification": "121042882",
+        "standardEntryClassCode": "PPD",
+        "companyEntryDescription": "PRENOTE",
+        "effectiveEntryDate": "190817",
+        "ODFIIdentification": "12104288",
+        "originatorStatusCode": 1,
+        "batchNumber": 1
+      },
+      "entryDetails": [
+        {
+          "transactionCode": 23,
+          "RDFIIdentification": "23138010",
+          "checkDigit": "4",
+          "DFIAccountNumber": "744-5678-99",
+          "amount": 0,
+          "identificationNumber": "45689033",
+          "individualName": "John Doe",
+          "addendaRecordIndicator": 0,
+          "traceNumber": "121042880000001",
+          "category": "Forward"
+        }
+      ]
+    }
+  ]
+}`
+
 func TestIssue1052(t *testing.T) {
-	// Create a file with prenote entries
-	fh := ach.NewFileHeader()
-	fh.ImmediateDestination = "121042882"
-	fh.ImmediateOrigin = "231380104"
-	fh.FileCreationDate = "190816"
-	fh.ImmediateDestinationName = "Federal Reserve Bank"
-	fh.ImmediateOriginName = "My Bank Name"
+	t.Run("json prenote omits generated ADV control", func(t *testing.T) {
+		file, err := ach.FileFromJSON([]byte(prenoteFileJSON))
+		require.NoError(t, err)
+		require.Len(t, file.Batches, 1)
 
-	file := ach.NewFile()
-	file.SetHeader(fh)
+		batch := file.Batches[0]
+		require.Equal(t, ach.PPD, batch.GetHeader().StandardEntryClassCode)
+		require.Equal(t, ach.CreditsOnly, batch.GetHeader().ServiceClassCode)
+		require.Equal(t, ach.CreditsOnly, batch.GetControl().ServiceClassCode)
+		require.Nil(t, batch.GetADVControl())
 
-	// Create a batch header for PPD (not ADV)
-	bh := ach.NewBatchHeader()
-	bh.ServiceClassCode = ach.CreditsOnly
-	bh.CompanyName = "Company Name, Inc"
-	bh.CompanyIdentification = fh.ImmediateOrigin
-	bh.StandardEntryClassCode = ach.PPD // This should be PPD, not ADV
-	bh.CompanyEntryDescription = "PRENOTE"
-	bh.ODFIIdentification = "121042882"
-	bh.OriginatorStatusCode = 1
+		bs, err := json.Marshal(file)
+		require.NoError(t, err)
+		require.NotContains(t, string(bs), `"advBatchControl"`)
+	})
 
-	// Create a batch
-	batch := ach.NewBatchPPD(bh)
+	t.Run("json prenote drops a submitted ADV control", func(t *testing.T) {
+		// A caller echoing an older response may send the generated control back.
+		raw := strings.Replace(prenoteFileJSON, `"entryDetails"`, `"advBatchControl": {"serviceClassCode": 280}, "entryDetails"`, 1)
+		require.Contains(t, raw, `"advBatchControl"`)
 
-	// Add a prenote entry
-	entry := ach.NewEntryDetail()
-	entry.TransactionCode = ach.CheckingPrenoteCredit
-	entry.SetRDFI("231380104")
-	entry.DFIAccountNumber = "744-5678-99"
-	entry.Amount = 0 // Prenotes must have zero amount
-	entry.IdentificationNumber = "45689033"
-	entry.IndividualName = "John Doe"
-	entry.SetTraceNumber(bh.ODFIIdentification, 1)
-	entry.Category = ach.CategoryForward
+		file, err := ach.FileFromJSON([]byte(raw))
+		require.NoError(t, err)
+		require.Len(t, file.Batches, 1)
+		require.Nil(t, file.Batches[0].GetADVControl())
+		require.Equal(t, ach.CreditsOnly, file.Batches[0].GetControl().ServiceClassCode)
 
-	batch.AddEntry(entry)
+		bs, err := json.Marshal(file)
+		require.NoError(t, err)
+		require.NotContains(t, string(bs), `"advBatchControl"`)
+	})
 
-	// Add batch to file
-	file.AddBatch(batch)
+	t.Run("decoded prenote batch does not invent an ADV control", func(t *testing.T) {
+		var raw struct {
+			Batches []json.RawMessage `json:"batches"`
+		}
+		require.NoError(t, json.Unmarshal([]byte(prenoteFileJSON), &raw))
+		require.Len(t, raw.Batches, 1)
 
-	// Create the file
-	err := file.Create()
-	require.NoError(t, err)
+		batch := &ach.Batch{}
+		require.NoError(t, batch.UnmarshalJSON(raw.Batches[0]))
+		require.Nil(t, batch.GetADVControl())
+		require.Equal(t, ach.PPD, batch.GetHeader().StandardEntryClassCode)
+		require.Equal(t, ach.CreditsOnly, batch.GetHeader().ServiceClassCode)
+	})
 
-	// Verify that the batch control does NOT have ServiceClassCode 280
-	control := batch.GetControl()
-	require.NotNil(t, control)
+	t.Run("ADV batch keeps service class 280", func(t *testing.T) {
+		bs, err := os.ReadFile(filepath.Join("..", "testdata", "adv-valid.json"))
+		require.NoError(t, err)
 
-	// The batch control should have the same ServiceClassCode as the header
-	// It should NOT be 280 (AutomatedAccountingAdvices)
-	require.NotEqual(t, ach.AutomatedAccountingAdvices, control.ServiceClassCode,
-		"Batch control ServiceClassCode should not be %d (AutomatedAccountingAdvices)",
-		ach.AutomatedAccountingAdvices)
+		file, err := ach.FileFromJSON(bs)
+		require.NoError(t, err)
+		require.True(t, file.IsADV())
+		require.Len(t, file.Batches, 1)
 
-	// Verify it's not an ADV batch
-	require.False(t, batch.IsADV(), "Batch should not be ADV type")
-
-	// Verify there's no ADV control
-	require.Nil(t, batch.GetADVControl(), "Batch should not have ADV control")
+		adv := file.Batches[0].GetADVControl()
+		require.NotNil(t, adv)
+		require.Equal(t, ach.AutomatedAccountingAdvices, adv.ServiceClassCode)
+		require.Equal(t, ach.AutomatedAccountingAdvices, file.Batches[0].GetHeader().ServiceClassCode)
+	})
 }
