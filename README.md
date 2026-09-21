@@ -319,7 +319,105 @@ Below are some SDKs generated from the API documentation:
 
 - [Node SDK](https://www.npmjs.com/package/ach-node-sdk) | [GitHub](https://github.com/moov-io/ach-node-sdk)
 
-- TODO - OpenAPI Guide
+### OpenAPI Guide
+
+This project includes an [OpenAPI 3.0.2 specification](openapi.yaml) that describes the HTTP API for creating, parsing, and validating ACH files. The OpenAPI spec can be used to:
+
+- **Generate client SDKs** in various programming languages
+- **Integrate with API documentation tools** like Swagger UI or Redoc
+- **Automate API testing** and validation
+- **Design and mock APIs** before implementation
+
+#### Using the OpenAPI Specification
+
+The OpenAPI specification is available in the repository root as `openapi.yaml`. You can use it with various tools:
+
+**Generate Client SDKs:**
+```bash
+# Using OpenAPI Generator
+openapi-generator-cli generate -i openapi.yaml -g go -o ./client/go
+
+# Using Swagger Codegen
+swagger-codegen generate -i openapi.yaml -l java -o ./client/java
+
+# Using AutoRest (for .NET)
+autorest --input-file=openapi.yaml --csharp --output-folder=./client/csharp
+```
+
+**Interactive Documentation:**
+- View the spec in [Swagger Editor](https://editor.swagger.io/) by uploading the `openapi.yaml` file
+- Use [Redoc](https://redocly.github.io/redoc/) for beautiful API documentation
+- Run a local Swagger UI server with the spec
+
+**API Testing:**
+- Use tools like [Postman](https://www.postman.com/) or [Insomnia](https://insomnia.rest/) to import the OpenAPI spec
+- Generate test cases based on the API definition
+- Validate API responses against the schema
+
+#### Key API Endpoints
+
+The ACH API provides the following main endpoints:
+
+- `POST /files/{fileID}` - Create ACH files from JSON or plaintext
+- `GET /files` - List all ACH files
+- `GET /files/{fileID}` - Retrieve a specific ACH file
+- `POST /files/{fileID}/validate` - Validate an ACH file
+- `POST /files/{fileID}/segments` - Segment an ACH file
+
+#### Validation Options
+
+The API supports extensive validation options that can be passed as query parameters to customize validation behavior:
+
+- `skipAll` - Skip all validation
+- `allowEmptyIndividualName` - Allow empty individual name fields
+- `allowInvalidAmounts` - Allow invalid amounts
+- `customTraceNumbers` - Allow custom trace numbers
+- `bypassBatchValidation` - Skip batch validation
+- And many more...
+
+See the OpenAPI specification for the complete list of validation options.
+
+#### Example Usage
+
+Here's an example of creating an ACH file using the API:
+
+```bash
+curl -X POST "http://localhost:8080/files/my-file-id" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fileHeader": {
+      "immediateDestination": "231380104",
+      "immediateOrigin": "121042882",
+      "fileCreationDate": "190625",
+      "immediateDestinationName": "Federal Reserve Bank",
+      "immediateOriginName": "My Bank Name"
+    },
+    "batches": [
+      {
+        "batchHeader": {
+          "companyName": "Name on Account",
+          "companyIdentification": "121042882",
+          "standardEntryClassCode": "PPD",
+          "companyEntryDescription": "REG.SALARY",
+          "effectiveEntryDate": "190625",
+          "ODFIIdentification": "231380104"
+        },
+        "entries": [
+          {
+            "transactionCode": "22",
+            "routingNumber": "231380104",
+            "accountNumber": "12345678",
+            "amount": 100000000,
+            "individualName": "Receiver Account Name",
+            "individualIdentificationNumber": "0121042880000001"
+          }
+        ]
+      }
+    ]
+  }'
+```
+
+For more details on the API structure and available endpoints, refer to the [OpenAPI specification](openapi.yaml).
 
 ## Learn about ACH
 
