@@ -51,10 +51,8 @@ func TestIssue1647_AddendaRecordIndicatorValidation(t *testing.T) {
 		batch := ach.NewBatchPPD(bh)
 		batch.AddEntry(entry)
 
-		// Build the batch - this should fail due to the indicator mismatch
 		err := batch.Create()
-		require.Error(t, err)
-		require.Contains(t, err.Error(), "AddendaRecordIndicator")
+		require.ErrorContains(t, err, ach.ErrBatchAddendaRequired.Error())
 	})
 
 	// Test case 2: AddendaRecordIndicator=0 but addenda present
@@ -85,10 +83,8 @@ func TestIssue1647_AddendaRecordIndicatorValidation(t *testing.T) {
 		batch := ach.NewBatchPPD(bh)
 		batch.AddEntry(entry)
 
-		// Build the batch - this should fail due to the indicator mismatch
 		err := batch.Create()
-		require.Error(t, err)
-		require.Contains(t, err.Error(), "AddendaRecordIndicator")
+		require.ErrorContains(t, err, ach.ErrBatchAddendaIndicator.Error())
 	})
 
 	// Test case 3: Valid case - AddendaRecordIndicator=1 with addenda present

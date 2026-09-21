@@ -204,7 +204,7 @@ func testBatchCTXAddendaCountZero(t testing.TB) {
 	mockBatch := NewBatchCTX(mockBatchCTXHeader())
 	mockBatch.AddEntry(mockCTXEntryDetail())
 	err := mockBatch.Create()
-	if !base.Match(err, NewErrBatchExpectedAddendaCount(0, 1)) {
+	if !base.Match(err, ErrBatchAddendaRequired) {
 		t.Errorf("%T: %s", err, err)
 	}
 }
@@ -437,7 +437,7 @@ func testBatchCTXZeroAddendaRecords(t testing.TB) {
 	mockBatch.AddEntry(entry)
 
 	err := mockBatch.Create()
-	if !base.Match(err, NewErrBatchExpectedAddendaCount(0, 1)) {
+	if !base.Match(err, ErrBatchAddendaRequired) {
 		t.Errorf("%T: %s", err, err)
 	}
 }

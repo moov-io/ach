@@ -888,7 +888,7 @@ func (batch *Batch) isAddendaSequence() error {
 			return batch.Error("AddendaRecordIndicator", ErrBatchAddendaIndicator)
 		}
 		if addendaCount == 0 && entry.AddendaRecordIndicator == 1 {
-			return batch.Error("AddendaRecordIndicator", NewErrBatchExpectedAddendaCount(0, 1))
+			return batch.Error("AddendaRecordIndicator", ErrBatchAddendaRequired)
 		}
 
 		if entry.Addenda02 != nil {
