@@ -2258,3 +2258,30 @@ func TestIATBatch_ValidateTotals(t *testing.T) {
 		require.Contains(t, err.Error(), "TotalCreditEntryDollarAmount")
 	})
 }
+
+// A correction entry must not skip addenda trace checks on later entries.
+func TestIATAddendaSequenceAfterCorrection(t *testing.T) {
+	mockBatch := IATBatch{}
+	mockBatch.SetHeader(mockIATNOCBatchHeaderFF())
+
+	// Category stays at the default Forward. issue1385 accepts that with Addenda98.
+	correction := mockIATEntryDetail()
+	correction.TransactionCode = CheckingReturnNOCCredit
+	correction.AddendaRecords = 1
+	correction.Addenda98 = mockIATAddenda98()
+	mockBatch.AddEntry(correction)
+
+	later := mockIATEntryDetailWithAddendas()
+	later.SetTraceNumber(mockIATNOCBatchHeaderFF().ODFIIdentification, 2)
+	mockBatch.AddEntry(later)
+
+	if err := mockBatch.build(); err != nil {
+		t.Fatalf("build: %v", err)
+	}
+	mockBatch.Entries[1].Addenda10.EntryDetailSequenceNumber = 00000005
+
+	err := mockBatch.Validate()
+	if !base.Match(err, NewErrBatchAddendaTraceNumber("0000005", "0000002")) {
+		t.Fatalf("%T: %s", err, err)
+	}
+}
