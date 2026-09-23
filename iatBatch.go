@@ -508,7 +508,9 @@ func (iatBatch *IATBatch) isAddendaSequence() error {
 		}
 
 		if entry.isCorrection() {
-			return nil // TODO(adam): probably need a smarter check
+			// A correction entry has no Addenda10-16 trace to check. Keep
+			// walking so a later entry is not accepted unchecked.
+			continue
 		}
 
 		// Verify Addenda* entry detail sequence numbers are valid
