@@ -93,7 +93,7 @@ func main() {
 	}()
 
 	readTimeout, _ := time.ParseDuration("30s")
-	writTimeout, _ := time.ParseDuration("30s")
+	writTimeout := writeTimeoutFromEnv(logger)
 	idleTimeout, _ := time.ParseDuration("60s")
 
 	// Check to see if our -http.addr flag has been overridden
@@ -164,4 +164,25 @@ func main() {
 		shutdownServer()
 		logger.LogError(err)
 	}
+}
+
+func writeTimeoutFromEnv(logger log.Logger) time.Duration {
+	const defaultTimeout = 30 * time.Second
+	v := os.Getenv("HTTP_WRITE_TIMEOUT")
+	if v == "" {
+		return defaultTimeout
+	}
+
+	timeout, err := time.ParseDuration(v)
+	if err != nil {
+		logger.Logf("Unable to parse HTTP_WRITE_TIMEOUT: %v; using %v", err, defaultTimeout)
+		return defaultTimeout
+	}
+	if timeout < 0 {
+		logger.Logf("HTTP_WRITE_TIMEOUT must not be negative; using %v", defaultTimeout)
+		return defaultTimeout
+	}
+
+	logger.Logf("Using %v as HTTP write timeout", timeout)
+	return timeout
 }
