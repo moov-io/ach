@@ -78,6 +78,8 @@ else
 	go test ./client
 endif
 
+# Local/admin push to master. The release workflow cannot use this path:
+# GITHUB_TOKEN is blocked by required status checks, so it opens a PR instead.
 dist-webui: build-webui
 	git config user.name "moov-bot"
 	git config user.email "oss@moov.io"

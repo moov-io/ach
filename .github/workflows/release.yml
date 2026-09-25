@@ -61,9 +61,13 @@ jobs:
   webui:
     permissions:
       contents: write
+      pull-requests: write
     name: WebUI
     needs: [testing, release]
     runs-on: ubuntu-latest
+    # GITHUB_TOKEN cannot push master: required checks live in the Default
+    # branch ruleset so Renovate can automerge, and classic protection cannot
+    # exempt Actions. Open a PR and squash-merge after those checks pass.
     steps:
     - name: Set up Go 1.x
       uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
@@ -87,7 +91,41 @@ jobs:
         git checkout master
 
     - name: Distribute
-      run: make dist-webui
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_REPO: ${{ github.repository }}
+      run: |
+        set -euo pipefail
+        make build-webui
+        if git diff --quiet -- docs/webui/assets/wasm_exec.js docs/webui/assets/ach.wasm; then
+          echo "No wasm changes"
+          exit 0
+        fi
+        tag="${GITHUB_REF_NAME}"
+        branch="chore/wasm-webui-${tag}"
+        git config user.name "moov-bot"
+        git config user.email "oss@moov.io"
+        git checkout -B "$branch"
+        git add docs/webui/assets/wasm_exec.js docs/webui/assets/ach.wasm
+        git commit -m "chore: updating wasm webui"
+        git push --force-with-lease origin "HEAD:refs/heads/${branch}"
+        if ! gh pr view "$branch" >/dev/null 2>&1; then
+          gh pr create --base master --head "$branch" \
+            --title "chore: updating wasm webui" \
+            --body "Generated WebUI wasm for \`${tag}\`."
+        fi
+        pr=$(gh pr view "$branch" --json number --jq .number)
+        gh pr merge "$pr" --auto --squash --delete-branch
+        for _ in $(seq 1 60); do
+          state=$(gh pr view "$pr" --json state --jq .state)
+          case "$state" in
+            MERGED) exit 0 ;;
+            CLOSED) echo "wasm PR #${pr} closed before merge"; exit 1 ;;
+          esac
+          sleep 30
+        done
+        echo "timed out waiting for wasm PR #${pr} to merge"
+        exit 1
 
   docker:
     name: Docker ${{ matrix.arch }}
