@@ -70,6 +70,19 @@ func TestMockFileHeader(t *testing.T) {
 	testMockFileHeader(t)
 }
 
+func TestFileHeader__invalidCreationTime(t *testing.T) {
+	fh := staticFileHeader()
+	fh.FileCreationTime = "2900"
+	if err := fh.Validate(); err == nil {
+		t.Fatal("expected invalid creation time")
+	}
+
+	fh.FileCreationTime = "1201"
+	if err := fh.Validate(); err != nil {
+		t.Fatal(err)
+	}
+}
+
 // BenchmarkMockFileHeader benchmarks validating a file header
 func BenchmarkMockFileHeader(b *testing.B) {
 	b.ReportAllocs()

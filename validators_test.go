@@ -113,6 +113,9 @@ func TestValidators__validateSimpleTime(t *testing.T) {
 		"2359": "2359",
 		"1201": "1201",
 		"1238": "1238",
+		// hour must be 00-23
+		"2400": "",
+		"2900": "",
 	}
 	v := validator{}
 	for input, expected := range cases {
