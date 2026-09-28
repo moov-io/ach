@@ -280,6 +280,9 @@ func (fh *FileHeader) ValidateWith(opts *ValidateOpts) error {
 				err = cmp.Or(err, errors.New("invalid FileCreationTime"))
 				return fieldError("FileCreationTime", err, fh.FileCreationTime)
 			}
+			if err != nil && strings.TrimSpace(fh.FileCreationTime) != "" && fh.validateSimpleTime(fh.FileCreationTime) == "" {
+				return fieldError("FileCreationTime", errors.New("invalid FileCreationTime"), fh.FileCreationTime)
+			}
 		}
 	}
 
