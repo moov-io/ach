@@ -24,6 +24,7 @@ EXAMPLES
   achcli -mask file.ach                Print file details with personally identifiable information partially removed
   achcli -reformat=json first.ach      Convert an incoming ACH file into another format (options: ach, json)
   achcli -validate opts.json file.ach  Read an ACH File with the provided ValidateOpts
+  achcli -validate-totals file.ach     Validate original raw ACH file and batch control totals
   achcli -version                      Print the version of achcli (Example: %s)
   achcli 20060102.ach                  Summarize an ACH file for human readability
 

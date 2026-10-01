@@ -13,6 +13,7 @@ parsing, and validating ACH files.
 - Merge multiple ACH files.
 - Flatten batches in ACH files.
 - Validate ACH files with custom options.
+- Check original raw ACH file and batch control totals with `-validate-totals`.
 - Fix certain fields in ACH files (e.g., update Effective Entry Date).
 - Pretty-print amounts and other values for better readability.
 
@@ -39,6 +40,7 @@ EXAMPLES
   achcli -mask file.ach                Print file details with personally identifiable information partially removed
   achcli -reformat=json first.ach      Convert an incoming ACH file into another format (options: ach, json)
   achcli -validate opts.json file.ach  Read an ACH File with the provided ValidateOpts
+  achcli -validate-totals file.ach     Validate original raw ACH file and batch control totals
   achcli -version                      Print the version of achcli (Example: v1.34.0)
   achcli 20060102.ach                  Summarize an ACH file for human readability
 
@@ -58,6 +60,7 @@ FLAGS
   -update-eed string           Set the EffectiveEntryDate to a new value
   -v                           Print verbose details about each ACH file
   -validate string             Path to config file in json format to enable validation opts
+  -validate-totals              Validate original raw ACH control totals without modifying files
   -version                     Print moov-io/ach cli version
 ```
 
@@ -81,6 +84,19 @@ Provide a JSON file with [validation options](https://moov-io.github.io/ach/crea
 ```
 
 Usage: `achcli -validate opts.json file.ach`
+
+### Checking original totals (-validate-totals)
+
+```bash
+achcli -validate-totals first.ach second.ach
+achcli -validate-totals -validate opts.json first.ach
+```
+
+This command reads each original file and checks file and batch counts, entry hashes, and debit and credit totals. It exits with status `0` only when every input passes, or `1` when any input or configuration fails. Flag syntax errors retain status `2`. It reports every failing path and is quiet on success unless `-v` is set. It does not modify inputs or create output files.
+
+Only raw ACH input is supported. JSON is rejected because the existing JSON parser recalculates control totals. The checks come from the reader and `File.ValidateTotals`; they do not recalculate block counts or verify padding consistency.
+
+Validation options still apply to the reader, but a stored file control record is required even when `AllowMissingFileControl` is set. `SkipAll`, `UnequalAddendaCounts` and `-skip-validation` are rejected because they waive validation or count checks. Version, transformation and presentation flags are also rejected: `-version`, `-diff`, `-fix`, `-merge`, `-flatten`, `-reformat`, `-update-eed`, `-mask` and its variants, and `-pretty` and its variants. Help requested after selecting totals mode is a conflict. Existing commands, including ordinary help, keep their current behaviour when `-validate-totals` is absent.
 
 ### Fixing Files (-fix)
 
