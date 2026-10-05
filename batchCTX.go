@@ -72,26 +72,20 @@ func (batch *BatchCTX) InvalidEntries() []InvalidEntry {
 	var out []InvalidEntry
 
 	for _, entry := range batch.Entries {
-		addendaCount := len(entry.Addenda05)
-
 		// Trapping this error, as entry.CTXAddendaRecordsField() can not be greater than 9999
-		if addendaCount > 9999 {
+		if len(entry.Addenda05) > 9999 {
 			out = append(out, InvalidEntry{
 				Entry: entry,
 				Error: batch.Error("AddendaCount", NewErrBatchAddendaCount(len(entry.Addenda05), 9999)),
 			})
 		}
 
-		// Add to addendaCount so Corrections and Returns compare AddendaRecordIndicator correctly
-		if entry.Addenda98 != nil {
-			addendaCount += 1
-		}
-		if entry.Addenda99 != nil {
-			addendaCount += 1
-		}
-
 		// validate CTXAddendaRecord Field is equal to the actual number of Addenda records
 		// use 0 value if there is no Addenda records
+		//
+		// Count every addenda type so Corrections, Returns, and Dishonored/Contested Returns
+		// compare correctly. See https://github.com/moov-io/ach/issues/1875
+		addendaCount := entry.catxAddendaCount()
 		indicator, _ := strconv.Atoi(entry.CATXAddendaRecordsField())
 		if addendaCount != indicator {
 			if batch.validateOpts == nil || !batch.validateOpts.UnequalAddendaCounts {

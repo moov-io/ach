@@ -99,12 +99,18 @@ func (batch *BatchTRX) InvalidEntries() []InvalidEntry {
 		}
 		// validate CTXAddendaRecord Field is equal to the actual number of Addenda records
 		// use 0 value if there is no Addenda records
+		//
+		// Count every addenda type so Corrections, Returns, and Dishonored/Contested Returns
+		// compare correctly. See https://github.com/moov-io/ach/issues/1875
+		addendaCount := entry.catxAddendaCount()
 		addendaRecords, _ := strconv.Atoi(entry.CATXAddendaRecordsField())
-		if len(entry.Addenda05) != addendaRecords {
-			out = append(out, InvalidEntry{
-				Entry: entry,
-				Error: batch.Error("AddendaCount", NewErrBatchExpectedAddendaCount(len(entry.Addenda05), addendaRecords)),
-			})
+		if addendaCount != addendaRecords {
+			if batch.validateOpts == nil || !batch.validateOpts.UnequalAddendaCounts {
+				out = append(out, InvalidEntry{
+					Entry: entry,
+					Error: batch.Error("AddendaCount", NewErrBatchExpectedAddendaCount(addendaCount, addendaRecords)),
+				})
+			}
 		}
 		// Verify the Amount is valid for SEC code and TransactionCode
 		if err := batch.ValidAmountForCodes(entry); err != nil {

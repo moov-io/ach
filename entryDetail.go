@@ -732,3 +732,14 @@ func (ed *EntryDetail) addendaCount() (n int) {
 	}
 	return n
 }
+
+// catxAddendaCount returns the number of addenda records that the CTX, ATX, and TRX
+// addenda records field (CATXAddendaRecordsField) counts. These SEC codes do not allow
+// Addenda02, so it is left out here and reported by addendaFieldInclusion instead.
+func (ed *EntryDetail) catxAddendaCount() int {
+	n := ed.addendaCount()
+	if ed != nil && ed.Addenda02 != nil {
+		n -= 1
+	}
+	return n
+}
