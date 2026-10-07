@@ -144,6 +144,33 @@ func TestBatchCTX_ReadReturnKeepsOriginalAddendaCount(t *testing.T) {
 	require.NotNil(t, got.Addenda99)
 }
 
+// TestBatchCTX_ReturnKeepsAddenda05AndCopiedCount validates a CTX return that still carries
+// Addenda05 records and copies Number of Addenda Records from the original entry.
+// addendaFieldInclusionReturn allows Addenda05 on CTX returns; the count is only checked
+// for being numeric.
+func TestBatchCTX_ReturnKeepsAddenda05AndCopiedCount(t *testing.T) {
+	entry := mockCTXEntryDetail()
+	entry.Addenda05 = nil
+	entry.AddAddenda05(mockAddenda05())
+	entry.AddAddenda05(mockAddenda05())
+	entry.TransactionCode = CheckingReturnNOCCredit
+	entry.Category = CategoryReturn
+	entry.Addenda99 = mockAddenda99()
+	entry.SetCATXAddendaRecords(12)
+	entry.AddendaRecordIndicator = 1
+
+	batch, err := NewBatch(mockBatchCTXHeader())
+	require.NoError(t, err)
+	batch.AddEntry(entry)
+	require.NoError(t, batch.Create())
+	require.NoError(t, batch.Validate())
+
+	got := batch.GetEntries()[0]
+	require.Equal(t, "0012", got.CATXAddendaRecordsField())
+	require.Len(t, got.Addenda05, 2)
+	require.NotNil(t, got.Addenda99)
+}
+
 // TestBatchCTX_ReturnWithOffset creates a CTX reply that keeps the original Number of Addenda
 // Records and then balances the batch with WithOffset. The OFFSET entry copies the reply
 // Category and uses IndividualName "OFFSET", so CATXAddendaRecordsField is "OFFS".
