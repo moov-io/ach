@@ -27,6 +27,8 @@ var (
 
 	//ErrNonAlphanumeric is given when a field has non-alphanumeric characters
 	ErrNonAlphanumeric = errors.New("has non alphanumeric characters")
+	//ErrNonNumeric is given when a field has non-numeric characters
+	ErrNonNumeric = errors.New("has non numeric characters")
 	//ErrUpperAlpha is given when a field is not in uppercase
 	ErrUpperAlpha = errors.New("is not uppercase A-Z or 0-9")
 	//ErrFieldInclusion is given when a field is mandatory and has a default value

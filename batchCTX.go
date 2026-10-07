@@ -93,7 +93,14 @@ func (batch *BatchCTX) InvalidEntries() []InvalidEntry {
 		// validate CTXAddendaRecord Field is equal to the actual number of Addenda records
 		// use 0 value if there is no Addenda records
 		indicator, _ := strconv.Atoi(entry.CATXAddendaRecordsField())
-		if addendaCount != indicator {
+		if isCATXReply(entry) {
+			if err := batch.validateCATXReplyAddendaRecords(entry); err != nil {
+				out = append(out, InvalidEntry{
+					Entry: entry,
+					Error: err,
+				})
+			}
+		} else if addendaCount != indicator {
 			if batch.validateOpts == nil || !batch.validateOpts.UnequalAddendaCounts {
 				out = append(out, InvalidEntry{
 					Entry: entry,

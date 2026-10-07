@@ -991,6 +991,40 @@ func (batch *Batch) isCategory() error {
 	return nil
 }
 
+// isCATXReply returns true if entry is a Return, Dishonored Return, or Contested Dishonored Return.
+//
+// CTX, ATX, and TRX replies copy Number of Addenda Records (positions 55-58) unchanged from the
+// entry they answer, so it does not match the reply's addenda records. The ACH Operators do not
+// edit that field on returns, so only check that it is numeric.
+// See https://github.com/moov-io/ach/issues/1875
+func isCATXReply(entry *EntryDetail) bool {
+	switch entry.Category {
+	case CategoryReturn, CategoryDishonoredReturn, CategoryDishonoredReturnContested:
+		return true
+	}
+	return false
+}
+
+// validateCATXReplyAddendaRecords verifies Number of Addenda Records on a CTX, ATX, or TRX reply is numeric
+func (batch *Batch) validateCATXReplyAddendaRecords(entry *EntryDetail) error {
+	// Offset entries copy Category from the first entry and set IndividualName to "OFFSET".
+	// They are not Corporate Entry Detail records, so Number of Addenda Records does not apply.
+	// addendaFieldInclusionReturn already skips the Addenda99 requirement for these entries.
+	if entry.IndividualName == offsetIndividualName {
+		return nil
+	}
+	field := entry.CATXAddendaRecordsField()
+	if field == "" {
+		return batch.Error("AddendaRecords", ErrNonNumeric, field)
+	}
+	for _, r := range field {
+		if r < '0' || r > '9' {
+			return batch.Error("AddendaRecords", ErrNonNumeric, field)
+		}
+	}
+	return nil
+}
+
 // addendaFieldInclusion verifies Addenda* Field Inclusion based on entry.Category and
 // batchHeader.StandardEntryClassCode
 // Forward Entries:
