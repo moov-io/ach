@@ -34,6 +34,7 @@ var (
 
 	flagSkipValidation = flag.Bool("skip-validation", false, "Skip all validation checks")
 	flagValidateOpts   = flag.String("validate", "", "Path to config file in json format to enable validation opts")
+	flagValidateTotals = flag.Bool("validate-totals", false, "Validate original raw ACH control totals without modifying files")
 
 	// Fix commands
 	flagFix       = flag.Bool("fix", false, "Trigger fix tasks")
@@ -42,7 +43,32 @@ var (
 
 func main() {
 	flag.Usage = help
-	flag.Parse()
+	flag.CommandLine.Init(os.Args[0], flag.ContinueOnError)
+	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
+		if err == flag.ErrHelp {
+			if *flagValidateTotals {
+				fmt.Println("ERROR: -validate-totals cannot be combined with help")
+				os.Exit(1)
+			}
+			return
+		}
+		os.Exit(2)
+	}
+
+	if *flagValidateTotals {
+		if err := validateTotalsFlags(); err != nil {
+			fmt.Printf("ERROR: %v\n", err)
+			os.Exit(1)
+		}
+		if err := validateTotalsFiles(flag.Args(), readValidationOpts(*flagValidateOpts)); err != nil {
+			fmt.Printf("ERROR: %v\n", err)
+			os.Exit(1)
+		}
+		if *flagVerbose {
+			fmt.Printf("Validated %d ACH file(s)\n", len(flag.Args()))
+		}
+		return
+	}
 
 	switch {
 	case *flagVersion:
