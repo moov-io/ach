@@ -143,3 +143,138 @@ func TestBatchCTX_ReadReturnKeepsOriginalAddendaCount(t *testing.T) {
 	require.Equal(t, "0012", got.CATXAddendaRecordsField())
 	require.NotNil(t, got.Addenda99)
 }
+
+// TestBatchCTX_ReturnWithOffset creates a CTX reply that keeps the original Number of Addenda
+// Records and then balances the batch with WithOffset. The OFFSET entry copies the reply
+// Category and uses IndividualName "OFFSET", so CATXAddendaRecordsField is "OFFS".
+func TestBatchCTX_ReturnWithOffset(t *testing.T) {
+	replies := []struct {
+		name     string
+		category string
+		attach   func(*EntryDetail)
+	}{
+		{"return", CategoryReturn, func(e *EntryDetail) { e.Addenda99 = mockAddenda99() }},
+		{"dishonored", CategoryDishonoredReturn, func(e *EntryDetail) { e.Addenda99Dishonored = mockAddenda99Dishonored() }},
+		{"contested", CategoryDishonoredReturnContested, func(e *EntryDetail) { e.Addenda99Contested = mockAddenda99Contested() }},
+	}
+	for _, reply := range replies {
+		t.Run(reply.name, func(t *testing.T) {
+			entry := mockCTXEntryDetail()
+			entry.Addenda05 = nil
+			entry.TransactionCode = CheckingReturnNOCCredit
+			entry.Category = reply.category
+			reply.attach(entry)
+			entry.SetCATXAddendaRecords(12)
+			entry.AddendaRecordIndicator = 1
+
+			batch, err := NewBatch(mockBatchCTXHeader())
+			require.NoError(t, err)
+			batch.AddEntry(entry)
+			batch.WithOffset(&Offset{
+				RoutingNumber: "121042882",
+				AccountNumber: "123456789",
+				AccountType:   OffsetChecking,
+				Description:   "test offset",
+			})
+			require.NoError(t, batch.Create())
+			require.NoError(t, batch.Validate())
+
+			entries := batch.GetEntries()
+			require.Len(t, entries, 2)
+			require.Equal(t, "0012", entries[0].CATXAddendaRecordsField())
+			require.Equal(t, offsetIndividualName, entries[1].IndividualName)
+			require.Equal(t, reply.category, entries[1].Category)
+			require.Equal(t, "OFFS", entries[1].CATXAddendaRecordsField())
+		})
+	}
+}
+
+// TestBatchCATX_OffsetEntryOnReply adds an OFFSET companion to CTX, ATX, and TRX returns
+// that keep a copied Number of Addenda Records.
+func TestBatchCATX_OffsetEntryOnReply(t *testing.T) {
+	secs := []struct {
+		sec             string
+		header          func() *BatchHeader
+		entry           func() *EntryDetail
+		transactionCode int
+		offset          func() *EntryDetail
+	}{
+		{
+			sec:             CTX,
+			header:          mockBatchCTXHeader,
+			entry:           mockCTXEntryDetail,
+			transactionCode: CheckingReturnNOCCredit,
+			offset: func() *EntryDetail {
+				ed := NewEntryDetail()
+				ed.TransactionCode = CheckingDebit
+				ed.SetRDFI("121042882")
+				ed.DFIAccountNumber = "123456789"
+				ed.Amount = 25000
+				ed.IndividualName = offsetIndividualName
+				ed.Category = CategoryReturn
+				return ed
+			},
+		},
+		{
+			sec:             ATX,
+			header:          mockBatchATXHeader,
+			entry:           mockATXEntryDetail,
+			transactionCode: CheckingReturnNOCCredit,
+			offset: func() *EntryDetail {
+				ed := NewEntryDetail()
+				ed.TransactionCode = CheckingZeroDollarRemittanceCredit
+				ed.SetRDFI("121042882")
+				ed.DFIAccountNumber = "123456789"
+				ed.Amount = 0
+				ed.IndividualName = offsetIndividualName
+				ed.Category = CategoryReturn
+				ed.SetOriginalTraceNumber("121042880000002")
+				return ed
+			},
+		},
+		{
+			sec:             TRX,
+			header:          mockBatchTRXHeader,
+			entry:           mockTRXEntryDetail,
+			transactionCode: CheckingReturnNOCDebit,
+			offset: func() *EntryDetail {
+				ed := NewEntryDetail()
+				ed.TransactionCode = CheckingDebit
+				ed.SetRDFI("121042882")
+				ed.DFIAccountNumber = "123456789"
+				ed.Amount = 100
+				ed.IndividualName = offsetIndividualName
+				ed.Category = CategoryReturn
+				return ed
+			},
+		},
+	}
+	for _, sec := range secs {
+		t.Run(sec.sec, func(t *testing.T) {
+			entry := sec.entry()
+			entry.Addenda05 = nil
+			entry.TransactionCode = sec.transactionCode
+			entry.Category = CategoryReturn
+			entry.Addenda99 = mockAddenda99()
+			entry.SetCATXAddendaRecords(12)
+			entry.AddendaRecordIndicator = 1
+
+			header := sec.header()
+			if sec.sec == CTX {
+				header.ServiceClassCode = MixedDebitsAndCredits
+			}
+			batch, err := NewBatch(header)
+			require.NoError(t, err)
+			batch.AddEntry(entry)
+			batch.AddEntry(sec.offset())
+			require.NoError(t, batch.Create())
+			require.NoError(t, batch.Validate())
+
+			entries := batch.GetEntries()
+			require.Len(t, entries, 2)
+			require.Equal(t, "0012", entries[0].CATXAddendaRecordsField())
+			require.Equal(t, offsetIndividualName, entries[1].IndividualName)
+			require.Equal(t, "OFFS", entries[1].CATXAddendaRecordsField())
+		})
+	}
+}

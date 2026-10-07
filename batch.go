@@ -1007,6 +1007,12 @@ func isCATXReply(entry *EntryDetail) bool {
 
 // validateCATXReplyAddendaRecords verifies Number of Addenda Records on a CTX, ATX, or TRX reply is numeric
 func (batch *Batch) validateCATXReplyAddendaRecords(entry *EntryDetail) error {
+	// Offset entries copy Category from the first entry and set IndividualName to "OFFSET".
+	// They are not Corporate Entry Detail records, so Number of Addenda Records does not apply.
+	// addendaFieldInclusionReturn already skips the Addenda99 requirement for these entries.
+	if entry.IndividualName == offsetIndividualName {
+		return nil
+	}
 	field := entry.CATXAddendaRecordsField()
 	if field == "" {
 		return batch.Error("AddendaRecords", ErrNonNumeric, field)
