@@ -9,7 +9,7 @@ source "https://rubygems.org"
 # Happy Jekylling!
 # This is the default theme for new Jekyll sites. You may change this to anything you like.
 gem "bulma-clean-theme"
-gem "jekyll", "~> 3.10"
+gem "jekyll", "~> 4.0"
 # github-pages 232 pins jekyll-remote-theme 0.4.3, which requires rubyzip < 3.0
 # (CVE-2026-85396, GHSA-47m2-wp7j-p9vc). Pin a remote-theme that allows rubyzip 3.4+.
 gem "jekyll-remote-theme", ">= 0.5.2"
