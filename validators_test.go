@@ -230,6 +230,22 @@ func TestValidators__isAlphanumericExamples(t *testing.T) {
 	})
 }
 
+func TestValidators_Jan2027_Expansion(t *testing.T) {
+	v := &validator{}
+
+	// The following table lists single-byte alphameric characters that are accepted by all ACH Operators in
+	// alphameric fi elds. An individual ACH Operator may accept characters other than those listed below;
+	// however, for fi les exchanged between ACH Operators, the output value for such additional characters
+	// is not guaranteed. Multi-byte characters are not recommended for use in an ACH Record, as the record
+	// would require adjustment to ensure it does not contain more than 94 bytes.
+	cases := `ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëìíîïñòóôõöøùúûüýÿ`
+
+	for _, c := range cases {
+		err := v.isAlphanumeric(string(c))
+		require.NoError(t, err)
+	}
+}
+
 func TestValidators__isNonZero(t *testing.T) {
 	v := &validator{}
 
