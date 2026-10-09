@@ -2231,6 +2231,57 @@ func TestFile__AscendingBatchSequence(t *testing.T) {
 	}
 }
 
+func TestFile__CreateAgainAfterAddBatch(t *testing.T) {
+	batchNumbers := func(file *File) (headers, controls []int) {
+		for _, batch := range file.Batches {
+			headers = append(headers, batch.GetHeader().BatchNumber)
+			controls = append(controls, batch.GetControl().BatchNumber)
+		}
+		for _, batch := range file.IATBatches {
+			headers = append(headers, batch.GetHeader().BatchNumber)
+			controls = append(controls, batch.GetControl().BatchNumber)
+		}
+		return headers, controls
+	}
+
+	t.Run("IAT batch", func(t *testing.T) {
+		file := NewFile().SetHeader(mockFileHeader())
+		file.AddBatch(mockBatchPPD(t))
+		file.AddIATBatch(mockIATBatch(t))
+		require.NoError(t, file.Create())
+
+		// The file writes IAT batches last, so the new batch comes before
+		// the IAT batch, which the first Create numbered 2.
+		file.AddBatch(mockBatchPPD(t))
+		require.NoError(t, file.Create())
+
+		headers, controls := batchNumbers(file)
+		require.Equal(t, []int{1, 2, 3}, headers)
+		require.Equal(t, []int{1, 2, 3}, controls)
+		require.Equal(t, 3, file.Control.BatchCount)
+	})
+
+	t.Run("caller set batch numbers", func(t *testing.T) {
+		file := NewFile().SetHeader(mockFileHeader())
+		for _, number := range []int{5, 7} {
+			batch := mockBatchPPD(t)
+			batch.GetHeader().BatchNumber = number
+			batch.GetControl().BatchNumber = number
+			file.AddBatch(batch)
+		}
+		iatBatch := mockIATBatch(t)
+		iatBatch.GetHeader().BatchNumber = 9
+		iatBatch.GetControl().BatchNumber = 9
+		file.AddIATBatch(iatBatch)
+		require.NoError(t, file.Create())
+		require.NoError(t, file.Create())
+
+		headers, controls := batchNumbers(file)
+		require.Equal(t, []int{5, 7, 9}, headers)
+		require.Equal(t, []int{5, 7, 9}, controls)
+	})
+}
+
 func TestFile_SkipValidation(t *testing.T) {
 	file := mockFilePPD(t)
 	file.validateOpts = &ValidateOpts{
