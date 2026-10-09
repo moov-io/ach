@@ -148,3 +148,21 @@ func NewErrFileBatchNumberAscending(previous, current int) ErrFileBatchNumberAsc
 func (e ErrFileBatchNumberAscending) Error() string {
 	return e.Message
 }
+
+// ErrFileDuplicateBatchNumber is the error given when two batches in a file share a batch number
+type ErrFileDuplicateBatchNumber struct {
+	Message     string
+	BatchNumber int
+}
+
+// NewErrFileDuplicateBatchNumber creates a new error of the ErrFileDuplicateBatchNumber type
+func NewErrFileDuplicateBatchNumber(batchNumber int) ErrFileDuplicateBatchNumber {
+	return ErrFileDuplicateBatchNumber{
+		Message:     fmt.Sprintf("duplicate batch number %v", batchNumber),
+		BatchNumber: batchNumber,
+	}
+}
+
+func (e ErrFileDuplicateBatchNumber) Error() string {
+	return e.Message
+}
