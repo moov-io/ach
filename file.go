@@ -808,6 +808,8 @@ func (f *File) Create() error {
 			totalCreditAmount = totalCreditAmount + iatBatch.GetControl().TotalCreditEntryDollarAmount
 		}
 
+		f.ensureUniqueBatchNumbers()
+
 		// create FileControl from calculated values
 		fc := NewFileControl()
 		fc.ID = f.ID
@@ -836,17 +838,13 @@ func (f *File) Create() error {
 }
 
 // assignCreatedBatchNumber writes seq onto a batch when the current number is
-// unset (0 or 1) or is the number an earlier File.Create wrote.
-//
-// Create keeps a number above 1 because the caller may have set it. A number
-// Create assigned is rewritten on a later call so a batch added after the first
-// Create does not take a number a later batch already holds. The writer emits
-// IAT batches after all other batches, so that later batch is often an IAT batch.
+// 0 or is the number an earlier File.Create wrote. NewBatchHeader defaults to 1,
+// so a new file of default batches is compacted by ensureUniqueBatchNumbers.
 func assignCreatedBatchNumber(batchNumber *int, created **int, seq int) bool {
 	if batchNumber == nil || created == nil {
 		return false
 	}
-	if *batchNumber > 1 && (*created == nil || *batchNumber != **created) {
+	if *batchNumber >= 1 && (*created == nil || *batchNumber != **created) {
 		return false
 	}
 	*batchNumber = seq
@@ -855,6 +853,94 @@ func assignCreatedBatchNumber(batchNumber *int, created **int, seq int) bool {
 	}
 	**created = seq
 	return true
+}
+
+func storeCreatedBatchNumber(created **int, seq int) {
+	if created == nil {
+		return
+	}
+	if *created == nil {
+		*created = new(int)
+	}
+	**created = seq
+}
+
+func (f *File) writeOrderBatchNumbers() []int {
+	var nums []int
+	for _, batch := range f.Batches {
+		if batch == nil {
+			continue
+		}
+		if header := batch.GetHeader(); header != nil {
+			nums = append(nums, header.BatchNumber)
+		}
+	}
+	for i := range f.IATBatches {
+		if header := f.IATBatches[i].GetHeader(); header != nil {
+			nums = append(nums, header.BatchNumber)
+		}
+	}
+	return nums
+}
+
+func duplicateBatchNumber(nums []int) (int, bool) {
+	seen := make(map[int]struct{}, len(nums))
+	for _, n := range nums {
+		if _, ok := seen[n]; ok {
+			return n, true
+		}
+		seen[n] = struct{}{}
+	}
+	return 0, false
+}
+
+// ensureUniqueBatchNumbers assigns 1..n in write order when two batches share a number.
+func (f *File) ensureUniqueBatchNumbers() {
+	if _, dup := duplicateBatchNumber(f.writeOrderBatchNumbers()); !dup {
+		return
+	}
+	f.renumberBatches()
+}
+
+func (f *File) renumberBatches() {
+	seq := 1
+	for i := range f.Batches {
+		header := f.Batches[i].GetHeader()
+		if header == nil {
+			seq++
+			continue
+		}
+		header.BatchNumber = seq
+		storeCreatedBatchNumber(&header.createdBatchNumber, seq)
+		if header.StandardEntryClassCode == ADV {
+			if control := f.Batches[i].GetADVControl(); control != nil {
+				control.BatchNumber = seq
+			}
+		} else if control := f.Batches[i].GetControl(); control != nil {
+			control.BatchNumber = seq
+		}
+		seq++
+	}
+	for i := range f.IATBatches {
+		header := f.IATBatches[i].GetHeader()
+		if header == nil {
+			seq++
+			continue
+		}
+		header.BatchNumber = seq
+		storeCreatedBatchNumber(&header.createdBatchNumber, seq)
+		if control := f.IATBatches[i].GetControl(); control != nil {
+			control.BatchNumber = seq
+		}
+		seq++
+	}
+}
+
+func (f *File) hasDuplicateBatchNumbers() error {
+	if n, dup := duplicateBatchNumber(f.writeOrderBatchNumbers()); dup {
+		return NewErrFileDuplicateBatchNumber(n)
+	}
+	return nil
 }
 
 // AddBatch appends a Batch to the ach.File
@@ -1118,6 +1204,9 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 				return err
 			}
 		}
+		if err := f.hasDuplicateBatchNumbers(); err != nil {
+			return err
+		}
 		if !opts.AllowUnorderedBatchNumbers {
 			if err := f.isSequenceAscending(); err != nil {
 				return err
@@ -1134,6 +1223,14 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 	}
 	if !opts.AllowMissingFileControl {
 		if err := f.ADVControl.Validate(); err != nil {
+			return err
+		}
+	}
+	if err := f.hasDuplicateBatchNumbers(); err != nil {
+		return err
+	}
+	if !opts.AllowUnorderedBatchNumbers {
+		if err := f.isSequenceAscending(); err != nil {
 			return err
 		}
 	}
@@ -1360,6 +1457,8 @@ func (f *File) createFileADV() error {
 		totalDebitAmount = totalDebitAmount + batch.GetADVControl().TotalDebitEntryDollarAmount
 		totalCreditAmount = totalCreditAmount + batch.GetADVControl().TotalCreditEntryDollarAmount
 	}
+
+	f.ensureUniqueBatchNumbers()
 
 	fc := NewADVFileControl()
 	fc.ID = f.ID
@@ -1647,6 +1746,9 @@ func segmentFileBatchAddADVEntry(creditBatch Batcher, debitBatch Batcher, entry 
 func (f *File) isSequenceAscending() error {
 	lastSeq := 0
 	for _, batch := range f.Batches {
+		if batch == nil || batch.GetHeader() == nil {
+			continue
+		}
 		current := batch.GetHeader().BatchNumber
 		if f.validateOpts == nil || !f.validateOpts.CustomTraceNumbers {
 			if current <= lastSeq {
@@ -1654,6 +1756,21 @@ func (f *File) isSequenceAscending() error {
 			}
 		}
 
+		lastSeq = current
+	}
+
+	lastSeq = 0
+	for i := range f.IATBatches {
+		header := f.IATBatches[i].GetHeader()
+		if header == nil {
+			continue
+		}
+		current := header.BatchNumber
+		if f.validateOpts == nil || !f.validateOpts.CustomTraceNumbers {
+			if current <= lastSeq {
+				return NewErrFileBatchNumberAscending(lastSeq, current)
+			}
+		}
 		lastSeq = current
 	}
 

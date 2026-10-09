@@ -2194,12 +2194,12 @@ func TestFile__AscendingBatchSequence(t *testing.T) {
 		{
 			desc:        "ascending then descending",
 			sequence:    []int{2, 3, 2},
-			expectedErr: NewErrFileBatchNumberAscending(3, 2),
+			expectedErr: nil, // Create rewrites duplicate 2
 		},
 		{
 			desc:        "equal values",
 			sequence:    []int{2, 3, 3, 4},
-			expectedErr: NewErrFileBatchNumberAscending(3, 3),
+			expectedErr: nil, // Create rewrites duplicate 3
 		},
 	}
 
@@ -2279,6 +2279,101 @@ func TestFile__CreateAgainAfterAddBatch(t *testing.T) {
 		headers, controls := batchNumbers(file)
 		require.Equal(t, []int{5, 7, 9}, headers)
 		require.Equal(t, []int{5, 7, 9}, controls)
+	})
+
+	t.Run("JSON clone then add batch", func(t *testing.T) {
+		file := NewFile().SetHeader(mockFileHeader())
+		file.AddBatch(mockBatchPPD(t))
+		file.AddIATBatch(mockIATBatch(t))
+		require.NoError(t, file.Create())
+
+		bs, err := json.Marshal(file)
+		require.NoError(t, err)
+		cloned, err := FileFromJSONWith(bs, &ValidateOpts{SkipAll: true})
+		require.NoError(t, err)
+
+		cloned.AddBatch(mockBatchPPD(t))
+		require.NoError(t, cloned.Create())
+
+		headers, controls := batchNumbers(cloned)
+		require.Equal(t, []int{1, 2, 3}, headers)
+		require.Equal(t, []int{1, 2, 3}, controls)
+	})
+
+	t.Run("default batch number 1 compacted", func(t *testing.T) {
+		file := NewFile().SetHeader(mockFileHeader())
+		file.AddBatch(mockBatchPPD(t))
+		file.AddBatch(mockBatchPPD(t))
+		file.AddIATBatch(mockIATBatch(t))
+		require.NoError(t, file.Create())
+
+		headers, controls := batchNumbers(file)
+		require.Equal(t, []int{1, 2, 3}, headers)
+		require.Equal(t, []int{1, 2, 3}, controls)
+	})
+
+	t.Run("read files then add batch", func(t *testing.T) {
+		ppd, err := ReadFile(filepath.Join("test", "testdata", "ppd-debit.ach"))
+		require.NoError(t, err)
+		iat, err := ReadFile(filepath.Join("test", "testdata", "iat-debit.ach"))
+		require.NoError(t, err)
+		extra, err := ReadFile(filepath.Join("test", "testdata", "ppd-mixedDebitCredit.ach"))
+		require.NoError(t, err)
+
+		file := NewFile().SetHeader(ppd.Header)
+		file.AddBatch(ppd.Batches[0])
+		file.AddIATBatch(iat.IATBatches[0])
+		file.AddBatch(extra.Batches[0])
+		require.NoError(t, file.Create())
+
+		headers, controls := batchNumbers(file)
+		require.Equal(t, []int{1, 2, 3}, headers)
+		require.Equal(t, []int{1, 2, 3}, controls)
+	})
+
+	t.Run("parsed descending batch numbers", func(t *testing.T) {
+		file := NewFile().SetHeader(mockFileHeader())
+		for _, number := range []int{3, 2, 1} {
+			batch := mockBatchPPD(t)
+			batch.GetHeader().BatchNumber = number
+			batch.GetControl().BatchNumber = number
+			file.AddBatch(batch)
+		}
+		require.NoError(t, file.Create())
+
+		headers, controls := batchNumbers(file)
+		require.Equal(t, []int{3, 2, 1}, headers)
+		require.Equal(t, []int{3, 2, 1}, controls)
+		require.NoError(t, file.ValidateWith(&ValidateOpts{AllowUnorderedBatchNumbers: true}))
+		require.Equal(t, NewErrFileBatchNumberAscending(3, 2), file.Validate())
+	})
+}
+
+func TestFile_DuplicateBatchNumbers(t *testing.T) {
+	t.Run("domestic", func(t *testing.T) {
+		file := mockFilePPD(t)
+		file.AddBatch(mockBatchPPD(t))
+		require.NoError(t, file.Create())
+
+		file.Batches[0].GetHeader().BatchNumber = 2
+		file.Batches[0].GetControl().BatchNumber = 2
+		file.Batches[1].GetHeader().BatchNumber = 2
+		file.Batches[1].GetControl().BatchNumber = 2
+
+		require.Equal(t, NewErrFileDuplicateBatchNumber(2), file.Validate())
+		require.Equal(t, NewErrFileDuplicateBatchNumber(2), file.ValidateWith(&ValidateOpts{AllowUnorderedBatchNumbers: true}))
+	})
+
+	t.Run("IAT shares domestic number", func(t *testing.T) {
+		file := NewFile().SetHeader(mockFileHeader())
+		file.AddBatch(mockBatchPPD(t))
+		file.AddIATBatch(mockIATBatch(t))
+		require.NoError(t, file.Create())
+
+		file.IATBatches[0].GetHeader().BatchNumber = file.Batches[0].GetHeader().BatchNumber
+		file.IATBatches[0].GetControl().BatchNumber = file.Batches[0].GetHeader().BatchNumber
+
+		require.Equal(t, NewErrFileDuplicateBatchNumber(file.Batches[0].GetHeader().BatchNumber), file.Validate())
 	})
 }
 
