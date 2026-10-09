@@ -123,6 +123,9 @@ type BatchHeader struct {
 	converters
 
 	validateOpts *ValidateOpts
+
+	// createdBatchNumber is the last batch number File.Create assigned to this header.
+	createdBatchNumber *int
 }
 
 const (

@@ -777,13 +777,9 @@ func (f *File) Create() error {
 
 		for i, batch := range f.Batches {
 			// create ascending batch numbers unless batch number has been provided
-			created := createdBatchNumber(batch)
-			if f.Batches[i].GetHeader().BatchNumber <= 1 || (created != nil && f.Batches[i].GetHeader().BatchNumber == *created) {
-				f.Batches[i].GetHeader().BatchNumber = batchSeq
+			header := f.Batches[i].GetHeader()
+			if header != nil && assignCreatedBatchNumber(&header.BatchNumber, &header.createdBatchNumber, batchSeq) {
 				f.Batches[i].GetControl().BatchNumber = batchSeq
-				if created != nil {
-					*created = batchSeq
-				}
 			}
 			batchSeq++
 			// sum file entry and addenda records. Assume batch.Create batch properly calculated control
@@ -797,10 +793,9 @@ func (f *File) Create() error {
 		}
 		for i, iatBatch := range f.IATBatches {
 			// create ascending batch numbers unless batch number has been provided
-			if f.IATBatches[i].GetHeader().BatchNumber <= 1 || f.IATBatches[i].GetHeader().BatchNumber == f.IATBatches[i].createdNumber {
-				f.IATBatches[i].GetHeader().BatchNumber = batchSeq
+			header := f.IATBatches[i].GetHeader()
+			if header != nil && assignCreatedBatchNumber(&header.BatchNumber, &header.createdBatchNumber, batchSeq) {
 				f.IATBatches[i].GetControl().BatchNumber = batchSeq
-				f.IATBatches[i].createdNumber = batchSeq
 			}
 			batchSeq++
 			// sum file entry and addenda records. Assume batch.Create batch properly calculated control
@@ -840,19 +835,26 @@ func (f *File) Create() error {
 	return nil
 }
 
-// createdBatchNumber returns where a batch records the batch number File.Create
-// gave it, or nil for a Batcher that does not embed Batch.
+// assignCreatedBatchNumber writes seq onto a batch when the current number is
+// unset (0 or 1) or is the number an earlier File.Create wrote.
 //
-// Create keeps a batch number above 1 because the caller may have set it. A
-// number that an earlier Create assigned is not the caller's, so Create
-// assigns it again. Otherwise a batch added after the first Create takes a
-// number that a later batch already holds, such as an IAT batch, which the
-// file writes after all other batches.
-func createdBatchNumber(batch Batcher) *int {
-	if b, ok := batch.(interface{ createdBatchNumber() *int }); ok {
-		return b.createdBatchNumber()
+// Create keeps a number above 1 because the caller may have set it. A number
+// Create assigned is rewritten on a later call so a batch added after the first
+// Create does not take a number a later batch already holds. The writer emits
+// IAT batches after all other batches, so that later batch is often an IAT batch.
+func assignCreatedBatchNumber(batchNumber *int, created **int, seq int) bool {
+	if batchNumber == nil || created == nil {
+		return false
 	}
-	return nil
+	if *batchNumber > 1 && (*created == nil || *batchNumber != **created) {
+		return false
+	}
+	*batchNumber = seq
+	if *created == nil {
+		*created = new(int)
+	}
+	**created = seq
+	return true
 }
 
 // AddBatch appends a Batch to the ach.File
@@ -1344,8 +1346,8 @@ func (f *File) createFileADV() error {
 			return ErrFileADVOnly
 		}
 
-		if f.Batches[i].GetHeader().BatchNumber <= 1 {
-			f.Batches[i].GetHeader().BatchNumber = batchSeq
+		header := f.Batches[i].GetHeader()
+		if header != nil && assignCreatedBatchNumber(&header.BatchNumber, &header.createdBatchNumber, batchSeq) {
 			f.Batches[i].GetADVControl().BatchNumber = batchSeq
 		}
 		batchSeq++
