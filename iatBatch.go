@@ -45,6 +45,9 @@ type IATBatch struct {
 	converters
 
 	validateOpts *ValidateOpts
+
+	// createdNumber is the batch number File.Create last gave this batch.
+	createdNumber int
 }
 
 // NewIATBatch takes a BatchHeader and returns a matching SEC code batch type that is a batcher. Returns an error if the SEC code is not supported.

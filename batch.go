@@ -50,6 +50,9 @@ type Batch struct {
 	converters
 
 	validateOpts *ValidateOpts
+
+	// createdNumber is the batch number File.Create last gave this batch.
+	createdNumber int
 }
 
 const (
@@ -609,6 +612,12 @@ func (batch *Batch) Category() string {
 		}
 	}
 	return CategoryForward
+}
+
+// createdBatchNumber returns where the batch records the batch number
+// File.Create gave it.
+func (batch *Batch) createdBatchNumber() *int {
+	return &batch.createdNumber
 }
 
 // ID returns the id of the batch

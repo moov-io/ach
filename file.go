@@ -777,9 +777,13 @@ func (f *File) Create() error {
 
 		for i, batch := range f.Batches {
 			// create ascending batch numbers unless batch number has been provided
-			if f.Batches[i].GetHeader().BatchNumber <= 1 {
+			created := createdBatchNumber(batch)
+			if f.Batches[i].GetHeader().BatchNumber <= 1 || (created != nil && f.Batches[i].GetHeader().BatchNumber == *created) {
 				f.Batches[i].GetHeader().BatchNumber = batchSeq
 				f.Batches[i].GetControl().BatchNumber = batchSeq
+				if created != nil {
+					*created = batchSeq
+				}
 			}
 			batchSeq++
 			// sum file entry and addenda records. Assume batch.Create batch properly calculated control
@@ -792,10 +796,11 @@ func (f *File) Create() error {
 			totalCreditAmount = totalCreditAmount + batch.GetControl().TotalCreditEntryDollarAmount
 		}
 		for i, iatBatch := range f.IATBatches {
-			// create ascending batch numbers
-			if f.IATBatches[i].GetHeader().BatchNumber <= 1 {
+			// create ascending batch numbers unless batch number has been provided
+			if f.IATBatches[i].GetHeader().BatchNumber <= 1 || f.IATBatches[i].GetHeader().BatchNumber == f.IATBatches[i].createdNumber {
 				f.IATBatches[i].GetHeader().BatchNumber = batchSeq
 				f.IATBatches[i].GetControl().BatchNumber = batchSeq
+				f.IATBatches[i].createdNumber = batchSeq
 			}
 			batchSeq++
 			// sum file entry and addenda records. Assume batch.Create batch properly calculated control
@@ -832,6 +837,21 @@ func (f *File) Create() error {
 		}
 	}
 	f.annotateLineNumbers()
+	return nil
+}
+
+// createdBatchNumber returns where a batch records the batch number File.Create
+// gave it, or nil for a Batcher that does not embed Batch.
+//
+// Create keeps a batch number above 1 because the caller may have set it. A
+// number that an earlier Create assigned is not the caller's, so Create
+// assigns it again. Otherwise a batch added after the first Create takes a
+// number that a later batch already holds, such as an IAT batch, which the
+// file writes after all other batches.
+func createdBatchNumber(batch Batcher) *int {
+	if b, ok := batch.(interface{ createdBatchNumber() *int }); ok {
+		return b.createdBatchNumber()
+	}
 	return nil
 }
 
