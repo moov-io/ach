@@ -1509,28 +1509,34 @@ components:
           example: "5ca8d25a"
         typeCode:
           type: string
+          maxLength: 2
+          enum: ["02"]
           description: 02 - NACHA regulations
           example: "02"
         referenceInformationOne:
           type: string
+          maxLength: 7
           description: |
             ReferenceInformationOne may be used for additional reference numbers, identification numbers,
             or codes that the merchant needs to identify the particular transaction or customer.
           example: ''
         referenceInformationTwo:
           type: string
+          maxLength: 3
           description: |
             ReferenceInformationTwo may be used for additional reference numbers, identification numbers,
             or codes that the merchant needs to identify the particular transaction or customer.
           example: ''
         terminalIdentificationCode:
           type: string
+          maxLength: 6
           description: |
             TerminalIdentificationCode identifies an Electronic terminal with a unique code that allows
             a terminal owner and/or switching network to identify the terminal at which an Entry originated.
           example: '200509'
         transactionSerialNumber:
           type: string
+          maxLength: 6
           description: |
             TransactionSerialNumber is assigned by the terminal at the time the transaction is originated.  The
             number, with the Terminal Identification Code, serves as an audit trail for the transaction and is
@@ -1539,26 +1545,32 @@ components:
         transactionDate:
           type: string
           format: "MMDD"
+          maxLength: 4
           description: Timestamp identifies the date on which the transaction occurred. (Format MMDD - M=Month, D=Day)
           example: '1224'
         authorizationCodeOrExpireDate:
           type: string
+          maxLength: 6
           description: Indicates the code that a card authorization center has furnished to the merchant.
           example: '123456'
         terminalLocation:
           type: string
+          maxLength: 27
           description: Identifies the specific location of a terminal (i.e., street names of an intersection, address, etc.) in accordance with the requirements of Regulation E.
           example: 2nd St
         terminalCity:
           type: string
+          maxLength: 15
           description: Identifies the city in which the electronic terminal is located.
           example: Anytown
         terminalState:
           type: string
+          maxLength: 2
           description: Identifies the state in which the electronic terminal is located.
           example: CA
         traceNumber:
           type: string
+          maxLength: 15
           description: Entry Detail Trace Number
           example: "124782618117"
         lineNumber:
@@ -1581,18 +1593,23 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
+          maxLength: 2
+          enum: ["05"]
           description: 05 - NACHA regulations
           example: "05"
         paymentRelatedInformation:
           type: string
+          maxLength: 80
           description: Text for describing the related payment
           example: "Car Payment"
         sequenceNumber:
           type: integer
+          maximum: 9999
           description: SequenceNumber is consecutively assigned to each Addenda05 Record following an Entry Detail Record. The first Addenda05 sequence number must always be a 1.
           example: 1
         entryDetailSequenceNumber:
           type: integer
+          maximum: 9999999
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
             Detail or Corporate Entry Detail Record's trace number. This number is
@@ -1616,10 +1633,13 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
+          maxLength: 2
+          enum: ["10"]
           description: 10 - NACHA regulations
           example: "10"
         transactionTypeCode:
           type: string
+          maxLength: 3
           description: |
             Describes the type of payment (secondary SEC code):
             ANN - Annuity |
@@ -1647,18 +1667,22 @@ components:
         foreignPaymentAmount:
           type: integer
           format: int64
+          maximum: 999999999999999999
           description: For inbound IAT payments this field should contain the USD amount or may be blank.
           example: 1021441
         foreignTraceNumber:
           type: string
+          maxLength: 22
           description: Trace number
           example: "19846249812"
         name:
           type: string
+          maxLength: 35
           description: Receiving Company Name/Individual Name
           example: Jane Smith
         entryDetailSequenceNumber:
           type: integer
+          maximum: 9999999
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
             Detail or Corporate Entry Detail Record's trace number. This number is
@@ -1683,18 +1707,23 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
+          maxLength: 2
+          enum: ["11"]
           description: 11 - NACHA regulations
           example: "11"
         originatorName:
           type: string
+          maxLength: 35
           description: Originator's name (your company name / name)
           example: Acme Corp
         originatorStreetAddress:
           type: string
+          maxLength: 35
           description: Originator's street address
           example: 111 1st St
         entryDetailSequenceNumber:
           type: integer
+          maximum: 9999999
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
             Detail or Corporate Entry Detail Record's trace number. This number is
@@ -1718,10 +1747,13 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
+          maxLength: 2
+          enum: ["12"]
           description: 12 - NACHA regulations
           example: "12"
         originatorCityStateProvince:
           type: string
+          maxLength: 35
           description: |
             Originator City & State / Province
             Data elements City and State / Province  should be separated with an asterisk (*) as a delimiter and the field should end with a backslash (\\).
@@ -1729,6 +1761,7 @@ components:
             San Francisco*CA\
         originatorCountryPostalCode:
           type: string
+          maxLength: 35
           description: |
             Originator Country & Postal Code
             Data elements must be separated by an asterisk (*) and must end with a backslash (\\).
@@ -1736,6 +1769,7 @@ components:
             US*10036\
         entryDetailSequenceNumber:
           type: integer
+          maximum: 9999999
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
             Detail or Corporate Entry Detail Record's trace number. This number is
@@ -1759,10 +1793,13 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
+          maxLength: 2
+          enum: ["13"]
           description: 13 - NACHA regulations
           example: "13"
         ODFIName:
           type: string
+          maxLength: 35
           description: |
             Originating DFI Name
             For Outbound IAT Entries, this field must contain the name of the U.S. ODFI.
@@ -1770,6 +1807,7 @@ components:
           example: My Bank
         ODFIIDNumberQualifier:
           type: string
+          maxLength: 2
           description: |
             Originating DFI Identification Number Qualifier.
             For Inbound IATs: The 2-digit code that identifies the numbering scheme used in the
@@ -1780,6 +1818,7 @@ components:
           example: '01'
         ODFIIdentification:
           type: string
+          maxLength: 34
           description: |
             Originating DFI Identification.
             This field contains the routing number that identifies the U.S. ODFI initiating the entry.
@@ -1788,6 +1827,7 @@ components:
           example: '04121503'
         ODFIBranchCountryCode:
           type: string
+          maxLength: 3
           description: |
             Originating DFI Branch Country Code:
             USb = United States
@@ -1799,6 +1839,7 @@ components:
           example: "US "
         entryDetailSequenceNumber:
           type: integer
+          maximum: 9999999
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
             Detail or Corporate Entry Detail Record's trace number. This number is
@@ -1823,14 +1864,18 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
+          maxLength: 2
+          enum: ["14"]
           description: 14 - NACHA regulations
           example: "14"
         RDFIName:
           type: string
+          maxLength: 35
           description: Name of the Receiver bank
           example: 'Citadel Bank'
         RDFIIDNumberQualifier:
           type: string
+          maxLength: 2
           description: |
             Receiving DFI Identification Number Qualifier.
             The 2-digit code that identifies the numbering scheme used in the
@@ -1841,10 +1886,12 @@ components:
           example: '01'
         RDFIIdentification:
           type: string
+          maxLength: 34
           description: This field contains the bank identification number of the DFI at which the Receiver maintains his account.
           example: '98765432'
         RDFIBranchCountryCode:
           type: string
+          maxLength: 3
           description: |
             Receiving DFI Branch Country Code
             USb" = United States
@@ -1856,6 +1903,7 @@ components:
           example: 'US '
         entryDetailSequenceNumber:
           type: integer
+          maximum: 9999999
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
             Detail or Corporate Entry Detail Record's trace number. This number is
@@ -1881,19 +1929,24 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
+          maxLength: 2
+          enum: ["15"]
           description: 15 - NACHA regulations
           example: "15"
         receiverIDNumber:
           type: string
+          maxLength: 15
           description: |
             Receiver Identification Number contains the accounting number by which the Originator is known to the Receiver for descriptive purposes. NACHA Rules recommend but do not require the RDFI to print the contents of this field on the receiver's statement.
           example: "98765432"
         receiverStreetAddress:
           type: string
+          maxLength: 35
           description: Receiver's physical address
           example: 123 1st St
         entryDetailSequenceNumber:
           type: integer
+          maximum: 9999999
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
             Detail or Corporate Entry Detail Record's trace number. This number is
@@ -1916,10 +1969,13 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
+          maxLength: 2
+          enum: ["16"]
           description: 16 - NACHA regulations
           example: "16"
         receiverCityStateProvince:
           type: string
+          maxLength: 35
           description: |
             Receiver City & State / Province
             Data elements City and State / Province  should be separated with an asterisk (*) as a delimiter
@@ -1928,6 +1984,7 @@ components:
             San Francisco*CA\
         receiverCountryPostalCode:
           type: string
+          maxLength: 35
           description: |
             Receiver Country & Postal Code
             Data elements must be separated by an asterisk (*) and must end with a backslash (\\).
@@ -1935,6 +1992,7 @@ components:
             US*10036\
         entryDetailSequenceNumber:
           type: integer
+          maximum: 9999999
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
             Detail or Corporate Entry Detail Record's trace number. This number is
@@ -1958,19 +2016,24 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
+          maxLength: 2
+          enum: ["17"]
           description: 17 - NACHA regulations
           example: "17"
         paymentRelatedInformation:
           type: string
+          maxLength: 80
           description: Additional information related to the payment
           example: Test data
         sequenceNumber:
           type: integer
+          maximum: 9999
           description: |
             SequenceNumber is consecutively assigned to each Addenda17 Record following an Entry Detail Record. The first Addenda17 sequence number must always be a 1.
           example: 1
         entryDetailSequenceNumber:
           type: integer
+          maximum: 9999999
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
             Detail or Corporate Entry Detail Record's trace number. This number is
@@ -1994,14 +2057,18 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
+          maxLength: 2
+          enum: ["18"]
           description: 18 - NACHA regulations
           example: "18"
         foreignCorrespondentBankName:
           type: string
+          maxLength: 35
           description: Name of the Foreign Correspondent Bank
           example: Other Bank
         foreignCorrespondentBankIDNumberQualifier:
           type: string
+          maxLength: 2
           description: |
             Foreign Correspondent Bank Identification Number Qualifier contains a 2-digit code that identifies the numbering scheme used in the Foreign Correspondent Bank Identification Number field. Code values for this field are:
               "01" = National Clearing System |
@@ -2010,20 +2077,24 @@ components:
           example: '01'
         foreignCorrespondentBankIDNumber:
           type: string
+          maxLength: 34
           description: Foreign Correspondent Bank Identification Number contains the bank ID number of the Foreign Correspondent Bank
           example: '98765432'
         foreignCorrespondentBankBranchCountryCode:
           type: string
+          maxLength: 3
           description: |
             Foreign Correspondent Bank Branch Country Code contains the two-character code, as approved by the International Organization for Standardization (ISO), to identify the country in which the branch of the Foreign Correspondent Bank is located. Values can be found on the International Organization for Standardization website: www.iso.org
           example: US
         sequenceNumber:
           type: integer
+          maximum: 9999
           description: |
             SequenceNumber is consecutively assigned to each Addenda17 Record following an Entry Detail Record. The first Addenda17 sequence number must always be a 1.
           example: 1
         entryDetailSequenceNumber:
           type: integer
+          maximum: 9999999
           description: |
             EntryDetailSequenceNumber contains the ascending sequence number section of the Entry
             Detail or Corporate Entry Detail Record's trace number. This number is
@@ -2049,10 +2120,13 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
+          maxLength: 2
+          enum: ["98"]
           description: 98 - NACHA regulations
           example: "98"
         changeCode:
           type: string
+          maxLength: 3
           description: |
             ChangeCode field contains a standard code used by an ACH Operator or RDFI to describe the reason for a change Entry.
             C01 - Incorrect bank account number |
@@ -2078,6 +2152,7 @@ components:
           example: C01
         originalTrace:
           type: string
+          maxLength: 15
           description: |
             OriginalTrace This field contains the Trace Number as originally included on the forward Entry or Prenotification.
             The RDFI must include the Original Entry Trace Number in the Addenda Record of an Entry being returned to an ODFI,
@@ -2085,14 +2160,17 @@ components:
           example: "214874812"
         originalDFI:
           type: string
+          maxLength: 8
           description: The Receiving DFI Identification (addenda.RDFIIdentification) as originally included on the forward Entry or Prenotification that the RDFI is returning or correcting.
           example: "98765432"
         correctedData:
           type: string
+          maxLength: 29
           description: Correct field value of what changeCode references
           example: "198424892"
         traceNumber:
           type: string
+          maxLength: 15
           description: Entry Detail Trace Number
           example: "124782618117"
         lineNumber:
@@ -2113,6 +2191,8 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
+          maxLength: 2
+          enum: ["98"]
           description: 98 - NACHA regulations
           example: "98"
         refusedChangeCode:
@@ -2130,6 +2210,7 @@ components:
             C69 - Incorrect Transaction Code
         originalTrace:
           type: string
+          maxLength: 15
           description: |
             OriginalTrace This field contains the Trace Number as originally included on the forward Entry or Prenotification.
             The RDFI must include the Original Entry Trace Number in the Addenda Record of an Entry being returned to an ODFI,
@@ -2137,10 +2218,12 @@ components:
           example: "214874812"
         originalDFI:
           type: string
+          maxLength: 8
           description: The Receiving DFI Identification (addenda.RDFIIdentification) as originally included on the forward Entry or Prenotification that the RDFI is returning or correcting.
           example: "98765432"
         correctedData:
           type: string
+          maxLength: 29
           description: Correct field value of what changeCode references
           example: "198424892"
         changeCode:
@@ -2154,6 +2237,7 @@ components:
           description: The last seven digits of the TraceNumber in the original Notification of Change.
         traceNumber:
           type: string
+          maxLength: 15
           description: Entry Detail Trace Number
           example: "124782618117"
         lineNumber:
@@ -2177,16 +2261,20 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
+          maxLength: 2
+          enum: ["99"]
           description: 99 - NACHA regulations
           example: "99"
         returnCode:
           type: string
+          maxLength: 3
           description: |
             Standard code used by an ACH Operator or RDFI to describe the reason for returning an Entry.
             Values match Nacha return reason codes supported by moov-io/ach (R01-R47, R50-R53, R61-R62, R67-R77, R80-R85, R90).
           example: "R01"
         originalTrace:
           type: string
+          maxLength: 15
           description: |
             OriginalTrace This field contains the Trace Number as originally included on the forward Entry or Prenotification.
             The RDFI must include the Original Entry Trace Number in the Addenda Record of an Entry being returned to an ODFI,
@@ -2195,18 +2283,22 @@ components:
         dateOfDeath:
           type: string
           format: "YYMMDD"
+          maxLength: 6
           description: The field date of death is to be supplied on Entries being returned for reason of death (return reason codes R14 and R15). (Format YYMMDD - Y=Year, M=Month, D=Day)
           example: "200102"
         originalDFI:
           type: string
+          maxLength: 8
           description: Contains the Receiving DFI Identification (addenda.RDFIIdentification) as originally included on the forward Entry or Prenotification that the RDFI is returning or correcting.
           example: "98765432"
         addendaInformation:
           type: string
+          maxLength: 44
           description: Information related to the return
           example: text
         traceNumber:
           type: string
+          maxLength: 15
           description: Matches the Entry Detail Trace Number of the entry being returned.
           example: "214874812"
         lineNumber:
@@ -2227,31 +2319,39 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
+          maxLength: 2
+          enum: ["99"]
           description: 99 - NACHA regulations
           example: "99"
         originalEntryTraceNumber:
           type: string
+          maxLength: 15
           description: Trace Number of the original entry being returned.
           example: "214874812"
         originalReceivingDFIIdentification:
           type: string
+          maxLength: 8
           description: Identification of the Original Receiving Depository Institution (ODFI)
           example: "12345678"
         returnTraceNumber:
           type: string
+          maxLength: 15
           description: Return trace number
           example: "214874812"
         returnSettlementDate:
           type: string
+          maxLength: 3
           description: Return settlement date
-          example: "200102"
+          example: "179"
         returnReasonCode:
           type: string
+          maxLength: 2
           description: |
             Original return reason code (2-character numeric portion as stored on the dishonored addenda, e.g. "01" for R01).
           example: "01"
         dishonoredReturnReasonCode:
           type: string
+          maxLength: 3
           description: |
             Return reason code of the Dishonored Return:
             R61 - Misrouted Return |
@@ -2263,12 +2363,14 @@ components:
           example: "R61"
         traceNumber:
           type: string
+          maxLength: 15
           description: Matches the Entry Detail Trace Number of the entry being returned.
           example: "214874812"
         addendaInformation:
           type: string
+          maxLength: 21
           description: Additional data
-          example: '00134                                       '
+          example: Untimely Return
         lineNumber:
           type: integer
           description: Line number at which the record appears in the file.
@@ -2289,10 +2391,13 @@ components:
           example: 5ca8d25a
         typeCode:
           type: string
+          maxLength: 2
+          enum: ["99"]
           description: 99 - NACHA regulations
           example: "99"
         contestedReturnCode:
           type: string
+          maxLength: 3
           description: |
             Return code explaining the contested dishonorment:
             R71 - Misrouted Dishonored Return |
@@ -2305,10 +2410,12 @@ components:
           example: "R71"
         dateOriginalEntryReturned:
           type: string
+          maxLength: 6
           description: Date original entry was returned
           example: "200102"
         dishonoredReturnReasonCode:
           type: string
+          maxLength: 2
           description: |
             Return reason code of the Dishonored Return:
             R61 - Misrouted Return |
@@ -2317,42 +2424,51 @@ components:
             R68 - Untimely Return |
             R69 - Field Error(s) |
             R70 - Permissible Return Entry Not Accepted/Return Not Requested by ODFI
-          example: "R61"
+          example: "67"
         dishonoredReturnTraceNumber:
           type: string
+          maxLength: 15
           description: Trace number from Dishonored Return
           example: "214874812"
         dishonoredReturnSettlementDate:
           type: string
+          maxLength: 3
           description: Settlement date of the Dishonored Return
-          example: "200102"
+          example: "166"
         originalEntryTraceNumber:
           type: string
+          maxLength: 15
           description: Trace Number of the original entry being returned.
           example: "214874812"
         originalReceivingDFIIdentification:
           type: string
+          maxLength: 8
           description: Identification of the Original Receiving Depository Institution (ODFI)
           example: "12345678"
         originalSettlementDate:
           type: string
+          maxLength: 3
           description: Original date of settlement
-          example: "200102"
+          example: "164"
         returnTraceNumber:
           type: string
+          maxLength: 15
           description: Return trace number
           example: "214874812"
         returnSettlementDate:
           type: string
+          maxLength: 3
           description: Return settlement date
-          example: "200102"
+          example: "165"
         returnReasonCode:
           type: string
+          maxLength: 2
           description: |
             Original return reason code (2-character numeric portion as stored on the contested addenda, e.g. "01" for R01).
           example: "01"
         traceNumber:
           type: string
+          maxLength: 15
           description: Unique Trace Number for the contested dishonored return
           example: "214874812"
         lineNumber:
