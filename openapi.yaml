@@ -1510,7 +1510,6 @@ components:
         typeCode:
           type: string
           maxLength: 2
-          enum: ["02"]
           description: 02 - NACHA regulations
           example: "02"
         referenceInformationOne:
@@ -1594,7 +1593,6 @@ components:
         typeCode:
           type: string
           maxLength: 2
-          enum: ["05"]
           description: 05 - NACHA regulations
           example: "05"
         paymentRelatedInformation:
@@ -1634,7 +1632,6 @@ components:
         typeCode:
           type: string
           maxLength: 2
-          enum: ["10"]
           description: 10 - NACHA regulations
           example: "10"
         transactionTypeCode:
@@ -1708,7 +1705,6 @@ components:
         typeCode:
           type: string
           maxLength: 2
-          enum: ["11"]
           description: 11 - NACHA regulations
           example: "11"
         originatorName:
@@ -1748,7 +1744,6 @@ components:
         typeCode:
           type: string
           maxLength: 2
-          enum: ["12"]
           description: 12 - NACHA regulations
           example: "12"
         originatorCityStateProvince:
@@ -1794,7 +1789,6 @@ components:
         typeCode:
           type: string
           maxLength: 2
-          enum: ["13"]
           description: 13 - NACHA regulations
           example: "13"
         ODFIName:
@@ -1865,7 +1859,6 @@ components:
         typeCode:
           type: string
           maxLength: 2
-          enum: ["14"]
           description: 14 - NACHA regulations
           example: "14"
         RDFIName:
@@ -1930,7 +1923,6 @@ components:
         typeCode:
           type: string
           maxLength: 2
-          enum: ["15"]
           description: 15 - NACHA regulations
           example: "15"
         receiverIDNumber:
@@ -1970,7 +1962,6 @@ components:
         typeCode:
           type: string
           maxLength: 2
-          enum: ["16"]
           description: 16 - NACHA regulations
           example: "16"
         receiverCityStateProvince:
@@ -2017,7 +2008,6 @@ components:
         typeCode:
           type: string
           maxLength: 2
-          enum: ["17"]
           description: 17 - NACHA regulations
           example: "17"
         paymentRelatedInformation:
@@ -2058,7 +2048,6 @@ components:
         typeCode:
           type: string
           maxLength: 2
-          enum: ["18"]
           description: 18 - NACHA regulations
           example: "18"
         foreignCorrespondentBankName:
@@ -2121,7 +2110,6 @@ components:
         typeCode:
           type: string
           maxLength: 2
-          enum: ["98"]
           description: 98 - NACHA regulations
           example: "98"
         changeCode:
@@ -2192,11 +2180,11 @@ components:
         typeCode:
           type: string
           maxLength: 2
-          enum: ["98"]
           description: 98 - NACHA regulations
           example: "98"
         refusedChangeCode:
           type: string
+          maxLength: 3
           description: |
             The code specifying why the Notification of Change is being refused.
             C61 - Misrouted Notification of Change |
@@ -2228,12 +2216,14 @@ components:
           example: "198424892"
         changeCode:
           type: string
+          maxLength: 3
           description: |
             ChangeCode field contains a standard code used by an ACH Operator or RDFI to describe the reason for a change Entry.
             See Addenda98.changeCode for the full list of values.
           example: C01
         traceSequenceNumber:
           type: string
+          maxLength: 7
           description: The last seven digits of the TraceNumber in the original Notification of Change.
         traceNumber:
           type: string
@@ -2262,7 +2252,6 @@ components:
         typeCode:
           type: string
           maxLength: 2
-          enum: ["99"]
           description: 99 - NACHA regulations
           example: "99"
         returnCode:
@@ -2320,7 +2309,6 @@ components:
         typeCode:
           type: string
           maxLength: 2
-          enum: ["99"]
           description: 99 - NACHA regulations
           example: "99"
         originalEntryTraceNumber:
@@ -2341,7 +2329,7 @@ components:
         returnSettlementDate:
           type: string
           maxLength: 3
-          description: Return settlement date
+          description: Return settlement date (Julian DDD, 001-366)
           example: "179"
         returnReasonCode:
           type: string
@@ -2392,7 +2380,6 @@ components:
         typeCode:
           type: string
           maxLength: 2
-          enum: ["99"]
           description: 99 - NACHA regulations
           example: "99"
         contestedReturnCode:
@@ -2417,7 +2404,7 @@ components:
           type: string
           maxLength: 2
           description: |
-            Return reason code of the Dishonored Return:
+            Dishonored return reason code (2-character numeric portion as stored on the contested addenda, e.g. "67" for R67):
             R61 - Misrouted Return |
             R62 - Return of Erroneous or Reversing Debt |
             R67 - Duplicate Return |
@@ -2433,7 +2420,7 @@ components:
         dishonoredReturnSettlementDate:
           type: string
           maxLength: 3
-          description: Settlement date of the Dishonored Return
+          description: Settlement date of the Dishonored Return (Julian DDD, 001-366)
           example: "166"
         originalEntryTraceNumber:
           type: string
@@ -2448,7 +2435,7 @@ components:
         originalSettlementDate:
           type: string
           maxLength: 3
-          description: Original date of settlement
+          description: Original date of settlement (Julian DDD, 001-366)
           example: "164"
         returnTraceNumber:
           type: string
@@ -2458,7 +2445,7 @@ components:
         returnSettlementDate:
           type: string
           maxLength: 3
-          description: Return settlement date
+          description: Return settlement date (Julian DDD, 001-366)
           example: "165"
         returnReasonCode:
           type: string
