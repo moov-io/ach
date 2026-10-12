@@ -83,6 +83,10 @@ UnequalServiceClassCode bool `json:"unequalServiceClassCode"`
 // AllowUnorderedBatchNumebrs allows a file to be read with unordered batch numbers.
 AllowUnorderedBatchNumbers bool `json:"allowUnorderedBatchNumbers"`
 
+// PreserveBatchNumbers tells File.Create to leave each batch's BatchNumber as-is
+// instead of assigning 1, 2, 3, ... in write order.
+PreserveBatchNumbers bool `json:"preserveBatchNumbers"`
+
 // UnequalAddendaCounts skips checking that Addenda Count fields match their expected and computed values.
 UnequalAddendaCounts bool `json:"unequalAddendaCounts"`
 

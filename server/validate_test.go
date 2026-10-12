@@ -43,3 +43,12 @@ func TestReadValidateOpts(t *testing.T) {
 	require.True(t, opts.AllowInvalidCheckDigit)
 	require.True(t, opts.SkipBatchHeaderCompanyValidation)
 }
+
+func TestReadValidateOpts_PreserveBatchNumbers(t *testing.T) {
+	req, err := http.NewRequest("POST", "/files/create?preserveBatchNumbers=true", strings.NewReader("{}"))
+	require.NoError(t, err)
+
+	_, opts, err := readValidateOpts(req)
+	require.NoError(t, err)
+	require.True(t, opts.PreserveBatchNumbers)
+}

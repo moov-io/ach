@@ -776,9 +776,8 @@ func (f *File) Create() error {
 		totalCreditAmount := 0
 
 		for i, batch := range f.Batches {
-			// create ascending batch numbers unless batch number has been provided
-			header := f.Batches[i].GetHeader()
-			if header != nil && assignCreatedBatchNumber(&header.BatchNumber, &header.createdBatchNumber, batchSeq) {
+			if !f.preserveBatchNumbers() {
+				f.Batches[i].GetHeader().BatchNumber = batchSeq
 				f.Batches[i].GetControl().BatchNumber = batchSeq
 			}
 			batchSeq++
@@ -792,9 +791,8 @@ func (f *File) Create() error {
 			totalCreditAmount = totalCreditAmount + batch.GetControl().TotalCreditEntryDollarAmount
 		}
 		for i, iatBatch := range f.IATBatches {
-			// create ascending batch numbers unless batch number has been provided
-			header := f.IATBatches[i].GetHeader()
-			if header != nil && assignCreatedBatchNumber(&header.BatchNumber, &header.createdBatchNumber, batchSeq) {
+			if !f.preserveBatchNumbers() {
+				f.IATBatches[i].GetHeader().BatchNumber = batchSeq
 				f.IATBatches[i].GetControl().BatchNumber = batchSeq
 			}
 			batchSeq++
@@ -835,26 +833,8 @@ func (f *File) Create() error {
 	return nil
 }
 
-// assignCreatedBatchNumber writes seq onto a batch when the current number is
-// unset (0 or 1) or is the number an earlier File.Create wrote.
-//
-// Create keeps a number above 1 because the caller may have set it. A number
-// Create assigned is rewritten on a later call so a batch added after the first
-// Create does not take a number a later batch already holds. The writer emits
-// IAT batches after all other batches, so that later batch is often an IAT batch.
-func assignCreatedBatchNumber(batchNumber *int, created **int, seq int) bool {
-	if batchNumber == nil || created == nil {
-		return false
-	}
-	if *batchNumber > 1 && (*created == nil || *batchNumber != **created) {
-		return false
-	}
-	*batchNumber = seq
-	if *created == nil {
-		*created = new(int)
-	}
-	**created = seq
-	return true
+func (f *File) preserveBatchNumbers() bool {
+	return f.validateOpts != nil && f.validateOpts.PreserveBatchNumbers
 }
 
 // AddBatch appends a Batch to the ach.File
@@ -998,6 +978,10 @@ type ValidateOpts struct {
 	// AllowUnorderedBatchNumebrs allows a file to be read with unordered batch numbers.
 	AllowUnorderedBatchNumbers bool `json:"allowUnorderedBatchNumbers"`
 
+	// PreserveBatchNumbers tells File.Create to leave each batch's BatchNumber as-is
+	// instead of assigning 1, 2, 3, ... in write order.
+	PreserveBatchNumbers bool `json:"preserveBatchNumbers"`
+
 	// AllowInvalidCheckDigit allows the CheckDigit field in EntryDetail to differ from
 	// the expected calculation
 	AllowInvalidCheckDigit bool `json:"allowInvalidCheckDigit"`
@@ -1054,6 +1038,7 @@ func (v *ValidateOpts) merge(other *ValidateOpts) *ValidateOpts {
 		CustomReturnCodes:                v.CustomReturnCodes || other.CustomReturnCodes,
 		UnequalServiceClassCode:          v.UnequalServiceClassCode || other.UnequalServiceClassCode,
 		AllowUnorderedBatchNumbers:       v.AllowUnorderedBatchNumbers || other.AllowUnorderedBatchNumbers,
+		PreserveBatchNumbers:             v.PreserveBatchNumbers || other.PreserveBatchNumbers,
 		AllowInvalidCheckDigit:           v.AllowInvalidCheckDigit || other.AllowInvalidCheckDigit,
 		UnequalAddendaCounts:             v.UnequalAddendaCounts || other.UnequalAddendaCounts,
 		PreserveSpaces:                   v.PreserveSpaces || other.PreserveSpaces,
@@ -1346,8 +1331,8 @@ func (f *File) createFileADV() error {
 			return ErrFileADVOnly
 		}
 
-		header := f.Batches[i].GetHeader()
-		if header != nil && assignCreatedBatchNumber(&header.BatchNumber, &header.createdBatchNumber, batchSeq) {
+		if !f.preserveBatchNumbers() {
+			f.Batches[i].GetHeader().BatchNumber = batchSeq
 			f.Batches[i].GetADVControl().BatchNumber = batchSeq
 		}
 		batchSeq++

@@ -26,6 +26,16 @@ func TestUnorderedBatches(t *testing.T) {
 	server.Handler.ServeHTTP(w, req)
 	w.Flush()
 
+	// Create assigns 1, 2, 3, ... so the file is accepted.
+	require.Equal(t, http.StatusOK, w.Code)
+
+	// PreserveBatchNumbers keeps 2, 1 and Validate fails without AllowUnordered.
+	w = httptest.NewRecorder()
+	req = httptest.NewRequest("POST", "/files/create?preserveBatchNumbers=true", bytes.NewReader(bs))
+	req.Header.Set("Content-Type", "application/json")
+	server.Handler.ServeHTTP(w, req)
+	w.Flush()
+
 	require.Equal(t, http.StatusInternalServerError, w.Code)
 	require.Contains(t, w.Body.String(), "Batch numbers must be in ascending order")
 
