@@ -170,9 +170,6 @@ type IATBatchHeader struct {
 
 	// validateOpts defines optional overrides for record validation
 	validateOpts *ValidateOpts
-
-	// createdBatchNumber is the last batch number File.Create assigned to this header.
-	createdBatchNumber *int
 }
 
 const (

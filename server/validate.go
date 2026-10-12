@@ -44,6 +44,7 @@ const (
 	unequalServiceClassCode          = "unequalServiceClassCode"
 	unorderedBatchNumbers            = "unorderedBatchNumbers"
 	allowUnorderedBatchNumbers       = "allowUnorderedBatchNumbers"
+	preserveBatchNumbers             = "preserveBatchNumbers"
 	allowInvalidCheckDigit           = "allowInvalidCheckDigit"
 	unequalAddendaCounts             = "unequalAddendaCounts"
 	preserveSpaces                   = "preserveSpaces"
@@ -77,6 +78,7 @@ func readValidateOpts(request *http.Request) (io.ReadCloser, *ach.ValidateOpts, 
 		unequalServiceClassCode,
 		unorderedBatchNumbers,
 		allowUnorderedBatchNumbers,
+		preserveBatchNumbers,
 		allowInvalidCheckDigit,
 		unequalAddendaCounts,
 		preserveSpaces,
@@ -136,6 +138,8 @@ func readValidateOpts(request *http.Request) (io.ReadCloser, *ach.ValidateOpts, 
 			opts.UnequalServiceClassCode = yes
 		case unorderedBatchNumbers, allowUnorderedBatchNumbers:
 			opts.AllowUnorderedBatchNumbers = yes
+		case preserveBatchNumbers:
+			opts.PreserveBatchNumbers = yes
 		case allowInvalidCheckDigit:
 			opts.AllowInvalidCheckDigit = yes
 		case unequalAddendaCounts:

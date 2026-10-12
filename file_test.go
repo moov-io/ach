@@ -2214,6 +2214,7 @@ func TestFile__AscendingBatchSequence(t *testing.T) {
 				file.AddBatch(mockBatch)
 			}
 
+			file.SetValidation(&ValidateOpts{PreserveBatchNumbers: true})
 			if err := file.Create(); err != nil {
 				t.Fatal(err)
 			}
@@ -2277,8 +2278,111 @@ func TestFile__CreateAgainAfterAddBatch(t *testing.T) {
 		require.NoError(t, file.Create())
 
 		headers, controls := batchNumbers(file)
+		require.Equal(t, []int{1, 2, 3}, headers)
+		require.Equal(t, []int{1, 2, 3}, controls)
+	})
+
+	t.Run("PreserveBatchNumbers keeps caller numbers", func(t *testing.T) {
+		file := NewFile().SetHeader(mockFileHeader())
+		file.SetValidation(&ValidateOpts{PreserveBatchNumbers: true})
+		for _, number := range []int{5, 7} {
+			batch := mockBatchPPD(t)
+			batch.GetHeader().BatchNumber = number
+			batch.GetControl().BatchNumber = number
+			file.AddBatch(batch)
+		}
+		iatBatch := mockIATBatch(t)
+		iatBatch.GetHeader().BatchNumber = 9
+		iatBatch.GetControl().BatchNumber = 9
+		file.AddIATBatch(iatBatch)
+		require.NoError(t, file.Create())
+		require.NoError(t, file.Create())
+
+		headers, controls := batchNumbers(file)
 		require.Equal(t, []int{5, 7, 9}, headers)
 		require.Equal(t, []int{5, 7, 9}, controls)
+	})
+
+	t.Run("JSON clone then add batch", func(t *testing.T) {
+		file := NewFile().SetHeader(mockFileHeader())
+		file.AddBatch(mockBatchPPD(t))
+		file.AddIATBatch(mockIATBatch(t))
+		require.NoError(t, file.Create())
+
+		bs, err := json.Marshal(file)
+		require.NoError(t, err)
+		cloned, err := FileFromJSONWith(bs, &ValidateOpts{SkipAll: true})
+		require.NoError(t, err)
+
+		cloned.AddBatch(mockBatchPPD(t))
+		require.NoError(t, cloned.Create())
+
+		headers, controls := batchNumbers(cloned)
+		require.Equal(t, []int{1, 2, 3}, headers)
+		require.Equal(t, []int{1, 2, 3}, controls)
+	})
+
+	t.Run("default batch number 1 compacted", func(t *testing.T) {
+		file := NewFile().SetHeader(mockFileHeader())
+		file.AddBatch(mockBatchPPD(t))
+		file.AddBatch(mockBatchPPD(t))
+		file.AddIATBatch(mockIATBatch(t))
+		require.NoError(t, file.Create())
+
+		headers, controls := batchNumbers(file)
+		require.Equal(t, []int{1, 2, 3}, headers)
+		require.Equal(t, []int{1, 2, 3}, controls)
+	})
+
+	t.Run("read files then add batch", func(t *testing.T) {
+		ppd, err := ReadFile(filepath.Join("test", "testdata", "ppd-debit.ach"))
+		require.NoError(t, err)
+		iat, err := ReadFile(filepath.Join("test", "testdata", "iat-debit.ach"))
+		require.NoError(t, err)
+		extra, err := ReadFile(filepath.Join("test", "testdata", "ppd-mixedDebitCredit.ach"))
+		require.NoError(t, err)
+
+		file := NewFile().SetHeader(ppd.Header)
+		file.AddBatch(ppd.Batches[0])
+		file.AddIATBatch(iat.IATBatches[0])
+		file.AddBatch(extra.Batches[0])
+		require.NoError(t, file.Create())
+
+		headers, controls := batchNumbers(file)
+		require.Equal(t, []int{1, 2, 3}, headers)
+		require.Equal(t, []int{1, 2, 3}, controls)
+	})
+
+	t.Run("parsed descending batch numbers", func(t *testing.T) {
+		file := NewFile().SetHeader(mockFileHeader())
+		for _, number := range []int{3, 2, 1} {
+			batch := mockBatchPPD(t)
+			batch.GetHeader().BatchNumber = number
+			batch.GetControl().BatchNumber = number
+			file.AddBatch(batch)
+		}
+		require.NoError(t, file.Create())
+
+		headers, controls := batchNumbers(file)
+		require.Equal(t, []int{1, 2, 3}, headers)
+		require.Equal(t, []int{1, 2, 3}, controls)
+	})
+
+	t.Run("PreserveBatchNumbers keeps descending numbers", func(t *testing.T) {
+		file := NewFile().SetHeader(mockFileHeader())
+		file.SetValidation(&ValidateOpts{PreserveBatchNumbers: true, AllowUnorderedBatchNumbers: true})
+		for _, number := range []int{3, 2, 1} {
+			batch := mockBatchPPD(t)
+			batch.GetHeader().BatchNumber = number
+			batch.GetControl().BatchNumber = number
+			file.AddBatch(batch)
+		}
+		require.NoError(t, file.Create())
+
+		headers, controls := batchNumbers(file)
+		require.Equal(t, []int{3, 2, 1}, headers)
+		require.Equal(t, []int{3, 2, 1}, controls)
+		require.NoError(t, file.Validate())
 	})
 }
 

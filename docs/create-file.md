@@ -59,6 +59,7 @@ Example: `POST /files/create?requireABAOrigin=true&bypassDestination=true`
 | `bypassOriginValidation`           | `BypassOriginValidation`           |
 | `customReturnCodes`                | `CustomReturnCodes`                |
 | `customTraceNumbers`               | `CustomTraceNumbers`               |
+| `preserveBatchNumbers`             | `PreserveBatchNumbers`             |
 | `preserveSpaces`                   | `PreserveSpaces`                   |
 | `requireABAOrigin`                 | `RequireABAOrigin`                 |
 | `skipAll`                          | `SkipAll`                          |
