@@ -20,7 +20,6 @@ package ach
 import (
 	"bytes"
 	"io"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -326,24 +325,22 @@ func testPPDIATWrite(t testing.TB) {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	w := NewWriter(os.Stdout)
+	var out bytes.Buffer
+	w := NewWriter(&out)
 	if err := w.Write(file); err != nil {
 		t.Fatalf("Unexpected error: %s\n", err)
 	}
-	w.Flush()
+	if err := w.Flush(); err != nil {
+		t.Fatalf("flush: %s", err)
+	}
+	if out.Len() == 0 {
+		t.Fatal("expected writer output")
+	}
 }
 
 // TestPPDIATWrite tests writing a IAT ACH file
 func TestPPDIATWrite(t *testing.T) {
 	testPPDIATWrite(t)
-}
-
-// BenchmarkPPDIATWrite benchmarks validating writing an ACH file which contain PPD and IAT entries
-func BenchmarkPPDIATWrite(b *testing.B) {
-	b.ReportAllocs()
-	for i := 0; i < b.N; i++ {
-		testPPDIATWrite(b)
-	}
 }
 
 // testIATReturn writes a IAT ACH Return file
@@ -389,11 +386,17 @@ func testIATReturn(t testing.TB) {
 		t.Errorf("%T: %s", err, err)
 	}
 
-	w := NewWriter(os.Stdout)
+	var out bytes.Buffer
+	w := NewWriter(&out)
 	if err := w.Write(file); err != nil {
 		t.Fatalf("Unexpected error: %s\n", err)
 	}
-	w.Flush()
+	if err := w.Flush(); err != nil {
+		t.Fatalf("flush: %s", err)
+	}
+	if out.Len() == 0 {
+		t.Fatal("expected writer output")
+	}
 }
 
 // TestIATReturn tests writing a IAT ACH Return file

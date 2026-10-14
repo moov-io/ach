@@ -164,11 +164,20 @@ func TestParseStringField(t *testing.T) {
 	testParseStringField(t)
 }
 
+// parseStringFieldSink keeps the parse result live so the compiler cannot drop it.
+var parseStringFieldSink string
+
 // BenchmarkParseStringField benchmark handles spaces in string conversion
 func BenchmarkParseStringField(b *testing.B) {
+	c := converters{}
 	b.ReportAllocs()
+	var result string
 	for i := 0; i < b.N; i++ {
-		testParseStringField(b)
+		result = c.parseStringField(" 012345")
+	}
+	parseStringFieldSink = result
+	if parseStringFieldSink != "012345" {
+		b.Errorf("Trim spaces: '%v'", parseStringFieldSink)
 	}
 }
 
