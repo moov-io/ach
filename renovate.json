@@ -30,6 +30,16 @@
       ],
       "groupName": "docker major",
       "automerge": false
+    },
+    {
+      "description": "Pin bench.yml to ubuntu-24.04 so nightly samples stay comparable",
+      "matchFileNames": [
+        ".github/workflows/bench.yml"
+      ],
+      "matchPackageNames": [
+        "ubuntu"
+      ],
+      "enabled": false
     }
   ],
   "platformAutomerge": true
