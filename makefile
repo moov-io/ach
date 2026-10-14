@@ -56,7 +56,8 @@ BENCH_REGEX := ^(BenchmarkBuildFile|Benchmark_ReadLargeFile|BenchmarkPPDDebitRea
 
 .PHONY: bench
 bench:
-	go test . -count=1 -run '^$$' -bench '$(BENCH_REGEX)' -benchmem | tee output.txt
+	go test . -count=6 -cpu=2 -run '^$$' -bench '$(BENCH_REGEX)' -benchmem > output.raw.txt
+	python3 scripts/bench-median.py output.raw.txt | tee output.txt
 
 check-openapi:
 	docker run \

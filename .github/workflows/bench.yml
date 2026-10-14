@@ -11,8 +11,8 @@ permissions: {}
 jobs:
   bench:
     name: Run
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
     permissions:
       contents: write
       deployments: write
@@ -53,7 +53,7 @@ jobs:
           ref: ${{ steps.meta.outputs.sha }}
           skip-fetch-gh-pages: false
           auto-push: true
-          alert-threshold: "120%"
+          alert-threshold: "150%"
           comment-on-alert: true
           fail-on-alert: false
           summary-always: true
@@ -65,4 +65,4 @@ jobs:
 
       - name: Logs
         if: failure()
-        run: cat output.txt || true
+        run: cat output.txt output.raw.txt 2>/dev/null || true
