@@ -971,6 +971,10 @@ type ValidateOpts struct {
 	// This allows for non-standard/deprecated return codes (e.g. R97)
 	CustomReturnCodes bool `json:"customReturnCodes"`
 
+	// CustomTransactionTypeCodes allows non-standard values for an IAT entry's
+	// Addenda10.TransactionTypeCode field
+	CustomTransactionTypeCodes bool `json:"customTransactionTypeCodes"`
+
 	// UnequalServiceClassCode skips equality checks for the ServiceClassCode in each pair of BatchHeader
 	// and BatchControl records.
 	UnequalServiceClassCode bool `json:"unequalServiceClassCode"`
@@ -1036,6 +1040,7 @@ func (v *ValidateOpts) merge(other *ValidateOpts) *ValidateOpts {
 		AllowMissingFileControl:          v.AllowMissingFileControl || other.AllowMissingFileControl,
 		BypassCompanyIdentificationMatch: v.BypassCompanyIdentificationMatch || other.BypassCompanyIdentificationMatch,
 		CustomReturnCodes:                v.CustomReturnCodes || other.CustomReturnCodes,
+		CustomTransactionTypeCodes:       v.CustomTransactionTypeCodes || other.CustomTransactionTypeCodes,
 		UnequalServiceClassCode:          v.UnequalServiceClassCode || other.UnequalServiceClassCode,
 		AllowUnorderedBatchNumbers:       v.AllowUnorderedBatchNumbers || other.AllowUnorderedBatchNumbers,
 		PreserveBatchNumbers:             v.PreserveBatchNumbers || other.PreserveBatchNumbers,

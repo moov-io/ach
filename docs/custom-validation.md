@@ -142,6 +142,14 @@ CustomReturnCodes bool `json:"customReturnCodes"`
 AllowSpecialCharacters bool `json:"allowSpecialCharacters"`
 ```
 
+### IAT
+
+```
+// CustomTransactionTypeCodes allows non-standard values for an IAT entry's
+// Addenda10.TransactionTypeCode field
+CustomTransactionTypeCodes bool `json:"customTransactionTypeCodes"`
+```
+
 ### Parsing
 
 ```

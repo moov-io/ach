@@ -170,8 +170,10 @@ func (addenda10 *Addenda10) Validate() error {
 	if addenda10.TypeCode != "10" {
 		return fieldError("TypeCode", ErrAddendaTypeCode, addenda10.TypeCode)
 	}
-	if err := addenda10.isTransactionTypeCode(addenda10.TransactionTypeCode); err != nil {
-		return fieldError("TransactionTypeCode", err, addenda10.TransactionTypeCode)
+	if addenda10.validateOpts == nil || !addenda10.validateOpts.CustomTransactionTypeCodes {
+		if err := addenda10.isTransactionTypeCode(addenda10.TransactionTypeCode); err != nil {
+			return fieldError("TransactionTypeCode", err, addenda10.TransactionTypeCode)
+		}
 	}
 	if addenda10.validateOpts == nil || !addenda10.validateOpts.AllowSpecialCharacters {
 		// ToDo: Foreign Payment Amount blank ?

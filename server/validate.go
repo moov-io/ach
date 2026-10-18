@@ -41,6 +41,7 @@ const (
 	allowMissingFileControl          = "allowMissingFileControl"
 	bypassCompanyIdentificationMatch = "bypassCompanyIdentificationMatch"
 	customReturnCodes                = "customReturnCodes"
+	customTransactionTypeCodes       = "customTransactionTypeCodes"
 	unequalServiceClassCode          = "unequalServiceClassCode"
 	unorderedBatchNumbers            = "unorderedBatchNumbers"
 	allowUnorderedBatchNumbers       = "allowUnorderedBatchNumbers"
@@ -75,6 +76,7 @@ func readValidateOpts(request *http.Request) (io.ReadCloser, *ach.ValidateOpts, 
 		allowMissingFileControl,
 		bypassCompanyIdentificationMatch,
 		customReturnCodes,
+		customTransactionTypeCodes,
 		unequalServiceClassCode,
 		unorderedBatchNumbers,
 		allowUnorderedBatchNumbers,
@@ -134,6 +136,8 @@ func readValidateOpts(request *http.Request) (io.ReadCloser, *ach.ValidateOpts, 
 			opts.BypassCompanyIdentificationMatch = yes
 		case customReturnCodes:
 			opts.CustomReturnCodes = yes
+		case customTransactionTypeCodes:
+			opts.CustomTransactionTypeCodes = yes
 		case unequalServiceClassCode:
 			opts.UnequalServiceClassCode = yes
 		case unorderedBatchNumbers, allowUnorderedBatchNumbers:

@@ -152,9 +152,19 @@ func testAddenda10TransactionTypeCode(t testing.TB) {
 	}
 }
 
+func testAddenda10CustomTransactionTypeCode(t testing.TB) {
+	addenda10 := mockAddenda10()
+	addenda10.TransactionTypeCode = "PAY"
+	addenda10.SetValidation(&ValidateOpts{CustomTransactionTypeCodes: true})
+	if err := addenda10.Validate(); err != nil {
+		t.Error("Custom transaction type code \"PAY\" should have been allowed")
+	}
+}
+
 // TestAddenda10TransactionTypeCode tests validating TransactionTypeCode
 func TestAddenda10TransactionTypeCode(t *testing.T) {
 	testAddenda10TransactionTypeCode(t)
+	testAddenda10CustomTransactionTypeCode(t)
 }
 
 // BenchmarkAddenda10TransactionTypeCode benchmarks validating TransactionTypeCode

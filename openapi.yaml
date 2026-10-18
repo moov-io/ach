@@ -85,6 +85,7 @@ paths:
         - $ref: "#/components/parameters/BypassOrigin"
         - $ref: "#/components/parameters/BypassOriginValidation"
         - $ref: "#/components/parameters/CustomReturnCodes"
+        - $ref: "#/components/parameters/CustomTransactionTypeCodes"
         - $ref: "#/components/parameters/CustomTraceNumbers"
         - $ref: "#/components/parameters/PreserveBatchNumbers"
         - $ref: "#/components/parameters/PreserveSpaces"
@@ -221,6 +222,7 @@ paths:
         - $ref: "#/components/parameters/BypassOrigin"
         - $ref: "#/components/parameters/BypassOriginValidation"
         - $ref: "#/components/parameters/CustomReturnCodes"
+        - $ref: "#/components/parameters/CustomTransactionTypeCodes"
         - $ref: "#/components/parameters/CustomTraceNumbers"
         - $ref: "#/components/parameters/PreserveBatchNumbers"
         - $ref: "#/components/parameters/PreserveSpaces"
@@ -338,6 +340,7 @@ paths:
       - $ref: "#/components/parameters/BypassOrigin"
       - $ref: "#/components/parameters/BypassOriginValidation"
       - $ref: "#/components/parameters/CustomReturnCodes"
+      - $ref: "#/components/parameters/CustomTransactionTypeCodes"
       - $ref: "#/components/parameters/CustomTraceNumbers"
       - $ref: "#/components/parameters/PreserveBatchNumbers"
       - $ref: "#/components/parameters/PreserveSpaces"
@@ -830,6 +833,12 @@ components:
       name: customReturnCodes
       in: query
       description: Optional parameter to configure ImmediateDestination validation
+      schema:
+        type: boolean
+    CustomTransactionTypeCodes:
+      name: customTransactionTypeCodes
+      in: query
+      description: Optional parameter to configure Addenda10 validation
       schema:
         type: boolean
     UnequalServiceClassCode:
@@ -2937,6 +2946,10 @@ components:
           type: boolean
           default: false
           description: Allow for non-standard/deprecated return codes (e.g. R97)
+        customTransactionTypeCodes:
+          type: boolean
+          default: false
+          description: Allow for non-standard transaction type codes for IAT Addenda 10
         unequalServiceClassCode:
           type: boolean
           default: false
