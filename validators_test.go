@@ -131,6 +131,8 @@ func TestValidators__isTransactionTypeCode(t *testing.T) {
 
 	require.NoError(t, v.isTransactionTypeCode("BUS"))
 	require.NoError(t, v.isTransactionTypeCode("tax"))
+	require.NoError(t, v.isTransactionTypeCode("PAY"))
+	require.NoError(t, v.isTransactionTypeCode("pay"))
 
 	require.Error(t, v.isTransactionTypeCode("ZZZ"))
 	require.Error(t, v.isTransactionTypeCode("abc"))

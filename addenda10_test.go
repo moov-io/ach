@@ -157,6 +157,14 @@ func TestAddenda10TransactionTypeCode(t *testing.T) {
 	testAddenda10TransactionTypeCode(t)
 }
 
+func TestAddenda10TransactionTypeCodePAY(t *testing.T) {
+	addenda10 := mockAddenda10()
+	addenda10.TransactionTypeCode = "PAY"
+	if err := addenda10.Validate(); err != nil {
+		t.Errorf("PAY should be a valid TransactionTypeCode: %v", err)
+	}
+}
+
 // BenchmarkAddenda10TransactionTypeCode benchmarks validating TransactionTypeCode
 func BenchmarkAddenda10TransactionTypeCode(b *testing.B) {
 	b.ReportAllocs()
