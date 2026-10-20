@@ -403,7 +403,9 @@ func (v *validator) isTransactionTypeCode(s string) error {
 	case
 		"ANN", "BUS", "DEP", "LOA", "MIS", "MOR",
 		"PEN", "REM", "RLS", "SAL", "TAX",
-		ARC, BOC, IAT, MTE, POP, POS, RCK, SHR, TEL, WEB:
+		ARC, BOC, IAT, MTE, POP, POS, RCK, SHR, TEL, WEB,
+		// PAY is delivered by the Federal Reserve on inbound IAT entries. Nacha does not list it.
+		"PAY":
 		return nil
 	}
 	return ErrTransactionTypeCode

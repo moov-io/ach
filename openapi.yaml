@@ -1651,7 +1651,8 @@ components:
             RCK - Re-presented Check Entry |
             SHR - Shared Network Transaction |
             TEL - Telephone-Initiated Transaction |
-            WEB - Internet-Initiated Transaction
+            WEB - Internet-Initiated Transaction |
+            PAY - delivered by the Federal Reserve on inbound IAT; not listed by Nacha
           example: TEL
         foreignPaymentAmount:
           type: integer
