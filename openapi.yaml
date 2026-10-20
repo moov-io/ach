@@ -1744,6 +1744,12 @@ components:
             Data elements must be separated by an asterisk (*) and must end with a backslash (\\).
           example: |
             US*10036\
+        originatorDateOfBirth:
+          type: string
+          description: |
+            Originator Date of Birth. Optional Nacha 2026 field in positions 74-83. Format YYYY-MM-DD.
+          example: "2025-01-02"
+          maxLength: 10
         entryDetailSequenceNumber:
           type: integer
           description: |
@@ -1943,6 +1949,12 @@ components:
             Data elements must be separated by an asterisk (*) and must end with a backslash (\\).
           example: |
             US*10036\
+        receiverDateOfBirth:
+          type: string
+          description: |
+            Receiver Date of Birth. Optional Nacha 2026 field in positions 74-83. Format YYYY-MM-DD.
+          example: "2025-03-04"
+          maxLength: 10
         entryDetailSequenceNumber:
           type: integer
           description: |
