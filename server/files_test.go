@@ -178,7 +178,7 @@ func TestFiles_CreateWithOffset(t *testing.T) {
 	require.Equal(t, "088888880123460", entries[1].TraceNumber)
 
 	offset := reflect.ValueOf(b).Elem().FieldByName("offset")
-	expected := `&ach.Offset{RoutingNumber:"987654320", AccountNumber:"123123123", AccountType:"checking", Description:"OFFSET"}`
+	expected := `&ach.Offset{RoutingNumber:"987654320", AccountNumber:"123123123", AccountType:"checking", Description:"OFFSET", Addenda05:[]*ach.Addenda05(nil)}`
 	require.Equal(t, expected, fmt.Sprintf("%#v", offset))
 }
 
