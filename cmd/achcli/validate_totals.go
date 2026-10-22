@@ -16,16 +16,19 @@ func validateTotalsFlags() error {
 	if *flagSkipValidation {
 		return errors.New("-validate-totals cannot be combined with -skip-validation")
 	}
-	if *flagVersion || *flagDiff || *flagFix || *flagMerge || *flagFlatten || *flagReformat != "" || *flagUpdateEED != "" ||
+	if *flagVersion || *flagDiff || *flagFix || *flagMerge || *flagFlatten || *flagUpdateEED != "" ||
 		*flagMask || *flagMaskAccounts || *flagMaskCorrectedData || *flagMaskNames || *flagPretty || *flagPrettyAmounts {
 		return errors.New("-validate-totals cannot be combined with version, transformation or presentation flags")
 	}
 	return nil
 }
 
-func validateTotalsFiles(paths []string, opts *ach.ValidateOpts) error {
+func validateTotalsFiles(paths []string, opts *ach.ValidateOpts, reformatAs string) error {
 	if len(paths) == 0 {
 		return errors.New("-validate-totals requires at least one ACH file")
+	}
+	if reformatAs != "" && len(paths) != 1 {
+		return fmt.Errorf("-validate-totals with -reformat requires exactly one ACH file, found %d", len(paths))
 	}
 	if opts != nil {
 		if opts.SkipAll {
@@ -38,31 +41,34 @@ func validateTotalsFiles(paths []string, opts *ach.ValidateOpts) error {
 
 	var failures []error
 	for _, path := range paths {
-		if err := validateTotalsFile(path, opts); err != nil {
+		file, err := validateTotalsFile(path, opts)
+		if err != nil {
 			failures = append(failures, err)
+		} else if reformatAs != "" {
+			return writeFormat(reformatAs, file)
 		}
 	}
 	return errors.Join(failures...)
 }
 
-func validateTotalsFile(path string, opts *ach.ValidateOpts) error {
+func validateTotalsFile(path string, opts *ach.ValidateOpts) (*ach.File, error) {
 	input, err := readInput(path)
 	if err != nil {
-		return fmt.Errorf("%s: reading input: %w", path, err)
+		return nil, fmt.Errorf("%s: reading input: %w", path, err)
 	}
 	if json.Valid(input) {
-		return fmt.Errorf("%s: -validate-totals accepts raw ACH only; JSON parsing recalculates totals", path)
+		return nil, fmt.Errorf("%s: -validate-totals accepts raw ACH only; JSON parsing recalculates totals", path)
 	}
 	file, err := readACHFile(input, opts)
 	if err != nil {
-		return fmt.Errorf("%s: reading ACH: %w", path, err)
+		return nil, fmt.Errorf("%s: reading ACH: %w", path, err)
 	}
 	// Missing-record options must not waive the presence of original control totals.
 	if file.Control == (ach.FileControl{}) && file.ADVControl == (ach.ADVFileControl{}) {
-		return fmt.Errorf("%s: reading ACH: FileControl: %w", path, ach.ErrFileControl)
+		return nil, fmt.Errorf("%s: reading ACH: FileControl: %w", path, ach.ErrFileControl)
 	}
 	if err := file.ValidateTotals(); err != nil {
-		return fmt.Errorf("%s: validating totals: %w", path, err)
+		return nil, fmt.Errorf("%s: validating totals: %w", path, err)
 	}
-	return nil
+	return file, nil
 }

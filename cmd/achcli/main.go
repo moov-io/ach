@@ -60,11 +60,11 @@ func main() {
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)
 		}
-		if err := validateTotalsFiles(flag.Args(), readValidationOpts(*flagValidateOpts)); err != nil {
+		if err := validateTotalsFiles(flag.Args(), readValidationOpts(*flagValidateOpts), *flagReformat); err != nil {
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)
 		}
-		if *flagVerbose {
+		if *flagVerbose && *flagReformat == "" {
 			fmt.Printf("Validated %d ACH file(s)\n", len(flag.Args()))
 		}
 		return

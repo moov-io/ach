@@ -17,7 +17,10 @@ func reformat(as string, filepath string, validateOpts *ach.ValidateOpts) error 
 	if err != nil {
 		return err
 	}
+	return writeFormat(as, file)
+}
 
+func writeFormat(as string, file *ach.File) error {
 	switch as {
 	case "ach":
 		w := ach.NewWriter(os.Stdout)

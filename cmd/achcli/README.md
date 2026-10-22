@@ -94,13 +94,16 @@ Usage: `achcli -validate opts.json file.ach`
 ```bash
 achcli -validate-totals first.ach second.ach
 achcli -validate-totals -validate opts.json first.ach
+achcli -validate-totals -reformat=json first.ach
 ```
 
 This command reads each original file and checks file and batch counts, entry hashes, and debit and credit totals. It exits with status `0` only when every input passes, or `1` when any input or configuration fails. Flag syntax errors retain status `2`. It reports every failing path and is quiet on success unless `-v` is set. It does not modify inputs or create output files.
 
 Only raw ACH input is supported. JSON is rejected because the existing JSON parser recalculates control totals. The checks come from the reader and `File.ValidateTotals`; they do not recalculate block counts or verify padding consistency.
 
-Validation options still apply to the reader, but a stored file control record is required even when `AllowMissingFileControl` is set. `SkipAll`, `UnequalAddendaCounts` and `-skip-validation` are rejected because they waive validation or count checks. Version, transformation and presentation flags are also rejected: `-version`, `-diff`, `-fix`, `-merge`, `-flatten`, `-reformat`, `-update-eed`, `-mask` and its variants, and `-pretty` and its variants. Help requested after selecting totals mode is a conflict. Existing commands, including ordinary help, keep their current behaviour when `-validate-totals` is absent.
+Validation options still apply to the reader, but a stored file control record is required even when `AllowMissingFileControl` is set. `SkipAll`, `UnequalAddendaCounts` and `-skip-validation` are rejected because they waive validation or count checks. Version, transformation and presentation flags are also rejected: `-version`, `-diff`, `-fix`, `-merge`, `-flatten`, `-update-eed`, `-mask` and its variants, and `-pretty` and its variants. Help requested after selecting totals mode is a conflict. Existing commands, including ordinary help, keep their current behaviour when `-validate-totals` is absent.
+
+With `-reformat`, it takes exactly one file, checks its totals and then writes it to stdout as `ach` or `json`. If the totals fail, only the error is printed. `-v` adds no output.
 
 ### Fixing Files (-fix)
 
