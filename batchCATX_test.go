@@ -19,6 +19,7 @@ package ach
 
 import (
 	"bytes"
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -302,6 +303,63 @@ func TestBatchCATX_OffsetEntryOnReply(t *testing.T) {
 			require.Equal(t, "0012", entries[0].CATXAddendaRecordsField())
 			require.Equal(t, offsetIndividualName, entries[1].IndividualName)
 			require.Equal(t, "OFFS", entries[1].CATXAddendaRecordsField())
+		})
+	}
+}
+
+// A CTX/ATX IndividualName starts with a 4-digit addenda count. FileFromJSON used to treat
+// a 0000 count as missing and add another, cutting the receiving company short.
+func TestBatchCATX_JSONKeepsReceivingCompany(t *testing.T) {
+	secs := []struct {
+		sec    string
+		header func() *BatchHeader
+		entry  func() *EntryDetail
+	}{
+		{CTX, mockBatchCTXHeader, mockCTXEntryDetail},
+		{ATX, mockBatchATXHeader, mockATXEntryDetail},
+	}
+	// loadTwice writes a file with entry, then loads its JSON twice and returns each IndividualName.
+	loadTwice := func(t *testing.T, header *BatchHeader, entry *EntryDetail, individualName string) []string {
+		t.Helper()
+		batch, err := NewBatch(header)
+		require.NoError(t, err)
+		batch.AddEntry(entry)
+		require.NoError(t, batch.Create())
+		file := NewFile()
+		file.SetHeader(mockFileHeader())
+		file.AddBatch(batch)
+		require.NoError(t, file.Create())
+		entry.IndividualName = individualName
+
+		var names []string
+		for range 2 {
+			bs, err := json.Marshal(file)
+			require.NoError(t, err)
+			file, err = FileFromJSON(bs)
+			require.NoError(t, err)
+			names = append(names, file.Batches[0].GetEntries()[0].IndividualName)
+		}
+		return names
+	}
+	for _, sec := range secs {
+		t.Run(sec.sec+" without addenda", func(t *testing.T) {
+			entry := sec.entry()
+			entry.Addenda05 = nil
+			entry.SetCATXAddendaRecords(0)
+			want := entry.IndividualName
+
+			got := loadTwice(t, sec.header(), entry, want)
+			require.Equal(t, []string{want, want}, got)
+		})
+		t.Run(sec.sec+" with addenda and a zero count", func(t *testing.T) {
+			entry := sec.entry()
+			entry.Addenda05 = nil
+			entry.AddAddenda05(mockAddenda05())
+			entry.SetCATXAddendaRecords(1)
+			want := entry.IndividualName
+
+			got := loadTwice(t, sec.header(), entry, "0000"+want[4:])
+			require.Equal(t, []string{want, want}, got)
 		})
 	}
 }

@@ -401,7 +401,8 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 			switch batch.GetHeader().StandardEntryClassCode {
 			case ATX, CTX:
 				addendaIndicator := e.AddendaRecordIndicator
-				addendaField, _ := strconv.Atoi(e.CATXAddendaRecordsField())
+				addendaField, err := strconv.Atoi(e.CATXAddendaRecordsField())
+				hasAddendaField := err == nil
 
 				individualName := e.IndividualName
 
@@ -412,7 +413,8 @@ func (f *File) setBatchesFromJSON(bs []byte) error {
 					e.SetCATXAddendaRecords(addendaField)
 				}
 
-				if addendaField == 0 {
+				// Only a bare receiving company still needs the count prefix.
+				if !hasAddendaField {
 					e.SetCATXReceivingCompany(individualName)
 				}
 			}
