@@ -800,3 +800,28 @@ func TestEntryDetail_UTF8Truncation(t *testing.T) {
 	require.Equal(t, "Testée Samples0", ed.IdentificationNumberField())
 	require.Equal(t, "Testée Samples01", ed.IdentificationNumber)
 }
+
+func TestCATXAddendaCount(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		count   int
+		present bool
+	}{
+		{name: "zero count with company", input: "0000GLOBAL LOGISTICS", count: 0, present: true},
+		{name: "zero count with company padded", input: "0000Receiver Company", count: 0, present: true},
+		{name: "nonzero count with company", input: "0001Other", count: 1, present: true},
+		{name: "count only", input: "0000", count: 0, present: true},
+		{name: "bare company", input: "Test", count: 0, present: false},
+		{name: "short name", input: "AB", count: 0, present: false},
+		{name: "empty", input: "", count: 0, present: false},
+		{name: "letters in count slot", input: "OFFSET", count: 0, present: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			count, present := catxAddendaCount(tt.input)
+			require.Equal(t, tt.present, present)
+			require.Equal(t, tt.count, count)
+		})
+	}
+}

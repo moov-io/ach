@@ -1,0 +1,41 @@
+{
+    "fileHeader": {
+        "immediateDestination": "031300012",
+        "immediateOrigin": "231380104",
+        "fileCreationDate": "190816",
+        "fileCreationTime": "1055",
+        "fileIDModifier": "A",
+        "immediateDestinationName": "Federal Reserve Bank",
+        "immediateOriginName": "My Bank Name",
+        "referenceCode": "12345678"
+    },
+    "batches": [
+        {
+            "batchHeader": {
+                "serviceClassCode": 225,
+                "companyName": "Name on Account",
+                "companyIdentification": "231380104",
+                "standardEntryClassCode": "CTX",
+                "companyEntryDescription": "ACH CTX",
+                "effectiveEntryDate": "190816",
+                "ODFIIdentification": "121042882",
+                "batchNumber": 1
+            },
+            "entryDetails": [
+                {
+                    "transactionCode": 27,
+                    "RDFIIdentification": "23138010",
+                    "checkDigit": "4",
+                    "DFIAccountNumber": "12345678",
+                    "amount": 100000000,
+                    "identificationNumber": "45689033",
+                    "individualName": "0000GLOBAL LOGISTICS",
+                    "discretionaryData": "01",
+                    "addendaRecordIndicator": 0,
+                    "traceNumber": "121042880000001",
+                    "category": "Forward"
+                }
+            ]
+        }
+    ]
+}

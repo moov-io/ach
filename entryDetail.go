@@ -602,6 +602,25 @@ func (ed *EntryDetail) CATXAddendaRecordsField() string {
 	return ed.parseStringField(readRunes(0, 4, ed.IndividualName))
 }
 
+// catxAddendaCount returns Number of Addenda Records when IndividualName already
+// holds the CTX/ATX layout (4 numeric digits in positions 1-4). Zero is a valid count.
+func catxAddendaCount(name string) (int, bool) {
+	if utf8.RuneCountInString(name) < 4 {
+		return 0, false
+	}
+	field := readRunes(0, 4, name)
+	for _, r := range field {
+		if r < '0' || r > '9' {
+			return 0, false
+		}
+	}
+	n, err := strconv.Atoi(field)
+	if err != nil {
+		return 0, false
+	}
+	return n, true
+}
+
 // CATXReceivingCompanyField is used in CTX and ATX files, characters 5-20 of underlying IndividualName field
 func (ed *EntryDetail) CATXReceivingCompanyField() string {
 	if utf8.RuneCountInString(ed.IndividualName) < 4 {
