@@ -197,6 +197,7 @@ func TestValidateTotalsCLI(t *testing.T) {
 		path := write(input.name, input.data)
 		cases = append(cases, testCase{name: input.name, args: []string{"-validate-totals", path}, code: 1, want: []string{path}})
 	}
+	cases = append(cases, testCase{name: "reformat json input", args: []string{"-validate-totals", "-reformat=json", write("reformat-json-input.json", jsonData)}, code: 1, want: []string{"raw ACH only"}, notWant: []string{`"fileHeader"`}})
 	for _, input := range []struct {
 		name string
 		data []byte
