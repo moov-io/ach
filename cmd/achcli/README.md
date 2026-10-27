@@ -44,6 +44,7 @@ EXAMPLES
   achcli -diff first.ach - < second.ach  Diff a file against stdin
   achcli -validate opts.json file.ach  Read an ACH File with the provided ValidateOpts
   achcli -validate-totals file.ach     Validate original raw ACH file and batch control totals
+  achcli -validate-totals -reformat=json file.ach  Write JSON to stdout if original totals pass
   achcli -validate-totals - < file.ach   Validate original control totals from stdin
   achcli -version                      Print the version of achcli (Example: v1.34.0)
   achcli 20060102.ach                  Summarize an ACH file for human readability
@@ -64,7 +65,7 @@ FLAGS
   -update-eed string           Set the EffectiveEntryDate to a new value
   -v                           Print verbose details about each ACH file
   -validate string             Path to config file in json format to enable validation opts
-  -validate-totals              Validate original raw ACH control totals without modifying files
+  -validate-totals              Validate original raw ACH control totals; with -reformat write to stdout if they pass
   -version                     Print moov-io/ach cli version
 ```
 
@@ -94,13 +95,17 @@ Usage: `achcli -validate opts.json file.ach`
 ```bash
 achcli -validate-totals first.ach second.ach
 achcli -validate-totals -validate opts.json first.ach
+achcli -validate-totals -reformat=json first.ach
+achcli -validate-totals -reformat=json - < file.ach
 ```
 
-This command reads each original file and checks file and batch counts, entry hashes, and debit and credit totals. It exits with status `0` only when every input passes, or `1` when any input or configuration fails. Flag syntax errors retain status `2`. It reports every failing path and is quiet on success unless `-v` is set. It does not modify inputs or create output files.
+This command reads each original file and checks file and batch counts, entry hashes, and debit and credit totals. It exits with status `0` only when every input passes, or `1` when any input or configuration fails. Flag syntax errors retain status `2`. Failures print to stdout as `ERROR: <path>: ...`. It reports every failing path. Without `-reformat` it is quiet on success unless `-v` is set, and it does not write output files.
 
 Only raw ACH input is supported. JSON is rejected because the existing JSON parser recalculates control totals. The checks come from the reader and `File.ValidateTotals`; they do not recalculate block counts or verify padding consistency.
 
-Validation options still apply to the reader, but a stored file control record is required even when `AllowMissingFileControl` is set. `SkipAll`, `UnequalAddendaCounts` and `-skip-validation` are rejected because they waive validation or count checks. Version, transformation and presentation flags are also rejected: `-version`, `-diff`, `-fix`, `-merge`, `-flatten`, `-reformat`, `-update-eed`, `-mask` and its variants, and `-pretty` and its variants. Help requested after selecting totals mode is a conflict. Existing commands, including ordinary help, keep their current behaviour when `-validate-totals` is absent.
+Validation options still apply to the reader, but a stored file control record is required even when `AllowMissingFileControl` is set. `SkipAll`, `UnequalAddendaCounts` and `-skip-validation` are rejected because they waive validation or count checks. Version, transformation and presentation flags are also rejected: `-version`, `-diff`, `-fix`, `-merge`, `-flatten`, `-update-eed`, `-mask` and its variants, and `-pretty` and its variants. Help requested after selecting totals mode is a conflict. Existing commands, including ordinary help, keep their current behaviour when `-validate-totals` is absent.
+
+With `-reformat`, it takes exactly one file, checks its totals, and writes the file to stdout as `ach` or `json`. If the totals fail, stdout is only the `ERROR:` line. `-v` does not add a summary line. JSON is the parsed in-memory file, including `validateOpts` when `-validate` was passed. `ach` is rewritten Nacha with LF line endings and 9-padding; `Writer.Write` still runs `File.Validate()`, so a file that passes totals can still fail to emit ACH.
 
 ### Fixing Files (-fix)
 

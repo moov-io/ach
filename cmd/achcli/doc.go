@@ -27,6 +27,7 @@ EXAMPLES
   achcli -diff first.ach - < second.ach  Diff a file against stdin
   achcli -validate opts.json file.ach  Read an ACH File with the provided ValidateOpts
   achcli -validate-totals file.ach     Validate original raw ACH file and batch control totals
+  achcli -validate-totals -reformat=json file.ach  Write JSON to stdout if original totals pass
   achcli -validate-totals - < file.ach   Validate original control totals from stdin
   achcli -version                      Print the version of achcli (Example: %s)
   achcli 20060102.ach                  Summarize an ACH file for human readability

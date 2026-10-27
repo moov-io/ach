@@ -34,7 +34,7 @@ var (
 
 	flagSkipValidation = flag.Bool("skip-validation", false, "Skip all validation checks")
 	flagValidateOpts   = flag.String("validate", "", "Path to config file in json format to enable validation opts")
-	flagValidateTotals = flag.Bool("validate-totals", false, "Validate original raw ACH control totals without modifying files")
+	flagValidateTotals = flag.Bool("validate-totals", false, "Validate original raw ACH control totals; with -reformat write to stdout if they pass")
 
 	// Fix commands
 	flagFix       = flag.Bool("fix", false, "Trigger fix tasks")
@@ -60,11 +60,11 @@ func main() {
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)
 		}
-		if err := validateTotalsFiles(flag.Args(), readValidationOpts(*flagValidateOpts)); err != nil {
+		if err := validateTotalsFiles(flag.Args(), readValidationOpts(*flagValidateOpts), *flagReformat); err != nil {
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)
 		}
-		if *flagVerbose {
+		if *flagVerbose && *flagReformat == "" {
 			fmt.Printf("Validated %d ACH file(s)\n", len(flag.Args()))
 		}
 		return

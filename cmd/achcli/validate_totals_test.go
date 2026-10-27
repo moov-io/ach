@@ -65,10 +65,11 @@ func TestValidateTotalsCLI(t *testing.T) {
 	shortLF := write("short-control-lf.ach", append(append([]byte(nil), shortControl...), '\n'))
 
 	type testCase struct {
-		name string
-		args []string
-		code int
-		want []string
+		name    string
+		args    []string
+		code    int
+		want    []string
+		notWant []string
 	}
 	cases := []testCase{
 		{name: "valid", args: []string{"-validate-totals", valid}},
@@ -126,10 +127,16 @@ func TestValidateTotalsCLI(t *testing.T) {
 			testCase{name: change.field + " default", args: []string{path}, want: []string{"Describing"}},
 		)
 	}
-	for _, flag := range []string{"-version", "-diff", "-fix", "-merge", "-flatten", "-reformat=json", "-update-eed=20260102", "-mask", "-mask.accounts", "-mask.corrections", "-mask.names", "-pretty", "-pretty.amounts", "-skip-validation"} {
+	for _, flag := range []string{"-version", "-diff", "-fix", "-merge", "-flatten", "-update-eed=20260102", "-mask", "-mask.accounts", "-mask.corrections", "-mask.names", "-pretty", "-pretty.amounts", "-skip-validation"} {
 		cases = append(cases, testCase{name: "conflict " + flag, args: []string{"-validate-totals", flag, valid}, code: 1, want: []string{"cannot be combined"}})
 	}
 	cases = append(cases,
+		testCase{name: "reformat json", args: []string{"-validate-totals", "-reformat=json", valid}, want: []string{`"fileHeader"`}},
+		testCase{name: "reformat ach", args: []string{"-validate-totals", "-reformat=ach", valid}, want: []string{"101 ", "9000001"}},
+		testCase{name: "reformat verbose", args: []string{"-validate-totals", "-reformat=json", "-v", valid}, want: []string{`"fileHeader"`}, notWant: []string{"Validated"}},
+		testCase{name: "reformat invalid", args: []string{"-validate-totals", "-reformat=json", invalid}, code: 1, want: []string{invalid, "BatchCount"}, notWant: []string{`"fileHeader"`}},
+		testCase{name: "reformat multiple", args: []string{"-validate-totals", "-reformat=json", valid, valid}, code: 1, want: []string{"exactly one"}},
+		testCase{name: "reformat skip all options", args: []string{"-validate-totals", "-reformat=json", "-validate", skipAll, valid}, code: 1, want: []string{"SkipAll"}},
 		testCase{name: "multiple valid", args: []string{"-validate-totals", valid, valid}},
 		testCase{name: "valid then invalid", args: []string{"-validate-totals", valid, invalid}, code: 1, want: []string{invalid}},
 		testCase{name: "invalid then valid", args: []string{"-validate-totals", invalid, valid}, code: 1, want: []string{invalid}},
@@ -175,6 +182,7 @@ func TestValidateTotalsCLI(t *testing.T) {
 	require.NoError(t, err)
 	require.ErrorContains(t, parsed.ValidateTotals(), "TotalDebitEntryDollarAmount")
 	cases = append(cases, testCase{name: "nested totals with reader bypass", args: []string{"-validate-totals", "-validate", bypassBatch, nestedPath}, code: 1, want: []string{nestedPath, "TotalDebitEntryDollarAmount"}})
+	cases = append(cases, testCase{name: "reformat nested totals with reader bypass", args: []string{"-validate-totals", "-reformat=json", "-validate", bypassBatch, nestedPath}, code: 1, want: []string{"TotalDebitEntryDollarAmount"}, notWant: []string{`"fileHeader"`}})
 
 	jsonData := fixture("test", "testdata", "ppd-valid.json")
 	var document map[string]json.RawMessage
@@ -189,6 +197,7 @@ func TestValidateTotalsCLI(t *testing.T) {
 		path := write(input.name, input.data)
 		cases = append(cases, testCase{name: input.name, args: []string{"-validate-totals", path}, code: 1, want: []string{path}})
 	}
+	cases = append(cases, testCase{name: "reformat json input", args: []string{"-validate-totals", "-reformat=json", write("reformat-json-input.json", jsonData)}, code: 1, want: []string{"raw ACH only"}, notWant: []string{`"fileHeader"`}})
 	for _, input := range []struct {
 		name string
 		data []byte
@@ -249,6 +258,9 @@ func TestValidateTotalsCLI(t *testing.T) {
 			}
 			for _, want := range tc.want {
 				require.Contains(t, string(output), want)
+			}
+			for _, notWant := range tc.notWant {
+				require.NotContains(t, string(output), notWant)
 			}
 			if len(tc.want) == 0 && tc.code == 0 {
 				require.Empty(t, string(output))
