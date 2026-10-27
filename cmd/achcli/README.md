@@ -14,6 +14,7 @@ parsing, and validating ACH files.
 - Flatten batches in ACH files.
 - Validate ACH files with custom options.
 - Check original raw ACH file and batch control totals with `-validate-totals`.
+- Read input from stdin when a path is `-` (describe, `-diff`, `-reformat`, `-validate-totals`). `-fix` writes next to the input file, so it does not support stdin.
 - Fix certain fields in ACH files (e.g., update Effective Entry Date).
 - Pretty-print amounts and other values for better readability.
 
@@ -33,15 +34,17 @@ Ensure your Go environment is set up (Go 1.21+ recommended).
 achcli is a tool for displaying Nacha formatted ACH files in a human readable format.
 
 USAGE
-   achcli [-mask] [-pretty] [-validate opts.json] path/to/file.ach
+   achcli [-mask] [-pretty] [-validate opts.json] file.ach|-
 
 EXAMPLES
   achcli -diff first.ach second.ach    Show the difference between two ACH files
   achcli -mask file.ach                Print file details with personally identifiable information partially removed
   achcli -reformat=json first.ach      Convert an incoming ACH file into another format (options: ach, json)
   achcli -reformat=json - < file.ach   Read the input from stdin instead of a file
+  achcli -diff first.ach - < second.ach  Diff a file against stdin
   achcli -validate opts.json file.ach  Read an ACH File with the provided ValidateOpts
   achcli -validate-totals file.ach     Validate original raw ACH file and batch control totals
+  achcli -validate-totals - < file.ach   Validate original control totals from stdin
   achcli -version                      Print the version of achcli (Example: v1.34.0)
   achcli 20060102.ach                  Summarize an ACH file for human readability
 

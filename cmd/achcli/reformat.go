@@ -6,9 +6,7 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
-	"io"
 	"os"
 
 	"github.com/moov-io/ach"
@@ -36,20 +34,6 @@ func reformat(as string, filepath string, validateOpts *ach.ValidateOpts) error 
 		return fmt.Errorf("unknown format %s", as)
 	}
 	return nil
-}
-
-var stdinRead bool
-
-// readInput reads a file, or stdin when path is "-".
-func readInput(path string) ([]byte, error) {
-	if path != "-" {
-		return os.ReadFile(path)
-	}
-	if stdinRead {
-		return nil, errors.New("stdin (-) can only be read once")
-	}
-	stdinRead = true
-	return io.ReadAll(os.Stdin)
 }
 
 func readIncomingFile(path string, validateOpts *ach.ValidateOpts) (*ach.File, error) {
