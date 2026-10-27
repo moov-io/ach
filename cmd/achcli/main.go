@@ -34,7 +34,7 @@ var (
 
 	flagSkipValidation = flag.Bool("skip-validation", false, "Skip all validation checks")
 	flagValidateOpts   = flag.String("validate", "", "Path to config file in json format to enable validation opts")
-	flagValidateTotals = flag.Bool("validate-totals", false, "Validate original raw ACH control totals without modifying files")
+	flagValidateTotals = flag.Bool("validate-totals", false, "Validate original raw ACH control totals; with -reformat write to stdout if they pass")
 
 	// Fix commands
 	flagFix       = flag.Bool("fix", false, "Trigger fix tasks")
