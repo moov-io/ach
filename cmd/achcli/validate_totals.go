@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 
 	"github.com/moov-io/ach"
 )
@@ -47,7 +46,7 @@ func validateTotalsFiles(paths []string, opts *ach.ValidateOpts) error {
 }
 
 func validateTotalsFile(path string, opts *ach.ValidateOpts) error {
-	input, err := os.ReadFile(path)
+	input, err := readInput(path)
 	if err != nil {
 		return fmt.Errorf("%s: reading input: %w", path, err)
 	}

@@ -13,10 +13,6 @@ import (
 )
 
 func reformat(as string, filepath string, validateOpts *ach.ValidateOpts) error {
-	if _, err := os.Stat(filepath); err != nil {
-		return err
-	}
-
 	file, err := readIncomingFile(filepath, validateOpts)
 	if err != nil {
 		return err
@@ -41,7 +37,7 @@ func reformat(as string, filepath string, validateOpts *ach.ValidateOpts) error 
 }
 
 func readIncomingFile(path string, validateOpts *ach.ValidateOpts) (*ach.File, error) {
-	bs, err := os.ReadFile(path)
+	bs, err := readInput(path)
 	if err != nil {
 		return nil, err
 	}

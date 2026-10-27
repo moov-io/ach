@@ -114,6 +114,10 @@ func main() {
 			fmt.Printf("ERROR: unexpected %d arguments: %#v\n", len(args), args)
 			os.Exit(1)
 		}
+		if err := rejectStdinFix(args[0]); err != nil {
+			fmt.Printf("ERROR: %v\n", err)
+			os.Exit(1)
+		}
 		conf := fix.Config{
 			UpdateEED: *flagUpdateEED,
 		}
