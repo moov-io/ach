@@ -13,8 +13,8 @@ parsing, and validating ACH files.
 - Merge multiple ACH files.
 - Flatten batches in ACH files.
 - Validate ACH files with custom options.
-- Check original raw ACH file and batch control totals with `-validate-totals`.
-- Read input from stdin when a path is `-` (describe, `-diff`, `-reformat`, `-validate-totals`). `-fix` writes next to the input file, so it does not support stdin.
+- Check original raw ACH file and batch control totals with `-validate-totals`, or also run `File.ValidateWith` as the HTTP server does with `-validate-file`.
+- Read input from stdin when a path is `-` (describe, `-diff`, `-reformat`, `-validate-totals`, `-validate-file`). `-fix` writes next to the input file, so it does not support stdin.
 - Fix certain fields in ACH files (e.g., update Effective Entry Date).
 - Pretty-print amounts and other values for better readability.
 
@@ -46,6 +46,7 @@ EXAMPLES
   achcli -validate-totals file.ach     Validate original raw ACH file and batch control totals
   achcli -validate-totals -reformat=json file.ach  Write JSON to stdout if original totals pass
   achcli -validate-totals - < file.ach   Validate original control totals from stdin
+  achcli -validate-file -reformat=json file.ach  Write JSON to stdout if File.ValidateWith passes
   achcli -version                      Print the version of achcli (Example: v1.34.0)
   achcli 20060102.ach                  Summarize an ACH file for human readability
 
@@ -65,6 +66,7 @@ FLAGS
   -update-eed string           Set the EffectiveEntryDate to a new value
   -v                           Print verbose details about each ACH file
   -validate string             Path to config file in json format to enable validation opts
+  -validate-file                Like -validate-totals, but check with File.ValidateWith as the HTTP server's validate endpoint does
   -validate-totals              Validate original raw ACH control totals; with -reformat write to stdout if they pass
   -version                     Print moov-io/ach cli version
 ```
@@ -106,6 +108,15 @@ Only raw ACH input is supported. JSON is rejected because the existing JSON pars
 Validation options still apply to the reader, but a stored file control record is required even when `AllowMissingFileControl` is set. `SkipAll`, `UnequalAddendaCounts` and `-skip-validation` are rejected because they waive validation or count checks. Version, transformation and presentation flags are also rejected: `-version`, `-diff`, `-fix`, `-merge`, `-flatten`, `-update-eed`, `-mask` and its variants, and `-pretty` and its variants. Help requested after selecting totals mode is a conflict. Existing commands, including ordinary help, keep their current behaviour when `-validate-totals` is absent.
 
 With `-reformat`, it takes exactly one file, checks its totals, and writes the file to stdout as `ach` or `json`. If the totals fail, stdout is only the `ERROR:` line. `-v` does not add a summary line. JSON is the parsed in-memory file, including `validateOpts` when `-validate` was passed. `ach` is rewritten Nacha with LF line endings and 9-padding; `Writer.Write` still runs `File.Validate()`, so a file that passes totals can still fail to emit ACH.
+
+### Checking the whole file (-validate-file)
+
+```bash
+achcli -validate-file first.ach second.ach
+achcli -validate-file -reformat=json - < file.ach
+```
+
+This works like `-validate-totals`, with the same inputs, options, exit codes and `-reformat` behaviour, but checks the file with `File.ValidateWith`, which the HTTP server's `/files/{id}/validate` endpoint uses. Beyond the reader's checks, that rejects batch numbers that don't ascend, unless `AllowUnorderedBatchNumbers` or `CustomTraceNumbers` is set.
 
 ### Fixing Files (-fix)
 

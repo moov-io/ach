@@ -35,6 +35,7 @@ var (
 	flagSkipValidation = flag.Bool("skip-validation", false, "Skip all validation checks")
 	flagValidateOpts   = flag.String("validate", "", "Path to config file in json format to enable validation opts")
 	flagValidateTotals = flag.Bool("validate-totals", false, "Validate original raw ACH control totals; with -reformat write to stdout if they pass")
+	flagValidateFile   = flag.Bool("validate-file", false, "Like -validate-totals, but check with File.ValidateWith as the HTTP server's validate endpoint does")
 
 	// Fix commands
 	flagFix       = flag.Bool("fix", false, "Trigger fix tasks")
@@ -46,8 +47,8 @@ func main() {
 	flag.CommandLine.Init(os.Args[0], flag.ContinueOnError)
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		if err == flag.ErrHelp {
-			if *flagValidateTotals {
-				fmt.Println("ERROR: -validate-totals cannot be combined with help")
+			if v, ok := selectedValidation(); ok {
+				fmt.Printf("ERROR: %s cannot be combined with help\n", v.flag)
 				os.Exit(1)
 			}
 			return
@@ -55,12 +56,12 @@ func main() {
 		os.Exit(2)
 	}
 
-	if *flagValidateTotals {
-		if err := validateTotalsFlags(); err != nil {
+	if v, ok := selectedValidation(); ok {
+		if err := validateTotalsFlags(v); err != nil {
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)
 		}
-		if err := validateTotalsFiles(flag.Args(), readValidationOpts(*flagValidateOpts), *flagReformat); err != nil {
+		if err := validateTotalsFiles(v, flag.Args(), readValidationOpts(*flagValidateOpts), *flagReformat); err != nil {
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)
 		}
