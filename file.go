@@ -1121,6 +1121,11 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 			return err
 		}
 	}
+	if !opts.AllowUnorderedBatchNumbers {
+		if err := f.isSequenceAscending(); err != nil {
+			return err
+		}
+	}
 	return f.ValidateTotals()
 }
 
@@ -1629,15 +1634,32 @@ func segmentFileBatchAddADVEntry(creditBatch Batcher, debitBatch Batcher, entry 
 
 // Validates that the batch numbers are ascending
 func (f *File) isSequenceAscending() error {
+	if f.validateOpts != nil && f.validateOpts.CustomTraceNumbers {
+		return nil
+	}
+
 	lastSeq := 0
+	domesticNumbers := make(map[int]bool, len(f.Batches))
 	for _, batch := range f.Batches {
 		current := batch.GetHeader().BatchNumber
-		if f.validateOpts == nil || !f.validateOpts.CustomTraceNumbers {
-			if current <= lastSeq {
-				return NewErrFileBatchNumberAscending(lastSeq, current)
-			}
+		if current <= lastSeq {
+			return NewErrFileBatchNumberAscending(lastSeq, current)
 		}
+		domesticNumbers[current] = true
+		lastSeq = current
+	}
 
+	// The reader keeps IAT batches apart from the others, so their numbers only have to ascend
+	// among themselves and not reuse a domestic batch's number.
+	lastSeq = 0
+	for _, batch := range f.IATBatches {
+		current := batch.GetHeader().BatchNumber
+		if domesticNumbers[current] {
+			return NewErrFileBatchNumberAscending(current, current)
+		}
+		if current <= lastSeq {
+			return NewErrFileBatchNumberAscending(lastSeq, current)
+		}
 		lastSeq = current
 	}
 
