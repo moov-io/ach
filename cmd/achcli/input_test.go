@@ -162,18 +162,23 @@ func TestReadIncomingFileStdin(t *testing.T) {
 func TestValidateTotalsFileStdin(t *testing.T) {
 	t.Run("ach", func(t *testing.T) {
 		setStdinReader(t, bytes.NewReader(testdataBytes(t, "ppd-debit.ach")))
-		_, err := validateTotalsFile("-", nil)
+		_, err := validateTotalsFile(totalsValidation, "-", nil)
 		require.NoError(t, err)
 	})
 	t.Run("json", func(t *testing.T) {
 		setStdinReader(t, bytes.NewReader(testdataBytes(t, "ppd-valid.json")))
-		_, err := validateTotalsFile("-", nil)
+		_, err := validateTotalsFile(totalsValidation, "-", nil)
 		require.Error(t, err)
 		require.ErrorContains(t, err, "raw ACH only")
 	})
+	t.Run("whole file", func(t *testing.T) {
+		setStdinReader(t, bytes.NewReader(testdataBytes(t, "ppd-debit.ach")))
+		_, err := validateTotalsFile(fileValidation, "-", nil)
+		require.NoError(t, err)
+	})
 	t.Run("empty", func(t *testing.T) {
 		setStdinReader(t, bytes.NewReader(nil))
-		_, err := validateTotalsFile("-", nil)
+		_, err := validateTotalsFile(totalsValidation, "-", nil)
 		require.ErrorIs(t, err, errStdinEmpty)
 	})
 }

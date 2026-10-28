@@ -237,6 +237,32 @@ func TestValidateTotalsCLI(t *testing.T) {
 		testCase{name: "mixed PPD IAT BatchCount", args: []string{"-validate-totals", write("bad-mixed.ach", badMixed)}, code: 1, want: []string{"BatchCount"}},
 	)
 
+	// -validate-file runs File.ValidateWith, as the HTTP server's validate endpoint does,
+	// so it also rejects batch numbers that aren't ascending, which -validate-totals allows.
+	multi := fixture("test", "testdata", "flattenBatchesMultipleBatchHeaders.ach")
+	renumber := func(record string) string { return record[:87] + "0000002" }
+	unordered := write("unordered.ach", rewriteACHRecord(t, rewriteACHRecord(t, multi, '5', renumber), '8', renumber))
+	allowUnordered := write("allow-unordered.json", []byte(`{"allowUnorderedBatchNumbers":true}`))
+	cases = append(cases,
+		testCase{name: "file valid", args: []string{"-validate-file", valid}},
+		testCase{name: "file verbose", args: []string{"-validate-file", "-v", valid}, want: []string{"Validated"}},
+		testCase{name: "file multiple batches", args: []string{"-validate-file", write("multi.ach", multi)}},
+		testCase{name: "totals unordered batch numbers", args: []string{"-validate-totals", unordered}},
+		testCase{name: "file unordered batch numbers", args: []string{"-validate-file", unordered}, code: 1, want: []string{unordered, "validating file", "ascending order"}},
+		testCase{name: "file unordered batch numbers allowed", args: []string{"-validate-file", "-validate", allowUnordered, unordered}},
+		testCase{name: "file totals", args: []string{"-validate-file", invalid}, code: 1, want: []string{invalid, "BatchCount"}},
+		testCase{name: "file reformat json", args: []string{"-validate-file", "-reformat=json", valid}, want: []string{`"fileHeader"`}},
+		testCase{name: "file reformat unordered", args: []string{"-validate-file", "-reformat=json", unordered}, code: 1, want: []string{"ascending order"}, notWant: []string{`"fileHeader"`}},
+		testCase{name: "file json input", args: []string{"-validate-file", write("file-json-input.json", jsonData)}, code: 1, want: []string{"-validate-file accepts raw ACH only"}},
+		testCase{name: "file and totals", args: []string{"-validate-file", "-validate-totals", valid}, code: 1, want: []string{"cannot be combined with -validate-file"}},
+		testCase{name: "file help", args: []string{"-validate-file", "-h", valid}, code: 1, want: []string{"-validate-file cannot be combined with help"}},
+		testCase{name: "file conflict", args: []string{"-validate-file", "-diff", valid}, code: 1, want: []string{"-validate-file cannot be combined"}},
+		testCase{name: "file skip validation", args: []string{"-validate-file", "-skip-validation", valid}, code: 1, want: []string{"-validate-file cannot be combined with -skip-validation"}},
+		testCase{name: "file skip all options", args: []string{"-validate-file", "-validate", skipAll, valid}, code: 1, want: []string{"SkipAll"}},
+		testCase{name: "file header only with missing control option", args: []string{"-validate-file", "-validate", missingControl, headerOnly}, code: 1, want: []string{headerOnly, "FileControl"}},
+		testCase{name: "file reformat ach", args: []string{"-validate-file", "-reformat=ach", valid}, want: []string{"101 ", "9000001"}},
+	)
+
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			before, err := os.ReadDir(dir)
@@ -265,7 +291,7 @@ func TestValidateTotalsCLI(t *testing.T) {
 			if len(tc.want) == 0 && tc.code == 0 {
 				require.Empty(t, string(output))
 			}
-			if strings.Contains(strings.Join(tc.args, " "), "-validate-totals") {
+			if strings.Contains(strings.Join(tc.args, " "), "-validate-") {
 				require.NotContains(t, string(output), "Describing")
 			}
 			for path, data := range inputs {
