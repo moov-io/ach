@@ -2232,6 +2232,54 @@ func TestFile__AscendingBatchSequence(t *testing.T) {
 	}
 }
 
+func TestFile__IATBatchNumbersAscendApartFromDomestic(t *testing.T) {
+	tests := []struct {
+		desc          string
+		domestic, iat []int
+		expectedErr   error
+	}{
+		{desc: "IAT batches ascend between domestic batches", domestic: []int{1, 3}, iat: []int{2, 4}},
+		{desc: "IAT batch numbers repeat", domestic: []int{1}, iat: []int{2, 2}, expectedErr: NewErrFileBatchNumberAscending(2, 2)},
+		{desc: "IAT batch numbers descend", domestic: []int{1}, iat: []int{3, 2}, expectedErr: NewErrFileBatchNumberAscending(3, 2)},
+		{desc: "IAT batch reuses a domestic number", domestic: []int{1, 2}, iat: []int{2}, expectedErr: NewErrFileBatchNumberAscending(2, 2)},
+	}
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			file := NewFile()
+			file.SetHeader(mockFileHeader())
+			for _, num := range tt.domestic {
+				batch := mockBatchPPD(t)
+				batch.GetHeader().BatchNumber = num
+				batch.GetControl().BatchNumber = num
+				file.AddBatch(batch)
+			}
+			for _, num := range tt.iat {
+				batch := mockIATBatch(t)
+				batch.GetHeader().BatchNumber = num
+				batch.GetControl().BatchNumber = num
+				file.AddIATBatch(batch)
+			}
+			file.SetValidation(&ValidateOpts{PreserveBatchNumbers: true})
+			require.NoError(t, file.Create())
+
+			require.NoError(t, file.ValidateWith(&ValidateOpts{AllowUnorderedBatchNumbers: true}))
+			require.Equal(t, tt.expectedErr, file.Validate())
+		})
+	}
+}
+
+func TestFile__AscendingBatchSequenceADV(t *testing.T) {
+	file := mockFileADV(t)
+	repeated := mockBatchADV(t)
+	repeated.GetHeader().BatchNumber = file.Batches[0].GetHeader().BatchNumber
+	file.AddBatch(repeated)
+	file.SetValidation(&ValidateOpts{PreserveBatchNumbers: true})
+	require.NoError(t, file.Create())
+
+	require.NoError(t, file.ValidateWith(&ValidateOpts{AllowUnorderedBatchNumbers: true}))
+	require.Equal(t, NewErrFileBatchNumberAscending(1, 1), file.Validate())
+}
+
 func TestFile__CreateAgainAfterAddBatch(t *testing.T) {
 	batchNumbers := func(file *File) (headers, controls []int) {
 		for _, batch := range file.Batches {
