@@ -264,6 +264,14 @@ func TestBatchARCAmount(t *testing.T) {
 	testBatchARCAmount(t)
 }
 
+// TestBatchARCAmountAtLimit validates that an entry of exactly $25,000.00 passes,
+// since Amount is in cents and the ARC limit is inclusive
+func TestBatchARCAmountAtLimit(t *testing.T) {
+	mockBatch := mockBatchARC(t)
+	mockBatch.Entries[0].Amount = 2500000
+	require.NoError(t, mockBatch.Create())
+}
+
 // BenchmarkBatchARCAmount validates BatchARC create for an invalid Amount
 func BenchmarkBatchARCAmount(b *testing.B) {
 	b.ReportAllocs()
