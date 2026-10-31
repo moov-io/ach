@@ -1639,13 +1639,18 @@ func (f *File) isSequenceAscending() error {
 	}
 
 	lastSeq := 0
-	domesticNumbers := make(map[int]bool, len(f.Batches))
+	var domesticNumbers map[int]bool
+	if len(f.IATBatches) > 0 {
+		domesticNumbers = make(map[int]bool, len(f.Batches))
+	}
 	for _, batch := range f.Batches {
 		current := batch.GetHeader().BatchNumber
 		if current <= lastSeq {
 			return NewErrFileBatchNumberAscending(lastSeq, current)
 		}
-		domesticNumbers[current] = true
+		if domesticNumbers != nil {
+			domesticNumbers[current] = true
+		}
 		lastSeq = current
 	}
 
