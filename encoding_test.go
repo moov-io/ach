@@ -21,7 +21,9 @@ import (
 	"bytes"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
+	"unicode/utf8"
 
 	"golang.org/x/net/html/charset"
 
@@ -164,4 +166,26 @@ func TestExtendedCharacters(t *testing.T) {
 		require.Len(t, entries[0].Addenda05, 12)
 		require.Contains(t, entries[0].Addenda05[0].PaymentRelatedInformation, "¦ZZ¦PAYEXPENSEPAY")
 	})
+}
+
+func TestEncodeNachaRecord(t *testing.T) {
+	ascii := strings.Repeat("A", 94)
+	got, err := encodeNachaRecord(ascii)
+	require.NoError(t, err)
+	require.Equal(t, []byte(ascii), got)
+
+	withEAcute := strings.Repeat("A", 93) + "é"
+	require.Equal(t, 95, len(withEAcute))
+	require.Equal(t, 94, utf8.RuneCountInString(withEAcute))
+	got, err = encodeNachaRecord(withEAcute)
+	require.NoError(t, err)
+	require.Equal(t, 94, len(got))
+	require.Equal(t, byte(0xE9), got[93])
+	require.False(t, bytes.Contains(got, []byte{0xC3, 0xA9}))
+
+	_, err = encodeNachaRecord(strings.Repeat("A", 93))
+	require.ErrorIs(t, err, ErrRecordLength)
+
+	_, err = encodeNachaRecord(strings.Repeat("A", 93) + "\u2019")
+	require.ErrorIs(t, err, ErrNonLatin1)
 }
