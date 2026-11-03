@@ -289,15 +289,20 @@ type writeEntry interface {
 }
 
 func (w *Writer) writeLine(entry writeEntry) error {
-
 	line := entry.String()
-
-	_, err := w.w.WriteString(line)
+	encoded, err := encodeNachaRecord(line)
+	if err != nil {
+		if !w.BypassValidation {
+			return err
+		}
+		_, err = w.w.WriteString(line)
+	} else {
+		_, err = w.w.Write(encoded)
+	}
 	if err != nil {
 		return err
 	}
-	_, err = w.w.WriteString(w.LineEnding)
-	if err != nil {
+	if _, err = w.w.WriteString(w.LineEnding); err != nil {
 		return err
 	}
 

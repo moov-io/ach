@@ -37,6 +37,10 @@ var (
 	ErrConstructor = errors.New("is a mandatory field and has a default value, did you use the constructor?")
 	//ErrFieldRequired is given when a field is required
 	ErrFieldRequired = errors.New("is a required field")
+	// ErrRecordLength is given when a Nacha record is not 94 bytes
+	ErrRecordLength = errors.New("record is not 94 bytes")
+	// ErrNonLatin1 is given when a character cannot be encoded as a single-byte Nacha character
+	ErrNonLatin1 = errors.New("character cannot be encoded as a single-byte Nacha character")
 	//ErrServiceClass is given when there's an invalid service class code
 	ErrServiceClass = errors.New("is an invalid Service Class Code")
 	//ErrSECCode is given when there's an invalid standard entry class code

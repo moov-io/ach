@@ -771,3 +771,50 @@ func TestWriteBypassValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestWriter_Latin1Addenda05(t *testing.T) {
+	file := NewFile().SetHeader(mockFileHeader())
+	entry := mockEntryDetail()
+	entry.AddendaRecordIndicator = 1
+	ad := mockAddenda05()
+	ad.PaymentRelatedInformation = "TXP*12345678é*94105*260901*1*100\\"
+	entry.AddAddenda05(ad)
+
+	batch := NewBatchPPD(mockBatchPPDHeader())
+	batch.SetHeader(mockBatchHeader())
+	batch.AddEntry(entry)
+	require.NoError(t, batch.Create())
+	file.AddBatch(batch)
+	require.NoError(t, file.Create())
+	require.NoError(t, file.Validate())
+
+	var buf bytes.Buffer
+	require.NoError(t, NewWriter(&buf).Write(file))
+
+	foundE9 := false
+	for _, line := range bytes.Split(buf.Bytes(), []byte{'\n'}) {
+		if len(line) == 0 {
+			continue
+		}
+		require.Equal(t, 94, len(line))
+		if bytes.Contains(line, []byte{0xE9}) {
+			foundE9 = true
+			require.False(t, bytes.Contains(line, []byte{0xC3, 0xA9}))
+		}
+	}
+	require.True(t, foundE9, "written file must contain Latin-1 é (0xE9)")
+
+	parsed, err := NewReader(bytes.NewReader(buf.Bytes())).Read()
+	require.NoError(t, err)
+	require.Equal(t, ad.PaymentRelatedInformation, parsed.Batches[0].GetEntries()[0].Addenda05[0].PaymentRelatedInformation)
+}
+
+type staticLine string
+
+func (s staticLine) String() string { return string(s) }
+
+func TestWriter_writeLineRejectsNonLatin1(t *testing.T) {
+	w := NewWriter(&bytes.Buffer{})
+	err := w.writeLine(staticLine(strings.Repeat("A", 93) + "\u2019"))
+	require.ErrorIs(t, err, ErrNonLatin1)
+}
