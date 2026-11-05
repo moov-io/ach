@@ -20,6 +20,7 @@ package ach
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"io"
 	"strings"
 )
@@ -290,19 +291,10 @@ type writeEntry interface {
 
 func (w *Writer) writeLine(entry writeEntry) error {
 	line := entry.String()
-	encoded, err := encodeNachaRecord(line)
-	if err != nil {
-		if !w.BypassValidation {
-			return err
-		}
-		_, err = w.w.WriteString(line)
-	} else {
-		_, err = w.w.Write(encoded)
-	}
-	if err != nil {
+	if err := w.writeRecord(line); err != nil {
 		return err
 	}
-	if _, err = w.w.WriteString(w.LineEnding); err != nil {
+	if _, err := w.w.WriteString(w.LineEnding); err != nil {
 		return err
 	}
 
@@ -314,4 +306,27 @@ func (w *Writer) writeLine(entry writeEntry) error {
 	}
 
 	return nil
+}
+
+func (w *Writer) writeRecord(line string) error {
+	// ASCII records are already valid Nacha bytes. WriteString avoids the
+	// []byte copy encodeNachaRecord would make on the identity path.
+	if isASCII(line) {
+		if len(line) != lineLength && !w.BypassValidation {
+			return fmt.Errorf("%w: got %d", ErrRecordLength, len(line))
+		}
+		_, err := w.w.WriteString(line)
+		return err
+	}
+
+	encoded, err := encodeNachaRecord(line)
+	if err != nil {
+		if !w.BypassValidation {
+			return err
+		}
+		_, err = w.w.WriteString(line)
+		return err
+	}
+	_, err = w.w.Write(encoded)
+	return err
 }

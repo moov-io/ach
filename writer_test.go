@@ -813,8 +813,71 @@ type staticLine string
 
 func (s staticLine) String() string { return string(s) }
 
-func TestWriter_writeLineRejectsNonLatin1(t *testing.T) {
-	w := NewWriter(&bytes.Buffer{})
-	err := w.writeLine(staticLine(strings.Repeat("A", 93) + "\u2019"))
-	require.ErrorIs(t, err, ErrNonLatin1)
+func TestWriter_writeLine(t *testing.T) {
+	ascii := strings.Repeat("A", 94)
+	short := strings.Repeat("A", 93)
+	latin1 := short + "é"
+	nonLatin1 := short + "\u2019"
+
+	tests := []struct {
+		name    string
+		line    string
+		bypass  bool
+		wantErr error
+		want    []byte
+	}{
+		{
+			name: "ASCII",
+			line: ascii,
+			want: []byte(ascii + "\n"),
+		},
+		{
+			name:    "wrong length",
+			line:    short,
+			wantErr: ErrRecordLength,
+		},
+		{
+			name:   "bypass wrong length",
+			line:   short,
+			bypass: true,
+			want:   []byte(short + "\n"),
+		},
+		{
+			name: "Latin-1",
+			line: latin1,
+			want: append(append(bytes.Repeat([]byte{'A'}, 93), 0xE9), '\n'),
+		},
+		{
+			name:    "Latin-1 wrong length",
+			line:    strings.Repeat("A", 92) + "é",
+			wantErr: ErrRecordLength,
+		},
+		{
+			name:    "non Latin-1",
+			line:    nonLatin1,
+			wantErr: ErrNonLatin1,
+		},
+		{
+			name:   "bypass non Latin-1",
+			line:   nonLatin1,
+			bypass: true,
+			want:   []byte(nonLatin1 + "\n"),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var buf bytes.Buffer
+			w := NewWriter(&buf)
+			w.BypassValidation = tt.bypass
+			err := w.writeLine(staticLine(tt.line))
+			if tt.wantErr != nil {
+				require.ErrorIs(t, err, tt.wantErr)
+				return
+			}
+			require.NoError(t, err)
+			require.NoError(t, w.Flush())
+			require.Equal(t, tt.want, buf.Bytes())
+		})
+	}
 }
