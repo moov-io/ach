@@ -1,0 +1,35 @@
+# Use https://app.stepsecurity.io/ to improve workflow security
+name: GuardSpine
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  review:
+    name: Review record
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+
+    - name: Produce review record
+      uses: DNYoussef/guardspine-code-action@36d60327349f9928bf306c14a978ab6b371a1930 # v2.7.4
+      with:
+        github_token: ${{ github.token }}
+        ai_review: 'false'
+        post_comment: 'false'
+        fail_on_high_risk: 'false'
+        generate_bundle: 'true'
+
+    - name: Upload review record
+      if: always()
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      with:
+        name: guardspine-review-record
+        path: .guardspine/bundles/
+        if-no-files-found: warn
