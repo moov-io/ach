@@ -112,6 +112,8 @@ func TestReversal_LoanCredit(t *testing.T) {
 	entries = b1.GetEntries()
 	require.Len(t, entries, 1)
 	require.Equal(t, LoanDebit, entries[0].TransactionCode)
+	require.Equal(t, DebitsOnly, b1.GetHeader().ServiceClassCode)
+	require.NoError(t, file.Validate())
 
 	// Reverse the REVERSAL
 	err = file.Reversal(effectiveEntryDate)
@@ -123,6 +125,43 @@ func TestReversal_LoanCredit(t *testing.T) {
 	entries = b1.GetEntries()
 	require.Len(t, entries, 1)
 	require.Equal(t, LoanCredit, entries[0].TransactionCode)
+	require.Equal(t, CreditsOnly, b1.GetHeader().ServiceClassCode)
+	require.Equal(t, CreditsOnly, b1.GetControl().ServiceClassCode)
+	require.NoError(t, file.Validate())
+}
+
+func TestReversal_IAT(t *testing.T) {
+	file, err := ReadFile(filepath.Join("test", "testdata", "iat-debit.ach"))
+	require.NoError(t, err)
+	require.Len(t, file.IATBatches, 1)
+
+	creationDate := file.Header.FileCreationDate
+	transactionCode := file.IATBatches[0].Entries[0].TransactionCode
+
+	err = file.Reversal(time.Now())
+	require.ErrorContains(t, err, "reversing IAT batches is not supported")
+
+	// The file is left as it was
+	require.Equal(t, creationDate, file.Header.FileCreationDate)
+	require.Equal(t, transactionCode, file.IATBatches[0].Entries[0].TransactionCode)
+}
+
+func TestReversal_ADV(t *testing.T) {
+	for _, name := range []string{"adv.ach", "flattenADVBatchesMultipleBatchHeaders.ach"} {
+		t.Run(name, func(t *testing.T) {
+			file, err := ReadFile(filepath.Join("test", "testdata", name))
+			require.NoError(t, err)
+			require.NotEmpty(t, file.Batches)
+
+			creationDate := file.Header.FileCreationDate
+
+			err = file.Reversal(time.Now())
+			require.ErrorContains(t, err, "reversing ADV batches is not supported")
+
+			// The file is left as it was
+			require.Equal(t, creationDate, file.Header.FileCreationDate)
+		})
+	}
 }
 
 func TestReversal_TEL(t *testing.T) {

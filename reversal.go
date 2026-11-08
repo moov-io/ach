@@ -18,12 +18,24 @@
 package ach
 
 import (
+	"errors"
 	"fmt"
 	"time"
 )
 
 // Reversal will transform a File into a Nacha compliant reversal which can be transmitted to undo fund movement.
+//
+// Files with IAT or ADV batches are not supported and are returned unchanged with an error.
 func (f *File) Reversal(effectiveEntryDate time.Time) error {
+	if len(f.IATBatches) > 0 {
+		return errors.New("reversing IAT batches is not supported")
+	}
+	for i := range f.Batches {
+		if bh := f.Batches[i].GetHeader(); bh != nil && bh.StandardEntryClassCode == ADV {
+			return errors.New("reversing ADV batches is not supported")
+		}
+	}
+
 	f.Header.FileCreationDate = effectiveEntryDate.Format("060102")
 	f.Header.FileCreationTime = effectiveEntryDate.Format("1504")
 
@@ -76,7 +88,7 @@ func (f *File) Reversal(effectiveEntryDate time.Time) error {
 				entries[j].TransactionCode -= 5
 
 			case LoanDebit:
-				hasDebits = true
+				hasCredits = true
 				entries[j].TransactionCode -= 3
 			}
 		}
