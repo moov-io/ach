@@ -221,6 +221,34 @@ func TestIterator(t *testing.T) {
 		require.Len(t, entries, 1)
 	})
 
+	t.Run("truncated addenda record", func(t *testing.T) {
+		// The Reader pads short lines before parsing them. The Iterator has to do the
+		// same for addenda records, and report the same error instead of panicking.
+		content := `101 121042882 2313801042308080808A094101Federal Reserve Bank   My Bank Name
+5220ACME Corporation                    121042882 PPDPAYROLL         000000   1121042880000001
+622121042882123456789        0100000000ABC##jvkdjfuiwnWade Arnold             1121042880000001
+7
+82200000020012104288000000000000000100000000121042882                          121042880000001
+9000001000001000000010004288200000000000000001000000                                       `
+
+		_, readErr := NewReader(strings.NewReader(content)).Read()
+		require.Error(t, readErr)
+
+		iter := NewIterator(strings.NewReader(content))
+		var err error
+		for {
+			bh, ed, e := iter.NextEntry()
+			if e != nil {
+				err = e
+				break
+			}
+			if bh == nil && ed == nil {
+				break
+			}
+		}
+		require.ErrorContains(t, err, readErr.Error())
+	})
+
 	t.Run("scanner error on overlong line", func(t *testing.T) {
 		// bufio.Scanner stops permanently on any line over bufio.MaxScanTokenSize,
 		// so the iterator must surface the error instead of reporting a clean end of file.
