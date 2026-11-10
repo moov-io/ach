@@ -2865,3 +2865,36 @@ func TestFileLineNumbers(t *testing.T) {
 	require.Equal(t, 14, file.IATBatches[0].GetControl().LineNumber)
 	require.Equal(t, 15, file.Control.LineNumber)
 }
+
+func TestFileValidate_IATBatches(t *testing.T) {
+	for _, invalid := range []bool{false, true} {
+		t.Run(fmt.Sprintf("invalid=%v", invalid), func(t *testing.T) {
+			file, err := ReadJSONFile("test/testdata/iat-debit.json")
+			require.NoError(t, err)
+			require.NoError(t, file.Validate())
+			if invalid {
+				file.IATBatches[0].Header.ISODestinationCountryCode = "ZZ"
+			}
+
+			for name, validate := range map[string]func() error{
+				"Validate":     file.Validate,
+				"ValidateWith": func() error { return file.ValidateWith(&ValidateOpts{}) },
+				"Writer": func() error {
+					var buf bytes.Buffer
+					return NewWriter(&buf).Write(file)
+				},
+			} {
+				t.Run(name, func(t *testing.T) {
+					err := validate()
+					if invalid {
+						require.ErrorContains(t, err, "ISODestinationCountryCode")
+					} else {
+						require.NoError(t, err)
+					}
+				})
+			}
+			require.NoError(t, file.ValidateWith(&ValidateOpts{BypassBatchValidation: true}))
+			require.NoError(t, file.ValidateWith(&ValidateOpts{SkipAll: true}))
+		})
+	}
+}

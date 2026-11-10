@@ -1095,6 +1095,11 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 					return err
 				}
 			}
+			for _, b := range f.IATBatches {
+				if err := b.Validate(); err != nil {
+					return err
+				}
+			}
 		}
 
 		if !opts.AllowMissingFileControl {
