@@ -34,6 +34,9 @@ func TestIssue1275(t *testing.T) {
 	b1 := file.IATBatches[0]
 	entries := b1.GetEntries()
 
+	// This formatting test deliberately removes mandatory IAT addenda.
+	file.SetValidation(&ach.ValidateOpts{BypassBatchValidation: true})
+
 	// Remove some batches to force new lines
 	entries[0].Addenda11 = nil
 	entries[0].Addenda12 = nil
