@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -272,6 +273,12 @@ func (iatEd *IATEntryDetail) Validate() error {
 			return fieldError("TransactionCode", err, strconv.Itoa(iatEd.TransactionCode))
 		}
 	}
+	if iatEd.Amount < 0 {
+		return fieldError("Amount", ErrNegativeAmount, iatEd.Amount)
+	}
+	if err := iatEd.amountOverflowsField(); err != nil {
+		return fieldError("Amount", err, iatEd.Amount)
+	}
 	if iatEd.validateOpts == nil || !iatEd.validateOpts.AllowSpecialCharacters {
 		if err := iatEd.isAlphanumeric(iatEd.DFIAccountNumber); err != nil {
 			return fieldError("DFIAccountNumber", err, iatEd.DFIAccountNumber)
@@ -344,6 +351,14 @@ func (iatEd *IATEntryDetail) AddendaRecordsField() string {
 // AmountField returns a zero padded string of amount
 func (iatEd *IATEntryDetail) AmountField() string {
 	return iatEd.numericField(iatEd.Amount, 10)
+}
+
+// amountOverflowsField reports an Amount that does not fit the 10 digit field.
+func (iatEd *IATEntryDetail) amountOverflowsField() error {
+	if iatEd.Amount > NachaEntryAmountLimit {
+		return fmt.Errorf("does not match formatted value %s", iatEd.AmountField())
+	}
+	return nil
 }
 
 // DFIAccountNumberField gets the DFIAccountNumber with space padding
