@@ -18,6 +18,7 @@
 package ach
 
 import (
+	"fmt"
 	"strconv"
 	"unicode/utf8"
 )
@@ -200,6 +201,12 @@ func (ed *ADVEntryDetail) Validate() error {
 	if err := ed.isTransactionCode(ed.TransactionCode); err != nil {
 		return fieldError("TransactionCode", err, strconv.Itoa(ed.TransactionCode))
 	}
+	if ed.Amount < 0 {
+		return fieldError("Amount", ErrNegativeAmount, ed.Amount)
+	}
+	if err := ed.amountOverflowsField(); err != nil {
+		return fieldError("Amount", err, ed.Amount)
+	}
 	if ed.validateOpts == nil || !ed.validateOpts.AllowSpecialCharacters {
 		if err := ed.isAlphanumeric(ed.DFIAccountNumber); err != nil {
 			return fieldError("DFIAccountNumber", err, ed.DFIAccountNumber)
@@ -279,6 +286,17 @@ func (ed *ADVEntryDetail) DFIAccountNumberField() string {
 // AmountField returns a zero padded string of amount
 func (ed *ADVEntryDetail) AmountField() string {
 	return ed.numericField(ed.Amount, 12)
+}
+
+// NachaADVEntryAmountLimit is the maximum amount the 12 digit ADV entry Amount field can hold
+const NachaADVEntryAmountLimit = 9_999_999_999_99
+
+// amountOverflowsField reports an Amount that does not fit the 12 digit field.
+func (ed *ADVEntryDetail) amountOverflowsField() error {
+	if ed.Amount > NachaADVEntryAmountLimit {
+		return fmt.Errorf("does not match formatted value %s", ed.AmountField())
+	}
+	return nil
 }
 
 // AdviceRoutingNumberField gets the AdviceRoutingNumber with zero padding

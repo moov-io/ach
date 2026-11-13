@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 // mockADVEntryDetail creates a ADV entry detail
@@ -359,4 +360,19 @@ func TestADVEntryDetailSpecialCharacter(t *testing.T) {
 	if err != nil {
 		t.Error("Special character should have been allowed with override set.")
 	}
+}
+
+func TestADVEntryDetailAmountNegative(t *testing.T) {
+	ed := mockADVEntryDetail()
+	ed.Amount = -100
+	require.True(t, base.Match(ed.Validate(), ErrNegativeAmount))
+}
+
+func TestADVEntryDetailAmountOverflow(t *testing.T) {
+	ed := mockADVEntryDetail()
+	ed.Amount = NachaADVEntryAmountLimit
+	require.NoError(t, ed.Validate())
+
+	ed.Amount = 1234567890123
+	require.ErrorContains(t, ed.Validate(), "Amount 1234567890123 does not match formatted value 234567890123")
 }
