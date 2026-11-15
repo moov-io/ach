@@ -36,7 +36,8 @@ func TestIterator_MalformedFiles(t *testing.T) {
 		{
 			path: filepath.Join("test", "testdata", "20110729A-invalid.ach"),
 			expectedBatches: []batchExpectation{
-				{entries: 223},
+				// 178 entry records; subsequent addenda must not yield duplicate entries.
+				{entries: 178},
 			},
 		},
 		{

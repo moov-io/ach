@@ -20,6 +20,7 @@ package ach
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -372,4 +373,70 @@ func collectEntries(t *testing.T, iter *Iterator) []*EntryDetail {
 		}
 	}
 	return entries
+}
+
+func TestIterator_MultipleAddenda(t *testing.T) {
+	for _, count := range []int{1, 2, 5} {
+		t.Run(fmt.Sprintf("addenda-%d", count), func(t *testing.T) {
+			batch := NewBatchCTX(mockBatchCTXHeader())
+			for n := 1; n <= 2; n++ {
+				entry := mockCTXEntryDetail()
+				entry.SetTraceNumber(batch.GetHeader().ODFIIdentification, n)
+				entry.SetCATXAddendaRecords(count)
+				entry.AddendaRecordIndicator = 1
+				for j := 0; j < count; j++ {
+					addenda := NewAddenda05()
+					addenda.PaymentRelatedInformation = fmt.Sprintf("Invoice %d-%d", n, j+1)
+					entry.AddAddenda05(addenda)
+				}
+				batch.AddEntry(entry)
+			}
+			require.NoError(t, batch.Create())
+			file := NewFile()
+			file.SetHeader(mockFileHeader())
+			file.AddBatch(batch)
+			require.NoError(t, file.Create())
+			var buf bytes.Buffer
+			require.NoError(t, NewWriter(&buf).Write(file))
+
+			parsed, err := NewReader(bytes.NewReader(buf.Bytes())).Read()
+			require.NoError(t, err)
+			require.Len(t, parsed.Batches[0].GetEntries(), 2)
+			for _, entry := range parsed.Batches[0].GetEntries() {
+				require.Len(t, entry.Addenda05, count)
+			}
+			for _, layout := range []string{"complete", "EOF after addenda", "blank lines between addenda"} {
+				t.Run(layout, func(t *testing.T) {
+					data := buf.String()
+					if layout == "EOF after addenda" {
+						data = strings.SplitN(data, "\n8", 2)[0]
+					} else if layout == "blank lines between addenda" {
+						data = strings.ReplaceAll(data, "\n7", "\n\n  \n7")
+					}
+					iter := NewIterator(strings.NewReader(data))
+					for _, expected := range parsed.Batches[0].GetEntries() {
+						header, entry, err := iter.NextEntry()
+						require.NoError(t, err)
+						require.NotNil(t, header)
+						require.NotNil(t, entry)
+						require.Equal(t, expected.TraceNumber, entry.TraceNumber)
+						require.Equal(t, expected.Amount, entry.Amount)
+						require.Len(t, entry.Addenda05, count)
+						for j, addenda := range expected.Addenda05 {
+							require.Equal(t, addenda.PaymentRelatedInformation, entry.Addenda05[j].PaymentRelatedInformation)
+							require.Equal(t, addenda.SequenceNumber, entry.Addenda05[j].SequenceNumber)
+							require.Equal(t, addenda.EntryDetailSequenceNumber, entry.Addenda05[j].EntryDetailSequenceNumber)
+						}
+						if layout != "blank lines between addenda" {
+							require.Equal(t, expected, entry)
+						}
+					}
+					header, entry, err := iter.NextEntry()
+					require.NoError(t, err)
+					require.Nil(t, header)
+					require.Nil(t, entry)
+				})
+			}
+		})
+	}
 }

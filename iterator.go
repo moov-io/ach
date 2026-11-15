@@ -154,8 +154,8 @@ start:
 					if i.reader.maxLines > 0 && i.reader.lineNum > i.reader.maxLines {
 						return nil, nil, fmt.Errorf("line %d: %w", i.reader.lineNum, ErrFileTooLong)
 					}
-					if foundLine == "" {
-						break
+					if foundLine == "" || allSpaces(foundLine) {
+						continue
 					}
 					switch {
 					case strings.HasPrefix(foundLine, entryDetailPos):
@@ -168,10 +168,7 @@ start:
 							return nil, nil, fmt.Errorf("reading addenda on line %d failed: %w", i.reader.lineNum, err)
 						}
 
-						entries := i.reader.currentBatch.GetEntries()
-						ed := entries[len(entries)-1]
-
-						return bh, ed, nil
+						// Keep reading so this entry includes every addenda record.
 
 					case strings.HasPrefix(foundLine, batchControlPos):
 						// Do nothing with the Batch Control record
