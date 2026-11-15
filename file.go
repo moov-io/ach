@@ -1565,6 +1565,8 @@ func createSegmentFileIATBatchHeader(serviceClassCode int, IATBh *IATBatchHeader
 	nbh.ServiceClassCode = serviceClassCode
 	nbh.ForeignExchangeIndicator = IATBh.ForeignExchangeIndicator
 	nbh.ForeignExchangeReferenceIndicator = IATBh.ForeignExchangeReferenceIndicator
+	nbh.ForeignExchangeReference = IATBh.ForeignExchangeReference
+	nbh.EffectiveEntryDate = IATBh.EffectiveEntryDate
 	nbh.ISODestinationCountryCode = IATBh.ISODestinationCountryCode
 	nbh.OriginatorIdentification = IATBh.OriginatorIdentification
 	nbh.StandardEntryClassCode = IATBh.StandardEntryClassCode

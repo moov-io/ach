@@ -2865,3 +2865,43 @@ func TestFileLineNumbers(t *testing.T) {
 	require.Equal(t, 14, file.IATBatches[0].GetControl().LineNumber)
 	require.Equal(t, 15, file.Control.LineNumber)
 }
+
+func TestFile__SegmentFileIATPreservesPaymentInstructions(t *testing.T) {
+	f, err := os.Open(filepath.Join("test", "testdata", "iat-mixedDebitCredit.ach"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+
+	achFile, err := NewReader(f).Read()
+	if err != nil {
+		t.Fatalf("reading file: %v", err)
+	}
+
+	// Use values that make FX reference and settlement date visible in the output.
+	header := achFile.IATBatches[0].GetHeader()
+	header.ForeignExchangeIndicator = "FV"
+	header.ForeignExchangeReferenceIndicator = 1
+	header.ForeignExchangeReference = "1.250000"
+	if err := achFile.Validate(); err != nil {
+		t.Fatalf("validating file: %v", err)
+	}
+
+	creditFile, debitFile, err := achFile.SegmentFile(NewSegmentFileConfiguration())
+	if err != nil {
+		t.Fatalf("segmenting file: %v", err)
+	}
+
+	for name, seg := range map[string]*File{"credit": creditFile, "debit": debitFile} {
+		if len(seg.IATBatches) != 1 {
+			t.Fatalf("%s file: expected 1 IAT batch, got %d", name, len(seg.IATBatches))
+		}
+		got := seg.IATBatches[0].GetHeader()
+		if got.EffectiveEntryDate != header.EffectiveEntryDate {
+			t.Errorf("%s file: EffectiveEntryDate=%q, want %q", name, got.EffectiveEntryDate, header.EffectiveEntryDate)
+		}
+		if got.ForeignExchangeReference != header.ForeignExchangeReference {
+			t.Errorf("%s file: ForeignExchangeReference=%q, want %q", name, got.ForeignExchangeReference, header.ForeignExchangeReference)
+		}
+	}
+}
