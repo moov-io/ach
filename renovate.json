@@ -40,6 +40,17 @@
         "ubuntu"
       ],
       "enabled": false
+    },
+    {
+      "description": "The docs Gemfile pins jekyll ~> 3.10, and bulma-clean-theme 1.x requires jekyll >= 4.3; disable major updates",
+      "matchPackageNames": [
+        "jekyll",
+        "bulma-clean-theme"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "enabled": false
     }
   ],
   "platformAutomerge": false
