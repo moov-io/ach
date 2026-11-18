@@ -7,7 +7,11 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os"
+	"reflect"
+	"strconv"
+	"strings"
 
 	"github.com/moov-io/ach"
 
@@ -22,23 +26,7 @@ func diffFiles(paths []string, validateOpts *ach.ValidateOpts) error {
 	if err != nil {
 		return err
 	}
-
-	w := ansiterm.NewTabWriter(os.Stdout, 0, 0, 1, ' ', 0)
-	w = w.Init(os.Stdout, 0, 0, 1, ' ', 0)
-	defer w.Flush()
-
-	switch {
-	case f1.Header.ImmediateOrigin != f2.Header.ImmediateOrigin:
-		printDiffedFileHeader(w, f1, f2)
-	case f1.Header.ImmediateOriginName != f2.Header.ImmediateOriginName:
-		printDiffedFileHeader(w, f1, f2)
-	case f1.Header.ImmediateDestination != f2.Header.ImmediateDestination:
-		printDiffedFileHeader(w, f1, f2)
-	case f1.Header.ImmediateDestinationName != f2.Header.ImmediateDestinationName:
-		printDiffedFileHeader(w, f1, f2)
-	}
-
-	return nil
+	return writeDiff(os.Stdout, paths, f1, f2, stdoutIsTTY())
 }
 
 func readTwoFiles(paths []string, validateOpts *ach.ValidateOpts) (*ach.File, *ach.File, error) {
@@ -53,44 +41,296 @@ func readTwoFiles(paths []string, validateOpts *ach.ValidateOpts) (*ach.File, *a
 	return f1, f2, nil
 }
 
-// TODO(adam): we should lookup batches which are in f1 against those in f2 and if a similar
-// batch is found (TODO: what, if any fields can we do exact matches on?) print that in the
-// order of f1. Otherwise show missing batches (from f1's view) and additional batches (from
-// f2's view) at the end.
-
-func printDiffedFileHeader(w *ansiterm.TabWriter, f1, f2 *ach.File) {
-	fmt.Fprintln(w, "  Origin\tOriginName\tDestination\tDestinationName")
-
-	var minusBuf bytes.Buffer
-	var plusBuf bytes.Buffer
-
-	minusBuf.WriteString("- ")
-	plusBuf.WriteString("+ ")
-
-	printColumn(&minusBuf, &plusBuf, f1.Header.ImmediateOrigin, f2.Header.ImmediateOrigin)
-	printColumn(&minusBuf, &plusBuf, f1.Header.ImmediateOriginName, f2.Header.ImmediateOriginName)
-	printColumn(&minusBuf, &plusBuf, f1.Header.ImmediateDestination, f2.Header.ImmediateDestination)
-	printColumn(&minusBuf, &plusBuf, f1.Header.ImmediateDestinationName, f2.Header.ImmediateDestinationName)
-
-	fmt.Fprintln(w, minusBuf.String())
-	fmt.Fprintln(w, plusBuf.String())
+func stdoutIsTTY() bool {
+	fi, err := os.Stdout.Stat()
+	return err == nil && fi.Mode()&os.ModeCharDevice != 0
 }
 
-func printColumn(minusBuf, plusBuf *bytes.Buffer, v1, v2 string) {
-	if v1 != v2 {
-		w := ansiterm.NewWriter(minusBuf)
-		ctx := ansiterm.Foreground(ansiterm.Green)
-		ctx.Fprint(w, v2)
-		ctx.SetForeground(ansiterm.Default)
-		ctx.Fprint(w, "\t")
+func writeDiff(out io.Writer, paths []string, f1, f2 *ach.File, color bool) error {
+	var buf bytes.Buffer
+	d := &differ{out: &buf, color: color, left: paths[0], right: paths[1], needBlank: true}
+	d.diff(f1, f2)
+	if buf.Len() == 0 {
+		return nil
+	}
+	fmt.Fprintf(out, "--- %s\n+++ %s\n", paths[0], paths[1])
+	_, err := io.Copy(out, &buf)
+	return err
+}
 
-		w = ansiterm.NewWriter(plusBuf)
-		ctx = ansiterm.Foreground(ansiterm.Red)
-		ctx.Fprint(w, v1)
-		ctx.SetForeground(ansiterm.Default)
-		ctx.Fprint(w, "\t")
-	} else {
-		minusBuf.WriteString(v2 + "\t")
-		plusBuf.WriteString(v1 + "\t")
+type col struct {
+	name  string
+	left  string
+	right string
+}
+
+type idxPair struct {
+	a int
+	b int
+}
+
+type differ struct {
+	out       io.Writer
+	color     bool
+	left      string
+	right     string
+	needBlank bool
+}
+
+func (d *differ) diff(f1, f2 *ach.File) {
+	if f1 == nil {
+		f1 = &ach.File{}
+	}
+	if f2 == nil {
+		f2 = &ach.File{}
+	}
+	d.section("FileHeader", fileHeaderCols(f1.Header, f2.Header))
+	d.diffBatches(f1.Batches, f2.Batches)
+	d.diffIATBatches(f1.IATBatches, f2.IATBatches)
+	d.section("FileControl", fileControlCols(f1.Control, f2.Control))
+	d.section("ADVFileControl", advFileControlCols(f1.ADVControl, f2.ADVControl))
+}
+
+func (d *differ) heading(s string) {
+	if d.needBlank {
+		fmt.Fprintln(d.out)
+	}
+	fmt.Fprintln(d.out, s)
+	d.needBlank = true
+}
+
+func (d *differ) section(title string, cols []col) {
+	if !hasDiff(cols) {
+		return
+	}
+	d.heading(title)
+	d.tableBoth("  ", differing(cols))
+}
+
+func indentOf(title string) string {
+	i := 0
+	for i < len(title) && title[i] == ' ' {
+		i++
+	}
+	return title[:i] + "  "
+}
+
+func (d *differ) nestedSide(title string, leftNil, rightNil bool, cols []col) {
+	if leftNil && rightNil {
+		return
+	}
+	if !hasDiff(cols) && leftNil == rightNil {
+		return
+	}
+	fmt.Fprintln(d.out, title)
+	d.oneOrBoth(indentOf(title), leftNil, rightNil, cols)
+}
+
+func hasDiff(cols []col) bool {
+	for _, c := range cols {
+		if c.left != c.right {
+			return true
+		}
+	}
+	return false
+}
+
+func differing(cols []col) []col {
+	out := make([]col, 0, len(cols))
+	for _, c := range cols {
+		if c.left != c.right {
+			out = append(out, c)
+		}
+	}
+	return out
+}
+
+func names(cols []col) []string {
+	out := make([]string, len(cols))
+	for i, c := range cols {
+		out[i] = c.name
+	}
+	return out
+}
+
+func sides(cols []col, right bool) []string {
+	out := make([]string, len(cols))
+	for i, c := range cols {
+		if right {
+			out[i] = c.right
+		} else {
+			out[i] = c.left
+		}
+	}
+	return out
+}
+
+func (d *differ) oneOrBoth(indent string, leftNil, rightNil bool, cols []col) {
+	cols = differing(cols)
+	if len(cols) == 0 {
+		return
+	}
+	switch {
+	case leftNil && !rightNil:
+		d.tableOne(indent, true, cols)
+	case rightNil && !leftNil:
+		d.tableOne(indent, false, cols)
+	default:
+		d.tableBoth(indent, cols)
+	}
+}
+
+func (d *differ) tableBoth(indent string, cols []col) {
+	if len(cols) == 0 {
+		return
+	}
+	tw := ansiterm.NewTabWriter(d.out, 0, 0, 2, ' ', 0)
+	d.writeRow(tw, indent+"  ", names(cols), false, ansiterm.Default)
+	d.writeRow(tw, indent+"- ", sides(cols, false), d.color, ansiterm.Red)
+	d.writeRow(tw, indent+"+ ", sides(cols, true), d.color, ansiterm.Green)
+	tw.Flush()
+}
+
+func (d *differ) tableOne(indent string, right bool, cols []col) {
+	prefix := "- "
+	color := ansiterm.Red
+	if right {
+		prefix = "+ "
+		color = ansiterm.Green
+	}
+	tw := ansiterm.NewTabWriter(d.out, 0, 0, 2, ' ', 0)
+	d.writeRow(tw, indent+"  ", names(cols), false, ansiterm.Default)
+	d.writeRow(tw, indent+prefix, sides(cols, right), d.color, color)
+	tw.Flush()
+}
+
+func (d *differ) writeRow(w io.Writer, prefix string, vals []string, colored bool, color ansiterm.Color) {
+	fmt.Fprint(w, prefix)
+	for i, v := range vals {
+		if i > 0 {
+			fmt.Fprint(w, "\t")
+		}
+		if colored {
+			aw := ansiterm.NewWriter(w)
+			aw.SetColorCapable(true)
+			ansiterm.Foreground(color).Fprint(aw, v)
+		} else {
+			fmt.Fprint(w, v)
+		}
+	}
+	fmt.Fprintln(w)
+}
+
+func align(na, nb int, keyA, keyB func(int) string) []idxPair {
+	usedA := make([]bool, na)
+	usedB := make([]bool, nb)
+	shared := zipSharedKeys(na, nb, usedA, usedB, keyA, keyB)
+	empty := zipKey(na, nb, usedA, usedB, keyA, keyB, "")
+	rest := unusedOneSided(na, nb, usedA, usedB)
+	out := make([]idxPair, 0, len(shared)+len(empty)+len(rest))
+	out = append(out, shared...)
+	out = append(out, empty...)
+	return append(out, rest...)
+}
+
+func zipSharedKeys(na, nb int, usedA, usedB []bool, keyA, keyB func(int) string) []idxPair {
+	out := make([]idxPair, 0, na)
+	seen := make(map[string]bool)
+	for i := 0; i < na; i++ {
+		if usedA[i] {
+			continue
+		}
+		k := keyA(i)
+		if k == "" || seen[k] {
+			continue
+		}
+		seen[k] = true
+		out = append(out, zipKey(na, nb, usedA, usedB, keyA, keyB, k)...)
+	}
+	return out
+}
+
+func zipKey(na, nb int, usedA, usedB []bool, keyA, keyB func(int) string, k string) []idxPair {
+	as := unusedWithKey(na, usedA, keyA, k)
+	bs := unusedWithKey(nb, usedB, keyB, k)
+	n := min(len(as), len(bs))
+	out := make([]idxPair, n)
+	for i := 0; i < n; i++ {
+		usedA[as[i]] = true
+		usedB[bs[i]] = true
+		out[i] = idxPair{a: as[i], b: bs[i]}
+	}
+	return out
+}
+
+func unusedWithKey(n int, used []bool, key func(int) string, want string) []int {
+	out := make([]int, 0, n)
+	for i := 0; i < n; i++ {
+		if !used[i] && key(i) == want {
+			out = append(out, i)
+		}
+	}
+	return out
+}
+
+func unusedOneSided(na, nb int, usedA, usedB []bool) []idxPair {
+	out := make([]idxPair, 0, na+nb)
+	for i := 0; i < na; i++ {
+		if !usedA[i] {
+			out = append(out, idxPair{a: i, b: -1})
+		}
+	}
+	for j := 0; j < nb; j++ {
+		if !usedB[j] {
+			out = append(out, idxPair{a: -1, b: j})
+		}
+	}
+	return out
+}
+
+func trim(v string) string { return strings.TrimSpace(v) }
+
+func batcherPresent(b ach.Batcher) bool {
+	if b == nil {
+		return false
+	}
+	v := reflect.ValueOf(b)
+	return v.Kind() != reflect.Ptr || !v.IsNil()
+}
+
+func num(i int) string { return strconv.Itoa(i) }
+
+func fileHeaderCols(a, b ach.FileHeader) []col {
+	return []col{
+		{"Origin", trim(a.ImmediateOrigin), trim(b.ImmediateOrigin)},
+		{"OriginName", trim(a.ImmediateOriginName), trim(b.ImmediateOriginName)},
+		{"Destination", trim(a.ImmediateDestination), trim(b.ImmediateDestination)},
+		{"DestinationName", trim(a.ImmediateDestinationName), trim(b.ImmediateDestinationName)},
+		{"FileCreationDate", trim(a.FileCreationDate), trim(b.FileCreationDate)},
+		{"FileCreationTime", trim(a.FileCreationTime), trim(b.FileCreationTime)},
+		{"FileIDModifier", trim(a.FileIDModifier), trim(b.FileIDModifier)},
+		{"ReferenceCode", trim(a.ReferenceCode), trim(b.ReferenceCode)},
+	}
+}
+
+func fileControlCols(a, b ach.FileControl) []col {
+	return []col{
+		{"BatchCount", num(a.BatchCount), num(b.BatchCount)},
+		{"BlockCount", num(a.BlockCount), num(b.BlockCount)},
+		{"EntryAddendaCount", num(a.EntryAddendaCount), num(b.EntryAddendaCount)},
+		{"EntryHash", num(a.EntryHash), num(b.EntryHash)},
+		{"TotalDebitAmount", num(a.TotalDebitEntryDollarAmountInFile), num(b.TotalDebitEntryDollarAmountInFile)},
+		{"TotalCreditAmount", num(a.TotalCreditEntryDollarAmountInFile), num(b.TotalCreditEntryDollarAmountInFile)},
+	}
+}
+
+func advFileControlCols(a, b ach.ADVFileControl) []col {
+	return []col{
+		{"BatchCount", num(a.BatchCount), num(b.BatchCount)},
+		{"BlockCount", num(a.BlockCount), num(b.BlockCount)},
+		{"EntryAddendaCount", num(a.EntryAddendaCount), num(b.EntryAddendaCount)},
+		{"EntryHash", num(a.EntryHash), num(b.EntryHash)},
+		{"TotalDebitAmount", num(a.TotalDebitEntryDollarAmountInFile), num(b.TotalDebitEntryDollarAmountInFile)},
+		{"TotalCreditAmount", num(a.TotalCreditEntryDollarAmountInFile), num(b.TotalCreditEntryDollarAmountInFile)},
 	}
 }
