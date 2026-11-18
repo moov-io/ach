@@ -163,8 +163,8 @@ start:
 						return bh, returnableEntry, nil
 
 					case strings.HasPrefix(foundLine, entryAddendaPos):
-						i.reader.line = foundLine
-						if err := i.reader.parseEDAddenda(); err != nil {
+						// Pad or trim to RecordLength the same way Reader.Read does.
+						if err := i.reader.readLine(foundLine); err != nil {
 							return nil, nil, fmt.Errorf("reading addenda on line %d failed: %w", i.reader.lineNum, err)
 						}
 

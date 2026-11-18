@@ -222,6 +222,30 @@ func TestIterator(t *testing.T) {
 		require.Len(t, entries, 1)
 	})
 
+	t.Run("truncated addenda record", func(t *testing.T) {
+		// A 1-character addenda line must be padded to RecordLength. parseAddenda
+		// slices [1:3] and panics on the raw input.
+		content := `101 121042882 2313801042308080808A094101Federal Reserve Bank   My Bank Name
+5220ACME Corporation                    121042882 PPDPAYROLL         000000   1121042880000001
+622121042882123456789        0100000000ABC##jvkdjfuiwnWade Arnold             1121042880000001
+7
+82200000020012104288000000000000000100000000121042882                          121042880000001
+90000010000010000000100042882000000000000000010000`
+
+		iter := NewIterator(strings.NewReader(content))
+		header, entry, err := iter.NextEntry()
+		require.NoError(t, err)
+		require.NotNil(t, header)
+		require.NotNil(t, entry)
+		require.Equal(t, "121042880000001", entry.TraceNumber)
+		require.Empty(t, entry.Addenda05)
+
+		header, entry, err = iter.NextEntry()
+		require.NoError(t, err)
+		require.Nil(t, header)
+		require.Nil(t, entry)
+	})
+
 	t.Run("scanner error on overlong line", func(t *testing.T) {
 		// bufio.Scanner stops permanently on any line over bufio.MaxScanTokenSize,
 		// so the iterator must surface the error instead of reporting a clean end of file.
@@ -405,13 +429,15 @@ func TestIterator_MultipleAddenda(t *testing.T) {
 			for _, entry := range parsed.Batches[0].GetEntries() {
 				require.Len(t, entry.Addenda05, count)
 			}
-			for _, layout := range []string{"complete", "EOF after addenda", "blank lines between addenda"} {
+			for _, layout := range []string{"complete", "EOF after addenda", "blank lines between addenda", "truncated addenda between records"} {
 				t.Run(layout, func(t *testing.T) {
 					data := buf.String()
 					if layout == "EOF after addenda" {
 						data = strings.SplitN(data, "\n8", 2)[0]
 					} else if layout == "blank lines between addenda" {
 						data = strings.ReplaceAll(data, "\n7", "\n\n  \n7")
+					} else if layout == "truncated addenda between records" {
+						data = strings.Replace(data, "\n7", "\n7\n7", 1)
 					}
 					iter := NewIterator(strings.NewReader(data))
 					for _, expected := range parsed.Batches[0].GetEntries() {
@@ -427,9 +453,12 @@ func TestIterator_MultipleAddenda(t *testing.T) {
 							require.Equal(t, addenda.SequenceNumber, entry.Addenda05[j].SequenceNumber)
 							require.Equal(t, addenda.EntryDetailSequenceNumber, entry.Addenda05[j].EntryDetailSequenceNumber)
 						}
-						if layout != "blank lines between addenda" {
-							require.Equal(t, expected, entry)
+						if layout == "blank lines between addenda" || layout == "truncated addenda between records" {
+							// Extra lines bump LineNumber, so compare the rest of the record.
+							expected = entryWithoutLineNumbers(expected)
+							entry = entryWithoutLineNumbers(entry)
 						}
+						require.Equal(t, expected, entry)
 					}
 					header, entry, err := iter.NextEntry()
 					require.NoError(t, err)
@@ -439,4 +468,22 @@ func TestIterator_MultipleAddenda(t *testing.T) {
 			}
 		})
 	}
+}
+
+func entryWithoutLineNumbers(ed *EntryDetail) *EntryDetail {
+	if ed == nil {
+		return nil
+	}
+	cp := *ed
+	cp.LineNumber = 0
+	if len(ed.Addenda05) == 0 {
+		return &cp
+	}
+	cp.Addenda05 = make([]*Addenda05, len(ed.Addenda05))
+	for i, a := range ed.Addenda05 {
+		ac := *a
+		ac.LineNumber = 0
+		cp.Addenda05[i] = &ac
+	}
+	return &cp
 }
