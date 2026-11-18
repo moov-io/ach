@@ -2865,3 +2865,45 @@ func TestFileLineNumbers(t *testing.T) {
 	require.Equal(t, 14, file.IATBatches[0].GetControl().LineNumber)
 	require.Equal(t, 15, file.Control.LineNumber)
 }
+
+func TestFile__SegmentFileIATPreservesPaymentInstructions(t *testing.T) {
+	f, err := os.Open(filepath.Join("test", "testdata", "iat-mixedDebitCredit.ach"))
+	require.NoError(t, err)
+	defer f.Close()
+
+	achFile, err := NewReader(f).Read()
+	require.NoError(t, err)
+
+	// Overlay non-default IAT header fields so a missed copy cannot match NewIATBatchHeader zeros.
+	header := achFile.IATBatches[0].GetHeader()
+	header.IATIndicator = IATCOR
+	header.ForeignExchangeIndicator = "FV"
+	header.ForeignExchangeReferenceIndicator = 1
+	header.ForeignExchangeReference = "1.250000"
+	header.SettlementDate = "100"
+	header.OriginatorStatusCode = 1
+	require.NoError(t, achFile.Validate())
+
+	creditFile, debitFile, err := achFile.SegmentFile(NewSegmentFileConfiguration())
+	require.NoError(t, err)
+
+	for _, tc := range []struct {
+		name string
+		file *File
+	}{
+		{"credit", creditFile},
+		{"debit", debitFile},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			require.Len(t, tc.file.IATBatches, 1)
+			got := tc.file.IATBatches[0].GetHeader()
+			require.Equal(t, IATCOR, got.IATIndicator)
+			require.Equal(t, "FV", got.ForeignExchangeIndicator)
+			require.Equal(t, 1, got.ForeignExchangeReferenceIndicator)
+			require.Equal(t, "1.250000", got.ForeignExchangeReference)
+			require.Equal(t, "190808", got.EffectiveEntryDate)
+			require.Equal(t, "100", got.SettlementDate)
+			require.Equal(t, 1, got.OriginatorStatusCode)
+		})
+	}
+}

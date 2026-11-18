@@ -1563,14 +1563,19 @@ func createSegmentFileIATBatchHeader(serviceClassCode int, IATBh *IATBatchHeader
 	nbh := NewIATBatchHeader()
 	nbh.ID = base.ID()
 	nbh.ServiceClassCode = serviceClassCode
+	nbh.IATIndicator = IATBh.IATIndicator
 	nbh.ForeignExchangeIndicator = IATBh.ForeignExchangeIndicator
 	nbh.ForeignExchangeReferenceIndicator = IATBh.ForeignExchangeReferenceIndicator
+	nbh.ForeignExchangeReference = IATBh.ForeignExchangeReference
 	nbh.ISODestinationCountryCode = IATBh.ISODestinationCountryCode
 	nbh.OriginatorIdentification = IATBh.OriginatorIdentification
 	nbh.StandardEntryClassCode = IATBh.StandardEntryClassCode
 	nbh.CompanyEntryDescription = IATBh.CompanyEntryDescription
 	nbh.ISOOriginatingCurrencyCode = IATBh.ISOOriginatingCurrencyCode
 	nbh.ISODestinationCurrencyCode = IATBh.ISODestinationCurrencyCode
+	nbh.EffectiveEntryDate = IATBh.EffectiveEntryDate
+	nbh.SettlementDate = IATBh.SettlementDate
+	nbh.OriginatorStatusCode = IATBh.OriginatorStatusCode
 	nbh.ODFIIdentification = IATBh.ODFIIdentification
 	return nbh
 }
