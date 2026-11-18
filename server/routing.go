@@ -28,6 +28,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/moov-io/ach"
 	"github.com/moov-io/base"
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/base/log"
@@ -333,6 +334,9 @@ func codeFrom(err error) int {
 
 	if errors.Is(err, ErrRequestBodyTooLarge) {
 		return http.StatusRequestEntityTooLarge
+	}
+	if errors.Is(err, ach.ErrReversingIATBatches) || errors.Is(err, ach.ErrReversingADVBatches) {
+		return http.StatusBadRequest
 	}
 
 	errString := fmt.Sprintf("%#v", err)
