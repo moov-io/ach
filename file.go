@@ -1004,7 +1004,8 @@ type ValidateOpts struct {
 	// for SEC codes that require the field to be non-blank (and non-zero)
 	AllowEmptyIndividualName bool `json:"allowEmptyIndividualName"`
 
-	// BypassBatchValidation will skip validation for batches in a file and only validate file header and control info
+	// BypassBatchValidation will skip validation for domestic, IAT, and ADV batches
+	// in a file and only validate file header and control info
 	BypassBatchValidation bool `json:"bypassBatchValidation"`
 
 	// SkipFileCreationValidation will skip validation of the FileCreationTime and FileCreationDate fields in a file header
@@ -1088,12 +1089,8 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 			return err
 		}
 
-		if !opts.BypassBatchValidation {
-			for _, b := range f.Batches {
-				if err := b.Validate(); err != nil {
-					return err
-				}
-			}
+		if err := f.validateBatches(opts); err != nil {
+			return err
 		}
 
 		if !opts.AllowMissingFileControl {
@@ -1115,6 +1112,9 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 	if f.ADVControl.BatchCount != len(f.Batches) {
 		return NewErrFileCalculatedControlEquality("BatchCount", len(f.Batches), f.ADVControl.BatchCount)
 	}
+	if err := f.validateBatches(opts); err != nil {
+		return err
+	}
 	if !opts.AllowMissingFileControl {
 		if err := f.ADVControl.Validate(); err != nil {
 			return err
@@ -1126,6 +1126,35 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 		}
 	}
 	return f.ValidateTotals()
+}
+
+func (f *File) validateBatches(opts *ValidateOpts) error {
+	if opts.BypassBatchValidation {
+		return nil
+	}
+	if f.IsADV() {
+		for _, b := range f.Batches {
+			for _, ed := range b.GetADVEntries() {
+				if err := ed.Validate(); err != nil {
+					return err
+				}
+			}
+		}
+	} else {
+		for _, b := range f.Batches {
+			if err := b.Validate(); err != nil {
+				return err
+			}
+		}
+	}
+	for i := range f.IATBatches {
+		for _, ed := range f.IATBatches[i].GetEntries() {
+			if err := ed.Validate(); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 // ValidateTotals performs checks on: 1.File entry addenda counts 2. File credit/debit totals 3. File entry hash 4. File batch count

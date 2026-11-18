@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
 )
 
 // mockIATEntryDetail creates an IAT EntryDetail
@@ -509,4 +510,19 @@ func TestIATEntryDetail_PreserveSpacesDFIAccountNumber(t *testing.T) {
 			t.Errorf("DFIAccountNumber length = %d, want 35", len(record.DFIAccountNumber))
 		}
 	})
+}
+
+func TestIATEntryDetailAmountNegative(t *testing.T) {
+	ed := mockIATEntryDetail()
+	ed.Amount = -100
+	require.True(t, base.Match(ed.Validate(), ErrNegativeAmount))
+}
+
+func TestIATEntryDetailAmountOverflow(t *testing.T) {
+	ed := mockIATEntryDetail()
+	ed.Amount = NachaEntryAmountLimit
+	require.NoError(t, ed.Validate())
+
+	ed.Amount = 12345678901
+	require.ErrorContains(t, ed.Validate(), "Amount 12345678901 does not match formatted value 2345678901")
 }

@@ -2606,6 +2606,93 @@ func TestFile_BypassBatchValidation(t *testing.T) {
 	require.Error(t, err)
 }
 
+func iatFileWithEntryAmount(t *testing.T, amount int) *File {
+	t.Helper()
+	file := NewFile().SetHeader(mockFileHeader())
+	iat := mockIATBatch(t)
+	iat.Entries[0].Amount = amount
+	require.NoError(t, iat.build())
+	file.AddIATBatch(iat)
+	require.NoError(t, file.Create())
+	return file
+}
+
+func advFileWithEntryAmount(t *testing.T, amount int) *File {
+	t.Helper()
+	file := NewFile().SetHeader(mockFileHeader())
+	batch := NewBatchADV(mockBatchADVHeader())
+	ed := mockADVEntryDetail()
+	ed.Amount = amount
+	batch.AddADVEntry(ed)
+	require.NoError(t, batch.build())
+	file.AddBatch(batch)
+	require.NoError(t, file.Create())
+	return file
+}
+
+func TestFile_IATAmountOverflowRejectedOnWrite(t *testing.T) {
+	file := iatFileWithEntryAmount(t, 12345678901)
+
+	require.ErrorContains(t, file.Validate(), "Amount 12345678901 does not match formatted value 2345678901")
+
+	var buf bytes.Buffer
+	require.ErrorContains(t, NewWriter(&buf).Write(file), "Amount 12345678901 does not match formatted value 2345678901")
+	require.Zero(t, buf.Len())
+}
+
+func TestFile_IATAmountNegativeRejectedOnWrite(t *testing.T) {
+	file := iatFileWithEntryAmount(t, -500)
+
+	require.True(t, base.Match(file.Validate(), ErrNegativeAmount))
+
+	var buf bytes.Buffer
+	require.True(t, base.Match(NewWriter(&buf).Write(file), ErrNegativeAmount))
+	require.Zero(t, buf.Len())
+}
+
+func TestFile_ADVAmountOverflowRejectedOnWrite(t *testing.T) {
+	file := advFileWithEntryAmount(t, 1234567890123)
+
+	require.ErrorContains(t, file.Validate(), "Amount 1234567890123 does not match formatted value 234567890123")
+
+	var buf bytes.Buffer
+	require.ErrorContains(t, NewWriter(&buf).Write(file), "Amount 1234567890123 does not match formatted value 234567890123")
+	require.Zero(t, buf.Len())
+}
+
+func TestFile_ADVAmountNegativeRejectedOnWrite(t *testing.T) {
+	file := advFileWithEntryAmount(t, -100)
+
+	require.True(t, base.Match(file.Validate(), ErrNegativeAmount))
+
+	var buf bytes.Buffer
+	require.True(t, base.Match(NewWriter(&buf).Write(file), ErrNegativeAmount))
+	require.Zero(t, buf.Len())
+}
+
+func TestFile_IATAmountOverflowBypassBatchValidation(t *testing.T) {
+	file := iatFileWithEntryAmount(t, 12345678901)
+	require.NoError(t, file.ValidateWith(&ValidateOpts{BypassBatchValidation: true}))
+}
+
+func TestFileFromJSON_IATAmountOverflow(t *testing.T) {
+	bs, err := os.ReadFile(filepath.Join("test", "testdata", "iat-debit.json"))
+	require.NoError(t, err)
+	bs = bytes.Replace(bs, []byte(`"amount": 100000`), []byte(`"amount": 12345678901`), 1)
+
+	_, err = FileFromJSON(bs)
+	require.ErrorContains(t, err, "Amount 12345678901 does not match formatted value 2345678901")
+}
+
+func TestFileFromJSON_ADVAmountOverflow(t *testing.T) {
+	bs, err := os.ReadFile(filepath.Join("test", "testdata", "adv-valid.json"))
+	require.NoError(t, err)
+	bs = bytes.Replace(bs, []byte(`"amount": 100000`), []byte(`"amount": 1234567890123`), 1)
+
+	_, err = FileFromJSON(bs)
+	require.ErrorContains(t, err, "Amount 1234567890123 does not match formatted value 234567890123")
+}
+
 // TestFile_ValidateTotals tests the ValidateTotals method
 func TestFile_ValidateTotals(t *testing.T) {
 	t.Run("after reading with ordinary validation disabled", func(t *testing.T) {
