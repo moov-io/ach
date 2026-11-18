@@ -2868,40 +2868,42 @@ func TestFileLineNumbers(t *testing.T) {
 
 func TestFile__SegmentFileIATPreservesPaymentInstructions(t *testing.T) {
 	f, err := os.Open(filepath.Join("test", "testdata", "iat-mixedDebitCredit.ach"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer f.Close()
 
 	achFile, err := NewReader(f).Read()
-	if err != nil {
-		t.Fatalf("reading file: %v", err)
-	}
+	require.NoError(t, err)
 
-	// Use values that make FX reference and settlement date visible in the output.
+	// Overlay non-default IAT header fields so a missed copy cannot match NewIATBatchHeader zeros.
 	header := achFile.IATBatches[0].GetHeader()
+	header.IATIndicator = IATCOR
 	header.ForeignExchangeIndicator = "FV"
 	header.ForeignExchangeReferenceIndicator = 1
 	header.ForeignExchangeReference = "1.250000"
-	if err := achFile.Validate(); err != nil {
-		t.Fatalf("validating file: %v", err)
-	}
+	header.SettlementDate = "100"
+	header.OriginatorStatusCode = 1
+	require.NoError(t, achFile.Validate())
 
 	creditFile, debitFile, err := achFile.SegmentFile(NewSegmentFileConfiguration())
-	if err != nil {
-		t.Fatalf("segmenting file: %v", err)
-	}
+	require.NoError(t, err)
 
-	for name, seg := range map[string]*File{"credit": creditFile, "debit": debitFile} {
-		if len(seg.IATBatches) != 1 {
-			t.Fatalf("%s file: expected 1 IAT batch, got %d", name, len(seg.IATBatches))
-		}
-		got := seg.IATBatches[0].GetHeader()
-		if got.EffectiveEntryDate != header.EffectiveEntryDate {
-			t.Errorf("%s file: EffectiveEntryDate=%q, want %q", name, got.EffectiveEntryDate, header.EffectiveEntryDate)
-		}
-		if got.ForeignExchangeReference != header.ForeignExchangeReference {
-			t.Errorf("%s file: ForeignExchangeReference=%q, want %q", name, got.ForeignExchangeReference, header.ForeignExchangeReference)
-		}
+	for _, tc := range []struct {
+		name string
+		file *File
+	}{
+		{"credit", creditFile},
+		{"debit", debitFile},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			require.Len(t, tc.file.IATBatches, 1)
+			got := tc.file.IATBatches[0].GetHeader()
+			require.Equal(t, IATCOR, got.IATIndicator)
+			require.Equal(t, "FV", got.ForeignExchangeIndicator)
+			require.Equal(t, 1, got.ForeignExchangeReferenceIndicator)
+			require.Equal(t, "1.250000", got.ForeignExchangeReference)
+			require.Equal(t, "190808", got.EffectiveEntryDate)
+			require.Equal(t, "100", got.SettlementDate)
+			require.Equal(t, 1, got.OriginatorStatusCode)
+		})
 	}
 }
