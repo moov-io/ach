@@ -37,7 +37,7 @@ USAGE
    achcli [-mask] [-pretty] [-validate opts.json] file.ach|-
 
 EXAMPLES
-  achcli -diff first.ach second.ach    Show the difference between two ACH files
+  achcli -diff first.ach second.ach    Show differing header, batch, entry, addenda and control fields
   achcli -mask file.ach                Print file details with personally identifiable information partially removed
   achcli -reformat=json first.ach      Convert an incoming ACH file into another format (options: ach, json)
   achcli -reformat=json - < file.ach   Read the input from stdin instead of a file
@@ -170,7 +170,18 @@ Masks account numbers, names, etc.
 achcli -diff file1.ach file2.ach
 ```
 
-Shows differences in headers, batches, etc., using colored output.
+Prints only the fields that differ: file header (including creation date/time and File ID modifier), batches, entries, addenda, and controls. Identical files produce no output. Changed cells use `-` / `+` rows and color when stdout is a terminal.
+
+```
+--- a.ach
++++ b.ach
+
+Batch 0000001 PPD
+  Entry 121042880000001
+      Amount
+    - 2543
+    + 9999
+```
 
 ### Reformat to JSON
 

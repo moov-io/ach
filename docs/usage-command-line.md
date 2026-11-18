@@ -20,7 +20,7 @@ USAGE
    achcli [-mask] [-pretty] [-validate opts.json] path/to/file.ach
 
 EXAMPLES
-  achcli -diff first.ach second.ach    Show the difference between two ACH files
+  achcli -diff first.ach second.ach    Show differing header, batch, entry, addenda and control fields
   achcli -mask file.ach                Print file details with personally identifiable information partially removed
   achcli -reformat=json first.ach      Convert an incoming ACH file into another format (options: ach, json)
   achcli -validate opts.json file.ach  Read an ACH File with the provided ValidateOpts
