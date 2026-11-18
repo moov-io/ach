@@ -1084,9 +1084,8 @@ func (f *File) ValidateWith(opts *ValidateOpts) error {
 	}
 
 	if !f.IsADV() {
-		// The value of the Batch Count Field is equal to the number of Company/Batch/Header Records in the file.
-		if f.Control.BatchCount != (len(f.Batches) + len(f.IATBatches)) {
-			return NewErrFileCalculatedControlEquality("BatchCount", len(f.Batches), f.Control.BatchCount)
+		if err := f.isBatchCount(false); err != nil {
+			return err
 		}
 
 		if !opts.BypassBatchValidation {

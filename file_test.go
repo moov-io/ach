@@ -2608,6 +2608,26 @@ func TestFile_BypassBatchValidation(t *testing.T) {
 
 // TestFile_ValidateTotals tests the ValidateTotals method
 func TestFile_ValidateTotals(t *testing.T) {
+	t.Run("after reading with ordinary validation disabled", func(t *testing.T) {
+		input, err := os.ReadFile("test/testdata/ppd-debit-invalid-entryDetail-checkDigit.ach")
+		require.NoError(t, err)
+		reader := NewReader(bytes.NewReader(input))
+		reader.SetValidation(&ValidateOpts{SkipAll: true})
+
+		file, err := reader.Read()
+		require.NoError(t, err)
+		require.NoError(t, file.ValidateTotals())
+
+		file.Control.TotalDebitEntryDollarAmountInFile++
+		err = file.ValidateTotals()
+		require.ErrorContains(t, err, "TotalDebitEntryDollarAmountInFile")
+
+		file.Control.TotalDebitEntryDollarAmountInFile--
+		file.Batches[0].GetEntries()[0].Amount++
+		err = file.ValidateTotals()
+		require.ErrorContains(t, err, "TotalDebitEntryDollarAmount")
+	})
+
 	t.Run("valid file with PPD batch", func(t *testing.T) {
 		file := mockFilePPD(t)
 		err := file.ValidateTotals()
@@ -2809,6 +2829,11 @@ func TestFile_isBatchCount(t *testing.T) {
 
 		err := file.isBatchCount(false)
 		require.NoError(t, err)
+
+		file.Control.BatchCount = 1
+		want := NewErrFileCalculatedControlEquality("BatchCount", 2, 1)
+		require.ErrorIs(t, file.Validate(), want)
+		require.ErrorIs(t, file.ValidateTotals(), want)
 	})
 }
 
