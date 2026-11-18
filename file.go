@@ -1148,6 +1148,11 @@ func (f *File) validateBatches(opts *ValidateOpts) error {
 		}
 	}
 	for i := range f.IATBatches {
+		if header := f.IATBatches[i].Header; header != nil {
+			if err := header.Validate(); err != nil {
+				return err
+			}
+		}
 		for _, ed := range f.IATBatches[i].GetEntries() {
 			if err := ed.Validate(); err != nil {
 				return err
