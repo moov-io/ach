@@ -285,24 +285,6 @@ The package [`github.com/moov-io/ach`](https://pkg.go.dev/github.com/moov-io/ach
 
 </details>
 
-#### Validate file and batch control totals
-
-To check only the stored control totals of a raw ACH file in Go, skip the reader's ordinary field and batch validations and call `File.ValidateTotals` explicitly.
-
-```go
-func validateControlTotals(input io.Reader) error {
-    reader := ach.NewReader(input)
-    reader.SetValidation(&ach.ValidateOpts{SkipAll: true})
-    file, err := reader.Read()
-    if err != nil {
-        return err
-    }
-    return file.ValidateTotals()
-}
-```
-
-The reader still reports parse errors. `ValidateTotals` compares counts, entry hashes, and debit and credit totals at the file and batch levels. Run it before calling `File.Create`, which recalculates the control records.
-
 ### Command line
 
 On each release there's an `achcli` utility released. This tool can display ACH files in a human-readable format which is easier to read than their plaintext format. It also allows masking `DFIAccountNumber` values with the `-mask` flag.
