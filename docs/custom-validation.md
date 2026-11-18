@@ -164,6 +164,24 @@ if err != nil {
 }
 ```
 
+## Control totals
+
+`File.Validate()` runs Nacha field checks and then `File.ValidateTotals()`. To check only stored file and batch control totals, skip ordinary reader validation and call `ValidateTotals` yourself.
+
+```
+func validateControlTotals(input io.Reader) error {
+    reader := ach.NewReader(input)
+    reader.SetValidation(&ach.ValidateOpts{SkipAll: true})
+    file, err := reader.Read()
+    if err != nil {
+        return err
+    }
+    return file.ValidateTotals()
+}
+```
+
+The reader still reports parse errors. `ValidateTotals` compares counts, entry hashes, and debit and credit totals at the file and batch levels. Run it before calling `File.Create`, which recalculates the control records. `ValidateTotals` still runs when `SkipAll` is set. `achcli -validate-totals` runs the same stored-control check on raw ACH files.
+
 ## JSON Options
 
 The JSON representation includes the `ValidateOpts` if specified on the `*ach.File` instance.
