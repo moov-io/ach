@@ -23,16 +23,23 @@ import (
 	"time"
 )
 
+var (
+	// ErrReversingIATBatches is returned by File.Reversal when the file contains IAT batches.
+	ErrReversingIATBatches = errors.New("reversing IAT batches is not supported")
+	// ErrReversingADVBatches is returned by File.Reversal when the file contains ADV batches.
+	ErrReversingADVBatches = errors.New("reversing ADV batches is not supported")
+)
+
 // Reversal will transform a File into a Nacha compliant reversal which can be transmitted to undo fund movement.
 //
 // Files with IAT or ADV batches are not supported and are returned unchanged with an error.
 func (f *File) Reversal(effectiveEntryDate time.Time) error {
 	if len(f.IATBatches) > 0 {
-		return errors.New("reversing IAT batches is not supported")
+		return ErrReversingIATBatches
 	}
 	for i := range f.Batches {
 		if bh := f.Batches[i].GetHeader(); bh != nil && bh.StandardEntryClassCode == ADV {
-			return errors.New("reversing ADV batches is not supported")
+			return ErrReversingADVBatches
 		}
 	}
 

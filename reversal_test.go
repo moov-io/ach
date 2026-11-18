@@ -139,7 +139,7 @@ func TestReversal_IAT(t *testing.T) {
 	transactionCode := file.IATBatches[0].Entries[0].TransactionCode
 
 	err = file.Reversal(time.Now())
-	require.ErrorContains(t, err, "reversing IAT batches is not supported")
+	require.ErrorIs(t, err, ErrReversingIATBatches)
 
 	// The file is left as it was
 	require.Equal(t, creationDate, file.Header.FileCreationDate)
@@ -156,7 +156,7 @@ func TestReversal_ADV(t *testing.T) {
 			creationDate := file.Header.FileCreationDate
 
 			err = file.Reversal(time.Now())
-			require.ErrorContains(t, err, "reversing ADV batches is not supported")
+			require.ErrorIs(t, err, ErrReversingADVBatches)
 
 			// The file is left as it was
 			require.Equal(t, creationDate, file.Header.FileCreationDate)

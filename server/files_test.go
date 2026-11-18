@@ -1574,6 +1574,43 @@ func TestFiles__reverseFileEndpointWithDate(t *testing.T) {
 	require.Equal(t, "250615", bh.EffectiveEntryDate)
 }
 
+func TestFiles__reverseFileEndpointUnsupported(t *testing.T) {
+	tests := []struct {
+		name    string
+		fixture string
+		want    error
+	}{
+		{name: "IAT", fixture: "iat-debit.ach", want: ach.ErrReversingIATBatches},
+		{name: "ADV", fixture: "adv.ach", want: ach.ErrReversingADVBatches},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			logger := log.NewNopLogger()
+			repo := NewRepositoryInMemory(testTTLDuration, logger)
+			svc := NewService(repo)
+			router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
+
+			file, err := ach.ReadFile(filepath.Join("..", "test", "testdata", tc.fixture))
+			require.NoError(t, err)
+			file.ID = base.ID()
+			require.NoError(t, repo.StoreFile(file))
+
+			w := httptest.NewRecorder()
+			req := httptest.NewRequest("POST", fmt.Sprintf("/files/%s/reverse", file.ID), nil)
+			req.Header.Set("Origin", "https://moov.io")
+			router.ServeHTTP(w, req)
+			w.Flush()
+
+			require.Equal(t, http.StatusBadRequest, w.Code)
+			var resp struct {
+				Err string `json:"error"`
+			}
+			require.NoError(t, json.NewDecoder(w.Body).Decode(&resp))
+			require.Equal(t, tc.want.Error(), resp.Err)
+		})
+	}
+}
+
 func TestFilesError__reverseFileEndpoint(t *testing.T) {
 	repo := NewRepositoryInMemory(testTTLDuration, nil)
 	svc := NewService(repo)
