@@ -92,9 +92,15 @@ docker-hub:
 	docker build --pull -t moov/ach:$(VERSION) -f Dockerfile .
 	docker tag moov/ach:$(VERSION) moov/ach:latest
 
+# Buildx on GitHub-hosted runners attaches provenance attestations by default.
+# That makes ${VERSION}-amd64 a manifest list, and `docker manifest create`
+# fails with "is a manifest list". Keep each arch tag as a single image, and
+# combine them with imagetools so ${VERSION} is linux/amd64 + linux/arm64.
+DOCKER_BUILD_FLAGS ?= --provenance=false --sbom=false
+
 .PHONY: docker-build-arch
 docker-build-arch:
-	docker build --platform linux/$(ARCH) -t moov/ach:$(VERSION)-$(ARCH) -f Dockerfile .
+	docker build --platform linux/$(ARCH) ${DOCKER_BUILD_FLAGS} -t moov/ach:$(VERSION)-$(ARCH) -f Dockerfile .
 
 .PHONY: docker-push-arch
 docker-push-arch:
@@ -102,12 +108,8 @@ docker-push-arch:
 
 .PHONY: docker-manifest
 docker-manifest:
-# Versioned
-	docker manifest create moov/ach:$(VERSION) moov/ach:$(VERSION)-amd64 moov/ach:$(VERSION)-arm64
-	docker manifest push moov/ach:$(VERSION)
-# Latest
-	docker manifest create moov/ach:latest moov/ach:$(VERSION)-amd64 moov/ach:$(VERSION)-arm64
-	docker manifest push moov/ach:latest
+	docker buildx imagetools create -t moov/ach:$(VERSION) moov/ach:$(VERSION)-amd64 moov/ach:$(VERSION)-arm64
+	docker buildx imagetools create -t moov/ach:latest moov/ach:$(VERSION)-amd64 moov/ach:$(VERSION)-arm64
 
 .PHONY: dev-docker
 dev-docker:

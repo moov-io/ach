@@ -1,0 +1,35 @@
+# Use https://app.stepsecurity.io/ to improve workflow security
+name: Docker Manifest
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Existing arch tags VERSION-amd64 and VERSION-arm64
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  docker-manifest:
+    name: Docker Manifest
+    if: github.repository_owner == 'moov-io' && !github.event.repository.fork
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+
+    - name: Login to DockerHub
+      run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Create and push manifests
+      env:
+        VERSION: ${{ inputs.version }}
+      run: make docker-manifest
