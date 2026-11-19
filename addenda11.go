@@ -173,10 +173,10 @@ func (addenda11 *Addenda11) fieldInclusion() error {
 	if addenda11.TypeCode == "" {
 		return fieldError("TypeCode", ErrConstructor, addenda11.TypeCode)
 	}
-	if addenda11.OriginatorName == "" {
+	if strings.TrimSpace(addenda11.OriginatorName) == "" {
 		return fieldError("OriginatorName", ErrConstructor, addenda11.OriginatorName)
 	}
-	if addenda11.OriginatorStreetAddress == "" {
+	if strings.TrimSpace(addenda11.OriginatorStreetAddress) == "" {
 		return fieldError("OriginatorStreetAddress", ErrConstructor, addenda11.OriginatorStreetAddress)
 	}
 	if addenda11.EntryDetailSequenceNumber < 0 {

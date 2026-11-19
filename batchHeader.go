@@ -350,13 +350,13 @@ func (bh *BatchHeader) fieldInclusion() error {
 	if bh.CompanyName == "" {
 		return fieldError("CompanyName", ErrConstructor, bh.CompanyName)
 	}
-	if bh.CompanyIdentification == "" {
+	if strings.TrimSpace(bh.CompanyIdentification) == "" {
 		return fieldError("CompanyIdentification", ErrConstructor, bh.CompanyIdentification)
 	}
 	if bh.StandardEntryClassCode == "" {
 		return fieldError("StandardEntryClassCode", ErrConstructor, bh.StandardEntryClassCode)
 	}
-	if bh.CompanyEntryDescription == "" {
+	if strings.TrimSpace(bh.CompanyEntryDescription) == "" {
 		return fieldError("CompanyEntryDescription", ErrConstructor, bh.CompanyEntryDescription)
 	}
 	if bh.ODFIIdentification == "" {

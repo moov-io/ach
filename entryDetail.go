@@ -374,7 +374,7 @@ func (ed *EntryDetail) fieldInclusion() error {
 	if ed.RDFIIdentification == "" {
 		return fieldError("RDFIIdentification", ErrConstructor, ed.RDFIIdentificationField())
 	}
-	if ed.DFIAccountNumber == "" {
+	if strings.TrimSpace(ed.DFIAccountNumber) == "" {
 		return fieldError("DFIAccountNumber", ErrConstructor, ed.DFIAccountNumber)
 	}
 	if ed.IndividualName == "" {

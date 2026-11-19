@@ -47,6 +47,39 @@ func TestMockAddenda02(t *testing.T) {
 	}
 }
 
+func TestAddenda02FieldPresence(t *testing.T) {
+	for _, tc := range []struct {
+		name     string
+		field    func(*Addenda02) *string
+		required bool
+	}{
+		{"TerminalIdentificationCode", func(a *Addenda02) *string { return &a.TerminalIdentificationCode }, false},
+		{"TransactionSerialNumber", func(a *Addenda02) *string { return &a.TransactionSerialNumber }, true},
+		{"TransactionDate", func(a *Addenda02) *string { return &a.TransactionDate }, true},
+		{"TerminalLocation", func(a *Addenda02) *string { return &a.TerminalLocation }, true},
+		{"TerminalCity", func(a *Addenda02) *string { return &a.TerminalCity }, true},
+		{"TerminalState", func(a *Addenda02) *string { return &a.TerminalState }, true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			record := mockAddenda02()
+			*tc.field(record) = "  "
+			parsed := NewAddenda02()
+			parsed.Parse(record.String())
+
+			for _, candidate := range []*Addenda02{record, parsed} {
+				err := candidate.Validate()
+				if tc.required {
+					if !base.Match(err, ErrFieldRequired) {
+						t.Errorf("Validate() = %v, want ErrFieldRequired", err)
+					}
+				} else if err != nil {
+					t.Errorf("Validate() = %v, want nil for a blank field", err)
+				}
+			}
+		})
+	}
+}
+
 // testAddenda02ValidTypeCode validates Addenda02 TypeCode
 func testAddenda02ValidTypeCode(t testing.TB) {
 	addenda02 := mockAddenda02()

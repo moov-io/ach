@@ -237,19 +237,19 @@ func (addenda02 *Addenda02) fieldInclusion() error {
 		return fieldError("TypeCode", ErrConstructor, addenda02.TypeCode)
 	}
 	// Required Fields
-	if addenda02.TransactionSerialNumber == "" {
+	if strings.TrimSpace(addenda02.TransactionSerialNumber) == "" {
 		return fieldError("TransactionSerialNumber", ErrFieldRequired, addenda02.TransactionSerialNumber)
 	}
-	if addenda02.TransactionDate == "" {
+	if strings.TrimSpace(addenda02.TransactionDate) == "" {
 		return fieldError("TransactionDate", ErrFieldRequired, addenda02.TransactionDate)
 	}
-	if addenda02.TerminalLocation == "" {
+	if strings.TrimSpace(addenda02.TerminalLocation) == "" {
 		return fieldError("TerminalLocation", ErrFieldRequired, addenda02.TerminalLocation)
 	}
-	if addenda02.TerminalCity == "" {
+	if strings.TrimSpace(addenda02.TerminalCity) == "" {
 		return fieldError("TerminalCity", ErrFieldRequired, addenda02.TerminalCity)
 	}
-	if addenda02.TerminalState == "" {
+	if strings.TrimSpace(addenda02.TerminalState) == "" {
 		return fieldError("TerminalState", ErrFieldRequired, addenda02.TerminalState)
 	}
 	return nil

@@ -186,10 +186,10 @@ func (addenda12 *Addenda12) fieldInclusion() error {
 	if addenda12.TypeCode == "" {
 		return fieldError("TypeCode", ErrConstructor, addenda12.TypeCode)
 	}
-	if addenda12.OriginatorCityStateProvince == "" {
+	if strings.TrimSpace(addenda12.OriginatorCityStateProvince) == "" {
 		return fieldError("OriginatorCityStateProvince", ErrConstructor, addenda12.OriginatorCityStateProvince)
 	}
-	if addenda12.OriginatorCountryPostalCode == "" {
+	if strings.TrimSpace(addenda12.OriginatorCountryPostalCode) == "" {
 		return fieldError("OriginatorCountryPostalCode", ErrConstructor, addenda12.OriginatorCountryPostalCode)
 	}
 	if addenda12.EntryDetailSequenceNumber < 0 {
