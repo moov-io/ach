@@ -135,7 +135,7 @@ cloudshell_open --repo_url "https://github.com/moov-io/ach" --page "shell" --git
 
 Start the ACH server inside the cloned repository.
 ```
-go run ./cmd/serverr
+go run ./cmd/server
 ```
 
 Connect to the web preview (e.g. `https://YOUR-ACH-APP-URL.a.run.app:8080/files`)
@@ -232,7 +232,7 @@ By design ACH **does not persist** (save) any data about the files, batches, or 
 
 ### Go library
 
-This project uses [Go Modules](https://go.dev/blog/using-go-modules) and Go v1.18 or newer. See [Golang's install instructions](https://golang.org/doc/install) for help in setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/ach/releases/latest) as well. We highly recommend you use a tagged release for production.
+This project uses [Go Modules](https://go.dev/blog/using-go-modules) and Go v1.26 or newer. See [Golang's install instructions](https://golang.org/doc/install) for help in setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/ach/releases/latest) as well. We highly recommend you use a tagged release for production.
 
 ```
 # Pull down into the Go Module cache
@@ -357,13 +357,29 @@ autorest --input-file=openapi.yaml --csharp --output-folder=./client/csharp
 
 #### Key API Endpoints
 
-The ACH API provides the following main endpoints:
+The ACH API provides the following main endpoints (see the [OpenAPI specification](openapi.yaml) for full request and response schemas):
 
-- `POST /files/{fileID}` - Create ACH files from JSON or plaintext
+- `GET /ping` - Health check
 - `GET /files` - List all ACH files
+- `POST /files/create` - Create an ACH file (generated ID) from JSON or plaintext
+- `POST /files/{fileID}` - Create an ACH file with a specific ID from JSON or plaintext
+- `POST /files/{fileID}/new` - Create a new ACH file
 - `GET /files/{fileID}` - Retrieve a specific ACH file
-- `POST /files/{fileID}/validate` - Validate an ACH file
-- `POST /files/{fileID}/segments` - Segment an ACH file
+- `GET /files/{fileID}/build` - Build an ACH file (calculate control records)
+- `GET /files/{fileID}/contents` - Get Nacha-formatted file contents
+- `GET /files/{fileID}/validate` - Validate an ACH file
+- `POST /files/{fileID}/validate` - Validate an ACH file with custom options
+- `DELETE /files/{fileID}` - Delete an ACH file
+- `GET /files/{fileID}/batches` - List batches in a file
+- `POST /files/{fileID}/batches` - Append a batch to a file
+- `GET /files/{fileID}/batches/{batchID}` - Retrieve a batch
+- `DELETE /files/{fileID}/batches/{batchID}` - Delete a batch
+- `POST /files/{fileID}/segment` - Segment an ACH file into credit and debit files
+- `POST /segment` - Segment an ACH file provided in the request body
+- `POST /files/{fileID}/flatten` - Flatten batches in an ACH file
+- `POST /files/{fileID}/reverse` - Reverse an ACH file
+- `POST /files/{fileID}/balance` - Add an offsetting entry to balance an ACH file
+- `POST /merge` - Merge ACH files
 
 #### Validation Options
 
@@ -396,21 +412,24 @@ curl -X POST "http://localhost:8080/files/my-file-id" \
     "batches": [
       {
         "batchHeader": {
+          "serviceClassCode": 220,
           "companyName": "Name on Account",
           "companyIdentification": "121042882",
           "standardEntryClassCode": "PPD",
           "companyEntryDescription": "REG.SALARY",
           "effectiveEntryDate": "190625",
-          "ODFIIdentification": "231380104"
+          "ODFIIdentification": "12104288"
         },
-        "entries": [
+        "entryDetails": [
           {
-            "transactionCode": "22",
-            "routingNumber": "231380104",
-            "accountNumber": "12345678",
+            "transactionCode": 22,
+            "RDFIIdentification": "23138010",
+            "checkDigit": "4",
+            "DFIAccountNumber": "12345678",
             "amount": 100000000,
+            "identificationNumber": "012104288000001",
             "individualName": "Receiver Account Name",
-            "individualIdentificationNumber": "0121042880000001"
+            "traceNumber": "121042880000001"
           }
         ]
       }
@@ -469,7 +488,7 @@ Note: 32-bit platforms have known issues and are not supported.
 
 Yes please! Please review our [Contributing guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) to get started! Check out our [issues for first time contributors](https://github.com/moov-io/ach/contribute) for something to help out with.
 
-This project uses [Go Modules](https://go.dev/blog/using-go-modules) and Go v1.18 or newer. See [Golang's install instructions](https://golang.org/doc/install) for help setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/ach/releases/latest) as well. We highly recommend you use a tagged release for production.
+This project uses [Go Modules](https://go.dev/blog/using-go-modules) and Go v1.26 or newer. See [Golang's install instructions](https://golang.org/doc/install) for help setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/ach/releases/latest) as well. We highly recommend you use a tagged release for production.
 
 ### Releasing
 
