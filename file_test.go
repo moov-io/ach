@@ -3052,3 +3052,32 @@ func TestFileValidate_IATBatches(t *testing.T) {
 		})
 	}
 }
+
+func TestFile__SegmentFilePreservesFileHeaderCodes(t *testing.T) {
+	f, err := os.Open(filepath.Join("test", "testdata", "ppd-mixedDebitCredit.ach"))
+	require.NoError(t, err)
+	defer f.Close()
+
+	achFile, err := NewReader(f).Read()
+	require.NoError(t, err)
+
+	// Overlay a non-default ReferenceCode so a missed copy cannot match NewFileHeader zeros.
+	achFile.Header.ReferenceCode = "REF12345"
+	require.NoError(t, achFile.Validate())
+
+	creditFile, debitFile, err := achFile.SegmentFile(NewSegmentFileConfiguration())
+	require.NoError(t, err)
+
+	for _, tc := range []struct {
+		name string
+		file *File
+	}{
+		{"credit", creditFile},
+		{"debit", debitFile},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			require.Equal(t, "REF12345", tc.file.Header.ReferenceCode)
+			require.Equal(t, "1", tc.file.Header.FormatCode)
+		})
+	}
+}
