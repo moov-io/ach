@@ -1624,6 +1624,8 @@ func (f *File) addFileHeaderData(file *File) *File {
 	file.Header.FileIDModifier = f.Header.FileIDModifier
 	file.Header.ImmediateDestinationName = f.Header.ImmediateDestinationName
 	file.Header.ImmediateOriginName = f.Header.ImmediateOriginName
+	file.Header.FormatCode = f.Header.FormatCode
+	file.Header.ReferenceCode = f.Header.ReferenceCode
 	return file
 }
 
