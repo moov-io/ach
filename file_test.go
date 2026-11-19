@@ -3055,26 +3055,29 @@ func TestFileValidate_IATBatches(t *testing.T) {
 
 func TestFile__SegmentFilePreservesFileHeaderCodes(t *testing.T) {
 	f, err := os.Open(filepath.Join("test", "testdata", "ppd-mixedDebitCredit.ach"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+	defer f.Close()
+
 	achFile, err := NewReader(f).Read()
-	if err != nil {
-		t.Fatalf("Issue reading file: %+v \n", err)
-	}
+	require.NoError(t, err)
+
+	// Overlay a non-default ReferenceCode so a missed copy cannot match NewFileHeader zeros.
 	achFile.Header.ReferenceCode = "REF12345"
-	achFile.Header.FormatCode = "1"
+	require.NoError(t, achFile.Validate())
 
 	creditFile, debitFile, err := achFile.SegmentFile(NewSegmentFileConfiguration())
-	if err != nil {
-		t.Fatalf("Could not segment the file: %+v \n", err)
-	}
-	for name, file := range map[string]*File{"credit": creditFile, "debit": debitFile} {
-		if file.Header.ReferenceCode != achFile.Header.ReferenceCode {
-			t.Errorf("%s file ReferenceCode = %q, want %q", name, file.Header.ReferenceCode, achFile.Header.ReferenceCode)
-		}
-		if file.Header.FormatCode != achFile.Header.FormatCode {
-			t.Errorf("%s file FormatCode = %q, want %q", name, file.Header.FormatCode, achFile.Header.FormatCode)
-		}
+	require.NoError(t, err)
+
+	for _, tc := range []struct {
+		name string
+		file *File
+	}{
+		{"credit", creditFile},
+		{"debit", debitFile},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			require.Equal(t, "REF12345", tc.file.Header.ReferenceCode)
+			require.Equal(t, "1", tc.file.Header.FormatCode)
+		})
 	}
 }
