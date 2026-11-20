@@ -59,9 +59,21 @@ FLAGS
 
 ## Install and Usage
 
-```
-$ wget -O achcli https://github.com/moov-io/ach/releases/download/v1.6.1/achcli-darwin-amd64 && chmod +x achcli
+Install `achcli` with Go:
 
+```
+$ go install github.com/moov-io/ach/cmd/achcli@latest
+```
+
+Or download a release tarball from the [latest release](https://github.com/moov-io/ach/releases/latest). Assets are named `ach_<version>_<os>_<arch>.tar.gz` (for example `ach_1.68.0_linux_amd64.tar.gz`, `ach_1.68.0_darwin_arm64.tar.gz`, `ach_1.68.0_darwin_amd64.tar.gz`, or `ach_1.68.0_windows_amd64.tar.gz`):
+
+```
+# Linux amd64 example — replace the version and os/arch to match your platform
+$ curl -sSL "https://github.com/moov-io/ach/releases/download/v1.68.0/ach_1.68.0_linux_amd64.tar.gz" | tar -xz achcli
+$ chmod +x achcli
+```
+
+```
 $ achcli test/testdata/ppd-debit.ach
 Describing ACH file 'test/testdata/ppd-debit.ach'
 
