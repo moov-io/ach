@@ -52,6 +52,10 @@ func (d *differ) diffBatch(a, b ach.Batcher) {
 	if !batcherPresent(a) && !batcherPresent(b) {
 		return
 	}
+	prev := d.sec
+	d.sec = maskedSEC(a, b)
+	defer func() { d.sec = prev }()
+
 	if !batcherPresent(a) {
 		d.diffBatchOnly(true, b)
 		return
@@ -66,7 +70,7 @@ func (d *differ) diffBatch(a, b ach.Batcher) {
 		return
 	}
 	var buf bytes.Buffer
-	inner := &differ{out: &buf, color: d.color, left: d.left, right: d.right}
+	inner := d.child(&buf)
 	inner.diffBatchRecords(a, b)
 	if buf.Len() == 0 {
 		return
@@ -123,6 +127,17 @@ func batchTitle(a, b ach.Batcher) string {
 		return strings.TrimSpace("Batch " + na + " " + sec)
 	}
 	return fmt.Sprintf("Batch %s vs %s %s", na, nb, sec)
+}
+
+// maskedSEC returns ENR or DNE when either batch has that SEC code, as those
+// batches carry personal data in their Addenda05 records.
+func maskedSEC(a, b ach.Batcher) string {
+	for _, sec := range []string{batchSEC(a), batchSEC(b)} {
+		if sec == ach.ENR || sec == ach.DNE {
+			return sec
+		}
+	}
+	return ""
 }
 
 func isADVBatch(b ach.Batcher) bool {
@@ -261,7 +276,7 @@ func entryTrace(a, b *ach.EntryDetail) string {
 
 func (d *differ) diffEntry(a, b *ach.EntryDetail) {
 	var buf bytes.Buffer
-	inner := &differ{out: &buf, color: d.color, left: d.left, right: d.right}
+	inner := d.child(&buf)
 	inner.oneOrBoth("    ", a == nil, b == nil, entryCols(a, b))
 	inner.diffEntryAddenda(a, b)
 	if buf.Len() == 0 {

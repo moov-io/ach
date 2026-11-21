@@ -14,6 +14,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/ach"
+	"github.com/moov-io/ach/cmd/achcli/describe/mask"
 	"github.com/stretchr/testify/require"
 )
 
@@ -27,7 +28,7 @@ func readPPD(t *testing.T) *ach.File {
 func diffText(t *testing.T, left, right *ach.File) string {
 	t.Helper()
 	var buf bytes.Buffer
-	require.NoError(t, writeDiff(&buf, []string{"left.ach", "right.ach"}, left, right, false))
+	require.NoError(t, writeDiff(&buf, []string{"left.ach", "right.ach"}, left, right, false, mask.Options{}))
 	return buf.String()
 }
 
@@ -310,7 +311,7 @@ func TestWriteDiff_color(t *testing.T) {
 	right.Batches[0].GetEntries()[0].Amount = 9999
 
 	var buf bytes.Buffer
-	require.NoError(t, writeDiff(&buf, []string{"left.ach", "right.ach"}, left, right, true))
+	require.NoError(t, writeDiff(&buf, []string{"left.ach", "right.ach"}, left, right, true, mask.Options{}))
 	out := buf.String()
 	require.Contains(t, out, "\x1b[31m")
 	require.Contains(t, out, "\x1b[32m")
@@ -456,13 +457,193 @@ func TestDiffCLI_issue1931(t *testing.T) {
 }
 
 func TestDiffFiles_wrongPathCount(t *testing.T) {
-	err := diffFiles([]string{"only.ach"}, nil)
+	err := diffFiles([]string{"only.ach"}, nil, mask.Options{})
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "expected 2 files")
 }
 
 func TestDiffFiles_missingFile(t *testing.T) {
-	err := diffFiles([]string{"no-such-left.ach", "no-such-right.ach"}, nil)
+	err := diffFiles([]string{"no-such-left.ach", "no-such-right.ach"}, nil, mask.Options{})
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "problem reading")
+}
+
+func diffTextMasked(t *testing.T, left, right *ach.File, opts mask.Options) string {
+	t.Helper()
+	var buf bytes.Buffer
+	require.NoError(t, writeDiff(&buf, []string{"left.ach", "right.ach"}, left, right, false, opts))
+	return buf.String()
+}
+
+func TestDiffFiles_mask(t *testing.T) {
+	all := mask.Options{MaskAccountNumbers: true, MaskNames: true, MaskCorrectedData: true}
+
+	cases := []struct {
+		name     string
+		opts     mask.Options
+		edit     func(left, right *ach.File)
+		contains []string
+		hidden   []string
+	}{
+		{
+			name: "entry name and account",
+			opts: all,
+			edit: func(_, right *ach.File) {
+				ed := right.Batches[0].GetEntries()[0]
+				ed.IndividualName = "ALICE SYNTHETIC"
+				ed.DFIAccountNumber = "4401234567"
+			},
+			contains: []string{"Name", "Re****** Ac***** Na**", "AL*** SY*******", "AccountNumber", "****5678", "******4567"},
+			hidden:   []string{"Receiver Account Name", "ALICE SYNTHETIC", "12345678", "4401234567"},
+		},
+		{
+			name: "only names",
+			opts: mask.Options{MaskNames: true},
+			edit: func(_, right *ach.File) {
+				ed := right.Batches[0].GetEntries()[0]
+				ed.IndividualName = "ALICE SYNTHETIC"
+				ed.DFIAccountNumber = "4401234567"
+			},
+			contains: []string{"AL*** SY*******", "12345678", "4401234567"},
+			hidden:   []string{"ALICE SYNTHETIC"},
+		},
+		{
+			// The raw values differ only in digits the mask hides: the row is
+			// still printed so the difference is not lost.
+			name: "difference hidden by the mask is still reported",
+			opts: all,
+			edit: func(left, right *ach.File) {
+				left.Batches[0].GetEntries()[0].DFIAccountNumber = "1112345678"
+				right.Batches[0].GetEntries()[0].DFIAccountNumber = "9992345678"
+			},
+			contains: []string{"Entry 121042880000001", "AccountNumber", "******5678"},
+			hidden:   []string{"1112345678", "9992345678"},
+		},
+		{
+			name: "corrected data",
+			opts: all,
+			edit: func(left, right *ach.File) {
+				l := ach.NewAddenda98()
+				l.CorrectedData = "1918164748"
+				left.Batches[0].GetEntries()[0].Addenda98 = l
+				r := ach.NewAddenda98()
+				r.CorrectedData = "1918169999"
+				right.Batches[0].GetEntries()[0].Addenda98 = r
+			},
+			contains: []string{"Addenda98", "CorrectedData", "******4748", "******9999"},
+			hidden:   []string{"1918164748", "1918169999"},
+		},
+		{
+			name: "DNE customer SSN",
+			opts: all,
+			edit: func(left, right *ach.File) {
+				for i, f := range []*ach.File{left, right} {
+					f.Batches[0].GetHeader().StandardEntryClassCode = ach.DNE
+					ad := ach.NewAddenda05()
+					ad.PaymentRelatedInformation = []string{
+						`DATE OF DEATH*010218*CUSTOMER SSN*123456789*AMOUNT*12.34\`,
+						`DATE OF DEATH*010218*CUSTOMER SSN*987654321*AMOUNT*12.34\`,
+					}[i]
+					ad.SequenceNumber = 1
+					f.Batches[0].GetEntries()[0].Addenda05 = []*ach.Addenda05{ad}
+				}
+			},
+			contains: []string{"Addenda05", "CUSTOMER SSN******6789", "CUSTOMER SSN******4321"},
+			hidden:   []string{"123456789", "987654321"},
+		},
+		{
+			name: "ENR account and name",
+			opts: all,
+			edit: func(left, right *ach.File) {
+				for i, f := range []*ach.File{left, right} {
+					f.Batches[0].GetHeader().StandardEntryClassCode = ach.ENR
+					ad := ach.NewAddenda05()
+					ad.PaymentRelatedInformation = []string{
+						`22*12200004*3*123987654321*777777777*DOE*JOHN*1\`,
+						`22*12200004*3*123987650000*777777777*DOE*JOHN*1\`,
+					}[i]
+					ad.SequenceNumber = 1
+					f.Batches[0].GetEntries()[0].Addenda05 = []*ach.Addenda05{ad}
+				}
+			},
+			contains: []string{"Addenda05", "********4321", "********0000"},
+			hidden:   []string{"123987654321", "123987650000", "777777777", "JOHN"},
+		},
+		{
+			name: "IAT account",
+			opts: all,
+			edit: func(left, right *ach.File) {
+				right.IATBatches[0].GetEntries()[0].DFIAccountNumber = "4401234567"
+			},
+			contains: []string{"IAT Batch", "AccountNumber", "******4567"},
+			hidden:   []string{"4401234567"},
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			name := "ppd-debit.ach"
+			if strings.HasPrefix(tc.name, "IAT") {
+				name = "iat-debit.ach"
+			}
+			left, err := ach.ReadFile(testdataPath(name))
+			require.NoError(t, err)
+			right, err := ach.ReadFile(testdataPath(name))
+			require.NoError(t, err)
+			tc.edit(left, right)
+
+			out := diffTextMasked(t, left, right, tc.opts)
+			for _, s := range tc.contains {
+				require.Contains(t, out, s)
+			}
+			for _, s := range tc.hidden {
+				require.NotContains(t, out, s)
+			}
+		})
+	}
+}
+
+func TestDiffCLI_mask(t *testing.T) {
+	if runtime.GOOS == "js" || runtime.GOOS == "wasip1" {
+		t.Skip("executable CLI tests require native subprocesses")
+	}
+	bin := filepath.Join(t.TempDir(), "achcli")
+	if runtime.GOOS == "windows" {
+		bin += ".exe"
+	}
+	build := exec.CommandContext(t.Context(), "go", "build", "-o", bin, ".")
+	buildOutput, err := build.CombinedOutput()
+	require.NoError(t, err, "%s", buildOutput)
+
+	left := joinACH(
+		"101 231380104 1210428822611160815A094101FED RESERVE SYNTH      NORTHWIND PAYROLL",
+		"5220NORTHWIND PAYROL                    1987654321PPDPAYROLL         261117   1121042880000001",
+		"6222313801044401234567       0000002543EMP0001        ALICE SYNTHETIC         0121042880000001",
+		"822000000100231380100000000000000000000025431987654321                         121042880000001",
+		"9000001000001000000010023138010000000000000000000002543",
+	)
+	right := strings.NewReplacer("4401234567", "4401239999", "ALICE SYNTHETIC", "ALICE CHANGED  ").Replace(left)
+	dir := t.TempDir()
+	a := filepath.Join(dir, "a.ach")
+	b := filepath.Join(dir, "b.ach")
+	require.NoError(t, os.WriteFile(a, []byte(left), 0600))
+	require.NoError(t, os.WriteFile(b, []byte(right), 0600))
+
+	out, err := exec.CommandContext(t.Context(), bin, "-mask", "-diff", a, b).CombinedOutput()
+	require.NoError(t, err, "%s", out)
+	text := string(out)
+	require.Contains(t, text, "AccountNumber")
+	require.Contains(t, text, "******4567")
+	require.Contains(t, text, "******9999")
+	require.Contains(t, text, "AL*** SY*******")
+	require.Contains(t, text, "AL*** CH*****")
+	for _, s := range []string{"4401234567", "4401239999", "SYNTHETIC", "CHANGED"} {
+		require.NotContains(t, text, s)
+	}
+
+	out, err = exec.CommandContext(t.Context(), bin, "-mask.accounts", "-diff", a, b).CombinedOutput()
+	require.NoError(t, err, "%s", out)
+	text = string(out)
+	require.Contains(t, text, "******9999")
+	require.Contains(t, text, "ALICE CHANGED")
+	require.NotContains(t, text, "4401239999")
 }

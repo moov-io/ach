@@ -35,7 +35,7 @@ func (d *differ) diffADVEntries(a, b []*ach.ADVEntryDetail) {
 
 func (d *differ) diffADVEntry(a, b *ach.ADVEntryDetail) {
 	var buf bytes.Buffer
-	inner := &differ{out: &buf, color: d.color, left: d.left, right: d.right}
+	inner := d.child(&buf)
 	inner.oneOrBoth("    ", a == nil, b == nil, advEntryCols(a, b))
 	var left99, right99 *ach.Addenda99
 	if a != nil {
@@ -122,7 +122,7 @@ func iatBatchTitle(a, b ach.IATBatch) string {
 
 func (d *differ) diffIATBatch(a, b ach.IATBatch) {
 	var buf bytes.Buffer
-	inner := &differ{out: &buf, color: d.color, left: d.left, right: d.right}
+	inner := d.child(&buf)
 	inner.nestedSide("  IATBatchHeader", a.GetHeader() == nil, b.GetHeader() == nil, iatBatchHeaderCols(a.GetHeader(), b.GetHeader()))
 	inner.diffIATEntries(a.GetEntries(), b.GetEntries())
 	inner.nestedSide("  BatchControl", a.GetControl() == nil, b.GetControl() == nil, batchControlCols(a.GetControl(), b.GetControl()))
@@ -201,7 +201,7 @@ func (d *differ) diffIATEntries(a, b []*ach.IATEntryDetail) {
 
 func (d *differ) diffIATEntry(a, b *ach.IATEntryDetail) {
 	var buf bytes.Buffer
-	inner := &differ{out: &buf, color: d.color, left: d.left, right: d.right}
+	inner := d.child(&buf)
 	inner.oneOrBoth("    ", a == nil, b == nil, iatEntryCols(a, b))
 	inner.diffIATAddenda(a, b)
 	if buf.Len() == 0 {
