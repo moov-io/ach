@@ -22,6 +22,7 @@ USAGE
 EXAMPLES
   achcli -diff first.ach second.ach    Show differing header, batch, entry, addenda and control fields
   achcli -mask file.ach                Print file details with personally identifiable information partially removed
+  achcli -mask -diff first.ach second.ach  Diff two files with account numbers and names masked
   achcli -reformat=json first.ach      Convert an incoming ACH file into another format (options: ach, json)
   achcli -reformat=json - < file.ach   Read the input from stdin instead of a file
   achcli -diff first.ach - < second.ach  Diff a file against stdin
