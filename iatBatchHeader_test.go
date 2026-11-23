@@ -759,3 +759,17 @@ func TestIATBatchHeaderSpecialCharacter(t *testing.T) {
 		t.Error("Special character should have been allowed with override set.")
 	}
 }
+
+func TestIATBatchHeaderEqual_DestinationCountry(t *testing.T) {
+	a := mockIATBatchHeaderFF()
+	b := mockIATBatchHeaderFF()
+	a.ISODestinationCountryCode = "US"
+	b.ISODestinationCountryCode = "US"
+	if !a.Equal(b) {
+		t.Fatal("expected identical headers to be equal")
+	}
+	b.ISODestinationCountryCode = "CA"
+	if a.Equal(b) {
+		t.Error("headers with different destination countries must not be equal")
+	}
+}
