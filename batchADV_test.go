@@ -221,3 +221,9 @@ func TestBatchADV_JSONRoundTrip(t *testing.T) {
 	// Validate the file still passes validation
 	require.NoError(t, read.Validate())
 }
+
+func TestBatchADV_InvalidEntriesCreditSummary(t *testing.T) {
+	batch := mockBatchADV(t)
+	batch.ADVEntries[0].TransactionCode = CreditSummary
+	require.Empty(t, batch.InvalidEntries())
+}
