@@ -32,3 +32,14 @@ func TestUSAbbrev(t *testing.T) {
 		t.Error("XX is not a valid US state or territory")
 	}
 }
+
+func TestUSAbbrevCaseInsensitive(t *testing.T) {
+	for _, code := range []string{"ca", "Ny", "ut"} {
+		if !Valid(code) {
+			t.Errorf("expected %q to be valid", code)
+		}
+	}
+	if Valid("ZZ") || Valid("zz") {
+		t.Error("expected ZZ to be invalid")
+	}
+}
