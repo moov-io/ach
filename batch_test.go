@@ -2062,3 +2062,47 @@ func TestBatch_ValidateTotals(t *testing.T) {
 		require.Contains(t, err.Error(), "TotalDebitEntryDollarAmount")
 	})
 }
+
+func TestBatch__RecreateWithDebitAndCreditOffsets(t *testing.T) {
+	f := mockFilePPD(t)
+	b, ok := f.Batches[0].(*BatchPPD)
+	require.True(t, ok)
+	b.Header.ServiceClassCode = MixedDebitsAndCredits
+	b.Entries[0].TransactionCode = SavingsDebit
+	b.WithOffset(&Offset{
+		RoutingNumber: "121042882",
+		AccountNumber: "123456789",
+		AccountType:   OffsetSavings,
+		Description:   "test offset",
+	})
+
+	ed := mockEntryDetail()
+	ed.Amount = 500
+	ed.TraceNumber = strconv.Itoa(lastTraceNumber([]*EntryDetail{ed}) + 1)
+	b.AddEntry(ed)
+
+	for i := 0; i < 2; i++ {
+		require.NoError(t, b.Create())
+		require.Len(t, b.Entries, 4)
+
+		var debitOffsets, creditOffsets int
+		for _, e := range b.Entries {
+			if e.IndividualName != offsetIndividualName {
+				continue
+			}
+			switch e.TransactionCode {
+			case SavingsDebit:
+				debitOffsets++
+				require.Equal(t, 500, e.Amount)
+			case SavingsCredit:
+				creditOffsets++
+				require.Equal(t, 100000000, e.Amount)
+			}
+		}
+		require.Equal(t, 1, debitOffsets)
+		require.Equal(t, 1, creditOffsets)
+		require.Equal(t, 4, b.Control.EntryAddendaCount)
+		require.Equal(t, 100000500, b.Control.TotalDebitEntryDollarAmount)
+		require.Equal(t, 100000500, b.Control.TotalCreditEntryDollarAmount)
+	}
+}
