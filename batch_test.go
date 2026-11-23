@@ -2078,7 +2078,7 @@ func TestBatch__RecreateWithDebitAndCreditOffsets(t *testing.T) {
 
 	ed := mockEntryDetail()
 	ed.Amount = 500
-	ed.TraceNumber = strconv.Itoa(lastTraceNumber([]*EntryDetail{ed}) + 1)
+	ed.TraceNumber = strconv.Itoa(lastTraceNumber(b.Entries) + 1)
 	b.AddEntry(ed)
 
 	for i := 0; i < 2; i++ {
