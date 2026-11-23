@@ -60,6 +60,8 @@ func TestValidators__isCreditCardYear(t *testing.T) {
 		// valid
 		"20": true,
 		"19": true,
+		"18": true,
+		"50": true,
 	}
 	v := validator{}
 	for yy, valid := range cases {
