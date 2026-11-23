@@ -342,3 +342,27 @@ func TestFlattenFile_ValidationPropagationFailsWithoutOpts(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "IndividualName")
 }
+
+func TestFlatten_DifferentEffectiveDatesStaySeparate(t *testing.T) {
+	file := NewFile()
+	file.SetHeader(mockFileHeader())
+
+	h1 := mockBatchPPDHeader()
+	h1.EffectiveEntryDate = "300101"
+	h2 := mockBatchPPDHeader()
+	h2.EffectiveEntryDate = "300102"
+
+	for i, h := range []*BatchHeader{h1, h2} {
+		b := NewBatchPPD(h)
+		e := mockPPDEntryDetail()
+		e.SetTraceNumber(h.ODFIIdentification, i+1)
+		b.AddEntry(e)
+		require.NoError(t, b.Create())
+		file.AddBatch(b)
+	}
+	require.NoError(t, file.Create())
+
+	flat, err := Flatten(file)
+	require.NoError(t, err)
+	require.Len(t, flat.Batches, 2)
+}
