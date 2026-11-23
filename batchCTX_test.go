@@ -611,3 +611,19 @@ func TestBatchCTX_JSON_RoundTrip(t *testing.T) {
 		require.ElementsMatch(t, ied, red, "batch[%d]", i)
 	}
 }
+
+// TestBatchCTXInvalidEntries_Addenda99Counted ensures an Addenda99 is included in the
+// addenda count, so the only problem reported is the misplaced Addenda99 itself.
+func TestBatchCTXInvalidEntries_Addenda99Counted(t *testing.T) {
+	batch := NewBatchCTX(mockBatchCTXHeader())
+	entry := mockCTXEntryDetail()
+	entry.AddAddenda05(mockAddenda05())
+	entry.Addenda99 = mockAddenda99()
+	entry.SetCATXAddendaRecords(2) // one Addenda05 + one Addenda99
+	entry.AddendaRecordIndicator = 1
+	batch.AddEntry(entry)
+
+	invalid := batch.InvalidEntries()
+	require.Len(t, invalid, 1)
+	require.True(t, base.Match(invalid[0].Error, ErrBatchAddendaCategory), "%v", invalid[0].Error)
+}
