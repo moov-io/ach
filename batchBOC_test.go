@@ -410,3 +410,12 @@ func testBatchBOCMixedDebitsAndCreditsWithCreditTransCode(t testing.TB) {
 func TestMixedDebitsAndCreditsWithCreditTransCode(t *testing.T) {
 	testBatchBOCMixedDebitsAndCreditsWithCreditTransCode(t)
 }
+
+func TestBatchBOCAmountCapBoundary(t *testing.T) {
+	batch := mockBatchBOC(t)
+	batch.Entries[0].Amount = 2500000
+	require.NoError(t, batch.Create())
+
+	batch.Entries[0].Amount = 2500001
+	require.Error(t, batch.Create())
+}
