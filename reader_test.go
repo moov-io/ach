@@ -2394,3 +2394,21 @@ func TestReadRunes(t *testing.T) {
 		})
 	}
 }
+
+func TestReaderMaxLinesBoundary(t *testing.T) {
+	line := strings.Repeat(" ", 94) + "\n"
+
+	r := NewReader(strings.NewReader(strings.Repeat(line, 5)))
+	r.SetMaxLines(5)
+	_, err := r.Read()
+	if base.Has(err, ErrFileTooLong) {
+		t.Errorf("file with exactly maxLines lines was rejected: %v", err)
+	}
+
+	r = NewReader(strings.NewReader(strings.Repeat(line, 6)))
+	r.SetMaxLines(5)
+	_, err = r.Read()
+	if !base.Has(err, ErrFileTooLong) {
+		t.Errorf("expected ErrFileTooLong, got %v", err)
+	}
+}
