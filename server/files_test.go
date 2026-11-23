@@ -1804,3 +1804,40 @@ func TestSetMaxBodySizeIgnoresNonPositive(t *testing.T) {
 	SetMaxBodySize(-1)
 	require.Equal(t, defaultMaxBodySize, MaxBodySize())
 }
+
+func TestFiles__segmentFileIDEndpointSides(t *testing.T) {
+	repo := NewRepositoryInMemory(testTTLDuration, log.NewNopLogger())
+	svc := NewService(repo)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
+
+	bs, err := os.ReadFile(filepath.Join("..", "test", "testdata", "ppd-mixedDebitCredit-valid.json"))
+	require.NoError(t, err)
+	file, err := ach.FileFromJSON(bs)
+	require.NoError(t, err)
+	require.NoError(t, repo.StoreFile(file))
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", fmt.Sprintf("/files/%s/segment", file.ID), strings.NewReader(`{}`))
+	router.ServeHTTP(w, req)
+	require.Equal(t, http.StatusOK, w.Code)
+
+	var resp segmentedFilesResponse
+	require.NoError(t, json.NewDecoder(w.Body).Decode(&resp))
+	require.NotNil(t, resp.CreditFile)
+	require.NotNil(t, resp.DebitFile)
+
+	check := func(f *ach.File, want string) {
+		require.NotEmpty(t, f.Batches)
+		for _, b := range f.Batches {
+			for _, e := range b.GetEntries() {
+				require.Equal(t, want, e.CreditOrDebit())
+			}
+		}
+	}
+	check(resp.CreditFile, "C")
+	check(resp.DebitFile, "D")
+
+	stored, err := repo.FindFile(resp.CreditFileID)
+	require.NoError(t, err)
+	check(stored, "C")
+}
