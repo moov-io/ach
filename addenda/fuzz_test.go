@@ -69,7 +69,7 @@ func FuzzParseTXP(f *testing.F) {
 		require.NotPanics(t, func() {
 			rec, _ := ParseTXP(input)
 			if rec != nil {
-				rec.String()
+				_ = rec.String()
 			}
 		})
 	})
