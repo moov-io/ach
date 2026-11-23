@@ -894,3 +894,26 @@ func TestMergeFiles_DuplicateTraceInOneBatchSeparated(t *testing.T) {
 	require.Len(t, names, 2)
 	require.True(t, names["Other Guy"])
 }
+
+func TestMergeFiles_MaxLinesOverflowCountsNewBatch(t *testing.T) {
+	file := NewFile()
+	file.SetHeader(mockFileHeader())
+	bh := mockBatchPPDHeader()
+	batch := NewBatchPPD(bh)
+	for i := 0; i < 20; i++ {
+		ed := mockPPDEntryDetail()
+		ed.SetTraceNumber(bh.ODFIIdentification, i+1)
+		batch.AddEntry(ed)
+	}
+	require.NoError(t, batch.Create())
+	file.AddBatch(batch)
+	require.NoError(t, file.Create())
+
+	const maxLines = 10
+	out, err := MergeFilesWith([]*File{file}, Conditions{MaxLines: maxLines})
+	require.NoError(t, err)
+	require.Greater(t, len(out), 2)
+	for _, f := range out {
+		require.LessOrEqual(t, lineCount(f), maxLines)
+	}
+}
