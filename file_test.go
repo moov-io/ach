@@ -3081,3 +3081,33 @@ func TestFile__SegmentFilePreservesFileHeaderCodes(t *testing.T) {
 		})
 	}
 }
+
+func TestSegmentFileMixedBatchLoanDebit(t *testing.T) {
+	file := NewFile()
+	file.SetHeader(mockFileHeader())
+
+	batch := NewBatchPPD(mockBatchPPDHeader2())
+	credit := mockPPDEntryDetail2()
+	batch.AddEntry(credit)
+	debit := mockPPDEntryDetail2()
+	debit.TransactionCode = LoanDebit
+	debit.Amount = 2500
+	debit.SetTraceNumber(mockBatchPPDHeader2().ODFIIdentification, 2)
+	batch.AddEntry(debit)
+	require.NoError(t, batch.Create())
+	file.AddBatch(batch)
+	require.NoError(t, file.Create())
+
+	creditFile, debitFile, err := file.SegmentFile(NewSegmentFileConfiguration())
+	require.NoError(t, err)
+
+	require.Len(t, creditFile.Batches, 1)
+	require.Len(t, creditFile.Batches[0].GetEntries(), 1)
+
+	require.Len(t, debitFile.Batches, 1)
+	entries := debitFile.Batches[0].GetEntries()
+	require.Len(t, entries, 1)
+	require.Equal(t, LoanDebit, entries[0].TransactionCode)
+	require.Equal(t, 2500, entries[0].Amount)
+	require.Equal(t, 2500, debitFile.Control.TotalDebitEntryDollarAmountInFile)
+}
