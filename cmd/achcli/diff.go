@@ -14,11 +14,12 @@ import (
 	"strings"
 
 	"github.com/moov-io/ach"
+	"github.com/moov-io/ach/cmd/achcli/describe/mask"
 
 	"github.com/juju/ansiterm"
 )
 
-func diffFiles(paths []string, validateOpts *ach.ValidateOpts) error {
+func diffFiles(paths []string, validateOpts *ach.ValidateOpts, maskOpts mask.Options) error {
 	if len(paths) != 2 {
 		return fmt.Errorf("expected 2 files, but got %d", len(paths))
 	}
@@ -26,7 +27,7 @@ func diffFiles(paths []string, validateOpts *ach.ValidateOpts) error {
 	if err != nil {
 		return err
 	}
-	return writeDiff(os.Stdout, paths, f1, f2, stdoutIsTTY())
+	return writeDiff(os.Stdout, paths, f1, f2, stdoutIsTTY(), maskOpts)
 }
 
 func readTwoFiles(paths []string, validateOpts *ach.ValidateOpts) (*ach.File, *ach.File, error) {
@@ -46,9 +47,9 @@ func stdoutIsTTY() bool {
 	return err == nil && fi.Mode()&os.ModeCharDevice != 0
 }
 
-func writeDiff(out io.Writer, paths []string, f1, f2 *ach.File, color bool) error {
+func writeDiff(out io.Writer, paths []string, f1, f2 *ach.File, color bool, maskOpts mask.Options) error {
 	var buf bytes.Buffer
-	d := &differ{out: &buf, color: color, left: paths[0], right: paths[1], needBlank: true}
+	d := &differ{out: &buf, color: color, left: paths[0], right: paths[1], needBlank: true, mask: maskOpts}
 	d.diff(f1, f2)
 	if buf.Len() == 0 {
 		return nil
@@ -75,6 +76,18 @@ type differ struct {
 	left      string
 	right     string
 	needBlank bool
+
+	// mask hides sensitive values when they are printed. Fields are still
+	// compared on their raw values, so a difference is never hidden.
+	mask mask.Options
+	// sec is the SEC code of the batch being compared, used to mask
+	// ENR and DNE payment information in Addenda05 records.
+	sec string
+}
+
+// child returns a differ writing to out with the same settings as d.
+func (d *differ) child(out io.Writer) *differ {
+	return &differ{out: out, color: d.color, left: d.left, right: d.right, mask: d.mask, sec: d.sec}
 }
 
 func (d *differ) diff(f1, f2 *ach.File) {
@@ -104,7 +117,7 @@ func (d *differ) section(title string, cols []col) {
 		return
 	}
 	d.heading(title)
-	d.tableBoth("  ", differing(cols))
+	d.tableBoth("  ", d.masked(differing(cols)))
 }
 
 func indentOf(title string) string {
@@ -145,6 +158,91 @@ func differing(cols []col) []col {
 	return out
 }
 
+// masked replaces the values of sensitive columns with their masked form,
+// following the same rules as achcli -mask when describing a file.
+func (d *differ) masked(cols []col) []col {
+	for i := range cols {
+		fn := d.maskFunc(cols[i].name)
+		if fn == nil {
+			continue
+		}
+		cols[i].left = maskValue(fn, cols[i].left)
+		cols[i].right = maskValue(fn, cols[i].right)
+	}
+	return cols
+}
+
+func (d *differ) maskFunc(name string) func(string) string {
+	switch name {
+	case "AccountNumber":
+		if d.mask.MaskAccountNumbers {
+			return mask.Number
+		}
+	case "Name":
+		if d.mask.MaskNames {
+			return mask.Name
+		}
+	case "IdentificationNumber":
+		if d.mask.MaskIdentification {
+			return mask.Number
+		}
+	case "CorrectedData":
+		if d.mask.MaskCorrectedData {
+			return mask.Number
+		}
+	case "PaymentRelatedInformation":
+		return d.maskPaymentInformation()
+	}
+	return nil
+}
+
+// maskPaymentInformation masks the account numbers, names and SSNs that ENR and
+// DNE batches carry in Addenda05 records.
+func (d *differ) maskPaymentInformation() func(string) string {
+	switch d.sec {
+	case ach.ENR:
+		if !d.mask.MaskNames && !d.mask.MaskAccountNumbers {
+			return nil
+		}
+		return func(v string) string {
+			info, err := ach.ParseENRPaymentInformation(&ach.Addenda05{PaymentRelatedInformation: v})
+			if err != nil || info == nil {
+				return v
+			}
+			if d.mask.MaskNames {
+				info.IndividualName = mask.Name(info.IndividualName)
+			}
+			if d.mask.MaskAccountNumbers {
+				info.IndividualIdentification = mask.Number(info.IndividualIdentification)
+				info.DFIAccountNumber = mask.Number(info.DFIAccountNumber)
+			}
+			return info.String()
+		}
+	case ach.DNE:
+		if !d.mask.MaskNames && !d.mask.MaskAccountNumbers {
+			return nil
+		}
+		return func(v string) string {
+			info, err := ach.ParseDNEPaymentInformation(&ach.Addenda05{PaymentRelatedInformation: v})
+			if err != nil || info == nil {
+				return v
+			}
+			info.CustomerSSN = mask.Number(info.CustomerSSN)
+			return info.String()
+		}
+	}
+	return nil
+}
+
+// maskValue leaves empty values empty, so a field that is only set on one
+// side does not look set on both.
+func maskValue(fn func(string) string, v string) string {
+	if v == "" {
+		return v
+	}
+	return fn(v)
+}
+
 func names(cols []col) []string {
 	out := make([]string, len(cols))
 	for i, c := range cols {
@@ -166,7 +264,7 @@ func sides(cols []col, right bool) []string {
 }
 
 func (d *differ) oneOrBoth(indent string, leftNil, rightNil bool, cols []col) {
-	cols = differing(cols)
+	cols = d.masked(differing(cols))
 	if len(cols) == 0 {
 		return
 	}

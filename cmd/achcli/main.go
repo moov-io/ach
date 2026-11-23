@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/moov-io/ach"
+	"github.com/moov-io/ach/cmd/achcli/describe/mask"
 	"github.com/moov-io/ach/cmd/achcli/fix"
 )
 
@@ -105,7 +106,7 @@ func main() {
 	// pick our command to do
 	switch {
 	case *flagDiff:
-		if err := diffFiles(args, validateOpts); err != nil {
+		if err := diffFiles(args, validateOpts, maskOptions()); err != nil {
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)
 		}
@@ -140,6 +141,15 @@ func main() {
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)
 		}
+	}
+}
+
+// maskOptions returns which values -mask and the -mask.* flags hide.
+func maskOptions() mask.Options {
+	return mask.Options{
+		MaskAccountNumbers: *flagMask || *flagMaskAccounts,
+		MaskCorrectedData:  *flagMask || *flagMaskCorrectedData,
+		MaskNames:          *flagMask || *flagMaskNames,
 	}
 }
 

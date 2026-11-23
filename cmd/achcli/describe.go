@@ -11,7 +11,6 @@ import (
 
 	"github.com/moov-io/ach"
 	"github.com/moov-io/ach/cmd/achcli/describe"
-	"github.com/moov-io/ach/cmd/achcli/describe/mask"
 )
 
 func dumpFiles(paths []string, validateOpts *ach.ValidateOpts) error {
@@ -56,11 +55,7 @@ func dumpFiles(paths []string, validateOpts *ach.ValidateOpts) error {
 		}
 		if files[i] != nil {
 			describe.File(os.Stdout, files[i], &describe.Opts{
-				Options: mask.Options{
-					MaskAccountNumbers: *flagMask || *flagMaskAccounts,
-					MaskCorrectedData:  *flagMask || *flagMaskCorrectedData,
-					MaskNames:          *flagMask || *flagMaskNames,
-				},
+				Options:       maskOptions(),
 				PrettyAmounts: *flagPretty || *flagPrettyAmounts,
 			})
 		} else {
