@@ -870,3 +870,27 @@ func TestMergeFiles_NoEntriesLostOnSplit(t *testing.T) {
 	}
 	require.Equal(t, wantTraces, gotTraces, "merge split dropped or duplicated entries")
 }
+
+func TestMergeFiles_DuplicateTraceInOneBatchSeparated(t *testing.T) {
+	f, err := readACHFilepath(filepath.Join("test", "testdata", "ppd-debit.ach"))
+	require.NoError(t, err)
+
+	dup := *f.Batches[0].GetEntries()[0]
+	dup.IndividualName = "Other Guy"
+	f.Batches[0].AddEntry(&dup)
+	require.Len(t, f.Batches[0].GetEntries(), 2)
+
+	merged, err := MergeFiles([]*File{f})
+	require.NoError(t, err)
+	require.Len(t, merged, 1)
+	require.Len(t, merged[0].Batches, 2)
+
+	names := make(map[string]bool)
+	for _, b := range merged[0].Batches {
+		for _, e := range b.GetEntries() {
+			names[e.IndividualName] = true
+		}
+	}
+	require.Len(t, names, 2)
+	require.True(t, names["Other Guy"])
+}
