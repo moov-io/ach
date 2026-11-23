@@ -139,3 +139,11 @@ func TestAddenda99Contested__Read(t *testing.T) {
 	require.Equal(t, "68", addenda.DishonoredReturnReasonCode)
 	require.Equal(t, "364275034310088", addenda.TraceNumber)
 }
+
+func TestAddenda99Contested__R77Accepted(t *testing.T) {
+	addenda99 := mockAddenda99Contested()
+	addenda99.ContestedReturnCode = "R77"
+
+	require.NoError(t, addenda99.Validate())
+	require.True(t, IsContestedReturnCode("R77"))
+}
