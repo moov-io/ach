@@ -40,3 +40,13 @@ func TestRead(t *testing.T) {
 }
 
 func ptr[T any](in T) *T { return &in }
+
+func TestFilepath_SkipAllFalseValidates(t *testing.T) {
+	path := filepath.Join("..", "..", "..", "..", "test", "testdata", "ppd-debit-invalid-entryDetail-checkDigit.ach")
+
+	_, _, err := read.Filepath(path, nil, ptr(false))
+	require.Error(t, err)
+
+	_, _, err = read.Filepath(path, nil, ptr(true))
+	require.NoError(t, err)
+}
