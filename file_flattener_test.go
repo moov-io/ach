@@ -148,12 +148,30 @@ func TestFlattenFile(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.label, func(t *testing.T) {
-			inputRaw, _ := os.Open(filepath.Join("test", "testdata", testCase.inputFixtureName))
-			inputFile, _ := NewReader(inputRaw).Read()
+			inputRaw, err := os.Open(filepath.Join("test", "testdata", testCase.inputFixtureName))
+			require.NoError(t, err)
+			defer inputRaw.Close()
+			inputFile, err := NewReader(inputRaw).Read()
+			require.NoError(t, err)
+
+			batchNumbers := func(file *File) []int {
+				numbers := make([]int, 0, len(file.Batches)+len(file.IATBatches))
+				for _, batch := range file.Batches {
+					numbers = append(numbers, batch.GetHeader().BatchNumber)
+				}
+				for _, batch := range file.IATBatches {
+					numbers = append(numbers, batch.Header.BatchNumber)
+				}
+				return numbers
+			}
+			inputBatchNumbers := batchNumbers(&inputFile)
 
 			flattenedFile, err := Flatten(&inputFile)
-			if err != nil {
-				require.NoError(t, err)
+			require.NoError(t, err)
+
+			require.Equal(t, inputBatchNumbers, batchNumbers(&inputFile))
+			if testCase.inputFixtureName == "flattenBatchesMultipleBatchHeaders.ach" {
+				require.NoError(t, inputFile.Validate())
 			}
 
 			inputFileStructureJson, _ := json.MarshalIndent(getFileStructure(&inputFile), "", "  ")

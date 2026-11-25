@@ -197,7 +197,8 @@ func (m mergeableBatcher) Consume(mergeableToConsume mergeable) error {
 }
 
 func (m mergeableBatcher) Copy() mergeable {
-	newBatcher, _ := NewBatch(m.batcher.GetHeader())
+	header := *m.batcher.GetHeader()
+	newBatcher, _ := NewBatch(&header)
 	newMergeable := mergeableBatcher{newBatcher, nil}
 	newMergeable.Consume(m)
 
@@ -278,7 +279,8 @@ func (m mergeableIATBatch) Consume(mergeableToConsume mergeable) error {
 }
 
 func (m mergeableIATBatch) Copy() mergeable {
-	newIATBatch := NewIATBatch(m.iatBatch.Header)
+	header := *m.iatBatch.Header
+	newIATBatch := NewIATBatch(&header)
 	newMergeable := mergeableIATBatch{&newIATBatch, nil}
 	newMergeable.Consume(m)
 
