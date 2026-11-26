@@ -26,6 +26,7 @@ import (
 	"testing"
 
 	"github.com/igrmk/treemap/v2"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -915,5 +916,39 @@ func TestMergeFiles_MaxLinesOverflowCountsNewBatch(t *testing.T) {
 	require.Greater(t, len(out), 2)
 	for _, f := range out {
 		require.LessOrEqual(t, lineCount(f), maxLines)
+	}
+}
+
+func TestMergeFiles_PreserveBatchNumbersOnOverflow(t *testing.T) {
+	for _, tt := range []struct {
+		name     string
+		fixture  string
+		maxLines int
+	}{
+		{"PPD", "ppd-mixedDebitCredit.ach", 5},
+		{"IAT", "iat-mixedDebitCredit.ach", 15},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			file, err := readACHFilepath(filepath.Join("test", "testdata", tt.fixture))
+			require.NoError(t, err)
+			opts := &ValidateOpts{PreserveBatchNumbers: true}
+			file.SetValidation(opts)
+
+			out, err := MergeFilesWith([]*File{file}, Conditions{MaxLines: tt.maxLines})
+			require.NoError(t, err)
+			require.Greater(t, len(out), 1)
+			for i, f := range out {
+				require.Equal(t, 1, len(f.Batches)+len(f.IATBatches))
+				for _, batch := range f.Batches {
+					assert.Equal(t, i+1, batch.GetHeader().BatchNumber)
+					assert.Equal(t, i+1, batch.GetControl().BatchNumber)
+				}
+				for _, batch := range f.IATBatches {
+					assert.Equal(t, i+1, batch.GetHeader().BatchNumber)
+					assert.Equal(t, i+1, batch.GetControl().BatchNumber)
+				}
+				require.Equal(t, opts, f.GetValidation(), "output file %d", i+1)
+			}
+		})
 	}
 }
