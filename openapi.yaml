@@ -933,12 +933,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Batch'
-          minItems: 1
         IATBatches:
           type: array
           items:
             $ref: '#/components/schemas/IATBatch'
-          minItems: 1
         fileControl:
           $ref: '#/components/schemas/FileControl'
         advEntryDetails:
@@ -949,8 +947,6 @@ components:
           $ref: '#/components/schemas/ADVBatchControl'
       required:
         - fileHeader
-        - batches
-        - IATBatches
     CreateFileResponse:
       properties:
         id:
@@ -1064,7 +1060,7 @@ components:
           format: "HHmm"
           example: "1504"
         fileCreationDate:
-          description: 'The File Creation Date is the date when the file was prepared by an ODFI. (Format YYMMDD - Y=Year, M=Month, D=Day)'
+          description: 'The File Creation Date is the date when the file was prepared by an ODFI. (Format YYMMDD - Y=Year, M=Month, D=Day). If fileCreationDate and fileCreationTime are both empty, the server sets them to the current date and time.'
           type: string
           format: "YYMMDD"
           example: "190102"
@@ -1085,7 +1081,6 @@ components:
       required:
         - immediateOrigin
         - immediateDestination
-        - fileCreationDate
     FileControl:
       properties:
         id:

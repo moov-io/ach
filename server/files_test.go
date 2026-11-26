@@ -1359,6 +1359,48 @@ func TestFiles__CreateFileEndpointJSONErr(t *testing.T) {
 	}
 }
 
+func TestFiles__CreateFileEndpointOmitsOptionalFields(t *testing.T) {
+	bs, err := os.ReadFile(filepath.Join("..", "test", "testdata", "ppd-valid.json"))
+	require.NoError(t, err)
+
+	var raw map[string]any
+	require.NoError(t, json.Unmarshal(bs, &raw))
+	delete(raw, "IATBatches")
+	header, ok := raw["fileHeader"].(map[string]any)
+	require.True(t, ok)
+	delete(header, "fileCreationDate")
+	delete(header, "fileCreationTime")
+
+	body, err := json.Marshal(raw)
+	require.NoError(t, err)
+
+	logger := log.NewNopLogger()
+	repo := NewRepositoryInMemory(testTTLDuration, logger)
+	svc := NewService(repo)
+	router := MakeHTTPHandler(svc, repo, kitlog.NewNopLogger())
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", "/files/create", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "text/plain")
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusOK, w.Code, w.Body.String())
+
+	var resp struct {
+		ID   string    `json:"id"`
+		File *ach.File `json:"file"`
+		Err  string    `json:"error"`
+	}
+	require.NoError(t, json.NewDecoder(w.Body).Decode(&resp))
+	require.Empty(t, resp.Err)
+	require.NotEmpty(t, resp.ID)
+	require.NotNil(t, resp.File)
+	require.Empty(t, resp.File.IATBatches)
+	require.NotEmpty(t, resp.File.Header.FileCreationDate)
+	require.NotEmpty(t, resp.File.Header.FileCreationTime)
+}
+
 // TestFiles_segmentFileIDEndpointError tests segmentFileIDEndpoints
 func TestFiles__segmentFileIDEndpointError(t *testing.T) {
 	logger := log.NewNopLogger()

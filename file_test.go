@@ -3111,3 +3111,29 @@ func TestSegmentFileMixedBatchLoanDebit(t *testing.T) {
 	require.Equal(t, 2500, entries[0].Amount)
 	require.Equal(t, 2500, debitFile.Control.TotalDebitEntryDollarAmountInFile)
 }
+
+func TestFileFromJSON_OmitsOptionalCreateFields(t *testing.T) {
+	bs, err := os.ReadFile(filepath.Join("test", "testdata", "ppd-valid.json"))
+	require.NoError(t, err)
+
+	var raw map[string]any
+	require.NoError(t, json.Unmarshal(bs, &raw))
+	delete(raw, "IATBatches")
+
+	header, ok := raw["fileHeader"].(map[string]any)
+	require.True(t, ok)
+	delete(header, "fileCreationDate")
+	delete(header, "fileCreationTime")
+
+	out, err := json.Marshal(raw)
+	require.NoError(t, err)
+
+	file, err := FileFromJSON(out)
+	require.NoError(t, err)
+	require.NotNil(t, file)
+	require.Empty(t, file.IATBatches)
+	require.NotEmpty(t, file.Header.FileCreationDate)
+	require.NotEmpty(t, file.Header.FileCreationTime)
+	require.NoError(t, file.Create())
+	require.NoError(t, file.Validate())
+}
