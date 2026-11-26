@@ -491,6 +491,15 @@ type outFile struct {
 	next *outFile
 }
 
+func (outf *outFile) newFile() *File {
+	file := NewFile()
+	file.Header = outf.header
+	if outf.validateOpts != nil {
+		file.SetValidation(outf.validateOpts)
+	}
+	return file
+}
+
 func (outf *outFile) add(incoming *File) error {
 	outFile := pickOutFile(incoming.Header, outf)
 	if outFile == nil {
@@ -581,12 +590,7 @@ func convertToFiles(sorted *outFile, conditions Conditions) ([]*File, error) {
 			break
 		}
 
-		file := NewFile()
-		file.Header = sorted.header
-
-		if sorted.validateOpts != nil {
-			file.SetValidation(sorted.validateOpts)
-		}
+		file := sorted.newFile()
 
 		currentFileLineCount := 2 // FileHeader, FileControl
 		// NACHA enforces separate debit and credit file totals (each up to MaxDollarAmount),
@@ -662,8 +666,7 @@ func convertToFiles(sorted *outFile, conditions Conditions) ([]*File, error) {
 				currentFileCreditAmount = 0
 
 				// Create the new file and batch
-				file = NewFile()
-				file.Header = sorted.header
+				file = sorted.newFile()
 
 				batchNumber += 1
 				batch, err = NewBatch(&BatchHeader{ // don't let BatchHeader escape and mutate
@@ -773,8 +776,7 @@ func convertToFiles(sorted *outFile, conditions Conditions) ([]*File, error) {
 				currentFileCreditAmount = 0
 
 				// Create the new file and batch
-				file = NewFile()
-				file.Header = sorted.header
+				file = sorted.newFile()
 
 				batchNumber += 1
 				iatBh = &IATBatchHeader{
