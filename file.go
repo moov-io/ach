@@ -1537,7 +1537,6 @@ func (f *File) segmentFileIATBatches(creditFile, debitFile *File) {
 
 			entries := iatb.GetEntries()
 			for _, IATEntry := range entries {
-				IATEntry.TraceNumber = "" // unset so Batch.build generates a TraceNumber
 				switch IATEntry.TransactionCode {
 				case CheckingCredit, CheckingReturnNOCCredit, CheckingPrenoteCredit, CheckingZeroDollarRemittanceCredit,
 					SavingsCredit, SavingsReturnNOCCredit, SavingsPrenoteCredit, SavingsZeroDollarRemittanceCredit,
