@@ -3020,6 +3020,47 @@ func TestFile__SegmentFileIATPreservesPaymentInstructions(t *testing.T) {
 	}
 }
 
+func TestFile__SegmentFileIATKeepsTraceNumbers(t *testing.T) {
+	f, err := os.Open(filepath.Join("test", "testdata", "iat-mixedDebitCredit.ach"))
+	require.NoError(t, err)
+	defer f.Close()
+
+	achFile, err := NewReader(f).Read()
+	require.NoError(t, err)
+
+	// Use trace numbers which differ from what Create would generate
+	entries := achFile.IATBatches[0].GetEntries()
+	for i, entry := range entries {
+		entry.SetTraceNumber(achFile.IATBatches[0].GetHeader().ODFIIdentification, 100+i)
+	}
+	require.NoError(t, achFile.IATBatches[0].Create())
+	require.NoError(t, achFile.Create())
+
+	var expected []string
+	for _, entry := range entries {
+		expected = append(expected, entry.TraceNumber)
+	}
+
+	creditFile, debitFile, err := achFile.SegmentFile(NewSegmentFileConfiguration())
+	require.NoError(t, err)
+
+	var original []string
+	for _, entry := range achFile.IATBatches[0].GetEntries() {
+		original = append(original, entry.TraceNumber)
+	}
+	require.Equal(t, expected, original)
+
+	var segmented []string
+	for _, file := range []*File{creditFile, debitFile} {
+		require.Len(t, file.IATBatches, 1)
+		for _, entry := range file.IATBatches[0].GetEntries() {
+			segmented = append(segmented, entry.TraceNumber)
+			require.Equal(t, entry.TraceNumber[8:], fmt.Sprintf("%07d", entry.Addenda10.EntryDetailSequenceNumber))
+		}
+	}
+	require.ElementsMatch(t, expected, segmented)
+}
+
 func TestFileValidate_IATBatches(t *testing.T) {
 	for _, invalid := range []bool{false, true} {
 		t.Run(fmt.Sprintf("invalid=%v", invalid), func(t *testing.T) {
